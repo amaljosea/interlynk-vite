@@ -1,5 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { Box, Button, FormLabel, Select, SimpleGrid, Stack, Table, Tbody, Text, Textarea, Th, Thead, Tr, Flex, FormControl, Checkbox } from '@chakra-ui/react'
+import { InfoIcon } from '@chakra-ui/icons'
+import { Box, Button, FormLabel, Select, SimpleGrid, Stack, Table, Tbody, Text, Textarea, Th, Thead, Tr, Flex, FormControl, Checkbox, useDisclosure, Icon } from '@chakra-ui/react'
+import InfoModal from 'components/InfoModal'
 import VulLinkRow from 'components/Tables/VulLinkRow'
 import { updateCompVulnVex } from 'graphQL/Mutation'
 import { getVexStatuses, getVexJustifications, GetCdxResponses } from 'graphQL/Queries'
@@ -7,6 +9,15 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { capitalizeFirstLetter } from 'utils'
+
+const InfoLabel = ({ title, name, onClick }) => {
+  return (
+    <Flex flexDirection={'row'} alignItems={'center'} gap={2} mb={1}>
+      <FormLabel m={0} p={0} fontSize='sm' color={'gray.600'} htmlFor={name}>{title}</FormLabel>
+      <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onClick} />
+    </Flex>
+  )
+}
 
 const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const location = useLocation()
@@ -25,6 +36,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
 
   const { id, componentVulnLogs } = data
 
+  const {isOpen, onOpen, onClose} = useDisclosure()
+
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
   const [justification, setJustification] = useState('')
@@ -39,9 +52,68 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const [upstream, setUpstream] = useState(false)
   const [statusResults, setStatusResults] = useState([])
   const [newVulnLogs, setNewVulnLogs] = useState([])
+  const [infoHeading, setInfoHeading] = useState('')
+  const [infoText, setInfoText] = useState('')
+  const [infoUrl, setInfoUrl] = useState('')
 
   const { data: allVexStatus } = useQuery(getVexStatuses, {skip: signedUrlParams})
   const { data: allVexJustify } = useQuery(getVexJustifications, {skip: signedUrlParams})
+
+  const onCheckStatus = () => {
+    setInfoHeading(`Status`)
+    setInfoText(`Declares the current state of an occurrence of a vulnerability, after automated or manual analysis.`)
+    setInfoUrl(``)
+    onOpen()
+  }
+
+  const onCheckJustify = () => {
+    setInfoHeading(`Justification`)
+    setInfoText(`...`)
+    setInfoUrl(``)
+    onOpen()
+  }
+
+  const onCheckResponse = () => {
+    setInfoHeading(`Response`)
+    setInfoText(`A response to the vulnerability by the manufacturer, supplier, or project responsible for the affected component or service. Responses are strongly encouraged for vulnerabilities where the analysis state is exploitable.`)
+    setInfoUrl(``)
+    onOpen()
+  }
+
+  const onCheckFixedVersion = () => {
+    setInfoHeading(`Fixed Version`)
+    setInfoText(`...`)
+    setInfoUrl(``)
+    onOpen()
+  }
+
+  const onCheckImpact = () => {
+    setInfoHeading(`Impact Statement`)
+    setInfoText(`...`)
+    setInfoUrl(``)
+    onOpen()
+  }
+
+  const onCheckAction = () => {
+    setInfoHeading(`Action Statement`)
+    setInfoText(`...`)
+    setInfoUrl(``)
+    onOpen()
+  }
+
+  const onCheckDetails = () => {
+    setInfoHeading(`Details`)
+    setInfoText(`Detailed description of the impact including methods used during assessment. If a vulnerability is not exploitable, this field should include specific details on why the component or service is not impacted by this vulnerability.`)
+    setInfoUrl(``)
+    onOpen()
+  }
+
+  const onCheckNotes = () => {
+    setInfoHeading(`Internal Notes`)
+    setInfoText(`...`)
+    setInfoUrl(``)
+    onOpen()
+  }
 
   const handleRefetch = async () => {
     const epssRange = (epss !== '' || epss !== '0-0') && epss.split('-')
@@ -170,14 +242,15 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   }, [componentVulnLogs])
 
   return (
+    <>
     <Stack spacing='24px'>
       <Box>
         <SimpleGrid row={5} spacing={4}>
           {!signedUrlParams && (
             <>
               {/* STATUS */}
-              <FormControl>
-                <FormLabel htmlFor='vexType' fontSize='sm' color={'gray.600'}>Status</FormLabel>
+              <FormControl isRequired>
+                <InfoLabel title={'Status'} name={'vexType'} onClick={onCheckStatus} />
                 <Select id='vexType' name='vexType' fontSize='sm' value={statusTitle} onChange={handleStatusChange}>
                   <option value=''>-- Select Status --</option>
                   {allVexStatus ? (
@@ -192,10 +265,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               {/* JUSTIFICATION */}
               {(statusName === 'Not Affected' ||
                 statusName === 'False Positive') && (
-                <FormControl>
-                  <FormLabel htmlFor='justification' fontSize='sm' color='gray.600'>
-                    Justification
-                  </FormLabel>
+                <FormControl isRequired={statusName === 'Not Affected' || statusName === 'False Positive'}>
+                  <InfoLabel title={'Justification'} name={justification} onClick={onCheckJustify} />
                   <Select id='justification' name='justification' value={justification} onChange={handleJustifyChange} fontSize='sm' color='gray.600'>
                     <option value=''>-- Select --</option>
                     {allVexJustify ? (
@@ -210,8 +281,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               )}
               {/* RESPONSE */}
               {statusName === 'Affected' && (
-                <FormControl>
-                  <FormLabel htmlFor='response' fontSize='sm' color='gray.600'>Response</FormLabel>
+                <FormControl isRequired={statusName === 'Affected'}>
+                  <InfoLabel title={'Response'} name={'response'} onClick={onCheckResponse} />
                   {res && (
                     <Select id='response' name='response' value={response} onChange={handleResponseChange} fontSize='sm' color='gray.600'>
                       <option value=''>-- Select --</option>
@@ -226,10 +297,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               {/* FIXED VERSION */}
               {statusName === 'Affected' && responseTitle === 'Update' && (
                 <Stack width={'100%'} direction={'column'} spacing={4} alignItems={'flex-start'}>
-                  <FormControl width={'100%'}>
-                    <FormLabel htmlFor='fixedVersion' fontSize='sm' color='gray.600'>
-                      Fixed Version
-                    </FormLabel>
+                  <FormControl width={'100%'} isRequired={responseTitle === 'Update'}>
+                    <InfoLabel title={'Fixed Version'} name={'fixedVersion'} onClick={onCheckFixedVersion} />
                     <Select id='fixedVersion' name='fixedVersion' value={selectedTag} onChange={(e) => setSelectedTag(e.target.value)} fontSize='sm' color='gray.600'>
                       <option value=''>-- Select --</option>
                       {fixedVersions.length > 0 ? (
@@ -246,34 +315,28 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               {/* IMPACT STATEMENT */}
               {(statusName === 'Not Affected' ||
                 statusName === 'False Positive') && (
-                <FormControl>
-                  <FormLabel htmlFor='impactStatement' fontSize='sm' color='gray.600'>
-                    Impact Statement
-                  </FormLabel>
+                <FormControl isRequired={(statusName === 'Not Affected' && justifyName === 'Other (impact statment required)') || (statusName === 'False Positive' && justifyName === 'Other (impact statment required)')}>
+                  <InfoLabel title={'Impact Statement'} name={'impactStatement'} onClick={onCheckImpact} />
                   <Textarea type='text' name='impactStatement' rows={2} id='impactStatement' placeholder='Add impact statement' value={impactData} onChange={(e) => setImpactData(e.target.value)} fontSize='sm' />
                 </FormControl>
               )}
               {/* ACTION STATEMENT */}
               {statusName === 'Affected' && (
-                <FormControl>
-                  <FormLabel htmlFor='actionStatement' fontSize='sm' color={'gray.600'}>
-                    Action Statement
-                  </FormLabel>
+                <FormControl isRequired={statusName === 'Affected'}>
+                  <InfoLabel title={'Action Statement'} name={'actionStatement'} onClick={onCheckAction} />
                   <Textarea rows={2} name='actionStatement' id='actionStatement' placeholder='Add statement' fontSize='sm' value={actionStatement} onChange={(e) => setActionStatement(e.target.value)} />
                 </FormControl>
               )}
               {/* DETAILS */}
               {(statusName === 'In Triage' || statusName === 'Affected') && (
                 <FormControl>
-                  <FormLabel htmlFor='details' fontSize='sm' color={'gray.600'}>Details</FormLabel>
+                  <InfoLabel title={'Details'} name={'details'} onClick={onCheckDetails} />
                   <Textarea rows={2} name='details' id='details' placeholder='Add details' fontSize='sm' value={details} onChange={(e) => setDetails(e.target.value)} />
                 </FormControl>
               )}
               {/* INTERNAL NOTES */}
               <FormControl>
-                <FormLabel htmlFor='internalNotes' fontSize='sm' color={'gray.600'}>
-                  Internal Notes
-                </FormLabel>
+                <InfoLabel title={'Internal Notes'} name={'internalNotes'} onClick={onCheckNotes} />
                 <Textarea rows={2} name='internalNotes' id='internalNotes' placeholder='Add notes' fontSize='sm' value={notes} onChange={(e) => setNotes(e.target.value)} />
               </FormControl>
               {/* UPSTERAM PRODUCT */}
@@ -322,6 +385,9 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
         </SimpleGrid>
       </Box>
     </Stack>
+     {/* INFO MODAL */}
+     {isOpen && <InfoModal isOpen={isOpen} onClose={onClose} heading={infoHeading} body={infoText} url={infoUrl} /> }
+    </>
   )
 }
 
