@@ -2154,7 +2154,7 @@ export const CreatePolicyRule = gql`
   mutation CreatePolicyRule(
     $policyId: Uuid!
     $operator: PolicyRuleOperatorEnum!
-    $value: String!
+    $value: String
     $subject: PolicyRuleSubjectEnum!
   ) {
     policyRuleCreate(
