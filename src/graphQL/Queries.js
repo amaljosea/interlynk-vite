@@ -3472,6 +3472,51 @@ export const PolicySubjectOperators = gql`
   }
 `
 
+// GET PROJECT POLICIES
+export const GetProjectPolicies = gql`
+  query GetProjectPolicies(
+    $projectId: Uuid!
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+  ) {
+    projectPolicies(
+      projectId: $projectId
+      after: $after
+      before: $before
+      first: $first
+      last: $last
+    ) {
+      totalCount
+      nodes {
+        createdAt
+        id
+        isExcluded
+        name
+        operator
+        organizationId
+        resultType
+        updatedAt
+        policyRules {
+          id
+          operator
+          policyId
+          subject
+          updatedAt
+          value
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+    }
+  }
+`
+
 // GET USER NOTIFICATIONS PREFRENCES
 
 export const GetUserNotificationPreferences = gql`
@@ -3479,5 +3524,3 @@ export const GetUserNotificationPreferences = gql`
     notificationPreferences(envId: $envId)
   }
 `
-
-

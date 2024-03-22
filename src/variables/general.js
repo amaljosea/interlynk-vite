@@ -2,6 +2,37 @@
 import { AiOutlineExclamation } from 'react-icons/ai'
 import { FaEye, FaThumbsUp, FaTools, FaBug, FaShare, FaGithub, FaArrowDown, FaArrowUp, FaFilePdf } from 'react-icons/fa'
 
+export const sagLabelTypes = [  "all", "Apple Trusted Product",  "CSA Verified Product",  "EUCC Certified Product",  "EU CE Mark",
+"Hitachi Trusted Product",  "Rockwell Automation Trusted Product",  "SAG Purl SWID Trusted Product",  "SAGScore",
+"SAG Trusted Artifact",  "SAG Trusted Internet Web API",  "SAG Trusted Product",  "SAG Trusted Software",  "SAG Trusted Web Site",
+"Standards Australia Trusted Product",  "Trust Bond",  "United Stated DOD Trusted Product",  "United States DHS Trusted Product",
+"United States DOE Trusted Product",  "United States FCC Trusted Product",  "United States FDA Trusted Product",
+"United States VA Trusted Product",  "U.S. Cyber Trust Mark",  "US DOE CyTRICS Tested Product"]
+
+export const sagCategories = [
+    "all",
+    "Internet Web Service API",
+    "IOT Digital Product, unspecified type",
+    "Smart Phone Product",
+    "Desktop Software Application",
+    "FIRMWARE",
+    "IOT Assistant Device",
+    "Smart Device Mobile Application",
+    "Software Bill of Materials",
+    "Enterprise Software Application",
+    "Battery Inverter Software",
+    "Video Surveillance Monitoring Software",
+    "Operating System",
+    "Solar Inverter Software",
+    "Wind Inverter Software",
+    "Software Vulnerability Disclosure Report",
+    "Smart TV product",
+    "Vendor Response File",
+    "Video Surveillance Camera",
+    "Internet Web Site",
+    "Wireless Camera IOT Product"
+]
+
 export const sagData = [
   {
     supplierName: 'Reliable Energy Analytics LLC',
@@ -55,6 +86,7 @@ export const sagData = [
     sagScore: 65.23,
     currentDate: '2024-03-14',
     category: 'Desktop Software Application',
+    link: 'https://softwareassuranceguardian.com/SAG-PM_VendorResponse_V1_2_2.xml',
     label: 'SAG Trusted Software'
   },
   {
@@ -82,7 +114,18 @@ export const sagData = [
     sagScore: 44.75,
     currentDate: '2024-03-10',
     category: 'Desktop Software Application',
+    link: 'https://softwareassuranceguardian.com/SAG-PM_VendorResponse_V1_2_2.xml',
     label: 'SAG Trusted Software'
+  },
+  {
+    supplierName: 'Interlynk',
+    productName: 'https://www.interlynk.io/',
+    productVersion: '2023-0320',
+    sagScore: 21.25,
+    currentDate: '2024-03-20',
+    category: 'Internet Web Site',
+    link: 'https://softwareassuranceguardian.com/SAG-PM_VendorResponse_V1_2_2.xml',
+    label: 'SAG Trusted Web Site'
   }
 ]
 

@@ -1,49 +1,9 @@
-import {
-  Flex,
-  Grid,
-  GridItem,
-  Icon,
-  IconButton,
-  Skeleton,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  Tooltip,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  UnorderedList,
-  ListItem,
-  Button,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuItemOption,
-  MenuOptionGroup,
-  MenuDivider
-} from '@chakra-ui/react'
+import { Flex, Grid, GridItem, Icon, IconButton, Skeleton, Stack, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Tooltip, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, UnorderedList, ListItem, Button } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import VersionsTable from 'components/Tables/VersionsTable'
-import { useEffect, useState } from 'react'
-import {
-  FaPenToSquare,
-  FaToggleOn,
-  FaUpload,
-  FaToggleOff,
-  FaWindowMaximize,
-  FaBoxArchive
-} from 'react-icons/fa6'
+import { useEffect, useMemo, useState } from 'react'
+import { FaPenToSquare, FaToggleOn, FaUpload, FaToggleOff, FaWindowMaximize, FaBoxArchive, } from 'react-icons/fa6'
 import { useLocation, useNavigate } from 'react-router-dom'
 import SBOM from 'views/Sbom'
 import ChangeLog from '../Changelog'
@@ -53,20 +13,9 @@ import UploadModal from './components/UploadModal'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client'
 import { DeleteProjectGroup } from 'graphQL/Mutation'
-import {
-  GetProjectCheck,
-  GetVulnData,
-  GetProjectLogs,
-  GetProjectSettings,
-  GetProjectGroup,
-  GetGlobalVulnData,
-  GetGlobalVulns
-} from 'graphQL/Queries'
+import { GetProjectCheck, GetVulnData, GetProjectLogs, GetProjectSettings, GetProjectGroup, GetGlobalVulnData, GetGlobalVulns } from 'graphQL/Queries'
 import Settings from '../ProductSettings'
-import CardHeader from 'components/Card/CardHeader'
-import { ChevronDownIcon, ViewIcon } from '@chakra-ui/icons'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
-import { isDefaultEnv, filterEnvList } from 'utils'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import StatusModal from './components/StatusModal'
 import VulnInfo from '../Vulnerabilities/vulnInfo'
@@ -82,36 +31,10 @@ const ProductDetails = () => {
   const vulnId = queryParams.get('vulnId')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const {
-    totalRows,
-    activeProdTab,
-    setActiveProdTab,
-    prodLogState,
-    prodVulnState,
-    prodRulesState,
-    globalVulnState,
-    compVulnState,
-    dispatch,
-    userPermissions
-  } = useGlobalState()
+  const { totalRows, activeProdTab, setActiveProdTab, prodLogState, prodVulnState, prodRulesState, globalVulnState, compVulnState, dispatch, userPermissions } = useGlobalState()
   const { field, direction, searchInput, type, user, object } = prodLogState
-  const {
-    searchInput: compVulnSearch,
-    envs,
-    statuses,
-    source,
-    versions: sbomVersions,
-    products
-  } = compVulnState
-  const {
-    searchInput: vulnSearch,
-    severities,
-    components,
-    statues,
-    kev,
-    epss,
-    direct
-  } = prodVulnState
+  const { searchInput: compVulnSearch,envs,statuses,source,versions: sbomVersions, products} = compVulnState
+  const { searchInput: vulnSearch, severities, components, statues, kev, epss, direct } = prodVulnState
   const { prodVulnDispatch, globalVulnDispatch } = dispatch
 
   const activeProd = localStorage.getItem('activeEnv')
@@ -119,37 +42,19 @@ const ProductDetails = () => {
   const environment = localStorage.getItem('environment')
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
 
-  const product = userPermissions?.find(
-    (item) => item.key === 'view_product_group'
-  )
-  const updateProduct = product?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_product_group' && permission.value === true
-  )
-  const archiveProduct = product?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'archive_product_group' && permission.value === true
-  )
+  const product = userPermissions?.find((item) => item.key === 'view_product_group')
+  const sbomPermission = userPermissions?.find((item) => item.key === 'view_sbom')
+  const vulnsPermissions = useMemo(() => userPermissions?.find((item) => item.key === 'view_feeds'), [userPermissions])
+  const updateProduct = product?.supersededBy?.some((permission) =>permission.key === 'update_product_group' && permission.value === true)
+  const archiveProduct = product?.supersededBy?.some((permission) =>permission.key === 'archive_product_group' && permission.value === true)
+  const canCreateSBOM = useMemo(() => sbomPermission?.supersededBy?.some((permission) => permission.key === 'create_sbom' && permission.value === true), [sbomPermission] )
 
-  const { data, refetch, loading, error } = useQuery(GetProjectGroup, {
-    fetchPolicy: 'network-only',
-    variables: {
-      id: productId
-    }
-  })
+  const { data, refetch, loading, error } = useQuery(GetProjectGroup, { fetchPolicy: 'network-only', variables: { id: productId } })
 
-  const epssRange =
-    globalVulnState.epss !== 'all' &&
-    globalVulnState.epss !== '' &&
-    globalVulnState.epss?.split('-')
-  const vulnRange = {
-    min: parseFloat(epssRange[0]) / 100,
-    max: parseFloat(epssRange[1]) / 100
-  }
+  const epssRange = globalVulnState.epss !== 'all' && globalVulnState.epss !== '' && globalVulnState.epss?.split('-')
+  const vulnRange = { min: parseFloat(epssRange[0]) / 100, max: parseFloat(epssRange[1]) / 100 }
 
-  const [getVulns, { data: globalVulnData }] = useLazyQuery(GetGlobalVulns, {
-    fetchPolicy: 'network-only'
-  })
+  const [getVulns, { data: globalVulnData }] = useLazyQuery(GetGlobalVulns, { fetchPolicy: 'network-only' })
 
   const { data: rules, refetch: getRules } = useQuery(GetProjectCheck, {
     fetchPolicy: 'network-only',
@@ -181,7 +86,7 @@ const ProductDetails = () => {
 
   // GET VULN DATA
   const { data: vulnData, refetch: vulnRefetch } = useQuery(GetVulnData, {
-    skip: sbomId ? false : true,
+    skip: sbomId && vulnsPermissions?.value === true ? false : true,
     fetchPolicy: 'network-only',
     variables: {
       projectId: productId || activeEnv,
@@ -208,7 +113,7 @@ const ProductDetails = () => {
   })
 
   const { data: vulnInfo, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
-    skip: vulnId ? false : true,
+    skip: vulnId && vulnsPermissions?.value === true ? false : true,
     fetchPolicy: 'cache-first',
     variables: {
       id: vulnId,
@@ -407,33 +312,14 @@ const ProductDetails = () => {
         <Card>
           <CardBody>
             {data && (
-              <Grid
-                width={'100%'}
-                templateColumns='repeat(5, 1fr)'
-                alignItems={'top'}
-                gap={10}
-              >
+              <Grid width={'100%'} templateColumns='repeat(5, 1fr)' alignItems={'top'} gap={10} >
                 {/* PRODUCT INFORMATIONS */}
                 <GridItem colSpan={3}>
-                  <Flex
-                    direction={'row'}
-                    alignItems={'flex-start'}
-                    gap={5}
-                    width={'100%'}
-                  >
-                    <Icon
-                      as={FaWindowMaximize}
-                      h={'64px'}
-                      w={'64px'}
-                      color='blue.300'
-                    />
+                  <Flex direction={'row'} alignItems={'flex-start'} gap={5} width={'100%'} >
+                    <Icon as={FaWindowMaximize} h={'64px'} w={'64px'} color='blue.300' />
                     <Flex direction={'column'} gap={0.5}>
                       {/* PRODUCT TITLE */}
-                      <Stack
-                        direction={'column'}
-                        spacing={1}
-                        alignItems={'left'}
-                      >
+                      <Stack direction={'column'} spacing={1} alignItems={'left'} >
                         <Text fontWeight={'semibold'} fontSize={25} lineHeight={1.2}>
                           {data?.projectGroup?.name || ''}
                         </Text>
@@ -458,57 +344,19 @@ const ProductDetails = () => {
                     <NotificationMenuBell/>
                     {/* EDIT PRODUCT */}
                     <Tooltip label='Edit Product'>
-                      <IconButton
-                        isDisabled={
-                          !data?.projectGroup?.enabled ||
-                          !updateProduct ||
-                          signedUrlParams
-                        }
-                        colorScheme='blue'
-                        onClick={onOpenProduct}
-                        icon={<FaPenToSquare />}
-                      />
+                      <IconButton isDisabled={!data?.projectGroup?.enabled || !updateProduct || signedUrlParams } colorScheme='blue' onClick={onOpenProduct} icon={<FaPenToSquare />} />
                     </Tooltip>
                     {/* UPLOAD SBOM */}
                     <Tooltip label='Upload SBOM'>
-                      <IconButton
-                        isDisabled={
-                          !data?.projectGroup?.enabled || signedUrlParams
-                        }
-                        colorScheme='blue'
-                        onClick={onOpenUpload}
-                        icon={<FaUpload />}
-                      />
+                      <IconButton isDisabled={!data?.projectGroup?.enabled || signedUrlParams || !canCreateSBOM} colorScheme='blue' onClick={onOpenUpload} icon={<FaUpload />} />
                     </Tooltip>
                     {/* UPDATE PRODUCT STATUS */}
-                    <Tooltip
-                      label={
-                        data?.projectGroup?.enabled
-                          ? 'Disable Product'
-                          : 'Enable Product'
-                      }
-                    >
-                      <IconButton
-                        colorScheme={'blue'}
-                        onClick={onWarningOpen}
-                        isDisabled={signedUrlParams}
-                        icon={
-                          data?.projectGroup?.enabled ? (
-                            <FaToggleOff />
-                          ) : (
-                            <FaToggleOn />
-                          )
-                        }
-                      />
+                    <Tooltip label={data?.projectGroup?.enabled ? 'Disable Product' : 'Enable Product' }>
+                      <IconButton colorScheme={'blue'} onClick={onWarningOpen} isDisabled={signedUrlParams} icon={data?.projectGroup?.enabled ? (<FaToggleOff />) : (<FaToggleOn />)} />
                     </Tooltip>
                     {/* ARCHIVE PRODUCT */}
                     <Tooltip label='Archive Product'>
-                      <IconButton
-                        colorScheme='red'
-                        onClick={onDeleteOpen}
-                        icon={<FaBoxArchive />}
-                        isDisabled={!archiveProduct || signedUrlParams}
-                      />
+                      <IconButton colorScheme='red' onClick={onDeleteOpen} icon={<FaBoxArchive />} isDisabled={!archiveProduct || signedUrlParams} />
                     </Tooltip>
                   </Flex>
                 </GridItem>
@@ -519,32 +367,11 @@ const ProductDetails = () => {
         {/* TAB SECTION */}
         <Card>
           <CardBody>
-            <Tabs
-              variant='enclosed'
-              w={'100%'}
-              bg={'white'}
-              index={activeProdTab}
-              onChange={(value) => handleTabChange(value)}
-            >
+            <Tabs variant='enclosed' w={'100%'} bg={'white'} index={activeProdTab} onChange={(value) => handleTabChange(value)}>
               <TabList>
-                {[
-                  'versions',
-                  'vulnerabilities',
-                  'automation rules',
-                  'settings',
-                  'change log'
-                ].map((item, index) => (
-                  <Tab
-                    key={index}
-                    _focus={{ outline: 'none' }}
-                    textTransform={'capitalize'}
-                    isDisabled={
-                      signedUrlParams &&
-                      (item === 'automation rules' ||
-                        item === 'settings' ||
-                        item === 'change log')
-                    }
-                  >
+                {['versions','vulnerabilities','automation rules','settings','change log']
+                .map((item, index) => (
+                  <Tab key={index} _focus={{ outline: 'none' }} textTransform={'capitalize'} isDisabled={signedUrlParams && (item === 'automation rules' || item === 'settings' || item === 'change log')}>
                     {item}
                   </Tab>
                 ))}
@@ -553,45 +380,24 @@ const ProductDetails = () => {
                 {/* VERSIONS */}
                 <TabPanel px={0}>
                   {data && (
-                    <VersionsTable
-                      productId={activeEnv}
-                      projectGroup={data?.projectGroup}
-                      getVulnData={vulnRefetch}
-                    />
+                    <VersionsTable productId={activeEnv} projectGroup={data?.projectGroup} getVulnData={vulnRefetch} />
                   )}
                 </TabPanel>
                 {/* VULNERABILITIES */}
                 <TabPanel px={0}>
-                  <GlobalVulnTable
-                    data={globalVulnData?.organization?.vulns}
-                    refetch={getVulns}
-                    activeEnv={activeEnv}
-                    productId={productId}
-                  />
+                  <GlobalVulnTable data={globalVulnData?.organization?.vulns} refetch={getVulns} activeEnv={activeEnv} productId={productId} />
                 </TabPanel>
                 {/* AUTOMATIONS */}
                 <TabPanel px={0}>
-                  <Automation
-                    data={rules?.project?.autoChecks}
-                    refetch={getRules}
-                  />
+                  <Automation data={rules?.project?.autoChecks} refetch={getRules} />
                 </TabPanel>
                 {/* SETTINGS */}
                 <TabPanel px={0}>
-                  <Settings
-                    data={settings?.project?.projectSetting}
-                    enabled={data?.projectGroup?.enabled}
-                    activeEnv={activeEnv}
-                    refetch={getSettings}
-                  />
+                  <Settings data={settings?.project?.projectSetting} enabled={data?.projectGroup?.enabled} activeEnv={activeEnv} refetch={getSettings} />
                 </TabPanel>
                 {/* CHANGE LOG */}
                 <TabPanel px={0}>
-                  <ChangeLog
-                    data={prodLogs}
-                    refetch={getLogs}
-                    activeEnv={activeProd}
-                  />
+                  <ChangeLog data={prodLogs} refetch={getLogs} activeEnv={activeProd} />
                 </TabPanel>
               </TabPanels>
             </Tabs>

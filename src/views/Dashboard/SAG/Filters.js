@@ -1,6 +1,7 @@
 import { Box, Menu, MenuItemOption, MenuList, MenuOptionGroup, Stack } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
 import MenuHeading from 'components/Misc/MenuHeading'
+import { sagLabelTypes, sagCategories } from 'variables/general'
 
 const SagFilters = ({ category, setCategory, label, setLabel, supplier, setSupplier }) => {
 
@@ -37,7 +38,7 @@ const SagFilters = ({ category, setCategory, label, setLabel, supplier, setSuppl
           <MenuHeading title={'Supplier'} />
           <MenuList>
             <MenuOptionGroup type='radio' value={supplier} onChange={onFilterSupplier}>
-              {['all','Reliable Energy Analytics LLC'].map((item, index) => (
+              {['all','Reliable Energy Analytics LLC', 'Interlynk'].map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'} >
                   {item}
                 </MenuItemOption>
@@ -50,10 +51,10 @@ const SagFilters = ({ category, setCategory, label, setLabel, supplier, setSuppl
       <Box width={'fit-content'} position={'relative'}>
         <Menu placement='top' closeOnSelect={false}>
           {(category !== 'all' && category !== '') && <CheckMark />}
-          <MenuHeading title={'Category'} />
+          <MenuHeading title={'Product Category'} />
           <MenuList>
             <MenuOptionGroup type='radio' value={category} onChange={onFilterCategory}>
-              {['all','Internet Web Service API','Desktop Software Application','Vendor Response File'].map((item, index) => (
+              {sagCategories.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'} >
                   {item}
                 </MenuItemOption>
@@ -66,10 +67,10 @@ const SagFilters = ({ category, setCategory, label, setLabel, supplier, setSuppl
       <Box width={'fit-content'} position={'relative'}>
         <Menu placement='top' closeOnSelect={false}>
           {(label !== 'all' && label !== '') && <CheckMark />}
-          <MenuHeading title={'Label'} />
+          <MenuHeading title={'Label Type'} />
           <MenuList minW='auto' maxW={'320px'} minH={'auto'} maxH={'300px'} overflowY={'scroll'} >
             <MenuOptionGroup type='radio' value={label} onChange={onFilterLabel}>
-              {['all','SAG Trusted Software','SAG Trusted Artifact','SAG Purl SWID Trusted Product'].map((item, index) => (
+              {sagLabelTypes.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'} wordBreak={'break-all'}>
                   {item}
                 </MenuItemOption>

@@ -105,7 +105,7 @@ function Profile() {
               <Tabs variant='enclosed' w={'100%'} bg={'white'} defaultIndex={tabIndex} onChange={(e) => onTabChange(e)} >
                 <TabList>
                   {['General','Users','Roles','Feeds','Checks','Lists'].map((item, index) => (
-                    <Tab key={index} _focus={{ outline: 'none' }} display={(item === 'Lists' && !manageListing) ||(item === 'Feeds' && !manageFeeds) || (item === 'Users' && !viewUsers.value) ? 'none' : 'block'}
+                    <Tab key={index} _focus={{ outline: 'none' }} display={(item === 'Lists' && !manageListing) ||(item === 'Feeds' && !manageFeeds) || (item === 'Users' && !viewUsers?.value) ? 'none' : 'block'}
                     >
                       {item}
                     </Tab>

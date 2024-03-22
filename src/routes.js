@@ -9,7 +9,7 @@ import { HomeIcon } from 'components/Icons/Icons'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 import Licenses from 'components/Licenses'
 import Support from 'views/Dashboard/Support'
-import { FaStar, FaToolbox } from 'react-icons/fa6'
+import { FaHandshakeSimple, FaToolbox } from 'react-icons/fa6'
 import Policies from 'views/Dashboard/Policies'
 
 export const dashRoutes = [
@@ -17,7 +17,7 @@ export const dashRoutes = [
   },
   { path: '/products', name: 'Products', icon: <FaWindowMaximize color='inherit' />, component: Products, layout: '/vendor'
   },
-  { path: '/SAG', name: 'SAG', icon: <FaStar color='inherit' size={18} />, component: Products, layout: '/vendor'
+  { path: '/SAG', name: 'SAG', icon: <FaHandshakeSimple color='inherit' size={18} />, component: Products, layout: '/vendor'
   },
   { path: '/vulnerabilities', name: 'Vulnerabilities', icon: <FaBug color='inherit' />, component: Vulnerabilities, layout: '/vendor'
   },
@@ -37,13 +37,13 @@ export const dashRoutes = [
   //   component: Feed,
   //   layout: '/vendor'
   // },
-  { 
+  {
     path: '/tools', name: 'Tools', icon: <FaToolbox color='inherit' />, component: () => 'Tool', layout: '/vendor'
   },
-  { 
+  {
     path: '/support', name: 'Support', icon: <FaPlug color='inherit' />, component: Support, layout: '/vendor'
   },
-  { 
+  {
     path: '/policies', name: 'Policies', icon: <MdPolicy color='inherit' />, component: Policies, layout: '/vendor'
   },
   {

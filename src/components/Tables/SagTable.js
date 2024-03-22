@@ -75,23 +75,34 @@ const SagTable = ({ data }) => {
     },
     {
       id: 'CATEGORY',
-      name: 'CATEGORY',
+      name: 'PRODUCT CATEGORY',
       selector: (row) => <Text>{row?.category}</Text>,
-      width: '250px',
+      width: '220px',
       wrap: true
     },
     {
       id: 'LABEL',
-      name: 'LABEL',
+      name: 'LABEL TYPE',
       selector: (row) => <Text>{row?.label}</Text>,
-      width: '250px',
+      width: '300px',
+      size: 'lg',
       wrap: true
     },
     {
       id: 'OMB-M-22-18 CRITERIA',
       name: 'OMB-M-22-18 CRITERIA',
-      selector: (row) => <Link to={`https://softwareassuranceguardian.com/SAGCTR_inquiry/getWEBHOSTLabel?ProductID=92656E7EFFBDF3B2DE818E81786D16EFA4489B886C826D70BFD803AF38947430`} target='_blank'><IconButton colorScheme='blue' size='sm' icon={<FaEnvelope/>} /></Link>,
-      width:'220px',
+      selector: (row) => {
+        if (row?.link) {
+          return (
+            <Link to={row.link} target='_blank'>
+              <IconButton colorScheme='blue' size='sm' icon={<FaEnvelope/>} />
+            </Link>
+          );
+        } else {
+          return null; // Return nothing if link value is not present
+        }
+      },
+      width:'210px',
       wrap: true
     },
     {

@@ -59,7 +59,7 @@ const GraphView = ({ data, activeComp }) => {
   const [position, setPosition] = useState({ x: 100, y: 250 })
   const [dimensions, translate, containerRef] = useCenteredTree()
 
-  const nodeSize = { x: 1000, y: 200 }
+  const nodeSize = { x: 1000, y: 500 }
   const foreignObjectProps = {
     width: nodeSize.x,
     height: nodeSize.y,
@@ -69,7 +69,8 @@ const GraphView = ({ data, activeComp }) => {
   const separation = { siblings: 1.5, nonSiblings: 2 }
 
   const { data: compDependency } = useQuery(signedUrlParams ? GetShareCompDependency : GetCompDependency, {
-    skip: data?.nodes?.length > 0 ? false : true,
+    skip: (data?.nodes?.length > 0 || activeComp) ? false : true,
+    fetchPolicy: 'network-only',
     variables: {
       compId: activeComp?.id || data?.nodes[0]?.id,
       sbomId: signedUrlParams ? undefined : sbomId

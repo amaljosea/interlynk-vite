@@ -1,5 +1,4 @@
-import { Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, Portal, Stack, Switch, Text, Tooltip, useDisclosure
-} from '@chakra-ui/react'
+import { Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, Portal, Stack, Switch, Tag, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import { useMemo, useState, useEffect } from 'react'
@@ -8,13 +7,12 @@ import { customStyles, timeSince, getFullDateAndTime } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
 import Pagination from 'components/Pagination'
 import { RepeatIcon } from '@chakra-ui/icons'
-import { FaCheck, FaPlus } from 'react-icons/fa6'
-import { FaEllipsisV, FaTimes } from 'react-icons/fa'
+import { FaPlus } from 'react-icons/fa6'
+import { FaEllipsisV } from 'react-icons/fa'
 import SupportModal from 'views/Dashboard/Support/SupportModal'
 import { useLocation } from 'react-router-dom'
-import { DeleteCompSupportOverride } from 'graphQL/Mutation'
+import { DeleteCompSupportOverride, UpdateCompSupportOverride } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
-import { UpdateCompSupportOverride } from 'graphQL/Mutation'
 
 const SupportTable = ({ data, refetch }) => {
   const location = useLocation()
@@ -212,44 +210,14 @@ const SupportTable = ({ data, refetch }) => {
     {
       id: 'DEPRECATED',
       name: 'DEPRECATED',
-      selector: (row) =>
-        row?.deprecated ? (
-          <IconButton
-            pointerEvents={'none'}
-            colorScheme='green'
-            size='xs'
-            icon={<FaCheck />}
-          />
-        ) : (
-          <IconButton
-            colorScheme='red'
-            pointerEvents={'none'}
-            size='xs'
-            icon={<FaTimes />}
-          />
-        ),
+      selector: (row) => <Tag variant='solid' colorScheme='blue' textTransform={'capitalize'}>{JSON.stringify(row?.deprecated)}</Tag>,
       width: '150px',
       wrap: true
     },
     {
       id: 'OUTDATED',
       name: 'OUTDATED',
-      selector: (row) =>
-        row?.outdated ? (
-          <IconButton
-            pointerEvents={'none'}
-            colorScheme='green'
-            size='xs'
-            icon={<FaCheck />}
-          />
-        ) : (
-          <IconButton
-            colorScheme='red'
-            pointerEvents={'none'}
-            size='xs'
-            icon={<FaTimes />}
-          />
-        ),
+      selector: (row) => <Tag variant='solid' colorScheme='blue' textTransform={'capitalize'}>{JSON.stringify(row?.outdated)}</Tag>,
       width: '150px',
       wrap: true
     },

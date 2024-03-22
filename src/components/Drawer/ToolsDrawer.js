@@ -1,18 +1,4 @@
-import {
-  Drawer,
-  DrawerBody,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  Grid,
-  GridItem,
-  Heading,
-  Flex,
-  Stack,
-  Tag,
-  Badge
-} from '@chakra-ui/react'
+import { Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, Grid, GridItem, Heading, Flex, Stack, Tag } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import SbomInfo from 'components/SbomInfo'
 import DiffTable from 'components/Tables/DiffTable'
@@ -24,15 +10,11 @@ const ToolsDrawer = ({ data, diffs, setData, selectedSbom, versionList, isOpen, 
   const versionsOne = versionList?.nodes?.find((item) => item?.id === selectedSbom[1]?.id)
   const versionsTwo = versionList?.nodes?.find((item) => item?.id === selectedSbom[0]?.id)
 
-  const handleClose = () => {
-    setSelectedSbom([])
-  }
-
   return (
     <Drawer size='full' isOpen={isOpen} placement='bottom' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton mt={2} onClick={handleClose} />
+        <DrawerCloseButton mt={2} />
         <DrawerHeader>SBOM Comparison</DrawerHeader>
         <DrawerBody>
           {/* SBOM INFO */}
