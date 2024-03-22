@@ -29,13 +29,6 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
     refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows, field: field, direction: direction } })
   }
 
-  const onBlurUri = () => {
-    if(idUri?.startsWith('pkg') || idUri?.startsWith('cpe')) {
-      setError('')
-    } else {
-      setError('Invalid entry')
-    }
-  }
 
   const handleEolChange = (newDate) => {
     const currentDate = new Date()
@@ -72,40 +65,48 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
 
   const handleCreate = async (e) => {
     e.preventDefault()
-    await createSupport({
-      variables: { idUri, name: productName, version: productVersion === '' ? undefined : productVersion, eol: eol ? eol : undefined, eos: eos ? eos : undefined, enabled: true, deprecated, outdated }
-    }).then((res) => {
-      if (res?.data) {
-        handleRefetch()
-        setIdUri('')
-        setProductName('')
-        setProductVersion('')
-        setEol(null)
-        setEos(null)
-        setDeprecated(false)
-        setOutdated(false)
-        onClose()
-      }
-    })
+    if(idUri !== '' && (idUri?.startsWith('pkg') || idUri?.startsWith('cpe'))) {
+      await createSupport({
+        variables: { idUri, name: productName, version: productVersion === '' ? undefined : productVersion, eol: eol ? eol : undefined, eos: eos ? eos : undefined, enabled: true, deprecated, outdated }
+      }).then((res) => {
+        if (res?.data) {
+          handleRefetch()
+          setIdUri('')
+          setProductName('')
+          setProductVersion('')
+          setEol(null)
+          setEos(null)
+          setDeprecated(false)
+          setOutdated(false)
+          onClose()
+        }
+      })
+    } else {
+      setError('Invalid PURL or CPE')
+    }
   }
 
   const handleUpdate = async (e) => {
     e.preventDefault()
-    await updateSupport({
-      variables: { id: data?.id, idUri, name: productName, version: productVersion === '' ? undefined : productVersion, eol: eol ? eol : undefined, eos: eos ? eos : undefined, enabled: data?.enabled, deprecated, outdated }
-    }).then((res) => {
-      if (res?.data) {
-        handleRefetch()
-        setIdUri('')
-        setProductName('')
-        setProductVersion('')
-        setEol(null)
-        setEos(null)
-        setDeprecated(false)
-        setOutdated(false)
-        onClose()
-      }
-    })
+    if(idUri !== '' && (idUri?.startsWith('pkg') || idUri?.startsWith('cpe'))) {
+      await updateSupport({
+        variables: { id: data?.id, idUri, name: productName, version: productVersion === '' ? undefined : productVersion, eol: eol ? eol : undefined, eos: eos ? eos : undefined, enabled: data?.enabled, deprecated, outdated }
+      }).then((res) => {
+        if (res?.data) {
+          handleRefetch()
+          setIdUri('')
+          setProductName('')
+          setProductVersion('')
+          setEol(null)
+          setEos(null)
+          setDeprecated(false)
+          setOutdated(false)
+          onClose()
+        }
+      })
+    } else {
+      setError('Invalid PURL or CPE')
+    }
   }
 
   useEffect(() => {
@@ -143,7 +144,6 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
                       setIdUri(e.target.value)
                       setError('')
                     }}
-                    onKeyDown={onBlurUri}
                   />
                 </FormControl>
                 <FormControl isRequired>
@@ -170,14 +170,10 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
                   {!isValidEos && <FormErrorMessage>Please enter a valid expiry date</FormErrorMessage>}
                 </FormControl>
                 <FormControl>
-                  <Checkbox isChecked={deprecated} onChange={(e) => setDeprecated(e.target.checked)}>
-                    Deprecated
-                  </Checkbox>
+                  <Checkbox isChecked={deprecated} onChange={(e) => setDeprecated(e.target.checked)}>Deprecated</Checkbox>
                 </FormControl>
                 <FormControl>
-                  <Checkbox isChecked={outdated} onChange={(e) => setOutdated(e.target.checked)} >
-                    Outdated
-                  </Checkbox>
+                  <Checkbox isChecked={outdated} onChange={(e) => setOutdated(e.target.checked)}>Outdated</Checkbox>
                 </FormControl>
               </Flex>
             </ModalBody>
