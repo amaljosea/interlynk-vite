@@ -2285,3 +2285,11 @@ export const UpdateNotificationPreference = gql`
   }
 `
 
+// SBOM POLICY SCAN
+export const SbomPolicyScan = gql`
+  mutation SbomPolicyScan($sbomId: Uuid!) {
+    sbomPolicyScan(input: { sbomId: $sbomId }) {
+      errors
+    }
+  }
+`

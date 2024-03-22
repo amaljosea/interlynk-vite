@@ -3517,6 +3517,93 @@ export const GetProjectPolicies = gql`
   }
 `
 
+// GET SBOM POLICIES
+export const PolicyResults = gql`
+  query PolicyResults(
+    $sbomId: [Uuid!]
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+  ) {
+    policyResults(
+      sbomId: $sbomId
+      after: $after
+      before: $before
+      first: $first
+      last: $last
+    ) {
+      totalCount
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+      nodes {
+        createdAt
+        id
+        operator
+        organizationId
+        policyId
+        result
+        resultType
+        sbomId
+        updatedAt
+        policyViolations {
+          totalCount
+          nodes {
+            componentId
+            createdAt
+            id
+            updatedAt
+            component {
+              copyright
+              cpes
+              description
+              group
+              id
+              internal
+              kind
+              licensesExp
+              name
+              primary
+              publisher
+              purl
+              sbomId
+              scope
+              uniqueId
+              updatedAt
+              version
+            }
+            policyRuleViolations {
+              totalCount
+              nodes {
+                createdAt
+                id
+                policyRuleId
+                policyViolationId
+                updatedAt
+                violationId
+                violationType
+                policyRule {
+                  createdAt
+                  id
+                  operator
+                  policyId
+                  subject
+                  updatedAt
+                  value
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 // GET USER NOTIFICATIONS PREFRENCES
 
 export const GetUserNotificationPreferences = gql`

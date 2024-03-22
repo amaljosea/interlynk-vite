@@ -13,8 +13,9 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import SupportTable from 'components/Tables/SupportTable'
 import SbomLicenseTable from '../../../components/Licenses/SbomLicenseTable'
 import { parseJSONSafely } from 'utils'
-import { GetSbomSupportTab, GetSbomParts, GetCheckResults, GetChangeLogs, GetSbomLicensesTable, GetProjectPolicies  } from 'graphQL/Queries'
+import { GetSbomSupportTab, GetSbomParts, GetCheckResults, GetChangeLogs, GetSbomLicensesTable } from 'graphQL/Queries'
 import PolicyTable from 'components/Tables/PolicyTable'
+import { PolicyResults } from 'graphQL/Queries'
 
 const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVulnData, getCompData, compData, error
 }) => {
@@ -74,7 +75,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
   const [getLicensesData, { data: licensesData, refetch: licensesRefetch }] = useLazyQuery(GetSbomLicensesTable, {fetchPolicy: 'network-only'})
 
   // GET POLICY DATA
-  const [getPolicyData, { data: policyData }] = useLazyQuery(GetProjectPolicies, {fetchPolicy: 'network-only'})
+  const [getPolicyData, { data: policyData }] = useLazyQuery(PolicyResults, {fetchPolicy: 'network-only'})
 
   const getUndefinedIfEmpty = (value) => (value !== '' ? value : undefined)
   const getUndefinedIfEmptyOrAll = (value, allValue = 'all') => value.includes(allValue) || value.length === 0 ? undefined : value
@@ -139,7 +140,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
         }
       })
     } else if (tabName === 'Policies' && shouldFetchData(tabName)) {
-      getPolicyData({ variables: { projectId: productId, first: totalRows }})
+      getPolicyData({ variables: { sbomId: sbomId, first: totalRows }})
       .then((res) => {
         if (res.data) {
           updateLastFetchTime(tabName)
@@ -236,7 +237,8 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
             </TabPanel>
             {/* POLICY TABLE */}
             <TabPanel px={0}>
-              <PolicyTable data={policyData?.projectPolicies} refetch={getPolicyData} />
+              {/* policyData?.policyResults */}
+              <PolicyTable data={[]} refetch={getPolicyData} />
             </TabPanel>
             {/* SUPPORT TABLE */}
             <TabPanel px={0}>

@@ -26,6 +26,8 @@ const PolicyTable = ({ data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
+  const sbomId = queryParams.get('sbom')
+  const activeProd = localStorage.getItem('activeEnv')
   const { totalRows, policyState, dispatch } = useGlobalState()
   const { pageIndex, searchInput } = policyState
   const { policyDispatch } = dispatch
@@ -44,7 +46,7 @@ const PolicyTable = ({ data, refetch }) => {
   const [createExclusion] = useMutation(PolicyExclusionCreate)
   const [deleteExclusion] = useMutation(DeletePolicyExclusion)
 
-  const policyData = { projectId: productId || undefined, search: (productId || searchInput === '') ? undefined : searchInput, first: totalRows }
+  const policyData = { projectId: activeProd || undefined, search: (activeProd || searchInput === '') ? undefined : searchInput, first: totalRows }
 
   const setPaginationControl = (data) => {
     setIsPrevActive(data?.pageInfo?.hasPreviousPage)
@@ -63,8 +65,8 @@ const PolicyTable = ({ data, refetch }) => {
     disablePaginationControl()
     await refetch({
       variables: {
-        projectId: productId || undefined,
-        search: (productId || searchInput === '') ? undefined : searchInput,
+        projectId: activeProd || undefined,
+        search: (activeProd || searchInput === '') ? undefined : searchInput,
         first: totalRows
       }
     }).then(
@@ -75,7 +77,7 @@ const PolicyTable = ({ data, refetch }) => {
   // CLEAR SERACH
   const handleClear = async () => {
     setFilterText('')
-    await refetch({ variables: { projectId: productId || undefined, search: undefined, first: totalRows } }).then(
+    await refetch({ variables: { projectId: activeProd || undefined, search: undefined, first: totalRows } }).then(
       (res) => res?.data && policyDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
   }
@@ -94,7 +96,7 @@ const PolicyTable = ({ data, refetch }) => {
   const handleSearch = async (event) => {
     const { value } = event.target
     if (event.key === 'Enter' && filterText !== '') {
-      refetch({ variables: { projectId: productId || undefined, search: productId ? undefined : value, first: totalRows } }).then(
+      refetch({ variables: { projectId: activeProd || undefined, search: activeProd ? undefined : value, first: totalRows } }).then(
         (res) =>
           res?.data &&
           policyDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
@@ -152,7 +154,7 @@ const PolicyTable = ({ data, refetch }) => {
   }
 
   const handleCreateExclusion = async (id) => {
-    await createExclusion({variables:{policyId: id, projectId: productId}})
+    await createExclusion({variables:{policyId: id, projectId: activeProd}})
     .then((res) => {
       const errors = res?.data?.policyExclusionCreate?.errors
       if (errors?.length > 0) {
@@ -164,7 +166,7 @@ const PolicyTable = ({ data, refetch }) => {
   }
 
   const handleDeleteExclusion = async (id) => {
-    await deleteExclusion({variables:{policyId: id, projectId: productId}})
+    await deleteExclusion({variables:{policyId: id, projectId: activeProd}})
     .then((res) => {
       const errors = res?.data?.policyExclusionDelete?.errors
       if (errors?.length > 0) {
@@ -198,7 +200,7 @@ const PolicyTable = ({ data, refetch }) => {
             />
           </Tooltip>
           <Tooltip label='Refresh'>
-            <IconButton colorScheme='blue' onClick={handleRefresh} icon={<RepeatIcon />} />
+            <IconButton hidden={sbomId} colorScheme='blue' onClick={handleRefresh} icon={<RepeatIcon />} />
           </Tooltip>
         </Stack>
       </Flex>
@@ -230,7 +232,9 @@ const PolicyTable = ({ data, refetch }) => {
       id: 'OPERATOR',
       name: 'OPERATOR',
       selector: (row) => (
-        <Text textTransform={'capitalize'}>{row?.operator}</Text>
+        <Text textTransform={'capitalize'}>
+          {row?.operator === 0 ? 'Any' : row?.operator === 1 ? 'All' : ''}
+        </Text>
       ),
       width: '200px',
       wrap: true
@@ -287,7 +291,7 @@ const PolicyTable = ({ data, refetch }) => {
                 </MenuItem>
                 {/* ADD POLICY RULE */}
                 <MenuItem
-                  hidden
+                  hidden={productId}
                   onClick={() => {
                     setActiveRow(row)
                     setActiveRule(null)
@@ -329,30 +333,30 @@ const PolicyTable = ({ data, refetch }) => {
         <Heading mb={6} fontFamily={'inherit'} fontSize={'sm'} color={'#555'} width={'90%'} mx={'auto'} >
           CONDITIONS
         </Heading>
-        <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={4} mx={'auto'} >
-          <GridItem>
+        <Grid width={'90%'} templateColumns='repeat(12, 1fr)' gap={6} mb={4} mx={'auto'} >
+          <GridItem colSpan={3}>
             <CustomText>subject</CustomText>
           </GridItem>
-          <GridItem>
+          <GridItem colSpan={3}>
             <CustomText>operator</CustomText>
           </GridItem>
-          <GridItem>
+          <GridItem colSpan={5}>
             <CustomText>value</CustomText>
           </GridItem>
-          {/* <GridItem colSpan={1}></GridItem> */}
+          <GridItem colSpan={1}></GridItem>
         </Grid>
         {policyRules?.map((item, index) => (
-          <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={3} mx={'auto'} >
-            <GridItem>
+          <Grid width={'90%'} templateColumns='repeat(12, 1fr)' gap={6} mb={3} mx={'auto'} >
+            <GridItem colSpan={3}>
               <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={updatedValue(item?.subject)} />
             </GridItem>
-            <GridItem>
+            <GridItem colSpan={3}>
               <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={updatedValue(item?.operator)} />
             </GridItem>
-            <GridItem>
+            <GridItem colSpan={5}>
               <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={item?.value} />
             </GridItem>
-            {/* <GridItem colSpan={1}>
+            <GridItem colSpan={1}>
               <Flex gap={3} justifyContent={'flex-end'}>
                 <IconButton
                   hidden={productId}
@@ -367,7 +371,7 @@ const PolicyTable = ({ data, refetch }) => {
                 />
                 <IconButton size='sm' colorScheme='red' icon={<FaTrash />} onClick={() => handleDeleteRule(item)}  hidden={productId} />
               </Flex>
-            </GridItem> */}
+            </GridItem>
           </Grid>
         ))}
       </Box>

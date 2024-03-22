@@ -19,8 +19,9 @@ import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import StatusModal from './components/StatusModal'
 import VulnInfo from '../Vulnerabilities/vulnInfo'
-import {FaBell} from "react-icons/fa";
 import NotificationMenuBell from "../../../components/Notifications/NotificationMenuBell";
+import PolicyTable from 'components/Tables/PolicyTable'
+import { GetProjectPolicies } from 'graphQL/Queries'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -48,13 +49,15 @@ const ProductDetails = () => {
   const updateProduct = product?.supersededBy?.some((permission) =>permission.key === 'update_product_group' && permission.value === true)
   const archiveProduct = product?.supersededBy?.some((permission) =>permission.key === 'archive_product_group' && permission.value === true)
   const canCreateSBOM = useMemo(() => sbomPermission?.supersededBy?.some((permission) => permission.key === 'create_sbom' && permission.value === true), [sbomPermission] )
-
+  // GET PROJECT DATA
   const { data, refetch, loading, error } = useQuery(GetProjectGroup, { fetchPolicy: 'network-only', variables: { id: productId } })
 
   const epssRange = globalVulnState.epss !== 'all' && globalVulnState.epss !== '' && globalVulnState.epss?.split('-')
   const vulnRange = { min: parseFloat(epssRange[0]) / 100, max: parseFloat(epssRange[1]) / 100 }
-
+  // GET VULN DATA
   const [getVulns, { data: globalVulnData }] = useLazyQuery(GetGlobalVulns, { fetchPolicy: 'network-only' })
+   // GET POLICY DATA
+   const [getPolicyData, { data: policyData }] = useLazyQuery(GetProjectPolicies, {fetchPolicy: 'network-only'})
 
   const { data: rules, refetch: getRules } = useQuery(GetProjectCheck, {
     fetchPolicy: 'network-only',
@@ -129,35 +132,11 @@ const ProductDetails = () => {
 
   const activeTab = Number(localStorage.getItem('activeProdTab'))
 
-  const {
-    isOpen: isOpenProduct,
-    onOpen: onOpenProduct,
-    onClose: onCloseProduct
-  } = useDisclosure()
-
-  const {
-    isOpen: isOpenUpload,
-    onOpen: onOpenUpload,
-    onClose: onCloseUpload
-  } = useDisclosure()
-
-  const {
-    isOpen: isWarningOpen,
-    onOpen: onWarningOpen,
-    onClose: onWarningClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isEnvOpen,
-    onOpen: onEnvOpen,
-    onClose: onEnvClose
-  } = useDisclosure()
+  const { isOpen: isOpenProduct, onOpen: onOpenProduct, onClose: onCloseProduct } = useDisclosure()
+  const { isOpen: isOpenUpload, onOpen: onOpenUpload, onClose: onCloseUpload } = useDisclosure()
+  const { isOpen: isWarningOpen, onOpen: onWarningOpen, onClose: onWarningClose } = useDisclosure()
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure()
+  const { isOpen: isEnvOpen, onOpen: onEnvOpen, onClose: onEnvClose } = useDisclosure()
 
   const handleTabChange = (value) => {
     localStorage.setItem('activeProdTab', value)
@@ -174,18 +153,13 @@ const ProductDetails = () => {
   // DELETE PRODUCT
   const onProductDelete = async () => {
     await projectDelete({
-      variables: {
-        id: productId
-      }
+      variables: { id: productId }
     })
       .then((res) => res.data && onDeleteClose())
       .finally(() => navigate('/vendor/products'))
   }
 
-  const defaultEnv =
-    data && activeEnv
-      ? data?.projectGroup?.projects.find((item) => item.id === activeEnv)?.name
-      : ''
+  const defaultEnv = data && activeEnv ? data?.projectGroup?.projects.find((item) => item.id === activeEnv)?.name : ''
 
   useEffect(() => {
     if (sbomId === null) {
@@ -206,28 +180,11 @@ const ProductDetails = () => {
           projectGroupIds: [productId],
           field: globalVulnState.field,
           direction: globalVulnState.direction,
-          search:
-            globalVulnState.searchInput !== ''
-              ? globalVulnState.searchInput
-              : undefined,
-          severity:
-            globalVulnState.severities?.length === 0
-              ? undefined
-              : globalVulnState.severities,
-          status:
-            globalVulnState.statues?.length === 0
-              ? undefined
-              : globalVulnState.statues,
-          kev:
-            globalVulnState.kev === 'yes'
-              ? true
-              : globalVulnState.kev === 'false'
-                ? false
-                : undefined,
-          epss:
-            globalVulnState.epss === 'all' || globalVulnState.epss === ''
-              ? undefined
-              : vulnRange
+          search: globalVulnState.searchInput !== '' ? globalVulnState.searchInput : undefined,
+          severity: globalVulnState.severities?.length === 0 ? undefined : globalVulnState.severities,
+          status: globalVulnState.statues?.length === 0 ? undefined : globalVulnState.statues,
+          kev: globalVulnState.kev === 'yes' ? true : globalVulnState.kev === 'false' ? false : undefined,
+          epss: globalVulnState.epss === 'all' || globalVulnState.epss === '' ? undefined : vulnRange
         }
       })
     } else if (activeTab === 2) {
@@ -237,6 +194,10 @@ const ProductDetails = () => {
       getSettings({
         variables: { id: activeEnv }
       })
+    } else if (activeTab === 4) {
+      setActiveProdTab(4)
+      getPolicyData({ variables: { projectId: activeEnv, first: totalRows }})
+      .then((res) => console.log(res?.data))
     } else if (activeTab === 4) {
       setActiveProdTab(4)
       getLogs({
@@ -279,29 +240,19 @@ const ProductDetails = () => {
 
   if (error) {
     return (
-      <Card>
-        <Text>Something went wrong</Text>
-      </Card>
+      <Card><Text>Something went wrong</Text></Card>
     )
   }
 
   if (sbomId) {
     return (
-      <SBOM
-        prodRefetch={refetch}
-        vulnData={vulnData}
-        getVulnData={vulnRefetch}
-      />
+      <SBOM prodRefetch={refetch} vulnData={vulnData} getVulnData={vulnRefetch} />
     )
   }
 
   if (vulnId) {
     return (
-      <VulnInfo
-        data={vulnInfo?.vuln}
-        componentVulns={vulnInfo?.componentVulns}
-        refetch={getVulnData}
-      />
+      <VulnInfo data={vulnInfo?.vuln} componentVulns={vulnInfo?.componentVulns} refetch={getVulnData} />
     )
   }
 
@@ -325,21 +276,13 @@ const ProductDetails = () => {
                         </Text>
                       </Stack>
                       {/* PRODUCT DESCRIPTION */}
-                      <Text fontSize={'sm'}>
-                        {data?.projectGroup?.description || ''}
-                      </Text>
+                      <Text fontSize={'sm'}>{data?.projectGroup?.description || ''}</Text>
                     </Flex>
                   </Flex>
                 </GridItem>
                 {/* PRODUCT ACTIONS */}
                 <GridItem colSpan={2}>
-                  <Flex
-                    direction={'row'}
-                    gap={2}
-                    justifyContent='flex-end'
-                    ml={'auto'}
-                    flexWrap={'wrap'}
-                  >
+                  <Flex direction={'row'} gap={2} justifyContent='flex-end' ml={'auto'} flexWrap={'wrap'}>
                     {/* Notifications */}
                     <NotificationMenuBell/>
                     {/* EDIT PRODUCT */}
@@ -369,7 +312,7 @@ const ProductDetails = () => {
           <CardBody>
             <Tabs variant='enclosed' w={'100%'} bg={'white'} index={activeProdTab} onChange={(value) => handleTabChange(value)}>
               <TabList>
-                {['versions','vulnerabilities','automation rules','settings','change log']
+                {['versions','vulnerabilities','automation rules','settings','policies','change log']
                 .map((item, index) => (
                   <Tab key={index} _focus={{ outline: 'none' }} textTransform={'capitalize'} isDisabled={signedUrlParams && (item === 'automation rules' || item === 'settings' || item === 'change log')}>
                     {item}
@@ -394,6 +337,10 @@ const ProductDetails = () => {
                 {/* SETTINGS */}
                 <TabPanel px={0}>
                   <Settings data={settings?.project?.projectSetting} enabled={data?.projectGroup?.enabled} activeEnv={activeEnv} refetch={getSettings} />
+                </TabPanel>
+                {/* POLICIES */}
+                <TabPanel px={0}>
+                  <PolicyTable data={policyData?.projectPolicies} refetch={getPolicyData} />
                 </TabPanel>
                 {/* CHANGE LOG */}
                 <TabPanel px={0}>
@@ -449,11 +396,7 @@ const ProductDetails = () => {
               <Text>Archiving this product will: </Text>
               <UnorderedList>
                 <Flex flexDir={'column'} gap={1} mt={4}>
-                  {[
-                    'remove this product, its versions and SBOMs',
-                    'remove access to the product for all users',
-                    'disable uploads of SBOMs to this product'
-                  ].map((item, index) => (
+                  {['remove this product, its versions and SBOMs','remove access to the product for all users','disable uploads of SBOMs to this product'].map((item, index) => (
                     <ListItem key={index}>{item}</ListItem>
                   ))}
                 </Flex>
@@ -462,12 +405,8 @@ const ProductDetails = () => {
               <Text mt={10}>Are you sure you wish to continue?</Text>
             </ModalBody>
             <ModalFooter>
-              <Button mr={3} onClick={onDeleteClose}>
-                No
-              </Button>
-              <Button colorScheme='red' onClick={onProductDelete}>
-                Yes
-              </Button>
+              <Button mr={3} onClick={onDeleteClose}>No</Button>
+              <Button colorScheme='red' onClick={onProductDelete}>Yes</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
