@@ -32,7 +32,10 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
 
   const handleRefetch = () => { refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows } }) }
 
-  const isInvalid = name === '' || operator === '' || resultType === '' || error !== ''
+
+  const lastRow = conditions[conditions?.length - 1];
+
+  const isInvalid = name === '' || operator === '' || resultType === '' || error !== '' || (lastRow?.id === '' || lastRow?.subject === '' || lastRow?.value === '' || lastRow?.operator === '' || lastRow?.list === '' || lastRow?.status === '' || lastRow?.min === '' || lastRow?.max === '')
 
   const onNameChange = (e) => {
     setName(e.target.value)
@@ -49,18 +52,20 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
     setError('')
   }
 
+
   const addRow = () => {
     const newId = conditions?.length + 1;
     if(conditions?.length > 0) {
       const lastRow = conditions[conditions.length - 1];
-      if (lastRow.id && lastRow.subject && lastRow.value && lastRow.operator && lastRow?.list && lastRow?.status) {
-        setConditions([...conditions, { id: newId, subject: '', operator: '', value: '', list: [], status: 'CREATED', min:0, max:0 }]);
+      console.log(lastRow);
+      if (lastRow.id && lastRow.subject && lastRow.value && lastRow.operator && lastRow?.list && lastRow?.status && lastRow?.min && lastRow?.max) {
+        setConditions([...conditions, { id: newId, subject: '', operator: '', value: '', list: [], status: 'CREATED', min: '0', max: '0' }]);
         setError('')
       } else {
         setError('Please fill all fields before adding a new one.')
       }
     } else {  
-      setConditions([...conditions, { id: newId, subject: '', operator: '', value: '', list: [], status: 'CREATED', min:0, max:0 }]);
+      setConditions([...conditions, { id: newId, subject: '', operator: '', value: '', list: [], status: 'CREATED', min:'0', max:'0' }]);
     }
   };
 
@@ -95,6 +100,16 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
     });
     setConditions(newData);
   };
+
+  const handleBlur = (rule) => {
+    const newData = conditions.map(item => {
+      if (item.id === rule?.id) {
+        return { ...item, value: `{min:${rule?.min},max:${rule?.max}}` };
+      }
+      return item;
+    });
+    setConditions(newData);
+  }
 
   const createRule = (item, policyId) => {
     onCreateRule({ variables: { policyId: policyId, operator: item?.operator === '' ? undefined : item?.operator, subject: item?.subject === '' ? undefined : item?.subject, value: item?.operator === 'RANGE' ? JSON.stringify({min:item?.min,max: item?.max}) : item?.value === '' ? undefined : item?.value }
@@ -195,7 +210,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
       setResultType(data?.resultType  === 'warn' ? 'WARN' : data?.resultType === 'inform' ? 'INFORM' : 'FAIL')
       const rules = []
       const opList = (item) => subOperators?.policySubjectOperatorMapping?.find((op) => op?.subject === item?.subject)
-      data?.policyRules?.map((item) => rules?.push({id:item?.id, subject: item?.subject, operator: item?.operator, value: item?.value, list: opList(item)?.operators, status: 'ADDED', min: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.min : 0, max: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.max : 0}))
+      data?.policyRules?.map((item) => rules?.push({id:item?.id, subject: item?.subject, operator: item?.operator, value: item?.value, list: opList(item)?.operators, status: 'ADDED', min: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.min : '0', max: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.max : '0'}))
       setConditions(rules)
     }
   }, [data, subOperators])
@@ -289,18 +304,18 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                       <Flex alignItems={'center'} gap={4}>
                       <InputGroup>
                         <InputLeftAddon>Min</InputLeftAddon>
-                        <Input type='text' name='min' value={item?.min} fontSize='sm' onChange={(e) => handleChange(e.target.value, item.id, 'min')} />
+                        <Input type='text' name='min' value={item?.min} fontSize='sm' onChange={(e) => handleChange(e.target.value, item.id, 'min')} onBlur={() => handleBlur(item)} />
                       </InputGroup>
                       <InputGroup>
                         <InputLeftAddon>Max</InputLeftAddon>
-                        <Input type='text' name='max' value={item?.max} fontSize='sm' onChange={(e) => handleChange(e.target.value, item.id, 'max')}/>
+                        <Input type='text' name='max' value={item?.max} fontSize='sm' onChange={(e) => handleChange(e.target.value, item.id, 'max')} onBlur={() => handleBlur(item)}/>
                       </InputGroup>
                       </Flex>
                     </GridItem>
                     )}
                     {item?.operator !== 'RANGE' && item?.subject !== 'VULNERABILITY_SEV' && (
                       <GridItem colSpan={5}>
-                        <Input disabled={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'} placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} />
+                        <Input placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} />
                       </GridItem>
                     )}
                     <GridItem colSpan={1}>
