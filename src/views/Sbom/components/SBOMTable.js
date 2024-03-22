@@ -16,6 +16,7 @@ import { parseJSONSafely } from 'utils'
 import { GetSbomSupportTab, GetSbomParts, GetCheckResults, GetChangeLogs, GetSbomLicensesTable } from 'graphQL/Queries'
 import PolicyTable from 'components/Tables/PolicyTable'
 import { PolicyResults } from 'graphQL/Queries'
+import PolicyEvalTable from 'components/Tables/PolicyEvalTable'
 
 const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVulnData, getCompData, compData, error
 }) => {
@@ -237,8 +238,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
             </TabPanel>
             {/* POLICY TABLE */}
             <TabPanel px={0}>
-              {/* policyData?.policyResults */}
-              <PolicyTable data={[]} refetch={getPolicyData} />
+              <PolicyEvalTable data={policyData?.policyResults} />
             </TabPanel>
             {/* SUPPORT TABLE */}
             <TabPanel px={0}>
