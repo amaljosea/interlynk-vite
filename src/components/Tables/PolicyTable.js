@@ -291,7 +291,7 @@ const PolicyTable = ({ data, refetch }) => {
                 </MenuItem>
                 {/* ADD POLICY RULE */}
                 <MenuItem
-                  hidden={productId}
+                  hidden
                   onClick={() => {
                     setActiveRow(row)
                     setActiveRule(null)
