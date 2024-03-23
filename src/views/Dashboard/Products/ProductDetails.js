@@ -198,8 +198,8 @@ const ProductDetails = () => {
       setActiveProdTab(4)
       getPolicyData({ variables: { projectId: activeEnv, first: totalRows }})
       .then((res) => console.log(res?.data))
-    } else if (activeTab === 4) {
-      setActiveProdTab(4)
+    } else if (activeTab === 5) {
+      setActiveProdTab(5)
       getLogs({
         variables: {
           search: searchInput !== '' ? searchInput : undefined,
@@ -218,9 +218,7 @@ const ProductDetails = () => {
   useEffect(() => {
     if (environment && data) {
       console.log('Environment changed')
-      const env = data?.projectGroup?.projects.find(
-        (item) => item.name === environment
-      )
+      const env = data?.projectGroup?.projects.find((item) => item.name === environment)
       globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
       localStorage.setItem('activeEnv', env?.id)
       setActiveEnv(env?.id)
