@@ -3611,3 +3611,13 @@ export const GetUserNotificationPreferences = gql`
     notificationPreferences(envId: $envId)
   }
 `
+
+export const GetUserNotificationChannels = gql`
+  query GetUserNotificationChannels {
+    notificationChannels {
+      email
+      slack
+      teams
+    }
+  }
+`

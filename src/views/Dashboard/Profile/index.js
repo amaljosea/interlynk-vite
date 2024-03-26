@@ -1,5 +1,5 @@
 // Chakra imports
-import { Flex, Grid, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react'
+import {Flex, Grid, Switch, Tab, TabList, TabPanel, TabPanels, Tabs, Text} from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { useQuery } from '@apollo/client'
 import { GetOrg, GetRoles, MyOrganizations, AllOrganizations, GetOrgSettings } from 'graphQL/Queries'
@@ -21,6 +21,7 @@ import TeamTable from 'components/Tables/TeamTable'
 import OrgTable from 'components/Tables/OrgTable'
 import RoleTable from 'components/Tables/RoleTable'
 import CustomLoader from 'components/CustomLoader'
+import NotificationChannels from "components/Notifications/NotificationChannels";
 
 function Profile() {
   const location = useLocation()
@@ -157,7 +158,7 @@ function Profile() {
             <Card>
               <Tabs variant='enclosed' w={'100%'} bg={'white'} index={psIndex} onChange={handleChange}>
                 <TabList>
-                  {['Personal Details', 'Organizations', 'Security Tokens'].map(
+                  {['Personal Details', 'Organizations', 'Security Tokens', 'Notification Settings'].map(
                     (item, index) => (
                       <Tab key={index} _focus={{ outline: 'none' }} isDisabled={orgInfo?.organization === null && (item === 'Personal Details' || item === 'Security Tokens')}>
                         {item}
@@ -181,6 +182,11 @@ function Profile() {
                   {/* SECURITY TOKEN */}
                   <TabPanel display={orgInfo?.organization ? 'block' : 'none'}>
                     <TokenInfo data={orgInfo?.organization?.currentUser?.apiKeys || []} refetch={refetch} />
+                  </TabPanel>
+
+                  {/* Notification Preferences */}
+                  <TabPanel>
+                    <NotificationChannels />
                   </TabPanel>
                 </TabPanels>
               </Tabs>

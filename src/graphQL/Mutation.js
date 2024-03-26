@@ -2293,3 +2293,17 @@ export const SbomPolicyScan = gql`
     }
   }
 `
+
+export const UpdateNotificationChannel = gql`
+  mutation NotificationChannelUpdate(
+    $notificationChannels: NotificationChannelInput!
+  ) {
+    notificationChannelUpdate(
+      input: {
+        notificationChannels: $notificationChannels
+      }
+    ) {
+       success
+    }
+  }
+`
