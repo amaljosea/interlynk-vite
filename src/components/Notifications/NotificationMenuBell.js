@@ -5,14 +5,15 @@ import {
   MenuButton,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup
+  MenuOptionGroup,
+  useToast
 } from "@chakra-ui/react";
 import {FaBell} from "react-icons/fa";
 import CheckMark from "../Misc/CheckMark";
 import {useEffect, useState} from "react";
 import {UpdateNotificationPreference} from "graphQL/Mutation";
-import {useMutation, useQuery} from "@apollo/client";
-import {GetUserNotificationPreferences} from "graphQL/Queries";
+import {useLazyQuery, useMutation, useQuery} from "@apollo/client";
+import {GetUserNotificationChannels, GetUserNotificationPreferences} from "graphQL/Queries";
 
 const NotificationMenuBell = () => {
   const [updatePreference] = useMutation(UpdateNotificationPreference)
@@ -21,6 +22,9 @@ const NotificationMenuBell = () => {
       envId: localStorage['activeEnv']
     }
   })
+  const [ getChannelsInfo ] = useLazyQuery(GetUserNotificationChannels)
+
+  const toast = useToast()
 
   useEffect(() => {
     if (data) {
@@ -48,6 +52,24 @@ const NotificationMenuBell = () => {
       }
     }).then((res) => {
       setPreference(newPreference)
+      getChannelsInfo().then(({data: { notificationChannels }}) => {
+        const enabledChannelCount = Object
+          .values(notificationChannels)
+          .filter(value => value === true)
+          .length
+
+        if (enabledChannelCount === 0 && !newPreference.includes('none')) {
+          toast({
+            title: 'No Notification Channels Enabled',
+            description: 'You have disabled all notification channels. Please enable at least one channel in settings to receive notifications.',
+            status: 'warning',
+            duration: 5000,
+            isClosable: true,
+            position: 'top'
+          })
+        }
+
+      })
     })
 
   }
