@@ -1,7 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, FormLabel, Input, Alert, AlertIcon, AlertDescription, Checkbox, FormErrorMessage } from '@chakra-ui/react'
-import { UpdateCompSupportOverride } from 'graphQL/Mutation'
-import { CreateCompSupportOverride } from 'graphQL/Mutation'
+import { UpdateCompSupportOverride, CreateCompSupportOverride } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
@@ -28,7 +27,6 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
   const handleRefetch = () => {
     refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows, field: field, direction: direction } })
   }
-
 
   const handleEolChange = (newDate) => {
     const currentDate = new Date()
@@ -63,13 +61,16 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
 
   const isInvalid = idUri === '' || productName === '' || error !== '' || !isValidEol || !isValidEos
 
-  const handleCreate = async (e) => {
+  const handleCreate =  (e) => {
     e.preventDefault()
     if(idUri !== '' && (idUri?.startsWith('pkg') || idUri?.startsWith('cpe'))) {
-      await createSupport({
+      createSupport({
         variables: { idUri, name: productName, version: productVersion === '' ? undefined : productVersion, eol: eol ? eol : undefined, eos: eos ? eos : undefined, enabled: true, deprecated, outdated }
       }).then((res) => {
-        if (res?.data) {
+        const errors = res?.data?.componentSupportOverrideCreate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
+        } else {
           handleRefetch()
           setIdUri('')
           setProductName('')
@@ -86,13 +87,16 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
     }
   }
 
-  const handleUpdate = async (e) => {
+  const handleUpdate = (e) => {
     e.preventDefault()
     if(idUri !== '' && (idUri?.startsWith('pkg') || idUri?.startsWith('cpe'))) {
-      await updateSupport({
+      updateSupport({
         variables: { id: data?.id, idUri, name: productName, version: productVersion === '' ? undefined : productVersion, eol: eol ? eol : undefined, eos: eos ? eos : undefined, enabled: data?.enabled, deprecated, outdated }
       }).then((res) => {
-        if (res?.data) {
+        const errors = res?.data?.componentSupportOverrideUpdate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
+        } else {
           handleRefetch()
           setIdUri('')
           setProductName('')
