@@ -1,35 +1,6 @@
 // Chakra imports
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  ExternalLinkIcon,
-  RepeatIcon
-} from '@chakra-ui/icons'
-import {
-  Flex,
-  Text,
-  useDisclosure,
-  Tag,
-  TagLabel,
-  Icon,
-  useColorModeValue,
-  Link,
-  Box,
-  Grid,
-  GridItem,
-  Tooltip,
-  Stack,
-  Drawer,
-  DrawerBody,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  IconButton,
-  Badge,
-  Skeleton,
-  useToast,
-} from '@chakra-ui/react'
+import { ChevronDownIcon, ChevronUpIcon, ExternalLinkIcon, RepeatIcon } from '@chakra-ui/icons'
+import { Flex, Text, useDisclosure, Tag, TagLabel, Icon, useColorModeValue, Link, Box, Grid, GridItem, Tooltip, Stack, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, IconButton, Badge, Skeleton, useToast } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { FaBug, FaCopy, FaPen } from 'react-icons/fa6'
 import { useState, useMemo, useEffect } from 'react'
@@ -68,20 +39,9 @@ const statusColor = (status) => {
   }
 }
 
-const VulnTable = ({
-  data,
-  sbomData,
-  refetch,
-  productId,
-  sbomId,
-  filteredData,
-  filterRefetch,
-  sbomRefetch
-}) => {
+const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, filterRefetch, sbomRefetch }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const firstDegreePart = data?.nodes?.filter(
-    (item) => item.isFirstDegreePart === true
-  )
+  const firstDegreePart = data?.nodes?.filter((item) => item.isFirstDegreePart === true)
   const componentVulnIds = firstDegreePart?.map((item) => item?.id)
   const sbomIds = firstDegreePart?.map((item) => item?.component?.sbom?.id)
 
@@ -131,28 +91,17 @@ const VulnTable = ({
   // GET VULN FILTER HEADS
   const {} = useQuery(signedUrlParams ? ShareVulnFilters : GetVulnFilterData, {
     fetchPolicy: 'cache-first',
-    variables: {
-      projectId: signedUrlParams ? undefined : productId,
-      sbomId: sbomId
-    },
+    variables: { projectId: signedUrlParams ? undefined : productId, sbomId: sbomId },
     onCompleted: (data) => {
-      prodVulnDispatch({
-        type: 'ADD_FILTER_HEADS',
-        payload: signedUrlParams
-          ? data?.shareLynkQuery?.sbom?.filters
-          : data?.sbom?.filters
-      })
+      prodVulnDispatch({ type: 'ADD_FILTER_HEADS', payload: signedUrlParams ? data?.shareLynkQuery?.sbom?.filters : data?.sbom?.filters })
     }
   })
 
-  const [onVulnScan] = useMutation(ManualVulnScan, {
-    fetchPolicy: 'network-only'
-  })
+  const [onVulnScan] = useMutation(ManualVulnScan, { fetchPolicy: 'network-only' })
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const editVulns = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'edit_vulnerabilities' && permission.value === true
+    (permission) => permission.key === 'edit_vulnerabilities' && permission.value === true
   )
 
   const handleChange = (state) => {
@@ -449,10 +398,7 @@ const VulnTable = ({
 
   const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
 
-  const range = {
-    min: parseFloat(vulnEpss[0]) / 100,
-    max: parseFloat(vulnEpss[1]) / 100
-  }
+  const range = { min: parseFloat(vulnEpss[0]) / 100, max: parseFloat(vulnEpss[1]) / 100 }
 
   const vulnData = {
     projectId: signedUrlParams ? undefined : productId,
@@ -481,8 +427,7 @@ const VulnTable = ({
       severity: severities.length > 0 ? severities : undefined,
       componentName: components.length > 0 ? components : undefined,
       status: statues.length > 0 ? statues : undefined,
-      kev:
-        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
+      kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
       direct: direct === true ? true : undefined,
       field: field,
@@ -552,26 +497,12 @@ const VulnTable = ({
       variables: { id: sbomId }
     }).then((res) => {
       if (sbomData?.vulnRunStatus === 'IN_PROGRESS') {
-        toast({
-          description: 'A scan is in-progress',
-          position: 'top',
-          status: 'info',
-          duration: 5000
-        })
+        toast({ description: 'A scan is in-progress', position: 'top', status: 'info', duration: 5000 })
       } else {
         if (res.data) {
-          toast({
-            description: 'Vulnerability re-scan started',
-            position: 'top',
-            status: 'success',
-            duration: 5000
-          })
-          sbomRefetch({
-            projectId: productId,
-            sbomId: sbomId
-          }).then((res) => {
-            res && setPaginationControl(res?.data)
-          })
+          toast({ description: 'Vulnerability re-scan started', position: 'top', status: 'success', duration: 5000 })
+          sbomRefetch({ projectId: productId, sbomId: sbomId
+          }).then((res) => res && setPaginationControl(res?.data))
           prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
         }
       }
@@ -580,44 +511,20 @@ const VulnTable = ({
 
   const handleRefresh = async () => {
     disablePaginationControl()
-    await refetch({
-      projectId: productId,
-      sbomId: sbomId
-    }).then((res) => {
+    await refetch({ projectId: productId, sbomId: sbomId }).then((res) => {
       res && setPaginationControl(res.data)
     })
   }
 
   const subHeader = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'flex-start'}
-        justifyContent={'space-between'}
-        gap={2}
-      >
-        <Flex
-          flexDirection={'row'}
-          alignItems={'flex-start'}
-          flexWrap={'wrap'}
-          gap={3}
-        >
+      <Flex width={'100%'} alignItems={'flex-start'} justifyContent={'space-between'} gap={2}>
+        <Flex flexDirection={'row'} alignItems={'flex-start'} flexWrap={'wrap'} gap={3} >
           {/* SEARCH COMPONENTS */}
-          <SearchFilter
-            id='vuln'
-            filterText={vulnSearch}
-            onChange={onSearchInputChange}
-            onFilter={handleSearch}
-            onClear={handleClear}
-          />
-
+          <SearchFilter id='vuln' filterText={vulnSearch} onChange={onSearchInputChange} onFilter={handleSearch} onClear={handleClear} />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {filters ? (
-            <VulnFilterMenu
-              refetch={refetch}
-              productId={productId}
-              sbomId={sbomId}
-            />
+            <VulnFilterMenu refetch={refetch} productId={productId} sbomId={sbomId} />
           ) : (
             <Stack direction='row' spacing={4}>
               {[1, 2, 3, 4].map((_, index) => (
@@ -631,22 +538,12 @@ const VulnTable = ({
           {/* UPDATE STATUES */}
           {selectedVulns.length > 0 && (
             <Tooltip label={'Set Status'}>
-              <IconButton
-                colorScheme='blue'
-                onClick={onOpen}
-                hidden={signedUrlParams}
-                icon={<FaPen />}
-              />
+              <IconButton colorScheme='blue' onClick={onOpen} hidden={signedUrlParams} icon={<FaPen />} />
             </Tooltip>
           )}
           {/* SCAN VULN */}
           <Tooltip label={'Scan Vulnerabilities'}>
-            <IconButton
-              colorScheme='blue'
-              onClick={handleScan}
-              hidden={signedUrlParams}
-              icon={<FaBug />}
-            />
+            <IconButton colorScheme='blue' onClick={handleScan} hidden={signedUrlParams} icon={<FaBug />} />
           </Tooltip>
           {/* IMPORT STATUS */}
           <Tooltip label='Import Statuses'>
@@ -686,57 +583,31 @@ const VulnTable = ({
       text-transform: uppercase;
       letter-spacing: 0.6px;
     `
-
     return (
-      <Box
-        width={'100%'}
-        p={5}
-        boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
-      >
-        <Grid
-          templateColumns='repeat(5, 1fr)'
-          gap={6}
-          width={'90%'}
-          margin={'0 auto'}
-        >
+      <Box width={'100%'} p={5} boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)' >
+        <Grid templateColumns='repeat(5, 1fr)' gap={6} width={'90%'} margin={'0 auto'} >
           {/* VULN DATA */}
-          <GridItem
-            w='100%'
-            colSpan={2}
-            display={'flex'}
-            flexDirection={'column'}
-            gap={4}
-          >
+          <GridItem w='100%' colSpan={2} display={'flex'} flexDirection={'column'} gap={4} >
             {/* Description */}
             <Box>
               <CustomText>Description :</CustomText>
-              <Text mt={1} fontSize={14}>
-                {vuln.desc}
-              </Text>
+              <Text mt={1} fontSize={14}>{vuln.desc}</Text>
             </Box>
             {/* Published At  */}
             <Box>
               <CustomText>Published:</CustomText>
-              <Text mt={1} fontSize={14}>
-                {getFullDateAndTime(vuln.publishedAt)}
-              </Text>
+              <Text mt={1} fontSize={14}>{getFullDateAndTime(vuln.publishedAt)}</Text>
             </Box>
             {/* Last Modified At */}
             <Box>
               <CustomText>Last Modified:</CustomText>
-              <Text mt={1} fontSize={14}>
-                {getFullDateAndTime(vuln.lastModifiedAt)}
-              </Text>
+              <Text mt={1} fontSize={14}>{getFullDateAndTime(vuln.lastModifiedAt)}</Text>
             </Box>
             {/* CVSS Vector */}
             <Box>
               <CustomText>CVSS Vector :</CustomText>
               {vuln?.cvssVector ? (
-                <Tooltip
-                  bg='gray.50'
-                  label={<CvssCard value={vuln?.cvssVector} />}
-                  placement='top'
-                >
+                <Tooltip bg='gray.50' label={<CvssCard value={vuln?.cvssVector} />} placement='top' >
                   <Tag
                     variant='subtle'
                     width={'fit-content'}
@@ -751,12 +622,7 @@ const VulnTable = ({
                   </Tag>
                 </Tooltip>
               ) : (
-                <Tag
-                  variant='subtle'
-                  width={'fit-content'}
-                  colorScheme={'cyan'}
-                  cursor={'pointer'}
-                >
+                <Tag variant='subtle' width={'fit-content'} colorScheme={'cyan'} cursor={'pointer'}>
                   {vuln?.cvssVector || '-'}
                 </Tag>
               )}
@@ -767,16 +633,9 @@ const VulnTable = ({
                 <CustomText>NVD Alias ID:</CustomText>
                 <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
                   <Flex mt={1} direction='row' alignItems={'center'} gap={2}>
-                    <Icon
-                      as={ExternalLinkIcon}
-                      h={'16px'}
-                      w={'16px'}
-                      color={'blue.500'}
-                    />
+                    <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} color={'blue.500'} />
                     <Tooltip label={vuln.nvdAliasId} placement={'top'}>
-                      <Text fontSize='sm' color={textColor}>
-                        {vuln.nvdAliasId}
-                      </Text>
+                      <Text fontSize='sm' color={textColor}>{vuln.nvdAliasId}</Text>
                     </Tooltip>
                   </Flex>
                 </Link>
@@ -786,22 +645,13 @@ const VulnTable = ({
             <Box>
               <CustomText>EPSS Percentile :</CustomText>
               <Text mt={1} fontSize={14}>
-                {vuln?.vulnInfo?.epssPercentile
-                  ? (vuln?.vulnInfo?.epssPercentile * 100).toFixed()
-                  : 0}
-                %
+                {vuln?.vulnInfo?.epssPercentile ? (vuln?.vulnInfo?.epssPercentile * 100).toFixed() : 0} %
               </Text>
             </Box>
           </GridItem>
           {/* STATUS UPDATE */}
           <GridItem w='100%' colSpan={3}>
-            <ProdStatusDrawer
-              data={data}
-              textColor={textColor}
-              refetch={refetch}
-              filteredData={filteredData}
-              filterRefetch={filterRefetch}
-            />
+            <ProdStatusDrawer data={data} textColor={textColor} refetch={refetch} filteredData={filteredData} filterRefetch={filterRefetch} />
           </GridItem>
         </Grid>
       </Box>
@@ -963,31 +813,16 @@ const VulnTable = ({
 
       {/* COPY DATA TABLE */}
       {isTableOpen && data && (
-        <Drawer
-          isOpen={isTableOpen}
-          placement='right'
-          size='full'
-          onClose={onTableClose}
-        >
+        <Drawer isOpen={isTableOpen} placement='right' size='full' onClose={onTableClose}>
           <DrawerOverlay />
           <DrawerContent>
-            <DrawerCloseButton
-              onClick={() => prodVulnDispatch({ type: 'RESET_IMPORT_SBOMS' })}
-            />
+            <DrawerCloseButton onClick={() => prodVulnDispatch({ type: 'RESET_IMPORT_SBOMS' })}/>
             <DrawerHeader>
-              <Text fontSize={20} fontWeight={'medium'}>
-                Import Vulnerability Status
-              </Text>
+              <Text fontSize={20} fontWeight={'medium'}>Import Vulnerability Status</Text>
             </DrawerHeader>
-
             <DrawerBody mt={2}>
               {/* IMPORT WIZARD */}
-              <ImportWizard
-                variant='circle'
-                currentSbomId={sbomId}
-                currentProductId={productId}
-                onClose={onTableClose}
-              />
+              <ImportWizard variant='circle' currentSbomId={sbomId} currentProductId={productId} onClose={onTableClose} />
             </DrawerBody>
           </DrawerContent>
         </Drawer>

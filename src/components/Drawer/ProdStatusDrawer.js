@@ -332,7 +332,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
                 </FormControl>
               )}
               {/* DETAILS */}
-              {(statusName === 'In Triage' || statusName === 'Affected') && (
+              {(statusName === 'In Triage') && (
                 <FormControl>
                   <InfoLabel title={'Details'} name={'details'} onClick={onCheckDetails} />
                   <Textarea rows={2} name='details' id='details' placeholder='Add details' fontSize='sm' value={details} onChange={(e) => setDetails(e.target.value)} />
