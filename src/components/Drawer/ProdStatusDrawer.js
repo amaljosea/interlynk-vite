@@ -210,7 +210,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const handleSelect = (item) => {
     const filterStatus = allVexStatus?.vexStatuses?.find((st) => st.name === item?.status)
     const filterJustify = allVexJustify?.vexJustifications?.find((st) => st?.name === item?.justification)
-    const filterRes = res?.cdxResponses?.find((st) => st?.name?.toLowerCase() === item?.response?.toLowerCase())
+    const filterRes = res?.cdxResponses?.find((st) => st?.name?.toLowerCase() === item?.response?.replace(/_/g, ' ').toLowerCase())
     setStatusTitle(filterStatus?.id || '')
     setStatusName(item?.status || '')
     setJustification(filterJustify?.id || '')
@@ -233,14 +233,14 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   }, [statusName])
 
   useEffect(() => {
-    if (componentVulnLogs) {
-      const sortedData =
-        componentVulnLogs &&
-        [...componentVulnLogs].sort((a, b) => {
-          const dateA = new Date(a.updatedAt).getTime()
-          const dateB = new Date(b.updatedAt).getTime()
-          return dateB - dateA
-        })
+    if (componentVulnLogs?.length > 0) {
+      const currentOne = componentVulnLogs[componentVulnLogs?.length - 1]
+      handleSelect(currentOne)
+      const sortedData = componentVulnLogs && [...componentVulnLogs].sort((a, b) => {
+        const dateA = new Date(a.updatedAt).getTime()
+        const dateB = new Date(b.updatedAt).getTime()
+        return dateB - dateA
+      })
       setStatusResults(sortedData)
     }
   }, [componentVulnLogs])
