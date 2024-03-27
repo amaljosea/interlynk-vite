@@ -13,7 +13,7 @@ import UploadModal from './components/UploadModal'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client'
 import { DeleteProjectGroup } from 'graphQL/Mutation'
-import { GetProjectCheck, GetVulnData, GetProjectLogs, GetProjectSettings, GetProjectGroup, GetGlobalVulnData, GetGlobalVulns } from 'graphQL/Queries'
+import { GetProjectCheck, GetVulnData, GetProjectLogs, GetProjectSettings, GetProjectGroup, GetGlobalVulnData, GetGlobalVulns, GetProjectPolicies } from 'graphQL/Queries'
 import Settings from '../ProductSettings'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
@@ -21,7 +21,6 @@ import StatusModal from './components/StatusModal'
 import VulnInfo from '../Vulnerabilities/vulnInfo'
 import NotificationMenuBell from "../../../components/Notifications/NotificationMenuBell";
 import PolicyTable from 'components/Tables/PolicyTable'
-import { GetProjectPolicies } from 'graphQL/Queries'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -32,9 +31,9 @@ const ProductDetails = () => {
   const vulnId = queryParams.get('vulnId')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const { totalRows, activeProdTab, setActiveProdTab, prodLogState, prodVulnState, prodRulesState, globalVulnState, compVulnState, dispatch, userPermissions } = useGlobalState()
+  const { totalRows, activeProdTab, setActiveProdTab, prodLogState, prodVulnState, prodRulesState, globalVulnState, dispatch, userPermissions } = useGlobalState()
   const { field, direction, searchInput, type, user, object } = prodLogState
-  const { searchInput: compVulnSearch,envs,statuses,source,versions: sbomVersions, products} = compVulnState
+  const { searchInput: compVulnSearch,envs,statuses,source,versions: sbomVersions} = prodVulnState
   const { searchInput: vulnSearch, severities, components, statues, kev, epss, direct } = prodVulnState
   const { prodVulnDispatch, globalVulnDispatch } = dispatch
 

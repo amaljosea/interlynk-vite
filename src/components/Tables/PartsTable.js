@@ -99,6 +99,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       .then((res) => {
         if (res.data) {
           sbomRefetch({ projectId: prodId, sbomId: sbomId })
+          prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
           refetch({ variables: { projectId: prodId, sbomId: sbomId } })
         }
       })
