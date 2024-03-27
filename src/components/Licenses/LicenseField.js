@@ -10,13 +10,14 @@ import {
   useDisclosure, TagLabel, Tag
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
-import ReactSelect from 'react-select'
+import ReactSelect, { components } from 'react-select';
 
 import { LicenseAutoComplete } from 'graphQL/Queries'
 
 import { useLazyQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
 import InfoModal from '../InfoModal'
+
 
 const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView, license }) => {
 
@@ -55,7 +56,7 @@ const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView, license }) =>
 
   const onLicenseChange = (selected) => {
 
-    selected = [selected[selected.length - 1]] // only allow one license to be selected
+    selected = [selected]
 
     dispatcher({ type: 'SET_LICENSE_FIELD', payload: selected })
 
@@ -77,7 +78,7 @@ const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView, license }) =>
           })
 
           //Remove duplicates values if any. Doing this since filtering over 25 entries is not expensive
-          const uniqueLicenses = licenses.filter((v, i, a) => a.findIndex(t => (t.value === v.value)) === i)
+          const uniqueLicenses = licenses?.filter((v, i, a) => a.findIndex(t => (t.value === v.value)) === i)
 
           setLicenseList(uniqueLicenses)
         }
@@ -94,6 +95,24 @@ const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView, license }) =>
     setInfoText(licenseInfo)
     setInfoUrl(``)
     onInfoOpen()
+  }
+
+  const Option = (props) => {
+    return (
+      <components.Option {...props}>
+        <Flex justifyContent={'space-between'} alignItems={'center'}>
+          <Text>{props.data.label}</Text>
+          <Tag
+            width={'fit-content'}
+            size={'sm'}
+            variant='subtle'
+            colorScheme='cyan'
+          >
+            <TagLabel fontSize={'10px'}>{props.data.type}</TagLabel>
+          </Tag>
+        </Flex>
+      </components.Option>
+    )
   }
 
   return (
@@ -126,7 +145,8 @@ const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView, license }) =>
             }}
             components={{
               DropdownIndicator: () => null,
-              IndicatorSeparator: () => null
+              IndicatorSeparator: () => null,
+              Option
             }}
             value={licenseString}
             options={licenseList}
@@ -134,7 +154,6 @@ const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView, license }) =>
             onInputChange={handleInputChange}
             placeholder={'Enter License'}
             className='react-select'
-            isMulti
           />
         {licenseType && <Flex justifyContent="flex-end">
           <Tag
@@ -142,7 +161,7 @@ const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView, license }) =>
             size={'sm'}
             my={2}
             variant='subtle'
-            colorScheme='orange'
+            colorScheme='cyan'
           >
             <TagLabel>{licenseType}</TagLabel>
           </Tag>

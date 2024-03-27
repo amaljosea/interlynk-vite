@@ -158,7 +158,7 @@ function Profile() {
             <Card>
               <Tabs variant='enclosed' w={'100%'} bg={'white'} index={psIndex} onChange={handleChange}>
                 <TabList>
-                  {['Personal Details', 'Organizations', 'Security Tokens', 'Notification Settings'].map(
+                  {['Personal Details', 'Organizations', 'Security Tokens', 'Notifications'].map(
                     (item, index) => (
                       <Tab key={index} _focus={{ outline: 'none' }} isDisabled={orgInfo?.organization === null && (item === 'Personal Details' || item === 'Security Tokens')}>
                         {item}
