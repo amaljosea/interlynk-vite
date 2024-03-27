@@ -1,42 +1,12 @@
-import { useMutation } from '@apollo/client'
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Input,
-  FormErrorMessage,
-  Stack,
-  Text,
-  Tag
-} from '@chakra-ui/react'
-import { CreateAutomation } from 'graphQL/Mutation'
-import { updateComSupplier } from 'graphQL/Mutation'
-import { recheckHealth } from 'graphQL/Mutation'
-import { addComSupplier } from 'graphQL/Mutation'
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useState, useEffect } from 'react'
+import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
-import { validateUrl } from 'utils'
-import { validateEmail } from 'utils'
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, FormLabel, Input, FormErrorMessage, Stack, Text, Tag } from '@chakra-ui/react'
+import { CreateAutomation, updateComSupplier, recheckHealth, addComSupplier } from 'graphQL/Mutation'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { validateUrl, validateEmail } from 'utils'
 
-const SupplierModal = ({
-  id,
-  isOpen,
-  onClose,
-  refetch,
-  data,
-  checkId,
-  filterRefetch,
-  activeCheck
-}) => {
+const SupplierModal = ({ id, isOpen, onClose, refetch, data, checkId, filterRefetch, activeCheck }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
@@ -56,17 +26,7 @@ const SupplierModal = ({
   const containsSpace = /\s/.test(orgUrl)
 
   const onFilterRefetch = () => {
-    filterRefetch({
-      projectId: productId,
-      sbomId: sbomId
-    }).then(
-      (res) =>
-        res.data &&
-        prodCompDispatch({
-          type: 'ADD_FILTER_HEADS',
-          payload: res.data.sbom.filters
-        })
-    )
+    filterRefetch({ projectId: productId, sbomId: sbomId }).then((res) => res.data && prodCompDispatch({ type: 'ADD_FILTER_HEADS', payload: res.data.sbom.filters }))
   }
 
   const onSupplierChange = (e) => {
@@ -92,9 +52,7 @@ const SupplierModal = ({
     }
   })
 
-  const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => refetch()
-  })
+  const [healthRecheck] = useMutation(recheckHealth, {onCompleted: () => refetch()})
 
   useEffect(() => {
     if (data && data?.suppliers?.length > 0) {
@@ -108,25 +66,13 @@ const SupplierModal = ({
 
   const handleSave = async () => {
     await createSupplier({
-      variables: {
-        name: orgName,
-        url: orgUrl,
-        contactName: supName,
-        contactEmail: supEmail,
-        componentId: activeCheck ? activeCheck.id : id
-      }
+      variables: { name: orgName, url: orgUrl, contactName: supName, contactEmail: supEmail, componentId: activeCheck ? activeCheck.id : id }
     })
       .then((res) => {
         if (res.data) {
           if (checkId) {
             prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
-            healthRecheck({
-              variables: {
-                sbomId: sbomId,
-                checkId: checkId,
-                compId: activeCheck.id
-              }
-            })
+            healthRecheck({ variables: { sbomId: sbomId, checkId: checkId, compId: activeCheck.id } })
           }
         }
       })
@@ -135,13 +81,7 @@ const SupplierModal = ({
 
   const handleUpdate = async () => {
     await updateSupplier({
-      variables: {
-        name: orgName,
-        url: orgUrl,
-        contactName: supName,
-        contactEmail: supEmail,
-        id: data && data.suppliers && data.suppliers[0].id
-      }
+      variables: { name: orgName, url: orgUrl, contactName: supName, contactEmail: supEmail, id: data && data.suppliers && data.suppliers[0].id }
     }).then((res) => res.data && onClose())
   }
 
@@ -158,14 +98,7 @@ const SupplierModal = ({
           enabled: true,
           compName: activeCheck.name,
           compVersion: activeCheck.version,
-          set: JSON.stringify(
-            {
-              name: supName,
-              contact_email: supEmail
-            },
-            null,
-            2
-          )
+          set: JSON.stringify( { name: supName, contact_email: supEmail }, null, 2 )
         }
       }).then((res) => res.data && handleSave())
     } catch (error) {
@@ -191,11 +124,7 @@ const SupplierModal = ({
     setIsValidUrl('')
   }
 
-  const isInvalid =
-    supName === '' ||
-    nameError !== '' ||
-    (supEmail !== '' && !validateEmail(supEmail)) ||
-    (orgUrl !== '' && !validateUrl(orgUrl))
+  const isInvalid = (supName === '' && supEmail === '' && orgName === '' && orgUrl === '') || nameError !== '' || (supEmail !== '' && !validateEmail(supEmail)) || (orgUrl !== '' && !validateUrl(orgUrl))
 
   return (
     <>
@@ -203,37 +132,17 @@ const SupplierModal = ({
         <ModalOverlay />
 
         <ModalContent>
-          <ModalHeader>
-            {data && data.suppliers?.length > 0 ? 'Edit' : 'Add'} Supplier
-          </ModalHeader>
+          <ModalHeader>{data && data.suppliers?.length > 0 ? 'Edit' : 'Add'} Supplier</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             {data && (
-              <Flex
-                width='99%'
-                direction={'row'}
-                alignItems={'center'}
-                justifyContent={'flex-start'}
-                flexWrap={'wrap'}
-                gap={2}
-                mb={4}
-              >
-                <Text fontWeight={'medium'} wordBreak={'break-all'}>
-                  {data.name}
-                </Text>
+              <Flex width='99%' direction={'row'} alignItems={'center'} justifyContent={'flex-start'} flexWrap={'wrap'} gap={2} mb={4}>
+                <Text fontWeight={'medium'} wordBreak={'break-all'}>{data.name}</Text>
                 <Tag colorScheme='blue'>{data.version}</Tag>
               </Flex>
             )}
             {activeCheck && (
-              <Flex
-                width='100%'
-                direction={'row'}
-                alignItems={'center'}
-                justifyContent={'flex-start'}
-                wrap={'wrap'}
-                gap={2}
-                mb={6}
-              >
+              <Flex width='100%' direction={'row'} alignItems={'center'} justifyContent={'flex-start'} wrap={'wrap'} gap={2} mb={6}>
                 <Text wordBreak={'break-all'}>{activeCheck?.name}</Text>
                 <Tag colorScheme='blue'>{activeCheck?.version}</Tag>
               </Flex>
@@ -242,35 +151,19 @@ const SupplierModal = ({
               {/* ORG NAME */}
               <FormControl>
                 <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
-                <Input
-                  placeholder='Enter organization name'
-                  value={orgName}
-                  onChange={(e) => setOrgName(e.target.value)}
-                />
+                <Input placeholder='Enter organization name' value={orgName} onChange={(e) => setOrgName(e.target.value)} />
               </FormControl>
               {/* ORG URL */}
-              <FormControl
-                isInvalid={
-                  (orgUrl !== '' && !validateUrl(orgUrl)) || containsSpace
-                }
+              <FormControl isInvalid={(orgUrl !== '' && !validateUrl(orgUrl)) || containsSpace}
               >
                 <FormLabel fontSize={'sm'}>URL</FormLabel>
-                <Input
-                  placeholder='Enter URL'
-                  value={orgUrl}
-                  onBlur={handleCheckUrl}
-                  onChange={onUrlChange}
-                />
+                <Input placeholder='Enter URL' value={orgUrl} onBlur={handleCheckUrl} onChange={onUrlChange} />
                 <FormErrorMessage>{isValidUrl}</FormErrorMessage>
               </FormControl>
               {/* SUPPLIER NAME */}
-              <FormControl isRequired isInvalid={nameError}>
+              <FormControl isInvalid={nameError}>
                 <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
-                <Input
-                  placeholder='Enter supplier name'
-                  value={supName}
-                  onChange={onSupplierChange}
-                />
+                <Input placeholder='Enter supplier name' value={supName} onChange={onSupplierChange} />
                 <FormErrorMessage>{nameError}</FormErrorMessage>
               </FormControl>
               {/* SUPPLIER EMAIL */}
@@ -292,43 +185,20 @@ const SupplierModal = ({
             </Flex>
           </ModalBody>
           <ModalFooter>
-            <Flex
-              width={'100%'}
-              justifyContent={'space-between'}
-              alignItems={'center'}
-            >
+            <Flex width={'100%'} justifyContent={'space-between'} alignItems={'center'} >
               {checkId ? (
-                <Button
-                  fontSize={'sm'}
-                  colorScheme='blue'
-                  onClick={onSaveRule}
-                  isDisabled={isInvalid}
-                >
+                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule} isDisabled={isInvalid}>
                   Save Rule
                 </Button>
               ) : (
                 <Text></Text>
               )}
               <Stack direction={'row'} spacing={2} alignItems={'center'}>
-                <Button colorScheme='gray' onClick={onClose}>
-                  Cancel
-                </Button>
+                <Button colorScheme='gray' onClick={onClose}>Cancel</Button>
                 {data && data.suppliers?.length > 0 ? (
-                  <Button
-                    colorScheme='blue'
-                    onClick={handleUpdate}
-                    isDisabled={isInvalid}
-                  >
-                    Update
-                  </Button>
+                  <Button colorScheme='blue' onClick={handleUpdate} isDisabled={isInvalid}>Update</Button>
                 ) : (
-                  <Button
-                    colorScheme='blue'
-                    onClick={handleSave}
-                    isDisabled={isInvalid}
-                  >
-                    Save
-                  </Button>
+                  <Button colorScheme='blue' onClick={handleSave} isDisabled={isInvalid}>Save</Button>
                 )}
               </Stack>
             </Flex>
