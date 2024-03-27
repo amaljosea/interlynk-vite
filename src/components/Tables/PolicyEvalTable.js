@@ -9,6 +9,7 @@ import Pagination from 'components/Pagination'
 import { SbomPolicyScan } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
+import { BiScan } from 'react-icons/bi'
 
 const PolicyEvalTable = ({ data }) => {
   const toast = useToast()
@@ -51,12 +52,8 @@ const PolicyEvalTable = ({ data }) => {
   const subHeader = useMemo(() => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
-        <Tooltip label='Refresh'>
-          <IconButton
-            colorScheme='blue'
-            onClick={handleRefresh}
-            icon={<RepeatIcon />}
-          />
+        <Tooltip label='Policy Scan'>
+          <IconButton  colorScheme='blue' onClick={handleRefresh} icon={<BiScan size={20}/>} />
         </Tooltip>
       </Flex>
     )
