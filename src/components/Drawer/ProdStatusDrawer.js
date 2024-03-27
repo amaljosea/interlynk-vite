@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { InfoIcon } from '@chakra-ui/icons'
-import { Box, Button, FormLabel, Select, SimpleGrid, Stack, Table, Tbody, Text, Textarea, Th, Thead, Tr, Flex, FormControl, Checkbox, useDisclosure, Icon } from '@chakra-ui/react'
+import { CheckIcon, InfoIcon } from '@chakra-ui/icons'
+import { Box, Button, FormLabel, Select, SimpleGrid, Stack, Table, Tbody, Text, Textarea, Th, Thead, Tr, Flex, FormControl, Checkbox, useDisclosure, Icon, IconButton } from '@chakra-ui/react'
+import Card from 'components/Card/Card'
 import InfoModal from 'components/InfoModal'
 import VulLinkRow from 'components/Tables/VulLinkRow'
 import { updateCompVulnVex } from 'graphQL/Mutation'
@@ -253,22 +254,26 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
           {!signedUrlParams && (
             <>
               {/* STATUS */}
-              <FormControl isRequired>
-                <InfoLabel title={'Status'} name={'vexType'} onClick={onCheckStatus} />
-                <Select id='vexType' name='vexType' fontSize='sm' value={statusTitle} onChange={handleStatusChange}>
-                  <option value=''>-- Select Status --</option>
-                  {allVexStatus ? (
-                    allVexStatus.vexStatuses.map((st, idx) => (
-                      <option key={idx} value={st.id}>{st.name}</option>
-                    ))
-                  ) : (
-                    <option value={''}>No data found</option>
-                  )}
-                </Select>
-              </FormControl>
+              <Card position='relative' p={6} border={`1px solid lightgray`}>
+                {statusTitle !== '' && <IconButton size='xs' position={'absolute'} right={-2} top={-2} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
+                <FormControl isRequired>
+                  <InfoLabel title={'Status'} name={'vexType'} onClick={onCheckStatus} />
+                  <Select id='vexType' name='vexType' fontSize='sm' value={statusTitle} onChange={handleStatusChange}>
+                    <option value=''>-- Select Status --</option>
+                    {allVexStatus ? (
+                      allVexStatus.vexStatuses.map((st, idx) => (
+                        <option key={idx} value={st.id}>{st.name}</option>
+                      ))
+                    ) : (
+                      <option value={''}>No data found</option>
+                    )}
+                  </Select>
+                </FormControl>
+              </Card>
               {/* JUSTIFICATION */}
-              {(statusName === 'Not Affected' ||
-                statusName === 'False Positive') && (
+              {(statusName === 'Not Affected' || statusName === 'False Positive') && (
+              <Card position='relative' p={6} border={`1px solid lightgray`}>
+                {justification !== '' && impactData !== '' && <IconButton size='xs' position={'absolute'} right={-2} top={-2} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
                 <FormControl isRequired={statusName === 'Not Affected' || statusName === 'False Positive'}>
                   <InfoLabel title={'Justification'} name={justification} onClick={onCheckJustify} />
                   <Select id='justification' name='justification' value={justification} onChange={handleJustifyChange} fontSize='sm' color='gray.600'>
@@ -282,67 +287,67 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
                     )}
                   </Select>
                 </FormControl>
-              )}
-              {/* RESPONSE */}
-              {statusName === 'Affected' && (
-                <FormControl isRequired={statusName === 'Affected'}>
-                  <InfoLabel title={'Response'} name={'response'} onClick={onCheckResponse} />
-                  {res && (
-                    <Select id='response' name='response' value={response} onChange={handleResponseChange} fontSize='sm' color='gray.600'>
-                      <option value=''>-- Select --</option>
-                      {res?.cdxResponses?.length > 0 &&
-                        res?.cdxResponses?.map((item, idx) => (
-                          <option key={idx} value={item.id}>{item.name}</option>
-                        ))}
-                    </Select>
-                  )}
-                </FormControl>
-              )}
-              {/* FIXED VERSION */}
-              {statusName === 'Affected' && responseTitle === 'Update' && (
-                <Stack width={'100%'} direction={'column'} spacing={4} alignItems={'flex-start'}>
-                  <FormControl width={'100%'} isRequired={responseTitle === 'Update'}>
-                    <InfoLabel title={'Fixed Version'} name={'fixedVersion'} onClick={onCheckFixedVersion} />
-                    <Select id='fixedVersion' name='fixedVersion' value={selectedTag} onChange={(e) => setSelectedTag(e.target.value)} fontSize='sm' color='gray.600'>
-                      <option value=''>-- Select --</option>
-                      {fixedVersions.length > 0 ? (
-                        fixedVersions.map((item, index) => (
-                          <option key={index} value={item.label} name={item.label}>{item.label}</option>
-                        ))
-                      ) : (
-                        <option value=''>-- --</option>
-                      )}
-                    </Select>
-                  </FormControl>
-                </Stack>
-              )}
-              {/* IMPACT STATEMENT */}
-              {(statusName === 'Not Affected' ||
-                statusName === 'False Positive') && (
-                <FormControl isRequired={(statusName === 'Not Affected' && justifyName === 'Other (impact statment required)') || (statusName === 'False Positive' && justifyName === 'Other (impact statment required)')}>
+                {/* IMPACT STATEMENT */}
+                <FormControl mt={5} isRequired={(statusName === 'Not Affected' && justifyName === 'Other (impact statment required)') || (statusName === 'False Positive' && justifyName === 'Other (impact statment required)')}>
                   <InfoLabel title={'Impact Statement'} name={'impactStatement'} onClick={onCheckImpact} />
                   <Textarea type='text' name='impactStatement' rows={2} id='impactStatement' placeholder='Add impact statement' value={impactData} onChange={(e) => setImpactData(e.target.value)} fontSize='sm' />
                 </FormControl>
+              </Card>
               )}
-              {/* ACTION STATEMENT */}
+              {/* RESPONSE */}
               {statusName === 'Affected' && (
-                <FormControl isRequired={statusName === 'Affected'}>
-                  <InfoLabel title={'Action Statement'} name={'actionStatement'} onClick={onCheckAction} />
-                  <Textarea rows={2} name='actionStatement' id='actionStatement' placeholder='Add statement' fontSize='sm' value={actionStatement} onChange={(e) => setActionStatement(e.target.value)} />
-                </FormControl>
-              )}
-              {/* DETAILS */}
-              {(statusName === 'In Triage') && (
-                <FormControl>
-                  <InfoLabel title={'Details'} name={'details'} onClick={onCheckDetails} />
-                  <Textarea rows={2} name='details' id='details' placeholder='Add details' fontSize='sm' value={details} onChange={(e) => setDetails(e.target.value)} />
-                </FormControl>
+                <Card position='relative' p={6} border={`1px solid lightgray`}>
+                  {response !== '' && selectedTag !== '' && actionStatement !== '' && <IconButton size='xs' position={'absolute'} right={-2} top={-2} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
+                  <FormControl isRequired={statusName === 'Affected'}>
+                    <InfoLabel title={'Response'} name={'response'} onClick={onCheckResponse} />
+                    {res && (
+                      <Select id='response' name='response' value={response} onChange={handleResponseChange} fontSize='sm' color='gray.600'>
+                        <option value=''>-- Select --</option>
+                        {res?.cdxResponses?.length > 0 &&
+                          res?.cdxResponses?.map((item, idx) => (
+                            <option key={idx} value={item.id}>{item.name}</option>
+                          ))}
+                      </Select>
+                    )}
+                  </FormControl>
+                  {/* FIXED VERSION */}
+                  {responseTitle === 'Update' && (
+                    <FormControl mt={5} width={'100%'} isRequired={responseTitle === 'Update'}>
+                      <InfoLabel title={'Fixed Version'} name={'fixedVersion'} onClick={onCheckFixedVersion} />
+                      <Select id='fixedVersion' name='fixedVersion' value={selectedTag} onChange={(e) => setSelectedTag(e.target.value)} fontSize='sm' color='gray.600'>
+                        <option value=''>-- Select --</option>
+                        {fixedVersions.length > 0 ? (
+                          fixedVersions.map((item, index) => (
+                            <option key={index} value={item.label} name={item.label}>{item.label}</option>
+                          ))
+                        ) : (
+                          <option value=''>-- --</option>
+                        )}
+                      </Select>
+                    </FormControl>
+                  )}
+                  {/* ACTION STATEMENT */}
+                  <FormControl mt={5} isRequired={statusName === 'Affected'}>
+                    <InfoLabel title={'Action Statement'} name={'actionStatement'} onClick={onCheckAction} />
+                    <Textarea rows={2} name='actionStatement' id='actionStatement' placeholder='Add statement' fontSize='sm' value={actionStatement} onChange={(e) => setActionStatement(e.target.value)} />
+                  </FormControl>
+                </Card>
               )}
               {/* INTERNAL NOTES */}
-              <FormControl>
-                <InfoLabel title={'Internal Notes'} name={'internalNotes'} onClick={onCheckNotes} />
-                <Textarea rows={2} name='internalNotes' id='internalNotes' placeholder='Add notes' fontSize='sm' value={notes} onChange={(e) => setNotes(e.target.value)} />
-              </FormControl>
+              <Card position='relative' p={6} border={`1px solid lightgray`}>
+                {details !== '' && notes !== '' && <IconButton size='xs' position={'absolute'} right={-2} top={-2} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
+                {/* DETAILS */}
+                {(statusName === 'In Triage') && (
+                  <FormControl>
+                    <InfoLabel title={'Details'} name={'details'} onClick={onCheckDetails} />
+                    <Textarea rows={2} name='details' id='details' placeholder='Add details' fontSize='sm' value={details} onChange={(e) => setDetails(e.target.value)} />
+                  </FormControl>
+                )}
+                <FormControl mt={statusName === 'In Triage' ? 5 : 0}>
+                  <InfoLabel title={'Internal Notes'} name={'internalNotes'} onClick={onCheckNotes} />
+                  <Textarea rows={2} name='internalNotes' id='internalNotes' placeholder='Add notes' fontSize='sm' value={notes} onChange={(e) => setNotes(e.target.value)} />
+                </FormControl>
+              </Card>
               {/* UPSTERAM PRODUCT */}
               <FormControl>
                 <Checkbox size='sm' isChecked={upstream} onChange={(e) => setUpstream(e.target.checked)}>
