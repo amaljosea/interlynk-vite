@@ -208,6 +208,18 @@ const PolicyTable = ({ data, refetch }) => {
       omit: productId
     },
     {
+      id: 'EXCLUSION',
+      name: 'EXCLUSION ',
+      selector: (row) => {
+        const { isExcluded } = row
+        return (
+          <Switch size='md' isChecked={isExcluded} onChange={() => isExcluded ? handleDeleteExclusion(row?.id) : handleCreateExclusion(row?.id)} />
+        )
+      },
+      width: '150px',
+      omit: !productId
+    },
+    {
       id: 'NAME',
       name: 'NAME',
       selector: (row) => <Text my={4}>{row?.name}</Text>,
@@ -231,13 +243,6 @@ const PolicyTable = ({ data, refetch }) => {
       ),
       width: '250px',
       wrap: true
-    },
-    {
-      id: 'EXCLUSION',
-      name: 'EXCLUSION ',
-      selector: (row) => <Tag variant='solid' colorScheme='blue' textTransform={'capitalize'}>{JSON.stringify(row?.isExcluded)}</Tag>,
-      width: '150px',
-      omit: !productId
     },
     // UPDATED AT
     {
