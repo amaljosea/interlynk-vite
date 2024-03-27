@@ -266,8 +266,6 @@ const PolicyTable = ({ data, refetch }) => {
             <MenuButton as={IconButton} icon={<FaEllipsisV />} variant='none' color='gray.400' />
             <Portal>
               <MenuList fontSize={'sm'}>
-                {/* UPDATE EXCLUSION */}
-                <MenuItem hidden={!productId} onClick={() => row?.isExcluded ? handleDeleteExclusion(row?.id) : handleCreateExclusion(row?.id)}>{row?.isExcluded ? 'Delete' : 'Create'} Exclusion</MenuItem>
                 {/* EDIT POLICY */}
                 <MenuItem
                   hidden={productId}
@@ -298,7 +296,8 @@ const PolicyTable = ({ data, refetch }) => {
           </Menu>
         )
       },
-      right: 'true'
+      right: 'true',
+      omit: productId
     }
   ]
 
