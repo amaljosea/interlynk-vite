@@ -35,7 +35,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const editVulns = sboms?.supersededBy?.some((permission) =>permission.key === 'edit_vulnerabilities' && permission.value === true)
 
-  const { id, componentVulnLogs } = data
+  const { id, componentVulnLogs, vexStatus, vexJustification, cdxResponse } = data
 
   const {isOpen, onOpen, onClose} = useDisclosure()
 
@@ -209,15 +209,12 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   }
 
   const handleSelect = (item) => {
-    const filterStatus = allVexStatus?.vexStatuses?.find((st) => st.name === item?.status)
-    const filterJustify = allVexJustify?.vexJustifications?.find((st) => st?.name === item?.justification)
-    const filterRes = res?.cdxResponses?.find((st) => st?.name?.toLowerCase() === item?.response?.replace(/_/g, ' ').toLowerCase())
-    setStatusTitle(filterStatus?.id || '')
-    setStatusName(item?.status || '')
-    setJustification(filterJustify?.id || '')
+    setStatusTitle(vexStatus?.id || '')
+    setStatusName(vexStatus?.name || '')
+    setJustification(vexJustification?.id || '')
     setJustifyName(item?.justification || '')
     setActionStatement(item?.actionStmt || '')
-    setResponse(filterRes?.id || '')
+    setResponse(cdxResponse?.id || '')
     setResponseTitle(capitalizeFirstLetter(item?.response) || '')
     setSelectedTag(item?.fixedIn || '')
     setDetails(item?.detail || '')
@@ -335,7 +332,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               )}
               {/* INTERNAL NOTES */}
               <Card position='relative' p={6} border={`1px solid lightgray`}>
-                {details !== '' && notes !== '' && <IconButton size='xs' position={'absolute'} right={-2} top={-2} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
+                {(details !== '' || notes !== '') && <IconButton size='xs' position={'absolute'} right={-2} top={-2} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
                 {/* DETAILS */}
                 {(statusName === 'In Triage') && (
                   <FormControl>

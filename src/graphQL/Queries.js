@@ -1922,6 +1922,10 @@ export const GetVulnData = gql`
             id
             name
           }
+          cdxResponse {
+            id
+            name
+          }
         }
       }
     }
