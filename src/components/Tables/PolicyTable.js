@@ -2,8 +2,7 @@ import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import styled from '@emotion/styled'
 import { Box, Flex, Grid, GridItem, Heading, IconButton, Input, Menu, MenuButton, MenuItem, MenuList, Portal, Stack, Switch, Tag, Text, Tooltip, useDisclosure, useToast } from '@chakra-ui/react'
-import { customStyles } from 'utils'
-import { getFullDateAndTime, timeSince } from 'utils'
+import { customStyles, getFullDateAndTime, timeSince, updatedValue } from 'utils'
 import { FaEllipsisV, FaPlus } from 'react-icons/fa'
 import { useEffect, useMemo, useState } from 'react'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -11,15 +10,10 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { RepeatIcon } from '@chakra-ui/icons'
 import Pagination from 'components/Pagination'
 import PolicyModal from 'views/Dashboard/Policies/PolicyModal'
-import { PolicyUpdate, PolicyDelete } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
-import { FaPen, FaTrash } from 'react-icons/fa6'
+import { PolicyUpdate, PolicyDelete, PolicyExclusionCreate, DeletePolicyExclusion, DeletePolicyRule } from 'graphQL/Mutation'
 import RuleModal from 'views/Dashboard/Policies/RuleModal'
-import { DeletePolicyRule } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
-import { PolicyExclusionCreate } from 'graphQL/Mutation'
-import { DeletePolicyExclusion } from 'graphQL/Mutation'
-import { updatedValue } from 'utils'
 
 const PolicyTable = ({ data, refetch }) => {
   const toast = useToast()
@@ -96,11 +90,7 @@ const PolicyTable = ({ data, refetch }) => {
   const handleSearch = async (event) => {
     const { value } = event.target
     if (event.key === 'Enter' && filterText !== '') {
-      refetch({ variables: { projectId: activeProd || undefined, search: activeProd ? undefined : value, first: totalRows } }).then(
-        (res) =>
-          res?.data &&
-          policyDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      )
+      refetch({ variables: { projectId: activeProd || undefined, search: activeProd ? undefined : value, first: totalRows } }).then((res) => res?.data && policyDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value }))
     }
   }
 
@@ -180,11 +170,7 @@ const PolicyTable = ({ data, refetch }) => {
   // SUB HEADER
   const subHeader = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={productId ? 'flex-end' : 'space-between'}
-      >
+      <Flex width={'100%'} alignItems={'center'} justifyContent={productId ? 'flex-end' : 'space-between'}>
         {/* SEARCH COMPONENTS */}
         {!productId && <SearchFilter id='support' filterText={filterText} onChange={onSearchInputChange} onClear={handleClear} onFilter={handleSearch} />}
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
@@ -232,9 +218,7 @@ const PolicyTable = ({ data, refetch }) => {
       id: 'OPERATOR',
       name: 'OPERATOR',
       selector: (row) => (
-        <Text textTransform={'capitalize'}>
-          {row?.operator === 0 ? 'Any' : row?.operator === 1 ? 'All' : ''}
-        </Text>
+        <Text textTransform={'capitalize'}>{row?.operator}</Text>
       ),
       width: '200px',
       wrap: true
@@ -323,37 +307,26 @@ const PolicyTable = ({ data, refetch }) => {
       text-transform: uppercase;
       letter-spacing: 0.6px;
     `
-
     return (
-      <Box
-        width={'100%'}
-        p={5}
-        boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
-      >
+      <Box width={'100%'} p={5} boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'>
         <Heading mb={6} fontFamily={'inherit'} fontSize={'sm'} color={'#555'} width={'90%'} mx={'auto'} >
           CONDITIONS
         </Heading>
         <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={4} mx={'auto'} >
-          <GridItem>
-            <CustomText>subject</CustomText>
-          </GridItem>
-          <GridItem>
-            <CustomText>operator</CustomText>
-          </GridItem>
-          <GridItem>
-            <CustomText>value</CustomText>
-          </GridItem>
+          <GridItem><CustomText>subject</CustomText></GridItem>
+          <GridItem><CustomText>operator</CustomText></GridItem>
+          <GridItem><CustomText>value</CustomText></GridItem>
         </Grid>
         {policyRules?.map((item, index) => (
-          <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={3} mx={'auto'} >
+          <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={3} mx={'auto'} bg={'#EDF2F7'} p={2}>
             <GridItem>
-              <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={updatedValue(item?.subject)} />
+              <Text fontSize={'sm'}>{updatedValue(item?.subject)}</Text>
             </GridItem>
             <GridItem>
-              <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={updatedValue(item?.operator)} />
+              <Text fontSize={'sm'}>{updatedValue(item?.operator)}</Text>
             </GridItem>
             <GridItem>
-              <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={item?.value} />
+              <Text fontSize={'sm'} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'}>{updatedValue(item?.value)} {item?.subject === 'VULNERABILITY_EPSS' && (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN') ? ' %' : ''}</Text>
             </GridItem>
           </Grid>
         ))}
@@ -371,54 +344,20 @@ const PolicyTable = ({ data, refetch }) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          columns={columns}
-          data={data?.nodes || []}
-          customStyles={customStyles}
-          progressPending={data ? false : true}
-          progressComponent={<CustomLoader />}
-          subHeader
-          subHeaderComponent={subHeader}
-          expandableRows
-          expandOnRowClicked
-          expandableRowsComponent={ExpandedComponent}
-          persistTableHead
-          responsive={true}
-        />
+        <DataTable columns={columns} data={data?.nodes || []} customStyles={customStyles} progressPending={data ? false : true} progressComponent={<CustomLoader />} subHeader subHeaderComponent={subHeader} expandableRows expandOnRowClicked expandableRowsComponent={ExpandedComponent} persistTableHead responsive={true} />
 
         {/* PAGINATION */}
         {data?.pageInfo && (
-          <Pagination
-            paginationSizes={paginationSizes}
-            pageIndex={pageIndex}
-            totalRows={totalRows}
-            totalCount={data?.totalCount}
-            onPreviousPage={handlePreviousPage}
-            onNextPage={handleNextPage}
-            onSetRow={handleSetRow}
-            hasNextPage={isNextActive}
-            hasPreviousPage={isPrevActive}
-          />
+          <Pagination paginationSizes={paginationSizes} pageIndex={pageIndex} totalRows={totalRows} totalCount={data?.totalCount} onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} onSetRow={handleSetRow} hasNextPage={isNextActive} hasPreviousPage={isPrevActive} />
         )}
       </Flex>
 
       {isOpen && (
-        <PolicyModal
-          data={activeRow}
-          isOpen={isOpen}
-          onClose={onClose}
-          refetch={refetch}
-        />
+        <PolicyModal data={activeRow} isOpen={isOpen} onClose={onClose} refetch={refetch} />
       )}
 
       {isRuleOpen && (
-        <RuleModal
-          activeRow={activeRow}
-          data={activeRule}
-          isOpen={isRuleOpen}
-          onClose={onRuleClose}
-          refetch={refetch}
-        />
+        <RuleModal activeRow={activeRow} data={activeRule} isOpen={isRuleOpen} onClose={onRuleClose} refetch={refetch} />
       )}
     </>
   )
