@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, Input, Alert, AlertIcon, AlertDescription, Select, Grid, GridItem, IconButton, Text, Heading, useToast, InputLeftAddon, InputGroup, InputRightAddon } from '@chakra-ui/react'
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, Input, Alert, AlertIcon, AlertDescription, Select, Grid, GridItem, IconButton, Text, Heading, InputLeftAddon, InputGroup, InputRightAddon, Box, Stack } from '@chakra-ui/react'
 import { DeletePolicyRule, CreatePolicyRule, UpdatePolicyRule, PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -11,7 +11,6 @@ import { updatedValue } from 'utils'
 const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
   const { totalRows, policyState } = useGlobalState()
   const { searchInput } = policyState
-  const toast = useToast()
   const [name, setName] = useState('')
   const [operator, setOperator] = useState('')
   const [resultType, setResultType] = useState('')
@@ -28,11 +27,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
 
 
   const handleRefetch = () => { refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows } }) }
-
-
-  const lastRow = conditions[conditions?.length - 1];
-
-  const isInvalid = name === '' || operator === '' || resultType === '' || error !== '' || (lastRow?.id === '' || lastRow?.subject === '' || lastRow?.value === '' || lastRow?.operator === '' || lastRow?.list === '' || lastRow?.status === '' || lastRow?.min === '0' || lastRow?.max === '1')
 
   const onNameChange = (e) => {
     setName(e.target.value)
@@ -52,18 +46,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
 
   const addRow = () => {
     const newId = conditions?.length + 1;
-    if(conditions?.length > 0) {
-      const lastRow = conditions[conditions.length - 1];
-      console.log(lastRow);
-      if (lastRow.id && lastRow.subject && lastRow.value && lastRow.operator && lastRow?.list && lastRow?.status && lastRow?.min && lastRow?.max) {
-        setConditions([...conditions, { id: newId, subject: '', operator: '', value: '', list: [], status: 'CREATED', min: '0', max: '1' }]);
-        setError('')
-      } else {
-        setError('Please fill all fields before adding a new one.')
-      }
-    } else {  
-      setConditions([...conditions, { id: newId, subject: '', operator: '', value: '', list: [], status: 'CREATED', min:'', max:'' }]);
-    }
+    setConditions([...conditions, { id: newId, subject: '', operator: '', value: '', list: [], status: 'CREATED', min:'0', max:'0', error:'' }]);
   };
 
   const deleteRow = rule => {
@@ -98,10 +81,10 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
   const handleBlur = (rule) => {
     const newData = conditions.map(item => {
       if (item.id === rule?.id) {
-        if(rule?.min !== '' && rule?.max !== '' && rule?.max < rule?.min) {
-          setError('Invalid EPSS range')
+        if(rule?.min !== '' && rule?.max !== '' && Number(rule?.max) < Number(rule?.min)) {
+          return { ...item, value: '', error: 'Invalid EPSS range' }
         } else {
-          return { ...item, value: `{min:${rule?.min},max:${rule?.max}}` };
+          return { ...item, value: `{"min":${rule?.min},max:${rule?.max}}`, error: '' };
         }
       }
       return item;
@@ -109,96 +92,84 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
     setConditions(newData);
   }
 
-  const createRule = (item, policyId) => {
-    onCreateRule({ variables: { policyId: policyId, operator: item?.operator === '' ? undefined : item?.operator, subject: item?.subject === '' ? undefined : item?.subject, value: item?.operator === 'RANGE' ? JSON.stringify({min:item?.min,max: item?.max}) : item?.value === '' ? undefined : item?.value }
-    }).then((res) => {
-      const ruleErros = res?.data?.policyRuleCreate?.errors
-      if (ruleErros?.length > 0) {
-        console.log(ruleErros[0])
-      } else {
-        setError('')
-        handleRefetch()
-      }
-    })
-  }
-
-  const updateRule = async (item, policyId) => {
-     onUpdateRule({ variables: { id: item?.id, policyId: policyId, operator: item?.operator === '' ? undefined : item?.operator, subject: item?.subject === '' ? undefined : item?.subject, value: item?.operator === 'RANGE' ? JSON.stringify({min:item?.min,max: item?.max}) : item?.value === '' ? undefined : item?.value }
-    }).then((res) => {
-      const ruleErrors = res?.data?.policyRuleUpdate?.errors
-      if (ruleErrors?.length > 0) {
-        setError(ruleErrors[0])
-      } else {
-        setError('')
-        handleRefetch()
-      }
-    })
-  }
-
-  const deleteRule = (id) => {
-    onDeleteRule({ variables: { id: id } }).then((res) => {
-      const ruleErros = res?.data?.policyRuleDelete?.errors
-      if (ruleErros?.length > 0) {
-        console.log(ruleErros[0])
-      } else {
-        setDeletedRules([])
-        setError('')
-        handleRefetch()
-      }
-    })
-  }
-
-
   const handleCreate = (e) => {
     e.preventDefault()
-    createPolicy({ variables: { name, isEnabled: true, operator: operator === '' ? undefined : operator, resultType: resultType === '' ? undefined : resultType }
+    const rules = []
+    if(conditions?.length > 0) {
+      conditions?.map((item) => rules?.push({operator: item?.operator,subject: item?.subject, value: (item?.operator === "EXISTS" || item?.operator === 'NOT_EXISTS') ? undefined : item?.operator === 'RANGE' ? JSON.stringify({min:Number(item?.min), max:Number(item?.max)}, null,2) : item?.value}))
+    }
+    createPolicy({ variables: { name, isEnabled: true, operator: operator === '' ? undefined : operator, resultType: resultType === '' ? undefined : resultType, policyRulesAttributes: rules?.length > 0 ? rules : undefined}
     }).then((res) => {
       const errors = res?.data?.policyCreate?.errors
       if (errors?.length > 0) {
         setError(errors[0])
       } else {
-        if(conditions?.length > 0) {
-          conditions?.map((item) => createRule(item, res?.data?.policyCreate?.policy?.id))
-        }
         handleRefetch()
+        setError('')
+        setName('')
+        setOperator('')
+        setResultType('')
         onClose()
       }
-    })
-    setName('')
-    setOperator('')
-    setResultType('')
-    setError('')
+    }) 
   }
+
+  let prevRules = []
+  const existingData = conditions?.filter((item) => item?.status === 'ADDED')
+  existingData?.map((item) => prevRules?.push({id: item?.id, operator: item?.operator,subject: item?.subject, value:  (item?.operator === "EXISTS" || item?.operator === 'NOT_EXISTS') ? undefined : item?.operator === 'RANGE' ? JSON.stringify({min:Number(item?.min), max:Number(item?.max)}, null,2) : item?.value}))
+  let newRules = []
+  const newData = conditions?.filter((item) => item?.status === 'CREATED')
+  newData?.map((item) => newRules?.push({operator: item?.operator,subject: item?.subject, value: (item?.operator === "EXISTS" || item?.operator === 'NOT_EXISTS') ? undefined : item?.operator === 'RANGE' ? JSON.stringify({min:Number(item?.min), max:Number(item?.max)}, null,2) : item?.value}))
+  let deleteRules = []
+  deletedRules?.map((item) => deleteRules?.push({id: item?.id, _destroy: true}))
 
   const handleUpdate = (e) => {
     e.preventDefault()
-    updatePolicy({ variables: { id: data?.id, name, isEnabled: data?.isEnabled, operator: operator === '' ? undefined : operator, resultType: resultType === '' ? undefined : resultType }
-    }).then((res) => {
-      console.log('conditions',conditions);
-      const errors = res?.data?.policyUpdate?.errors
-      if (errors?.length > 0) {
-        setError(errors[0])
-      } else {
-        const existingData = conditions?.filter((item) => item?.status === 'ADDED')
-        const newData = conditions?.filter((item) => item?.status === 'CREATED')
-        if(existingData?.length > 0) {
-          existingData?.map((item) => updateRule(item, res?.data?.policyUpdate?.policy?.id))
+    if(prevRules?.length > 0) {
+      updatePolicy({ variables: { id: data?.id, name, isEnabled: data?.isEnabled, operator: operator === '' ? undefined : operator, resultType: resultType === '' ? undefined : resultType, policyRulesAttributes: prevRules }
+      }).then((res) => {
+        const errors = res?.data?.policyUpdate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
         }
-        if (newData?.length > 0) {
-          newData?.map((item) =>  createRule(item, res?.data?.policyUpdate?.policy?.id))
+      })
+    }
+    if (newRules?.length > 0) {
+      updatePolicy({ variables: { id: data?.id, name, isEnabled: data?.isEnabled, operator: operator === '' ? undefined : operator, resultType: resultType === '' ? undefined : resultType, policyRulesAttributes: newRules}
+      }).then((res) => {
+        const errors = res?.data?.policyUpdate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
         }
-        if(deletedRules?.length > 0) {
-          deletedRules?.map((item) =>  deleteRule(item?.id))
+      })
+    }
+    if(deleteRules?.length > 0) {
+      updatePolicy({ variables: { id: data?.id, name, isEnabled: data?.isEnabled, operator: operator === '' ? undefined : operator, resultType: resultType === '' ? undefined : resultType, policyRulesAttributes: deleteRules }
+      }).then((res) => {
+        const errors = res?.data?.policyUpdate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
         }
-        handleRefetch()
-        onClose()
-      }
-    })
+      })
+    }
+    handleRefetch()
+    onClose()
     setName('')
     setOperator('')
     setResultType('')
-    setError('')
   }
+
+  const checkDataValidity = (data) => {
+    for (let i = 0; i < data.length; i++) {
+      const { subject, operator, value, min, max } = data[i];
+      if (subject === '' || operator === '' || value === '' || min === '' || max === '' || error !== '') {
+        return "Error: Some properties are empty";
+      }
+    }
+    return null;
+  }
+
+  const errorMessage = checkDataValidity(conditions)
 
   useEffect(() => {
     if (data && subOperators) {
@@ -208,7 +179,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
       setResultType(data?.resultType  === 'warn' ? 'WARN' : data?.resultType === 'inform' ? 'INFORM' : 'FAIL')
       const rules = []
       const opList = (item) => subOperators?.policySubjectOperatorMapping?.find((op) => op?.subject === item?.subject)
-      data?.policyRules?.map((item) => rules?.push({id:item?.id, subject: item?.subject, operator: item?.operator, value: item?.value, list: opList(item)?.operators, status: 'ADDED', min: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.min : '0', max: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.max : '0'}))
+      data?.policyRules?.map((item) => rules?.push({id:item?.id, subject: item?.subject, operator: item?.operator, value: item?.value, list: opList(item)?.operators, status: 'ADDED', min: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.min : '0', max: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.max : '0', error: ''}))
       setConditions(rules)
     }
   }, [data, subOperators])
@@ -234,11 +205,11 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                 <Flex alignItems={'center'} gap={3} flexWrap={'wrap'}>
                   <Text>Policy:</Text>
                   <FormControl width={550} isRequired>
-                    <Input type='text' name='name' placeholder='Enter name' value={name} onChange={onNameChange} />
+                    <Input size='sm' type='text' name='name' placeholder='Enter name' value={name} onChange={onNameChange} />
                   </FormControl>
                   <Text>will</Text>
                   <FormControl width={200} isRequired>
-                    <Select id='resultType' name='resultType' value={resultType} onChange={onResultChange} textTransform={'capitalize'} fontSize='sm'>
+                    <Select size='sm' id='resultType' name='resultType' value={resultType} onChange={onResultChange} textTransform={'capitalize'} fontSize='sm'>
                       <option value=''>-- Select --</option>
                       {['INFORM', 'WARN','FAIL'].map((item, index) => (
                         <option key={index} value={item} style={{textTransform:'capitalize'}}>{item}</option>
@@ -247,7 +218,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                   </FormControl>
                   <Text>when</Text>
                   <FormControl width={200} isRequired>
-                    <Select id='operator' name='operator' value={operator} onChange={onOperatorChange} textTransform={'capitalize'} fontSize='sm'>
+                    <Select size='sm' id='operator' name='operator' value={operator} onChange={onOperatorChange} textTransform={'capitalize'} fontSize='sm'>
                       <option value=''>-- Select --</option>
                       {['ANY', 'ALL'].map((item, index) => (
                         <option key={index} value={item} style={{textTransform:'capitalize'}}>{item}</option>
@@ -260,19 +231,19 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                   <Heading fontWeight={'medium'} fontFamily={'inherit'} fontSize={'md'}>
                     Conditions
                   </Heading>
-                  <IconButton colorScheme='blue' icon={<FaPlus />} onClick={addRow}/>
+                  <IconButton size='sm' colorScheme='blue' icon={<FaPlus />} onClick={addRow}/>
                 </Flex>
                 {conditions?.length > 0 && conditions?.map((item, index) => (
-                  <Grid key={index} templateColumns='repeat(12, 1fr)' gap={4}>
+                  <Grid key={index} templateColumns='repeat(12, 1fr)' gap={3}>
                     <GridItem colSpan={3}>
-                      <Select value={item?.subject} onChange={e => handleChange(e.target.value, item.id, 'subject')} placeholder="-- Select Subject --" textTransform={'capitalize'} fontSize='sm'>
+                      <Select size='sm' value={item?.subject} onChange={e => handleChange(e.target.value, item.id, 'subject')} placeholder="-- Select Subject --" textTransform={'capitalize'} fontSize='sm'>
                         {subOperators?.policySubjectOperatorMapping?.map((rule, index) => (
                           <option key={index} value={rule.subject} style={{textTransform:'capitalize'}}>{rule.category} {rule?.name}</option>
                         ))}
                       </Select>
                     </GridItem>
                     <GridItem colSpan={3}>
-                      <Select id='operator' name='operator' value={item?.operator} onChange={e => handleChange(e.target.value, item.id, 'operator')} textTransform={'capitalize'} fontSize='sm' placeholder='-- Select Opeator --'>
+                      <Select size='sm' id='operator' name='operator' value={item?.operator} onChange={e => handleChange(e.target.value, item.id, 'operator')} textTransform={'capitalize'} fontSize='sm' placeholder='-- Select Opeator --'>
                       {item?.list?.map(option => (
                         <option value={option} key={option}>{updatedValue(option)}</option>
                       ))}
@@ -281,9 +252,9 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                     <GridItem colSpan={4}>
                     {item?.subject === 'VULNERABILITY_SEV' && (
                       <FormControl isRequired>
-                        <Select id='operator' name='operator' value={item?.value} onChange={(e) => handleChange(e.target.value, item.id, 'value')} textTransform={'capitalize'} fontSize='sm' disabled={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'}>
+                        <Select size='sm' id='operator' name='operator' value={item?.value} onChange={(e) => handleChange(e.target.value, item.id, 'value')} textTransform={'capitalize'} fontSize='sm' hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'}>
                           <option value=''>-- Select --</option>
-                          {['Critical','High','Medium','Low'].map((item, index) => (
+                          {['critical','high','medium','low'].map((item, index) => (
                             <option key={index} value={item} style={{ textTransform: 'capitalize' }} >
                               {item}
                             </option>
@@ -291,33 +262,38 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                         </Select>
                       </FormControl>
                     )}
-                    {((item?.subject === 'VULNERABILITY_EPSS' || item?.subject === 'COMPONENT_VERSION') && item?.operator === 'RANGE') && (
-                      <Flex alignItems={'center'} gap={4}>
-                      <InputGroup>
-                        <InputLeftAddon>Min</InputLeftAddon>
-                        <Input name='min' value={item?.min} fontSize='sm' onChange={(e) => handleChange(e.target.value, item.id, 'min')} onBlur={() => handleBlur(item)} />
-                      </InputGroup>
-                      <InputGroup>
-                        <InputLeftAddon>Max</InputLeftAddon>
-                        <Input name='max' value={item?.max} fontSize='sm' onChange={(e) => handleChange(e.target.value, item.id, 'max')} onBlur={() => handleBlur(item)}/>
-                      </InputGroup>
-                      </Flex>
+                    {item?.operator === 'RANGE' && (
+                      <Stack direction={'column'} alignItems={'flex-start'}>
+                        <Flex alignItems={'center'} gap={4}>
+                          <InputGroup size='sm'>
+                            <InputLeftAddon>Min</InputLeftAddon>
+                            <Input type={'number'} name='min' value={item?.min} fontSize='sm' onChange={(e) => handleChange(e.target.value, item.id, 'min')} onBlur={() => handleBlur(item)} />
+                            {item?.subject === 'VULNERABILITY_EPSS' && <InputRightAddon>%</InputRightAddon>}
+                          </InputGroup>
+                          <InputGroup size='sm'>
+                            <InputLeftAddon>Max</InputLeftAddon>
+                            <Input type={'number'} name='max' value={item?.max} fontSize='sm' onChange={(e) => handleChange(e.target.value, item.id, 'max')} onBlur={() => handleBlur(item)}/>
+                            {item?.subject === 'VULNERABILITY_EPSS' && <InputRightAddon>%</InputRightAddon>}
+                          </InputGroup>
+                        </Flex>
+                        {item?.error !== '' && <Text fontSize={'xs'} color={'red'}>{item?.error}</Text>}
+                      </Stack>
                     )}
                     {item?.subject === 'VULNERABILITY_EPSS' && (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN') && (
-                      <InputGroup>
-                        <Input placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'} />
+                      <InputGroup size='sm'>
+                        <Input type='number' size='sm' placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'} />
                         <InputRightAddon>%</InputRightAddon>
                       </InputGroup>
                     )}
                     {item?.operator !== 'RANGE' && item?.subject !== 'VULNERABILITY_SEV' && item?.subject !== 'VULNERABILITY_EPSS' && (
-                      <Input placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'} />
+                      <Input type={'text'} size='sm' placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'} />
                     )}
                     </GridItem>
                     <GridItem colSpan={2}>
                       <Flex alignItems={'center'} gap={4} justifyContent={'space-between'}>
-                        <Text>{operator === 'ALL' ? 'And' : 'Or'}</Text>
+                        <Box>{conditions?.length > 1  && conditions?.length - 1 !== index && <Text>{operator === 'ALL' ? 'And' : 'Or'}</Text>}</Box>
                         <Flex gap={3} justifyContent={'flex-end'}>
-                          <IconButton colorScheme='red' icon={<FaTrash />} onClick={() => deleteRow(item)}/>
+                          <IconButton size='sm' colorScheme='red' icon={<FaTrash />} onClick={() => deleteRow(item)} />
                         </Flex>
                       </Flex>
                     </GridItem>
@@ -327,7 +303,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
             </ModalBody>
             <ModalFooter mt={6}>
               <Button colorScheme='gray' mr={3} onClick={onClose}>Cancel</Button>
-              <Button colorScheme='blue' type='submit' disabled={isInvalid}>{data ? 'Update' : 'Save'}</Button>
+              <Button colorScheme='blue' type='submit' disabled={errorMessage}>{data ? 'Update' : 'Save'}</Button>
             </ModalFooter>
           </ModalContent>
         </form>
