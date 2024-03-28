@@ -13,7 +13,7 @@ import SupplierModal from 'views/Sbom/components/SupplierModal'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import styled from '@emotion/styled'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { GetComponentPath, GetCompFilterData } from 'graphQL/Queries'
+import { GetComponentPath, GetCompFilterData, ShareCompFilters } from 'graphQL/Queries'
 import { deleteComSupplier } from 'graphQL/Mutation'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 import CustomLoader from 'components/CustomLoader'
@@ -23,7 +23,6 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import Pagination from '../Pagination'
 import PurlCard from 'components/Misc/PurlCard'
 import CpeCard from 'components/Misc/CpeCard'
-import { ShareCompFilters } from 'graphQL/Queries'
 import { openSsf } from 'variables/general'
 import GraphDrawer from 'components/Drawer/GraphDrawer'
 
@@ -105,11 +104,10 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       .finally(() => window.scrollTo({ top: 0, behavior: 'smooth' }))
   }
 
-  const [activeRow, setActiveRow] = useState(null)
-  const [compSearch, setCompSearch] = useState('')
-
   const compBtn = useRef(null)
   const linkRef = useRef(null)
+  const [activeRow, setActiveRow] = useState(null)
+  const [compSearch, setCompSearch] = useState('')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -444,9 +442,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
   // EXPAND SECTION
   const ExpandedComponent = ({ data }) => {
     const { scope, suppliers, purl, description, cpes, name, kind, internal, licenses, licensesExp, licensesCustom, dependencyOf, dependsOn } = data
-
     const openSSF = openSsf?.find((item) => item?.name === purl)
-
     const CustomText = styled(Text)`
       font-size: 13px;
       font-weight: bold;
@@ -454,13 +450,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       text-transform: uppercase;
       letter-spacing: 0.6px;
     `
-
     return (
-      <Box
-        width={'100%'}
-        p={5}
-        boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
-      >
+      <Box width={'100%'} p={5} boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'>
         <Grid templateColumns='repeat(3, 1fr)' gap={6} width={'80%'} margin={'0 auto'}>
           <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
@@ -487,9 +478,9 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
                 suppliers.map((item, index) => (
                   <Tag size={'md'} key={index} variant='subtle' colorScheme='orange' width={'fit-content'} >
                     <Text wordBreak={'break-all'}>
-                      {item.contactName}
-                      {item.contactEmail && ` (${item.contactEmail})`}
-                      {item.url ? (<Link href={item.url} isExternal>{' '}{item.name}</Link>
+                      {item?.contactName}
+                      {item?.contactEmail && ` (${item?.contactEmail})`}
+                      {item?.url ? (<Link href={item?.url?.startsWith(`https://`) === true ? item?.url : `https://${item?.url}`} isExternal>{' '}{item.name}</Link>
                       ) : (` ${item.name}` )}
                     </Text>
                     {!signedUrlParams && <TagCloseButton onClick={() => handleSupRemove(item.id)} />}
@@ -692,63 +683,20 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
   // HEADER SECTION
   const subHeader = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={4}
-          alignItems={'center'}
-        >
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'}>
+        <Stack width={'100%'} direction={'row'} spacing={4} alignItems={'center'}>
           {/* SEARCH COMPONENTS */}
-          <SearchFilter
-            id='component'
-            filterText={compSearch}
-            onFilter={handleSearch}
-            onClear={handleClear}
-            onChange={onSearchInputChange}
-          />
-
+          <SearchFilter id='component' filterText={compSearch} onFilter={handleSearch} onClear={handleClear} onChange={onSearchInputChange} />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && (
-            <CompFilterMenu
-              refetch={refetch}
-              productId={productId}
-              sbomId={sbomId}
-            />
-          )}
+          {filters && <CompFilterMenu refetch={refetch} productId={productId} sbomId={sbomId} />}
         </Stack>
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={2}
-          justifyContent={'flex-end'}
-        >
+        <Stack width={'100%'} direction={'row'} spacing={2} justifyContent={'flex-end'}>
           {/* CREATE COMPONENT */}
           <Tooltip label='Add Component'>
-            <IconButton
-              ref={compBtn}
-              onClick={onCreateComponent}
-              icon={<AddIcon />}
-              colorScheme='blue'
-              variant='solid'
-              fontWeight='normal'
-              fontSize={'sm'}
-              hidden={signedUrlParams}
-              isDisabled={
-                lifecycle === 'signed' || !updateComponent || !updateSboms
-              }
-            />
+            <IconButton ref={compBtn} onClick={onCreateComponent} icon={<AddIcon />} colorScheme='blue' variant='solid' fontWeight='normal' fontSize={'sm'} hidden={signedUrlParams} isDisabled={lifecycle === 'signed' || !updateComponent || !updateSboms} />
           </Tooltip>
           <Tooltip label='Refresh'>
-            <IconButton
-              onClick={fetchCompData}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            ></IconButton>
+            <IconButton onClick={fetchCompData} colorScheme='blue' icon={<RepeatIcon />} />
           </Tooltip>
         </Stack>
       </Flex>
