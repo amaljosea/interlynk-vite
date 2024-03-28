@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { CheckIcon, InfoIcon } from '@chakra-ui/icons'
-import { Box, Button, FormLabel, Select, SimpleGrid, Stack, Table, Tbody, Text, Textarea, Th, Thead, Tr, Flex, FormControl, Checkbox, useDisclosure, Icon, IconButton } from '@chakra-ui/react'
+import { Box, Button, FormLabel, Select, SimpleGrid, Stack, Table, Tbody, Text, Textarea, Th, Thead, Tr, Flex, FormControl, Checkbox, useDisclosure, Icon, IconButton, Alert, AlertIcon, AlertDescription } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import InfoModal from 'components/InfoModal'
 import VulLinkRow from 'components/Tables/VulLinkRow'
@@ -56,6 +56,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
+  const [error, setError] = useState('')
 
   const { data: allVexStatus } = useQuery(getVexStatuses, {skip: signedUrlParams})
   const { data: allVexJustify } = useQuery(getVexJustifications, {skip: signedUrlParams})
@@ -151,6 +152,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const handleStatusChange = (e) => {
     const { value } = e.target
     const status = e.target.options[e.target.selectedIndex].text
+    setError('')
     setStatusTitle(value)
     setStatusName(status)
     setJustification('')
@@ -192,9 +194,14 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
         action: actionStatement !== '' ? actionStatement : undefined,
         fixedIn: selectedTag !== '' ? selectedTag : undefined
       }
-    }).then(
-      (res) => res.data && prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-    )
+    }).then((res) => {
+      const errors = res?.data?.componentVexUpdate?.errors
+      if(errors?.length > 0) {
+        setError(errors[0])
+      } else  {
+        prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      }
+    })
     setStatusTitle('')
     setStatusName('')
     setJustification('')
@@ -250,6 +257,12 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
         <SimpleGrid row={5} spacing={4}>
           {!signedUrlParams && (
             <>
+              {error !== '' && (
+                <Alert status='error' borderRadius={4}>
+                  <AlertIcon />
+                  <AlertDescription fontSize={'sm'} pr={2}>{error}</AlertDescription>
+                </Alert>
+              )}
               {/* STATUS */}
               <Card position='relative' p={6} border={`1px solid lightgray`}>
                 {statusTitle !== '' && <IconButton size='xs' position={'absolute'} right={-2} top={-2} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
@@ -295,7 +308,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               {statusName === 'Affected' && (
                 <Card position='relative' p={6} border={`1px solid lightgray`}>
                   {response !== '' && selectedTag !== '' && actionStatement !== '' && <IconButton size='xs' position={'absolute'} right={-2} top={-2} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
-                  <FormControl isRequired={statusName === 'Affected'}>
+                  <FormControl>
                     <InfoLabel title={'Response'} name={'response'} onClick={onCheckResponse} />
                     {res && (
                       <Select id='response' name='response' value={response} onChange={handleResponseChange} fontSize='sm' color='gray.600'>
@@ -358,7 +371,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               width={'fit-content'}
               colorScheme='blue'
               onClick={handleSave}
-              isDisabled={statusTitle === '' || (statusName === 'Not Affected' && justification === '') || (statusName === 'Not Affected' && justifyName === 'Other (impact statment required)' && impactData === '') || (statusName === 'False Positive' && justification === '') || (statusName === 'False Positive' &&justifyName === 'Other (impact statment required)' && impactData === '') || (statusName === 'Affected' && (responseTitle === '' || actionStatement === '')) || (responseTitle !== '' && actionStatement === '') || (responseTitle === 'update' && selectedTag === '') || !editVulns }
+              isDisabled={statusTitle === '' || (statusName === 'Not Affected' && justification === '') || (statusName === 'Not Affected' && justifyName === 'Other (impact statment required)' && impactData === '') || (statusName === 'False Positive' && justification === '') || (statusName === 'False Positive' &&justifyName === 'Other (impact statment required)' && impactData === '') || (statusName === 'Affected' && actionStatement === '') || (responseTitle !== '' && actionStatement === '') || (responseTitle === 'update' && selectedTag === '') || !editVulns }
             >
               Add
             </Button>
