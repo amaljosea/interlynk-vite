@@ -2079,6 +2079,7 @@ export const PolicyCreate = gql`
     $isEnabled: Boolean
     $operator: PolicyOperatorEnum!
     $resultType: PolicyResultTypeEnum!
+    $policyRulesAttributes: [PolicyPolicyRuleInput!]
   ) {
     policyCreate(
       input: {
@@ -2086,6 +2087,7 @@ export const PolicyCreate = gql`
         isEnabled: $isEnabled
         operator: $operator
         resultType: $resultType
+        policyRulesAttributes: $policyRulesAttributes
       }
     ) {
       policy {
@@ -2094,6 +2096,12 @@ export const PolicyCreate = gql`
         isEnabled
         operator
         resultType
+        policyRules {
+          id
+          operator
+          subject
+          value
+        }
       }
       errors
     }
@@ -2108,6 +2116,7 @@ export const PolicyUpdate = gql`
     $isEnabled: Boolean
     $operator: PolicyOperatorEnum
     $resultType: PolicyResultTypeEnum
+    $policyRulesAttributes: [PolicyPolicyRuleInput!]
   ) {
     policyUpdate(
       input: {
@@ -2116,6 +2125,7 @@ export const PolicyUpdate = gql`
         isEnabled: $isEnabled
         operator: $operator
         resultType: $resultType
+        policyRulesAttributes: $policyRulesAttributes
       }
     ) {
       policy {
@@ -2124,6 +2134,12 @@ export const PolicyUpdate = gql`
         isEnabled
         operator
         resultType
+        policyRules {
+          id
+          subject
+          value
+          operator
+        }
       }
       errors
     }
@@ -2299,11 +2315,9 @@ export const UpdateNotificationChannel = gql`
     $notificationChannels: NotificationChannelInput!
   ) {
     notificationChannelUpdate(
-      input: {
-        notificationChannels: $notificationChannels
-      }
+      input: { notificationChannels: $notificationChannels }
     ) {
-       success
+      success
     }
   }
 `

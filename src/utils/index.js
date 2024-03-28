@@ -781,5 +781,5 @@ export const parseJSONSafely = (str) => {
 
 export const updatedValue = (operator) => {
   // Capitalize the operator and replace underscores with spaces
-  return operator.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  return operator?.toLowerCase()?.replace(/_/g, ' ')?.replace(/\b\w/g, c => c?.toUpperCase());
 };
