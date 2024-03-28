@@ -97,6 +97,13 @@ const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView, license }) =>
     onInfoOpen()
   }
 
+  const colorScheme = {
+    'SPDX License Expression': 'cyan',
+    'Custom License Expression / Custom License': 'orange',
+    'SPDX License ID': 'green',
+    'Custom License': 'orange',
+  }
+
   const Option = (props) => {
     return (
       <components.Option {...props}>
@@ -106,7 +113,7 @@ const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView, license }) =>
             width={'fit-content'}
             size={'sm'}
             variant='subtle'
-            colorScheme='cyan'
+            colorScheme= {colorScheme[props.data.type]}
           >
             <TagLabel fontSize={'10px'}>{props.data.type}</TagLabel>
           </Tag>
@@ -161,7 +168,7 @@ const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView, license }) =>
             size={'sm'}
             my={2}
             variant='subtle'
-            colorScheme='cyan'
+            colorScheme={colorScheme[licenseType]}
           >
             <TagLabel>{licenseType}</TagLabel>
           </Tag>

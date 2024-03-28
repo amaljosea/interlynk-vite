@@ -60,8 +60,8 @@ const NotificationMenuBell = () => {
 
         if (enabledChannelCount === 0 && !newPreference.includes('none')) {
           toast({
-            title: 'No Notification Channels Enabled',
-            description: 'You have disabled all notification channels. Please enable at least one channel in settings to receive notifications.',
+            title: 'No notification channel enabled',
+            description: 'Please enable at least one channel under personal settings.',
             status: 'warning',
             duration: 5000,
             isClosable: true,
