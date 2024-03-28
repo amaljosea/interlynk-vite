@@ -1,7 +1,7 @@
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import styled from '@emotion/styled'
-import { Box, Flex, Grid, GridItem, Heading, IconButton, Input, Menu, MenuButton, MenuItem, MenuList, Portal, Stack, Switch, Tag, Text, Tooltip, useDisclosure, useToast } from '@chakra-ui/react'
+import { Box, Flex, Grid, GridItem, Heading, IconButton, Menu, MenuButton, MenuItem, MenuList, Portal, Stack, Switch, Text, Tooltip, useDisclosure, useToast } from '@chakra-ui/react'
 import { customStyles, getFullDateAndTime, timeSince, updatedValue } from 'utils'
 import { FaEllipsisV, FaPlus } from 'react-icons/fa'
 import { useEffect, useMemo, useState } from 'react'
@@ -11,9 +11,10 @@ import { RepeatIcon } from '@chakra-ui/icons'
 import Pagination from 'components/Pagination'
 import PolicyModal from 'views/Dashboard/Policies/PolicyModal'
 import { useMutation } from '@apollo/client'
-import { PolicyUpdate, PolicyDelete, PolicyExclusionCreate, DeletePolicyExclusion, DeletePolicyRule } from 'graphQL/Mutation'
+import { PolicyDelete, PolicyExclusionCreate, DeletePolicyExclusion, DeletePolicyRule } from 'graphQL/Mutation'
 import RuleModal from 'views/Dashboard/Policies/RuleModal'
 import { useLocation } from 'react-router-dom'
+import WarnModal from 'views/Dashboard/Policies/WarnModal'
 
 const PolicyTable = ({ data, refetch }) => {
   const toast = useToast()
@@ -33,7 +34,6 @@ const PolicyTable = ({ data, refetch }) => {
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
-  const [updatePolicy] = useMutation(PolicyUpdate)
   const [deletePolicy] = useMutation(PolicyDelete)
   const [onDeleteRule] = useMutation(DeletePolicyRule)
 
@@ -53,6 +53,7 @@ const PolicyTable = ({ data, refetch }) => {
   }
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {isOpen: isWarningOpen, onOpen: onWarningOpen, onClose: onWarningClose} = useDisclosure()
   const { isOpen: isRuleOpen, onOpen: onRuleOpen, onClose: onRuleClose } = useDisclosure()
 
   const handleRefresh = async () => {
@@ -92,20 +93,6 @@ const PolicyTable = ({ data, refetch }) => {
     if (event.key === 'Enter' && filterText !== '') {
       refetch({ variables: { projectId: activeProd || undefined, search: activeProd ? undefined : value, first: totalRows } }).then((res) => res?.data && policyDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value }))
     }
-  }
-
-  const onChangeStatus = async (e, row) => {
-    e.preventDefault()
-    await updatePolicy({
-      variables: { id: row?.id, isEnabled: e.target.checked }
-    }).then((res) => {
-      const errors = res?.data?.policyUpdate?.errors
-      if (errors?.length > 0) {
-        toast({ description: errors[0], status: 'error', position: 'top', duration: 2000 })
-      } else {
-        refetch({ variables: { ...policyData } })
-      }
-    })
   }
 
   const onDeletePolicy = async (id) => {
@@ -201,7 +188,10 @@ const PolicyTable = ({ data, refetch }) => {
       selector: (row) => {
         const { isEnabled } = row
         return (
-          <Switch size='md' isChecked={isEnabled} onChange={(e) => onChangeStatus(e, row)} />
+          <Switch size='md' isChecked={isEnabled} onChange={() => {
+            setActiveRow(row)
+            onWarningOpen()
+          }} />
         )
       },
       width: '150px',
@@ -363,6 +353,8 @@ const PolicyTable = ({ data, refetch }) => {
       {isRuleOpen && (
         <RuleModal activeRow={activeRow} data={activeRule} isOpen={isRuleOpen} onClose={onRuleClose} refetch={refetch} />
       )}
+
+      {isWarningOpen && <WarnModal isOpen={isWarningOpen} onClose={onWarningClose} data={activeRow} refetch={refetch} />}
     </>
   )
 }
