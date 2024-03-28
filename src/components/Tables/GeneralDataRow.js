@@ -1,42 +1,13 @@
+import { useEffect, useRef, useState } from 'react'
 import { useMutation } from '@apollo/client'
 import { EditIcon, InfoIcon } from '@chakra-ui/icons'
-import {
-  Button,
-  Flex,
-  HStack,
-  Icon,
-  Link,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Stack,
-  Table,
-  Tag,
-  TagCloseButton,
-  TagLabel,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-  useColorModeValue,
-  useDisclosure,
-} from '@chakra-ui/react'
+import { Button, Flex, HStack, Icon, Link, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Stack, Table, Tag, TagCloseButton, TagLabel, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue, useDisclosure } from '@chakra-ui/react'
 import CardBody from 'components/Card/CardBody'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
-import { authorDelete } from 'graphQL/Mutation'
-import { toolDelete } from 'graphQL/Mutation'
-import { supplierDelete } from 'graphQL/Mutation'
-import { useEffect, useRef, useState } from 'react'
+import { authorDelete, sbomUpdate, toolDelete, supplierDelete } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
-import { sbomUpdate } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
 import InfoModal from 'components/InfoModal'
 import LicenseField from "../Licenses/LicenseField";
@@ -59,19 +30,15 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const sbomId = queryParams.get('sbom')
 
   const { userPermissions, sbomState, dispatch } = useGlobalState()
-  const { licenseType, expLicense } = sbomState
+  const { expLicense } = sbomState
   const { sbomDispatch } = dispatch
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const updateComponent = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom_components' && permission.value === true
-  )
-  const updateSboms = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom' && permission.value === true
-  )
+  const updateComponent = sboms?.supersededBy?.some((permission) => permission.key === 'update_sbom_components' && permission.value === true)
+  const updateSboms = sboms?.supersededBy?.some((permission) => permission.key === 'update_sbom' && permission.value === true)
 
+  const btnRef = useRef(null)
+  const licenseBtn = useRef(null)
   const textColor = useColorModeValue('gray.700', 'white')
   const customerView = location.pathname.startsWith('/customer')
   const [selectedKey, setSelectedKey] = useState('')
@@ -81,39 +48,13 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
 
-  const btnRef = useRef(null)
-  const licenseBtn = useRef(null)
-
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen: isDelOpen, onOpen: onDelOpen, onClose: onDelClose } = useDisclosure()
+  const { isOpen: isSBMOpen, onOpen: onSBMOpen, onClose: onSBMClose, onToggle: onSBMToggle } = useDisclosure()
+  const { isOpen: isSupOpen, onOpen: onSupOpen, onClose: onSupClose } = useDisclosure()
+  const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
 
-  const {
-    isOpen: isDelOpen,
-    onOpen: onDelOpen,
-    onClose: onDelClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isSBMOpen,
-    onOpen: onSBMOpen,
-    onClose: onSBMClose,
-    onToggle: onSBMToggle
-  } = useDisclosure()
-
-  const {
-    isOpen: isSupOpen,
-    onOpen: onSupOpen,
-    onClose: onSupClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isInfoOpen,
-    onOpen: onInfoOpen,
-    onClose: onInfoClose
-  } = useDisclosure()
-
-  const handleRefetch = () => {
-    refetch({ projectId: productId, sbomId: sbomId })
-  }
+  const handleRefetch = () => refetch({ projectId: productId, sbomId: sbomId })
 
   const [deleteSupplier] = useMutation(supplierDelete)
   const [deleteTool] = useMutation(toolDelete)
@@ -122,20 +63,8 @@ const GeneralDataRow = ({ status, data, refetch }) => {
 
   const handleToolRemove = async (id) => {
     try {
-      await deleteTool({
-        variables: {
-          toolID: id,
-          sbomID: sbomId
-        }
-      })
-        .then((res) => {
-          if (res) {
-            refetch({
-              productId: productId,
-              sbomId: sbomId
-            })
-          }
-        })
+      await deleteTool({ variables: { toolID: id, sbomID: sbomId } })
+        .then((res) => res?.data &&refetch({ productId: productId, sbomId: sbomId }))
         .finally(() => onDelClose())
     } catch (error) {
       console.log(`Mutation error`, error)
@@ -144,19 +73,8 @@ const GeneralDataRow = ({ status, data, refetch }) => {
 
   const handleAuthorRemove = async (id) => {
     try {
-      await deleteAuthor({
-        variables: {
-          authorId: id,
-          sbomId: sbomId
-        }
-      }).then((res) => {
-        if (res) {
-          refetch({
-            productId: productId,
-            sbomId: sbomId
-          })
-        }
-      })
+      await deleteAuthor({variables: { authorId: id, sbomId: sbomId }})
+      .then((res) => res?.data && refetch({ productId: productId, sbomId: sbomId }))
     } catch (error) {
       console.log(`Mutation error`, error)
     }
@@ -168,18 +86,8 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   }
 
   const handleSupRemove = async (id) => {
-    await deleteSupplier({
-      variables: {
-        id: id
-      }
-    }).then(
-      (res) =>
-        res.data &&
-        refetch({
-          productId: productId,
-          sbomId: sbomId
-        })
-    )
+    await deleteSupplier({ variables: { id: id } })
+    .then((res) => res.data && refetch({ productId: productId, sbomId: sbomId }))
   }
 
   const onLicenseOpen = () => {
@@ -188,17 +96,8 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   }
 
   const onUpdateLicense = async () => {
-    await updateSbom({
-      variables: {
-        id: data.id,
-        spec: data.spec,
-        licenses: {
-          licensesExp: expLicense || '',
-        },
-      }
-    })
-      .then((res) => res.data && sbomDispatch({ type: 'CLEAR_LICENSES' }))
-      .finally(() => onSBMClose())
+    await updateSbom({ variables: { id: data.id, spec: data.spec, licenses: { licensesExp: expLicense || ''} }
+    }).then((res) => res.data && sbomDispatch({ type: 'CLEAR_LICENSES' })).finally(() => onSBMClose())
   }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
@@ -239,7 +138,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   // KEYBOARD EVENT LISTNER FOR SBOM DRAWER
   useEffect(() => {
     window.addEventListener('keydown', handleSBMDown)
-
     return () => {
       window.removeEventListener('keydown', handleSBMDown)
     }
@@ -248,17 +146,10 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   return (
     <>
       <CardBody>
-        <Table
-          __css={{ tableLayout: 'fixed', width: 'full' }}
-          variant='simple'
-          color={textColor}
-          size='sm'
-        >
+        <Table __css={{ tableLayout: 'fixed', width: 'full' }} variant='simple' color={textColor} size='sm'>
           {/* TABLE HEAD */}
           <Thead>
-            <Tr>
-              {[1,2,3].map((_, index) => <Th key={index}></Th>)}
-            </Tr>
+            <Tr>{[1,2,3].map((_, index) => <Th key={index}></Th>)}</Tr>
           </Thead>
           <Tbody>
             {/* CREATION TOOLS */}
@@ -267,45 +158,25 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 <InfoLabel title={`Creation Tool`} onClick={onCheckTool} />
               </Td>
               <Td pl={0}>
-                <Flex
-                  flexDirection={'row'}
-                  alignItems={'flex-start'}
-                  flexWrap={'wrap'}
-                  gap={2.5}
-                >
-                  {data.tools &&
-                    data.tools.map((item, index) => (
-                      <Tag
-                        size={'md'}
-                        key={index}
-                        variant='subtle'
-                        colorScheme='teal'
-                        width={'fit-content'}
-                      >
-                        <TagLabel>
-                          {item.name} - {item.version}
-                        </TagLabel>
-                        {updateComponent && (
-                          <TagCloseButton
-                            onClick={() => {
-                              setActiveTool(item)
-                              onDelOpen()
-                            }}
-                          />
-                        )}
-                      </Tag>
-                    ))}
+                <Flex flexDirection={'row'} alignItems={'flex-start'} flexWrap={'wrap'} gap={2.5}>
+                  {data.tools && data.tools.map((item, index) => (
+                    <Tag size={'md'} key={index} variant='subtle' colorScheme='teal' width={'fit-content'}>
+                      <TagLabel>{item.name} - {item.version}</TagLabel>
+                      {updateComponent && (
+                        <TagCloseButton
+                          onClick={() => {
+                            setActiveTool(item)
+                            onDelOpen()
+                          }}
+                        />
+                      )}
+                    </Tag>
+                  ))}
                 </Flex>
               </Td>
               <Td pl={0}>
                 {!customerView && (
-                  <Button
-                    size='sm'
-                    isDisabled={
-                      status === 'signed' || !updateComponent || signedUrlParams
-                    }
-                    onClick={() => handleClick('tools')}
-                  >
+                  <Button size='sm' isDisabled={status === 'signed' || !updateComponent || signedUrlParams} onClick={() => handleClick('tools')}>
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
                   </Button>
                 )}
@@ -313,50 +184,26 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             </Tr>
             {/* CREATED AT */}
             <Tr>
-              <Td pl={0} fontWeight={'medium'}>
-                Created At
-              </Td>
+              <Td pl={0} fontWeight={'medium'}>Created At</Td>
               <Td pl={0}>{getFullDateAndTime(data?.creationAt)}</Td>
               <Td pl={0}></Td>
             </Tr>
             {/* AUTHORS */}
             <Tr>
-              <Td pl={0} fontWeight={'medium'}>
-                <InfoLabel title={`Authors`} onClick={onCheckAuthor} />
-              </Td>
+              <Td pl={0} fontWeight={'medium'}><InfoLabel title={`Authors`} onClick={onCheckAuthor} /></Td>
               <Td pl={0}>
                 <Stack spacing={2} direction={'column'}>
-                  {data.authors &&
-                    data.authors.length > 0 &&
-                    data.authors.map((item, index) => (
-                      <Tag
-                        size={'md'}
-                        key={index}
-                        variant='subtle'
-                        colorScheme='blue'
-                        width={'fit-content'}
-                      >
-                        <TagLabel>
-                          {item.name} - {item.email}
-                        </TagLabel>
-                        {updateComponent && (
-                          <TagCloseButton
-                            onClick={() => handleAuthorRemove(item.id)}
-                          />
-                        )}
-                      </Tag>
-                    ))}
+                  {data.authors && data.authors.length > 0 && data.authors.map((item, index) => (
+                    <Tag size={'md'} key={index} variant='subtle' colorScheme='blue' width={'fit-content'}>
+                      <TagLabel>{item.name} - {item.email}</TagLabel>
+                      {updateComponent && <TagCloseButton onClick={() => handleAuthorRemove(item.id)} />}
+                    </Tag>
+                  ))}
                 </Stack>
               </Td>
               <Td pl={0}>
                 {!customerView && (
-                  <Button
-                    size='sm'
-                    isDisabled={
-                      status === 'signed' || !updateComponent || signedUrlParams
-                    }
-                    onClick={() => handleClick('author')}
-                  >
+                  <Button size='sm' isDisabled={status === 'signed' || !updateComponent || signedUrlParams} onClick={() => handleClick('author')}>
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
                   </Button>
                 )}
@@ -364,56 +211,30 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             </Tr>
             {/* SUPPLIERS */}
             <Tr>
-              <Td pl={0} fontWeight={'medium'}>
-                <InfoLabel title={`Supplier`} onClick={onCheckSupplier} />
-              </Td>
+              <Td pl={0} fontWeight={'medium'}><InfoLabel title={`Supplier`} onClick={onCheckSupplier} /></Td>
               <Td pl={0}>
                 <HStack spacing={4}>
-                  {data?.suppliers?.length > 0 &&
-                    data?.suppliers.map((item, index) => (
-                      <Tag
-                        size={'md'}
-                        key={index}
-                        variant='subtle'
-                        colorScheme='orange'
-                      >
-                        <TagLabel>
-                          {item.contactName}
-                          {item.contactEmail && ` (${item.contactEmail})`}
-                          {item.url ? (
-                            <Link
-                              href={
-                                item?.url?.startsWith('http')
-                                  ? item.url
-                                  : `http://${item.url}`
-                              }
-                              isExternal
-                            >
-                              {' '}
-                              {item.name}
-                            </Link>
-                          ) : (
-                            ` ${item.name}`
-                          )}
-                        </TagLabel>
-                        {updateComponent && (
-                          <TagCloseButton
-                            onClick={() => handleSupRemove(item.id)}
-                          />
+                  {data?.suppliers?.length > 0 && data?.suppliers.map((item, index) => (
+                    <Tag size={'md'} key={index} variant='subtle' colorScheme='orange'>
+                      <TagLabel>
+                        {item.contactName}
+                        {item.contactEmail && ` (${item.contactEmail})`}
+                        {item.url ? (
+                          <Link href={ item?.url?.startsWith('http') ? item.url : `http://${item.url}` } isExternal>
+                            {' '}{item.name}
+                          </Link>
+                        ) : (
+                          ` ${item.name}`
                         )}
-                      </Tag>
-                    ))}
+                      </TagLabel>
+                      {updateComponent && <TagCloseButton onClick={() => handleSupRemove(item.id)} />}
+                    </Tag>
+                  ))}
                 </HStack>
               </Td>
               <Td pl={0}>
                 {!customerView && (
-                  <Button
-                    size='sm'
-                    isDisabled={
-                      status === 'signed' || !updateComponent || signedUrlParams
-                    }
-                    onClick={onSupOpen}
-                  >
+                  <Button size='sm' isDisabled={status === 'signed' || !updateComponent || signedUrlParams} onClick={onSupOpen}>
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
                   </Button>
                 )}
@@ -421,32 +242,18 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             </Tr>
             {/* LICENSES */}
             <Tr>
-              <Td pl={0} fontWeight={'medium'}>
-                <InfoLabel title={`Data License`} onClick={onCheckLicense} />
-              </Td>
+              <Td pl={0} fontWeight={'medium'}><InfoLabel title={`Data License`} onClick={onCheckLicense} /></Td>
               <Td pl={0}>
                 <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
                   {/* SPDX */}
-                  {data.licenses?.length > 0 &&
-                    data.licenses?.map((item, index) => (
-                      <Tag
-                        size={'md'}
-                        key={index}
-                        variant='subtle'
-                        colorScheme='green'
-                        width={'fit-content'}
-                      >
-                        <TagLabel>{item}</TagLabel>
-                      </Tag>
-                    ))}
+                  {data.licenses?.length > 0 && data.licenses?.map((item, index) => (
+                    <Tag size={'md'} key={index} variant='subtle' colorScheme='green' width={'fit-content'}>
+                      <TagLabel>{item}</TagLabel>
+                    </Tag>
+                  ))}
                   {/* EXPRESSION */}
                   {data.licensesExp && data.licensesExp !== '' && (
-                    <Tag
-                      size={'md'}
-                      variant='subtle'
-                      colorScheme='green'
-                      width={'fit-content'}
-                    >
+                    <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
                       <TagLabel>{data.licensesExp}</TagLabel>
                     </Tag>
                   )}
@@ -454,14 +261,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               </Td>
               <Td pl={0}>
                 {!customerView && (
-                  <Button
-                    size='sm'
-                    ref={licenseBtn}
-                    isDisabled={
-                      status === 'signed' || !updateComponent || signedUrlParams
-                    }
-                    onClick={onLicenseOpen}
-                  >
+                  <Button size='sm' ref={licenseBtn} isDisabled={status === 'signed' || !updateComponent || signedUrlParams} onClick={onLicenseOpen}>
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
                   </Button>
                 )}
@@ -473,15 +273,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
 
       {/* GENERAL DRAWER */}
       {data && isOpen && (
-        <GeneralDataDrawer
-          isOpen={isOpen}
-          onClose={onClose}
-          btnRef={btnRef}
-          data={data}
-          selectedKey={selectedKey}
-          refetch={refetch}
-          checkId={null}
-        />
+        <GeneralDataDrawer isOpen={isOpen} onClose={onClose} btnRef={btnRef} data={data} selectedKey={selectedKey} refetch={refetch} checkId={null} />
       )}
 
       {/* SBOM LICENSE DRAWER */}
@@ -489,23 +281,12 @@ const GeneralDataRow = ({ status, data, refetch }) => {
         <Modal isOpen={isSBMOpen} onClose={onSBMClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>
-              {data?.licenses?.length > 0 ? 'Update' : 'Add'} License
-            </ModalHeader>
+            <ModalHeader>{data?.licenses?.length > 0 ? 'Update' : 'Add'} License</ModalHeader>
             <ModalCloseButton />
-            <ModalBody>
-              <LicenseField sbomView={true} isValid={isValid} setIsValid={setIsValid} />
-            </ModalBody>
+            <ModalBody><LicenseField sbomView={true} isValid={isValid} setIsValid={setIsValid} /></ModalBody>
             <ModalFooter>
-              <Button fontSize={'sm'} mr={3} onClick={onSBMClose}>
-                Close
-              </Button>
-              <Button
-                fontSize={'sm'}
-                colorScheme='blue'
-                onClick={onUpdateLicense}
-                isDisabled={!isValid}
-              >
+              <Button fontSize={'sm'} mr={3} onClick={onSBMClose}>Close</Button>
+              <Button fontSize={'sm'} colorScheme='blue' onClick={onUpdateLicense} isDisabled={!isValid} >
                 {data?.licensesExp?.length > 0 ? 'Update' : 'Save'}
               </Button>
             </ModalFooter>
@@ -515,14 +296,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
 
       {/* SUPPLIER MODAL */}
       {isSupOpen && data && (
-        <PriSupplierModal
-          refetch={refetch}
-          isOpen={isSupOpen}
-          onClose={onSupClose}
-          suppliers={data.suppliers}
-          checkId={null}
-          shortDesc={null}
-        />
+        <PriSupplierModal refetch={refetch} isOpen={isSupOpen} onClose={onSupClose} suppliers={data.suppliers} checkId={null} shortDesc={null} />
       )}
 
       {/* TOOL DELETE MODAL */}
@@ -534,21 +308,13 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             <ModalCloseButton />
             <ModalBody>
               <Text>
-                You are about to delete the creator Tool : {activeTool.name}-
-                {activeTool.version} from this version.
+                You are about to delete the creator Tool : {activeTool.name}-{activeTool.version} from this version.
               </Text>
               <Text mt={4}>Are you sure you wish to continue?</Text>
             </ModalBody>
-
             <ModalFooter>
-              <Button mr={3} onClick={onDelClose}>
-                Cancel
-              </Button>
-              <Button
-                variant='solid'
-                colorScheme='red'
-                onClick={() => handleToolRemove(activeTool.id)}
-              >
+              <Button mr={3} onClick={onDelClose}>Cancel</Button>
+              <Button variant='solid' colorScheme='red' onClick={() => handleToolRemove(activeTool.id)}>
                 Delete
               </Button>
             </ModalFooter>
@@ -558,13 +324,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
 
       {/* INFO MODAL */}
       {isInfoOpen && (
-        <InfoModal
-          isOpen={isInfoOpen}
-          onClose={onInfoClose}
-          heading={infoHeading}
-          body={infoText}
-          url={infoUrl}
-        />
+        <InfoModal isOpen={isInfoOpen} onClose={onInfoClose} heading={infoHeading} body={infoText} url={infoUrl} />
       )}
     </>
   )
