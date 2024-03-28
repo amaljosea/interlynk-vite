@@ -3,20 +3,17 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Drawer, DrawerBody, DrawerFooter, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, Button, Stack, FormControl, FormLabel, Input, InputRightElement, InputGroup, Select, Checkbox, Text, Flex, useToast, chakra, useDisclosure, Icon, IconButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { CreateComponent, UpdateComponent } from 'graphQL/Mutation'
+import { CreateComponent, UpdateComponent, CreateCompRelation } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { InfoIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
-import { CpeAutoComplete } from 'graphQL/Queries'
+import { CpeAutoComplete, GetAllComponents, AllShareComponents } from 'graphQL/Queries'
 import LicenseField from 'components/Licenses/LicenseField'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { GetAllComponents } from 'graphQL/Queries'
-import { CreateCompRelation } from 'graphQL/Mutation'
 import CpeField from 'components/CpeField'
-import { AllShareComponents } from 'graphQL/Queries'
 import InfoModal from 'components/InfoModal'
 
 function ComponentDrawer(props) {
@@ -34,9 +31,7 @@ function ComponentDrawer(props) {
   const { licenseType, purlString, expLicense, totalComp } = prodCompState
   const { prodCompDispatch } = dispatch
 
-  const [getAllComps, { data: allComponents }] = useLazyQuery(
-    signedUrlParams ? AllShareComponents : GetAllComponents
-  )
+  const [getAllComps, { data: allComponents }] = useLazyQuery(signedUrlParams ? AllShareComponents : GetAllComponents)
   const [addRelation] = useMutation(CreateCompRelation)
 
   const onFilterRefetch = () => {
@@ -323,21 +318,11 @@ function ComponentDrawer(props) {
               {/* KIND */}
               <FormControl isRequired>
                 <FormLabel htmlFor='componentType'>Type</FormLabel>
-                <Select id='componentType' name='componentType' size='md' fontSize={'sm'} value={compKind} isDisabled={signedUrlParams} onChange={(e) => setCompKind(e.target.value)} >
-                  <option value='' style={{ background: 'lightgray' }}>-- Select --</option>
-                  <option value='application'>Application</option>
-                  <option value='library'>Library</option>
-                  <option value='operating-system'>Operating System</option>
-                  <option value='firmware'>Firmware</option>
-                  <option value='file'>File</option>
-                  <option value='device'>Device</option>
-                  <option value='container'>Container</option>
-                  <option value='framework'>Framework</option>
-                  <option value='source'>Source</option>
-                  <option value='archive'>Archive</option>
-                  <option value='install'>Install</option>
-                  <option value='other'>Other</option>
-                  <option value='unspecified'>Unspecified</option>
+                <Select id='componentType' name='componentType' size='md' fontSize={'sm'} value={compKind} isDisabled={signedUrlParams} onChange={(e) => setCompKind(e.target.value)} textTransform={'capitalize'}>
+                  <option value='' style={{ background: 'lightgray' }}>-- Select --</option>\
+                  {['application','framework','library','container','platform','operating-system','device','device-driver','firmware','file','machine-learning-model','data'].map((item, index) => (
+                    <option key={index} value={item} style={{textTransform:'capitalize'}}>{item}</option>
+                  ))}
                 </Select>
               </FormControl>
               {/* LICENSES */}
