@@ -1,21 +1,4 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Input,
-  InputGroup,
-  InputLeftAddon,
-  InputRightAddon,
-  Menu,
-  MenuDivider,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
-  Stack,
-  Switch,
-  Text,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Box, Button, Flex, Input, InputGroup, InputLeftAddon, InputRightAddon, Menu, MenuDivider, MenuItemOption, MenuList, MenuOptionGroup, Stack, Switch, Text, useDisclosure } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
 import { useGlobalState } from 'hooks/useGlobalState'
 import MenuHeading from 'components/Misc/MenuHeading'
@@ -24,19 +7,7 @@ import { useRef } from 'react'
 const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const { totalRows, prodVulnState, dispatch } = useGlobalState()
-  const {
-    field,
-    direction,
-    severities,
-    components,
-    statues,
-    source,
-    kev,
-    epss,
-    filters,
-    minEpss,
-    maxEpss,
-    direct
+  const { field, direction, severities, components, statues, source, kev, epss, filters, minEpss, maxEpss, direct
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
@@ -44,7 +15,6 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
   const maxRef = useRef()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-
   const { vulnCompNames, vulnStatuses, vulnSeverities } = filters
 
   const onMinKeyDown = (e) => {
@@ -61,32 +31,16 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     }
   }
 
-  const handleRefetch = (
-    source,
-    severity,
-    component,
-    status,
-    kev,
-    epss,
-    direct
-  ) => {
+  const handleRefetch = ( source, severity, component, status, kev, epss, direct ) => {
     const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
-
-    const range = {
-      min: parseFloat(epssRange[0]) / 100,
-      max: parseFloat(epssRange[1]) / 100
-    }
+    const range = { min: parseFloat(epssRange[0]) / 100, max: parseFloat(epssRange[1]) / 100 }
 
     refetch({
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       source: source === true ? undefined : 'COMPONENT',
-      severity:
-        !severity.includes('all') && severity.length > 0 ? severity : undefined,
-      componentName:
-        !component.includes('all') && component.length > 0
-          ? component
-          : undefined,
+      severity: !severity.includes('all') && severity.length > 0 ? severity : undefined,
+      componentName: !component.includes('all') && component.length > 0 ? component : undefined,
       status: !status.includes('all') && status.length > 0 ? status : undefined,
       kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
       epss: epss === 'all' || epss === '' ? undefined : range,
@@ -102,15 +56,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
 
   const onFilterOrigin = (e) => {
     prodVulnDispatch({ type: 'FILTER_SOURCE', payload: e.target.checked })
-    handleRefetch(
-      e.target.checked,
-      severities,
-      components,
-      statues,
-      kev,
-      epss,
-      direct
-    )
+    handleRefetch(e.target.checked, severities, components, statues, kev, epss, direct)
   }
 
   const onFilterCompName = (value) => {
@@ -140,28 +86,12 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
 
   const onFilterDirect = (e) => {
     prodVulnDispatch({ type: 'FILTER_DIRECT', payload: e.target.checked })
-    handleRefetch(
-      source,
-      severities,
-      components,
-      statues,
-      kev,
-      epss,
-      e.target.checked
-    )
+    handleRefetch( source, severities, components, statues, kev, epss, e.target.checked )
   }
 
   const handleSubmit = () => {
     prodVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` })
-    handleRefetch(
-      source,
-      severities,
-      components,
-      statues,
-      kev,
-      `${minEpss}-${maxEpss}`,
-      direct
-    )
+    handleRefetch( source, severities, components, statues, kev, `${minEpss}-${maxEpss}`, direct)
     onClose()
   }
 
@@ -173,21 +103,10 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
           {severities.length !== 0 && <CheckMark />}
           <MenuHeading title={'Severity'} />
           <MenuList>
-            <MenuOptionGroup
-              type='checkbox'
-              value={severities}
-              onChange={onFilterSeverity}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
+            <MenuOptionGroup type='checkbox' value={severities} onChange={onFilterSeverity}>
+              <MenuItemOption value={'all'} fontSize={'sm'}>All</MenuItemOption>
               {vulnSeverities?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
@@ -200,27 +119,11 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
         <Menu closeOnSelect={false}>
           {components.length !== 0 && <CheckMark />}
           <MenuHeading title={'Component'} />
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
-              value={components}
-              onChange={onFilterCompName}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
+          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
+            <MenuOptionGroup type='checkbox' value={components} onChange={onFilterCompName}>
+              <MenuItemOption value={'all'} fontSize={'sm'}>All</MenuItemOption>
               {vulnCompNames?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
@@ -233,27 +136,11 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
         <Menu closeOnSelect={false}>
           {statues.length !== 0 && <CheckMark />}
           <MenuHeading title={'Status'} />
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
-              value={statues}
-              onChange={onFilterStatus}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
+          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
+            <MenuOptionGroup type='checkbox' value={statues} onChange={onFilterStatus}>
+              <MenuItemOption value={'all'} fontSize={'sm'}>All</MenuItemOption>
               {vulnStatuses?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
@@ -269,12 +156,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
           <MenuList>
             <MenuOptionGroup type='radio' value={kev} onChange={onFilterKev}>
               {['all', 'yes', 'no'].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
@@ -289,9 +171,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
           <MenuHeading title={'EPSS'} onClick={onOpen} />
           <MenuList>
             <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
+              <MenuItemOption value={'all'} fontSize={'sm'}>All</MenuItemOption>
               {['0-0.1', '0.1-1', '1-10', '10-100'].map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {`${item} %`}
@@ -340,13 +220,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
                   <InputRightAddon>%</InputRightAddon>
                 </InputGroup>
               </Stack>
-              <Button
-                ml={8}
-                my={3}
-                size='sm'
-                onClick={handleSubmit}
-                isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}
-              >
+              <Button ml={8} my={3} size='sm' onClick={handleSubmit} isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0} >
                 Submit
               </Button>
             </Flex>
@@ -362,6 +236,11 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Flex align='center' gap={2}>
         <Switch id='isDirect' isChecked={source} onChange={onFilterOrigin} />
         <Text>Parts</Text>
+      </Flex>
+      {/* INCOMPLETE STATUS */}
+      <Flex align='center' gap={2}>
+        <Switch id='incompleteStatus' defaultChecked={false} />
+        <Text>Incomplete Status</Text>
       </Flex>
     </Stack>
   )

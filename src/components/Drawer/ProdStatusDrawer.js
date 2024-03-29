@@ -265,7 +265,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               )}
               {/* STATUS */}
               <Card position='relative' p={6} border={`1px solid lightgray`}>
-                {statusTitle !== '' && <IconButton size='xs' position={'absolute'} right={-2} top={-2} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
+                {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
                 <FormControl isRequired>
                   <InfoLabel title={'Status'} name={'vexType'} onClick={onCheckStatus} />
                   <Select id='vexType' name='vexType' fontSize='sm' value={statusTitle} onChange={handleStatusChange}>
@@ -283,7 +283,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               {/* JUSTIFICATION */}
               {(statusName === 'Not Affected' || statusName === 'False Positive') && (
               <Card position='relative' p={6} border={`1px solid lightgray`}>
-                {justification !== '' && impactData !== '' && <IconButton size='xs' position={'absolute'} right={-2} top={-2} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
+                {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={justification !== '' && impactData !== '' ? 'green' : 'red'} rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
                 <FormControl isRequired={statusName === 'Not Affected' || statusName === 'False Positive'}>
                   <InfoLabel title={'Justification'} name={justification} onClick={onCheckJustify} />
                   <Select id='justification' name='justification' value={justification} onChange={handleJustifyChange} fontSize='sm' color='gray.600'>
@@ -297,17 +297,18 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
                     )}
                   </Select>
                 </FormControl>
+                <Text fontSize={'xs'} mt={5}>AND / OR</Text>
                 {/* IMPACT STATEMENT */}
                 <FormControl mt={5} isRequired={(statusName === 'Not Affected' && justifyName === 'Other (impact statment required)') || (statusName === 'False Positive' && justifyName === 'Other (impact statment required)')}>
                   <InfoLabel title={'Impact Statement'} name={'impactStatement'} onClick={onCheckImpact} />
-                  <Textarea type='text' name='impactStatement' rows={2} id='impactStatement' placeholder='Add impact statement' value={impactData} onChange={(e) => setImpactData(e.target.value)} fontSize='sm' />
+                  <Textarea type='text' name='impactStatement' rows={2} id='impactStatement' placeholder='Exmple: The product is not affected by this vulnerability because ....' value={impactData} onChange={(e) => setImpactData(e.target.value)} fontSize='sm' />
                 </FormControl>
               </Card>
               )}
               {/* RESPONSE */}
               {statusName === 'Affected' && (
                 <Card position='relative' p={6} border={`1px solid lightgray`}>
-                  {response !== '' && selectedTag !== '' && actionStatement !== '' && <IconButton size='xs' position={'absolute'} right={-2} top={-2} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
+                  {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={actionStatement === '' ? 'red' : 'green'} rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
                   <FormControl>
                     <InfoLabel title={'Response'} name={'response'} onClick={onCheckResponse} />
                     {res && (
@@ -339,28 +340,28 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
                   {/* ACTION STATEMENT */}
                   <FormControl mt={5} isRequired={statusName === 'Affected'}>
                     <InfoLabel title={'Action Statement'} name={'actionStatement'} onClick={onCheckAction} />
-                    <Textarea rows={2} name='actionStatement' id='actionStatement' placeholder='Add statement' fontSize='sm' value={actionStatement} onChange={(e) => setActionStatement(e.target.value)} />
+                    <Textarea rows={2} name='actionStatement' id='actionStatement' placeholder='Example: This vulnerability can be mitigate by running the application with ENV_PROTECTED enabled or turning off Notifications under settings.' fontSize='sm' value={actionStatement} onChange={(e) => setActionStatement(e.target.value)} />
                   </FormControl>
                 </Card>
               )}
               {/* INTERNAL NOTES */}
               <Card position='relative' p={6} border={`1px solid lightgray`}>
-                {(details !== '' || notes !== '') && <IconButton size='xs' position={'absolute'} right={-2} top={-2} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
+                {(details !== '' || notes !== '') && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
                 {/* DETAILS */}
                 {(statusName === 'In Triage') && (
                   <FormControl>
                     <InfoLabel title={'Details'} name={'details'} onClick={onCheckDetails} />
-                    <Textarea rows={2} name='details' id='details' placeholder='Add details' fontSize='sm' value={details} onChange={(e) => setDetails(e.target.value)} />
+                    <Textarea rows={2} name='details' id='details' placeholder='Example: The vulnerability surfaced in the reports on March 13th 3pm and has been sent to PSIRT for analysis by 7pm.' fontSize='sm' value={details} onChange={(e) => setDetails(e.target.value)} />
                   </FormControl>
                 )}
                 <FormControl mt={statusName === 'In Triage' ? 5 : 0}>
                   <InfoLabel title={'Internal Notes'} name={'internalNotes'} onClick={onCheckNotes} />
-                  <Textarea rows={2} name='internalNotes' id='internalNotes' placeholder='Add notes' fontSize='sm' value={notes} onChange={(e) => setNotes(e.target.value)} />
+                  <Textarea rows={2} name='internalNotes' id='internalNotes' placeholder='Example: John Appleseed has scan the codebase and found two instances of function alls encrypt(). Next step: exploitability analysis.' fontSize='sm' value={notes} onChange={(e) => setNotes(e.target.value)} />
                 </FormControl>
               </Card>
               {/* UPSTERAM PRODUCT */}
               <FormControl>
-                <Checkbox size='sm' isChecked={upstream} onChange={(e) => setUpstream(e.target.checked)}>
+                <Checkbox size='sm' isChecked={upstream} onChange={(e) => setUpstream(e.target.checked)} isDisabled={statusTitle === ''}>
                   Also update upstream products
                 </Checkbox>
               </FormControl>
