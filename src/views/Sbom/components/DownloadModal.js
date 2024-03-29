@@ -76,7 +76,7 @@ const DownloadModal = ({ finalRef, isOpen, onClose, initialRef, productId, produ
           <Stack direction='column' gap='20px' mt={2}>
             <RadioGroup value={spec} onChange={(value) => setSpec(value)}>
               <Stack spacing={4} direction='row'>
-                <Radio value='spdx' disabled>SPDX</Radio>
+                <Radio value='spdx'>SPDX</Radio>
                 <Radio value='cyclonedx'>CycloneDX</Radio>
               </Stack>
             </RadioGroup>
@@ -90,7 +90,7 @@ const DownloadModal = ({ finalRef, isOpen, onClose, initialRef, productId, produ
               </Stack>
             </RadioGroup>
             <Stack direction='column' gap='5px'>
-              <Checkbox isChecked={includeVulns} onChange={() => setIncludeVulns(!includeVulns)} >
+              <Checkbox isChecked={includeVulns} onChange={() => setIncludeVulns(!includeVulns)} isDisabled={spec === 'spdx'}>
                 Include Vulnerabilities
               </Checkbox>
             </Stack>
