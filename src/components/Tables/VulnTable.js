@@ -22,6 +22,7 @@ import { linkURl } from 'utils'
 import CvssCard from 'components/Misc/CvssCard'
 import { ShareVulnFilters } from 'graphQL/Queries'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
+import { capitalizeFirstLetter } from 'utils'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -62,12 +63,11 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
   const [selectedGroup, setSelectedGroup] = useState('')
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
+  const [currentRow, setCurrentRow] = useState(null);
 
   const setPaginationControl = (data) => {
     if (signedUrlParams) {
-      setIsPrevActive(
-        data?.shareLynkQuery?.sbom?.vulns?.pageInfo?.hasPreviousPage
-      )
+      setIsPrevActive(data?.shareLynkQuery?.sbom?.vulns?.pageInfo?.hasPreviousPage)
       setIsNextActive(data?.shareLynkQuery?.sbom?.vulns?.pageInfo?.hasNextPage)
     } else {
       setIsPrevActive(data?.sbom?.vulns?.pageInfo?.hasPreviousPage)
@@ -85,7 +85,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
   const toast = useToast()
 
   const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } = useGlobalState()
-  const { pageIndex, field, direction, searchInput, severities, components, statues, source, kev, epss, filters, direct } = prodVulnState
+  const { pageIndex, field, direction, searchInput, severities, components, statues, source, kev, epss, filters, direct, statusTitle } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
   // GET VULN FILTER HEADS
@@ -467,12 +467,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
         severity: severities.length > 0 ? severities : undefined,
         componentName: components.length > 0 ? components : undefined,
         status: statues.length > 0 ? statues : undefined,
-        kev:
-          kev === 'all' || kev === ''
-            ? undefined
-            : kev === 'yes'
-              ? true
-              : false,
+        kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
         epss: epss !== '' && epss !== 'all' ? range : undefined,
         direct: direct === true ? true : undefined,
         first: totalRows,
@@ -585,7 +580,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
     `
     return (
       <Box width={'100%'} p={5} boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)' >
-        <Grid templateColumns='repeat(5, 1fr)' gap={6} width={'90%'} margin={'0 auto'} >
+        <Grid templateColumns='repeat(5, 1fr)' gap={12} width={'90%'} margin={'0 auto'} >
           {/* VULN DATA */}
           <GridItem w='100%' colSpan={2} display={'flex'} flexDirection={'column'} gap={4} >
             {/* Description */}
@@ -651,7 +646,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
           </GridItem>
           {/* STATUS UPDATE */}
           <GridItem w='100%' colSpan={3}>
-            <ProdStatusDrawer data={data} textColor={textColor} refetch={refetch} filteredData={filteredData} filterRefetch={filterRefetch} />
+            <ProdStatusDrawer data={data} textColor={textColor} refetch={refetch} filteredData={filteredData} filterRefetch={filterRefetch} setCurrentRow={setCurrentRow} />
           </GridItem>
         </Grid>
       </Box>
@@ -681,22 +676,11 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
   const handleNextPage = async () => {
     disablePaginationControl()
     setIsNextActive(false)
-    await refetch({
-      ...vulnData,
-      first: totalRows,
-      last: undefined,
-      after: data.pageInfo.endCursor,
-      before: undefined
+    await refetch({ ...vulnData, first: totalRows, last: undefined, after: data.pageInfo.endCursor, before: undefined
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res?.data)
-        prodVulnDispatch({
-          type: 'INCREMENT_PAGE',
-          payload: {
-            total: data.totalCount,
-            after: data.pageInfo.endCursor
-          }
-        })
+        prodVulnDispatch({ type: 'INCREMENT_PAGE', payload: { total: data.totalCount, after: data.pageInfo.endCursor } })
       }
     })
   }
@@ -709,18 +693,10 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       signedParams: undefined,
       search: searchInput !== '' ? searchInput : undefined,
       source: source === true ? undefined : 'COMPONENT',
-      severity:
-        !severities.includes('all') && severities.length > 0
-          ? severities
-          : undefined,
-      componentName:
-        !components.includes('all') && components.length > 0
-          ? components
-          : undefined,
-      status:
-        !statues.includes('all') && statues.length > 0 ? statues : undefined,
-      kev:
-        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
+      severity: !severities.includes('all') && severities.length > 0 ? severities : undefined,
+      componentName: !components.includes('all') && components.length > 0 ? components : undefined,
+      status: !statues.includes('all') && statues.length > 0 ? statues : undefined,
+      kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
       direct: direct === true ? true : undefined,
       first: totalRows,
@@ -732,13 +708,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
-        prodVulnDispatch({
-          type: 'SET_SORT_ORDER',
-          payload: {
-            field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-          }
-        })
+        prodVulnDispatch({ type: 'SET_SORT_ORDER', payload: { field: column.id, direction: sortDirection === 'asc' ? 'ASC' : 'DESC' } })
         window.scrollTo({ top: 0, behavior: 'smooth' })
       }
     })
@@ -748,18 +718,37 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
   const handleSetRow = async (e) => {
     disablePaginationControl()
     setTotalRows(Number(e.target.value))
-    await refetch({
-      ...vulnData,
-      first: Number(e.target.value),
-      last: undefined,
-      after: undefined,
-      before: undefined
+    await refetch({ ...vulnData, first: Number(e.target.value), last: undefined, after: undefined, before: undefined
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
         prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
     })
+  }
+
+  const handleSelect = (row) => {
+    const {componentVulnLogs, vexStatus, vexJustification, cdxResponse } = row
+    const item = componentVulnLogs[componentVulnLogs?.length - 1]
+    console.log(item);
+    prodVulnDispatch({type:'ON_CHANGE_STATUS', payload: {value:vexStatus?.id, name: vexStatus?.name}})
+    prodVulnDispatch({type:'ON_CHANGE_JUSTIFICATION', payload: {value:vexJustification?.id, name: item?.justification}})
+    prodVulnDispatch({type:'ON_CHANGE_RESPONSE', payload: {value:cdxResponse?.id, name: capitalizeFirstLetter(item?.response)}})
+    prodVulnDispatch({type:'SET_ACTION_STMT', payload: item?.actionStmt })
+    prodVulnDispatch({type:'SET_SELECTED_TAG', payload: item?.fixedIn })
+    prodVulnDispatch({type:'SET_DETAILS', payload: item?.detail })
+    prodVulnDispatch({type:'SET_NOTES', payload: item?.note })
+    prodVulnDispatch({type:'SET_IMPACT_DATA', payload: item?.impact })
+  }
+
+  // ON SELECT ROW
+  const handleSelectRow = (row) => {
+    const {componentVulnLogs } = row
+    if (componentVulnLogs?.length > 0) {
+      handleSelect(row)
+    } else {
+      setCurrentRow(row)
+    }
   }
 
   useEffect(() => {
@@ -787,9 +776,12 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
           subHeaderComponent={subHeader}
           responsive={true}
           expandableRows
+          expandableRowExpanded={(row) => (row === currentRow)}
           expandOnRowClicked
+          onRowClicked={(row) => handleSelectRow(row)}
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
+          onRowExpandToggled={(bool, row) => setCurrentRow(row)}
           selectableRows={!signedUrlParams}
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}

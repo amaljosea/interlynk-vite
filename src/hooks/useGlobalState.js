@@ -1,20 +1,5 @@
 import React, { useState, createContext, useContext, useReducer } from 'react'
-import {
-  globalVulnReducer,
-  compVulnReducer,
-  prodRulesReducer,
-  prodCheckReducer,
-  prodCompReducer,
-  prodLogReducer,
-  prodVulnReducer,
-  sbomLogReducer,
-  prodReducer,
-  sbomReducer,
-  versionReducer,
-  toolsReducer,
-  supportReducer,
-  policyReducer
-} from 'context/reducers'
+import { globalVulnReducer, compVulnReducer, prodRulesReducer, prodCheckReducer, prodCompReducer, prodLogReducer, prodVulnReducer, sbomLogReducer, prodReducer, sbomReducer, versionReducer, toolsReducer, supportReducer, policyReducer } from 'context/reducers'
 
 const GlobalStateContext = createContext()
 
@@ -140,7 +125,19 @@ const GlobalStateProvider = ({ children }) => {
     importSbom: [],
     mergeData: [],
     currentSbom: [],
-    licenseString: []
+    licenseString: [],
+    statusTitle:'',
+    statusName:'',
+    justification: '',
+    justifyName:'',
+    selectedTag:'',
+    actionStatement:'',
+    response:'',
+    responseTitle:'',
+    details:'',
+    notes:'',
+    impactData:'',
+    upstream:false
   })
   const [prodCheckState, prodCheckDispatch] = useReducer(prodCheckReducer, {
     field: 'CHECK_RESULTS_UPDATED_AT',

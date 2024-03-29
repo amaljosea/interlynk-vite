@@ -9,7 +9,6 @@ import { getVexStatuses, getVexJustifications, GetCdxResponses } from 'graphQL/Q
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { capitalizeFirstLetter } from 'utils'
 
 const InfoLabel = ({ title, name, onClick }) => {
   return (
@@ -20,7 +19,7 @@ const InfoLabel = ({ title, name, onClick }) => {
   )
 }
 
-const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
+const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRow }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
@@ -29,28 +28,20 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const { data: res } = useQuery(GetCdxResponses, { skip: signedUrlParams })
 
   const { totalRows, userPermissions, prodVulnState, dispatch } = useGlobalState()
-  const { field, direction, searchInput, severities, components, statues, kev, epss } = prodVulnState
+  const { field, direction, searchInput, severities, components, statues, kev, epss, statusTitle, statusName, justification, justifyName, selectedTag, actionStatement, response, responseTitle, details, notes, impactData, upstream } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const editVulns = sboms?.supersededBy?.some((permission) =>permission.key === 'edit_vulnerabilities' && permission.value === true)
 
-  const { id, componentVulnLogs, vexStatus, vexJustification, cdxResponse } = data
+  const { id, componentVulnLogs } = data
 
   const {isOpen, onOpen, onClose} = useDisclosure()
 
-  const [statusTitle, setStatusTitle] = useState('')
-  const [statusName, setStatusName] = useState('')
-  const [justification, setJustification] = useState('')
-  const [justifyName, setJustifyName] = useState('')
-  const [selectedTag, setSelectedTag] = useState('')
-  const [actionStatement, setActionStatement] = useState('')
-  const [response, setResponse] = useState('')
-  const [responseTitle, setResponseTitle] = useState('')
-  const [details, setDetails] = useState('')
-  const [notes, setNotes] = useState('')
-  const [impactData, setImpactData] = useState('')
-  const [upstream, setUpstream] = useState(false)
+  const [impactStmt, setImpactStmt] = useState(impactData)
+  const [actionStmt, setActionStmt] = useState(actionStatement)
+  const [stDetails, setStDetails] = useState(details)
+  const [internalNotes, setInternalNotes] = useState(notes)
   const [statusResults, setStatusResults] = useState([])
   const [newVulnLogs, setNewVulnLogs] = useState([])
   const [infoHeading, setInfoHeading] = useState('')
@@ -121,6 +112,23 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
     onOpen()
   }
 
+  const onImpactBlur = (e) => {
+    e.preventDefault()
+    prodVulnDispatch({type:'SET_IMPACT_DATA', payload: impactStmt })
+  }
+  const onActionBlur = (e) => {
+    e.preventDefault()
+    prodVulnDispatch({type:'SET_ACTION_STMT', payload: actionStmt })
+  }
+  const onDetailsBlur = (e) => {
+    e.preventDefault()
+    prodVulnDispatch({type:'SET_DETAILS', payload: stDetails })
+  }
+  const onNotesBlur = (e) => {
+    e.preventDefault()
+    prodVulnDispatch({type:'SET_NOTES', payload: internalNotes })
+  }
+
   const handleRefetch = async () => {
     const epssRange = (epss !== '' || epss !== '0-0') && epss.split('-')
     const range = { min: parseFloat(epssRange[0]) / 100, max: parseFloat(epssRange[1]) / 100 }
@@ -152,31 +160,20 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const handleStatusChange = (e) => {
     const { value } = e.target
     const status = e.target.options[e.target.selectedIndex].text
+    prodVulnDispatch({type:'ON_CHANGE_STATUS', payload: {value:value, name:status}})
     setError('')
-    setStatusTitle(value)
-    setStatusName(status)
-    setJustification('')
-    setJustifyName('')
-    setSelectedTag('')
-    setActionStatement('')
-    setResponse('')
-    setResponseTitle('')
-    setDetails('')
-    setNotes('')
-    setImpactData('')
   }
 
   const handleResponseChange = (e) => {
     const { value } = e.target
     const title = e.target.options[e.target.selectedIndex].text
-    setResponse(value)
-    setResponseTitle(title)
+    prodVulnDispatch({type:'ON_CHANGE_RESPONSE', payload: {value:value, name:title}})
   }
 
   const handleJustifyChange = (e) => {
     const { value } = e.target
-    setJustification(value)
-    setJustifyName(e.target.options[e.target.selectedIndex].text)
+    const title = e?.target?.options[e.target.selectedIndex]?.text
+    prodVulnDispatch({type:'ON_CHANGE_JUSTIFICATION', payload: {value:value, name:title}})
   }
 
   const handleSave = () => {
@@ -202,45 +199,12 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
         prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
     })
-    setStatusTitle('')
-    setStatusName('')
-    setJustification('')
-    setJustifyName('')
-    setSelectedTag('')
-    setActionStatement('')
-    setResponse('')
-    setResponseTitle('')
-    setDetails('')
-    setNotes('')
-    setImpactData('')
+    prodVulnDispatch({type:'CLEAR_VEX_STATE'})
+    setCurrentRow(data)
   }
-
-  const handleSelect = (item) => {
-    setStatusTitle(vexStatus?.id || '')
-    setStatusName(vexStatus?.name || '')
-    setJustification(vexJustification?.id || '')
-    setJustifyName(item?.justification || '')
-    setActionStatement(item?.actionStmt || '')
-    setResponse(cdxResponse?.id || '')
-    setResponseTitle(capitalizeFirstLetter(item?.response) || '')
-    setSelectedTag(item?.fixedIn || '')
-    setDetails(item?.detail || '')
-    setNotes(item?.note || '')
-    setImpactData(item?.impact || '')
-  }
-
-  useEffect(() => {
-    if (statusName === 'Not Affected' || statusName === 'False Positive') {
-      setUpstream(true)
-    } else {
-      setUpstream(false)
-    }
-  }, [statusName])
 
   useEffect(() => {
     if (componentVulnLogs?.length > 0) {
-      const currentOne = componentVulnLogs[componentVulnLogs?.length - 1]
-      handleSelect(currentOne)
       const sortedData = componentVulnLogs && [...componentVulnLogs].sort((a, b) => {
         const dateA = new Date(a.updatedAt).getTime()
         const dateB = new Date(b.updatedAt).getTime()
@@ -301,7 +265,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
                 {/* IMPACT STATEMENT */}
                 <FormControl mt={5} isRequired={(statusName === 'Not Affected' && justifyName === 'Other (impact statment required)') || (statusName === 'False Positive' && justifyName === 'Other (impact statment required)')}>
                   <InfoLabel title={'Impact Statement'} name={'impactStatement'} onClick={onCheckImpact} />
-                  <Textarea type='text' name='impactStatement' rows={2} id='impactStatement' placeholder='Exmple: The product is not affected by this vulnerability because ....' value={impactData} onChange={(e) => setImpactData(e.target.value)} fontSize='sm' />
+                  <Textarea type='text' name='impactStatement' rows={2} id='impactStatement' placeholder='Exmple: The product is not affected by this vulnerability because ....' value={impactStmt} onChange={(e) => setImpactStmt(e.target.value)} onBlur={onImpactBlur} fontSize='sm' />
                 </FormControl>
               </Card>
               )}
@@ -325,7 +289,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
                   {responseTitle === 'Update' && (
                     <FormControl mt={5} width={'100%'} isRequired={responseTitle === 'Update'}>
                       <InfoLabel title={'Fixed Version'} name={'fixedVersion'} onClick={onCheckFixedVersion} />
-                      <Select id='fixedVersion' name='fixedVersion' value={selectedTag} onChange={(e) => setSelectedTag(e.target.value)} fontSize='sm' color='gray.600'>
+                      <Select id='fixedVersion' name='fixedVersion' value={selectedTag} onChange={(e) =>     prodVulnDispatch({type:'SET_SELECTED_TAG', payload: e.target.value })} fontSize='sm' color='gray.600'>
                         <option value=''>-- Select --</option>
                         {fixedVersions.length > 0 ? (
                           fixedVersions.map((item, index) => (
@@ -340,28 +304,28 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
                   {/* ACTION STATEMENT */}
                   <FormControl mt={5} isRequired={statusName === 'Affected'}>
                     <InfoLabel title={'Action Statement'} name={'actionStatement'} onClick={onCheckAction} />
-                    <Textarea rows={2} name='actionStatement' id='actionStatement' placeholder='Example: This vulnerability can be mitigate by running the application with ENV_PROTECTED enabled or turning off Notifications under settings.' fontSize='sm' value={actionStatement} onChange={(e) => setActionStatement(e.target.value)} />
+                    <Textarea rows={2} name='actionStatement' id='actionStatement' placeholder='Example: This vulnerability can be mitigate by running the application with ENV_PROTECTED enabled or turning off Notifications under settings.' fontSize='sm' value={actionStmt} onChange={(e) => setActionStmt(e.target.value)} onBlur={onActionBlur} />
                   </FormControl>
                 </Card>
               )}
               {/* INTERNAL NOTES */}
               <Card position='relative' p={6} border={`1px solid lightgray`}>
-                {(details !== '' || notes !== '') && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
+                {(details || notes ) && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
                 {/* DETAILS */}
                 {(statusName === 'In Triage') && (
                   <FormControl>
                     <InfoLabel title={'Details'} name={'details'} onClick={onCheckDetails} />
-                    <Textarea rows={2} name='details' id='details' placeholder='Example: The vulnerability surfaced in the reports on March 13th 3pm and has been sent to PSIRT for analysis by 7pm.' fontSize='sm' value={details} onChange={(e) => setDetails(e.target.value)} />
+                    <Textarea rows={2} name='details' id='details' placeholder='Example: The vulnerability surfaced in the reports on March 13th 3pm and has been sent to PSIRT for analysis by 7pm.' fontSize='sm' value={stDetails} onChange={(e) => setStDetails(e.target.value)} onBlur={onDetailsBlur} />
                   </FormControl>
                 )}
                 <FormControl mt={statusName === 'In Triage' ? 5 : 0}>
                   <InfoLabel title={'Internal Notes'} name={'internalNotes'} onClick={onCheckNotes} />
-                  <Textarea rows={2} name='internalNotes' id='internalNotes' placeholder='Example: John Appleseed has scan the codebase and found two instances of function alls encrypt(). Next step: exploitability analysis.' fontSize='sm' value={notes} onChange={(e) => setNotes(e.target.value)} />
+                  <Textarea rows={2} name='internalNotes' id='internalNotes' placeholder='Example: John Appleseed has scan the codebase and found two instances of function alls encrypt(). Next step: exploitability analysis.' fontSize='sm' value={internalNotes} onChange={(e) => setInternalNotes(e.target.value)} onBlur={onNotesBlur} />
                 </FormControl>
               </Card>
               {/* UPSTERAM PRODUCT */}
               <FormControl>
-                <Checkbox size='sm' isChecked={upstream} onChange={(e) => setUpstream(e.target.checked)} isDisabled={statusTitle === ''}>
+                <Checkbox size='sm' isChecked={upstream} onChange={(e) => prodVulnDispatch({type:'SET_UPSTREAM', payload: e.target.checked })}>
                   Also update upstream products
                 </Checkbox>
               </FormControl>
@@ -392,7 +356,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
                 <Tbody>
                   {statusResults.length > 0 &&
                     statusResults.map((item) => (
-                      <VulLinkRow key={item.id} id={item.id} username={item.changedBy} justification={item.justification} status={item.status} timestamp={item.updatedAt} note={item.note} impact={item.impact} onSelect={() => handleSelect(item)} />
+                      <VulLinkRow key={item.id} id={item.id} username={item.changedBy} justification={item.justification} status={item.status} timestamp={item.updatedAt} note={item.note} impact={item.impact} />
                     ))}
                 </Tbody>
               </Table>
