@@ -27,17 +27,19 @@ const Filters = ({ data, refetch }) => {
   const onFilterVesion = async (value) => {
     await refetch({
       id,
+      vexComplete,
       first: totalRows,
       search: searchInput !== '' ? searchInput : undefined,
       projectNames: envs?.length === 0 ? undefined : envs,
       statuses: statuses?.length === 0 ? undefined : statuses,
-      versions: value.includes('all') || value.length === 0 ? undefined : value
+      versions: value.includes('all') || value.length === 0 ? undefined : value,
     }).then(() => compVulnDispatch({ type: 'FILTER_VERSION', payload: value }))
   }
 
   const onFilterEnv = async (value) => {
     await refetch({
       id,
+      vexComplete,
       first: totalRows,
       search: searchInput !== '' ? searchInput : undefined,
       versions: versions?.length === 0 ? undefined : versions,
@@ -49,6 +51,7 @@ const Filters = ({ data, refetch }) => {
   const onFilterStatus = async (value) => {
     await refetch({
       id,
+      vexComplete,
       first: totalRows,
       search: searchInput !== '' ? searchInput : undefined,
       projectNames: envs?.length === 0 ? undefined : envs,
@@ -60,13 +63,13 @@ const Filters = ({ data, refetch }) => {
   const onFilterComplete = async (e) => {
     await refetch({
       id,
+      vexComplete: e.target.checked,
       first: totalRows,
       search: searchInput !== '' ? searchInput : undefined,
       projectNames: envs?.length === 0 ? undefined : envs,
       versions: versions?.length === 0 ? undefined : versions,
       statuses: statuses?.length === 0 ? undefined : statuses,
-      vexComplete: e.target.checked
-    }).then(() => compVulnDispatch({ type: 'FILTER_COMPLETE', payload: e.target.checked }))
+    }).then(() => compVulnDispatch({ type: 'FILTER_COMPLETE', payload: vexComplete ? false : true }))
   }
 
   const envList = project && filterEnvList(project?.projectGroup?.projects)
