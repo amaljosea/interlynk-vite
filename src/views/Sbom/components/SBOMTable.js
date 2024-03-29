@@ -112,7 +112,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
         }
       })
     } else if (tabName === 'Vulnerabilities' && shouldFetchData(tabName) && vulnsPermissions?.value === true) {
-      const { field, direction, searchInput, severities, components, statues, source, kev, epss, direct } = prodVulnState
+      const { field, direction, searchInput, severities, components, statues, source, kev, epss, direct, vexComplete } = prodVulnState
       const vulnEpss = epss !== 'all' && epss !== '' ? epss.split('-').map((v) => parseFloat(v) / 10000) : undefined
       getVulnData({
         ...commonParams,
@@ -125,7 +125,8 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
         epss: epss !== '' && epss !== 'all' ? { min: vulnEpss[0], max: vulnEpss[1] } : undefined,
         direct: direct === true ? true : undefined,
         field,
-        direction
+        direction,
+        vexComplete
       }).then((res) => {
         if (res.data) {
           prodVulnDispatch({ type: 'SET_TOTAL_VULNS', payload: res.data.sbom.vulns.totalCount })

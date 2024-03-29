@@ -9,8 +9,11 @@ const compVulnReducer = (state, action) => {
         before: '',
         searchInput: '',
         pageIndex: 1,
+        envs: [],
+        versions: [],
         products: [],
-        statues: []
+        statues: [],
+        vexComplete: true
       }
     case 'FETCH_DATA_SUCCESS':
       return {
@@ -62,6 +65,14 @@ const compVulnReducer = (state, action) => {
       return {
         ...state,
         statuses: [...payload]?.includes('all') ? [] : payload,
+        pageIndex: 1,
+        after: '',
+        before: ''
+      }
+    case 'FILTER_COMPLETE':
+      return {
+        ...state,
+        vexComplete: payload,
         pageIndex: 1,
         after: '',
         before: ''

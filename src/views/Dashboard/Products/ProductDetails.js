@@ -31,10 +31,10 @@ const ProductDetails = () => {
   const vulnId = queryParams.get('vulnId')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const { totalRows, activeProdTab, setActiveProdTab, prodLogState, prodVulnState, prodRulesState, globalVulnState, dispatch, userPermissions } = useGlobalState()
+  const { totalRows, activeProdTab, setActiveProdTab, prodLogState, compVulnState, prodVulnState, prodRulesState, globalVulnState, dispatch, userPermissions } = useGlobalState()
   const { field, direction, searchInput, type, user, object } = prodLogState
-  const { searchInput: compVulnSearch,envs,statuses,source,versions: sbomVersions} = prodVulnState
-  const { searchInput: vulnSearch, severities, components, statues, kev, epss, direct } = prodVulnState
+  const { searchInput: compVulnSearch,envs,statuses,source,versions: sbomVersions, vexComplete: isCompleted } = compVulnState
+  const { searchInput: vulnSearch, severities, components, statues, kev, epss, direct, vexComplete } = prodVulnState
   const { prodVulnDispatch, globalVulnDispatch } = dispatch
 
   const activeProd = localStorage.getItem('activeEnv')
@@ -105,6 +105,7 @@ const ProductDetails = () => {
       kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
       direct: direct === true ? true : undefined,
+      vexComplete: vexComplete,
       field: prodVulnState.field,
       direction: prodVulnState.direction
     }
@@ -125,7 +126,8 @@ const ProductDetails = () => {
       search: compVulnSearch !== '' ? compVulnSearch : undefined,
       projectNames: envs?.length === 0 ? undefined : envs,
       versions: sbomVersions?.length === 0 ? undefined : sbomVersions,
-      statuses: statuses?.length === 0 ? undefined : statuses
+      statuses: statuses?.length === 0 ? undefined : statuses,
+      vexComplete: isCompleted
     }
   })
 

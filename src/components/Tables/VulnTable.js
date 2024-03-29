@@ -85,7 +85,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
   const toast = useToast()
 
   const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } = useGlobalState()
-  const { pageIndex, field, direction, searchInput, severities, components, statues, source, kev, epss, filters, direct, statusTitle } = prodVulnState
+  const { pageIndex, field, direction, searchInput, severities, components, statues, source, kev, epss, filters, direct, vexComplete } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
   // GET VULN FILTER HEADS
@@ -403,6 +403,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
   const vulnData = {
     projectId: signedUrlParams ? undefined : productId,
     sbomId: sbomId,
+    vexComplete,
     search: searchInput !== '' ? searchInput : undefined,
     source: source === true ? undefined : 'COMPONENT',
     severity: severities.length > 0 ? severities : undefined,
@@ -430,6 +431,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
       direct: direct === true ? true : undefined,
+      vexComplete,
       field: field,
       direction: direction,
       first: totalRows,
@@ -470,6 +472,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
         kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
         epss: epss !== '' && epss !== 'all' ? range : undefined,
         direct: direct === true ? true : undefined,
+        vexComplete,
         first: totalRows,
         last: undefined,
         after: undefined,
