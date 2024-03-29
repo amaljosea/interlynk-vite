@@ -1,10 +1,12 @@
 import { useMutation } from '@apollo/client'
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, FormLabel, Input, Alert, AlertIcon, AlertDescription, Checkbox, FormErrorMessage } from '@chakra-ui/react'
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, FormLabel, Input, Alert, AlertIcon, AlertDescription, Checkbox, FormErrorMessage, Textarea } from '@chakra-ui/react'
 import { UpdateCompSupportOverride, CreateCompSupportOverride } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { PackageURL } from 'packageurl-js'
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
+import { validateCpe } from 'utils'
 
 const SupportModal = ({ data, isOpen, onClose, refetch }) => {
   const { totalRows, supportState } = useGlobalState()
@@ -26,6 +28,26 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
 
   const handleRefetch = () => {
     refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows, field: field, direction: direction } })
+  }
+
+  const onUriBlur = () => {
+    if (idUri !== '') {
+      if (idUri?.startsWith(`cpe`)) {
+        const matches = validateCpe(idUri)
+        if (matches) {
+          setError('')
+        } else {
+          setError('Please enter a valid CPE')
+        }
+      } else if (idUri?.startsWith(`pkg`)) {
+        try {
+          PackageURL.fromString(idUri)
+          setError('')
+        } catch (ex) {
+          setError(`Please enter a valid PURL`)
+        }
+      }
+    }
   }
 
   const handleEolChange = (newDate) => {
@@ -59,7 +81,7 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
     }
   }
 
-  const isInvalid = idUri === '' || productName === '' || error !== '' || !isValidEol || !isValidEos
+  const isInvalid = idUri === '' || productName === '' || error !== '' || !isValidEol || !isValidEos || idUri === productName || idUri === productVersion
 
   const handleCreate =  (e) => {
     e.preventDefault()
@@ -143,25 +165,23 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
                 )}
                 <FormControl isRequired>
                   <FormLabel>PURL / CPE</FormLabel>
-                  <Input type='text' value={idUri}
+                  <Textarea type='text' value={idUri}
                     onChange={(e) => {
                       setIdUri(e.target.value)
                       setError('')
                     }}
+                    onBlur={onUriBlur}
                   />
                 </FormControl>
-                <FormControl isRequired>
+                <FormControl isRequired isInvalid={productName !== '' && idUri === productName}>
                   <FormLabel>Product name</FormLabel>
-                  <Input type='text' value={productName}
-                    onChange={(e) => {
-                      setProductName(e.target.value)
-                      setError('')
-                    }}
-                  />
+                  <Input type='text' value={productName} onChange={(e) => setProductName(e.target.value)} />
+                  <FormErrorMessage>Invalid name</FormErrorMessage>
                 </FormControl>
-                <FormControl>
+                <FormControl isInvalid={productVersion !== '' && idUri === productVersion}>
                   <FormLabel>Product version</FormLabel>
                   <Input type='text' value={productVersion} onChange={(e) => setProductVersion(e.target.value)} />
+                  <FormErrorMessage>Invalid version</FormErrorMessage>
                 </FormControl>
                 <FormControl isInvalid={!isValidEol}>
                   <FormLabel mb={1} htmlFor='expire'>End of life</FormLabel>

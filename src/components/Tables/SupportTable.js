@@ -1,4 +1,4 @@
-import { Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, Portal, Stack, Switch, Tag, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
+import { Badge, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, Portal, Stack, Switch, Tag, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import { useMemo, useState, useEffect } from 'react'
@@ -187,25 +187,40 @@ const SupportTable = ({ data, refetch }) => {
           <Switch size='md' isChecked={enabled} onChange={(e) => onChangeStatus(e, row)} />
         )
       },
-      width: '150px',
+      width: '110px',
       omit: sbomId ? true : false,
       sortable: true
     },
     {
       id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_NAME',
-      name: 'COMPONENT',
-      selector: (row) => <Text my={4}>{row?.productName}</Text>,
+      name: 'PRODUCT',
+      selector: (row) => {
+        return (
+          <Stack my={4}>
+            <Text>{row?.productName}</Text>
+            <Badge colorScheme='blue' width={'fit-content'}>{row?.productVersion}</Badge>
+          </Stack>
+        )
+      },
       wrap: true,
-      width: '350px',
+      width: '200px',
       sortable: true
+    },
+    {
+      id: 'IDURI',
+      name: 'URI',
+      selector: (row) => <Text my={4}>{row?.idUri}</Text>,
+      wrap: true,
+      width: '320px',
     },
     {
       id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_VERSION',
       name: 'VERSION',
       selector: (row) => row?.productVersion,
-      width: '200px',
+      width: '150px',
       wrap: true,
-      sortable: true
+      sortable: true,
+      omit: true,
     },
     {
       id: 'DEPRECATED',
@@ -225,26 +240,25 @@ const SupportTable = ({ data, refetch }) => {
       id: 'EOL_INFOS_EOL_DATE',
       name: 'END-OF-LIFE',
       selector: (row) => row?.eol || '',
-      width: '200px',
+      width: '160px',
       wrap: true
     },
     {
       id: 'EOL_INFOS_EOL_SUPPORT',
       name: 'END-OF-SERVICE',
       selector: (row) => row?.eos || '',
-      width: '200px',
+      width: '160px',
       wrap: true
     },
     // UPDATED AT
     {
       id: 'COMPONENT_SUPPORT_OVERRIDES_UPDATED_AT',
-      name: 'UPDATED',
+      name: 'UPDATED AT',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           {timeSince(row.updatedAt)}
         </Tooltip>
       ),
-      width: '160px',
       right: 'true',
       wrap: true,
       sortable: true,
@@ -260,12 +274,7 @@ const SupportTable = ({ data, refetch }) => {
       selector: (row) => {
         return (
           <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color='gray.400'
-            />
+            <MenuButton as={IconButton} icon={<FaEllipsisV />} variant='none' color='gray.400' />
             <Portal>
               <MenuList fontSize={'sm'}>
                 {/* EDIT SUPPORT */}
@@ -286,6 +295,7 @@ const SupportTable = ({ data, refetch }) => {
           </Menu>
         )
       },
+      width: '120px',
       right: 'true',
       omit: sbomId ? true : false
     }
@@ -301,34 +311,11 @@ const SupportTable = ({ data, refetch }) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          columns={columns}
-          data={data?.nodes || []}
-          customStyles={customStyles}
-          onSort={handleSort}
-          defaultSortFieldId={field}
-          defaultSortAsc={false}
-          progressPending={data ? false : true}
-          persistTableHead
-          subHeader
-          subHeaderComponent={subHeader}
-          progressComponent={<CustomLoader />}
-          responsive={true}
-        />
+        <DataTable columns={columns} data={data?.nodes || []} customStyles={customStyles} onSort={handleSort} defaultSortFieldId={field} defaultSortAsc={false} progressPending={data ? false : true} persistTableHead subHeader subHeaderComponent={subHeader} progressComponent={<CustomLoader />} responsive={true} />
 
         {/* PAGINATION */}
         {data?.pageInfo && (
-          <Pagination
-            paginationSizes={paginationSizes}
-            pageIndex={pageIndex}
-            totalRows={totalRows}
-            totalCount={data?.totalCount}
-            onPreviousPage={handlePreviousPage}
-            onNextPage={handleNextPage}
-            onSetRow={handleSetRow}
-            hasNextPage={isNextActive}
-            hasPreviousPage={isPrevActive}
-          />
+          <Pagination paginationSizes={paginationSizes} pageIndex={pageIndex} totalRows={totalRows} totalCount={data?.totalCount} onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} onSetRow={handleSetRow} hasNextPage={isNextActive} hasPreviousPage={isPrevActive} />
         )}
       </Flex>
 
