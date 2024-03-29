@@ -3554,53 +3554,12 @@ export const PolicyResults = gql`
         resultType
         sbomId
         updatedAt
-        policyViolations {
-          totalCount
-          nodes {
-            componentId
-            createdAt
-            id
-            updatedAt
-            component {
-              copyright
-              cpes
-              description
-              group
-              id
-              internal
-              kind
-              licensesExp
-              name
-              primary
-              publisher
-              purl
-              sbomId
-              scope
-              uniqueId
-              updatedAt
-              version
-            }
-            policyRuleViolations {
-              totalCount
-              nodes {
-                createdAt
-                id
-                policyRuleId
-                policyViolationId
-                updatedAt
-                violationId
-                violationType
-                policyRule {
-                  createdAt
-                  id
-                  operator
-                  policyId
-                  subject
-                  updatedAt
-                  value
-                }
-              }
-            }
+        policy {
+          name
+          policyRules {
+            operator
+            subject
+            value
           }
         }
       }

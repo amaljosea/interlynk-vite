@@ -1,7 +1,7 @@
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import styled from '@emotion/styled'
-import { Box, Flex, Grid, GridItem, Heading, IconButton, Menu, MenuButton, MenuItem, MenuList, Portal, Stack, Switch, Text, Tooltip, useDisclosure, useToast } from '@chakra-ui/react'
+import { Badge, Box, Flex, Grid, GridItem, Heading, IconButton, Menu, MenuButton, MenuItem, MenuList, Portal, Select, Stack, Switch, Tag, TagLabel, Text, Tooltip, useDisclosure, useToast } from '@chakra-ui/react'
 import { customStyles, getFullDateAndTime, timeSince, updatedValue } from 'utils'
 import { FaEllipsisV, FaPlus } from 'react-icons/fa'
 import { useEffect, useMemo, useState } from 'react'
@@ -198,27 +198,15 @@ const PolicyTable = ({ data, refetch }) => {
       omit: productId
     },
     {
-      id: 'EXCLUSION',
-      name: 'EXCLUSION ',
-      selector: (row) => {
-        const { isExcluded } = row
-        return (
-          <Switch size='md' isChecked={isExcluded} onChange={() => isExcluded ? handleDeleteExclusion(row?.id) : handleCreateExclusion(row?.id)} />
-        )
-      },
-      width: '150px',
-      omit: !productId
-    },
-    {
-      id: 'NAME',
-      name: 'NAME',
+      id: 'POLICY',
+      name: 'POLICY',
       selector: (row) => <Text my={4}>{row?.name}</Text>,
       wrap: true,
       width: '350px'
     },
     {
-      id: 'OPERATOR',
-      name: 'OPERATOR',
+      id: 'CONDITIONS',
+      name: 'CONDITIONS',
       selector: (row) => (
         <Text textTransform={'capitalize'}>{row?.operator}</Text>
       ),
@@ -226,11 +214,15 @@ const PolicyTable = ({ data, refetch }) => {
       wrap: true
     },
     {
-      id: 'RESULT_TYPE',
-      name: 'RESULT TYPE',
-      selector: (row) => (
-        <Text textTransform={'capitalize'}>{row?.resultType}</Text>
-      ),
+      id: 'RESULT',
+      name: 'RESULT',
+      selector: (row) => {
+        const {resultType} = row
+        return (
+        <Tag width={'80px'} colorScheme={resultType === 'inform' ? 'blue' : resultType === 'warn' ? 'orange' : 'red'}>  
+          <TagLabel fontSize={'xs'} style={{ textTransform: 'uppercase' }} mx={'auto'}>{resultType}</TagLabel>
+        </Tag>
+      )},
       width: '250px',
       wrap: true
     },
@@ -243,9 +235,27 @@ const PolicyTable = ({ data, refetch }) => {
           {timeSince(row?.updatedAt)}
         </Tooltip>
       ),
-      width: '160px',
       right: 'true',
       wrap: true
+    },
+    // EXCLUSION
+    {
+      id: 'EXCLUSION',
+      name: 'EXCLUSION',
+      selector: (row) => {
+        const { isExcluded, id } = row
+        return (
+          <Select size='sm' width={'120px'} value={isExcluded ? 'excluded' : 'included'} onChange={() => isExcluded ? handleDeleteExclusion(id) : handleCreateExclusion(id)} bg={isExcluded ? 'red.200' : 'green.200'} border={'none'} textTransform={'capitalize'} variant={'outline'}
+          >
+            {['included', 'excluded'].map((itm, index) => (
+              <option key={index} value={itm} style={{textTransform:'capitalize'}}>{itm}</option>
+            ))}
+          </Select>
+        )
+      },
+      width:'200px',
+      right: 'true',
+      omit: !productId
     },
     {
       id: 'ACTION',
@@ -286,10 +296,18 @@ const PolicyTable = ({ data, refetch }) => {
           </Menu>
         )
       },
+      width:'100px',
       right: 'true',
       omit: productId
     }
   ]
+
+  const conditionalRowStyles = [
+    {
+      when: row => row.isExcluded === true,
+      style: { backgroundColor: '#f2f2f2', color: '#111', '&:hover': { cursor: 'pointer' } }
+    },
+  ];
 
   // EXPAND VIEW
   const ExpandedComponent = ({ data }) => {
@@ -312,7 +330,7 @@ const PolicyTable = ({ data, refetch }) => {
           <GridItem><CustomText>value</CustomText></GridItem>
         </Grid>
         {policyRules?.map((item, index) => (
-          <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={3} mx={'auto'} bg={'#EDF2F7'} p={2}>
+          <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={1} mx={'auto'} bg={'#EDF2F7'} p={2}>
             <GridItem>
               <Text fontSize={'sm'}>{updatedValue(item?.subject)}</Text>
             </GridItem>
@@ -338,7 +356,7 @@ const PolicyTable = ({ data, refetch }) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable columns={columns} data={data?.nodes || []} customStyles={customStyles} progressPending={data ? false : true} progressComponent={<CustomLoader />} subHeader subHeaderComponent={subHeader} expandableRows expandOnRowClicked expandableRowsComponent={ExpandedComponent} persistTableHead responsive={true} />
+        <DataTable columns={columns} data={data?.nodes || []} customStyles={customStyles} progressPending={data ? false : true} progressComponent={<CustomLoader />} subHeader subHeaderComponent={subHeader} expandableRows expandOnRowClicked expandableRowsComponent={ExpandedComponent} persistTableHead responsive={true} conditionalRowStyles={conditionalRowStyles} />
 
         {/* PAGINATION */}
         {data?.pageInfo && (

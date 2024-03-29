@@ -262,6 +262,18 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                         </Select>
                       </FormControl>
                     )}
+                    {item?.subject === 'VULNERABILITY_STATUS' && (
+                      <FormControl isRequired>
+                        <Select size='sm' id='operator' name='operator' value={item?.value} onChange={(e) => handleChange(e.target.value, item.id, 'value')} textTransform={'capitalize'} fontSize='sm' hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'}>
+                          <option value=''>-- Select --</option>
+                          {["In Triage","False Positive","Not Affected","Affected","Fixed","Unspecified"].map((item, index) => (
+                            <option key={index} value={item} style={{ textTransform: 'capitalize' }} >
+                              {item}
+                            </option>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
                     {item?.operator === 'RANGE' && (
                       <Stack direction={'column'} alignItems={'flex-start'}>
                         <Flex alignItems={'center'} gap={4}>
@@ -285,7 +297,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                         <InputRightAddon>%</InputRightAddon>
                       </InputGroup>
                     )}
-                    {item?.operator !== 'RANGE' && item?.subject !== 'VULNERABILITY_SEV' && item?.subject !== 'VULNERABILITY_EPSS' && (
+                    {item?.operator !== 'RANGE' && item?.subject !== 'VULNERABILITY_SEV' && item?.subject !== 'VULNERABILITY_EPSS' && item?.subject !== 'VULNERABILITY_STATUS' && (
                       <Input type={'text'} size='sm' placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'} />
                     )}
                     </GridItem>

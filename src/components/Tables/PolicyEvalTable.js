@@ -1,6 +1,7 @@
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
-import { Flex, IconButton, Text, Tooltip, useToast } from '@chakra-ui/react'
+import { Box, Flex, Grid, GridItem, Heading, IconButton, Tag, TagLabel, Text, Tooltip, useToast } from '@chakra-ui/react'
+import styled from '@emotion/styled'
 import { getFullDateAndTime, timeSince, customStyles } from 'utils'
 import { useEffect, useMemo, useState } from 'react'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -10,6 +11,7 @@ import { SbomPolicyScan } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
 import { BiScan } from 'react-icons/bi'
+import { updatedValue } from 'utils'
 
 const PolicyEvalTable = ({ data }) => {
   const toast = useToast()
@@ -62,30 +64,29 @@ const PolicyEvalTable = ({ data }) => {
   // COLUMNS
   const columns = [
     {
-      id: 'OPERATOR',
-      name: 'OPERATOR',
-      selector: (row) => <Text textTransform={'capitalize'}>{row?.operator}</Text>,
-      width: '200px',
+      id: 'POLICY',
+      name: 'POLICY',
+      selector: (row) => <Text textTransform={'capitalize'}>{row?.policy?.name}</Text>,
+      width: '400px',
       wrap: true
     },
     {
       id: 'RESULT',
       name: 'RESULT',
-      selector: (row) => <Text textTransform={'capitalize'}>{row?.result}</Text>,
-      width: '200px',
-      wrap: true
-    },
-    {
-      id: 'RESULT_TYPE',
-      name: 'RESULT TYPE',
-      selector: (row) => <Text textTransform={'capitalize'}>{row?.resultType}</Text>,
+      selector: (row) => {
+        const {resultType} = row
+        return (
+        <Tag width={'80px'} colorScheme={resultType === 'inform' ? 'blue' : resultType === 'warn' ? 'orange' : 'red'}>  
+          <TagLabel fontSize={'xs'} style={{ textTransform: 'uppercase' }} mx={'auto'}>{resultType}</TagLabel>
+        </Tag>
+      )},
       width: '250px',
       wrap: true
     },
     // CREATED AT
     {
-      id: 'CREATED_AT',
-      name: 'CREATED AT',
+      id: 'CHECKED_AT',
+      name: 'CHECKED AT',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.createdAt)} placement={'top'}>
           {timeSince(row?.createdAt)}
@@ -93,20 +94,45 @@ const PolicyEvalTable = ({ data }) => {
       ),
       right: 'true',
       wrap: true
-    },
-    // UPDATED AT
-    {
-      id: 'UPDATED_AT',
-      name: 'UPDATED AT',
-      selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
-          {timeSince(row?.updatedAt)}
-        </Tooltip>
-      ),
-      right: 'true',
-      wrap: true
     }
   ]
+
+   // EXPAND VIEW
+   const ExpandedComponent = ({ data }) => {
+    const { policyRules } = data?.policy
+    const CustomText = styled(Text)`
+      font-size: 13px;
+      font-weight: bold;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    `
+    return (
+      <Box width={'100%'} p={5} boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'>
+        <Heading mb={6} fontFamily={'inherit'} fontSize={'sm'} color={'#555'} width={'90%'} mx={'auto'} >
+          CONDITIONS
+        </Heading>
+        <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={4} mx={'auto'} >
+          <GridItem><CustomText>subject</CustomText></GridItem>
+          <GridItem><CustomText>operator</CustomText></GridItem>
+          <GridItem><CustomText>value</CustomText></GridItem>
+        </Grid>
+        {policyRules?.map((item, index) => (
+          <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={1} mx={'auto'} bg={'#EDF2F7'} p={2}>
+            <GridItem>
+              <Text fontSize={'sm'}>{updatedValue(item?.subject)}</Text>
+            </GridItem>
+            <GridItem>
+              <Text fontSize={'sm'}>{updatedValue(item?.operator)}</Text>
+            </GridItem>
+            <GridItem>
+              <Text fontSize={'sm'} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'}>{updatedValue(item?.value)} {item?.subject === 'VULNERABILITY_EPSS' && (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN') ? ' %' : ''}</Text>
+            </GridItem>
+          </Grid>
+        ))}
+      </Box>
+    )
+  }
 
   useEffect(() => {
     if (data) {
@@ -118,17 +144,7 @@ const PolicyEvalTable = ({ data }) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          columns={columns}
-          data={data?.nodes || []}
-          customStyles={customStyles}
-          progressPending={data ? false : true}
-          progressComponent={<CustomLoader />}
-          subHeader
-          subHeaderComponent={subHeader}
-          persistTableHead
-          responsive={true}
-        />
+        <DataTable columns={columns} data={data?.nodes || []} customStyles={customStyles} progressPending={data ? false : true} progressComponent={<CustomLoader />} subHeader subHeaderComponent={subHeader} persistTableHead responsive={true} expandableRows expandOnRowClicked expandableRowsComponent={ExpandedComponent} />
       </Flex>
     </>
   )
