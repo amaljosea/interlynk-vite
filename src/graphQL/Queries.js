@@ -640,6 +640,7 @@ export const GetGlobalVulnData = gql`
     $after: String
     $before: String
     $search: String
+    $vexComplete: Boolean
     $projectIds: [Uuid!]
     $projectGroupIds: [Uuid!]
     $projectNames: [String!]
@@ -685,6 +686,7 @@ export const GetGlobalVulnData = gql`
       projectNames: $projectNames
       sbomVersions: $versions
       status: $statuses
+      vexComplete: $vexComplete
     ) {
       totalCount
       pageInfo {
@@ -1826,6 +1828,7 @@ export const GetVulnData = gql`
     $kev: Boolean
     $epss: RangeInput
     $direct: Boolean
+    $vexComplete: Boolean
     $first: Int
     $last: Int
     $after: String
@@ -1844,6 +1847,7 @@ export const GetVulnData = gql`
         kev: $kev
         epss: $epss
         direct: $direct
+        vexComplete: $vexComplete
         after: $after
         before: $before
         first: $first

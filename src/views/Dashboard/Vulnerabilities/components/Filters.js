@@ -1,4 +1,4 @@
-import { Box, Menu, MenuItemOption, MenuList, MenuOptionGroup, Stack } from '@chakra-ui/react'
+import { Box, Flex, Menu, MenuItemOption, MenuList, MenuOptionGroup, Stack, Switch, Text } from '@chakra-ui/react'
 import MenuHeading from 'components/Misc/MenuHeading'
 import CheckMark from 'components/Misc/CheckMark'
 import { useLocation, useParams } from 'react-router-dom'
@@ -14,7 +14,7 @@ const Filters = ({ data, refetch }) => {
   const id = queryParams.get('vulnId')
 
   const { totalRows, compVulnState, dispatch } = useGlobalState()
-  const { searchInput, envs, statuses, versions, products } = compVulnState
+  const { searchInput, envs, statuses, versions, products, vexComplete } = compVulnState
   const { compVulnDispatch } = dispatch
 
   const product = JSON.parse(localStorage.getItem('product'))
@@ -57,10 +57,22 @@ const Filters = ({ data, refetch }) => {
     }).then(() => compVulnDispatch({ type: 'FILTER_STATUS', payload: value }))
   }
 
+  const onFilterComplete = async (e) => {
+    await refetch({
+      id,
+      first: totalRows,
+      search: searchInput !== '' ? searchInput : undefined,
+      projectNames: envs?.length === 0 ? undefined : envs,
+      versions: versions?.length === 0 ? undefined : versions,
+      statuses: statuses?.length === 0 ? undefined : statuses,
+      vexComplete: e.target.checked
+    }).then(() => compVulnDispatch({ type: 'FILTER_COMPLETE', payload: e.target.checked }))
+  }
+
   const envList = project && filterEnvList(project?.projectGroup?.projects)
 
   return (
-    <Stack direction={'row'} alignItems={'center'} gap={1}>
+    <Stack direction={'row'} alignItems={'center'} gap={2}>
       {/* PRODUCTS */}
       <Box width={'fit-content'} position={'relative'} display={'none'}>
         <Menu closeOnSelect={false}>
@@ -135,6 +147,11 @@ const Filters = ({ data, refetch }) => {
           </MenuList>
         </Menu>
       </Box>
+      {/* INCOMPLETE STATUS */}
+      <Flex align='center' gap={2}>
+        <Switch id='incompleteStatus' isChecked={vexComplete} onChange={onFilterComplete} />
+        <Text>Incomplete Status</Text>
+      </Flex>
     </Stack>
   )
 }

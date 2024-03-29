@@ -7,8 +7,7 @@ import { useRef } from 'react'
 const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const { totalRows, prodVulnState, dispatch } = useGlobalState()
-  const { field, direction, severities, components, statues, source, kev, epss, filters, minEpss, maxEpss, direct
-  } = prodVulnState
+  const { field, direction, severities, components, statues, source, kev, epss, filters, minEpss, maxEpss, direct, vexComplete } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
   const minRef = useRef()
@@ -31,14 +30,14 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     }
   }
 
-  const handleRefetch = ( source, severity, component, status, kev, epss, direct ) => {
+  const handleRefetch = ( source, severity, component, status, kev, epss, direct, complete ) => {
     const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
     const range = { min: parseFloat(epssRange[0]) / 100, max: parseFloat(epssRange[1]) / 100 }
-
     refetch({
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       source: source === true ? undefined : 'COMPONENT',
+      vexComplete: complete,
       severity: !severity.includes('all') && severity.length > 0 ? severity : undefined,
       componentName: !component.includes('all') && component.length > 0 ? component : undefined,
       status: !status.includes('all') && status.length > 0 ? status : undefined,
@@ -56,42 +55,47 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
 
   const onFilterOrigin = (e) => {
     prodVulnDispatch({ type: 'FILTER_SOURCE', payload: e.target.checked })
-    handleRefetch(e.target.checked, severities, components, statues, kev, epss, direct)
+    handleRefetch(e.target.checked, severities, components, statues, kev, epss, direct, vexComplete)
   }
 
   const onFilterCompName = (value) => {
     prodVulnDispatch({ type: 'FILTER_COMPONENT', payload: value })
-    handleRefetch(source, severities, value, statues, kev, epss, direct)
+    handleRefetch(source, severities, value, statues, kev, epss, direct, vexComplete)
   }
 
   const onFilterSeverity = (value) => {
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-    handleRefetch(source, value, components, statues, kev, epss, direct)
+    handleRefetch(source, value, components, statues, kev, epss, direct, vexComplete)
   }
 
   const onFilterStatus = (value) => {
     prodVulnDispatch({ type: 'FILTER_STATUS', payload: value })
-    handleRefetch(source, severities, components, value, kev, epss, direct)
+    handleRefetch(source, severities, components, value, kev, epss, direct, vexComplete)
+  }
+
+  const onFilterComplete = (e) => {
+    prodVulnDispatch({ type: 'FILTER_COMPLETE', payload: e.target.checked })
+    handleRefetch(source, severities, components, statues, kev, epss, direct, e.target.checked)
   }
 
   const onFilterKev = (value) => {
     prodVulnDispatch({ type: 'FILTER_KEV', payload: value })
-    handleRefetch(source, severities, components, statues, value, epss, direct)
+    handleRefetch(source, severities, components, statues, value, epss, direct, vexComplete)
   }
 
   const onFilterEpss = (value) => {
     prodVulnDispatch({ type: 'FILTER_EPSS', payload: value })
-    handleRefetch(source, severities, components, statues, kev, value, direct)
+    handleRefetch(source, severities, components, statues, kev, value, direct, vexComplete)
   }
 
   const onFilterDirect = (e) => {
     prodVulnDispatch({ type: 'FILTER_DIRECT', payload: e.target.checked })
-    handleRefetch( source, severities, components, statues, kev, epss, e.target.checked )
+    handleRefetch( source, severities, components, statues, kev, epss, e.target.checked, vexComplete )
   }
 
   const handleSubmit = () => {
     prodVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` })
-    handleRefetch( source, severities, components, statues, kev, `${minEpss}-${maxEpss}`, direct)
+    handleRefetch( source, severities, components, statues, kev, `${minEpss}-${maxEpss}`, direct, vexComplete)
     onClose()
   }
 
@@ -239,7 +243,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       </Flex>
       {/* INCOMPLETE STATUS */}
       <Flex align='center' gap={2}>
-        <Switch id='incompleteStatus' defaultChecked={false} />
+        <Switch id='incompleteStatus' isChecked={vexComplete} onChange={onFilterComplete} />
         <Text>Incomplete Status</Text>
       </Flex>
     </Stack>

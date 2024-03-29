@@ -2,7 +2,7 @@ const prodVulnReducer = (state, action) => {
   const { type, payload } = action
   switch (type) {
     case 'CLEAR_PROD_VULN':
-      return {...state,field: 'COMPONENT_VULNS_UPDATED_AT',direction: 'DESC',after: '',before: '',searchInput: '',pageIndex: 1,severities: [],components: [],statues: [],source: false,kev: '',epss: '',min: 0,max: 0,direct: false,statusTitle:'',statusName:'',justification: '',justifyName:'',selectedTag:'',actionStatement:'',response:'',responseTitle:'',details:'',notes:'',impactData:'',upstream:false }
+      return {...state,field: 'COMPONENT_VULNS_UPDATED_AT',direction: 'DESC',after: '',before: '',searchInput: '',pageIndex: 1,severities: [],components: [],statues: [],source: false,kev: '',epss: '',min: 0,max: 0,direct: false,statusTitle:'',statusName:'',justification: '',justifyName:'',selectedTag:'',actionStatement:'',response:'',responseTitle:'',details:'',notes:'',impactData:'',upstream:false, vexComplete:true }
     case 'CLEAR_VEX_STATE':
       return {...state,  statusTitle:'', statusName:'', justification: '', justifyName:'', selectedTag:'', actionStatement:'', response:'', responseTitle:'', details:'', notes:'', impactData:'', upstream: false }
     case 'ON_CHANGE_STATUS':
@@ -48,6 +48,8 @@ const prodVulnReducer = (state, action) => {
       return { ...state, severities: [...payload]?.includes('all') ? [] : payload, pageIndex: 1, after: '', before: '' }
     case 'FILTER_STATUS':
       return { ...state, statues: [...payload]?.includes('all') ? [] : payload, pageIndex: 1, after: '', before: '' }
+    case 'FILTER_COMPLETE':
+      return { ...state, vexComplete: payload, pageIndex: 1, after: '', before: '' }
     case 'FILTER_KEV':
       return { ...state, kev: payload, pageIndex: 1, after: '', before: '' }
     case 'FILTER_EPSS':

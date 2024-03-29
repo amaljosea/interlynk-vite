@@ -15,7 +15,8 @@ const Vulnerabilities = () => {
   const vulnId = queryParams.get('vulnId')
   const org = localStorage.getItem('organization')
 
-  const { totalRows, globalVulnState, userPermissions } = useGlobalState()
+  const { totalRows, globalVulnState, compVulnState, userPermissions } = useGlobalState()
+  const { vexComplete } = compVulnState
   const { field, direction, searchInput, severities, products, statues, kev, epss } = globalVulnState
 
   const epssRange = epss !== 'all' && epss !== '' && epss?.split('-')
@@ -29,7 +30,7 @@ const Vulnerabilities = () => {
   const { data: vulnData, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
     skip: vulnId ? false : true,
     fetchPolicy: 'network-only',
-    variables: { id: vulnId, componentVulnId: vulnId, first: totalRows }
+    variables: { id: vulnId, componentVulnId: vulnId, first: totalRows, vexComplete }
   })
 
   useEffect(() => {
