@@ -338,7 +338,7 @@ const PolicyTable = ({ data, refetch }) => {
               <Text fontSize={'sm'}>{updatedValue(item?.operator)}</Text>
             </GridItem>
             <GridItem>
-              <Text fontSize={'sm'} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'}>{updatedValue(item?.value)} {item?.subject === 'VULNERABILITY_EPSS' && (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN') ? ' %' : ''}</Text>
+              <Text fontSize={'sm'} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'}>{item?.value} {item?.subject === 'VULNERABILITY_EPSS' && (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN') ? ' %' : ''}</Text>
             </GridItem>
           </Grid>
         ))}
