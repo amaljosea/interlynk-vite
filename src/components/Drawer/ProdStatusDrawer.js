@@ -184,7 +184,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
         compVulnId: id,
         vexStatusId: statusTitle,
         propagateVex: upstream,
-        details: details !== '' ? details : undefined,
+        detail: details !== '' ? details : undefined,
         note: notes !== '' ? notes : undefined,
         vexJustificationId: justification !== '' ? justification : undefined,
         cdxResponseId: response !== '' ? response : undefined,
