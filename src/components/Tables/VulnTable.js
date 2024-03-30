@@ -630,10 +630,10 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
               <Box>
                 <CustomText>NVD Alias ID:</CustomText>
                 <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
-                  <Flex mt={1} direction='row' alignItems={'center'} gap={2}>
+                  <Flex width={'fit-content'} mt={1} direction='row' alignItems={'center'} gap={2}>
                     <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} color={'blue.500'} />
                     <Tooltip label={vuln.nvdAliasId} placement={'top'}>
-                      <Text fontSize='sm' color={textColor}>{vuln.nvdAliasId}</Text>
+                      <Text width={'fit-content'} fontSize='sm' color={textColor}>{vuln.nvdAliasId}</Text>
                     </Tooltip>
                   </Flex>
                 </Link>
@@ -793,17 +793,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
 
       {/* PAGINATION */}
       {data?.pageInfo && (
-        <Pagination
-          paginationSizes={paginationSizes}
-          pageIndex={pageIndex}
-          totalRows={totalRows}
-          totalCount={data?.totalCount}
-          onPreviousPage={handlePreviousPage}
-          onNextPage={handleNextPage}
-          onSetRow={handleSetRow}
-          hasNextPage={isNextActive}
-          hasPreviousPage={isPrevActive}
-        />
+        <Pagination paginationSizes={paginationSizes} pageIndex={pageIndex} totalRows={totalRows} totalCount={data?.totalCount} onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} onSetRow={handleSetRow} hasNextPage={isNextActive} hasPreviousPage={isPrevActive} />
       )}
 
       {/* COPY DATA TABLE */}
@@ -824,25 +814,12 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       )}
 
       {isOpen && selectedVulns.length > 0 && (
-        <VexModal
-          isOpen={isOpen}
-          onClose={onClose}
-          refetch={refetch}
-          checkEquals={true}
-          selectedGroup={selectedGroup}
-          selectedVulns={selectedVulns}
-          setSelectedVulns={setSelectedVulns}
-          setToggleClear={setToggleClear}
-        />
+        <VexModal isOpen={isOpen} onClose={onClose} refetch={refetch} checkEquals={true} selectedGroup={selectedGroup} selectedVulns={selectedVulns} setSelectedVulns={setSelectedVulns} setToggleClear={setToggleClear} />
       )}
 
       {/* CVSS CARD */}
       {isCvssOpen && (
-        <CvssCard
-          isOpen={isCvssOpen}
-          onClose={onCvssClose}
-          value={activeRow?.vuln?.cvssVector}
-        />
+        <CvssCard isOpen={isCvssOpen} onClose={onCvssClose} value={activeRow?.vuln?.cvssVector} />
       )}
     </>
   )
