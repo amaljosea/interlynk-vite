@@ -8,7 +8,7 @@ import { updateCompVulnVex } from 'graphQL/Mutation'
 import { getVexStatuses, getVexJustifications, GetCdxResponses } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useState } from 'react'
-import { FaTimesCircle } from 'react-icons/fa'
+import { FaTimes } from 'react-icons/fa'
 import { useLocation } from 'react-router-dom'
 
 const InfoLabel = ({ title, name, onClick }) => {
@@ -248,7 +248,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
               {/* JUSTIFICATION */}
               {(statusName === 'Not Affected' || statusName === 'False Positive') && (
               <Card position='relative' p={6} border={`1px solid lightgray`}>
-                {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={justification !== '' && impactData !== '' ? 'green' : 'red'} rounded={'full'} icon={justification !== '' && impactData !== '' ? <CheckIcon /> : <FaTimesCircle/>} zIndex={9999} />}
+                {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={(justification !== '' || impactData !== '') ? 'green' : 'red'} rounded={'full'} icon={(justification !== '' || impactData !== '') ? <CheckIcon /> : <FaTimes/>} zIndex={9999} />}
                 <FormControl>
                   <InfoLabel title={'Justification'} name={justification} onClick={onCheckJustify} />
                   <Select id='justification' name='justification' value={justification} onChange={handleJustifyChange} fontSize='sm' color='gray.600'>
@@ -262,7 +262,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
                     )}
                   </Select>
                 </FormControl>
-                <Text fontSize='sm' color={'gray.600'} mt={5}>AND / OR</Text>
+                <Text fontSize='sm' fontWeight={'medium'} color={'gray.600'} mt={5}>AND / OR</Text>
                 {/* IMPACT STATEMENT */}
                 <FormControl mt={5}>
                   <InfoLabel title={'Impact Statement'} name={'impactStatement'} onClick={onCheckImpact} />
@@ -273,14 +273,14 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
               {/* RESPONSE */}
               {statusName === 'Affected' && (
                 <Card position='relative' p={6} border={`1px solid lightgray`}>
-                  {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={actionStatement === '' ? 'red' : 'green'} rounded={'full'} icon={actionStatement === '' ? <FaTimesCircle/> : <CheckIcon />} zIndex={9999} />}
+                  {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={actionStatement === '' ? 'red' : 'green'} rounded={'full'} icon={actionStatement === '' ? <FaTimes/> : <CheckIcon />} zIndex={9999} />}
                   {/* ACTION STATEMENT */}
-                  <FormControl mt={5} isRequired={statusName === 'Affected'}>
+                  <FormControl>
                     <InfoLabel title={'Action Statement'} name={'actionStatement'} onClick={onCheckAction} />
                     <Textarea rows={2} name='actionStatement' id='actionStatement' placeholder='Example: This vulnerability can be mitigate by running the application with ENV_PROTECTED enabled or turning off Notifications under settings.' fontSize='sm' value={actionStmt} onChange={(e) => setActionStmt(e.target.value)} onBlur={onActionBlur} />
                   </FormControl>
                   {/* RESPONSE */}
-                  <FormControl>
+                  <FormControl mt={5}>
                     <InfoLabel title={'Response'} name={'response'} onClick={onCheckResponse} />
                     {res && (
                       <Select id='response' name='response' value={response} onChange={handleResponseChange} fontSize='sm' color='gray.600'>
@@ -322,7 +322,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
               )}
               {/* INTERNAL NOTES */}
               <Card position='relative' p={6} border={`1px solid lightgray`}>
-                {<IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={notes ? 'green' : 'gray'} rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
+                {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={notes ? 'green' : 'gray'} rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
                 <FormControl mt={statusName === 'In Triage' ? 5 : 0}>
                   <InfoLabel title={'Internal Notes'} name={'internalNotes'} onClick={onCheckNotes} />
                   <Textarea rows={2} name='internalNotes' id='internalNotes' placeholder='Example: John Appleseed has scan the codebase and found two instances of function alls encrypt(). Next step: exploitability analysis.' fontSize='sm' value={internalNotes} onChange={(e) => setInternalNotes(e.target.value)} onBlur={onNotesBlur} />
@@ -342,9 +342,10 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
               width={'fit-content'}
               colorScheme='blue'
               onClick={handleSave}
+              fontSize={'sm'}
               isDisabled={statusTitle === '' || (statusName === 'Not Affected' && justification === '') || (statusName === 'Not Affected' && justifyName === 'Other (impact statment required)' && impactData === '') || (statusName === 'False Positive' && justification === '') || (statusName === 'False Positive' &&justifyName === 'Other (impact statment required)' && impactData === '') || (statusName === 'Affected' && actionStatement === '') || (responseTitle !== '' && actionStatement === '') || (responseTitle === 'update' && selectedTag === '') || !editVulns }
             >
-              {statusTitle !== '' ? 'Add Record' : 'Save'}
+              {componentVulnLogs?.length > 0 ? 'Save' : 'Add Record'}
             </Button>
           )}
           {/* STATUS HISTORY */}
