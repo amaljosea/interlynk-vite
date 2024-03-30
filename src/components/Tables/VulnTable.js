@@ -1,5 +1,5 @@
 // Chakra imports
-import { ChevronDownIcon, ChevronUpIcon, ExternalLinkIcon, RepeatIcon } from '@chakra-ui/icons'
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, ExternalLinkIcon, RepeatIcon } from '@chakra-ui/icons'
 import { Flex, Text, useDisclosure, Tag, TagLabel, Icon, useColorModeValue, Link, Box, Grid, GridItem, Tooltip, Stack, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, IconButton, Badge, Skeleton, useToast } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { FaBug, FaCopy, FaPen } from 'react-icons/fa6'
@@ -23,6 +23,7 @@ import CvssCard from 'components/Misc/CvssCard'
 import { ShareVulnFilters } from 'graphQL/Queries'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import { capitalizeFirstLetter } from 'utils'
+import { FaTimes } from 'react-icons/fa'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -287,20 +288,11 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       id: 'VEX_STATUSES_NAME',
       name: 'STATUS',
       selector: (row) => {
-        const { vexStatus } = row
+        const { vexStatus, isComplete } = row
         return (
-          <Tag
-            size='md'
-            variant='solid'
-            width={'130px'}
-            colorScheme={statusColor(
-              vexStatus ? vexStatus.name : 'Unspecified'
-            )}
-          >
-            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-              {vexStatus !== null ? vexStatus.name : 'Unspecified'}
-            </TagLabel>
-          </Tag>
+        <Tag size='md' variant='solid' width={'130px'} colorScheme={statusColor(vexStatus ? vexStatus.name : 'Unspecified')}>
+          <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>{vexStatus !== null ? vexStatus.name : 'Unspecified'}</TagLabel>
+        </Tag>
         )
       },
       width: '200px',
@@ -311,7 +303,6 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
     {
       id: 'COMPONENT_VULNS_UPDATED_AT',
       name: 'UPDATED',
-      width: '150px',
       selector: (row) => (
         <Tooltip
           label={getFullDateAndTime(row.vuln.updatedAt)}
