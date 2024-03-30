@@ -555,14 +555,14 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
             {vuln.nvdAliasId ? (
               <Box>
                 <CustomText>NVD Alias ID:</CustomText>
-                <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
                   <Flex width={'fit-content'} mt={1} direction='row' alignItems={'center'} gap={2}>
-                    <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} color={'blue.500'} />
+                    <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
+                      <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} color={'blue.500'} />
+                    </Link>
                     <Tooltip label={vuln.nvdAliasId} placement={'top'}>
                       <Text width={'fit-content'} fontSize='sm' color={textColor}>{vuln.nvdAliasId}</Text>
                     </Tooltip>
                   </Flex>
-                </Link>
               </Box>
             ) : null}
             {/* EPSS Percentile */}
