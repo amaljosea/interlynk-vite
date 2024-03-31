@@ -99,6 +99,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
         res && setPaginationControl(res.data)
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
         prodCompDispatch({ type: 'SET_TOTAL_COMP', payload: res?.data?.sbom?.components?.totalCount })
+        getCompFilters({ projectId: signedUrlParams ? undefined : productId, sbomId: sbomId })
 
       })
       .finally(() => window.scrollTo({ top: 0, behavior: 'smooth' }))

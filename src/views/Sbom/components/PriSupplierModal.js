@@ -64,10 +64,10 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
 
   useEffect(() => {
     if (suppliers && suppliers.length > 0) {
-      setOrgName(suppliers[0].name)
-      setOrgUrl(suppliers[0].url)
-      setSupName(suppliers[0].contactName)
-      setSupEmail(suppliers[0].contactEmail)
+      setOrgName(suppliers[0].name || '')
+      setOrgUrl(suppliers[0].url || '')
+      setSupName(suppliers[0].contactName || '')
+      setSupEmail(suppliers[0].contactEmail || '')
     }
   }, [suppliers])
 
