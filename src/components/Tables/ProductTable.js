@@ -259,7 +259,7 @@ const ProductTable = ({ data, refetch }) => {
           return (
             <Stack direction='column' alignItems={'flex-start'} spacing={1} my={3}>
               <Link to={`/${path}/products/${name}?id=${id}`} onClick={handleClick}>
-                <Text fontSize={15} color={'blue.500'} minWidth='100%' fontWeight={'medium'}>
+                <Text fontSize={14} color={'blue.500'} minWidth='100%' fontWeight={'medium'}>
                   {name?.length > 20 ? `${name?.substring(0,20)}...` : name}
                 </Text>
               </Link>
