@@ -1,17 +1,5 @@
 // Chakra imports
-import {
-  Flex,
-  Text,
-  Tag,
-  TagLabel,
-  Tooltip,
-  Button,
-  useDisclosure,
-  Select,
-  Stack,
-  Box,
-  IconButton
-} from '@chakra-ui/react'
+import { Flex, Text, Tag, TagLabel, Tooltip, Button, useDisclosure, Select, Stack, Box, IconButton } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { useEffect, useMemo, useState } from 'react'
 import CustomLoader from 'components/CustomLoader'
@@ -24,8 +12,7 @@ import { useLazyQuery } from '@apollo/client'
 import { FaFolderTree } from 'react-icons/fa6'
 import ConnectedSbomDrawer from 'components/Drawer/ConnectedSbomDrawer'
 import { GetConnectedSbom } from 'graphQL/Queries'
-import { statusColor, timeSince, areArraysEqual, getFullDateAndTime } from 'utils'
-import { customStyles } from 'utils'
+import { customStyles, statusColor, timeSince, areArraysEqual, getFullDateAndTime } from 'utils'
 
 
 const VulnProdTable = ({ data, vuln, refetch }) => {
@@ -42,11 +29,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
   const [getSboms, { data: connectedSboms }] = useLazyQuery(GetConnectedSbom)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isSbomOpen,
-    onOpen: onSbomOpen,
-    onClose: onSbomClose
-  } = useDisclosure()
+  const { isOpen: isSbomOpen, onOpen: onSbomOpen, onClose: onSbomClose } = useDisclosure()
 
   const [statusResults, setStatusResults] = useState([])
   const [selectedVulns, setSelectedVulns] = useState([])
@@ -60,11 +43,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     const { id, component } = row
     await getSboms({
       fetchPolicy: 'network-only',
-      variables: {
-        projectId: component?.sbom?.project?.id,
-        sbomId: component?.sbom?.id,
-        componentVulnId: id
-      }
+      variables: { projectId: component?.sbom?.project?.id, sbomId: component?.sbom?.id, componentVulnId: id }
     }).then((res) => {
       console.log(res?.data)
       onSbomOpen()
@@ -92,13 +71,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         return (
           <Flex flexDir={'row'} my={3} gap={2} alignItems={'center'}>
             <Tooltip label='Also affected'>
-              <IconButton
-                isDisabled={!component?.sbom?.hasConnectedSboms}
-                icon={<FaFolderTree />}
-                onClick={() => handlePreview(row)}
-                size='xs'
-                colorScheme='blue'
-              />
+              <IconButton isDisabled={!component?.sbom?.hasConnectedSboms} icon={<FaFolderTree />} onClick={() => handlePreview(row)} size='xs' colorScheme='blue'/>
             </Tooltip>
             <Text>{component?.sbom?.project?.projectGroup?.name || ''}</Text>
           </Flex>
@@ -114,9 +87,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row?.component?.sbom?.projectVersion} placement='top'>
-          <Text my={2} textAlign={'right'}>
-            {row?.component?.sbom?.projectVersion}
-          </Text>
+          <Text my={2} textAlign={'right'}>{row?.component?.sbom?.projectVersion}</Text>
         </Tooltip>
       ),
       wrap: true,
@@ -130,9 +101,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       selector: (row) => {
         const { component } = row
         return (
-          <Text textTransform={'capitalize'}>
-            {component?.sbom?.project?.name || ''}
-          </Text>
+          <Text textTransform={'capitalize'}>{component?.sbom?.project?.name || ''}</Text>
         )
       },
       wrap: true,
@@ -145,9 +114,10 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       selector: (row) => {
         const { component } = row
         return (
-          <Tooltip label={component?.name} placement='top'>
-            <Text textTransform={'capitalize'}>{component?.name || ''}</Text>
-          </Tooltip>
+          <Stack direction='column' alignItems={'flex-start'} spacing={1} my={3}>
+            <Text>{component?.name || ''}</Text>
+            <Text>{component?.version || ''}</Text>
+          </Stack>
         )
       },
       wrap: true,
@@ -159,14 +129,13 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row?.component?.version} placement='top'>
-          <Text my={2} textAlign={'right'}>
-            {row?.component?.version || ''}
-          </Text>
+          <Text my={2} textAlign={'right'}>{row?.component?.version || ''}</Text>
         </Tooltip>
       ),
       wrap: true,
       right: 'true',
-      width: '220px'
+      width: '220px',
+      omit:true,
     },
     // STATUS
     {
@@ -175,15 +144,8 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       selector: (row) => {
         const { vexStatus } = row
         return (
-          <Tag
-            size='md'
-            variant='solid'
-            width={'130px'}
-            colorScheme={statusColor(vexStatus?.name || 'Unspecified')}
-          >
-            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-              {vexStatus?.name || 'Unspecified'}
-            </TagLabel>
+          <Tag size='md' variant='solid' width={'130px'} colorScheme={statusColor(vexStatus?.name || 'Unspecified')}>
+            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>{vexStatus?.name || 'Unspecified'}</TagLabel>
           </Tag>
         )
       },
@@ -195,12 +157,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       id: 'VEX_UPDATED_AT',
       name: 'UPDATED',
       selector: (row) => (
-        <Tooltip
-          label={getFullDateAndTime(row?.updatedAt)}
-          placement={'top'}
-        >
-          {timeSince(row?.updatedAt)}
-        </Tooltip>
+        <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>{timeSince(row?.updatedAt)}</Tooltip>
       ),
       width: '160px',
       right: 'true',
@@ -220,11 +177,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         projectNames: envs?.length === 0 ? undefined : envs,
         versions: versions?.length === 0 ? undefined : versions,
         statuses: statuses?.length === 0 ? undefined : statuses
-      }).then(
-        (res) =>
-          res.data &&
-          compVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      )
+      }).then((res) => res.data && compVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value }))
     }
   }
 
@@ -239,9 +192,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       projectNames: envs?.length === 0 ? undefined : envs,
       versions: versions?.length === 0 ? undefined : versions,
       statuses: statuses?.length === 0 ? undefined : statuses
-    }).then(
-      (res) => res.data && compVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-    )
+    }).then((res) => res.data && compVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' }))
   }
 
   // ON SEARCH INPUT CHANGE
@@ -256,64 +207,33 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
 
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'}>
         {/* FILTER */}
         <Stack spacing={4} alignItems={'center'} direction={'row'}>
-          <SearchFilter
-            id='globalVulns'
-            filterText={filterInput}
-            onFilter={handleSearch}
-            onClear={handleClear}
-            onChange={onSearchInputChange}
-          />
-
+          <SearchFilter id='globalVulns' filterText={filterInput} onFilter={handleSearch} onClear={handleClear} onChange={onSearchInputChange} />
           <Filters data={vuln} refetch={refetch} />
         </Stack>
-
         {/* UPDATE STATUES */}
         {selectedVulns.length > 0 && (
-          <Button
-            variant='solid'
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            onClick={onOpen}
-            isDisabled={signedUrlParams}
-          >
+          <Button variant='solid' colorScheme='blue' fontWeight='normal' fontSize={'sm'} onClick={onOpen} isDisabled={signedUrlParams}>
             Set Status
           </Button>
         )}
       </Flex>
     )
-  }, [
-    selectedVulns,
-    filterInput,
-    onSearchInputChange,
-    handleClear,
-    handleSearch
-  ])
+  }, [selectedVulns,filterInput,onSearchInputChange,handleClear,handleSearch])
 
   const [checkEquals, setCheckEquals] = useState(false)
 
   const handleChange = (state) => {
-    console.log(state)
     setSelectedVulns(state?.selectedRows)
-    const version =
-      state?.selectedRows[0]?.component?.sbom?.primaryComponent?.version
-    const versionData = state.selectedRows.map(
-      (item) => item?.component?.sbom?.primaryComponent?.version
-    )
+    const version = state?.selectedRows[0]?.component?.sbom?.primaryComponent?.version
+    const versionData = state.selectedRows.map((item) => item?.component?.sbom?.primaryComponent?.version)
     const sameData = versionData.filter((item) => item === version)
     const checkEquality = areArraysEqual(versionData, sameData)
     setCheckEquals(checkEquality)
     if (checkEquality) {
-      setSelectedGroup(
-        state?.selectedRows[0]?.component?.sbom?.project?.projectGroup?.id
-      )
+      setSelectedGroup(state?.selectedRows[0]?.component?.sbom?.project?.projectGroup?.id)
     } else {
       setSelectedGroup('')
     }
@@ -336,10 +256,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       if (res.data) {
         const project = res?.data?.componentVulns
         setPaginationControl(project)
-        compVulnDispatch({
-          type: 'DECREMENT_PAGE',
-          payload: project?.pageInfo.startCursor
-        })
+        compVulnDispatch({type: 'DECREMENT_PAGE',payload: project?.pageInfo.startCursor})
       }
     })
   }
@@ -363,10 +280,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         setPaginationControl(project)
         compVulnDispatch({
           type: 'INCREMENT_PAGE',
-          payload: {
-            total: project?.totalCount,
-            after: project?.pageInfo.endCursor
-          }
+          payload: {total: project?.totalCount,after: project?.pageInfo.endCursor}
         })
       }
     })
@@ -376,15 +290,9 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
   const handleSetRow = async (e) => {
     const { value } = e.target
     setTotalRows(Number(value))
-    await refetch({
-      id,
-      first: Number(value),
-      last: undefined
-    }).then((res) => {
+    await refetch({ id, first: Number(value), last: undefined }).then((res) => {
       if (res.data) {
-        compVulnDispatch({
-          type: 'FETCH_DATA_SUCCESS'
-        })
+        compVulnDispatch({type: 'FETCH_DATA_SUCCESS'})
       }
     })
   }
@@ -413,63 +321,18 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     <>
       {/* TABLE */}
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          columns={columns}
-          data={statusResults || []}
-          customStyles={customStyles}
-          progressPending={data ? false : true}
-          progressComponent={<CustomLoader />}
-          subHeader
-          subHeaderComponent={subHeaderComponent}
-          responsive
-          persistTableHead
-          selectableRows
-          clearSelectedRows={toggleClear}
-          onSelectedRowsChange={handleChange}
-        />
+        <DataTable columns={columns} data={statusResults || []} customStyles={customStyles} progressPending={data ? false : true} progressComponent={<CustomLoader />} subHeader subHeaderComponent={subHeaderComponent} responsive persistTableHead selectableRows clearSelectedRows={toggleClear} onSelectedRowsChange={handleChange} />
 
         {data && (
-          <Flex
-            width={'100%'}
-            flexDir={'row'}
-            gap={4}
-            alignItems={'center'}
-            mt={6}
-            justifyContent={'space-between'}
-            flexWrap={'wrap'}
-          >
+          <Flex width={'100%'} flexDir={'row'} gap={4} alignItems={'center'} mt={6} justifyContent={'space-between'} flexWrap={'wrap'}>
             <Stack alignItems={'center'} direction={'row'} spacing={4}>
-              <Button
-                colorScheme='blue'
-                onClick={handlePreviousPage}
-                isDisabled={!isPrevActive}
-              >
-                Prev
-              </Button>
-              <Button
-                colorScheme='blue'
-                onClick={handleNextPage}
-                isDisabled={!isNextActive}
-              >
-                Next
-              </Button>
-              <Box>
-                Page {pageIndex} of{' '}
-                {data.totalCount === 0
-                  ? 1
-                  : Math.ceil(data.totalCount / totalRows)}
-              </Box>
+              <Button colorScheme='blue' onClick={handlePreviousPage} isDisabled={!isPrevActive}>Prev</Button>
+              <Button colorScheme='blue' onClick={handleNextPage} isDisabled={!isNextActive}>Next</Button>
+              <Box>Page {pageIndex} of{' '}{data.totalCount === 0? 1: Math.ceil(data.totalCount / totalRows)}</Box>
             </Stack>
-
             <Stack alignItems={'center'} direction={'row'} spacing={4}>
               <Text>Show</Text>
-              <Select
-                width={20}
-                value={totalRows}
-                onChange={handleSetRow}
-                id='rowlimit'
-                name='rowlimit'
-              >
+              <Select width={20} value={totalRows} onChange={handleSetRow} id='rowlimit' name='rowlimit'>
                 <option value={25}>25</option>
                 <option value={50}>50</option>
                 <option value={100}>100</option>
@@ -480,24 +343,11 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       </Flex>
 
       {isSbomOpen && connectedSboms && (
-        <ConnectedSbomDrawer
-          data={connectedSboms?.sbom}
-          isOpen={isSbomOpen}
-          onClose={onSbomClose}
-        />
+        <ConnectedSbomDrawer data={connectedSboms?.sbom} isOpen={isSbomOpen} onClose={onSbomClose} />
       )}
 
       {isOpen && selectedVulns.length > 0 && (
-        <VexModal
-          isOpen={isOpen}
-          onClose={onClose}
-          refetch={refetch}
-          checkEquals={checkEquals}
-          selectedGroup={selectedGroup}
-          selectedVulns={selectedVulns}
-          setSelectedVulns={setSelectedVulns}
-          setToggleClear={setToggleClear}
-        />
+        <VexModal isOpen={isOpen} onClose={onClose} refetch={refetch} checkEquals={checkEquals} selectedGroup={selectedGroup} selectedVulns={selectedVulns} setSelectedVulns={setSelectedVulns} setToggleClear={setToggleClear} />
       )}
     </>
   )

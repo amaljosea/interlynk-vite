@@ -99,7 +99,7 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
         sbomId: sbomId || undefined,
         propagateVex: sbomId ? undefined : upstream,
         vexStatusId: statusTitle,
-        details: details !== '' ? details : undefined,
+        detail: details !== '' ? details : undefined,
         note: notes !== '' ? notes : undefined,
         vexJustificationId: justification !== '' ? justification : undefined,
         cdxResponseId: response !== '' ? response : undefined,

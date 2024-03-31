@@ -1,24 +1,5 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  Badge,
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  GridItem,
-  HStack,
-  Heading,
-  Icon,
-  IconButton,
-  Select,
-  Stack,
-  Tag,
-  Text
-} from '@chakra-ui/react'
+import { Alert, AlertDescription, AlertIcon, Button, Flex, FormControl, FormLabel, Grid, GridItem, HStack, Heading, Icon, IconButton, Select, Stack, Tag, Text } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import { GetSbomDrift, GetProductsForSbomDrift, GetProductData, GetProject } from 'graphQL/Queries'
 import { FaCodeCompare, FaScaleUnbalanced, FaX } from 'react-icons/fa6'
@@ -36,10 +17,7 @@ const Compare = ({ selectedSboms }) => {
 
   const [isLoading, setIsLoading] = useState(false)
 
-  const productPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_product_group'),
-    [userPermissions]
-  )
+  const productPermissions = useMemo(() => userPermissions?.find((item) => item.key === 'view_product_group'),[userPermissions])
   const [getProduct] = useLazyQuery(GetProject, { fetchPolicy: 'network-only' })
   const [getSbomData] = useLazyQuery(GetProductData, {fetchPolicy: 'network-only'})
   const [getDrift, { data: driftData }] = useLazyQuery(GetSbomDrift, {fetchPolicy: 'network-only'})
@@ -73,11 +51,7 @@ const Compare = ({ selectedSboms }) => {
 
   const onSubmitSbomOne = () => {
     if (selectedProdOne && selectedVersionOne) {
-      getSbomData({
-        variables: {
-          projectId: selectedProdOne,
-          sbomId: selectedVersionOne?.value
-        }
+      getSbomData({ variables: { projectId: selectedProdOne, sbomId: selectedVersionOne?.value }
       }).then((res) => {
         if (res?.data) {
           console.log(res.data)
@@ -94,38 +68,22 @@ const Compare = ({ selectedSboms }) => {
 
   useEffect(() => {
     if (selectedGroupOne) {
-      const activeGroup = data?.organization?.projectGroups?.nodes.find(
-        (item) => item.id === selectedGroupOne
-      )
-      const result = activeGroup?.projects?.map((option) => ({
-        value: option.id,
-        label: option.name
-      }))
+      const activeGroup = data?.organization?.projectGroups?.nodes.find((item) => item.id === selectedGroupOne)
+      const result = activeGroup?.projects?.map((option) => ({ value: option.id, label: option.name }))
       setProductListOne(result)
     }
   }, [selectedGroupOne])
 
   useEffect(() => {
     if (selectedProdOne !== '' && selectedVersionOne === null) {
-      getProduct({
-        variables: {
-          id: selectedProdOne
-        }
-      }).then((res) => {
+      getProduct({variables: {id: selectedProdOne} }).then((res) => {
         if (res.data) {
           const data = sortByUpdatedAt(res?.data?.project?.sboms)
           if (data?.length > 0) {
             const versions = []
-            data
-              ?.filter(
-                (item) => item?.projectVersion !== selectedVersionTwo?.label
-              )
-              ?.map((sbom) => {
-                versions.push({
-                  label: sbom?.projectVersion,
-                  value: sbom?.id
-                })
-              })
+            data?.filter((item) => item?.projectVersion !== selectedVersionTwo?.label)?.map((sbom) => {
+              versions.push({ label: sbom?.projectVersion, value: sbom?.id })
+            })
             setUniqVersionsOne(versions)
             setSelectedVersionOne(null)
           } else {
@@ -161,16 +119,8 @@ const Compare = ({ selectedSboms }) => {
 
   const onSubmitSbomTwo = () => {
     if (selectedProdTwo && selectedVersionTwo) {
-      getSbomData({
-        variables: {
-          projectId: selectedProdTwo,
-          sbomId: selectedVersionTwo?.value
-        }
-      }).then((res) => {
-        if (res?.data) {
-          setSecondSbomInfo(res.data.sbom)
-        }
-      })
+      getSbomData({ variables: { projectId: selectedProdTwo, sbomId: selectedVersionTwo?.value } })
+      .then((res) => res?.data && setSecondSbomInfo(res.data.sbom))
     }
   }
 
@@ -181,38 +131,22 @@ const Compare = ({ selectedSboms }) => {
 
   useEffect(() => {
     if (selectedGroupTwo) {
-      const activeGroup = data?.organization?.projectGroups?.nodes.find(
-        (item) => item.id === selectedGroupTwo
-      )
-      const result = activeGroup?.projects?.map((option) => ({
-        value: option.id,
-        label: option.name
-      }))
+      const activeGroup = data?.organization?.projectGroups?.nodes.find((item) => item.id === selectedGroupTwo)
+      const result = activeGroup?.projects?.map((option) => ({ value: option.id, label: option.name }))
       setProductListTwo(result)
     }
   }, [selectedGroupTwo])
 
   useEffect(() => {
     if (selectedProdTwo !== '' && selectedVersionTwo === null) {
-      getProduct({
-        variables: {
-          id: selectedProdTwo
-        }
-      }).then((res) => {
+      getProduct({ variables: { id: selectedProdTwo } }).then((res) => {
         if (res.data) {
           const data = sortByUpdatedAt(res?.data?.project?.sboms)
           if (data?.length > 0) {
             const versions = []
-            data
-              ?.filter(
-                (item) => item?.projectVersion !== selectedVersionOne?.label
-              )
-              ?.map((sbom) => {
-                versions.push({
-                  label: sbom?.projectVersion,
-                  value: sbom?.id
-                })
-              })
+            data?.filter((item) => item?.projectVersion !== selectedVersionOne?.label)?.map((sbom) => {
+              versions.push({ label: sbom?.projectVersion, value: sbom?.id })
+            })
             setUniqVersionsTwo(versions)
             setSelectedVersionTwo(null)
           } else {
@@ -226,13 +160,7 @@ const Compare = ({ selectedSboms }) => {
 
   useEffect(() => {
     if (firstSbomInfo && secondSbomInfo) {
-      getDrift({
-        variables: {
-          projectId: selectedProdOne,
-          subjectSbomId: selectedVersionOne?.value,
-          targetSbomId: selectedVersionTwo?.value
-        }
-      }).then((res) => {
+      getDrift({ variables: { projectId: selectedProdOne, subjectSbomId: selectedVersionOne?.value, targetSbomId: selectedVersionTwo?.value } }).then((res) => {
         if (res?.data) {
           setIsLoading(false)
           toolsDispatch({type:'SET_DATA', payload: res?.data?.sbom?.sbomDrift})
@@ -302,9 +230,7 @@ const Compare = ({ selectedSboms }) => {
                 )}
                 {/* ENVIRONMENT */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='productOne' fontSize='md' color='gray.600'>
-                    Environment
-                  </FormLabel>
+                  <FormLabel htmlFor='productOne' fontSize='md' color='gray.600'>Environment</FormLabel>
                   <Select bg={'white'} name='productOne' id='productOne' isDisabled={selectedSboms?.length > 0} value={selectedProdOne} onChange={onSelectProductOne} textTransform={'capitalize'}>
                     <option value={''}>-- Select --</option>
                     {productListOne?.length > 0 &&
@@ -336,7 +262,10 @@ const Compare = ({ selectedSboms }) => {
                         IndicatorSeparator: () => null
                       }}
                       value={selectedVersionOne}
-                      onChange={(value) => setSelectedVersionOne(value)}
+                      onChange={(value) => {
+                        setSelectedVersionOne(value)
+                        setSelectedVersionTwo(null)
+                      }}
                       className='react-select'
                       isSearchable
                       type='text'
