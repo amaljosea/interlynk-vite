@@ -244,7 +244,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       {/* INCOMPLETE STATUS */}
       <Flex align='center' gap={2}>
         <Switch id='incompleteStatus' isChecked={vexComplete} onChange={onFilterComplete} />
-        <Text>Incomplete Status</Text>
+        <Text>Complete Status</Text>
       </Flex>
     </Stack>
   )

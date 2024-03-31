@@ -8,6 +8,7 @@ import { updateCompVulnVex } from 'graphQL/Mutation'
 import { getVexStatuses, getVexJustifications, GetCdxResponses } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useState } from 'react'
+import { FaTimes } from 'react-icons/fa'
 import { useLocation } from 'react-router-dom'
 
 const InfoLabel = ({ title, name, onClick }) => {
@@ -183,7 +184,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
         compVulnId: id,
         vexStatusId: statusTitle,
         propagateVex: upstream,
-        details: details !== '' ? details : undefined,
+        detail: details !== '' ? details : undefined,
         note: notes !== '' ? notes : undefined,
         vexJustificationId: justification !== '' ? justification : undefined,
         cdxResponseId: response !== '' ? response : undefined,
@@ -247,8 +248,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
               {/* JUSTIFICATION */}
               {(statusName === 'Not Affected' || statusName === 'False Positive') && (
               <Card position='relative' p={6} border={`1px solid lightgray`}>
-                {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={justification !== '' && impactData !== '' ? 'green' : 'red'} rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
-                <FormControl isRequired={statusName === 'Not Affected' || statusName === 'False Positive'}>
+                {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={(justification !== '' || impactData !== '') ? 'green' : 'red'} rounded={'full'} icon={(justification !== '' || impactData !== '') ? <CheckIcon /> : <FaTimes/>} zIndex={9999} />}
+                <FormControl>
                   <InfoLabel title={'Justification'} name={justification} onClick={onCheckJustify} />
                   <Select id='justification' name='justification' value={justification} onChange={handleJustifyChange} fontSize='sm' color='gray.600'>
                     <option value=''>-- Select --</option>
@@ -261,9 +262,9 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
                     )}
                   </Select>
                 </FormControl>
-                <Text fontSize={'xs'} mt={5}>AND / OR</Text>
+                <Text fontSize='sm' fontWeight={'medium'} color={'gray.600'} mt={5}>AND / OR</Text>
                 {/* IMPACT STATEMENT */}
-                <FormControl mt={5} isRequired={(statusName === 'Not Affected' && justifyName === 'Other (impact statment required)') || (statusName === 'False Positive' && justifyName === 'Other (impact statment required)')}>
+                <FormControl mt={5}>
                   <InfoLabel title={'Impact Statement'} name={'impactStatement'} onClick={onCheckImpact} />
                   <Textarea type='text' name='impactStatement' rows={2} id='impactStatement' placeholder='Exmple: The product is not affected by this vulnerability because ....' value={impactStmt} onChange={(e) => setImpactStmt(e.target.value)} onBlur={onImpactBlur} fontSize='sm' />
                 </FormControl>
@@ -272,8 +273,14 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
               {/* RESPONSE */}
               {statusName === 'Affected' && (
                 <Card position='relative' p={6} border={`1px solid lightgray`}>
-                  {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={actionStatement === '' ? 'red' : 'green'} rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
+                  {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={actionStatement === '' ? 'red' : 'green'} rounded={'full'} icon={actionStatement === '' ? <FaTimes/> : <CheckIcon />} zIndex={9999} />}
+                  {/* ACTION STATEMENT */}
                   <FormControl>
+                    <InfoLabel title={'Action Statement'} name={'actionStatement'} onClick={onCheckAction} />
+                    <Textarea rows={2} name='actionStatement' id='actionStatement' placeholder='Example: This vulnerability can be mitigate by running the application with ENV_PROTECTED enabled or turning off Notifications under settings.' fontSize='sm' value={actionStmt} onChange={(e) => setActionStmt(e.target.value)} onBlur={onActionBlur} />
+                  </FormControl>
+                  {/* RESPONSE */}
+                  <FormControl mt={5}>
                     <InfoLabel title={'Response'} name={'response'} onClick={onCheckResponse} />
                     {res && (
                       <Select id='response' name='response' value={response} onChange={handleResponseChange} fontSize='sm' color='gray.600'>
@@ -301,23 +308,21 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
                       </Select>
                     </FormControl>
                   )}
-                  {/* ACTION STATEMENT */}
-                  <FormControl mt={5} isRequired={statusName === 'Affected'}>
-                    <InfoLabel title={'Action Statement'} name={'actionStatement'} onClick={onCheckAction} />
-                    <Textarea rows={2} name='actionStatement' id='actionStatement' placeholder='Example: This vulnerability can be mitigate by running the application with ENV_PROTECTED enabled or turning off Notifications under settings.' fontSize='sm' value={actionStmt} onChange={(e) => setActionStmt(e.target.value)} onBlur={onActionBlur} />
-                  </FormControl>
+                </Card>
+              )}
+              {/* DETAILS */}
+              {(statusName === 'In Triage') && (
+                <Card position='relative' p={6} border={`1px solid lightgray`}>
+                  {<IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={details ? 'green' : 'gray'} rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
+                    <FormControl>
+                      <InfoLabel title={'Details'} name={'details'} onClick={onCheckDetails} />
+                      <Textarea rows={2} name='details' id='details' placeholder='Example: The vulnerability surfaced in the reports on March 13th 3pm and has been sent to PSIRT for analysis by 7pm.' fontSize='sm' value={stDetails} onChange={(e) => setStDetails(e.target.value)} onBlur={onDetailsBlur} />
+                    </FormControl>
                 </Card>
               )}
               {/* INTERNAL NOTES */}
               <Card position='relative' p={6} border={`1px solid lightgray`}>
-                {(details || notes ) && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme='green' rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
-                {/* DETAILS */}
-                {(statusName === 'In Triage') && (
-                  <FormControl>
-                    <InfoLabel title={'Details'} name={'details'} onClick={onCheckDetails} />
-                    <Textarea rows={2} name='details' id='details' placeholder='Example: The vulnerability surfaced in the reports on March 13th 3pm and has been sent to PSIRT for analysis by 7pm.' fontSize='sm' value={stDetails} onChange={(e) => setStDetails(e.target.value)} onBlur={onDetailsBlur} />
-                  </FormControl>
-                )}
+                {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={notes ? 'green' : 'gray'} rounded={'full'} icon={<CheckIcon />} zIndex={9999} />}
                 <FormControl mt={statusName === 'In Triage' ? 5 : 0}>
                   <InfoLabel title={'Internal Notes'} name={'internalNotes'} onClick={onCheckNotes} />
                   <Textarea rows={2} name='internalNotes' id='internalNotes' placeholder='Example: John Appleseed has scan the codebase and found two instances of function alls encrypt(). Next step: exploitability analysis.' fontSize='sm' value={internalNotes} onChange={(e) => setInternalNotes(e.target.value)} onBlur={onNotesBlur} />
@@ -333,12 +338,14 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
           )}
           {!signedUrlParams && (
             <Button
+              hidden={statusTitle === ''}
               width={'fit-content'}
               colorScheme='blue'
               onClick={handleSave}
+              fontSize={'sm'}
               isDisabled={statusTitle === '' || (statusName === 'Not Affected' && justification === '') || (statusName === 'Not Affected' && justifyName === 'Other (impact statment required)' && impactData === '') || (statusName === 'False Positive' && justification === '') || (statusName === 'False Positive' &&justifyName === 'Other (impact statment required)' && impactData === '') || (statusName === 'Affected' && actionStatement === '') || (responseTitle !== '' && actionStatement === '') || (responseTitle === 'update' && selectedTag === '') || !editVulns }
             >
-              Add
+              {componentVulnLogs?.length > 0 ? 'Save' : 'Add Record'}
             </Button>
           )}
           {/* STATUS HISTORY */}
