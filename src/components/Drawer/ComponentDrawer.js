@@ -34,10 +34,6 @@ function ComponentDrawer(props) {
   const [getAllComps, { data: allComponents }] = useLazyQuery(signedUrlParams ? AllShareComponents : GetAllComponents)
   const [addRelation] = useMutation(CreateCompRelation)
 
-  const onFilterRefetch = () => {
-    filterRefetch({ projectId: productId, sbomId: sbomId }).then((res) => res.data && prodCompDispatch({ type: 'ADD_FILTER_HEADS', payload: signedUrlParams ? res?.data?.shareLynkQuery?.sbom?.filters : res?.data?.sbom?.filters }))
-  }
-
   const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [createComponent] = useMutation(CreateComponent, {onCompleted: () => fetchCompData()})
   const [updateComponent] = useMutation(UpdateComponent, { onCompleted: () => fetchCompData() })
@@ -143,7 +139,6 @@ function ComponentDrawer(props) {
           setDisabled(false)
           sbomRefetch({ projectId: productId, sbomId: sbomId })
           prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-          onFilterRefetch()
           addRelation({ variables: { from: res.data.componentCreate.component.id, to: component, relType: relation } })
         }
       })
@@ -176,7 +171,6 @@ function ComponentDrawer(props) {
           localStorage.setItem( 'currentSBOM', JSON.stringify({ version: compVersion, id: sbomId }) )
         }
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        onFilterRefetch()
       }
     })
     onClose()

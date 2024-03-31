@@ -699,6 +699,7 @@ export const GetGlobalVulnData = gql`
         id
         vulnId
         updatedAt
+        isComplete
         vexStatus {
           id
           name
@@ -1865,6 +1866,7 @@ export const GetVulnData = gql`
           id
           impact
           isPart
+          isComplete
           isFirstDegreePart
           cdxResponseId
           vuln {

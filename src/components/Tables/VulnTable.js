@@ -1,5 +1,5 @@
 // Chakra imports
-import { ChevronDownIcon, ChevronUpIcon, ExternalLinkIcon, RepeatIcon } from '@chakra-ui/icons'
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, ExternalLinkIcon, RepeatIcon } from '@chakra-ui/icons'
 import { Flex, Text, useDisclosure, Tag, TagLabel, Icon, useColorModeValue, Link, Box, Grid, GridItem, Tooltip, Stack, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, IconButton, Badge, Skeleton, useToast } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { FaBug, FaCopy, FaPen } from 'react-icons/fa6'
@@ -23,6 +23,7 @@ import CvssCard from 'components/Misc/CvssCard'
 import { ShareVulnFilters } from 'graphQL/Queries'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import { capitalizeFirstLetter } from 'utils'
+import { FaTimes } from 'react-icons/fa'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -144,12 +145,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
         return (
           <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
             <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
-              <Icon
-                as={ExternalLinkIcon}
-                h={'16px'}
-                w={'16px'}
-                color={'blue.500'}
-              />
+              <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} color={'blue.500'}/>
             </Link>
             <Stack direction={'column'} spacing={1.5}>
               <Tooltip label={vuln.vulnId} placement={'top'}>
@@ -158,18 +154,12 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
                 </Text>
               </Tooltip>
               {isPart && (
-                <Text
-                  fontSize={'xs'}
-                  fontWeight={'medium'}
-                  width={'fit-content'}
-                >
+                <Text fontSize={'xs'} fontWeight={'medium'} width={'fit-content'}>
                   {project?.projectGroup?.name || ''} : {projectVersion || ''}
                 </Text>
               )}
               {kev === true && (
-                <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
-                  KEV
-                </Badge>
+                <Badge width={'fit-content'} variant='subtle' colorScheme='red'>KEV</Badge>
               )}
             </Stack>
           </Flex>
@@ -185,15 +175,8 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       selector: (row) => {
         const { vuln } = row
         return (
-          <Tag
-            size='md'
-            variant='subtle'
-            width={'80px'}
-            colorScheme={sevColor(vuln?.sev)}
-          >
-            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-              {vuln?.sev || '-'}
-            </TagLabel>
+          <Tag size='md' variant='subtle' width={'80px'} colorScheme={sevColor(vuln?.sev)}>
+            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>{vuln?.sev || '-'}</TagLabel>
           </Tag>
         )
       },
@@ -208,16 +191,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       selector: (row) => {
         const { vuln } = row
         return (
-          <Tag
-            size='sm'
-            key='md'
-            variant='solid'
-            colorScheme={vuln.source === 'osv' ? 'red' : 'blue'}
-            textTransform={'uppercase'}
-            width={'100%'}
-            alignItems={'center'}
-            justifyContent={'center'}
-          >
+          <Tag size='sm' key='md' variant='solid' colorScheme={vuln.source === 'osv' ? 'red' : 'blue'} textTransform={'uppercase'} width={'100%'} alignItems={'center'} justifyContent={'center'}>
             <TagLabel>{vuln.source}</TagLabel>
           </Tag>
         )
@@ -234,16 +208,8 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
         const { vuln } = row
         return (
           <Flex minWidth='max-content' alignItems='center' gap='2'>
-            <Tag
-              size='md'
-              key='md'
-              variant='subtle'
-              width={'50px'}
-              colorScheme={cvssColor(vuln.cvssScore)}
-            >
-              <TagLabel mx={'auto'}>
-                {vuln.cvssScore ? vuln.cvssScore : '-'}
-              </TagLabel>
+            <Tag size='md' key='md' variant='subtle' width={'50px'} colorScheme={cvssColor(vuln.cvssScore)}>
+              <TagLabel mx={'auto'}>{vuln.cvssScore ? vuln.cvssScore : '-'}</TagLabel>
             </Tag>
           </Flex>
         )
@@ -262,46 +228,18 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
         const { epssScores } = vulnInfo ? vulnInfo : ''
         return (
           <Flex alignItems='center' gap='0'>
-            <Tooltip
-              placement='top'
-              label={
-                epssScores?.length > 0
-                  ? `${(epssScores[0] * 100).toFixed(3)} %`
-                  : '-'
-              }
-            >
-              <Tag
-                size='md'
-                key='md'
-                variant='subtle'
-                width={'100px'}
-                justifyContent='center'
-                alignItems='center'
-              >
-                <TagLabel>
-                  {epssScores?.length > 0
-                    ? `${(epssScores[0] * 100).toFixed(3)} %`
-                    : '-'}
-                </TagLabel>
+            <Tooltip placement='top' label={epssScores?.length > 0? `${(epssScores[0] * 100).toFixed(3)} %`: '-'}>
+              <Tag size='md' key='md' variant='subtle' width={'100px'} justifyContent='center' alignItems='center'>
+                <TagLabel>{epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-'}</TagLabel>
               </Tag>
             </Tooltip>
             {epssScores && epssScores.length > 1 ? (
               epssScores[0] > epssScores[epssScores.length - 1] ? (
-                <Tooltip
-                  placement='top'
-                  label={`Up from ${(
-                    epssScores[epssScores.length - 1] * 100
-                  ).toFixed(3)} % last week`}
-                >
+                <Tooltip placement='top' label={`Up from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}>
                   <ChevronUpIcon w={5} h={5} color='green.500' />
                 </Tooltip>
               ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
-                <Tooltip
-                  placement='top'
-                  label={`Down from ${(
-                    epssScores[epssScores.length - 1] * 100
-                  ).toFixed(3)} % last week`}
-                >
+                <Tooltip placement='top' label={`Down from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}>
                   <ChevronDownIcon w={5} h={5} color='red.500' />
                 </Tooltip>
               ) : null
@@ -320,11 +258,10 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       selector: (row) => {
         const { component } = row
         return (
-          <Tooltip label={component.name} placement='top'>
-            <Text textTransform={'capitalize'} my={3}>
-              {component.name || ''}
-            </Text>
-          </Tooltip>
+          <Stack direction='column' alignItems={'flex-start'} spacing={1} my={3}>
+            <Text>{component?.name || ''}</Text>
+            <Text>{component?.version || ''}</Text>
+          </Stack>
         )
       },
       wrap: true,
@@ -337,35 +274,25 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row.component.version} placement='top'>
-          <Text textAlign='right' my={2}>
-            {row.component.version}
-          </Text>
+          <Text textAlign='right' my={2}>{row.component.version}</Text>
         </Tooltip>
       ),
       wrap: true,
       width: '180px',
       sortable: true,
-      right: 'true'
+      right: 'true',
+      omit: true,
     },
     // STATUS
     {
       id: 'VEX_STATUSES_NAME',
       name: 'STATUS',
       selector: (row) => {
-        const { vexStatus } = row
+        const { vexStatus, isComplete } = row
         return (
-          <Tag
-            size='md'
-            variant='solid'
-            width={'130px'}
-            colorScheme={statusColor(
-              vexStatus ? vexStatus.name : 'Unspecified'
-            )}
-          >
-            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-              {vexStatus !== null ? vexStatus.name : 'Unspecified'}
-            </TagLabel>
-          </Tag>
+        <Tag size='md' variant='solid' width={'130px'} colorScheme={statusColor(vexStatus ? vexStatus.name : 'Unspecified')}>
+          <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>{vexStatus !== null ? vexStatus.name : 'Unspecified'}</TagLabel>
+        </Tag>
         )
       },
       width: '200px',
@@ -376,7 +303,6 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
     {
       id: 'COMPONENT_VULNS_UPDATED_AT',
       name: 'UPDATED',
-      width: '150px',
       selector: (row) => (
         <Tooltip
           label={getFullDateAndTime(row.vuln.updatedAt)}
@@ -629,14 +555,14 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
             {vuln.nvdAliasId ? (
               <Box>
                 <CustomText>NVD Alias ID:</CustomText>
-                <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
-                  <Flex mt={1} direction='row' alignItems={'center'} gap={2}>
-                    <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} color={'blue.500'} />
+                  <Flex width={'fit-content'} mt={1} direction='row' alignItems={'center'} gap={2}>
+                    <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
+                      <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} color={'blue.500'} />
+                    </Link>
                     <Tooltip label={vuln.nvdAliasId} placement={'top'}>
-                      <Text fontSize='sm' color={textColor}>{vuln.nvdAliasId}</Text>
+                      <Text width={'fit-content'} fontSize='sm' color={textColor}>{vuln.nvdAliasId}</Text>
                     </Tooltip>
                   </Flex>
-                </Link>
               </Box>
             ) : null}
             {/* EPSS Percentile */}
@@ -793,17 +719,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
 
       {/* PAGINATION */}
       {data?.pageInfo && (
-        <Pagination
-          paginationSizes={paginationSizes}
-          pageIndex={pageIndex}
-          totalRows={totalRows}
-          totalCount={data?.totalCount}
-          onPreviousPage={handlePreviousPage}
-          onNextPage={handleNextPage}
-          onSetRow={handleSetRow}
-          hasNextPage={isNextActive}
-          hasPreviousPage={isPrevActive}
-        />
+        <Pagination paginationSizes={paginationSizes} pageIndex={pageIndex} totalRows={totalRows} totalCount={data?.totalCount} onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} onSetRow={handleSetRow} hasNextPage={isNextActive} hasPreviousPage={isPrevActive} />
       )}
 
       {/* COPY DATA TABLE */}
@@ -824,25 +740,12 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       )}
 
       {isOpen && selectedVulns.length > 0 && (
-        <VexModal
-          isOpen={isOpen}
-          onClose={onClose}
-          refetch={refetch}
-          checkEquals={true}
-          selectedGroup={selectedGroup}
-          selectedVulns={selectedVulns}
-          setSelectedVulns={setSelectedVulns}
-          setToggleClear={setToggleClear}
-        />
+        <VexModal isOpen={isOpen} onClose={onClose} refetch={refetch} checkEquals={true} selectedGroup={selectedGroup} selectedVulns={selectedVulns} setSelectedVulns={setSelectedVulns} setToggleClear={setToggleClear} />
       )}
 
       {/* CVSS CARD */}
       {isCvssOpen && (
-        <CvssCard
-          isOpen={isCvssOpen}
-          onClose={onCvssClose}
-          value={activeRow?.vuln?.cvssVector}
-        />
+        <CvssCard isOpen={isCvssOpen} onClose={onCvssClose} value={activeRow?.vuln?.cvssVector} />
       )}
     </>
   )
