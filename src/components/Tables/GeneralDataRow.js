@@ -217,14 +217,14 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                   {data?.suppliers?.length > 0 && data?.suppliers.map((item, index) => (
                     <Tag size={'md'} key={index} variant='subtle' colorScheme='orange'>
                       <TagLabel>
-                        {item.contactName}
-                        {item.contactEmail && ` (${item.contactEmail})`}
+                        {item?.contactName || ''}
+                        {item?.contactEmail && ` (${item.contactEmail})`}
                         {item.url ? (
                           <Link href={ item?.url?.startsWith('http') ? item.url : `http://${item.url}` } isExternal>
-                            {' '}{item.name}
+                            {' '}{item?.name || ''}
                           </Link>
                         ) : (
-                          ` ${item.name}`
+                          ` ${item?.name || ''}`
                         )}
                       </TagLabel>
                       {updateComponent && <TagCloseButton onClick={() => handleSupRemove(item.id)} />}
