@@ -198,7 +198,7 @@ const SupportTable = ({ data, refetch }) => {
         return (
           <Stack my={4}>
             <Text>{row?.productName}</Text>
-            <Badge colorScheme='blue' width={'fit-content'}>{row?.productVersion}</Badge>
+            <Text>{row?.productVersion}</Text>
           </Stack>
         )
       },
