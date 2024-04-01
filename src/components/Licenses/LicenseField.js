@@ -140,15 +140,18 @@ const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView, license }) =>
           <ReactSelect
             isDisabled={isDisabled}
             styles={{
-              control: (baseStyles, state) => ({
-                ...baseStyles,
-                borderColor: state.isFocused ? 'inherit' : 'inherit',
-                fontSize: '14px',
-                padding: '2px 0',
-                '&:hover': {
-                  borderColor: '#CBD5E0'
+              control: (baseStyles, state) => {
+                return {
+                  ...baseStyles,
+                  borderColor: state.isFocused ? 'inherit' : 'inherit',
+                  fontSize: '14px',
+                  padding: '2px 0',
+                  caretColor: state.options?.length === 0 && 'transparent',
+                  '&:hover': {
+                    borderColor: '#CBD5E0'
+                  }
                 }
-              })
+              }
             }}
             components={{
               DropdownIndicator: () => null,

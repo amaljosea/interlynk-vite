@@ -1,6 +1,6 @@
 import { CheckIcon } from '@chakra-ui/icons'
 
-const CheckMark = () => {
+const CheckMark = ({zIndex}) => {
   return (
     <CheckIcon
       w={5}
@@ -13,7 +13,7 @@ const CheckMark = () => {
       position={'absolute'}
       right={-1}
       top={-1}
-      zIndex={11}
+      zIndex= { zIndex || 11 }
     />
   )
 }

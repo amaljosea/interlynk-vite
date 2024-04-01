@@ -90,7 +90,7 @@ const NotificationMenuBell = () => {
   return (
     <Box width={'fit-content'} position={'relative'}>
       <Menu closeOnSelect={false}>
-        {preference[0] != 'none' && <CheckMark />}
+        {preference[0] != 'none' && <CheckMark zIndex={1}/>}
         <MenuButton>
           <IconButton
             colorScheme='blue'
