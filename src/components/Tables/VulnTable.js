@@ -304,11 +304,8 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       id: 'COMPONENT_VULNS_UPDATED_AT',
       name: 'UPDATED',
       selector: (row) => (
-        <Tooltip
-          label={getFullDateAndTime(row.vuln.updatedAt)}
-          placement={'top'}
-        >
-          {timeSince(row.vuln.updatedAt)}
+        <Tooltip label={getFullDateAndTime(row.vuln.updatedAt)} placement={'top'}>
+          <Text width={'150px'} textAlign={'right'}>{timeSince(row.vuln.updatedAt)}</Text>
         </Tooltip>
       ),
       sortable: true,
@@ -448,7 +445,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
           <SearchFilter id='vuln' filterText={vulnSearch} onChange={onSearchInputChange} onFilter={handleSearch} onClear={handleClear} />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {filters ? (
-            <VulnFilterMenu refetch={refetch} productId={productId} sbomId={sbomId} />
+            <VulnFilterMenu refetch={refetch} productId={productId} sbomId={sbomId} setCurrentRow={setCurrentRow} />
           ) : (
             <Stack direction='row' spacing={4}>
               {[1, 2, 3, 4].map((_, index) => (
@@ -457,7 +454,6 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
             </Stack>
           )}
         </Flex>
-
         <Stack direction='row' alignItems={'center'} width={'fit-content'}>
           {/* UPDATE STATUES */}
           {selectedVulns.length > 0 && (
@@ -487,16 +483,12 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
           </Tooltip>
           {/* REFRESH */}
           <Tooltip label='Refresh'>
-            <IconButton
-              onClick={handleRefresh}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            ></IconButton>
+            <IconButton onClick={handleRefresh} colorScheme='blue' icon={<RepeatIcon />} />
           </Tooltip>
         </Stack>
       </Flex>
     )
-  }, [vulnSearch, filters, onSearchInputChange, handleSearch, handleScan])
+  }, [vulnSearch, filters, onSearchInputChange, handleSearch, handleScan, setCurrentRow])
 
   const ExpandedComponent = ({ data }) => {
     const { vuln } = data
@@ -657,17 +649,17 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
   }
 
   const handleSelect = (row) => {
+    console.log('row',row);
     const {componentVulnLogs, vexStatus, vexJustification, cdxResponse } = row
     const item = componentVulnLogs[componentVulnLogs?.length - 1]
-    console.log(item);
-    prodVulnDispatch({type:'ON_CHANGE_STATUS', payload: {value:vexStatus?.id, name: vexStatus?.name}})
-    prodVulnDispatch({type:'ON_CHANGE_JUSTIFICATION', payload: {value:vexJustification?.id, name: item?.justification}})
-    prodVulnDispatch({type:'ON_CHANGE_RESPONSE', payload: {value:cdxResponse?.id, name: capitalizeFirstLetter(item?.response)}})
-    prodVulnDispatch({type:'SET_ACTION_STMT', payload: item?.actionStmt })
-    prodVulnDispatch({type:'SET_SELECTED_TAG', payload: item?.fixedIn })
-    prodVulnDispatch({type:'SET_DETAILS', payload: item?.detail })
-    prodVulnDispatch({type:'SET_NOTES', payload: item?.note })
-    prodVulnDispatch({type:'SET_IMPACT_DATA', payload: item?.impact })
+    prodVulnDispatch({type:'ON_CHANGE_STATUS', payload: {value:vexStatus?.id || '', name: vexStatus?.name || ''}})
+    prodVulnDispatch({type:'ON_CHANGE_JUSTIFICATION', payload: {value:vexJustification?.id || '', name: item?.justification || ''}})
+    prodVulnDispatch({type:'ON_CHANGE_RESPONSE', payload: {value:cdxResponse?.id || '', name: item?.response ? capitalizeFirstLetter(item?.response) : ''}})
+    prodVulnDispatch({type:'SET_ACTION_STMT', payload: item?.actionStmt || '' })
+    prodVulnDispatch({type:'SET_SELECTED_TAG', payload: item?.fixedIn || '' })
+    prodVulnDispatch({type:'SET_DETAILS', payload: item?.detail || '' })
+    prodVulnDispatch({type:'SET_NOTES', payload: item?.note || '' })
+    prodVulnDispatch({type:'SET_IMPACT_DATA', payload: item?.impact || '' })
   }
 
   // ON SELECT ROW
@@ -676,6 +668,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
     if (componentVulnLogs?.length > 0) {
       handleSelect(row)
     } else {
+      prodVulnDispatch({type:'CLEAR_VEX_STATE'})
       setCurrentRow(row)
     }
   }
@@ -710,7 +703,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
           onRowClicked={(row) => handleSelectRow(row)}
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
-          onRowExpandToggled={(bool, row) => setCurrentRow(row)}
+          onRowExpandToggled={(bool, row) => handleSelectRow(row)}
           selectableRows={!signedUrlParams}
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}

@@ -6,7 +6,7 @@ const prodVulnReducer = (state, action) => {
     case 'CLEAR_VEX_STATE':
       return {...state,  statusTitle:'', statusName:'', justification: '', justifyName:'', selectedTag:'', actionStatement:'', response:'', responseTitle:'', details:'', notes:'', impactData:'', upstream: false }
     case 'ON_CHANGE_STATUS':
-      return { ...state, statusTitle: payload?.value, statusName: payload?.name, justification: '', justifyName:'', selectedTag:'', actionStatement:'', response:'', responseTitle:'', details:'', notes:'', impactData:'', upstream: (payload?.name === 'Not Affected' || payload?.name === 'False Positive') ? true : false }
+      return { ...state, statusTitle: payload?.value, statusName: payload?.name, justification: '', justifyName:'', selectedTag:'', actionStatement:'', response:'', responseTitle:'', details:'', notes:'', impactData:'', upstream: false }
     case 'ON_CHANGE_RESPONSE':
       return { ...state, response: payload?.value, responseTitle: payload?.name }
     case 'ON_CHANGE_JUSTIFICATION':
