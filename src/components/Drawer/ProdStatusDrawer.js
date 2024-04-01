@@ -248,7 +248,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
               {/* JUSTIFICATION */}
               {(statusName === 'Not Affected' || statusName === 'False Positive') && (
               <Card position='relative' p={6} border={`1px solid lightgray`}>
-                {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={(justifyName !== '' || impactData !== '') ? 'green' : 'red'} rounded={'full'} icon={(justifyName !== '' || impactData !== '') ? <CheckIcon /> : <FaTimes/>} />}
+                {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={(justification !== '' || impactData !== '') ? 'green' : 'red'} rounded={'full'} icon={(justification !== '' || impactData !== '') ? <CheckIcon /> : <FaTimes/>} />}
                 <FormControl>
                   <InfoLabel title={'Justification'} name={justification} onClick={onCheckJustify} />
                   <Select id='justification' name='justification' value={justification} onChange={handleJustifyChange} fontSize='sm' color='gray.600'>
