@@ -95,18 +95,18 @@ const ImportWizard = ({ variant, currentSbomId, currentProductId, onClose }) => 
       <Steps variant={variant} colorScheme='blue' activeStep={activeStep}>
         {steps.map(({ label, component }, index) => (
           <Step label={label} key={label}>
-            <Flex width={'100%'} flexDir={'column'} alignItems={'center'} justifyContent={'center'} sx={{ p: 8, bg, my: 8, rounded: 'md' }}>
+            <Flex width={'100%'} flexDir={'column'} alignItems={'center'} justifyContent={'center'} sx={{ p: 8, my: 8, rounded: 'md' }}>
               {component}
             </Flex>
           </Step>
         ))}
       </Steps>
       {hasCompletedAllSteps && (
-        <Flex width={'100%'} flexDir={'column'} alignItems={'center'} justifyContent={'center'} sx={{ p: 8, bg, my: 8, rounded: 'md' }}>
+        <Flex width={'100%'} flexDir={'column'} alignItems={'center'} justifyContent={'center'} sx={{ p: 8, my: 8, rounded: 'md' }}>
           <StepThree />
         </Flex>
       )}
-      <Flex width='100%' justify='flex-end' gap={4} pos={'absolute'} bottom={2} right={0} py={5} pr={8}>
+      <Flex width='100%' justify='flex-end' gap={4} pos={'absolute'} bottom={0} right={0} py={5} pr={8} bg={'white'}>
         {hasCompletedAllSteps ? (
           <Button variant='solid' colorScheme='green' onClick={refetchCurrentVuln}>
             Done

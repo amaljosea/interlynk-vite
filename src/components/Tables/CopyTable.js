@@ -1,35 +1,9 @@
 import { ExternalLinkIcon } from '@chakra-ui/icons'
-import {
-  Flex,
-  Text,
-  Tag,
-  TagLabel,
-  Icon,
-  Link,
-  Tooltip,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Flex, Text, Tag, TagLabel, Icon, Link, Tooltip, useColorModeValue, Stack } from '@chakra-ui/react'
 import { useGlobalState } from 'hooks/useGlobalState'
 import React, { useMemo } from 'react'
 import DataTable from 'react-data-table-component'
-import { sevColor } from 'utils'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
+import { customStyles, sevColor } from 'utils'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -65,16 +39,9 @@ const CopyTable = () => {
         return (
           <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
             <Flex direction='row' alignItems={'center'} gap={2}>
-              <Icon
-                as={ExternalLinkIcon}
-                h={'16px'}
-                w={'16px'}
-                color={'blue.500'}
-              />
+              <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} color={'blue.500'} />
               <Tooltip label={vuln.vulnId} placement={'top'}>
-                <Text fontSize='sm' color={textColor}>
-                  {vuln.vulnId !== null ? vuln.vulnId : ''}
-                </Text>
+                <Text fontSize='sm' color={textColor}>{vuln.vulnId !== null ? vuln.vulnId : ''}</Text>
               </Tooltip>
             </Flex>
           </Link>
@@ -92,15 +59,8 @@ const CopyTable = () => {
         return (
           <>
             {vuln.sev !== null ? (
-              <Tag
-                size='md'
-                variant='subtle'
-                width={'80px'}
-                colorScheme={sevColor(`${vuln.sev}`)}
-              >
-                <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-                  {vuln.sev}
-                </TagLabel>
+              <Tag size='md' variant='subtle' width={'80px'} colorScheme={sevColor(`${vuln.sev}`)}>
+                <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>{vuln.sev}</TagLabel>
               </Tag>
             ) : (
               ''
@@ -111,30 +71,20 @@ const CopyTable = () => {
     },
     // COMPONENT
     {
-      id: 'component',
+      id: 'COMPONENTS_NAME',
       name: 'COMPONENT',
       selector: (row) => {
         const { component } = row
         return (
-          <Tooltip label={component.name} placement='top'>
-            <Text textTransform={'capitalize'}>
-              {component.name !== null
-                ? `${component.name?.substring(0, 30)}${
-                    component.name.length > 30 ? '...' : ''
-                  }`
-                : ''}
-            </Text>
-          </Tooltip>
+          <Stack direction='column' alignItems={'flex-start'} spacing={1} my={3}>
+            <Text>{component?.name || ''}</Text>
+            <Text>{component?.version || ''}</Text>
+          </Stack>
         )
       },
-      wrap: true
-    },
-    // VERSION
-    {
-      id: 'version',
-      name: 'VERSION',
-      selector: (row) => row.component.version,
-      wrap: true
+      wrap: true,
+      width: '250px',
+      sortable: true
     },
     // CURRENT STATUS
     {
@@ -143,14 +93,7 @@ const CopyTable = () => {
       selector: (row) => {
         const { vexStatus } = row
         return (
-          <Tag
-            size='md'
-            variant='solid'
-            width={'130px'}
-            colorScheme={statusColor(
-              vexStatus ? vexStatus.name : 'Unspecified'
-            )}
-          >
+          <Tag size='md' variant='solid' width={'130px'} colorScheme={statusColor(vexStatus ? vexStatus.name : 'Unspecified')}>
             <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
               {vexStatus !== null ? vexStatus.name : 'Unspecified'}
             </TagLabel>
@@ -166,14 +109,7 @@ const CopyTable = () => {
       selector: (row) => {
         const { importStatus } = row
         return (
-          <Tag
-            size='md'
-            variant='solid'
-            width={'130px'}
-            colorScheme={statusColor(
-              importStatus ? importStatus.name : 'Unspecified'
-            )}
-          >
+          <Tag size='md' variant='solid' width={'130px'} colorScheme={statusColor(importStatus ? importStatus.name : 'Unspecified')}>
             <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
               {importStatus ? importStatus.name : 'Unspecified'}
             </TagLabel>
@@ -186,15 +122,8 @@ const CopyTable = () => {
 
   const subHeaderComponentMemo = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Text>
-          {selectedVulns.length} of {mergeData.length} selected for status
-          Import
-        </Text>
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'}>
+        <Text>{selectedVulns.length} of {mergeData.length} selected for statusImport</Text>
       </Flex>
     )
   }, [mergeData, selectedVulns])
@@ -208,10 +137,7 @@ const CopyTable = () => {
   }
 
   const handleChange = (state) => {
-    prodVulnDispatch({
-      type: 'UPDATE_SELECTED_VULN',
-      payload: state.selectedRows
-    })
+    prodVulnDispatch({ type: 'UPDATE_SELECTED_VULN', payload: state.selectedRows })
   }
 
   return (

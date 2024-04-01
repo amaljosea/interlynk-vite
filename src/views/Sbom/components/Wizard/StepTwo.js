@@ -66,7 +66,7 @@ const StepTwo = ({
 
 
   return (
-    <Box width={'90%'} mx={'auto'}>
+    <Box width={'100%'} mx={'auto'}>
       <Stack
         dir='column'
         spacing={4}
