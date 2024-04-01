@@ -153,7 +153,7 @@ const Filters = ({ data, refetch }) => {
       {/* INCOMPLETE STATUS */}
       <Flex align='center' gap={2}>
         <Switch id='incompleteStatus' isChecked={vexComplete} onChange={onFilterComplete} />
-        <Text>Complete Status</Text>
+        <Text>Completed</Text>
       </Flex>
     </Stack>
   )

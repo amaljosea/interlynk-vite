@@ -4,7 +4,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import MenuHeading from 'components/Misc/MenuHeading'
 import { useRef } from 'react'
 
-const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
+const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const { totalRows, prodVulnState, dispatch } = useGlobalState()
   const { field, direction, severities, components, statues, source, kev, epss, filters, minEpss, maxEpss, direct, vexComplete } = prodVulnState
@@ -76,6 +76,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
   const onFilterComplete = (e) => {
     prodVulnDispatch({ type: 'FILTER_COMPLETE', payload: e.target.checked })
     handleRefetch(source, severities, components, statues, kev, epss, direct, e.target.checked)
+    setCurrentRow(null)
   }
 
   const onFilterKev = (value) => {
@@ -244,7 +245,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       {/* INCOMPLETE STATUS */}
       <Flex align='center' gap={2}>
         <Switch id='incompleteStatus' isChecked={vexComplete} onChange={onFilterComplete} />
-        <Text>Complete Status</Text>
+        <Text>Completed</Text>
       </Flex>
     </Stack>
   )
