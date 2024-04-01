@@ -158,7 +158,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 <InfoLabel title={`Creation Tool`} onClick={onCheckTool} />
               </Td>
               <Td pl={0}>
-                <Flex flexDirection={'row'} alignItems={'flex-start'} flexWrap={'wrap'} gap={2.5}>
+                <Flex my={2} flexDirection={'row'} alignItems={'flex-start'} flexWrap={'wrap'} gap={2.5}>
                   {data.tools && data.tools.map((item, index) => (
                     <Tag size={'md'} key={index} variant='subtle' colorScheme='teal' width={'fit-content'}>
                       <TagLabel>{item.name} - {item.version}</TagLabel>
@@ -185,7 +185,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             {/* CREATED AT */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>Created At</Td>
-              <Td pl={0}>{getFullDateAndTime(data?.creationAt)}</Td>
+              <Td pl={0}><Text my={2}>{getFullDateAndTime(data?.creationAt)}</Text></Td>
               <Td pl={0}></Td>
             </Tr>
             {/* AUTHORS */}
@@ -194,7 +194,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               <Td pl={0}>
                 <Stack spacing={2} direction={'column'}>
                   {data.authors && data.authors.length > 0 && data.authors.map((item, index) => (
-                    <Tag size={'md'} key={index} variant='subtle' colorScheme='blue' width={'fit-content'}>
+                    <Tag my={2} size={'md'} key={index} variant='subtle' colorScheme='blue' width={'fit-content'}>
                       <TagLabel>{item.name} - {item.email}</TagLabel>
                       {updateComponent && <TagCloseButton onClick={() => handleAuthorRemove(item.id)} />}
                     </Tag>
@@ -215,7 +215,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               <Td pl={0}>
                 <HStack spacing={4}>
                   {data?.suppliers?.length > 0 && data?.suppliers.map((item, index) => (
-                    <Tag size={'md'} key={index} variant='subtle' colorScheme='orange'>
+                    <Tag my={2} size={'md'} key={index} variant='subtle' colorScheme='orange'>
                       <TagLabel>
                         {item?.contactName || ''}
                         {item?.contactEmail && ` (${item.contactEmail})`}
@@ -247,13 +247,13 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
                   {/* SPDX */}
                   {data.licenses?.length > 0 && data.licenses?.map((item, index) => (
-                    <Tag size={'md'} key={index} variant='subtle' colorScheme='green' width={'fit-content'}>
+                    <Tag my={2} size={'md'} key={index} variant='subtle' colorScheme='green' width={'fit-content'}>
                       <TagLabel>{item}</TagLabel>
                     </Tag>
                   ))}
                   {/* EXPRESSION */}
                   {data.licensesExp && data.licensesExp !== '' && (
-                    <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                    <Tag my={2} size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
                       <TagLabel>{data.licensesExp}</TagLabel>
                     </Tag>
                   )}
