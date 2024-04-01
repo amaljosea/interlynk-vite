@@ -64,7 +64,7 @@ const SidebarContent = ({ minimize, logoText, routes }) => {
           onClick={() => gaEventTracker(prop.name)}
         >
           {activeRoute(prop.layout + prop.path) === 'active' ? (
-            <Button boxSize='initial' justifyContent='flex-start' alignItems='center' title={prop.name} mb={{ xl: '12px' }} mx={{ xl: 'auto' }} py='4px' pl={'18px'} bg='none' _active={{ bg: 'none' }} _hover={{ bg: 'none' }}>
+            <Button fontWeight={'medium'} boxSize='initial' justifyContent='flex-start' alignItems='center' title={prop.name} mb={{ xl: '12px' }} mx={{ xl: 'auto' }} py='4px' pl={'18px'} bg='none' _active={{ bg: 'none' }} _hover={{ bg: 'none' }}>
               <Flex>
                 {typeof prop.icon === 'string' ? (
                   <Icon>{prop.icon}</Icon>
@@ -79,7 +79,7 @@ const SidebarContent = ({ minimize, logoText, routes }) => {
               </Flex>
             </Button>
           ) : (
-            <Button boxSize='initial' justifyContent='flex-start' alignItems='center' mb={{ xl: '12px' }} mx={{ xl: 'auto' }} py='4px' pl={'18px'} bg='none' _active={{ bg: 'none' }} _hover={{ bg: 'none' }} title={prop.name}>
+            <Button fontWeight={'medium'} boxSize='initial' justifyContent='flex-start' alignItems='center' mb={{ xl: '12px' }} mx={{ xl: 'auto' }} py='4px' pl={'18px'} bg='none' _active={{ bg: 'none' }} _hover={{ bg: 'none' }} title={prop.name}>
               <Flex>
                 {typeof prop.icon === 'string' ? (
                   <Icon>{prop.icon}</Icon>
