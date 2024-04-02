@@ -105,7 +105,7 @@ const ProductDetails = () => {
       kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
       direct: direct === true ? true : undefined,
-      vexComplete: vexComplete,
+      vexComplete: vexComplete === true ? true : undefined,
       field: prodVulnState.field,
       direction: prodVulnState.direction
     }
@@ -127,7 +127,7 @@ const ProductDetails = () => {
       projectNames: envs?.length === 0 ? undefined : envs,
       versions: sbomVersions?.length === 0 ? undefined : sbomVersions,
       statuses: statuses?.length === 0 ? undefined : statuses,
-      vexComplete: isCompleted
+      vexComplete: isCompleted === true ? true : undefined
     }
   })
 

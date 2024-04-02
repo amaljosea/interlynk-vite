@@ -37,7 +37,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       source: source === true ? undefined : 'COMPONENT',
-      vexComplete: complete,
+      vexComplete: complete === true ? true : undefined,
       severity: !severity.includes('all') && severity.length > 0 ? severity : undefined,
       componentName: !component.includes('all') && component.length > 0 ? component : undefined,
       status: !status.includes('all') && status.length > 0 ? status : undefined,

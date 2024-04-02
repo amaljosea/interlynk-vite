@@ -189,7 +189,7 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
       name: 'STATUSES',
       selector: (row) => {
         const { metrics } = row
-        const { affectedCount, falsePositiveCount, fixedCount, inTriageCount, notAffectedCount, unspecifiedCount } = metrics
+        const { affectedCount, fixedCount, inTriageCount, notAffectedCount, unspecifiedCount } = metrics
         return (
           <Stack fontWeight={'medium'} direction={'row'} my={2}>
             <Round bg='gray.200' label='Unspecified'>{unspecifiedCount}</Round>
@@ -198,7 +198,6 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
             <Divider orientation='vertical' colorScheme={'gray.900'} height={10} />
             <Round bg='orange.100' label='Fixed'>{fixedCount}</Round>
             <Round bg='green.100' label='Not Affected'>{notAffectedCount}</Round>
-            <Round bg='pink.100' label='False Positive'>{falsePositiveCount}</Round>
           </Stack>
         )
       },
