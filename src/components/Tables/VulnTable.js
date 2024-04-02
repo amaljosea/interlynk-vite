@@ -143,7 +143,12 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
         const { vulnInfo } = vuln
         const { kev } = vulnInfo ? vulnInfo : ''
         return (
-          <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
+          <Flex
+            direction='row'
+            alignItems={'flex-start'}
+            gap={2}
+            my={3}
+            >
             <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
               <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} color={'blue.500'}/>
             </Link>
@@ -175,7 +180,14 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       selector: (row) => {
         const { component } = row
         return (
-          <Stack direction='column' alignItems={'flex-start'} spacing={1} my={3}>
+          <Stack
+            direction='column'
+            alignItems={'flex-start'}
+            spacing={1}
+            my={3}
+            onClick={(e) => {
+              e.currentTarget.parentElement.click()
+            }}>
             <Text>{component?.name || ''}</Text>
             <Text>{component?.version || ''}</Text>
           </Stack>
@@ -192,7 +204,11 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       selector: (row) => {
         const { vuln } = row
         return (
-          <Tag size='md' variant='subtle' width={'80px'} colorScheme={sevColor(vuln?.sev)}>
+          <Tag
+            size='md' variant='subtle' width={'80px'} colorScheme={sevColor(vuln?.sev)}
+            onClick={(e) => {
+            e.currentTarget.parentElement.click()
+          }}>
             <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>{vuln?.sev || '-'}</TagLabel>
           </Tag>
         )
@@ -208,7 +224,11 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       selector: (row) => {
         const { vuln } = row
         return (
-          <Tag size='sm' key='md' variant='solid' colorScheme={vuln.source === 'osv' ? 'red' : 'blue'} textTransform={'uppercase'} width={'100%'} alignItems={'center'} justifyContent={'center'}>
+          <Tag
+            onClick={(e) => {
+              e.currentTarget.parentElement.click()
+            }}
+            size='sm' key='md' variant='solid' colorScheme={vuln.source === 'osv' ? 'red' : 'blue'} textTransform={'uppercase'} width={'100%'} alignItems={'center'} justifyContent={'center'}>
             <TagLabel>{vuln.source}</TagLabel>
           </Tag>
         )
@@ -224,7 +244,11 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       selector: (row) => {
         const { vuln } = row
         return (
-          <Flex minWidth='max-content' alignItems='center' gap='2'>
+          <Flex
+            onClick={(e) => {
+              e.currentTarget.parentElement.click()
+            }}
+            minWidth='max-content' alignItems='center' gap='2'>
             <Tag size='md' key='md' variant='subtle' width={'50px'} colorScheme={cvssColor(vuln.cvssScore)}>
               <TagLabel mx={'auto'}>{vuln.cvssScore ? vuln.cvssScore : '-'}</TagLabel>
             </Tag>
@@ -244,7 +268,11 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
         const { vulnInfo } = vuln
         const { epssScores } = vulnInfo ? vulnInfo : ''
         return (
-          <Flex alignItems='center' gap='0'>
+          <Flex
+            onClick={(e) => {
+              e.currentTarget.parentElement.click()
+            }}
+            alignItems='center' gap='0'>
             <Tooltip placement='top' label={epssScores?.length > 0? `${(epssScores[0] * 100).toFixed(3)} %`: '-'}>
               <Tag size='md' key='md' variant='subtle' width={'100px'} justifyContent='center' alignItems='center'>
                 <TagLabel>{epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-'}</TagLabel>
@@ -274,7 +302,11 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row.component.version} placement='top'>
-          <Text textAlign='right' my={2}>{row.component.version}</Text>
+          <Text
+            onClick={(e) => {
+              e.currentTarget.parentElement.click()
+            }}
+            textAlign='right' my={2}>{row.component.version}</Text>
         </Tooltip>
       ),
       wrap: true,
@@ -290,7 +322,11 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       selector: (row) => {
         const { vexStatus, isComplete } = row
         return (
-        <Tag size='md' variant='solid' width={'130px'} colorScheme={statusColor(vexStatus ? vexStatus.name : 'Unspecified')}>
+        <Tag
+          onClick={(e) => {
+            e.currentTarget.parentElement.click()
+          }}
+          size='md' variant='solid' width={'130px'} colorScheme={statusColor(vexStatus ? vexStatus.name : 'Unspecified')}>
           <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>{vexStatus !== null ? vexStatus.name : 'Unspecified'}</TagLabel>
         </Tag>
         )
@@ -305,7 +341,11 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.vuln.updatedAt)} placement={'top'}>
-          <Text width={'150px'} textAlign={'right'}>{timeSince(row.vuln.updatedAt)}</Text>
+          <Text
+            onClick={(e) => {
+              e.currentTarget.parentElement.click()
+            }}
+            width={'150px'} textAlign={'right'}>{timeSince(row.vuln.updatedAt)}</Text>
         </Tooltip>
       ),
       sortable: true,

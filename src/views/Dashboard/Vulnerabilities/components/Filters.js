@@ -63,13 +63,13 @@ const Filters = ({ data, refetch }) => {
   const onFilterComplete = async (e) => {
     await refetch({
       id,
-      vexComplete: e.target.checked,
+      vexComplete: e.target.checked === true ? true : undefined,
       first: totalRows,
       search: searchInput !== '' ? searchInput : undefined,
       projectNames: envs?.length === 0 ? undefined : envs,
       versions: versions?.length === 0 ? undefined : versions,
       statuses: statuses?.length === 0 ? undefined : statuses,
-    }).then(() => compVulnDispatch({ type: 'FILTER_COMPLETE', payload: vexComplete ? false : true }))
+    }).then(() => compVulnDispatch({ type: 'FILTER_COMPLETE', payload: vexComplete === true ? true : undefined }))
   }
 
   const envList = project && filterEnvList(project?.projectGroup?.projects)
