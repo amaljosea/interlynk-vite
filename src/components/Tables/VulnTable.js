@@ -168,6 +168,23 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       width: '280px',
       sortable: true
     },
+    // COMPONENT
+    {
+      id: 'COMPONENTS_NAME',
+      name: 'COMPONENT',
+      selector: (row) => {
+        const { component } = row
+        return (
+          <Stack direction='column' alignItems={'flex-start'} spacing={1} my={3}>
+            <Text>{component?.name || ''}</Text>
+            <Text>{component?.version || ''}</Text>
+          </Stack>
+        )
+      },
+      wrap: true,
+      width: '250px',
+      sortable: true
+    },
     // SEVERITY
     {
       id: 'VULNS_SEV',
@@ -250,23 +267,6 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
       width: '150px',
       sortable: true,
       wrap: true
-    },
-    // COMPONENT
-    {
-      id: 'COMPONENTS_NAME',
-      name: 'COMPONENT',
-      selector: (row) => {
-        const { component } = row
-        return (
-          <Stack direction='column' alignItems={'flex-start'} spacing={1} my={3}>
-            <Text>{component?.name || ''}</Text>
-            <Text>{component?.version || ''}</Text>
-          </Stack>
-        )
-      },
-      wrap: true,
-      width: '250px',
-      sortable: true
     },
     // VERSION
     {
