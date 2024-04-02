@@ -610,7 +610,6 @@ export const GetGlobalVulns = gql`
           vulnId
           metrics {
             affectedCount
-            falsePositiveCount
             fixedCount
             inTriageCount
             notAffectedCount
