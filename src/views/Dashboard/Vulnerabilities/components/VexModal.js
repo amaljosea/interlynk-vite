@@ -129,7 +129,7 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
   }
 
   useEffect(() => {
-    if (statusName === 'Not Affected' || statusName === 'False Positive') {
+    if (statusName === 'Not Affected') {
       setUpstream(true)
     } else {
       setUpstream(false)
@@ -157,8 +157,7 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
               </Select>
             </FormControl>
             {/* JUSTIFICATION */}
-            {(statusName === 'Not Affected' ||
-              statusName === 'False Positive') && (
+            {statusName === 'Not Affected' && (
               <FormControl>
                 <FormLabel htmlFor='justification' fontSize='sm' color='gray.600'>Justification</FormLabel>
                 <Select id='justification' name='justification' value={justification} onChange={handleJustifyChange} fontSize='sm' color='gray.600'>
@@ -230,8 +229,7 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
                 </Alert>
               )}
             {/* IMPACT STATEMENT */}
-            {(statusName === 'Not Affected' ||
-              statusName === 'False Positive') && (
+            {statusName === 'Not Affected' && (
               <FormControl>
                 <FormLabel htmlFor='impactStatement' fontSize='sm' color='gray.600'>
                   Impact Statement
@@ -273,7 +271,7 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
 
         <ModalFooter>
           <Button mr={3} onClick={onClose}>Cancel</Button>
-          <Button variant='solid' colorScheme='blue' onClick={handleSave} disabled={ statusTitle === '' || (statusName === 'Not Affected' && justification === '') || (statusName === 'Not Affected' && justifyName === 'Other (impact statment required)' && impactData === '') ||(statusName === 'False Positive' && justification === '') || (statusName === 'False Positive' &&justifyName === 'Other (impact statment required)' && impactData === '') || (statusName === 'Affected' &&responseTitle === '' && actionStatement === '') || (responseTitle !== '' && actionStatement === '') ||(responseTitle === 'update' && selectedTag === '')}>
+          <Button variant='solid' colorScheme='blue' onClick={handleSave} disabled={ statusTitle === '' || (statusName === 'Not Affected' && justification === '') || (statusName === 'Not Affected' && justifyName === 'Other (impact statment required)' && impactData === '') || (statusName === 'Affected' && responseTitle === '' && actionStatement === '') || (responseTitle !== '' && actionStatement === '') ||(responseTitle === 'update' && selectedTag === '')}>
             Save
           </Button>
         </ModalFooter>

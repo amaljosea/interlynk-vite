@@ -204,7 +204,6 @@ function ImageInfo() {
   const unresolveFilter = allResults.filter(
     (item) =>
       item.vexVuln?.vexStatus?.name !== 'Fixed' &&
-      item.vexVuln?.vexStatus?.name !== 'False Positive' &&
       item.vexVuln?.vexStatus?.name !== 'Not Affected'
   )
 

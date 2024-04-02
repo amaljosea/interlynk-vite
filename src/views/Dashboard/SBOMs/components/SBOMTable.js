@@ -197,7 +197,6 @@ const SBOMTable = ({
       const filterData = vulnData.filter(
         (item) =>
           item.vexVuln?.vexStatus?.name !== 'Fixed' &&
-          item.vexVuln?.vexStatus?.name !== 'False Positive' &&
           item.vexVuln?.vexStatus?.name !== 'Not Affected'
       )
       console.log(`filter data`, filterData)

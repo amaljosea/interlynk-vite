@@ -246,7 +246,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
                 </FormControl>
               </Card>
               {/* JUSTIFICATION */}
-              {(statusName === 'Not Affected' || statusName === 'False Positive') && (
+              {statusName === 'Not Affected' && (
               <Card position='relative' p={6} border={`1px solid lightgray`}>
                 {statusTitle !== '' && <IconButton size='xs' position={'absolute'} left={'-4%'} top={'49%'} colorScheme={(justification !== '' || impactData !== '') ? 'green' : 'red'} rounded={'full'} icon={(justification !== '' || impactData !== '') ? <CheckIcon /> : <FaTimes/>} />}
                 <FormControl>
