@@ -135,7 +135,7 @@ const VulnsFilters = ({ refetch }) => {
           <MenuHeading title={'Status'} />
           <MenuList>
             <MenuOptionGroup type='checkbox' value={statues} onChange={onFilterStatus}>
-              {['all','Affected','False Positive','Fixed','In Triage','Not Affected']
+              {['all','Affected','Fixed','In Triage','Not Affected']
               .map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}

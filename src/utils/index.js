@@ -200,8 +200,6 @@ export const statusColor = (status) => {
     return 'green'
   } else if (status && status === 'Affected') {
     return 'red'
-  } else if (status && status === 'False Positive') {
-    return 'purple'
   } else if (status && status === 'In Triage') {
     return 'cyan'
   } else {

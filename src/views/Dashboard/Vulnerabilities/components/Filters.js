@@ -140,7 +140,7 @@ const Filters = ({ data, refetch }) => {
           <MenuHeading title={'Status'} />
           <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
             <MenuOptionGroup type='checkbox' value={statuses} onChange={onFilterStatus}>
-              {['all','Unspecified','In Triage','Not Affected','False Positive','Affected','Fixed']
+              {['all','Unspecified','In Triage','Not Affected','Affected','Fixed']
               .map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
