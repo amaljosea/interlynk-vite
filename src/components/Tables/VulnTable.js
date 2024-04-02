@@ -667,6 +667,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
     const {componentVulnLogs } = row
     if (componentVulnLogs?.length > 0) {
       handleSelect(row)
+      setCurrentRow(row)
     } else {
       prodVulnDispatch({type:'CLEAR_VEX_STATE'})
       setCurrentRow(row)
