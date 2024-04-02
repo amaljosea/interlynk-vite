@@ -17,10 +17,10 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
   const handleUpload = async (file) => {
     await sbomUpload({ variables: { doc: file, projectId: selectedEnv } })
       .then((res) => {
-        if (res.data.sbomUpload.errors === '[]') {
-          toast({ title: 'SBOM uploaded successfully and is now processing', description: 'The validated SBOM data will be available in the product shortly. Please refresh to update the product.', duration: 6500, isClosable: true, position: 'top', variant: 'left-accent' })
-        } else {
+        if (res?.data?.sbomUpload.errors?.length > 0) {
           toast({ description: 'Upload failed !', status: 'error', duration: 4000, isClosable: true, position: 'top' })
+        } else {
+          toast({ title: 'SBOM uploaded successfully and is now processing', description: 'The validated SBOM data will be available in the product shortly. Please refresh to update the product.', duration: 6500, isClosable: true, position: 'top', variant: 'left-accent' })
         }
       })
       .finally(() => onClose())
