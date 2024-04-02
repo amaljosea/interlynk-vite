@@ -45,6 +45,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
 
 
   const addRow = () => {
+    setError('')
     const newId = conditions?.length + 1;
     setConditions([...conditions, { id: newId, subject: '', operator: '', value: '', list: [], status: 'CREATED', min:'0', max:'0', error:'' }]);
   };
@@ -131,6 +132,8 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
         const errors = res?.data?.policyUpdate?.errors
         if (errors?.length > 0) {
           setError(errors[0])
+        } else {
+          onClose()
         }
       })
     }
@@ -140,6 +143,8 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
         const errors = res?.data?.policyUpdate?.errors
         if (errors?.length > 0) {
           setError(errors[0])
+        } else {
+          onClose()
         }
       })
     }
@@ -149,11 +154,12 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
         const errors = res?.data?.policyUpdate?.errors
         if (errors?.length > 0) {
           setError(errors[0])
+        } else {
+          onClose()
         }
       })
     }
     handleRefetch()
-    onClose()
     setName('')
     setOperator('')
     setResultType('')
@@ -186,7 +192,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
 
   return (
     <>
-      <Modal size='5xl' isOpen={isOpen} onClose={onClose}>
+      <Modal size='5xl' isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false}>
         <ModalOverlay />
         <form onSubmit={data ? handleUpdate : handleCreate}>
           <ModalContent>
@@ -197,9 +203,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                 {error !== '' && (
                   <Alert status='error' borderRadius={4}>
                     <AlertIcon />
-                    <AlertDescription fontSize={'sm'} pr={2}>
-                      {error}
-                    </AlertDescription>
+                    <AlertDescription fontSize={'sm'} pr={2}>{error}</AlertDescription>
                   </Alert>
                 )}
                 <Flex alignItems={'center'} gap={3} flexWrap={'wrap'}>
@@ -254,9 +258,21 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                       <FormControl isRequired>
                         <Select size='sm' id='operator' name='operator' value={item?.value} onChange={(e) => handleChange(e.target.value, item.id, 'value')} textTransform={'capitalize'} fontSize='sm' hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'}>
                           <option value=''>-- Select --</option>
-                          {['critical','high','medium','low'].map((item, index) => (
+                          {['critical','high','medium','low','unknown'].map((item, index) => (
                             <option key={index} value={item} style={{ textTransform: 'capitalize' }} >
                               {item}
+                            </option>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
+                    {item?.subject === 'VULNERABILITY_KEV' && (
+                      <FormControl isRequired>
+                        <Select size='sm' id='operator' name='operator' value={item?.value} onChange={(e) => handleChange(e.target.value, item.id, 'value')} textTransform={'capitalize'}>
+                          <option value=''>-- Select --</option>
+                          {[true, false].map((item, index) => (
+                            <option key={index} value={item} style={{ textTransform: 'capitalize' }} >
+                              {JSON.stringify(item)}
                             </option>
                           ))}
                         </Select>
@@ -288,8 +304,13 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                             {item?.subject === 'VULNERABILITY_EPSS' && <InputRightAddon>%</InputRightAddon>}
                           </InputGroup>
                         </Flex>
-                        {item?.error !== '' && <Text fontSize={'xs'} color={'red'}>{item?.error}</Text>}
                       </Stack>
+                    )}
+                    {item?.subject === 'VULNERABILITY_STATUS_AGE' && (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN') && (
+                      <InputGroup size='sm'>
+                        <Input type='number' size='sm' placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} />
+                        <InputRightAddon>Days</InputRightAddon>
+                      </InputGroup>
                     )}
                     {item?.subject === 'VULNERABILITY_EPSS' && (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN') && (
                       <InputGroup size='sm'>
@@ -297,7 +318,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                         <InputRightAddon>%</InputRightAddon>
                       </InputGroup>
                     )}
-                    {item?.operator !== 'RANGE' && item?.subject !== 'VULNERABILITY_SEV' && item?.subject !== 'VULNERABILITY_EPSS' && item?.subject !== 'VULNERABILITY_STATUS' && (
+                    {item?.operator !== 'RANGE' && item?.subject !== 'VULNERABILITY_SEV' && item?.subject !== 'VULNERABILITY_EPSS' && item?.subject !== 'VULNERABILITY_STATUS' && item?.subject !== 'VULNERABILITY_KEV' && item?.subject !== 'VULNERABILITY_STATUS_AGE' && (
                       <Input type={'text'} size='sm' placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'} />
                     )}
                     </GridItem>
