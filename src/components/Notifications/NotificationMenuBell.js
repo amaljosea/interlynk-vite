@@ -80,6 +80,7 @@ const NotificationMenuBell = () => {
         key={key}
         value={value}
         fontSize={'sm'}
+        isDisabled={['Vulnerabilities', 'Policies', 'All Activities'].includes(key)}
       >
         {key}
       </MenuItemOption>

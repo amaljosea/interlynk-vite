@@ -52,6 +52,7 @@ const NotificationChannels = () => {
             isChecked={notificationChannels[id]}
             me='20px'
             onChange={() => handleSwitchChange(id)}
+            isDisabled={['slack', 'teams'].includes(id)}
           />
           <Text
             noOfLines={1}
@@ -63,6 +64,9 @@ const NotificationChannels = () => {
           </Text>
         </Flex>
       ))}
+      <Text color='gray.500' fontSize='sm' mt='20px'>
+        * More channels will be enabled soon
+      </Text>
     </Card>
   )
 }
