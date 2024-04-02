@@ -3447,6 +3447,7 @@ export const GetPolicies = gql`
         id
         isEnabled
         name
+        description
         operator
         resultType
         updatedAt

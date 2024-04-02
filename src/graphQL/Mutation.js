@@ -2076,6 +2076,7 @@ export const DeleteCompSupportOverride = gql`
 export const PolicyCreate = gql`
   mutation PolicyCreate(
     $name: String!
+    $desc: String
     $isEnabled: Boolean
     $operator: PolicyOperatorEnum!
     $resultType: PolicyResultTypeEnum!
@@ -2084,6 +2085,7 @@ export const PolicyCreate = gql`
     policyCreate(
       input: {
         name: $name
+        description: $desc
         isEnabled: $isEnabled
         operator: $operator
         resultType: $resultType
@@ -2113,6 +2115,7 @@ export const PolicyUpdate = gql`
   mutation PolicyUpdate(
     $id: Uuid!
     $name: String
+    $desc: String
     $isEnabled: Boolean
     $operator: PolicyOperatorEnum
     $resultType: PolicyResultTypeEnum
@@ -2122,6 +2125,7 @@ export const PolicyUpdate = gql`
       input: {
         id: $id
         name: $name
+        description: $desc
         isEnabled: $isEnabled
         operator: $operator
         resultType: $resultType
