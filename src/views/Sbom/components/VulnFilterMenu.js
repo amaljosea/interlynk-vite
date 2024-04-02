@@ -41,7 +41,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
       severity: !severity.includes('all') && severity.length > 0 ? severity : undefined,
       componentName: !component.includes('all') && component.length > 0 ? component : undefined,
       status: !status.includes('all') && status.length > 0 ? status : undefined,
-      kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
+      kev: kev === 'yes' ? true : kev === 'no' ? false : undefined,
       epss: epss === 'all' || epss === '' ? undefined : range,
       direct: direct === true ? true : undefined,
       first: totalRows,
@@ -178,9 +178,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
             <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
               <MenuItemOption value={'all'} fontSize={'sm'}>All</MenuItemOption>
               {['0-0.1', '0.1-1', '1-10', '10-100'].map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                  {`${item} %`}
-                </MenuItemOption>
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>{`${item} %`}</MenuItemOption>
               ))}
             </MenuOptionGroup>
             <MenuDivider />
@@ -188,46 +186,16 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
               <Stack direction={'column'} alignItems={'center'} pl={8}>
                 <InputGroup size='sm'>
                   <InputLeftAddon width={14}>Min</InputLeftAddon>
-                  <Input
-                    type='number'
-                    width={'64px'}
-                    id='minValue'
-                    name='minValue'
-                    value={minEpss}
-                    ref={minRef}
-                    onKeyDown={onMinKeyDown}
-                    onChange={(e) =>
-                      prodVulnDispatch({
-                        type: 'SET_MIN_EPSS',
-                        payload: e.target.value
-                      })
-                    }
-                  />
+                  <Input type='number' width={'64px'} id='minValue' name='minValue' value={minEpss} ref={minRef} onKeyDown={onMinKeyDown} onChange={(e) => prodVulnDispatch({ type: 'SET_MIN_EPSS', payload: e.target.value }) } />
                   <InputRightAddon>%</InputRightAddon>
                 </InputGroup>
                 <InputGroup size='sm'>
                   <InputLeftAddon width={14}>Max</InputLeftAddon>
-                  <Input
-                    type='number'
-                    width={'64px'}
-                    id='maxValue'
-                    name='maxValue'
-                    value={maxEpss}
-                    ref={maxRef}
-                    onKeyDown={onMaxKeyDown}
-                    onChange={(e) =>
-                      prodVulnDispatch({
-                        type: 'SET_MAX_EPSS',
-                        payload: e.target.value
-                      })
-                    }
-                  />
+                  <Input type='number' width={'64px'} id='maxValue' name='maxValue' value={maxEpss} ref={maxRef} onKeyDown={onMaxKeyDown} onChange={(e) => prodVulnDispatch({ type: 'SET_MAX_EPSS', payload: e.target.value }) } />
                   <InputRightAddon>%</InputRightAddon>
                 </InputGroup>
               </Stack>
-              <Button ml={8} my={3} size='sm' onClick={handleSubmit} isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0} >
-                Submit
-              </Button>
+              <Button ml={8} my={3} size='sm' onClick={handleSubmit} isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}>Submit</Button>
             </Flex>
           </MenuList>
         </Menu>
