@@ -1,7 +1,7 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { Flex, Text } from '@chakra-ui/react'
 import { useLocation } from 'react-router-dom'
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import { GetGlobalVulns, GetGlobalVulnData } from 'graphQL/Queries'
@@ -25,18 +25,13 @@ const Vulnerabilities = () => {
   const productPermissions = useMemo(() => userPermissions?.find((item) => item.key === 'view_product_group'), [userPermissions])
   const vulnsPermissions = useMemo(() => userPermissions?.find((item) => item.key === 'view_feeds'), [userPermissions])
 
-  const [getVulns, { data }] = useLazyQuery(GetGlobalVulns, {fetchPolicy: 'network-only'})
+  const { data, refetch } = useQuery(GetGlobalVulns, {fetchPolicy: 'network-only', skip: (productPermissions?.value === true && vulnsPermissions?.value === true) ? false : true, variables: { first: totalRows, field: field, direction: direction, search: searchInput !== '' ? searchInput : undefined, projectGroupIds: products?.length === 0 ? undefined : products, severity: severities?.length === 0 ? undefined : severities, status: statues?.length === 0 ? undefined : statues, kev: kev === 'yes' ? true : kev === 'false' ? false : undefined, epss: epss === 'all' || epss === '' ? undefined : range }})
 
   const { data: vulnData, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
     skip: vulnId ? false : true,
     fetchPolicy: 'network-only',
     variables: { id: vulnId, componentVulnId: vulnId, first: totalRows, vexComplete }
   })
-
-  useEffect(() => {
-    if (data === undefined && productPermissions?.value === true && vulnsPermissions?.value === true) {
-      getVulns({ variables: { first: totalRows, field: field, direction: direction, search: searchInput !== '' ? searchInput : undefined, projectGroupIds: products?.length === 0 ? undefined : products, severity: severities?.length === 0 ? undefined : severities, status: statues?.length === 0 ? undefined : statues, kev: kev === 'yes' ? true : kev === 'false' ? false : undefined, epss: epss === 'all' || epss === '' ? undefined : range } }) }
-  }, [])
 
   if (!org || org === 'undefined') {
     return (
@@ -59,11 +54,7 @@ const Vulnerabilities = () => {
   return (
     <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
       <Card>
-        {vulnsPermissions?.value === true ? (
-         <GlobalVulnTable data={data?.organization?.vulns} refetch={getVulns}/>
-        ) : (
-          <Text>You are not allowed to access this data</Text>
-        )}
+        {vulnsPermissions?.value === false ? <Text>You are not allowed to access this data</Text> : <GlobalVulnTable data={data?.organization?.vulns} refetch={refetch}/>}
       </Card>
     </Flex>
   )

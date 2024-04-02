@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import {Modal,ModalOverlay,ModalContent,ModalHeader,ModalFooter,ModalBody,ModalCloseButton,Button,SimpleGrid,FormLabel,Select,Stack,Textarea,FormControl,Alert,Checkbox} from '@chakra-ui/react'
+import {Modal,ModalOverlay,ModalContent,ModalHeader,ModalFooter,ModalBody,ModalCloseButton,Button,SimpleGrid,FormLabel,Select,Stack,Textarea,FormControl,Alert,Checkbox, useToast} from '@chakra-ui/react'
 import { getVexStatuses, getVexJustifications, GetCdxResponses, GetProject, GetProjectGroup } from 'graphQL/Queries'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { filterEnvList } from 'utils'
 import { updateBulkCompVex } from 'graphQL/Mutation'
 
 const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, selectedVulns, setSelectedVulns, setToggleClear }) => {
+  const toast = useToast()
   const { totalRows, prodVulnState } = useGlobalState()
   const { field, direction } = prodVulnState
   const location = useLocation()
@@ -91,7 +92,6 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
 
   const handleSave = () => {
     setToggleClear(false)
-    console.log('selectedVulns', selectedVulns)
     const vulnIds = selectedVulns?.map((item) => item?.id)
     compVexCreate({
       variables: {
@@ -107,7 +107,14 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
         action: actionStatement !== '' ? actionStatement : undefined,
         fixedIn: selectedTag !== '' ? selectedTag : undefined
       }
-    }).then((res) => res?.data && onClose())
+    }).then((res) => {
+      const errors = res?.data?.componentVexBulkUpdate?.errors
+      if(errors?.length > 0) {
+        toast({description:errors[0], status:'error', duration:2000, position:'top'})
+      } else {
+        onClose()
+      }
+    })
     setStatusTitle('')
     setStatusName('')
     setJustification('')
@@ -142,11 +149,9 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
               <FormLabel htmlFor='vexType' fontSize='sm' color={'gray.600'}>Status</FormLabel>
               <Select id='vexType' name='vexType' fontSize='sm' value={statusTitle} onChange={handleStatusChange}>
                 <option value=''>-- Select Status --</option>
-                {allVexStatus ? (
-                  allVexStatus.vexStatuses.map((st, idx) => (
-                    <option key={idx} value={st.id}>{st.name}</option>
-                  ))
-                ) : (
+                {allVexStatus ? (allVexStatus.vexStatuses.map((st, idx) => (
+                  <option key={idx} value={st.id}>{st.name}</option>
+                )) ) : (
                   <option value={''}>No data found</option>
                 )}
               </Select>
@@ -155,16 +160,12 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
             {(statusName === 'Not Affected' ||
               statusName === 'False Positive') && (
               <FormControl>
-                <FormLabel htmlFor='justification' fontSize='sm' color='gray.600'>
-                  Justification
-                </FormLabel>
+                <FormLabel htmlFor='justification' fontSize='sm' color='gray.600'>Justification</FormLabel>
                 <Select id='justification' name='justification' value={justification} onChange={handleJustifyChange} fontSize='sm' color='gray.600'>
                   <option value=''>-- Select --</option>
-                  {allVexJustify ? (
-                    allVexJustify.vexJustifications.map((justify, idx) => (
-                      <option key={idx} value={justify.id}>{justify.name}</option>
-                    ))
-                  ) : (
+                  {allVexJustify ? (allVexJustify.vexJustifications.map((justify, idx) => (
+                    <option key={idx} value={justify.id}>{justify.name}</option>
+                  ))) : (
                     <option value={''}>No data found</option>
                   )}
                 </Select>
@@ -177,10 +178,9 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
                 {allCdx && (
                   <Select id='response' name='response' value={response} onChange={handleResponseChange} fontSize='sm' color='gray.600'>
                     <option value=''>-- Select --</option>
-                    {allCdx?.cdxResponses.length > 0 &&
-                      allCdx?.cdxResponses.map((item, idx) => (
-                        <option key={idx} value={item.id}>{item.name}</option>
-                      ))}
+                    {allCdx?.cdxResponses.length > 0 && allCdx?.cdxResponses.map((item, idx) => (
+                      <option key={idx} value={item.id}>{item.name}</option>
+                    ))}
                   </Select>
                 )}
               </FormControl>
@@ -189,17 +189,13 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
             {statusName === 'Affected' && responseTitle === 'Update' && groups && (
                 <Stack width={'100%'} direction={'column'} spacing={4} alignItems={'flex-start'}>
                   <FormControl width={'100%'}>
-                    <FormLabel htmlFor='fixedVersion' fontSize='sm' color='gray.600'>
-                      Project Environment
-                    </FormLabel>
+                    <FormLabel htmlFor='fixedVersion' fontSize='sm' color='gray.600'>Project Environment</FormLabel>
                     <Select id='env' name='env' value={selectEnv} onChange={handleEnvChange} textTransform={'capitalize'} fontSize='sm' color='gray.600'>
                       <option value=''>-- Select --</option>
                       {groups?.projectGroup?.projects.length > 0 ? (
                         filterEnvList(groups?.projectGroup?.projects).map(
                           (item, index) => (
-                            <option key={index} value={item.id} name={item.name}>
-                              {item.name}
-                            </option>
+                            <option key={index} value={item.id} name={item.name}>{item.name}</option>
                           )
                         )
                       ) : (
@@ -208,9 +204,7 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
                     </Select>
                   </FormControl>
                   <FormControl width={'100%'}>
-                    <FormLabel htmlFor='fixedVersion' fontSize='sm' color='gray.600'>
-                      Fixed Version
-                    </FormLabel>
+                    <FormLabel htmlFor='fixedVersion' fontSize='sm' color='gray.600'>Fixed Version</FormLabel>
                     <Select id='fixedVersion' name='fixedVersion' value={selectedTag} onChange={(e) => setSelectedTag(e.target.value)} textTransform={'capitalize'} fontSize='sm' color='gray.600'>
                       <option value=''>-- Select --</option>
                       {data?.project?.sboms?.length > 0 ? (

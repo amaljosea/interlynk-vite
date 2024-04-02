@@ -45,7 +45,6 @@ const VulnsFilters = ({ refetch }) => {
     const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
     const range = { min: parseFloat(epssRange[0]) / 100, max: parseFloat(epssRange[1]) / 100}
     await refetch({
-      variables: {
         first: totalRows,
         projectGroupIds: groupIds?.includes('all') || groupIds?.length === 0 ? undefined : groupIds,
         severity: severities?.includes('all') || severities?.length === 0 ? undefined : severities,
@@ -54,7 +53,6 @@ const VulnsFilters = ({ refetch }) => {
         epss: epss === 'all' || epss === '' ? undefined : range,
         field,
         direction
-      }
     })
   }
 

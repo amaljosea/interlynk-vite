@@ -246,23 +246,19 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   const handleSearch = async (event) => {
     const { value } = event.target
     if (event.key === 'Enter' && filterText !== '') {
-      refetch({variables: { field, direction, search: value, first: totalRows, ...vulnData }
-      }).then((res) => res?.data && globalVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value }) )
+      refetch({ field, direction, search: value, first: totalRows, ...vulnData }).then((res) => res?.data && globalVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value }) )
     }
   }
 
   // CLEAR SERACH
   const handleClear = async () => {
     setFilterText('')
-    await refetch({ variables: { field, direction, search: undefined, first: totalRows, ...vulnData }
-    }).then((res) => res?.data && globalVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' }))
+    await refetch({ field, direction, search: undefined, first: totalRows, ...vulnData }).then((res) => res?.data && globalVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' }))
   }
 
   // CLEAR SERACH
   const handleRefresh = async () => {
-    await refetch({
-      variables: { field, direction, first: totalRows, projectIds: activeEnv ? [activeEnv] : undefined, projectGroupIds: productId ? [productId] : undefined }
-    }).then((res) => res?.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' }))
+    await refetch({ field, direction, first: totalRows, projectIds: activeEnv ? [activeEnv] : undefined, projectGroupIds: productId ? [productId] : undefined }).then((res) => res?.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' }))
   }
 
   // ON SEARCH INPUT CHANGE
@@ -295,8 +291,7 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   // ON PREV PAGE
   const handlePreviousPage = async () => {
     setIsPrevActive(false)
-    await refetch({
-      variables: { field, direction, last: totalRows, before: data?.pageInfo?.startCursor, search: searchInput !== '' ? searchInput : undefined, ...vulnData } }).then((res) => {
+    await refetch({ field, direction, last: totalRows, before: data?.pageInfo?.startCursor, search: searchInput !== '' ? searchInput : undefined, ...vulnData }).then((res) => {
       if (res.data) {
         const project = res?.data?.organization?.vulns
         globalVulnDispatch({ type: 'DECREMENT_PAGE', payload: project?.pageInfo?.startCursor })
@@ -308,7 +303,7 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   // ON NEXT PAGE
   const handleNextPage = async () => {
     setIsNextActive(false)
-    await refetch({ variables: { field, direction, first: totalRows, after: data?.pageInfo?.endCursor, search: searchInput !== '' ? searchInput : undefined, ...vulnData } }).then((res) => {
+    await refetch({ field, direction, first: totalRows, after: data?.pageInfo?.endCursor, search: searchInput !== '' ? searchInput : undefined, ...vulnData }).then((res) => {
       if (res.data) {
         const project = res?.data?.organization?.vulns
         globalVulnDispatch({ type: 'INCREMENT_PAGE', payload: { total: project?.totalCount, after: project?.pageInfo?.endCursor } })
@@ -321,14 +316,12 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   const handleSetRow = async (e) => {
     const { value } = e.target
     setTotalRows(Number(value))
-    await refetch({ variables: { field, direction, first: Number(value), search: searchInput !== '' ? searchInput : undefined, ...vulnData } }).then((res) => res.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' }))
+    await refetch({ field, direction, first: Number(value), search: searchInput !== '' ? searchInput : undefined, ...vulnData }).then((res) => res.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' }))
   }
 
   // SORTING
   const handleSort = async (column, sortDirection) => {
-    await refetch({
-      variables: { first: totalRows, field: column.id, direction: sortDirection === 'asc' ? 'ASC' : 'DESC', search: searchInput !== '' ? searchInput : undefined, ...vulnData }
-    }).then((res) => {
+    await refetch({ first: totalRows, field: column.id, direction: sortDirection === 'asc' ? 'ASC' : 'DESC', search: searchInput !== '' ? searchInput : undefined, ...vulnData }).then((res) => {
       if (res.data) {
         globalVulnDispatch({ type: 'SET_SORT_ORDER', payload: { field: column.id, direction: sortDirection === 'asc' ? 'ASC' : 'DESC' } })
       }
