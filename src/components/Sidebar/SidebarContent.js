@@ -13,13 +13,14 @@ import { Link, useLocation } from 'react-router-dom'
 
 const SidebarContent = ({ minimize, logoText, routes }) => {
   let location = useLocation()
+  const activeUser = localStorage.getItem('email')
   const org = localStorage.getItem('organization')
   const isSuperAdmin = localStorage.getItem('isSuperAdmin')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
 
-  const filterRoutes = isSuperAdmin === 'true' ? routes : routes?.filter((item) => item?.name !== 'SAG')
+  const filterRoutes = (activeUser === 'sp@interlynk.io' || activeUser === 'surendra.pathak@interlynk' || isSuperAdmin === 'true')  ? routes : routes?.filter((item) => item?.name !== 'SAG')
 
   const [state, setState] = useState({})
 

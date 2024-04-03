@@ -5,6 +5,7 @@ import { useState } from 'react'
 
 const DownloadModal = ({ finalRef, isOpen, onClose, initialRef, productId, productName, version, sbomId }) => {
   const toast = useToast()
+  const activeUser = localStorage.getItem('email')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const [getData] = useLazyQuery(signedUrlParams ? SignedSbomDownload : DownloadSBOM)
 
@@ -76,7 +77,7 @@ const DownloadModal = ({ finalRef, isOpen, onClose, initialRef, productId, produ
           <Stack direction='column' gap='20px' mt={2}>
             <RadioGroup value={spec} onChange={(value) => setSpec(value)}>
               <Stack spacing={4} direction='row'>
-                <Radio value='spdx'>SPDX</Radio>
+                {(activeUser === 'sp@interlynk.io' || activeUser === 'surendra.pathak@interlynk') && <Radio value='spdx'>SPDX</Radio>}
                 <Radio value='cyclonedx'>CycloneDX</Radio>
               </Stack>
             </RadioGroup>
