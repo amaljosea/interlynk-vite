@@ -16,7 +16,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
   const [operator, setOperator] = useState('')
   const [resultType, setResultType] = useState('')
   const [error, setError] = useState('')
-  const [conditions, setConditions] = useState([{id: 1, subject: '', operator: '', value: '', list: [], status: 'CREATED', min:'0', max:'0', error:''}])
+  const [conditions, setConditions] = useState([{id: 1, subject: '', operator: '', value: '', list: [], status: 'CREATED', min:'0', max:'0', subError:'', opError:'', valError:''}])
   const [deletedRules, setDeletedRules] = useState([])
 
   const { data: subOperators } = useQuery(PolicySubjectOperators, { fetchPolicy: 'network-only' })
@@ -53,7 +53,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
   const addRow = () => {
     setError('')
     const newId = conditions?.length + 1;
-    setConditions([...conditions, { id: newId, subject: '', operator: '', value: '', list: [], status: 'CREATED', min:'0', max:'0', error:'' }]);
+    setConditions([...conditions, { id: newId, subject: '', operator: '', value: '', list: [], status: 'CREATED', min:'0', max:'0', subError:'', opError:'', valError:'' }]);
   };
 
   const deleteRow = rule => {
@@ -85,13 +85,41 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
     setConditions(newData);
   };
 
+  const onSubjectBlur = (rule) => {
+    const newData = conditions.map(item => {
+      if (item.id === rule?.id) {
+        if(rule?.subject === '') {
+          return { ...item, subError: 'Please select any subject' }
+        } else {
+          return { ...item, subError: '' };
+        }
+      }
+      return item;
+    });
+    setConditions(newData);
+  }
+
+  const onOperatorBlur = (rule) => {
+    const newData = conditions.map(item => {
+      if (item.id === rule?.id) {
+        if(rule?.operator === '') {
+          return { ...item, opError: 'Please select any operator' }
+        } else {
+          return { ...item, opError: '' };
+        }
+      }
+      return item;
+    });
+    setConditions(newData);
+  }
+
   const handleBlur = (rule) => {
     const newData = conditions.map(item => {
       if (item.id === rule?.id) {
         if(rule?.min !== '' && rule?.max !== '' && Number(rule?.max) < Number(rule?.min)) {
-          return { ...item, value: '', error: 'Invalid EPSS range' }
+          return { ...item, value: '', valError: 'Invalid EPSS range' }
         } else {
-          return { ...item, value: `{"min":${rule?.min},max:${rule?.max}}`, error: '' };
+          return { ...item, value: `{"min":${rule?.min},max:${rule?.max}}`, valError: '' };
         }
       }
       return item;
@@ -180,9 +208,10 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
   }
 
   const checkDataValidity = (data) => {
+    console.log('data',data);
     for (let i = 0; i < data.length; i++) {
-      const { subject, operator, value, min, max } = data[i];
-      if (subject === '' || operator === '' || value === '' || min === '' || max === '' || error !== '') {
+      const { subject, operator, value, min, max, subError, opError, valError } = data[i];
+      if (subject === '' || operator === '' || value === '' || min === '' || max === '' || subError !== '' || opError !== '' || valError !== '') {
         return "Error: Some properties are empty";
       }
     }
@@ -190,6 +219,8 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
   }
 
   const errorMessage = checkDataValidity(conditions)
+
+  const blockInvalidChar = e => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault();
 
   useEffect(() => {
     if (data && subOperators) {
@@ -200,7 +231,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
       setResultType(data?.resultType  === 'warn' ? 'WARN' : data?.resultType === 'inform' ? 'INFORM' : 'FAIL')
       const rules = []
       const opList = (item) => subOperators?.policySubjectOperatorMapping?.find((op) => op?.subject === item?.subject)
-      data?.policyRules?.map((item) => rules?.push({id:item?.id, subject: item?.subject, operator: item?.operator, value: item?.value, list: opList(item)?.operators, status: 'ADDED', min: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.min : '0', max: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.max : '0', error: ''}))
+      data?.policyRules?.map((item) => rules?.push({id:item?.id, subject: item?.subject, operator: item?.operator, value: item?.value, list: opList(item)?.operators, status: 'ADDED', min: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.min : '0', max: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.max : '0', subError: '', opError:'', valError: ''}))
       setConditions(rules)
     }
   }, [data, subOperators])
@@ -260,90 +291,101 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                 </Flex>
                 <Flex width={'100%'} my={2} justifyContent={'space-between'} alignItems={'center'}>
                   <Heading fontWeight={'medium'} fontFamily={'inherit'} fontSize={'md'}>Conditions</Heading>
-                  <IconButton size='sm' colorScheme='blue' icon={<FaPlus />} onClick={addRow}/>
+                  <IconButton size='sm' colorScheme='blue' icon={<FaPlus />} onClick={addRow} />
                 </Flex>
                 {conditions?.length > 0 && conditions?.map((item, index) => (
-                  <Flex width='100%' key={index} gap={4} alignItems={'flex-start'}>
-                    <Button width={'fit-content'} size='sm'>{index + 1}</Button>
-                    <FormControl width={500}>
-                      <Select size='sm' value={item?.subject} onChange={e => handleChange(e.target.value, item.id, 'subject')} placeholder="-- Select Subject --" textTransform={'capitalize'} fontSize='sm'>
-                        {subOperators?.policySubjectOperatorMapping?.map((rule, index) => (
-                          <option key={index} value={rule.subject} style={{textTransform:'capitalize'}}>{rule.category} {rule?.name}</option>
-                        ))}
-                      </Select>
-                    </FormControl>
-                    <FormControl width={500}>
-                      <Select size='sm' id='operator' name='operator' value={item?.operator} onChange={e => handleChange(e.target.value, item.id, 'operator')} textTransform={'capitalize'} fontSize='sm' placeholder='-- Select Opeator --'>
+                  <Grid key={index} gap={4} templateColumns='repeat(12, 1fr)'  alignItems={'flex-start'}>
+                    <GridItem colSpan={3}>
+                      <FormControl>
+                        <Select size='sm' value={item?.subject} onChange={e => handleChange(e.target.value, item.id, 'subject')} onBlur={() => onSubjectBlur(item)} placeholder="-- Select Subject --" textTransform={'capitalize'} fontSize='sm' onBlurCapture={() => onSubjectBlur(item)}>
+                          {subOperators?.policySubjectOperatorMapping?.map((rule, index) => (
+                            <option key={index} value={rule.subject} style={{textTransform:'capitalize'}}>{rule.category} {rule?.name}</option>
+                          ))}
+                        </Select>
+                        {item?.subError !== '' && <Text mt={1} color={'red.500'} fontSize={'sm'}>{item?.subError}</Text>}
+                      </FormControl>
+                    </GridItem>
+                    <GridItem colSpan={3}>
+                      <FormControl>
+                      <Select size='sm' id='operator' name='operator' value={item?.operator} onChange={e => handleChange(e.target.value, item.id, 'operator')} textTransform={'capitalize'} fontSize='sm' placeholder='-- Select Opeator --' onBlur={() => onOperatorBlur(item)}>
                       {item?.list?.map(option => (
                         <option value={option} key={option}>{updatedValue(option)}</option>
                       ))}
                       </Select>
-                    </FormControl>
-                    {item?.subject === 'VULNERABILITY_SEV' && (
-                      <FormControl isRequired>
-                        <Select size='sm' id='operator' name='operator' value={item?.value} onChange={(e) => handleChange(e.target.value, item.id, 'value')} textTransform={'capitalize'} fontSize='sm' hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'}>
-                          <option value=''>-- Select --</option>
-                          {['critical','high','medium','low','unknown'].map((item, index) => (
-                            <option key={index} value={item} style={{ textTransform: 'capitalize' }}>{item}</option>
-                          ))}
-                        </Select>
+                      {item?.opError !== '' && <Text mt={1} color={'red.500'} fontSize={'sm'}>{item?.opError}</Text>}
                       </FormControl>
-                    )}
-                    {item?.subject === 'VULNERABILITY_KEV' && (
-                      <FormControl isRequired>
-                        <Select size='sm' id='operator' name='operator' value={item?.value} onChange={(e) => handleChange(e.target.value, item.id, 'value')} textTransform={'capitalize'}>
-                          <option value=''>-- Select --</option>
-                          {[true, false].map((item, index) => (
-                            <option key={index} value={item} style={{ textTransform: 'capitalize' }}>{JSON.stringify(item)}</option>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    )}
-                    {item?.subject === 'VULNERABILITY_STATUS' && (
-                      <FormControl isRequired>
-                        <Select size='sm' id='operator' name='operator' value={item?.value} onChange={(e) => handleChange(e.target.value, item.id, 'value')} textTransform={'capitalize'} fontSize='sm' hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'}>
-                          <option value=''>-- Select --</option>
-                          {["In Triage","Not Affected","Affected","Fixed","Unspecified"].map((item, index) => (
-                            <option key={index} value={item} style={{ textTransform: 'capitalize' }}>{item}</option>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    )}
-                    {item?.operator === 'RANGE' && (
-                      <Stack direction={'column'} alignItems={'flex-start'}>
-                       <Flex alignItems={'center'} gap={4}>
-                         <InputGroup width={'180px'} size='sm'>
-                           <InputLeftAddon>Min</InputLeftAddon>
-                           <Input type={'number'} name='min' value={item?.min} fontSize='sm' onChange={(e) => handleChange(e.target.value, item.id, 'min')} onBlur={() => handleBlur(item)} />
-                           {item?.subject === 'VULNERABILITY_EPSS' && <InputRightAddon>%</InputRightAddon>}
-                         </InputGroup>
-                         <InputGroup width={'180px'} size='sm'>
-                           <InputLeftAddon>Max</InputLeftAddon>
-                           <Input type={'number'} name='max' value={item?.max} fontSize='sm' onChange={(e) => handleChange(e.target.value, item.id, 'max')} onBlur={() => handleBlur(item)}/>
-                           {item?.subject === 'VULNERABILITY_EPSS' && <InputRightAddon>%</InputRightAddon>}
-                         </InputGroup>
-                       </Flex>
-                       {item?.error !== '' && <Text color={'red.500'} fontSize={'sm'}>{item?.error}</Text>}
-                     </Stack>
-                    )}
-                    {item?.subject === 'VULNERABILITY_STATUS_AGE' && (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN' || item?.operator === '') && (
-                      <InputGroup width={'500px'} size='sm'>
-                        <Input type='number' size='sm' placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} />
-                        <InputRightAddon>Days</InputRightAddon>
-                      </InputGroup>
-                    )}
-                    {item?.subject === 'VULNERABILITY_EPSS' && (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN' || item?.operator === '') && (
-                      <InputGroup width={'500px'} size='sm'>
-                        <Input type='number' size='sm' placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'} />
-                        <InputRightAddon>%</InputRightAddon>
-                      </InputGroup>
-                    )}
-                    {item?.operator !== 'RANGE' && item?.subject !== 'VULNERABILITY_SEV' && item?.subject !== 'VULNERABILITY_EPSS' && item?.subject !== 'VULNERABILITY_STATUS' && item?.subject !== 'VULNERABILITY_KEV' && item?.subject !== 'VULNERABILITY_STATUS_AGE' && (
-                      <Input width={'500px'} type={'text'} size='sm' placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'} />
-                    )}
-                    <Box>{conditions?.length > 1  && conditions?.length - 1 !== index && <Text>{operator === 'ALL' ? 'and' : 'or'}</Text>}</Box>
-                    <Flex gap={3} ml={'auto'} justifyContent={'flex-end'}><IconButton size='sm' colorScheme='red' icon={<FaTrash />} onClick={() => deleteRow(item)} /></Flex>
-                  </Flex>
+                    </GridItem>
+                    <GridItem colSpan={6}>
+                      <Flex alignItems={'center'} gap={2}>
+                        {item?.subject === 'VULNERABILITY_SEV' && (
+                          <FormControl isRequired>
+                            <Select size='sm' id='operator' name='operator' value={item?.value} onChange={(e) => handleChange(e.target.value, item.id, 'value')} textTransform={'capitalize'} fontSize='sm' hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'}>
+                              <option value=''>-- Select --</option>
+                              {['critical','high','medium','low','unknown'].map((item, index) => (
+                                <option key={index} value={item} style={{ textTransform: 'capitalize' }}>{item}</option>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        )}
+                        {item?.subject === 'VULNERABILITY_KEV' && (
+                          <FormControl isRequired>
+                            <Select size='sm' id='operator' name='operator' value={item?.value} onChange={(e) => handleChange(e.target.value, item.id, 'value')} textTransform={'capitalize'}>
+                              <option value=''>-- Select --</option>
+                              {[true, false].map((item, index) => (
+                                <option key={index} value={item} style={{ textTransform: 'capitalize' }}>{JSON.stringify(item)}</option>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        )}
+                        {item?.subject === 'VULNERABILITY_STATUS' && (
+                          <FormControl isRequired>
+                            <Select size='sm' id='operator' name='operator' value={item?.value} onChange={(e) => handleChange(e.target.value, item.id, 'value')} textTransform={'capitalize'} fontSize='sm' hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'}>
+                              <option value=''>-- Select --</option>
+                              {["In Triage","Not Affected","Affected","Fixed","Unspecified"].map((item, index) => (
+                                <option key={index} value={item} style={{ textTransform: 'capitalize' }}>{item}</option>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        )}
+                        {item?.operator === 'RANGE' && (
+                          <Stack direction={'column'} alignItems={'flex-start'}>
+                          <Flex alignItems={'center'} gap={4}>
+                            <InputGroup size='sm'>
+                              <InputLeftAddon>Min</InputLeftAddon>
+                              <Input width={100} type={'number'} name='min' value={item?.min} fontSize='sm' onChange={(e) => handleChange(e.target.value, item.id, 'min')} onBlur={() => handleBlur(item)} />
+                              {item?.subject === 'VULNERABILITY_EPSS' && <InputRightAddon>%</InputRightAddon>}
+                            </InputGroup>
+                            <InputGroup size='sm'>
+                              <InputLeftAddon>Max</InputLeftAddon>
+                              <Input width={100} type={'number'} name='max' value={item?.max} fontSize='sm' onChange={(e) => handleChange(e.target.value, item.id, 'max')} onBlur={() => handleBlur(item)}/>
+                              {item?.subject === 'VULNERABILITY_EPSS' && <InputRightAddon>%</InputRightAddon>}
+                            </InputGroup>
+                          </Flex>
+                          {item?.valError !== '' && <Text color={'red.500'} fontSize={'sm'}>{item?.valError}</Text>}
+                        </Stack>
+                        )}
+                        {item?.subject === 'VULNERABILITY_STATUS_AGE' && (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN' || item?.operator === '') && (
+                          <InputGroup size='sm'>
+                            <Input type='number' size='sm' placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} onKeyDown={blockInvalidChar} />
+                            <InputRightAddon>Days</InputRightAddon>
+                          </InputGroup>
+                        )}
+                        {item?.subject === 'VULNERABILITY_EPSS' && (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN' || item?.operator === '') && (
+                          <InputGroup size='sm'>
+                            <Input type='number' size='sm' placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'} />
+                            <InputRightAddon>%</InputRightAddon>
+                          </InputGroup>
+                        )}
+                        {item?.operator !== 'RANGE' && item?.subject !== 'VULNERABILITY_SEV' && item?.subject !== 'VULNERABILITY_EPSS' && item?.subject !== 'VULNERABILITY_STATUS' && item?.subject !== 'VULNERABILITY_KEV' && item?.subject !== 'VULNERABILITY_STATUS_AGE' && (
+                          <Input type={'text'} size='sm' placeholder='Value' value={item?.value} onChange={e => handleChange(e.target.value, item.id, 'value')} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'} />
+                        )}
+                        <Flex width={'100%'} gap={4} justifyContent={'space-between'}>
+                          <Box>{conditions?.length > 1  && conditions?.length - 1 !== index && <Text>{operator === 'ALL' ? 'and' : 'or'}</Text>}</Box>
+                          <IconButton ml={'auto'} size='sm' colorScheme='red' icon={<FaTrash />} onClick={() => deleteRow(item)} />
+                        </Flex>
+                      </Flex>
+                    </GridItem>
+                  </Grid>
                 ))}
               </Flex>
             </ModalBody>
