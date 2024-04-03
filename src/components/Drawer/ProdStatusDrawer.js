@@ -277,7 +277,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData, setCurrentRo
                   {/* ACTION STATEMENT */}
                   <FormControl isRequired>
                     <InfoLabel title={'Action Statement'} name={'actionStatement'} onClick={onCheckAction} />
-                    <Textarea rows={2} name='actionStatement' id='actionStatement' placeholder='Example: This vulnerability can be mitigate by running the application with ENV_PROTECTED enabled or turning off Notifications under settings.' fontSize='sm' value={actionStmt} onChange={(e) => setActionStmt(e.target.value)} onBlur={onActionBlur} />
+                    <Textarea rows={2} name='actionStatement' id='actionStatement' placeholder={`Example: This vulnerability can be mitigate by running the application with ENV_PROTECTED enabled or turning off 'Notifications' under settings.`} fontSize='sm' value={actionStmt} onChange={(e) => setActionStmt(e.target.value)} onBlur={onActionBlur} />
                   </FormControl>
                   {/* RESPONSE */}
                   <FormControl mt={5}>
