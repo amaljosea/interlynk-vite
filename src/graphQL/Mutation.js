@@ -1368,7 +1368,7 @@ export const updateApiToken = gql`
 export const updateCompVulnVex = gql`
   mutation updateCompVulnVex(
     $compVulnId: Uuid!
-    $vexStatusId: Uuid!
+    $vexStatusId: Uuid
     $sbomId: Uuid!
     $propagateVex: Boolean
     $vexJustificationId: Uuid

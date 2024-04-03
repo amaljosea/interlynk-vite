@@ -5,7 +5,6 @@ import DataTable from 'react-data-table-component'
 import { FaBug, FaCopy, FaPen } from 'react-icons/fa6'
 import { useState, useMemo, useEffect } from 'react'
 import styled from '@emotion/styled'
-import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
 import VulnFilterMenu from 'views/Sbom/components/VulnFilterMenu'
 import { sevColor, timeSince, getFullDateAndTime } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -24,6 +23,7 @@ import { ShareVulnFilters } from 'graphQL/Queries'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import { capitalizeFirstLetter } from 'utils'
 import { FaTimes } from 'react-icons/fa'
+import VexStatusComponent from "../VulnerabilityVex/VexStatusComponent";
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -468,9 +468,9 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
     })
   }
 
-  const handleRefresh = async () => {
+  const handleRefresh = () => {
     disablePaginationControl()
-    await refetch({ projectId: productId, sbomId: sbomId }).then((res) => {
+    refetch({ projectId: productId, sbomId: sbomId }).then((res) => {
       res && setPaginationControl(res.data)
     })
   }
@@ -605,7 +605,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
           </GridItem>
           {/* STATUS UPDATE */}
           <GridItem w='100%' colSpan={3}>
-            <ProdStatusDrawer data={data} textColor={textColor} refetch={refetch} filteredData={filteredData} filterRefetch={filterRefetch} setCurrentRow={setCurrentRow} />
+            <VexStatusComponent data={data} fixedVersions={filteredData} />
           </GridItem>
         </Grid>
       </Box>
@@ -687,7 +687,6 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
   }
 
   const handleSelect = (row) => {
-    console.log('row',row);
     const {componentVulnLogs, vexStatus, vexJustification, cdxResponse } = row
     const item = componentVulnLogs[componentVulnLogs?.length - 1]
     prodVulnDispatch({type:'ON_CHANGE_STATUS', payload: {value:vexStatus?.id || '', name: vexStatus?.name || ''}})
@@ -701,7 +700,10 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
   }
 
   // ON SELECT ROW
-  const handleSelectRow = (row) => {
+  const handleSelectRow = (row, bool) => {
+    if (bool === false) {
+      handleRefresh()
+    }
     const {componentVulnLogs } = row
     if (componentVulnLogs?.length > 0) {
       handleSelect(row)
@@ -742,7 +744,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
           onRowClicked={(row) => handleSelectRow(row)}
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
-          onRowExpandToggled={(bool, row) => handleSelectRow(row)}
+          onRowExpandToggled={(bool, row) => handleSelectRow(row, bool)}
           selectableRows={!signedUrlParams}
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}

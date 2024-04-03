@@ -1868,6 +1868,11 @@ export const GetVulnData = gql`
           isComplete
           isFirstDegreePart
           cdxResponseId
+          impact
+          note
+          detail
+          actionStmt
+          fixedIn
           vuln {
             vulnId
             desc
@@ -1954,6 +1959,7 @@ export const ShareVulnData = gql`
     $before: String
     $field: ComponentVulnOrderByFields!
     $direction: OrderByDirection!
+    $vexComplete: Boolean
   ) {
     shareLynkQuery {
       sbom(id: $sbomId) {
@@ -1972,6 +1978,7 @@ export const ShareVulnData = gql`
           first: $first
           last: $last
           orderBy: { field: $field, direction: $direction }
+          vexComplete: $vexComplete
         ) {
           totalCount
           pageInfo {
