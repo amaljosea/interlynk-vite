@@ -76,11 +76,22 @@ const PolicyEvalTable = ({ data }) => {
       selector: (row) => {
         const {resultType} = row
         return (
-        <Tag width={'80px'} colorScheme={resultType === 'inform' ? 'blue' : resultType === 'warn' ? 'orange' : 'red'}>  
-          <TagLabel fontSize={'xs'} style={{ textTransform: 'uppercase' }} mx={'auto'}>{resultType}</TagLabel>
+        <Tag colorScheme={resultType === 'inform' ? 'blue' : resultType === 'warn' ? 'orange' : 'red'} textTransform={'capitalize'}>  
+          {resultType}
         </Tag>
       )},
       width: '250px',
+      wrap: true
+    },
+    // EXECUTION
+    {
+      id: 'EXECUTION',
+      name: 'EXECUTION',
+      selector: (row) => {
+        const {result} = row
+        return (
+        <Tag colorScheme='blue' textTransform={'capitalize'}>{result}</Tag>
+      )},
       wrap: true
     },
     // CREATED AT
