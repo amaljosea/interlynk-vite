@@ -22,6 +22,7 @@ import OrgTable from 'components/Tables/OrgTable'
 import RoleTable from 'components/Tables/RoleTable'
 import CustomLoader from 'components/CustomLoader'
 import NotificationChannels from "components/Notifications/NotificationChannels";
+import LegalTable from 'components/Tables/LegalTable'
 
 function Profile() {
   const location = useLocation()
@@ -105,7 +106,7 @@ function Profile() {
             <Card>
               <Tabs variant='enclosed' w={'100%'} bg={'white'} defaultIndex={tabIndex} onChange={(e) => onTabChange(e)} >
                 <TabList>
-                  {['General','Users','Roles','Feeds','Checks','Lists'].map((item, index) => (
+                  {['General','Users','Roles','Feeds','Checks','Lists','Legal'].map((item, index) => (
                     <Tab key={index} _focus={{ outline: 'none' }} display={(item === 'Lists' && !manageListing) ||(item === 'Feeds' && !manageFeeds) || (item === 'Users' && !viewUsers?.value) ? 'none' : 'block'}
                     >
                       {item}
@@ -147,6 +148,10 @@ function Profile() {
                     <Grid width={'100%'} templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }} gap='22px'>
                       <ComponentFeed data={orgInfo?.organization?.organizationComponents} refetch={refetch} />
                     </Grid>
+                  </TabPanel>
+                   {/* LEGAL */}
+                   <TabPanel>
+                    <LegalTable />
                   </TabPanel>
                 </TabPanels>
               </Tabs>

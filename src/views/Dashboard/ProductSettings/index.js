@@ -155,13 +155,7 @@ const Settings = ({ enabled, data, refetch, activeEnv }) => {
           <GridItem w='100%'>
             <FormControl>
               <FormLabel>Retain Data For</FormLabel>
-              <Select
-                width={'400px'}
-                id='dataRetention'
-                value={dataRetentionDays}
-                onChange={(e) => setDataRetentionDays(e.target.value)}
-                isDisabled={!enabled || !editControls}
-              >
+              <Select width={'400px'} id='dataRetention' value={dataRetentionDays} onChange={(e) => setDataRetentionDays(e.target.value)} isDisabled={!enabled || !editControls} >
                 {[1, 30, 90, 365, 0].map((item, index) => (
                  <option key={index} value={item}>
                   {item !== 0 && item} {item === 365 ? 'Year' : item === 0 ? 'Forever' : 'Days'}
@@ -169,11 +163,20 @@ const Settings = ({ enabled, data, refetch, activeEnv }) => {
                 ))}
               </Select>
             </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Manufacturer</FormLabel>
+              <Select width={'400px'}>
+                <option value={''}>-- Select --</option>
+                {['Interlynk Inc','IronSource Inc'].map((item, index) => (
+                 <option key={index} value={item}>{item}</option>
+                ))}
+              </Select>
+            </FormControl>
             {editControls === true && (
               <Button
                 colorScheme='blue'
                 variant='solid'
-                mt={2}
+                mt={4}
                 isDisabled={!enabled}
                 onClick={() =>
                   onUpdate(Number(dataRetentionDays), 'dataRetention')
