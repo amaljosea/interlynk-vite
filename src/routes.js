@@ -17,8 +17,10 @@ export const dashRoutes = [
   },
   { path: '/products', name: 'Products', icon: <FaWindowMaximize color='inherit' />, component: Products, layout: '/vendor'
   },
+  /*
   { path: '/SAG', name: 'SAG', icon: <FaHandshakeSimple color='inherit' size={18} />, component: Products, layout: '/vendor'
   },
+  */
   { path: '/vulnerabilities', name: 'Vulnerabilities', icon: <FaBug color='inherit' />, component: Vulnerabilities, layout: '/vendor'
   },
   { path: '/licenses', name: 'Licenses', icon: <FaBalanceScale color='inherit' />, component: Licenses, layout: '/vendor'

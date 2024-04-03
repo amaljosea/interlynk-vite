@@ -89,7 +89,7 @@ ReactDOM.render(
                 <Route index element={<ProductList />} />
                 <Route path={`:name`} element={<ProductDetails />} />
               </Route>
-              <Route path={`SAG`} element={<Sag />} />
+              {/* <Route path={`SAG`} element={<Sag />} /> */}
               <Route path={`vulnerabilities`} element={<Vulnerabilities />} />
               <Route path={`licenses`} element={<Licenses />} />
               <Route path={`tools`} element={<Tools />} />
