@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Input, InputGroup, InputLeftAddon, InputRightAddon, Menu, MenuDivider, MenuItemOption, MenuList, MenuOptionGroup, Stack, Switch, Text, useDisclosure } from '@chakra-ui/react'
+import { Box, Button, Flex, Input, InputGroup, InputLeftAddon, InputRightAddon, Menu, MenuButton, MenuDivider, MenuItemOption, MenuList, MenuOptionGroup, Stack, Switch, Text, useDisclosure } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
 import { useGlobalState } from 'hooks/useGlobalState'
 import MenuHeading from 'components/Misc/MenuHeading'
@@ -37,13 +37,13 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       source: source === true ? undefined : 'COMPONENT',
-      vexComplete: complete === true ? true : undefined,
+      vexComplete: complete === 'incomplete' ? undefined : true,
       severity: !severity.includes('all') && severity.length > 0 ? severity : undefined,
       componentName: !component.includes('all') && component.length > 0 ? component : undefined,
       status: !status.includes('all') && status.length > 0 ? status : undefined,
       kev: kev === 'yes' ? true : kev === 'no' ? false : undefined,
       epss: epss === 'all' || epss === '' ? undefined : range,
-      direct: direct === true ? true : undefined,
+      direct: direct === 'direct' ? true : undefined,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -73,9 +73,9 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
     handleRefetch(source, severities, components, value, kev, epss, direct, vexComplete)
   }
 
-  const onFilterComplete = (e) => {
-    prodVulnDispatch({ type: 'FILTER_COMPLETE', payload: e.target.checked })
-    handleRefetch(source, severities, components, statues, kev, epss, direct, e.target.checked)
+  const onFilterComplete = (value) => {
+    prodVulnDispatch({ type: 'FILTER_COMPLETE', payload: value })
+    handleRefetch(source, severities, components, statues, kev, epss, direct, value)
     setCurrentRow(null)
   }
 
@@ -89,9 +89,9 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
     handleRefetch(source, severities, components, statues, kev, value, direct, vexComplete)
   }
 
-  const onFilterDirect = (e) => {
-    prodVulnDispatch({ type: 'FILTER_DIRECT', payload: e.target.checked })
-    handleRefetch( source, severities, components, statues, kev, epss, e.target.checked, vexComplete )
+  const onFilterDirect = (value) => {
+    prodVulnDispatch({ type: 'FILTER_DIRECT', payload: value })
+    handleRefetch( source, severities, components, statues, kev, epss, value, vexComplete )
   }
 
   const handleSubmit = () => {
@@ -102,6 +102,40 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
+      {/* COMPONENT */}
+      <Menu closeOnSelect={false}>
+        <MenuHeading title={'Component'} />
+        <MenuList minH={'auto'} maxH={'400px'} overflow={'hidden'} overflowY={'scroll'}>
+          <MenuOptionGroup title='Included' type='radio' value={direct} onChange={onFilterDirect} textAlign={'left'}>
+            {['direct','transitive'].map((item, index) =>  <MenuItemOption key={index} value={item} textTransform={'capitalize'} fontSize={'sm'}>{item}</MenuItemOption> )}
+          </MenuOptionGroup>
+          <MenuDivider />
+          <MenuOptionGroup title='Name' type='checkbox' textAlign={'left'} value={components} onChange={onFilterCompName}fontSize='sm'>
+            {vulnCompNames?.map((item, index) => (
+              <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
+                {item}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
+      {/* STATUS */}
+      <Menu closeOnSelect={false}>
+        <MenuHeading title={'Status'} />
+        <MenuList minH={'auto'} maxH={'400px'} overflow={'hidden'} overflowY={'scroll'}>
+          <MenuOptionGroup title='Status Completeness' value={vexComplete} onChange={onFilterComplete} type='radio' textAlign={'left'}>
+            {['incomplete','complete'].map((item, index) =>  <MenuItemOption key={index} value={item} textTransform={'capitalize'} fontSize={'sm'}>{item}</MenuItemOption> )}
+          </MenuOptionGroup>
+          <MenuDivider />
+          <MenuOptionGroup title='Values' type='checkbox' textAlign={'left'} value={statues} onChange={onFilterStatus} fontSize={'sm'}>
+            {['Unspecified','In Triage','Not Affected','Affected','Fixed'].map((item, index) => (
+              <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'} >
+                {item}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
@@ -120,7 +154,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
         </Menu>
       </Box>
       {/* COMPONENT NAME */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'} position={'relative'} hidden>
         <Menu closeOnSelect={false}>
           {components.length !== 0 && <CheckMark />}
           <MenuHeading title={'Component'} />
@@ -137,7 +171,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
         </Menu>
       </Box>
       {/* STATUS */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'} position={'relative'} hidden>
         <Menu closeOnSelect={false}>
           {statues.length !== 0 && <CheckMark />}
           <MenuHeading title={'Status'} />
@@ -201,7 +235,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
         </Menu>
       </Box>
       {/* DIRECT */}
-      <Flex align='center' gap={2}>
+      <Flex align='center' gap={2} hidden>
         <Switch id='isDirect' isChecked={direct} onChange={onFilterDirect} />
         <Text>Direct</Text>
       </Flex>
@@ -211,7 +245,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
         <Text>Parts</Text>
       </Flex>
       {/* INCOMPLETE STATUS */}
-      <Flex align='center' gap={2}>
+      <Flex align='center' gap={2} hidden>
         <Switch id='incompleteStatus' isChecked={vexComplete} onChange={onFilterComplete} />
         <Text>Completed</Text>
       </Flex>

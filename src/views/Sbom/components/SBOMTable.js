@@ -123,10 +123,10 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
         status: getUndefinedIfEmptyOrAll(statues),
         kev: kev === 'yes' ? true : kev === 'no' ? false : undefined,
         epss: epss !== '' && epss !== 'all' ? { min: vulnEpss[0], max: vulnEpss[1] } : undefined,
-        direct: direct === true ? true : undefined,
+        direct: direct === 'direct' ? true : undefined,
+        vexComplete: vexComplete === 'incomplete' ? undefined : true,
         field,
         direction,
-        vexComplete
       }).then((res) => {
         if (res.data) {
           prodVulnDispatch({ type: 'SET_TOTAL_VULNS', payload: res.data.sbom.vulns.totalCount })

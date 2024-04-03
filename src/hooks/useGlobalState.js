@@ -1,5 +1,20 @@
 import React, { useState, createContext, useContext, useReducer } from 'react'
-import { globalVulnReducer, compVulnReducer, prodRulesReducer, prodCheckReducer, prodCompReducer, prodLogReducer, prodVulnReducer, sbomLogReducer, prodReducer, sbomReducer, versionReducer, toolsReducer, supportReducer, policyReducer } from 'context/reducers'
+import {
+  globalVulnReducer,
+  compVulnReducer,
+  prodRulesReducer,
+  prodCheckReducer,
+  prodCompReducer,
+  prodLogReducer,
+  prodVulnReducer,
+  sbomLogReducer,
+  prodReducer,
+  sbomReducer,
+  versionReducer,
+  toolsReducer,
+  supportReducer,
+  policyReducer
+} from 'context/reducers'
 
 const GlobalStateContext = createContext()
 
@@ -120,26 +135,26 @@ const GlobalStateProvider = ({ children }) => {
     epss: '',
     minEpss: 0,
     maxEpss: 0,
-    direct: false,
+    direct: 'transitive',
     filters: null,
     selectedVulns: [],
     importSbom: [],
     mergeData: [],
     currentSbom: [],
     licenseString: [],
-    vexComplete: undefined,
-    statusTitle:'',
-    statusName:'',
+    vexComplete: 'incomplete',
+    statusTitle: '',
+    statusName: '',
     justification: '',
-    justifyName:'',
-    selectedTag:'',
-    actionStatement:'',
-    response:'',
-    responseTitle:'',
-    details:'',
-    notes:'',
-    impactData:'',
-    upstream:false
+    justifyName: '',
+    selectedTag: '',
+    actionStatement: '',
+    response: '',
+    responseTitle: '',
+    details: '',
+    notes: '',
+    impactData: '',
+    upstream: false
   })
   const [prodCheckState, prodCheckDispatch] = useReducer(prodCheckReducer, {
     field: 'CHECK_RESULTS_UPDATED_AT',
@@ -175,11 +190,11 @@ const GlobalStateProvider = ({ children }) => {
     types: [],
     filters: null
   })
-   // SBOM VERSIONS
-   const [supportState, supportDispatch] = useReducer(supportReducer, {
+  // SBOM VERSIONS
+  const [supportState, supportDispatch] = useReducer(supportReducer, {
     pageIndex: 1,
     searchInput: '',
-    after:'',
+    after: '',
     before: '',
     field: 'COMPONENT_SUPPORT_OVERRIDES_UPDATED_AT',
     direction: 'DESC'
@@ -192,11 +207,11 @@ const GlobalStateProvider = ({ children }) => {
     searchInput: '',
     filters: null
   })
-   // POLICIES
-   const [policyState, policyDispatch] = useReducer(policyReducer, {
+  // POLICIES
+  const [policyState, policyDispatch] = useReducer(policyReducer, {
     pageIndex: 1,
     searchInput: '',
-    after:'',
+    after: '',
     before: '',
     field: 'POLICIES_UPDATED_AT',
     direction: 'DESC'

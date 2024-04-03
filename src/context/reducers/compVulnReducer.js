@@ -13,7 +13,7 @@ const compVulnReducer = (state, action) => {
         versions: [],
         products: [],
         statues: [],
-        vexComplete: true
+        vexComplete: undefined
       }
     case 'FETCH_DATA_SUCCESS':
       return {
