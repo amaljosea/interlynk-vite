@@ -16,8 +16,12 @@ const VulLinkRow = ({ username, justification, status, timestamp, note, impact, 
         </Flex>
       </Td>
       <Td fontSize={'xs'} pl={0}>{justification}</Td>
-      <Td fontSize={'xs'} pl={0}>{impact && <Tooltip text={impact}><BiNote /></Tooltip>}</Td>
-      <Td fontSize={'xs'} pl={0}>{note && <Tooltip text={note}><BiNote /></Tooltip>}</Td>
+      <Td fontSize={'xs'} pl={0}>
+        {impact && <Tooltip text={impact?.length > 35 ? `${impact.substring(0, 35)}...` : impact}><BiNote /></Tooltip>}
+      </Td>
+      <Td fontSize={'xs'} pl={0}>
+        {note && <Tooltip text={note?.length > 35 ? `${note.substring(0, 35)}...` : note}><BiNote /></Tooltip>}
+      </Td>
       <Td fontSize={'xs'} pl={0}>{username}</Td>
       <Td fontSize={'xs'} pl={0}><Tooltip text={getFullDateAndTime(timestamp)}>{timeSince(timestamp)}</Tooltip></Td>
     </Tr>
