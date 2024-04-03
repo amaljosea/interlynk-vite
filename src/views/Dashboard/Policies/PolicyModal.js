@@ -49,11 +49,30 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
     setError('')
   }
 
+  const hasSimilarRow = (data) => {
+    for (let i = 0; i < data.length; i++) {
+        for (let j = i + 1; j < data.length; j++) {
+            if (
+                data[i].subject === data[j].subject &&
+                data[i].operator === data[j].operator &&
+                data[i].value === data[j].value
+            ) {
+                return true; // Similar row found
+            }
+        }
+    }
+    return false; // No similar rows found
+  };
+
 
   const addRow = () => {
-    setError('')
-    const newId = conditions?.length + 1;
-    setConditions([...conditions, { id: newId, subject: '', operator: '', value: '', list: [], status: 'CREATED', min:'0', max:'0', subError:'', opError:'', valError:'' }]);
+    if(hasSimilarRow(conditions)) {
+      setError(`A row with the same values already exists. Please update or remove it before continue.`)
+    } else {
+      setError('')
+      const newId = conditions?.length + 1;
+      setConditions([...conditions, { id: newId, subject: '', operator: '', value: '', list: [], status: 'CREATED', min:'0', max:'0', subError:'', opError:'', valError:'' }]);
+    }
   };
 
   const deleteRow = rule => {
@@ -231,7 +250,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
       setResultType(data?.resultType  === 'warn' ? 'WARN' : data?.resultType === 'inform' ? 'INFORM' : 'FAIL')
       const rules = []
       const opList = (item) => subOperators?.policySubjectOperatorMapping?.find((op) => op?.subject === item?.subject)
-      data?.policyRules?.map((item) => rules?.push({id:item?.id, subject: item?.subject, operator: item?.operator, value: item?.value, list: opList(item)?.operators, status: 'ADDED', min: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.min : '0', max: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.max : '0', subError: '', opError:'', valError: ''}))
+      data?.policyRules?.map((item) => rules?.push({id:item?.id, subject: item?.subject, operator: item?.operator, value: (item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS') ? 'Defined' : item?.value, list: opList(item)?.operators, status: 'ADDED', min: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.min : '0', max: item?.operator === 'RANGE' ? JSON.parse(item?.value)?.max : '0', subError: '', opError:'', valError: ''}))
       setConditions(rules)
     }
   }, [data, subOperators])
@@ -246,12 +265,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
-                {error !== '' && (
-                  <Alert status='error' borderRadius={4}>
-                    <AlertIcon />
-                    <AlertDescription fontSize={'sm'} pr={2}>{error}</AlertDescription>
-                  </Alert>
-                )}
                 <Flex alignItems={'center'} gap={3}>
                   <Text>Policy:</Text>
                   <FormControl isRequired>
@@ -387,11 +400,17 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                     </GridItem>
                   </Grid>
                 ))}
+                {error !== '' && (
+                  <Alert status='error' borderRadius={4}>
+                    <AlertIcon />
+                    <AlertDescription fontSize={'sm'} pr={2}>{error}</AlertDescription>
+                  </Alert>
+                )}
               </Flex>
             </ModalBody>
             <ModalFooter mt={6}>
               <Button colorScheme='gray' mr={3} onClick={onClose}>Cancel</Button>
-              <Button colorScheme='blue' type='submit' disabled={errorMessage}>{data ? 'Update' : 'Save'}</Button>
+              <Button colorScheme='blue' type='submit' disabled={errorMessage || error !== ''}>{data ? 'Update' : 'Save'}</Button>
             </ModalFooter>
           </ModalContent>
         </form>
