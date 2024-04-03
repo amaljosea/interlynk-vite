@@ -144,7 +144,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
           <MenuList>
             <MenuOptionGroup type='checkbox' value={severities} onChange={onFilterSeverity}>
               <MenuItemOption value={'all'} fontSize={'sm'}>All</MenuItemOption>
-              {vulnSeverities?.map((item, index) => (
+              {['critical','high','medium','low','unknown']?.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
