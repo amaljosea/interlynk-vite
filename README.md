@@ -5,17 +5,16 @@
 1. Create an organization
 2. Next you need copy the ORG ID and paste it inside the .env file
 3. name REACT_APP_ORGID, just remove the existing id and paste the new ID
-4. After that run the project 
+4. After that run the project
 5. Now you can test the new api integration for updating and creating connections
 
 # Important point
 
-The main API URL - 'http://localhost:3000/lynkapi' 
+The main API URL - 'http://localhost:3000/lynkapi'
 
-In case if you have a different URL, then you need to change the URL inside 
+In case if you have a different URL, then you need to change the URL inside
 
 ## /src/index.js --> ApolloClient object
-
 
 # Install Node JS & NPM
 
@@ -55,16 +54,21 @@ npm install
 npm run start
 
 ```
+
 5.5 If `npm run start` gives you error:
+
 ```
 ....
   code: 'ERR_OSSL_EVP_UNSUPPORTED'
 ....
 ```
-set 
+
+set
+
 ```
 export NODE_OPTIONS=--openssl-legacy-provider
 ```
+
 and retry
 
 6. If you have any project running on localhost:3000 then it will ask for other port just press yes. then it will start on
@@ -72,3 +76,7 @@ and retry
 ```
 port 3001
 ```
+
+# Installing VSCode extensions
+
+- Install all the workspace recommended extensions, see `.vscode/extensions.json`
