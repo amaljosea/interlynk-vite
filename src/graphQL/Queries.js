@@ -75,8 +75,11 @@ export const GetOrg = gql`
 export const GetUserPermissions = gql`
   query GetUserPermissions {
     organization {
+      id
       currentUser {
+        id
         role {
+          id
           permissionsMap {
             category
             description
@@ -337,6 +340,7 @@ export const GetProductTable = gql`
     $direction: OrderByDirection!
   ) {
     organization {
+      id
       projectGroups(
         search: $search
         enabled: $enabled
