@@ -54,7 +54,8 @@ const ProductDetails = () => {
   const epssRange = globalVulnState.epss !== 'all' && globalVulnState.epss !== '' && globalVulnState.epss?.split('-')
   const vulnRange = { min: parseFloat(epssRange[0]) / 100, max: parseFloat(epssRange[1]) / 100 }
   // GET VULN DATA
-  const [getVulns, { data: globalVulnData }] = useLazyQuery(GetGlobalVulns, { fetchPolicy: 'network-only' })
+  const [getVulns, { data: globalVulnData, refetch: refetchVulnsVulns }] =
+    useLazyQuery(GetGlobalVulns, { fetchPolicy: "network-only" });
    // GET POLICY DATA
    const [getPolicyData, { data: policyData }] = useLazyQuery(GetProjectPolicies, {fetchPolicy: 'network-only'})
 
@@ -327,7 +328,7 @@ const ProductDetails = () => {
                 </TabPanel>
                 {/* VULNERABILITIES */}
                 <TabPanel px={0}>
-                  <GlobalVulnTable data={globalVulnData?.organization?.vulns} refetch={getVulns} activeEnv={activeEnv} productId={productId} />
+                  <GlobalVulnTable data={globalVulnData?.organization?.vulns} refetch={refetchVulnsVulns} activeEnv={activeEnv} productId={productId} />
                 </TabPanel>
                 {/* AUTOMATIONS */}
                 <TabPanel px={0}>
