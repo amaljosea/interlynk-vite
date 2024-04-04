@@ -37,13 +37,13 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       source: source === true ? undefined : 'COMPONENT',
-      vexComplete: complete === 'incomplete' ? undefined : true,
+      vexComplete: complete === 'all' ? undefined : false,
       severity: !severity.includes('all') && severity.length > 0 ? severity : undefined,
       componentName: !component.includes('all') && component.length > 0 ? component : undefined,
       status: !status.includes('all') && status.length > 0 ? status : undefined,
       kev: kev === 'yes' ? true : kev === 'no' ? false : undefined,
       epss: epss === 'all' || epss === '' ? undefined : range,
-      direct: direct === 'direct' ? true : undefined,
+      direct: direct === 'direct only' ? true : undefined,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -107,7 +107,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
         <MenuHeading title={'Component'} />
         <MenuList minH={'auto'} maxH={'400px'} overflow={'hidden'} overflowY={'scroll'}>
           <MenuOptionGroup title='Included' type='radio' value={direct} onChange={onFilterDirect} textAlign={'left'}>
-            {['direct','transitive'].map((item, index) =>  <MenuItemOption key={index} value={item} textTransform={'capitalize'} fontSize={'sm'}>{item}</MenuItemOption> )}
+            {['all','direct only'].map((item, index) =>  <MenuItemOption key={index} value={item} textTransform={'capitalize'} fontSize={'sm'}>{item}</MenuItemOption> )}
           </MenuOptionGroup>
           <MenuDivider />
           <MenuOptionGroup title='Name' type='checkbox' textAlign={'left'} value={components} onChange={onFilterCompName}fontSize='sm'>
@@ -123,8 +123,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
       <Menu closeOnSelect={false}>
         <MenuHeading title={'Status'} />
         <MenuList minH={'auto'} maxH={'400px'} overflow={'hidden'} overflowY={'scroll'}>
-          <MenuOptionGroup title='Status Completeness' value={vexComplete} onChange={onFilterComplete} type='radio' textAlign={'left'}>
-            {['incomplete','complete'].map((item, index) =>  <MenuItemOption key={index} value={item} textTransform={'capitalize'} fontSize={'sm'}>{item}</MenuItemOption> )}
+          <MenuOptionGroup title='Completeness' value={vexComplete} onChange={onFilterComplete} type='radio' textAlign={'left'}>
+            {['all','incomplete only'].map((item, index) =>  <MenuItemOption key={index} value={item} textTransform={'capitalize'} fontSize={'sm'}>{item}</MenuItemOption> )}
           </MenuOptionGroup>
           <MenuDivider />
           <MenuOptionGroup title='Values' type='checkbox' textAlign={'left'} value={statues} onChange={onFilterStatus} fontSize={'sm'}>

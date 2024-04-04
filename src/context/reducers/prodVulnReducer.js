@@ -2,7 +2,7 @@ const prodVulnReducer = (state, action) => {
   const { type, payload } = action
   switch (type) {
     case 'CLEAR_PROD_VULN':
-      return {...state,field: 'COMPONENT_VULNS_UPDATED_AT',direction: 'DESC',after: '',before: '',searchInput: '',pageIndex: 1,severities: [],components: [],statues: [],source: false,kev: '',epss: '',min: 0,max: 0,direct: 'transitive',statusTitle:'',statusName:'',justification: '',justifyName:'',selectedTag:'',actionStatement:'',response:'',responseTitle:'',details:'',notes:'',impactData:'',upstream:false, vexComplete:'incomplete' }
+      return {...state,field: 'COMPONENT_VULNS_UPDATED_AT',direction: 'DESC',after: '',before: '',searchInput: '',pageIndex: 1,severities: [],components: [],statues: [],source: false,kev: '',epss: '',min: 0,max: 0,direct: 'all',statusTitle:'',statusName:'',justification: '',justifyName:'',selectedTag:'',actionStatement:'',response:'',responseTitle:'',details:'',notes:'',impactData:'',upstream:false, vexComplete:'all' }
     case 'CLEAR_VEX_STATE':
       return {...state,  statusTitle:'', statusName:'', justification: '', justifyName:'', selectedTag:'', actionStatement:'', response:'', responseTitle:'', details:'', notes:'', impactData:'', upstream: false }
     case 'ON_CHANGE_STATUS':

@@ -14,7 +14,6 @@ import SupportTable from 'components/Tables/SupportTable'
 import SbomLicenseTable from '../../../components/Licenses/SbomLicenseTable'
 import { parseJSONSafely } from 'utils'
 import { GetSbomSupportTab, GetSbomParts, GetCheckResults, GetChangeLogs, GetSbomLicensesTable } from 'graphQL/Queries'
-import PolicyTable from 'components/Tables/PolicyTable'
 import { PolicyResults } from 'graphQL/Queries'
 import PolicyEvalTable from 'components/Tables/PolicyEvalTable'
 
@@ -123,8 +122,8 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
         status: getUndefinedIfEmptyOrAll(statues),
         kev: kev === 'yes' ? true : kev === 'no' ? false : undefined,
         epss: epss !== '' && epss !== 'all' ? { min: vulnEpss[0], max: vulnEpss[1] } : undefined,
-        direct: direct === 'direct' ? true : undefined,
-        vexComplete: vexComplete === 'incomplete' ? undefined : true,
+        direct: direct === 'direct only' ? true : undefined,
+        vexComplete: vexComplete === 'all' ? undefined : false,
         field,
         direction,
       }).then((res) => {

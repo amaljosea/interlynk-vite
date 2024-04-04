@@ -105,8 +105,8 @@ const ProductDetails = () => {
       status: statues.length > 0 ? statues : undefined,
       kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
-      direct: direct === 'direct' ? true : undefined,
-      vexComplete: vexComplete === 'incomplete' ? undefined : true,
+      direct: direct === 'direct only' ? true : undefined,
+      vexComplete: vexComplete === 'all' ? undefined : false,
       field: prodVulnState.field,
       direction: prodVulnState.direction
     }
