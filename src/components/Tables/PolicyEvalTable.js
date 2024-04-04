@@ -1,29 +1,30 @@
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
-import { Box, Flex, Grid, GridItem, Heading, IconButton, Stack, Tag, TagLabel, Text, Tooltip, useToast } from '@chakra-ui/react'
+import { Box, Flex, Grid, GridItem, Heading, IconButton, Stack, Tag, TagLabel, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
 import styled from '@emotion/styled'
 import { getFullDateAndTime, timeSince, customStyles } from 'utils'
-import { useEffect, useMemo, useState } from 'react'
-import { useGlobalState } from 'hooks/useGlobalState'
-import { RepeatIcon } from '@chakra-ui/icons'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Pagination from 'components/Pagination'
 import { SbomPolicyScan } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
 import { BiScan } from 'react-icons/bi'
-import { updatedValue } from 'utils'
+import ViolationDrawer from 'components/Drawer/ViolationDrawer'
+import { FaEye } from 'react-icons/fa6'
 
-const PolicyEvalTable = ({ data }) => {
-  const toast = useToast()
+const PolicyEvalTable = ({ data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
+  const {isOpen, onOpen, onClose} = useDisclosure()
+
   const paginationSizes = [25, 50, 100]
   const [activeRow, setActiveRow] = useState(null)
-  const [activeRule, setActiveRule] = useState(null)
-  const [filterText, setFilterText] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [currentRow, setCurrentRow] = useState(null);
+  const [totalRows, setTotalRows] = useState(paginationSizes[0])
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
@@ -46,8 +47,6 @@ const PolicyEvalTable = ({ data }) => {
     )
   }
 
-  const handlePreviousPage = () => {}
-  const handleNextPage = () => {}
   const handleSetRow = () => {}
 
   // SUB HEADER
@@ -120,41 +119,72 @@ const PolicyEvalTable = ({ data }) => {
 
    // EXPAND VIEW
    const ExpandedComponent = ({ data }) => {
-    const { policyRules } = data?.policy
+    const { policyViolations } = data
     const CustomText = styled(Text)`
-      font-size: 13px;
+      font-size: 12px;
       font-weight: bold;
-      color: #718096;
+      color: #333;
       text-transform: uppercase;
       letter-spacing: 0.6px;
     `
+
     return (
       <Box width={'100%'} p={5} boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'>
-        <Heading mb={6} fontFamily={'inherit'} fontSize={'sm'} color={'#555'} width={'90%'} mx={'auto'} >
-          CONDITIONS
+        <Heading mt={2} mb={5} fontFamily={'inherit'} fontSize={'sm'} color={'#555'} width={'95%'} mx={'auto'} textTransform={'uppercase'}>
+          Policy Violations
         </Heading>
-        <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={4} mx={'auto'} >
-          <GridItem><CustomText>subject</CustomText></GridItem>
-          <GridItem><CustomText>operator</CustomText></GridItem>
-          <GridItem><CustomText>value</CustomText></GridItem>
+        <Grid width={'95%'} templateColumns='repeat(12, 1fr)' gap={6} mx={'auto'} borderBottom={'1px solid #E2E8F0'} py={2}>
+          <GridItem colSpan={3}><CustomText>component</CustomText></GridItem>
+          <GridItem colSpan={3}><CustomText>version</CustomText></GridItem>
+          <GridItem colSpan={3}><CustomText>violations</CustomText></GridItem>
+          <GridItem colSpan={3}><CustomText>action</CustomText></GridItem>
         </Grid>
-        {policyRules?.map((item, index) => (
-          <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={1} mx={'auto'} bg={'#EDF2F7'} p={2}>
-            <GridItem>
-              <Text fontSize={'sm'}>{updatedValue(item?.subject)}</Text>
+        {policyViolations?.nodes?.length > 0 ? policyViolations?.nodes.map((item, index) => (
+          <Grid width={'95%'} key={index} alignItems={'center'} templateColumns='repeat(12, 1fr)' gap={6} mb={1} mx={'auto'} py={2} borderBottom={'1px solid #E2E8F0'}>
+            <GridItem colSpan={3}><Text fontSize={'sm'} wordBreak={'break-all'}>{item?.component?.name}</Text></GridItem>
+            <GridItem colSpan={3}><Text fontSize={'sm'} wordBreak={'break-all'}>{item?.component?.version}</Text></GridItem>
+            <GridItem colSpan={3}>
+              <Tag width={'50px'} colorScheme='blue'>
+                <TagLabel mx={'auto'}>{item?.policyRuleViolations?.totalCount || 0}</TagLabel>
+              </Tag>
             </GridItem>
-            <GridItem>
-              <Text fontSize={'sm'}>{updatedValue(item?.operator)}</Text>
-            </GridItem>
-            <GridItem>
-              <Text fontSize={'sm'} hidden={item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'}>{item?.value} {item?.subject === 'VULNERABILITY_EPSS' && (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN') ? ' %' : ''}</Text>
+            <GridItem colSpan={3}>
+              <Tooltip label={'View Violations'}>
+                <IconButton size='sm' icon={<FaEye/>} colorScheme='blue' fontWeight={'medium'} onClick={() => {
+                  setActiveRow(item?.policyRuleViolations)
+                  onOpen()
+                }} />
+              </Tooltip>
             </GridItem>
           </Grid>
-        ))}
+        )) : <GridItem width={'97.5%'} mx={'auto'} colSpan={12} my={6} textAlign={'center'}>There are no records to display</GridItem>}
       </Box>
     )
   }
 
+  const handlePreviousPage = useCallback(async () => {
+    disablePaginationControl()
+    setCurrentPage(currentPage - 1)
+    await refetch({ variables: { sbomId: sbomId, first: undefined, last: totalRows, after: undefined, before: data?.pageInfo?.startCursor }
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+      }
+    })
+  }, [refetch, totalRows, data, currentPage])
+
+  const handleNextPage = useCallback(async () => {
+    disablePaginationControl()
+    setCurrentPage(currentPage + 1)
+    await refetch({ variables: { sbomId: sbomId, first: totalRows, last: undefined, after: data?.pageInfo?.endCursor, before: undefined }
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+      }
+    })
+  }, [refetch, totalRows, data, currentPage])
+
+ 
   useEffect(() => {
     if (data) {
       setIsPrevActive(data?.pageInfo?.hasPreviousPage)
@@ -166,7 +196,13 @@ const PolicyEvalTable = ({ data }) => {
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable columns={columns} data={data?.nodes || []} customStyles={customStyles} progressPending={data ? false : true} progressComponent={<CustomLoader />} subHeader subHeaderComponent={subHeader} persistTableHead responsive={true} expandableRows expandOnRowClicked expandableRowsComponent={ExpandedComponent} />
+
+      {data?.pageInfo && (
+        <Pagination paginationSizes={paginationSizes} pageIndex={currentPage} totalRows={totalRows} totalCount={data?.totalCount} onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} onSetRow={handleSetRow} hasNextPage={isNextActive} hasPreviousPage={isPrevActive} />
+      )}
       </Flex>
+    
+      {isOpen && <ViolationDrawer isOpen={isOpen} onClose={onClose} data={activeRow} />}
     </>
   )
 }

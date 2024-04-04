@@ -238,7 +238,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
             </TabPanel>
             {/* POLICY TABLE */}
             <TabPanel px={0}>
-              <PolicyEvalTable data={policyData?.policyResults} />
+              <PolicyEvalTable data={policyData?.policyResults} refetch={getPolicyData} />
             </TabPanel>
             {/* SUPPORT TABLE */}
             <TabPanel px={0}>

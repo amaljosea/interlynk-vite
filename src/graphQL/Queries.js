@@ -3542,6 +3542,10 @@ export const PolicyResults = gql`
     $before: String
     $first: Int
     $last: Int
+    $vlAfter: String
+    $vlBefore: String
+    $vlFirst: Int
+    $vlLast: Int
   ) {
     policyResults(
       sbomId: $sbomId
@@ -3558,48 +3562,29 @@ export const PolicyResults = gql`
         startCursor
       }
       nodes {
-        createdAt
-        id
-        operator
-        organizationId
-        policyId
-        result
-        resultType
-        sbomId
         updatedAt
         policy {
           name
           description
-          policyRules {
-            operator
-            subject
-            value
-          }
         }
-        policyViolations {
+        result
+        resultType
+        policyViolations(
+          after: $vlAfter
+          before: $vlBefore
+          first: $vlFirst
+          last: $vlLast
+        ) {
           totalCount
+          pageInfo {
+            endCursor
+            hasNextPage
+            hasPreviousPage
+            startCursor
+          }
           nodes {
-            componentId
-            createdAt
-            id
-            updatedAt
             component {
-              copyright
-              cpes
-              description
-              group
-              id
-              internal
-              kind
-              licensesExp
               name
-              primary
-              publisher
-              purl
-              sbomId
-              scope
-              uniqueId
-              updatedAt
               version
             }
             policyRuleViolations {
@@ -3610,58 +3595,12 @@ export const PolicyResults = gql`
                 policyRuleId
                 policyViolationId
                 updatedAt
-                violationId
-                violationType
-                policyRule {
-                  createdAt
-                  id
-                  operator
-                  policyId
-                  subject
-                  updatedAt
-                  value
-                }
                 violation {
-                  ... on ComponentVuln {
-                    actionStmt
-                    cdxResponseId
-                    componentId
-                    detail
-                    fixedIn
-                    impact
-                    isComplete
-                    isFirstDegreePart
-                    isPart
-                    note
-                    sbomId
-                    updatedAt
-                    vexJustificationId
-                    vexStatusId
-                    vulnId
-                  }
-                  ... on Sbom {
-                    createdAt
-                    creationAt
-                    deepPartIds
-                    format
-                    hasConnectedSboms
-                    id
-                    licensesExp
-                    lifecycle
-                    projectId
-                    projectVersion
-                    spec
-                    specVersion
-                    uniqueId
-                    updatedAt
-                    vulnRunStatus
-                  }
                   ... on SbomComponent {
                     copyright
                     cpes
                     description
                     group
-                    compId: id
                     internal
                     kind
                     licensesExp
@@ -3674,6 +3613,51 @@ export const PolicyResults = gql`
                     updatedAt
                     version
                   }
+                  ... on Sbom {
+                    createdAt
+                    creationAt
+                    deepPartIds
+                    format
+                    hasConnectedSboms
+                    licensesExp
+                    lifecycle
+                    projectId
+                    projectVersion
+                    spec
+                    specVersion
+                    uniqueId
+                    updatedAt
+                    vulnRunStatus
+                  }
+                  ... on ComponentVuln {
+                    actionStmt
+                    cdxResponseId
+                    componentId
+                    detail
+                    fixedIn
+                    id
+                    impact
+                    isComplete
+                    isFirstDegreePart
+                    isPart
+                    note
+                    sbomId
+                    updatedAt
+                    vexJustificationId
+                    vexStatusId
+                    vulnId
+                  }
+                }
+                violationId
+                violationType
+                policyRule {
+                  createdAt
+                  id
+                  operator
+                  policyId
+                  subject
+                  updatedAt
+                  value
                 }
               }
             }
