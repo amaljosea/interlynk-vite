@@ -605,7 +605,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
           </GridItem>
           {/* STATUS UPDATE */}
           <GridItem w='100%' colSpan={3}>
-            <VexStatusComponent data={data} fixedVersions={filteredData} />
+            {data && <VexStatusComponent data={data} fixedVersions={filteredData} />}
           </GridItem>
         </Grid>
       </Box>
@@ -700,19 +700,6 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
   }
 
   // ON SELECT ROW
-  const handleSelectRow = (row, bool) => {
-    if (bool === false) {
-      handleRefresh()
-    }
-    const {componentVulnLogs } = row
-    if (componentVulnLogs?.length > 0) {
-      handleSelect(row)
-      setCurrentRow(row)
-    } else {
-      prodVulnDispatch({type:'CLEAR_VEX_STATE'})
-      setCurrentRow(row)
-    }
-  }
 
   useEffect(() => {
     if (data) {
@@ -739,12 +726,9 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
           subHeaderComponent={subHeader}
           responsive={true}
           expandableRows
-          expandableRowExpanded={(row) => (row === currentRow)}
           expandOnRowClicked
-          onRowClicked={(row) => handleSelectRow(row)}
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
-          onRowExpandToggled={(bool, row) => handleSelectRow(row, bool)}
           selectableRows={!signedUrlParams}
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
