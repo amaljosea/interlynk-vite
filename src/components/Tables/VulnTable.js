@@ -708,6 +708,12 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
     }
   }, [data])
 
+  const handleSelectRow = (row, bool) => {
+    if (!bool) {
+      handleRefresh()
+    }
+  }
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
@@ -732,6 +738,7 @@ const VulnTable = ({ data, sbomData, refetch, productId, sbomId, filteredData, f
           selectableRows={!signedUrlParams}
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
+          onRowExpandToggled={(bool, row) => handleSelectRow(row, bool)}
         />
       </Flex>
 
