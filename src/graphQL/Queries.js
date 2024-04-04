@@ -3569,10 +3569,114 @@ export const PolicyResults = gql`
         updatedAt
         policy {
           name
+          description
           policyRules {
             operator
             subject
             value
+          }
+        }
+        policyViolations {
+          totalCount
+          nodes {
+            componentId
+            createdAt
+            id
+            updatedAt
+            component {
+              copyright
+              cpes
+              description
+              group
+              id
+              internal
+              kind
+              licensesExp
+              name
+              primary
+              publisher
+              purl
+              sbomId
+              scope
+              uniqueId
+              updatedAt
+              version
+            }
+            policyRuleViolations {
+              totalCount
+              nodes {
+                createdAt
+                id
+                policyRuleId
+                policyViolationId
+                updatedAt
+                violationId
+                violationType
+                policyRule {
+                  createdAt
+                  id
+                  operator
+                  policyId
+                  subject
+                  updatedAt
+                  value
+                }
+                violation {
+                  ... on ComponentVuln {
+                    actionStmt
+                    cdxResponseId
+                    componentId
+                    detail
+                    fixedIn
+                    impact
+                    isComplete
+                    isFirstDegreePart
+                    isPart
+                    note
+                    sbomId
+                    updatedAt
+                    vexJustificationId
+                    vexStatusId
+                    vulnId
+                  }
+                  ... on Sbom {
+                    createdAt
+                    creationAt
+                    deepPartIds
+                    format
+                    hasConnectedSboms
+                    id
+                    licensesExp
+                    lifecycle
+                    projectId
+                    projectVersion
+                    spec
+                    specVersion
+                    uniqueId
+                    updatedAt
+                    vulnRunStatus
+                  }
+                  ... on SbomComponent {
+                    copyright
+                    cpes
+                    description
+                    group
+                    compId: id
+                    internal
+                    kind
+                    licensesExp
+                    name
+                    primary
+                    publisher
+                    purl
+                    scope
+                    uniqueId
+                    updatedAt
+                    version
+                  }
+                }
+              }
+            }
           }
         }
       }

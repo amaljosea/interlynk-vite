@@ -15,6 +15,7 @@ import { PolicyDelete, PolicyExclusionCreate, DeletePolicyExclusion, DeletePolic
 import RuleModal from 'views/Dashboard/Policies/RuleModal'
 import { useLocation } from 'react-router-dom'
 import WarnModal from 'views/Dashboard/Policies/WarnModal'
+import DeleteModal from 'views/Dashboard/Policies/DeleteModal'
 
 const PolicyTable = ({ data, refetch }) => {
   const toast = useToast()
@@ -54,6 +55,7 @@ const PolicyTable = ({ data, refetch }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {isOpen: isWarningOpen, onOpen: onWarningOpen, onClose: onWarningClose} = useDisclosure()
+  const {isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose} = useDisclosure()
   const { isOpen: isRuleOpen, onOpen: onRuleOpen, onClose: onRuleClose } = useDisclosure()
 
   const handleRefresh = async () => {
@@ -93,24 +95,6 @@ const PolicyTable = ({ data, refetch }) => {
     if (event.key === 'Enter' && filterText !== '') {
       refetch({ variables: { projectId: activeProd || undefined, search: activeProd ? undefined : value, first: totalRows } }).then((res) => res?.data && policyDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value }))
     }
-  }
-
-  const onDeletePolicy = async (id) => {
-    await deletePolicy({
-      variables: { id }
-    }).then((res) => {
-      const errors = res?.data?.policyDelete?.errors
-      if (errors?.length > 0) {
-        toast({
-          description: errors[0],
-          status: 'error',
-          position: 'top',
-          duration: 2000
-        })
-      } else {
-        refetch({ variables: { ...policyData } })
-      }
-    })
   }
 
   const handlePreviousPage = () => {}
@@ -157,9 +141,8 @@ const PolicyTable = ({ data, refetch }) => {
   // SUB HEADER
   const subHeader = useMemo(() => {
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={productId ? 'flex-end' : 'space-between'}>
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         {/* SEARCH COMPONENTS */}
-        {!productId && <SearchFilter id='support' filterText={filterText} onChange={onSearchInputChange} onClear={handleClear} onFilter={handleSearch} />}
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
           <Tooltip label='Create Policy'>
             <IconButton
@@ -178,7 +161,7 @@ const PolicyTable = ({ data, refetch }) => {
         </Stack>
       </Flex>
     )
-  }, [ filterText, onSearchInputChange, handleClear, handleSearch, handleRefresh ])
+  }, [])
 
   // COLUMNS
   const columns = [
@@ -208,7 +191,7 @@ const PolicyTable = ({ data, refetch }) => {
       id: 'CONDITIONS',
       name: 'CONDITIONS',
       selector: (row) => (
-        <Text textTransform={'capitalize'}>{row?.operator}</Text>
+        <Text textTransform={'uppercase'}>{row?.operator}</Text>
       ),
       width: '200px',
       wrap: true
@@ -240,14 +223,14 @@ const PolicyTable = ({ data, refetch }) => {
     },
     // EXCLUSION
     {
-      id: 'EXCLUSION',
-      name: 'EXCLUSION',
+      id: 'APPLY',
+      name: 'APPLY',
       selector: (row) => {
         const { isExcluded, id } = row
         return (
-          <Select size='sm' width={'120px'} value={isExcluded ? 'excluded' : 'included'} onChange={() => isExcluded ? handleDeleteExclusion(id) : handleCreateExclusion(id)} bg={isExcluded ? 'red.200' : 'green.200'} border={'none'} textTransform={'capitalize'} variant={'outline'}
+          <Select size='sm' width={'120px'} value={isExcluded ? 'no' : 'yes'} onChange={() => isExcluded ? handleDeleteExclusion(id) : handleCreateExclusion(id)} bg={isExcluded ? 'red.200' : 'green.200'} border={'none'} textTransform={'capitalize'} variant={'outline'}
           >
-            {['included', 'excluded'].map((itm, index) => (
+            {['yes', 'no'].map((itm, index) => (
               <option key={index} value={itm} style={{textTransform:'capitalize'}}>{itm}</option>
             ))}
           </Select>
@@ -288,7 +271,14 @@ const PolicyTable = ({ data, refetch }) => {
                   Add Policy Rule
                 </MenuItem>
                 {/* DELETE POLICY  */}
-                <MenuItem color='red' onClick={() => onDeletePolicy(row?.id)} hidden={productId}>
+                <MenuItem 
+                  color='red' 
+                  onClick={() => {
+                  setActiveRow(row)
+                  onDeleteOpen()
+                  // onDeletePolicy(row?.id)
+                  }} 
+                  hidden={productId}>
                   Archive Policy
                 </MenuItem>
               </MenuList>
@@ -373,6 +363,7 @@ const PolicyTable = ({ data, refetch }) => {
       )}
 
       {isWarningOpen && <WarnModal isOpen={isWarningOpen} onClose={onWarningClose} data={activeRow} refetch={refetch} />}
+      {isDeleteOpen && <DeleteModal isOpen={isDeleteOpen} onClose={onDeleteClose} data={activeRow} refetch={refetch} />}
     </>
   )
 }

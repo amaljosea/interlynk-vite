@@ -1,6 +1,6 @@
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
-import { Box, Flex, Grid, GridItem, Heading, IconButton, Tag, TagLabel, Text, Tooltip, useToast } from '@chakra-ui/react'
+import { Box, Flex, Grid, GridItem, Heading, IconButton, Stack, Tag, TagLabel, Text, Tooltip, useToast } from '@chakra-ui/react'
 import styled from '@emotion/styled'
 import { getFullDateAndTime, timeSince, customStyles } from 'utils'
 import { useEffect, useMemo, useState } from 'react'
@@ -66,7 +66,15 @@ const PolicyEvalTable = ({ data }) => {
     {
       id: 'POLICY',
       name: 'POLICY',
-      selector: (row) => <Text textTransform={'capitalize'}>{row?.policy?.name}</Text>,
+      selector: (row) => {
+        const {policy} = row
+        return (
+          <Stack direction='column' alignItems={'flex-start'} spacing={1} my={3}>
+            <Text>{policy?.name || ''}</Text>
+            <Text>{policy?.description || ''}</Text>
+          </Stack>
+        )
+      },
       width: '400px',
       wrap: true
     },
@@ -76,28 +84,30 @@ const PolicyEvalTable = ({ data }) => {
       selector: (row) => {
         const {resultType} = row
         return (
-        <Tag colorScheme={resultType === 'inform' ? 'blue' : resultType === 'warn' ? 'orange' : 'red'} textTransform={'capitalize'}>  
-          {resultType}
+        <Tag width={'110px'} colorScheme={resultType === 'inform' ? 'blue' : resultType === 'warn' ? 'orange' : 'red'} textTransform={'uppercase'}>  
+          <TagLabel mx={'auto'} pt={0.5}>{resultType}</TagLabel>
         </Tag>
       )},
       width: '250px',
       wrap: true
     },
-    // EXECUTION
     {
-      id: 'EXECUTION',
-      name: 'EXECUTION',
+      id: 'VIOLATIONS',
+      name: 'VIOLATIONS',
       selector: (row) => {
-        const {result} = row
+        const {policyViolations} = row
         return (
-        <Tag colorScheme='blue' textTransform={'capitalize'}>{result}</Tag>
+        <Tag width={'60px'} colorScheme={policyViolations?.totalCount === 0 ? 'red' : 'blue'}>  
+          <TagLabel mx={'auto'} pt={0.5}>{policyViolations?.totalCount || 0}</TagLabel>
+        </Tag>
       )},
+      width: '250px',
       wrap: true
     },
     // CREATED AT
     {
-      id: 'CHECKED_AT',
-      name: 'CHECKED AT',
+      id: 'LAST_CHECKED',
+      name: 'LAST CHECKED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.createdAt)} placement={'top'}>
           {timeSince(row?.createdAt)}

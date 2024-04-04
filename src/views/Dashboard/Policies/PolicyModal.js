@@ -26,6 +26,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
   const [onUpdateRule] = useMutation(UpdatePolicyRule)
   const [onDeleteRule] = useMutation(DeletePolicyRule)
 
+  const sortedData = subOperators && [...subOperators?.policySubjectOperatorMapping].sort((a, b) => a?.subject?.localeCompare(b?.subject));
 
   const handleRefetch = () => { refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows } }) }
 
@@ -227,7 +228,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
   }
 
   const checkDataValidity = (data) => {
-    console.log('data',data);
     for (let i = 0; i < data.length; i++) {
       const { subject, operator, value, min, max, subError, opError, valError } = data[i];
       if (subject === '' || operator === '' || value === '' || min === '' || max === '' || subError !== '' || opError !== '' || valError !== '') {
@@ -310,9 +310,9 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                   <Grid key={index} gap={4} templateColumns='repeat(12, 1fr)'  alignItems={'flex-start'}>
                     <GridItem colSpan={3}>
                       <FormControl>
-                        <Select size='sm' value={item?.subject} onChange={e => handleChange(e.target.value, item.id, 'subject')} onBlur={() => onSubjectBlur(item)} placeholder="-- Select Subject --" textTransform={'capitalize'} fontSize='sm' onBlurCapture={() => onSubjectBlur(item)}>
-                          {subOperators?.policySubjectOperatorMapping?.map((rule, index) => (
-                            <option key={index} value={rule.subject} style={{textTransform:'capitalize'}}>{rule.category} {rule?.name}</option>
+                        <Select size='sm' value={item?.subject} onChange={e => handleChange(e.target.value, item.id, 'subject')} onBlur={() => onSubjectBlur(item)} placeholder="-- Select Subject --" fontSize='sm' onBlurCapture={() => onSubjectBlur(item)}>
+                          {sortedData?.map((rule, index) => (
+                            <option key={index} value={rule.subject}>{updatedValue(rule?.subject)}</option>
                           ))}
                         </Select>
                         {item?.subError !== '' && <Text mt={1} color={'red.500'} fontSize={'sm'}>{item?.subError}</Text>}
@@ -320,7 +320,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                     </GridItem>
                     <GridItem colSpan={3}>
                       <FormControl>
-                      <Select size='sm' id='operator' name='operator' value={item?.operator} onChange={e => handleChange(e.target.value, item.id, 'operator')} textTransform={'capitalize'} fontSize='sm' placeholder='-- Select Opeator --' onBlur={() => onOperatorBlur(item)}>
+                      <Select size='sm' id='operator' name='operator' value={item?.operator} onChange={e => handleChange(e.target.value, item.id, 'operator')} fontSize='sm' placeholder='-- Select Opeator --' onBlur={() => onOperatorBlur(item)}>
                       {item?.list?.map(option => (
                         <option value={option} key={option}>{updatedValue(option)}</option>
                       ))}
