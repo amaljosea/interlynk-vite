@@ -58,7 +58,7 @@
     "format:all": "prettier -w . && git add -A ."
   },
   "optionalDependencies": {
-    "@babel/core": "7.23.9"
+    "@babel/core": "7.24.4"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
