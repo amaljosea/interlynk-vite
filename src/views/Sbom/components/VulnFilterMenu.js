@@ -106,7 +106,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
       <Menu closeOnSelect={false}>
         <MenuHeading title={'Component'} />
         <MenuList minH={'auto'} maxH={'400px'} overflow={'hidden'} overflowY={'scroll'}>
-          <MenuOptionGroup title='Included' type='radio' value={direct} onChange={onFilterDirect} textAlign={'left'}>
+          <MenuOptionGroup title='Dependency' type='radio' value={direct} onChange={onFilterDirect} textAlign={'left'}>
             {['all','direct only'].map((item, index) =>  <MenuItemOption key={index} value={item} textTransform={'capitalize'} fontSize={'sm'}>{item}</MenuItemOption> )}
           </MenuOptionGroup>
           <MenuDivider />
