@@ -72,15 +72,27 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
 
   const sortedData =
     subOperators &&
-    [...subOperators?.policySubjectOperatorMapping].sort((a, b) =>
+    [...subOperators.policySubjectOperatorMapping].sort((a, b) =>
       a?.subject?.localeCompare(b?.subject)
     )
-  const vulnerability = sortedData?.filter(
-    (item) => item?.category === 'vulnerability'
-  )
-  const component = sortedData?.filter((item) => item?.category === 'component')
-  const license = sortedData?.filter((item) => item?.category === 'license')
-  const version = sortedData?.filter((item) => item?.category === 'version')
+
+  const categories = [...new Set(sortedData?.map((item) => item.category))]
+
+  const optionsByCategory = categories.reduce((acc, category) => {
+    const options = subOperators?.policySubjectOperatorMapping
+      .filter((item) => item.category === category)
+      .map((item) => (
+        <option
+          value={item.subject}
+          key={item?.subject}
+          style={{ textTransform: 'capitalize' }}
+        >
+          {item.category} {item.name}
+        </option>
+      ))
+    acc[category] = options
+    return acc
+  }, {})
 
   const handleRefetch = () => {
     refetch({
@@ -170,7 +182,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
           const result = subOperators?.policySubjectOperatorMapping?.find(
             (item) => item?.subject === value
           )
-          return { ...item, [field]: value, list: [...result?.operators] }
+          return { ...item, [field]: value, list: result?.operators }
         } else if (
           field === 'operator' &&
           (value === 'EXISTS' || value === 'NOT_EXISTS')
@@ -618,50 +630,11 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                             onBlurCapture={() => onSubjectBlur(item)}
                             textTransform={'capitalize'}
                           >
-                            <optgroup label={'Component'}>
-                              {component?.map((item, index) => (
-                                <option
-                                  value={item.subject}
-                                  key={index}
-                                  style={{ textTransform: 'capitalize' }}
-                                >
-                                  {item.category} {item.name}
-                                </option>
-                              ))}
-                            </optgroup>
-                            <optgroup label={'License'}>
-                              {license?.map((item, index) => (
-                                <option
-                                  value={item.subject}
-                                  key={index}
-                                  style={{ textTransform: 'capitalize' }}
-                                >
-                                  {item.category} {item.name}
-                                </option>
-                              ))}
-                            </optgroup>
-                            <optgroup label={'Version'}>
-                              {version?.map((item, index) => (
-                                <option
-                                  value={item.subject}
-                                  key={index}
-                                  style={{ textTransform: 'capitalize' }}
-                                >
-                                  {item.category} {item.name}
-                                </option>
-                              ))}
-                            </optgroup>
-                            <optgroup label={'Vulnerability'}>
-                              {vulnerability?.map((item, index) => (
-                                <option
-                                  value={item.subject}
-                                  key={index}
-                                  style={{ textTransform: 'capitalize' }}
-                                >
-                                  {item.category} {item.name}
-                                </option>
-                              ))}
-                            </optgroup>
+                            {categories.map((category) => (
+                              <optgroup key={category} label={category}>
+                                {optionsByCategory[category]}
+                              </optgroup>
+                            ))}
                           </Select>
                           {item?.subError !== '' && (
                             <Text mt={1} color={'red.500'} fontSize={'sm'}>
