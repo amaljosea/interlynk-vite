@@ -54,6 +54,7 @@ jobs:
         REACT_APP_GRAPHQL_API: https://staging-api.interlynk.io/lynkapi
         REACT_APP_SERVER: https://staging-api.interlynk.io
         REACT_APP_VENDOR_RESET_URL: https://staging-api.interlynk.io/password
+        CI: ""
 
     - name: List build directory contents
       run: ls -la ./build
