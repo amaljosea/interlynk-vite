@@ -58,13 +58,11 @@ const DeleteModal = ({ isOpen, onClose, data, refetch }) => {
         <ModalHeader>Archive Support</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text>Archiving this support will : </Text>
+          <Text>Archiving this entry will: </Text>
           <UnorderedList>
             <Flex flexDir={'column'} gap={1} mt={4}>
               {[
-                `Disable the execution of this support on products`,
-                `Remove results of this support from existing products`,
-                `Remove this support from the list of available supports`
+                `Remove this support detail from existing products`,
               ].map((item, index) => (
                 <ListItem key={index}>{item}</ListItem>
               ))}
