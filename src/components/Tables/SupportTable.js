@@ -11,8 +11,9 @@ import { FaPlus } from 'react-icons/fa6'
 import { FaEllipsisV } from 'react-icons/fa'
 import SupportModal from 'views/Dashboard/Support/SupportModal'
 import { useLocation } from 'react-router-dom'
-import { DeleteCompSupportOverride, UpdateCompSupportOverride } from 'graphQL/Mutation'
+import { UpdateCompSupportOverride } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
+import DeleteModal from 'views/Dashboard/Support/DeleteModal'
 
 const SupportTable = ({ data, refetch }) => {
   const location = useLocation()
@@ -25,6 +26,7 @@ const SupportTable = ({ data, refetch }) => {
   const { supportDispatch } = dispatch
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure()
 
   const paginationSizes = [25, 50, 100]
   const [activeRow, setActiveRow] = useState(null)
@@ -34,7 +36,6 @@ const SupportTable = ({ data, refetch }) => {
 
   const supportData = { search: searchInput === '' ? undefined : searchInput, first: totalRows, field: field, direction: direction }
 
-  const [deleteSupport] = useMutation(DeleteCompSupportOverride)
   const [updateSupport] = useMutation(UpdateCompSupportOverride)
 
   const setPaginationControl = (data) => {
@@ -44,16 +45,7 @@ const SupportTable = ({ data, refetch }) => {
 
   const handleRefetch = async (after, before) => {
     disablePaginationControl()
-    await refetch({
-      variables: {
-        search: searchInput === '' ? undefined : searchInput,
-        first: after ? totalRows : undefined,
-        after: after ? after : undefined,
-        last: before ? totalRows : undefined,
-        before: before ? before : undefined,
-        field: field,
-        direction: direction
-      }
+    await refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: after ? totalRows : undefined, after: after ? after : undefined, last: before ? totalRows : undefined, before: before ? before : undefined, field, direction }
     }).then((res) => {
       if (res?.data) {
         console.log('res', res?.data?.supports)
@@ -72,7 +64,7 @@ const SupportTable = ({ data, refetch }) => {
     if (sbomId) {
       await refetch({ variables: { projectId, sbomId } })
     } else {
-      await refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows, field: field, direction: direction }
+      await refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows, field, direction }
       }).then((res) => res?.data && supportDispatch({ type: 'CLEAR_SEARCH_INPUT' }))
     }
   }
@@ -98,7 +90,7 @@ const SupportTable = ({ data, refetch }) => {
   const handleSearch = async (event) => {
     const { value } = event.target
     if (event.key === 'Enter' && filterText !== '') {
-      refetch({ variables: { search: value, first: totalRows, field: field, direction: direction }
+      refetch({ variables: { search: value, first: totalRows, field, direction }
       }).then((res) => res?.data && supportDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value }) )
     }
   }
@@ -170,10 +162,6 @@ const SupportTable = ({ data, refetch }) => {
     await updateSupport({
       variables: { id: row?.id, enabled: e.target.checked }
     }).then((res) => res?.data && refetch({ variables: {...supportData } }))
-  }
-
-  const onDeleteSupport = async (id) => {
-    await deleteSupport({ variables: { id } }).then((res) => res?.data && refetch({ variables: { ...supportData } }))
   }
 
   // COLUMNS
@@ -287,7 +275,10 @@ const SupportTable = ({ data, refetch }) => {
                   Edit Support
                 </MenuItem>
                 {/* DELETE SUPPORT  */}
-                <MenuItem color='red' onClick={() => onDeleteSupport(row?.id)}>
+                <MenuItem color='red' onClick={() => {
+                  setActiveRow(row)
+                  onDeleteOpen()
+                }}>
                   Archive Support
                 </MenuItem>
               </MenuList>
@@ -320,6 +311,8 @@ const SupportTable = ({ data, refetch }) => {
       </Flex>
 
       {isOpen && <SupportModal data={activeRow} isOpen={isOpen} onClose={onClose} refetch={refetch} />}
+
+      {isDeleteOpen && <DeleteModal data={activeRow} isOpen={isDeleteOpen} onClose={onDeleteClose} refetch={refetch} />}
     </>
   )
 }
