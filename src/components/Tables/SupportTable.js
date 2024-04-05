@@ -310,7 +310,7 @@ const SupportTable = ({ data, refetch }) => {
         )}
       </Flex>
 
-      {isOpen && <SupportModal data={activeRow} isOpen={isOpen} onClose={onClose} refetch={refetch} />}
+      {isOpen && <SupportModal supports={data?.nodes || []} data={activeRow} isOpen={isOpen} onClose={onClose} refetch={refetch} />}
 
       {isDeleteOpen && <DeleteModal data={activeRow} isOpen={isDeleteOpen} onClose={onDeleteClose} refetch={refetch} />}
     </>

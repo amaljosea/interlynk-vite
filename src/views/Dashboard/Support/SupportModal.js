@@ -1,14 +1,15 @@
 import { useMutation } from '@apollo/client'
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, FormLabel, Input, Alert, AlertIcon, AlertDescription, Checkbox, FormErrorMessage, Textarea } from '@chakra-ui/react'
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, FormLabel, Input, Alert, AlertIcon, AlertDescription, Checkbox, FormErrorMessage, HStack, Stack, IconButton, Text } from '@chakra-ui/react'
 import { UpdateCompSupportOverride, CreateCompSupportOverride } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { PackageURL } from 'packageurl-js'
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
+import { FaPlus, FaTrash } from 'react-icons/fa'
 import { validateCpe } from 'utils'
 
-const SupportModal = ({ data, isOpen, onClose, refetch }) => {
+const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
   const { totalRows, supportState } = useGlobalState()
   const { searchInput, field, direction } = supportState
 
@@ -22,12 +23,90 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
   const [isValidEos, setIsValidEos] = useState(true)
   const [deprecated, setDeprecated] = useState(false)
   const [outdated, setOutdated] = useState(false)
+  const [IDs, setIDs] = useState([{id:1, value:'', error:''}])
 
   const [createSupport] = useMutation(CreateCompSupportOverride)
   const [updateSupport] = useMutation(UpdateCompSupportOverride)
 
   const handleRefetch = () => {
     refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows, field: field, direction: direction } })
+  }
+
+  const hasSimilarRow = (data) => {
+    for (let i = 0; i < data.length; i++) {
+      for (let j = i + 1; j < data.length; j++) {
+        if (data[i].value === data[j].value) {
+          return true; // Similar row found
+        }
+      }
+    }
+    return false; // No similar rows found
+  };
+
+  const checkDataValidity = (data) => {
+    for (let i = 0; i < data.length; i++) {
+      const { value, error } = data[i];
+      if (value === '' || error !== '') {
+        return "Error: Some properties are empty";
+      }
+    }
+    return null;
+  }
+
+  const errorMessage = checkDataValidity(IDs)
+
+  const addRow = () => {
+    if(hasSimilarRow(IDs)) {
+      setError(`Field with empty or same values already exists. Please update or remove it before continue.`)
+    } else {
+      setError('')
+      const newId = IDs?.length + 1;
+      setIDs([...IDs, {id:newId, value:'', error:''}]);
+    }
+  };
+
+  const deleteRow = id => {
+    setError('')
+    const newData = IDs?.filter(item => item.id !== id);
+    setIDs(newData);
+  };
+
+  const handleIdChange = (value, id) => {
+    setError('')
+    const newData = IDs.map((item) => {
+      if (item.id === id) {
+        return { ...item, value: value, error: '' }
+      }
+      return item
+    })
+    setIDs(newData)
+  }
+
+  const onIdBlur = (rule) => {
+    const newData = IDs.map(item => {
+      if (item.id === rule?.id) {
+        const {value} = rule
+        if (value?.startsWith(`cpe`)) {
+          const matches = validateCpe(value)
+          if (matches) {
+            return { ...item, value: value, error: '' }
+          } else {
+            return { ...item, value: value, error: 'Please enter a valid CPE' }
+          }
+        } else if (value?.startsWith(`pkg`)) {
+          try {
+            PackageURL.fromString(value)
+            return { ...item, error: '' }
+          } catch (ex) {
+            return { ...item, error: 'Please enter a valid PURL' }
+          }
+        } else {
+          return { ...item, error: 'Invalid entry' }
+        }
+      }
+      return item;
+    });
+    setIDs(newData);
   }
 
   const onUriBlur = () => {
@@ -85,27 +164,30 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
 
   const handleCreate =  (e) => {
     e.preventDefault()
-    if(idUri !== '' && (idUri?.startsWith('pkg') || idUri?.startsWith('cpe'))) {
-      createSupport({
-        variables: { idUri, name: productName, version: productVersion === '' ? undefined : productVersion, eol: eol ? eol : undefined, eos: eos ? eos : undefined, enabled: true, deprecated, outdated }
-      }).then((res) => {
-        const errors = res?.data?.componentSupportOverrideCreate?.errors
-        if (errors?.length > 0) {
-          setError(errors[0])
+    if(IDs?.length > 0) {
+      IDs?.map((item) => {
+        if(item?.value !== '' && item?.error === '' && (item?.value?.startsWith('pkg') || item?.value?.startsWith('cpe'))) {
+          const existingIDs = supports?.some((sp) => item?.value?.startsWith(sp?.idUri))
+          if(existingIDs) {
+            setError('ID already exists')
+          } else {
+            createSupport({ variables: { idUri: item?.value, name: productName, version: productVersion === '' ? undefined : productVersion, eol: eol ? eol : undefined, eos: eos ? eos : undefined, enabled: true, deprecated, outdated }
+            }).then((res) => {
+              const errors = res?.data?.componentSupportOverrideCreate?.errors
+              if (errors?.length > 0) {
+                setError(errors[0])
+              } else {
+                handleRefetch()
+                onClose()
+              }
+            })
+          }
         } else {
-          handleRefetch()
-          setIdUri('')
-          setProductName('')
-          setProductVersion('')
-          setEol(null)
-          setEos(null)
-          setDeprecated(false)
-          setOutdated(false)
-          onClose()
+          setError('Invalid PURL or CPE')
         }
       })
     } else {
-      setError('Invalid PURL or CPE')
+      setError('Please enter atleast one ID')
     }
   }
 
@@ -149,7 +231,7 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal size='lg' isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <form onSubmit={data ? handleUpdate : handleCreate}>
           <ModalContent>
@@ -157,22 +239,6 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
-                {error !== '' && (
-                  <Alert status='error' borderRadius={4}>
-                    <AlertIcon />
-                    <AlertDescription fontSize={'sm'} pr={2}>{error}</AlertDescription>
-                  </Alert>
-                )}
-                <FormControl isRequired>
-                  <FormLabel>PURL / CPE</FormLabel>
-                  <Textarea type='text' value={idUri}
-                    onChange={(e) => {
-                      setIdUri(e.target.value)
-                      setError('')
-                    }}
-                    onBlur={onUriBlur}
-                  />
-                </FormControl>
                 <FormControl isRequired isInvalid={productName !== '' && idUri === productName}>
                   <FormLabel>Product name</FormLabel>
                   <Input type='text' value={productName} onChange={(e) => setProductName(e.target.value)} />
@@ -193,17 +259,55 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
                   <Datetime value={eos} timeFormat={false} onChange={handleEosChange} inputProps={{ onCopy: (e) => e.preventDefault(), onPaste: (e) => e.preventDefault() }} />
                   {!isValidEos && <FormErrorMessage>Please enter a valid expiry date</FormErrorMessage>}
                 </FormControl>
-                <FormControl>
-                  <Checkbox isChecked={deprecated} onChange={(e) => setDeprecated(e.target.checked)}>Deprecated</Checkbox>
-                </FormControl>
-                <FormControl>
-                  <Checkbox isChecked={outdated} onChange={(e) => setOutdated(e.target.checked)}>Outdated</Checkbox>
-                </FormControl>
+                <HStack>
+                  <FormControl>
+                    <Checkbox isChecked={deprecated} onChange={(e) => setDeprecated(e.target.checked)}>Deprecated</Checkbox>
+                  </FormControl>
+                  <FormControl>
+                    <Checkbox isChecked={outdated} onChange={(e) => setOutdated(e.target.checked)}>Outdated</Checkbox>
+                  </FormControl>
+                </HStack>
+                {data ? (
+                  <FormControl isRequired mt={1}>
+                    <FormLabel>PURL / CPE</FormLabel>
+                    <Input type='text' value={idUri}
+                      onChange={(e) => {
+                        setIdUri(e.target.value)
+                        setError('')
+                      }}
+                      onBlur={onUriBlur}
+                    />
+                  </FormControl>
+                  ): (
+                <Stack>
+                  <Flex width={'100%'} my={2} justifyContent={'space-between'} alignItems={'center'}>
+                    <FormControl isRequired>
+                      <FormLabel>IDs</FormLabel>
+                    </FormControl>
+                    <IconButton size='xs' colorScheme='blue' icon={<FaPlus />} onClick={addRow} isDisabled={error !== ''} />
+                  </Flex>
+                  {IDs?.length > 0 && IDs?.map((item) => (
+                    <Flex key={item?.id} width={'100%'} gap={4} justifyContent={'space-between'} alignItems={'flex-start'}>
+                      <FormControl>
+                      <Input fontSize={'sm'} placeholder='Enter PURL / CPE' type='text' alue={item?.value} onChange={(e) => handleIdChange(e.target.value,item.id)} onBlur={() => onIdBlur(item)} />
+                      {item?.error !== '' && <Text mt={1} color={'red.500'} fontSize={'sm'}>{item?.error}</Text>}
+                      </FormControl>
+                      <IconButton ml={'auto'} size='xs' colorScheme='red' icon={<FaTrash />} onClick={() => deleteRow(item?.id)} />
+                    </Flex>
+                  ))}
+                </Stack>
+                )}
+                {error !== '' && (
+                  <Alert status='error' borderRadius={4}>
+                    <AlertIcon />
+                    <AlertDescription fontSize={'sm'} pr={2}>{error}</AlertDescription>
+                  </Alert>
+                )}
               </Flex>
             </ModalBody>
             <ModalFooter>
               <Button colorScheme='gray' mr={3} onClick={onClose}>Cancel</Button>
-              <Button colorScheme='blue' type='submit' disabled={isInvalid}>{data ? 'Update' : 'Save'}</Button>
+              <Button colorScheme='blue' type='submit' isDisabled={data ? isInvalid : (errorMessage || productName === '' || error !== '')}>{data ? 'Update' : 'Save'}</Button>
             </ModalFooter>
           </ModalContent>
         </form>
