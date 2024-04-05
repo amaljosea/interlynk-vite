@@ -1,22 +1,11 @@
 import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
-import {
-  Stack,
-  Text,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  Divider,
-  Grid
-} from '@chakra-ui/react'
+import { Stack, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Divider, Grid, Tag, Flex } from '@chakra-ui/react'
 import { PackageURL } from 'packageurl-js'
 
 const PurlText = ({ children }) => (
-  <Text fontSize='sm' textAlign={'right'} fontWeight={'semibold'}>
+  <Tag width={'130px'} justifyContent={'center'} ml={'auto'} size='sm' variant='subtle' colorScheme={'blue'} wordBreak={'break-all'} py={1} textAlign={'center'} alignItems={'center'}>
     {children}
-  </Text>
+  </Tag>
 )
 
 const PurlCard = ({ value, isOpen, onClose }) => {
@@ -36,51 +25,43 @@ const PurlCard = ({ value, isOpen, onClose }) => {
         <ModalHeader>PURL Details</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          <Text fontWeight={'semibold'} py={2}>
-            {value}
-          </Text>
-          <Divider />
-          <Stack spacing={2} py={3}>
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text fontSize={'sm'}>Type</Text>
-              <PurlText>{purlString(value)?.type || 'Unknown'}</PurlText>
-            </Grid>
+          <Stack spacing={1}>
+            <Tag justifyContent={'center'} alignItems={'center'} fontSize={'sm'} py={2} wordBreak={'break-all'}>
+              {value}
+            </Tag>
             <Divider />
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text fontSize={'sm'}>Namespace</Text>
-              <PurlText>{purlString()?.namespace || 'Unknown'}</PurlText>
-            </Grid>
-            <Divider />
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text fontSize={'sm'}>Package Name</Text>
-              <PurlText>{purlString()?.name || 'Unknown'}</PurlText>
-            </Grid>
-            <Divider />
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text fontSize={'sm'}>Package Version</Text>
-              <PurlText>{purlString()?.version || 'Unknown'}</PurlText>
-            </Grid>
-            <Divider />
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text fontSize={'sm'}>Qualifiers</Text>
-              <PurlText>
-                {purlString()?.qualifiers
-                  ? JSON.stringify(purlString()?.qualifiers)
-                  : 'Unknown'}
-              </PurlText>
-            </Grid>
-            <Divider />
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text fontSize={'sm'}>Validity</Text>
-              <PurlText>
-                {purlString() ? (
-                  <CheckCircleIcon color={'green.500'} />
-                ) : (
-                  <WarningIcon color={'red.500'} />
-                )}
-              </PurlText>
-            </Grid>
-          </Stack>
+            <Stack spacing={2} py={3}>
+              <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+                <Text fontSize={'sm'}>Type</Text>
+                {purlString(value)?.type && <PurlText>{purlString(value)?.type}</PurlText>}
+              </Grid>
+              <Divider />
+              <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+                <Text fontSize={'sm'}>Namespace</Text>
+                {purlString(value)?.namespace && <PurlText>{purlString(value)?.namespace}</PurlText>}
+              </Grid>
+              <Divider />
+              <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+                <Text fontSize={'sm'}>Package Name</Text>
+                {purlString()?.name && <PurlText>{purlString()?.name}</PurlText>}
+              </Grid>
+              <Divider />
+              <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+                <Text fontSize={'sm'}>Package Version</Text>
+                {purlString()?.version && <PurlText>{purlString()?.version}</PurlText>}
+              </Grid>
+              <Divider />
+              <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+                <Text fontSize={'sm'}>Qualifiers</Text>
+                {purlString()?.qualifiers && <PurlText>{JSON.stringify(purlString()?.qualifiers)}</PurlText>}
+              </Grid>
+              <Divider />
+              <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+                <Text fontSize={'sm'}>Validity</Text>
+                <Flex alignItems={'flex-end'} justifyContent={'flex-end'}>{purlString() ? <CheckCircleIcon color={'green.500'} /> : <WarningIcon color={'red.500'} />}</Flex>
+              </Grid>
+            </Stack>
+            </Stack>
         </ModalBody>
       </ModalContent>
     </Modal>
