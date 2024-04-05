@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, Input, Alert, AlertIcon, AlertDescription, Select, Grid, GridItem, IconButton, Text, Heading, InputLeftAddon, InputGroup, InputRightAddon, Box, Stack, Textarea, Tag } from '@chakra-ui/react'
-import { DeletePolicyRule, CreatePolicyRule, UpdatePolicyRule, PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, Input, Alert, AlertIcon, AlertDescription, Select, Grid, GridItem, IconButton, Text, Heading, InputLeftAddon, InputGroup, InputRightAddon, Box, Stack, Textarea } from '@chakra-ui/react'
+import { PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useState } from 'react'
@@ -22,11 +22,12 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
   const { data: subOperators } = useQuery(PolicySubjectOperators, { fetchPolicy: 'network-only' })
   const [createPolicy] = useMutation(PolicyCreate)
   const [updatePolicy] = useMutation(PolicyUpdate)
-  const [onCreateRule] = useMutation(CreatePolicyRule)
-  const [onUpdateRule] = useMutation(UpdatePolicyRule)
-  const [onDeleteRule] = useMutation(DeletePolicyRule)
 
   const sortedData = subOperators && [...subOperators?.policySubjectOperatorMapping].sort((a, b) => a?.subject?.localeCompare(b?.subject));
+  const vulnerability = sortedData?.filter((item) => item?.category === 'vulnerability')
+  const component = sortedData?.filter((item) => item?.category === 'component')
+  const license = sortedData?.filter((item) => item?.category === 'license')
+  const version = sortedData?.filter((item) => item?.category === 'version')
 
   const handleRefetch = () => { refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows } }) }
 
@@ -68,7 +69,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
 
   const addRow = () => {
     if(hasSimilarRow(conditions)) {
-      setError(`A row with the same values already exists. Please update or remove it before continue.`)
+      setError(`A row with the empty or same values already exists. Please update or remove it before continue.`)
     } else {
       setError('')
       const newId = conditions?.length + 1;
@@ -243,7 +244,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
 
   useEffect(() => {
     if (data && subOperators) {
-      console.log(data);
       setName(data?.name || '')
       setDesc(data?.description || '')
       setOperator(data?.operator === 'any' ? 'ANY' : data?.operator === 'all' ? 'ALL' : '')
@@ -310,10 +310,35 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                   <Grid key={index} gap={4} templateColumns='repeat(12, 1fr)'  alignItems={'flex-start'}>
                     <GridItem colSpan={3}>
                       <FormControl>
-                        <Select size='sm' value={item?.subject} onChange={e => handleChange(e.target.value, item.id, 'subject')} onBlur={() => onSubjectBlur(item)} placeholder="-- Select Subject --" fontSize='sm' onBlurCapture={() => onSubjectBlur(item)}>
-                          {sortedData?.map((rule, index) => (
-                            <option key={index} value={rule.subject}>{updatedValue(rule?.subject)}</option>
-                          ))}
+                        <Select size='sm' value={item?.subject} onChange={e => handleChange(e.target.value, item.id, 'subject')} onBlur={() => onSubjectBlur(item)} placeholder="-- Select Subject --" fontSize='sm' onBlurCapture={() => onSubjectBlur(item)} textTransform={'capitalize'}>
+                          <optgroup label={'Component'}>
+                            {component?.map((item, index) => (
+                              <option value={item.subject} key={index} style={{textTransform:'capitalize'}}>
+                                {item.category} {item.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                          <optgroup label={'License'}>
+                            {license?.map((item, index) => (
+                              <option value={item.subject} key={index} style={{textTransform:'capitalize'}}>
+                                {item.category} {item.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                          <optgroup label={'Version'}>
+                            {version?.map((item, index) => (
+                              <option value={item.subject} key={index} style={{textTransform:'capitalize'}}>
+                                {item.category} {item.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                          <optgroup label={'Vulnerability'}>
+                            {vulnerability?.map((item, index) => (
+                              <option value={item.subject} key={index} style={{textTransform:'capitalize'}}>
+                                {item.category} {item.name}
+                              </option>
+                            ))}
+                          </optgroup>
                         </Select>
                         {item?.subError !== '' && <Text mt={1} color={'red.500'} fontSize={'sm'}>{item?.subError}</Text>}
                       </FormControl>

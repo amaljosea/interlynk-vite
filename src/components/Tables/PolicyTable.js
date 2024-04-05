@@ -320,9 +320,9 @@ const PolicyTable = ({ data, refetch }) => {
           <GridItem><CustomText>value</CustomText></GridItem>
         </Grid>
         {policyRules?.map((item, index) => (
-          <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={1} mx={'auto'} bg={'#EDF2F7'} p={2}>
+          <Grid key={index} width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={1} mx={'auto'} bg={'#EDF2F7'} p={2}>
             <GridItem>
-              <Text fontSize={'sm'}>{updatedValue(item?.subject)}</Text>
+              <Text fontSize={'sm'} textTransform={'capitalize'}>{updatedValue(item?.subject)}</Text>
             </GridItem>
             <GridItem>
               <Text fontSize={'sm'}>{updatedValue(item?.operator)}</Text>
