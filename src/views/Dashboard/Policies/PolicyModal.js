@@ -656,9 +656,14 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
                             fontSize='sm'
                             placeholder='-- Select Opeator --'
                             onBlur={() => onOperatorBlur(item)}
+                            textTransform={'lowercase'}
                           >
                             {item?.list?.map((option) => (
-                              <option value={option} key={option}>
+                              <option
+                                value={option}
+                                key={option}
+                                style={{ textTransform: 'lowercase' }}
+                              >
                                 {updatedValue(option)}
                               </option>
                             ))}

@@ -496,7 +496,9 @@ const PolicyTable = ({ data, refetch }) => {
               </Text>
             </GridItem>
             <GridItem>
-              <Text fontSize={'sm'}>{updatedValue(item?.operator)}</Text>
+              <Text fontSize={'sm'} textTransform={'lowercase'}>
+                {updatedValue(item?.operator)}
+              </Text>
             </GridItem>
             <GridItem>
               <Text
