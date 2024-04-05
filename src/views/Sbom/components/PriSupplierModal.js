@@ -1,10 +1,34 @@
 import { useMutation } from '@apollo/client'
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, FormLabel, Input, FormErrorMessage, Stack, Text } from '@chakra-ui/react'
-import { CreateAutomation, recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
-import { useGlobalState } from 'hooks/useGlobalState'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { validateUrl, validateEmail } from 'utils'
+import { validateEmail, validateUrl } from 'utils'
+
+import {
+  Button,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
+  Text
+} from '@chakra-ui/react'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import {
+  CreateAutomation,
+  recheckHealth,
+  supplierCreate,
+  supplierUpdate
+} from 'graphQL/Mutation'
 
 const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   const location = useLocation()
@@ -53,13 +77,23 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
     setIsValidUrl('')
   }
 
-  const isInvalid = (supName === '' && supEmail === '' && orgName === '' && orgUrl === '') || supplierError !== ''  || (supEmail !== '' && !validateEmail(supEmail)) || (orgUrl !== '' && !validateUrl(orgUrl))
+  const isInvalid =
+    (supName === '' && supEmail === '' && orgName === '' && orgUrl === '') ||
+    supplierError !== '' ||
+    (supEmail !== '' && !validateEmail(supEmail)) ||
+    (orgUrl !== '' && !validateUrl(orgUrl))
 
   const handleRefetch = () => refetch({ productId: productId, sbomId: sbomId })
 
-  const [createSupplier] = useMutation(supplierCreate, {onCompleted: () => handleRefetch()})
-  const [updateSupplier] = useMutation(supplierUpdate, {onCompleted: () => handleRefetch()})
-  const [healthRecheck] = useMutation(recheckHealth, {onCompleted: () => refetch()})
+  const [createSupplier] = useMutation(supplierCreate, {
+    onCompleted: () => handleRefetch()
+  })
+  const [updateSupplier] = useMutation(supplierUpdate, {
+    onCompleted: () => handleRefetch()
+  })
+  const [healthRecheck] = useMutation(recheckHealth, {
+    onCompleted: () => refetch()
+  })
   const [createAutoCheck] = useMutation(CreateAutomation)
 
   useEffect(() => {
@@ -72,17 +106,33 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   }, [suppliers])
 
   const handleSave = async () => {
-    await createSupplier({ variables: { name: orgName, url: orgUrl, contactName: supName, contactEmail: supEmail, sbomId: sbomId }}).then((res) => {
-      if (checkId) {
-        prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        healthRecheck({variables: { sbomId: sbomId, checkId: checkId }})
+    await createSupplier({
+      variables: {
+        name: orgName,
+        url: orgUrl,
+        contactName: supName,
+        contactEmail: supEmail,
+        sbomId: sbomId
       }
-    }).finally(() => onClose())
+    })
+      .then((res) => {
+        if (checkId) {
+          prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
+          healthRecheck({ variables: { sbomId: sbomId, checkId: checkId } })
+        }
+      })
+      .finally(() => onClose())
   }
 
   const handleUpdate = async () => {
     await updateSupplier({
-      variables: { name: orgName, url: orgUrl, contactName: supName, contactEmail: supEmail, id: suppliers[0].id }
+      variables: {
+        name: orgName,
+        url: orgUrl,
+        contactName: supName,
+        contactEmail: supEmail,
+        id: suppliers[0].id
+      }
     }).then((res) => res.data && onClose())
   }
 
@@ -95,7 +145,11 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
           condition: 'missing',
           attr: 'supplier',
           enabled: true,
-          set: JSON.stringify({ name: supName, contact_email: supEmail },null,2)
+          set: JSON.stringify(
+            { name: supName, contact_email: supEmail },
+            null,
+            2
+          )
         }
       }).then((res) => res.data && handleSave())
     } catch (error) {
@@ -115,22 +169,41 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
               {/* ORG NAME */}
               <FormControl>
                 <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
-                <Input placeholder='Enter organization name' value={orgName} onChange={(e) => setOrgName(e.target.value)} />
+                <Input
+                  placeholder='Enter organization name'
+                  value={orgName}
+                  onChange={(e) => setOrgName(e.target.value)}
+                />
               </FormControl>
               {/* ORG URL */}
-              <FormControl isInvalid={(orgUrl !== '' && !validateUrl(orgUrl)) || containsSpace}>
+              <FormControl
+                isInvalid={
+                  (orgUrl !== '' && !validateUrl(orgUrl)) || containsSpace
+                }
+              >
                 <FormLabel fontSize={'sm'}>URL</FormLabel>
-                <Input placeholder='Enter URL' value={orgUrl} onBlur={handleCheckUrl} onChange={onUrlChange} />
+                <Input
+                  placeholder='Enter URL'
+                  value={orgUrl}
+                  onBlur={handleCheckUrl}
+                  onChange={onUrlChange}
+                />
                 <FormErrorMessage>{isValidUrl}</FormErrorMessage>
               </FormControl>
               {/* SUPPLIER NAME */}
               <FormControl isInvalid={supplierError}>
                 <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
-                <Input placeholder='Enter supplier name' value={supName} onChange={onSupplierChange} />
+                <Input
+                  placeholder='Enter supplier name'
+                  value={supName}
+                  onChange={onSupplierChange}
+                />
                 <FormErrorMessage>{supplierError}</FormErrorMessage>
               </FormControl>
               {/* SUPPLIER EMAIL */}
-              <FormControl isInvalid={supEmail !== '' && !validateEmail(supEmail)}>
+              <FormControl
+                isInvalid={supEmail !== '' && !validateEmail(supEmail)}
+              >
                 <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
                 <Input
                   placeholder='Enter supplier email'
@@ -146,20 +219,43 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
             </Flex>
           </ModalBody>
           <ModalFooter>
-            <Flex width={'100%'} justifyContent={'space-between'} alignItems={'center'}>
+            <Flex
+              width={'100%'}
+              justifyContent={'space-between'}
+              alignItems={'center'}
+            >
               {checkId ? (
-                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule} disabled={isInvalid}>
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  onClick={onSaveRule}
+                  disabled={isInvalid}
+                >
                   Save Rule
                 </Button>
               ) : (
                 <Text></Text>
               )}
               <Stack direction={'row'} spacing={2} alignItems={'center'}>
-                <Button colorScheme='gray' mr={3} onClick={onClose}>Cancel</Button>
+                <Button colorScheme='gray' mr={3} onClick={onClose}>
+                  Cancel
+                </Button>
                 {suppliers && suppliers.length > 0 ? (
-                  <Button colorScheme='blue' onClick={handleUpdate} disabled={isInvalid}>Update</Button>
+                  <Button
+                    colorScheme='blue'
+                    onClick={handleUpdate}
+                    disabled={isInvalid}
+                  >
+                    Update
+                  </Button>
                 ) : (
-                  <Button colorScheme='blue' onClick={handleSave} disabled={isInvalid}>Save</Button>
+                  <Button
+                    colorScheme='blue'
+                    onClick={handleSave}
+                    disabled={isInvalid}
+                  >
+                    Save
+                  </Button>
                 )}
               </Stack>
             </Flex>

@@ -1,17 +1,67 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
-import { Button, Flex, HStack, IconButton, Menu, MenuButton, MenuItem, MenuItemOption, MenuList, MenuOptionGroup, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Portal, Stack, Text, Tooltip, useDisclosure, FormControl, FormLabel, Select, Tag, TagLabel, UnorderedList, ListItem, Alert, AlertIcon, AlertDescription } from '@chakra-ui/react'
 import { useMemo, useRef, useState } from 'react'
+import DataTable from 'react-data-table-component'
+import { Link, useLocation, useParams } from 'react-router-dom'
+import {
+  capitalizeFirstLetter,
+  customStyles,
+  envOrderList,
+  isDefaultEnv,
+  parseJSONSafely
+} from 'utils'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
+
+import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Button,
+  Flex,
+  FormControl,
+  FormLabel,
+  HStack,
+  IconButton,
+  ListItem,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Portal,
+  Select,
+  Stack,
+  Tag,
+  TagLabel,
+  Text,
+  Tooltip,
+  UnorderedList,
+  useDisclosure
+} from '@chakra-ui/react'
+
 import CustomLoader from 'components/CustomLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
-import { SbomPartDelete, SbomPartCreate } from 'graphQL/Mutation'
-import { GetProjectGroups, GetProject, GetSbomParts, GetProductData, CheckDeepParts} from 'graphQL/Queries'
+
 import { useGlobalState } from 'hooks/useGlobalState'
-import DataTable from 'react-data-table-component'
+
+import { SbomPartCreate, SbomPartDelete } from 'graphQL/Mutation'
+import {
+  CheckDeepParts,
+  GetProductData,
+  GetProject,
+  GetProjectGroups,
+  GetSbomParts
+} from 'graphQL/Queries'
+
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
-import { useLocation, Link, useParams } from 'react-router-dom'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { isDefaultEnv, envOrderList, customStyles, capitalizeFirstLetter, parseJSONSafely } from 'utils'
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const location = useLocation()
@@ -39,17 +89,42 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   })()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const filterData = data?.length > 0 && data?.filter((item) => item?.part?.id !== currentSbom?.id && item?.part?.id !== subProduct?.sbomId && item?.part?.id !== subProduct?.childOne?.sbomId && item?.part?.id !== subProduct?.childTwo?.sbomId && item?.part?.id !== subProduct?.childThree?.sbomId && item?.part?.id !== subProduct?.childFour?.sbomId)
+  const filterData =
+    data?.length > 0 &&
+    data?.filter(
+      (item) =>
+        item?.part?.id !== currentSbom?.id &&
+        item?.part?.id !== subProduct?.sbomId &&
+        item?.part?.id !== subProduct?.childOne?.sbomId &&
+        item?.part?.id !== subProduct?.childTwo?.sbomId &&
+        item?.part?.id !== subProduct?.childThree?.sbomId &&
+        item?.part?.id !== subProduct?.childFour?.sbomId
+    )
 
-  const { setActiveProdTab, totalRows, prodState, prodCompState, prodVulnState, userPermissions, dispatch } = useGlobalState()
+  const {
+    setActiveProdTab,
+    totalRows,
+    prodState,
+    prodCompState,
+    prodVulnState,
+    userPermissions,
+    dispatch
+  } = useGlobalState()
   const { enabled, field, direction } = prodState
   const { prodVulnDispatch } = dispatch
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const updateSboms = sboms?.supersededBy?.some((permission) => permission.key === 'update_sbom' && permission.value === true)
+  const updateSboms = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_sbom' && permission.value === true
+  )
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure()
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
 
   const addBtn = useRef()
   const [selectedProd, setSelectedProd] = useState('')
@@ -61,7 +136,12 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const [newPartExists, setNewPartExists] = useState(false)
 
   const { data: allProjects } = useQuery(GetProjectGroups, {
-    variables: { first: totalRows, enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined, field: field, direction: direction }
+    variables: {
+      first: totalRows,
+      enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
+      field: field,
+      direction: direction
+    }
   })
 
   const { refetch: sbomRefetch } = useQuery(GetProductData, {
@@ -84,9 +164,13 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     onCompleted: (data) => console.log('Deep parts', data)
   })
 
-  const isExists = partsData?.sbom?.sbomParts?.some((item) => item?.part?.project?.id === prodId && item?.part?.id === sbomId)
+  const isExists = partsData?.sbom?.sbomParts?.some(
+    (item) => item?.part?.project?.id === prodId && item?.part?.id === sbomId
+  )
 
-  const existingNodes = deep?.sbom?.deepParts?.some((item) => item?.id === sbomId)
+  const existingNodes = deep?.sbom?.deepParts?.some(
+    (item) => item?.id === sbomId
+  )
 
   const [createSbomPart] = useMutation(SbomPartCreate)
   const [deleteSbomPart] = useMutation(SbomPartDelete)
@@ -131,7 +215,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       .finally(() => onDeleteClose())
   }
 
-  const [getProduct] = useLazyQuery(GetProject, { skip: signedUrlParams ? true : false })
+  const [getProduct] = useLazyQuery(GetProject, {
+    skip: signedUrlParams ? true : false
+  })
 
   const handleSelectGroup = (e) => {
     const { value } = e.target
@@ -139,13 +225,19 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       setSelectedGroup(value)
       setSelectedProd('')
       setSelectedVersion('')
-      const activeGroup = allProjects && allProjects?.organization?.projectGroups?.nodes.find((item) => item.id === value)
-      const productList = activeGroup && activeGroup.projects
-        .filter((item) => item.enabled === true)
-        .map((option) => ({
-          value: option.id,
-          label: option.name
-        }))
+      const activeGroup =
+        allProjects &&
+        allProjects?.organization?.projectGroups?.nodes.find(
+          (item) => item.id === value
+        )
+      const productList =
+        activeGroup &&
+        activeGroup.projects
+          .filter((item) => item.enabled === true)
+          .map((option) => ({
+            value: option.id,
+            label: option.name
+          }))
       setEnvList(productList)
     } else {
       setSelectedGroup('')
@@ -168,34 +260,69 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     }
   }
 
-  const activeGroup = allProjects && allProjects?.organization?.projectGroups?.nodes.find((item) => item.id === selectedGroup)
+  const activeGroup =
+    allProjects &&
+    allProjects?.organization?.projectGroups?.nodes.find(
+      (item) => item.id === selectedGroup
+    )
 
-  const product = activeGroup?.projects?.find((item) => item.id === selectedProd)
+  const product = activeGroup?.projects?.find(
+    (item) => item.id === selectedProd
+  )
 
   const existingVersions = []
 
-  data?.map((item) => existingVersions.push({ group: item?.part?.project?.projectGroup?.name, env: item?.part?.project?.name, version: item?.part?.projectVersion }) )
+  data?.map((item) =>
+    existingVersions.push({
+      group: item?.part?.project?.projectGroup?.name,
+      env: item?.part?.project?.name,
+      version: item?.part?.projectVersion
+    })
+  )
 
   const sbomVersions = []
 
-  product?.sboms?.length > 0 && product.sboms.map((project) => {
-    const myProduct = { group: product?.projectGroup?.name, env: product?.name, version: project?.projectVersion}
-    const isVersionIncluded = existingVersions?.some((item) => JSON.stringify(item) === JSON.stringify(myProduct))
-    if (!isVersionIncluded) {
-      sbomVersions.push({ label: project?.projectVersion, value: project?.id, creationAt: project?.createdAt})
-    }
-  })
+  product?.sboms?.length > 0 &&
+    product.sboms.map((project) => {
+      const myProduct = {
+        group: product?.projectGroup?.name,
+        env: product?.name,
+        version: project?.projectVersion
+      }
+      const isVersionIncluded = existingVersions?.some(
+        (item) => JSON.stringify(item) === JSON.stringify(myProduct)
+      )
+      if (!isVersionIncluded) {
+        sbomVersions.push({
+          label: project?.projectVersion,
+          value: project?.id,
+          creationAt: project?.createdAt
+        })
+      }
+    })
 
   const getComponents = () => {
     localStorage.setItem('activeSbomTab', 2)
     getCompData({
-      variables: { projectId: prodId, sbomId: sbomId, first: totalRows, field: prodCompState.field, direction: prodCompState.direction }
+      variables: {
+        projectId: prodId,
+        sbomId: sbomId,
+        first: totalRows,
+        field: prodCompState.field,
+        direction: prodCompState.direction
+      }
     })
   }
 
   const onFilterSev = async (value) => {
-    await getVulnData({ projectId: prodId, sbomId: sbomId, severity: value, first: totalRows, field: prodVulnState.field, direction: prodVulnState.direction })
-    .then((res) => {
+    await getVulnData({
+      projectId: prodId,
+      sbomId: sbomId,
+      severity: value,
+      first: totalRows,
+      field: prodVulnState.field,
+      direction: prodVulnState.direction
+    }).then((res) => {
       if (res.data) {
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
         localStorage.setItem('activeSbomTab', 3)
@@ -208,19 +335,77 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     localStorage.setItem('activeSbomTab', 0)
     const { id, project, projectVersion } = part
     const { projectGroup } = project
-    if ( subProduct?.name && !subProduct?.childOne && !subProduct?.childTwo && !subProduct?.childThree && !subProduct?.childFour ) {
-      localStorage.setItem('subProduct', JSON.stringify({...subProduct, childOne: { name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id } }))
+    if (
+      subProduct?.name &&
+      !subProduct?.childOne &&
+      !subProduct?.childTwo &&
+      !subProduct?.childThree &&
+      !subProduct?.childFour
+    ) {
+      localStorage.setItem(
+        'subProduct',
+        JSON.stringify({
+          ...subProduct,
+          childOne: {
+            name: projectGroup?.name,
+            version: projectVersion,
+            projectId: project?.id,
+            sbomId: id
+          }
+        })
+      )
     } else {
-      localStorage.setItem( 'subProduct', JSON.stringify({ name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id }) )
+      localStorage.setItem(
+        'subProduct',
+        JSON.stringify({
+          name: projectGroup?.name,
+          version: projectVersion,
+          projectId: project?.id,
+          sbomId: id
+        })
+      )
     }
     if (subProduct?.childOne?.name) {
-      localStorage.setItem( 'subProduct', JSON.stringify({ ...subProduct, childTwo: { name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id } }))
+      localStorage.setItem(
+        'subProduct',
+        JSON.stringify({
+          ...subProduct,
+          childTwo: {
+            name: projectGroup?.name,
+            version: projectVersion,
+            projectId: project?.id,
+            sbomId: id
+          }
+        })
+      )
     }
     if (subProduct?.childTwo?.name) {
-      localStorage.setItem( 'subProduct', JSON.stringify({ ...subProduct, childThree: { name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id } }))
+      localStorage.setItem(
+        'subProduct',
+        JSON.stringify({
+          ...subProduct,
+          childThree: {
+            name: projectGroup?.name,
+            version: projectVersion,
+            projectId: project?.id,
+            sbomId: id
+          }
+        })
+      )
     }
     if (subProduct?.childThree?.name) {
-      localStorage.setItem( 'subProduct', JSON.stringify({ ...subProduct, childFour: { name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id } }))
+      localStorage.setItem(
+        'subProduct',
+        JSON.stringify({
+          ...subProduct,
+          childFour: {
+            name: projectGroup?.name,
+            version: projectVersion,
+            projectId: project?.id,
+            sbomId: id
+          }
+        })
+      )
     }
     setActiveProdTab(0)
   }
@@ -233,8 +418,15 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Link to={`/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}>
-            <Text color={'blue.500'} minWidth='100%' fontSize={14} onClick={() => onSelectPart(part)}>
+          <Link
+            to={`/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
+          >
+            <Text
+              color={'blue.500'}
+              minWidth='100%'
+              fontSize={14}
+              onClick={() => onSelectPart(part)}
+            >
               {part.project.projectGroup.name}
             </Text>
           </Link>
@@ -249,7 +441,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Text fontSize={14} my={2}>{part?.projectVersion}</Text>
+          <Text fontSize={14} my={2}>
+            {part?.projectVersion}
+          </Text>
         )
       },
       width: '200px',
@@ -265,9 +459,21 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
           <>
             {part.suppliers.length > 0 &&
               part.suppliers.map((item, index) => (
-                <Tooltip label={`${item.contactName} ${item.contactEmail && `- ${item.contactEmail}`}`} placement='top' >
-                  <Tag size={'md'} key={index} fontSize={14} variant='subtle' colorScheme='orange'>
-                    <TagLabel>{item.contactName || ''}{item.contactEmail && ` - ${item.contactEmail}`}</TagLabel>
+                <Tooltip
+                  label={`${item.contactName} ${item.contactEmail && `- ${item.contactEmail}`}`}
+                  placement='top'
+                >
+                  <Tag
+                    size={'md'}
+                    key={index}
+                    fontSize={14}
+                    variant='subtle'
+                    colorScheme='orange'
+                  >
+                    <TagLabel>
+                      {item.contactName || ''}
+                      {item.contactEmail && ` - ${item.contactEmail}`}
+                    </TagLabel>
                   </Tag>
                 </Tooltip>
               ))}
@@ -281,8 +487,17 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Link to={`/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`} onClick={getComponents}>
-            <Tag size='md' variant='subtle' width={16} colorScheme={'blue'} cursor={'pointer'}>
+          <Link
+            to={`/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
+            onClick={getComponents}
+          >
+            <Tag
+              size='md'
+              variant='subtle'
+              width={16}
+              colorScheme={'blue'}
+              cursor={'pointer'}
+            >
               <TagLabel mx={'auto'}>{part.stats.compCount}</TagLabel>
             </Tag>
           </Link>
@@ -312,27 +527,47 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
             <Link to={link}>
-              <VulnBadge color='red' label='Critical' onClick={() => onFilterSev(['critical'])} >
+              <VulnBadge
+                color='red'
+                label='Critical'
+                onClick={() => onFilterSev(['critical'])}
+              >
                 {part?.stats?.vulnStats?.critical || 0}
               </VulnBadge>
             </Link>
             <Link to={link}>
-              <VulnBadge color='orange' label='High' onClick={() => onFilterSev(['high'])} >
+              <VulnBadge
+                color='orange'
+                label='High'
+                onClick={() => onFilterSev(['high'])}
+              >
                 {part?.stats?.vulnStats?.high || 0}
               </VulnBadge>
             </Link>
             <Link to={link}>
-              <VulnBadge color='yellow' label='Medium' onClick={() => onFilterSev(['medium'])} >
+              <VulnBadge
+                color='yellow'
+                label='Medium'
+                onClick={() => onFilterSev(['medium'])}
+              >
                 {part?.stats?.vulnStats?.medium || 0}
               </VulnBadge>
             </Link>
             <Link to={link}>
-              <VulnBadge color='green' label='Low' onClick={() => onFilterSev(['low'])} >
+              <VulnBadge
+                color='green'
+                label='Low'
+                onClick={() => onFilterSev(['low'])}
+              >
                 {part?.stats?.vulnStats?.low || 0}
               </VulnBadge>
             </Link>
             <Link to={link}>
-              <VulnBadge color='gray' label='Unknown' onClick={() => onFilterSev(['unknown'])} >
+              <VulnBadge
+                color='gray'
+                label='Unknown'
+                onClick={() => onFilterSev(['unknown'])}
+              >
                 {part?.stats?.vulnStats?.unknown || 0}
               </VulnBadge>
             </Link>
@@ -359,7 +594,12 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         return (
           <Menu>
-            <MenuButton as={IconButton} icon={<FaEllipsisV />} variant='none' color='gray.400' />
+            <MenuButton
+              as={IconButton}
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+            />
             <Portal>
               <MenuList size='sm'>
                 <MenuItem
@@ -395,20 +635,44 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   // SUB HEADER
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'}>
-        <Stack width={'100%'} direction={'row'} spacing={2} alignItems={'flex-start'} justifyContent={'flex-end'}>
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
+        <Stack
+          width={'100%'}
+          direction={'row'}
+          spacing={2}
+          alignItems={'flex-start'}
+          justifyContent={'flex-end'}
+        >
           <HStack spacing={4} display={'none'}>
             {/* SEARCH COMPONENTS */}
-            <SearchFilter id='team' filterText={searchInput} setFilterText={setSearchInput} onFilter={handleSearch} onClear={handleClear} />
+            <SearchFilter
+              id='team'
+              filterText={searchInput}
+              setFilterText={setSearchInput}
+              onFilter={handleSearch}
+              onClear={handleClear}
+            />
             {/* FILTER */}
             <Menu closeOnSelect={true}>
-              <MenuButton as={Button} colorScheme='blue' fontWeight='normal' fontSize={'sm'} leftIcon={<FaFilter size={14} />} >
+              <MenuButton
+                as={Button}
+                colorScheme='blue'
+                fontWeight='normal'
+                fontSize={'sm'}
+                leftIcon={<FaFilter size={14} />}
+              >
                 Supplier
               </MenuButton>
               <MenuList>
                 <MenuOptionGroup type='checkbox'>
                   {['Interlynk', 'Biotronik', 'Oracle'].map((item, index) => (
-                    <MenuItemOption key={index} value={item} fontSize={'sm'}>{item}</MenuItemOption>
+                    <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                      {item}
+                    </MenuItemOption>
                   ))}
                 </MenuOptionGroup>
               </MenuList>
@@ -416,11 +680,32 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
           </HStack>
 
           <Tooltip label='Add Part' placement='top'>
-            <IconButton display={ subProduct?.name && subProduct?.childOne?.name && subProduct?.childTwo?.name && subProduct?.childThree?.name && subProduct?.childFour?.name ? 'none' : 'flex' } ref={addBtn} onClick={onOpen} icon={<AddIcon />} colorScheme='blue' variant='solid' fontWeight='normal' fontSize={'sm'} isDisabled={!updateSboms || signedUrlParams}
+            <IconButton
+              display={
+                subProduct?.name &&
+                subProduct?.childOne?.name &&
+                subProduct?.childTwo?.name &&
+                subProduct?.childThree?.name &&
+                subProduct?.childFour?.name
+                  ? 'none'
+                  : 'flex'
+              }
+              ref={addBtn}
+              onClick={onOpen}
+              icon={<AddIcon />}
+              colorScheme='blue'
+              variant='solid'
+              fontWeight='normal'
+              fontSize={'sm'}
+              isDisabled={!updateSboms || signedUrlParams}
             />
           </Tooltip>
           <Tooltip label='Refresh'>
-            <IconButton onClick={handleRefresh} colorScheme='blue' icon={<RepeatIcon />}/>
+            <IconButton
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+            />
           </Tooltip>
         </Stack>
       </Flex>
@@ -453,23 +738,58 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               <Stack spacing={4} direction={'column'} gap={2}>
                 {/* PROJECTS */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='product' fontSize='md' color='gray.600'>Project</FormLabel>
-                  <Select fontSize={'sm'} name='groups' id='groups' value={selectedGroup} onChange={handleSelectGroup} >
+                  <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+                    Project
+                  </FormLabel>
+                  <Select
+                    fontSize={'sm'}
+                    name='groups'
+                    id='groups'
+                    value={selectedGroup}
+                    onChange={handleSelectGroup}
+                  >
                     <option value={''}>-- Select --</option>
                     {allProjects?.organization?.projectGroups?.nodes
-                      .filter((item) => item.id !== group?.groupId && item?.name !== subProduct?.name && item?.name !== subProduct?.childOne?.name && item?.name !== subProduct?.childTwo?.name && item?.name !== subProduct?.childThree?.name && item?.name !== subProduct?.childFour?.name)
+                      .filter(
+                        (item) =>
+                          item.id !== group?.groupId &&
+                          item?.name !== subProduct?.name &&
+                          item?.name !== subProduct?.childOne?.name &&
+                          item?.name !== subProduct?.childTwo?.name &&
+                          item?.name !== subProduct?.childThree?.name &&
+                          item?.name !== subProduct?.childFour?.name
+                      )
                       .map((item, index) => (
-                        <option key={index} value={item.id}>{item.name}</option>
+                        <option key={index} value={item.id}>
+                          {item.name}
+                        </option>
                       ))}
                   </Select>
                 </FormControl>
                 {/* ENVIRONMENTS */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='product' fontSize='md' color='gray.600'>Environment</FormLabel>
-                  <Select fontSize={'sm'} name='product' id='product' value={selectedProd} onChange={handleSelectProduct}>
+                  <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+                    Environment
+                  </FormLabel>
+                  <Select
+                    fontSize={'sm'}
+                    name='product'
+                    id='product'
+                    value={selectedProd}
+                    onChange={handleSelectProduct}
+                  >
                     <option value={''}>-- Select --</option>
-                    {envList?.length > 0 && envOrderList(envList).map((item, index) => (
-                        <option key={index} value={item.value} label={isDefaultEnv(item.label) ? capitalizeFirstLetter(item.label) : item.label }>
+                    {envList?.length > 0 &&
+                      envOrderList(envList).map((item, index) => (
+                        <option
+                          key={index}
+                          value={item.value}
+                          label={
+                            isDefaultEnv(item.label)
+                              ? capitalizeFirstLetter(item.label)
+                              : item.label
+                          }
+                        >
                           {item.label}
                         </option>
                       ))}
@@ -477,17 +797,27 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                 </FormControl>
                 {/* Version */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='versions' fontSize='md' color='gray.600'>Version</FormLabel>
+                  <FormLabel htmlFor='versions' fontSize='md' color='gray.600'>
+                    Version
+                  </FormLabel>
                   {sbomVersions?.length === 0 ? (
                     <Alert borderRadius={'md'} py={'8px'} status='info'>
                       <AlertIcon />
                       No version available
                     </Alert>
                   ) : (
-                    <Select fontSize={'sm'} name='versions' id='versions' value={selectedVersion} onChange={(e) => setSelectedVersion(e.target.value)}>
+                    <Select
+                      fontSize={'sm'}
+                      name='versions'
+                      id='versions'
+                      value={selectedVersion}
+                      onChange={(e) => setSelectedVersion(e.target.value)}
+                    >
                       <option value={''}>-- Select --</option>
                       {sbomVersions.map((item, index) => (
-                        <option key={index} value={item.value}>{item.label}</option>
+                        <option key={index} value={item.value}>
+                          {item.label}
+                        </option>
                       ))}
                     </Select>
                   )}
@@ -495,14 +825,28 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                 {(isExists === true || existingNodes) && (
                   <Alert borderRadius={4} status='error'>
                     <AlertIcon />
-                    <AlertDescription>Same version already exists inside selected SBOM</AlertDescription>
+                    <AlertDescription>
+                      Same version already exists inside selected SBOM
+                    </AlertDescription>
                   </Alert>
                 )}
               </Stack>
             </ModalBody>
             <ModalFooter>
-              <Button mr={3} fontSize={'sm'} onClick={onClose}>Close</Button>
-              <Button fontSize={'sm'} variant='solid' colorScheme='blue' onClick={handleCreatePart} disabled={selectedVersion === '' || isExists === true || existingNodes === true}>
+              <Button mr={3} fontSize={'sm'} onClick={onClose}>
+                Close
+              </Button>
+              <Button
+                fontSize={'sm'}
+                variant='solid'
+                colorScheme='blue'
+                onClick={handleCreatePart}
+                disabled={
+                  selectedVersion === '' ||
+                  isExists === true ||
+                  existingNodes === true
+                }
+              >
                 Add
               </Button>
             </ModalFooter>
@@ -521,8 +865,10 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               <Text>Deleting this version will: </Text>
               <UnorderedList>
                 <Flex flexDir={'column'} gap={1} mt={4}>
-                  {['remove this versions and its SBOM','remove access to this version for all users']
-                  .map((item, index) => (
+                  {[
+                    'remove this versions and its SBOM',
+                    'remove access to this version for all users'
+                  ].map((item, index) => (
                     <ListItem key={index}>{item}</ListItem>
                   ))}
                 </Flex>
@@ -530,8 +876,12 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               <Text mt={6}>Are you sure you wish to continue ?</Text>
             </ModalBody>
             <ModalFooter>
-              <Button mr={3} onClick={onDeleteClose}>No</Button>
-              <Button onClick={handleRemove} colorScheme='red'>Yes</Button>
+              <Button mr={3} onClick={onDeleteClose}>
+                No
+              </Button>
+              <Button onClick={handleRemove} colorScheme='red'>
+                Yes
+              </Button>
             </ModalFooter>
           </ModalContent>
         </Modal>

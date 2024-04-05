@@ -1,4 +1,5 @@
 import { Select, Stack, Text } from '@chakra-ui/react'
+
 import { useGlobalState } from 'hooks/useGlobalState'
 
 const RowLimit = ({ onChange, name }) => {

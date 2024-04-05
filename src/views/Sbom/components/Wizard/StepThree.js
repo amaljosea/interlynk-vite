@@ -1,11 +1,13 @@
-import { Box, Stack, Heading } from '@chakra-ui/react'
+import { Box, Heading, Stack } from '@chakra-ui/react'
+
 import { useGlobalState } from 'hooks/useGlobalState'
+
 import { FaCheckCircle } from 'react-icons/fa'
 
 const StepThree = () => {
   const { prodVulnState } = useGlobalState()
   const { mergeData, selectedVulns } = prodVulnState
-  
+
   return (
     <Box width={'50%'} mx={'auto'}>
       <Stack

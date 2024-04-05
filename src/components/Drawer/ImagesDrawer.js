@@ -1,31 +1,32 @@
 import React, { useContext, useState } from 'react'
+
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Button,
+  Checkbox,
+  Divider,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  Input,
-  Button,
-  Stack,
-  Box,
-  FormLabel,
-  Select,
   Flex,
-  Checkbox,
-  Text,
+  FormLabel,
+  Input,
+  Select,
   Spacer,
-  Divider,
+  Stack,
   Tag,
-  TagLabel,
   TagCloseButton,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon
+  TagLabel,
+  Text
 } from '@chakra-ui/react'
 
 function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
@@ -104,16 +105,16 @@ function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
                       </option>
                     ))
                   : activeImageId == 2
-                  ? sbomasmVersion.map((p) => (
-                      <option key={p} value={p}>
-                        {p}+
-                      </option>
-                    ))
-                  : sbomgrVersion.map((p) => (
-                      <option key={p} value={p}>
-                        {p}+
-                      </option>
-                    ))}
+                    ? sbomasmVersion.map((p) => (
+                        <option key={p} value={p}>
+                          {p}+
+                        </option>
+                      ))
+                    : sbomgrVersion.map((p) => (
+                        <option key={p} value={p}>
+                          {p}+
+                        </option>
+                      ))}
               </Select>
             </Box>
             <Box>

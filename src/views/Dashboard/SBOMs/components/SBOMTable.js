@@ -1,51 +1,56 @@
 // Chakra imports
+import { useMutation } from '@apollo/client'
+import React, { useEffect } from 'react'
+import { useState } from 'react'
+import { CSVLink } from 'react-csv'
+import { vuln_captions } from 'utils'
+
 import {
-  Table,
-  Tbody,
-  Th,
-  Thead,
-  Tr,
-  useColorModeValue,
-  Tabs,
-  TabList,
+  Box,
+  Button,
+  Flex,
+  Icon,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Skeleton,
   Tab,
+  TabList,
   TabPanel,
   TabPanels,
-  Input,
-  Flex,
-  Button,
-  Box,
-  Tooltip,
-  useDisclosure,
-  Skeleton,
+  Table,
+  Tabs,
+  Tbody,
   Td,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
   Text,
-  Icon
+  Th,
+  Thead,
+  Tooltip,
+  Tr,
+  useColorModeValue,
+  useDisclosure
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
-import React, { useEffect } from 'react'
 import CardHeader from 'components/Card/CardHeader'
-import { useState } from 'react'
-import { BiImport, BiExport } from 'react-icons/bi'
-import { CSVLink } from 'react-csv'
-import { useMutation } from '@apollo/client'
+import MultiStatusDrawer from 'components/Drawer/MultiStatusDrawer'
+import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { UpdateImageVersion } from 'graphQL/Mutation'
 import { ImageUpdate } from 'graphQL/Mutation'
-import { vuln_captions } from 'utils'
+
+import { BiExport, BiImport } from 'react-icons/bi'
 import { FaEllipsisV } from 'react-icons/fa'
-import MultiStatusDrawer from 'components/Drawer/MultiStatusDrawer'
+
 import FilterMenu from './FilterMenu'
-import { useGlobalState } from 'hooks/useGlobalState'
 
 const SBOMTable = ({
   imageId,

@@ -1,17 +1,22 @@
 // Chakra imports
-import { Flex, Skeleton, Stack, useToast } from '@chakra-ui/react'
-import React, { useState, useEffect } from 'react'
-import Card from 'components/Card/Card.js'
-import SBOMTable from './SbomTable'
-import SbomInfo from '../../Sbom/components/SbomInfo'
-import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
+import React, { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+
+import { Flex, Skeleton, Stack, useToast } from '@chakra-ui/react'
+
+import Card from 'components/Card/Card.js'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import {
   ShareComponentData,
   ShareProductData,
   ShareProject
 } from 'graphQL/Queries'
-import { useGlobalState } from 'hooks/useGlobalState'
+
+import SbomInfo from '../../Sbom/components/SbomInfo'
+import SBOMTable from './SbomTable'
 
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/

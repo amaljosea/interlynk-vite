@@ -4,7 +4,7 @@ const sbomReducer = (state, action) => {
     case 'SET_LICENSE_TYPE':
       return {
         ...state,
-        licenseType: 'license_exp',
+        licenseType: 'license_exp'
       }
     case 'CLEAR_LICENSES':
       return {
@@ -16,11 +16,11 @@ const sbomReducer = (state, action) => {
       }
     case 'SET_LICENSES':
       if (payload) {
-        const {licensesExp} = payload
+        const { licensesExp } = payload
         return {
           ...state,
           licenseType: 'license_exp',
-          expLicense: licensesExp,
+          expLicense: licensesExp
         }
       }
     case 'SET_LICENSE_FIELD':

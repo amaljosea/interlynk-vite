@@ -1,14 +1,44 @@
 import { useMutation } from '@apollo/client'
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, FormLabel, Input, Alert, AlertIcon, Text, Textarea } from '@chakra-ui/react'
-import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import {errorMapping} from "utils/errorUtils";
+import { errorMapping } from 'utils/errorUtils'
 
-const ProductModal = ({id,isOpen,onClose,product,description,refetch}) => {
+import {
+  Alert,
+  AlertIcon,
+  Button,
+  Flex,
+  FormControl,
+  FormLabel,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  Textarea
+} from '@chakra-ui/react'
+
+import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
+
+const ProductModal = ({
+  id,
+  isOpen,
+  onClose,
+  product,
+  description,
+  refetch
+}) => {
   const params = useParams()
-  const [projectGroupCreate] = useMutation(CreateProjectGroup, {onCompleted: () => refetch()})
-  const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {onCompleted: () => refetch()})
+  const [projectGroupCreate] = useMutation(CreateProjectGroup, {
+    onCompleted: () => refetch()
+  })
+  const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {
+    onCompleted: () => refetch()
+  })
 
   const [productName, setProductName] = useState('')
   const [productDesc, setProductDesc] = useState('')
@@ -18,7 +48,6 @@ const ProductModal = ({id,isOpen,onClose,product,description,refetch}) => {
     setProductName(product)
     setProductDesc(description)
   }, [id])
-
 
   const updateProduct = async (e) => {
     e.preventDefault()
@@ -90,11 +119,17 @@ const ProductModal = ({id,isOpen,onClose,product,description,refetch}) => {
               </Flex>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>Cancel</Button>
+              <Button colorScheme='gray' mr={3} onClick={onClose}>
+                Cancel
+              </Button>
               {id ? (
-                <Button colorScheme='blue' type='submit' disabled={isInvalid}>Update</Button>
+                <Button colorScheme='blue' type='submit' disabled={isInvalid}>
+                  Update
+                </Button>
               ) : (
-                <Button colorScheme='blue' type='submit' disabled={isInvalid}>Save</Button>
+                <Button colorScheme='blue' type='submit' disabled={isInvalid}>
+                  Save
+                </Button>
               )}
             </ModalFooter>
           </ModalContent>

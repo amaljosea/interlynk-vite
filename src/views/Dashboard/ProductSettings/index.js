@@ -1,29 +1,33 @@
 import { useMutation } from '@apollo/client'
+import { useEffect, useState } from 'react'
+
 import {
-  Switch,
-  Text,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
   Button,
-  Grid,
-  GridItem,
-  VStack,
   Flex,
   FormControl,
   FormLabel,
+  Grid,
+  GridItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Select,
+  Switch,
+  Text,
+  VStack,
+  useDisclosure,
   useToast
 } from '@chakra-ui/react'
+
 import CardBody from 'components/Card/CardBody'
-import { ProjectSettingUpdate } from 'graphQL/Mutation'
+
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useState, useEffect } from 'react'
+
+import { ProjectSettingUpdate } from 'graphQL/Mutation'
 
 const Settings = ({ enabled, data, refetch, activeEnv }) => {
   const toast = useToast()
@@ -155,11 +159,18 @@ const Settings = ({ enabled, data, refetch, activeEnv }) => {
           <GridItem w='100%'>
             <FormControl>
               <FormLabel>Retain Data For</FormLabel>
-              <Select width={'400px'} id='dataRetention' value={dataRetentionDays} onChange={(e) => setDataRetentionDays(e.target.value)} isDisabled={!enabled || !editControls} >
+              <Select
+                width={'400px'}
+                id='dataRetention'
+                value={dataRetentionDays}
+                onChange={(e) => setDataRetentionDays(e.target.value)}
+                isDisabled={!enabled || !editControls}
+              >
                 {[1, 30, 90, 365, 0].map((item, index) => (
-                 <option key={index} value={item}>
-                  {item !== 0 && item} {item === 365 ? 'Year' : item === 0 ? 'Forever' : 'Days'}
-                 </option>
+                  <option key={index} value={item}>
+                    {item !== 0 && item}{' '}
+                    {item === 365 ? 'Year' : item === 0 ? 'Forever' : 'Days'}
+                  </option>
                 ))}
               </Select>
             </FormControl>
@@ -167,8 +178,10 @@ const Settings = ({ enabled, data, refetch, activeEnv }) => {
               <FormLabel>Manufacturer</FormLabel>
               <Select width={'400px'}>
                 <option value={''}>-- Select --</option>
-                {['Interlynk Inc','IronSource Inc'].map((item, index) => (
-                 <option key={index} value={item}>{item}</option>
+                {['Interlynk Inc', 'IronSource Inc'].map((item, index) => (
+                  <option key={index} value={item}>
+                    {item}
+                  </option>
                 ))}
               </Select>
             </FormControl>

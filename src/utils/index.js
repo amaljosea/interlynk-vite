@@ -1,54 +1,52 @@
+// USER IMAGES
+import userOne from 'assets/img/abhi.png'
+import custom from 'assets/img/custom.png'
 import grype from 'assets/img/grype.png'
-import trivy from 'assets/img/trivy.png'
+import userThree from 'assets/img/rcn.jpg'
 import scout from 'assets/img/scout.png'
 import snyk from 'assets/img/snyk.png'
-import custom from 'assets/img/custom.png'
+import userTwo from 'assets/img/sp.png'
+import trivy from 'assets/img/trivy.png'
+import userNone from 'assets/img/user.png'
+import AlpmIcon from 'assets/svg/alpm.png'
+import CondaIcon from 'assets/svg/anaconda.png'
+import ApkIcon from 'assets/svg/apk.png'
+import AWSIcon from 'assets/svg/aws.svg'
+import AzureIcon from 'assets/svg/azure.svg'
+import BitbucketIcon from 'assets/svg/bitbucket.png'
+import BitnamiIcon from 'assets/svg/bitnami.svg'
+import CargoIcon from 'assets/svg/cargo.png'
+import CocoapodsIcon from 'assets/svg/cocoapods.png'
+import ComposerIcon from 'assets/svg/composer.png'
+import ConanIcon from 'assets/svg/conan.png'
+import CranIcon from 'assets/svg/cran.svg'
+import DebIcon from 'assets/svg/debian.png'
+import DocIcon from 'assets/svg/docker.png'
+import DockerIcon from 'assets/svg/docker.svg'
+import GemIcon from 'assets/svg/gem.png'
+import GenericIcon from 'assets/svg/generic.png'
+import GitHubIcon from 'assets/svg/github.svg'
+import GolangIcon from 'assets/svg/go.svg'
+import HackageIcon from 'assets/svg/haskell.png'
+import HexIcon from 'assets/svg/hex.png'
+import HuggingFaceIcon from 'assets/svg/huggingface.png'
+import MavenIcon from 'assets/svg/maven.png'
+import MlflowIcon from 'assets/svg/mflow.png'
+import NpmIcon from 'assets/svg/npm.png'
+import NugetIcon from 'assets/svg/nuget.png'
+import OciIcon from 'assets/svg/oci.png'
+import PubIcon from 'assets/svg/pub.png'
+import PypiIcon from 'assets/svg/pypi.png'
+import QpkgIcon from 'assets/svg/qpkg.png'
+import RpmIcon from 'assets/svg/rpm.png'
+import SwidIcon from 'assets/svg/swid.png'
+import SwiftIcon from 'assets/svg/swift.png'
+import { PackageURL } from 'packageurl-js'
 
 import { LetterCIcon } from 'components/Icons/Icons'
 import { LetterHIcon } from 'components/Icons/Icons'
 import { LetterMIcon } from 'components/Icons/Icons'
 import { LetterLIcon } from 'components/Icons/Icons'
-
-import DockerIcon from 'assets/svg/docker.svg'
-import AWSIcon from 'assets/svg/aws.svg'
-import AzureIcon from 'assets/svg/azure.svg'
-import GitHubIcon from 'assets/svg/github.svg'
-import CranIcon from 'assets/svg/cran.svg'
-import BitnamiIcon from 'assets/svg/bitnami.svg'
-import CondaIcon from 'assets/svg/anaconda.png'
-import GolangIcon from 'assets/svg/go.svg'
-import MavenIcon from 'assets/svg/maven.png'
-import BitbucketIcon from 'assets/svg/bitbucket.png'
-import AlpmIcon from 'assets/svg/alpm.png'
-import ApkIcon from 'assets/svg/apk.png'
-import CocoapodsIcon from 'assets/svg/cocoapods.png'
-import CargoIcon from 'assets/svg/cargo.png'
-import ComposerIcon from 'assets/svg/composer.png'
-import ConanIcon from 'assets/svg/conan.png'
-import DebIcon from 'assets/svg/debian.png'
-import DocIcon from 'assets/svg/docker.png'
-import GemIcon from 'assets/svg/gem.png'
-import GenericIcon from 'assets/svg/generic.png'
-import HackageIcon from 'assets/svg/haskell.png'
-import HexIcon from 'assets/svg/hex.png'
-import HuggingFaceIcon from 'assets/svg/huggingface.png'
-import MlflowIcon from 'assets/svg/mflow.png'
-import NpmIcon from 'assets/svg/npm.png'
-import NugetIcon from 'assets/svg/nuget.png'
-import QpkgIcon from 'assets/svg/qpkg.png'
-import OciIcon from 'assets/svg/oci.png'
-import PypiIcon from 'assets/svg/pypi.png'
-import PubIcon from 'assets/svg/pub.png'
-import RpmIcon from 'assets/svg/rpm.png'
-import SwidIcon from 'assets/svg/swid.png'
-import SwiftIcon from 'assets/svg/swift.png'
-
-// USER IMAGES
-import userOne from 'assets/img/abhi.png'
-import userTwo from 'assets/img/sp.png'
-import userThree from 'assets/img/rcn.jpg'
-import userNone from 'assets/img/user.png'
-import { PackageURL } from 'packageurl-js'
 
 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
@@ -648,7 +646,7 @@ export const validateUrl = (url) => {
 
 export const validPassword = (value) => {
   const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[<>^~!@#$%^&*()-_=+{}|\\;:'",.?/`])(.{8,16})$/
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[<>^~!@#$%^&*()-_=+{}|\\;:'",.?/`])(.{8,16})$/
   return passwordRegex.test(value)
 }
 
@@ -708,21 +706,41 @@ export const isDefaultEnv = (name) => {
 
 export const filterEnvList = (projects) => {
   const defaultEnvs = [...projects]
-  .filter((item) => item.name === 'default' || item.name === 'development' || item.name === 'production')
-  .sort((a, b) => a?.name?.localeCompare(b?.name))
+    .filter(
+      (item) =>
+        item.name === 'default' ||
+        item.name === 'development' ||
+        item.name === 'production'
+    )
+    .sort((a, b) => a?.name?.localeCompare(b?.name))
   const newEnvs = [...projects]
-  .filter((item) => item.name !== 'default' && item.name !== 'development' && item.name !== 'production')
-  .sort((a, b) => a?.name?.localeCompare(b?.name))
+    .filter(
+      (item) =>
+        item.name !== 'default' &&
+        item.name !== 'development' &&
+        item.name !== 'production'
+    )
+    .sort((a, b) => a?.name?.localeCompare(b?.name))
   return defaultEnvs && newEnvs ? [...defaultEnvs, ...newEnvs] : []
 }
 
 export const envOrderList = (projects) => {
   const defaultEnvs = [...projects]
-  .filter((item) => item.label === 'default' || item.label === 'development' || item.label === 'production')
-  .sort((a, b) => a?.label?.localeCompare(b?.label))
+    .filter(
+      (item) =>
+        item.label === 'default' ||
+        item.label === 'development' ||
+        item.label === 'production'
+    )
+    .sort((a, b) => a?.label?.localeCompare(b?.label))
   const newEnvs = [...projects]
-  .filter((item) => item.label !== 'default' && item.label !== 'development' && item.label !== 'production')
-  .sort((a, b) => a?.label?.localeCompare(b?.label))
+    .filter(
+      (item) =>
+        item.label !== 'default' &&
+        item.label !== 'development' &&
+        item.label !== 'production'
+    )
+    .sort((a, b) => a?.label?.localeCompare(b?.label))
   return defaultEnvs && newEnvs ? [...defaultEnvs, ...newEnvs] : []
 }
 
@@ -760,8 +778,8 @@ export const sortByUpdatedAt = (data) => {
 }
 
 export const truncatedValue = (name) => {
-  if(name !== '') {
-    return name?.length > 20 ? `${name?.substring(0,20)}...` : name
+  if (name !== '') {
+    return name?.length > 20 ? `${name?.substring(0, 20)}...` : name
   } else {
     return name
   }
@@ -779,5 +797,5 @@ export const parseJSONSafely = (str) => {
 
 export const updatedValue = (operator) => {
   // Capitalize the operator and replace underscores with spaces
-  return operator?.replace(/_/g, ' ')?.replace(/\b\w/g, c => c);
-};
+  return operator?.replace(/_/g, ' ')?.replace(/\b\w/g, (c) => c)
+}

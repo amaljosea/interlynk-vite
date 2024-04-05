@@ -1,15 +1,37 @@
 import { useMutation } from '@apollo/client'
+import Cookies from 'js-cookie'
+import React, { useEffect, useState } from 'react'
+import { validPassword, validateEmail } from 'utils'
+
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Text, FormControl, FormLabel, Flex, Input, Button, useToast, Box, FormErrorMessage, FormHelperText, Grid, GridItem, InputRightElement, IconButton, InputGroup, Alert, AlertIcon, AlertDescription } from '@chakra-ui/react'
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormHelperText,
+  FormLabel,
+  Grid,
+  GridItem,
+  IconButton,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Text,
+  useToast
+} from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/system'
+
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import { UpdateUserPassword, updateOrgUser } from 'graphQL/Mutation'
-import { useGlobalState } from 'hooks/useGlobalState'
-import React, { useState, useEffect } from 'react'
-import { validPassword, validateEmail } from 'utils'
-import Cookies from 'js-cookie'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import { UpdateUserPassword, updateOrgUser } from 'graphQL/Mutation'
 
 const PersonalInfo = ({ user, refetch }) => {
   const textColor = useColorModeValue('gray.700', 'white')
@@ -99,7 +121,7 @@ const PersonalInfo = ({ user, refetch }) => {
 
   const handleUpdate = async () => {
     try {
-      await updateUser({ variables: { id: user.id, name: name, email: email }})
+      await updateUser({ variables: { id: user.id, name: name, email: email } })
         .then((res) => {
           if (res.data.userUpdate.errors.length === 0) {
             setMessage('Saving....')
@@ -108,7 +130,12 @@ const PersonalInfo = ({ user, refetch }) => {
             localStorage.setItem('email', email)
             setTimeout(() => {
               setMessage('Update')
-              toast({ description: 'User details updated successfully', status: 'success', position: 'top', duration: 2000 })
+              toast({
+                description: 'User details updated successfully',
+                status: 'success',
+                position: 'top',
+                duration: 2000
+              })
             }, 2000)
           }
         })
@@ -119,30 +146,51 @@ const PersonalInfo = ({ user, refetch }) => {
   }
 
   const handleUpdatePassword = () => {
-     updatePassword({ variables: { currentPassword: oldPassword, newPassword: newPassword, newPasswordConfirmation: confirmPassword } })
-      .then((res) => {
-        console.log(res?.data)
-        const errors = res?.data?.userUpdatePassword?.errors
-        if (errors?.length > 0) {
-          toast({ description: errors[0], status: 'error', position: 'top', duration: 2000 })
-        } else {
-          Cookies.set('authToken', res?.data?.userUpdatePassword?.updatedToken)
-          toast({description:'Password updated successfully',status:'success',position:'top',duration:3000})
-          window.location.href = `/vendor/dashboard`
-        }
-      })
-
+    updatePassword({
+      variables: {
+        currentPassword: oldPassword,
+        newPassword: newPassword,
+        newPasswordConfirmation: confirmPassword
+      }
+    }).then((res) => {
+      console.log(res?.data)
+      const errors = res?.data?.userUpdatePassword?.errors
+      if (errors?.length > 0) {
+        toast({
+          description: errors[0],
+          status: 'error',
+          position: 'top',
+          duration: 2000
+        })
+      } else {
+        Cookies.set('authToken', res?.data?.userUpdatePassword?.updatedToken)
+        toast({
+          description: 'Password updated successfully',
+          status: 'success',
+          position: 'top',
+          duration: 3000
+        })
+        window.location.href = `/vendor/dashboard`
+      }
+    })
   }
 
   return (
     <Box px={0} mx={0}>
       <CardHeader p='12px 0' mb='12px'>
-        <Text fontSize='lg' color={textColor} fontWeight='bold'>Personal Details</Text>
+        <Text fontSize='lg' color={textColor} fontWeight='bold'>
+          Personal Details
+        </Text>
       </CardHeader>
       <CardBody px='5px'>
         <Grid width={'100%'} templateColumns='repeat(2, 1fr)' gap={12}>
           <GridItem>
-            <Flex width={'100%'} flexDirection={'column'} alignItems={'flex-start'} gap={6}>
+            <Flex
+              width={'100%'}
+              flexDirection={'column'}
+              alignItems={'flex-start'}
+              gap={6}
+            >
               {/* NAME */}
               <FormControl isRequired isInvalid={error}>
                 <FormLabel>Name</FormLabel>
@@ -152,26 +200,57 @@ const PersonalInfo = ({ user, refetch }) => {
               {/* EMAIL */}
               <FormControl isRequired>
                 <FormLabel>Email</FormLabel>
-                <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
                 {user?.unconfirmedEmail && (
-                  <FormHelperText>{JSON.stringify(user?.unconfirmedEmail)}</FormHelperText>
+                  <FormHelperText>
+                    {JSON.stringify(user?.unconfirmedEmail)}
+                  </FormHelperText>
                 )}
               </FormControl>
               {/* ACTION */}
-              <Button variant='solid' colorScheme='blue' onClick={handleUpdate} disabled={ message === 'Saving....' || !name || !validateEmail(email) || error !== ''} >
+              <Button
+                variant='solid'
+                colorScheme='blue'
+                onClick={handleUpdate}
+                disabled={
+                  message === 'Saving....' ||
+                  !name ||
+                  !validateEmail(email) ||
+                  error !== ''
+                }
+              >
                 {message}
               </Button>
             </Flex>
           </GridItem>
           <GridItem>
-            <Flex width={'100%'} flexDirection={'column'} alignItems={'flex-start'} gap={6}>
+            <Flex
+              width={'100%'}
+              flexDirection={'column'}
+              alignItems={'flex-start'}
+              gap={6}
+            >
               {/* OLD PASSWORD */}
               <FormControl>
                 <FormLabel>Old Password</FormLabel>
                 <InputGroup>
-                  <Input type={showOldPass ? 'text' : 'password'} value={oldPassword} onChange={handleOldPassChange} placeholder='*******' />
+                  <Input
+                    type={showOldPass ? 'text' : 'password'}
+                    value={oldPassword}
+                    onChange={handleOldPassChange}
+                    placeholder='*******'
+                  />
                   <InputRightElement width='3.1rem'>
-                    <IconButton h='1.75rem' size='sm' bg={'transparent'} onClick={onToggleOldPass} icon={showOldPass ? <ViewOffIcon /> : <ViewIcon />} />
+                    <IconButton
+                      h='1.75rem'
+                      size='sm'
+                      bg={'transparent'}
+                      onClick={onToggleOldPass}
+                      icon={showOldPass ? <ViewOffIcon /> : <ViewIcon />}
+                    />
                   </InputRightElement>
                 </InputGroup>
               </FormControl>
@@ -179,37 +258,80 @@ const PersonalInfo = ({ user, refetch }) => {
               <FormControl>
                 <FormLabel>New Password</FormLabel>
                 <InputGroup>
-                  <Input type={showNewPass ? 'text' : 'password'} value={newPassword} onChange={handleNewPassChange} placeholder='*******' onBlur={handleCheckPassword} />
+                  <Input
+                    type={showNewPass ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={handleNewPassChange}
+                    placeholder='*******'
+                    onBlur={handleCheckPassword}
+                  />
                   <InputRightElement width='3.1rem'>
-                    <IconButton h='1.75rem' size='sm' bg={'transparent'} onClick={onToggleNewPass} icon={showNewPass ? <ViewOffIcon /> : <ViewIcon />} />
+                    <IconButton
+                      h='1.75rem'
+                      size='sm'
+                      bg={'transparent'}
+                      onClick={onToggleNewPass}
+                      icon={showNewPass ? <ViewOffIcon /> : <ViewIcon />}
+                    />
                   </InputRightElement>
                 </InputGroup>
                 {invalidPassword && (
                   <FormHelperText color={'red.500'}>
-                    <Text mb={1}>Your password must be 8-16 characters contain:</Text>
+                    <Text mb={1}>
+                      Your password must be 8-16 characters contain:
+                    </Text>
                     <Text>1. Lower case letters {`(a-z)`}</Text>
                     <Text>2. Upper case letters {`(A-Z)`}</Text>
                     <Text>3. Special characters {`(ex. !@#&$%*.)`}</Text>
                     <Text>4. Numbers {`(0-9)`}</Text>
                   </FormHelperText>
                 )}
-                {oldPassword !== '' && newPassword !== '' && oldPassword === newPassword && (
-                  <FormHelperText color={'red.500'}>Old password and new password cannot be same</FormHelperText>
-                )}
+                {oldPassword !== '' &&
+                  newPassword !== '' &&
+                  oldPassword === newPassword && (
+                    <FormHelperText color={'red.500'}>
+                      Old password and new password cannot be same
+                    </FormHelperText>
+                  )}
               </FormControl>
               {/* CONFIRM PASSWORD */}
               <FormControl isInvalid={passError !== ''}>
                 <FormLabel>Confirm Password</FormLabel>
                 <InputGroup>
-                  <Input type={showConfPass ? 'text' : 'password'} value={confirmPassword} onChange={handleConfirmChange} isDisabled={!validPassword(newPassword)} placeholder='*******' />
+                  <Input
+                    type={showConfPass ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={handleConfirmChange}
+                    isDisabled={!validPassword(newPassword)}
+                    placeholder='*******'
+                  />
                   <InputRightElement width='3.1rem'>
-                    <IconButton h='1.75rem' size='sm' bg={'transparent'} onClick={onToggleConfirmPass} icon={showConfPass ? <ViewOffIcon /> : <ViewIcon />} />
+                    <IconButton
+                      h='1.75rem'
+                      size='sm'
+                      bg={'transparent'}
+                      onClick={onToggleConfirmPass}
+                      icon={showConfPass ? <ViewOffIcon /> : <ViewIcon />}
+                    />
                   </InputRightElement>
                 </InputGroup>
-                {passError !== '' && <FormErrorMessage>{passError}</FormErrorMessage>}
+                {passError !== '' && (
+                  <FormErrorMessage>{passError}</FormErrorMessage>
+                )}
               </FormControl>
               {/* ACTION */}
-              <Button variant='solid' colorScheme='blue' isDisabled={ oldPassword === '' || newPassword === '' || confirmPassword === '' ||  newPassword !== confirmPassword || oldPassword === newPassword } onClick={handleUpdatePassword}>
+              <Button
+                variant='solid'
+                colorScheme='blue'
+                isDisabled={
+                  oldPassword === '' ||
+                  newPassword === '' ||
+                  confirmPassword === '' ||
+                  newPassword !== confirmPassword ||
+                  oldPassword === newPassword
+                }
+                onClick={handleUpdatePassword}
+              >
                 Update
               </Button>
             </Flex>

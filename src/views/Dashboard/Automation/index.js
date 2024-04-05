@@ -1,33 +1,38 @@
+import { useMutation } from '@apollo/client'
+import { useMemo, useState } from 'react'
+import DataTable from 'react-data-table-component'
+import { customStyles } from 'utils'
+import { timeSince } from 'utils'
+
 import { DeleteIcon, RepeatIcon, SettingsIcon } from '@chakra-ui/icons'
 import {
+  Button,
   Flex,
   HStack,
   IconButton,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
   Switch,
   Tag,
   Text,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Button,
-  useDisclosure,
-  Stack,
-  Tooltip
+  Tooltip,
+  useDisclosure
 } from '@chakra-ui/react'
+
 import CardBody from 'components/Card/CardBody'
 import CustomLoader from 'components/CustomLoader'
-import DataTable from 'react-data-table-component'
-import UpdateRule from './components/UpdateRule'
-import { useMemo, useState } from 'react'
-import { customStyles } from 'utils'
-import { DeleteAutomation, UpdateAutomation } from 'graphQL/Mutation'
-import { useMutation } from '@apollo/client'
-import { timeSince } from 'utils'
+
 import { useGlobalState } from 'hooks/useGlobalState'
+
+import { DeleteAutomation, UpdateAutomation } from 'graphQL/Mutation'
+
+import UpdateRule from './components/UpdateRule'
 
 const Automation = ({ data, refetch }) => {
   const { totalRows, userPermissions, prodRulesState, dispatch } =

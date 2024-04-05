@@ -1,26 +1,28 @@
 // Chakra imports
-import { Flex, Button, Input, Spacer, Stack } from '@chakra-ui/react'
+import { useMutation, useQuery } from '@apollo/client'
 import React, { useState } from 'react'
+import { useEffect } from 'react'
+
+import { Button, Flex, Input, Spacer, Stack } from '@chakra-ui/react'
 import {
+  Box,
+  Checkbox,
+  Divider,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  Box,
   FormLabel,
   Select,
-  Checkbox,
-  Divider,
-  Text,
   Tag,
+  TagCloseButton,
   TagLabel,
-  TagCloseButton
+  Text
 } from '@chakra-ui/react'
-import { useEffect } from 'react'
-import { useMutation, useQuery } from '@apollo/client'
+
 import { UpdateShareLynk } from 'graphQL/Mutation'
 import { getAllScanners } from 'graphQL/Queries'
 
@@ -84,7 +86,8 @@ function SBOMLinkDrawer(props) {
     } catch (error) {
       console.error('ShareLynk update error: ', error)
       toast({
-        description: 'An error occured while updating ShareLynk. Please retry in few minutes.',
+        description:
+          'An error occured while updating ShareLynk. Please retry in few minutes.',
         status: 'error',
         duration: 2000,
         position: 'top'

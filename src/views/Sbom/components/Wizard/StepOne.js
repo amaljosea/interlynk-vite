@@ -1,22 +1,61 @@
-import { Heading, Box, Stack, FormControl, FormLabel, Select, Text, Alert, AlertIcon } from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
-import { GetProject, GetProjectGroups } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
-import { useGlobalState } from 'hooks/useGlobalState'
+import { useEffect, useState } from 'react'
 import { envOrderList } from 'utils'
 
-const StepOne = ({ setProductId, setSbomId, currentSbomId, currentProductId, selectedGroup, setSelectedGroup, selectedProd, setSelectedProd, selectedVersion, setSelectedVersion, uniqVersions, setUniqVersions }) => {
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  FormControl,
+  FormLabel,
+  Heading,
+  Select,
+  Stack,
+  Text
+} from '@chakra-ui/react'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import { GetProject, GetProjectGroups } from 'graphQL/Queries'
+
+const StepOne = ({
+  setProductId,
+  setSbomId,
+  currentSbomId,
+  currentProductId,
+  selectedGroup,
+  setSelectedGroup,
+  selectedProd,
+  setSelectedProd,
+  selectedVersion,
+  setSelectedVersion,
+  uniqVersions,
+  setUniqVersions
+}) => {
   const { totalRows, prodState } = useGlobalState()
   const { enabled, field, direction } = prodState
   const group = JSON.parse(localStorage.getItem('product'))
 
   const [envName, setEnvName] = useState('')
 
-  const { data } = useQuery(GetProjectGroups, { variables: { first: totalRows, enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined, field: field, direction: direction } })
+  const { data } = useQuery(GetProjectGroups, {
+    variables: {
+      first: totalRows,
+      enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
+      field: field,
+      direction: direction
+    }
+  })
 
-  const activeGroup = data && data?.organization?.projectGroups?.nodes.find((item) => item.id === selectedGroup)
+  const activeGroup =
+    data &&
+    data?.organization?.projectGroups?.nodes.find(
+      (item) => item.id === selectedGroup
+    )
 
-  const productList = activeGroup && activeGroup.projects
+  const productList =
+    activeGroup &&
+    activeGroup.projects
       .filter((item) => item.enabled === true)
       .map((option) => ({
         value: option.id,
@@ -25,7 +64,9 @@ const StepOne = ({ setProductId, setSbomId, currentSbomId, currentProductId, sel
 
   useEffect(() => {
     if (activeGroup) {
-      const currentProd = activeGroup.projects.find((item) => item.id === currentProductId)
+      const currentProd = activeGroup.projects.find(
+        (item) => item.id === currentProductId
+      )
       setSelectedProd(currentProd?.id)
       setEnvName(currentProd?.name)
       setProductId(currentProd?.id)
@@ -84,7 +125,13 @@ const StepOne = ({ setProductId, setSbomId, currentSbomId, currentProductId, sel
   return (
     <>
       <Box width={'50%'} mx={'auto'}>
-        <Stack dir='column' spacing={4} alignItems={'center'} justifyContent={'center'} textAlign={'center'}>
+        <Stack
+          dir='column'
+          spacing={4}
+          alignItems={'center'}
+          justifyContent={'center'}
+          textAlign={'center'}
+        >
           <Heading fontWeight={'medium'} fontSize={24} fontFamily={'inherit'}>
             Select the source of Vulnerability Status.
           </Heading>
@@ -95,15 +142,31 @@ const StepOne = ({ setProductId, setSbomId, currentSbomId, currentProductId, sel
           </Text>
         </Stack>
         {productList && (
-          <Stack width={'350px'} mx={'auto'} spacing={4} direction={'column'} gap={2} mt={12}>
+          <Stack
+            width={'350px'}
+            mx={'auto'}
+            spacing={4}
+            direction={'column'}
+            gap={2}
+            mt={12}
+          >
             {/* PROJECT GROUPS */}
             {data?.organization?.projectGroups?.nodes?.length > 0 && (
               <FormControl fontSize={'sm'}>
-                <FormLabel htmlFor='product' fontSize='md' color='gray.600'>Product</FormLabel>
-                <Select name='groups' id='groups' value={selectedGroup} onChange={handleSelectGroup}>
+                <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+                  Product
+                </FormLabel>
+                <Select
+                  name='groups'
+                  id='groups'
+                  value={selectedGroup}
+                  onChange={handleSelectGroup}
+                >
                   {data?.organization?.projectGroups?.nodes?.map(
                     (item, index) => (
-                      <option key={index} value={item.id}>{item.name}</option>
+                      <option key={index} value={item.id}>
+                        {item.name}
+                      </option>
                     )
                   )}
                 </Select>
@@ -111,12 +174,24 @@ const StepOne = ({ setProductId, setSbomId, currentSbomId, currentProductId, sel
             )}
             {/* ENVIRONMENT */}
             <FormControl fontSize={'sm'}>
-              <FormLabel htmlFor='product' fontSize='md' color='gray.600'>Environment</FormLabel>
-              <Select name='product' id='product' value={selectedProd} onChange={handleSelectProduct} textTransform={'capitalize'} >
+              <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+                Environment
+              </FormLabel>
+              <Select
+                name='product'
+                id='product'
+                value={selectedProd}
+                onChange={handleSelectProduct}
+                textTransform={'capitalize'}
+              >
                 <option value={''}>-- Select --</option>
                 {productList?.length > 0 &&
                   envOrderList(productList).map((item, index) => (
-                    <option key={index} value={item.value} style={{textTransform: 'capitalize'}}>
+                    <option
+                      key={index}
+                      value={item.value}
+                      style={{ textTransform: 'capitalize' }}
+                    >
                       {item.label}
                     </option>
                   ))}
@@ -124,7 +199,9 @@ const StepOne = ({ setProductId, setSbomId, currentSbomId, currentProductId, sel
             </FormControl>
             {/* Version */}
             <FormControl fontSize={'sm'}>
-              <FormLabel htmlFor='versions' fontSize='md' color='gray.600'>Version</FormLabel>
+              <FormLabel htmlFor='versions' fontSize='md' color='gray.600'>
+                Version
+              </FormLabel>
               {uniqVersions.length > 0 ? (
                 <Select
                   name='versions'
@@ -137,7 +214,9 @@ const StepOne = ({ setProductId, setSbomId, currentSbomId, currentProductId, sel
                 >
                   <option value={''}>-- Select --</option>
                   {uniqVersions.map((item, index) => (
-                    <option key={index} value={item.id}>{item?.projectVersion}</option>
+                    <option key={index} value={item.id}>
+                      {item?.projectVersion}
+                    </option>
                   ))}
                 </Select>
               ) : (

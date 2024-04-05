@@ -11,7 +11,7 @@ const sbomLogReducer = (state, action) => {
         users: [],
         objects: [],
         types: [],
-        filters: null,
+        filters: null
       }
     case 'CHANGE_SEARCH_INPUT':
       return {

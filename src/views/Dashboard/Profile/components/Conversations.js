@@ -1,26 +1,22 @@
 // Chakra imports
-import {
-  Avatar,
-  Button,
-  Flex,
-  Text,
-  useColorModeValue,
-} from "@chakra-ui/react";
 // Assets
-import avatar2 from "assets/img/avatars/avatar2.png";
-import avatar3 from "assets/img/avatars/avatar3.png";
-import avatar4 from "assets/img/avatars/avatar4.png";
-import avatar5 from "assets/img/avatars/avatar5.png";
-import avatar6 from "assets/img/avatars/avatar6.png";
+import avatar2 from 'assets/img/avatars/avatar2.png'
+import avatar3 from 'assets/img/avatars/avatar3.png'
+import avatar4 from 'assets/img/avatars/avatar4.png'
+import avatar5 from 'assets/img/avatars/avatar5.png'
+import avatar6 from 'assets/img/avatars/avatar6.png'
+import React from 'react'
+
+import { Avatar, Button, Flex, Text, useColorModeValue } from '@chakra-ui/react'
+
 // Custom components
-import Card from "components/Card/Card";
-import CardBody from "components/Card/CardBody";
-import CardHeader from "components/Card/CardHeader";
-import React from "react";
+import Card from 'components/Card/Card'
+import CardBody from 'components/Card/CardBody'
+import CardHeader from 'components/Card/CardHeader'
 
 const Conversations = ({ title }) => {
   // Chakra color mode
-  const textColor = useColorModeValue("gray.700", "white");
+  const textColor = useColorModeValue('gray.700', 'white')
 
   return (
     <Card p='16px'>
@@ -42,7 +38,7 @@ const Conversations = ({ title }) => {
               />
               <Flex direction='column'>
                 <Text fontSize='sm' color={textColor} fontWeight='bold'>
-                  Sophie B.{" "}
+                  Sophie B.{' '}
                 </Text>
                 <Text fontSize='xs' color='gray.500' fontWeight='400'>
                   Hi! I need more information...
@@ -54,7 +50,8 @@ const Conversations = ({ title }) => {
                 fontSize='sm'
                 fontWeight='600'
                 color='teal.300'
-                alignSelf='center'>
+                alignSelf='center'
+              >
                 REPLY
               </Text>
             </Button>
@@ -70,7 +67,7 @@ const Conversations = ({ title }) => {
               />
               <Flex direction='column'>
                 <Text fontSize='sm' color={textColor} fontWeight='bold'>
-                  Sophie B.{" "}
+                  Sophie B.{' '}
                 </Text>
                 <Text fontSize='xs' color='gray.500' fontWeight='400'>
                   Awesome work, can you change...
@@ -82,7 +79,8 @@ const Conversations = ({ title }) => {
                 fontSize='sm'
                 fontWeight='600'
                 color='teal.300'
-                alignSelf='center'>
+                alignSelf='center'
+              >
                 REPLY
               </Text>
             </Button>
@@ -98,7 +96,7 @@ const Conversations = ({ title }) => {
               />
               <Flex direction='column'>
                 <Text fontSize='sm' color={textColor} fontWeight='bold'>
-                  Sophie B.{" "}
+                  Sophie B.{' '}
                 </Text>
                 <Text fontSize='xs' color='gray.500' fontWeight='400'>
                   Have a great afternoon...
@@ -110,7 +108,8 @@ const Conversations = ({ title }) => {
                 fontSize='sm'
                 fontWeight='600'
                 color='teal.300'
-                alignSelf='center'>
+                alignSelf='center'
+              >
                 REPLY
               </Text>
             </Button>
@@ -126,7 +125,7 @@ const Conversations = ({ title }) => {
               />
               <Flex direction='column'>
                 <Text fontSize='sm' color={textColor} fontWeight='bold'>
-                  Sophie B.{" "}
+                  Sophie B.{' '}
                 </Text>
                 <Text fontSize='xs' color='gray.500' fontWeight='400'>
                   About files I can...
@@ -138,7 +137,8 @@ const Conversations = ({ title }) => {
                 fontSize='sm'
                 fontWeight='600'
                 color='teal.300'
-                alignSelf='center'>
+                alignSelf='center'
+              >
                 REPLY
               </Text>
             </Button>
@@ -154,7 +154,7 @@ const Conversations = ({ title }) => {
               />
               <Flex direction='column'>
                 <Text fontSize='sm' color={textColor} fontWeight='bold'>
-                  Sophie B.{" "}
+                  Sophie B.{' '}
                 </Text>
                 <Text fontSize='xs' color='gray.500' fontWeight='400'>
                   About files I can...
@@ -166,7 +166,8 @@ const Conversations = ({ title }) => {
                 fontSize='sm'
                 fontWeight='600'
                 color='teal.300'
-                alignSelf='center'>
+                alignSelf='center'
+              >
                 REPLY
               </Text>
             </Button>
@@ -174,7 +175,7 @@ const Conversations = ({ title }) => {
         </Flex>
       </CardBody>
     </Card>
-  );
-};
+  )
+}
 
-export default Conversations;
+export default Conversations

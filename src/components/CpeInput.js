@@ -1,19 +1,21 @@
+import { PackageURL } from 'packageurl-js'
 import React, { useEffect, useRef, useState } from 'react'
+import { validateCpe } from 'utils'
+
+import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Box,
-  Input,
-  VStack,
-  InputGroup,
-  InputRightElement,
   FormControl,
   FormLabel,
+  Input,
+  InputGroup,
+  InputRightElement,
+  List,
   ListItem,
-  List
+  VStack
 } from '@chakra-ui/react'
-import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
-import { PackageURL } from 'packageurl-js'
+
 import { useGlobalState } from 'hooks/useGlobalState'
-import { validateCpe } from 'utils'
 
 const CpeInput = ({
   name,

@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import {
   Box,
   Button,
@@ -8,11 +10,12 @@ import {
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
+
 import CheckMark from 'components/Misc/CheckMark'
-import {useState} from 'react'
+
 import { FaFilter } from 'react-icons/fa'
 
-const LicenseFilter = ( {onFilter} ) => {
+const LicenseFilter = ({ onFilter }) => {
   const [status, setStatus] = useState([undefined])
   const availableStatus = {
     All: undefined,
@@ -25,7 +28,7 @@ const LicenseFilter = ( {onFilter} ) => {
   const availableSpdxFilters = {
     All: undefined,
     SPDX: 'License',
-    Custom: 'LicenseCustom',
+    Custom: 'LicenseCustom'
   }
 
   const handleStatusChange = (newStatus) => {
@@ -44,16 +47,11 @@ const LicenseFilter = ( {onFilter} ) => {
 
   const generateMenuItems = (availableFilters) => {
     return Object.entries(availableFilters).map(([key, value]) => (
-      <MenuItemOption
-        key={key}
-        value={value}
-        fontSize={'sm'}
-      >
+      <MenuItemOption key={key} value={value} fontSize={'sm'}>
         {key}
       </MenuItemOption>
     ))
   }
-
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>

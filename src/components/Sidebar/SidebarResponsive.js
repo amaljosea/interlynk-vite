@@ -1,4 +1,7 @@
 /*eslint-disable*/
+import React from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
+
 import { HamburgerIcon } from '@chakra-ui/icons'
 // chakra imports
 import {
@@ -16,12 +19,11 @@ import {
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
+
 import IconBox from 'components/Icons/IconBox'
 import { InterlynkLogo } from 'components/Icons/Icons'
 import { Separator } from 'components/Separator/Separator'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
-import React from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
 
 function SidebarResponsive(props) {
   // to check for active links and opened collapses

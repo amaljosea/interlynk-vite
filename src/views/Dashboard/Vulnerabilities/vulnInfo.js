@@ -1,31 +1,35 @@
 // Chakra imports
+import { Link } from 'react-router-dom'
+import { getFullDateAndTime, linkURl } from 'utils'
+
 import {
+  Box,
   Flex,
   Icon,
-  Text,
-  TabList,
-  Tabs,
-  Tab,
-  TabPanels,
-  TabPanel,
   Stack,
-  Box,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Tag,
   TagLabel,
+  Text,
   useDisclosure
 } from '@chakra-ui/react'
+
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-import { FaCube, FaCubes, FaBug } from 'react-icons/fa'
-import { getFullDateAndTime, linkURl } from 'utils'
-import VulnProdTable from './components/ProdTable'
-import { FaCodeMerge } from 'react-icons/fa6'
-import VulnBadge from 'components/Misc/VulnBadge'
-import { Link } from 'react-router-dom'
 import CvssCard from 'components/Misc/CvssCard'
+import VulnBadge from 'components/Misc/VulnBadge'
+
+import { FaBug, FaCube, FaCubes } from 'react-icons/fa'
+import { FaCodeMerge } from 'react-icons/fa6'
+
+import VulnProdTable from './components/ProdTable'
 
 const VulnInfo = ({ data, componentVulns, refetch }) => {
-  const {isOpen, onOpen, onClose} = useDisclosure()
+  const { isOpen, onOpen, onClose } = useDisclosure()
   return (
     <>
       {/* Product Info */}
@@ -169,16 +173,16 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                     <Flex flexDir={'column'} alignItems={'center'}>
                       {data?.cvssVector ? (
                         <Tag
-                         variant='subtle'
-                         width={'full'}
-                         colorScheme={'cyan'}
-                         cursor={'pointer'}
-                         onClick={onOpen}
+                          variant='subtle'
+                          width={'full'}
+                          colorScheme={'cyan'}
+                          cursor={'pointer'}
+                          onClick={onOpen}
                         >
-                         <TagLabel mx={'auto'}>
-                           {data?.cvssVector || '-'}
-                         </TagLabel>
-                       </Tag>
+                          <TagLabel mx={'auto'}>
+                            {data?.cvssVector || '-'}
+                          </TagLabel>
+                        </Tag>
                       ) : (
                         <Tag
                           variant='subtle'
@@ -227,7 +231,9 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
       </Card>
 
       {/* CVSS CARD */}
-      {isOpen && <CvssCard isOpen={isOpen} onClose={onClose} value={data?.cvssVector} />}
+      {isOpen && (
+        <CvssCard isOpen={isOpen} onClose={onClose} value={data?.cvssVector} />
+      )}
     </>
   )
 }

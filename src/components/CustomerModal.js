@@ -1,6 +1,10 @@
 import axios from 'axios'
+import Cookies from 'js-cookie'
 import React from 'react'
 import { useEffect } from 'react'
+import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
+
 const {
   ModalOverlay,
   useDisclosure,
@@ -22,9 +26,6 @@ const {
   AlertIcon,
   AlertDescription
 } = require('@chakra-ui/react')
-import { useLocation } from 'react-router-dom'
-import Cookies from 'js-cookie'
-import { useState } from 'react'
 
 const CustomerModal = ({ refetch }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()

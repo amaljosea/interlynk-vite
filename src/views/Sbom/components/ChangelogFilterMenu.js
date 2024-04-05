@@ -1,17 +1,21 @@
 import { useQuery } from '@apollo/client'
+
 import {
+  Box,
+  Flex,
   Menu,
+  MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  MenuItemOption,
-  Flex,
-  Box,
   Text
 } from '@chakra-ui/react'
+
 import CheckMark from 'components/Misc/CheckMark'
 import MenuHeading from 'components/Misc/MenuHeading'
-import { GetLogFilters } from 'graphQL/Queries'
+
 import { useGlobalState } from 'hooks/useGlobalState'
+
+import { GetLogFilters } from 'graphQL/Queries'
 
 const ChangelogFilterMenu = ({ id, refetch }) => {
   const { totalRows, activeProdTab, prodLogState, dispatch } = useGlobalState()

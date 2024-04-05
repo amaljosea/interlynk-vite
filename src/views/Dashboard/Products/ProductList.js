@@ -1,14 +1,19 @@
 // Chakra imports
-import { Flex, Text } from '@chakra-ui/react'
-import { useEffect, useMemo } from 'react'
 import { useQuery } from '@apollo/client'
+import { useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
-import ProductTable from 'components/Tables/ProductTable'
-import { useGlobalState } from 'hooks/useGlobalState'
-import OrgRegister from '../Profile/components/OrgRegister'
 import { displayErrorMessage } from 'utils'
+
 import { WarningTwoIcon } from '@chakra-ui/icons'
+import { Flex, Text } from '@chakra-ui/react'
+
+import ProductTable from 'components/Tables/ProductTable'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { GetProductTable } from 'graphQL/Queries'
+
+import OrgRegister from '../Profile/components/OrgRegister'
 
 function ProductList() {
   const { totalRows, prodState, userPermissions, dispatch } = useGlobalState()
@@ -86,7 +91,12 @@ function ProductList() {
     )
   }
 
-  if (productPermissions?.value === false) return <Text textAlign={'center'} mt={30}>There are no records to display</Text>
+  if (productPermissions?.value === false)
+    return (
+      <Text textAlign={'center'} mt={30}>
+        There are no records to display
+      </Text>
+    )
 
   return (
     <ProductTable

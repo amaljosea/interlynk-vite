@@ -1,6 +1,7 @@
-import ChangelogTable from 'components/Tables/ChangelogTable'
 import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+
+import ChangelogTable from 'components/Tables/ChangelogTable'
 
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/

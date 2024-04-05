@@ -1,4 +1,8 @@
+import { useMutation } from '@apollo/client'
 import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+
+import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -12,10 +16,8 @@ import {
   Text,
   useToast
 } from '@chakra-ui/react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
+
 import { AcceptInvitation } from 'graphQL/Mutation'
-import { useMutation } from '@apollo/client'
 import { DeclineInvitation } from 'graphQL/Mutation'
 
 const Invitation = () => {

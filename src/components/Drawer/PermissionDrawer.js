@@ -1,18 +1,20 @@
 import { useMutation, useQuery } from '@apollo/client'
+
 import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  Button,
-  Stack,
-  Checkbox,
-  Box,
-  Divider
+  Stack
 } from '@chakra-ui/react'
+
 import { UpdateOrganizationRole } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
 

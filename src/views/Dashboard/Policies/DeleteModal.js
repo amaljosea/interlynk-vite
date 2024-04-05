@@ -1,24 +1,50 @@
 import { useMutation } from '@apollo/client'
-import {Modal,ModalOverlay,ModalContent,ModalHeader,ModalFooter,ModalBody,ModalCloseButton,UnorderedList,Flex,Text,Button,ListItem,useToast } from '@chakra-ui/react'
-import { PolicyDelete } from 'graphQL/Mutation'
+
+import {
+  Button,
+  Flex,
+  ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  UnorderedList,
+  useToast
+} from '@chakra-ui/react'
+
 import { useGlobalState } from 'hooks/useGlobalState'
+
+import { PolicyDelete } from 'graphQL/Mutation'
 
 const DeleteModal = ({ isOpen, onClose, data, refetch }) => {
   const toast = useToast()
   const { id } = data
-  console.log('data',data);
+  console.log('data', data)
   const activeProd = localStorage.getItem('activeEnv')
   const { totalRows, policyState, dispatch } = useGlobalState()
   const { searchInput } = policyState
   const [deletePolicy] = useMutation(PolicyDelete)
 
-  const policyData = { projectId: activeProd || undefined, search: (activeProd || searchInput === '') ? undefined : searchInput, first: totalRows }
+  const policyData = {
+    projectId: activeProd || undefined,
+    search: activeProd || searchInput === '' ? undefined : searchInput,
+    first: totalRows
+  }
 
   const onDeletePolicy = async () => {
-    await deletePolicy({variables: { id }}).then((res) => {
+    await deletePolicy({ variables: { id } }).then((res) => {
       const errors = res?.data?.policyDelete?.errors
       if (errors?.length > 0) {
-        toast({ description: errors[0], status: 'error', position: 'top', duration: 2000 })
+        toast({
+          description: errors[0],
+          status: 'error',
+          position: 'top',
+          duration: 2000
+        })
       } else {
         refetch({ variables: { ...policyData } })
         onClose()
@@ -48,8 +74,12 @@ const DeleteModal = ({ isOpen, onClose, data, refetch }) => {
           <Text mt={10}>Are you sure you wish to continue ?</Text>
         </ModalBody>
         <ModalFooter>
-          <Button mr={3} onClick={onClose}>No</Button>
-          <Button colorScheme={'red'} onClick={onDeletePolicy} >Yes</Button>
+          <Button mr={3} onClick={onClose}>
+            No
+          </Button>
+          <Button colorScheme={'red'} onClick={onDeletePolicy}>
+            Yes
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

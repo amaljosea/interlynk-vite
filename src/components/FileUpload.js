@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+
 import {
   Box,
   Flex,
@@ -11,16 +14,15 @@ import {
 import {
   Button,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
-  ModalCloseButton
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay
 } from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
+
 import { FaUpload } from 'react-icons/fa'
-import { useLocation } from 'react-router-dom'
 
 const FileUpload = () => {
   const {

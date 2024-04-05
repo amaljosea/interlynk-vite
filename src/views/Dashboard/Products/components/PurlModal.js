@@ -1,33 +1,37 @@
+import { useMutation } from '@apollo/client'
+import { PackageURL } from 'packageurl-js'
+import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
+  Box,
   Button,
+  Flex,
   FormControl,
   FormLabel,
-  Select,
-  Flex,
   Input,
-  Stack,
-  ListItem,
-  Textarea,
   List,
+  ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Select,
+  Stack,
+  Tag,
   Text,
-  Box,
-  Tag
+  Textarea
 } from '@chakra-ui/react'
-import { useState, useEffect, useRef } from 'react'
-import { PackageURL } from 'packageurl-js'
-import { useLocation } from 'react-router-dom'
-import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
-import { useMutation } from '@apollo/client'
+
 import CpeInput from 'components/CpeInput'
-import { CreateAutomation } from 'graphQL/Mutation'
+
 import { useGlobalState } from 'hooks/useGlobalState'
+
+import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
+import { CreateAutomation } from 'graphQL/Mutation'
 
 const typeOptions = [
   { value: '', label: '-- Select --' },
@@ -552,7 +556,7 @@ const PurlModal = ({
 
   const onQualifierBlur = () => {
     const pkg = PackageURL.fromString(purlString)
-    console.log('pkg', pkg);
+    console.log('pkg', pkg)
     const convertedObject = {}
     if (qualifiers !== '') {
       const params = new URLSearchParams(qualifiers)

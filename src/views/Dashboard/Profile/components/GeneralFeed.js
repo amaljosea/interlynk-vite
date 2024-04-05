@@ -1,22 +1,26 @@
 // Chakra imports
 import { useMutation } from '@apollo/client'
+import { useEffect, useState } from 'react'
+
 import {
+  Button,
   Flex,
-  Text,
-  useColorModeValue,
   FormControl,
   FormLabel,
   Input,
-  Button,
+  Text,
+  useColorModeValue,
   useToast
 } from '@chakra-ui/react'
+
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import { orgUpdate } from 'graphQL/Mutation'
+
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useEffect, useState } from 'react'
+
+import { orgUpdate } from 'graphQL/Mutation'
 
 const GeneralFeed = ({ orgInfo, refetch }) => {
   const { userPermissions } = useGlobalState()

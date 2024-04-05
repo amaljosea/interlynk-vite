@@ -1,13 +1,43 @@
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, FormLabel, ModalBody, Checkbox, RadioGroup, Radio, ModalFooter, Stack, Button, useToast, Flex, Spinner } from '@chakra-ui/react'
 import { useLazyQuery } from '@apollo/client'
-import { DownloadSBOM, SignedSbomDownload } from 'graphQL/Queries'
 import { useState } from 'react'
 
-const DownloadModal = ({ finalRef, isOpen, onClose, initialRef, productId, productName, version, sbomId }) => {
+import {
+  Button,
+  Checkbox,
+  Flex,
+  FormLabel,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Radio,
+  RadioGroup,
+  Spinner,
+  Stack,
+  useToast
+} from '@chakra-ui/react'
+
+import { DownloadSBOM, SignedSbomDownload } from 'graphQL/Queries'
+
+const DownloadModal = ({
+  finalRef,
+  isOpen,
+  onClose,
+  initialRef,
+  productId,
+  productName,
+  version,
+  sbomId
+}) => {
   const toast = useToast()
   const activeUser = localStorage.getItem('email')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const [getData] = useLazyQuery(signedUrlParams ? SignedSbomDownload : DownloadSBOM)
+  const [getData] = useLazyQuery(
+    signedUrlParams ? SignedSbomDownload : DownloadSBOM
+  )
 
   const [spec, setSpec] = useState('cyclonedx')
   const [format, setFormat] = useState('json')
@@ -45,12 +75,20 @@ const DownloadModal = ({ finalRef, isOpen, onClose, initialRef, productId, produ
   const handleDownload = async () => {
     setIsLoading(true)
     try {
-      await getData({ variables: { projectId: signedUrlParams ? undefined : productId, sbomId: sbomId, includeVulns } })
+      await getData({
+        variables: {
+          projectId: signedUrlParams ? undefined : productId,
+          sbomId: sbomId,
+          includeVulns
+        }
+      })
         .then((res) => {
           console.log(`res`, res)
           if (res.called) {
             setIsLoading(false)
-            const decodedData = signedUrlParams ? window.atob(res?.data?.shareLynkQuery?.sbom?.download) : window.atob(res?.data?.sbom?.download)
+            const decodedData = signedUrlParams
+              ? window.atob(res?.data?.shareLynkQuery?.sbom?.download)
+              : window.atob(res?.data?.sbom?.download)
             const parsedJson = JSON.parse(decodedData)
             if (format === 'json') {
               downloadJsonFile(parsedJson)
@@ -62,12 +100,22 @@ const DownloadModal = ({ finalRef, isOpen, onClose, initialRef, productId, produ
         .finally(() => onClose())
     } catch (error) {
       console.log(`Error`, error)
-      toast({ description: `Internal error during SBOM download. Please try again in a few minutes.`, duration: 3000, position: 'top', status: 'error' })
+      toast({
+        description: `Internal error during SBOM download. Please try again in a few minutes.`,
+        duration: 3000,
+        position: 'top',
+        status: 'error'
+      })
     }
   }
 
   return (
-    <Modal finalFocusRef={finalRef} initialFocusRef={initialRef} isOpen={isOpen} onClose={onClose}>
+    <Modal
+      finalFocusRef={finalRef}
+      initialFocusRef={initialRef}
+      isOpen={isOpen}
+      onClose={onClose}
+    >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Download SBOM</ModalHeader>
@@ -77,12 +125,17 @@ const DownloadModal = ({ finalRef, isOpen, onClose, initialRef, productId, produ
           <Stack direction='column' gap='20px' mt={2}>
             <RadioGroup value={spec} onChange={(value) => setSpec(value)}>
               <Stack spacing={4} direction='row'>
-                {(activeUser === 'sp@interlynk.io' || activeUser === 'surendra.pathak@interlynk') && <Radio value='spdx'>SPDX</Radio>}
+                {(activeUser === 'sp@interlynk.io' ||
+                  activeUser === 'surendra.pathak@interlynk') && (
+                  <Radio value='spdx'>SPDX</Radio>
+                )}
                 <Radio value='cyclonedx'>CycloneDX</Radio>
               </Stack>
             </RadioGroup>
           </Stack>
-          <FormLabel align='center' pt='30px'>File Format</FormLabel>
+          <FormLabel align='center' pt='30px'>
+            File Format
+          </FormLabel>
           <Stack direction='column' gap='20px' mt={2}>
             <RadioGroup value={format} onChange={(value) => setFormat(value)}>
               <Stack spacing={4} direction='row'>
@@ -91,16 +144,34 @@ const DownloadModal = ({ finalRef, isOpen, onClose, initialRef, productId, produ
               </Stack>
             </RadioGroup>
             <Stack direction='column' gap='5px'>
-              <Checkbox isChecked={includeVulns} onChange={() => setIncludeVulns(!includeVulns)} isDisabled={spec === 'spdx'}>
+              <Checkbox
+                isChecked={includeVulns}
+                onChange={() => setIncludeVulns(!includeVulns)}
+                isDisabled={spec === 'spdx'}
+              >
                 Include Vulnerabilities
               </Checkbox>
             </Stack>
           </Stack>
         </ModalBody>
         <ModalFooter>
-          <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'} gap={4}>
-            <Button colorScheme='gray' onClick={onClose}>Cancel</Button>
-            <Button colorScheme='blue' onClick={handleDownload} isLoading={isLoading} loadingText='Loading...'>Download</Button>
+          <Flex
+            width={'100%'}
+            alignItems={'center'}
+            justifyContent={'flex-end'}
+            gap={4}
+          >
+            <Button colorScheme='gray' onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={handleDownload}
+              isLoading={isLoading}
+              loadingText='Loading...'
+            >
+              Download
+            </Button>
           </Flex>
         </ModalFooter>
       </ModalContent>

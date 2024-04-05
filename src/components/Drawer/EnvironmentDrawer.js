@@ -1,41 +1,44 @@
+import { useMutation } from '@apollo/client'
+import { useMemo, useState } from 'react'
+import DataTable from 'react-data-table-component'
+import {
+  customStyles,
+  filterEnvList,
+  getFullDateAndTime,
+  isDefaultEnv,
+  timeSince
+} from 'utils'
+import EnvModal from 'views/Dashboard/Products/components/EnvModal'
+
 import { AddIcon, CheckCircleIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
+  Button,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Text,
   Flex,
-  Tooltip,
   IconButton,
+  ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Stack,
-  useDisclosure,
+  Text,
+  Tooltip,
   UnorderedList,
-  ListItem
+  useDisclosure
 } from '@chakra-ui/react'
-import {
-  timeSince,
-  customStyles,
-  getFullDateAndTime,
-  isDefaultEnv,
-  filterEnvList
-} from 'utils'
+
 import CustomLoader from 'components/CustomLoader'
-import DataTable from 'react-data-table-component'
-import { useMemo, useState } from 'react'
-import EnvModal from 'views/Dashboard/Products/components/EnvModal'
-import { useMutation } from '@apollo/client'
+
 import { EnvDelete } from 'graphQL/Mutation'
 
 const EnvironmentDrawer = ({

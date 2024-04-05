@@ -1,5 +1,18 @@
 // chakra imports
 import {
+  ApolloClient,
+  ApolloProvider,
+  InMemoryCache,
+  createHttpLink
+} from '@apollo/client'
+import DashboardBg from 'assets/img/dashboard.png'
+import InterlynkLogo from 'assets/img/logo.png'
+import Cookies from 'js-cookie'
+import { useEffect, useRef } from 'react'
+// core components
+import { useNavigate } from 'react-router-dom'
+
+import {
   Box,
   Flex,
   Image,
@@ -10,18 +23,7 @@ import {
   ModalOverlay,
   Text
 } from '@chakra-ui/react'
-// core components
-import { useNavigate } from 'react-router-dom'
-import DashboardBg from 'assets/img/dashboard.png'
-import InterlynkLogo from 'assets/img/logo.png'
-import { useEffect, useRef } from 'react'
-import Cookies from 'js-cookie'
-import {
-  ApolloClient,
-  ApolloProvider,
-  InMemoryCache,
-  createHttpLink
-} from '@apollo/client'
+
 import ResetForm from 'components/ResetForm'
 
 export default function Reset() {

@@ -1,50 +1,55 @@
+import { useMutation } from '@apollo/client'
+import Cookies from 'js-cookie'
 import { useMemo, useState } from 'react'
+import DataTable from 'react-data-table-component'
+import { useNavigate } from 'react-router-dom'
+import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
+
 import { AddIcon } from '@chakra-ui/icons'
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Badge,
+  Box,
   Button,
   Flex,
   IconButton,
   Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Portal,
   Stack,
   Tag,
   TagLabel,
   Text,
   Tooltip,
   useDisclosure,
-  useToast,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Menu,
-  MenuButton,
-  MenuList,
-  Portal,
-  MenuItem,
-  Badge,
-  Box,
-  Alert,
-  AlertIcon,
-  AlertDescription
+  useToast
 } from '@chakra-ui/react'
-import DataTable from 'react-data-table-component'
-import { customStyles, timeSince, getFullDateAndTime } from 'utils'
+
 import CustomLoader from 'components/CustomLoader'
-import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
-import { useMutation } from '@apollo/client'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import {
-  SwitchOrganization,
   AcceptOrgInvitation,
   DeclineOrgInvitation,
-  QuitOrganization
+  QuitOrganization,
+  SwitchOrganization
 } from 'graphQL/Mutation'
-import Cookies from 'js-cookie'
+
 import { FaEllipsisVertical } from 'react-icons/fa6'
-import { useNavigate } from 'react-router-dom'
-import { useGlobalState } from 'hooks/useGlobalState'
 
 const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
   const navigate = useNavigate()
@@ -274,7 +279,7 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
         )
       },
       wrap: true,
-      right:'true',
+      right: 'true',
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)

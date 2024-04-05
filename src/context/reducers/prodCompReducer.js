@@ -125,11 +125,11 @@ const prodCompReducer = (state, action) => {
       }
     case 'SET_LICENSES':
       if (payload) {
-        const {licensesExp} = payload
+        const { licensesExp } = payload
         return {
           ...state,
           licenseType: 'license_exp',
-          expLicense: licensesExp,
+          expLicense: licensesExp
         }
       }
     case 'SET_PURL_STRING':
@@ -148,7 +148,6 @@ const prodCompReducer = (state, action) => {
         isCpeValid: payload
       }
     case 'SET_LICENSE_FIELD':
-
       return {
         ...state,
         licenseString: payload,

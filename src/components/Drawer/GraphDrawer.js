@@ -1,5 +1,12 @@
-import { Drawer, DrawerBody, DrawerOverlay, DrawerContent, DrawerCloseButton } from '@chakra-ui/react'
 import GraphView from 'views/Sbom/components/GraphView'
+
+import {
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerOverlay
+} from '@chakra-ui/react'
 
 const GraphDrawer = ({ isOpen, onClose, primaryComp, activeComp }) => {
   return (
@@ -7,7 +14,9 @@ const GraphDrawer = ({ isOpen, onClose, primaryComp, activeComp }) => {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerBody mt={12}><GraphView data={primaryComp} activeComp={activeComp} /></DrawerBody>
+        <DrawerBody mt={12}>
+          <GraphView data={primaryComp} activeComp={activeComp} />
+        </DrawerBody>
       </DrawerContent>
     </Drawer>
   )

@@ -1,53 +1,56 @@
-import React, { useState, useEffect } from 'react'
+import { useMutation } from '@apollo/client'
+import React, { useEffect, useState } from 'react'
+import { CSVLink } from 'react-csv'
+
 // COMPONENTS
 import {
-  Table,
-  Tbody,
-  Th,
-  Thead,
-  Tr,
-  useColorModeValue,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanel,
-  TabPanels,
+  Box,
+  Button,
   Flex,
   Input,
   Menu,
   MenuButton,
-  Button,
-  MenuOptionGroup,
-  MenuList,
   MenuItemOption,
-  Box,
-  Skeleton,
-  Td,
-  Tooltip,
-  Text,
-  useDisclosure,
+  MenuList,
+  MenuOptionGroup,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalCloseButton,
-  ModalHeader,
   ModalBody,
-  ModalFooter
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Skeleton,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Table,
+  Tabs,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tooltip,
+  Tr,
+  useColorModeValue,
+  useDisclosure
 } from '@chakra-ui/react'
-import { CSVLink } from 'react-csv'
+
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import CardHeader from 'components/Card/CardHeader'
-
 // HELPERS
 import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import { UpdateImageVersion } from 'graphQL/Mutation'
+
+import { BiExport, BiImport } from 'react-icons/bi'
 // ICONS
 import { BsFilterRight } from 'react-icons/bs'
-import { BiExport, BiImport } from 'react-icons/bi'
-import { UpdateImageVersion } from 'graphQL/Mutation'
-import { useMutation } from '@apollo/client'
-import { useGlobalState } from 'hooks/useGlobalState'
 
 const CustomerSBOMTable = ({
   data,

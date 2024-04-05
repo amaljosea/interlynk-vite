@@ -1,17 +1,20 @@
-import {RepeatIcon} from '@chakra-ui/icons'
-import {
-  Flex,
-  Tag,
-  Text,
-  TagLabel,
-  Tooltip,
-  IconButton,
-  Box,
-} from '@chakra-ui/react'
-import CustomLoader from 'components/CustomLoader'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils'
+
+import { RepeatIcon } from '@chakra-ui/icons'
+import {
+  Box,
+  Flex,
+  IconButton,
+  Tag,
+  TagLabel,
+  Text,
+  Tooltip
+} from '@chakra-ui/react'
+
+import CustomLoader from 'components/CustomLoader'
+
 import Pagination from '../Pagination'
 
 const SbomLicenseTable = ({ data, refetch }) => {
@@ -50,7 +53,7 @@ const SbomLicenseTable = ({ data, refetch }) => {
       first: undefined,
       last: totalRows,
       after: undefined,
-      before: data.pageInfo.startCursor,
+      before: data.pageInfo.startCursor
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
@@ -68,7 +71,7 @@ const SbomLicenseTable = ({ data, refetch }) => {
         first: newTotalRows,
         last: undefined,
         after: undefined,
-        before: undefined,
+        before: undefined
       }).then((res) => {
         if (res.data) {
           setPaginationControl(res.data)
@@ -98,8 +101,7 @@ const SbomLicenseTable = ({ data, refetch }) => {
 
   const handleRefresh = useCallback(async () => {
     disablePaginationControl()
-    await refetch({
-    }).then((res) => {
+    await refetch({}).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
       }
@@ -108,7 +110,12 @@ const SbomLicenseTable = ({ data, refetch }) => {
 
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent='flex-end' gap={3}>
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent='flex-end'
+        gap={3}
+      >
         <Tooltip label='Refresh'>
           <IconButton
             onClick={handleRefresh}
@@ -118,7 +125,7 @@ const SbomLicenseTable = ({ data, refetch }) => {
         </Tooltip>
       </Flex>
     )
-  }, )
+  })
 
   // COLUMNS
   const columns = [
@@ -130,15 +137,8 @@ const SbomLicenseTable = ({ data, refetch }) => {
       wrap: true,
       selector: ({ licenseExpression }) => {
         return (
-          <Flex
-            direction='row'
-            alignItems={'center'}
-            gap={2}
-          >
-            <Text
-              my={3}
-              fontWeight={'medium'}
-            >
+          <Flex direction='row' alignItems={'center'} gap={2}>
+            <Text my={3} fontWeight={'medium'}>
               {licenseExpression || 'Not Available'}
             </Text>
           </Flex>
@@ -152,13 +152,13 @@ const SbomLicenseTable = ({ data, refetch }) => {
       width: '60%',
       wrap: true,
       selector: ({ components }) => {
-
         let sortedComponents = [...components]
         sortedComponents.sort((a, b) => a.name.localeCompare(b.name))
 
         return (
           <Flex
-            direction='row' py={5}
+            direction='row'
+            py={5}
             alignItems={'center'}
             wrap='wrap'
             gap={2}
@@ -172,7 +172,9 @@ const SbomLicenseTable = ({ data, refetch }) => {
               </TagLabel>
             </Tag>
             <Text>
-              {sortedComponents.length > 1 ? `+${sortedComponents.length - 1} more` : ''}
+              {sortedComponents.length > 1
+                ? `+${sortedComponents.length - 1} more`
+                : ''}
             </Text>
           </Flex>
         )
@@ -211,8 +213,7 @@ const SbomLicenseTable = ({ data, refetch }) => {
     }
   ]
 
-  const ExpandedRow = ({ data: {components} }) => {
-
+  const ExpandedRow = ({ data: { components } }) => {
     let sortedComponents = [...components]
     sortedComponents.sort((a, b) => a.name.localeCompare(b.name))
 
@@ -230,14 +231,13 @@ const SbomLicenseTable = ({ data, refetch }) => {
           gap={2}
           marginLeft={'350px'}
         >
-          {sortedComponents?.map(
-            (component, index) =>
-              <Tag variant='subtle' key={index} >
-                <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
-                  {component.name}
-                </TagLabel>
-              </Tag>
-          )}
+          {sortedComponents?.map((component, index) => (
+            <Tag variant='subtle' key={index}>
+              <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
+                {component.name}
+              </TagLabel>
+            </Tag>
+          ))}
         </Flex>
       </Box>
     )

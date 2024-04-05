@@ -1,22 +1,32 @@
-import { useState } from 'react'
-import { Step, Steps, useSteps } from 'chakra-ui-steps'
-import { Flex, Button, useColorModeValue } from '@chakra-ui/react'
-import StepOne from './Wizard/StepOne'
-import StepTwo from './Wizard/StepTwo'
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { updateCompVulnVex } from 'graphQL/Mutation'
-import { GetVulnData } from 'graphQL/Queries'
-import { findSimilarItems } from 'utils'
-import StepThree from './Wizard/StepThree'
+import { Step, Steps, useSteps } from 'chakra-ui-steps'
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { findSimilarItems } from 'utils'
+
+import { Button, Flex, useColorModeValue } from '@chakra-ui/react'
+
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const ImportWizard = ({ variant, currentSbomId, currentProductId, onClose }) => {
+import { updateCompVulnVex } from 'graphQL/Mutation'
+import { GetVulnData } from 'graphQL/Queries'
+
+import StepOne from './Wizard/StepOne'
+import StepThree from './Wizard/StepThree'
+import StepTwo from './Wizard/StepTwo'
+
+const ImportWizard = ({
+  variant,
+  currentSbomId,
+  currentProductId,
+  onClose
+}) => {
   const [compVexCreate] = useMutation(updateCompVulnVex)
   const [getVulns] = useLazyQuery(GetVulnData)
 
   const { prodVulnState, dispatch } = useGlobalState()
-  const { totalVulns, field, direction, importSbom, selectedVulns } = prodVulnState
+  const { totalVulns, field, direction, importSbom, selectedVulns } =
+    prodVulnState
   const { prodVulnDispatch } = dispatch
 
   const group = JSON.parse(localStorage.getItem('product'))
@@ -34,7 +44,15 @@ const ImportWizard = ({ variant, currentSbomId, currentProductId, onClose }) => 
   const [uniqVersions, setUniqVersions] = useState([])
 
   const refetchCurrentVuln = async () => {
-    await getVulns({ variables: { projectId: currentProductId, sbomId: currentSbomId, first: totalVulns, field: field, direction: direction } })
+    await getVulns({
+      variables: {
+        projectId: currentProductId,
+        sbomId: currentSbomId,
+        first: totalVulns,
+        field: field,
+        direction: direction
+      }
+    })
       .then((res) => {
         if (res.data) {
           const data = findSimilarItems(res.data.sbom.vulns.nodes, importSbom)
@@ -43,7 +61,9 @@ const ImportWizard = ({ variant, currentSbomId, currentProductId, onClose }) => 
         }
       })
       .finally(() => {
-        navigate(`/vendor/products/${params.name}?id=${currentProductId}&sbom=${currentSbomId}`)
+        navigate(
+          `/vendor/products/${params.name}?id=${currentProductId}&sbom=${currentSbomId}`
+        )
         onClose()
       })
   }
@@ -58,10 +78,14 @@ const ImportWizard = ({ variant, currentSbomId, currentProductId, onClose }) => 
             compVulnId: item.id,
             note: item.importNotes ? item.importNotes : undefined,
             vexStatusId: item.importStatus.id,
-            vexJustificationId: item.importJustification ? item.importJustification.id : undefined,
+            vexJustificationId: item.importJustification
+              ? item.importJustification.id
+              : undefined,
             impact: item.importStatement ? item.importStatement : undefined,
             details: item.importDetail ? item.importDetail : undefined,
-            cdxResponseId: item.importResponse ? item.importResponse : undefined,
+            cdxResponseId: item.importResponse
+              ? item.importResponse
+              : undefined,
             fixedIn: item.importFixedIn ? item.importFixedIn : undefined,
             action: item.importActionStmt ? item.importActionStmt : undefined
           }
@@ -75,13 +99,32 @@ const ImportWizard = ({ variant, currentSbomId, currentProductId, onClose }) => 
     {
       label: 'Product',
       component: (
-        <StepOne setProductId={setProductId} setSbomId={setSbomId} currentSbomId={currentSbomId} currentProductId={currentProductId} selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup} selectedProd={selectedProd} setSelectedProd={setSelectedProd} selectedVersion={selectedVersion} setSelectedVersion={setSelectedVersion} uniqVersions={uniqVersions} setUniqVersions={setUniqVersions} />
+        <StepOne
+          setProductId={setProductId}
+          setSbomId={setSbomId}
+          currentSbomId={currentSbomId}
+          currentProductId={currentProductId}
+          selectedGroup={selectedGroup}
+          setSelectedGroup={setSelectedGroup}
+          selectedProd={selectedProd}
+          setSelectedProd={setSelectedProd}
+          selectedVersion={selectedVersion}
+          setSelectedVersion={setSelectedVersion}
+          uniqVersions={uniqVersions}
+          setUniqVersions={setUniqVersions}
+        />
       )
     },
     {
       label: 'Import',
       component: (
-        <StepTwo currentSbomId={currentSbomId} currentProductId={currentProductId} getVulns={getVulns} productId={productId} sbomId={sbomId} />
+        <StepTwo
+          currentSbomId={currentSbomId}
+          currentProductId={currentProductId}
+          getVulns={getVulns}
+          productId={productId}
+          sbomId={sbomId}
+        />
       )
     }
   ]
@@ -95,20 +138,46 @@ const ImportWizard = ({ variant, currentSbomId, currentProductId, onClose }) => 
       <Steps variant={variant} colorScheme='blue' activeStep={activeStep}>
         {steps.map(({ label, component }, index) => (
           <Step label={label} key={label}>
-            <Flex width={'100%'} flexDir={'column'} alignItems={'center'} justifyContent={'center'} sx={{ p: 8, my: 8, rounded: 'md' }}>
+            <Flex
+              width={'100%'}
+              flexDir={'column'}
+              alignItems={'center'}
+              justifyContent={'center'}
+              sx={{ p: 8, my: 8, rounded: 'md' }}
+            >
               {component}
             </Flex>
           </Step>
         ))}
       </Steps>
       {hasCompletedAllSteps && (
-        <Flex width={'100%'} flexDir={'column'} alignItems={'center'} justifyContent={'center'} sx={{ p: 8, my: 8, rounded: 'md' }}>
+        <Flex
+          width={'100%'}
+          flexDir={'column'}
+          alignItems={'center'}
+          justifyContent={'center'}
+          sx={{ p: 8, my: 8, rounded: 'md' }}
+        >
           <StepThree />
         </Flex>
       )}
-      <Flex width='100%' justify='flex-end' gap={4} pos={'absolute'} bottom={0} right={0} py={5} pr={8} bg={'white'}>
+      <Flex
+        width='100%'
+        justify='flex-end'
+        gap={4}
+        pos={'absolute'}
+        bottom={0}
+        right={0}
+        py={5}
+        pr={8}
+        bg={'white'}
+      >
         {hasCompletedAllSteps ? (
-          <Button variant='solid' colorScheme='green' onClick={refetchCurrentVuln}>
+          <Button
+            variant='solid'
+            colorScheme='green'
+            onClick={refetchCurrentVuln}
+          >
             Done
           </Button>
         ) : (
@@ -128,13 +197,27 @@ const ImportWizard = ({ variant, currentSbomId, currentProductId, onClose }) => 
             )}
 
             {activeStep === 0 && (
-              <Button variant='solid' colorScheme='blue' onClick={nextStep} disabled={selectedVersion === '' || selectedGroup === '' || selectedProd === ''}>
+              <Button
+                variant='solid'
+                colorScheme='blue'
+                onClick={nextStep}
+                disabled={
+                  selectedVersion === '' ||
+                  selectedGroup === '' ||
+                  selectedProd === ''
+                }
+              >
                 Next
               </Button>
             )}
 
             {activeStep === 1 && (
-              <Button variant='solid' colorScheme='blue' onClick={handleSubmit} disabled={selectedVulns.length === 0}>
+              <Button
+                variant='solid'
+                colorScheme='blue'
+                onClick={handleSubmit}
+                disabled={selectedVulns.length === 0}
+              >
                 Submit
               </Button>
             )}

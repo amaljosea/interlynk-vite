@@ -1,4 +1,7 @@
 import { useQuery } from '@apollo/client'
+import { useEffect } from 'react'
+import { useState } from 'react'
+
 import {
   Alert,
   AlertIcon,
@@ -19,8 +22,6 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
-import { useEffect } from 'react'
-import { useState } from 'react'
 
 const CopyModal = ({ isOpen, onClose, product, version }) => {
   const [message, setMessage] = useState('')

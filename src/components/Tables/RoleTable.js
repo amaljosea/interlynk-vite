@@ -1,8 +1,10 @@
-import { Button, Flex, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
-import { timeSince, customStyles, getFullDateAndTime } from 'utils'
-import PermissionDrawer from 'components/Drawer/PermissionDrawer'
-import DataTable from 'react-data-table-component'
 import { useState } from 'react'
+import DataTable from 'react-data-table-component'
+import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+
+import { Button, Flex, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
+
+import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 
 const RoleTable = ({ data, role, tabIndex }) => {
   const [selectedRole, setSelectedRole] = useState(null)

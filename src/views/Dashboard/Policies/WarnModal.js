@@ -1,7 +1,24 @@
 import { useMutation } from '@apollo/client'
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, UnorderedList, Flex, Text, Button, ListItem, useToast } from '@chakra-ui/react'
-import { PolicyUpdate } from 'graphQL/Mutation'
+
+import {
+  Button,
+  Flex,
+  ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  UnorderedList,
+  useToast
+} from '@chakra-ui/react'
+
 import { useGlobalState } from 'hooks/useGlobalState'
+
+import { PolicyUpdate } from 'graphQL/Mutation'
 
 const WarnModal = ({ isOpen, onClose, data, refetch }) => {
   const toast = useToast()
@@ -17,14 +34,24 @@ const WarnModal = ({ isOpen, onClose, data, refetch }) => {
     }).then((res) => {
       const errors = res?.data?.policyUpdate?.errors
       if (errors?.length > 0) {
-        toast({ description: errors[0], status: 'error', position: 'top', duration: 2000 })
+        toast({
+          description: errors[0],
+          status: 'error',
+          position: 'top',
+          duration: 2000
+        })
       } else {
-        refetch({ variables: { projectId: activeProd || undefined, search: (activeProd || searchInput === '') ? undefined : searchInput, first: totalRows } })
+        refetch({
+          variables: {
+            projectId: activeProd || undefined,
+            search: activeProd || searchInput === '' ? undefined : searchInput,
+            first: totalRows
+          }
+        })
         onClose()
       }
     })
   }
-
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -36,8 +63,10 @@ const WarnModal = ({ isOpen, onClose, data, refetch }) => {
           <Text>{isEnabled ? 'Disable' : 'Enable'} this policy will : </Text>
           <UnorderedList>
             <Flex flexDir={'column'} gap={1} mt={4}>
-              {[`${isEnabled ? 'Disable' : 'Enable'} the execution of this policy on products`, `${isEnabled ? 'Remove' : 'Add'} results of this policy's execution from existing products`,]
-              .map((item, index) => (
+              {[
+                `${isEnabled ? 'Disable' : 'Enable'} the execution of this policy on products`,
+                `${isEnabled ? 'Remove' : 'Add'} results of this policy's execution from existing products`
+              ].map((item, index) => (
                 <ListItem key={index}>{item}</ListItem>
               ))}
             </Flex>
@@ -45,8 +74,15 @@ const WarnModal = ({ isOpen, onClose, data, refetch }) => {
           <Text mt={10}>Are you sure you wish to continue ?</Text>
         </ModalBody>
         <ModalFooter>
-          <Button mr={3} onClick={onClose}>No</Button>
-          <Button colorScheme={isEnabled ? 'red' : 'green'} onClick={toggleStatus}>Yes</Button>
+          <Button mr={3} onClick={onClose}>
+            No
+          </Button>
+          <Button
+            colorScheme={isEnabled ? 'red' : 'green'}
+            onClick={toggleStatus}
+          >
+            Yes
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

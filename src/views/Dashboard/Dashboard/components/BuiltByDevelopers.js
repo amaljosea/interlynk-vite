@@ -1,31 +1,35 @@
 // Chakra imports
+import React from 'react'
+
 import {
   Button,
   Flex,
   Icon,
   Spacer,
   Text,
-  useColorModeValue,
-} from "@chakra-ui/react";
+  useColorModeValue
+} from '@chakra-ui/react'
+
 // Custom components
-import Card from "components/Card/Card.js";
-import CardBody from "components/Card/CardBody.js";
-import React from "react";
+import Card from 'components/Card/Card.js'
+import CardBody from 'components/Card/CardBody.js'
+
 // react icons
-import { BsArrowRight } from "react-icons/bs";
+import { BsArrowRight } from 'react-icons/bs'
 
 const BuiltByDevelopers = ({ title, name, description, image }) => {
-  const textColor = useColorModeValue("gray.700", "white");
+  const textColor = useColorModeValue('gray.700', 'white')
 
   return (
     <Card minHeight='290.5px' p='1.2rem'>
       <CardBody w='100%'>
-        <Flex flexDirection={{ sm: "column", lg: "row" }} w='100%'>
+        <Flex flexDirection={{ sm: 'column', lg: 'row' }} w='100%'>
           <Flex
             flexDirection='column'
             h='100%'
             lineHeight='1.6'
-            width={{ lg: "45%" }}>
+            width={{ lg: '45%' }}
+          >
             <Text fontSize='sm' color='gray.400' fontWeight='bold'>
               {title}
             </Text>
@@ -41,15 +45,17 @@ const BuiltByDevelopers = ({ title, name, description, image }) => {
                 p='0px'
                 variant='no-hover'
                 bg='transparent'
-                my={{ sm: "1.5rem", lg: "0px" }}>
+                my={{ sm: '1.5rem', lg: '0px' }}
+              >
                 <Text
                   fontSize='sm'
                   color={textColor}
                   fontWeight='bold'
                   cursor='pointer'
                   transition='all .5s ease'
-                  my={{ sm: "1.5rem", lg: "0px" }}
-                  _hover={{ me: "4px" }}>
+                  my={{ sm: '1.5rem', lg: '0px' }}
+                  _hover={{ me: '4px' }}
+                >
                   Read more
                 </Text>
                 <Icon
@@ -61,7 +67,7 @@ const BuiltByDevelopers = ({ title, name, description, image }) => {
                   mx='.3rem'
                   cursor='pointer'
                   pt='4px'
-                  _hover={{ transform: "translateX(20%)" }}
+                  _hover={{ transform: 'translateX(20%)' }}
                 />
               </Button>
             </Flex>
@@ -72,14 +78,15 @@ const BuiltByDevelopers = ({ title, name, description, image }) => {
             align='center'
             justify='center'
             borderRadius='15px'
-            width={{ lg: "40%" }}
-            minHeight={{ sm: "250px" }}>
+            width={{ lg: '40%' }}
+            minHeight={{ sm: '250px' }}
+          >
             {image}
           </Flex>
         </Flex>
       </CardBody>
     </Card>
-  );
-};
+  )
+}
 
-export default BuiltByDevelopers;
+export default BuiltByDevelopers

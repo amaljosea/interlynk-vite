@@ -1,41 +1,47 @@
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
-import {
-  Flex,
-  IconButton,
-  Tooltip,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Stack,
-  Button,
-  Text,
-  UnorderedList,
-  ListItem,
-  Spinner
-} from '@chakra-ui/react'
-import { useGlobalState } from 'hooks/useGlobalState'
-import { FaFileDownload, FaLayerGroup } from 'react-icons/fa'
-import { TbSignature, TbSignatureOff } from 'react-icons/tb'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import ReactSelect from 'react-select'
-import { useRef, useState } from 'react'
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { GetProject } from 'graphQL/Queries'
-import CheckModal from './CheckModal'
-import { GetAllComponents } from 'graphQL/Queries'
+
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import {
+  Button,
+  Flex,
+  IconButton,
+  ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Spinner,
+  Stack,
+  Text,
+  Tooltip,
+  UnorderedList,
+  useDisclosure
+} from '@chakra-ui/react'
+
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
-import SigningModal from './SigningModal'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { sbomDelete } from 'graphQL/Mutation'
-import DownloadModal from './DownloadModal'
+import { GetProject } from 'graphQL/Queries'
+import { GetAllComponents } from 'graphQL/Queries'
 import { GetCompFilterData } from 'graphQL/Queries'
 import { ShareCompFilters } from 'graphQL/Queries'
 import { ShareProject } from 'graphQL/Queries'
 import { AllShareComponents } from 'graphQL/Queries'
+
+import { FaFileDownload, FaLayerGroup } from 'react-icons/fa'
+import { TbSignature, TbSignatureOff } from 'react-icons/tb'
+
+import CheckModal from './CheckModal'
+import DownloadModal from './DownloadModal'
+import SigningModal from './SigningModal'
 
 const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')

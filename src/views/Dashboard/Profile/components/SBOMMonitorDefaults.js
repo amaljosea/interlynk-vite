@@ -1,14 +1,16 @@
 // Chakra imports
-import { Flex, Switch, Text, useColorModeValue } from "@chakra-ui/react";
+import React from 'react'
+
+import { Flex, Switch, Text, useColorModeValue } from '@chakra-ui/react'
+
 // Custom components
-import Card from "components/Card/Card";
-import CardBody from "components/Card/CardBody";
-import CardHeader from "components/Card/CardHeader";
-import React from "react";
+import Card from 'components/Card/Card'
+import CardBody from 'components/Card/CardBody'
+import CardHeader from 'components/Card/CardHeader'
 
 const SBOMMonitorDefaults = () => {
   // Chakra color mode
-  const textColor = useColorModeValue("gray.700", "white");
+  const textColor = useColorModeValue('gray.700', 'white')
   return (
     <Card p='16px'>
       <CardHeader p='12px 5px' mb='12px'>
@@ -28,14 +30,31 @@ const SBOMMonitorDefaults = () => {
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' isChecked id='lic_conflict'/>
-            <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400' htmlFor='lic_conflict'>
+            <Switch colorScheme='blue' me='10px' isChecked id='lic_conflict' />
+            <Text
+              noOfLines={1}
+              fontSize='md'
+              color='gray.500'
+              fontWeight='400'
+              htmlFor='lic_conflict'
+            >
               License Conflict Detection
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' isChecked id='isApprovedLicenses'/>
-            <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400' htmlFor='isApprovedLicenses'>
+            <Switch
+              colorScheme='blue'
+              me='10px'
+              isChecked
+              id='isApprovedLicenses'
+            />
+            <Text
+              noOfLines={1}
+              fontSize='md'
+              color='gray.500'
+              fontWeight='400'
+              htmlFor='isApprovedLicenses'
+            >
               Approved License List
             </Text>
           </Flex>
@@ -43,7 +62,8 @@ const SBOMMonitorDefaults = () => {
             fontSize='sm'
             color='gray.500'
             fontWeight='600'
-            m='6px 0px 20px 0px'>
+            m='6px 0px 20px 0px'
+          >
             Security
           </Text>
           <Flex align='center' mb='20px'>
@@ -67,7 +87,7 @@ const SBOMMonitorDefaults = () => {
         </Flex>
       </CardBody>
     </Card>
-  );
-};
+  )
+}
 
-export default SBOMMonitorDefaults;
+export default SBOMMonitorDefaults

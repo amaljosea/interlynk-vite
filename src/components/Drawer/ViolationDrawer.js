@@ -1,15 +1,17 @@
+import DataTable from 'react-data-table-component'
+import { customStyles } from 'utils'
+
 import {
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
   DrawerHeader,
   DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
   Text
 } from '@chakra-ui/react'
+
 import CustomLoader from 'components/CustomLoader'
-import DataTable from 'react-data-table-component'
-import { customStyles } from 'utils'
 
 const ViolationDrawer = ({ data, isOpen, onClose }) => {
   console.log(data)

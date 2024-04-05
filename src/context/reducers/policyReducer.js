@@ -7,7 +7,7 @@ const policyReducer = (state, action) => {
         field: 'POLICIES_UPDATED_AT',
         direction: 'DESC',
         searchInput: '',
-        pageIndex: 1,
+        pageIndex: 1
       }
     case 'CHANGE_SEARCH_INPUT':
       return {

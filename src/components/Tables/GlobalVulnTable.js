@@ -1,15 +1,35 @@
 // Chakra imports
 import { useEffect, useMemo, useState } from 'react'
-import { Flex, Text, Tag, TagLabel, Tooltip, Stack, IconButton, Divider, Badge, Icon} from '@chakra-ui/react'
-import { sevColor, timeSince, getFullDateAndTime, customStyles } from 'utils'
-import { ChevronDownIcon, ChevronUpIcon, ExternalLinkIcon, RepeatIcon } from '@chakra-ui/icons'
-import { Link, useParams } from 'react-router-dom'
 import DataTable from 'react-data-table-component'
-import CustomLoader from 'components/CustomLoader'
+import { Link, useParams } from 'react-router-dom'
+import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
 import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { useGlobalState } from 'hooks/useGlobalState'
+
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  ExternalLinkIcon,
+  RepeatIcon
+} from '@chakra-ui/icons'
+import {
+  Badge,
+  Divider,
+  Flex,
+  Icon,
+  IconButton,
+  Stack,
+  Tag,
+  TagLabel,
+  Text,
+  Tooltip
+} from '@chakra-ui/react'
+
+import CustomLoader from 'components/CustomLoader'
 import Round from 'components/Misc/Round'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import Pagination from '../Pagination'
 
 const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
@@ -33,7 +53,17 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const { globalVulnState, dispatch } = useGlobalState()
-  const { pageIndex, field, direction, searchInput, severities, products, statues, kev, epss } = globalVulnState
+  const {
+    pageIndex,
+    field,
+    direction,
+    searchInput,
+    severities,
+    products,
+    statues,
+    kev,
+    epss
+  } = globalVulnState
   const { globalVulnDispatch } = dispatch
 
   const [filterText, setFilterText] = useState(searchInput)
@@ -61,7 +91,10 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   }
 
   const epssRange = epss !== 'all' && epss !== '' && epss?.split('-')
-  const range = { min: parseFloat(epssRange[0]) / 100, max: parseFloat(epssRange[1]) / 100 }
+  const range = {
+    min: parseFloat(epssRange[0]) / 100,
+    max: parseFloat(epssRange[1]) / 100
+  }
 
   const vulnData = {
     projectGroupIds: products?.length === 0 ? undefined : products,
@@ -84,14 +117,34 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
           <Stack spacing={1} my={2}>
             <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
               <Link to={linkURl(source, vulnId)} target={'_blank'}>
-                <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} color={'blue.500'} />
+                <Icon
+                  as={ExternalLinkIcon}
+                  h={'16px'}
+                  w={'16px'}
+                  color={'blue.500'}
+                />
               </Link>
               <Stack>
-                <Link to={params?.name ? `/${path}/products/${product?.name}?id=${product?.id}&vulnId=${id}` : `/${path}/vulnerabilities?vulnId=${id}`} onClick={() => localStorage.setItem('activeVuln', vulnId)}>
-                  <Text fontSize='sm' color={'blue.500'}>{vulnId || ''}</Text>
+                <Link
+                  to={
+                    params?.name
+                      ? `/${path}/products/${product?.name}?id=${product?.id}&vulnId=${id}`
+                      : `/${path}/vulnerabilities?vulnId=${id}`
+                  }
+                  onClick={() => localStorage.setItem('activeVuln', vulnId)}
+                >
+                  <Text fontSize='sm' color={'blue.500'}>
+                    {vulnId || ''}
+                  </Text>
                 </Link>
                 {vulnInfo?.kev === true && (
-                  <Badge width={'fit-content'} variant='subtle' colorScheme='red' >KEV</Badge>
+                  <Badge
+                    width={'fit-content'}
+                    variant='subtle'
+                    colorScheme='red'
+                  >
+                    KEV
+                  </Badge>
                 )}
               </Stack>
             </Flex>
@@ -108,8 +161,15 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
       selector: (row) => {
         const { sev } = row
         return (
-          <Tag size='md' variant='subtle' width={'80px'} colorScheme={sevColor(sev)}>
-            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>{sev || '-'}</TagLabel>
+          <Tag
+            size='md'
+            variant='subtle'
+            width={'80px'}
+            colorScheme={sevColor(sev)}
+          >
+            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
+              {sev || '-'}
+            </TagLabel>
           </Tag>
         )
       },
@@ -124,7 +184,16 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
       selector: (row) => {
         const { source } = row
         return (
-          <Tag size='sm' key='md' variant='solid' colorScheme={source === 'osv' ? 'red' : 'blue'} textTransform={'uppercase'} width={'100%'} alignItems={'center'} justifyContent={'center'}>
+          <Tag
+            size='sm'
+            key='md'
+            variant='solid'
+            colorScheme={source === 'osv' ? 'red' : 'blue'}
+            textTransform={'uppercase'}
+            width={'100%'}
+            alignItems={'center'}
+            justifyContent={'center'}
+          >
             <TagLabel>{source}</TagLabel>
           </Tag>
         )
@@ -141,7 +210,13 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
         const { cvssScore } = row
         return (
           <Flex minWidth='max-content' alignItems='center' gap='2'>
-            <Tag size='md' key='md' variant='subtle' width={'50px'} colorScheme={cvssColor(cvssScore || '')}>
+            <Tag
+              size='md'
+              key='md'
+              variant='subtle'
+              width={'50px'}
+              colorScheme={cvssColor(cvssScore || '')}
+            >
               <TagLabel mx={'auto'}>{cvssScore || '-'}</TagLabel>
             </Tag>
           </Flex>
@@ -160,18 +235,42 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
         const { epssScores } = vulnInfo || ''
         return (
           <Flex alignItems='center' gap='0'>
-            <Tooltip placement='top' label={epssScores?.length > 0? `${(epssScores[0] * 100).toFixed(3)} %`: '-'}>
-              <Tag size='md' key='md' variant='subtle' width={'100px'} justifyContent='center' alignItems='center'>
-                <TagLabel>{epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-'}</TagLabel>
+            <Tooltip
+              placement='top'
+              label={
+                epssScores?.length > 0
+                  ? `${(epssScores[0] * 100).toFixed(3)} %`
+                  : '-'
+              }
+            >
+              <Tag
+                size='md'
+                key='md'
+                variant='subtle'
+                width={'100px'}
+                justifyContent='center'
+                alignItems='center'
+              >
+                <TagLabel>
+                  {epssScores?.length > 0
+                    ? `${(epssScores[0] * 100).toFixed(3)} %`
+                    : '-'}
+                </TagLabel>
               </Tag>
             </Tooltip>
             {epssScores && epssScores.length > 1 ? (
               epssScores[0] > epssScores[epssScores.length - 1] ? (
-                <Tooltip placement='top' label={`Up from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}>
+                <Tooltip
+                  placement='top'
+                  label={`Up from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
+                >
                   <ChevronUpIcon w={5} h={5} color='green.500' />
                 </Tooltip>
               ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
-                <Tooltip placement='top' label={`Down from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}>
+                <Tooltip
+                  placement='top'
+                  label={`Down from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
+                >
                   <ChevronDownIcon w={5} h={5} color='red.500' />
                 </Tooltip>
               ) : null
@@ -189,15 +288,35 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
       name: 'STATUSES',
       selector: (row) => {
         const { metrics } = row
-        const { affectedCount, fixedCount, inTriageCount, notAffectedCount, unspecifiedCount } = metrics
+        const {
+          affectedCount,
+          fixedCount,
+          inTriageCount,
+          notAffectedCount,
+          unspecifiedCount
+        } = metrics
         return (
           <Stack fontWeight={'medium'} direction={'row'} my={2}>
-            <Round bg='gray.200' label='Unspecified'>{unspecifiedCount}</Round>
-            <Round bg='blue.100' label='In Triage'>{inTriageCount}</Round>
-            <Round bg='red.100' label='Affected'>{affectedCount}</Round>
-            <Divider orientation='vertical' colorScheme={'gray.900'} height={10} />
-            <Round bg='orange.100' label='Fixed'>{fixedCount}</Round>
-            <Round bg='green.100' label='Not Affected'>{notAffectedCount}</Round>
+            <Round bg='gray.200' label='Unspecified'>
+              {unspecifiedCount}
+            </Round>
+            <Round bg='blue.100' label='In Triage'>
+              {inTriageCount}
+            </Round>
+            <Round bg='red.100' label='Affected'>
+              {affectedCount}
+            </Round>
+            <Divider
+              orientation='vertical'
+              colorScheme={'gray.900'}
+              height={10}
+            />
+            <Round bg='orange.100' label='Fixed'>
+              {fixedCount}
+            </Round>
+            <Round bg='green.100' label='Not Affected'>
+              {notAffectedCount}
+            </Round>
           </Stack>
         )
       },
@@ -227,7 +346,10 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
       id: 'VULNS_LAST_MODIFIED_AT',
       name: 'MODIFIED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.lastModifiedAt)} placement={'top'}>
+        <Tooltip
+          label={getFullDateAndTime(row?.lastModifiedAt)}
+          placement={'top'}
+        >
           <Text textAlign={'right'}>{timeSince(row?.lastModifiedAt)}</Text>
         </Tooltip>
       ),
@@ -246,19 +368,45 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   const handleSearch = async (event) => {
     const { value } = event.target
     if (event.key === 'Enter' && filterText !== '') {
-      refetch({ field, direction, search: value, first: totalRows, ...vulnData }).then((res) => res?.data && globalVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value }) )
+      refetch({
+        field,
+        direction,
+        search: value,
+        first: totalRows,
+        ...vulnData
+      }).then(
+        (res) =>
+          res?.data &&
+          globalVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+      )
     }
   }
 
   // CLEAR SERACH
   const handleClear = async () => {
     setFilterText('')
-    await refetch({ field, direction, search: undefined, first: totalRows, ...vulnData }).then((res) => res?.data && globalVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' }))
+    await refetch({
+      field,
+      direction,
+      search: undefined,
+      first: totalRows,
+      ...vulnData
+    }).then(
+      (res) => res?.data && globalVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+    )
   }
 
   // CLEAR SERACH
   const handleRefresh = async () => {
-    await refetch({ field, direction, first: totalRows, projectIds: activeEnv ? [activeEnv] : undefined, projectGroupIds: productId ? [productId] : undefined }).then((res) => res?.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' }))
+    await refetch({
+      field,
+      direction,
+      first: totalRows,
+      projectIds: activeEnv ? [activeEnv] : undefined,
+      projectGroupIds: productId ? [productId] : undefined
+    }).then(
+      (res) => res?.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+    )
   }
 
   // ON SEARCH INPUT CHANGE
@@ -275,26 +423,62 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   const subHeader = useMemo(() => {
     return (
       <Flex width={'100%'} alignItems={'center'} gap={3}>
-        <Stack width={'100%'} direction={'row'} spacing={4} alignItems={'flex-start'}>
-          <SearchFilter id='globalVulns' filterText={filterText} onFilter={handleSearch} onClear={handleClear} onChange={onSearchInputChange} />
+        <Stack
+          width={'100%'}
+          direction={'row'}
+          spacing={4}
+          alignItems={'flex-start'}
+        >
+          <SearchFilter
+            id='globalVulns'
+            filterText={filterText}
+            onFilter={handleSearch}
+            onClear={handleClear}
+            onChange={onSearchInputChange}
+          />
           <VulnsFilters refetch={refetch} />
         </Stack>
-        <Stack width={'100%'} direction={'row'} spacing={2} justifyContent={'flex-end'} >
+        <Stack
+          width={'100%'}
+          direction={'row'}
+          spacing={2}
+          justifyContent={'flex-end'}
+        >
           <Tooltip label='Refresh'>
-            <IconButton onClick={handleRefresh} colorScheme='blue' icon={<RepeatIcon />} />
+            <IconButton
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+            />
           </Tooltip>
         </Stack>
       </Flex>
     )
-  }, [filterText,onSearchInputChange,handleClear,handleSearch,handleRefresh])
+  }, [
+    filterText,
+    onSearchInputChange,
+    handleClear,
+    handleSearch,
+    handleRefresh
+  ])
 
   // ON PREV PAGE
   const handlePreviousPage = async () => {
     setIsPrevActive(false)
-    await refetch({ field, direction, last: totalRows, before: data?.pageInfo?.startCursor, search: searchInput !== '' ? searchInput : undefined, ...vulnData }).then((res) => {
+    await refetch({
+      field,
+      direction,
+      last: totalRows,
+      before: data?.pageInfo?.startCursor,
+      search: searchInput !== '' ? searchInput : undefined,
+      ...vulnData
+    }).then((res) => {
       if (res.data) {
         const project = res?.data?.organization?.vulns
-        globalVulnDispatch({ type: 'DECREMENT_PAGE', payload: project?.pageInfo?.startCursor })
+        globalVulnDispatch({
+          type: 'DECREMENT_PAGE',
+          payload: project?.pageInfo?.startCursor
+        })
         setIsPrevActive(project?.pageInfo?.hasPreviousPage)
       }
     })
@@ -303,10 +487,23 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   // ON NEXT PAGE
   const handleNextPage = async () => {
     setIsNextActive(false)
-    await refetch({ field, direction, first: totalRows, after: data?.pageInfo?.endCursor, search: searchInput !== '' ? searchInput : undefined, ...vulnData }).then((res) => {
+    await refetch({
+      field,
+      direction,
+      first: totalRows,
+      after: data?.pageInfo?.endCursor,
+      search: searchInput !== '' ? searchInput : undefined,
+      ...vulnData
+    }).then((res) => {
       if (res.data) {
         const project = res?.data?.organization?.vulns
-        globalVulnDispatch({ type: 'INCREMENT_PAGE', payload: { total: project?.totalCount, after: project?.pageInfo?.endCursor } })
+        globalVulnDispatch({
+          type: 'INCREMENT_PAGE',
+          payload: {
+            total: project?.totalCount,
+            after: project?.pageInfo?.endCursor
+          }
+        })
         setIsNextActive(project?.pageInfo?.hasNextPage)
       }
     })
@@ -316,14 +513,34 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   const handleSetRow = async (e) => {
     const { value } = e.target
     setTotalRows(Number(value))
-    await refetch({ field, direction, first: Number(value), search: searchInput !== '' ? searchInput : undefined, ...vulnData }).then((res) => res.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' }))
+    await refetch({
+      field,
+      direction,
+      first: Number(value),
+      search: searchInput !== '' ? searchInput : undefined,
+      ...vulnData
+    }).then(
+      (res) => res.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+    )
   }
 
   // SORTING
   const handleSort = async (column, sortDirection) => {
-    await refetch({ first: totalRows, field: column.id, direction: sortDirection === 'asc' ? 'ASC' : 'DESC', search: searchInput !== '' ? searchInput : undefined, ...vulnData }).then((res) => {
+    await refetch({
+      first: totalRows,
+      field: column.id,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC',
+      search: searchInput !== '' ? searchInput : undefined,
+      ...vulnData
+    }).then((res) => {
       if (res.data) {
-        globalVulnDispatch({ type: 'SET_SORT_ORDER', payload: { field: column.id, direction: sortDirection === 'asc' ? 'ASC' : 'DESC' } })
+        globalVulnDispatch({
+          type: 'SET_SORT_ORDER',
+          payload: {
+            field: column.id,
+            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+          }
+        })
       }
     })
   }
@@ -332,10 +549,34 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
     <>
       {/* TABLE */}
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable columns={columns} keyField='PUBLISHED' data={data?.nodes || []} onSort={handleSort} defaultSortFieldId={field} defaultSortAsc={false} customStyles={customStyles} progressPending={data ? false : true} progressComponent={<CustomLoader />} subHeader subHeaderComponent={subHeader} responsive persistTableHead />
+        <DataTable
+          columns={columns}
+          keyField='PUBLISHED'
+          data={data?.nodes || []}
+          onSort={handleSort}
+          defaultSortFieldId={field}
+          defaultSortAsc={false}
+          customStyles={customStyles}
+          progressPending={data ? false : true}
+          progressComponent={<CustomLoader />}
+          subHeader
+          subHeaderComponent={subHeader}
+          responsive
+          persistTableHead
+        />
 
         {data && (
-          <Pagination paginationSizes={paginationSizes} pageIndex={pageIndex} totalRows={totalRows} totalCount={data.totalCount} onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} onSetRow={handleSetRow} hasNextPage={isNextActive} hasPreviousPage={isPrevActive} />
+          <Pagination
+            paginationSizes={paginationSizes}
+            pageIndex={pageIndex}
+            totalRows={totalRows}
+            totalCount={data.totalCount}
+            onPreviousPage={handlePreviousPage}
+            onNextPage={handleNextPage}
+            onSetRow={handleSetRow}
+            hasNextPage={isNextActive}
+            hasPreviousPage={isPrevActive}
+          />
         )}
       </Flex>
     </>

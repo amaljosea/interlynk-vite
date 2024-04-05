@@ -1,4 +1,6 @@
 // Chakra imports
+import React from 'react'
+
 import {
   Flex,
   Table,
@@ -7,19 +9,19 @@ import {
   Th,
   Thead,
   Tr,
-  useColorModeValue,
-} from "@chakra-ui/react";
+  useColorModeValue
+} from '@chakra-ui/react'
+
 // Custom components
-import Card from "components/Card/Card.js";
-import CardBody from "components/Card/CardBody.js";
-import CardHeader from "components/Card/CardHeader.js";
-import TablesProjectRow from "components/Tables/TablesProjectRow";
-import React from "react";
+import Card from 'components/Card/Card.js'
+import CardBody from 'components/Card/CardBody.js'
+import CardHeader from 'components/Card/CardHeader.js'
+import TablesProjectRow from 'components/Tables/TablesProjectRow'
 
 const Projects = ({ title, captions, data }) => {
-  const textColor = useColorModeValue("gray.600", "white");
+  const textColor = useColorModeValue('gray.600', 'white')
   return (
-    <Card my='22px' overflowX={{ sm: "scroll", xl: "hidden" }}>
+    <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
       <CardHeader p='6px 0px 22px 0px'>
         <Flex direction='column'>
           <Text fontSize='lg' color={textColor} fontWeight='bold' pb='.5rem'>
@@ -33,10 +35,10 @@ const Projects = ({ title, captions, data }) => {
             <Tr my='.8rem' pl='0px'>
               {captions.map((caption, idx) => {
                 return (
-                  <Th color='gray.400' key={idx} ps={idx === 0 ? "0px" : null}>
+                  <Th color='gray.400' key={idx} ps={idx === 0 ? '0px' : null}>
                     {caption}
                   </Th>
-                );
+                )
               })}
             </Tr>
           </Thead>
@@ -51,13 +53,13 @@ const Projects = ({ title, captions, data }) => {
                   budget={row.budget}
                   progression={row.progression}
                 />
-              );
+              )
             })}
           </Tbody>
         </Table>
       </CardBody>
     </Card>
-  );
-};
+  )
+}
 
-export default Projects;
+export default Projects

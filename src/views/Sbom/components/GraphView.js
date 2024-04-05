@@ -1,13 +1,26 @@
-import { Alert, Box, Flex, IconButton, Stack, Tag, Text, Tooltip } from '@chakra-ui/react'
-import React, { useEffect, useState, useCallback } from 'react'
-import { GetCompDependency } from 'graphQL/Queries'
-import { useLocation } from 'react-router-dom'
-import Card from 'components/Card/Card'
 import { useQuery } from '@apollo/client'
+import React, { useCallback, useEffect, useState } from 'react'
 import Tree from 'react-d3-tree'
+import { useLocation } from 'react-router-dom'
+
+import {
+  Alert,
+  Box,
+  Flex,
+  IconButton,
+  Stack,
+  Tag,
+  Text,
+  Tooltip
+} from '@chakra-ui/react'
+
+import Card from 'components/Card/Card'
 import CardHeader from 'components/Card/CardHeader'
-import { BiZoomIn, BiZoomOut } from 'react-icons/bi'
+
+import { GetCompDependency } from 'graphQL/Queries'
 import { GetShareCompDependency } from 'graphQL/Queries'
+
+import { BiZoomIn, BiZoomOut } from 'react-icons/bi'
 
 const containerStyles = { width: '100vw', height: '60vh' }
 
@@ -24,22 +37,45 @@ export const useCenteredTree = (defaultTranslate = { x: 0, y: 0 }) => {
   return [dimensions, translate, containerRef]
 }
 
-const renderForeignObjectNode = ({ nodeDatum, toggleNode, foreignObjectProps, activeComp }) => {
+const renderForeignObjectNode = ({
+  nodeDatum,
+  toggleNode,
+  foreignObjectProps,
+  activeComp
+}) => {
   // console.log('nodeDatum', nodeDatum)
   return (
     <g>
       <circle fill={'dodgerblue'} r='20' onClick={toggleNode} />
       <foreignObject {...foreignObjectProps} y={-20}>
         <Flex width={'100%'} flexDirection={'column'} alignItems={'flex-start'}>
-          <Box p={3} left={12} bg={'blue.500'} minW={'fit-content'} maxW={'300px'} position={'relative'} fontWeight={'medium'} colorScheme='blue' wordBreak={'break-all'} borderRadius={5} color={'white'}>
+          <Box
+            p={3}
+            left={12}
+            bg={'blue.500'}
+            minW={'fit-content'}
+            maxW={'300px'}
+            position={'relative'}
+            fontWeight={'medium'}
+            colorScheme='blue'
+            wordBreak={'break-all'}
+            borderRadius={5}
+            color={'white'}
+          >
             <Stack direction={'column'}>
-              <Text wordBreak={'break-all'} lineHeight={1.3}>{nodeDatum?.name}</Text>
+              <Text wordBreak={'break-all'} lineHeight={1.3}>
+                {nodeDatum?.name}
+              </Text>
               {activeComp === null && !nodeDatum?.attributes?.version && (
-                <Tag size='sm' width={'fit-content'}>Primary</Tag>
+                <Tag size='sm' width={'fit-content'}>
+                  Primary
+                </Tag>
               )}
             </Stack>
             {nodeDatum.attributes?.version && (
-              <Text opacity={0.8} mt={1} fontSize='sm' colorScheme='blue'>{nodeDatum.attributes?.version}</Text>
+              <Text opacity={0.8} mt={1} fontSize='sm' colorScheme='blue'>
+                {nodeDatum.attributes?.version}
+              </Text>
             )}
           </Box>
         </Flex>
@@ -68,14 +104,17 @@ const GraphView = ({ data, activeComp }) => {
   }
   const separation = { siblings: 1.5, nonSiblings: 2 }
 
-  const { data: compDependency } = useQuery(signedUrlParams ? GetShareCompDependency : GetCompDependency, {
-    skip: (data?.nodes?.length > 0 || activeComp) ? false : true,
-    fetchPolicy: 'network-only',
-    variables: {
-      compId: activeComp?.id || data?.nodes[0]?.id,
-      sbomId: signedUrlParams ? undefined : sbomId
+  const { data: compDependency } = useQuery(
+    signedUrlParams ? GetShareCompDependency : GetCompDependency,
+    {
+      skip: data?.nodes?.length > 0 || activeComp ? false : true,
+      fetchPolicy: 'network-only',
+      variables: {
+        compId: activeComp?.id || data?.nodes[0]?.id,
+        sbomId: signedUrlParams ? undefined : sbomId
+      }
     }
-  })
+  )
 
   const handleZoomIn = () => setZoom(zoom + Number(0.1))
   const handleZoomOut = () => setZoom(zoom - Number(0.1))
@@ -83,15 +122,19 @@ const GraphView = ({ data, activeComp }) => {
   useEffect(() => {
     if (compDependency) {
       // console.log('compDependency', compDependency)
-      if(signedUrlParams) {
-        const dependsOnNodes = compDependency?.shareLynkQuery?.component?.dependsOn?.map(
-          (relation) => ({
-            name: relation.toComp.name,
-            attributes: { version: relation.toComp.version }
-          })
-        )
+      if (signedUrlParams) {
+        const dependsOnNodes =
+          compDependency?.shareLynkQuery?.component?.dependsOn?.map(
+            (relation) => ({
+              name: relation.toComp.name,
+              attributes: { version: relation.toComp.version }
+            })
+          )
         const data = {
-          name:  compDependency?.shareLynkQuery?.component?.name || compDependency?.shareLynkQuery?.component?.version || '----',
+          name:
+            compDependency?.shareLynkQuery?.component?.name ||
+            compDependency?.shareLynkQuery?.component?.version ||
+            '----',
           children: dependsOnNodes
         }
         setTreeView(data)
@@ -103,7 +146,10 @@ const GraphView = ({ data, activeComp }) => {
           })
         )
         const data = {
-          name: compDependency?.component?.name || compDependency?.component?.version || '----',
+          name:
+            compDependency?.component?.name ||
+            compDependency?.component?.version ||
+            '----',
           children: dependsOnNodes
         }
         setTreeView(data)
@@ -117,10 +163,20 @@ const GraphView = ({ data, activeComp }) => {
         <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
           <Flex alignItems={'center'} gap={2}>
             <Tooltip label='Zoom In'>
-              <IconButton colorScheme='blue' onClick={handleZoomIn} isDisabled={zoom > 0.8} icon={<BiZoomIn size={20} />} />
+              <IconButton
+                colorScheme='blue'
+                onClick={handleZoomIn}
+                isDisabled={zoom > 0.8}
+                icon={<BiZoomIn size={20} />}
+              />
             </Tooltip>
             <Tooltip label='Zoom Out'>
-              <IconButton colorScheme='blue' onClick={handleZoomOut} isDisabled={zoom < 0.2} icon={<BiZoomOut size={20} />} />
+              <IconButton
+                colorScheme='blue'
+                onClick={handleZoomOut}
+                isDisabled={zoom < 0.2}
+                icon={<BiZoomOut size={20} />}
+              />
             </Tooltip>
           </Flex>
         </Flex>

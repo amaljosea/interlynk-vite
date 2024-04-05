@@ -1,4 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client'
+import React from 'react'
+import { useEffect } from 'react'
+import { useState } from 'react'
+
 import {
   Box,
   Button,
@@ -9,6 +13,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerOverlay,
+  Flex,
   FormLabel,
   Select,
   SimpleGrid,
@@ -19,19 +24,17 @@ import {
   Textarea,
   Th,
   Thead,
-  chakra,
-  Flex
+  chakra
 } from '@chakra-ui/react'
+
 import VulLinkRow from 'components/Tables/VulLinkRow'
+
 import { VexVulnCreate } from 'graphQL/Mutation'
 import {
-  getVexStatuses,
   getVexJustifications,
-  getVexLogs
+  getVexLogs,
+  getVexStatuses
 } from 'graphQL/Queries'
-import React from 'react'
-import { useEffect } from 'react'
-import { useState } from 'react'
 
 const MultiStatusDrawer = ({
   isOpen,
@@ -83,13 +86,14 @@ const MultiStatusDrawer = ({
             })
         })
     } catch (error) {
-        console.error('Status update error: ', error)
-        toast({
-          description: 'An error occured while setting vulnerability status. Please retry in few minutes.',
-          status: 'error',
-          duration: 2000,
-          position: 'top'
-        })
+      console.error('Status update error: ', error)
+      toast({
+        description:
+          'An error occured while setting vulnerability status. Please retry in few minutes.',
+        status: 'error',
+        duration: 2000,
+        position: 'top'
+      })
     }
   }
 

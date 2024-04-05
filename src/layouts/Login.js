@@ -1,5 +1,12 @@
 import axios from 'axios'
+import Cookies from 'js-cookie'
 import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import theme from 'theme/theme.js'
+
+import Card from 'components/Card/Card'
+import CardBody from 'components/Card/CardBody'
+
 const {
   ChakraProvider,
   Button,
@@ -15,11 +22,6 @@ const {
   AlertDescription,
   Image
 } = require('@chakra-ui/react')
-import { useLocation, useNavigate } from 'react-router-dom'
-import Cookies from 'js-cookie'
-import theme from 'theme/theme.js'
-import Card from 'components/Card/Card'
-import CardBody from 'components/Card/CardBody'
 
 const Login = () => {
   const userLoginURL = process.env.REACT_APP_USER_LOGIN_URL

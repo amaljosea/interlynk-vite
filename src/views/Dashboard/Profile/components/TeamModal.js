@@ -1,28 +1,30 @@
 import { useMutation, useQuery } from '@apollo/client'
-import {
-  Input,
-  Stack,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  useToast,
-  Alert,
-  AlertIcon,
-  Text,
-  Select
-} from '@chakra-ui/react'
-import { InviteUser } from 'graphQL/Mutation'
-import { GetRoles } from 'graphQL/Queries'
 import { useState } from 'react'
 import { validateEmail } from 'utils'
+
+import {
+  Alert,
+  AlertIcon,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Select,
+  Stack,
+  Text,
+  useToast
+} from '@chakra-ui/react'
+
+import { InviteUser } from 'graphQL/Mutation'
+import { GetRoles } from 'graphQL/Queries'
 
 const TeamModal = ({ isOpen, onClose, refetch, data }) => {
   const toast = useToast()

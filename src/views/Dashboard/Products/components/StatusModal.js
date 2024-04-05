@@ -1,21 +1,24 @@
-import { useState } from 'react'
 import { useMutation } from '@apollo/client'
+import { useState } from 'react'
+
 import {
+  Button,
+  Flex,
+  ListItem,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-  UnorderedList,
-  Flex,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Text,
-  Button,
-  ListItem
+  UnorderedList
 } from '@chakra-ui/react'
-import { UpdateProjectGroup } from 'graphQL/Mutation'
+
 import { useGlobalState } from 'hooks/useGlobalState'
+
+import { UpdateProjectGroup } from 'graphQL/Mutation'
 
 const StatusModal = ({ isOpen, onClose, group, grouId, refetch }) => {
   const { totalRows, prodState } = useGlobalState()

@@ -1,19 +1,39 @@
-import { Badge, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, Portal, Stack, Switch, Tag, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
-import CustomLoader from 'components/CustomLoader'
-import DataTable from 'react-data-table-component'
-import { useMemo, useState, useEffect } from 'react'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { customStyles, timeSince, getFullDateAndTime } from 'utils'
-import { useGlobalState } from 'hooks/useGlobalState'
-import Pagination from 'components/Pagination'
-import { RepeatIcon } from '@chakra-ui/icons'
-import { FaPlus } from 'react-icons/fa6'
-import { FaEllipsisV } from 'react-icons/fa'
-import SupportModal from 'views/Dashboard/Support/SupportModal'
-import { useLocation } from 'react-router-dom'
-import { UpdateCompSupportOverride } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
+import { useEffect, useMemo, useState } from 'react'
+import DataTable from 'react-data-table-component'
+import { useLocation } from 'react-router-dom'
+import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import DeleteModal from 'views/Dashboard/Support/DeleteModal'
+import SupportModal from 'views/Dashboard/Support/SupportModal'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
+
+import { RepeatIcon } from '@chakra-ui/icons'
+import {
+  Badge,
+  Flex,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
+  Stack,
+  Switch,
+  Tag,
+  Text,
+  Tooltip,
+  useDisclosure
+} from '@chakra-ui/react'
+
+import CustomLoader from 'components/CustomLoader'
+import Pagination from 'components/Pagination'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import { UpdateCompSupportOverride } from 'graphQL/Mutation'
+
+import { FaEllipsisV } from 'react-icons/fa'
+import { FaPlus } from 'react-icons/fa6'
 
 const SupportTable = ({ data, refetch }) => {
   const location = useLocation()
@@ -26,7 +46,11 @@ const SupportTable = ({ data, refetch }) => {
   const { supportDispatch } = dispatch
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure()
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
 
   const paginationSizes = [25, 50, 100]
   const [activeRow, setActiveRow] = useState(null)
@@ -34,7 +58,12 @@ const SupportTable = ({ data, refetch }) => {
   const [isNextActive, setIsNextActive] = useState(false)
   const [filterText, setFilterText] = useState('')
 
-  const supportData = { search: searchInput === '' ? undefined : searchInput, first: totalRows, field: field, direction: direction }
+  const supportData = {
+    search: searchInput === '' ? undefined : searchInput,
+    first: totalRows,
+    field: field,
+    direction: direction
+  }
 
   const [updateSupport] = useMutation(UpdateCompSupportOverride)
 
@@ -45,7 +74,16 @@ const SupportTable = ({ data, refetch }) => {
 
   const handleRefetch = async (after, before) => {
     disablePaginationControl()
-    await refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: after ? totalRows : undefined, after: after ? after : undefined, last: before ? totalRows : undefined, before: before ? before : undefined, field, direction }
+    await refetch({
+      variables: {
+        search: searchInput === '' ? undefined : searchInput,
+        first: after ? totalRows : undefined,
+        after: after ? after : undefined,
+        last: before ? totalRows : undefined,
+        before: before ? before : undefined,
+        field,
+        direction
+      }
     }).then((res) => {
       if (res?.data) {
         console.log('res', res?.data?.supports)
@@ -64,16 +102,32 @@ const SupportTable = ({ data, refetch }) => {
     if (sbomId) {
       await refetch({ variables: { projectId, sbomId } })
     } else {
-      await refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows, field, direction }
-      }).then((res) => res?.data && supportDispatch({ type: 'CLEAR_SEARCH_INPUT' }))
+      await refetch({
+        variables: {
+          search: searchInput === '' ? undefined : searchInput,
+          first: totalRows,
+          field,
+          direction
+        }
+      }).then(
+        (res) => res?.data && supportDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+      )
     }
   }
 
   // CLEAR SERACH
   const handleClear = async () => {
     setFilterText('')
-    await refetch({ variables: { search: undefined, first: totalRows, field: field, direction: direction } })
-    .then((res) => res?.data && supportDispatch({ type: 'CLEAR_SEARCH_INPUT' }))
+    await refetch({
+      variables: {
+        search: undefined,
+        first: totalRows,
+        field: field,
+        direction: direction
+      }
+    }).then(
+      (res) => res?.data && supportDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+    )
   }
 
   // ON SEARCH INPUT CHANGE
@@ -90,17 +144,33 @@ const SupportTable = ({ data, refetch }) => {
   const handleSearch = async (event) => {
     const { value } = event.target
     if (event.key === 'Enter' && filterText !== '') {
-      refetch({ variables: { search: value, first: totalRows, field, direction }
-      }).then((res) => res?.data && supportDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value }) )
+      refetch({
+        variables: { search: value, first: totalRows, field, direction }
+      }).then(
+        (res) =>
+          res?.data &&
+          supportDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+      )
     }
   }
 
   const handleSort = async (column, sortDirection) => {
     await refetch({
-      variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows, field: column.id, direction: sortDirection === 'asc' ? 'ASC' : 'DESC' }
+      variables: {
+        search: searchInput === '' ? undefined : searchInput,
+        first: totalRows,
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
     }).then((res) => {
       if (res.data) {
-        supportDispatch({ type: 'SET_SORT_ORDER', payload: { field: column.id, direction: sortDirection === 'asc' ? 'ASC' : 'DESC' } })
+        supportDispatch({
+          type: 'SET_SORT_ORDER',
+          payload: {
+            field: column.id,
+            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+          }
+        })
       }
     })
   }
@@ -109,7 +179,13 @@ const SupportTable = ({ data, refetch }) => {
   const handleSetRow = async (e) => {
     setTotalRows(Number(e.target.value))
     disablePaginationControl()
-    await refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: Number(e.target.value), field: field, direction: direction }
+    await refetch({
+      variables: {
+        search: searchInput === '' ? undefined : searchInput,
+        first: Number(e.target.value),
+        field: field,
+        direction: direction
+      }
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
@@ -121,21 +197,37 @@ const SupportTable = ({ data, refetch }) => {
   const handlePreviousPage = async () => {
     disablePaginationControl()
     handleRefetch(null, data.pageInfo.startCursor)
-    supportDispatch({ type: 'DECREMENT_PAGE', payload: data.pageInfo.startCursor })
+    supportDispatch({
+      type: 'DECREMENT_PAGE',
+      payload: data.pageInfo.startCursor
+    })
   }
 
   const handleNextPage = async () => {
     disablePaginationControl()
     handleRefetch(data.pageInfo.endCursor, null)
-    supportDispatch({ type: 'INCREMENT_PAGE', payload: { total: data.totalCount, after: data.pageInfo.endCursor } })
+    supportDispatch({
+      type: 'INCREMENT_PAGE',
+      payload: { total: data.totalCount, after: data.pageInfo.endCursor }
+    })
   }
 
   // SUB HEADER
   const subHeader = useMemo(() => {
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'}>
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
         {/* SEARCH COMPONENTS */}
-        <SearchFilter id='support' filterText={filterText} onChange={onSearchInputChange} onClear={handleClear} onFilter={handleSearch} />
+        <SearchFilter
+          id='support'
+          filterText={filterText}
+          onChange={onSearchInputChange}
+          onClear={handleClear}
+          onFilter={handleSearch}
+        />
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
           {!sbomId && (
             <Tooltip label='Create Support'>
@@ -150,18 +242,28 @@ const SupportTable = ({ data, refetch }) => {
             </Tooltip>
           )}
           <Tooltip label='Refresh'>
-            <IconButton colorScheme='blue' onClick={handleRefresh} icon={<RepeatIcon />}/>
+            <IconButton
+              colorScheme='blue'
+              onClick={handleRefresh}
+              icon={<RepeatIcon />}
+            />
           </Tooltip>
         </Stack>
       </Flex>
     )
-  }, [filterText,onSearchInputChange,handleClear,handleSearch,handleRefresh])
+  }, [
+    filterText,
+    onSearchInputChange,
+    handleClear,
+    handleSearch,
+    handleRefresh
+  ])
 
   const onChangeStatus = async (e, row) => {
     e.preventDefault()
     await updateSupport({
       variables: { id: row?.id, enabled: e.target.checked }
-    }).then((res) => res?.data && refetch({ variables: {...supportData } }))
+    }).then((res) => res?.data && refetch({ variables: { ...supportData } }))
   }
 
   // COLUMNS
@@ -172,7 +274,11 @@ const SupportTable = ({ data, refetch }) => {
       selector: (row) => {
         const { enabled } = row
         return (
-          <Switch size='md' isChecked={enabled} onChange={(e) => onChangeStatus(e, row)} />
+          <Switch
+            size='md'
+            isChecked={enabled}
+            onChange={(e) => onChangeStatus(e, row)}
+          />
         )
       },
       width: '110px',
@@ -199,7 +305,7 @@ const SupportTable = ({ data, refetch }) => {
       name: 'URI',
       selector: (row) => <Text my={4}>{row?.idUri}</Text>,
       wrap: true,
-      width: '320px',
+      width: '320px'
     },
     {
       id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_VERSION',
@@ -208,19 +314,27 @@ const SupportTable = ({ data, refetch }) => {
       width: '150px',
       wrap: true,
       sortable: true,
-      omit: true,
+      omit: true
     },
     {
       id: 'DEPRECATED',
       name: 'DEPRECATED',
-      selector: (row) => <Tag variant='solid' colorScheme='blue' textTransform={'capitalize'}>{JSON.stringify(row?.deprecated)}</Tag>,
+      selector: (row) => (
+        <Tag variant='solid' colorScheme='blue' textTransform={'capitalize'}>
+          {JSON.stringify(row?.deprecated)}
+        </Tag>
+      ),
       width: '150px',
       wrap: true
     },
     {
       id: 'OUTDATED',
       name: 'OUTDATED',
-      selector: (row) => <Tag variant='solid' colorScheme='blue' textTransform={'capitalize'}>{JSON.stringify(row?.outdated)}</Tag>,
+      selector: (row) => (
+        <Tag variant='solid' colorScheme='blue' textTransform={'capitalize'}>
+          {JSON.stringify(row?.outdated)}
+        </Tag>
+      ),
       width: '150px',
       wrap: true
     },
@@ -262,7 +376,12 @@ const SupportTable = ({ data, refetch }) => {
       selector: (row) => {
         return (
           <Menu>
-            <MenuButton as={IconButton} icon={<FaEllipsisV />} variant='none' color='gray.400' />
+            <MenuButton
+              as={IconButton}
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+            />
             <Portal>
               <MenuList fontSize={'sm'}>
                 {/* EDIT SUPPORT */}
@@ -275,10 +394,13 @@ const SupportTable = ({ data, refetch }) => {
                   Edit Support
                 </MenuItem>
                 {/* DELETE SUPPORT  */}
-                <MenuItem color='red' onClick={() => {
-                  setActiveRow(row)
-                  onDeleteOpen()
-                }}>
+                <MenuItem
+                  color='red'
+                  onClick={() => {
+                    setActiveRow(row)
+                    onDeleteOpen()
+                  }}
+                >
                   Archive Support
                 </MenuItem>
               </MenuList>
@@ -302,17 +424,55 @@ const SupportTable = ({ data, refetch }) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable columns={columns} data={data?.nodes || []} customStyles={customStyles} onSort={handleSort} defaultSortFieldId={field} defaultSortAsc={false} progressPending={data ? false : true} persistTableHead subHeader subHeaderComponent={subHeader} progressComponent={<CustomLoader />} responsive={true} />
+        <DataTable
+          columns={columns}
+          data={data?.nodes || []}
+          customStyles={customStyles}
+          onSort={handleSort}
+          defaultSortFieldId={field}
+          defaultSortAsc={false}
+          progressPending={data ? false : true}
+          persistTableHead
+          subHeader
+          subHeaderComponent={subHeader}
+          progressComponent={<CustomLoader />}
+          responsive={true}
+        />
 
         {/* PAGINATION */}
         {data?.pageInfo && (
-          <Pagination paginationSizes={paginationSizes} pageIndex={pageIndex} totalRows={totalRows} totalCount={data?.totalCount} onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} onSetRow={handleSetRow} hasNextPage={isNextActive} hasPreviousPage={isPrevActive} />
+          <Pagination
+            paginationSizes={paginationSizes}
+            pageIndex={pageIndex}
+            totalRows={totalRows}
+            totalCount={data?.totalCount}
+            onPreviousPage={handlePreviousPage}
+            onNextPage={handleNextPage}
+            onSetRow={handleSetRow}
+            hasNextPage={isNextActive}
+            hasPreviousPage={isPrevActive}
+          />
         )}
       </Flex>
 
-      {isOpen && <SupportModal supports={data?.nodes || []} data={activeRow} isOpen={isOpen} onClose={onClose} refetch={refetch} />}
+      {isOpen && (
+        <SupportModal
+          supports={data?.nodes || []}
+          data={activeRow}
+          isOpen={isOpen}
+          onClose={onClose}
+          refetch={refetch}
+        />
+      )}
 
-      {isDeleteOpen && <DeleteModal data={activeRow} isOpen={isDeleteOpen} onClose={onDeleteClose} refetch={refetch} />}
+      {isDeleteOpen && (
+        <DeleteModal
+          data={activeRow}
+          isOpen={isDeleteOpen}
+          onClose={onDeleteClose}
+          refetch={refetch}
+        />
+      )}
     </>
   )
 }

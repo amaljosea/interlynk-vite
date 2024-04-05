@@ -1,26 +1,28 @@
-import React, {useEffect, useState} from 'react';
-import { Flex, Switch, Text } from '@chakra-ui/react';
-import Card from "../Card/Card";
-import CardHeader from "../Card/CardHeader";
-import {useMutation, useQuery} from "@apollo/client";
-import {GetUserNotificationChannels} from "graphQL/Queries";
-import {UpdateNotificationChannel} from "graphQL/Mutation";
+import { useMutation, useQuery } from '@apollo/client'
+import React, { useEffect, useState } from 'react'
+
+import { Flex, Switch, Text } from '@chakra-ui/react'
+
+import { UpdateNotificationChannel } from 'graphQL/Mutation'
+import { GetUserNotificationChannels } from 'graphQL/Queries'
+
+import Card from '../Card/Card'
+import CardHeader from '../Card/CardHeader'
 
 const NotificationChannels = () => {
   const [updateChannel] = useMutation(UpdateNotificationChannel)
   const [notificationChannels, setNotificationChannels] = useState({})
   const { data } = useQuery(GetUserNotificationChannels)
 
-
   useEffect(() => {
     if (data) {
       let notificationChannels = { ...data.notificationChannels } || {}
       if ('__typename' in notificationChannels) {
-        delete notificationChannels.__typename;
+        delete notificationChannels.__typename
       }
-      setNotificationChannels(notificationChannels);
+      setNotificationChannels(notificationChannels)
     }
-  }, [data]);
+  }, [data])
 
   const handleSwitchChange = (id) => {
     const selectedChannels = {
@@ -33,7 +35,8 @@ const NotificationChannels = () => {
         notificationChannels: selectedChannels
       }
     }).then((res) => {
-      res?.data?.notificationChannelUpdate?.success && setNotificationChannels(selectedChannels)
+      res?.data?.notificationChannelUpdate?.success &&
+        setNotificationChannels(selectedChannels)
     })
   }
 
@@ -71,4 +74,4 @@ const NotificationChannels = () => {
   )
 }
 
-export default NotificationChannels;
+export default NotificationChannels

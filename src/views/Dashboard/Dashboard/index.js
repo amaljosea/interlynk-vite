@@ -1,26 +1,39 @@
 // Chakra imports
-import { Flex, Grid, GridItem, SimpleGrid, Skeleton, useColorModeValue } from '@chakra-ui/react'
-import BarChart from 'components/Charts/BarChart'
-import LineChart from 'components/Charts/LineChart'
-import { FaLayerGroup, FaBug, FaCube, FaWindowMaximize } from 'react-icons/fa'
-import SBOMActivities from './components/ActiveUsers'
-import MiniStatistics from './components/MiniStatistics'
-import ActivitiesOverview from './components/ActivitiesOverview'
-import ProductsOverview from './components/ProductsOverview'
-import RiskScoreOverview from './components/SalesOverview'
-import { GetOrg } from 'graphQL/Queries'
 import { useQuery } from '@apollo/client'
-import OrgRegister from '../Profile/components/OrgRegister'
 import { useEffect, useMemo } from 'react'
-import { GetOrgMetrics } from 'graphQL/Queries'
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useLocation } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
-import { Text } from '@chakra-ui/react'
-import { WarningTwoIcon } from '@chakra-ui/icons'
-import CustomLoader from 'components/CustomLoader'
-import Card from 'components/Card/Card'
 import { logoutUser } from 'utils/authUtils'
+
+import { WarningTwoIcon } from '@chakra-ui/icons'
+import {
+  Flex,
+  Grid,
+  GridItem,
+  SimpleGrid,
+  Skeleton,
+  useColorModeValue
+} from '@chakra-ui/react'
+import { Text } from '@chakra-ui/react'
+
+import Card from 'components/Card/Card'
+import BarChart from 'components/Charts/BarChart'
+import LineChart from 'components/Charts/LineChart'
+import CustomLoader from 'components/CustomLoader'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import { GetOrg } from 'graphQL/Queries'
+import { GetOrgMetrics } from 'graphQL/Queries'
+
+import { FaBug, FaCube, FaLayerGroup, FaWindowMaximize } from 'react-icons/fa'
+
+import OrgRegister from '../Profile/components/OrgRegister'
+import SBOMActivities from './components/ActiveUsers'
+import ActivitiesOverview from './components/ActivitiesOverview'
+import MiniStatistics from './components/MiniStatistics'
+import ProductsOverview from './components/ProductsOverview'
+import RiskScoreOverview from './components/SalesOverview'
 
 export default function Dashboard() {
   const location = useLocation()
@@ -31,21 +44,34 @@ export default function Dashboard() {
 
   const iconBoxInside = useColorModeValue('white', 'white')
 
-  const productPermissions = useMemo(() => userPermissions?.find((item) => item.key === 'view_product_group'),  [userPermissions])
+  const productPermissions = useMemo(
+    () => userPermissions?.find((item) => item.key === 'view_product_group'),
+    [userPermissions]
+  )
 
-  const { data, error: eOrg, loading } = useQuery(GetOrg, {
+  const {
+    data,
+    error: eOrg,
+    loading
+  } = useQuery(GetOrg, {
     skip: data === undefined ? false : true,
     fetchPolicy: 'network-only',
     onCompleted: (data) => {
-      if(data) {
+      if (data) {
         localStorage.setItem('organization', data?.organization?.name)
-        localStorage.setItem('isSuperAdmin', data?.organization?.currentUser?.superAdmin)
+        localStorage.setItem(
+          'isSuperAdmin',
+          data?.organization?.currentUser?.superAdmin
+        )
       }
     }
   })
 
   const { data: metrics, error: eOrgMetric } = useQuery(GetOrgMetrics, {
-    skip: data?.organization?.name && productPermissions?.value === true ? false : true,
+    skip:
+      data?.organization?.name && productPermissions?.value === true
+        ? false
+        : true,
     variables: { env: envName }
   })
 
@@ -69,7 +95,13 @@ export default function Dashboard() {
 
   if (eOrg && eOrgMetric) {
     return (
-      <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} gap={'24px'} pr={2} pl={5}>
+      <Flex
+        flexDirection='column'
+        pt={{ base: '120px', md: '74px' }}
+        gap={'24px'}
+        pr={2}
+        pl={5}
+      >
         <OrgRegister />
       </Flex>
     )
@@ -77,7 +109,13 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} gap={'24px'} pr={2} pl={5}>
+      <Flex
+        flexDirection='column'
+        pt={{ base: '120px', md: '74px' }}
+        gap={'24px'}
+        pr={2}
+        pl={5}
+      >
         <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
           {[1, 2, 3, 4].map((_, index) => (
             <Card key={index}>
@@ -88,9 +126,15 @@ export default function Dashboard() {
             </Card>
           ))}
         </SimpleGrid>
-        <Grid templateColumns={{ sm: '1fr', md: '1fr 1fr', lg: '2fr 1fr' }} templateRows={{ sm: '1fr auto', md: '1fr', lg: '1fr' }} gap='24px'>
+        <Grid
+          templateColumns={{ sm: '1fr', md: '1fr 1fr', lg: '2fr 1fr' }}
+          templateRows={{ sm: '1fr auto', md: '1fr', lg: '1fr' }}
+          gap='24px'
+        >
           {[1, 2].map((_, index) => (
-            <Card key={index}><CustomLoader /></Card>
+            <Card key={index}>
+              <CustomLoader />
+            </Card>
           ))}
         </Grid>
       </Flex>
@@ -100,18 +144,54 @@ export default function Dashboard() {
   return (
     <>
       {data && (
-        <Flex width={'100%'} flexDirection='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
+        <Flex
+          width={'100%'}
+          flexDirection='column'
+          pt={{ base: '120px', md: '74px' }}
+          pr={2}
+          pl={5}
+        >
           {data.organization ? (
             <Flex flexDirection='column'>
               {/* STATS */}
               <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
-                <MiniStatistics title={'Products'} amount={metrics?.organizationMetric?.projectCount} percentage={9} icon={<FaWindowMaximize h={'24px'} w={'24px'} color={iconBoxInside}/>}/>
-                <MiniStatistics title={'Versions'} amount={metrics?.organizationMetric?.versionCount} icon={<FaLayerGroup h={'24px'} w={'24px'} color={iconBoxInside} />}/>
-                <MiniStatistics title={'Components'} amount={metrics?.organizationMetric?.componentCount} icon={<FaCube h={'24px'} w={'24px'} color={iconBoxInside} />}/>
-                <MiniStatistics title={'Vulnerabilities'} amount={metrics?.organizationMetric?.vulnsMetric} icon={<FaBug h={'24px'} w={'24px'} color={iconBoxInside} />}/>
+                <MiniStatistics
+                  title={'Products'}
+                  amount={metrics?.organizationMetric?.projectCount}
+                  percentage={9}
+                  icon={
+                    <FaWindowMaximize
+                      h={'24px'}
+                      w={'24px'}
+                      color={iconBoxInside}
+                    />
+                  }
+                />
+                <MiniStatistics
+                  title={'Versions'}
+                  amount={metrics?.organizationMetric?.versionCount}
+                  icon={
+                    <FaLayerGroup h={'24px'} w={'24px'} color={iconBoxInside} />
+                  }
+                />
+                <MiniStatistics
+                  title={'Components'}
+                  amount={metrics?.organizationMetric?.componentCount}
+                  icon={<FaCube h={'24px'} w={'24px'} color={iconBoxInside} />}
+                />
+                <MiniStatistics
+                  title={'Vulnerabilities'}
+                  amount={metrics?.organizationMetric?.vulnsMetric}
+                  icon={<FaBug h={'24px'} w={'24px'} color={iconBoxInside} />}
+                />
               </SimpleGrid>
               {/* GRAPHS */}
-              <Grid templateColumns={{ sm: '1fr', lg: '1.3fr 1.7fr' }} templateRows={{ sm: 'repeat(2, 1fr)', lg: '1fr' }} mb={{ lg: '26px' }} gap='24px'>
+              <Grid
+                templateColumns={{ sm: '1fr', lg: '1.3fr 1.7fr' }}
+                templateRows={{ sm: 'repeat(2, 1fr)', lg: '1fr' }}
+                mb={{ lg: '26px' }}
+                gap='24px'
+              >
                 {/* TODO: 1.0 Add back in when ready
                 <RiskScoreOverview
                   title={'Risk Score'}
@@ -126,14 +206,27 @@ export default function Dashboard() {
                 */}
               </Grid>
               {/* LIST */}
-              <Grid templateColumns='repeat(12, 1fr)' gap={'24px'} flexWrap={'wrap'}>
+              <Grid
+                templateColumns='repeat(12, 1fr)'
+                gap={'24px'}
+                flexWrap={'wrap'}
+              >
                 {/* RECENT IMPORTS */}
                 <GridItem colSpan={8} w='100%'>
-                  <ProductsOverview title={'Recent Imports'} data={metrics?.organizationMetric?.latestVersions} prodPermissions={productPermissions} />
+                  <ProductsOverview
+                    title={'Recent Imports'}
+                    data={metrics?.organizationMetric?.latestVersions}
+                    prodPermissions={productPermissions}
+                  />
                 </GridItem>
                 {/* LATEST ACTIVITIES */}
                 <GridItem colSpan={4} w='100%'>
-                  <ActivitiesOverview title={'Recent Activities'} amount={metrics?.organizationMetric?.latestActivity?.length} data={metrics?.organizationMetric?.latestActivity} prodPermissions={productPermissions} />
+                  <ActivitiesOverview
+                    title={'Recent Activities'}
+                    amount={metrics?.organizationMetric?.latestActivity?.length}
+                    data={metrics?.organizationMetric?.latestActivity}
+                    prodPermissions={productPermissions}
+                  />
                 </GridItem>
               </Grid>
             </Flex>

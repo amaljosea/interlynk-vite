@@ -1,25 +1,27 @@
 import { useMutation } from '@apollo/client'
+import { useEffect, useState } from 'react'
+
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
+  Alert,
+  AlertIcon,
+  Box,
   Button,
   Flex,
   FormControl,
   FormLabel,
-  Textarea,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Select,
-  Alert,
-  AlertIcon,
   Text,
-  Box
+  Textarea
 } from '@chakra-ui/react'
+
 import { signSbom } from 'graphQL/Mutation'
-import { useEffect, useState } from 'react'
 
 const SigningModal = ({
   isOpen,
@@ -126,7 +128,7 @@ const SigningModal = ({
                 >
                   SBOM Signing coming soon...
                 </Box>
-              {/* Algorithm */}
+                {/* Algorithm */}
                 <FormControl isRequired>
                   <FormLabel fontSize={14}>Algorithm</FormLabel>
                   <Select
@@ -188,7 +190,7 @@ const SigningModal = ({
               <Button colorScheme='gray' mr={3} onClick={onClose}>
                 Cancel
               </Button>
-{/*               {message === '' ? (
+              {/*               {message === '' ? (
                 <Button colorScheme='blue' type='submit'>
                   {status === 'signed' ? 'Unsign' : 'Validate and Sign'}
                 </Button>

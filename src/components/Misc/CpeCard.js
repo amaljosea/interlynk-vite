@@ -1,8 +1,30 @@
-import { Stack, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Divider, Grid, Tag
+import {
+  Divider,
+  Grid,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
+  Tag,
+  Text
 } from '@chakra-ui/react'
 
 const CpeText = ({ children }) => (
-  <Tag width={'130px'} justifyContent={'center'} ml={'auto'} size='sm' variant='subtle' colorScheme={'blue'} wordBreak={'break-all'} py={1} textAlign={'center'} alignItems={'center'}>
+  <Tag
+    width={'130px'}
+    justifyContent={'center'}
+    ml={'auto'}
+    size='sm'
+    variant='subtle'
+    colorScheme={'blue'}
+    wordBreak={'break-all'}
+    py={1}
+    textAlign={'center'}
+    alignItems={'center'}
+  >
     {children}
   </Tag>
 )
@@ -11,7 +33,7 @@ const CpeCard = ({ value, isOpen, onClose }) => {
   const filterString = value?.replace(/[\[\]"]/g, '') || ''
   const cpeString = filterString.split(':')
 
-  console.log('cpeString', cpeString);
+  console.log('cpeString', cpeString)
 
   console.log('cpeString', cpeString)
 
@@ -36,7 +58,13 @@ const CpeCard = ({ value, isOpen, onClose }) => {
         <ModalCloseButton />
         <ModalBody pb={6}>
           <Stack spacing={1}>
-            <Tag justifyContent={'center'} alignItems={'center'} fontSize={'sm'} py={2} wordBreak={'break-all'}>
+            <Tag
+              justifyContent={'center'}
+              alignItems={'center'}
+              fontSize={'sm'}
+              py={2}
+              wordBreak={'break-all'}
+            >
               {value}
             </Tag>
             <Divider />

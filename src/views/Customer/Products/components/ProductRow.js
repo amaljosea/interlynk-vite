@@ -1,8 +1,9 @@
-import { Td, Text, Tr, Switch, Skeleton } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import { useContext } from 'react'
 import { Link } from 'react-router-dom'
-import { timeSince, normalizeSBOMVersion } from 'utils'
+import { normalizeSBOMVersion, timeSince } from 'utils'
+
+import { Skeleton, Switch, Td, Text, Tr } from '@chakra-ui/react'
 
 function ProductRow(props) {
   const { id, sbomId, name, description, updatedAt, isLoading } = props

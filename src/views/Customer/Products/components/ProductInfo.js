@@ -1,22 +1,39 @@
 // Chakra imports
+import { useLazyQuery, useQuery } from '@apollo/client'
+import GlobalContext from 'context/GlobalContext'
+import Cookies from 'js-cookie'
+import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { getFullDateAndTime, normalizeSBOMVersion, timeSince } from 'utils'
+import DownloadModal from 'views/Sbom/components/DownloadModal'
+
 import {
+  Badge,
+  Box,
   Flex,
-  Icon,
   Grid,
   GridItem,
-  Text,
+  Icon,
+  IconButton,
   Select,
-  useDisclosure,
+  Skeleton,
   Stack,
-  Box,
-  Tooltip,
-  Badge,
   Tag,
   TagLabel,
-  IconButton,
-  Skeleton
+  Text,
+  Tooltip,
+  useDisclosure
 } from '@chakra-ui/react'
-import React, { useState, useEffect, useRef, useContext } from 'react'
+
+import Card from 'components/Card/Card'
+import CardBody from 'components/Card/CardBody'
+
+import { GetProjectInfo, GetSignedSBOM } from 'graphQL/Queries'
+import { GetSignedProductData } from 'graphQL/Queries'
+import { GetSignedProjects } from 'graphQL/Queries'
+import { GetSignedVulnData } from 'graphQL/Queries'
+import { ShareLynkProjectGroups } from 'graphQL/Queries'
+
 import {
   FaBalanceScale,
   FaBug,
@@ -25,20 +42,8 @@ import {
   FaFileDownload,
   FaLayerGroup
 } from 'react-icons/fa'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { useLazyQuery, useQuery } from '@apollo/client'
-import { GetSignedSBOM, GetProjectInfo } from 'graphQL/Queries'
-import Card from 'components/Card/Card'
-import CardBody from 'components/Card/CardBody'
-import DownloadModal from 'views/Sbom/components/DownloadModal'
-import Cookies from 'js-cookie'
-import { getFullDateAndTime, normalizeSBOMVersion, timeSince } from 'utils'
-import { GetSignedProductData } from 'graphQL/Queries'
-import { GetSignedProjects } from 'graphQL/Queries'
+
 import SignedSbomTable from './SBOMTable'
-import { GetSignedVulnData } from 'graphQL/Queries'
-import GlobalContext from 'context/GlobalContext'
-import { ShareLynkProjectGroups } from 'graphQL/Queries'
 
 function ProductInfo() {
   const initialRef = useRef(null)

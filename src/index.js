@@ -1,41 +1,42 @@
+import * as Sentry from '@sentry/react'
+import Cookies from 'js-cookie'
+import Reset from 'layouts/Reset'
+import Success from 'layouts/Success'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactGA from 'react-ga'
-import * as Sentry from '@sentry/react'
 import TagManager from 'react-gtm-module'
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
-import './main.css'
-
-// import SBOMLayout from './layouts/SBOM.js'
-import AuthLayout from './layouts/Auth.js'
-import AdminLayout from './layouts/Admin.js'
-import CustomerLayout from './layouts/Customer.js'
-import Register from './layouts/Register.js'
-import LoginLayout from './layouts/Login.js'
-import ScrollToTop from 'components/ScrollToTop.js'
-import { ChakraProvider } from '@chakra-ui/react'
-import Dashboard from 'views/Dashboard/Dashboard'
-import Products from 'views/Dashboard/Products'
-import { GlobalStateProvider } from 'hooks/useGlobalState'
-import ChatbotPreview from 'components/ChatbotPreview'
-import ProductList from 'views/Dashboard/Products/ProductList'
-import ProductDetails from 'views/Dashboard/Products/ProductDetails'
-import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
-import Licenses from 'components/Licenses'
-import Profile from 'views/Dashboard/Profile'
-import Success from 'layouts/Success'
-import Cookies from 'js-cookie'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import theme from 'theme/theme.js'
-
 import PubProducts from 'views/Customer/Products'
-import PubProductList from 'views/Customer/Products/ProductList'
 import PubProductDetails from 'views/Customer/Products/ProductDetails'
+import PubProductList from 'views/Customer/Products/ProductList'
+import Dashboard from 'views/Dashboard/Dashboard'
+import Policies from 'views/Dashboard/Policies'
+import Products from 'views/Dashboard/Products'
+import ProductDetails from 'views/Dashboard/Products/ProductDetails'
+import ProductList from 'views/Dashboard/Products/ProductList'
+import Profile from 'views/Dashboard/Profile'
+import Sag from 'views/Dashboard/SAG'
 import Support from 'views/Dashboard/Support'
 import Tools from 'views/Dashboard/Tools'
-import Reset from 'layouts/Reset'
-import Sag from 'views/Dashboard/SAG'
-import Policies from 'views/Dashboard/Policies'
+import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 
+import { ChakraProvider } from '@chakra-ui/react'
+
+import ChatbotPreview from 'components/ChatbotPreview'
+import Licenses from 'components/Licenses'
+import ScrollToTop from 'components/ScrollToTop.js'
+
+import { GlobalStateProvider } from 'hooks/useGlobalState'
+
+import AdminLayout from './layouts/Admin.js'
+// import SBOMLayout from './layouts/SBOM.js'
+import AuthLayout from './layouts/Auth.js'
+import CustomerLayout from './layouts/Customer.js'
+import LoginLayout from './layouts/Login.js'
+import Register from './layouts/Register.js'
+import './main.css'
 
 const authToken = Cookies.get('authToken')
 const env = process.env.NODE_ENV
@@ -76,7 +77,13 @@ ReactDOM.render(
           <Routes>
             <Route
               path=''
-              element={authToken ? <Navigate replace to='/vendor/dashboard' /> : <Navigate replace to='/auth' />}
+              element={
+                authToken ? (
+                  <Navigate replace to='/vendor/dashboard' />
+                ) : (
+                  <Navigate replace to='/auth' />
+                )
+              }
             />
             <Route path={`auth`} element={<AuthLayout />} />
             <Route path={`reset_password`} element={<Reset />} />

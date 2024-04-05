@@ -1,6 +1,7 @@
+import { useEffect, useRef } from 'react'
+
 import { CloseIcon } from '@chakra-ui/icons'
 import { Box, Input } from '@chakra-ui/react'
-import { useEffect, useRef } from 'react'
 
 const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
   const searchInputRef = useRef()

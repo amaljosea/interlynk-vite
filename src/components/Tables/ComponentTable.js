@@ -1,32 +1,77 @@
 // Chakra imports
-import { AddIcon, RepeatIcon, ViewIcon } from '@chakra-ui/icons'
-import { Flex, Text, Stack, Box, IconButton, Tooltip, MenuButton, Menu, Portal, MenuList, MenuItem, useDisclosure, Tag, TagLabel, Grid, GridItem, TagCloseButton, Link, Divider, VStack } from '@chakra-ui/react'
-import DataTable from 'react-data-table-component'
-import { BsFillPatchQuestionFill } from 'react-icons/bs'
-import { FaEllipsisV, FaGlobe, FaHouseUser, FaLightbulb, FaSitemap } from 'react-icons/fa'
-import { timeSince, GetIcon, getFullDateAndTime, customStyles } from 'utils'
-import { useState, useMemo, useRef, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
-import ComponentDrawer from 'components/Drawer/ComponentDrawer'
-import ComponentModal from 'views/Sbom/components/ComponentModal'
-import SupplierModal from 'views/Sbom/components/SupplierModal'
-import LinksDrawer from 'components/Drawer/LinksDrawer'
-import styled from '@emotion/styled'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { GetComponentPath, GetCompFilterData, ShareCompFilters } from 'graphQL/Queries'
-import { deleteComSupplier } from 'graphQL/Mutation'
-import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
-import CustomLoader from 'components/CustomLoader'
-import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
-import { useGlobalState } from 'hooks/useGlobalState'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
-import Pagination from '../Pagination'
-import PurlCard from 'components/Misc/PurlCard'
-import CpeCard from 'components/Misc/CpeCard'
+import styled from '@emotion/styled'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import DataTable from 'react-data-table-component'
+import { useLocation } from 'react-router-dom'
+import { GetIcon, customStyles, getFullDateAndTime, timeSince } from 'utils'
 import { openSsf } from 'variables/general'
-import GraphDrawer from 'components/Drawer/GraphDrawer'
+import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
+import ComponentModal from 'views/Sbom/components/ComponentModal'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
+import SupplierModal from 'views/Sbom/components/SupplierModal'
 
-const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, activeComp, setActiveComp }) => {
+import { AddIcon, RepeatIcon, ViewIcon } from '@chakra-ui/icons'
+import {
+  Box,
+  Divider,
+  Flex,
+  Grid,
+  GridItem,
+  IconButton,
+  Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
+  Stack,
+  Tag,
+  TagCloseButton,
+  TagLabel,
+  Text,
+  Tooltip,
+  VStack,
+  useDisclosure
+} from '@chakra-ui/react'
+
+import CustomLoader from 'components/CustomLoader'
+import ComponentDrawer from 'components/Drawer/ComponentDrawer'
+import GraphDrawer from 'components/Drawer/GraphDrawer'
+import LinksDrawer from 'components/Drawer/LinksDrawer'
+import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
+import CpeCard from 'components/Misc/CpeCard'
+import PurlCard from 'components/Misc/PurlCard'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import { deleteComSupplier } from 'graphQL/Mutation'
+import {
+  GetCompFilterData,
+  GetComponentPath,
+  ShareCompFilters
+} from 'graphQL/Queries'
+
+import { BsFillPatchQuestionFill } from 'react-icons/bs'
+import {
+  FaEllipsisV,
+  FaGlobe,
+  FaHouseUser,
+  FaLightbulb,
+  FaSitemap
+} from 'react-icons/fa'
+
+import Pagination from '../Pagination'
+
+const ComponentTable = ({
+  lifecycle,
+  data,
+  refetch,
+  primaryComp,
+  sbomRefetch,
+  activeComp,
+  setActiveComp
+}) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const customerView = location.pathname.startsWith('/customer')
@@ -40,9 +85,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
   const [isNextActive, setIsNextActive] = useState(false)
 
   const setPaginationControl = (data) => {
-    if(signedUrlParams) {
-      setIsPrevActive(data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasNextPage)
+    if (signedUrlParams) {
+      setIsPrevActive(
+        data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasPreviousPage
+      )
+      setIsNextActive(
+        data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasNextPage
+      )
     } else {
       setIsPrevActive(data?.sbom?.components?.pageInfo?.hasPreviousPage)
       setIsNextActive(data?.sbom?.components?.pageInfo?.hasNextPage)
@@ -55,25 +104,59 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
   }
   //end
 
-  const { userPermissions, totalRows, setTotalRows, setActiveSbomTab, prodCompState, dispatch } = useGlobalState()
-  const { field, direction, pageIndex, searchInput, ecosystems, kinds, licenses, suppliers, scope, filters, direct, totalComp } = prodCompState
+  const {
+    userPermissions,
+    totalRows,
+    setTotalRows,
+    setActiveSbomTab,
+    prodCompState,
+    dispatch
+  } = useGlobalState()
+  const {
+    field,
+    direction,
+    pageIndex,
+    searchInput,
+    ecosystems,
+    kinds,
+    licenses,
+    suppliers,
+    scope,
+    filters,
+    direct,
+    totalComp
+  } = prodCompState
   const { prodCompDispatch } = dispatch
 
   // GET COMPONENT FILTER HEADS
-  const {refetch: getCompFilters} = useQuery(
+  const { refetch: getCompFilters } = useQuery(
     signedUrlParams ? ShareCompFilters : GetCompFilterData,
     {
       fetchPolicy: 'cache-first',
-      variables: { projectId: signedUrlParams ? undefined : productId, sbomId: sbomId },
+      variables: {
+        projectId: signedUrlParams ? undefined : productId,
+        sbomId: sbomId
+      },
       onCompleted: (data) => {
-        prodCompDispatch({ type: 'ADD_FILTER_HEADS', payload: signedUrlParams ? data?.shareLynkQuery?.sbom?.filters : data?.sbom?.filters })
+        prodCompDispatch({
+          type: 'ADD_FILTER_HEADS',
+          payload: signedUrlParams
+            ? data?.shareLynkQuery?.sbom?.filters
+            : data?.sbom?.filters
+        })
       }
     }
   )
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const updateComponent = sboms?.supersededBy?.some((permission) => permission.key === 'update_sbom_components' && permission.value === true)
-  const updateSboms = sboms?.supersededBy?.some((permission) => permission.key === 'update_sbom' && permission.value === true)
+  const updateComponent = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_sbom_components' && permission.value === true
+  )
+  const updateSboms = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_sbom' && permission.value === true
+  )
 
   const fetchCompData = async () => {
     disablePaginationControl()
@@ -81,13 +164,22 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       search: searchInput !== '' ? searchInput : undefined,
-      ecosystem: ecosystems.includes('all') || ecosystems.length === 0 ? undefined : ecosystems,
+      ecosystem:
+        ecosystems.includes('all') || ecosystems.length === 0
+          ? undefined
+          : ecosystems,
       kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses: licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
-      supplierName: suppliers.includes('all') || suppliers.length === 0 ? undefined : suppliers,
+      licenses:
+        licenses.includes('all') || licenses.length === 0
+          ? undefined
+          : licenses,
+      supplierName:
+        suppliers.includes('all') || suppliers.length === 0
+          ? undefined
+          : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true :  undefined,
+      direct: direct === true ? true : undefined,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -98,9 +190,14 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       .then((res) => {
         res && setPaginationControl(res.data)
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        prodCompDispatch({ type: 'SET_TOTAL_COMP', payload: res?.data?.sbom?.components?.totalCount })
-        getCompFilters({ projectId: signedUrlParams ? undefined : productId, sbomId: sbomId })
-
+        prodCompDispatch({
+          type: 'SET_TOTAL_COMP',
+          payload: res?.data?.sbom?.components?.totalCount
+        })
+        getCompFilters({
+          projectId: signedUrlParams ? undefined : productId,
+          sbomId: sbomId
+        })
       })
       .finally(() => window.scrollTo({ top: 0, behavior: 'smooth' }))
   }
@@ -114,14 +211,47 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
 
   const [getComPath, { data: comPath }] = useLazyQuery(GetComponentPath)
 
-  const { isOpen: isDelOpen, onOpen: onDelOpen, onClose: onDelClose } = useDisclosure()
-  const { isOpen: isGraphOpen, onOpen: onGraphOpen, onClose: onGraphClose } = useDisclosure()
-  const { isOpen: isSupOpen, onOpen: onSupOpen, onClose: onSupClose } = useDisclosure()
-  const { isOpen: isLinkOpen, onOpen: onLinkOpen, onClose: onLinkClose } = useDisclosure()
-  const { isOpen: isRelationOpen, onOpen: onRelationOpen, onClose: onRelationClose } = useDisclosure()
-  const { isOpen: isCompOpen, onOpen: onCompOpen, onClose: onCompClose, onToggle: onCompToggle } = useDisclosure()
-  const { isOpen: isPurlOpen, onOpen: onPurlOpen, onClose: onPurlClose } = useDisclosure()
-  const { isOpen: isCpeOpen, onOpen: onCpeOpen, onClose: onCpeClose } = useDisclosure()
+  const {
+    isOpen: isDelOpen,
+    onOpen: onDelOpen,
+    onClose: onDelClose
+  } = useDisclosure()
+  const {
+    isOpen: isGraphOpen,
+    onOpen: onGraphOpen,
+    onClose: onGraphClose
+  } = useDisclosure()
+  const {
+    isOpen: isSupOpen,
+    onOpen: onSupOpen,
+    onClose: onSupClose
+  } = useDisclosure()
+  const {
+    isOpen: isLinkOpen,
+    onOpen: onLinkOpen,
+    onClose: onLinkClose
+  } = useDisclosure()
+  const {
+    isOpen: isRelationOpen,
+    onOpen: onRelationOpen,
+    onClose: onRelationClose
+  } = useDisclosure()
+  const {
+    isOpen: isCompOpen,
+    onOpen: onCompOpen,
+    onClose: onCompClose,
+    onToggle: onCompToggle
+  } = useDisclosure()
+  const {
+    isOpen: isPurlOpen,
+    onOpen: onPurlOpen,
+    onClose: onPurlClose
+  } = useDisclosure()
+  const {
+    isOpen: isCpeOpen,
+    onOpen: onCpeOpen,
+    onClose: onCpeClose
+  } = useDisclosure()
 
   const onLicenseOpen = (row) => {
     setActiveRow(row)
@@ -164,57 +294,119 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       selector: (row) => {
         const { purl, name, primary, internal, externalUrls } = row
         const website = externalUrls?.find((item) => item.name === 'website')
-        const distribution = externalUrls?.find((item) => item.name === 'distribution')
-        const issueTracker = externalUrls?.find((item) => item.name === 'issue-tracker')
+        const distribution = externalUrls?.find(
+          (item) => item.name === 'distribution'
+        )
+        const issueTracker = externalUrls?.find(
+          (item) => item.name === 'issue-tracker'
+        )
         const vcs = externalUrls?.find((item) => item.name === 'vcs')
         return (
           <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
             <GridItem colSpan={1} width={'50px'}>
               {purl !== null && purl !== '' ? (
-                <IconButton isRound={true} variant='solid' colorScheme='gray' icon={GetIcon(purl.split('/')[0])} />
+                <IconButton
+                  isRound={true}
+                  variant='solid'
+                  colorScheme='gray'
+                  icon={GetIcon(purl.split('/')[0])}
+                />
               ) : (
-                <IconButton isRound={true} variant='solid' colorScheme='gray' icon={ <BsFillPatchQuestionFill color='#4299E1' fontSize={24} /> } />
+                <IconButton
+                  isRound={true}
+                  variant='solid'
+                  colorScheme='gray'
+                  icon={
+                    <BsFillPatchQuestionFill color='#4299E1' fontSize={24} />
+                  }
+                />
               )}
             </GridItem>
-            <GridItem colSpan={6} display={'flex'} flexWrap={'wrap'} flexDirection={'column'} gap={2} >
+            <GridItem
+              colSpan={6}
+              display={'flex'}
+              flexWrap={'wrap'}
+              flexDirection={'column'}
+              gap={2}
+            >
               {/* COMPONENT NAME */}
-              <Tooltip placement='top' label={name}><Text data-tag='allowRowEvents'>{name}</Text></Tooltip>
+              <Tooltip placement='top' label={name}>
+                <Text data-tag='allowRowEvents'>{name}</Text>
+              </Tooltip>
               {/* EXTERNAL REFERENCE */}
               <Stack direction={'row'} alignItems={'center'}>
                 {/* WEBSITE */}
                 <Tooltip placement='top' label={website?.url}>
                   <Link href={website?.url} isExternal>
-                    <IconButton type='button' size='xs' variant='solid' isDisabled={!website} colorScheme='gray' icon={<FaGlobe fontSize={16} />} />
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      isDisabled={!website}
+                      colorScheme='gray'
+                      icon={<FaGlobe fontSize={16} />}
+                    />
                   </Link>
                 </Tooltip>
                 {/* DISTRIBUTION */}
                 <Tooltip placement='top' label={vcs?.url}>
                   <Link href={vcs?.url} isExternal>
-                    <IconButton type='button' size='xs' variant='solid' colorScheme='gray' isDisabled={!vcs} icon={<FaSitemap fontSize={16} />} />
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      colorScheme='gray'
+                      isDisabled={!vcs}
+                      icon={<FaSitemap fontSize={16} />}
+                    />
                   </Link>
                 </Tooltip>
                 {/* ADVISORIES */}
                 <Tooltip placement='top' label={issueTracker?.url}>
                   <Link href={issueTracker?.url} isExternal>
-                    <IconButton type='button' size='xs' variant='solid' colorScheme='gray' isDisabled={!issueTracker} icon={<FaHouseUser fontSize={16} />} />
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      colorScheme='gray'
+                      isDisabled={!issueTracker}
+                      icon={<FaHouseUser fontSize={16} />}
+                    />
                   </Link>
                 </Tooltip>
                 {/* SUPPORT */}
                 <Tooltip placement='top' label={distribution?.url}>
                   <Link href={distribution?.url} isExternal>
-                    <IconButton type='button' size='xs' variant='solid' isDisabled={!distribution} colorScheme='gray' icon={<FaLightbulb fontSize={16} />} />
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      isDisabled={!distribution}
+                      colorScheme='gray'
+                      icon={<FaLightbulb fontSize={16} />}
+                    />
                   </Link>
                 </Tooltip>
               </Stack>
               {/* COMPONENT TYPE */}
               <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
                 {primary && (
-                  <Tag width={'fit-content'} size={'sm'} variant='subtle' colorScheme='blue' >
+                  <Tag
+                    width={'fit-content'}
+                    size={'sm'}
+                    variant='subtle'
+                    colorScheme='blue'
+                  >
                     <TagLabel textTransform={'capitalize'}>Primary</TagLabel>
                   </Tag>
                 )}
                 {internal && (
-                  <Tag width={'fit-content'} size={'sm'} variant='subtle' colorScheme='cyan' >
+                  <Tag
+                    width={'fit-content'}
+                    size={'sm'}
+                    variant='subtle'
+                    colorScheme='cyan'
+                  >
                     <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
                   </Tag>
                 )}
@@ -274,22 +466,44 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       selector: (row) => {
         const { licenses, licensesExp, licensesCustom } = row
         const totalSpdx = licenses?.length > 1 && licenses.slice(1)
-        const totalCustom = licensesCustom?.length > 1 && licensesCustom.slice(1)
+        const totalCustom =
+          licensesCustom?.length > 1 && licensesCustom.slice(1)
         return (
-          <Flex alignItems={'flex-end'} justifyContent={'flex-end'} gap={2} flexWrap={'wrap'} my={2} >
+          <Flex
+            alignItems={'flex-end'}
+            justifyContent={'flex-end'}
+            gap={2}
+            flexWrap={'wrap'}
+            my={2}
+          >
             {/* SPDX */}
             {licenses && (
               <Stack direction={'row'} spacing={2}>
                 {licenses.length > 0 && (
                   <Tooltip label={licenses[0]} placement={'top'}>
-                    <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'} >
+                    <Tag
+                      size={'md'}
+                      variant='subtle'
+                      colorScheme='green'
+                      width={'fit-content'}
+                    >
                       <TagLabel>{licenses[0]}</TagLabel>
                     </Tag>
                   </Tooltip>
                 )}
                 {totalSpdx.length > 0 && (
-                  <Tooltip label={JSON.stringify(totalSpdx).slice(1, -1).replace(/"/g, '')} placement={'top'}>
-                    <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'} >
+                  <Tooltip
+                    label={JSON.stringify(totalSpdx)
+                      .slice(1, -1)
+                      .replace(/"/g, '')}
+                    placement={'top'}
+                  >
+                    <Tag
+                      size={'md'}
+                      variant='subtle'
+                      colorScheme='green'
+                      width={'fit-content'}
+                    >
                       <TagLabel width={6}>{`+${totalSpdx.length}`}</TagLabel>
                     </Tag>
                   </Tooltip>
@@ -299,7 +513,12 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
             {/* EXPRESSION */}
             {licensesExp && licensesExp !== '' && (
               <Tooltip label={licensesExp} placement={'top'}>
-                <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'} >
+                <Tag
+                  size={'md'}
+                  variant='subtle'
+                  colorScheme='green'
+                  width={'fit-content'}
+                >
                   <TagLabel>{licensesExp}</TagLabel>
                 </Tag>
               </Tooltip>
@@ -309,14 +528,29 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
               <Stack direction={'row'} spacing={2}>
                 {licensesCustom.length > 0 && (
                   <Tooltip label={licensesCustom[0]} placement={'top'}>
-                    <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'} >
+                    <Tag
+                      size={'md'}
+                      variant='subtle'
+                      colorScheme='green'
+                      width={'fit-content'}
+                    >
                       <TagLabel>{licensesCustom[0]}</TagLabel>
                     </Tag>
                   </Tooltip>
                 )}
                 {totalCustom && (
-                  <Tooltip label={JSON.stringify(totalCustom).slice(1, -1).replace(/"/g, '')} placement={'top'}>
-                    <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                  <Tooltip
+                    label={JSON.stringify(totalCustom)
+                      .slice(1, -1)
+                      .replace(/"/g, '')}
+                    placement={'top'}
+                  >
+                    <Tag
+                      size={'md'}
+                      variant='subtle'
+                      colorScheme='green'
+                      width={'fit-content'}
+                    >
                       <TagLabel>{`+${totalCustom.length}`}</TagLabel>
                     </Tag>
                   </Tooltip>
@@ -335,7 +569,9 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       id: 'COMPONENTS_UPDATED_AT',
       name: 'UPDATED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>{timeSince(row.updatedAt)}</Tooltip>
+        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
+          {timeSince(row.updatedAt)}
+        </Tooltip>
       ),
       sortable: true,
       width: '160px',
@@ -357,19 +593,33 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
           <>
             {!customerView ? (
               <Menu>
-                <MenuButton as={IconButton} aria-label='Options' icon={<FaEllipsisV />} variant='none' color='gray.400' />
+                <MenuButton
+                  as={IconButton}
+                  aria-label='Options'
+                  icon={<FaEllipsisV />}
+                  variant='none'
+                  color='gray.400'
+                />
                 <Portal>
                   <MenuList size='sm'>
-                    <MenuItem onClick={() => onLicenseOpen(row)} isDisabled={status === 'signed' || !updateComponent}>
+                    <MenuItem
+                      onClick={() => onLicenseOpen(row)}
+                      isDisabled={status === 'signed' || !updateComponent}
+                    >
                       Edit Component
                     </MenuItem>
-                    <MenuItem onClick={() => handleOpen(row)} isDisabled={!updateComponent}>Edit Relationships</MenuItem>
+                    <MenuItem
+                      onClick={() => handleOpen(row)}
+                      isDisabled={!updateComponent}
+                    >
+                      Edit Relationships
+                    </MenuItem>
                     <MenuItem
                       onClick={() => {
                         setActiveRow(row)
                         onSupOpen()
                       }}
-                      isDisabled={ status === 'signed' || !updateComponent}
+                      isDisabled={status === 'signed' || !updateComponent}
                     >
                       {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
                     </MenuItem>
@@ -378,13 +628,20 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
                         setActiveRow(row)
                         onLinkOpen()
                       }}
-                      isDisabled={ status === 'signed' || !updateComponent}
+                      isDisabled={status === 'signed' || !updateComponent}
                     >
                       Edit Links
                     </MenuItem>
-                    <MenuItem onClick={() => handleGraphView(row)} isDisabled={ status === 'signed' || !updateComponent || totalComp?.length === 1 } >
-                        View Relationships
-                      </MenuItem>
+                    <MenuItem
+                      onClick={() => handleGraphView(row)}
+                      isDisabled={
+                        status === 'signed' ||
+                        !updateComponent ||
+                        totalComp?.length === 1
+                      }
+                    >
+                      View Relationships
+                    </MenuItem>
                     <Divider />
                     {primary === false && (
                       <MenuItem
@@ -393,7 +650,11 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
                           setActiveRow(row)
                           onDelOpen()
                         }}
-                        isDisabled={ status === 'signed' || !updateComponent || totalComp?.length === 1 }
+                        isDisabled={
+                          status === 'signed' ||
+                          !updateComponent ||
+                          totalComp?.length === 1
+                        }
                       >
                         Delete
                       </MenuItem>
@@ -419,7 +680,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
     }
   ]
 
-  const handleGraphView  = (row) => {
+  const handleGraphView = (row) => {
     setActiveComp(row)
     onGraphOpen()
   }
@@ -431,8 +692,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       await deleteSupplier({ variables: { id: id } }).then((res) => {
         if (res.data) {
           disablePaginationControl()
-          refetch({ projectId: productId, sbomId: sbomId, first: totalRows, field: field, direction: direction })
-          .then((res) => res && setPaginationControl(res.data))
+          refetch({
+            projectId: productId,
+            sbomId: sbomId,
+            first: totalRows,
+            field: field,
+            direction: direction
+          }).then((res) => res && setPaginationControl(res.data))
         }
       })
     } catch (error) {
@@ -442,7 +708,21 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
 
   // EXPAND SECTION
   const ExpandedComponent = ({ data }) => {
-    const { scope, suppliers, purl, description, cpes, name, kind, internal, licenses, licensesExp, licensesCustom, dependencyOf, dependsOn } = data
+    const {
+      scope,
+      suppliers,
+      purl,
+      description,
+      cpes,
+      name,
+      kind,
+      internal,
+      licenses,
+      licensesExp,
+      licensesCustom,
+      dependencyOf,
+      dependsOn
+    } = data
     const openSSF = openSsf?.find((item) => item?.name === purl)
     const CustomText = styled(Text)`
       font-size: 13px;
@@ -452,8 +732,17 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       letter-spacing: 0.6px;
     `
     return (
-      <Box width={'100%'} p={5} boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'>
-        <Grid templateColumns='repeat(3, 1fr)' gap={6} width={'80%'} margin={'0 auto'}>
+      <Box
+        width={'100%'}
+        p={5}
+        boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
+      >
+        <Grid
+          templateColumns='repeat(3, 1fr)'
+          gap={6}
+          width={'80%'}
+          margin={'0 auto'}
+        >
           <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
             <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
@@ -462,29 +751,58 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
           </GridItem>
           <GridItem>
             <CustomText>Component :</CustomText>
-            <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>{name}</Text>
+            <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
+              {name}
+            </Text>
           </GridItem>
           <GridItem>
             <CustomText>Type :</CustomText>
-            <Text mt={1} fontSize={14} textTransform={'capitalize'}>{kind}</Text>
+            <Text mt={1} fontSize={14} textTransform={'capitalize'}>
+              {kind}
+            </Text>
           </GridItem>
           <GridItem>
             <CustomText>Internal :</CustomText>
-            <Text mt={1} fontSize={14} wordBreak={'break-all'}>{internal ? 'True' : 'False'}</Text>
+            <Text mt={1} fontSize={14} wordBreak={'break-all'}>
+              {internal ? 'True' : 'False'}
+            </Text>
           </GridItem>
           <GridItem>
             <CustomText>Supplier :</CustomText>
             <VStack spacing={4} mt={1} alignItems={'left'}>
               {suppliers &&
                 suppliers.map((item, index) => (
-                  <Tag size={'md'} key={index} variant='subtle' colorScheme='orange' width={'fit-content'} >
+                  <Tag
+                    size={'md'}
+                    key={index}
+                    variant='subtle'
+                    colorScheme='orange'
+                    width={'fit-content'}
+                  >
                     <Text wordBreak={'break-all'}>
                       {item?.contactName}
                       {item?.contactEmail && ` (${item?.contactEmail})`}
-                      {item?.url ? (<Link href={item?.url?.startsWith(`https://`) === true ? item?.url : `https://${item?.url}`} isExternal>{' '}{item.name}</Link>
-                      ) : (` ${item.name}` )}
+                      {item?.url ? (
+                        <Link
+                          href={
+                            item?.url?.startsWith(`https://`) === true
+                              ? item?.url
+                              : `https://${item?.url}`
+                          }
+                          isExternal
+                        >
+                          {' '}
+                          {item.name}
+                        </Link>
+                      ) : (
+                        ` ${item.name}`
+                      )}
                     </Text>
-                    {!signedUrlParams && <TagCloseButton onClick={() => handleSupRemove(item.id)} />}
+                    {!signedUrlParams && (
+                      <TagCloseButton
+                        onClick={() => handleSupRemove(item.id)}
+                      />
+                    )}
                   </Tag>
                 ))}
             </VStack>
@@ -506,7 +824,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
           </GridItem>
           <GridItem>
             <CustomText>CPES :</CustomText>
-            <Flex mt={1} flexDirection={'column'} alignItems={'flex-start'} gap={1} flexWrap={'wrap'}>
+            <Flex
+              mt={1}
+              flexDirection={'column'}
+              alignItems={'flex-start'}
+              gap={1}
+              flexWrap={'wrap'}
+            >
               {cpes?.length > 0 &&
                 cpes.map((item, index) => (
                   <Text
@@ -531,9 +855,21 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
                 [...dependsOn]
                   .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
                   .map((comp, index) => (
-                    <Tooltip key={index} label={comp.toComp.name} placement='top'>
-                      <Tag size='sm' padding={1} variant='subtle' colorScheme={'blue'} wordBreak={'break-all'}>
-                        <Text wordBreak={'break-all'}>{comp.toComp.name}-{comp.toComp.version}</Text>
+                    <Tooltip
+                      key={index}
+                      label={comp.toComp.name}
+                      placement='top'
+                    >
+                      <Tag
+                        size='sm'
+                        padding={1}
+                        variant='subtle'
+                        colorScheme={'blue'}
+                        wordBreak={'break-all'}
+                      >
+                        <Text wordBreak={'break-all'}>
+                          {comp.toComp.name}-{comp.toComp.version}
+                        </Text>
                       </Tag>
                     </Tooltip>
                   ))}
@@ -544,9 +880,20 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
               {dependencyOf?.length > 0 &&
                 dependencyOf?.map((comp, index) => (
-                  <Tooltip key={index} label={comp.fromComp.name} placement='top' >
-                    <Tag size='sm' padding={1} variant='subtle' colorScheme={'blue'}>
-                      <Text wordBreak={'break-all'}>{comp.fromComp.name}-{comp.fromComp.version}</Text>
+                  <Tooltip
+                    key={index}
+                    label={comp.fromComp.name}
+                    placement='top'
+                  >
+                    <Tag
+                      size='sm'
+                      padding={1}
+                      variant='subtle'
+                      colorScheme={'blue'}
+                    >
+                      <Text wordBreak={'break-all'}>
+                        {comp.fromComp.name}-{comp.fromComp.version}
+                      </Text>
                     </Tag>
                   </Tooltip>
                 ))}
@@ -554,7 +901,9 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
           </GridItem>
           <GridItem>
             <CustomText>Scope :</CustomText>
-            <Text mt={1} fontSize={14} textTransform={'capitalize'}>{scope}</Text>
+            <Text mt={1} fontSize={14} textTransform={'capitalize'}>
+              {scope}
+            </Text>
           </GridItem>
           <GridItem>
             <CustomText>Licenses :</CustomText>
@@ -562,20 +911,37 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
               {/* SPDX */}
               {licenses?.length > 0 &&
                 licenses.map((item, index) => (
-                  <Tag key={index} size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                  <Tag
+                    key={index}
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                  >
                     <Text wordBreak={'break-all'}>{item}</Text>
                   </Tag>
                 ))}
               {/* EXPRESSION */}
               {licensesExp && licensesExp !== '' && (
-                <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                <Tag
+                  size={'md'}
+                  variant='subtle'
+                  colorScheme='green'
+                  width={'fit-content'}
+                >
                   <Text wordBreak={'break-all'}>{licensesExp}</Text>
                 </Tag>
               )}
               {/* CUSTOM */}
               {licensesCustom?.length > 0 &&
                 licensesCustom?.map((item, index) => (
-                  <Tag key={index} size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                  <Tag
+                    key={index}
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                  >
                     <Text wordBreak={'break-all'}>{item}</Text>
                   </Tag>
                 ))}
@@ -583,7 +949,9 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
           </GridItem>
           <GridItem>
             <CustomText>OpenSSF Scorecard :</CustomText>
-            <Tag mt={1.5} variant='subtle' colorScheme={'blue'}>{openSSF?.score || '-'}</Tag>
+            <Tag mt={1.5} variant='subtle' colorScheme={'blue'}>
+              {openSSF?.score || '-'}
+            </Tag>
           </GridItem>
         </Grid>
       </Box>
@@ -598,13 +966,22 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       projectId: productId,
       sbomId: sbomId,
       search: undefined,
-      ecosystem: ecosystems.includes('all') || ecosystems.length === 0 ? undefined : ecosystems,
+      ecosystem:
+        ecosystems.includes('all') || ecosystems.length === 0
+          ? undefined
+          : ecosystems,
       kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses: licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
-      supplierName: suppliers.includes('all') || suppliers.length === 0 ? undefined : suppliers,
+      licenses:
+        licenses.includes('all') || licenses.length === 0
+          ? undefined
+          : licenses,
+      supplierName:
+        suppliers.includes('all') || suppliers.length === 0
+          ? undefined
+          : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true :  undefined,
+      direct: direct === true ? true : undefined,
       field: field,
       direction: direction,
       first: totalRows,
@@ -638,19 +1015,28 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
         projectId: signedUrlParams ? undefined : productId,
         sbomId: sbomId,
         search: value,
-        ecosystem: ecosystems.includes('all') || ecosystems.length === 0 ? undefined : ecosystems,
+        ecosystem:
+          ecosystems.includes('all') || ecosystems.length === 0
+            ? undefined
+            : ecosystems,
         kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-        licenses: licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
-        supplierName: suppliers.includes('all') || suppliers.length === 0 ? undefined : suppliers,
+        licenses:
+          licenses.includes('all') || licenses.length === 0
+            ? undefined
+            : licenses,
+        supplierName:
+          suppliers.includes('all') || suppliers.length === 0
+            ? undefined
+            : suppliers,
         primary: scope === 'primary' ? true : undefined,
         internal: scope === 'internal' ? true : undefined,
-        direct: direct === true ? true :  undefined,
+        direct: direct === true ? true : undefined,
         first: totalRows,
         last: undefined,
         after: undefined,
         before: undefined,
         field: field,
-        direction: direction,
+        direction: direction
       }).then((res) => {
         if (res.data) {
           setPaginationControl(res.data)
@@ -684,20 +1070,62 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
   // HEADER SECTION
   const subHeader = useMemo(() => {
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'}>
-        <Stack width={'100%'} direction={'row'} spacing={4} alignItems={'center'}>
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
+        <Stack
+          width={'100%'}
+          direction={'row'}
+          spacing={4}
+          alignItems={'center'}
+        >
           {/* SEARCH COMPONENTS */}
-          <SearchFilter id='component' filterText={compSearch} onFilter={handleSearch} onClear={handleClear} onChange={onSearchInputChange} />
+          <SearchFilter
+            id='component'
+            filterText={compSearch}
+            onFilter={handleSearch}
+            onClear={handleClear}
+            onChange={onSearchInputChange}
+          />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && <CompFilterMenu refetch={refetch} productId={productId} sbomId={sbomId} />}
+          {filters && (
+            <CompFilterMenu
+              refetch={refetch}
+              productId={productId}
+              sbomId={sbomId}
+            />
+          )}
         </Stack>
-        <Stack width={'100%'} direction={'row'} spacing={2} justifyContent={'flex-end'}>
+        <Stack
+          width={'100%'}
+          direction={'row'}
+          spacing={2}
+          justifyContent={'flex-end'}
+        >
           {/* CREATE COMPONENT */}
           <Tooltip label='Add Component'>
-            <IconButton ref={compBtn} onClick={onCreateComponent} icon={<AddIcon />} colorScheme='blue' variant='solid' fontWeight='normal' fontSize={'sm'} hidden={signedUrlParams} isDisabled={lifecycle === 'signed' || !updateComponent || !updateSboms} />
+            <IconButton
+              ref={compBtn}
+              onClick={onCreateComponent}
+              icon={<AddIcon />}
+              colorScheme='blue'
+              variant='solid'
+              fontWeight='normal'
+              fontSize={'sm'}
+              hidden={signedUrlParams}
+              isDisabled={
+                lifecycle === 'signed' || !updateComponent || !updateSboms
+              }
+            />
           </Tooltip>
           <Tooltip label='Refresh'>
-            <IconButton onClick={fetchCompData} colorScheme='blue' icon={<RepeatIcon />} />
+            <IconButton
+              onClick={fetchCompData}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+            />
           </Tooltip>
         </Stack>
       </Flex>
@@ -714,13 +1142,22 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       last: before ? totalRows : undefined,
       before: before ? before : undefined,
       search: searchInput !== '' ? searchInput : undefined,
-      ecosystem: ecosystems.includes('all') || ecosystems.length === 0 ? undefined : ecosystems,
+      ecosystem:
+        ecosystems.includes('all') || ecosystems.length === 0
+          ? undefined
+          : ecosystems,
       kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses: licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
-      supplierName: suppliers.includes('all') || suppliers.length === 0 ? undefined : suppliers,
+      licenses:
+        licenses.includes('all') || licenses.length === 0
+          ? undefined
+          : licenses,
+      supplierName:
+        suppliers.includes('all') || suppliers.length === 0
+          ? undefined
+          : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true :  undefined,
+      direct: direct === true ? true : undefined,
       field: field,
       direction: direction
     }).then((res) => {
@@ -740,13 +1177,22 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       after: undefined,
       before: undefined,
       search: searchInput !== '' ? searchInput : undefined,
-      ecosystem: ecosystems.includes('all') || ecosystems.length === 0 ? undefined : ecosystems,
+      ecosystem:
+        ecosystems.includes('all') || ecosystems.length === 0
+          ? undefined
+          : ecosystems,
       kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses: licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
-      supplierName: suppliers.includes('all') || suppliers.length === 0 ? undefined : suppliers,
+      licenses:
+        licenses.includes('all') || licenses.length === 0
+          ? undefined
+          : licenses,
+      supplierName:
+        suppliers.includes('all') || suppliers.length === 0
+          ? undefined
+          : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true :  undefined,
+      direct: direct === true ? true : undefined,
       field: column.id,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     }).then((res) => {
@@ -754,7 +1200,10 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
         setPaginationControl(res?.data)
         prodCompDispatch({
           type: 'SET_SORT_ORDER',
-          payload: { field: column.id, direction: sortDirection === 'asc' ? 'ASC' : 'DESC' }
+          payload: {
+            field: column.id,
+            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+          }
         })
       }
     })
@@ -822,44 +1271,109 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
         />
       )}
 
-      {isGraphOpen && activeComp && <GraphDrawer isOpen={isGraphOpen} onClose={onGraphClose} primaryComp={null} activeComp={activeComp} /> }
+      {isGraphOpen && activeComp && (
+        <GraphDrawer
+          isOpen={isGraphOpen}
+          onClose={onGraphClose}
+          primaryComp={null}
+          activeComp={activeComp}
+        />
+      )}
 
       {/* ACTIONS */}
       {activeRow !== null && (
         <>
           {isOpen && (
-            <ComponentDrawer data={activeRow} isOpen={isOpen} onClose={onClose} sbomRefetch={sbomRefetch} fetchCompData={fetchCompData} filterRefetch={getCompFilters} shortDesc={null} checkId={null} primaryComp={primaryComp} />
+            <ComponentDrawer
+              data={activeRow}
+              isOpen={isOpen}
+              onClose={onClose}
+              sbomRefetch={sbomRefetch}
+              fetchCompData={fetchCompData}
+              filterRefetch={getCompFilters}
+              shortDesc={null}
+              checkId={null}
+              primaryComp={primaryComp}
+            />
           )}
 
           {isDelOpen && (
-            <ComponentModal isOpen={isDelOpen} onClose={onDelClose} id={activeRow.id} sbomRefetch={sbomRefetch} fetchCompData={fetchCompData} />
+            <ComponentModal
+              isOpen={isDelOpen}
+              onClose={onDelClose}
+              id={activeRow.id}
+              sbomRefetch={sbomRefetch}
+              fetchCompData={fetchCompData}
+            />
           )}
 
           {isSupOpen && (
-            <SupplierModal id={activeRow.id} refetch={fetchCompData} filterRefetch={getCompFilters} isOpen={isSupOpen} onClose={onSupClose} data={activeRow} shortDesc={null} checkId={null} />
+            <SupplierModal
+              id={activeRow.id}
+              refetch={fetchCompData}
+              filterRefetch={getCompFilters}
+              isOpen={isSupOpen}
+              onClose={onSupClose}
+              data={activeRow}
+              shortDesc={null}
+              checkId={null}
+            />
           )}
 
           {isLinkOpen && (
-            <LinksDrawer component={activeRow} btnRef={linkRef} isOpen={isLinkOpen} onClose={onLinkClose} fetchCompData={fetchCompData} productId={productId} sbomId={sbomId} />
+            <LinksDrawer
+              component={activeRow}
+              btnRef={linkRef}
+              isOpen={isLinkOpen}
+              onClose={onLinkClose}
+              fetchCompData={fetchCompData}
+              productId={productId}
+              sbomId={sbomId}
+            />
           )}
 
           {isRelationOpen && comPath && (
-            <RelationshipDrawer isOpen={isRelationOpen} onClose={onRelationClose} data={activeRow} compPath={comPath.component.pathToPrimary} total={totalComp} fetchCompData={fetchCompData} />
+            <RelationshipDrawer
+              isOpen={isRelationOpen}
+              onClose={onRelationClose}
+              data={activeRow}
+              compPath={comPath.component.pathToPrimary}
+              total={totalComp}
+              fetchCompData={fetchCompData}
+            />
           )}
         </>
       )}
 
       {/* COMPONENT DRAWER */}
       {isCompOpen && (
-        <ComponentDrawer isOpen={isCompOpen} onClose={onCompClose} fetchCompData={fetchCompData} filterRefetch={getCompFilters} sbomRefetch={sbomRefetch} primaryComp={primaryComp} shortDesc={null} checkId={null} data={null} />
+        <ComponentDrawer
+          isOpen={isCompOpen}
+          onClose={onCompClose}
+          fetchCompData={fetchCompData}
+          filterRefetch={getCompFilters}
+          sbomRefetch={sbomRefetch}
+          primaryComp={primaryComp}
+          shortDesc={null}
+          checkId={null}
+          data={null}
+        />
       )}
 
       {isPurlOpen && (
-        <PurlCard value={activeRow?.purl} isOpen={isPurlOpen} onClose={onPurlClose} />
+        <PurlCard
+          value={activeRow?.purl}
+          isOpen={isPurlOpen}
+          onClose={onPurlClose}
+        />
       )}
 
       {isCpeOpen && (
-        <CpeCard value={activeRow?.cpes[0]} isOpen={isCpeOpen} onClose={onCpeClose} />
+        <CpeCard
+          value={activeRow?.cpes[0]}
+          isOpen={isCpeOpen}
+          onClose={onCpeClose}
+        />
       )}
     </>
   )

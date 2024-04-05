@@ -1,8 +1,29 @@
 import { useMutation } from '@apollo/client'
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, VStack, FormControl, FormLabel, Select, Input, Button, Text, AlertDescription, AlertIcon, Alert } from '@chakra-ui/react'
-import { UpdateAutomation } from 'graphQL/Mutation'
+import { useEffect, useState } from 'react'
+
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Select,
+  Text,
+  VStack
+} from '@chakra-ui/react'
+
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useState, useEffect } from 'react'
+
+import { UpdateAutomation } from 'graphQL/Mutation'
 
 const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
   const { totalRows, prodRulesState } = useGlobalState()
@@ -23,10 +44,19 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
 
   const handleUpdate = async () => {
     await updateAutoCheck({
-      variables: { id: data.id, projectId: productId, condition: condition, enabled: data.enabled, set: JSON.stringify({ value: value }) }
-    }).then((res) => {
-      refetch({ id: productId, first: totalRows, field, direction })
-    }).catch((error) => setError(error?.message)).finally(() => onClose())
+      variables: {
+        id: data.id,
+        projectId: productId,
+        condition: condition,
+        enabled: data.enabled,
+        set: JSON.stringify({ value: value })
+      }
+    })
+      .then((res) => {
+        refetch({ id: productId, first: totalRows, field, direction })
+      })
+      .catch((error) => setError(error?.message))
+      .finally(() => onClose())
   }
 
   return (
@@ -59,7 +89,12 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
             {/* CONDITION */}
             <FormControl>
               <FormLabel htmlFor='condition'>Condition</FormLabel>
-              <Select id='condition' name='condition' value={condition} onChange={(e) => setCondition(e.target.value)}>
+              <Select
+                id='condition'
+                name='condition'
+                value={condition}
+                onChange={(e) => setCondition(e.target.value)}
+              >
                 <option value=''>-- Select --</option>
                 <option value='missing'>Missing</option>
                 <option value='always'>Always</option>
@@ -68,8 +103,16 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
           </VStack>
         </ModalBody>
         <ModalFooter>
-          <Button mr={3} onClick={onClose}>Close</Button>
-          <Button colorScheme='blue' onClick={handleUpdate} isDisabled={value === '' || condition === ''}>Update</Button>
+          <Button mr={3} onClick={onClose}>
+            Close
+          </Button>
+          <Button
+            colorScheme='blue'
+            onClick={handleUpdate}
+            isDisabled={value === '' || condition === ''}
+          >
+            Update
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

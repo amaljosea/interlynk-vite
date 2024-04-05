@@ -1,27 +1,28 @@
 // Chakra imports
-import { Flex, Button, Input, Spacer, Stack } from '@chakra-ui/react'
 import React, { useState } from 'react'
+import { useEffect } from 'react'
+import { productVersionsData } from 'variables/general'
+
+import { Button, Flex, Input, Spacer, Stack } from '@chakra-ui/react'
 import {
+  Box,
+  Checkbox,
+  Divider,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  Box,
   FormLabel,
   InputGroup,
   Select,
-  Checkbox,
-  Divider,
-  Text,
   Tag,
+  TagCloseButton,
   TagLabel,
-  TagCloseButton
+  Text
 } from '@chakra-ui/react'
-import { useEffect } from 'react'
-import { productVersionsData } from 'variables/general'
 
 function ProductLinkDrawer(props) {
   const {

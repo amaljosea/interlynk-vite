@@ -1,22 +1,26 @@
 import { useLazyQuery } from '@apollo/client'
+import Cookies from 'js-cookie'
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+
 import {
   Box,
   Button,
   Flex,
   Table,
+  Tbody,
   Th,
   Thead,
-  Tr,
-  Tbody
+  Tr
 } from '@chakra-ui/react'
+
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
+
 import { GetSignedImages } from 'graphQL/Queries'
-import Cookies from 'js-cookie'
-import { useEffect } from 'react'
-import ImageRow from './components/ImageRow'
-import { useLocation } from 'react-router-dom'
+
 import ImageInfo from './components/ImageInfo'
+import ImageRow from './components/ImageRow'
 
 const Images = () => {
   const signedParamId = Cookies.get('signedParamId')

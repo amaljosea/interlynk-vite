@@ -1,6 +1,15 @@
-import { Box, Menu, MenuItemOption, MenuList, MenuOptionGroup, Stack } from '@chakra-ui/react'
+import {
+  Box,
+  Menu,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
+  Stack
+} from '@chakra-ui/react'
+
 import CheckMark from 'components/Misc/CheckMark'
 import MenuHeading from 'components/Misc/MenuHeading'
+
 import { useGlobalState } from 'hooks/useGlobalState'
 
 const ToolsFilterMenu = () => {
@@ -30,12 +39,21 @@ const ToolsFilterMenu = () => {
       {/* STATUS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu placement='top' closeOnSelect={false}>
-          {(difference !== 'all' && difference !== '') && <CheckMark />}
+          {difference !== 'all' && difference !== '' && <CheckMark />}
           <MenuHeading title={'Difference'} />
           <MenuList>
-            <MenuOptionGroup type='radio' value={difference} onChange={onFilterStatus} >
+            <MenuOptionGroup
+              type='radio'
+              value={difference}
+              onChange={onFilterStatus}
+            >
               {filters?.statusList?.map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'} >
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}
@@ -46,13 +64,31 @@ const ToolsFilterMenu = () => {
       {/* COMPONENTS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu placement='top' closeOnSelect={false}>
-          {(component !== 'all' && component !== '') && <CheckMark />}
+          {component !== 'all' && component !== '' && <CheckMark />}
           <MenuHeading title={'Components'} />
-          <MenuList minW='auto' maxW={'320px'} minH={'auto'} maxH={'300px'} overflowY={'scroll'} >
-            <MenuOptionGroup type='radio' value={component} onChange={onFilterComponent} >
-              <MenuItemOption fontSize={'sm'} value='all'>All</MenuItemOption>
+          <MenuList
+            minW='auto'
+            maxW={'320px'}
+            minH={'auto'}
+            maxH={'300px'}
+            overflowY={'scroll'}
+          >
+            <MenuOptionGroup
+              type='radio'
+              value={component}
+              onChange={onFilterComponent}
+            >
+              <MenuItemOption fontSize={'sm'} value='all'>
+                All
+              </MenuItemOption>
               {filters?.componentList?.map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'} wordBreak={'break-all'}>
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                  wordBreak={'break-all'}
+                >
                   {item}
                 </MenuItemOption>
               ))}

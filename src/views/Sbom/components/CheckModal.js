@@ -1,4 +1,7 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
+import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+
 import { InfoIcon } from '@chakra-ui/icons'
 import {
   Alert,
@@ -26,16 +29,17 @@ import {
   Text,
   Tooltip
 } from '@chakra-ui/react'
+
 import LicenseField from 'components/Licenses/LicenseField'
-import { GetComponentData } from 'graphQL/Queries'
-import {
-  UpdateComponent,
-  recheckHealth,
-  CreateAutomation
-} from 'graphQL/Mutation'
-import { useEffect, useState, useRef } from 'react'
-import { useLocation } from 'react-router-dom'
+
 import { useGlobalState } from 'hooks/useGlobalState'
+
+import {
+  CreateAutomation,
+  UpdateComponent,
+  recheckHealth
+} from 'graphQL/Mutation'
+import { GetComponentData } from 'graphQL/Queries'
 
 const CheckModal = ({
   activeCheck,
@@ -178,7 +182,7 @@ const CheckModal = ({
           id: componentId,
           sbomId: sbomId,
           licenses: {
-            licensesExp: expLicense || '',
+            licensesExp: expLicense || ''
           }
         }
       })
@@ -436,7 +440,11 @@ const CheckModal = ({
             {(shortDesc === 'Component has license/s specified' ||
               shortDesc === 'Componet has deprecated license/s' ||
               shortDesc === 'Component has restrictive licenses specified') && (
-              <LicenseField sbomView={false} isValid={isValid} setIsValid={setIsValid} />
+              <LicenseField
+                sbomView={false}
+                isValid={isValid}
+                setIsValid={setIsValid}
+              />
             )}
           </ModalBody>
 

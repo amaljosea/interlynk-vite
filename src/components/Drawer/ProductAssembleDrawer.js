@@ -1,22 +1,24 @@
 import React, { useState } from 'react'
-import { Flex, Button, Input, Stack } from '@chakra-ui/react'
+
+import { Button, Flex, Input, Stack } from '@chakra-ui/react'
 import {
+  Box,
+  Checkbox,
+  Divider,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  Box,
   FormLabel,
   Select,
-  Checkbox,
-  Divider,
   Text
 } from '@chakra-ui/react'
-import { FaGithub } from 'react-icons/fa'
 import { useToast } from '@chakra-ui/react'
+
+import { FaGithub } from 'react-icons/fa'
 
 function ProductAssembleDrawer(props) {
   const {

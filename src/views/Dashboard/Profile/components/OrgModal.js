@@ -1,23 +1,25 @@
 import { useMutation } from '@apollo/client'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { validateEmail, validateUrl } from 'utils'
+
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   Button,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
-  FormErrorMessage
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay
 } from '@chakra-ui/react'
+
 import { RegisterOrganization } from 'graphQL/Mutation'
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { validateUrl, validateEmail } from 'utils'
 
 const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
   console.log('org', org)
@@ -69,7 +71,10 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
     setUrl('')
   }
 
-  const isInvalid = name === '' || (email !== '' && emailError !== '') || (url !== '' && !validateUrl(url))
+  const isInvalid =
+    name === '' ||
+    (email !== '' && emailError !== '') ||
+    (url !== '' && !validateUrl(url))
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>

@@ -1,13 +1,25 @@
 import { useMutation } from '@apollo/client'
+import { isValid } from 'date-fns'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import DataTable from 'react-data-table-component'
+import Datetime from 'react-datetime'
+import 'react-datetime/css/react-datetime.css'
+import { getFullDateAndTime } from 'utils'
+
 import { AddIcon } from '@chakra-ui/icons'
 import {
   Button,
+  Checkbox,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
-  Tag,
   IconButton,
   Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -15,33 +27,26 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useClipboard,
-  useDisclosure,
-  TagLabel,
-  MenuButton,
-  Menu,
   Portal,
-  MenuList,
-  MenuItem,
-  Tooltip,
-  Checkbox,
-  Text,
   Stack,
-  FormErrorMessage
+  Tag,
+  TagLabel,
+  Text,
+  Tooltip,
+  useClipboard,
+  useDisclosure
 } from '@chakra-ui/react'
-import React, { useRef, useState, useMemo, useEffect } from 'react'
-import DataTable from 'react-data-table-component'
-import { FaEllipsisV } from 'react-icons/fa'
-import Datetime from 'react-datetime'
-import 'react-datetime/css/react-datetime.css' // CSS styling for the date-time picker
+
+import CustomLoader from 'components/CustomLoader'
+
+// CSS styling for the date-time picker
 import {
   createApiToken,
   deleteApiToken,
   updateApiToken
 } from 'graphQL/Mutation'
-import { getFullDateAndTime } from 'utils'
-import { isValid } from 'date-fns'
-import CustomLoader from 'components/CustomLoader'
+
+import { FaEllipsisV } from 'react-icons/fa'
 
 const customStyles = {
   headCells: {

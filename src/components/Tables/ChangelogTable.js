@@ -1,12 +1,16 @@
-import { Flex, Stack, Tag, Tooltip, Text, IconButton } from '@chakra-ui/react'
 import React, { useEffect, useMemo, useState } from 'react'
-import { timeSince, getFullDateAndTime, customStyles } from 'utils'
 import DataTable from 'react-data-table-component'
-import CustomLoader from 'components/CustomLoader'
-import { useGlobalState } from 'hooks/useGlobalState'
+import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
+
 import { RepeatIcon } from '@chakra-ui/icons'
+import { Flex, IconButton, Stack, Tag, Text, Tooltip } from '@chakra-ui/react'
+
+import CustomLoader from 'components/CustomLoader'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import Pagination from '../Pagination'
 
 const setColor = (type) => {

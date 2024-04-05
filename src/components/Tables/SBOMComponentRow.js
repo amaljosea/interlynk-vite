@@ -1,30 +1,38 @@
+import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import { timeSince } from 'utils'
+import { GetIcon } from 'utils'
+import ComponentModal from 'views/Sbom/components/ComponentModal'
+import SupplierModal from 'views/Sbom/components/SupplierModal'
+
+import { ChevronDownIcon, ChevronRightIcon, ViewIcon } from '@chakra-ui/icons'
 import {
-  Flex,
-  Td,
-  Text,
-  Tr,
-  useDisclosure,
+  Badge,
   Box,
+  Button,
+  Divider,
+  Flex,
   IconButton,
+  Link,
   Menu,
   MenuButton,
-  Portal,
-  MenuList,
   MenuItem,
+  MenuList,
+  Portal,
   Stack,
   Tag,
   TagLabel,
-  Link,
+  Td,
+  Text,
   Tooltip,
-  Badge,
-  Button,
-  Divider
+  Tr,
+  useDisclosure
 } from '@chakra-ui/react'
-import { useEffect, useState, useRef } from 'react'
-import { useLocation } from 'react-router-dom'
+
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
-import ComponentModal from 'views/Sbom/components/ComponentModal'
-import { timeSince } from 'utils'
+import LinksDrawer from 'components/Drawer/LinksDrawer'
+
+import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import {
   FaEllipsisV,
   FaGlobe,
@@ -32,11 +40,6 @@ import {
   FaLightbulb,
   FaSitemap
 } from 'react-icons/fa'
-import SupplierModal from 'views/Sbom/components/SupplierModal'
-import { ChevronDownIcon, ChevronRightIcon, ViewIcon } from '@chakra-ui/icons'
-import { BsFillPatchQuestionFill } from 'react-icons/bs'
-import { GetIcon } from 'utils'
-import LinksDrawer from 'components/Drawer/LinksDrawer'
 
 function SBOMComponentRow(props) {
   const {

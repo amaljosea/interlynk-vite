@@ -1,44 +1,47 @@
 import { useMutation } from '@apollo/client'
+import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import { getFullDateAndTime, timeSince, validateEmail } from 'utils'
+
 import { DeleteIcon } from '@chakra-ui/icons'
 import {
+  Button,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  Input,
-  Button,
   Flex,
-  Text,
-  Thead,
-  Tr,
-  Th,
-  Tbody,
-  Td,
-  Table,
-  Icon,
-  useToast,
   FormControl,
   FormErrorMessage,
-  Tooltip,
   FormLabel,
-  Stack
+  Icon,
+  Input,
+  Stack,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tooltip,
+  Tr,
+  useToast
 } from '@chakra-ui/react'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import {
   CreateAutomation,
-  toolDelete,
+  authorCreate,
+  recheckHealth,
   supplierCreate,
   supplierDelete,
-  recheckHealth,
-  authorCreate,
-  toolCreate
+  toolCreate,
+  toolDelete
 } from 'graphQL/Mutation'
-import { useGlobalState } from 'hooks/useGlobalState'
-import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
-import { getFullDateAndTime, timeSince, validateEmail } from 'utils'
 
 const GeneralDataDrawer = ({
   isOpen,

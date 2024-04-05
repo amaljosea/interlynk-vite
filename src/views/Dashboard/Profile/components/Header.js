@@ -1,5 +1,8 @@
 // Chakra imports
 import { useMutation } from '@apollo/client'
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 import {
   Avatar,
   Box,
@@ -10,12 +13,13 @@ import {
   useColorModeValue,
   useToast
 } from '@chakra-ui/react'
+
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-import { UploadProfileImage } from 'graphQL/Mutation'
+
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+
+import { UploadProfileImage } from 'graphQL/Mutation'
 
 const Header = ({
   org,

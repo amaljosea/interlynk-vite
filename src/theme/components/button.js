@@ -2,36 +2,36 @@ export const buttonStyles = {
   components: {
     Button: {
       variants: {
-        "no-hover": {
+        'no-hover': {
           _hover: {
-            boxShadow: "none",
-          },
+            boxShadow: 'none'
+          }
         },
-        "transparent-with-icon": {
-          bg: "transparent",
-          fontWeight: "medium",
-          borderRadius: "inherit",
-          cursor: "pointer",
-          _hover: "none",
+        'transparent-with-icon': {
+          bg: 'transparent',
+          fontWeight: 'medium',
+          borderRadius: 'inherit',
+          cursor: 'pointer',
+          _hover: 'none',
           _active: {
-            bg: "transparent",
-            transform: "none",
-            borderColor: "transparent",
+            bg: 'transparent',
+            transform: 'none',
+            borderColor: 'transparent'
           },
           _focus: {
-            boxShadow: "none",
+            boxShadow: 'none'
           },
           _hover: {
-            boxShadow: "none",
-          },
-        },
+            boxShadow: 'none'
+          }
+        }
       },
       baseStyle: {
-        borderRadius: "5px",
+        borderRadius: '5px',
         _focus: {
-          boxShadow: "none",
-        },
-      },
-    },
-  },
-};
+          boxShadow: 'none'
+        }
+      }
+    }
+  }
+}

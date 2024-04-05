@@ -1,15 +1,16 @@
 import {
   ApolloClient,
-  InMemoryCache,
   ApolloProvider,
+  InMemoryCache,
   createHttpLink
 } from '@apollo/client'
-import { Box, Image } from '@chakra-ui/react'
-import Invitation from 'views/Auth/Invitation'
 import DashboardBg from 'assets/img/dashboard.png'
 import { useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import Confirmation from 'views/Auth/Confirmation'
+import Invitation from 'views/Auth/Invitation'
+
+import { Box, Image } from '@chakra-ui/react'
 
 const Success = () => {
   const navRef = useRef()

@@ -1,28 +1,50 @@
 // Chakra imports
-import {Flex, Grid, Switch, Tab, TabList, TabPanel, TabPanels, Tabs, Text} from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
 import { useQuery } from '@apollo/client'
-import { GetOrg, GetRoles, MyOrganizations, AllOrganizations, GetOrgSettings } from 'graphQL/Queries'
-import { FaUserCircle, FaBuilding } from 'react-icons/fa'
-import { WarningTwoIcon } from '@chakra-ui/icons'
-import { displayErrorMessage } from 'utils'
-import { useGlobalState } from 'hooks/useGlobalState'
-import Header from './components/Header'
-import AdvisoryFeeds from './components/AdvisoryFeeds'
-import ExploitFeeds from './components/ExploitFeeds'
-import ApiFeed from './components/ApiFeed'
-import Card from 'components/Card/Card'
-import ComponentFeed from './components/ComponentFeed'
-import GeneralFeed from './components/GeneralFeed'
-import PersonalInfo from './components/PersonalInfo'
+import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import TokenInfo from './components/TokenInfo'
-import TeamTable from 'components/Tables/TeamTable'
+import { displayErrorMessage } from 'utils'
+
+import { WarningTwoIcon } from '@chakra-ui/icons'
+import {
+  Flex,
+  Grid,
+  Switch,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text
+} from '@chakra-ui/react'
+
+import Card from 'components/Card/Card'
+import CustomLoader from 'components/CustomLoader'
+import NotificationChannels from 'components/Notifications/NotificationChannels'
+import LegalTable from 'components/Tables/LegalTable'
 import OrgTable from 'components/Tables/OrgTable'
 import RoleTable from 'components/Tables/RoleTable'
-import CustomLoader from 'components/CustomLoader'
-import NotificationChannels from "components/Notifications/NotificationChannels";
-import LegalTable from 'components/Tables/LegalTable'
+import TeamTable from 'components/Tables/TeamTable'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import {
+  AllOrganizations,
+  GetOrg,
+  GetOrgSettings,
+  GetRoles,
+  MyOrganizations
+} from 'graphQL/Queries'
+
+import { FaBuilding, FaUserCircle } from 'react-icons/fa'
+
+import AdvisoryFeeds from './components/AdvisoryFeeds'
+import ApiFeed from './components/ApiFeed'
+import ComponentFeed from './components/ComponentFeed'
+import ExploitFeeds from './components/ExploitFeeds'
+import GeneralFeed from './components/GeneralFeed'
+import Header from './components/Header'
+import PersonalInfo from './components/PersonalInfo'
+import TokenInfo from './components/TokenInfo'
 
 function Profile() {
   const location = useLocation()
@@ -30,25 +52,49 @@ function Profile() {
   const activetab = queryParams.get('tab')
   const { totalRows, userPermissions } = useGlobalState()
 
-  const tabs = [{ name: 'PERSONAL', icon: FaUserCircle },{ name: 'ORGANIZATION', icon: FaBuilding }]
-  const viewOrg = userPermissions?.find((item) => item.key === 'view_organization')
+  const tabs = [
+    { name: 'PERSONAL', icon: FaUserCircle },
+    { name: 'ORGANIZATION', icon: FaBuilding }
+  ]
+  const viewOrg = userPermissions?.find(
+    (item) => item.key === 'view_organization'
+  )
   const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
   const viewFeeds = userPermissions?.find((item) => item.key === 'view_feeds')
-  const manageFeeds = viewFeeds?.supersededBy?.some((permission) => permission.key === 'manage_feeds' && permission.value === true )
-  const manageListing = viewFeeds?.supersededBy?.some((permission) => permission.key === 'manage_listing' && permission.value === true )
+  const manageFeeds = viewFeeds?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'manage_feeds' && permission.value === true
+  )
+  const manageListing = viewFeeds?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'manage_listing' && permission.value === true
+  )
 
   const [tabIndex, setTabIndex] = useState(0)
   const [psIndex, setPsIndex] = useState(0)
   const [selectedTab, setSelectedTab] = useState(tabs[1].name)
 
-  const { data: orgInfo, refetch, error } = useQuery(GetOrg, { skip: orgInfo === undefined ? false : true })
+  const {
+    data: orgInfo,
+    refetch,
+    error
+  } = useQuery(GetOrg, { skip: orgInfo === undefined ? false : true })
 
   const isAdmin = orgInfo && orgInfo?.organization?.currentUser?.superAdmin
 
-  const { data: orgs, refetch: myOrgRefetch } = useQuery(MyOrganizations, {skip: isAdmin, variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] } })
-  const { data: allOrgs, refetch: allOrgRefetch } = useQuery(AllOrganizations, {skip: !isAdmin, variables: { first: totalRows, status: 'approved' } })
-  const { data: roles, refetch: roleRefetch } = useQuery(GetRoles, { skip: tabIndex === 2 ? false : true })
-  const { data: settingsData, refetch: settingsRefetch } = useQuery(GetOrgSettings)
+  const { data: orgs, refetch: myOrgRefetch } = useQuery(MyOrganizations, {
+    skip: isAdmin,
+    variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
+  })
+  const { data: allOrgs, refetch: allOrgRefetch } = useQuery(AllOrganizations, {
+    skip: !isAdmin,
+    variables: { first: totalRows, status: 'approved' }
+  })
+  const { data: roles, refetch: roleRefetch } = useQuery(GetRoles, {
+    skip: tabIndex === 2 ? false : true
+  })
+  const { data: settingsData, refetch: settingsRefetch } =
+    useQuery(GetOrgSettings)
 
   const onTabChange = (value) => setTabIndex(value)
   const handleChange = (value) => setPsIndex(value)
@@ -98,16 +144,53 @@ function Profile() {
   return (
     <>
       {orgInfo ? (
-        <Flex direction='column' pr={2} pl={5} pt={{ base: '120px', md: '75px' }}>
+        <Flex
+          direction='column'
+          pr={2}
+          pl={5}
+          pt={{ base: '120px', md: '75px' }}
+        >
           {/*  HEADER */}
-          <Header org={orgInfo?.organization} user={orgInfo?.organization?.currentUser} selectedTab={selectedTab} refetch={refetch} setSelectedTab={setSelectedTab} setTabIndex={setTabIndex} setPsIndex={setPsIndex} tabs={tabs} />
+          <Header
+            org={orgInfo?.organization}
+            user={orgInfo?.organization?.currentUser}
+            selectedTab={selectedTab}
+            refetch={refetch}
+            setSelectedTab={setSelectedTab}
+            setTabIndex={setTabIndex}
+            setPsIndex={setPsIndex}
+            tabs={tabs}
+          />
           {/*  ORGANIZATION */}
           {selectedTab === 'ORGANIZATION' && (
             <Card>
-              <Tabs variant='enclosed' w={'100%'} bg={'white'} defaultIndex={tabIndex} onChange={(e) => onTabChange(e)} >
+              <Tabs
+                variant='enclosed'
+                w={'100%'}
+                bg={'white'}
+                defaultIndex={tabIndex}
+                onChange={(e) => onTabChange(e)}
+              >
                 <TabList>
-                  {['General','Users','Roles','Feeds','Checks','Lists','Legal'].map((item, index) => (
-                    <Tab key={index} _focus={{ outline: 'none' }} display={(item === 'Lists' && !manageListing) ||(item === 'Feeds' && !manageFeeds) || (item === 'Users' && !viewUsers?.value) ? 'none' : 'block'}
+                  {[
+                    'General',
+                    'Users',
+                    'Roles',
+                    'Feeds',
+                    'Checks',
+                    'Lists',
+                    'Legal'
+                  ].map((item, index) => (
+                    <Tab
+                      key={index}
+                      _focus={{ outline: 'none' }}
+                      display={
+                        (item === 'Lists' && !manageListing) ||
+                        (item === 'Feeds' && !manageFeeds) ||
+                        (item === 'Users' && !viewUsers?.value)
+                          ? 'none'
+                          : 'block'
+                      }
                     >
                       {item}
                     </Tab>
@@ -116,26 +199,48 @@ function Profile() {
                 <TabPanels>
                   {/* GEENRAL */}
                   <TabPanel>
-                    <Grid width={'100%'} templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }} gap='22px'>
+                    <Grid
+                      width={'100%'}
+                      templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
+                      gap='22px'
+                    >
                       <GeneralFeed orgInfo={orgInfo} refetch={refetch} />
                     </Grid>
                   </TabPanel>
                   {/* TEAMS */}
                   <TabPanel>
                     {orgInfo && (
-                      <TeamTable data={orgInfo?.organization || null} refetch={refetch}/>
+                      <TeamTable
+                        data={orgInfo?.organization || null}
+                        refetch={refetch}
+                      />
                     )}
                   </TabPanel>
                   {/* ROLES */}
                   <TabPanel>
-                    <RoleTable tabIndex={tabIndex} data={roles?.organization?.organizationRoles} role={orgInfo?.organization?.currentUser?.role?.name} refetch={roleRefetch} />
+                    <RoleTable
+                      tabIndex={tabIndex}
+                      data={roles?.organization?.organizationRoles}
+                      role={orgInfo?.organization?.currentUser?.role?.name}
+                      refetch={roleRefetch}
+                    />
                   </TabPanel>
                   {/* FEEDS */}
                   <TabPanel display={manageFeeds ? 'block' : 'none'}>
                     {settingsData && (
-                      <Grid width={'100%'} templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }} gap='22px'>
-                        <AdvisoryFeeds data={settingsData} refetch={settingsRefetch} />
-                        <ExploitFeeds data={settingsData} refetch={settingsRefetch} />
+                      <Grid
+                        width={'100%'}
+                        templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
+                        gap='22px'
+                      >
+                        <AdvisoryFeeds
+                          data={settingsData}
+                          refetch={settingsRefetch}
+                        />
+                        <ExploitFeeds
+                          data={settingsData}
+                          refetch={settingsRefetch}
+                        />
                       </Grid>
                     )}
                   </TabPanel>
@@ -145,12 +250,19 @@ function Profile() {
                   </TabPanel>
                   {/* LISTS */}
                   <TabPanel>
-                    <Grid width={'100%'} templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }} gap='22px'>
-                      <ComponentFeed data={orgInfo?.organization?.organizationComponents} refetch={refetch} />
+                    <Grid
+                      width={'100%'}
+                      templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
+                      gap='22px'
+                    >
+                      <ComponentFeed
+                        data={orgInfo?.organization?.organizationComponents}
+                        refetch={refetch}
+                      />
                     </Grid>
                   </TabPanel>
-                   {/* LEGAL */}
-                   <TabPanel>
+                  {/* LEGAL */}
+                  <TabPanel>
                     <LegalTable />
                   </TabPanel>
                 </TabPanels>
@@ -161,32 +273,65 @@ function Profile() {
           {/* PERSONAL  */}
           {selectedTab === 'PERSONAL' && (
             <Card>
-              <Tabs variant='enclosed' w={'100%'} bg={'white'} index={psIndex} onChange={handleChange}>
+              <Tabs
+                variant='enclosed'
+                w={'100%'}
+                bg={'white'}
+                index={psIndex}
+                onChange={handleChange}
+              >
                 <TabList>
-                  {['Personal Details', 'Organizations', 'Security Tokens', 'Notifications'].map(
-                    (item, index) => (
-                      <Tab key={index} _focus={{ outline: 'none' }} isDisabled={orgInfo?.organization === null && (item === 'Personal Details' || item === 'Security Tokens')}>
-                        {item}
-                      </Tab>
-                    )
-                  )}
+                  {[
+                    'Personal Details',
+                    'Organizations',
+                    'Security Tokens',
+                    'Notifications'
+                  ].map((item, index) => (
+                    <Tab
+                      key={index}
+                      _focus={{ outline: 'none' }}
+                      isDisabled={
+                        orgInfo?.organization === null &&
+                        (item === 'Personal Details' ||
+                          item === 'Security Tokens')
+                      }
+                    >
+                      {item}
+                    </Tab>
+                  ))}
                 </TabList>
                 <TabPanels>
                   {/* PERSONA DETAILS */}
                   <TabPanel display={orgInfo?.organization ? 'block' : 'none'}>
-                    <PersonalInfo user={orgInfo?.organization?.currentUser || null} refetch={refetch} />
+                    <PersonalInfo
+                      user={orgInfo?.organization?.currentUser || null}
+                      refetch={refetch}
+                    />
                   </TabPanel>
                   {/* ORG DETAILS */}
                   <TabPanel>
                     {isAdmin === true ? (
-                      <OrgTable data={allOrgs?.allOrganizations?.nodes || []} refetch={allOrgRefetch} isAdmin={isAdmin} activeOrg={orgInfo?.organization?.id || null}/>
+                      <OrgTable
+                        data={allOrgs?.allOrganizations?.nodes || []}
+                        refetch={allOrgRefetch}
+                        isAdmin={isAdmin}
+                        activeOrg={orgInfo?.organization?.id || null}
+                      />
                     ) : (
-                      <OrgTable data={orgs?.myOrganizations?.nodes || []} refetch={myOrgRefetch} isAdmin={isAdmin} activeOrg={orgInfo?.organization?.id || null} />
+                      <OrgTable
+                        data={orgs?.myOrganizations?.nodes || []}
+                        refetch={myOrgRefetch}
+                        isAdmin={isAdmin}
+                        activeOrg={orgInfo?.organization?.id || null}
+                      />
                     )}
                   </TabPanel>
                   {/* SECURITY TOKEN */}
                   <TabPanel display={orgInfo?.organization ? 'block' : 'none'}>
-                    <TokenInfo data={orgInfo?.organization?.currentUser?.apiKeys || []} refetch={refetch} />
+                    <TokenInfo
+                      data={orgInfo?.organization?.currentUser?.apiKeys || []}
+                      refetch={refetch}
+                    />
                   </TabPanel>
 
                   {/* Notification Preferences */}

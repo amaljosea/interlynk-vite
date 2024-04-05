@@ -1,19 +1,26 @@
 // Chakra imports
-import { Flex, Skeleton, Stack, useToast } from '@chakra-ui/react'
-import React, { useState, useEffect } from 'react'
-import Card from 'components/Card/Card.js'
-import SBOMTable from './components/SBOMTable'
-import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
-import { GetProductData, GetProject, GetComponentData } from 'graphQL/Queries'
+import React, { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+
+import { Flex, Skeleton, Stack, useToast } from '@chakra-ui/react'
+
+import Card from 'components/Card/Card.js'
+
 import { useGlobalState } from 'hooks/useGlobalState'
-import SbomInfo from './components/SbomInfo'
+
+import { GetComponentData, GetProductData, GetProject } from 'graphQL/Queries'
 import { GetSbomParts } from 'graphQL/Queries'
 
-const idRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+import SBOMTable from './components/SBOMTable'
+import SbomInfo from './components/SbomInfo'
+
+const idRegex =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
 function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
-  const { totalRows, setActiveSbomTab, prodState, prodCompState, dispatch } = useGlobalState()
+  const { totalRows, setActiveSbomTab, prodState, prodCompState, dispatch } =
+    useGlobalState()
   const { data: allProjectGroups } = prodState
   const { prodVulnDispatch } = dispatch
   const location = useLocation()
@@ -29,20 +36,38 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   const group = JSON.parse(localStorage.getItem('product'))
 
   // GET COMPONENT DATA
-  const { data: compData, refetch: compRefetch, error: compError } = useQuery(GetComponentData, {
+  const {
+    data: compData,
+    refetch: compRefetch,
+    error: compError
+  } = useQuery(GetComponentData, {
     fetchPolicy: 'network-only',
-    variables: { projectId: productId, sbomId: sbomId, first: totalRows, field: prodCompState.field, direction: prodCompState.direction }
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      field: prodCompState.field,
+      direction: prodCompState.direction
+    }
   })
 
   // GET SBOM PARTS
-  const {} = useQuery(GetSbomParts, { 
-    skip: sbomId ? false: true, 
+  const {} = useQuery(GetSbomParts, {
+    skip: sbomId ? false : true,
     fetchPolicy: 'network-only',
     variables: { projectId: productId, sbomId: sbomId, first: totalRows },
-    onCompleted: (data) => data?.sbom?.sbomParts?.length > 0 && prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
+    onCompleted: (data) =>
+      data?.sbom?.sbomParts?.length > 0 &&
+      prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
   })
 
-  const { data: sbomData, refetch, error } = useQuery(GetProductData, { variables: { projectId: productId, sbomId: sbomId } })
+  const {
+    data: sbomData,
+    refetch,
+    error
+  } = useQuery(GetProductData, {
+    variables: { projectId: productId, sbomId: sbomId }
+  })
 
   const { data } = useQuery(GetProject, { variables: { id: productId } })
 
@@ -56,7 +81,10 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
 
   const uniqVersions = []
 
-  data?.project?.sboms?.length > 0 && data.project.sboms.map((project) => uniqVersions.push({ label: project?.projectVersion }))
+  data?.project?.sboms?.length > 0 &&
+    data.project.sboms.map((project) =>
+      uniqVersions.push({ label: project?.projectVersion })
+    )
 
   const handleTabChange = (value) => {
     localStorage.setItem('activeSbomTab', value)
@@ -86,7 +114,12 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
 
   useEffect(() => {
     if (error) {
-      toast({ description: error.message, status: 'error', duration: 2000, position: 'top' })
+      toast({
+        description: error.message,
+        status: 'error',
+        duration: 2000,
+        position: 'top'
+      })
       navigate('/vendor/products')
     }
   }, [])
@@ -118,7 +151,10 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
             getCompData={compRefetch}
             compData={compData}
             error={compError}
-            type={ selectedProject?.sboms.length > 0 && selectedProject.sboms[0].format }
+            type={
+              selectedProject?.sboms.length > 0 &&
+              selectedProject.sboms[0].format
+            }
           />
         </Stack>
       ) : (

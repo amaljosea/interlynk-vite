@@ -1,40 +1,44 @@
 import { useMutation } from '@apollo/client'
+import React, { useMemo, useState } from 'react'
+import DataTable from 'react-data-table-component'
+import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
+import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
+
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
   Avatar,
+  Badge,
+  Button,
   Flex,
   IconButton,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Portal,
-  Stack,
-  Text,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-  useDisclosure,
-  Button,
-  Tooltip,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Portal,
+  Stack,
   Tag,
-  useToast,
   TagLabel,
-  Badge
+  Text,
+  Tooltip,
+  useDisclosure,
+  useToast
 } from '@chakra-ui/react'
-import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
+
 import { useGlobalState } from 'hooks/useGlobalState'
-import React, { useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
+
+import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
+
 import { FaEllipsisV } from 'react-icons/fa'
-import { getFullDateAndTime, timeSince, customStyles } from 'utils'
-import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
-import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 function userTimeStart(row) {
   let timeStart
@@ -196,7 +200,7 @@ const TeamTable = ({ data, refetch }) => {
           </Tooltip>
         )
       },
-      right:'true',
+      right: 'true',
       sortable: true,
       sortFunction: (a, b) => {
         const aUserStart = userTimeStart(a)

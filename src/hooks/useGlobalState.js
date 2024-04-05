@@ -1,20 +1,20 @@
-import React, { useState, createContext, useContext, useReducer } from 'react'
 import {
-  globalVulnReducer,
   compVulnReducer,
-  prodRulesReducer,
+  globalVulnReducer,
+  policyReducer,
   prodCheckReducer,
   prodCompReducer,
   prodLogReducer,
+  prodReducer,
+  prodRulesReducer,
   prodVulnReducer,
   sbomLogReducer,
-  prodReducer,
   sbomReducer,
-  versionReducer,
-  toolsReducer,
   supportReducer,
-  policyReducer
+  toolsReducer,
+  versionReducer
 } from 'context/reducers'
+import React, { createContext, useContext, useReducer, useState } from 'react'
 
 const GlobalStateContext = createContext()
 

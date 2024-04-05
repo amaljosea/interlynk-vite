@@ -1,28 +1,31 @@
 import { useMutation } from '@apollo/client'
-import {
-  Button,
-  Heading,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Flex,
-  FormControl,
-  FormLabel,
-  Input,
-  FormErrorMessage,
-  useToast
-} from '@chakra-ui/react'
-import Card from 'components/Card/Card'
-import { RegisterOrganization, SwitchOrganization } from 'graphQL/Mutation'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { validateEmail, validateUrl } from 'utils'
+
+import {
+  Button,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Heading,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
+  useToast
+} from '@chakra-ui/react'
+
+import Card from 'components/Card/Card'
+
+import { RegisterOrganization, SwitchOrganization } from 'graphQL/Mutation'
 
 const OrgRegister = () => {
   const navigate = useNavigate()

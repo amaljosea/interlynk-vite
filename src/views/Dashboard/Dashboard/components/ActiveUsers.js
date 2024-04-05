@@ -1,37 +1,45 @@
 // Chakra imports
-import { Flex, Box, SimpleGrid, Text, useColorModeValue } from "@chakra-ui/react";
+import React from 'react'
+
+import {
+  Box,
+  Flex,
+  SimpleGrid,
+  Text,
+  useColorModeValue
+} from '@chakra-ui/react'
 
 // Custom components
-import Card from "components/Card/Card.js";
-import CardHeader from "components/Card/CardHeader.js";
-import CardBody from "components/Card/CardBody.js";
+import Card from 'components/Card/Card.js'
+import CardBody from 'components/Card/CardBody.js'
+import CardHeader from 'components/Card/CardHeader.js'
 // Custom icons
 import {
   CartIcon,
   RocketIcon,
   StatsIcon,
-  WalletIcon,
-} from "components/Icons/Icons.js";
-import React from "react";
-import ChartStatistics from "./ChartStatistics";
+  WalletIcon
+} from 'components/Icons/Icons.js'
+
+import ChartStatistics from './ChartStatistics'
 
 const SBOMActivities = ({ title, percentage, chart }) => {
-  const iconBoxInside = useColorModeValue("white", "white");
-  const textColor = useColorModeValue("gray.700", "white");
+  const iconBoxInside = useColorModeValue('white', 'white')
+  const textColor = useColorModeValue('gray.700', 'white')
   return (
-    <Card p='28px 10px 16px 0px' mb={{ sm: "26px", lg: "0px" }}>
-        <CardHeader mb='20px' pl='22px'>
+    <Card p='28px 10px 16px 0px' mb={{ sm: '26px', lg: '0px' }}>
+      <CardHeader mb='20px' pl='22px'>
         <Flex direction='column' alignSelf='flex-start'>
           <Text fontSize='lg' color={textColor} fontWeight='bold' mb='6px'>
             {title}
           </Text>
         </Flex>
       </CardHeader>
-      <Box w='100%' h={{ sm: "300px" }} ps='12px'>
+      <Box w='100%' h={{ sm: '300px' }} ps='12px'>
         {chart}
       </Box>
     </Card>
-  );
-};
+  )
+}
 
-export default SBOMActivities;
+export default SBOMActivities

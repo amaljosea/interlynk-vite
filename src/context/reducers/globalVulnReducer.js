@@ -34,7 +34,7 @@ const globalVulnReducer = (state, action) => {
       return {
         ...state,
         searchInput: payload,
-        pageIndex: 1,
+        pageIndex: 1
       }
     case 'CLEAR_SEARCH_INPUT':
       return {

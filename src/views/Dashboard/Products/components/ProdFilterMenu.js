@@ -6,9 +6,11 @@ import {
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
+
 import CheckMark from 'components/Misc/CheckMark'
-import { useGlobalState } from 'hooks/useGlobalState'
 import MenuHeading from 'components/Misc/MenuHeading'
+
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const ProdFilterMenu = ({ onFilter }) => {
   const { prodState } = useGlobalState()

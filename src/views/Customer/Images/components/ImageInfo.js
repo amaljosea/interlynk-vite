@@ -1,40 +1,46 @@
 // Chakra imports
-import {
-  Flex,
-  Heading,
-  Icon,
-  Grid,
-  GridItem,
-  Text,
-  Box,
-  Select,
-  Image,
-  chakra,
-  Tag,
-  TagLabel,
-  Tooltip,
-  Stack,
-  StackDivider,
-  Button
-} from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import Card from 'components/Card/Card.js'
-import CardHeader from 'components/Card/CardHeader'
-import CardBody from 'components/Card/CardBody.js'
-import { sbom } from 'variables/general'
-import { FaCubes, FaLayerGroup, FaMicroscope } from 'react-icons/fa'
-import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
-import { scanImage } from 'utils'
+import Cookies from 'js-cookie'
+import React, { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import semver from 'semver'
-import { GetSignedImage, GetSignedImageVerion } from 'graphQL/Queries'
-import { getAllScanners } from 'graphQL/Queries'
+import { scanImage } from 'utils'
 import { timeSince } from 'utils'
 import { formattedTime } from 'utils'
 import { dateTime } from 'utils'
-import Cookies from 'js-cookie'
-import ImageLogs from './ImageLogs'
+import { sbom } from 'variables/general'
+
+import {
+  Box,
+  Button,
+  Flex,
+  Grid,
+  GridItem,
+  Heading,
+  Icon,
+  Image,
+  Select,
+  Stack,
+  StackDivider,
+  Tag,
+  TagLabel,
+  Text,
+  Tooltip,
+  chakra
+} from '@chakra-ui/react'
+
+import Card from 'components/Card/Card.js'
+import CardBody from 'components/Card/CardBody.js'
+import CardHeader from 'components/Card/CardHeader'
+
 import { useGlobalState } from 'hooks/useGlobalState'
+
+import { GetSignedImage, GetSignedImageVerion } from 'graphQL/Queries'
+import { getAllScanners } from 'graphQL/Queries'
+
+import { FaCubes, FaLayerGroup, FaMicroscope } from 'react-icons/fa'
+
+import ImageLogs from './ImageLogs'
 
 function ImageInfo() {
   const [scanResults, setScanResults] = useState(null)
@@ -443,8 +449,8 @@ function ImageInfo() {
                                 item.status === 'completed'
                                   ? 'green.500'
                                   : item.status === 'failed'
-                                  ? 'red.500'
-                                  : 'orange.400'
+                                    ? 'red.500'
+                                    : 'orange.400'
                               }`}
                             >
                               {item.status}

@@ -1,4 +1,5 @@
-import { Box, Table, Th, Tbody, Thead, Tr } from '@chakra-ui/react'
+import { Box, Table, Tbody, Th, Thead, Tr } from '@chakra-ui/react'
+
 import SBOMLinkRow from 'components/Tables/SBOMLinkRow'
 
 const LynkTable = ({ captions, data, refetch }) => {

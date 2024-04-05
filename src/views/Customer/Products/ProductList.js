@@ -1,11 +1,15 @@
 import { useQuery } from '@apollo/client'
+import { displayErrorMessage } from 'utils'
+
 import { WarningTwoIcon } from '@chakra-ui/icons'
 import { Flex, Text } from '@chakra-ui/react'
+
 import Card from 'components/Card/Card'
 import ProductTable from 'components/Tables/ProductTable'
-import { ShareLynkProjectGroups } from 'graphQL/Queries'
+
 import { useGlobalState } from 'hooks/useGlobalState'
-import { displayErrorMessage } from 'utils'
+
+import { ShareLynkProjectGroups } from 'graphQL/Queries'
 
 const ProductList = () => {
   const { prodState } = useGlobalState()

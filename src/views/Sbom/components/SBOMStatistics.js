@@ -1,16 +1,26 @@
 // Chakra imports
-import { Flex, Text, useColorModeValue, Stat, StatNumber, StatHelpText, StatLabel } from "@chakra-ui/react";
+import React from 'react'
+
+import {
+  Flex,
+  Stat,
+  StatHelpText,
+  StatLabel,
+  StatNumber,
+  Text,
+  useColorModeValue
+} from '@chakra-ui/react'
+
 // Custom components
-import Card from "components/Card/Card.js";
-import CardBody from "components/Card/CardBody.js";
-import IconBox from "components/Icons/IconBox";
-import { Separator } from "components/Separator/Separator";
-import React from "react";
+import Card from 'components/Card/Card.js'
+import CardBody from 'components/Card/CardBody.js'
+import IconBox from 'components/Icons/IconBox'
+import { Separator } from 'components/Separator/Separator'
 
 const SBOMStatistics = ({ icon, title, description, amount }) => {
-  const iconTeal = useColorModeValue("teal.300", "teal.300");
-  const iconBlue = useColorModeValue("blue.300", "blue.300");
-  const textColor = useColorModeValue("gray.700", "white");
+  const iconTeal = useColorModeValue('teal.300', 'teal.300')
+  const iconBlue = useColorModeValue('blue.300', 'blue.300')
+  const textColor = useColorModeValue('gray.700', 'white')
 
   return (
     <Card minH='83px'>
@@ -21,7 +31,8 @@ const SBOMStatistics = ({ icon, title, description, amount }) => {
               fontSize='md'
               color='gray.400'
               fontWeight='bold'
-              pb='.1rem'>
+              pb='.1rem'
+            >
               {title}
             </StatLabel>
             <Flex>
@@ -30,13 +41,13 @@ const SBOMStatistics = ({ icon, title, description, amount }) => {
               </StatNumber>
             </Flex>
           </Stat>
-          <IconBox h={"45px"} w={"45px"} bg={iconBlue}>
+          <IconBox h={'45px'} w={'45px'} bg={iconBlue}>
             {icon}
           </IconBox>
         </Flex>
       </CardBody>
     </Card>
-  );
-};
+  )
+}
 
-export default SBOMStatistics;
+export default SBOMStatistics

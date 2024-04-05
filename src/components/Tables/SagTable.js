@@ -1,12 +1,15 @@
-import CustomLoader from 'components/CustomLoader'
-import DataTable from 'react-data-table-component'
-import { Badge, Button, Flex, IconButton, Stack, Text } from '@chakra-ui/react'
 import React, { useMemo, useState } from 'react'
-import { customStyles } from 'utils'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
-import SagFilters from 'views/Dashboard/SAG/Filters'
-import Card from 'components/Card/Card'
+import DataTable from 'react-data-table-component'
 import { Link } from 'react-router-dom'
+import { customStyles } from 'utils'
+import SagFilters from 'views/Dashboard/SAG/Filters'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
+
+import { Badge, Button, Flex, IconButton, Stack, Text } from '@chakra-ui/react'
+
+import Card from 'components/Card/Card'
+import CustomLoader from 'components/CustomLoader'
+
 import { FaEnvelope } from 'react-icons/fa6'
 
 const SagTable = ({ data }) => {
@@ -16,7 +19,13 @@ const SagTable = ({ data }) => {
   const [category, setCategory] = useState('')
   const [label, setLabel] = useState('')
 
-  const filteredData = data?.filter((item) => item?.productName?.toLowerCase().includes(searchInput.toLowerCase()) && item?.supplierName?.toLowerCase().includes(supplier.toLowerCase()) && item?.category?.toLowerCase().includes(category.toLowerCase()) && item?.label?.toLowerCase().includes(label.toLowerCase()))
+  const filteredData = data?.filter(
+    (item) =>
+      item?.productName?.toLowerCase().includes(searchInput.toLowerCase()) &&
+      item?.supplierName?.toLowerCase().includes(supplier.toLowerCase()) &&
+      item?.category?.toLowerCase().includes(category.toLowerCase()) &&
+      item?.label?.toLowerCase().includes(label.toLowerCase())
+  )
 
   // CLEAR SERACH
   const handleClear = () => {
@@ -48,7 +57,7 @@ const SagTable = ({ data }) => {
       id: 'PRODUCT_NAME',
       name: 'PRODUCT NAME',
       selector: (row) => {
-        const {supplierName, productName} = row
+        const { supplierName, productName } = row
         return (
           <Stack my={4} alignItems={'flex-start'} spacing={2}>
             <Text>{productName}</Text>
@@ -63,14 +72,24 @@ const SagTable = ({ data }) => {
       id: 'PRODUCT_VERSION',
       name: 'PRODUCT VERSION',
       selector: (row) => <Text>{row?.productVersion}</Text>,
-      width:'200px',
+      width: '200px',
       wrap: true
     },
     {
       id: 'SAG_SCORE',
       name: 'SAG SCORE',
-      selector: (row) => <Button pointerEvents={'none'} size='xs' variant='outline' colorScheme='blue' width={'60px'}>{row?.sagScore}</Button>,
-      width:'150px',
+      selector: (row) => (
+        <Button
+          pointerEvents={'none'}
+          size='xs'
+          variant='outline'
+          colorScheme='blue'
+          width={'60px'}
+        >
+          {row?.sagScore}
+        </Button>
+      ),
+      width: '150px',
       wrap: true
     },
     {
@@ -95,21 +114,21 @@ const SagTable = ({ data }) => {
         if (row?.link) {
           return (
             <Link to={row.link} target='_blank'>
-              <IconButton colorScheme='blue' size='sm' icon={<FaEnvelope/>} />
+              <IconButton colorScheme='blue' size='sm' icon={<FaEnvelope />} />
             </Link>
-          );
+          )
         } else {
-          return null; // Return nothing if link value is not present
+          return null // Return nothing if link value is not present
         }
       },
-      width:'210px',
+      width: '210px',
       wrap: true
     },
     {
       id: 'UPDATED_AT',
       name: 'UPDATED',
       selector: (row) => <Text>{row.currentDate}</Text>,
-      right:'true',
+      right: 'true',
       wrap: true
     }
   ]
@@ -118,13 +137,44 @@ const SagTable = ({ data }) => {
   const subHeader = useMemo(() => {
     return (
       <>
-        <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-start'} mb={4} px={4} gap={4}>
-          <SearchFilter id='sagData' filterText={filterText} onChange={onSearchInputChange} onClear={handleClear} onFilter={handleSearch} />
-          <SagFilters category={category} setCategory={setCategory} label={label} setLabel={setLabel} supplier={supplier} setSupplier={setSupplier} />
+        <Flex
+          width={'100%'}
+          alignItems={'center'}
+          justifyContent={'flex-start'}
+          mb={4}
+          px={4}
+          gap={4}
+        >
+          <SearchFilter
+            id='sagData'
+            filterText={filterText}
+            onChange={onSearchInputChange}
+            onClear={handleClear}
+            onFilter={handleSearch}
+          />
+          <SagFilters
+            category={category}
+            setCategory={setCategory}
+            label={label}
+            setLabel={setLabel}
+            supplier={supplier}
+            setSupplier={setSupplier}
+          />
         </Flex>
       </>
     )
-  }, [filterText, category, label, setCategory, setLabel, supplier, setSupplier, handleClear, handleSearch, onSearchInputChange])
+  }, [
+    filterText,
+    category,
+    label,
+    setCategory,
+    setLabel,
+    supplier,
+    setSupplier,
+    handleClear,
+    handleSearch,
+    onSearchInputChange
+  ])
 
   return (
     <Card>

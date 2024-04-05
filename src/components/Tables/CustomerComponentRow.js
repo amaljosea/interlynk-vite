@@ -1,27 +1,28 @@
+import React from 'react'
+import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+
 import {
-  Tag,
   Button,
   Flex,
+  Icon,
+  Tag,
+  TagLabel,
+  TagLeftIcon,
   Td,
   Text,
   Tr,
-  useColorModeValue,
-  TagLeftIcon,
-  TagLabel,
-  Icon
+  useColorModeValue
 } from '@chakra-ui/react'
-import React from 'react'
 
 import {
   LetterCIcon,
   LetterHIcon,
-  LetterMIcon,
-  LetterLIcon
+  LetterLIcon,
+  LetterMIcon
 } from 'components/Icons/Icons'
 
 import { FaEllipsisV } from 'react-icons/fa'
-import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
 
 function CustomerComponentRow(props) {
   const {

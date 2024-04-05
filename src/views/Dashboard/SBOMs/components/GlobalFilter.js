@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+
 import { Input } from '@chakra-ui/react'
 
 const GlobalFilter = ({ filter, setFilter }) => {

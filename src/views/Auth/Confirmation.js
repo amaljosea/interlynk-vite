@@ -1,4 +1,8 @@
+import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { Navigate, useLocation } from 'react-router-dom'
+
+import { WarningIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
@@ -10,9 +14,7 @@ import {
   Text,
   useToast
 } from '@chakra-ui/react'
-import { Navigate, useLocation } from 'react-router-dom'
-import { WarningIcon } from '@chakra-ui/icons'
-import { useMutation } from '@apollo/client'
+
 import { UserEmailConfirmation } from 'graphQL/Mutation'
 
 const Confirmation = () => {

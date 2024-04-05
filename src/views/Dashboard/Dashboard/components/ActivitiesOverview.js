@@ -1,4 +1,6 @@
 // Chakra imports
+import React, { useState } from 'react'
+
 import {
   Flex,
   Heading,
@@ -6,6 +8,7 @@ import {
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
+
 // Custom components
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
@@ -13,7 +16,7 @@ import CardHeader from 'components/Card/CardHeader.js'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import ActivitiesOverviewRow from 'components/Tables/ActivitiesOverviewRow'
-import React, { useState } from 'react'
+
 import { FaEye } from 'react-icons/fa'
 
 const ActivitiesOverview = ({ title, prodPermissions, data }) => {

@@ -1,3 +1,6 @@
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useEffect, useState } from 'react'
+
 import {
   Box,
   IconButton,
@@ -7,13 +10,17 @@ import {
   MenuList,
   MenuOptionGroup,
   useToast
-} from "@chakra-ui/react";
-import {FaBell} from "react-icons/fa";
-import CheckMark from "../Misc/CheckMark";
-import {useEffect, useState} from "react";
-import {UpdateNotificationPreference} from "graphQL/Mutation";
-import {useLazyQuery, useMutation, useQuery} from "@apollo/client";
-import {GetUserNotificationChannels, GetUserNotificationPreferences} from "graphQL/Queries";
+} from '@chakra-ui/react'
+
+import { UpdateNotificationPreference } from 'graphQL/Mutation'
+import {
+  GetUserNotificationChannels,
+  GetUserNotificationPreferences
+} from 'graphQL/Queries'
+
+import { FaBell } from 'react-icons/fa'
+
+import CheckMark from '../Misc/CheckMark'
 
 const NotificationMenuBell = () => {
   const [updatePreference] = useMutation(UpdateNotificationPreference)
@@ -22,7 +29,7 @@ const NotificationMenuBell = () => {
       envId: localStorage['activeEnv']
     }
   })
-  const [ getChannelsInfo ] = useLazyQuery(GetUserNotificationChannels)
+  const [getChannelsInfo] = useLazyQuery(GetUserNotificationChannels)
 
   const toast = useToast()
 
@@ -34,11 +41,11 @@ const NotificationMenuBell = () => {
 
   const [preference, setPreference] = useState([])
   const notificationPreferences = {
-    'Off': 'none',
+    Off: 'none',
     'All Activities': 'all',
-    'Vulnerabilities': 'vulnerabilities',
-    'Licenses': 'licenses',
-    'Policies': 'policies',
+    Vulnerabilities: 'vulnerabilities',
+    Licenses: 'licenses',
+    Policies: 'policies'
   }
   const handlePreferenceChange = (newPreference) => {
     if (newPreference.includes('none') || newPreference.includes('all')) {
@@ -52,26 +59,24 @@ const NotificationMenuBell = () => {
       }
     }).then((res) => {
       setPreference(newPreference)
-      getChannelsInfo().then(({data: { notificationChannels }}) => {
-        const enabledChannelCount = Object
-          .values(notificationChannels)
-          .filter(value => value === true)
-          .length
+      getChannelsInfo().then(({ data: { notificationChannels } }) => {
+        const enabledChannelCount = Object.values(notificationChannels).filter(
+          (value) => value === true
+        ).length
 
         if (enabledChannelCount === 0 && !newPreference.includes('none')) {
           toast({
             title: 'No notification channel enabled',
-            description: 'Please enable at least one channel under personal settings.',
+            description:
+              'Please enable at least one channel under personal settings.',
             status: 'warning',
             duration: 5000,
             isClosable: true,
             position: 'top'
           })
         }
-
       })
     })
-
   }
 
   const generateMenuItems = (notificationPreferences) => {
@@ -80,23 +85,21 @@ const NotificationMenuBell = () => {
         key={key}
         value={value}
         fontSize={'sm'}
-        isDisabled={['Vulnerabilities', 'Policies', 'All Activities'].includes(key)}
+        isDisabled={['Vulnerabilities', 'Policies', 'All Activities'].includes(
+          key
+        )}
       >
         {key}
       </MenuItemOption>
     ))
   }
 
-
   return (
     <Box width={'fit-content'} position={'relative'}>
       <Menu closeOnSelect={false}>
-        {preference[0] != 'none' && <CheckMark zIndex={1}/>}
+        {preference[0] != 'none' && <CheckMark zIndex={1} />}
         <MenuButton>
-          <IconButton
-            colorScheme='blue'
-            icon={<FaBell />}
-          />
+          <IconButton colorScheme='blue' icon={<FaBell />} />
         </MenuButton>
         <MenuList>
           <MenuOptionGroup

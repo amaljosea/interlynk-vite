@@ -1,25 +1,28 @@
 // Chakra imports
 import { useMutation } from '@apollo/client'
+import { useState } from 'react'
+
 import {
+  Button,
+  Code,
   Flex,
-  Text,
-  useColorModeValue,
   FormControl,
+  FormErrorMessage,
   Input,
   Stack,
-  Button,
-  TagLabel,
-  TagCloseButton,
-  Code,
   Tag,
-  FormErrorMessage
+  TagCloseButton,
+  TagLabel,
+  Text,
+  useColorModeValue
 } from '@chakra-ui/react'
+
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import { updateOrgComp, deleteOrgComp, createOrgComp } from 'graphQL/Mutation'
-import { useState } from 'react'
+
+import { createOrgComp, deleteOrgComp, updateOrgComp } from 'graphQL/Mutation'
 
 const ComponentFeed = ({ data, refetch }) => {
   const textColor = useColorModeValue('gray.700', 'white')

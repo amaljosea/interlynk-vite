@@ -1,15 +1,17 @@
 import React, { useState } from 'react'
+
 import {
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuOptionGroup,
-  MenuItemOption,
+  Badge,
+  Box,
   Button,
   Flex,
-  Box,
-  Badge
+  Menu,
+  MenuButton,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup
 } from '@chakra-ui/react'
+
 import { FaFilter } from 'react-icons/fa'
 
 const FilterMenu = () => {

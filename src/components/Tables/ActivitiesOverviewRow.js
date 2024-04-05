@@ -1,28 +1,31 @@
+import React from 'react'
+import { getFullDateAndTime } from 'utils'
+import { purlString } from 'utils'
+
 import {
   Box,
   Flex,
   Icon,
-  Text,
-  useColorModeValue,
   Popover,
   PopoverTrigger,
-  Stack
+  Stack,
+  Text,
+  useColorModeValue
 } from '@chakra-ui/react'
-import React from 'react'
-import { getFullDateAndTime } from 'utils'
+
+import PurlCard from 'components/Misc/PurlCard'
+import Tooltip from 'components/Tooltip'
+
 import {
-  FaPlus,
-  FaMinus,
+  FaDownload,
   FaEdit,
   FaHammer,
+  FaMinus,
+  FaPlus,
   FaRobot,
-  FaUpload,
-  FaDownload,
-  FaTimesCircle
+  FaTimesCircle,
+  FaUpload
 } from 'react-icons/fa'
-import Tooltip from 'components/Tooltip'
-import { purlString } from 'utils'
-import PurlCard from 'components/Misc/PurlCard'
 
 const setColor = (type) => {
   switch (type) {
@@ -190,7 +193,12 @@ function ActivitiesOverviewRow(props) {
         <Text fontSize='sm' color={textColor} fontWeight='normal'>
           {event} by {changedBy}
         </Text>
-        <Text fontSize='sm' color={textColor} fontWeight='normal' wordBreak={'break-all'}>
+        <Text
+          fontSize='sm'
+          color={textColor}
+          fontWeight='normal'
+          wordBreak={'break-all'}
+        >
           {valueToText(action, event, orig, updated)}
         </Text>
         <Text fontSize='xs' color='gray.400' fontWeight='normal'>

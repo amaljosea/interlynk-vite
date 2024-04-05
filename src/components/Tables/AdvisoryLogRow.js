@@ -1,20 +1,22 @@
+import { useEffect, useRef, useState } from 'react'
+import { timeSince } from 'utils'
+
+import { ExternalLinkIcon } from '@chakra-ui/icons'
 import {
-  Tag,
-  Icon,
   Flex,
+  Icon,
+  Link,
+  Tag,
+  TagLabel,
   Td,
   Text,
-  Tr,
-  TagLabel,
-  useColorModeValue,
-  useDisclosure,
   Tooltip,
-  Link
+  Tr,
+  useColorModeValue,
+  useDisclosure
 } from '@chakra-ui/react'
-import { useEffect, useState, useRef } from 'react'
-import { FaTools, FaNeos } from 'react-icons/fa'
-import { ExternalLinkIcon } from '@chakra-ui/icons'
-import { timeSince } from 'utils'
+
+import { FaNeos, FaTools } from 'react-icons/fa'
 
 function AdvisoryLogRow(props) {
   const {
@@ -59,10 +61,10 @@ function AdvisoryLogRow(props) {
     severity == 'critical'
       ? 'red'
       : severity == 'high'
-      ? 'orange'
-      : severity == 'medium'
-      ? 'yellow'
-      : 'green'
+        ? 'orange'
+        : severity == 'medium'
+          ? 'yellow'
+          : 'green'
 
   return (
     <Tr>

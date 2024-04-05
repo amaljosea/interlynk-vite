@@ -1,28 +1,33 @@
-import {
-  Flex,
-  Stack,
-  Tag,
-  Text,
-  Box,
-  TagLabel,
-  Tooltip,
-  IconButton,
-  useDisclosure,
-  Skeleton
-} from '@chakra-ui/react'
+import { useLazyQuery } from '@apollo/client'
 import React, { useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { RepeatIcon } from '@chakra-ui/icons'
 import { useLocation } from 'react-router-dom'
-import { getFullDateAndTime, customStyles, timeSince } from 'utils'
-import CustomLoader from 'components/CustomLoader'
+import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import LogFilterMenu from 'views/Sbom/components/LogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { useGlobalState } from 'hooks/useGlobalState'
-import Pagination from '../Pagination'
+
+import { RepeatIcon } from '@chakra-ui/icons'
+import {
+  Box,
+  Flex,
+  IconButton,
+  Skeleton,
+  Stack,
+  Tag,
+  TagLabel,
+  Text,
+  Tooltip,
+  useDisclosure
+} from '@chakra-ui/react'
+
+import CustomLoader from 'components/CustomLoader'
 import PurlCard from 'components/Misc/PurlCard'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { GetSbomLogFilters } from 'graphQL/Queries'
-import { useLazyQuery } from '@apollo/client'
+
+import Pagination from '../Pagination'
 
 const setColor = (type) => {
   switch (type) {

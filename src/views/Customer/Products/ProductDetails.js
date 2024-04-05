@@ -1,3 +1,8 @@
+import { useQuery } from '@apollo/client'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import SBOM from 'views/Customer/Sbom'
+
 import {
   Flex,
   Grid,
@@ -12,17 +17,17 @@ import {
   Tabs,
   Text
 } from '@chakra-ui/react'
+
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import { FaLock, FaWindowMaximize } from 'react-icons/fa6'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { useQuery } from '@apollo/client'
-import { ShareLynkProjectGroup } from 'graphQL/Queries'
-import { useEffect, useState } from 'react'
-import { useGlobalState } from 'hooks/useGlobalState'
 import VersionsTable from 'components/Tables/VersionsTable'
-import SBOM from 'views/Customer/Sbom'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import { ShareLynkProjectGroup } from 'graphQL/Queries'
 import { ShareVulnData } from 'graphQL/Queries'
+
+import { FaLock, FaWindowMaximize } from 'react-icons/fa6'
 
 const ProductDetails = () => {
   const navigate = useNavigate()

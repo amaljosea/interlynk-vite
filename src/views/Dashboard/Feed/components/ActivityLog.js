@@ -1,4 +1,6 @@
 // Chakra imports
+import React from 'react'
+
 import {
   Flex,
   Table,
@@ -9,16 +11,14 @@ import {
   Tr,
   useColorModeValue
 } from '@chakra-ui/react'
+
 // Custom components
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import ActivityLogRow from 'components/Tables/ActivityLogRow.js'
-import React from 'react'
-
 
 const ActivityLog = ({ title, captions, data, filterData }) => {
   const textColor = useColorModeValue('gray.700', 'white')
-
 
   return (
     <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>

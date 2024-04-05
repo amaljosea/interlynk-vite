@@ -1,5 +1,11 @@
 import { useLazyQuery } from '@apollo/client'
+import GlobalContext from 'context/GlobalContext'
+import Cookies from 'js-cookie'
+import { useContext, useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+
 import {
+  Button,
   Flex,
   Skeleton,
   Tab,
@@ -7,21 +13,18 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  Button,
   Text
 } from '@chakra-ui/react'
+
 import Card from 'components/Card/Card'
 import ComponentTable from 'components/Tables/ComponentTable'
 import GeneralDataRow from 'components/Tables/GeneralDataRow'
 import VulnTable from 'components/Tables/VulnTable'
-import GlobalContext from 'context/GlobalContext'
+
 import { GetSignedVulnData } from 'graphQL/Queries'
 import { GetSignedCompFilterData } from 'graphQL/Queries'
 import { GetSignedVulnFilterData } from 'graphQL/Queries'
 import { GetSignedComponentData } from 'graphQL/Queries'
-import Cookies from 'js-cookie'
-import { useContext, useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
 
 const SignedSbomTable = ({
   refetch,
@@ -132,8 +135,8 @@ const SignedSbomTable = ({
             signedVulnKev === 'all'
               ? undefined
               : signedVulnKev === 'yes'
-              ? true
-              : false,
+                ? true
+                : false,
           epss:
             signedVulnEpss !== '' && signedVulnEpss !== 'all'
               ? range

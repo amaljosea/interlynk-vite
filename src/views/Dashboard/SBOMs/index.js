@@ -1,39 +1,43 @@
 // Chakra imports
-import {
-  Flex,
-  Heading,
-  Icon,
-  Grid,
-  GridItem,
-  Text,
-  Box,
-  Select,
-  Image,
-  chakra,
-  Tag,
-  TagLabel,
-  Tooltip,
-  Stack,
-  StackDivider
-} from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import Card from 'components/Card/Card.js'
-import CardHeader from 'components/Card/CardHeader'
-import CardBody from 'components/Card/CardBody.js'
-import SBOMTable from './components/SBOMTable'
-import { sbom } from 'variables/general'
-import { FaCubes, FaLayerGroup, FaMicroscope } from 'react-icons/fa'
-import { useLocation, useNavigate } from 'react-router-dom'
-
 import { useQuery } from '@apollo/client'
-import { scanImage } from 'utils'
-import { getImage } from 'graphQL/Queries'
+import React, { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import semver from 'semver'
-import { GetImgVersionPagination } from 'graphQL/Queries'
-import { getAllScanners } from 'graphQL/Queries'
+import { scanImage } from 'utils'
 import { timeSince } from 'utils'
 import { formattedTime } from 'utils'
 import { dateTime } from 'utils'
+import { sbom } from 'variables/general'
+
+import {
+  Box,
+  Flex,
+  Grid,
+  GridItem,
+  Heading,
+  Icon,
+  Image,
+  Select,
+  Stack,
+  StackDivider,
+  Tag,
+  TagLabel,
+  Text,
+  Tooltip,
+  chakra
+} from '@chakra-ui/react'
+
+import Card from 'components/Card/Card.js'
+import CardBody from 'components/Card/CardBody.js'
+import CardHeader from 'components/Card/CardHeader'
+
+import { getImage } from 'graphQL/Queries'
+import { GetImgVersionPagination } from 'graphQL/Queries'
+import { getAllScanners } from 'graphQL/Queries'
+
+import { FaCubes, FaLayerGroup, FaMicroscope } from 'react-icons/fa'
+
+import SBOMTable from './components/SBOMTable'
 
 function SBOMs() {
   const [scanResults, setScanResults] = useState(null)
@@ -412,8 +416,8 @@ function SBOMs() {
                                 item.status === 'completed'
                                   ? 'green.500'
                                   : item.status === 'failed'
-                                  ? 'red.500'
-                                  : 'orange.400'
+                                    ? 'red.500'
+                                    : 'orange.400'
                               }`}
                             >
                               {item.status}

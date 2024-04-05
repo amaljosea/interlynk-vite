@@ -1,20 +1,63 @@
 // Chakra imports
-
-import React, { useState, useEffect, useRef } from 'react'
-import { Drawer, DrawerBody, DrawerFooter, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, Button, Stack, FormControl, FormLabel, Input, InputRightElement, InputGroup, Select, Checkbox, Text, Flex, useToast, chakra, useDisclosure, Icon, IconButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { CreateComponent, UpdateComponent, CreateCompRelation } from 'graphQL/Mutation'
-import { useLocation } from 'react-router-dom'
 import { PackageURL } from 'packageurl-js'
-import PurlModal from 'views/Dashboard/Products/components/PurlModal'
+import React, { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
-import { InfoIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
-import { FaExpandAlt } from 'react-icons/fa'
-import { CpeAutoComplete, GetAllComponents, AllShareComponents } from 'graphQL/Queries'
-import LicenseField from 'components/Licenses/LicenseField'
-import { useGlobalState } from 'hooks/useGlobalState'
+import PurlModal from 'views/Dashboard/Products/components/PurlModal'
+
+import { CheckIcon, InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
+import {
+  Button,
+  Checkbox,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  Flex,
+  FormControl,
+  FormLabel,
+  Icon,
+  IconButton,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Select,
+  Stack,
+  Text,
+  chakra,
+  useDisclosure,
+  useToast
+} from '@chakra-ui/react'
+
 import CpeField from 'components/CpeField'
 import InfoModal from 'components/InfoModal'
+import LicenseField from 'components/Licenses/LicenseField'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import {
+  CreateCompRelation,
+  CreateComponent,
+  UpdateComponent
+} from 'graphQL/Mutation'
+import {
+  AllShareComponents,
+  CpeAutoComplete,
+  GetAllComponents
+} from 'graphQL/Queries'
+
+import { FaExpandAlt } from 'react-icons/fa'
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -26,17 +69,32 @@ function ComponentDrawer(props) {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const customerView = location.pathname.startsWith('/customer')
 
-  const { isOpen, onClose, data, primaryComp, fetchCompData, shortDesc, filterRefetch, sbomRefetch } = props
+  const {
+    isOpen,
+    onClose,
+    data,
+    primaryComp,
+    fetchCompData,
+    shortDesc,
+    filterRefetch,
+    sbomRefetch
+  } = props
   const { prodCompState, dispatch } = useGlobalState()
   const { licenseType, purlString, expLicense, totalComp } = prodCompState
   const { prodCompDispatch } = dispatch
 
-  const [getAllComps, { data: allComponents }] = useLazyQuery(signedUrlParams ? AllShareComponents : GetAllComponents)
+  const [getAllComps, { data: allComponents }] = useLazyQuery(
+    signedUrlParams ? AllShareComponents : GetAllComponents
+  )
   const [addRelation] = useMutation(CreateCompRelation)
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
-  const [createComponent] = useMutation(CreateComponent, {onCompleted: () => fetchCompData()})
-  const [updateComponent] = useMutation(UpdateComponent, { onCompleted: () => fetchCompData() })
+  const [createComponent] = useMutation(CreateComponent, {
+    onCompleted: () => fetchCompData()
+  })
+  const [updateComponent] = useMutation(UpdateComponent, {
+    onCompleted: () => fetchCompData()
+  })
 
   const cpeRef = useRef()
 
@@ -60,11 +118,21 @@ function ComponentDrawer(props) {
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
-  const [disabled, setDisabled] = useState(false)  
+  const [disabled, setDisabled] = useState(false)
 
   useEffect(() => {
     if (data) {
-      const { name, version, kind, cpes, purl, primary, internal, group, scope } = data
+      const {
+        name,
+        version,
+        kind,
+        cpes,
+        purl,
+        primary,
+        internal,
+        group,
+        scope
+      } = data
       setGroupInfo(group)
       setCompName(name)
       setCompVersion(version)
@@ -92,10 +160,26 @@ function ComponentDrawer(props) {
     }
   }, [])
 
-  const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
-  const { isOpen: isPurlOpen, onOpen: onPurlOpen, onClose: onPurlClose } = useDisclosure()
-  const { isOpen: isCpeOpen, onOpen: onCpeOpen, onClose: onCpeClose } = useDisclosure()
-  const { isOpen: isWarningOpen, onOpen: onWarningOpen, onClose: onWarningClose } = useDisclosure()
+  const {
+    isOpen: isInfoOpen,
+    onOpen: onInfoOpen,
+    onClose: onInfoClose
+  } = useDisclosure()
+  const {
+    isOpen: isPurlOpen,
+    onOpen: onPurlOpen,
+    onClose: onPurlClose
+  } = useDisclosure()
+  const {
+    isOpen: isCpeOpen,
+    onOpen: onCpeOpen,
+    onClose: onCpeClose
+  } = useDisclosure()
+  const {
+    isOpen: isWarningOpen,
+    onOpen: onWarningOpen,
+    onClose: onWarningClose
+  } = useDisclosure()
 
   const handlePURLInputChange = (e) => {
     const { value } = e.target
@@ -132,18 +216,42 @@ function ComponentDrawer(props) {
   const handleCreateCom = () => {
     setDisabled(true)
     createComponent({
-      variables: { sbomId: sbomId, kind: compKind, name: compName, version: compVersion, group: groupInfo, scope: compScope, licenses: { licensesExp: expLicense || '' }, cpes: cpeValue !== '' ? [cpeValue] : [], purl: purlValue, primary: isPrimary, internal: isInternal }
+      variables: {
+        sbomId: sbomId,
+        kind: compKind,
+        name: compName,
+        version: compVersion,
+        group: groupInfo,
+        scope: compScope,
+        licenses: { licensesExp: expLicense || '' },
+        cpes: cpeValue !== '' ? [cpeValue] : [],
+        purl: purlValue,
+        primary: isPrimary,
+        internal: isInternal
+      }
     })
       .then((res) => {
         if (res.data) {
           setDisabled(false)
           sbomRefetch({ projectId: productId, sbomId: sbomId })
           prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-          addRelation({ variables: { from: res.data.componentCreate.component.id, to: component, relType: relation } })
+          addRelation({
+            variables: {
+              from: res.data.componentCreate.component.id,
+              to: component,
+              relType: relation
+            }
+          })
         }
       })
       .finally(() => {
-        toast({ description: `Data added successfully`, status: 'success', position: 'top', isClosable: true, duration: 2000 })
+        toast({
+          description: `Data added successfully`,
+          status: 'success',
+          position: 'top',
+          isClosable: true,
+          duration: 2000
+        })
       })
     onClose()
     setGroupInfo('')
@@ -162,13 +270,36 @@ function ComponentDrawer(props) {
   const handleUpdateCom = () => {
     setDisabled(true)
     updateComponent({
-      variables: { id: data?.id, sbomId: sbomId, kind: compKind, name: compName, version: compVersion, group: groupInfo, scope: compScope, licenses: { licensesExp: licenseType === 'license_exp' ? expLicense ? expLicense : '' : undefined }, cpes: cpeValue !== '' ? [cpeValue] : [], purl: purlValue, primary: isPrimary, internal: isInternal }
+      variables: {
+        id: data?.id,
+        sbomId: sbomId,
+        kind: compKind,
+        name: compName,
+        version: compVersion,
+        group: groupInfo,
+        scope: compScope,
+        licenses: {
+          licensesExp:
+            licenseType === 'license_exp'
+              ? expLicense
+                ? expLicense
+                : ''
+              : undefined
+        },
+        cpes: cpeValue !== '' ? [cpeValue] : [],
+        purl: purlValue,
+        primary: isPrimary,
+        internal: isInternal
+      }
     }).then((res) => {
       if (res.data) {
         setDisabled(false)
         if (isPrimary) {
           sbomRefetch({ projectId: productId, sbomId: sbomId })
-          localStorage.setItem( 'currentSBOM', JSON.stringify({ version: compVersion, id: sbomId }) )
+          localStorage.setItem(
+            'currentSBOM',
+            JSON.stringify({ version: compVersion, id: sbomId })
+          )
         }
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
@@ -190,7 +321,12 @@ function ComponentDrawer(props) {
   const handleCreateCpe = (string) => {
     const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
-      toast({ description: 'CPE already exists', status: 'error', position: 'top', duration: 3000 })
+      toast({
+        description: 'CPE already exists',
+        status: 'error',
+        position: 'top',
+        duration: 3000
+      })
     } else {
       setCpeList([...cpeList, string])
       setCpeData([])
@@ -202,7 +338,12 @@ function ComponentDrawer(props) {
   const handleUpdateCpe = (string, id) => {
     const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
-      toast({ description: 'CPE already exists', status: 'error', position: 'top', duration: 3000 })
+      toast({
+        description: 'CPE already exists',
+        status: 'error',
+        position: 'top',
+        duration: 3000
+      })
     } else if (cpeList?.find((item, index) => index === id)) {
       const updatedData = cpeList?.map((item, index) => {
         if (index === id) {
@@ -221,7 +362,9 @@ function ComponentDrawer(props) {
     const val = value.replace(/\s/g, '')
     setCpeValue(val)
     getCpe({
-      variables: { input: { idType: 'cpe', ecosystem: 'cpe', search: { idUri: val } } }
+      variables: {
+        input: { idType: 'cpe', ecosystem: 'cpe', search: { idUri: val } }
+      }
     }).then((res) => {
       if (res?.data) {
         setCpeData(res?.data?.idAutoComplete?.result || [])
@@ -231,35 +374,49 @@ function ComponentDrawer(props) {
 
   const onCheckName = () => {
     setInfoHeading(`Name`)
-    setInfoText(`The component name within an SBOM serves as a unique identifier for a particular software component, helping to distinguish it from others and providing clarity when referring to or discussing components within the software supply chain.`)
+    setInfoText(
+      `The component name within an SBOM serves as a unique identifier for a particular software component, helping to distinguish it from others and providing clarity when referring to or discussing components within the software supply chain.`
+    )
     setInfoUrl(``)
     onInfoOpen()
   }
 
   const onCheckVersion = () => {
     setInfoHeading(`Version`)
-    setInfoText(`A component version refers to the specific version or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software produc`)
+    setInfoText(
+      `A component version refers to the specific version or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software produc`
+    )
     setInfoUrl(``)
     onInfoOpen()
   }
 
   const onCheckGroup = () => {
     setInfoHeading(`Group`)
-    setInfoText(`Component group refers to a categorization or grouping of related software components within the SBOM document. Component groups are typically used to organize components based on their function, purpose, or other relevant criteria.`)
+    setInfoText(
+      `Component group refers to a categorization or grouping of related software components within the SBOM document. Component groups are typically used to organize components based on their function, purpose, or other relevant criteria.`
+    )
     setInfoUrl(``)
     onInfoOpen()
   }
 
   const onCheckIdentifiers = () => {
     setInfoHeading(`Identifiers`)
-    setInfoText(`Component identifiers refer to unique identifiers assigned to each software component listed in the SBOM document. These identifiers serve to uniquely identify and distinguish one component from another within the software inventory.`)
+    setInfoText(
+      `Component identifiers refer to unique identifiers assigned to each software component listed in the SBOM document. These identifiers serve to uniquely identify and distinguish one component from another within the software inventory.`
+    )
     setInfoUrl(``)
     onInfoOpen()
   }
 
   useEffect(() => {
     getAllComps({
-      variables: { projectId: signedUrlParams ? undefined : productId, field: signedUrlParams ? undefined : 'COMPONENTS_UPDATED_AT', direction: signedUrlParams ? undefined : 'DESC', sbomId: sbomId, first: totalComp }
+      variables: {
+        projectId: signedUrlParams ? undefined : productId,
+        field: signedUrlParams ? undefined : 'COMPONENTS_UPDATED_AT',
+        direction: signedUrlParams ? undefined : 'DESC',
+        sbomId: sbomId,
+        first: totalComp
+      }
     }).then((res) => {
       if (res.data) {
         setRelation('')
@@ -275,7 +432,11 @@ function ComponentDrawer(props) {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-            {signedUrlParams ? 'Component' : data ? 'Edit Component' : 'Add Component'}
+            {signedUrlParams
+              ? 'Component'
+              : data
+                ? 'Edit Component'
+                : 'Add Component'}
           </DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>
@@ -283,65 +444,178 @@ function ComponentDrawer(props) {
               <FormControl isReadOnly={signedUrlParams}>
                 <FormLabel htmlFor='compName' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>Name<chakra.span color={'red.500'} ml={1}>*</chakra.span></Text>
-                    <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckName}/>
+                    <Text>
+                      Name
+                      <chakra.span color={'red.500'} ml={1}>
+                        *
+                      </chakra.span>
+                    </Text>
+                    <Icon
+                      as={InfoIcon}
+                      color={'blue.500'}
+                      cursor={'pointer'}
+                      onClick={onCheckName}
+                    />
                   </Flex>
                 </FormLabel>
-                <Input size='md' fontSize={'sm'} placeholder='Enter name' value={compName} onChange={(e) => setCompName(e.target.value)} />
+                <Input
+                  size='md'
+                  fontSize={'sm'}
+                  placeholder='Enter name'
+                  value={compName}
+                  onChange={(e) => setCompName(e.target.value)}
+                />
               </FormControl>
               {/* Version */}
               <FormControl isReadOnly={signedUrlParams}>
                 <FormLabel htmlFor='compVersion' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>Version{' '}<chakra.span color={'red.500'} ml={1}>*</chakra.span></Text>
-                    <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckVersion}/>
+                    <Text>
+                      Version{' '}
+                      <chakra.span color={'red.500'} ml={1}>
+                        *
+                      </chakra.span>
+                    </Text>
+                    <Icon
+                      as={InfoIcon}
+                      color={'blue.500'}
+                      cursor={'pointer'}
+                      onClick={onCheckVersion}
+                    />
                   </Flex>
                 </FormLabel>
-                <Input size='md' fontSize={'sm'} placeholder='Enter version' value={compVersion} onChange={(e) => setCompVersion(e.target.value)} />
+                <Input
+                  size='md'
+                  fontSize={'sm'}
+                  placeholder='Enter version'
+                  value={compVersion}
+                  onChange={(e) => setCompVersion(e.target.value)}
+                />
               </FormControl>
               {/* GROUP */}
               <FormControl isReadOnly={signedUrlParams}>
                 <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Group</Text>
-                    <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckGroup} />
+                    <Icon
+                      as={InfoIcon}
+                      color={'blue.500'}
+                      cursor={'pointer'}
+                      onClick={onCheckGroup}
+                    />
                   </Flex>
                 </FormLabel>
-                <Input size='md' fontSize={'sm'} placeholder='Add group' value={groupInfo} onChange={(e) => setGroupInfo(e.target.value)} />
+                <Input
+                  size='md'
+                  fontSize={'sm'}
+                  placeholder='Add group'
+                  value={groupInfo}
+                  onChange={(e) => setGroupInfo(e.target.value)}
+                />
               </FormControl>
               {/* KIND */}
               <FormControl isRequired>
                 <FormLabel htmlFor='componentType'>Type</FormLabel>
-                <Select id='componentType' name='componentType' size='md' fontSize={'sm'} value={compKind} isDisabled={signedUrlParams} onChange={(e) => setCompKind(e.target.value)} textTransform={'capitalize'}>
-                  <option value='' style={{ background: 'lightgray' }}>-- Select --</option>\
-                  {['application','framework','library','container','platform','operating-system','device','device-driver','firmware','file','machine-learning-model','data'].map((item, index) => (
-                    <option key={index} value={item} style={{textTransform:'capitalize'}}>{item}</option>
+                <Select
+                  id='componentType'
+                  name='componentType'
+                  size='md'
+                  fontSize={'sm'}
+                  value={compKind}
+                  isDisabled={signedUrlParams}
+                  onChange={(e) => setCompKind(e.target.value)}
+                  textTransform={'capitalize'}
+                >
+                  <option value='' style={{ background: 'lightgray' }}>
+                    -- Select --
+                  </option>
+                  \
+                  {[
+                    'application',
+                    'framework',
+                    'library',
+                    'container',
+                    'platform',
+                    'operating-system',
+                    'device',
+                    'device-driver',
+                    'firmware',
+                    'file',
+                    'machine-learning-model',
+                    'data'
+                  ].map((item, index) => (
+                    <option
+                      key={index}
+                      value={item}
+                      style={{ textTransform: 'capitalize' }}
+                    >
+                      {item}
+                    </option>
                   ))}
                 </Select>
               </FormControl>
               {/* LICENSES */}
-              <LicenseField license={data?.licensesExp} sbomView={false} isDisabled={signedUrlParams} isValid={isValid} setIsValid={setIsValid} />
+              <LicenseField
+                license={data?.licensesExp}
+                sbomView={false}
+                isDisabled={signedUrlParams}
+                isValid={isValid}
+                setIsValid={setIsValid}
+              />
               {/* PURL INPUI */}
-              <FormControl isReadOnly={customerView} isInvalid={purlValue !== '' && !isPURLInputValid}>
+              <FormControl
+                isReadOnly={customerView}
+                isInvalid={purlValue !== '' && !isPURLInputValid}
+              >
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     {shortDesc === 'Component Identifier' &&
-                      purlString === '' && <WarningTwoIcon w={4} h={4} color='red.500' />}
+                      purlString === '' && (
+                        <WarningTwoIcon w={4} h={4} color='red.500' />
+                      )}
                     <Text>Identifiers</Text>
-                    <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckIdentifiers}/>
+                    <Icon
+                      as={InfoIcon}
+                      color={'blue.500'}
+                      cursor={'pointer'}
+                      onClick={onCheckIdentifiers}
+                    />
                   </Flex>
                 </FormLabel>
                 <Stack direction={'row'} spacing={2}>
                   <InputGroup>
-                    <Input type='text' size='md' id='purl' name='purl' fontSize={'sm'} placeholder='PURL' value={purlValue} autoComplete='off' onChange={handlePURLInputChange} onBlur={purlInputBlur}/>
+                    <Input
+                      type='text'
+                      size='md'
+                      id='purl'
+                      name='purl'
+                      fontSize={'sm'}
+                      placeholder='PURL'
+                      value={purlValue}
+                      autoComplete='off'
+                      onChange={handlePURLInputChange}
+                      onBlur={purlInputBlur}
+                    />
                     <InputRightElement align='center' zIndex={-1}>
                       {purlValue != null && purlValue !== '' ? (
-                        isPURLInputValid ? <CheckIcon color='green' /> : <WarningTwoIcon color='red' />
+                        isPURLInputValid ? (
+                          <CheckIcon color='green' />
+                        ) : (
+                          <WarningTwoIcon color='red' />
+                        )
                       ) : null}
                     </InputRightElement>
                   </InputGroup>
                   {!signedUrlParams && (
-                    <IconButton icon={<FaExpandAlt />} size='md' fontWeight={'normal'} variant='solid' colorScheme='blue' width={'fit-content'} onClick={handlePurlModal}>
+                    <IconButton
+                      icon={<FaExpandAlt />}
+                      size='md'
+                      fontWeight={'normal'}
+                      variant='solid'
+                      colorScheme='blue'
+                      width={'fit-content'}
+                      onClick={handlePurlModal}
+                    >
                       Details
                     </IconButton>
                   )}
@@ -350,9 +624,24 @@ function ComponentDrawer(props) {
               {/* CPE INPUT */}
               <FormControl>
                 <Stack direction={'row'} width={'100%'} spacing={2}>
-                  <CpeField inputRef={cpeRef} inputValue={cpeValue} setInputValue={setCpeValue} cpeList={cpeData} setCpeList={setCpeData} onChange={handleCpeChange} />
+                  <CpeField
+                    inputRef={cpeRef}
+                    inputValue={cpeValue}
+                    setInputValue={setCpeValue}
+                    cpeList={cpeData}
+                    setCpeList={setCpeData}
+                    onChange={handleCpeChange}
+                  />
                   {!signedUrlParams && (
-                    <IconButton icon={<FaExpandAlt />} size='md' fontWeight={'normal'} variant='solid' colorScheme='blue' width={'fit-content'} onClick={onCpeOpen}>
+                    <IconButton
+                      icon={<FaExpandAlt />}
+                      size='md'
+                      fontWeight={'normal'}
+                      variant='solid'
+                      colorScheme='blue'
+                      width={'fit-content'}
+                      onClick={onCpeOpen}
+                    >
                       Details
                     </IconButton>
                   )}
@@ -361,8 +650,18 @@ function ComponentDrawer(props) {
               {/* SCOPE */}
               <FormControl>
                 <FormLabel htmlFor='compScope'>Scope</FormLabel>
-                <Select id='compScope' name='compScope' size='md' fontSize={'sm'} value={compScope} isDisabled={signedUrlParams} onChange={(e) => setCompScope(e.target.value)}>
-                  <option value='' style={{ background: 'lightgray' }}>-- Select --</option>
+                <Select
+                  id='compScope'
+                  name='compScope'
+                  size='md'
+                  fontSize={'sm'}
+                  value={compScope}
+                  isDisabled={signedUrlParams}
+                  onChange={(e) => setCompScope(e.target.value)}
+                >
+                  <option value='' style={{ background: 'lightgray' }}>
+                    -- Select --
+                  </option>
                   <option value='excluded'>Excluded</option>
                   <option value='optional'>Optional</option>
                   <option value='required'>Required</option>
@@ -374,14 +673,24 @@ function ComponentDrawer(props) {
                   {shortDesc === 'Primary Component' && !isPrimary && (
                     <WarningTwoIcon w={4} h={4} color='red.500' />
                   )}
-                  <Checkbox size='sm' colorScheme='blue' isChecked={isPrimary} onChange={onWarningOpen}>
+                  <Checkbox
+                    size='sm'
+                    colorScheme='blue'
+                    isChecked={isPrimary}
+                    onChange={onWarningOpen}
+                  >
                     Primary component
                   </Checkbox>
                 </Flex>
               </FormControl>
               {/* INTERNAL COMPONENT */}
               <FormControl isReadOnly={signedUrlParams}>
-                <Checkbox size='sm' colorScheme='blue' isChecked={isInternal} onChange={() => setIsInternal(!isInternal)}>
+                <Checkbox
+                  size='sm'
+                  colorScheme='blue'
+                  isChecked={isInternal}
+                  onChange={() => setIsInternal(!isInternal)}
+                >
                   Internal component
                 </Checkbox>
               </FormControl>
@@ -390,25 +699,44 @@ function ComponentDrawer(props) {
                 <>
                   <Text>Relationships</Text>
                   <FormControl>
-                    <FormLabel htmlFor='relation' color='gray.600'>Type</FormLabel>
-                    <Select id='relation' size='sm' value={relation} onChange={(e) => setRelation(e.target.value)}>
+                    <FormLabel htmlFor='relation' color='gray.600'>
+                      Type
+                    </FormLabel>
+                    <Select
+                      id='relation'
+                      size='sm'
+                      value={relation}
+                      onChange={(e) => setRelation(e.target.value)}
+                    >
                       <option value=''>-- Select --</option>
                       {[{ value: 'depends_on', label: 'Depends On' }].map(
                         (item, idx) => (
-                          <option key={idx} value={item.value}>{item.label}</option>
+                          <option key={idx} value={item.value}>
+                            {item.label}
+                          </option>
                         )
                       )}
                     </Select>
                   </FormControl>
                   {allComponents && (
                     <FormControl>
-                      <FormLabel htmlFor='component' color='gray.600'>Component</FormLabel>
-                      <Select id='component' size='sm' value={component} onChange={(e) => setComponent(e.target.value)} mb={10}>
+                      <FormLabel htmlFor='component' color='gray.600'>
+                        Component
+                      </FormLabel>
+                      <Select
+                        id='component'
+                        size='sm'
+                        value={component}
+                        onChange={(e) => setComponent(e.target.value)}
+                        mb={10}
+                      >
                         <option value=''>-- Select --</option>
                         {[...allComponents.sbom.components.nodes]
                           .sort((a, b) => a.name.localeCompare(b.name))
                           .map((item, idx) => (
-                            <option key={idx} value={item.id}>{item.name}-{item.version}</option>
+                            <option key={idx} value={item.id}>
+                              {item.name}-{item.version}
+                            </option>
                           ))}
                       </Select>
                     </FormControl>
@@ -419,13 +747,29 @@ function ComponentDrawer(props) {
           </DrawerBody>
           {!customerView && (
             <DrawerFooter borderTopWidth='1px'>
-              <Button mr={3} onClick={onClose}>Cancel</Button>
+              <Button mr={3} onClick={onClose}>
+                Cancel
+              </Button>
               {!data ? (
-                <Button colorScheme='blue' onClick={handleCreateCom} isDisabled={ compKind === '' || compName === '' || compVersion === '' || !isValid || disabled }>
+                <Button
+                  colorScheme='blue'
+                  onClick={handleCreateCom}
+                  isDisabled={
+                    compKind === '' ||
+                    compName === '' ||
+                    compVersion === '' ||
+                    !isValid ||
+                    disabled
+                  }
+                >
                   Save
                 </Button>
               ) : (
-                <Button colorScheme='blue' onClick={handleUpdateCom} isDisabled={!compKind || !isValid || disabled}>
+                <Button
+                  colorScheme='blue'
+                  onClick={handleUpdateCom}
+                  isDisabled={!compKind || !isValid || disabled}
+                >
                   Update
                 </Button>
               )}
@@ -436,12 +780,32 @@ function ComponentDrawer(props) {
 
       {/* PURL EDITOR */}
       {isPurlOpen && (
-        <PurlModal data={purlData} isOpen={isPurlOpen} onClose={onPurlClose} setPurlValue={setPurlValue} setIsValid={setPURLInputValid} purlValue={purlValue} getCpe={getCpe} activeComp={data} />
+        <PurlModal
+          data={purlData}
+          isOpen={isPurlOpen}
+          onClose={onPurlClose}
+          setPurlValue={setPurlValue}
+          setIsValid={setPURLInputValid}
+          purlValue={purlValue}
+          getCpe={getCpe}
+          activeComp={data}
+        />
       )}
 
       {/* CPE EDITOR */}
       {isCpeOpen && (
-        <CpeModal data={cpeData} isOpen={isCpeOpen} onClose={onCpeClose} cpeValue={cpeValue} setCpeValue={setCpeValue} onCreateCpe={handleCreateCpe} onUpdateCpe={handleUpdateCpe} selectedCpe={selectedCpe} getCpe={getCpe} activeComp={data} />
+        <CpeModal
+          data={cpeData}
+          isOpen={isCpeOpen}
+          onClose={onCpeClose}
+          cpeValue={cpeValue}
+          setCpeValue={setCpeValue}
+          onCreateCpe={handleCreateCpe}
+          onUpdateCpe={handleUpdateCpe}
+          selectedCpe={selectedCpe}
+          getCpe={getCpe}
+          activeComp={data}
+        />
       )}
 
       {/* DISABLE */}
@@ -475,7 +839,9 @@ function ComponentDrawer(props) {
               <Text mt={6}>Are you sure you wish to continue ?</Text>
             </ModalBody>
             <ModalFooter>
-              <Button mr={3} onClick={onWarningClose}>No</Button>
+              <Button mr={3} onClick={onWarningClose}>
+                No
+              </Button>
               <Button
                 colorScheme={'red'}
                 onClick={() => {
@@ -492,7 +858,13 @@ function ComponentDrawer(props) {
 
       {/* INFO MODAL */}
       {isInfoOpen && (
-        <InfoModal isOpen={isInfoOpen} onClose={onInfoClose} heading={infoHeading} body={infoText} url={infoUrl} />
+        <InfoModal
+          isOpen={isInfoOpen}
+          onClose={onInfoClose}
+          heading={infoHeading}
+          body={infoText}
+          url={infoUrl}
+        />
       )}
     </>
   )

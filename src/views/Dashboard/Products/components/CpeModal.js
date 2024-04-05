@@ -1,32 +1,36 @@
 import { useMutation } from '@apollo/client'
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
-  FormControl,
-  FormLabel,
-  Select,
-  Stack,
-  Flex,
-  Textarea,
-  Text,
-  Tag,
-  FormErrorMessage,
-  Grid,
-  Input
-} from '@chakra-ui/react'
-import CpeInput from 'components/CpeInput'
-import { CreateAutomation } from 'graphQL/Mutation'
-import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
-import { useGlobalState } from 'hooks/useGlobalState'
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { validateCpe } from 'utils'
+
+import {
+  Button,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Grid,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Select,
+  Stack,
+  Tag,
+  Text,
+  Textarea
+} from '@chakra-ui/react'
+
+import CpeInput from 'components/CpeInput'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import { CreateAutomation } from 'graphQL/Mutation'
+import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 
 const CpeModal = ({
   data,

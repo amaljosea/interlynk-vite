@@ -1,3 +1,7 @@
+import { useMutation } from '@apollo/client'
+import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+
 import {
   Button,
   Flex,
@@ -11,12 +15,12 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
-import { useMutation } from '@apollo/client'
-import { sbomUpdate, CreateAutomation, recheckHealth } from 'graphQL/Mutation'
-import { useLocation } from 'react-router-dom'
+
 import { useGlobalState } from 'hooks/useGlobalState'
-import {useEffect, useState} from 'react'
-import LicenseField from "./Licenses/LicenseField";
+
+import { CreateAutomation, recheckHealth, sbomUpdate } from 'graphQL/Mutation'
+
+import LicenseField from './Licenses/LicenseField'
 
 const LicenseModal = ({
   data,
@@ -37,7 +41,7 @@ const LicenseModal = ({
 
   const [isValid, setIsValid] = useState(true)
 
-  const isInvalidLicense = (expLicense === '')
+  const isInvalidLicense = expLicense === ''
 
   const handleRefetch = () => {
     refetch({
@@ -75,8 +79,8 @@ const LicenseModal = ({
           id: data.id,
           spec: data.spec,
           licenses: {
-            licensesExp: expLicense || '',
-          },
+            licensesExp: expLicense || ''
+          }
         }
       })
         .then((res) => {
@@ -110,7 +114,7 @@ const LicenseModal = ({
           enabled: true,
           set: JSON.stringify(
             {
-              value: expLicense || '',
+              value: expLicense || ''
             },
             null,
             2
@@ -129,7 +133,11 @@ const LicenseModal = ({
         <ModalHeader>Add License</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <LicenseField sbomView={true} isValid={isValid} setIsValid={setIsValid} />
+          <LicenseField
+            sbomView={true}
+            isValid={isValid}
+            setIsValid={setIsValid}
+          />
         </ModalBody>
         <ModalFooter>
           <Flex

@@ -1,26 +1,28 @@
 import { useMutation } from '@apollo/client'
+import { useState } from 'react'
+import { errorMapping } from 'utils/errorUtils'
+
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
+  Alert,
+  AlertDescription,
+  AlertIcon,
   Button,
   Flex,
   FormControl,
   FormLabel,
   Input,
-  Alert,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Text,
-  useToast,
-  AlertIcon,
-  AlertDescription
+  useToast
 } from '@chakra-ui/react'
+
 import { EnvCreate } from 'graphQL/Mutation'
-import { useState } from 'react'
-import {errorMapping} from "utils/errorUtils";
 
 const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
   const toast = useToast()

@@ -1,21 +1,34 @@
 import { useLazyQuery } from '@apollo/client'
+import { useEffect } from 'react'
+
 import { Flex } from '@chakra-ui/react'
+
 import Card from 'components/Card/Card'
 import SupportTable from 'components/Tables/SupportTable'
-import { GetSupportTab } from 'graphQL/Queries'
+
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useEffect } from 'react'
+
+import { GetSupportTab } from 'graphQL/Queries'
 
 const Support = () => {
   const { totalRows, supportState } = useGlobalState()
   const { searchInput, field, direction } = supportState
 
   // GET COMPONENT SUPPORT INFO
-  const [getSupportData, { data }] = useLazyQuery(GetSupportTab, {fetchPolicy: 'network-only' })
+  const [getSupportData, { data }] = useLazyQuery(GetSupportTab, {
+    fetchPolicy: 'network-only'
+  })
 
   useEffect(() => {
     if (data === undefined) {
-      getSupportData({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows, field: field, direction: direction }}).then((res) => {
+      getSupportData({
+        variables: {
+          search: searchInput === '' ? undefined : searchInput,
+          first: totalRows,
+          field: field,
+          direction: direction
+        }
+      }).then((res) => {
         if (res?.data) {
           console.log('Support data', res.data)
         }
@@ -24,8 +37,15 @@ const Support = () => {
   }, [])
 
   return (
-    <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
-      <Card><SupportTable data={data?.supports} refetch={getSupportData}/></Card>
+    <Flex
+      flexDirection='column'
+      pt={{ base: '120px', md: '74px' }}
+      pr={2}
+      pl={5}
+    >
+      <Card>
+        <SupportTable data={data?.supports} refetch={getSupportData} />
+      </Card>
     </Flex>
   )
 }

@@ -7,7 +7,7 @@ const supportReducer = (state, action) => {
         field: 'EOL_INFOS_EOL_DATE',
         direction: 'DESC',
         searchInput: '',
-        pageIndex: 1,
+        pageIndex: 1
       }
     case 'CHANGE_SEARCH_INPUT':
       return {

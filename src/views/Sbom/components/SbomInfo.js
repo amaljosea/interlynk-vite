@@ -1,6 +1,8 @@
 import { Grid, GridItem } from '@chakra-ui/react'
+
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
+
 import SbomActions from './SbomActions'
 import SbomDetails from './SbomDetails'
 

@@ -1,4 +1,5 @@
 import { Button, MenuButton } from '@chakra-ui/react'
+
 import { FaFilter } from 'react-icons/fa'
 
 const MenuHeading = ({ title, onClick }) => {

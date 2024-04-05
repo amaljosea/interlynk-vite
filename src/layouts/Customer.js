@@ -1,24 +1,27 @@
 // Chakra imports
-import { Box, Portal, Stack, useToast } from '@chakra-ui/react'
-// Layout components
-import AdminNavbar from 'components/Navbars/AdminNavbar.js'
-import Sidebar from 'components/Sidebar'
-import React, { useState, useEffect } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
-// Custom components
-import PanelContainer from '../components/Layout/PanelContainer'
-import PanelContent from '../components/Layout/PanelContent'
 import {
   ApolloClient,
-  InMemoryCache,
+  ApolloLink,
   ApolloProvider,
-  ApolloLink
+  InMemoryCache
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
-import { getActiveNavbar, getActiveRoute } from '../utils'
 import { createUploadLink } from 'apollo-upload-client'
+import React, { useEffect, useState } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
 import { customerRoutes } from 'routes'
+
+import { Box, Portal, Stack, useToast } from '@chakra-ui/react'
+
+// Layout components
+import AdminNavbar from 'components/Navbars/AdminNavbar.js'
+import Sidebar from 'components/Sidebar'
+
+// Custom components
+import PanelContainer from '../components/Layout/PanelContainer'
+import PanelContent from '../components/Layout/PanelContent'
+import { getActiveNavbar, getActiveRoute } from '../utils'
 
 export default function Customer(props) {
   const location = useLocation()

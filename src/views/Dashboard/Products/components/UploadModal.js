@@ -1,10 +1,34 @@
 import { useMutation } from '@apollo/client'
-import { Box, FormLabel, Input, Alert, AlertIcon, AlertTitle, Text, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, FormControl, Select, Stack, FormHelperText, Tag, Button } from '@chakra-ui/react'
-import { UploadSbom } from 'graphQL/Mutation'
 import { useRef, useState } from 'react'
-import { MdOutlineFileUpload } from 'react-icons/md'
 import { useParams } from 'react-router-dom'
 import { filterEnvList, isDefaultEnv } from 'utils'
+
+import {
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Button,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Select,
+  Stack,
+  Tag,
+  Text,
+  useToast
+} from '@chakra-ui/react'
+
+import { UploadSbom } from 'graphQL/Mutation'
+
+import { MdOutlineFileUpload } from 'react-icons/md'
 
 const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
   const params = useParams()
@@ -13,14 +37,28 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
   const [sbomUpload, { loading, error }] = useMutation(UploadSbom)
   const [selectedEnv, setSelectedEnv] = useState(activeEnv || projects[0].id)
   const [errorMessage, setErrorMessage] = useState('')
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef(null)
   const handleUpload = async (file) => {
     await sbomUpload({ variables: { doc: file, projectId: selectedEnv } })
       .then((res) => {
         if (res?.data?.sbomUpload.errors?.length > 0) {
-          toast({ description: 'Upload failed !', status: 'error', duration: 4000, isClosable: true, position: 'top' })
+          toast({
+            description: 'Upload failed !',
+            status: 'error',
+            duration: 4000,
+            isClosable: true,
+            position: 'top'
+          })
         } else {
-          toast({ title: 'SBOM uploaded successfully and is now processing', description: 'The validated SBOM data will be available in the product shortly. Please refresh to update the product.', duration: 6500, isClosable: true, position: 'top', variant: 'left-accent' })
+          toast({
+            title: 'SBOM uploaded successfully and is now processing',
+            description:
+              'The validated SBOM data will be available in the product shortly. Please refresh to update the product.',
+            duration: 6500,
+            isClosable: true,
+            position: 'top',
+            variant: 'left-accent'
+          })
         }
       })
       .finally(() => onClose())
@@ -43,7 +81,9 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
     }
   }
 
-  const defaultEnv = activeEnv ? projects?.find((item) => item.id === activeEnv)?.name : ''
+  const defaultEnv = activeEnv
+    ? projects?.find((item) => item.id === activeEnv)?.name
+    : ''
 
   return (
     <>
@@ -54,23 +94,46 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
           <ModalCloseButton onClick={() => setErrorMessage('')} />
           <ModalBody pb={4}>
             {!params?.name && (
-              <Tag colorScheme='blue' mb={4}><Text fontWeight={'medium'} wordBreak={'break-all'}>{name}</Text></Tag>
+              <Tag colorScheme='blue' mb={4}>
+                <Text fontWeight={'medium'} wordBreak={'break-all'}>
+                  {name}
+                </Text>
+              </Tag>
             )}
             {errorMessage !== '' && (
               <Alert status='error' mb={4} borderRadius={5}>
                 <AlertIcon />
-                <AlertTitle fontSize={'sm'} fontWeight={'medium'}>{errorMessage}</AlertTitle>
+                <AlertTitle fontSize={'sm'} fontWeight={'medium'}>
+                  {errorMessage}
+                </AlertTitle>
               </Alert>
             )}
             <Stack spacing={4}>
               <FormControl>
                 <FormLabel>Environment</FormLabel>
-                <Select width={'400px'} id='dataRetention' value={selectedEnv} onChange={(e) => setSelectedEnv(e.target.value)} textTransform={isDefaultEnv(defaultEnv) ? 'capitalize' : 'none'}>
-                  {projects?.length > 0 && filterEnvList(projects).map((item) => (
-                    <option key={item.id} value={item.id} style={{ textTransform: isDefaultEnv(item.name) ? 'capitalize' : 'none' }}>
-                      {item.name}
-                    </option>
-                  ))}
+                <Select
+                  width={'400px'}
+                  id='dataRetention'
+                  value={selectedEnv}
+                  onChange={(e) => setSelectedEnv(e.target.value)}
+                  textTransform={
+                    isDefaultEnv(defaultEnv) ? 'capitalize' : 'none'
+                  }
+                >
+                  {projects?.length > 0 &&
+                    filterEnvList(projects).map((item) => (
+                      <option
+                        key={item.id}
+                        value={item.id}
+                        style={{
+                          textTransform: isDefaultEnv(item.name)
+                            ? 'capitalize'
+                            : 'none'
+                        }}
+                      >
+                        {item.name}
+                      </option>
+                    ))}
                 </Select>
                 <FormHelperText>
                   Interlynk supports importing CycloneDX versions 1.2-1.5 in
@@ -78,11 +141,34 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
                 </FormHelperText>
               </FormControl>
               <FormLabel htmlFor='file' width={'100%'} cursor={'pointer'}>
-                <Input type='file' id='file' ref={fileInputRef} style={{ display: 'none' }} accept='.xml,.json' onChange={handleFileChange} />
-                <Button fontWeight={'medium'} my={4} width={'full'} colorScheme='blue' name='file' leftIcon={<MdOutlineFileUpload size={24}/>} loadingText='Uploading....' isLoading={loading} onClick={() => fileInputRef?.current?.click()}>Upload File</Button>
+                <Input
+                  type='file'
+                  id='file'
+                  ref={fileInputRef}
+                  style={{ display: 'none' }}
+                  accept='.xml,.json'
+                  onChange={handleFileChange}
+                />
+                <Button
+                  fontWeight={'medium'}
+                  my={4}
+                  width={'full'}
+                  colorScheme='blue'
+                  name='file'
+                  leftIcon={<MdOutlineFileUpload size={24} />}
+                  loadingText='Uploading....'
+                  isLoading={loading}
+                  onClick={() => fileInputRef?.current?.click()}
+                >
+                  Upload File
+                </Button>
               </FormLabel>
             </Stack>
-            {error && <Box mb={4}><Text>Something went wrong!!</Text></Box>}
+            {error && (
+              <Box mb={4}>
+                <Text>Something went wrong!!</Text>
+              </Box>
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>

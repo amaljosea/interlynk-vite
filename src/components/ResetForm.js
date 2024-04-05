@@ -1,9 +1,28 @@
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Alert, AlertDescription, AlertIcon, Box, Button, Flex, FormControl, FormErrorMessage, FormHelperText, FormLabel, IconButton, Input, InputGroup, InputRightElement, Stack, Text, useToast } from '@chakra-ui/react'
 import axios from 'axios'
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { validPassword } from 'utils'
+
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormHelperText,
+  FormLabel,
+  IconButton,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Stack,
+  Text,
+  useToast
+} from '@chakra-ui/react'
 
 const ResetForm = () => {
   const toast = useToast()
@@ -73,7 +92,12 @@ const ResetForm = () => {
         if (status === 201) {
           setIsLoading(false)
           setSuccess(true)
-          toast({ description: 'Email sent successfully 👍', status: 'success', position: 'top', duration: 3000 })
+          toast({
+            description: 'Email sent successfully 👍',
+            status: 'success',
+            position: 'top',
+            duration: 3000
+          })
           setError('')
         }
       })
@@ -97,13 +121,24 @@ const ResetForm = () => {
     e.preventDefault()
     setIsLoading(true)
     axios
-      .put(`${resetURL}`, { user: { reset_password_token: token, password: password, password_confirmation: confirmPassword } })
+      .put(`${resetURL}`, {
+        user: {
+          reset_password_token: token,
+          password: password,
+          password_confirmation: confirmPassword
+        }
+      })
       .then((response) => {
         console.log('response', response)
         const { status } = response
         if (status === 204) {
           setIsLoading(false)
-          toast({ description: 'Password changed successfully 👍', status: 'success', position: 'top', duration: 3000 })
+          toast({
+            description: 'Password changed successfully 👍',
+            status: 'success',
+            position: 'top',
+            duration: 3000
+          })
           navigate('/auth')
         }
       })
@@ -115,8 +150,16 @@ const ResetForm = () => {
 
   if (success) {
     return (
-      <Flex my={10} gap={4} direction={'column'} alignItems={'center'} justifyContent={'center'}>
-        <Text fontSize={'xl'} textAlign={'center'} fontWeight={'medium'}>Check your email</Text>
+      <Flex
+        my={10}
+        gap={4}
+        direction={'column'}
+        alignItems={'center'}
+        justifyContent={'center'}
+      >
+        <Text fontSize={'xl'} textAlign={'center'} fontWeight={'medium'}>
+          Check your email
+        </Text>
         <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
           Thanks! If <strong>{email}</strong> matches an email we have on file,
           then we've sent you an email containing further instructions for
@@ -132,22 +175,44 @@ const ResetForm = () => {
 
   if (token) {
     return (
-      <Flex mt={10} gap={4} direction={'column'} alignItems={'center'} justifyContent={'center'}>
-        <Text fontSize={'xl'} textAlign={'center'} fontWeight={'medium'}>Reset your password</Text>
+      <Flex
+        mt={10}
+        gap={4}
+        direction={'column'}
+        alignItems={'center'}
+        justifyContent={'center'}
+      >
+        <Text fontSize={'xl'} textAlign={'center'} fontWeight={'medium'}>
+          Reset your password
+        </Text>
         <form style={{ width: '100%' }} onSubmit={handleReset}>
           <Stack py={'1rem'} direction={'column'} gap={4} width={'100%'}>
             {/* PASSWORD */}
             <FormControl isRequired>
               <FormLabel htmlFor='password'>New password</FormLabel>
               <InputGroup>
-                <Input type={showPassword ? 'text' : 'password'} value={password} onChange={handlePasswordChange} placeholder='*******' onBlur={handleCheckPassword} />
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={handlePasswordChange}
+                  placeholder='*******'
+                  onBlur={handleCheckPassword}
+                />
                 <InputRightElement width='3.1rem'>
-                  <IconButton h='1.75rem' size='sm' bg={'transparent'} onClick={handleTogglePassword} icon={showPassword ? <ViewOffIcon /> : <ViewIcon />} />
+                  <IconButton
+                    h='1.75rem'
+                    size='sm'
+                    bg={'transparent'}
+                    onClick={handleTogglePassword}
+                    icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                  />
                 </InputRightElement>
               </InputGroup>
               {invalidPassword && (
                 <FormHelperText color={'red.500'}>
-                  <Text mb={1}>Your password must be 8-16 characters contain:</Text>
+                  <Text mb={1}>
+                    Your password must be 8-16 characters contain:
+                  </Text>
                   <Text>1. Lower case letters {`(a-z)`}</Text>
                   <Text>2. Upper case letters {`(A-Z)`}</Text>
                   <Text>3. Special characters {`(ex. !@#&$%*)`}</Text>
@@ -157,16 +222,43 @@ const ResetForm = () => {
             </FormControl>
             {/* CONFIRM PASSWORD */}
             <FormControl mt={3} isRequired isInvalid={passError !== ''}>
-              <FormLabel htmlFor='ConfirmPassword'>Confirm your password</FormLabel>
+              <FormLabel htmlFor='ConfirmPassword'>
+                Confirm your password
+              </FormLabel>
               <InputGroup>
-                <Input type={showConfPassword ? 'text' : 'password'} value={confirmPassword} onChange={handleConfirmChange} isDisabled={!validPassword(password)} placeholder='*******'/>
+                <Input
+                  type={showConfPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={handleConfirmChange}
+                  isDisabled={!validPassword(password)}
+                  placeholder='*******'
+                />
                 <InputRightElement width='3.1rem'>
-                  <IconButton h='1.75rem' size='sm' bg={'transparent'} onClick={handleToggleConfirm} icon={showConfPassword ? <ViewOffIcon /> : <ViewIcon />} />
+                  <IconButton
+                    h='1.75rem'
+                    size='sm'
+                    bg={'transparent'}
+                    onClick={handleToggleConfirm}
+                    icon={showConfPassword ? <ViewOffIcon /> : <ViewIcon />}
+                  />
                 </InputRightElement>
               </InputGroup>
-              {passError !== '' && <FormErrorMessage>{passError}</FormErrorMessage>}
+              {passError !== '' && (
+                <FormErrorMessage>{passError}</FormErrorMessage>
+              )}
             </FormControl>
-            <Button width='full' colorScheme='blue' type='submit' isLoading={isLoading} isDisabled={ passError !== '' || invalidPassword || password === '' || confirmPassword === ''}>
+            <Button
+              width='full'
+              colorScheme='blue'
+              type='submit'
+              isLoading={isLoading}
+              isDisabled={
+                passError !== '' ||
+                invalidPassword ||
+                password === '' ||
+                confirmPassword === ''
+              }
+            >
               Submit
             </Button>
           </Stack>
@@ -176,8 +268,16 @@ const ResetForm = () => {
   }
 
   return (
-    <Flex mt={10} gap={4} direction={'column'} alignItems={'center'} justifyContent={'center'}>
-      <Text fontSize={'xl'} textAlign={'center'} fontWeight={'medium'}>Reset your password</Text>
+    <Flex
+      mt={10}
+      gap={4}
+      direction={'column'}
+      alignItems={'center'}
+      justifyContent={'center'}
+    >
+      <Text fontSize={'xl'} textAlign={'center'} fontWeight={'medium'}>
+        Reset your password
+      </Text>
       <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
         Enter the email address associated with your account and we'll send you
         a link to reset your password.
@@ -206,11 +306,22 @@ const ResetForm = () => {
               isReadOnly={emailId}
             />
           </FormControl>
-          <Button width='full' colorScheme='blue' type='submit' isLoading={isLoading} isDisabled={email === ''}>
+          <Button
+            width='full'
+            colorScheme='blue'
+            type='submit'
+            isLoading={isLoading}
+            isDisabled={email === ''}
+          >
             Continue
           </Button>
           <Link to={'/auth'}>
-            <Text fontSize='sm' color='blue.500' fontWeight={'medium'} textAlign={'center'}>
+            <Text
+              fontSize='sm'
+              color='blue.500'
+              fontWeight={'medium'}
+              textAlign={'center'}
+            >
               Return to sign in
             </Text>
           </Link>

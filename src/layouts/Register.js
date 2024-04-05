@@ -1,5 +1,16 @@
 // chakra imports
 import {
+  ApolloClient,
+  ApolloProvider,
+  InMemoryCache,
+  createHttpLink
+} from '@apollo/client'
+import DashboardBg from 'assets/img/dashboard.png'
+// core components
+import InterlynkLogo from 'assets/img/logo.png'
+import React, { useRef } from 'react'
+
+import {
   Box,
   Flex,
   Image,
@@ -10,11 +21,6 @@ import {
   ModalOverlay,
   Text
 } from '@chakra-ui/react'
-// core components
-import InterlynkLogo from 'assets/img/logo.png'
-import DashboardBg from 'assets/img/dashboard.png'
-import React, { useRef } from 'react'
-import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client'
 
 import RegistrationForm from 'components/RegistrationForm'
 
@@ -52,7 +58,9 @@ export default function Register() {
                 gap={1}
               >
                 <Img src={InterlynkLogo} w='40px' h='40px' me='5px' />
-                <Text fontSize={'3xl'} fontWeight={600}>Interlynk</Text>
+                <Text fontSize={'3xl'} fontWeight={600}>
+                  Interlynk
+                </Text>
               </Flex>
               {/* REGISTRATION FORM */}
               <RegistrationForm />

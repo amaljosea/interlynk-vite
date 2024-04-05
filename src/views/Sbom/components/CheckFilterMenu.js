@@ -1,3 +1,5 @@
+import { useQuery } from '@apollo/client'
+
 import {
   Box,
   Button,
@@ -7,11 +9,13 @@ import {
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
+
 import CheckMark from 'components/Misc/CheckMark'
-import { GetOrgRules } from 'graphQL/Queries'
-import { useQuery } from '@apollo/client'
-import { useGlobalState } from 'hooks/useGlobalState'
 import MenuHeading from 'components/Misc/MenuHeading'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import { GetOrgRules } from 'graphQL/Queries'
 
 const CheckFilterMenu = ({ refetch, productId, sbomId }) => {
   const { totalRows, prodCheckState, dispatch } = useGlobalState()

@@ -1,6 +1,8 @@
 import React from 'react'
+import { convertDateFormat, getDateFormat } from 'utils'
+
 import { Flex, Tag } from '@chakra-ui/react'
-import { getDateFormat, convertDateFormat } from 'utils'
+
 import Card from 'components/Card/Card'
 
 const Timeline = ({ formattedDate, setFormattedDate, getFeed }) => {

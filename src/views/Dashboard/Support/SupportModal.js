@@ -1,13 +1,42 @@
 import { useMutation } from '@apollo/client'
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, FormLabel, Input, Alert, AlertIcon, AlertDescription, Checkbox, FormErrorMessage, HStack, Stack, IconButton, Text } from '@chakra-ui/react'
-import { UpdateCompSupportOverride, CreateCompSupportOverride } from 'graphQL/Mutation'
-import { useGlobalState } from 'hooks/useGlobalState'
 import { PackageURL } from 'packageurl-js'
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
-import { FaPlus, FaTrash } from 'react-icons/fa'
 import { validateCpe } from 'utils'
+
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Button,
+  Checkbox,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  HStack,
+  IconButton,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
+  Text
+} from '@chakra-ui/react'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import {
+  CreateCompSupportOverride,
+  UpdateCompSupportOverride
+} from 'graphQL/Mutation'
+
+import { FaPlus, FaTrash } from 'react-icons/fa'
 
 const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
   const { totalRows, supportState } = useGlobalState()
@@ -23,53 +52,62 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
   const [isValidEos, setIsValidEos] = useState(true)
   const [deprecated, setDeprecated] = useState(false)
   const [outdated, setOutdated] = useState(false)
-  const [IDs, setIDs] = useState([{id:1, value:'', error:''}])
+  const [IDs, setIDs] = useState([{ id: 1, value: '', error: '' }])
 
   const [createSupport] = useMutation(CreateCompSupportOverride)
   const [updateSupport] = useMutation(UpdateCompSupportOverride)
 
   const handleRefetch = () => {
-    refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows, field: field, direction: direction } })
+    refetch({
+      variables: {
+        search: searchInput === '' ? undefined : searchInput,
+        first: totalRows,
+        field: field,
+        direction: direction
+      }
+    })
   }
 
   const hasSimilarRow = (data) => {
     for (let i = 0; i < data.length; i++) {
       for (let j = i + 1; j < data.length; j++) {
         if (data[i].value === data[j].value) {
-          return true; // Similar row found
+          return true // Similar row found
         }
       }
     }
-    return false; // No similar rows found
-  };
+    return false // No similar rows found
+  }
 
   const checkDataValidity = (data) => {
     for (let i = 0; i < data.length; i++) {
-      const { value, error } = data[i];
+      const { value, error } = data[i]
       if (value === '' || error !== '') {
-        return "Error: Some properties are empty";
+        return 'Error: Some properties are empty'
       }
     }
-    return null;
+    return null
   }
 
   const errorMessage = checkDataValidity(IDs)
 
   const addRow = () => {
-    if(hasSimilarRow(IDs)) {
-      setError(`Field with empty or same values already exists. Please update or remove it before continue.`)
+    if (hasSimilarRow(IDs)) {
+      setError(
+        `Field with empty or same values already exists. Please update or remove it before continue.`
+      )
     } else {
       setError('')
-      const newId = IDs?.length + 1;
-      setIDs([...IDs, {id:newId, value:'', error:''}]);
+      const newId = IDs?.length + 1
+      setIDs([...IDs, { id: newId, value: '', error: '' }])
     }
-  };
+  }
 
-  const deleteRow = id => {
+  const deleteRow = (id) => {
     setError('')
-    const newData = IDs?.filter(item => item.id !== id);
-    setIDs(newData);
-  };
+    const newData = IDs?.filter((item) => item.id !== id)
+    setIDs(newData)
+  }
 
   const handleIdChange = (value, id) => {
     setError('')
@@ -83,9 +121,9 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
   }
 
   const onIdBlur = (rule) => {
-    const newData = IDs.map(item => {
+    const newData = IDs.map((item) => {
       if (item.id === rule?.id) {
-        const {value} = rule
+        const { value } = rule
         if (value?.startsWith(`cpe`)) {
           const matches = validateCpe(value)
           if (matches) {
@@ -104,9 +142,9 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
           return { ...item, error: 'Invalid entry' }
         }
       }
-      return item;
-    });
-    setIDs(newData);
+      return item
+    })
+    setIDs(newData)
   }
 
   const onUriBlur = () => {
@@ -160,18 +198,41 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
     }
   }
 
-  const isInvalid = idUri === '' || productName === '' || error !== '' || !isValidEol || !isValidEos || idUri === productName || idUri === productVersion
+  const isInvalid =
+    idUri === '' ||
+    productName === '' ||
+    error !== '' ||
+    !isValidEol ||
+    !isValidEos ||
+    idUri === productName ||
+    idUri === productVersion
 
-  const handleCreate =  (e) => {
+  const handleCreate = (e) => {
     e.preventDefault()
-    if(IDs?.length > 0) {
+    if (IDs?.length > 0) {
       IDs?.map((item) => {
-        if(item?.value !== '' && item?.error === '' && (item?.value?.startsWith('pkg') || item?.value?.startsWith('cpe'))) {
-          const existingIDs = supports?.some((sp) => item?.value?.startsWith(sp?.idUri))
-          if(existingIDs) {
+        if (
+          item?.value !== '' &&
+          item?.error === '' &&
+          (item?.value?.startsWith('pkg') || item?.value?.startsWith('cpe'))
+        ) {
+          const existingIDs = supports?.some((sp) =>
+            item?.value?.startsWith(sp?.idUri)
+          )
+          if (existingIDs) {
             setError('ID already exists')
           } else {
-            createSupport({ variables: { idUri: item?.value, name: productName, version: productVersion === '' ? undefined : productVersion, eol: eol ? eol : undefined, eos: eos ? eos : undefined, enabled: true, deprecated, outdated }
+            createSupport({
+              variables: {
+                idUri: item?.value,
+                name: productName,
+                version: productVersion === '' ? undefined : productVersion,
+                eol: eol ? eol : undefined,
+                eos: eos ? eos : undefined,
+                enabled: true,
+                deprecated,
+                outdated
+              }
             }).then((res) => {
               const errors = res?.data?.componentSupportOverrideCreate?.errors
               if (errors?.length > 0) {
@@ -193,9 +254,22 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
 
   const handleUpdate = (e) => {
     e.preventDefault()
-    if(idUri !== '' && (idUri?.startsWith('pkg') || idUri?.startsWith('cpe'))) {
+    if (
+      idUri !== '' &&
+      (idUri?.startsWith('pkg') || idUri?.startsWith('cpe'))
+    ) {
       updateSupport({
-        variables: { id: data?.id, idUri, name: productName, version: productVersion === '' ? undefined : productVersion, eol: eol ? eol : undefined, eos: eos ? eos : undefined, enabled: data?.enabled, deprecated, outdated }
+        variables: {
+          id: data?.id,
+          idUri,
+          name: productName,
+          version: productVersion === '' ? undefined : productVersion,
+          eol: eol ? eol : undefined,
+          eos: eos ? eos : undefined,
+          enabled: data?.enabled,
+          deprecated,
+          outdated
+        }
       }).then((res) => {
         const errors = res?.data?.componentSupportOverrideUpdate?.errors
         if (errors?.length > 0) {
@@ -239,38 +313,92 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
-                <FormControl isRequired isInvalid={productName !== '' && idUri === productName}>
+                <FormControl
+                  isRequired
+                  isInvalid={productName !== '' && idUri === productName}
+                >
                   <FormLabel>Product name</FormLabel>
-                  <Input type='text' value={productName} onChange={(e) => setProductName(e.target.value)} />
+                  <Input
+                    type='text'
+                    value={productName}
+                    onChange={(e) => setProductName(e.target.value)}
+                  />
                   <FormErrorMessage>Invalid name</FormErrorMessage>
                 </FormControl>
-                <FormControl isInvalid={productVersion !== '' && idUri === productVersion}>
+                <FormControl
+                  isInvalid={productVersion !== '' && idUri === productVersion}
+                >
                   <FormLabel>Product version</FormLabel>
-                  <Input type='text' value={productVersion} onChange={(e) => setProductVersion(e.target.value)} />
+                  <Input
+                    type='text'
+                    value={productVersion}
+                    onChange={(e) => setProductVersion(e.target.value)}
+                  />
                   <FormErrorMessage>Invalid version</FormErrorMessage>
                 </FormControl>
                 <FormControl isInvalid={!isValidEol}>
-                  <FormLabel mb={1} htmlFor='expire'>End of life</FormLabel>
-                  <Datetime value={eol} timeFormat={false} onChange={handleEolChange} inputProps={{ onCopy: (e) => e.preventDefault(), onPaste: (e) => e.preventDefault() }} />
-                  {!isValidEol && <FormErrorMessage> Please enter a valid expiry date </FormErrorMessage>}
+                  <FormLabel mb={1} htmlFor='expire'>
+                    End of life
+                  </FormLabel>
+                  <Datetime
+                    value={eol}
+                    timeFormat={false}
+                    onChange={handleEolChange}
+                    inputProps={{
+                      onCopy: (e) => e.preventDefault(),
+                      onPaste: (e) => e.preventDefault()
+                    }}
+                  />
+                  {!isValidEol && (
+                    <FormErrorMessage>
+                      {' '}
+                      Please enter a valid expiry date{' '}
+                    </FormErrorMessage>
+                  )}
                 </FormControl>
                 <FormControl isInvalid={!isValidEos}>
-                  <FormLabel mb={1} htmlFor='expire'>End of service</FormLabel>
-                  <Datetime value={eos} timeFormat={false} onChange={handleEosChange} inputProps={{ onCopy: (e) => e.preventDefault(), onPaste: (e) => e.preventDefault() }} />
-                  {!isValidEos && <FormErrorMessage>Please enter a valid expiry date</FormErrorMessage>}
+                  <FormLabel mb={1} htmlFor='expire'>
+                    End of service
+                  </FormLabel>
+                  <Datetime
+                    value={eos}
+                    timeFormat={false}
+                    onChange={handleEosChange}
+                    inputProps={{
+                      onCopy: (e) => e.preventDefault(),
+                      onPaste: (e) => e.preventDefault()
+                    }}
+                  />
+                  {!isValidEos && (
+                    <FormErrorMessage>
+                      Please enter a valid expiry date
+                    </FormErrorMessage>
+                  )}
                 </FormControl>
                 <HStack>
                   <FormControl>
-                    <Checkbox isChecked={deprecated} onChange={(e) => setDeprecated(e.target.checked)}>Deprecated</Checkbox>
+                    <Checkbox
+                      isChecked={deprecated}
+                      onChange={(e) => setDeprecated(e.target.checked)}
+                    >
+                      Deprecated
+                    </Checkbox>
                   </FormControl>
                   <FormControl>
-                    <Checkbox isChecked={outdated} onChange={(e) => setOutdated(e.target.checked)}>Outdated</Checkbox>
+                    <Checkbox
+                      isChecked={outdated}
+                      onChange={(e) => setOutdated(e.target.checked)}
+                    >
+                      Outdated
+                    </Checkbox>
                   </FormControl>
                 </HStack>
                 {data ? (
                   <FormControl isRequired mt={1}>
                     <FormLabel>PURL / CPE</FormLabel>
-                    <Input type='text' value={idUri}
+                    <Input
+                      type='text'
+                      value={idUri}
                       onChange={(e) => {
                         setIdUri(e.target.value)
                         setError('')
@@ -278,36 +406,87 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
                       onBlur={onUriBlur}
                     />
                   </FormControl>
-                  ): (
-                <Stack>
-                  <Flex width={'100%'} my={2} justifyContent={'space-between'} alignItems={'center'}>
-                    <FormControl isRequired>
-                      <FormLabel>IDs</FormLabel>
-                    </FormControl>
-                    <IconButton size='xs' colorScheme='blue' icon={<FaPlus />} onClick={addRow} isDisabled={error !== ''} />
-                  </Flex>
-                  {IDs?.length > 0 && IDs?.map((item) => (
-                    <Flex key={item?.id} width={'100%'} gap={4} justifyContent={'space-between'} alignItems={'flex-start'}>
-                      <FormControl>
-                      <Input fontSize={'sm'} placeholder='Enter PURL / CPE' type='text' alue={item?.value} onChange={(e) => handleIdChange(e.target.value,item.id)} onBlur={() => onIdBlur(item)} />
-                      {item?.error !== '' && <Text mt={1} color={'red.500'} fontSize={'sm'}>{item?.error}</Text>}
+                ) : (
+                  <Stack>
+                    <Flex
+                      width={'100%'}
+                      my={2}
+                      justifyContent={'space-between'}
+                      alignItems={'center'}
+                    >
+                      <FormControl isRequired>
+                        <FormLabel>IDs</FormLabel>
                       </FormControl>
-                      <IconButton ml={'auto'} size='xs' colorScheme='red' icon={<FaTrash />} onClick={() => deleteRow(item?.id)} />
+                      <IconButton
+                        size='xs'
+                        colorScheme='blue'
+                        icon={<FaPlus />}
+                        onClick={addRow}
+                        isDisabled={error !== ''}
+                      />
                     </Flex>
-                  ))}
-                </Stack>
+                    {IDs?.length > 0 &&
+                      IDs?.map((item) => (
+                        <Flex
+                          key={item?.id}
+                          width={'100%'}
+                          gap={4}
+                          justifyContent={'space-between'}
+                          alignItems={'flex-start'}
+                        >
+                          <FormControl>
+                            <Input
+                              fontSize={'sm'}
+                              placeholder='Enter PURL / CPE'
+                              type='text'
+                              alue={item?.value}
+                              onChange={(e) =>
+                                handleIdChange(e.target.value, item.id)
+                              }
+                              onBlur={() => onIdBlur(item)}
+                            />
+                            {item?.error !== '' && (
+                              <Text mt={1} color={'red.500'} fontSize={'sm'}>
+                                {item?.error}
+                              </Text>
+                            )}
+                          </FormControl>
+                          <IconButton
+                            ml={'auto'}
+                            size='xs'
+                            colorScheme='red'
+                            icon={<FaTrash />}
+                            onClick={() => deleteRow(item?.id)}
+                          />
+                        </Flex>
+                      ))}
+                  </Stack>
                 )}
                 {error !== '' && (
                   <Alert status='error' borderRadius={4}>
                     <AlertIcon />
-                    <AlertDescription fontSize={'sm'} pr={2}>{error}</AlertDescription>
+                    <AlertDescription fontSize={'sm'} pr={2}>
+                      {error}
+                    </AlertDescription>
                   </Alert>
                 )}
               </Flex>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>Cancel</Button>
-              <Button colorScheme='blue' type='submit' isDisabled={data ? isInvalid : (errorMessage || productName === '' || error !== '')}>{data ? 'Update' : 'Save'}</Button>
+              <Button colorScheme='gray' mr={3} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme='blue'
+                type='submit'
+                isDisabled={
+                  data
+                    ? isInvalid
+                    : errorMessage || productName === '' || error !== ''
+                }
+              >
+                {data ? 'Update' : 'Save'}
+              </Button>
             </ModalFooter>
           </ModalContent>
         </form>

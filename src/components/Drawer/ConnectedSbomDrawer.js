@@ -1,24 +1,25 @@
+import { statusColor } from 'utils'
+
 import {
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
   DrawerHeader,
   DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
   Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
   Tag,
   TagLabel,
-  Text
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr
 } from '@chakra-ui/react'
-import { statusColor } from 'utils'
 
 const ConnectedSbomDrawer = ({ data, isOpen, onClose }) => {
-  console.log('data',data);
+  console.log('data', data)
   return (
     <Drawer size='lg' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
@@ -31,7 +32,12 @@ const ConnectedSbomDrawer = ({ data, isOpen, onClose }) => {
               <Tr>
                 {['PRODUCT', 'VERSION', 'ENVIRONEMENT', 'STATUS'].map(
                   (item, index) => (
-                    <Th px={0} fontFamily={'inherit'} key={index} textAlign={item === 'STATUS' ? 'right' : 'left'} >
+                    <Th
+                      px={0}
+                      fontFamily={'inherit'}
+                      key={index}
+                      textAlign={item === 'STATUS' ? 'right' : 'left'}
+                    >
                       {item}
                     </Th>
                   )
@@ -45,21 +51,41 @@ const ConnectedSbomDrawer = ({ data, isOpen, onClose }) => {
                   return (
                     <Tr key={index}>
                       <Td px={0} fontSize={'sm'} width='250px'>
-                        <Text wordBreak={'break-all'}>{project?.projectGroup?.name || ''}</Text>
+                        <Text wordBreak={'break-all'}>
+                          {project?.projectGroup?.name || ''}
+                        </Text>
                       </Td>
                       <Td px={0} fontSize={'sm'} width='150px'>
-                        <Text wordBreak={'break-all'}>{projectVersion || ''}</Text>
+                        <Text wordBreak={'break-all'}>
+                          {projectVersion || ''}
+                        </Text>
                       </Td>
                       <Td px={0} fontSize={'sm'} width='150px'>
-                        <Text wordBreak={'break-all'}>{project?.name || ''}</Text>
+                        <Text wordBreak={'break-all'}>
+                          {project?.name || ''}
+                        </Text>
                       </Td>
-                      <Td px={0} fontSize={'sm'} width='300px' textAlign={'right'}>
-                        <Tag size='md' variant='solid' width={'130px'} colorScheme={statusColor(
-                            item?.parentDispositionFrom?.vexStatus?.name || 'Unspecified'
+                      <Td
+                        px={0}
+                        fontSize={'sm'}
+                        width='300px'
+                        textAlign={'right'}
+                      >
+                        <Tag
+                          size='md'
+                          variant='solid'
+                          width={'130px'}
+                          colorScheme={statusColor(
+                            item?.parentDispositionFrom?.vexStatus?.name ||
+                              'Unspecified'
                           )}
                         >
-                          <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-                            {item?.parentDispositionFrom?.vexStatus?.name || 'Unspecified'}
+                          <TagLabel
+                            style={{ textTransform: 'capitalize' }}
+                            mx={'auto'}
+                          >
+                            {item?.parentDispositionFrom?.vexStatus?.name ||
+                              'Unspecified'}
                           </TagLabel>
                         </Tag>
                       </Td>

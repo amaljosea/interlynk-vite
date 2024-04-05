@@ -1,36 +1,65 @@
-
 import { AiOutlineExclamation } from 'react-icons/ai'
-import { FaEye, FaThumbsUp, FaTools, FaBug, FaShare, FaGithub, FaArrowDown, FaArrowUp, FaFilePdf } from 'react-icons/fa'
+import {
+  FaArrowDown,
+  FaArrowUp,
+  FaBug,
+  FaEye,
+  FaFilePdf,
+  FaGithub,
+  FaShare,
+  FaThumbsUp,
+  FaTools
+} from 'react-icons/fa'
 
-export const sagLabelTypes = [  "all", "Apple Trusted Product",  "CSA Verified Product",  "EUCC Certified Product",  "EU CE Mark",
-"Hitachi Trusted Product",  "Rockwell Automation Trusted Product",  "SAG Purl SWID Trusted Product",  "SAGScore",
-"SAG Trusted Artifact",  "SAG Trusted Internet Web API",  "SAG Trusted Product",  "SAG Trusted Software",  "SAG Trusted Web Site",
-"Standards Australia Trusted Product",  "Trust Bond",  "United Stated DOD Trusted Product",  "United States DHS Trusted Product",
-"United States DOE Trusted Product",  "United States FCC Trusted Product",  "United States FDA Trusted Product",
-"United States VA Trusted Product",  "U.S. Cyber Trust Mark",  "US DOE CyTRICS Tested Product"]
+export const sagLabelTypes = [
+  'all',
+  'Apple Trusted Product',
+  'CSA Verified Product',
+  'EUCC Certified Product',
+  'EU CE Mark',
+  'Hitachi Trusted Product',
+  'Rockwell Automation Trusted Product',
+  'SAG Purl SWID Trusted Product',
+  'SAGScore',
+  'SAG Trusted Artifact',
+  'SAG Trusted Internet Web API',
+  'SAG Trusted Product',
+  'SAG Trusted Software',
+  'SAG Trusted Web Site',
+  'Standards Australia Trusted Product',
+  'Trust Bond',
+  'United Stated DOD Trusted Product',
+  'United States DHS Trusted Product',
+  'United States DOE Trusted Product',
+  'United States FCC Trusted Product',
+  'United States FDA Trusted Product',
+  'United States VA Trusted Product',
+  'U.S. Cyber Trust Mark',
+  'US DOE CyTRICS Tested Product'
+]
 
 export const sagCategories = [
-    "all",
-    "Internet Web Service API",
-    "IOT Digital Product, unspecified type",
-    "Smart Phone Product",
-    "Desktop Software Application",
-    "FIRMWARE",
-    "IOT Assistant Device",
-    "Smart Device Mobile Application",
-    "Software Bill of Materials",
-    "Enterprise Software Application",
-    "Battery Inverter Software",
-    "Video Surveillance Monitoring Software",
-    "Operating System",
-    "Solar Inverter Software",
-    "Wind Inverter Software",
-    "Software Vulnerability Disclosure Report",
-    "Smart TV product",
-    "Vendor Response File",
-    "Video Surveillance Camera",
-    "Internet Web Site",
-    "Wireless Camera IOT Product"
+  'all',
+  'Internet Web Service API',
+  'IOT Digital Product, unspecified type',
+  'Smart Phone Product',
+  'Desktop Software Application',
+  'FIRMWARE',
+  'IOT Assistant Device',
+  'Smart Device Mobile Application',
+  'Software Bill of Materials',
+  'Enterprise Software Application',
+  'Battery Inverter Software',
+  'Video Surveillance Monitoring Software',
+  'Operating System',
+  'Solar Inverter Software',
+  'Wind Inverter Software',
+  'Software Vulnerability Disclosure Report',
+  'Smart TV product',
+  'Vendor Response File',
+  'Video Surveillance Camera',
+  'Internet Web Site',
+  'Wireless Camera IOT Product'
 ]
 
 export const sagData = [
@@ -131,320 +160,320 @@ export const sagData = [
 
 export const openSsf = [
   {
-      "name": "pkg:pypi/acme@1.13.0",
-      "score": 5.90
+    name: 'pkg:pypi/acme@1.13.0',
+    score: 5.9
   },
   {
-      "name": "pkg:pypi/aiodns@2.0.0",
-      "score": 4.40
+    name: 'pkg:pypi/aiodns@2.0.0',
+    score: 4.4
   },
   {
-      "name": "pkg:pypi/aiohttp@3.7.3",
-      "score": 7.80
+    name: 'pkg:pypi/aiohttp@3.7.3',
+    score: 7.8
   },
   {
-      "name": "pkg:pypi/altgraph@0.17",
-      "score": 3.50
+    name: 'pkg:pypi/altgraph@0.17',
+    score: 3.5
   },
   {
-      "name": "pkg:pypi/async-timeout@3.0.1",
-      "score": 5.60
+    name: 'pkg:pypi/async-timeout@3.0.1',
+    score: 5.6
   },
   {
-      "name": "pkg:pypi/boto3@1.16.51",
-      "score": 7.90
+    name: 'pkg:pypi/boto3@1.16.51',
+    score: 7.9
   },
   {
-      "name": "pkg:pypi/botocore@1.19.51",
-      "score": 8.50
+    name: 'pkg:pypi/botocore@1.19.51',
+    score: 8.5
   },
   {
-      "name": "pkg:pypi/certbot@1.13.0",
-      "score": 5.90
+    name: 'pkg:pypi/certbot@1.13.0',
+    score: 5.9
   },
   {
-      "name": "pkg:pypi/certifi@2021.5.30",
-      "score": 7.60
+    name: 'pkg:pypi/certifi@2021.5.30',
+    score: 7.6
   },
   {
-      "name": "pkg:pypi/cffi@1.14.4",
-      "score": 4.90
+    name: 'pkg:pypi/cffi@1.14.4',
+    score: 4.9
   },
   {
-      "name": "pkg:pypi/chardet@3.0.4",
-      "score": 4.10
+    name: 'pkg:pypi/chardet@3.0.4',
+    score: 4.1
   },
   {
-      "name": "pkg:pypi/configargparse@1.4",
-      "score": 3.50
+    name: 'pkg:pypi/configargparse@1.4',
+    score: 3.5
   },
   {
-      "name": "pkg:pypi/configobj@5.0.6",
-      "score": 3.60
+    name: 'pkg:pypi/configobj@5.0.6',
+    score: 3.6
   },
   {
-      "name": "pkg:pypi/cryptography@3.3.1",
-      "score": 8.50
+    name: 'pkg:pypi/cryptography@3.3.1',
+    score: 8.5
   },
   {
-      "name": "pkg:pypi/cyclonedx-bom@0.4.3",
-      "score": 5.10
+    name: 'pkg:pypi/cyclonedx-bom@0.4.3',
+    score: 5.1
   },
   {
-      "name": "pkg:pypi/cyclonedx-python-lib@0.4.0",
-      "score": 5.40
+    name: 'pkg:pypi/cyclonedx-python-lib@0.4.0',
+    score: 5.4
   },
   {
-      "name": "pkg:pypi/datedelta@1.3",
-      "score": 3.00
+    name: 'pkg:pypi/datedelta@1.3',
+    score: 3.0
   },
   {
-      "name": "pkg:pypi/distro@1.5.0",
-      "score": 4.50
+    name: 'pkg:pypi/distro@1.5.0',
+    score: 4.5
   },
   {
-      "name": "pkg:pypi/dnspython@2.0.0",
-      "score": 6.40
+    name: 'pkg:pypi/dnspython@2.0.0',
+    score: 6.4
   },
   {
-      "name": "pkg:pypi/elementpath@2.1.1",
-      "score": 4.80
+    name: 'pkg:pypi/elementpath@2.1.1',
+    score: 4.8
   },
   {
-      "name": "pkg:pypi/future@0.18.2",
-      "score": 5.80
+    name: 'pkg:pypi/future@0.18.2',
+    score: 5.8
   },
   {
-      "name": "pkg:pypi/geoip2@4.1.0",
-      "score": 6.10
+    name: 'pkg:pypi/geoip2@4.1.0',
+    score: 6.1
   },
   {
-      "name": "pkg:pypi/idna@2.10",
-      "score": 6.90
+    name: 'pkg:pypi/idna@2.10',
+    score: 6.9
   },
   {
-      "name": "pkg:pypi/importlib-metadata@4.8.1",
-      "score": 6.40
+    name: 'pkg:pypi/importlib-metadata@4.8.1',
+    score: 6.4
   },
   {
-      "name": "pkg:pypi/ipwhois@1.2.0",
-      "score": 3.80
+    name: 'pkg:pypi/ipwhois@1.2.0',
+    score: 3.8
   },
   {
-      "name": "pkg:pypi/isodate@0.6.0",
-      "score": 4.50
+    name: 'pkg:pypi/isodate@0.6.0',
+    score: 4.5
   },
   {
-      "name": "pkg:pypi/jinja2@2.11.2",
-      "score": 7.00
+    name: 'pkg:pypi/jinja2@2.11.2',
+    score: 7.0
   },
   {
-      "name": "pkg:pypi/jmespath@0.10.0",
-      "score": 4.70
+    name: 'pkg:pypi/jmespath@0.10.0',
+    score: 4.7
   },
   {
-      "name": "pkg:pypi/josepy@1.8.0",
-      "score": 4.40
+    name: 'pkg:pypi/josepy@1.8.0',
+    score: 4.4
   },
   {
-      "name": "pkg:pypi/jsonschema@3.2.0",
-      "score": 6.00
+    name: 'pkg:pypi/jsonschema@3.2.0',
+    score: 6.0
   },
   {
-      "name": "pkg:pypi/lxml@4.6.2",
-      "score": 6.80
+    name: 'pkg:pypi/lxml@4.6.2',
+    score: 6.8
   },
   {
-      "name": "pkg:pypi/markupsafe@1.1.1",
-      "score": 7.10
+    name: 'pkg:pypi/markupsafe@1.1.1',
+    score: 7.1
   },
   {
-      "name": "pkg:pypi/multidict@5.1.0",
-      "score": 6.60
+    name: 'pkg:pypi/multidict@5.1.0',
+    score: 6.6
   },
   {
-      "name": "pkg:pypi/numpy@1.19.5",
-      "score": 8.80
+    name: 'pkg:pypi/numpy@1.19.5',
+    score: 8.8
   },
   {
-      "name": "pkg:pypi/packageurl-python@0.9.3",
-      "score": 4.90
+    name: 'pkg:pypi/packageurl-python@0.9.3',
+    score: 4.9
   },
   {
-      "name": "pkg:pypi/packaging@20.7",
-      "score": 7.40
+    name: 'pkg:pypi/packaging@20.7',
+    score: 7.4
   },
   {
-      "name": "pkg:pypi/pandas@1.2.0",
-      "score": 6.40
+    name: 'pkg:pypi/pandas@1.2.0',
+    score: 6.4
   },
   {
-      "name": "pkg:pypi/parsedatetime@2.6",
-      "score": 2.30
+    name: 'pkg:pypi/parsedatetime@2.6',
+    score: 2.3
   },
   {
-      "name": "pkg:pypi/pefile@2019.4.18",
-      "score": 3.90
+    name: 'pkg:pypi/pefile@2019.4.18',
+    score: 3.9
   },
   {
-      "name": "pkg:pypi/pillow@9.2.0",
-      "score": 7.10
+    name: 'pkg:pypi/pillow@9.2.0',
+    score: 7.1
   },
   {
-      "name": "pkg:pypi/psycopg2@2.8.6",
-      "score": 4.90
+    name: 'pkg:pypi/psycopg2@2.8.6',
+    score: 4.9
   },
   {
-      "name": "pkg:pypi/pycares@3.1.1",
-      "score": 4.50
+    name: 'pkg:pypi/pycares@3.1.1',
+    score: 4.5
   },
   {
-      "name": "pkg:pypi/pycparser@2.20",
-      "score": 6.10
+    name: 'pkg:pypi/pycparser@2.20',
+    score: 6.1
   },
   {
-      "name": "pkg:pypi/pycurl@7.43.0.6",
-      "score": 4.50
+    name: 'pkg:pypi/pycurl@7.43.0.6',
+    score: 4.5
   },
   {
-      "name": "pkg:pypi/pydnsbl@1.1.2",
-      "score": 3.80
+    name: 'pkg:pypi/pydnsbl@1.1.2',
+    score: 3.8
   },
   {
-      "name": "pkg:pypi/pyinstaller-hooks-contrib@2020.11",
-      "score": 5.60
+    name: 'pkg:pypi/pyinstaller-hooks-contrib@2020.11',
+    score: 5.6
   },
   {
-      "name": "pkg:pypi/pyinstaller@4.1",
-      "score": 4.90
+    name: 'pkg:pypi/pyinstaller@4.1',
+    score: 4.9
   },
   {
-      "name": "pkg:pypi/pyopenssl@20.0.1",
-      "score": 5.90
+    name: 'pkg:pypi/pyopenssl@20.0.1',
+    score: 5.9
   },
   {
-      "name": "pkg:pypi/pyparsing@2.4.7",
-      "score": 6.70
+    name: 'pkg:pypi/pyparsing@2.4.7',
+    score: 6.7
   },
   {
-      "name": "pkg:pypi/pyrfc3339@1.1",
-      "score": 2.90
+    name: 'pkg:pypi/pyrfc3339@1.1',
+    score: 2.9
   },
   {
-      "name": "pkg:pypi/pyrsistent@0.17.3",
-      "score": 4.30
+    name: 'pkg:pypi/pyrsistent@0.17.3',
+    score: 4.3
   },
   {
-      "name": "pkg:pypi/python-dateutil@2.8.1",
-      "score": 6.10
+    name: 'pkg:pypi/python-dateutil@2.8.1',
+    score: 6.1
   },
   {
-      "name": "pkg:pypi/python-multipart@0.0.5",
-      "score": 5.00
+    name: 'pkg:pypi/python-multipart@0.0.5',
+    score: 5.0
   },
   {
-      "name": "pkg:pypi/pytz@2020.5",
-      "score": 5.40
+    name: 'pkg:pypi/pytz@2020.5',
+    score: 5.4
   },
   {
-      "name": "pkg:pypi/pywin32-ctypes@0.2.0",
-      "score": 3.80
+    name: 'pkg:pypi/pywin32-ctypes@0.2.0',
+    score: 3.8
   },
   {
-      "name": "pkg:pypi/pywin32@300",
-      "score": 4.70
+    name: 'pkg:pypi/pywin32@300',
+    score: 4.7
   },
   {
-      "name": "pkg:pypi/pyyaml@5.3.1",
-      "score": 6.10
+    name: 'pkg:pypi/pyyaml@5.3.1',
+    score: 6.1
   },
   {
-      "name": "pkg:pypi/rdflib@5.0.0",
-      "score": 5.90
+    name: 'pkg:pypi/rdflib@5.0.0',
+    score: 5.9
   },
   {
-      "name": "pkg:pypi/requests-toolbelt@0.9.1",
-      "score": 4.90
+    name: 'pkg:pypi/requests-toolbelt@0.9.1',
+    score: 4.9
   },
   {
-      "name": "pkg:pypi/requests@2.25.0",
-      "score": 8.80
+    name: 'pkg:pypi/requests@2.25.0',
+    score: 8.8
   },
   {
-      "name": "pkg:pypi/requirements-parser@0.2.0",
-      "score": 3.30
+    name: 'pkg:pypi/requirements-parser@0.2.0',
+    score: 3.3
   },
   {
-      "name": "pkg:pypi/s3transfer@0.3.3",
-      "score": 6.80
+    name: 'pkg:pypi/s3transfer@0.3.3',
+    score: 6.8
   },
   {
-      "name": "pkg:pypi/simplejson@3.17.2",
-      "score": 4.80
+    name: 'pkg:pypi/simplejson@3.17.2',
+    score: 4.8
   },
   {
-      "name": "pkg:pypi/six@1.15.0",
-      "score": 4.30
+    name: 'pkg:pypi/six@1.15.0',
+    score: 4.3
   },
   {
-      "name": "pkg:pypi/stix2-patterns@1.3.2",
-      "score": 4.60
+    name: 'pkg:pypi/stix2-patterns@1.3.2',
+    score: 4.6
   },
   {
-      "name": "pkg:pypi/stix2@2.1.0",
-      "score": 4.40
+    name: 'pkg:pypi/stix2@2.1.0',
+    score: 4.4
   },
   {
-      "name": "pkg:pypi/taxii2-client@2.2.2",
-      "score": 3.90
+    name: 'pkg:pypi/taxii2-client@2.2.2',
+    score: 3.9
   },
   {
-      "name": "pkg:pypi/toml@0.10.2",
-      "score": 5.30
+    name: 'pkg:pypi/toml@0.10.2',
+    score: 5.3
   },
   {
-      "name": "pkg:pypi/typing-extensions@3.7.4.3",
-      "score": 6.70
+    name: 'pkg:pypi/typing-extensions@3.7.4.3',
+    score: 6.7
   },
   {
-      "name": "pkg:pypi/urllib3@1.26.2",
-      "score": 9.10
+    name: 'pkg:pypi/urllib3@1.26.2',
+    score: 9.1
   },
   {
-      "name": "pkg:pypi/wincertstore@0.2",
-      "score": 3.00
+    name: 'pkg:pypi/wincertstore@0.2',
+    score: 3.0
   },
   {
-      "name": "pkg:pypi/xmlschema@1.2.5",
-      "score": 4.80
+    name: 'pkg:pypi/xmlschema@1.2.5',
+    score: 4.8
   },
   {
-      "name": "pkg:pypi/xmltodict@0.12.0",
-      "score": 4.80
+    name: 'pkg:pypi/xmltodict@0.12.0',
+    score: 4.8
   },
   {
-      "name": "pkg:pypi/yarl@1.6.3",
-      "score": 6.70
+    name: 'pkg:pypi/yarl@1.6.3',
+    score: 6.7
   },
   {
-      "name": "pkg:pypi/zipp@3.5.0",
-      "score": 6.60
+    name: 'pkg:pypi/zipp@3.5.0',
+    score: 6.6
   },
   {
-      "name": "pkg:pypi/zope.component@5.0.0",
-      "score": 4.80
+    name: 'pkg:pypi/zope.component@5.0.0',
+    score: 4.8
   },
   {
-      "name": "pkg:pypi/zope.event@4.5.0",
-      "score": 4.80
+    name: 'pkg:pypi/zope.event@4.5.0',
+    score: 4.8
   },
   {
-      "name": "pkg:pypi/zope.hookable@5.0.1",
-      "score": 5.00
+    name: 'pkg:pypi/zope.hookable@5.0.1',
+    score: 5.0
   },
   {
-      "name": "pkg:pypi/zope.interface@5.3.0",
-      "score": 5.90
+    name: 'pkg:pypi/zope.interface@5.3.0',
+    score: 5.9
   }
 ]
 

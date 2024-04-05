@@ -1,19 +1,22 @@
 // Chakra imports
+import { useMutation, useQuery } from '@apollo/client'
+import React from 'react'
+
 import {
   Flex,
+  Icon,
+  Link,
   Switch,
   Text,
-  useColorModeValue,
-  Icon,
-  Link
+  useColorModeValue
 } from '@chakra-ui/react'
+
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import React from 'react'
-import { useMutation, useQuery } from '@apollo/client'
-import { OrgSettingUpdate, OrgSettingCreate } from 'graphQL/Mutation'
+
+import { OrgSettingCreate, OrgSettingUpdate } from 'graphQL/Mutation'
 
 const AdvisoryFeeds = ({ data, refetch }) => {
   const textColor = useColorModeValue('gray.700', 'white')

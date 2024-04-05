@@ -1,7 +1,10 @@
 import { useEffect } from 'react'
-import { Box, Heading, Flex, Text, Stack } from '@chakra-ui/react'
 import { findSimilarItems } from 'utils'
+
+import { Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
+
 import CopyTable from 'components/Tables/CopyTable'
+
 import { useGlobalState } from 'hooks/useGlobalState'
 
 const StepTwo = ({
@@ -63,7 +66,6 @@ const StepTwo = ({
       prodVulnDispatch({ type: 'UPDATE_MERGE_DATA', payload: filterData })
     }
   }, [currentSbom, importSbom])
-
 
   return (
     <Box width={'100%'} mx={'auto'}>

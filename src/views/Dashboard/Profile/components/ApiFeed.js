@@ -1,29 +1,32 @@
 // Chakra imports
+import { useMutation, useQuery } from '@apollo/client'
+import DataTable from 'react-data-table-component'
+import { sevColor } from 'utils'
+
 import {
-  Text,
+  Box,
+  Flex,
+  Select,
+  Skeleton,
+  Switch,
   Table,
   Tbody,
   Td,
-  Tr,
+  Text,
   Th,
   Thead,
-  Flex,
-  Switch,
-  useColorModeValue,
-  Select,
-  Box,
-  Skeleton
+  Tr,
+  useColorModeValue
 } from '@chakra-ui/react'
+
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import { sevColor } from 'utils'
-import { useMutation, useQuery } from '@apollo/client'
+import CustomLoader from 'components/CustomLoader'
+
 import { orgRuleUpdate } from 'graphQL/Mutation'
 import { GetOrgRules } from 'graphQL/Queries'
-import DataTable from 'react-data-table-component'
-import CustomLoader from 'components/CustomLoader'
 
 const customStyles = {
   headCells: {

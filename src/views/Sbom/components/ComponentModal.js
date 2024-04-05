@@ -1,18 +1,20 @@
 import { useMutation } from '@apollo/client'
+import { useLocation } from 'react-router-dom'
+
 import {
+  Button,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Button,
-  Text,
-  Stack
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
+  Text
 } from '@chakra-ui/react'
+
 import { DeleteComponent } from 'graphQL/Mutation'
-import { useLocation } from 'react-router-dom'
 
 const ComponentModal = ({
   isOpen,

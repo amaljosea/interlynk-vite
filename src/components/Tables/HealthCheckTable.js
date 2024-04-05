@@ -1,34 +1,7 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
-import {
-  Button,
-  Flex,
-  Stack,
-  Tag,
-  TagLabel,
-  useDisclosure,
-  Tooltip,
-  Text,
-  IconButton,
-  Box,
-  Badge,
-  useToast
-} from '@chakra-ui/react'
-import CustomLoader from 'components/CustomLoader'
-import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
-import LicenseModal from 'components/LicenseModal'
-import { sbomUpdate } from 'graphQL/Mutation'
-import { CreateAutomation } from 'graphQL/Mutation'
-import { UpdateComponent } from 'graphQL/Mutation'
-import { recheckHealth, checkResultUpdate } from 'graphQL/Mutation'
-import { GetCheckFilterData } from 'graphQL/Queries'
-import { CpeAutoComplete } from 'graphQL/Queries'
-import { useGlobalState } from 'hooks/useGlobalState'
-import React, { useMemo, useRef, useState, useEffect } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { BiSolidWrench } from 'react-icons/bi'
-import { FaCheckDouble } from 'react-icons/fa'
-import { GoSkip } from 'react-icons/go'
-import { timeSince, sevColor, getFullDateAndTime, customStyles } from 'utils'
+import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckFilterMenu from 'views/Sbom/components/CheckFilterMenu'
@@ -37,6 +10,39 @@ import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
+
+import {
+  Badge,
+  Box,
+  Button,
+  Flex,
+  IconButton,
+  Stack,
+  Tag,
+  TagLabel,
+  Text,
+  Tooltip,
+  useDisclosure,
+  useToast
+} from '@chakra-ui/react'
+
+import CustomLoader from 'components/CustomLoader'
+import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
+import LicenseModal from 'components/LicenseModal'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
+import { sbomUpdate } from 'graphQL/Mutation'
+import { CreateAutomation } from 'graphQL/Mutation'
+import { UpdateComponent } from 'graphQL/Mutation'
+import { checkResultUpdate, recheckHealth } from 'graphQL/Mutation'
+import { GetCheckFilterData } from 'graphQL/Queries'
+import { CpeAutoComplete } from 'graphQL/Queries'
+
+import { BiSolidWrench } from 'react-icons/bi'
+import { FaCheckDouble } from 'react-icons/fa'
+import { GoSkip } from 'react-icons/go'
+
 import Pagination from '../Pagination'
 
 const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {

@@ -1,15 +1,15 @@
 import { ArrowForwardIcon } from '@chakra-ui/icons'
 import {
+  Button,
+  Link,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Button,
-  Text,
-  Link
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text
 } from '@chakra-ui/react'
 
 const InfoModal = ({ isOpen, onClose, heading, body, url }) => {
@@ -23,14 +23,22 @@ const InfoModal = ({ isOpen, onClose, heading, body, url }) => {
           <Text>{body}</Text>
           {url !== '' && (
             <Link href={url} isExternal>
-              <Button size='sm' mt={5} rightIcon={<ArrowForwardIcon />} colorScheme='blue' variant='link' >
+              <Button
+                size='sm'
+                mt={5}
+                rightIcon={<ArrowForwardIcon />}
+                colorScheme='blue'
+                variant='link'
+              >
                 Learn more
               </Button>
             </Link>
           )}
         </ModalBody>
         <ModalFooter>
-          <Button variant='unstyled' colorScheme='red' onClick={onClose}>Close</Button>
+          <Button variant='unstyled' colorScheme='red' onClick={onClose}>
+            Close
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

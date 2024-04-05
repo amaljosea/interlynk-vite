@@ -1,13 +1,21 @@
 // Chakra imports
 import React, { useMemo } from 'react'
-import { Link } from 'react-router-dom'
 import DataTable from 'react-data-table-component'
-import { Flex, Heading, TagLabel, Tooltip, Tag, Text } from '@chakra-ui/react'
-import { getFullDateAndTime, timeSince, normalizeSBOMVersion, customStyles } from 'utils'
+import { Link } from 'react-router-dom'
+import {
+  customStyles,
+  getFullDateAndTime,
+  normalizeSBOMVersion,
+  timeSince
+} from 'utils'
+
+import { Flex, Heading, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
+
 // Custom components
 import Card from 'components/Card/Card'
-import VulnBadge from 'components/Misc/VulnBadge'
 import CustomLoader from 'components/CustomLoader'
+import VulnBadge from 'components/Misc/VulnBadge'
+
 import { useGlobalState } from 'hooks/useGlobalState'
 
 const ProductsOverview = ({ title, data, prodPermissions }) => {
@@ -20,22 +28,44 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
     const { project, id, projectId, projectVersion } = prod
     const { projectGroup, name } = project
     // const env = projects?.find((item) => item.name === environment)
-    const product = { version: projectVersion, groupId: projectGroup?.id, id: projectGroup?.id, name: name, sbomId: id, defaultEnv: projectGroup?.defaultProject?.id }
+    const product = {
+      version: projectVersion,
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
+      sbomId: id,
+      defaultEnv: projectGroup?.defaultProject?.id
+    }
     localStorage.setItem('activeEnv', project?.id)
     localStorage.setItem('product', JSON.stringify(product))
     localStorage.setItem('activeProdTab', 0)
-    prodDispatch({ type: 'SET_CURRENT_PRODUCT', payload: { id: projectId, sbomId: id } })
+    prodDispatch({
+      type: 'SET_CURRENT_PRODUCT',
+      payload: { id: projectId, sbomId: id }
+    })
     setActiveSbomTab(0)
-    prodDispatch({ type: 'SET_CURRENT_PRODUCT', payload: { id: projectId, sbomId: id } })
+    prodDispatch({
+      type: 'SET_CURRENT_PRODUCT',
+      payload: { id: projectId, sbomId: id }
+    })
   }
 
   const onVersionClick = (item) => {
     const { project, id, projectVersion } = item
     const { projectGroup, name } = project
-    const product = { version: projectVersion, groupId: projectGroup?.id, id: projectGroup?.id, name: name, sbomId: id }
+    const product = {
+      version: projectVersion,
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
+      sbomId: id
+    }
     localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
     localStorage.setItem('product', JSON.stringify(product))
-    localStorage.setItem( 'currentSBOM', JSON.stringify({ version: projectVersion, id: item?.id }) )
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({ version: projectVersion, id: item?.id })
+    )
     localStorage.setItem('activeSbomTab', 0)
     setActiveSbomTab(0)
   }
@@ -43,10 +73,19 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
   const onFilterComp = (item) => {
     const { project, id, projectVersion } = item
     const { projectGroup, name } = project
-    const product = { version: projectVersion, groupId: projectGroup?.id, id: projectGroup?.id, name: name, sbomId: id }
+    const product = {
+      version: projectVersion,
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
+      sbomId: id
+    }
     localStorage.setItem('product', JSON.stringify(product))
     localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
-    localStorage.setItem( 'currentSBOM', JSON.stringify({ version: projectVersion, id: item.id }))
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({ version: projectVersion, id: item.id })
+    )
     localStorage.setItem('activeSbomTab', 2)
     setActiveSbomTab(2)
   }
@@ -54,20 +93,38 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
   const onFilterLicense = (item) => {
     const { project, id, projectVersion } = item
     const { projectGroup, name } = project
-    const product = { version: projectVersion, groupId: projectGroup?.id, id: projectGroup?.id, name: name, sbomId: id }
+    const product = {
+      version: projectVersion,
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
+      sbomId: id
+    }
     localStorage.setItem('product', JSON.stringify(product))
     localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
-    localStorage.setItem( 'currentSBOM', JSON.stringify({ version: projectVersion, id: item.id }))
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({ version: projectVersion, id: item.id })
+    )
     localStorage.setItem('activeSbomTab', 4)
     setActiveSbomTab(4)
   }
 
   const onFilterSev = (project, id, version, value) => {
     const { projectGroup, name } = project
-    const product = { version: version, groupId: projectGroup?.id, id: projectGroup?.id, name: name, sbomId: id }
+    const product = {
+      version: version,
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
+      sbomId: id
+    }
     localStorage.setItem('product', JSON.stringify(product))
     localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
-    localStorage.setItem( 'currentSBOM', JSON.stringify({ version: version, id: id }))
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({ version: version, id: id })
+    )
     localStorage.setItem('activeSbomTab', 3)
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
     prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
@@ -102,8 +159,14 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
         const { id, project } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
-          <Link to={`/vendor/products/${project?.projectGroup?.name}?id=${project?.projectGroup?.id}`} style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }} onClick={() => handleClick(row)}>
-            <Text color={uniqueSbom ? 'blue.500' : 'gray.500'}>{project?.projectGroup?.name}</Text>
+          <Link
+            to={`/vendor/products/${project?.projectGroup?.name}?id=${project?.projectGroup?.id}`}
+            style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }}
+            onClick={() => handleClick(row)}
+          >
+            <Text color={uniqueSbom ? 'blue.500' : 'gray.500'}>
+              {project?.projectGroup?.name}
+            </Text>
           </Link>
         )
       }
@@ -118,8 +181,14 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
         const { id, project, projectId, projectVersion } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
-          <Link to={`/vendor/products/${project?.projectGroup?.name}?id=${projectId}&sbom=${id}`} style={{ pointerEvents: uniqueSbom ? '' : 'none' }} onClick={() => onVersionClick(row)} >
-            <Text my={2} color={uniqueSbom ? 'blue.500' : 'gray.500'}>{projectVersion}</Text>
+          <Link
+            to={`/vendor/products/${project?.projectGroup?.name}?id=${projectId}&sbom=${id}`}
+            style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
+            onClick={() => onVersionClick(row)}
+          >
+            <Text my={2} color={uniqueSbom ? 'blue.500' : 'gray.500'}>
+              {projectVersion}
+            </Text>
           </Link>
         )
       }
@@ -139,7 +208,13 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
             style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
             onClick={() => (uniqueSbom ? onFilterComp(row) : null)}
           >
-            <Tag size='md' variant='subtle' width={16} colorScheme={'blue'} cursor={'pointer'} >
+            <Tag
+              size='md'
+              variant='subtle'
+              width={16}
+              colorScheme={'blue'}
+              cursor={'pointer'}
+            >
               <TagLabel mx={'auto'}>{stats?.compCount || 0}</TagLabel>
             </Tag>
           </Link>
@@ -156,7 +231,11 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
         const { id, project, projectId, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
-          <Link to={`/vendor/products/${project?.projectGroup?.name}?id=${projectId}&sbom=${id}`} style={{ pointerEvents: uniqueSbom ? '' : 'none' }} onClick={() => (uniqueSbom ? onFilterLicense(row) : null)} >
+          <Link
+            to={`/vendor/products/${project?.projectGroup?.name}?id=${projectId}&sbom=${id}`}
+            style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
+            onClick={() => (uniqueSbom ? onFilterLicense(row) : null)}
+          >
             <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
               <TagLabel mx={'auto'}>{stats?.compLicenseCount || 0}</TagLabel>
             </Tag>
@@ -176,20 +255,70 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
         const link = `/vendor/products/${project?.projectGroup?.name}?id=${projectId}&sbom=${id}`
         return (
           <Flex direction={'row'} flexWrap={'wrap'} gap={2} my={2}>
-            <Link to={link} style={{ pointerEvents: uniqueSbom ? '' : 'none' }} onClick={() => uniqueSbom ? onFilterSev(project, id, projectVersion, ['critical']) : null } >
-              <VulnBadge color='red' label='Critical'>{stats?.vulnStats?.critical || 0}</VulnBadge>
+            <Link
+              to={link}
+              style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
+              onClick={() =>
+                uniqueSbom
+                  ? onFilterSev(project, id, projectVersion, ['critical'])
+                  : null
+              }
+            >
+              <VulnBadge color='red' label='Critical'>
+                {stats?.vulnStats?.critical || 0}
+              </VulnBadge>
             </Link>
-            <Link to={link} style={{ pointerEvents: uniqueSbom ? '' : 'none' }} onClick={() => uniqueSbom ? onFilterSev(project, id, projectVersion, ['high']) : null }>
-              <VulnBadge color='orange' label='High'>{stats?.vulnStats?.high || 0}</VulnBadge>
+            <Link
+              to={link}
+              style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
+              onClick={() =>
+                uniqueSbom
+                  ? onFilterSev(project, id, projectVersion, ['high'])
+                  : null
+              }
+            >
+              <VulnBadge color='orange' label='High'>
+                {stats?.vulnStats?.high || 0}
+              </VulnBadge>
             </Link>
-            <Link to={link} style={{ pointerEvents: uniqueSbom ? '' : 'none' }} onClick={() => uniqueSbom ? onFilterSev(project, id, projectVersion, ['medium']) : null }>
-              <VulnBadge color='yellow' label='Medium'>{stats?.vulnStats?.medium || 0}</VulnBadge>
+            <Link
+              to={link}
+              style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
+              onClick={() =>
+                uniqueSbom
+                  ? onFilterSev(project, id, projectVersion, ['medium'])
+                  : null
+              }
+            >
+              <VulnBadge color='yellow' label='Medium'>
+                {stats?.vulnStats?.medium || 0}
+              </VulnBadge>
             </Link>
-            <Link to={link} style={{ pointerEvents: uniqueSbom ? '' : 'none' }} onClick={() => uniqueSbom ? onFilterSev(project, id, projectVersion, ['low']) : null }>
-              <VulnBadge color='green' label='Low'>{stats?.vulnStats?.low || 0}</VulnBadge>
+            <Link
+              to={link}
+              style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
+              onClick={() =>
+                uniqueSbom
+                  ? onFilterSev(project, id, projectVersion, ['low'])
+                  : null
+              }
+            >
+              <VulnBadge color='green' label='Low'>
+                {stats?.vulnStats?.low || 0}
+              </VulnBadge>
             </Link>
-            <Link to={link} style={{ pointerEvents: uniqueSbom ? '' : 'none' }} onClick={() => uniqueSbom ? onFilterSev(project, id, projectVersion, ['unknown']) : null }>
-              <VulnBadge color='gray' label='Unknown'>{stats?.vulnStats?.unknown || 0}</VulnBadge>
+            <Link
+              to={link}
+              style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
+              onClick={() =>
+                uniqueSbom
+                  ? onFilterSev(project, id, projectVersion, ['unknown'])
+                  : null
+              }
+            >
+              <VulnBadge color='gray' label='Unknown'>
+                {stats?.vulnStats?.unknown || 0}
+              </VulnBadge>
             </Link>
           </Flex>
         )
@@ -215,9 +344,15 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
   // HEADER SECTION
   const subHeader = useMemo(() => {
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'} >
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
         {/* HEADING */}
-        <Heading fontSize={'lg'} fontFamily={'inherit'}>{title}</Heading>
+        <Heading fontSize={'lg'} fontFamily={'inherit'}>
+          {title}
+        </Heading>
       </Flex>
     )
   }, [])
@@ -226,7 +361,9 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
     <Card>
       {prodPermissions?.value === false ? (
         <Flex width={'100%'} flexDir={'column'} gap={4}>
-          <Heading fontSize={'lg'} fontFamily={'inherit'}>{title}</Heading>
+          <Heading fontSize={'lg'} fontFamily={'inherit'}>
+            {title}
+          </Heading>
           <Text textAlign={'center'}>No record to display</Text>
         </Flex>
       ) : (

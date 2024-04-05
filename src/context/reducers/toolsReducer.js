@@ -32,12 +32,12 @@ const toolsReducer = (state, action) => {
     case 'FILTER_DIFF':
       return {
         ...state,
-        difference: payload,
+        difference: payload
       }
     case 'FILTER_COMP':
       return {
         ...state,
-        component: payload,
+        component: payload
       }
     default:
       return state

@@ -1,34 +1,36 @@
+import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { validateUrl } from 'utils'
+
+import { DeleteIcon } from '@chakra-ui/icons'
 import {
+  Button,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  Button,
   Flex,
-  Text,
   FormControl,
-  Thead,
-  Tr,
-  Th,
+  FormErrorMessage,
+  FormLabel,
+  Icon,
+  Input,
+  Select,
+  Table,
+  Tag,
   Tbody,
   Td,
-  Table,
-  Icon,
-  Select,
-  FormLabel,
-  Input,
-  FormErrorMessage,
+  Text,
+  Th,
+  Thead,
   Tooltip,
-  Tag
+  Tr
 } from '@chakra-ui/react'
-import { DeleteIcon } from '@chakra-ui/icons'
-import { useMutation } from '@apollo/client'
+
 import { UpdateCompLinks } from 'graphQL/Mutation'
-import { validateUrl } from 'utils'
 
 const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
   const [type, setType] = useState('')

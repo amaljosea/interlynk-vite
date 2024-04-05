@@ -1,3 +1,9 @@
+import { useMutation } from '@apollo/client'
+import Cookies from 'js-cookie'
+import { useState } from 'react'
+import { CSVLink } from 'react-csv'
+import FilterMenu from 'views/Dashboard/SBOMs/components/FilterMenu'
+
 import {
   Badge,
   Box,
@@ -21,19 +27,17 @@ import {
   Tooltip,
   Tr
 } from '@chakra-ui/react'
+
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import { useState } from 'react'
-import { CSVLink } from 'react-csv'
+import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
+
+import { ImageUpdate } from 'graphQL/Mutation'
+
 import { BiExport } from 'react-icons/bi'
 import { BsFilterRight } from 'react-icons/bs'
-import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
-import { useMutation } from '@apollo/client'
-import { ImageUpdate } from 'graphQL/Mutation'
-import Cookies from 'js-cookie'
 import { FaFilter } from 'react-icons/fa'
-import FilterMenu from 'views/Dashboard/SBOMs/components/FilterMenu'
 
 const vuln_captions = [
   'CVE ID',
@@ -142,7 +146,12 @@ const ImageLogs = ({ data, refetch, imageInfo }) => {
                         </CSVLink>
                       </Button>
                     </Tooltip>
-                    <Button colorScheme='blue' fontWeight='normal' fontSize='sm' onClick={refreshImage}>
+                    <Button
+                      colorScheme='blue'
+                      fontWeight='normal'
+                      fontSize='sm'
+                      onClick={refreshImage}
+                    >
                       Refresh
                     </Button>
                   </Box>

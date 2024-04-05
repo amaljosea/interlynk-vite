@@ -1,5 +1,21 @@
-import { Flex, HStack, Link, Stack, Table, TableContainer, Tag, TagLabel, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react'
 import { getFullDateAndTime } from 'utils'
+
+import {
+  Flex,
+  HStack,
+  Link,
+  Stack,
+  Table,
+  TableContainer,
+  Tag,
+  TagLabel,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr
+} from '@chakra-ui/react'
 
 const SbomInfo = ({ data }) => {
   return (
@@ -16,9 +32,17 @@ const SbomInfo = ({ data }) => {
           <Tr>
             <Td pl={0}>Creation Tool</Td>
             <Td>
-              <Flex flexDirection={'row'} alignItems={'flex-start'} flexWrap={'wrap'} gap={2.5}>
-                {data?.tools && data?.tools.map((item, index) => (
-                    <Text key={index}>{item.name} - {item.version}</Text>
+              <Flex
+                flexDirection={'row'}
+                alignItems={'flex-start'}
+                flexWrap={'wrap'}
+                gap={2.5}
+              >
+                {data?.tools &&
+                  data?.tools.map((item, index) => (
+                    <Text key={index}>
+                      {item.name} - {item.version}
+                    </Text>
                   ))}
               </Flex>
             </Td>
@@ -35,8 +59,16 @@ const SbomInfo = ({ data }) => {
               <Stack spacing={2} direction={'column'}>
                 {data?.authors.length > 0 &&
                   data?.authors.map((item, index) => (
-                    <Tag size={'md'} key={index} variant='subtle' colorScheme='blue' width={'fit-content'}>
-                      <TagLabel>{item.name} - {item.email}</TagLabel>
+                    <Tag
+                      size={'md'}
+                      key={index}
+                      variant='subtle'
+                      colorScheme='blue'
+                      width={'fit-content'}
+                    >
+                      <TagLabel>
+                        {item.name} - {item.email}
+                      </TagLabel>
                     </Tag>
                   ))}
               </Stack>
@@ -49,12 +81,24 @@ const SbomInfo = ({ data }) => {
               <HStack spacing={4}>
                 {data?.suppliers?.length > 0 &&
                   data?.suppliers.map((item, index) => (
-                    <Tag size={'md'} key={index} variant='subtle' colorScheme='orange'>
+                    <Tag
+                      size={'md'}
+                      key={index}
+                      variant='subtle'
+                      colorScheme='orange'
+                    >
                       <TagLabel>
                         {item.contactName}
                         {item.contactEmail && ` (${item.contactEmail})`}
                         {item.url ? (
-                          <Link href={item?.url?.startsWith('http') ? item.url : `http://${item.url}`} isExternal>
+                          <Link
+                            href={
+                              item?.url?.startsWith('http')
+                                ? item.url
+                                : `http://${item.url}`
+                            }
+                            isExternal
+                          >
                             {item.name}
                           </Link>
                         ) : (
@@ -74,20 +118,37 @@ const SbomInfo = ({ data }) => {
                 {/* SPDX */}
                 {data.licenses?.length > 0 &&
                   data.licenses?.map((item, index) => (
-                    <Tag size={'md'} key={index} variant='subtle' colorScheme='green' width={'fit-content'}>
+                    <Tag
+                      size={'md'}
+                      key={index}
+                      variant='subtle'
+                      colorScheme='green'
+                      width={'fit-content'}
+                    >
                       <TagLabel>{item}</TagLabel>
                     </Tag>
                   ))}
                 {/* EXPRESSION */}
                 {data.licensesExp && data.licensesExp !== '' && (
-                  <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                  <Tag
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                  >
                     <TagLabel>{data.licensesExp}</TagLabel>
                   </Tag>
                 )}
                 {/* CUSTOM */}
                 {data.licensesCustom?.length > 0 &&
                   data.licensesCustom.map((item, index) => (
-                    <Tag size={'md'} key={index} variant='subtle' colorScheme='green' width={'fit-content'}>
+                    <Tag
+                      size={'md'}
+                      key={index}
+                      variant='subtle'
+                      colorScheme='green'
+                      width={'fit-content'}
+                    >
                       <TagLabel>{item}</TagLabel>
                     </Tag>
                   ))}

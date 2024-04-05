@@ -1,29 +1,33 @@
 // Chakra imports
+import { useEffect, useState } from 'react'
+
+import { CheckIcon } from '@chakra-ui/icons'
 import {
+  Button,
   Flex,
+  Input,
   InputGroup,
   InputRightElement,
-  Text,
-  useColorModeValue,
+  Spinner,
   Switch,
-  Input,
-  Button,
-  Spinner
+  Text,
+  useColorModeValue
 } from '@chakra-ui/react'
+
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import { useState, useEffect } from 'react'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import {
-  FaJira,
-  FaSlack,
+  FaDocker,
   FaGithubSquare,
   FaGitlab,
-  FaDocker
+  FaJira,
+  FaSlack
 } from 'react-icons/fa'
-import { CheckIcon } from '@chakra-ui/icons'
-import { useGlobalState } from 'hooks/useGlobalState'
 
 const Connections = () => {
   // Chakra color mode

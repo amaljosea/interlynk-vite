@@ -1,4 +1,5 @@
 import { Flex } from '@chakra-ui/react'
+
 import Compare from './Compare'
 
 const Tools = () => {

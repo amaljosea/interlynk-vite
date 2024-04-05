@@ -1,25 +1,27 @@
 import { useMutation, useQuery } from '@apollo/client'
+import { useEffect, useState } from 'react'
+
 import {
-  Input,
-  Stack,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
+  Alert,
+  AlertIcon,
   Button,
   FormControl,
   FormLabel,
-  Alert,
-  AlertIcon,
-  Text,
-  Select
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Select,
+  Stack,
+  Text
 } from '@chakra-ui/react'
+
 import { UpdateOrganizationUserRole } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
-import { useEffect, useState } from 'react'
 
 const RoleModal = ({ isOpen, onClose, refetch, data }) => {
   const [role, setRole] = useState(data?.role?.id)
@@ -75,7 +77,11 @@ const RoleModal = ({ isOpen, onClose, refetch, data }) => {
             {roles && (
               <FormControl>
                 <FormLabel>Role</FormLabel>
-                <Select value={role} onChange={(e) => setRole(e.target.value)} textTransform={'capitalize'}>
+                <Select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  textTransform={'capitalize'}
+                >
                   <option value=''>-- Select --</option>
                   {roles?.organization?.organizationRoles.map((item) => (
                     <option value={item.id}>{item.name}</option>

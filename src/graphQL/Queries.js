@@ -3693,17 +3693,17 @@ export const GetUserNotificationChannels = gql`
 export const ComponentVulnLogs = gql`
   query ComponentVulnLogs($vexLogableId: Uuid!) {
     componentVulnLogs(vexLogableId: $vexLogableId) {
-        actionStmt
-        changedBy
-        detail
-        fixedIn
-        id
-        impact
-        justification
-        note
-        response
-        status
-        updatedAt
+      actionStmt
+      changedBy
+      detail
+      fixedIn
+      id
+      impact
+      justification
+      note
+      response
+      status
+      updatedAt
     }
   }
 `

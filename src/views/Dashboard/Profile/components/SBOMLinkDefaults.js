@@ -1,17 +1,25 @@
 // Chakra imports
-import { Flex, Icon, Link, Text, useColorModeValue, Switch } from "@chakra-ui/react";
-// Custom components
-import Card from "components/Card/Card";
-import CardBody from "components/Card/CardBody";
-import CardHeader from "components/Card/CardHeader";
-import React from "react";
-import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
+import React from 'react'
 
-const SBOMLinkDefaults = ({
-  title
-}) => {
+import {
+  Flex,
+  Icon,
+  Link,
+  Switch,
+  Text,
+  useColorModeValue
+} from '@chakra-ui/react'
+
+// Custom components
+import Card from 'components/Card/Card'
+import CardBody from 'components/Card/CardBody'
+import CardHeader from 'components/Card/CardHeader'
+
+import { FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa'
+
+const SBOMLinkDefaults = ({ title }) => {
   // Chakra color mode
-  const textColor = useColorModeValue("gray.700", "white");
+  const textColor = useColorModeValue('gray.700', 'white')
 
   return (
     <Card p='16px'>
@@ -47,7 +55,8 @@ const SBOMLinkDefaults = ({
             fontSize='sm'
             color='gray.500'
             fontWeight='600'
-            m='6px 0px 20px 0px'>
+            m='6px 0px 20px 0px'
+          >
             SBOM Access
           </Text>
           <Flex align='center' mb='20px'>
@@ -71,7 +80,7 @@ const SBOMLinkDefaults = ({
         </Flex>
       </CardBody>
     </Card>
-  );
-};
+  )
+}
 
-export default SBOMLinkDefaults;
+export default SBOMLinkDefaults
