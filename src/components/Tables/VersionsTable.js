@@ -476,10 +476,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     {
       id: 'SBOMS_UPDATED_AT',
       name: 'UPDATED',
-      width: '200px',
       selector: (row) => {
         const { updatedAt } = row
-
         return (
           <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
             <Text>{timeSince(updatedAt)}</Text>
@@ -492,7 +490,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB
       },
-      right: 'false'
+      right: 'true'
     },
     // ACTIONS
     {
@@ -526,7 +524,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
           </Menu>
         )
       },
-      right: 'true'
+      right: 'true',
+      width: '120px'
     }
   ]
 

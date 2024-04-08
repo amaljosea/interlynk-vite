@@ -50,7 +50,8 @@ const RoleTable = ({ data, role, tabIndex }) => {
           Permissions
         </Button>
       ),
-      right: 'true'
+      right: 'true',
+      width: '200px'
     }
   ]
 

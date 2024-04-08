@@ -375,7 +375,8 @@ const TokenInfo = ({ data, refetch }) => {
           </Menu>
         )
       },
-      right: 'true'
+      right: 'true',
+      width: '120px'
     }
   ]
 

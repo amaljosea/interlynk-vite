@@ -183,7 +183,8 @@ const Automation = ({ data, refetch }) => {
         const { updatedAt } = row
         return <Text>{timeSince(updatedAt)}</Text>
       },
-      sortable: true
+      sortable: true,
+      right: 'true'
     },
     // ACTIONS
     {
@@ -203,7 +204,8 @@ const Automation = ({ data, refetch }) => {
           />
         )
       },
-      right: 'true'
+      right: 'true',
+      width: '120px'
     }
   ]
 

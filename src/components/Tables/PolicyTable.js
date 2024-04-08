@@ -322,8 +322,8 @@ const PolicyTable = ({ data, refetch }) => {
     },
     // UPDATED AT
     {
-      id: 'UPDATED_AT',
-      name: 'UPDATED AT',
+      id: 'UPDATED',
+      name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
           {timeSince(row?.updatedAt)}
