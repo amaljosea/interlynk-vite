@@ -13,7 +13,7 @@ import Licenses from 'components/Licenses'
 import {
   FaBalanceScale,
   FaBug,
-  FaPlug,
+  FaHeartbeat,
   FaRegSun,
   FaWindowMaximize
 } from 'react-icons/fa'
@@ -77,7 +77,7 @@ export const dashRoutes = [
   {
     path: '/support',
     name: 'Support',
-    icon: <FaPlug color='inherit' />,
+    icon: <FaHeartbeat color='inherit' />,
     component: Support,
     layout: '/vendor'
   },
