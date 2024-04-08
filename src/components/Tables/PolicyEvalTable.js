@@ -107,21 +107,21 @@ const PolicyEvalTable = ({ data, refetch }) => {
       id: 'RESULT',
       name: 'RESULT',
       selector: (row) => {
-        const { resultType } = row
+        const { result } = row
         return (
           <Tag
             width={'110px'}
             colorScheme={
-              resultType === 'inform'
+              result === 'inform'
                 ? 'blue'
-                : resultType === 'warn'
+                : result === 'warn'
                   ? 'orange'
                   : 'red'
             }
             textTransform={'uppercase'}
           >
             <TagLabel mx={'auto'} pt={0.5}>
-              {resultType}
+              {result}
             </TagLabel>
           </Tag>
         )
@@ -133,14 +133,16 @@ const PolicyEvalTable = ({ data, refetch }) => {
       id: 'VIOLATIONS',
       name: 'VIOLATIONS',
       selector: (row) => {
-        const { policyViolations } = row
+        const { policyRuleViolations } = row
         return (
           <Tag
             width={'60px'}
-            colorScheme={policyViolations?.totalCount === 0 ? 'red' : 'blue'}
+            colorScheme={
+              policyRuleViolations?.totalCount === 0 ? 'red' : 'blue'
+            }
           >
             <TagLabel mx={'auto'} pt={0.5}>
-              {policyViolations?.totalCount || 0}
+              {policyRuleViolations?.totalCount || 0}
             </TagLabel>
           </Tag>
         )
@@ -153,8 +155,8 @@ const PolicyEvalTable = ({ data, refetch }) => {
       id: 'LAST_CHECKED',
       name: 'LAST CHECKED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.createdAt)} placement={'top'}>
-          {timeSince(row?.createdAt)}
+        <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
+          {timeSince(row?.updatedAt)}
         </Tooltip>
       ),
       right: 'true',
@@ -164,7 +166,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
 
   // EXPAND VIEW
   const ExpandedComponent = ({ data }) => {
-    const { policyViolations } = data
+    const { policy, policyRuleViolations } = data
     const CustomText = styled(Text)`
       font-size: 12px;
       font-weight: bold;
@@ -200,10 +202,13 @@ const PolicyEvalTable = ({ data, refetch }) => {
           py={2}
         >
           <GridItem colSpan={3}>
-            <CustomText>component</CustomText>
+            <CustomText>subject</CustomText>
           </GridItem>
           <GridItem colSpan={3}>
-            <CustomText>version</CustomText>
+            <CustomText>operator</CustomText>
+          </GridItem>
+          <GridItem colSpan={3}>
+            <CustomText>value</CustomText>
           </GridItem>
           <GridItem colSpan={3}>
             <CustomText>violations</CustomText>
@@ -212,52 +217,59 @@ const PolicyEvalTable = ({ data, refetch }) => {
             <CustomText>action</CustomText>
           </GridItem>
         </Grid>
-        {policyViolations?.nodes?.length > 0 ? (
-          policyViolations?.nodes.map((item, index) => (
-            <Grid
-              width={'95%'}
-              key={index}
-              alignItems={'center'}
-              templateColumns='repeat(12, 1fr)'
-              gap={6}
-              mb={1}
-              mx={'auto'}
-              py={2}
-              borderBottom={'1px solid #E2E8F0'}
-            >
-              <GridItem colSpan={3}>
-                <Text fontSize={'sm'} wordBreak={'break-all'}>
-                  {item?.component?.name}
-                </Text>
-              </GridItem>
-              <GridItem colSpan={3}>
-                <Text fontSize={'sm'} wordBreak={'break-all'}>
-                  {item?.component?.version}
-                </Text>
-              </GridItem>
-              <GridItem colSpan={3}>
-                <Tag width={'50px'} colorScheme='blue'>
-                  <TagLabel mx={'auto'}>
-                    {item?.policyRuleViolations?.totalCount || 0}
-                  </TagLabel>
-                </Tag>
-              </GridItem>
-              <GridItem colSpan={3}>
-                <Tooltip label={'View Violations'}>
-                  <IconButton
-                    size='sm'
-                    icon={<FaEye />}
-                    colorScheme='blue'
-                    fontWeight={'medium'}
-                    onClick={() => {
-                      setActiveRow(item?.policyRuleViolations)
-                      onOpen()
-                    }}
-                  />
-                </Tooltip>
-              </GridItem>
-            </Grid>
-          ))
+        {policy?.policyRules?.policyRuleViolations?.nodes?.length > 0 ? (
+          policy?.policyRules?.policyRuleViolations?.nodes.map(
+            (item, index) => (
+              <Grid
+                width={'95%'}
+                key={index}
+                alignItems={'center'}
+                templateColumns='repeat(12, 1fr)'
+                gap={6}
+                mb={1}
+                mx={'auto'}
+                py={2}
+                borderBottom={'1px solid #E2E8F0'}
+              >
+                <GridItem colSpan={3}>
+                  <Text fontSize={'sm'} wordBreak={'break-all'}>
+                    {policy?.policyRules?.subject}
+                  </Text>
+                </GridItem>
+                <GridItem colSpan={3}>
+                  <Text fontSize={'sm'} wordBreak={'break-all'}>
+                    {policy?.policyRules?.operator}
+                  </Text>
+                </GridItem>
+                <GridItem colSpan={3}>
+                  <Text fontSize={'sm'} wordBreak={'break-all'}>
+                    {policy?.policyRules?.value}
+                  </Text>
+                </GridItem>
+                <GridItem colSpan={3}>
+                  <Tag width={'50px'} colorScheme='blue'>
+                    <TagLabel mx={'auto'}>
+                      {policyRuleViolations?.totalCount || 0}
+                    </TagLabel>
+                  </Tag>
+                </GridItem>
+                <GridItem colSpan={3}>
+                  <Tooltip label={'View Violations'}>
+                    <IconButton
+                      size='sm'
+                      icon={<FaEye />}
+                      colorScheme='blue'
+                      fontWeight={'medium'}
+                      onClick={() => {
+                        setActiveRow(item)
+                        onOpen()
+                      }}
+                    />
+                  </Tooltip>
+                </GridItem>
+              </Grid>
+            )
+          )
         ) : (
           <GridItem
             width={'97.5%'}

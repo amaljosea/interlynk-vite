@@ -288,13 +288,11 @@ const SBOMTable = ({
         }
       })
     } else if (tabName === 'Policies' && shouldFetchData(tabName)) {
-      getPolicyData({ variables: { sbomId: sbomId, first: totalRows } }).then(
-        (res) => {
-          if (res.data) {
-            updateLastFetchTime(tabName)
-          }
+      getPolicyData({ variables: { sbomId: sbomId } }).then((res) => {
+        if (res.data) {
+          updateLastFetchTime(tabName)
         }
-      )
+      })
     } else if (tabName === 'Support' && shouldFetchData(tabName)) {
       getSupportInfos({ variables: { projectId: productId, sbomId } }).then(
         (res) => {

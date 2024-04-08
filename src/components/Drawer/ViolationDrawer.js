@@ -50,7 +50,7 @@ const ViolationDrawer = ({ data, isOpen, onClose }) => {
         <DrawerCloseButton />
         <DrawerHeader>Violations List</DrawerHeader>
         <DrawerBody>
-          <DataTable
+          {/* <DataTable
             columns={columns}
             data={data?.nodes || []}
             customStyles={customStyles}
@@ -58,7 +58,8 @@ const ViolationDrawer = ({ data, isOpen, onClose }) => {
             progressComponent={<CustomLoader />}
             persistTableHead
             responsive={true}
-          />
+          /> */}
+          <Text mt={6}>Pending</Text>
         </DrawerBody>
       </DrawerContent>
     </Drawer>

@@ -3548,128 +3548,51 @@ export const GetProjectPolicies = gql`
 
 // GET SBOM POLICIES
 export const PolicyResults = gql`
-  query PolicyResults(
-    $sbomId: [Uuid!]
-    $after: String
-    $before: String
-    $first: Int
-    $last: Int
-    $vlAfter: String
-    $vlBefore: String
-    $vlFirst: Int
-    $vlLast: Int
-  ) {
-    policyResults(
-      sbomId: $sbomId
-      after: $after
-      before: $before
-      first: $first
-      last: $last
-    ) {
+  query PolicyResults($sbomId: Uuid!) {
+    policyResults(sbomId: [$sbomId]) {
       totalCount
-      pageInfo {
-        endCursor
-        hasNextPage
-        hasPreviousPage
-        startCursor
-      }
       nodes {
+        policyRuleViolations {
+          totalCount
+        }
+        createdAt
         updatedAt
+        result
         policy {
           name
           description
-        }
-        result
-        resultType
-        policyViolations(
-          after: $vlAfter
-          before: $vlBefore
-          first: $vlFirst
-          last: $vlLast
-        ) {
-          totalCount
-          pageInfo {
-            endCursor
-            hasNextPage
-            hasPreviousPage
-            startCursor
-          }
-          nodes {
-            component {
-              name
-              version
-            }
-            policyRuleViolations {
+          policyRules {
+            name
+            category
+            subject
+            operator
+            operatorWording
+            value
+            policyRuleViolations(sbomId: $sbomId) {
               totalCount
               nodes {
-                createdAt
                 id
-                policyRuleId
-                policyViolationId
-                updatedAt
+                violationType
+                component {
+                  id
+                  licensesExp
+                }
                 violation {
-                  ... on SbomComponent {
-                    copyright
-                    cpes
-                    description
-                    group
-                    internal
-                    kind
-                    licensesExp
-                    name
-                    primary
-                    publisher
-                    purl
-                    scope
-                    uniqueId
-                    updatedAt
-                    version
+                  ... on ComponentVuln {
+                    id
+                    vuln {
+                      id
+                      vulnId
+                    }
                   }
                   ... on Sbom {
-                    createdAt
-                    creationAt
-                    deepPartIds
-                    format
-                    hasConnectedSboms
-                    licensesExp
-                    lifecycle
-                    projectId
                     projectVersion
-                    spec
-                    specVersion
-                    uniqueId
-                    updatedAt
-                    vulnRunStatus
                   }
-                  ... on ComponentVuln {
-                    actionStmt
-                    cdxResponseId
-                    componentId
-                    detail
-                    fixedIn
-                    id
-                    impact
-                    isComplete
-                    isFirstDegreePart
-                    isPart
-                    note
-                    sbomId
-                    updatedAt
-                    vexJustificationId
-                    vexStatusId
-                    vulnId
+                  ... on SbomComponent {
+                    primary
+                    version
+                    name
                   }
-                }
-                violationId
-                violationType
-                policyRule {
-                  createdAt
-                  id
-                  operator
-                  policyId
-                  subject
-                  updatedAt
-                  value
                 }
               }
             }
