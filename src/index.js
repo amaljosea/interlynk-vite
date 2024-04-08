@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react'
+import { ApolloWrapper } from 'context/ApolloWrapper.js'
 import Cookies from 'js-cookie'
 import Reset from 'layouts/Reset'
 import Success from 'layouts/Success'
@@ -74,45 +75,47 @@ ReactDOM.render(
         <ChakraProvider theme={theme} resetCSS={true}>
           <ChatbotPreview env={env} />
           <ScrollToTop />
-          <Routes>
-            <Route
-              path=''
-              element={
-                authToken ? (
-                  <Navigate replace to='/vendor/dashboard' />
-                ) : (
-                  <Navigate replace to='/auth' />
-                )
-              }
-            />
-            <Route path={`auth`} element={<AuthLayout />} />
-            <Route path={`reset_password`} element={<Reset />} />
-            <Route path={`register`} element={<Register />} />
-            <Route path={`accept-user-invitation`} element={<Success />} />
-            <Route path={`confirmation`} element={<Success />} />
-            <Route path={`vendor`} element={<AdminLayout />}>
-              <Route path={`dashboard`} element={<Dashboard />} />
-              <Route path={`products`} element={<Products />}>
-                <Route index element={<ProductList />} />
-                <Route path={`:name`} element={<ProductDetails />} />
+          <ApolloWrapper>
+            <Routes>
+              <Route
+                path=''
+                element={
+                  authToken ? (
+                    <Navigate replace to='/vendor/dashboard' />
+                  ) : (
+                    <Navigate replace to='/auth' />
+                  )
+                }
+              />
+              <Route path={`auth`} element={<AuthLayout />} />
+              <Route path={`reset_password`} element={<Reset />} />
+              <Route path={`register`} element={<Register />} />
+              <Route path={`accept-user-invitation`} element={<Success />} />
+              <Route path={`confirmation`} element={<Success />} />
+              <Route path={`vendor`} element={<AdminLayout />}>
+                <Route path={`dashboard`} element={<Dashboard />} />
+                <Route path={`products`} element={<Products />}>
+                  <Route index element={<ProductList />} />
+                  <Route path={`:name`} element={<ProductDetails />} />
+                </Route>
+                {/* <Route path={`SAG`} element={<Sag />} /> */}
+                <Route path={`vulnerabilities`} element={<Vulnerabilities />} />
+                <Route path={`licenses`} element={<Licenses />} />
+                <Route path={`tools`} element={<Tools />} />
+                <Route path={`support`} element={<Support />} />
+                <Route path={`policies`} element={<Policies />} />
+                <Route path={`settings`} element={<Profile />} />
               </Route>
-              {/* <Route path={`SAG`} element={<Sag />} /> */}
-              <Route path={`vulnerabilities`} element={<Vulnerabilities />} />
-              <Route path={`licenses`} element={<Licenses />} />
-              <Route path={`tools`} element={<Tools />} />
-              <Route path={`support`} element={<Support />} />
-              <Route path={`policies`} element={<Policies />} />
-              <Route path={`settings`} element={<Profile />} />
-            </Route>
-            <Route path={`login`} element={<LoginLayout />} />
-            <Route path={`customer`} element={<CustomerLayout />}>
-              <Route path={`products`} element={<PubProducts />}>
-                <Route index element={<PubProductList />} />
-                <Route path={`:name`} element={<PubProductDetails />} />
+              <Route path={`login`} element={<LoginLayout />} />
+              <Route path={`customer`} element={<CustomerLayout />}>
+                <Route path={`products`} element={<PubProducts />}>
+                  <Route index element={<PubProductList />} />
+                  <Route path={`:name`} element={<PubProductDetails />} />
+                </Route>
               </Route>
-            </Route>
-            <Route path={`register`} element={<Register />} />
-          </Routes>
+              <Route path={`register`} element={<Register />} />
+            </Routes>
+          </ApolloWrapper>
         </ChakraProvider>
       </GlobalStateProvider>
     </BrowserRouter>

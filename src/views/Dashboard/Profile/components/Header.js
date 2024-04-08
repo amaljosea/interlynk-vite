@@ -100,7 +100,6 @@ const Header = ({
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
-    console.log('file', file)
     if (file) {
       if (isValidFileType(file) && isValidFileSize(file)) {
         onImageChange(file)

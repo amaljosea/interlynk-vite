@@ -1,9 +1,3 @@
-import {
-  ApolloClient,
-  ApolloProvider,
-  InMemoryCache,
-  createHttpLink
-} from '@apollo/client'
 import DashboardBg from 'assets/img/dashboard.png'
 import { useRef } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -18,30 +12,16 @@ const Success = () => {
   const queryParams = new URLSearchParams(location.search)
   const confirmation = queryParams.get('confirmation_token')
 
-  const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
-
-  const httpLink = createHttpLink({
-    uri: graphqlAPI
-  })
-
-  const client = new ApolloClient({
-    link: httpLink,
-    cache: new InMemoryCache(),
-    queryDeduplication: false
-  })
-
   return (
-    <ApolloProvider client={client}>
-      <Box ref={navRef} w='100%' height={'100vh'} position={'relative'}>
-        <Image
-          src={DashboardBg}
-          width={'100%'}
-          height={'100%'}
-          pos={'absolute'}
-        />
-        {confirmation ? <Confirmation /> : <Invitation />}
-      </Box>
-    </ApolloProvider>
+    <Box ref={navRef} w='100%' height={'100vh'} position={'relative'}>
+      <Image
+        src={DashboardBg}
+        width={'100%'}
+        height={'100%'}
+        pos={'absolute'}
+      />
+      {confirmation ? <Confirmation /> : <Invitation />}
+    </Box>
   )
 }
 
