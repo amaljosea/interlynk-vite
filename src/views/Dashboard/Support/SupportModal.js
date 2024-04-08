@@ -139,7 +139,7 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
             return { ...item, error: 'Please enter a valid PURL' }
           }
         } else {
-          return { ...item, error: 'Invalid entry' }
+          return { ...item, error: '' }
         }
       }
       return item
