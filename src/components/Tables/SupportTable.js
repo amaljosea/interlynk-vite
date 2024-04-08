@@ -7,7 +7,7 @@ import DeleteModal from 'views/Dashboard/Support/DeleteModal'
 import SupportModal from 'views/Dashboard/Support/SupportModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { RepeatIcon } from '@chakra-ui/icons'
+import { CheckIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
@@ -310,36 +310,41 @@ const SupportTable = ({ data, refetch }) => {
     {
       id: 'DEPRECATED',
       name: 'DEPRECATED',
-      selector: (row) => (
-        <Tag variant='solid' colorScheme='blue' textTransform={'capitalize'}>
-          {JSON.stringify(row?.deprecated)}
-        </Tag>
-      ),
+      selector: (row) =>
+        row?.deprecated ? <CheckIcon color={'red.500'} /> : '',
       width: '150px',
       wrap: true
     },
     {
       id: 'OUTDATED',
       name: 'OUTDATED',
-      selector: (row) => (
-        <Tag variant='solid' colorScheme='blue' textTransform={'capitalize'}>
-          {JSON.stringify(row?.outdated)}
-        </Tag>
-      ),
+      selector: (row) => (row?.outdated ? <CheckIcon color={'red.500'} /> : ''),
       width: '150px',
       wrap: true
     },
     {
       id: 'EOL_INFOS_EOL_DATE',
       name: 'END-OF-LIFE',
-      selector: (row) => row?.eol || '',
+      selector: (row) => {
+        return (
+          <Tag variant='solid' colorScheme='blue'>
+            {row?.eol}
+          </Tag>
+        )
+      },
       width: '160px',
       wrap: true
     },
     {
       id: 'EOL_INFOS_EOL_SUPPORT',
       name: 'END-OF-SERVICE',
-      selector: (row) => row?.eos || '',
+      selector: (row) => {
+        return (
+          <Tag variant='solid' colorScheme='blue'>
+            {row?.eos}
+          </Tag>
+        )
+      },
       width: '160px',
       wrap: true
     },
