@@ -427,7 +427,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
             </Link>
             <Link
               to={link}
-              onClick={() => onFilterSev(id, version, ['unknown'])}
+              onClick={() => onFilterSev(id, projectVersion, ['unknown'])}
             >
               <VulnBadge color='gray' label='Unknown'>
                 {stats?.vulnStats?.unknown || 0}

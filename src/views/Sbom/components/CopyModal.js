@@ -28,6 +28,7 @@ const CopyModal = ({ isOpen, onClose, product, version }) => {
   const [selectedProduct, setSelectedProduct] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
   const [filteredData, setFilteredData] = useState()
+  const data = null
 
   useEffect(() => {
     if (data) {

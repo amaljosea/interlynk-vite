@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import React, { useState } from 'react'
 import { useEffect } from 'react'
 
-import { Button, Flex, Input, Spacer, Stack } from '@chakra-ui/react'
+import { Button, Flex, Input, Spacer, Stack, useToast } from '@chakra-ui/react'
 import {
   Box,
   Checkbox,
@@ -39,6 +39,7 @@ function SBOMLinkDrawer(props) {
     setEmailList,
     imageInfo
   } = props
+  const toast = useToast()
 
   const sortScanResult = [...scanResults].sort((a, b) =>
     a.company.localeCompare(b.company)

@@ -24,7 +24,8 @@ import {
   Textarea,
   Th,
   Thead,
-  chakra
+  chakra,
+  useToast
 } from '@chakra-ui/react'
 
 import VulLinkRow from 'components/Tables/VulLinkRow'
@@ -46,6 +47,8 @@ const MultiStatusDrawer = ({
   setCheckedRows,
   vulnRefetch
 }) => {
+  const toast = useToast()
+
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
   const [selectedTag, setSelectedTag] = useState('')

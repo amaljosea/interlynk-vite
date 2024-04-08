@@ -88,7 +88,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   // ADD KEYBOARD SHORTCUT FOR TOGGLE DOWNLOAD MODAL
   const handleKeyDownload = (event) => {
     if (event.altKey && event.key === '3') {
-      onToggle()
+      // onToggle()
     }
   }
 

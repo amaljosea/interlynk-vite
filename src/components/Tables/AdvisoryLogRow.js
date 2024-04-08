@@ -116,7 +116,7 @@ function AdvisoryLogRow(props) {
         <Flex direction='column'>{affected ? affected : ''}</Flex>
       </Td>
       <Td>
-        <Flex direction='column'>{aliasId ? aliases : ''}</Flex>
+        <Flex direction='column'>{aliasId ? aliasId : ''}</Flex>
       </Td>
     </Tr>
   )

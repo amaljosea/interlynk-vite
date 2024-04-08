@@ -52,7 +52,7 @@
     "eject": "react-scripts eject",
     "deploy": "npm run build",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
-    "lint": "eslint .",
+    "lint": "eslint --quiet  .",
     "prepare": "husky install",
     "format": "pretty-quick --staged",
     "format:all": "prettier -w . && git add -A ."

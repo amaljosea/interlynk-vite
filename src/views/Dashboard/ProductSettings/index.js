@@ -34,6 +34,8 @@ const Settings = ({ enabled, data, refetch, activeEnv }) => {
   const { userPermissions } = useGlobalState()
   const [dataRetentionDays, setDataRetentionDays] = useState(0)
   const [projectSettingId, setProjectSettingId] = useState(null)
+  const [checks, setChecks] = useState(false)
+  const [internalComp, setInternalComp] = useState(false)
 
   const product = userPermissions?.find((item) => item.key === 'view_product')
   const editControls = product?.supersededBy?.some(

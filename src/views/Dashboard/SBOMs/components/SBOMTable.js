@@ -284,9 +284,9 @@ const SBOMTable = ({
 
   const [checkedRows, setCheckedRows] = useState([])
 
-  const onPurlFilter = (p) => {
-    setPurlFilterBy(p)
-  }
+  // const onPurlFilter = (p) => {
+  //   setPurlFilterBy(p)
+  // }
 
   return (
     <>

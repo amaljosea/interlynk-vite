@@ -44,7 +44,7 @@ function ProductLinkDrawer(props) {
     versionName,
     redactions
   } = props
-  const handleChange = (event) => setValue(event.target.value)
+  // const handleChange = (event) => setValue(event.target.value)
 
   const [hasEmail, setHasEmail] = useState(conf_email)
   const [hasTerms, setHasTerms] = useState(conf_terms)

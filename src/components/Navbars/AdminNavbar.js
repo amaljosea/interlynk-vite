@@ -89,27 +89,23 @@ export default function AdminNavbar(props) {
   if (props.fixed === true)
     if (scrolled === true) {
       navbarPosition = 'fixed'
-      navbarShadow = useColorModeValue(
-        '0px 7px 23px rgba(0, 0, 0, 0.05)',
-        'none'
-      )
       navbarBg = useColorModeValue(
         'linear-gradient(112.83deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.8) 110.84%)',
         'linear-gradient(112.83deg, rgba(255, 255, 255, 0.21) 0%, rgba(255, 255, 255, 0) 110.84%)'
       )
       navbarBorder = useColorModeValue('#FFFFFF', 'rgba(255, 255, 255, 0.31)')
-      navbarFilter = useColorModeValue(
-        'none',
-        'drop-shadow(0px 7px 23px rgba(0, 0, 0, 0.05))'
-      )
+      // navbarFilter = useColorModeValue(
+      //   'none',
+      //   'drop-shadow(0px 7px 23px rgba(0, 0, 0, 0.05))'
+      // )
     }
   if (props.secondary) {
-    navbarBackdrop = 'none'
+    // navbarBackdrop = 'none'
     navbarPosition = 'absolute'
     mainText = 'white'
     secondaryText = 'white'
     secondaryMargin = '22px'
-    paddingX = '30px'
+    // paddingX = '30px'
   }
 
   const newData = { ...subProduct }
