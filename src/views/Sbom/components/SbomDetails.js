@@ -39,6 +39,7 @@ import { MdPolicy } from 'react-icons/md'
 const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   const {
     project,
+    policyResultMetrics,
     projectVersion,
     primaryComponent,
     updatedAt,
@@ -455,22 +456,22 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
               <Flex flexDir={'column'} alignItems={'center'}>
                 <Stack fontWeight={'medium'} direction={'row'}>
                   <VulnBadge color='red' label='FAIL'>
-                    {0}
+                    {policyResultMetrics?.failedCount || 0}
                   </VulnBadge>
                   <VulnBadge color='yellow' label='WARN'>
-                    {0}
+                    {policyResultMetrics?.warnCount || 0}
                   </VulnBadge>
                   <VulnBadge color='blue' label='INFORM'>
-                    {0}
+                    {policyResultMetrics?.informCount || 0}
                   </VulnBadge>
                   <VulnBadge color='green' label='PASS'>
-                    {0}
+                    {policyResultMetrics?.passedCount || 0}
                   </VulnBadge>
                   <VulnBadge color='orange' label='SKIPPED'>
-                    {0}
+                    {policyResultMetrics?.skippedCount || 0}
                   </VulnBadge>
                   <VulnBadge color='gray' label='ERROR'>
-                    {0}
+                    {policyResultMetrics?.errorCount || 0}
                   </VulnBadge>
                 </Stack>
                 <Text

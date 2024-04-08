@@ -1233,6 +1233,14 @@ export const GetProductData = gql`
       updatedAt
       vulnRunStatus
       projectVersion
+      policyResultMetrics {
+        skippedCount
+        failedCount
+        errorCount
+        passedCount
+        informCount
+        warnCount
+      }
       primaryComponent {
         id
         name
