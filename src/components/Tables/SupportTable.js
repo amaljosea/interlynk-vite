@@ -1,15 +1,14 @@
-import { useMutation } from '@apollo/client'
 import { useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import StatusModal from 'views/Dashboard/Products/components/StatusModal'
 import DeleteModal from 'views/Dashboard/Support/DeleteModal'
 import SupportModal from 'views/Dashboard/Support/SupportModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { RepeatIcon } from '@chakra-ui/icons'
 import {
-  Badge,
   Flex,
   IconButton,
   Menu,
@@ -30,8 +29,6 @@ import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { UpdateCompSupportOverride } from 'graphQL/Mutation'
-
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaPlus } from 'react-icons/fa6'
 
@@ -47,6 +44,11 @@ const SupportTable = ({ data, refetch }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
+    isOpen: isActiveOpen,
+    onOpen: onActiveOpen,
+    onClose: onActiveClose
+  } = useDisclosure()
+  const {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
     onClose: onDeleteClose
@@ -57,15 +59,6 @@ const SupportTable = ({ data, refetch }) => {
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
   const [filterText, setFilterText] = useState('')
-
-  const supportData = {
-    search: searchInput === '' ? undefined : searchInput,
-    first: totalRows,
-    field: field,
-    direction: direction
-  }
-
-  const [updateSupport] = useMutation(UpdateCompSupportOverride)
 
   const setPaginationControl = (data) => {
     setIsPrevActive(data?.pageInfo?.hasPreviousPage)
@@ -259,12 +252,7 @@ const SupportTable = ({ data, refetch }) => {
     handleRefresh
   ])
 
-  const onChangeStatus = async (e, row) => {
-    e.preventDefault()
-    await updateSupport({
-      variables: { id: row?.id, enabled: e.target.checked }
-    }).then((res) => res?.data && refetch({ variables: { ...supportData } }))
-  }
+  // onChangeStatus(e, row)
 
   // COLUMNS
   const columns = [
@@ -277,7 +265,10 @@ const SupportTable = ({ data, refetch }) => {
           <Switch
             size='md'
             isChecked={enabled}
-            onChange={(e) => onChangeStatus(e, row)}
+            onChange={() => {
+              setActiveRow(row)
+              onActiveOpen()
+            }}
           />
         )
       },
@@ -470,6 +461,15 @@ const SupportTable = ({ data, refetch }) => {
           data={activeRow}
           isOpen={isDeleteOpen}
           onClose={onDeleteClose}
+          refetch={refetch}
+        />
+      )}
+
+      {isActiveOpen && (
+        <StatusModal
+          data={activeRow}
+          isOpen={isActiveOpen}
+          onClose={onActiveClose}
           refetch={refetch}
         />
       )}
