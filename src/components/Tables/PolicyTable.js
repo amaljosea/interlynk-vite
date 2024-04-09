@@ -1,6 +1,6 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import {
@@ -13,11 +13,9 @@ import DeleteModal from 'views/Dashboard/Policies/DeleteModal'
 import PolicyModal from 'views/Dashboard/Policies/PolicyModal'
 import RuleModal from 'views/Dashboard/Policies/RuleModal'
 import WarnModal from 'views/Dashboard/Policies/WarnModal'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { RepeatIcon } from '@chakra-ui/icons'
 import {
-  Badge,
   Box,
   Flex,
   Grid,
@@ -45,12 +43,8 @@ import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import {
-  DeletePolicyExclusion,
-  DeletePolicyRule,
-  PolicyDelete,
-  PolicyExclusionCreate
-} from 'graphQL/Mutation'
+import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
+import { PolicySubjectOperators } from 'graphQL/Queries'
 
 import { FaEllipsisV, FaPlus } from 'react-icons/fa'
 
@@ -68,12 +62,23 @@ const PolicyTable = ({ data, refetch }) => {
   const paginationSizes = [25, 50, 100]
   const [activeRow, setActiveRow] = useState(null)
   const [activeRule, setActiveRule] = useState(null)
-  const [filterText, setFilterText] = useState(searchInput)
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
-  const [deletePolicy] = useMutation(PolicyDelete)
-  const [onDeleteRule] = useMutation(DeletePolicyRule)
+  const { data: subOperators } = useQuery(PolicySubjectOperators, {
+    fetchPolicy: 'network-only'
+  })
+
+  console.log('subOperators', subOperators)
+
+  const formatSubject = (value) => {
+    if (subOperators) {
+      const result = subOperators.policySubjectOperatorMapping.find(
+        (item) => item?.subject === value
+      )
+      return `${result?.category} ${result?.name}`
+    }
+  }
 
   const [createExclusion] = useMutation(PolicyExclusionCreate)
   const [deleteExclusion] = useMutation(DeletePolicyExclusion)
@@ -111,7 +116,7 @@ const PolicyTable = ({ data, refetch }) => {
     onClose: onRuleClose
   } = useDisclosure()
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     disablePaginationControl()
     await refetch({
       variables: {
@@ -122,71 +127,11 @@ const PolicyTable = ({ data, refetch }) => {
     }).then(
       (res) => res?.data && policyDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
-  }
-
-  // CLEAR SERACH
-  const handleClear = async () => {
-    setFilterText('')
-    await refetch({
-      variables: {
-        projectId: activeProd || undefined,
-        search: undefined,
-        first: totalRows
-      }
-    }).then(
-      (res) => res?.data && policyDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-    )
-  }
-
-  // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    const { value } = e.target
-    if (value === '') {
-      handleClear()
-    } else {
-      setFilterText(value)
-    }
-  }
-
-  // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    const { value } = event.target
-    if (event.key === 'Enter' && filterText !== '') {
-      refetch({
-        variables: {
-          projectId: activeProd || undefined,
-          search: activeProd ? undefined : value,
-          first: totalRows
-        }
-      }).then(
-        (res) =>
-          res?.data &&
-          policyDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      )
-    }
-  }
+  }, [activeProd, policyDispatch, refetch, searchInput, totalRows])
 
   const handlePreviousPage = () => {}
   const handleNextPage = () => {}
   const handleSetRow = () => {}
-
-  const handleDeleteRule = async (rule) => {
-    await onDeleteRule({
-      variables: { id: rule?.id }
-    }).then((res) => {
-      const errors = res?.data?.policyRuleDelete?.errors
-      if (errors?.length > 0) {
-        toast({
-          description: errors[0],
-          status: 'error',
-          position: 'top',
-          duration: 2000
-        })
-      } else {
-        refetch({ variables: { ...policyData } })
-      }
-    })
-  }
 
   const handleCreateExclusion = async (id) => {
     await createExclusion({
@@ -252,7 +197,7 @@ const PolicyTable = ({ data, refetch }) => {
         </Stack>
       </Flex>
     )
-  }, [])
+  }, [handleRefresh, onOpen, productId, sbomId])
 
   // COLUMNS
   const columns = [
@@ -408,7 +353,6 @@ const PolicyTable = ({ data, refetch }) => {
                   onClick={() => {
                     setActiveRow(row)
                     onDeleteOpen()
-                    // onDeletePolicy(row?.id)
                   }}
                   hidden={productId}
                 >
@@ -492,7 +436,7 @@ const PolicyTable = ({ data, refetch }) => {
           >
             <GridItem>
               <Text fontSize={'sm'} textTransform={'capitalize'}>
-                {updatedValue(item?.subject)}
+                {formatSubject(item?.subject)}
               </Text>
             </GridItem>
             <GridItem>
@@ -569,6 +513,7 @@ const PolicyTable = ({ data, refetch }) => {
           isOpen={isOpen}
           onClose={onClose}
           refetch={refetch}
+          plSubjects={subOperators?.policySubjectOperatorMapping || []}
         />
       )}
 

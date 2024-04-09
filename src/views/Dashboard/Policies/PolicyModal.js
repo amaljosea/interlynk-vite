@@ -34,12 +34,11 @@ import {
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
-import { PolicySubjectOperators } from 'graphQL/Queries'
 
 import { FaTrash } from 'react-icons/fa'
 import { FaPlus } from 'react-icons/fa6'
 
-const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
+const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
   const { totalRows, policyState } = useGlobalState()
   const { searchInput } = policyState
   const [name, setName] = useState('')
@@ -64,22 +63,17 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
   ])
   const [deletedRules, setDeletedRules] = useState([])
 
-  const { data: subOperators } = useQuery(PolicySubjectOperators, {
-    fetchPolicy: 'network-only'
-  })
   const [createPolicy] = useMutation(PolicyCreate)
   const [updatePolicy] = useMutation(PolicyUpdate)
 
   const sortedData =
-    subOperators &&
-    [...subOperators.policySubjectOperatorMapping].sort((a, b) =>
-      a?.subject?.localeCompare(b?.subject)
-    )
+    plSubjects &&
+    [...plSubjects].sort((a, b) => a?.subject?.localeCompare(b?.subject))
 
   const categories = [...new Set(sortedData?.map((item) => item.category))]
 
   const optionsByCategory = categories.reduce((acc, category) => {
-    const options = subOperators?.policySubjectOperatorMapping
+    const options = plSubjects
       .filter((item) => item.category === category)
       .map((item) => (
         <option
@@ -87,7 +81,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
           key={item?.subject}
           style={{ textTransform: 'capitalize' }}
         >
-          {item.category} {item.name}
+          {item.name}
         </option>
       ))
     acc[category] = options
@@ -179,9 +173,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
     const newData = conditions.map((item) => {
       if (item.id === id) {
         if (field === 'subject' && value !== '') {
-          const result = subOperators?.policySubjectOperatorMapping?.find(
-            (item) => item?.subject === value
-          )
+          const result = plSubjects?.find((item) => item?.subject === value)
           return { ...item, [field]: value, list: result?.operators }
         } else if (
           field === 'operator' &&
@@ -449,7 +441,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
     ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()
 
   useEffect(() => {
-    if (data && subOperators) {
+    if (data && plSubjects) {
       setName(data?.name || '')
       setDesc(data?.description || '')
       setOperator(
@@ -464,9 +456,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
       )
       const rules = []
       const opList = (item) =>
-        subOperators?.policySubjectOperatorMapping?.find(
-          (op) => op?.subject === item?.subject
-        )
+        plSubjects?.find((op) => op?.subject === item?.subject)
       data?.policyRules?.map((item) =>
         rules?.push({
           id: item?.id,
@@ -487,7 +477,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch }) => {
       )
       setConditions(rules)
     }
-  }, [data, subOperators])
+  }, [data, plSubjects])
 
   return (
     <>
