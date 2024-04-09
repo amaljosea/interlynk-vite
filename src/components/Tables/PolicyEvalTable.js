@@ -74,17 +74,15 @@ const PolicyEvalTable = ({ data, refetch }) => {
     setIsNextActive(false)
   }
 
-  const handleRefresh = useMemo(async () => {
-    disablePaginationControl()
-    await policyScan({ variables: { sbomId } }).then(
-      (res) => res?.data && console.log(res?.data)
-    )
-  }, [policyScan, sbomId])
-
   const handleSetRow = () => {}
 
   // SUB HEADER
   const subHeader = useMemo(() => {
+    const handleRefresh = async () => {
+      await policyScan({ variables: { sbomId } }).then(
+        (res) => res?.data && refetch({ variables: { sbomId } })
+      )
+    }
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         <Tooltip label='Policy Scan'>
@@ -96,7 +94,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
         </Tooltip>
       </Flex>
     )
-  }, [handleRefresh])
+  }, [policyScan, refetch, sbomId])
 
   // COLUMNS
   const columns = [
@@ -124,21 +122,20 @@ const PolicyEvalTable = ({ data, refetch }) => {
       id: 'RESULT',
       name: 'RESULT',
       selector: (row) => {
-        const { result } = row
+        const { resultWording } = row
         return (
           <Tag
-            width={'150px'}
+            minW={'120px'}
             colorScheme={
-              result === 'inform'
+              resultWording === 'inform'
                 ? 'blue'
-                : result === 'warn'
+                : resultWording === 'warn'
                   ? 'orange'
                   : 'red'
             }
-            textTransform={'uppercase'}
           >
             <TagLabel mx={'auto'} pt={0.5}>
-              {updatedValue(result)}
+              {resultWording}
             </TagLabel>
           </Tag>
         )
@@ -153,7 +150,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
         const { resultType } = row
         return (
           <Tag
-            width={'100px'}
+            minW={'100px'}
             colorScheme={
               resultType === 'fail'
                 ? 'red'
@@ -162,7 +159,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
                   : 'blue'
             }
           >
-            <TagLabel mx={'auto'} pt={0.5} textTransform={'uppercase'}>
+            <TagLabel mx={'auto'} pt={0.5} textTransform={'capitalize'}>
               {resultType || ''}
             </TagLabel>
           </Tag>
@@ -278,7 +275,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
               </GridItem>
               <GridItem colSpan={2}>
                 <Text fontSize={'sm'} textTransform={'lowercase'}>
-                  {updatedValue(item?.operator)}
+                  {item?.operatorWording}
                 </Text>
               </GridItem>
               <GridItem colSpan={3}>

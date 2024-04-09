@@ -3566,6 +3566,7 @@ export const PolicyResults = gql`
         updatedAt
         result
         resultType
+        resultWording
         policy {
           name
           description

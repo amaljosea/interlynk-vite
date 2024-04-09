@@ -229,7 +229,15 @@ const PolicyTable = ({ data, refetch }) => {
       id: 'CONDITIONS',
       name: 'CONDITIONS',
       selector: (row) => (
-        <Text textTransform={'uppercase'}>{row?.operator}</Text>
+        <Tag minW={'60px'} textTransform={'uppercase'} colorScheme='blue'>
+          <TagLabel
+            pt={0.5}
+            style={{ textTransform: 'capitalize' }}
+            mx={'auto'}
+          >
+            {row?.operator}
+          </TagLabel>
+        </Tag>
       ),
       width: '200px',
       wrap: true
@@ -241,7 +249,7 @@ const PolicyTable = ({ data, refetch }) => {
         const { resultType } = row
         return (
           <Tag
-            width={'80px'}
+            minW={'80px'}
             colorScheme={
               resultType === 'inform'
                 ? 'blue'
@@ -251,8 +259,8 @@ const PolicyTable = ({ data, refetch }) => {
             }
           >
             <TagLabel
-              fontSize={'xs'}
-              style={{ textTransform: 'uppercase' }}
+              pt={0.5}
+              style={{ textTransform: 'capitalize' }}
               mx={'auto'}
             >
               {resultType}
