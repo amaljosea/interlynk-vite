@@ -574,7 +574,6 @@ const ComponentTable = ({
         </Tooltip>
       ),
       sortable: true,
-      width: '160px',
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
@@ -587,7 +586,7 @@ const ComponentTable = ({
     {
       id: 'action',
       name: 'ACTION',
-      selector: (row, rowIndex) => {
+      selector: (row) => {
         const { suppliers, status, primary } = row
         return (
           <>
