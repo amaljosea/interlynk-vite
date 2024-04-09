@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
-import StatusModal from 'views/Dashboard/Products/components/StatusModal'
 import DeleteModal from 'views/Dashboard/Support/DeleteModal'
+import StatusModal from 'views/Dashboard/Support/StatusModal'
 import SupportModal from 'views/Dashboard/Support/SupportModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -326,9 +326,10 @@ const SupportTable = ({ data, refetch }) => {
       id: 'EOL_INFOS_EOL_DATE',
       name: 'END-OF-LIFE',
       selector: (row) => {
+        const { eol } = row
         return (
-          <Tag variant='solid' colorScheme='blue'>
-            {row?.eol}
+          <Tag variant='solid' colorScheme='blue' hidden={!eol}>
+            {eol}
           </Tag>
         )
       },
@@ -339,9 +340,10 @@ const SupportTable = ({ data, refetch }) => {
       id: 'EOL_INFOS_EOL_SUPPORT',
       name: 'END-OF-SERVICE',
       selector: (row) => {
+        const { eos } = row
         return (
-          <Tag variant='solid' colorScheme='blue'>
-            {row?.eos}
+          <Tag variant='solid' colorScheme='blue' hidden={!eos}>
+            {eos}
           </Tag>
         )
       },

@@ -12,7 +12,8 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  UnorderedList
+  UnorderedList,
+  useToast
 } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -20,6 +21,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { UpdateCompSupportOverride } from 'graphQL/Mutation'
 
 const StatusModal = ({ isOpen, onClose, data, refetch }) => {
+  const toast = useToast()
   const { id, enabled } = data
   const { totalRows, supportState } = useGlobalState()
   const { searchInput, field, direction } = supportState
@@ -35,7 +37,20 @@ const StatusModal = ({ isOpen, onClose, data, refetch }) => {
   const onChangeStatus = async () => {
     await updateSupport({
       variables: { id: id, enabled: enabled === true ? false : true }
-    }).then((res) => res?.data && refetch({ variables: { ...supportData } }))
+    }).then((res) => {
+      const errors = res?.data?.componentSupportOverrideUpdate?.errors
+      if (errors?.length > 0) {
+        toast({
+          description: errors[0],
+          status: 'error',
+          duration: 2000,
+          position: 'top'
+        })
+      } else {
+        refetch({ variables: { ...supportData } })
+        onClose()
+      }
+    })
   }
 
   return (
