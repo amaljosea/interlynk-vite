@@ -69,8 +69,6 @@ const PolicyTable = ({ data, refetch }) => {
     fetchPolicy: 'network-only'
   })
 
-  console.log('subOperators', subOperators)
-
   const formatSubject = (value) => {
     if (subOperators) {
       const result = subOperators.policySubjectOperatorMapping.find(
@@ -447,6 +445,7 @@ const PolicyTable = ({ data, refetch }) => {
             <GridItem>
               <Text
                 fontSize={'sm'}
+                wordBreak={'break-all'}
                 hidden={
                   item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'
                 }

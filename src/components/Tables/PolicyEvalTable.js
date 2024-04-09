@@ -22,7 +22,8 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useDisclosure
+  useDisclosure,
+  useQuery
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -30,6 +31,7 @@ import ViolationDrawer from 'components/Drawer/ViolationDrawer'
 import Pagination from 'components/Pagination'
 
 import { SbomPolicyScan } from 'graphQL/Mutation'
+import { PolicySubjectOperators } from 'graphQL/Queries'
 
 import { BiScan } from 'react-icons/bi'
 import { FaEye } from 'react-icons/fa6'
@@ -47,6 +49,19 @@ const PolicyEvalTable = ({ data, refetch }) => {
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
+
+  const { data: subOperators } = useQuery(PolicySubjectOperators, {
+    fetchPolicy: 'network-only'
+  })
+
+  const formatSubject = (value) => {
+    if (subOperators) {
+      const result = subOperators.policySubjectOperatorMapping.find(
+        (item) => item?.subject === value
+      )
+      return `${result?.category} ${result?.name}`
+    }
+  }
 
   const [policyScan] = useMutation(SbomPolicyScan)
 
@@ -258,16 +273,12 @@ const PolicyEvalTable = ({ data, refetch }) => {
               borderBottom={'1px solid #E2E8F0'}
             >
               <GridItem colSpan={3}>
-                <Text fontSize={'sm'} wordBreak={'break-all'}>
-                  {updatedValue(item?.subject)}
+                <Text fontSize={'sm'} textTransform={'capitalize'}>
+                  {formatSubject(item?.subject)}
                 </Text>
               </GridItem>
               <GridItem colSpan={2}>
-                <Text
-                  fontSize={'sm'}
-                  wordBreak={'break-all'}
-                  textTransform={'lowercase'}
-                >
+                <Text fontSize={'sm'} textTransform={'lowercase'}>
                   {updatedValue(item?.operator)}
                 </Text>
               </GridItem>
