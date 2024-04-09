@@ -23,7 +23,7 @@ const ChangelogFilterMenu = ({ id, refetch }) => {
   const { prodLogDispatch } = dispatch
 
   const { data, error, loading } = useQuery(GetLogFilters, {
-    skip: activeProdTab === 4 ? false : true,
+    skip: activeProdTab === 5 ? false : true,
     variables: { id: id },
     fetchPolicy: 'network-only'
   })
