@@ -75,6 +75,144 @@ const statusColor = (status) => {
   }
 }
 
+const ExpandedComponent = ({
+  data,
+  setActiveRow,
+  onCvssOpen,
+  textColor,
+  filteredData
+}) => {
+  const { vuln } = data
+  const CustomText = styled(Text)`
+    font-size: 13px;
+    font-weight: bold;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  `
+  return (
+    <Box
+      width={'100%'}
+      p={5}
+      boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
+    >
+      <Grid
+        templateColumns='repeat(5, 1fr)'
+        gap={12}
+        width={'90%'}
+        margin={'0 auto'}
+      >
+        {/* VULN DATA */}
+        <GridItem
+          w='100%'
+          colSpan={2}
+          display={'flex'}
+          flexDirection={'column'}
+          gap={4}
+        >
+          {/* Description */}
+          <Box>
+            <CustomText>Description :</CustomText>
+            <Text mt={1} fontSize={14}>
+              {vuln.desc}
+            </Text>
+          </Box>
+          {/* Published At  */}
+          <Box>
+            <CustomText>Published:</CustomText>
+            <Text mt={1} fontSize={14}>
+              {getFullDateAndTime(vuln.publishedAt)}
+            </Text>
+          </Box>
+          {/* Last Modified At */}
+          <Box>
+            <CustomText>Last Modified:</CustomText>
+            <Text mt={1} fontSize={14}>
+              {getFullDateAndTime(vuln.lastModifiedAt)}
+            </Text>
+          </Box>
+          {/* CVSS Vector */}
+          <Box>
+            <CustomText>CVSS Vector :</CustomText>
+            {vuln?.cvssVector ? (
+              <Tooltip
+                bg='gray.50'
+                label={<CvssCard value={vuln?.cvssVector} />}
+                placement='top'
+              >
+                <Tag
+                  variant='subtle'
+                  width={'fit-content'}
+                  colorScheme={'cyan'}
+                  cursor={'pointer'}
+                  onClick={() => {
+                    setActiveRow(data)
+                    onCvssOpen()
+                  }}
+                >
+                  {vuln?.cvssVector || '-'}
+                </Tag>
+              </Tooltip>
+            ) : (
+              <Tag
+                variant='subtle'
+                width={'fit-content'}
+                colorScheme={'cyan'}
+                cursor={'pointer'}
+              >
+                {vuln?.cvssVector || '-'}
+              </Tag>
+            )}
+          </Box>
+          {/* NVD ALIAS ID */}
+          {vuln.nvdAliasId ? (
+            <Box>
+              <CustomText>NVD Alias ID:</CustomText>
+              <Flex
+                width={'fit-content'}
+                mt={1}
+                direction='row'
+                alignItems={'center'}
+                gap={2}
+              >
+                <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
+                  <Icon
+                    as={ExternalLinkIcon}
+                    h={'16px'}
+                    w={'16px'}
+                    color={'blue.500'}
+                  />
+                </Link>
+                <Tooltip label={vuln.nvdAliasId} placement={'top'}>
+                  <Text width={'fit-content'} fontSize='sm' color={textColor}>
+                    {vuln.nvdAliasId}
+                  </Text>
+                </Tooltip>
+              </Flex>
+            </Box>
+          ) : null}
+          {/* EPSS Percentile */}
+          <Box>
+            <CustomText>EPSS Percentile :</CustomText>
+            <Text mt={1} fontSize={14}>
+              {vuln?.vulnInfo?.epssPercentile
+                ? (vuln?.vulnInfo?.epssPercentile * 100).toFixed()
+                : 0}{' '}
+              %
+            </Text>
+          </Box>
+        </GridItem>
+        {/* STATUS UPDATE */}
+        <GridItem w='100%' colSpan={3}>
+          {data && (
+            <VexStatusComponent data={data} fixedVersions={filteredData} />
+          )}
+        </GridItem>
+      </Grid>
+    </Box>
+  )
+}
+
 const VulnTable = ({
   data,
   sbomData,
@@ -750,141 +888,6 @@ const VulnTable = ({
     setCurrentRow
   ])
 
-  const ExpandedComponent = ({ data }) => {
-    const { vuln } = data
-    const CustomText = styled(Text)`
-      font-size: 13px;
-      font-weight: bold;
-      color: #718096;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-    `
-    return (
-      <Box
-        width={'100%'}
-        p={5}
-        boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
-      >
-        <Grid
-          templateColumns='repeat(5, 1fr)'
-          gap={12}
-          width={'90%'}
-          margin={'0 auto'}
-        >
-          {/* VULN DATA */}
-          <GridItem
-            w='100%'
-            colSpan={2}
-            display={'flex'}
-            flexDirection={'column'}
-            gap={4}
-          >
-            {/* Description */}
-            <Box>
-              <CustomText>Description :</CustomText>
-              <Text mt={1} fontSize={14}>
-                {vuln.desc}
-              </Text>
-            </Box>
-            {/* Published At  */}
-            <Box>
-              <CustomText>Published:</CustomText>
-              <Text mt={1} fontSize={14}>
-                {getFullDateAndTime(vuln.publishedAt)}
-              </Text>
-            </Box>
-            {/* Last Modified At */}
-            <Box>
-              <CustomText>Last Modified:</CustomText>
-              <Text mt={1} fontSize={14}>
-                {getFullDateAndTime(vuln.lastModifiedAt)}
-              </Text>
-            </Box>
-            {/* CVSS Vector */}
-            <Box>
-              <CustomText>CVSS Vector :</CustomText>
-              {vuln?.cvssVector ? (
-                <Tooltip
-                  bg='gray.50'
-                  label={<CvssCard value={vuln?.cvssVector} />}
-                  placement='top'
-                >
-                  <Tag
-                    variant='subtle'
-                    width={'fit-content'}
-                    colorScheme={'cyan'}
-                    cursor={'pointer'}
-                    onClick={() => {
-                      setActiveRow(data)
-                      onCvssOpen()
-                    }}
-                  >
-                    {vuln?.cvssVector || '-'}
-                  </Tag>
-                </Tooltip>
-              ) : (
-                <Tag
-                  variant='subtle'
-                  width={'fit-content'}
-                  colorScheme={'cyan'}
-                  cursor={'pointer'}
-                >
-                  {vuln?.cvssVector || '-'}
-                </Tag>
-              )}
-            </Box>
-            {/* NVD ALIAS ID */}
-            {vuln.nvdAliasId ? (
-              <Box>
-                <CustomText>NVD Alias ID:</CustomText>
-                <Flex
-                  width={'fit-content'}
-                  mt={1}
-                  direction='row'
-                  alignItems={'center'}
-                  gap={2}
-                >
-                  <Link
-                    href={linkURl('nvd', vuln.nvdAliasId)}
-                    target={'_blank'}
-                  >
-                    <Icon
-                      as={ExternalLinkIcon}
-                      h={'16px'}
-                      w={'16px'}
-                      color={'blue.500'}
-                    />
-                  </Link>
-                  <Tooltip label={vuln.nvdAliasId} placement={'top'}>
-                    <Text width={'fit-content'} fontSize='sm' color={textColor}>
-                      {vuln.nvdAliasId}
-                    </Text>
-                  </Tooltip>
-                </Flex>
-              </Box>
-            ) : null}
-            {/* EPSS Percentile */}
-            <Box>
-              <CustomText>EPSS Percentile :</CustomText>
-              <Text mt={1} fontSize={14}>
-                {vuln?.vulnInfo?.epssPercentile
-                  ? (vuln?.vulnInfo?.epssPercentile * 100).toFixed()
-                  : 0}{' '}
-                %
-              </Text>
-            </Box>
-          </GridItem>
-          {/* STATUS UPDATE */}
-          <GridItem w='100%' colSpan={3}>
-            {data && (
-              <VexStatusComponent data={data} fixedVersions={filteredData} />
-            )}
-          </GridItem>
-        </Grid>
-      </Box>
-    )
-  }
-
   const handlePreviousPage = async () => {
     disablePaginationControl()
     setIsPrevActive(false)
@@ -1053,6 +1056,12 @@ const VulnTable = ({
           expandOnRowClicked
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
+          expandableRowsComponentProps={{
+            setActiveRow,
+            onCvssOpen,
+            textColor,
+            filteredData
+          }}
           selectableRows={!signedUrlParams}
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
