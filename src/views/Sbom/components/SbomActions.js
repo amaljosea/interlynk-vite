@@ -220,7 +220,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
       })
       .finally(() => {
         navigate(`/${path}/products/${productName}?id=${productId}&sbom=${id}`)
-        // setActiveProdTab(0)
+        setActiveSbomTab(0)
       })
   }
 

@@ -80,7 +80,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
   const subHeader = useMemo(() => {
     const handleRefresh = async () => {
       await policyScan({ variables: { sbomId } }).then(
-        (res) => res?.data && refetch({ variables: { sbomId } })
+        (res) => res?.data && console.log(res?.data)
       )
     }
     return (
@@ -94,7 +94,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
         </Tooltip>
       </Flex>
     )
-  }, [policyScan, refetch, sbomId])
+  }, [policyScan, sbomId])
 
   // COLUMNS
   const columns = [
