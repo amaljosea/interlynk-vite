@@ -116,8 +116,10 @@ const TeamModal = ({ isOpen, onClose, refetch, data }) => {
                   textTransform='capitalize'
                 >
                   <option value=''>-- Select --</option>
-                  {roles?.organization?.organizationRoles.map((item) => (
-                    <option value={item.id}>{item.name}</option>
+                  {roles?.organization?.organizationRoles.map((item, index) => (
+                    <option key={index} value={item.id}>
+                      {item.name}
+                    </option>
                   ))}
                 </Select>
               </FormControl>

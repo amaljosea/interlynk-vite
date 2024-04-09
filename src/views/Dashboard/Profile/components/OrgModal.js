@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
+  Alert,
+  AlertIcon,
   Button,
   Flex,
   FormControl,
@@ -16,7 +18,8 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  ModalOverlay
+  ModalOverlay,
+  Text
 } from '@chakra-ui/react'
 
 import { RegisterOrganization } from 'graphQL/Mutation'

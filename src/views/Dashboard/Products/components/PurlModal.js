@@ -4,14 +4,11 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
 import {
-  Box,
   Button,
   Flex,
   FormControl,
   FormLabel,
   Input,
-  List,
-  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -120,7 +117,7 @@ const PurlModal = ({
     'apk'
   ]
 
-  const hasNamespace = validPurlTypes.includes(purlType)
+  // const hasNamespace = validPurlTypes.includes(purlType)
 
   const namespaceOptions = {
     alpm: [
@@ -728,8 +725,10 @@ const PurlModal = ({
                     onChange={handleNamespaceChange}
                     onBlur={onNamespaceBlur}
                   >
-                    {namespaceOptions[purlType].map((item) => (
-                      <option value={item.value}>{item.label}</option>
+                    {namespaceOptions[purlType].map((item, index) => (
+                      <option key={index} value={item.value}>
+                        {item.label}
+                      </option>
                     ))}
                   </Select>
                 </FormControl>

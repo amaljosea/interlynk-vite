@@ -399,7 +399,7 @@ function SBOMComponentRow(props) {
                   flexWrap={'wrap'}
                 >
                   {cpes.length > 0 &&
-                    cpes.map((item, index) => <Text>{item}</Text>)}
+                    cpes.map((item, index) => <Text key={index}>{item}</Text>)}
                 </Flex>
               </Stack>
             </Td>

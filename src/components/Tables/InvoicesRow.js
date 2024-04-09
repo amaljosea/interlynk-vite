@@ -12,10 +12,10 @@ import {
 
 function InvoicesRow(props) {
   const textColor = useColorModeValue('gray.700', 'white')
-  const { date, code, price, format, logo } = props
+  const { key, date, code, price, format, logo } = props
 
   return (
-    <Flex my={{ sm: '1rem', xl: '10px' }} alignItems='center'>
+    <Flex key={key} my={{ sm: '1rem', xl: '10px' }} alignItems='center'>
       <Flex direction='column'>
         <Text fontSize='md' color={textColor} fontWeight='bold'>
           {date}

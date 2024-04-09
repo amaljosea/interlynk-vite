@@ -805,7 +805,6 @@ export const sbom = [
     updated: '4 days ago',
     source: 'github.com/CycloneDX/cyclonedx-go',
     depth: 0,
-    dependsOn: 'None',
     language: 'Go',
     repo: 'https://github.com/CycloneDX/cyclonedx-go',
     critical: 1,

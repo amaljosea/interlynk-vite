@@ -12,7 +12,6 @@ export const buttonStyles = {
           fontWeight: 'medium',
           borderRadius: 'inherit',
           cursor: 'pointer',
-          _hover: 'none',
           _active: {
             bg: 'transparent',
             transform: 'none',

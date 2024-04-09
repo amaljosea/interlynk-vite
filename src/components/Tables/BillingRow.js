@@ -15,10 +15,10 @@ function BillingRow(props) {
   const textColor = useColorModeValue('gray.700', 'white')
   const bgColor = useColorModeValue('#F8F9FA', 'gray.800')
   const nameColor = useColorModeValue('gray.500', 'white')
-  const { name, company, email, number } = props
+  const { key, name, company, email, number } = props
 
   return (
-    <Box p='24px' bg={bgColor} my='22px' borderRadius='12px'>
+    <Box key={key} p='24px' bg={bgColor} my='22px' borderRadius='12px'>
       <Flex justify='space-between' w='100%'>
         <Flex direction='column' maxWidth='70%'>
           <Text color={nameColor} fontSize='md' fontWeight='bold' mb='10px'>

@@ -21,9 +21,10 @@ const BillingInformation = ({ title, data }) => {
         </CardHeader>
         <CardBody>
           <Flex direction='column' w='100%'>
-            {data.map((row) => {
+            {data.map((row, index) => {
               return (
                 <BillingRow
+                  key={index}
                   name={row.name}
                   company={row.company}
                   email={row.email}

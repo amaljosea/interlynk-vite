@@ -28,10 +28,10 @@
     // todo: move the below to "error" one by one
     "no-undef": "error",
     "react-hooks/rules-of-hooks": "warn",
-    "react/jsx-no-undef": "warn",
-    "no-dupe-keys": "warn",
+    "react/jsx-no-undef": "error",
+    "no-dupe-keys": "error",
     "no-empty-pattern": "warn",
-    "react/jsx-key": "warn",
+    "react/jsx-key": "error",
     "no-case-declarations": "warn",
     "react/no-unknown-property": "warn",
     "react/no-children-prop": "warn",

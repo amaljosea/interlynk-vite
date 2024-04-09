@@ -40,6 +40,7 @@ import { FaFileDownload, FaLayerGroup } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 
 import CheckModal from './CheckModal'
+import CopyModal from './CopyModal'
 import DownloadModal from './DownloadModal'
 import SigningModal from './SigningModal'
 

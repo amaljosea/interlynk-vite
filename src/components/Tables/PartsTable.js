@@ -460,6 +460,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             {part.suppliers.length > 0 &&
               part.suppliers.map((item, index) => (
                 <Tooltip
+                  key={index}
                   label={`${item.contactName} ${item.contactEmail && `- ${item.contactEmail}`}`}
                   placement='top'
                 >

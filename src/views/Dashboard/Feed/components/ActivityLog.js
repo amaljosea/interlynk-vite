@@ -2,10 +2,8 @@
 import React from 'react'
 
 import {
-  Flex,
   Table,
   Tbody,
-  Text,
   Th,
   Thead,
   Tr,
@@ -17,7 +15,7 @@ import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import ActivityLogRow from 'components/Tables/ActivityLogRow.js'
 
-const ActivityLog = ({ title, captions, data, filterData }) => {
+const ActivityLog = ({ captions, data, filterData }) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
   return (
@@ -37,9 +35,10 @@ const ActivityLog = ({ title, captions, data, filterData }) => {
           </Thead>
           <Tbody>
             {filterData.length > 0 &&
-              filterData.map((row) => {
+              filterData.map((row, index) => {
                 return (
                   <ActivityLogRow
+                    key={index}
                     type={row.type}
                     product={row.product}
                     version={row.version}
@@ -50,9 +49,10 @@ const ActivityLog = ({ title, captions, data, filterData }) => {
                 )
               })}
             {filterData.length === 0 &&
-              data.map((row) => {
+              data.map((row, index) => {
                 return (
                   <ActivityLogRow
+                    key={index}
                     type={row.type}
                     product={row.product}
                     version={row.version}

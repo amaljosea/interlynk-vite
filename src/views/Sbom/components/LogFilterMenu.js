@@ -41,7 +41,6 @@ const LogFilterMenu = ({ refetch, productId, sbomId }) => {
       first: totalRows,
       last: undefined,
       after: undefined,
-      last: undefined,
       field: field,
       direction: direction
     })
@@ -59,7 +58,6 @@ const LogFilterMenu = ({ refetch, productId, sbomId }) => {
       first: totalRows,
       last: undefined,
       after: undefined,
-      last: undefined,
       field: field,
       direction: direction
     })
