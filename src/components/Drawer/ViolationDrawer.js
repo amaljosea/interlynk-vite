@@ -1,6 +1,3 @@
-import DataTable from 'react-data-table-component'
-import { customStyles } from 'utils'
-
 import {
   Drawer,
   DrawerBody,
@@ -8,58 +5,69 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerOverlay,
-  Text
+  Grid,
+  GridItem
 } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
-
 const ViolationDrawer = ({ data, isOpen, onClose }) => {
-  console.log(data)
-  // COLUMNS
-  const columns = [
-    {
-      id: 'SUBJECT',
-      name: 'SUBJECT',
-      selector: (row) => <Text>{row?.policyRule?.subject || ''}</Text>,
-      wrap: true
-    },
-    {
-      id: 'OPERATOR',
-      name: 'OPERATOR',
-      selector: (row) => <Text>{row?.policyRule?.operator || ''}</Text>,
-      wrap: true
-    },
-    {
-      id: 'VALUE',
-      name: 'VALUE',
-      selector: (row) => <Text>{row?.policyRule?.value || ''}</Text>,
-      wrap: true
-    },
-    {
-      id: 'VIOLATION_TYPE',
-      name: 'VIOLATION TYPE',
-      selector: (row) => <Text>{row?.violationType || ''}</Text>,
-      wrap: true
-    }
-  ]
+  // console.log(data)
+  const { category, policyRuleViolations } = data || null
 
   return (
-    <Drawer size='xl' isOpen={isOpen} placement='right' onClose={onClose}>
+    <Drawer size='lg' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader>Violations List</DrawerHeader>
-        <DrawerBody>
-          {/* <DataTable
-            columns={columns}
-            data={data?.nodes || []}
-            customStyles={customStyles}
-            progressPending={data ? false : true}
-            progressComponent={<CustomLoader />}
-            persistTableHead
-            responsive={true}
-          /> */}
-          <Text mt={6}>Pending</Text>
+        <DrawerBody mb={10}>
+          {category === 'license' &&
+            policyRuleViolations?.nodes?.map((item, index) => (
+              <Grid
+                key={index}
+                templateColumns='repeat(12, 1fr)'
+                py={2}
+                gap={6}
+                borderBottom={'1px solid #E2E8F0'}
+              >
+                <GridItem fontSize={'sm'} colSpan={6} wordBreak={'break-all'}>
+                  {item?.violation?.name}
+                </GridItem>
+                <GridItem fontSize={'sm'} colSpan={6} wordBreak={'break-all'}>
+                  {item?.component?.licensesExp}
+                </GridItem>
+              </Grid>
+            ))}
+          {category === 'component' &&
+            policyRuleViolations?.nodes?.map((item, index) => (
+              <Grid
+                key={index}
+                templateColumns='repeat(12, 1fr)'
+                py={2}
+                gap={6}
+                borderBottom={'1px solid #E2E8F0'}
+              >
+                <GridItem fontSize={'sm'} colSpan={8} wordBreak={'break-all'}>
+                  {item?.violation?.name}
+                </GridItem>
+                <GridItem fontSize={'sm'} colSpan={4} wordBreak={'break-all'}>
+                  {item?.violation?.version}
+                </GridItem>
+              </Grid>
+            ))}
+          {category === 'vulnerability' &&
+            policyRuleViolations?.nodes?.map((item, index) => (
+              <Grid
+                key={index}
+                templateColumns='repeat(1, 1fr)'
+                py={2}
+                gap={6}
+                borderBottom={'1px solid #E2E8F0'}
+              >
+                <GridItem fontSize={'sm'} wordBreak={'break-all'}>
+                  {item?.violation?.vuln?.vulnId}
+                </GridItem>
+              </Grid>
+            ))}
         </DrawerBody>
       </DrawerContent>
     </Drawer>

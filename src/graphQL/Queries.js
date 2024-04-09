@@ -3548,16 +3548,24 @@ export const GetProjectPolicies = gql`
 
 // GET SBOM POLICIES
 export const PolicyResults = gql`
-  query PolicyResults($sbomId: Uuid!) {
+  query PolicyResults(
+    $sbomId: Uuid!
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+  ) {
     policyResults(sbomId: [$sbomId]) {
       totalCount
       nodes {
+        id
         policyRuleViolations {
           totalCount
         }
         createdAt
         updatedAt
         result
+        resultType
         policy {
           name
           description
@@ -3568,13 +3576,25 @@ export const PolicyResults = gql`
             operator
             operatorWording
             value
-            policyRuleViolations(sbomId: $sbomId) {
+            policyRuleViolations(
+              sbomId: $sbomId
+              after: $after
+              before: $before
+              first: $first
+              last: $last
+            ) {
               totalCount
+              pageInfo {
+                endCursor
+                hasNextPage
+                hasPreviousPage
+                startCursor
+              }
               nodes {
                 id
                 violationType
                 component {
-                  id
+                  name
                   licensesExp
                 }
                 violation {
@@ -3586,6 +3606,11 @@ export const PolicyResults = gql`
                     }
                   }
                   ... on Sbom {
+                    project {
+                      projectGroup {
+                        name
+                      }
+                    }
                     projectVersion
                   }
                   ... on SbomComponent {

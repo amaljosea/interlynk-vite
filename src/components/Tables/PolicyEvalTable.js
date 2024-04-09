@@ -3,7 +3,12 @@ import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import {
+  customStyles,
+  getFullDateAndTime,
+  timeSince,
+  updatedValue
+} from 'utils'
 
 import {
   Box,
@@ -32,7 +37,6 @@ import { FaEye } from 'react-icons/fa6'
 const PolicyEvalTable = ({ data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -40,7 +44,6 @@ const PolicyEvalTable = ({ data, refetch }) => {
   const paginationSizes = [25, 50, 100]
   const [activeRow, setActiveRow] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
-  const [currentRow, setCurrentRow] = useState(null)
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
@@ -57,12 +60,12 @@ const PolicyEvalTable = ({ data, refetch }) => {
     setIsNextActive(false)
   }
 
-  const handleRefresh = async () => {
+  const handleRefresh = useMemo(async () => {
     disablePaginationControl()
     await policyScan({ variables: { sbomId } }).then(
       (res) => res?.data && console.log(res?.data)
     )
-  }
+  }, [policyScan, sbomId])
 
   const handleSetRow = () => {}
 
@@ -110,7 +113,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
         const { result } = row
         return (
           <Tag
-            width={'110px'}
+            width={'150px'}
             colorScheme={
               result === 'inform'
                 ? 'blue'
@@ -121,7 +124,32 @@ const PolicyEvalTable = ({ data, refetch }) => {
             textTransform={'uppercase'}
           >
             <TagLabel mx={'auto'} pt={0.5}>
-              {result}
+              {updatedValue(result)}
+            </TagLabel>
+          </Tag>
+        )
+      },
+      width: '250px',
+      wrap: true
+    },
+    {
+      id: 'RESULT_TYPE',
+      name: 'RESULT TYPE',
+      selector: (row) => {
+        const { resultType } = row
+        return (
+          <Tag
+            width={'100px'}
+            colorScheme={
+              resultType === 'fail'
+                ? 'red'
+                : resultType === 'warn'
+                  ? 'orange'
+                  : 'blue'
+            }
+          >
+            <TagLabel mx={'auto'} pt={0.5} textTransform={'uppercase'}>
+              {resultType || ''}
             </TagLabel>
           </Tag>
         )
@@ -166,7 +194,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
 
   // EXPAND VIEW
   const ExpandedComponent = ({ data }) => {
-    const { policy, policyRuleViolations } = data
+    const { policy } = data
     const CustomText = styled(Text)`
       font-size: 12px;
       font-weight: bold;
@@ -174,7 +202,6 @@ const PolicyEvalTable = ({ data, refetch }) => {
       text-transform: uppercase;
       letter-spacing: 0.6px;
     `
-
     return (
       <Box
         width={'100%'}
@@ -204,72 +231,75 @@ const PolicyEvalTable = ({ data, refetch }) => {
           <GridItem colSpan={3}>
             <CustomText>subject</CustomText>
           </GridItem>
-          <GridItem colSpan={3}>
+          <GridItem colSpan={2}>
             <CustomText>operator</CustomText>
           </GridItem>
           <GridItem colSpan={3}>
             <CustomText>value</CustomText>
           </GridItem>
-          <GridItem colSpan={3}>
+          <GridItem colSpan={2}>
             <CustomText>violations</CustomText>
           </GridItem>
-          <GridItem colSpan={3}>
+          <GridItem colSpan={2}>
             <CustomText>action</CustomText>
           </GridItem>
         </Grid>
-        {policy?.policyRules?.policyRuleViolations?.nodes?.length > 0 ? (
-          policy?.policyRules?.policyRuleViolations?.nodes.map(
-            (item, index) => (
-              <Grid
-                width={'95%'}
-                key={index}
-                alignItems={'center'}
-                templateColumns='repeat(12, 1fr)'
-                gap={6}
-                mb={1}
-                mx={'auto'}
-                py={2}
-                borderBottom={'1px solid #E2E8F0'}
-              >
-                <GridItem colSpan={3}>
-                  <Text fontSize={'sm'} wordBreak={'break-all'}>
-                    {policy?.policyRules?.subject}
-                  </Text>
-                </GridItem>
-                <GridItem colSpan={3}>
-                  <Text fontSize={'sm'} wordBreak={'break-all'}>
-                    {policy?.policyRules?.operator}
-                  </Text>
-                </GridItem>
-                <GridItem colSpan={3}>
-                  <Text fontSize={'sm'} wordBreak={'break-all'}>
-                    {policy?.policyRules?.value}
-                  </Text>
-                </GridItem>
-                <GridItem colSpan={3}>
-                  <Tag width={'50px'} colorScheme='blue'>
-                    <TagLabel mx={'auto'}>
-                      {policyRuleViolations?.totalCount || 0}
-                    </TagLabel>
-                  </Tag>
-                </GridItem>
-                <GridItem colSpan={3}>
-                  <Tooltip label={'View Violations'}>
-                    <IconButton
-                      size='sm'
-                      icon={<FaEye />}
-                      colorScheme='blue'
-                      fontWeight={'medium'}
-                      onClick={() => {
-                        setActiveRow(item)
-                        onOpen()
-                      }}
-                    />
-                  </Tooltip>
-                </GridItem>
-              </Grid>
-            )
-          )
+        {policy?.policyRules?.length > 0 ? (
+          policy?.policyRules?.map((item, index) => (
+            <Grid
+              width={'95%'}
+              key={index}
+              alignItems={'center'}
+              templateColumns='repeat(12, 1fr)'
+              gap={6}
+              mb={1}
+              mx={'auto'}
+              py={2}
+              borderBottom={'1px solid #E2E8F0'}
+            >
+              <GridItem colSpan={3}>
+                <Text fontSize={'sm'} wordBreak={'break-all'}>
+                  {updatedValue(item?.subject)}
+                </Text>
+              </GridItem>
+              <GridItem colSpan={2}>
+                <Text
+                  fontSize={'sm'}
+                  wordBreak={'break-all'}
+                  textTransform={'lowercase'}
+                >
+                  {updatedValue(item?.operator)}
+                </Text>
+              </GridItem>
+              <GridItem colSpan={3}>
+                <Text fontSize={'sm'} wordBreak={'break-all'}>
+                  {item?.value}
+                </Text>
+              </GridItem>
+              <GridItem colSpan={2}>
+                <Tag width={'50px'} colorScheme='blue'>
+                  <TagLabel mx={'auto'}>
+                    {item?.policyRuleViolations?.totalCount || 0}
+                  </TagLabel>
+                </Tag>
+              </GridItem>
+              <GridItem colSpan={2}>
+                <Tooltip label={'View Violations'}>
+                  <IconButton
+                    size='sm'
+                    icon={<FaEye />}
+                    colorScheme='blue'
+                    fontWeight={'medium'}
+                    hidden={item?.category === 'version'}
+                    onClick={() => {
+                      setActiveRow(item)
+                      onOpen()
+                    }}
+                  />
+                </Tooltip>
+              </GridItem>
+            </Grid>
+          ))
         ) : (
           <GridItem
             width={'97.5%'}
@@ -301,7 +331,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
         setPaginationControl(res.data)
       }
     })
-  }, [refetch, totalRows, data, currentPage])
+  }, [currentPage, refetch, sbomId, totalRows, data?.pageInfo?.startCursor])
 
   const handleNextPage = useCallback(async () => {
     disablePaginationControl()
@@ -319,7 +349,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
         setPaginationControl(res.data)
       }
     })
-  }, [refetch, totalRows, data, currentPage])
+  }, [currentPage, refetch, sbomId, totalRows, data?.pageInfo?.endCursor])
 
   useEffect(() => {
     if (data) {
@@ -362,7 +392,13 @@ const PolicyEvalTable = ({ data, refetch }) => {
       </Flex>
 
       {isOpen && (
-        <ViolationDrawer isOpen={isOpen} onClose={onClose} data={activeRow} />
+        <ViolationDrawer
+          isOpen={isOpen}
+          onClose={onClose}
+          data={activeRow}
+          sbomId={sbomId}
+          refetch={refetch}
+        />
       )}
     </>
   )
