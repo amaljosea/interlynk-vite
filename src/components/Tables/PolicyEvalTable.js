@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -22,8 +22,7 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useDisclosure,
-  useQuery
+  useDisclosure
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
