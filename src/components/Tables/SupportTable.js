@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
@@ -90,7 +90,7 @@ const SupportTable = ({ data, refetch }) => {
     setIsNextActive(false)
   }
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     disablePaginationControl()
     if (sbomId) {
       await refetch({ variables: { projectId, sbomId } })
@@ -106,10 +106,19 @@ const SupportTable = ({ data, refetch }) => {
         (res) => res?.data && supportDispatch({ type: 'CLEAR_SEARCH_INPUT' })
       )
     }
-  }
+  }, [
+    direction,
+    field,
+    projectId,
+    refetch,
+    sbomId,
+    searchInput,
+    supportDispatch,
+    totalRows
+  ])
 
   // CLEAR SERACH
-  const handleClear = async () => {
+  const handleClear = useCallback(async () => {
     setFilterText('')
     await refetch({
       variables: {
@@ -121,31 +130,37 @@ const SupportTable = ({ data, refetch }) => {
     }).then(
       (res) => res?.data && supportDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
-  }
+  }, [direction, field, refetch, supportDispatch, totalRows])
 
   // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    const { value } = e.target
-    if (value === '') {
-      handleClear()
-    } else {
-      setFilterText(value)
-    }
-  }
+  const onSearchInputChange = useCallback(
+    (e) => {
+      const { value } = e.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setFilterText(value)
+      }
+    },
+    [handleClear]
+  )
 
   // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    const { value } = event.target
-    if (event.key === 'Enter' && filterText !== '') {
-      refetch({
-        variables: { search: value, first: totalRows, field, direction }
-      }).then(
-        (res) =>
-          res?.data &&
-          supportDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      )
-    }
-  }
+  const handleSearch = useCallback(
+    async (event) => {
+      const { value } = event.target
+      if (event.key === 'Enter' && filterText !== '') {
+        refetch({
+          variables: { search: value, first: totalRows, field, direction }
+        }).then(
+          (res) =>
+            res?.data &&
+            supportDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        )
+      }
+    },
+    [direction, field, filterText, refetch, supportDispatch, totalRows]
+  )
 
   const handleSort = async (column, sortDirection) => {
     await refetch({
@@ -249,10 +264,24 @@ const SupportTable = ({ data, refetch }) => {
     onSearchInputChange,
     handleClear,
     handleSearch,
-    handleRefresh
+    sbomId,
+    handleRefresh,
+    onOpen
   ])
 
-  // onChangeStatus(e, row)
+  const getColor = (eolDate) => {
+    const currentDate = new Date()
+    const sixMonthsFromToday = new Date()
+    sixMonthsFromToday.setMonth(sixMonthsFromToday.getMonth() + 6)
+
+    if (new Date(eolDate) <= currentDate) {
+      return 'red'
+    } else if (new Date(eolDate) <= sixMonthsFromToday) {
+      return 'orange'
+    } else {
+      return 'green'
+    }
+  }
 
   // COLUMNS
   const columns = [
@@ -328,7 +357,7 @@ const SupportTable = ({ data, refetch }) => {
       selector: (row) => {
         const { eol } = row
         return (
-          <Tag variant='solid' colorScheme='blue' hidden={!eol}>
+          <Tag variant='solid' colorScheme={getColor(eol)} hidden={!eol}>
             {eol}
           </Tag>
         )
@@ -342,7 +371,7 @@ const SupportTable = ({ data, refetch }) => {
       selector: (row) => {
         const { eos } = row
         return (
-          <Tag variant='solid' colorScheme='blue' hidden={!eos}>
+          <Tag variant='solid' colorScheme={getColor(eos)} hidden={!eos}>
             {eos}
           </Tag>
         )
