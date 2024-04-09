@@ -49,7 +49,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
   const maxRef = useRef()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const { vulnCompNames, vulnStatuses, vulnSeverities } = filters
+  const { vulnCompNames, vulnStatuses } = filters
 
   const onMinKeyDown = (e) => {
     if (e.key === 'ArrowRight') {

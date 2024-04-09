@@ -142,12 +142,12 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   }
 
   const onFilterVuln = (value) => {
-    const { field, direction } = prodVulnState
+    const { field, direction, source } = prodVulnState
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     getVulnData({
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
-      source: undefined,
+      source: source === true ? undefined : 'COMPONENT',
       severity: value || undefined,
       first: totalRows,
       last: undefined,
@@ -162,7 +162,6 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
         } else {
           setActiveSbomTab(3)
         }
-        prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
       }
     })

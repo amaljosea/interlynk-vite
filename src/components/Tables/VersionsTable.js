@@ -88,7 +88,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     dispatch
   } = useGlobalState()
   const { searchInput } = versionState
-  const { field, direction } = prodVulnState
+  const { field, direction, source } = prodVulnState
   const { prodVulnDispatch, prodCompDispatch, versionDispatch } = dispatch
 
   const paginationSizes = [25, 50, 100]
@@ -254,7 +254,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       projectId: signedUrlParams ? undefined : activeProd,
       sbomId: id,
       severity: value,
-      source: undefined,
+      source: source === true ? undefined : 'COMPONENT',
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -273,7 +273,6 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
           localStorage.setItem('activeSbomTab', 3)
         }
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-        prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
       }
     })
   }

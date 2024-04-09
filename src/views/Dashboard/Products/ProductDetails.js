@@ -96,7 +96,6 @@ const ProductDetails = () => {
     searchInput: compVulnSearch,
     envs,
     statuses,
-    source,
     versions: sbomVersions,
     vexComplete: isCompleted
   } = compVulnState
@@ -105,6 +104,7 @@ const ProductDetails = () => {
     severities,
     components,
     statues,
+    source,
     kev,
     epss,
     direct,

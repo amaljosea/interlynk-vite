@@ -463,7 +463,7 @@ const SBOMTable = ({
                 />
               ) : (
                 <Text mt={4} textAlign={'center'}>
-                  You don't have permission to access this data
+                  You do not have permission to access this data
                 </Text>
               )}
             </TabPanel>
