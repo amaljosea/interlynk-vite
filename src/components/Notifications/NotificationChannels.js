@@ -12,7 +12,9 @@ import CardHeader from '../Card/CardHeader'
 const NotificationChannels = () => {
   const [updateChannel] = useMutation(UpdateNotificationChannel)
   const [notificationChannels, setNotificationChannels] = useState({})
-  const { data } = useQuery(GetUserNotificationChannels)
+  const { data } = useQuery(GetUserNotificationChannels, {
+    fetchPolicy: 'network-only'
+  })
 
   useEffect(() => {
     if (data) {

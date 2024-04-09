@@ -27,9 +27,12 @@ const NotificationMenuBell = () => {
   const { data } = useQuery(GetUserNotificationPreferences, {
     variables: {
       envId: localStorage['activeEnv']
-    }
+    },
+    fetchPolicy: 'network-only'
   })
-  const [getChannelsInfo] = useLazyQuery(GetUserNotificationChannels)
+  const [getChannelsInfo] = useLazyQuery(GetUserNotificationChannels, {
+    fetchPolicy: 'network-only'
+  })
 
   const toast = useToast()
 
@@ -85,9 +88,7 @@ const NotificationMenuBell = () => {
         key={key}
         value={value}
         fontSize={'sm'}
-        isDisabled={['Vulnerabilities', 'Policies', 'All Activities'].includes(
-          key
-        )}
+        isDisabled={key === 'Policies'}
       >
         {key}
       </MenuItemOption>
