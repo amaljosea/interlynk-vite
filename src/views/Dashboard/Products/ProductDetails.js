@@ -158,8 +158,9 @@ const ProductDetails = () => {
     max: parseFloat(epssRange[1]) / 100
   }
   // GET VULN DATA
-  const [getVulns, { data: globalVulnData, refetch: refetchVulnsVulns }] =
-    useLazyQuery(GetGlobalVulns, { fetchPolicy: 'network-only' })
+  const [getVulns, { data: globalVulnData }] = useLazyQuery(GetGlobalVulns, {
+    fetchPolicy: 'network-only'
+  })
   // GET POLICY DATA
   const [getPolicyData, { data: policyData }] = useLazyQuery(
     GetProjectPolicies,
@@ -588,7 +589,7 @@ const ProductDetails = () => {
                 <TabPanel px={0}>
                   <GlobalVulnTable
                     data={globalVulnData?.organization?.vulns}
-                    refetch={refetchVulnsVulns}
+                    refetch={getVulns}
                     activeEnv={activeEnv}
                     productId={productId}
                   />
