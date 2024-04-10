@@ -321,8 +321,8 @@ const SupportTable = ({ data, refetch }) => {
       sortable: true
     },
     {
-      id: 'IDURI',
-      name: 'URI',
+      id: 'IDS',
+      name: 'IDS',
       selector: (row) => <Text my={4}>{row?.idUri}</Text>,
       wrap: true,
       width: '320px'
