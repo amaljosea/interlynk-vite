@@ -34,6 +34,7 @@ import {
   GetRoles,
   MyOrganizations
 } from 'graphQL/Queries'
+import { GetOrgManufacturers } from 'graphQL/Queries'
 
 import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 
@@ -92,6 +93,10 @@ function Profile() {
   })
   const { data: roles, refetch: roleRefetch } = useQuery(GetRoles, {
     skip: tabIndex === 2 ? false : true
+  })
+  const { data: mfc, refetch: mfcRefetch } = useQuery(GetOrgManufacturers, {
+    skip: tabIndex === 6 ? false : true,
+    fetchPolicy: 'network-only'
   })
   const { data: settingsData, refetch: settingsRefetch } =
     useQuery(GetOrgSettings)
@@ -263,7 +268,10 @@ function Profile() {
                   </TabPanel>
                   {/* LEGAL */}
                   <TabPanel>
-                    <LegalTable />
+                    <LegalTable
+                      data={mfc?.organizationManufacturers}
+                      refetch={mfcRefetch}
+                    />
                   </TabPanel>
                 </TabPanels>
               </Tabs>

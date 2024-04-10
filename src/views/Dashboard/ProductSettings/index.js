@@ -29,13 +29,14 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
 
-const Settings = ({ enabled, data, refetch, activeEnv }) => {
+const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
   const toast = useToast()
   const { userPermissions } = useGlobalState()
   const [dataRetentionDays, setDataRetentionDays] = useState(0)
   const [projectSettingId, setProjectSettingId] = useState(null)
   const [checks, setChecks] = useState(false)
   const [internalComp, setInternalComp] = useState(false)
+  const [orgMfc, setOrgMfc] = useState('')
 
   const product = userPermissions?.find((item) => item.key === 'view_product')
   const editControls = product?.supersededBy?.some(
@@ -65,14 +66,15 @@ const Settings = ({ enabled, data, refetch, activeEnv }) => {
         intcomp: id === 'internalComp' ? value : undefined,
         autofix: id === 'automation' ? value : undefined,
         vulnscan: id === 'vulnScan' ? value : undefined,
-        days: id === 'dataRetention' ? value : undefined
+        days: id === 'dataRetention' ? value : undefined,
+        mfcId: orgMfc !== '' ? orgMfc : undefined
       }
     })
       .then((res) => res.data && refetch({ variables: { id: activeEnv } }))
       .finally(() => {
         if (id === 'dataRetention') {
           toast({
-            description: `Retention updated successfully`,
+            description: `Settings updated successfully`,
             position: 'top',
             status: 'success',
             duration: 3000
@@ -178,11 +180,15 @@ const Settings = ({ enabled, data, refetch, activeEnv }) => {
             </FormControl>
             <FormControl mt={4}>
               <FormLabel>Manufacturer</FormLabel>
-              <Select width={'400px'}>
+              <Select
+                width={'400px'}
+                value={orgMfc}
+                onChange={(e) => setOrgMfc(e.target.value)}
+              >
                 <option value={''}>-- Select --</option>
-                {['Interlynk Inc', 'IronSource Inc'].map((item, index) => (
-                  <option key={index} value={item}>
-                    {item}
+                {mfc?.nodes?.map((item, index) => (
+                  <option key={index} value={item?.id}>
+                    {item?.organizationName}
                   </option>
                 ))}
               </Select>

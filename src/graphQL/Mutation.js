@@ -329,6 +329,7 @@ export const ProjectSettingUpdate = gql`
     $days: Float
     $autofix: Boolean
     $vulnscan: Boolean
+    $mfcId: Uuid
   ) {
     projectSettingUpdate(
       input: {
@@ -338,6 +339,7 @@ export const ProjectSettingUpdate = gql`
         dataRetentionDays: $days
         automatedFixesEnabled: $autofix
         vulnScanningEnabled: $vulnscan
+        organizationManufacturerId: $mfcId
       }
     ) {
       projectSetting {
@@ -2322,6 +2324,58 @@ export const UpdateNotificationChannel = gql`
       input: { notificationChannels: $notificationChannels }
     ) {
       success
+    }
+  }
+`
+
+export const OrganizationManufacturerCreate = gql`
+  mutation OrganizationManufacturerCreate(
+    $orgName: String!
+    $url: String
+    $contacts: [OrganizationContactInput!]
+  ) {
+    organizationManufacturerCreate(
+      input: {
+        organizationName: $orgName
+        url: $url
+        organizationContactsAttributes: $contacts
+      }
+    ) {
+      errors
+      organizationManufacturer {
+        id
+      }
+    }
+  }
+`
+
+export const OrganizationManufacturerUpdate = gql`
+  mutation OrganizationManufacturerUpdate(
+    $id: Uuid!
+    $orgName: String!
+    $url: String
+    $contacts: [OrganizationContactInput!]
+  ) {
+    organizationManufacturerUpdate(
+      input: {
+        id: $id
+        organizationName: $orgName
+        url: $url
+        organizationContactsAttributes: $contacts
+      }
+    ) {
+      errors
+      organizationManufacturer {
+        id
+      }
+    }
+  }
+`
+
+export const OrganizationManufacturerDelete = gql`
+  mutation OrganizationManufacturerDelete($id: Uuid!) {
+    organizationManufacturerDelete(input: { id: $id }) {
+      errors
     }
   }
 `

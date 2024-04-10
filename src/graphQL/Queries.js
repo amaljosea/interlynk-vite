@@ -3664,3 +3664,56 @@ export const ComponentVulnLogs = gql`
     }
   }
 `
+
+export const GetOrgMfc = gql`
+  query GetOrgMfc($after: String, $before: String, $first: Int, $last: Int) {
+    organizationManufacturers(
+      after: $after
+      before: $before
+      first: $first
+      last: $last
+    ) {
+      nodes {
+        id
+        organizationName
+      }
+    }
+  }
+`
+
+export const GetOrgManufacturers = gql`
+  query GetOrgManufacturers(
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+  ) {
+    organizationManufacturers(
+      after: $after
+      before: $before
+      first: $first
+      last: $last
+    ) {
+      totalCount
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+      nodes {
+        id
+        url
+        organizationName
+        updatedAt
+        createdAt
+        organizationContacts {
+          id
+          name
+          phone
+          email
+        }
+      }
+    }
+  }
+`

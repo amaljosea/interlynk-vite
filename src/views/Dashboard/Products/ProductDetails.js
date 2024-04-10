@@ -51,6 +51,7 @@ import {
   GetProjectSettings,
   GetVulnData
 } from 'graphQL/Queries'
+import { GetOrgMfc } from 'graphQL/Queries'
 
 import {
   FaBoxArchive,
@@ -179,6 +180,10 @@ const ProductDetails = () => {
   })
 
   const [getSettings, { data: settings }] = useLazyQuery(GetProjectSettings, {
+    skip: activeProdTab === 3 ? false : true,
+    fetchPolicy: 'network-only'
+  })
+  const { data: mfc } = useQuery(GetOrgMfc, {
     skip: activeProdTab === 3 ? false : true,
     fetchPolicy: 'network-only'
   })
@@ -606,6 +611,7 @@ const ProductDetails = () => {
                   <Settings
                     data={settings?.project?.projectSetting}
                     enabled={data?.projectGroup?.enabled}
+                    mfc={mfc?.organizationManufacturers}
                     activeEnv={activeEnv}
                     refetch={getSettings}
                   />

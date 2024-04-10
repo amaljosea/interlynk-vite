@@ -1,58 +1,64 @@
+import { useMutation } from '@apollo/client'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils'
+import { getFullDateAndTime } from 'utils'
+import { timeSince } from 'utils'
 import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 
 import {
   Flex,
   IconButton,
-  Stack,
-  Tag,
-  TagLabel,
+  List,
+  ListIcon,
+  ListItem,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
   Text,
   Tooltip,
-  useDisclosure
+  useDisclosure,
+  useToast
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
-import { FaPlus } from 'react-icons/fa6'
+import { useGlobalState } from 'hooks/useGlobalState'
 
-const LegalTable = () => {
+import { OrganizationManufacturerDelete } from 'graphQL/Mutation'
+
+import { FaEllipsisVertical, FaPlus } from 'react-icons/fa6'
+import { MdCheckCircle } from 'react-icons/md'
+
+const LegalTable = ({ data, refetch }) => {
+  const toast = useToast()
+  const { totalRows } = useGlobalState()
   const [activeRow, setActiveRow] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const data = [
-    {
-      id: 1,
-      orgName: 'Interlynk Inc',
-      url: 'https://interlynk.io',
-      contacts: [
-        {
-          name: 'Surendra Pathak',
-          email: 'sp@interlynk.io',
-          phone: '+1 345 756 1234'
-        },
-        {
-          name: 'Ritesh Carl Noronha',
-          email: 'rcn@interlynk.io',
-          phone: '+1 235 124 5432'
-        }
-      ]
-    },
-    {
-      id: 2,
-      orgName: 'IronSource Inc',
-      url: 'https://unity.co',
-      contacts: [
-        {
-          name: 'Jeff.Drobick',
-          email: 'jeff@ironsource.io',
-          phone: '+1 643 234 2345'
-        }
-      ]
-    }
-  ]
+  const [deleteMfc] = useMutation(OrganizationManufacturerDelete)
+
+  const handleDelete = async (id) => {
+    await deleteMfc({
+      variables: {
+        id
+      }
+    }).then((res) => {
+      const errors = res?.data?.organizationManufacturerDelete?.errors
+      if (errors?.length > 0) {
+        toast({
+          description: errors[0],
+          status: 'error',
+          duration: 2000,
+          position: 'top'
+        })
+      } else {
+        refetch({ first: totalRows })
+      }
+    })
+  }
 
   // SUB HEADER
   const subHeader = useMemo(() => {
@@ -62,13 +68,16 @@ const LegalTable = () => {
           <IconButton
             size='sm'
             colorScheme='blue'
-            onClick={onOpen}
+            onClick={() => {
+              setActiveRow(null)
+              onOpen()
+            }}
             icon={<FaPlus size={20} />}
           />
         </Tooltip>
       </Flex>
     )
-  }, [])
+  }, [onOpen])
 
   // COLUMNS
   const columns = [
@@ -77,7 +86,7 @@ const LegalTable = () => {
       id: 'ORG_NAME',
       name: 'ORGANIZATION NAME',
       selector: (row) => (
-        <Text textTransform={'capitalize'}>{row?.orgName}</Text>
+        <Text textTransform={'capitalize'}>{row?.organizationName}</Text>
       ),
       width: '400px',
       wrap: true
@@ -95,32 +104,103 @@ const LegalTable = () => {
       id: 'CONTACTS',
       name: 'CONTACTS',
       selector: (row) => {
-        const { contacts } = row
-        const totalContacts = contacts?.length > 1 && contacts.slice(1)
+        const { organizationContacts } = row
+        const totalContacts =
+          organizationContacts?.length > 1 && organizationContacts.slice(1)
         return (
-          <Stack direction={'row'} spacing={4} alignItems={'center'}>
-            {contacts.length > 0 && (
-              <Text>{`${contacts[0]?.name} [${contacts[0]?.email}] [${contacts[0]?.phone}]`}</Text>
-            )}
-            {totalContacts.length > 0 && (
+          <List my={4}>
+            {organizationContacts?.map((item) => (
               <Tooltip
-                label={JSON.stringify(totalContacts).slice(1, -1)}
-                placement={'top'}
+                key={item?.id}
+                placement='top'
+                label={`[${item?.email}]-[${item?.phone}]`}
               >
-                <Tag
-                  size={'md'}
-                  variant='subtle'
-                  colorScheme='green'
-                  width={'fit-content'}
-                >
-                  <TagLabel width={6}>{`+${totalContacts.length}`}</TagLabel>
-                </Tag>
+                <ListItem py={1} as={Flex} alignItems='center' cursor='pointer'>
+                  <ListIcon as={MdCheckCircle} color='blue.500' />
+                  <Text>{item?.name}</Text>
+                </ListItem>
               </Tooltip>
-            )}
-          </Stack>
+            ))}
+          </List>
         )
       },
       wrap: true
+    },
+    // CREATED AT
+    {
+      id: 'CREATED_AT',
+      name: 'CREATED',
+      selector: (row) => {
+        const { createdAt } = row
+        return (
+          <Tooltip label={getFullDateAndTime(createdAt)} placement='top'>
+            <Text>{timeSince(createdAt)}</Text>
+          </Tooltip>
+        )
+      },
+      right: 'false',
+      sortable: false,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.createdAt)
+        const dateB = new Date(b.createdAt)
+        return dateA - dateB
+      }
+    },
+    // UPDATED AT
+    {
+      id: 'UPDATED_AT',
+      name: 'UPDATED',
+      selector: (row) => {
+        const { updatedAt } = row
+        return (
+          <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
+            <Text>{timeSince(updatedAt)}</Text>
+          </Tooltip>
+        )
+      },
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB
+      },
+      right: 'true'
+    },
+    // ACTIONS
+    {
+      id: 'ACTION',
+      name: 'ACTION',
+      selector: (row) => {
+        return (
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              icon={<FaEllipsisVertical />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              <MenuList fontSize={'sm'}>
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onOpen()
+                  }}
+                >
+                  Update Manufacturer
+                </MenuItem>
+                <MenuItem
+                  color={'red.500'}
+                  onClick={() => handleDelete(row?.id)}
+                >
+                  Archive Manufacturer
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        )
+      },
+      right: 'true'
     }
   ]
 
@@ -129,7 +209,7 @@ const LegalTable = () => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data || []}
+          data={data?.nodes || []}
           customStyles={customStyles}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
@@ -140,7 +220,14 @@ const LegalTable = () => {
         />
       </Flex>
 
-      {isOpen && <LegalModal isOpen={isOpen} onClose={onClose} />}
+      {isOpen && (
+        <LegalModal
+          data={activeRow}
+          isOpen={isOpen}
+          onClose={onClose}
+          refetch={refetch}
+        />
+      )}
     </>
   )
 }
