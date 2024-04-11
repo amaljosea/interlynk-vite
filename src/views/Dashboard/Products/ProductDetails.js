@@ -159,9 +159,42 @@ const ProductDetails = () => {
     max: parseFloat(epssRange[1]) / 100
   }
   // GET VULN DATA
-  const [getVulns, { data: globalVulnData }] = useLazyQuery(GetGlobalVulns, {
-    fetchPolicy: 'network-only'
-  })
+  const { data: globalVulnData, refetch: globalVulnRefetch } = useQuery(
+    GetGlobalVulns,
+    {
+      fetchPolicy: 'network-only',
+      skip: activeProdTab === 1 ? false : true,
+      variables: {
+        first: totalRows,
+        projectIds: [activeEnv],
+        projectGroupIds: [productId],
+        field: globalVulnState.field,
+        direction: globalVulnState.direction,
+        search:
+          globalVulnState.searchInput !== ''
+            ? globalVulnState.searchInput
+            : undefined,
+        severity:
+          globalVulnState.severities?.length === 0
+            ? undefined
+            : globalVulnState.severities,
+        status:
+          globalVulnState.statues?.length === 0
+            ? undefined
+            : globalVulnState.statues,
+        kev:
+          globalVulnState.kev === 'yes'
+            ? true
+            : globalVulnState.kev === 'false'
+              ? false
+              : undefined,
+        epss:
+          globalVulnState.epss === 'all' || globalVulnState.epss === ''
+            ? undefined
+            : vulnRange
+      }
+    }
+  )
   // GET POLICY DATA
   const [getPolicyData, { data: policyData }] = useLazyQuery(
     GetProjectPolicies,
@@ -312,37 +345,6 @@ const ProductDetails = () => {
       setActiveProdTab(0)
     } else if (activeTab === 1) {
       setActiveProdTab(1)
-      getVulns({
-        variables: {
-          first: totalRows,
-          projectIds: [activeEnv],
-          projectGroupIds: [productId],
-          field: globalVulnState.field,
-          direction: globalVulnState.direction,
-          search:
-            globalVulnState.searchInput !== ''
-              ? globalVulnState.searchInput
-              : undefined,
-          severity:
-            globalVulnState.severities?.length === 0
-              ? undefined
-              : globalVulnState.severities,
-          status:
-            globalVulnState.statues?.length === 0
-              ? undefined
-              : globalVulnState.statues,
-          kev:
-            globalVulnState.kev === 'yes'
-              ? true
-              : globalVulnState.kev === 'false'
-                ? false
-                : undefined,
-          epss:
-            globalVulnState.epss === 'all' || globalVulnState.epss === ''
-              ? undefined
-              : vulnRange
-        }
-      })
     } else if (activeTab === 2) {
       setActiveProdTab(2)
     } else if (activeTab === 3) {
@@ -594,7 +596,7 @@ const ProductDetails = () => {
                 <TabPanel px={0}>
                   <GlobalVulnTable
                     data={globalVulnData?.organization?.vulns}
-                    refetch={getVulns}
+                    refetch={globalVulnRefetch}
                     activeEnv={activeEnv}
                     productId={productId}
                   />

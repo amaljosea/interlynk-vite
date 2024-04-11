@@ -90,25 +90,26 @@ const VulnsFilters = ({ refetch }) => {
       max: parseFloat(epssRange[1]) / 100
     }
     await refetch({
-      variables: {
-        first: totalRows,
-        projectGroupIds:
-          groupIds?.includes('all') || groupIds?.length === 0
-            ? undefined
-            : groupIds,
-        severity:
-          severities?.includes('all') || severities?.length === 0
-            ? undefined
-            : severities,
-        status:
-          statuses.includes('all') || statuses?.length === 0
-            ? undefined
-            : statuses,
-        kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
-        epss: epss === 'all' || epss === '' ? undefined : range,
-        field,
-        direction
-      }
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      projectGroupIds:
+        groupIds?.includes('all') || groupIds?.length === 0
+          ? undefined
+          : groupIds,
+      severity:
+        severities?.includes('all') || severities?.length === 0
+          ? undefined
+          : severities,
+      status:
+        statuses.includes('all') || statuses?.length === 0
+          ? undefined
+          : statuses,
+      kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
+      epss: epss === 'all' || epss === '' ? undefined : range,
+      field,
+      direction
     })
   }
 

@@ -369,13 +369,11 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
     const { value } = event.target
     if (event.key === 'Enter' && filterText !== '') {
       refetch({
-        variables: {
-          field,
-          direction,
-          search: value,
-          first: totalRows,
-          ...vulnData
-        }
+        field,
+        direction,
+        search: value,
+        first: totalRows,
+        ...vulnData
       }).then(
         (res) =>
           res?.data &&
@@ -388,13 +386,11 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   const handleClear = async () => {
     setFilterText('')
     await refetch({
-      variables: {
-        field,
-        direction,
-        search: undefined,
-        first: totalRows,
-        ...vulnData
-      }
+      field,
+      direction,
+      search: undefined,
+      first: totalRows,
+      ...vulnData
     }).then(
       (res) => res?.data && globalVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
@@ -403,13 +399,11 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   // CLEAR SERACH
   const handleRefresh = async () => {
     await refetch({
-      variables: {
-        field,
-        direction,
-        first: totalRows,
-        projectIds: activeEnv ? [activeEnv] : undefined,
-        projectGroupIds: productId ? [productId] : undefined
-      }
+      field,
+      direction,
+      first: totalRows,
+      projectIds: activeEnv ? [activeEnv] : undefined,
+      projectGroupIds: productId ? [productId] : undefined
     }).then(
       (res) => res?.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
     )
@@ -472,15 +466,14 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   const handlePreviousPage = async () => {
     setIsPrevActive(false)
     await refetch({
-      variables: {
-        field,
-        direction,
-        last: totalRows,
-        after: undefined,
-        before: data?.pageInfo?.startCursor,
-        search: searchInput !== '' ? searchInput : undefined,
-        ...vulnData
-      }
+      field,
+      direction,
+      first: undefined,
+      last: totalRows,
+      after: undefined,
+      before: data?.pageInfo?.startCursor,
+      search: searchInput !== '' ? searchInput : undefined,
+      ...vulnData
     }).then((res) => {
       if (res.data) {
         const project = res?.data?.organization?.vulns
@@ -497,15 +490,14 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   const handleNextPage = async () => {
     setIsNextActive(false)
     await refetch({
-      variables: {
-        field,
-        direction,
-        first: totalRows,
-        after: data?.pageInfo?.endCursor,
-        before: undefined,
-        search: searchInput !== '' ? searchInput : undefined,
-        ...vulnData
-      }
+      field,
+      direction,
+      first: totalRows,
+      last: undefined,
+      after: data?.pageInfo?.endCursor,
+      before: undefined,
+      search: searchInput !== '' ? searchInput : undefined,
+      ...vulnData
     }).then((res) => {
       if (res.data) {
         const project = res?.data?.organization?.vulns
@@ -526,13 +518,11 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
     const { value } = e.target
     setTotalRows(Number(value))
     await refetch({
-      variables: {
-        field,
-        direction,
-        first: Number(value),
-        search: searchInput !== '' ? searchInput : undefined,
-        ...vulnData
-      }
+      field,
+      direction,
+      first: Number(value),
+      search: searchInput !== '' ? searchInput : undefined,
+      ...vulnData
     }).then(
       (res) => res.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
     )
@@ -541,13 +531,11 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   // SORTING
   const handleSort = async (column, sortDirection) => {
     await refetch({
-      variables: {
-        first: totalRows,
-        field: column.id,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC',
-        search: searchInput !== '' ? searchInput : undefined,
-        ...vulnData
-      }
+      first: totalRows,
+      field: column.id,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC',
+      search: searchInput !== '' ? searchInput : undefined,
+      ...vulnData
     }).then((res) => {
       if (res.data) {
         globalVulnDispatch({
