@@ -96,9 +96,9 @@ const Connections = () => {
                   <InputGroup>
                     <Input placeholder='GITHUB_TOKEN' width='auto' size='sm' />
                     {isLoading ? (
-                      <InputRightElement
-                        children={<CheckIcon color='green.500' />}
-                      />
+                      <InputRightElement>
+                        <CheckIcon color='green.500' />
+                      </InputRightElement>
                     ) : (
                       <></>
                     )}

@@ -3,7 +3,7 @@ name: Frontend Tests
 on:
   push:
     branches:
-      - '*' # Trigger on all branches
+      - '**' # Trigger on all branches
 
 jobs:
   tests:

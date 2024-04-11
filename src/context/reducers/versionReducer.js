@@ -33,11 +33,11 @@ const versionReducer = (state, action) => {
         before: payload
       }
     case 'INCREMENT_PAGE':
-      const { total, after } = payload
       return {
         ...state,
-        pageIndex: state.pageIndex < Math.ceil(total) && state.pageIndex + 1,
-        after: after
+        pageIndex:
+          state.pageIndex < Math.ceil(payload?.total) && state.pageIndex + 1,
+        after: payload?.after
       }
     case 'SET_SORT_ORDER':
       return {

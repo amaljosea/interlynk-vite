@@ -137,7 +137,7 @@ export const DashboardLogo = createIcon({
   displayName: 'DashboardLogo',
   viewBox: '0 0 1000 257',
   path: (
-    <g width='998' height='257' viewBox='0 0 998 257' fill='none'>
+    <svg width='998' height='257' viewBox='0 0 998 257' fill='none'>
       <g clipPath='url(#clip0)'>
         <path
           d='M388.5 115.302C406.112 115.302 413.966 126.726 416.584 136.96L441.336 127.916C436.576 109.352 419.44 89.836 388.262 89.836C354.942 89.836 329 115.54 329 151.24C329 186.464 354.942 212.882 388.976 212.882C419.44 212.882 436.814 193.128 442.288 175.04L418.012 166.234C415.394 175.04 407.064 187.654 388.976 187.654C371.602 187.654 356.608 174.564 356.608 151.24C356.608 127.916 371.602 115.302 388.5 115.302Z'
@@ -185,7 +185,7 @@ export const DashboardLogo = createIcon({
           <rect width='997.832' height='257' fill='white' />
         </clipPath>
       </defs>
-    </g>
+    </svg>
   )
 })
 

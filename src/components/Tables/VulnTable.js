@@ -290,21 +290,24 @@ const VulnTable = ({
   const { prodVulnDispatch } = dispatch
 
   // GET VULN FILTER HEADS
-  const {} = useQuery(signedUrlParams ? ShareVulnFilters : GetVulnFilterData, {
-    fetchPolicy: 'cache-first',
-    variables: {
-      projectId: signedUrlParams ? undefined : productId,
-      sbomId: sbomId
-    },
-    onCompleted: (data) => {
-      prodVulnDispatch({
-        type: 'ADD_FILTER_HEADS',
-        payload: signedUrlParams
-          ? data?.shareLynkQuery?.sbom?.filters
-          : data?.sbom?.filters
-      })
+  const { data: vFilters } = useQuery(
+    signedUrlParams ? ShareVulnFilters : GetVulnFilterData,
+    {
+      fetchPolicy: 'cache-first',
+      variables: {
+        projectId: signedUrlParams ? undefined : productId,
+        sbomId: sbomId
+      },
+      onCompleted: (data) => {
+        prodVulnDispatch({
+          type: 'ADD_FILTER_HEADS',
+          payload: signedUrlParams
+            ? data?.shareLynkQuery?.sbom?.filters
+            : data?.sbom?.filters
+        })
+      }
     }
-  })
+  )
 
   const [onVulnScan] = useMutation(ManualVulnScan, {
     fetchPolicy: 'network-only'

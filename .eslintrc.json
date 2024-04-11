@@ -5,6 +5,11 @@
     "node": true,
     "jest": true
   },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -25,18 +30,7 @@
     "react/no-unescaped-entities": "warn",
     "no-useless-escape": "warn",
     "react/display-name": "warn",
-    // todo: move the below to "error" one by one
-    "no-undef": "error",
     "react-hooks/rules-of-hooks": "warn",
-    "react/jsx-no-undef": "error",
-    "no-dupe-keys": "error",
-    "no-empty-pattern": "warn",
-    "react/jsx-key": "error",
-    "no-case-declarations": "warn",
-    "react/no-unknown-property": "warn",
-    "react/no-children-prop": "warn",
-    "no-unsafe-optional-chaining": "warn",
-    "no-fallthrough": "warn",
     "react/no-deprecated": "warn"
   }
 }

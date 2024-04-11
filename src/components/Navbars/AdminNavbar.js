@@ -6,7 +6,6 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { parseJSONSafely, permissionList, truncatedValue } from 'utils'
 
 import {
-  Box,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
@@ -28,7 +27,7 @@ export default function AdminNavbar(props) {
     useGlobalState()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const {} = useQuery(GetUserPermissions, {
+  const { data } = useQuery(GetUserPermissions, {
     skip: signedUrlParams ? true : false,
     onCompleted: (data) => {
       const permissions = permissionList(

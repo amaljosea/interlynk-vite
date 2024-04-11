@@ -46,7 +46,7 @@ const SbomList = ({ isOpen, onClose, data }) => {
             </Thead>
             <Tbody>
               {data?.alternatives?.length > 0 &&
-                [...data?.alternatives]
+                [...data.alternatives]
                   .sort((a, b) => {
                     const dateA = new Date(a.updatedAt)
                     const dateB = new Date(b.updatedAt)

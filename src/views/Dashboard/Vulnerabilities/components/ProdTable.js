@@ -389,7 +389,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     if (data) {
       const sortedData =
         data &&
-        [...data?.nodes].sort((a, b) => {
+        [...data.nodes].sort((a, b) => {
           const dateA = new Date(a.updatedAt)
           const dateB = new Date(b.updatedAt)
           return dateB - dateA

@@ -52,7 +52,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   })
 
   // GET SBOM PARTS
-  const {} = useQuery(GetSbomParts, {
+  const { data: bomParts } = useQuery(GetSbomParts, {
     skip: sbomId ? false : true,
     fetchPolicy: 'network-only',
     variables: { projectId: productId, sbomId: sbomId, first: totalRows },

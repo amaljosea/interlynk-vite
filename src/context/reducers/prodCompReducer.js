@@ -45,11 +45,11 @@ const prodCompReducer = (state, action) => {
         before: payload
       }
     case 'INCREMENT_PAGE':
-      const { total, after } = payload
       return {
         ...state,
-        pageIndex: state.pageIndex < Math.ceil(total) && state.pageIndex + 1,
-        after: after
+        pageIndex:
+          state.pageIndex < Math.ceil(payload?.total) && state.pageIndex + 1,
+        after: payload?.after
       }
     case 'SET_SORT_ORDER':
       return {
@@ -124,13 +124,10 @@ const prodCompReducer = (state, action) => {
         expLicense: ''
       }
     case 'SET_LICENSES':
-      if (payload) {
-        const { licensesExp } = payload
-        return {
-          ...state,
-          licenseType: 'license_exp',
-          expLicense: licensesExp
-        }
+      return {
+        ...state,
+        licenseType: 'license_exp',
+        expLicense: payload?.licensesExp
       }
     case 'SET_PURL_STRING':
       return {

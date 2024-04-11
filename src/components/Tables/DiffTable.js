@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils'
 import ToolsFilterMenu from 'views/Dashboard/Tools/Filters'
@@ -20,39 +20,45 @@ const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
   const filteredData = diffs?.sbomDrift?.filter(
     (item) =>
       (item?.subjectComponent?.name || item?.targetComponent?.name) &&
-      (item?.subjectComponent?.name || item?.targetComponent?.name)
+      (item?.subjectComponent?.name || item.targetComponent.name)
         .toLowerCase()
         .includes(searchInput.toLowerCase()) &&
       item?.diffType?.toLowerCase().includes(difference.toLowerCase()) &&
       (item?.subjectComponent?.name || item?.targetComponent?.name) &&
-      (item?.subjectComponent?.name || item?.targetComponent?.name)
+      (item?.subjectComponent?.name || item.targetComponent.name)
         .toLowerCase()
         .includes(component.toLowerCase())
   )
 
   // CLEAR SERACH
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     setFilterText('')
     toolsDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-  }
+  }, [toolsDispatch])
 
   // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    const { value } = e.target
-    if (value === '') {
-      handleClear()
-    } else {
-      setFilterText(value)
-    }
-  }
+  const onSearchInputChange = useCallback(
+    (e) => {
+      const { value } = e.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setFilterText(value)
+      }
+    },
+    [handleClear]
+  )
 
   // SEARCH COMPONENT
-  const handleSearch = (event) => {
-    const { value } = event.target
-    if (event.key === 'Enter' && filterText !== '') {
-      toolsDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-    }
-  }
+  const handleSearch = useCallback(
+    (event) => {
+      const { value } = event.target
+      if (event.key === 'Enter' && filterText !== '') {
+        toolsDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+      }
+    },
+    [filterText, toolsDispatch]
+  )
 
   // COLUMNS
   const columns = [
