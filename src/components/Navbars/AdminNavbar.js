@@ -27,7 +27,7 @@ export default function AdminNavbar(props) {
     useGlobalState()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const { data } = useQuery(GetUserPermissions, {
+  useQuery(GetUserPermissions, {
     skip: signedUrlParams ? true : false,
     onCompleted: (data) => {
       const permissions = permissionList(
@@ -37,8 +37,8 @@ export default function AdminNavbar(props) {
     }
   })
 
-  const [scrolled, setScrolled] = useState(false)
-  const { brandText, tabRes } = props
+  const [scrolled] = useState(false)
+  const { tabRes } = props
   const location = useLocation()
   const params = useParams()
   const queryParams = new URLSearchParams(location.search)
@@ -88,11 +88,11 @@ export default function AdminNavbar(props) {
   if (props.fixed === true)
     if (scrolled === true) {
       navbarPosition = 'fixed'
-      navbarBg = useColorModeValue(
-        'linear-gradient(112.83deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.8) 110.84%)',
-        'linear-gradient(112.83deg, rgba(255, 255, 255, 0.21) 0%, rgba(255, 255, 255, 0) 110.84%)'
-      )
-      navbarBorder = useColorModeValue('#FFFFFF', 'rgba(255, 255, 255, 0.31)')
+      // navbarBg = useColorModeValue(
+      //   'linear-gradient(112.83deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.8) 110.84%)',
+      //   'linear-gradient(112.83deg, rgba(255, 255, 255, 0.21) 0%, rgba(255, 255, 255, 0) 110.84%)'
+      // )
+      // navbarBorder = useColorModeValue('#FFFFFF', 'rgba(255, 255, 255, 0.31)')
       // navbarFilter = useColorModeValue(
       //   'none',
       //   'drop-shadow(0px 7px 23px rgba(0, 0, 0, 0.05))'

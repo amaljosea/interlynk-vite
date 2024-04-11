@@ -1,5 +1,5 @@
 // Chakra imports
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
@@ -91,18 +91,22 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   }
 
   const epssRange = epss !== 'all' && epss !== '' && epss?.split('-')
-  const range = {
-    min: parseFloat(epssRange[0]) / 100,
-    max: parseFloat(epssRange[1]) / 100
-  }
+  const range = useMemo(() => {
+    return {
+      min: parseFloat(epssRange[0]) / 100,
+      max: parseFloat(epssRange[1]) / 100
+    }
+  }, [epssRange])
 
-  const vulnData = {
-    projectGroupIds: products?.length === 0 ? undefined : products,
-    severity: severities?.length === 0 ? undefined : severities,
-    status: statues?.length === 0 ? undefined : statues,
-    kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
-    epss: epss === 'all' || epss === '' ? undefined : range
-  }
+  const vulnData = useMemo(() => {
+    return {
+      projectGroupIds: products?.length === 0 ? undefined : products,
+      severity: severities?.length === 0 ? undefined : severities,
+      status: statues?.length === 0 ? undefined : statues,
+      kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
+      epss: epss === 'all' || epss === '' ? undefined : range
+    }
+  }, [epss, kev, products, range, severities, statues])
 
   // COLUMNS
   const columns = [
@@ -365,25 +369,36 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   ]
 
   // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    const { value } = event.target
-    if (event.key === 'Enter' && filterText !== '') {
-      refetch({
-        field,
-        direction,
-        search: value,
-        first: totalRows,
-        ...vulnData
-      }).then(
-        (res) =>
-          res?.data &&
-          globalVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      )
-    }
-  }
+  const handleSearch = useCallback(
+    async (event) => {
+      const { value } = event.target
+      if (event.key === 'Enter' && filterText !== '') {
+        refetch({
+          field,
+          direction,
+          search: value,
+          first: totalRows,
+          ...vulnData
+        }).then(
+          (res) =>
+            res?.data &&
+            globalVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        )
+      }
+    },
+    [
+      direction,
+      field,
+      filterText,
+      globalVulnDispatch,
+      refetch,
+      totalRows,
+      vulnData
+    ]
+  )
 
   // CLEAR SERACH
-  const handleClear = async () => {
+  const handleClear = useCallback(async () => {
     setFilterText('')
     await refetch({
       field,
@@ -394,10 +409,10 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
     }).then(
       (res) => res?.data && globalVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
-  }
+  }, [direction, field, globalVulnDispatch, refetch, totalRows, vulnData])
 
   // CLEAR SERACH
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     await refetch({
       field,
       direction,
@@ -407,17 +422,28 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
     }).then(
       (res) => res?.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
     )
-  }
+  }, [
+    activeEnv,
+    direction,
+    field,
+    globalVulnDispatch,
+    productId,
+    refetch,
+    totalRows
+  ])
 
   // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    const { value } = e.target
-    if (value === '') {
-      handleClear()
-    } else {
-      setFilterText(value)
-    }
-  }
+  const onSearchInputChange = useCallback(
+    (e) => {
+      const { value } = e.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setFilterText(value)
+      }
+    },
+    [handleClear]
+  )
 
   // HEADER
   const subHeader = useMemo(() => {
@@ -456,9 +482,10 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
     )
   }, [
     filterText,
-    onSearchInputChange,
-    handleClear,
     handleSearch,
+    handleClear,
+    onSearchInputChange,
+    refetch,
     handleRefresh
   ])
 

@@ -9,7 +9,6 @@ import {
   InputLeftAddon,
   InputRightAddon,
   Menu,
-  MenuButton,
   MenuDivider,
   MenuItemOption,
   MenuList,
@@ -25,7 +24,7 @@ import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
+const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const { totalRows, prodVulnState, dispatch } = useGlobalState()
   const {
@@ -172,7 +171,6 @@ const VulnFilterMenu = ({ refetch, productId, sbomId, setCurrentRow }) => {
       direct,
       value
     )
-    setCurrentRow(null)
   }
 
   const onFilterKev = (value) => {

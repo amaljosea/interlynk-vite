@@ -52,12 +52,12 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
 
   const onVersionClick = (item) => {
     const { project, id, projectVersion } = item
-    const { projectGroup, name } = project
+    const { projectGroup } = project
     const product = {
       version: projectVersion,
       groupId: projectGroup?.id,
       id: projectGroup?.id,
-      name: name,
+      name: projectGroup?.name,
       sbomId: id
     }
     localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)

@@ -300,7 +300,7 @@ const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
         payload: { componentList, statusList }
       })
     }
-  }, [diffs])
+  }, [diffs, toolsDispatch])
 
   return (
     <DataTable

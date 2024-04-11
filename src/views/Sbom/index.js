@@ -19,8 +19,7 @@ const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
 function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
-  const { totalRows, setActiveSbomTab, prodState, prodCompState, dispatch } =
-    useGlobalState()
+  const { totalRows, prodState, prodCompState, dispatch } = useGlobalState()
   const { data: allProjectGroups } = prodState
   const { prodVulnDispatch } = dispatch
   const location = useLocation()
@@ -31,7 +30,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
-  const [status, setStatus] = useState('created')
+  const [status] = useState('created')
   const [totalComp, setTotalComp] = useState(0)
   const group = JSON.parse(localStorage.getItem('product'))
 
@@ -52,7 +51,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   })
 
   // GET SBOM PARTS
-  const { data: bomParts } = useQuery(GetSbomParts, {
+  useQuery(GetSbomParts, {
     skip: sbomId ? false : true,
     fetchPolicy: 'network-only',
     variables: { projectId: productId, sbomId: sbomId, first: totalRows },
@@ -86,10 +85,10 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
       uniqVersions.push({ label: project?.projectVersion })
     )
 
-  const handleTabChange = (value) => {
-    localStorage.setItem('activeSbomTab', value)
-    setActiveSbomTab(value)
-  }
+  // const handleTabChange = (value) => {
+  //   localStorage.setItem('activeSbomTab', value)
+  //   setActiveSbomTab(value)
+  // }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE DOWNLOAD MODAL
   const handleKeyDownload = (event) => {
@@ -122,7 +121,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
       })
       navigate('/vendor/products')
     }
-  }, [])
+  }, [error, navigate, toast])
 
   return (
     <>

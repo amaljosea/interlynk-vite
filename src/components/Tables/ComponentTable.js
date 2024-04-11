@@ -197,7 +197,12 @@ const ComponentTable = ({
         getCompFilters({
           projectId: signedUrlParams ? undefined : productId,
           sbomId: sbomId
-        })
+        }).then((res) =>
+          prodCompDispatch({
+            type: 'ADD_FILTER_HEADS',
+            payload: res?.data?.sbom?.filters
+          })
+        )
       })
       .finally(() => window.scrollTo({ top: 0, behavior: 'smooth' }))
   }

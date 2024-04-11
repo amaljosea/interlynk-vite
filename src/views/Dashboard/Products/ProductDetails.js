@@ -114,7 +114,7 @@ const ProductDetails = () => {
   const { prodVulnDispatch, globalVulnDispatch } = dispatch
 
   const activeProd = localStorage.getItem('activeEnv')
-  const group = JSON.stringify(localStorage.getItem('product'))
+  // const group = JSON.stringify(localStorage.getItem('product'))
   const environment = localStorage.getItem('environment')
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
 
@@ -301,11 +301,7 @@ const ProductDetails = () => {
     onOpen: onDeleteOpen,
     onClose: onDeleteClose
   } = useDisclosure()
-  const {
-    isOpen: isEnvOpen,
-    onOpen: onEnvOpen,
-    onClose: onEnvClose
-  } = useDisclosure()
+  const { isOpen: isEnvOpen, onClose: onEnvClose } = useDisclosure()
 
   const handleTabChange = (value) => {
     localStorage.setItem('activeProdTab', value)
@@ -313,11 +309,11 @@ const ProductDetails = () => {
   }
 
   // ON CHANGE ENV
-  const onChangeEnv = (value) => {
-    globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-    localStorage.setItem('activeEnv', value)
-    setActiveEnv(value)
-  }
+  // const onChangeEnv = (value) => {
+  //   globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+  //   localStorage.setItem('activeEnv', value)
+  //   setActiveEnv(value)
+  // }
 
   // DELETE PRODUCT
   const onProductDelete = async () => {
@@ -328,17 +324,17 @@ const ProductDetails = () => {
       .finally(() => navigate('/vendor/products'))
   }
 
-  const defaultEnv =
-    data && activeEnv
-      ? data?.projectGroup?.projects.find((item) => item.id === activeEnv)?.name
-      : ''
+  // const defaultEnv =
+  //   data && activeEnv
+  //     ? data?.projectGroup?.projects.find((item) => item.id === activeEnv)?.name
+  //     : ''
 
   useEffect(() => {
     if (sbomId === null) {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
       globalVulnDispatch({ type: 'CLEAR_GLOBAL_VULN' })
     }
-  }, [sbomId])
+  }, [globalVulnDispatch, prodVulnDispatch, sbomId])
 
   useEffect(() => {
     if (activeTab === 0) {
@@ -372,7 +368,21 @@ const ProductDetails = () => {
         }
       })
     }
-  }, [activeTab, activeEnv])
+  }, [
+    activeTab,
+    activeEnv,
+    setActiveProdTab,
+    getSettings,
+    getPolicyData,
+    totalRows,
+    getLogs,
+    searchInput,
+    type,
+    user,
+    object,
+    field,
+    direction
+  ])
 
   useEffect(() => {
     if (environment && data) {
@@ -384,7 +394,7 @@ const ProductDetails = () => {
       localStorage.setItem('activeEnv', env?.id)
       setActiveEnv(env?.id)
     }
-  }, [environment])
+  }, [data, environment, globalVulnDispatch])
 
   if (loading) {
     return (

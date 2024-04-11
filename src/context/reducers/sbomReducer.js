@@ -18,13 +18,13 @@ const sbomReducer = (state, action) => {
       return {
         ...state,
         licenseType: 'license_exp',
-        expLicense: payload?.licensesExp
+        expLicense: payload.licensesExp
       }
     case 'SET_LICENSE_FIELD':
       return {
         ...state,
         licenseString: payload,
-        expLicense: payload[0]?.value
+        expLicense: payload[0].value
       }
     default:
       return state

@@ -40,8 +40,8 @@ const prodReducer = (state, action) => {
     case 'INCREMENT_PAGE':
       return {
         ...state,
-        pageIndex: pageIndex < Math.ceil(payload?.total) && pageIndex + 1,
-        after: payload?.after
+        pageIndex: pageIndex < Math.ceil(payload.total) && pageIndex + 1,
+        after: payload.after
       }
     case 'SET_SORT_ORDER':
       return {

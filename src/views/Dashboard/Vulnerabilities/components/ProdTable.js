@@ -1,6 +1,6 @@
 // Chakra imports
 import { useLazyQuery } from '@apollo/client'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import {
@@ -207,27 +207,39 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
   ]
 
   // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    const { value } = event.target
-    if (event.key === 'Enter' && filterInput !== '') {
-      refetch({
-        id,
-        first: totalRows,
-        last: undefined,
-        search: value,
-        projectNames: envs?.length === 0 ? undefined : envs,
-        versions: versions?.length === 0 ? undefined : versions,
-        statuses: statuses?.length === 0 ? undefined : statuses
-      }).then(
-        (res) =>
-          res.data &&
-          compVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      )
-    }
-  }
+  const handleSearch = useCallback(
+    async (event) => {
+      const { value } = event.target
+      if (event.key === 'Enter' && filterInput !== '') {
+        refetch({
+          id,
+          first: totalRows,
+          last: undefined,
+          search: value,
+          projectNames: envs?.length === 0 ? undefined : envs,
+          versions: versions?.length === 0 ? undefined : versions,
+          statuses: statuses?.length === 0 ? undefined : statuses
+        }).then(
+          (res) =>
+            res.data &&
+            compVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        )
+      }
+    },
+    [
+      compVulnDispatch,
+      envs,
+      filterInput,
+      id,
+      refetch,
+      statuses,
+      totalRows,
+      versions
+    ]
+  )
 
   // CLEAR SERACH
-  const handleClear = async () => {
+  const handleClear = useCallback(async () => {
     setFilterInput('')
     await refetch({
       id,
@@ -240,17 +252,20 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     }).then(
       (res) => res.data && compVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
-  }
+  }, [compVulnDispatch, envs, id, refetch, statuses, totalRows, versions])
 
   // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    const { value } = e.target
-    if (value === '') {
-      handleClear()
-    } else {
-      setFilterInput(value)
-    }
-  }
+  const onSearchInputChange = useCallback(
+    (e) => {
+      const { value } = e.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setFilterInput(value)
+      }
+    },
+    [handleClear]
+  )
 
   const subHeaderComponent = useMemo(() => {
     return (
@@ -286,11 +301,15 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       </Flex>
     )
   }, [
-    selectedVulns,
     filterInput,
-    onSearchInputChange,
+    handleSearch,
     handleClear,
-    handleSearch
+    onSearchInputChange,
+    vuln,
+    refetch,
+    selectedVulns.length,
+    onOpen,
+    signedUrlParams
   ])
 
   const [checkEquals, setCheckEquals] = useState(false)

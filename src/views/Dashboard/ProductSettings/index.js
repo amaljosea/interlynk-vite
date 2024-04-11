@@ -46,17 +46,9 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
 
   const [updateSettings] = useMutation(ProjectSettingUpdate)
 
-  const {
-    isOpen: isChecksOpen,
-    onOpen: onChecksOpen,
-    onClose: onChecksClose
-  } = useDisclosure()
+  const { isOpen: isChecksOpen, onClose: onChecksClose } = useDisclosure()
 
-  const {
-    isOpen: isCompOpen,
-    onOpen: onCompOpen,
-    onClose: onCompClose
-  } = useDisclosure()
+  const { isOpen: isCompOpen, onClose: onCompClose } = useDisclosure()
 
   const onUpdate = async (value, id) => {
     await updateSettings({

@@ -87,7 +87,7 @@ export const ApolloWrapper = ({ children }) => {
   useEffect(() => {
     navigateCache = navigate
     toastCache = toast
-  }, [])
+  }, [navigate, toast])
 
   return <ApolloProvider client={client}>{children}</ApolloProvider>
 }
