@@ -271,7 +271,12 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
 
   return (
     <>
-      <Modal size='4xl' isOpen={isOpen} onClose={onClose}>
+      <Modal
+        size='4xl'
+        isOpen={isOpen}
+        onClose={onClose}
+        closeOnOverlayClick={false}
+      >
         <ModalOverlay />
         <form onSubmit={data ? handleUpdate : handleCreate}>
           <ModalContent>
