@@ -69,7 +69,15 @@ const client = new ApolloClient({
   link: ApolloLink.from([errorLink, authLink, uploadLink]),
   cache: new InMemoryCache(),
   queryDeduplication: false,
-  connectToDevTools: true
+  connectToDevTools: true,
+  defaultOptions: {
+    query: {
+      fetchPolicy: 'cache-and-network'
+    },
+    watchQuery: {
+      fetchPolicy: 'cache-and-network'
+    }
+  }
 })
 
 export const ApolloWrapper = ({ children }) => {
