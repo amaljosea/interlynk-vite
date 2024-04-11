@@ -481,6 +481,10 @@ export const GetProjectSettings = gql`
         dataRetentionDays
         internalCompMatchingEnabled
         vulnScanningEnabled
+        organizationManufacturer {
+          id
+          organizationName
+        }
       }
     }
   }

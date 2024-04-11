@@ -85,8 +85,9 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
 
   useEffect(() => {
     if (data) {
-      setProjectSettingId(data?.id)
-      setDataRetentionDays(data?.dataRetentionDays)
+      setProjectSettingId(data?.id || '')
+      setDataRetentionDays(data?.dataRetentionDays || '')
+      setOrgMfc(data?.organizationManufacturer?.id || '')
     }
   }, [data])
 
