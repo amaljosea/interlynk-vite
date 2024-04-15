@@ -1,7 +1,6 @@
 import { useLazyQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import GraphView from 'views/Sbom/components/GraphView'
 
 import {
   Button,
@@ -24,7 +23,6 @@ import VulnTable from 'components/Tables/VulnTable'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { GetShareLicensesTable } from 'graphQL/Queries'
-import { GetSharPrimartComp } from 'graphQL/Queries'
 
 import { FaLock } from 'react-icons/fa6'
 
@@ -57,7 +55,7 @@ const SbomTable = ({
   } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
-  const [activeComp, setActiveComp] = useState(null)
+  const [setActiveComp] = useState(null)
 
   // How often each tab should refetch the data (in minutes)
   const fetchIntervalMinutes = {
@@ -66,6 +64,7 @@ const SbomTable = ({
     Components: 0,
     Vulnerabilities: 0.5,
     Licenses: 0,
+    Policies: 0,
     Support: 0,
     Checks: 0,
     'Change Log': 0
@@ -77,6 +76,7 @@ const SbomTable = ({
     Components: null,
     Vulnerabilities: null,
     Licenses: null,
+    Policies: null,
     Support: null,
     Checks: null,
     'Change Log': null
@@ -88,16 +88,11 @@ const SbomTable = ({
     2: 'Components',
     3: 'Vulnerabilities',
     4: 'Licenses',
-    5: 'Support',
-    6: 'Checks',
-    7: 'Change Log'
+    5: 'Policies',
+    6: 'Support',
+    7: 'Checks',
+    8: 'Change Log'
   }
-
-  // GET PRIMARY COMPONENT
-  const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(
-    GetSharPrimartComp,
-    { fetchPolicy: 'network-only' }
-  )
 
   // GET LICENSES DATA
   const [getLicensesData, { data: licensesData, refetch: licenseRefetch }] =
@@ -244,13 +239,15 @@ const SbomTable = ({
                 item === 'Parts' ||
                 item === 'Checks' ||
                 item === 'Change Log' ||
-                item === 'Support'
+                item === 'Support' ||
+                item === 'Policies'
               }
             >
               {(item === 'Parts' ||
                 item === 'Checks' ||
                 item === 'Change Log' ||
-                item === 'Support') && (
+                item === 'Support' ||
+                item === 'Policies') && (
                 <FaLock color='darkgray' style={{ marginRight: '6px' }} />
               )}
               {item}

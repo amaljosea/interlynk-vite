@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import SBOM from 'views/Customer/Sbom'
 
 import {
@@ -30,16 +30,13 @@ import { ShareVulnData } from 'graphQL/Queries'
 import { FaLock, FaWindowMaximize } from 'react-icons/fa6'
 
 const ProductDetails = () => {
-  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  const vulnId = queryParams.get('vulnId')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const activeProd = localStorage.getItem('publicEnv')
-  const group = JSON.stringify(localStorage.getItem('product'))
   const environment = localStorage.getItem('environment')
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
 
@@ -113,7 +110,7 @@ const ProductDetails = () => {
     if (sbomId === null) {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
-  }, [sbomId])
+  }, [prodVulnDispatch, sbomId])
 
   useEffect(() => {
     if (environment && data) {
@@ -124,7 +121,7 @@ const ProductDetails = () => {
       localStorage.setItem('publicEnv', env?.id)
       setActiveEnv(env?.id)
     }
-  }, [environment])
+  }, [data, environment])
 
   if (loading) {
     return (
@@ -222,6 +219,7 @@ const ProductDetails = () => {
                   'vulnerabilities',
                   'automation rules',
                   'settings',
+                  'policies',
                   'change log'
                 ].map((item, index) => (
                   <Tab
@@ -232,13 +230,15 @@ const ProductDetails = () => {
                       item === 'automation rules' ||
                       item === 'settings' ||
                       item === 'change log' ||
-                      item === 'vulnerabilities'
+                      item === 'vulnerabilities' ||
+                      item === 'policies'
                     }
                   >
                     {(item === 'automation rules' ||
                       item === 'settings' ||
                       item === 'change log' ||
-                      item === 'vulnerabilities') && (
+                      item === 'vulnerabilities' ||
+                      item === 'policies') && (
                       <FaLock color='darkgray' style={{ marginRight: '6px' }} />
                     )}
                     {item}
