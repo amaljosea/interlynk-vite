@@ -3,7 +3,6 @@ import { useQuery } from '@apollo/client'
 import { useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
-import { logoutUser } from 'utils/authUtils'
 
 import { WarningTwoIcon } from '@chakra-ui/icons'
 import {
@@ -17,8 +16,6 @@ import {
 import { Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import BarChart from 'components/Charts/BarChart'
-import LineChart from 'components/Charts/LineChart'
 import CustomLoader from 'components/CustomLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -29,11 +26,9 @@ import { GetOrgMetrics } from 'graphQL/Queries'
 import { FaBug, FaCube, FaLayerGroup, FaWindowMaximize } from 'react-icons/fa'
 
 import OrgRegister from '../Profile/components/OrgRegister'
-import SBOMActivities from './components/ActiveUsers'
 import ActivitiesOverview from './components/ActivitiesOverview'
 import MiniStatistics from './components/MiniStatistics'
 import ProductsOverview from './components/ProductsOverview'
-import RiskScoreOverview from './components/SalesOverview'
 
 export default function Dashboard() {
   const location = useLocation()
@@ -80,7 +75,7 @@ export default function Dashboard() {
       prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
-  }, [product])
+  }, [prodCompDispatch, prodVulnDispatch, product])
 
   if (eOrg) {
     return (

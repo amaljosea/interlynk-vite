@@ -1,7 +1,7 @@
 // Chakra imports
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { GetIcon, customStyles, getFullDateAndTime, timeSince } from 'utils'
@@ -84,19 +84,22 @@ const ComponentTable = ({
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
-  const setPaginationControl = (data) => {
-    if (signedUrlParams) {
-      setIsPrevActive(
-        data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasPreviousPage
-      )
-      setIsNextActive(
-        data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasNextPage
-      )
-    } else {
-      setIsPrevActive(data?.sbom?.components?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.sbom?.components?.pageInfo?.hasNextPage)
-    }
-  }
+  const setPaginationControl = useCallback(
+    (data) => {
+      if (signedUrlParams) {
+        setIsPrevActive(
+          data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasPreviousPage
+        )
+        setIsNextActive(
+          data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasNextPage
+        )
+      } else {
+        setIsPrevActive(data?.sbom?.components?.pageInfo?.hasPreviousPage)
+        setIsNextActive(data?.sbom?.components?.pageInfo?.hasNextPage)
+      }
+    },
+    [signedUrlParams]
+  )
 
   const disablePaginationControl = () => {
     setIsPrevActive(false)
@@ -104,14 +107,8 @@ const ComponentTable = ({
   }
   //end
 
-  const {
-    userPermissions,
-    totalRows,
-    setTotalRows,
-    setActiveSbomTab,
-    prodCompState,
-    dispatch
-  } = useGlobalState()
+  const { userPermissions, totalRows, setTotalRows, prodCompState, dispatch } =
+    useGlobalState()
   const {
     field,
     direction,
@@ -158,7 +155,7 @@ const ComponentTable = ({
       permission.key === 'update_sbom' && permission.value === true
   )
 
-  const fetchCompData = async () => {
+  const fetchCompData = useCallback(async () => {
     disablePaginationControl()
     await refetch({
       projectId: signedUrlParams ? undefined : productId,
@@ -205,7 +202,25 @@ const ComponentTable = ({
         )
       })
       .finally(() => window.scrollTo({ top: 0, behavior: 'smooth' }))
-  }
+  }, [
+    direct,
+    direction,
+    ecosystems,
+    field,
+    getCompFilters,
+    kinds,
+    licenses,
+    prodCompDispatch,
+    productId,
+    refetch,
+    sbomId,
+    scope,
+    searchInput,
+    setPaginationControl,
+    signedUrlParams,
+    suppliers,
+    totalRows
+  ])
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -264,10 +279,10 @@ const ComponentTable = ({
     onOpen()
   }
 
-  const onCreateComponent = () => {
+  const onCreateComponent = useCallback(() => {
     prodCompDispatch({ type: 'CLEAR_LICENSES' })
     onCompOpen()
-  }
+  }, [onCompOpen, prodCompDispatch])
 
   const handleOpen = (row) => {
     setActiveRow(row)
@@ -276,11 +291,14 @@ const ComponentTable = ({
   }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE COMPONENT DRAWER
-  const handleCompDown = (event) => {
-    if (event.altKey && event.key === '1') {
-      onCompToggle()
-    }
-  }
+  const handleCompDown = useCallback(
+    (event) => {
+      if (event.altKey && event.key === '1') {
+        onCompToggle()
+      }
+    },
+    [onCompToggle]
+  )
 
   // KEYBOARD EVENT LISTNER FOR COMPONENT DRAWER
   useEffect(() => {
@@ -288,7 +306,7 @@ const ComponentTable = ({
     return () => {
       window.removeEventListener('keydown', handleCompDown)
     }
-  }, [])
+  }, [handleCompDown])
 
   // COLUMNS
   const columns = [
@@ -964,7 +982,7 @@ const ComponentTable = ({
   }
 
   // CLEAR SERACH
-  const handleClear = async () => {
+  const handleClear = useCallback(async () => {
     setCompSearch('')
     disablePaginationControl()
     await refetch({
@@ -999,57 +1017,94 @@ const ComponentTable = ({
         prodCompDispatch({ type: 'CLEAR_SEARCH_INPUT' })
       }
     })
-  }
+  }, [
+    direct,
+    direction,
+    ecosystems,
+    field,
+    kinds,
+    licenses,
+    prodCompDispatch,
+    productId,
+    refetch,
+    sbomId,
+    scope,
+    setPaginationControl,
+    suppliers,
+    totalRows
+  ])
 
   // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    const { value } = e.target
-    if (value === '') {
-      handleClear()
-    } else {
-      setCompSearch(value)
-    }
-  }
+  const onSearchInputChange = useCallback(
+    (e) => {
+      const { value } = e.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setCompSearch(value)
+      }
+    },
+    [handleClear]
+  )
 
   // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    const { value } = event.target
-    if (event.key === 'Enter' && value !== '') {
-      disablePaginationControl()
-      await refetch({
-        projectId: signedUrlParams ? undefined : productId,
-        sbomId: sbomId,
-        search: value,
-        ecosystem:
-          ecosystems.includes('all') || ecosystems.length === 0
-            ? undefined
-            : ecosystems,
-        kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-        licenses:
-          licenses.includes('all') || licenses.length === 0
-            ? undefined
-            : licenses,
-        supplierName:
-          suppliers.includes('all') || suppliers.length === 0
-            ? undefined
-            : suppliers,
-        primary: scope === 'primary' ? true : undefined,
-        internal: scope === 'internal' ? true : undefined,
-        direct: direct === true ? true : undefined,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined,
-        field: field,
-        direction: direction
-      }).then((res) => {
-        if (res.data) {
-          setPaginationControl(res.data)
-          prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-        }
-      })
-    }
-  }
+  const handleSearch = useCallback(
+    async (event) => {
+      const { value } = event.target
+      if (event.key === 'Enter' && value !== '') {
+        disablePaginationControl()
+        await refetch({
+          projectId: signedUrlParams ? undefined : productId,
+          sbomId: sbomId,
+          search: value,
+          ecosystem:
+            ecosystems.includes('all') || ecosystems.length === 0
+              ? undefined
+              : ecosystems,
+          kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
+          licenses:
+            licenses.includes('all') || licenses.length === 0
+              ? undefined
+              : licenses,
+          supplierName:
+            suppliers.includes('all') || suppliers.length === 0
+              ? undefined
+              : suppliers,
+          primary: scope === 'primary' ? true : undefined,
+          internal: scope === 'internal' ? true : undefined,
+          direct: direct === true ? true : undefined,
+          first: totalRows,
+          last: undefined,
+          after: undefined,
+          before: undefined,
+          field: field,
+          direction: direction
+        }).then((res) => {
+          if (res.data) {
+            setPaginationControl(res.data)
+            prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+          }
+        })
+      }
+    },
+    [
+      direct,
+      direction,
+      ecosystems,
+      field,
+      kinds,
+      licenses,
+      prodCompDispatch,
+      productId,
+      refetch,
+      sbomId,
+      scope,
+      setPaginationControl,
+      signedUrlParams,
+      suppliers,
+      totalRows
+    ]
+  )
 
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
@@ -1135,7 +1190,22 @@ const ComponentTable = ({
         </Stack>
       </Flex>
     )
-  }, [compSearch, onSearchInputChange, handleClear, handleSearch, filters])
+  }, [
+    compSearch,
+    handleSearch,
+    handleClear,
+    onSearchInputChange,
+    filters,
+    refetch,
+    productId,
+    sbomId,
+    onCreateComponent,
+    signedUrlParams,
+    lifecycle,
+    updateComponent,
+    updateSboms,
+    fetchCompData
+  ])
 
   const handleRefetch = async (after, before) => {
     disablePaginationControl()

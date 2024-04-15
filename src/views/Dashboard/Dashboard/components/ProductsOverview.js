@@ -1,5 +1,5 @@
 // Chakra imports
-import React, { useMemo } from 'react'
+import React from 'react'
 import DataTable from 'react-data-table-component'
 import { Link } from 'react-router-dom'
 import {
@@ -13,6 +13,7 @@ import { Flex, Heading, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card'
+import CardBody from 'components/Card/CardBody'
 import CustomLoader from 'components/CustomLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
 
@@ -21,7 +22,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 const ProductsOverview = ({ title, data, prodPermissions }) => {
   const { setActiveSbomTab, dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
-  const environment = localStorage.getItem('environment')
 
   const handleClick = (prod) => {
     console.log('prod', prod)
@@ -341,43 +341,33 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
     }
   ]
 
-  // HEADER SECTION
-  const subHeader = useMemo(() => {
-    return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        {/* HEADING */}
-        <Heading fontSize={'lg'} fontFamily={'inherit'}>
-          {title}
-        </Heading>
-      </Flex>
-    )
-  }, [])
-
   return (
     <Card>
       {prodPermissions?.value === false ? (
         <Flex width={'100%'} flexDir={'column'} gap={4}>
-          <Heading fontSize={'lg'} fontFamily={'inherit'}>
+          <Heading m={0} fontSize={'lg'} fontFamily={'inherit'}>
             {title}
           </Heading>
           <Text textAlign={'center'}>No record to display</Text>
         </Flex>
       ) : (
-        <DataTable
-          subHeader
-          responsive
-          persistTableHead
-          columns={columns}
-          data={data || []}
-          customStyles={customStyles}
-          progressPending={data ? false : true}
-          progressComponent={<CustomLoader />}
-          subHeaderComponent={subHeader}
-        />
+        <>
+          {/* HEADING */}
+          <Heading minH={'auto'} fontSize={'lg'} fontFamily={'inherit'}>
+            {title}
+          </Heading>
+          <CardBody mt={6}>
+            <DataTable
+              responsive
+              persistTableHead
+              columns={columns}
+              data={data || []}
+              customStyles={customStyles}
+              progressPending={data ? false : true}
+              progressComponent={<CustomLoader />}
+            />
+          </CardBody>
+        </>
       )}
     </Card>
   )
