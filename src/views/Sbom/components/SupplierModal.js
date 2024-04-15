@@ -191,7 +191,8 @@ const SupplierModal = ({
 
   const isInvalid =
     (supName === '' && supEmail === '' && orgName === '' && orgUrl === '') ||
-    nameError !== '' ||
+    orgName === '' ||
+    (supName !== '' && nameError !== '') ||
     (supEmail !== '' && !validateEmail(supEmail)) ||
     (orgUrl !== '' && !validateUrl(orgUrl))
 
@@ -238,7 +239,7 @@ const SupplierModal = ({
             )}
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* ORG NAME */}
-              <FormControl>
+              <FormControl isRequired>
                 <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
                 <Input
                   placeholder='Enter organization name'
@@ -262,7 +263,7 @@ const SupplierModal = ({
                 <FormErrorMessage>{isValidUrl}</FormErrorMessage>
               </FormControl>
               {/* SUPPLIER NAME */}
-              <FormControl isInvalid={nameError}>
+              <FormControl isInvalid={supName !== '' && nameError !== ''}>
                 <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
                 <Input
                   placeholder='Enter supplier name'

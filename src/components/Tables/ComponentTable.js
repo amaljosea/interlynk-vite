@@ -132,7 +132,7 @@ const ComponentTable = ({
   const { refetch: getCompFilters } = useQuery(
     signedUrlParams ? ShareCompFilters : GetCompFilterData,
     {
-      fetchPolicy: 'cache-first',
+      fetchPolicy: 'network-only',
       variables: {
         projectId: signedUrlParams ? undefined : productId,
         sbomId: sbomId
