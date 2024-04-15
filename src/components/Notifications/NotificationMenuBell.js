@@ -84,12 +84,7 @@ const NotificationMenuBell = () => {
 
   const generateMenuItems = (notificationPreferences) => {
     return Object.entries(notificationPreferences).map(([key, value]) => (
-      <MenuItemOption
-        key={key}
-        value={value}
-        fontSize={'sm'}
-        isDisabled={key === 'Policies'}
-      >
+      <MenuItemOption key={key} value={value} fontSize={'sm'}>
         {key}
       </MenuItemOption>
     ))
