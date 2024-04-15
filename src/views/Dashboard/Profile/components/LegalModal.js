@@ -41,17 +41,16 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
   const { totalRows } = useGlobalState()
   const [orgName, setOrgName] = useState('')
   const [url, setUrl] = useState('')
-  const [contacts, setContacts] = useState([
-    {
-      id: 1,
-      name: '',
-      email: '',
-      phone: '',
-      status: 'CREATED',
-      emailError: '',
-      phError: ''
-    }
-  ])
+  // {
+  //   id: 1,
+  //   name: '',
+  //   email: '',
+  //   phone: '',
+  //   status: 'CREATED',
+  //   emailError: '',
+  //   phError: ''
+  // }
+  const [contacts, setContacts] = useState([])
   const [deletedContacts, setDeletedContacts] = useState([])
   const [error, setError] = useState('')
   const [isValidUrl, setIsValidUrl] = useState('')
@@ -253,18 +252,6 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
         }))
         console.log('result', result)
         setContacts(result)
-      } else {
-        setContacts([
-          {
-            id: 1,
-            name: '',
-            email: '',
-            phone: '',
-            status: 'CREATED',
-            emailError: '',
-            phError: ''
-          }
-        ])
       }
     }
   }, [data])
@@ -332,7 +319,6 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
                     >
                       Contacts
                     </Heading>
-                    <Text fontSize={'xs'}>Atleast 1 contact is required</Text>
                   </Stack>
                   <IconButton
                     size='sm'
