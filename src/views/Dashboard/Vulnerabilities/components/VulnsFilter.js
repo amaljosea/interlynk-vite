@@ -192,7 +192,7 @@ const VulnsFilters = ({ refetch }) => {
               value={severities}
               onChange={onFilterSeverity}
             >
-              {['all', 'critical', 'high', 'medium', 'low'].map(
+              {['all', 'critical', 'high', 'medium', 'low', 'unknown'].map(
                 (item, index) => (
                   <MenuItemOption
                     key={index}
