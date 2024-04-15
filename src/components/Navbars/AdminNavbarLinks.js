@@ -2,9 +2,10 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import { logoutUser } from 'utils/authUtils'
+import { getProductDetailPageUrl } from 'utils/url'
 
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import {
@@ -37,13 +38,9 @@ import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useProjectGroup } from 'hooks/useProjectGroup'
 
-import {
-  GetOrgName,
-  GetProductTable,
-  GetProjectGroup,
-  ShareLynkProjectGroup
-} from 'graphQL/Queries'
+import { GetOrgName, GetProductTable } from 'graphQL/Queries'
 
 import { FaExchangeAlt, FaRegKeyboard, FaSignOutAlt } from 'react-icons/fa'
 import { FaCode, FaInbox, FaSquareArrowUpRight, FaUser } from 'react-icons/fa6'
@@ -52,10 +49,11 @@ export default function HeaderLinks(props) {
   const location = useLocation()
   const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
-  const vulnId = queryParams.get('vulnId')
-  const group = JSON.parse(localStorage.getItem('product'))
+  const params = useParams()
+
+  const productId = params.productid
+  const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
+
   const dashboardView = location.pathname === '/vendor/dashboard'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const name = localStorage.getItem('username')
@@ -81,10 +79,10 @@ export default function HeaderLinks(props) {
     skip: groups === undefined && !signedUrlParams ? false : true,
     variables: { first: totalRows, direction, field }
   })
-  const [getProdGroup] = useLazyQuery(
-    signedUrlParams ? ShareLynkProjectGroup : GetProjectGroup,
-    { fetchPolicy: 'network-only' }
-  )
+
+  const { projects } = useProjectGroup({
+    projectGroupId: params.productgroupid
+  })
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
 
@@ -117,29 +115,23 @@ export default function HeaderLinks(props) {
   const shortcuts = [{ key: 'Ctrl + /', title: 'Search' }]
 
   const handleEnvChange = (value) => {
+    if (params.productgroupid) {
+      const project = projects.find((p) => p.name === value)
+      navigate(
+        getProductDetailPageUrl({
+          // todo: find productId here
+          productid: project.id,
+          productgroupid: params.productgroupid
+        })
+      )
+      localStorage.setItem('publicEnv', project?.id)
+      localStorage.setItem('activeEnv', project?.id)
+    }
+
     localStorage.setItem('environment', value)
     setEnvName(value)
     setClearSelect(true)
     setSelectedSbom([])
-    if (sbomId) {
-      getProdGroup({ variables: { id: group?.id } }).then((res) => {
-        if (res?.data) {
-          if (signedUrlParams) {
-            const env = res?.data?.shareLynkQuery?.projectGroup?.projects?.find(
-              (item) => item.name === value
-            )
-            localStorage.setItem('publicEnv', env?.id)
-            window.location.href = `/customer/products/${group?.name}?id=${group?.id}`
-          } else {
-            const env = res?.data?.projectGroup?.projects?.find(
-              (item) => item.name === value
-            )
-            localStorage.setItem('activeEnv', env?.id)
-            window.location.href = `/vendor/products/${group?.name}?id=${group?.id}`
-          }
-        }
-      })
-    }
   }
 
   const envIcon = (env) => {
@@ -186,9 +178,9 @@ export default function HeaderLinks(props) {
                 onChange={(value) => handleEnvChange(value)}
                 type='radio'
               >
-                {['default', 'development', 'production'].map((item, index) => (
+                {['default', 'development', 'production'].map((item) => (
                   <MenuItemOption
-                    key={index}
+                    key={item.id}
                     value={item}
                     fontSize='sm'
                     textTransform={'capitalize'}

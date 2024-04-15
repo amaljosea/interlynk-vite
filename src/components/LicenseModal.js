@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
-import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 import {
   Button,
@@ -30,10 +30,9 @@ const LicenseModal = ({
   filterRefetch,
   refetch
 }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
 
   const { sbomState, dispatch } = useGlobalState()
   const { licenseType, spdxLicenses, customLicenses, expLicense } = sbomState

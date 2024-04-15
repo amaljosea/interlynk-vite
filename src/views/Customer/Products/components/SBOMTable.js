@@ -2,7 +2,7 @@ import { useLazyQuery } from '@apollo/client'
 import GlobalContext from 'context/GlobalContext'
 import Cookies from 'js-cookie'
 import { useContext, useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 
 import {
   Button,
@@ -37,10 +37,9 @@ const SignedSbomTable = ({
 }) => {
   const location = useLocation()
 
-  const queryParams = new URLSearchParams(location.search)
-
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
 
   const [tabIndex, setTabIndex] = useState(0)
   const [totalRows, setTotalRows] = useState(25)

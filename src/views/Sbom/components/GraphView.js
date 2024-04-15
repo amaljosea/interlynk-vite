@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import React, { useCallback, useEffect, useState } from 'react'
 import Tree from 'react-d3-tree'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 
 import {
   Alert,
@@ -85,9 +85,8 @@ const renderForeignObjectNode = ({
 }
 
 const GraphView = ({ data, activeComp }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+  const sbomId = params.sbomid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const [treeView, setTreeView] = useState(null)

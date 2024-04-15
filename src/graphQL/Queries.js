@@ -3086,6 +3086,9 @@ export const GetSharelynks = gql`
           ... on ProjectGroup {
             id
             name
+            defaultProject {
+              id
+            }
           }
         }
       }

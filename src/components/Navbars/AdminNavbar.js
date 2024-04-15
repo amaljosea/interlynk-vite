@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { parseJSONSafely, permissionList, truncatedValue } from 'utils'
+import { getProductVersionDetailPageUrl } from 'utils/url'
+import { getProductDetailPageUrl } from 'utils/url'
 
 import {
   Breadcrumb,
@@ -16,6 +18,7 @@ import {
 } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useProjectGroup } from 'hooks/useProjectGroup'
 
 import { GetUserPermissions } from 'graphQL/Queries'
 
@@ -42,10 +45,10 @@ export default function AdminNavbar(props) {
   const location = useLocation()
   const params = useParams()
   const queryParams = new URLSearchParams(location.search)
-  const prodID = queryParams.get('id')
+  const prodID = params.productid
   const parts = queryParams.get('parts')
-  const sbomId = queryParams.get('sbom')
-  const vulnId = queryParams.get('vulnId')
+  const sbomId = params.sbomid
+  const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const activeVuln = localStorage.getItem('activeVuln')
@@ -107,6 +110,10 @@ export default function AdminNavbar(props) {
     // paddingX = '30px'
   }
 
+  const { name: projectGroupName, defaultProjectId } = useProjectGroup({
+    projectGroupId: params.productgroupid
+  })
+
   const newData = { ...subProduct }
   const subProdData = {
     name: subProduct?.name,
@@ -117,30 +124,54 @@ export default function AdminNavbar(props) {
 
   const removeChildOne = () => {
     localStorage.setItem('subProduct', JSON.stringify({ ...subProdData }))
-    navigate(
-      `/vendor/products/${currentProduct?.name}?id=${subProduct?.projectId}&sbom=${subProduct?.sbomId}&parts=true`
-    )
+    const url = getProductVersionDetailPageUrl({
+      productgroupid: params.productgroupid,
+      productid: subProduct?.projectId,
+      sbomid: subProduct?.sbomId,
+      paramsObj: {
+        parts: true
+      }
+    })
+    navigate(url)
   }
   const removeChildTwo = () => {
     delete newData.childTwo
     localStorage.setItem('subProduct', JSON.stringify(newData))
-    navigate(
-      `/vendor/products/${currentProduct?.name}?id=${subProduct?.childOne?.projectId}&sbom=${subProduct?.childOne?.sbomId}&parts=true`
-    )
+    const url = getProductVersionDetailPageUrl({
+      productgroupid: params.productgroupid,
+      productid: subProduct?.childOne?.projectId,
+      sbomid: subProduct?.childOne?.sbomId,
+      paramsObj: {
+        parts: true
+      }
+    })
+    navigate(url)
   }
   const removeChildThree = () => {
     delete newData.childThree
     localStorage.setItem('subProduct', JSON.stringify(newData))
-    navigate(
-      `/vendor/products/${currentProduct?.name}?id=${subProduct?.childTwo?.projectId}&sbom=${subProduct?.childTwo?.sbomId}&parts=true`
-    )
+    const url = getProductVersionDetailPageUrl({
+      productgroupid: params.productgroupid,
+      productid: subProduct?.childTwo?.projectId,
+      sbomid: subProduct?.childTwo?.sbomId,
+      paramsObj: {
+        parts: true
+      }
+    })
+    navigate(url)
   }
   const removeChildFour = () => {
     delete newData.childFour
     localStorage.setItem('subProduct', JSON.stringify(newData))
-    navigate(
-      `/vendor/products/${currentProduct?.name}?id=${subProduct?.childThree?.projectId}&sbom=${subProduct?.childThree?.sbomId}&parts=true`
-    )
+    const url = getProductVersionDetailPageUrl({
+      productgroupid: params.productgroupid,
+      productid: subProduct?.childThree?.projectId,
+      sbomid: subProduct?.childThree?.sbomId,
+      paramsObj: {
+        parts: true
+      }
+    })
+    navigate(url)
   }
 
   useEffect(() => {
@@ -194,13 +225,16 @@ export default function AdminNavbar(props) {
               <Link to={`/${path}/${category}`}>{category}</Link>
             </BreadcrumbItem>
 
-            {params?.name && (
+            {projectGroupName && (
               <BreadcrumbItem
                 color={mainText}
                 isCurrentPage={sbomId && currentSBOM?.version ? false : true}
               >
                 <Link
-                  to={`/${path}/products/${params.name}?id=${currentProduct?.groupId}`}
+                  to={getProductDetailPageUrl({
+                    productgroupid: params.productgroupid,
+                    productid: defaultProjectId
+                  })}
                   onClick={() => {
                     localStorage.removeItem('currentSBOM')
                     if (signedUrlParams) {
@@ -212,7 +246,7 @@ export default function AdminNavbar(props) {
                     }
                   }}
                 >
-                  {truncatedValue(decodeURI(params.name))}
+                  {projectGroupName}
                 </Link>
               </BreadcrumbItem>
             )}
@@ -225,7 +259,11 @@ export default function AdminNavbar(props) {
                 <BreadcrumbLink
                   href={
                     parts
-                      ? `/${path}/products/${currentProduct?.name}?id=${activeEnv}&sbom=${currentSBOM?.id}`
+                      ? getProductVersionDetailPageUrl({
+                          productgroupid: params.productgroupid,
+                          productid: activeEnv,
+                          sbomid: currentSBOM?.id
+                        })
                       : ''
                   }
                   onClick={() => {

@@ -1,6 +1,6 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
@@ -51,10 +51,9 @@ const CheckModal = ({
   filterRefetch,
   componentId
 }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
 
   const compRef = useRef()
 

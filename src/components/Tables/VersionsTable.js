@@ -8,6 +8,7 @@ import {
   sortByUpdatedAt,
   timeSince
 } from 'utils'
+import { getProductVersionDetailPageUrl } from 'utils/url'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -293,7 +294,11 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     localStorage.setItem('activeSbomTab', 4)
     setActiveSbomTab(4)
     navigate(
-      `/${path}/products/${projectGroup?.name}?id=${activeProd}&sbom=${id}`
+      getProductVersionDetailPageUrl({
+        productgroupid: params.productgroupid,
+        productid: activeProd,
+        sbomid: id
+      })
     )
   }
 
@@ -307,7 +312,11 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         const { id, projectVersion } = row
         return (
           <Link
-            to={`/${path}/products/${projectGroup?.name}?id=${activeProd}&sbom=${id}`}
+            to={getProductVersionDetailPageUrl({
+              productgroupid: projectGroup.id,
+              productid: projectGroup.defaultProject.id,
+              sbomid: row.id
+            })}
             onClick={() => {
               localStorage.setItem(
                 'currentSBOM',
@@ -336,7 +345,11 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         const { stats, id, projectVersion } = row
         return (
           <Link
-            to={`/${path}/products/${params.name}?id=${activeProd}&sbom=${id}`}
+            to={getProductVersionDetailPageUrl({
+              productgroupid: params.productgroupid,
+              productid: activeProd,
+              sbomid: id
+            })}
           >
             <Tag
               size='md'
@@ -389,7 +402,11 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       name: 'VULNERABILITIES',
       selector: (row) => {
         const { stats, id, projectVersion } = row
-        const link = `/${path}/products/${params.name}?id=${activeProd}&sbom=${id}`
+        const link = getProductVersionDetailPageUrl({
+          productgroupid: params.productgroupid,
+          productid: activeProd,
+          sbomid: id
+        })
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
             <Link

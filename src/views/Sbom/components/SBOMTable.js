@@ -1,6 +1,6 @@
 import { useLazyQuery } from '@apollo/client'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { parseJSONSafely } from 'utils'
 
 import {
@@ -110,10 +110,10 @@ const SBOMTable = ({
     [userPermissions]
   )
 
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+
+  const productId = params.productid
+  const sbomId = params.sbomid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const activeTab = Number(localStorage.getItem('activeSbomTab') || 0)
   const subProduct = (() => {

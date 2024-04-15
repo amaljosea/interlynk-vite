@@ -8,6 +8,8 @@ import {
   normalizeSBOMVersion,
   timeSince
 } from 'utils'
+import { getProductVersionDetailPageUrl } from 'utils/url'
+import { getProductDetailPageUrl } from 'utils/url'
 
 import { Flex, Heading, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
@@ -160,7 +162,10 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
           <Link
-            to={`/vendor/products/${project?.projectGroup?.name}?id=${project?.projectGroup?.id}`}
+            to={getProductDetailPageUrl({
+              productgroupid: project?.projectGroup?.id,
+              productid: project?.id
+            })}
             style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }}
             onClick={() => handleClick(row)}
           >
@@ -178,11 +183,17 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       wrap: true,
       width: '150px',
       selector: (row) => {
+        console.log({ row })
+
         const { id, project, projectId, projectVersion } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
           <Link
-            to={`/vendor/products/${project?.projectGroup?.name}?id=${projectId}&sbom=${id}`}
+            to={getProductVersionDetailPageUrl({
+              productgroupid: project?.projectGroup?.id,
+              productid: project?.id,
+              sbomid: id
+            })}
             style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
             onClick={() => onVersionClick(row)}
           >
@@ -204,7 +215,11 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
           <Link
-            to={`/vendor/products/${project?.projectGroup?.name}?id=${projectId}&sbom=${id}`}
+            to={getProductVersionDetailPageUrl({
+              productgroupid: project?.projectGroup?.id,
+              productid: project?.id,
+              sbomid: id
+            })}
             style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
             onClick={() => (uniqueSbom ? onFilterComp(row) : null)}
           >
@@ -232,7 +247,11 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
           <Link
-            to={`/vendor/products/${project?.projectGroup?.name}?id=${projectId}&sbom=${id}`}
+            to={getProductVersionDetailPageUrl({
+              productgroupid: project?.projectGroup?.id,
+              productid: project?.id,
+              sbomid: id
+            })}
             style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
             onClick={() => (uniqueSbom ? onFilterLicense(row) : null)}
           >
@@ -250,9 +269,13 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       wrap: true,
       width: '350px',
       selector: (row) => {
-        const { id, project, projectId, stats, projectVersion } = row
+        const { id, project, stats, projectVersion } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
-        const link = `/vendor/products/${project?.projectGroup?.name}?id=${projectId}&sbom=${id}`
+        const link = getProductVersionDetailPageUrl({
+          productgroupid: project?.projectGroup?.id,
+          productid: project?.id,
+          sbomid: id
+        })
         return (
           <Flex direction={'row'} flexWrap={'wrap'} gap={2} my={2}>
             <Link

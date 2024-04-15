@@ -1,6 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import SBOM from 'views/Sbom'
 
 import {
@@ -73,11 +73,11 @@ import UploadModal from './components/UploadModal'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
-  const vulnId = queryParams.get('vulnId')
+  const params = useParams()
+  const productId = params.productid
+  const productGroupId = params.productgroupid
+  const sbomId = params.sbomid
+  const vulnId = params.vulnerabilityid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const {
@@ -147,7 +147,7 @@ const ProductDetails = () => {
   // GET PROJECT DATA
   const { data, refetch, loading, error } = useQuery(GetProjectGroup, {
     fetchPolicy: 'network-only',
-    variables: { id: productId }
+    variables: { id: productGroupId }
   })
 
   const epssRange =
@@ -167,7 +167,7 @@ const ProductDetails = () => {
       variables: {
         first: totalRows,
         projectIds: [activeEnv],
-        projectGroupIds: [productId],
+        projectGroupIds: [productGroupId],
         field: globalVulnState.field,
         direction: globalVulnState.direction,
         search:
@@ -265,12 +265,12 @@ const ProductDetails = () => {
 
   const { data: vulnInfo, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
     skip: vulnId && vulnsPermissions?.value === true ? false : true,
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
     variables: {
       id: vulnId,
       first: totalRows,
-      projectIds: [activeEnv],
-      projectGroupIds: [productId],
+      projectIds: [productId],
+      projectGroupIds: [productGroupId],
       search: compVulnSearch !== '' ? compVulnSearch : undefined,
       projectNames: envs?.length === 0 ? undefined : envs,
       versions: sbomVersions?.length === 0 ? undefined : sbomVersions,
@@ -318,7 +318,7 @@ const ProductDetails = () => {
   // DELETE PRODUCT
   const onProductDelete = async () => {
     await projectDelete({
-      variables: { id: productId }
+      variables: { id: productGroupId }
     })
       .then((res) => res.data && onDeleteClose())
       .finally(() => navigate('/vendor/products'))
@@ -607,8 +607,6 @@ const ProductDetails = () => {
                   <GlobalVulnTable
                     data={globalVulnData?.organization?.vulns}
                     refetch={globalVulnRefetch}
-                    activeEnv={activeEnv}
-                    productId={productId}
                   />
                 </TabPanel>
                 {/* AUTOMATIONS */}

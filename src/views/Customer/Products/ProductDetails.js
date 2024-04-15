@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import SBOM from 'views/Customer/Sbom'
 
 import {
@@ -31,9 +31,11 @@ import { FaLock, FaWindowMaximize } from 'react-icons/fa6'
 
 const ProductDetails = () => {
   const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+
+  const params = useParams()
+  const productId = params.productid
+  const productGroupId = params.productgroupid
+  const sbomId = params.sbomid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const activeProd = localStorage.getItem('publicEnv')
@@ -65,7 +67,7 @@ const ProductDetails = () => {
     skip: sbomId,
     fetchPolicy: 'network-only',
     variables: {
-      id: productId
+      id: productGroupId
     }
   })
 

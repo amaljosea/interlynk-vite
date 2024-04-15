@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 
@@ -64,10 +64,10 @@ const InfoLabel = ({ title, onClick }) => {
 
 const GeneralDataRow = ({ status, data, refetch }) => {
   const location = useLocation()
+  const params = useParams()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const productId = params.productid
+  const sbomId = params.sbomid
 
   const { userPermissions, sbomState, dispatch } = useGlobalState()
   const { expLicense } = sbomState

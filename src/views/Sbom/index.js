@@ -1,7 +1,7 @@
 // Chakra imports
 import { useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { Flex, Skeleton, Stack, useToast } from '@chakra-ui/react'
 
@@ -22,13 +22,12 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   const { totalRows, prodState, prodCompState, dispatch } = useGlobalState()
   const { data: allProjectGroups } = prodState
   const { prodVulnDispatch } = dispatch
-  const location = useLocation()
   const navigate = useNavigate()
   const toast = useToast()
 
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
 
   const [status] = useState('created')
   const [totalComp, setTotalComp] = useState(0)

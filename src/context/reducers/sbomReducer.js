@@ -24,7 +24,7 @@ const sbomReducer = (state, action) => {
       return {
         ...state,
         licenseString: payload,
-        expLicense: payload[0].value
+        expLicense: [...payload]?.length > 0 ? payload[0].value : ''
       }
     default:
       return state

@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import { ArrowDownIcon } from '@chakra-ui/icons'
 import {
@@ -66,10 +66,10 @@ const RelationshipDrawer = ({
   fetchCompData,
   compPath
 }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
+
   const { name, version, id } = data
 
   const [dependencyOfList, setDependencyOfList] = useState([])

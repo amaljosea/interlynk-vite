@@ -2,7 +2,7 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import React, { useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 
@@ -62,10 +62,9 @@ import { FaExpandAlt } from 'react-icons/fa'
 function ComponentDrawer(props) {
   const location = useLocation()
   const toast = useToast()
-
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const customerView = location.pathname.startsWith('/customer')
 

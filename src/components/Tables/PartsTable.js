@@ -9,6 +9,7 @@ import {
   isDefaultEnv,
   parseJSONSafely
 } from 'utils'
+import { getProductVersionDetailPageUrl } from 'utils/url'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -66,9 +67,8 @@ import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const location = useLocation()
   const params = useParams()
-  const queryParams = new URLSearchParams(location.search)
-  const sbomId = queryParams.get('sbom')
-  const prodId = queryParams.get('id')
+  const sbomId = params.sbomid
+  const prodId = params.productid
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
   const group = JSON.parse(localStorage.getItem('product'))
   const subProduct = (() => {
@@ -417,10 +417,18 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'NAME',
       selector: (row) => {
         const { part } = row
+
+        const link = getProductVersionDetailPageUrl({
+          productgroupid: params.productgroupid,
+          productid: part.project.id,
+          sbomid: part.id,
+          paramsObj: {
+            parts: true
+          }
+        })
+
         return (
-          <Link
-            to={`/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
-          >
+          <Link to={link}>
             <Text
               color={'blue.500'}
               minWidth='100%'
@@ -487,11 +495,18 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'COMPONENTS',
       selector: (row) => {
         const { part } = row
+
+        const link = getProductVersionDetailPageUrl({
+          productgroupid: params.productgroupid,
+          productid: part.project.id,
+          sbomid: part.id,
+          paramsObj: {
+            parts: true
+          }
+        })
+
         return (
-          <Link
-            to={`/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
-            onClick={getComponents}
-          >
+          <Link to={link} onClick={getComponents}>
             <Tag
               size='md'
               variant='subtle'
@@ -524,7 +539,12 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'VULNERABILITIES',
       selector: (row) => {
         const { part } = row
-        const link = `/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`
+        const link = getProductVersionDetailPageUrl({
+          productgroupid: params.productgroupid,
+          productid: part.project.id,
+          sbomid: part.id
+        })
+
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
             <Link to={link}>

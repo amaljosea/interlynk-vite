@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import DeleteModal from 'views/Dashboard/Support/DeleteModal'
 import StatusModal from 'views/Dashboard/Support/StatusModal'
@@ -33,10 +33,9 @@ import { FaEllipsisV } from 'react-icons/fa'
 import { FaPlus } from 'react-icons/fa6'
 
 const SupportTable = ({ data, refetch }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const projectId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+  const projectId = params.productid
+  const sbomId = params.sbomid
 
   const { totalRows, setTotalRows, supportState, dispatch } = useGlobalState()
   const { pageIndex, searchInput, field, direction } = supportState

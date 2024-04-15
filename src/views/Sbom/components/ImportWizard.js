@@ -3,6 +3,7 @@ import { Step, Steps, useSteps } from 'chakra-ui-steps'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { findSimilarItems } from 'utils'
+import { getProductVersionDetailPageUrl } from 'utils/url'
 
 import { Button, Flex, useColorModeValue } from '@chakra-ui/react'
 
@@ -61,9 +62,12 @@ const ImportWizard = ({
         }
       })
       .finally(() => {
-        navigate(
-          `/vendor/products/${params.name}?id=${currentProductId}&sbom=${currentSbomId}`
-        )
+        const url = getProductVersionDetailPageUrl({
+          productgroupid: params.productgroupid,
+          productid: currentProductId,
+          sbomid: currentSbomId
+        })
+        navigate(url)
         onClose()
       })
   }

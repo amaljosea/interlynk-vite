@@ -50,13 +50,13 @@ import { CpeAutoComplete } from 'graphQL/Queries'
 
 import { FaExpandAlt } from 'react-icons/fa'
 
-function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
+function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const toast = useToast()
   const params = useParams()
+  const productId = params.productid
   const activeEnv = localStorage.getItem('activeEnv')
-  const { totalRows, prodState, prodCompState, versionState, dispatch } =
-    useGlobalState()
-  const { licenseType, expLicense } = prodCompState
+  const { totalRows, prodCompState, versionState, dispatch } = useGlobalState()
+  const { expLicense } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const [sbomName, setSbomName] = useState('')
@@ -76,12 +76,12 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
 
   const handleRefetch = () => {
     refetch({
-      id: params?.name ? productId : undefined,
+      id: productId,
       first: totalRows,
       after: undefined,
       before: undefined,
-      field: params?.name ? versionState?.field : prodState?.field,
-      direction: params?.name ? versionState?.direction : prodState?.direction
+      field: versionState?.field,
+      direction: versionState?.direction
     })
   }
 

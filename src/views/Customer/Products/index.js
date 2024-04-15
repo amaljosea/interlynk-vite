@@ -1,25 +1,25 @@
 // Chakra imports
 import { useLazyQuery } from '@apollo/client'
 import { useEffect } from 'react'
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useParams } from 'react-router-dom'
+import { getProductDetailPageUrl } from 'utils/url'
 
 import { Flex } from '@chakra-ui/react'
 
 import { ShareLynkProjectGroup } from 'graphQL/Queries'
 
 function Index() {
-  const location = useLocation()
   const navigate = useNavigate()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
+  const params = useParams()
+  const productGroupId = params.productgroupid
 
   const [getProjectGroup] = useLazyQuery(ShareLynkProjectGroup, {
     fetchPolicy: 'network-only'
   })
 
   useEffect(() => {
-    if (productId) {
-      getProjectGroup({ variables: { id: productId } }).then((res) => {
+    if (productGroupId) {
+      getProjectGroup({ variables: { id: productGroupId } }).then((res) => {
         if (res?.data) {
           const group = res?.data?.shareLynkQuery?.projectGroup
           const product = {
@@ -29,7 +29,12 @@ function Index() {
           }
           localStorage.setItem('product', JSON.stringify(product))
           localStorage.setItem('publicEnv', group?.defaultProject?.id)
-          navigate(`/customer/products/${group?.name}?id=${group?.id}`)
+          navigate(
+            getProductDetailPageUrl({
+              productgroupid: productGroupId,
+              productid: params.productid
+            })
+          )
         }
       })
     }

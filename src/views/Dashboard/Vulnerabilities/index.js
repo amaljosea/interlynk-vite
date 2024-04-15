@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useMemo } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 
 import { Flex, Text } from '@chakra-ui/react'
 
@@ -16,8 +16,9 @@ import VulnInfo from './vulnInfo'
 
 const Vulnerabilities = () => {
   const location = useLocation()
+  const params = useParams()
   const queryParams = new URLSearchParams(location.search)
-  const vulnId = queryParams.get('vulnId')
+  const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
   const org = localStorage.getItem('organization')
 
   const { totalRows, globalVulnState, compVulnState, userPermissions } =

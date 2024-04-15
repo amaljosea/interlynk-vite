@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
+import { getProductVulnerabilityDetailPageUrl } from 'utils/url'
 import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -32,7 +33,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import Pagination from '../Pagination'
 
-const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
+const GlobalVulnTable = ({ data, refetch }) => {
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
@@ -49,6 +50,8 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   //end
 
   const params = useParams()
+  const projectGroupId = params.productgroupid
+  const projectId = params.productid
   const product = JSON.parse(localStorage.getItem('product'))
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
@@ -131,8 +134,12 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
               <Stack>
                 <Link
                   to={
-                    params?.name
-                      ? `/${path}/products/${product?.name}?id=${product?.id}&vulnId=${id}`
+                    params?.productgroupid
+                      ? getProductVulnerabilityDetailPageUrl({
+                          productgroupid: params.productgroupid,
+                          productid: params.productid,
+                          vulnerabilityid: id
+                        })
                       : `/${path}/vulnerabilities?vulnId=${id}`
                   }
                   onClick={() => localStorage.setItem('activeVuln', vulnId)}
@@ -417,17 +424,17 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
       field,
       direction,
       first: totalRows,
-      projectIds: activeEnv ? [activeEnv] : undefined,
-      projectGroupIds: productId ? [productId] : undefined
+      projectIds: projectId ? [projectId] : undefined,
+      projectGroupIds: projectGroupId ? [projectGroupId] : undefined
     }).then(
       (res) => res?.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
     )
   }, [
-    activeEnv,
+    projectGroupId,
     direction,
     field,
     globalVulnDispatch,
-    productId,
+    projectId,
     refetch,
     totalRows
   ])

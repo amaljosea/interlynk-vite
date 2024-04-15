@@ -2,6 +2,8 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import ReactSelect from 'react-select'
+import { getProductVersionDetailPageUrl } from 'utils/url'
+import { getProductDetailPageUrl } from 'utils/url'
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
@@ -92,9 +94,9 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   const location = useLocation()
   const params = useParams()
 
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const productId = params.productid
+  const sbomId = params.sbomid
+
   const product = JSON.parse(localStorage.getItem('product'))
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
@@ -219,7 +221,12 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         }
       })
       .finally(() => {
-        navigate(`/${path}/products/${productName}?id=${productId}&sbom=${id}`)
+        const url = getProductVersionDetailPageUrl({
+          productgroupid: params.productgroupid,
+          productid: productId,
+          sbomid: id
+        })
+        navigate(url)
         setActiveSbomTab(0)
       })
   }
@@ -280,9 +287,12 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
       }
     }).then((res) => {
       if (res.data) {
-        navigate(
-          `/${path}/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`
-        )
+        const url = getProductVersionDetailPageUrl({
+          productgroupid: params.productgroupid,
+          productid: productId,
+          sbomid: sbomId
+        })
+        navigate(url)
       }
     })
     // .finally(() => setActiveProdTab(2))
@@ -299,7 +309,11 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         setTimeout(() => {
           setIsLoading(false)
           prodRefetch({ id: product?.groupId })
-          navigate(`/${path}/products/${params.name}?id=${product?.groupId}`)
+          const url = getProductDetailPageUrl({
+            productgroupid: params.productgroupid,
+            productid: product?.groupId
+          })
+          navigate(url)
         }, 3000)
       }
     })

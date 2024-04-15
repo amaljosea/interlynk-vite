@@ -3,7 +3,7 @@ import { useLazyQuery, useQuery } from '@apollo/client'
 import GlobalContext from 'context/GlobalContext'
 import Cookies from 'js-cookie'
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, normalizeSBOMVersion, timeSince } from 'utils'
 import DownloadModal from 'views/Sbom/components/DownloadModal'
 
@@ -49,10 +49,8 @@ function ProductInfo() {
   const initialRef = useRef(null)
   const finalRef = useRef(null)
 
-  const location = useLocation()
   const navigate = useNavigate()
 
-  const queryParams = new URLSearchParams(location.search)
   const {
     setSignedVulnSeverity,
     setSignedActiveTab,
@@ -61,8 +59,9 @@ function ProductInfo() {
     signedVulnDirection
   } = useContext(GlobalContext)
 
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
 
   const signedParams = Cookies.get(`signedParamId`)
 

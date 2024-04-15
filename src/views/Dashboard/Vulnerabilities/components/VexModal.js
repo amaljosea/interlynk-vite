@@ -1,6 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { filterEnvList } from 'utils'
 
 import {
@@ -47,11 +47,11 @@ const VexModal = ({
   const toast = useToast()
   const { totalRows, prodVulnState } = useGlobalState()
   const { field, direction } = prodVulnState
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const vulnId = queryParams.get('vulnId')
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
+  const vulnId = params.vulnerabilityid
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')

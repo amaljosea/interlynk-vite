@@ -2,13 +2,8 @@ import { useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation } from 'react-router-dom'
-import {
-  customStyles,
-  getFullDateAndTime,
-  timeSince,
-  updatedValue
-} from 'utils'
+import { useParams } from 'react-router-dom'
+import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 
 import {
   Box,
@@ -36,9 +31,9 @@ import { BiScan } from 'react-icons/bi'
 import { FaEye } from 'react-icons/fa6'
 
 const PolicyEvalTable = ({ data, refetch }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+
+  const sbomId = params.sbomid
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 

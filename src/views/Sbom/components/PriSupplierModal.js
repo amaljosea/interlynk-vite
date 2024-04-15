@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
@@ -31,10 +31,9 @@ import {
 } from 'graphQL/Mutation'
 
 const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
 
   const { dispatch } = useGlobalState()
   const { prodCheckDispatch } = dispatch

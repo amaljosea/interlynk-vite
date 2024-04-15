@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince, validateEmail } from 'utils'
 
 import { DeleteIcon } from '@chakra-ui/icons'
@@ -54,10 +54,9 @@ const GeneralDataDrawer = ({
   filterRefetch
 }) => {
   const toast = useToast()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
 
   const { dispatch } = useGlobalState()
   const { prodCheckDispatch } = dispatch

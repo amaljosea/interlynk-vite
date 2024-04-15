@@ -1,7 +1,8 @@
 import { useLazyQuery } from '@apollo/client'
 import { useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { getFullDateAndTime, parseJSONSafely, timeSince } from 'utils'
+import { getProductVersionDetailPageUrl } from 'utils/url'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
 import {
@@ -62,8 +63,11 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
+
   const parts = queryParams.get('parts')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const subProduct = (() => {
@@ -188,15 +192,55 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
 
   const parentLink = () => {
     if (subProduct?.childFour) {
-      return `/vendor/products/${name}?id=${subProduct?.childThree?.projectId}&sbom=${subProduct?.childThree?.sbomId}&parts=true`
+      const url = getProductVersionDetailPageUrl({
+        productgroupid: params.productgroupid,
+        productid: subProduct?.childThree?.projectId,
+        sbomid: subProduct?.childThree?.sbomId,
+        paramsObj: {
+          parts: true
+        }
+      })
+      return url
     } else if (subProduct?.childThree) {
-      return `/vendor/products/${name}?id=${subProduct?.childTwo?.projectId}&sbom=${subProduct?.childTwo?.sbomId}&parts=true`
+      const url = getProductVersionDetailPageUrl({
+        productgroupid: params.productgroupid,
+        productid: subProduct?.childTwo?.projectId,
+        sbomid: subProduct?.childTwo?.sbomId,
+        paramsObj: {
+          parts: true
+        }
+      })
+      return url
     } else if (subProduct?.childTwo) {
-      return `/vendor/products/${name}?id=${subProduct?.childOne?.projectId}&sbom=${subProduct?.childOne?.sbomId}&parts=true`
+      const url = getProductVersionDetailPageUrl({
+        productgroupid: params.productgroupid,
+        productid: subProduct?.childOne?.projectId,
+        sbomid: subProduct?.childOne?.sbomId,
+        paramsObj: {
+          parts: true
+        }
+      })
+      return url
     } else if (subProduct?.childOne) {
-      return `/vendor/products/${name}?id=${subProduct?.projectId}&sbom=${subProduct?.sbomId}&parts=true`
+      const url = getProductVersionDetailPageUrl({
+        productgroupid: params.productgroupid,
+        productid: subProduct?.projectId,
+        sbomid: subProduct?.sbomId,
+        paramsObj: {
+          parts: true
+        }
+      })
+      return url
     } else {
-      return `/vendor/products/${name}?id=${id}&sbom=${currentSBOM?.id}`
+      const url = getProductVersionDetailPageUrl({
+        productgroupid: params.productgroupid,
+        productid: id,
+        sbomid: currentSBOM?.id,
+        paramsObj: {
+          parts: true
+        }
+      })
+      return url
     }
   }
 

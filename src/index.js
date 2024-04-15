@@ -3,6 +3,10 @@ import { ApolloWrapper } from 'context/ApolloWrapper.js'
 import Cookies from 'js-cookie'
 import Reset from 'layouts/Reset'
 import Success from 'layouts/Success'
+import { IndexPage } from 'newroutes/IndexPage.js'
+import { ProductDetailPage } from 'newroutes/ProductDetailPage.js'
+import { ProductVersionDetailPage } from 'newroutes/ProductVersionDetailPage.js'
+import { ProductVulnerabilityDetailPage } from 'newroutes/ProductVulnerabilityDetailPage.js'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactGA from 'react-ga'
@@ -18,7 +22,6 @@ import Products from 'views/Dashboard/Products'
 import ProductDetails from 'views/Dashboard/Products/ProductDetails'
 import ProductList from 'views/Dashboard/Products/ProductList'
 import Profile from 'views/Dashboard/Profile'
-import Sag from 'views/Dashboard/SAG'
 import Support from 'views/Dashboard/Support'
 import Tools from 'views/Dashboard/Tools'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
@@ -96,7 +99,22 @@ ReactDOM.render(
                 <Route path={`dashboard`} element={<Dashboard />} />
                 <Route path={`products`} element={<Products />}>
                   <Route index element={<ProductList />} />
-                  <Route path={`:name`} element={<ProductDetails />} />
+                  <Route path='index' Component={IndexPage} />
+                  <Route
+                    exact
+                    path=':productgroupid/env/:productid'
+                    Component={ProductDetailPage}
+                  />
+                  <Route
+                    exact
+                    path=':productgroupid/env/:productid/version/:sbomid'
+                    Component={ProductVersionDetailPage}
+                  />
+                  <Route
+                    exact
+                    path=':productgroupid/env/:productid/vulnerability/:vulnerabilityid'
+                    Component={ProductVulnerabilityDetailPage}
+                  />
                 </Route>
                 {/* <Route path={`SAG`} element={<Sag />} /> */}
                 <Route path={`vulnerabilities`} element={<Vulnerabilities />} />
@@ -110,7 +128,22 @@ ReactDOM.render(
               <Route path={`customer`} element={<CustomerLayout />}>
                 <Route path={`products`} element={<PubProducts />}>
                   <Route index element={<PubProductList />} />
-                  <Route path={`:name`} element={<PubProductDetails />} />
+                  <Route path='index' Component={IndexPage} />
+                  <Route
+                    exact
+                    path=':productgroupid/env/:productid'
+                    element={<PubProductDetails />}
+                  />
+                  <Route
+                    exact
+                    path=':productgroupid/env/:productid/version/:sbomid'
+                    element={<PubProductDetails />}
+                  />
+                  <Route
+                    exact
+                    path=':productgroupid/env/:productid/vulnerability/:vulnerabilityid'
+                    element={<PubProductDetails />}
+                  />
                 </Route>
               </Route>
               <Route path={`register`} element={<Register />} />

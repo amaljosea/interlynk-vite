@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { getShareLinklUrl } from 'utils/url'
 
 import {
   Alert,
@@ -50,7 +51,6 @@ const ShareLynkDrawer = ({
   groupId,
   refetch
 }) => {
-  const domain = window.location.origin
   const BACKEND_URL = process.env.REACT_APP_SERVER
   const [createLynk] = useMutation(CreateShareLynk)
 
@@ -161,8 +161,13 @@ const ShareLynkDrawer = ({
       name: 'LINK',
       selector: (row) => {
         const { enabled, contents } = row
+        const projectGroup = contents[0]
         const sbomLink = useClipboard(
-          `${domain}/customer/products?id=${contents[0]?.id}&signed_url_params=${row?.signedUrlParams}`
+          getShareLinklUrl({
+            signedUrlParams: row?.signedUrlParams,
+            productgroupid: projectGroup.id,
+            productid: projectGroup.defaultProject.id
+          })
         )
         return (
           <Flex my={2} gap={2} alignItems={'center'}>

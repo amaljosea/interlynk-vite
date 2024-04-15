@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import ChangelogTable from 'components/Tables/ChangelogTable'
 
@@ -7,10 +7,9 @@ const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
 const ChangeLog = ({ data, refetch, activeEnv }) => {
-  const location = useLocation()
   const navigate = useNavigate()
-  const queryParams = new URLSearchParams(location.search)
-  const id = queryParams.get('id')
+  const params = useParams()
+  const id = params.productid
 
   useEffect(() => {
     if (!idRegex.test(id)) {

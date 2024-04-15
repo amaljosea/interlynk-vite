@@ -3,7 +3,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { GetIcon, customStyles, getFullDateAndTime, timeSince } from 'utils'
 import { openSsf } from 'variables/general'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
@@ -73,10 +73,11 @@ const ComponentTable = ({
   setActiveComp
 }) => {
   const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
+  const params = useParams()
+
   const customerView = location.pathname.startsWith('/customer')
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const productId = params.productid
+  const sbomId = params.sbomid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]

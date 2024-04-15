@@ -40,9 +40,7 @@ import VexModal from './VexModal'
 
 const VulnProdTable = ({ data, vuln, refetch }) => {
   const params = useParams()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const id = queryParams.get('vulnId')
+  const id = params.vulnerabilityid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const { totalRows, setTotalRows, compVulnState, dispatch } = useGlobalState()

@@ -1,8 +1,9 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { getProductDetailPageUrl } from 'utils/url'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import StatusModal from 'views/Dashboard/Products/components/StatusModal'
@@ -89,12 +90,11 @@ const ProductTable = ({ data, refetch }) => {
   }
   //end
 
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
+  const params = useParams()
+  const productId = params.productid
+
   const activeEnv = localStorage.getItem('activeEnv')
   const environment = localStorage.getItem('environment')
-  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const {
     userPermissions,
@@ -437,7 +437,10 @@ const ProductTable = ({ data, refetch }) => {
               my={3}
             >
               <Link
-                to={`/${path}/products/${name}?id=${id}`}
+                to={getProductDetailPageUrl({
+                  productgroupid: row.id,
+                  productid: row.defaultProject.id
+                })}
                 onClick={handleClick}
               >
                 <Text
@@ -487,7 +490,10 @@ const ProductTable = ({ data, refetch }) => {
             <Stack direction={'row'} spacing={2} alignItems={'center'}>
               <Tooltip label='Default'>
                 <Link
-                  to={`/${path}/products/${name}?id=${id}`}
+                  to={getProductDetailPageUrl({
+                    productgroupid: row.id,
+                    productid: row.defaultProject.id
+                  })}
                   onClick={() => handleClick('default')}
                 >
                   <IconButton size='sm' colorScheme='blue' icon={<FaInbox />} />
@@ -495,7 +501,12 @@ const ProductTable = ({ data, refetch }) => {
               </Tooltip>
               <Tooltip label='Development'>
                 <Link
-                  to={`/${path}/products/${name}?id=${id}`}
+                  to={getProductDetailPageUrl({
+                    productgroupid: row.id,
+                    productid: projects?.find(
+                      (item) => item.name === 'development'
+                    ).id
+                  })}
                   onClick={() => handleClick('development')}
                 >
                   <IconButton size='sm' colorScheme='blue' icon={<FaCode />} />
@@ -503,7 +514,12 @@ const ProductTable = ({ data, refetch }) => {
               </Tooltip>
               <Tooltip label='Production'>
                 <Link
-                  to={`/${path}/products/${name}?id=${id}`}
+                  to={getProductDetailPageUrl({
+                    productgroupid: row.id,
+                    productid: projects?.find(
+                      (item) => item.name === 'production'
+                    ).id
+                  })}
                   onClick={() => handleClick('production')}
                 >
                   <IconButton

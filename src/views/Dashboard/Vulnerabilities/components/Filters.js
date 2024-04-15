@@ -23,9 +23,7 @@ import { GetProjectGroup } from 'graphQL/Queries'
 
 const Filters = ({ data, refetch }) => {
   const params = useParams()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const id = queryParams.get('vulnId')
+  const id = params.vulnerabilityid
 
   const { totalRows, compVulnState, dispatch } = useGlobalState()
   const { searchInput, envs, statuses, versions, products, vexComplete } =

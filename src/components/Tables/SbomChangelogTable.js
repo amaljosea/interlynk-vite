@@ -1,7 +1,7 @@
 import { useLazyQuery } from '@apollo/client'
 import React, { useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import LogFilterMenu from 'views/Sbom/components/LogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -76,11 +76,9 @@ const SbomChangelogTable = ({ data, refetch }) => {
   }
 
   //end
-
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
 
   const { totalRows, setTotalRows, sbomLogState, dispatch } = useGlobalState()
   const { filters, field, direction, pageIndex } = sbomLogState
