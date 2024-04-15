@@ -454,22 +454,22 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
               <Icon mt={1} h={5} w={5} color='#777' as={MdPolicy} />
               <Flex flexDir={'column'} alignItems={'center'}>
                 <Stack fontWeight={'medium'} direction={'row'}>
-                  <VulnBadge color='red' label='FAIL'>
+                  <VulnBadge color='red' label='Fail'>
                     {policyResultMetrics?.failedCount || 0}
                   </VulnBadge>
-                  <VulnBadge color='yellow' label='WARN'>
+                  <VulnBadge color='yellow' label='Warn'>
                     {policyResultMetrics?.warnCount || 0}
                   </VulnBadge>
-                  <VulnBadge color='blue' label='INFORM'>
+                  <VulnBadge color='blue' label='Inform'>
                     {policyResultMetrics?.informCount || 0}
                   </VulnBadge>
-                  <VulnBadge color='green' label='PASS'>
+                  <VulnBadge color='green' label='Pass'>
                     {policyResultMetrics?.passedCount || 0}
                   </VulnBadge>
-                  <VulnBadge color='orange' label='SKIPPED'>
+                  <VulnBadge color='orange' label='Skipped'>
                     {policyResultMetrics?.skippedCount || 0}
                   </VulnBadge>
-                  <VulnBadge color='gray' label='ERROR'>
+                  <VulnBadge color='gray' label='Error'>
                     {policyResultMetrics?.errorCount || 0}
                   </VulnBadge>
                 </Stack>
