@@ -37,7 +37,7 @@ import {
 import { FaCircleCheck } from 'react-icons/fa6'
 import { MdPolicy } from 'react-icons/md'
 
-const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
+const SbomDetails = ({ sbom, getVulnData }) => {
   const {
     project,
     policyResultMetrics,
@@ -111,47 +111,54 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   }
 
   const onSelectComp = () => {
-    const { field, direction } = prodCompState
-    getCompData({
-      projectId: signedUrlParams ? undefined : productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      search: undefined,
-      ecosystem: undefined,
-      kind: undefined,
-      licenses: undefined,
-      supplierName: undefined,
-      primary: undefined,
-      internal: undefined,
-      field: field,
-      direction: direction
-    }).then((res) => {
-      if (res.data) {
-        if (signedUrlParams) {
-          setActiveCsSbomTab(2)
-        } else {
-          setActiveSbomTab(2)
-        }
-        prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
-      }
-    })
+    prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
+    localStorage.setItem('activeSbomTab', 2)
+    if (signedUrlParams) {
+      setActiveCsSbomTab(2)
+    } else {
+      setActiveSbomTab(2)
+    }
+  }
+
+  const onSelectVulns = () => {
+    prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
+    localStorage.setItem('activeSbomTab', 3)
+    if (signedUrlParams) {
+      setActiveCsSbomTab(3)
+    } else {
+      setActiveSbomTab(3)
+      prodVulnDispatch({
+        type: 'FILTER_SOURCE',
+        payload: sbom?.sbomParts?.length > 0 ? true : false
+      })
+    }
   }
 
   const onSelectLicenses = () => {
     localStorage.setItem('activeSbomTab', 4)
-    setActiveSbomTab(4)
+    if (signedUrlParams) {
+      setActiveCsSbomTab(4)
+    } else {
+      setActiveSbomTab(4)
+    }
+  }
+
+  const onSelectPolicy = () => {
+    localStorage.setItem('activeSbomTab', 5)
+    if (signedUrlParams) {
+      setActiveCsSbomTab(5)
+    } else {
+      setActiveSbomTab(5)
+    }
   }
 
   const onFilterVuln = (value) => {
-    const { field, direction, source } = prodVulnState
+    const { field, direction } = prodVulnState
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     getVulnData({
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
-      source: source === true ? undefined : 'COMPONENT',
+      source: sbom?.sbomParts?.length > 0 ? undefined : 'COMPONENT',
       severity: value || undefined,
       first: totalRows,
       last: undefined,
@@ -167,6 +174,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           setActiveSbomTab(3)
         }
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+        prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
       }
     })
   }
@@ -402,9 +410,9 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
                 <Text
                   mt={1}
                   fontSize={'xs'}
-                  onClick={onSelectComp}
                   cursor={'pointer'}
                   _hover={{ textDecoration: 'underline' }}
+                  onClick={onSelectComp}
                 >
                   Components
                 </Text>
@@ -483,11 +491,11 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
                   </VulnBadge>
                 </Stack>
                 <Text
-                  fontSize={'xs'}
                   mt={1}
-                  onClick={() => onFilterVuln(null)}
+                  fontSize={'xs'}
                   style={{ cursor: 'pointer' }}
                   _hover={{ textDecoration: 'underline' }}
+                  onClick={onSelectVulns}
                 >
                   Vulnerabilities
                 </Text>
@@ -518,10 +526,11 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
                   </VulnBadge>
                 </Stack>
                 <Text
-                  fontSize={'xs'}
                   mt={1}
+                  fontSize={'xs'}
                   style={{ cursor: 'pointer' }}
                   _hover={{ textDecoration: 'underline' }}
+                  onClick={onSelectPolicy}
                 >
                   Policy Results
                 </Text>

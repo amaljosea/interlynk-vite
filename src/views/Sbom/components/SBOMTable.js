@@ -181,7 +181,7 @@ const SBOMTable = ({
   useEffect(() => {
     setActiveSbomTab(activeTab)
     fetchTabData(activeTab)
-  }, [activeTab, setActiveSbomTab])
+  }, [activeTab])
 
   const fetchTabData = (activeTab) => {
     const commonParams = {

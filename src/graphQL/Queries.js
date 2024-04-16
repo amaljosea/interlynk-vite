@@ -1237,6 +1237,9 @@ export const GetProductData = gql`
       updatedAt
       vulnRunStatus
       projectVersion
+      sbomParts {
+        id
+      }
       policyResultMetrics {
         skippedCount
         failedCount
