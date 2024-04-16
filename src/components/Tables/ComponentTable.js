@@ -198,7 +198,9 @@ const ComponentTable = ({
         }).then((res) =>
           prodCompDispatch({
             type: 'ADD_FILTER_HEADS',
-            payload: res?.data?.sbom?.filters
+            payload: signedUrlParams
+              ? res?.data?.shareLynkQuery?.sbom?.filters
+              : res?.data?.sbom?.filters
           })
         )
       })
