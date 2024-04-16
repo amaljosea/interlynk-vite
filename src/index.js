@@ -3,10 +3,6 @@ import { ApolloWrapper } from 'context/ApolloWrapper.js'
 import Cookies from 'js-cookie'
 import Reset from 'layouts/Reset'
 import Success from 'layouts/Success'
-import { IndexPage } from 'newroutes/IndexPage.js'
-import { ProductDetailPage } from 'newroutes/ProductDetailPage.js'
-import { ProductVersionDetailPage } from 'newroutes/ProductVersionDetailPage.js'
-import { ProductVulnerabilityDetailPage } from 'newroutes/ProductVulnerabilityDetailPage.js'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactGA from 'react-ga'
@@ -19,7 +15,9 @@ import PubProductList from 'views/Customer/Products/ProductList'
 import Dashboard from 'views/Dashboard/Dashboard'
 import Policies from 'views/Dashboard/Policies'
 import Products from 'views/Dashboard/Products'
-import ProductDetails from 'views/Dashboard/Products/ProductDetails'
+import ProductDetailsMain from 'views/Dashboard/Products/ProductDetailsMain.js'
+import ProductDetailsSbom from 'views/Dashboard/Products/ProductDetailsSbom.js'
+import ProductDetailsVul from 'views/Dashboard/Products/ProductDetailsVul.js'
 import ProductList from 'views/Dashboard/Products/ProductList'
 import Profile from 'views/Dashboard/Profile'
 import Support from 'views/Dashboard/Support'
@@ -99,21 +97,20 @@ ReactDOM.render(
                 <Route path={`dashboard`} element={<Dashboard />} />
                 <Route path={`products`} element={<Products />}>
                   <Route index element={<ProductList />} />
-                  <Route path='index' Component={IndexPage} />
                   <Route
                     exact
                     path=':productgroupid/env/:productid'
-                    Component={ProductDetailPage}
+                    Component={ProductDetailsMain}
                   />
                   <Route
                     exact
                     path=':productgroupid/env/:productid/version/:sbomid'
-                    Component={ProductVersionDetailPage}
+                    Component={ProductDetailsSbom}
                   />
                   <Route
                     exact
                     path=':productgroupid/env/:productid/vulnerability/:vulnerabilityid'
-                    Component={ProductVulnerabilityDetailPage}
+                    Component={ProductDetailsVul}
                   />
                 </Route>
                 {/* <Route path={`SAG`} element={<Sag />} /> */}
@@ -128,7 +125,6 @@ ReactDOM.render(
               <Route path={`customer`} element={<CustomerLayout />}>
                 <Route path={`products`} element={<PubProducts />}>
                   <Route index element={<PubProductList />} />
-                  <Route path='index' Component={IndexPage} />
                   <Route
                     exact
                     path=':productgroupid/env/:productid'

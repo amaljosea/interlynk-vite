@@ -1,7 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import SBOM from 'views/Sbom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import {
   Button,
@@ -42,7 +41,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
-  GetGlobalVulnData,
   GetGlobalVulns,
   GetProjectCheck,
   GetProjectGroup,
@@ -66,18 +64,16 @@ import NotificationMenuBell from '../../../components/Notifications/Notification
 import Automation from '../Automation'
 import ChangeLog from '../Changelog'
 import Settings from '../ProductSettings'
-import VulnInfo from '../Vulnerabilities/vulnInfo'
 import ProductModal from './components/ProductModal'
 import StatusModal from './components/StatusModal'
 import UploadModal from './components/UploadModal'
 
-const ProductDetails = () => {
+const ProductDetailsMain = () => {
   const navigate = useNavigate()
   const params = useParams()
   const productId = params.productid
   const productGroupId = params.productgroupid
   const sbomId = params.sbomid
-  const vulnId = params.vulnerabilityid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const {
@@ -85,7 +81,6 @@ const ProductDetails = () => {
     activeProdTab,
     setActiveProdTab,
     prodLogState,
-    compVulnState,
     prodVulnState,
     prodRulesState,
     globalVulnState,
@@ -93,13 +88,7 @@ const ProductDetails = () => {
     userPermissions
   } = useGlobalState()
   const { field, direction, searchInput, type, user, object } = prodLogState
-  const {
-    searchInput: compVulnSearch,
-    envs,
-    statuses,
-    versions: sbomVersions,
-    vexComplete: isCompleted
-  } = compVulnState
+
   const {
     searchInput: vulnSearch,
     severities,
@@ -234,7 +223,7 @@ const ProductDetails = () => {
   }
 
   // GET VULN DATA
-  const { data: vulnData, refetch: vulnRefetch } = useQuery(GetVulnData, {
+  const { refetch: vulnRefetch } = useQuery(GetVulnData, {
     skip: sbomId && vulnsPermissions?.value === true ? false : true,
     fetchPolicy: 'network-only',
     variables: {
@@ -261,22 +250,6 @@ const ProductDetails = () => {
 
   const [projectDelete] = useMutation(DeleteProjectGroup, {
     onCompleted: () => refetch({ id: productId })
-  })
-
-  const { data: vulnInfo, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
-    skip: vulnId && vulnsPermissions?.value === true ? false : true,
-    fetchPolicy: 'cache-and-network',
-    variables: {
-      id: vulnId,
-      first: totalRows,
-      projectIds: [productId],
-      projectGroupIds: [productGroupId],
-      search: compVulnSearch !== '' ? compVulnSearch : undefined,
-      projectNames: envs?.length === 0 ? undefined : envs,
-      versions: sbomVersions?.length === 0 ? undefined : sbomVersions,
-      statuses: statuses?.length === 0 ? undefined : statuses,
-      vexComplete: isCompleted === true ? true : undefined
-    }
   })
 
   const activeTab = Number(localStorage.getItem('activeProdTab'))
@@ -412,26 +385,6 @@ const ProductDetails = () => {
       <Card>
         <Text>Something went wrong</Text>
       </Card>
-    )
-  }
-
-  if (sbomId) {
-    return (
-      <SBOM
-        prodRefetch={refetch}
-        vulnData={vulnData}
-        getVulnData={vulnRefetch}
-      />
-    )
-  }
-
-  if (vulnId) {
-    return (
-      <VulnInfo
-        data={vulnInfo?.vuln}
-        componentVulns={vulnInfo?.componentVulns}
-        refetch={getVulnData}
-      />
     )
   }
 
@@ -730,4 +683,4 @@ const ProductDetails = () => {
   )
 }
 
-export default ProductDetails
+export default ProductDetailsMain
