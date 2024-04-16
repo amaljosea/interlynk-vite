@@ -3565,8 +3565,20 @@ export const PolicyResults = gql`
     $first: Int
     $last: Int
   ) {
-    policyResults(sbomId: [$sbomId]) {
+    policyResults(
+      sbomId: [$sbomId]
+      after: $after
+      before: $before
+      first: $first
+      last: $last
+    ) {
       totalCount
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
       nodes {
         id
         policyRuleViolations {
@@ -3581,56 +3593,15 @@ export const PolicyResults = gql`
           name
           description
           policyRules {
+            id
             name
             category
             subject
             operator
             operatorWording
             value
-            policyRuleViolations(
-              sbomId: $sbomId
-              after: $after
-              before: $before
-              first: $first
-              last: $last
-            ) {
+            policyRuleViolations(sbomId: $sbomId) {
               totalCount
-              pageInfo {
-                endCursor
-                hasNextPage
-                hasPreviousPage
-                startCursor
-              }
-              nodes {
-                id
-                violationType
-                component {
-                  name
-                  licensesExp
-                }
-                violation {
-                  ... on ComponentVuln {
-                    id
-                    vuln {
-                      id
-                      vulnId
-                    }
-                  }
-                  ... on Sbom {
-                    project {
-                      projectGroup {
-                        name
-                      }
-                    }
-                    projectVersion
-                  }
-                  ... on SbomComponent {
-                    primary
-                    version
-                    name
-                  }
-                }
-              }
             }
           }
         }
@@ -3639,8 +3610,66 @@ export const PolicyResults = gql`
   }
 `
 
-// GET USER NOTIFICATIONS PREFRENCES
+// GET POLICY RULE VIOLATIONS
+export const PolicyRuleViolations = gql`
+  query PolicyRuleViolations(
+    $sbomId: Uuid
+    $policyRuleId: Uuid
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+  ) {
+    policyRuleViolations(
+      sbomId: $sbomId
+      policyRuleId: $policyRuleId
+      after: $after
+      before: $before
+      first: $first
+      last: $last
+    ) {
+      totalCount
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+      nodes {
+        id
+        violationType
+        component {
+          name
+          licensesExp
+        }
+        violation {
+          ... on ComponentVuln {
+            id
+            vuln {
+              id
+              vulnId
+            }
+          }
+          ... on Sbom {
+            project {
+              projectGroup {
+                name
+              }
+            }
+            projectVersion
+          }
+          ... on SbomComponent {
+            primary
+            version
+            name
+          }
+        }
+      }
+    }
+  }
+`
 
+// GET USER NOTIFICATIONS PREFRENCES
 export const GetUserNotificationPreferences = gql`
   query GetUserNotificationPreferences($envId: Uuid!) {
     notificationPreferences(envId: $envId)

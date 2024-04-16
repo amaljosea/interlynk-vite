@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -25,18 +25,15 @@ import ViolationDrawer from 'components/Drawer/ViolationDrawer'
 import Pagination from 'components/Pagination'
 
 import { SbomPolicyScan } from 'graphQL/Mutation'
-import { PolicySubjectOperators } from 'graphQL/Queries'
+import { PolicyRuleViolations } from 'graphQL/Queries'
 
 import { BiScan } from 'react-icons/bi'
 import { FaEye } from 'react-icons/fa6'
 
 const PolicyEvalTable = ({ data, refetch }) => {
   const params = useParams()
-
   const sbomId = params.sbomid
-
   const { isOpen, onOpen, onClose } = useDisclosure()
-
   const paginationSizes = [25, 50, 100]
   const [activeRow, setActiveRow] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -44,18 +41,8 @@ const PolicyEvalTable = ({ data, refetch }) => {
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
-  const { data: subOperators } = useQuery(PolicySubjectOperators, {
-    fetchPolicy: 'network-only'
-  })
-
-  const formatSubject = (value) => {
-    if (subOperators) {
-      const result = subOperators.policySubjectOperatorMapping.find(
-        (item) => item?.subject === value
-      )
-      return `${result?.category} ${result?.name}`
-    }
-  }
+  const [getViolations, { data: violations }] =
+    useLazyQuery(PolicyRuleViolations)
 
   const [policyScan] = useMutation(SbomPolicyScan)
 
@@ -69,7 +56,27 @@ const PolicyEvalTable = ({ data, refetch }) => {
     setIsNextActive(false)
   }
 
-  const handleSetRow = () => {}
+  // SET ROW LENGTH
+  const handleSetRow = useCallback(
+    async (e) => {
+      disablePaginationControl()
+      setTotalRows(Number(e.target.value))
+      await refetch({
+        variables: {
+          sbomId,
+          first: Number(e.target.value),
+          last: undefined,
+          after: undefined,
+          before: undefined
+        }
+      }).then((res) => {
+        if (res?.data) {
+          setPaginationControl(res.data)
+        }
+      })
+    },
+    [refetch, sbomId]
+  )
 
   // SUB HEADER
   const subHeader = useMemo(() => {
@@ -198,6 +205,22 @@ const PolicyEvalTable = ({ data, refetch }) => {
     }
   ]
 
+  const onCheckViolations = useCallback(
+    async (item) => {
+      console.log('item', item)
+      await getViolations({
+        variables: { sbomId, policyRuleId: item.id, first: totalRows }
+      }).then((res) => {
+        if (res?.data) {
+          setActiveRow(item)
+          console.log(res?.data?.policyRuleViolations)
+        }
+      })
+      onOpen()
+    },
+    [getViolations, onOpen, sbomId, totalRows]
+  )
+
   // EXPAND VIEW
   const ExpandedComponent = ({ data }) => {
     const { policy } = data
@@ -265,7 +288,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
             >
               <GridItem colSpan={3}>
                 <Text fontSize={'sm'} textTransform={'capitalize'}>
-                  {formatSubject(item?.subject)}
+                  {`${item?.category} ${item?.name}`}
                 </Text>
               </GridItem>
               <GridItem colSpan={2}>
@@ -279,7 +302,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
                 </Text>
               </GridItem>
               <GridItem colSpan={2}>
-                <Tag width={'50px'} colorScheme='blue'>
+                <Tag width={'80px'} colorScheme='blue'>
                   <TagLabel mx={'auto'}>
                     {item?.policyRuleViolations?.totalCount || 0}
                   </TagLabel>
@@ -293,10 +316,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
                     colorScheme='blue'
                     fontWeight={'medium'}
                     hidden={item?.category === 'version'}
-                    onClick={() => {
-                      setActiveRow(item)
-                      onOpen()
-                    }}
+                    onClick={() => onCheckViolations(item)}
                   />
                 </Tooltip>
               </GridItem>
@@ -397,9 +417,10 @@ const PolicyEvalTable = ({ data, refetch }) => {
         <ViolationDrawer
           isOpen={isOpen}
           onClose={onClose}
-          data={activeRow}
+          activeRow={activeRow}
+          data={violations?.policyRuleViolations}
           sbomId={sbomId}
-          refetch={refetch}
+          refetch={getViolations}
         />
       )}
     </>
