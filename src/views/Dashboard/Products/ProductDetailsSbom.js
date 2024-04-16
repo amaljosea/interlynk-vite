@@ -29,6 +29,7 @@ const ProductDetailsSbom = () => {
     kev,
     epss,
     direct,
+    retracted,
     vexComplete
   } = prodVulnState
   const { prodVulnDispatch, globalVulnDispatch } = dispatch
@@ -75,6 +76,7 @@ const ProductDetailsSbom = () => {
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
       direct: direct === 'direct only' ? true : undefined,
+      includeRetracted: retracted,
       vexComplete: vexComplete === 'all' ? undefined : false,
       field: prodVulnState.field,
       direction: prodVulnState.direction

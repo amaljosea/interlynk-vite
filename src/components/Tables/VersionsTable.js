@@ -89,7 +89,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     dispatch
   } = useGlobalState()
   const { searchInput } = versionState
-  const { field, direction, source } = prodVulnState
+  const { field, direction, source, retracted } = prodVulnState
   const { prodVulnDispatch, prodCompDispatch, versionDispatch } = dispatch
 
   const paginationSizes = [25, 50, 100]
@@ -252,9 +252,10 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
   const onFilterSev = async (id, version, value) => {
     await getVulnData({
-      projectId: signedUrlParams ? undefined : activeProd,
       sbomId: id,
       severity: value,
+      includeRetracted: retracted,
+      projectId: signedUrlParams ? undefined : activeProd,
       source: source === true ? undefined : 'COMPONENT',
       first: totalRows,
       last: undefined,

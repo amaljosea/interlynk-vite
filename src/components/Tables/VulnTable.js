@@ -285,6 +285,7 @@ const VulnTable = ({
     epss,
     filters,
     direct,
+    retracted,
     vexComplete
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
@@ -658,8 +659,9 @@ const VulnTable = ({
   const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
 
   const vulnData = {
-    projectId: signedUrlParams ? undefined : productId,
     sbomId: sbomId,
+    includeRetracted: retracted,
+    projectId: signedUrlParams ? undefined : productId,
     vexComplete: vexComplete === true ? true : undefined,
     search: searchInput !== '' ? searchInput : undefined,
     source: source === true ? undefined : 'COMPONENT',

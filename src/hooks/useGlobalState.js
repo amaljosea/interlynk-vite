@@ -154,7 +154,8 @@ const GlobalStateProvider = ({ children }) => {
     details: '',
     notes: '',
     impactData: '',
-    upstream: false
+    upstream: false,
+    retracted: false
   })
   const [prodCheckState, prodCheckDispatch] = useReducer(prodCheckReducer, {
     field: 'CHECK_RESULTS_UPDATED_AT',

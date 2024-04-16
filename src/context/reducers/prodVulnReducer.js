@@ -31,7 +31,8 @@ const prodVulnReducer = (state, action) => {
         notes: '',
         impactData: '',
         upstream: false,
-        vexComplete: 'all'
+        vexComplete: 'all',
+        retracted: false
       }
     case 'CLEAR_VEX_STATE':
       return {
@@ -167,6 +168,8 @@ const prodVulnReducer = (state, action) => {
       }
     case 'FILTER_DIRECT':
       return { ...state, direct: payload, pageIndex: 1, after: '', before: '' }
+    case 'FILTER_RETRACTED':
+      return { ...state, retracted: payload }
     case 'SET_EPSS':
       return { ...state, epss: payload }
     case 'SET_MIN_EPSS':

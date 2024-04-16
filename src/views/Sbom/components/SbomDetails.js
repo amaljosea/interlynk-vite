@@ -153,12 +153,13 @@ const SbomDetails = ({ sbom, getVulnData }) => {
   }
 
   const onFilterVuln = (value) => {
-    const { field, direction } = prodVulnState
+    const { field, direction, source, retracted } = prodVulnState
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     getVulnData({
-      projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
-      source: sbom?.sbomParts?.length > 0 ? undefined : 'COMPONENT',
+      includeRetracted: retracted,
+      projectId: signedUrlParams ? undefined : productId,
+      source: source === true ? undefined : 'COMPONENT',
       severity: value || undefined,
       first: totalRows,
       last: undefined,

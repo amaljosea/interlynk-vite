@@ -40,6 +40,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     minEpss,
     maxEpss,
     direct,
+    retracted,
     vexComplete
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
@@ -72,7 +73,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     kev,
     epss,
     direct,
-    complete
+    complete,
+    retract
   ) => {
     const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
     const range = {
@@ -80,8 +82,9 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       max: parseFloat(epssRange[1]) / 100
     }
     refetch({
-      projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
+      includeRetracted: retract,
+      projectId: signedUrlParams ? undefined : productId,
       source: source === true ? undefined : 'COMPONENT',
       vexComplete: complete === 'all' ? undefined : false,
       severity:
@@ -113,7 +116,23 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       kev,
       epss,
       direct,
-      vexComplete
+      vexComplete,
+      retracted
+    )
+  }
+
+  const onFilterRetracted = (e) => {
+    prodVulnDispatch({ type: 'FILTER_RETRACTED', payload: e.target.checked })
+    handleRefetch(
+      source,
+      severities,
+      components,
+      statues,
+      kev,
+      epss,
+      direct,
+      vexComplete,
+      e.target.checked
     )
   }
 
@@ -127,7 +146,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       kev,
       epss,
       direct,
-      vexComplete
+      vexComplete,
+      retracted
     )
   }
 
@@ -141,7 +161,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       kev,
       epss,
       direct,
-      vexComplete
+      vexComplete,
+      retracted
     )
   }
 
@@ -155,7 +176,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       kev,
       epss,
       direct,
-      vexComplete
+      vexComplete,
+      retracted
     )
   }
 
@@ -169,7 +191,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       kev,
       epss,
       direct,
-      value
+      value,
+      retracted
     )
   }
 
@@ -183,7 +206,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       value,
       epss,
       direct,
-      vexComplete
+      vexComplete,
+      retracted
     )
   }
 
@@ -197,7 +221,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       kev,
       value,
       direct,
-      vexComplete
+      vexComplete,
+      retracted
     )
   }
 
@@ -211,7 +236,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       kev,
       epss,
       value,
-      vexComplete
+      vexComplete,
+      retracted
     )
   }
 
@@ -225,7 +251,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       kev,
       `${minEpss}-${maxEpss}`,
       direct,
-      vexComplete
+      vexComplete,
+      retracted
     )
     onClose()
   }
@@ -536,14 +563,14 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
         <Switch id='isDirect' isChecked={source} onChange={onFilterOrigin} />
         <Text>Parts</Text>
       </Flex>
-      {/* INCOMPLETE STATUS */}
-      <Flex align='center' gap={2} hidden>
+      {/* RETRACTED */}
+      <Flex align='center' gap={2}>
         <Switch
-          id='incompleteStatus'
-          isChecked={vexComplete}
-          onChange={onFilterComplete}
+          id='retracted'
+          isChecked={retracted}
+          onChange={onFilterRetracted}
         />
-        <Text>Completed</Text>
+        <Text>Retracted</Text>
       </Flex>
     </Stack>
   )

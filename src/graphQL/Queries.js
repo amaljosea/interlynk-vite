@@ -1854,6 +1854,7 @@ export const GetVulnData = gql`
     $before: String
     $field: ComponentVulnOrderByFields!
     $direction: OrderByDirection!
+    $includeRetracted: Boolean
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       vulns(
@@ -1872,6 +1873,7 @@ export const GetVulnData = gql`
         first: $first
         last: $last
         orderBy: { field: $field, direction: $direction }
+        includeRetracted: $includeRetracted
       ) {
         totalCount
         pageInfo {

@@ -249,6 +249,7 @@ const SBOMTable = ({
         kev,
         epss,
         direct,
+        retracted,
         vexComplete
       } = prodVulnState
       const vulnEpss =
@@ -257,6 +258,7 @@ const SBOMTable = ({
           : undefined
       getVulnData({
         ...commonParams,
+        includeRetracted: retracted,
         search: getUndefinedIfEmpty(searchInput),
         source: source === true ? undefined : 'COMPONENT',
         severity: getUndefinedIfEmptyOrAll(severities),
