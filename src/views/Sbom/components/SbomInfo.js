@@ -15,7 +15,7 @@ const SbomInfo = ({ sbom, refetch, getCompData, getVulnData, prodRefetch }) => {
             width={'100%'}
             templateColumns='repeat(5, 1fr)'
             alignItems={'top'}
-            gap={40}
+            gap={10}
           >
             {/* SBOM INFORMATIONS */}
             <GridItem colSpan={3}>
@@ -27,7 +27,7 @@ const SbomInfo = ({ sbom, refetch, getCompData, getVulnData, prodRefetch }) => {
             </GridItem>
 
             {/* SBOM ACTIONS */}
-            <GridItem colSpan={2}>
+            <GridItem colSpan={2} height={'fit-content'}>
               <SbomActions
                 sbom={sbom}
                 refetch={refetch}
