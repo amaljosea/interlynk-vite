@@ -93,7 +93,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
           <ModalHeader>Upload SBOM</ModalHeader>
           <ModalCloseButton onClick={() => setErrorMessage('')} />
           <ModalBody pb={4}>
-            {!params?.name && (
+            {!params?.productgroupid && (
               <Tag colorScheme='blue' mb={4}>
                 <Text fontWeight={'medium'} wordBreak={'break-all'}>
                   {name}
