@@ -81,7 +81,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
           key={item?.subject}
           style={{ textTransform: 'capitalize' }}
         >
-          {item.name}
+          {`${item?.category} ${item.name}`}
         </option>
       ))
     acc[category] = options
