@@ -58,13 +58,10 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
   const containsSpace = /\s/.test(url)
   const checkDataValidity = (data) => {
     for (let i = 0; i < data.length; i++) {
-      const { name, email, phone, emailError, phError } = data[i]
+      const { email, phone, emailError, phError } = data[i]
       if (
-        name === '' ||
-        email === '' ||
-        phone === '' ||
-        emailError !== '' ||
-        phError !== ''
+        (email !== '' && emailError !== '') ||
+        (phone !== '' && phError !== '')
       ) {
         return 'Error: Some properties are empty'
       }
@@ -207,7 +204,8 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
     }
   }
 
-  const onEmailBlur = (cn) => {
+  const onEmailBlur = (e, cn) => {
+    e.preventDefault()
     const newData = contacts.map((item) => {
       if (item.id === cn?.id) {
         if (!validateEmail(cn.email)) {
@@ -221,10 +219,11 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
     setContacts(newData)
   }
 
-  const onPhoneBlur = (cn) => {
+  const onPhoneBlur = (e, cn) => {
+    e.preventDefault()
     const newData = contacts.map((item) => {
       if (item.id === cn?.id) {
-        const isValidPhoneNumber = /^\d{10}$/.test(cn.phone)
+        const isValidPhoneNumber = /^\+?\d{10,12}$/.test(cn.phone)
         if (!isValidPhoneNumber) {
           return { ...item, phError: 'Please enter a valid phone number' }
         } else {
@@ -351,39 +350,49 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
                         </FormControl>
                       </GridItem>
                       <GridItem>
-                        <FormControl isInvalid={item?.emailError !== ''}>
+                        <FormControl
+                          isInvalid={
+                            item?.email !== '' && item?.emailError !== ''
+                          }
+                        >
                           <Input
                             size='sm'
                             type='email'
                             placeholder='Enter email'
                             value={item?.email}
-                            onBlur={() => onEmailBlur(item)}
+                            onBlur={(e) => onEmailBlur(e, item)}
                             onChange={(e) =>
                               handleChange(e.target.value, item.id, 'email')
                             }
                           />
-                          <FormErrorMessage fontSize='xs'>
-                            {item?.emailError}
-                          </FormErrorMessage>
+                          {item?.email !== '' && item?.emailError !== '' && (
+                            <FormErrorMessage fontSize='xs'>
+                              {item?.emailError}
+                            </FormErrorMessage>
+                          )}
                         </FormControl>
                       </GridItem>
                       <GridItem as={Flex} gap={4} alignItems='flex-start'>
-                        <FormControl isInvalid={item?.phError !== ''}>
+                        <FormControl
+                          isInvalid={item?.phone !== '' && item?.phError !== ''}
+                        >
                           <Input
                             size='sm'
                             type='text'
                             minLength={10}
-                            maxLength={10}
+                            maxLength={13}
                             placeholder='Enter phone number'
                             value={item?.phone}
-                            onBlur={() => onPhoneBlur(item)}
+                            onBlur={(e) => onPhoneBlur(e, item)}
                             onChange={(e) =>
                               handleChange(e.target.value, item.id, 'phone')
                             }
                           />
-                          <FormErrorMessage fontSize='xs'>
-                            {item?.phError}
-                          </FormErrorMessage>
+                          {item?.phone !== '' && item?.phError !== '' && (
+                            <FormErrorMessage fontSize='xs'>
+                              {item?.phError}
+                            </FormErrorMessage>
+                          )}
                         </FormControl>
                         <IconButton
                           size='sm'

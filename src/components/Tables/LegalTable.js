@@ -113,7 +113,7 @@ const LegalTable = ({ data, refetch }) => {
               <Tooltip
                 key={item?.id}
                 placement='top'
-                label={`[${item?.email}]-[${item?.phone}]`}
+                label={`${item?.email ? `[${item?.email}]` : ''} ${item?.phone ? `-[${item?.phone}]` : ''}`}
               >
                 <ListItem py={1} as={Flex} alignItems='center' cursor='pointer'>
                   <ListIcon as={MdCheckCircle} color='blue.500' />
