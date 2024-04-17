@@ -280,13 +280,13 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
         setError(errors[0])
       } else {
         handleRefetch()
-        setError('')
-        setName('')
-        setOperator('')
-        setResultType('')
-        onClose()
       }
     })
+    setError('')
+    setName('')
+    setOperator('')
+    setResultType('')
+    onClose()
   }
 
   let prevRules = []
@@ -356,7 +356,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
           setError(errors[0])
         } else {
           handleRefetch()
-          clearState()
           onClose()
         }
       })
@@ -378,7 +377,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
           setError(errors[0])
         } else {
           handleRefetch()
-          clearState()
           onClose()
         }
       })
@@ -400,11 +398,11 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
           setError(errors[0])
         } else {
           handleRefetch()
-          clearState()
           onClose()
         }
       })
     }
+    clearState()
   }
 
   const checkDataValidity = (data) => {
