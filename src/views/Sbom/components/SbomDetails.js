@@ -245,9 +245,7 @@ const SbomDetails = ({ sbom, getVulnData }) => {
         productgroupid: params.productgroupid,
         productid: id,
         sbomid: currentSBOM?.id,
-        paramsObj: {
-          parts: true
-        }
+        paramsObj: {}
       })
       return url
     }
