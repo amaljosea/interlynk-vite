@@ -6,7 +6,9 @@ import { getFullDateAndTime } from 'utils'
 import { timeSince } from 'utils'
 import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 
+import { EmailIcon, InfoIcon, PhoneIcon } from '@chakra-ui/icons'
 import {
+  Box,
   Flex,
   IconButton,
   List,
@@ -17,8 +19,11 @@ import {
   MenuItem,
   MenuList,
   Portal,
+  Stack,
+  Tag,
   Text,
   Tooltip,
+  useColorModeValue,
   useDisclosure,
   useToast
 } from '@chakra-ui/react'
@@ -30,13 +35,13 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { OrganizationManufacturerDelete } from 'graphQL/Mutation'
 
 import { FaEllipsisVertical, FaPlus } from 'react-icons/fa6'
-import { MdCheckCircle } from 'react-icons/md'
 
 const LegalTable = ({ data, refetch }) => {
   const toast = useToast()
   const { totalRows } = useGlobalState()
   const [activeRow, setActiveRow] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const textColor = useColorModeValue('gray.700', 'white')
 
   const [deleteMfc] = useMutation(OrganizationManufacturerDelete)
 
@@ -63,7 +68,21 @@ const LegalTable = ({ data, refetch }) => {
   // SUB HEADER
   const subHeader = useMemo(() => {
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
+        <Stack direction={'row'} alignItems={'center'}>
+          <Text fontSize='lg' color={textColor} fontWeight='bold'>
+            Manufacturer Identities
+          </Text>
+          <Tooltip
+            label={`For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries.`}
+          >
+            <InfoIcon color={'blue.500'} cursor={'pointer'} />
+          </Tooltip>
+        </Stack>
         <Tooltip label='Add Manufacturer'>
           <IconButton
             size='sm'
@@ -77,7 +96,7 @@ const LegalTable = ({ data, refetch }) => {
         </Tooltip>
       </Flex>
     )
-  }, [onOpen])
+  }, [onOpen, textColor])
 
   // COLUMNS
   const columns = [
@@ -105,23 +124,33 @@ const LegalTable = ({ data, refetch }) => {
       name: 'CONTACTS',
       selector: (row) => {
         const { organizationContacts } = row
-        const totalContacts =
-          organizationContacts?.length > 1 && organizationContacts.slice(1)
         return (
-          <List my={4}>
-            {organizationContacts?.map((item) => (
-              <Tooltip
-                key={item?.id}
-                placement='top'
-                label={`${item?.email ? `[${item?.email}]` : ''} ${item?.phone ? `-[${item?.phone}]` : ''}`}
-              >
-                <ListItem py={1} as={Flex} alignItems='center' cursor='pointer'>
-                  <ListIcon as={MdCheckCircle} color='blue.500' />
-                  <Text>{item?.name}</Text>
-                </ListItem>
-              </Tooltip>
+          <Flex
+            flexDirection={'column'}
+            alignItems={'flex-start'}
+            gap={3}
+            my={4}
+          >
+            {organizationContacts?.map((item, index) => (
+              <Flex key={index} alignItems={'center'} gap={4}>
+                {item?.email ? (
+                  <Tooltip placement='top' label={item?.email}>
+                    <EmailIcon color={'blue.500'} boxSize={4} />
+                  </Tooltip>
+                ) : (
+                  <EmailIcon color={'blackAlpha.500'} boxSize={4} />
+                )}
+                {item?.phone ? (
+                  <Tooltip placement='top' label={item?.phone}>
+                    <PhoneIcon color={'blue.500'} boxSize={3} />
+                  </Tooltip>
+                ) : (
+                  <PhoneIcon color={'blackAlpha.500'} boxSize={3} />
+                )}
+                <Text>{item?.name || ''}</Text>
+              </Flex>
             ))}
-          </List>
+          </Flex>
         )
       },
       wrap: true
@@ -138,7 +167,8 @@ const LegalTable = ({ data, refetch }) => {
           </Tooltip>
         )
       },
-      right: 'false',
+      width: '200px',
+      right: 'true',
       sortable: false,
       sortFunction: (a, b) => {
         const dateA = new Date(a.createdAt)
@@ -164,6 +194,7 @@ const LegalTable = ({ data, refetch }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB
       },
+      width: '200px',
       right: 'true'
     },
     // ACTIONS
@@ -200,6 +231,7 @@ const LegalTable = ({ data, refetch }) => {
           </Menu>
         )
       },
+      width: '120px',
       right: 'true'
     }
   ]

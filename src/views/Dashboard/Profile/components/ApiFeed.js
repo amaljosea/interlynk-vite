@@ -3,21 +3,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import DataTable from 'react-data-table-component'
 import { sevColor } from 'utils'
 
-import {
-  Box,
-  Flex,
-  Select,
-  Skeleton,
-  Switch,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Flex, Select, Switch, Text, useColorModeValue } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card'

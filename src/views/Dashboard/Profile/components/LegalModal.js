@@ -24,8 +24,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Stack,
-  Text
+  Stack
 } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -76,9 +75,9 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
 
   // console.log('data', data)
 
-  const handleCreate = async (e) => {
+  const handleCreate = (e) => {
     e.preventDefault()
-    await createMfc({
+    createMfc({
       variables: {
         orgName,
         url,
@@ -97,9 +96,12 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
         onClose()
       }
     })
+    setOrgName('')
+    setContacts([])
+    setUrl('')
   }
 
-  const handleUpdate = async (e) => {
+  const handleUpdate = (e) => {
     e.preventDefault()
     const removedData = deletedContacts?.map((item) => ({
       id: item?.status === 'ADDED' ? item?.id : undefined,
@@ -122,7 +124,7 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
     if (existingData && existingData.length > 0) {
       mergedArray.push(...existingData)
     }
-    await updateMfc({
+    updateMfc({
       variables: {
         id: data?.id,
         orgName,
@@ -138,6 +140,9 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
         onClose()
       }
     })
+    setOrgName('')
+    setContacts([])
+    setUrl('')
   }
 
   const hasSimilarRow = (data) => {
@@ -223,8 +228,11 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
     e.preventDefault()
     const newData = contacts.map((item) => {
       if (item.id === cn?.id) {
-        const isValidPhoneNumber = /^\+?\d{10,12}$/.test(cn.phone)
-        if (!isValidPhoneNumber) {
+        const isValidPhoneNumber =
+          /^(\+\d{1,3}\s?)?(\(\d{1,4}\)|\d{1,4})[-\s]?\d{1,4}[-\s]?\d{1,4}$/.test(
+            cn.phone
+          )
+        if (cn?.phone !== '' && !isValidPhoneNumber) {
           return { ...item, phError: 'Please enter a valid phone number' }
         } else {
           return { ...item, phError: '' }
@@ -379,8 +387,6 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
                           <Input
                             size='sm'
                             type='text'
-                            minLength={10}
-                            maxLength={13}
                             placeholder='Enter phone number'
                             value={item?.phone}
                             onBlur={(e) => onPhoneBlur(e, item)}
