@@ -1,7 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { validateEmail } from 'utils'
-import { validateUrl } from 'utils'
 
 import {
   Alert,
@@ -36,7 +35,13 @@ import {
 
 import { FaPlus, FaTrash } from 'react-icons/fa6'
 
-const LegalModal = ({ data, isOpen, onClose, refetch }) => {
+const validateUrl = (url) => {
+  const urlRegex = /^https:\/\/(?:www\.)?([a-zA-Z0-9-]+)(?:\.[a-zA-Z]{2,})$/
+  return urlRegex.test(url)
+}
+
+const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
+  console.log('orgs', orgs)
   const { totalRows } = useGlobalState()
   const [orgName, setOrgName] = useState('')
   const [url, setUrl] = useState('')
@@ -73,32 +78,36 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
   const [createMfc] = useMutation(OrganizationManufacturerCreate)
   const [updateMfc] = useMutation(OrganizationManufacturerUpdate)
 
-  // console.log('data', data)
-
   const handleCreate = (e) => {
     e.preventDefault()
-    createMfc({
-      variables: {
-        orgName,
-        url,
-        contacts: contacts?.map((item) => ({
-          name: item?.name,
-          email: item?.email,
-          phone: item?.phone
-        }))
-      }
-    }).then((res) => {
-      const errors = res?.data?.organizationManufacturerCreate?.errors
-      if (errors?.length > 0) {
-        setError(errors[0])
-      } else {
-        refetch({ first: totalRows })
-        onClose()
-      }
-    })
-    setOrgName('')
-    setContacts([])
-    setUrl('')
+    if (orgs?.includes(orgName?.toLocaleLowerCase())) {
+      setError('Organization already exists')
+    } else if (url !== '' && !validateUrl(url)) {
+      setIsValidUrl('Please enter a valid URL')
+    } else {
+      createMfc({
+        variables: {
+          orgName,
+          url,
+          contacts: contacts?.map((item) => ({
+            name: item?.name,
+            email: item?.email,
+            phone: item?.phone
+          }))
+        }
+      }).then((res) => {
+        const errors = res?.data?.organizationManufacturerCreate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
+        } else {
+          refetch({ first: totalRows })
+          onClose()
+        }
+      })
+      setOrgName('')
+      setContacts([])
+      setUrl('')
+    }
   }
 
   const handleUpdate = (e) => {
@@ -203,10 +212,10 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
     setContacts(newData)
   }
 
-  const handleCheckUrl = () => {
-    if (!validateUrl(url)) {
-      setIsValidUrl('Please enter a valid URL')
-    }
+  const onChangeUrl = (e) => {
+    setUrl(e.target.value)
+    setIsValidUrl('')
+    setError('')
   }
 
   const onEmailBlur = (e, cn) => {
@@ -290,23 +299,21 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
                         size='sm'
                         type='text'
                         value={orgName}
-                        onChange={(e) => setOrgName(e.target.value)}
+                        onChange={(e) => {
+                          setOrgName(e.target.value)
+                          setError('')
+                        }}
                       />
                     </FormControl>
                   </GridItem>
                   <GridItem>
-                    <FormControl
-                      isInvalid={
-                        (url !== '' && !validateUrl(url)) || containsSpace
-                      }
-                    >
+                    <FormControl isInvalid={isValidUrl !== '' || containsSpace}>
                       <FormLabel>URL</FormLabel>
                       <Input
                         size='sm'
                         type='text'
                         value={url}
-                        onBlur={handleCheckUrl}
-                        onChange={(e) => setUrl(e.target.value)}
+                        onChange={onChangeUrl}
                       />
                       <FormErrorMessage>{isValidUrl}</FormErrorMessage>
                     </FormControl>
@@ -426,7 +433,11 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
               <Button
                 colorScheme='blue'
                 type='submit'
-                isDisabled={errorMessage || orgName === '' || isValidUrl !== ''}
+                isDisabled={
+                  errorMessage ||
+                  orgName === '' ||
+                  (url !== '' && isValidUrl !== '')
+                }
               >
                 {data ? 'Update' : 'Save'}
               </Button>

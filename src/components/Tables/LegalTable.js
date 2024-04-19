@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils'
 import { getFullDateAndTime } from 'utils'
@@ -8,19 +8,14 @@ import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 
 import { EmailIcon, InfoIcon, PhoneIcon } from '@chakra-ui/icons'
 import {
-  Box,
   Flex,
   IconButton,
-  List,
-  ListIcon,
-  ListItem,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Portal,
   Stack,
-  Tag,
   Text,
   Tooltip,
   useColorModeValue,
@@ -29,6 +24,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import InfoModal from 'components/InfoModal'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -40,8 +36,30 @@ const LegalTable = ({ data, refetch }) => {
   const toast = useToast()
   const { totalRows } = useGlobalState()
   const [activeRow, setActiveRow] = useState(null)
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [infoHeading, setInfoHeading] = useState('')
+  const [infoText, setInfoText] = useState('')
+  const [infoUrl, setInfoUrl] = useState('')
   const textColor = useColorModeValue('gray.700', 'white')
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isInfoOpen,
+    onOpen: onInfoOpen,
+    onClose: onInfoClose
+  } = useDisclosure()
+
+  const onCheckMfc = useCallback(() => {
+    setInfoHeading(`Manufacturer`)
+    setInfoText(
+      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries.`
+    )
+    setInfoUrl(``)
+    onInfoOpen()
+  }, [onInfoOpen])
+
+  const existingData = data?.nodes?.map((item) =>
+    item?.organizationName?.toLowerCase()
+  )
 
   const [deleteMfc] = useMutation(OrganizationManufacturerDelete)
 
@@ -77,11 +95,11 @@ const LegalTable = ({ data, refetch }) => {
           <Text fontSize='lg' color={textColor} fontWeight='bold'>
             Manufacturer Identities
           </Text>
-          <Tooltip
-            label={`For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries.`}
-          >
-            <InfoIcon color={'blue.500'} cursor={'pointer'} />
-          </Tooltip>
+          <InfoIcon
+            color={'blue.500'}
+            cursor={'pointer'}
+            onClick={onCheckMfc}
+          />
         </Stack>
         <Tooltip label='Add Manufacturer'>
           <IconButton
@@ -96,7 +114,7 @@ const LegalTable = ({ data, refetch }) => {
         </Tooltip>
       </Flex>
     )
-  }, [onOpen, textColor])
+  }, [onCheckMfc, onOpen, textColor])
 
   // COLUMNS
   const columns = [
@@ -258,6 +276,18 @@ const LegalTable = ({ data, refetch }) => {
           isOpen={isOpen}
           onClose={onClose}
           refetch={refetch}
+          orgs={existingData}
+        />
+      )}
+
+      {/* INFO MODAL */}
+      {isInfoOpen && (
+        <InfoModal
+          isOpen={isInfoOpen}
+          onClose={onInfoClose}
+          heading={infoHeading}
+          body={infoText}
+          url={infoUrl}
         />
       )}
     </>
