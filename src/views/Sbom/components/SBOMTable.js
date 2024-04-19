@@ -180,19 +180,27 @@ const SBOMTable = ({
 
   useEffect(() => {
     setActiveSbomTab(activeTab)
-    fetchTabData(activeTab)
+    fetchTabData()
   }, [activeTab])
 
-  const fetchTabData = (activeTab) => {
-    const commonParams = {
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined
-    }
-    const tabName = tabIndexToName[activeTab]
+  const tabName = tabIndexToName[activeTab]
+
+  const commonParams = {
+    projectId: productId,
+    sbomId: sbomId,
+    first: totalRows,
+    last: undefined,
+    after: undefined,
+    before: undefined
+  }
+
+  useEffect(() => {
+    getPartsData({ variables: { ...commonParams } }).then(() =>
+      updateLastFetchTime(tabName)
+    )
+  }, [sbomId])
+
+  const fetchTabData = () => {
     if (tabName === 'General' && shouldFetchData(tabName)) {
       refetch({ ...commonParams }).then(() => updateLastFetchTime(tabName))
     } else if (tabName === 'Parts') {
