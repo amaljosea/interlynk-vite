@@ -32,7 +32,7 @@ const GlobalStateProvider = ({ children }) => {
   const [vulnerabilitiesData, setVulnerabilitiesData] = useState([])
   const [scanEnabled, setScanEnabled] = useState(false)
   const [envName, setEnvName] = useState(env || 'default')
-  const [clearSelect, setClearSelect] = useState(false)
+  const [clearSelect, setClearSelect] = useState(true)
   const [selectedSbom, setSelectedSbom] = useState([])
   // PRODUCTS
   const [prodState, prodDispatch] = useReducer(prodReducer, {

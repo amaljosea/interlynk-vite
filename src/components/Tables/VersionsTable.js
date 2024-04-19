@@ -81,8 +81,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     activeProdTab,
     setActiveSbomTab,
     prodVulnState,
-    setClearSelect,
     clearSelect,
+    setClearSelect,
     selectedSbom,
     setSelectedSbom,
     versionState,
@@ -100,11 +100,13 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
   const [loading, setLoading] = useState(false)
   const [drifts, setDrifts] = useState([])
 
-  const versionData = {
-    id: activeProd,
-    field: versionState?.field,
-    direction: versionState?.direction
-  }
+  const versionData = useMemo(() => {
+    return {
+      id: activeProd,
+      field: versionState?.field,
+      direction: versionState?.direction
+    }
+  }, [activeProd, versionState?.direction, versionState?.field])
 
   const [getAlternatives, { data: sbomAlts }] = useLazyQuery(
     signedUrlParams ? GetShareSbomAlternatives : GetSbomAlternatives,
@@ -129,6 +131,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       variables: {
         ...versionData,
         first: totalRows,
+        last: undefined,
         search: searchInput !== '' ? searchInput : undefined
       },
       onCompleted: () => setClearSelect(false)
@@ -166,14 +169,14 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       ...versionData,
       first: totalRows,
       last: undefined,
-      after: versions.pageInfo.endCursor,
+      after: versions?.pageInfo?.endCursor,
       before: undefined
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
       }
     })
-  }, [refetch, totalRows, versions, currentPage])
+  }, [currentPage, refetch, versionData, totalRows, versions])
 
   const handlePreviousPage = useCallback(async () => {
     disablePaginationControl()
@@ -183,13 +186,13 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       first: undefined,
       last: totalRows,
       after: undefined,
-      before: versions.pageInfo.startCursor
+      before: versions?.pageInfo?.startCursor
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
       }
     })
-  }, [refetch, totalRows, versions, currentPage])
+  }, [currentPage, refetch, versionData, totalRows, versions])
 
   const handleSetRow = useCallback(
     async (e) => {
@@ -209,7 +212,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         }
       })
     },
-    [refetch, setTotalRows]
+    [refetch, versionData]
   )
 
   const sbom = userPermissions?.find((item) => item.key === 'view_sbom')
@@ -546,9 +549,9 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     }
   ]
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     setIsLoading(true)
-    await deleteSbom({
+    deleteSbom({
       variables: {
         id: activeRow.id
       }
@@ -556,15 +559,19 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       if (res.data.sbomDelete?.errors?.length === 0) {
         setTimeout(() => {
           setIsLoading(false)
+          setClearSelect(true)
+          setSelectedSbom([])
           refetch({ id: activeProd })
           onDeleteClose()
-        }, 4000)
+        }, 2000)
       }
     })
   }
 
+  console.log('selectedSbom', selectedSbom)
+
   // REFRESH PRODUCTS
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     disablePaginationControl()
     setCurrentPage(1)
     await refetch({
@@ -578,19 +585,18 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         setPaginationControl(res.data)
       }
     })
-  }
+  }, [activeProd, refetch, totalRows])
 
-  const onBuildSbom = () => {
+  const onBuildSbom = useCallback(() => {
     prodCompDispatch({ type: 'CLEAR_LICENSES' })
     onSbomOpen()
-  }
+  }, [onSbomOpen, prodCompDispatch])
 
   const handleChange = (state) => {
-    setClearSelect(false)
     setSelectedSbom(state?.selectedRows)
   }
 
-  const handleCompare = () => {
+  const handleCompare = useCallback(() => {
     setLoading(true)
     if (selectedSbom?.length === 2) {
       getVersions({ variables: { id: activeProd } }).then(() => {
@@ -614,10 +620,17 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         })
       })
     }
-  }
+  }, [
+    activeProd,
+    getDrift,
+    getVersions,
+    onToolOpen,
+    selectedSbom,
+    signedUrlParams
+  ])
 
   // CLEAR SERACH
-  const handleClear = async () => {
+  const handleClear = useCallback(async () => {
     setFilterText('')
     await refetch({
       ...versionData,
@@ -629,35 +642,41 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     }).then(
       (res) => res?.data && versionDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
-  }
+  }, [refetch, totalRows, versionData, versionDispatch])
 
   // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    const { value } = e.target
-    if (value === '') {
-      handleClear()
-    } else {
-      setFilterText(value)
-    }
-  }
+  const onSearchInputChange = useCallback(
+    (e) => {
+      const { value } = e.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setFilterText(value)
+      }
+    },
+    [handleClear]
+  )
 
   // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    const { value } = event.target
-    if (event.key === 'Enter' && filterText !== '') {
-      refetch({
-        ...versionData,
-        search: value,
-        first: totalRows,
-        after: undefined,
-        before: undefined
-      }).then(
-        (res) =>
-          res?.data &&
-          versionDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      )
-    }
-  }
+  const handleSearch = useCallback(
+    async (event) => {
+      const { value } = event.target
+      if (event.key === 'Enter' && filterText !== '') {
+        refetch({
+          ...versionData,
+          search: value,
+          first: totalRows,
+          after: undefined,
+          before: undefined
+        }).then(
+          (res) =>
+            res?.data &&
+            versionDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        )
+      }
+    },
+    [filterText, refetch, totalRows, versionData, versionDispatch]
+  )
 
   const subHeaderComponent = useMemo(() => {
     return (
@@ -720,11 +739,17 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     )
   }, [
     filterText,
-    handleRefresh,
-    handleCompare,
     onSearchInputChange,
     handleClear,
-    handleSearch
+    handleSearch,
+    selectedSbom?.length,
+    handleCompare,
+    loading,
+    projectGroup?.enabled,
+    createSbom,
+    signedUrlParams,
+    onBuildSbom,
+    handleRefresh
   ])
 
   const handleSort = async (column, sortDirection) => {
@@ -763,7 +788,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     responsive: true,
     persistTableHead: true,
     selectableRows: true,
-    clearSelectedRows: clearSelect === true,
+    clearSelectedRows: clearSelect,
     onSelectedRowsChange: handleChange
   }
 
@@ -801,6 +826,9 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
             <ModalHeader>Delete Version</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
+              <Tag colorScheme='blue' mb={3}>
+                {activeRow?.projectVersion}
+              </Tag>
               <Text>Deleting this version will: </Text>
               <UnorderedList>
                 <Flex flexDir={'column'} gap={1} mt={4}>
