@@ -1,5 +1,6 @@
 import { useLazyQuery } from '@apollo/client'
 import { useEffect } from 'react'
+import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import { Flex } from '@chakra-ui/react'
 
@@ -11,16 +12,15 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { GetSupportTab } from 'graphQL/Queries'
 
 const Support = () => {
+  const org = localStorage.getItem('organization')
   const { totalRows, supportState } = useGlobalState()
   const { searchInput, field, direction } = supportState
 
   // GET COMPONENT SUPPORT INFO
-  const [getSupportData, { data }] = useLazyQuery(GetSupportTab, {
-    fetchPolicy: 'network-only'
-  })
+  const [getSupportData, { data }] = useLazyQuery(GetSupportTab)
 
   useEffect(() => {
-    if (data === undefined) {
+    if (org !== 'undefined' && data === undefined) {
       getSupportData({
         variables: {
           search: searchInput === '' ? undefined : searchInput,
@@ -43,9 +43,13 @@ const Support = () => {
       pr={2}
       pl={5}
     >
-      <Card>
-        <SupportTable data={data?.supports} refetch={getSupportData} />
-      </Card>
+      {!org || org === 'undefined' ? (
+        <OrgRegister />
+      ) : (
+        <Card>
+          <SupportTable data={data?.supports} refetch={getSupportData} />
+        </Card>
+      )}
     </Flex>
   )
 }

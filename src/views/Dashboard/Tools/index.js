@@ -1,8 +1,11 @@
+import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
+
 import { Flex } from '@chakra-ui/react'
 
 import Compare from './Compare'
 
 const Tools = () => {
+  const org = localStorage.getItem('organization')
   return (
     <Flex
       flexDirection='column'
@@ -11,7 +14,11 @@ const Tools = () => {
       pr={2}
       pl={5}
     >
-      <Compare selectedSboms={null} />
+      {!org || org === 'undefined' ? (
+        <OrgRegister />
+      ) : (
+        <Compare selectedSboms={null} />
+      )}
     </Flex>
   )
 }

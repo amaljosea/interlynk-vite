@@ -58,8 +58,8 @@ const OrgRegister = () => {
     }
   }
 
-  const onSwitchOrg = async (id, name) => {
-    await switchOrg({
+  const onSwitchOrg = (id, name) => {
+    switchOrg({
       variables: {
         orgId: id
       }
@@ -74,7 +74,7 @@ const OrgRegister = () => {
           })
         }
       })
-      .finally(() => navigate('/vendor/dashboard'))
+      .finally(() => (window.location.href = '/vendor/dashboard'))
   }
 
   const handleCreate = async () => {

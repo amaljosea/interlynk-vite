@@ -33,17 +33,12 @@ const signedUrlParams =
 
 const authLink = setContext((_, { headers }) => {
   const authHeader = signedUrlParams
-    ? {
-        'Interlynk-ShareLynk-Token': signedUrlParams || authToken
-      }
-    : {
-        authorization: authToken
-      }
-  return {
-    headers: {
-      ...headers,
-      ...authHeader
-    }
+    ? { 'Interlynk-ShareLynk-Token': signedUrlParams || authToken }
+    : { authorization: authToken }
+  if (authToken) {
+    return { headers: { ...headers, ...authHeader } }
+  } else {
+    return { headers: { ...headers } }
   }
 })
 

@@ -1,5 +1,6 @@
 import { useLazyQuery } from '@apollo/client'
 import { useEffect } from 'react'
+import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import { Flex } from '@chakra-ui/react'
 
@@ -11,14 +12,13 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { GetPolicies } from 'graphQL/Queries'
 
 const Policies = () => {
+  const org = localStorage.getItem('organization')
   const { totalRows, policyState } = useGlobalState()
   const { searchInput } = policyState
-  const [getPolicyData, { data }] = useLazyQuery(GetPolicies, {
-    fetchPolicy: 'network-only'
-  })
+  const [getPolicyData, { data }] = useLazyQuery(GetPolicies)
 
   useEffect(() => {
-    if (data === undefined) {
+    if (org !== 'undefined' && data === undefined) {
       getPolicyData({
         variables: {
           search: searchInput === '' ? undefined : searchInput,
@@ -36,9 +36,13 @@ const Policies = () => {
       pr={2}
       pl={5}
     >
-      <Card>
-        <PolicyTable data={data?.policies} refetch={getPolicyData} />
-      </Card>
+      {!org || org === 'undefined' ? (
+        <OrgRegister />
+      ) : (
+        <Card>
+          <PolicyTable data={data?.policies} refetch={getPolicyData} />
+        </Card>
+      )}
     </Flex>
   )
 }

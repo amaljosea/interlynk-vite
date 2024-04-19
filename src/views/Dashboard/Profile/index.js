@@ -3,12 +3,12 @@ import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
+import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import { WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Grid,
-  Switch,
   Tab,
   TabList,
   TabPanel,
@@ -18,7 +18,6 @@ import {
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import CustomLoader from 'components/CustomLoader'
 import NotificationChannels from 'components/Notifications/NotificationChannels'
 import LegalTable from 'components/Tables/LegalTable'
 import OrgTable from 'components/Tables/OrgTable'
@@ -51,6 +50,7 @@ function Profile() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
+  const org = localStorage.getItem('organization')
   const { totalRows, userPermissions } = useGlobalState()
 
   const tabs = [
@@ -79,27 +79,31 @@ function Profile() {
     data: orgInfo,
     refetch,
     error
-  } = useQuery(GetOrg, { skip: orgInfo === undefined ? false : true })
+  } = useQuery(GetOrg, { skip: !org || org === 'undefined' ? true : false })
 
   const isAdmin = orgInfo && orgInfo?.organization?.currentUser?.superAdmin
 
   const { data: orgs, refetch: myOrgRefetch } = useQuery(MyOrganizations, {
-    skip: isAdmin,
+    skip: org === 'undefined' ? true : isAdmin === true ? true : false,
     variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
   })
   const { data: allOrgs, refetch: allOrgRefetch } = useQuery(AllOrganizations, {
-    skip: !isAdmin,
+    skip: org === 'undefined' ? true : isAdmin === true ? false : true,
     variables: { first: totalRows, status: 'approved' }
   })
   const { data: roles, refetch: roleRefetch } = useQuery(GetRoles, {
-    skip: tabIndex === 2 ? false : true
+    skip: org === 'undefined' ? true : tabIndex === 2 ? false : true
   })
   const { data: mfc, refetch: mfcRefetch } = useQuery(GetOrgManufacturers, {
-    skip: tabIndex === 6 ? false : true,
+    skip: org === 'undefined' ? true : tabIndex === 6 ? false : true,
     fetchPolicy: 'network-only'
   })
-  const { data: settingsData, refetch: settingsRefetch } =
-    useQuery(GetOrgSettings)
+  const { data: settingsData, refetch: settingsRefetch } = useQuery(
+    GetOrgSettings,
+    {
+      skip: !org || org === 'undefined' ? true : false
+    }
+  )
 
   const onTabChange = (value) => setTabIndex(value)
   const handleChange = (value) => setPsIndex(value)
@@ -353,9 +357,7 @@ function Profile() {
         </Flex>
       ) : (
         <Flex pr={2} pl={5} pt={{ base: '120px', md: '75px' }}>
-          <Card>
-            <CustomLoader />
-          </Card>
+          <OrgRegister />
         </Flex>
       )}
     </>

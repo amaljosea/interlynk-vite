@@ -46,7 +46,7 @@ export const useProjectGroup = ({ projectGroupId }) => {
     ? data?.shareLynkQuery?.projectGroup
     : data?.projectGroup
 
-  console.log({ projectGroup })
+  // console.log({ projectGroup })
   return {
     projects: projectGroup?.projects || [],
     name: projectGroup?.name,
