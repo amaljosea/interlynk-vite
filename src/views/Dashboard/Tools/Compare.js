@@ -116,7 +116,7 @@ const Compare = ({ selectedSboms }) => {
       }))
       setProductListOne(result)
     }
-  }, [selectedGroupOne])
+  }, [data, selectedGroupOne])
 
   useEffect(() => {
     if (selectedProdOne !== '' && selectedVersionOne === null) {
@@ -141,7 +141,7 @@ const Compare = ({ selectedSboms }) => {
         }
       })
     }
-  }, [selectedProdOne])
+  }, [getProduct, selectedProdOne, selectedVersionOne, selectedVersionTwo])
 
   // ------------- SBOM 2 --------------
   const [selectedGroupTwo, setSelectedGroupTwo] = useState('')
@@ -192,7 +192,7 @@ const Compare = ({ selectedSboms }) => {
       }))
       setProductListTwo(result)
     }
-  }, [selectedGroupTwo])
+  }, [data, selectedGroupTwo])
 
   useEffect(() => {
     if (selectedProdTwo !== '' && selectedVersionTwo === null) {
@@ -217,7 +217,7 @@ const Compare = ({ selectedSboms }) => {
         }
       })
     }
-  }, [selectedProdTwo])
+  }, [getProduct, selectedProdTwo, selectedVersionOne, selectedVersionTwo])
 
   useEffect(() => {
     if (firstSbomInfo && secondSbomInfo) {
@@ -237,7 +237,15 @@ const Compare = ({ selectedSboms }) => {
         }
       })
     }
-  }, [firstSbomInfo, secondSbomInfo])
+  }, [
+    firstSbomInfo,
+    getDrift,
+    secondSbomInfo,
+    selectedProdOne,
+    selectedVersionOne,
+    selectedVersionTwo,
+    toolsDispatch
+  ])
 
   const handleCompare = () => {
     setIsLoading(true)
@@ -420,6 +428,7 @@ const Compare = ({ selectedSboms }) => {
                       value={selectedVersionOne}
                       onChange={(value) => {
                         setSelectedVersionOne(value)
+                        setSelectedProdTwo('')
                         setSelectedVersionTwo(null)
                       }}
                       className='react-select'
@@ -454,8 +463,13 @@ const Compare = ({ selectedSboms }) => {
                     fontFamily={'inherit'}
                     size='md'
                   >
-                    {secondSbomInfo?.project?.projectGroup?.name} :{' '}
-                    {secondSbomInfo?.projectVersion}
+                    {secondSbomInfo?.project?.projectGroup?.name?.length > 20
+                      ? `${secondSbomInfo?.project?.projectGroup?.name?.substring(0, 20)}...`
+                      : secondSbomInfo?.project?.projectGroup?.name}{' '}
+                    :{' '}
+                    {secondSbomInfo?.projectVersion?.length > 20
+                      ? `${secondSbomInfo?.projectVersion?.substring(0, 20)}...`
+                      : secondSbomInfo?.projectVersion}
                   </Heading>
                   <Tag
                     variant='solid'
@@ -557,7 +571,7 @@ const Compare = ({ selectedSboms }) => {
                   >
                     Version
                   </FormLabel>
-                  {uniqVersionsTwo.length > 0 ? (
+                  {uniqVersionsTwo?.length > 0 ? (
                     <ReactSelect
                       styles={{
                         control: (baseStyles, state) => ({
