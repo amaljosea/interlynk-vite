@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils'
+import { updatedValue } from 'utils'
 
 import {
   Box,
@@ -11,6 +12,7 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
+  Stack,
   Tag,
   Text
 } from '@chakra-ui/react'
@@ -19,6 +21,7 @@ import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
 const ViolationDrawer = ({
+  policy,
   activeRow,
   data,
   sbomId,
@@ -144,38 +147,32 @@ const ViolationDrawer = ({
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>Violations List</DrawerHeader>
+        <DrawerHeader>
+          {/* <Text width={'90%'} mr={'auto'} wordBreak={'break-all'}>
+            {policy?.length > 25 ? `${policy?.substring(0, 25)}...` : policy}
+          </Text> */}
+        </DrawerHeader>
         <DrawerBody>
           <Flex
             height={'100%'}
             flexDir={'column'}
             width={'100%'}
             pos={'relative'}
-            gap={4}
+            gap={2}
           >
-            <Flex flexWrap={'wrap'} alignItems={'center'} gap={2}>
-              <Tag
-                colorScheme='blue'
-                variant='outline'
-                textTransform={'capitalize'}
-              >
-                {category}
-              </Tag>
-              <Tag variant='solid' colorScheme='blue'>
-                {name}
-              </Tag>
-              <Tag colorScheme={'blue'} textTransform={'capitalize'}>
-                {operatorWording}
-              </Tag>
-              <Tag
-                variant='solid'
-                hidden={value ? false : true}
-                colorScheme={'cyan'}
-                textTransform={'capitalize'}
-              >
-                {value}
-              </Tag>
-            </Flex>
+            <Stack spacing={2} direction={'column'} ml={3}>
+              <Text>
+                <strong>Policy:</strong> {policy}
+              </Text>
+              <Text>
+                <strong>Condition:</strong>{' '}
+                <span style={{ textTransform: 'capitalize' }}>{category}</span>{' '}
+                {name} {operatorWording} {value}
+              </Text>
+              <Text fontWeight={'bold'} fontSize={'md'}>
+                Violations List
+              </Text>
+            </Stack>
             <Box height={'85%'} overflowY={'scroll'}>
               <DataTable
                 responsive
@@ -187,7 +184,7 @@ const ViolationDrawer = ({
                 persistTableHead
               />
             </Box>
-            <Box position={'absolute'} left={0} right={0} bottom={2}>
+            <Box bg='white' position={'absolute'} left={0} right={0} bottom={2}>
               {data?.pageInfo && (
                 <Pagination
                   paginationSizes={paginationSizes}

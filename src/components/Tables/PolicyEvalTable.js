@@ -35,6 +35,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
   const sbomId = params.sbomid
   const { isOpen, onOpen, onClose } = useDisclosure()
   const paginationSizes = [25, 50, 100]
+  const [activePolicy, setActivePolicy] = useState('')
   const [activeRow, setActiveRow] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
@@ -117,48 +118,26 @@ const PolicyEvalTable = ({ data, refetch }) => {
           </Stack>
         )
       },
-      width: '400px',
       wrap: true
     },
     {
       id: 'RESULT',
       name: 'RESULT',
       selector: (row) => {
-        const { resultWording } = row
-        return (
-          <Tag
-            minW={'120px'}
-            colorScheme={
-              resultWording === 'inform'
-                ? 'blue'
-                : resultWording === 'warn'
-                  ? 'orange'
-                  : 'red'
-            }
-          >
-            <TagLabel mx={'auto'} pt={0.5}>
-              {resultWording}
-            </TagLabel>
-          </Tag>
-        )
-      },
-      width: '250px',
-      wrap: true
-    },
-    {
-      id: 'RESULT_TYPE',
-      name: 'RESULT TYPE',
-      selector: (row) => {
         const { resultType } = row
         return (
           <Tag
             minW={'100px'}
             colorScheme={
-              resultType === 'fail'
-                ? 'red'
-                : resultType === 'warn'
-                  ? 'orange'
-                  : 'blue'
+              resultType === 'pass'
+                ? 'green'
+                : resultType === 'inform'
+                  ? 'blue'
+                  : resultType === 'warn'
+                    ? 'orange'
+                    : resultType === 'fail'
+                      ? 'red'
+                      : 'gray'
             }
           >
             <TagLabel mx={'auto'} pt={0.5} textTransform={'capitalize'}>
@@ -167,14 +146,13 @@ const PolicyEvalTable = ({ data, refetch }) => {
           </Tag>
         )
       },
-      width: '250px',
       wrap: true
     },
     {
       id: 'VIOLATIONS',
       name: 'VIOLATIONS',
       selector: (row) => {
-        const { policyRuleViolations } = row
+        const { resultType, policyRuleViolations } = row
         return (
           <Tag
             width={'60px'}
@@ -183,12 +161,15 @@ const PolicyEvalTable = ({ data, refetch }) => {
             }
           >
             <TagLabel mx={'auto'} pt={0.5}>
-              {policyRuleViolations?.totalCount || 0}
+              {resultType === 'pass' || resultType === 'skip'
+                ? 0
+                : policyRuleViolations?.totalCount}
             </TagLabel>
           </Tag>
         )
       },
-      width: '250px',
+      right: 'true',
+      width: '220px',
       wrap: true
     },
     // CREATED AT
@@ -206,12 +187,13 @@ const PolicyEvalTable = ({ data, refetch }) => {
   ]
 
   const onCheckViolations = useCallback(
-    async (item) => {
+    async (name, item) => {
       console.log('item', item)
       await getViolations({
         variables: { sbomId, policyRuleId: item.id, first: totalRows }
       }).then((res) => {
         if (res?.data) {
+          setActivePolicy(name)
           setActiveRow(item)
           console.log(res?.data?.policyRuleViolations)
         }
@@ -247,7 +229,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
           mx={'auto'}
           textTransform={'uppercase'}
         >
-          Policy Violations
+          Results
         </Heading>
         <Grid
           width={'95%'}
@@ -316,7 +298,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
                     colorScheme='blue'
                     fontWeight={'medium'}
                     hidden={item?.category === 'version'}
-                    onClick={() => onCheckViolations(item)}
+                    onClick={() => onCheckViolations(policy?.name, item)}
                   />
                 </Tooltip>
               </GridItem>
@@ -418,6 +400,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
           isOpen={isOpen}
           onClose={onClose}
           activeRow={activeRow}
+          policy={activePolicy}
           data={violations?.policyRuleViolations}
           sbomId={sbomId}
           refetch={getViolations}
