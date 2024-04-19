@@ -106,17 +106,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
       name: 'POLICY',
       selector: (row) => {
         const { policy } = row
-        return (
-          <Stack
-            direction='column'
-            alignItems={'flex-start'}
-            spacing={1}
-            my={3}
-          >
-            <Text>{policy?.name || ''}</Text>
-            <Text>{policy?.description || ''}</Text>
-          </Stack>
-        )
+        return <Text>{policy?.name || ''}</Text>
       },
       wrap: true
     },
@@ -209,113 +199,110 @@ const PolicyEvalTable = ({ data, refetch }) => {
     const CustomText = styled(Text)`
       font-size: 12px;
       font-weight: bold;
-      color: #333;
+      color: #718096;
       text-transform: uppercase;
       letter-spacing: 0.6px;
     `
     return (
-      <Box
-        width={'100%'}
+      <Flex
         p={5}
+        gap={6}
+        width={'100%'}
+        flexDir={'column'}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        <Heading
-          mt={2}
-          mb={5}
-          fontFamily={'inherit'}
-          fontSize={'sm'}
-          color={'#555'}
-          width={'95%'}
-          mx={'auto'}
-          textTransform={'uppercase'}
-        >
-          Results
-        </Heading>
-        <Grid
-          width={'95%'}
-          templateColumns='repeat(12, 1fr)'
-          gap={6}
-          mx={'auto'}
-          borderBottom={'1px solid #E2E8F0'}
-          py={2}
-        >
-          <GridItem colSpan={3}>
-            <CustomText>subject</CustomText>
-          </GridItem>
-          <GridItem colSpan={2}>
-            <CustomText>operator</CustomText>
-          </GridItem>
-          <GridItem colSpan={3}>
-            <CustomText>value</CustomText>
-          </GridItem>
-          <GridItem colSpan={2}>
-            <CustomText>violations</CustomText>
-          </GridItem>
-          <GridItem colSpan={2}>
-            <CustomText>action</CustomText>
-          </GridItem>
-        </Grid>
-        {policy?.policyRules?.length > 0 ? (
-          policy?.policyRules?.map((item, index) => (
-            <Grid
-              width={'95%'}
-              key={index}
-              alignItems={'center'}
-              templateColumns='repeat(12, 1fr)'
-              gap={6}
-              mb={1}
-              mx={'auto'}
-              py={2}
-              borderBottom={'1px solid #E2E8F0'}
-            >
-              <GridItem colSpan={3}>
-                <Text fontSize={'sm'} textTransform={'capitalize'}>
-                  {`${item?.category} ${item?.name}`}
-                </Text>
-              </GridItem>
-              <GridItem colSpan={2}>
-                <Text fontSize={'sm'} textTransform={'lowercase'}>
-                  {item?.operatorWording}
-                </Text>
-              </GridItem>
-              <GridItem colSpan={3}>
-                <Text fontSize={'sm'} wordBreak={'break-all'}>
-                  {item?.value}
-                </Text>
-              </GridItem>
-              <GridItem colSpan={2}>
-                <Tag width={'80px'} colorScheme='blue'>
-                  <TagLabel mx={'auto'}>
-                    {item?.policyRuleViolations?.totalCount || 0}
-                  </TagLabel>
-                </Tag>
-              </GridItem>
-              <GridItem colSpan={2}>
-                <Tooltip label={'View Violations'}>
-                  <IconButton
-                    size='sm'
-                    icon={<FaEye />}
-                    colorScheme='blue'
-                    fontWeight={'medium'}
-                    hidden={item?.category === 'version'}
-                    onClick={() => onCheckViolations(policy?.name, item)}
-                  />
-                </Tooltip>
-              </GridItem>
-            </Grid>
-          ))
-        ) : (
-          <GridItem
-            width={'97.5%'}
-            mx={'auto'}
-            colSpan={12}
-            my={6}
-            textAlign={'center'}
+        <Box width={'95%'} mx={'auto'}>
+          <CustomText>Description :</CustomText>
+          <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
+            {policy?.description || ''}
+          </Text>
+        </Box>
+        <Box width={'95%'} mx={'auto'}>
+          <Heading
+            mb={2}
+            fontFamily={'inherit'}
+            fontSize={'sm'}
+            color={'#555'}
+            textTransform={'uppercase'}
           >
-            There are no records to display
-          </GridItem>
-        )}
-      </Box>
+            Results
+          </Heading>
+          <Grid
+            templateColumns='repeat(12, 1fr)'
+            gap={6}
+            borderBottom={'1px solid #E2E8F0'}
+            py={2}
+          >
+            <GridItem colSpan={3}>
+              <CustomText>subject</CustomText>
+            </GridItem>
+            <GridItem colSpan={2}>
+              <CustomText>operator</CustomText>
+            </GridItem>
+            <GridItem colSpan={3}>
+              <CustomText>value</CustomText>
+            </GridItem>
+            <GridItem colSpan={2}>
+              <CustomText>violations</CustomText>
+            </GridItem>
+            <GridItem colSpan={2}>
+              <CustomText>action</CustomText>
+            </GridItem>
+          </Grid>
+          {policy?.policyRules?.length > 0 ? (
+            policy?.policyRules?.map((item, index) => (
+              <Grid
+                key={index}
+                alignItems={'center'}
+                templateColumns='repeat(12, 1fr)'
+                gap={6}
+                mb={1}
+                py={2}
+                borderBottom={'1px solid #E2E8F0'}
+              >
+                <GridItem colSpan={3}>
+                  <Text fontSize={'sm'} textTransform={'capitalize'}>
+                    {`${item?.category} ${item?.name}`}
+                  </Text>
+                </GridItem>
+                <GridItem colSpan={2}>
+                  <Text fontSize={'sm'} textTransform={'lowercase'}>
+                    {item?.operatorWording}
+                  </Text>
+                </GridItem>
+                <GridItem colSpan={3}>
+                  <Text fontSize={'sm'} wordBreak={'break-all'}>
+                    {item?.value}
+                  </Text>
+                </GridItem>
+                <GridItem colSpan={2}>
+                  <Tag width={'80px'} colorScheme='blue'>
+                    <TagLabel mx={'auto'}>
+                      {item?.policyRuleViolations?.totalCount || 0}
+                    </TagLabel>
+                  </Tag>
+                </GridItem>
+                <GridItem colSpan={2}>
+                  <Tooltip label={'View Violations'}>
+                    <IconButton
+                      size='sm'
+                      icon={<FaEye />}
+                      colorScheme='blue'
+                      fontWeight={'medium'}
+                      hidden={item?.category === 'version'}
+                      onClick={() => onCheckViolations(policy?.name, item)}
+                    />
+                  </Tooltip>
+                </GridItem>
+              </Grid>
+            ))
+          ) : (
+            <GridItem colSpan={12} my={6} textAlign={'center'}>
+              There are no records to display
+            </GridItem>
+          )}
+        </Box>
+      </Flex>
     )
   }
 

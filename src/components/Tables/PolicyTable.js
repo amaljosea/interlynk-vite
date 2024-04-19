@@ -387,7 +387,7 @@ const PolicyTable = ({ data, refetch }) => {
 
   // EXPAND VIEW
   const ExpandedComponent = ({ data }) => {
-    const { policyRules } = data
+    const { description, policyRules } = data
     const CustomText = styled(Text)`
       font-size: 13px;
       font-weight: bold;
@@ -396,78 +396,74 @@ const PolicyTable = ({ data, refetch }) => {
       letter-spacing: 0.6px;
     `
     return (
-      <Box
-        width={'100%'}
+      <Flex
         p={5}
+        gap={6}
+        width={'100%'}
+        flexDir={'column'}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        <Heading
-          mb={6}
-          fontFamily={'inherit'}
-          fontSize={'sm'}
-          color={'#555'}
-          width={'90%'}
-          mx={'auto'}
-        >
-          CONDITIONS
-        </Heading>
-        <Grid
-          width={'90%'}
-          templateColumns='repeat(3, 1fr)'
-          gap={6}
-          mb={4}
-          mx={'auto'}
-        >
-          <GridItem>
-            <CustomText>subject</CustomText>
-          </GridItem>
-          <GridItem>
-            <CustomText>operator</CustomText>
-          </GridItem>
-          <GridItem>
-            <CustomText>value</CustomText>
-          </GridItem>
-        </Grid>
-        {policyRules?.map((item, index) => (
-          <Grid
-            key={index}
-            width={'90%'}
-            templateColumns='repeat(3, 1fr)'
-            gap={6}
-            mb={1}
-            mx={'auto'}
-            bg={'#EDF2F7'}
-            p={2}
-          >
+        <Box width={'95%'} mx={'auto'}>
+          <CustomText>Description :</CustomText>
+          <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
+            {description || ''}
+          </Text>
+        </Box>
+        <Box width={'95%'} mx={'auto'}>
+          <Heading mb={3} fontFamily={'inherit'} fontSize={'sm'} color={'#555'}>
+            CONDITIONS
+          </Heading>
+          <Grid templateColumns='repeat(3, 1fr)' gap={6} mb={4}>
             <GridItem>
-              <Text fontSize={'sm'} textTransform={'capitalize'}>
-                {formatSubject(item?.subject)}
-              </Text>
+              <CustomText>subject</CustomText>
             </GridItem>
             <GridItem>
-              <Text fontSize={'sm'} textTransform={'lowercase'}>
-                {updatedValue(item?.operator)}
-              </Text>
+              <CustomText>operator</CustomText>
             </GridItem>
             <GridItem>
-              <Text
-                fontSize={'sm'}
-                wordBreak={'break-all'}
-                hidden={
-                  item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS'
-                }
-              >
-                {item?.value}{' '}
-                {item?.subject === 'VULNERABILITY_EPSS' &&
-                (item?.operator === 'LESS_THAN' ||
-                  item?.operator === 'MORE_THAN')
-                  ? ' %'
-                  : ''}
-              </Text>
+              <CustomText>value</CustomText>
             </GridItem>
           </Grid>
-        ))}
-      </Box>
+          {policyRules?.map((item, index) => (
+            <Grid
+              key={index}
+              templateColumns='repeat(3, 1fr)'
+              gap={6}
+              mb={1}
+              bg={'#EDF2F7'}
+              p={2}
+            >
+              <GridItem>
+                <Text fontSize={'sm'} textTransform={'capitalize'}>
+                  {formatSubject(item?.subject)}
+                </Text>
+              </GridItem>
+              <GridItem>
+                <Text fontSize={'sm'} textTransform={'lowercase'}>
+                  {updatedValue(item?.operator)}
+                </Text>
+              </GridItem>
+              <GridItem>
+                <Text
+                  fontSize={'sm'}
+                  wordBreak={'break-all'}
+                  hidden={
+                    item?.operator === 'EXISTS' ||
+                    item?.operator === 'NOT_EXISTS'
+                  }
+                >
+                  {item?.value}{' '}
+                  {item?.subject === 'VULNERABILITY_EPSS' &&
+                  (item?.operator === 'LESS_THAN' ||
+                    item?.operator === 'MORE_THAN')
+                    ? ' %'
+                    : ''}
+                </Text>
+              </GridItem>
+            </Grid>
+          ))}
+        </Box>
+      </Flex>
     )
   }
 
