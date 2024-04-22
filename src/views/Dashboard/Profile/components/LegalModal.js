@@ -36,7 +36,8 @@ import {
 import { FaPlus, FaTrash } from 'react-icons/fa6'
 
 const validateUrl = (url) => {
-  const urlRegex = /^https:\/\/(?:www\.)?([a-zA-Z0-9-]+)(?:\.[a-zA-Z]{2,})$/
+  const urlRegex =
+    /^https?:\/\/(?:www\.)?([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,})(\/[^?#]*\/?)?(?:\?[^#]*)?(?:#.*)?$/
   return urlRegex.test(url)
 }
 
@@ -83,7 +84,7 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
     if (orgs?.includes(orgName?.toLocaleLowerCase())) {
       setError('Organization already exists')
     } else if (url !== '' && !validateUrl(url)) {
-      setIsValidUrl('Please enter a valid URL')
+      setIsValidUrl('Please enter a valid URL including http:// or https://')
     } else {
       createMfc({
         variables: {
@@ -101,12 +102,9 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
           setError(errors[0])
         } else {
           refetch({ first: totalRows })
-          onClose()
         }
       })
-      setOrgName('')
-      setContacts([])
-      setUrl('')
+      onClose()
     }
   }
 
@@ -133,25 +131,28 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
     if (existingData && existingData.length > 0) {
       mergedArray.push(...existingData)
     }
-    updateMfc({
-      variables: {
-        id: data?.id,
-        orgName,
-        url,
-        contacts: mergedArray
-      }
-    }).then((res) => {
-      const errors = res?.data?.OrganizationManufacturerUpdate?.errors
-      if (errors?.length > 0) {
-        setError(errors[0])
-      } else {
-        refetch({ first: totalRows })
-        onClose()
-      }
-    })
-    setOrgName('')
-    setContacts([])
-    setUrl('')
+    if (orgs?.includes(orgName?.toLocaleLowerCase())) {
+      setError('Organization already exists')
+    } else if (url !== '' && !validateUrl(url)) {
+      setIsValidUrl('Please enter a valid URL including http:// or https://')
+    } else {
+      updateMfc({
+        variables: {
+          id: data?.id,
+          orgName,
+          url,
+          contacts: mergedArray
+        }
+      }).then((res) => {
+        const errors = res?.data?.OrganizationManufacturerUpdate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
+        } else {
+          refetch({ first: totalRows })
+        }
+      })
+      onClose()
+    }
   }
 
   const hasSimilarRow = (data) => {
@@ -293,7 +294,10 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
                   gap={4}
                 >
                   <GridItem>
-                    <FormControl isRequired>
+                    <FormControl
+                      isRequired
+                      isInvalid={orgName !== '' && error !== ''}
+                    >
                       <FormLabel>Organization Name</FormLabel>
                       <Input
                         size='sm'
@@ -304,6 +308,7 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
                           setError('')
                         }}
                       />
+                      <FormErrorMessage>{error}</FormErrorMessage>
                     </FormControl>
                   </GridItem>
                   <GridItem>
@@ -416,14 +421,6 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
                       </GridItem>
                     </Grid>
                   ))}
-                {error !== '' && (
-                  <Alert status='error' borderRadius={4}>
-                    <AlertIcon />
-                    <AlertDescription fontSize={'sm'} pr={2}>
-                      {error}
-                    </AlertDescription>
-                  </Alert>
-                )}
               </Flex>
             </ModalBody>
             <ModalFooter mt={4}>
