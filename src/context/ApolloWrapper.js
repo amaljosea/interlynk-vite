@@ -24,21 +24,34 @@ const uploadLink = createUploadLink({
 })
 const env = process.env.NODE_ENV
 
-const queryParams = new URLSearchParams(location.search)
-
-const authToken = Cookies.get('authToken')
-const signedUrlParams =
-  queryParams.get('signed_url_params') ||
-  sessionStorage.getItem('signedUrlParams')
-
 const authLink = setContext((_, { headers }) => {
-  const authHeader = signedUrlParams
-    ? { 'Interlynk-ShareLynk-Token': signedUrlParams || authToken }
-    : { authorization: authToken }
+  const authToken = Cookies.get('authToken')
+  const queryParams = new URLSearchParams(location.search)
+
+  const signedUrlParams =
+    queryParams.get('signed_url_params') ||
+    sessionStorage.getItem('signedUrlParams')
+
+  let authHeaders
+
+  if (signedUrlParams) {
+    authHeaders = {
+      'Interlynk-ShareLynk-Token': signedUrlParams || authToken
+    }
+  }
+
   if (authToken) {
-    return { headers: { ...headers, ...authHeader } }
-  } else {
-    return { headers: { ...headers } }
+    authHeaders = {
+      ...authHeaders,
+      authorization: authToken
+    }
+  }
+
+  return {
+    headers: {
+      ...headers,
+      ...authHeaders
+    }
   }
 })
 

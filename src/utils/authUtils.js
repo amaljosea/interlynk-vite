@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { client } from 'context/ApolloWrapper'
 import Cookies from 'js-cookie'
 
 export const logoutUser = async () => {
@@ -23,6 +24,7 @@ export const logoutUser = async () => {
     Cookies.remove('authToken')
     Cookies.remove('signedParamId')
     Cookies.remove('userToken')
+    client.clearStore()
   }
 }
 
