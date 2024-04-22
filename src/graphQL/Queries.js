@@ -9,6 +9,31 @@ export const GetOrgName = gql`
   }
 `
 
+// GET USERS
+export const GetUsers = gql`
+  query GetUsers($search: String) {
+    organization {
+      users(search: $search) {
+        id
+        name
+        email
+        role {
+          id
+          name
+          permissions
+        }
+        createdAt
+        invitationStatus
+        invitationAcceptedAt
+        profileImage {
+          filename
+          url
+        }
+      }
+    }
+  }
+`
+
 // GET ORG INFO
 export const GetOrg = gql`
   query GetOrganization {

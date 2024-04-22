@@ -1,5 +1,5 @@
 // Chakra imports
-import { useQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
@@ -225,10 +225,7 @@ function Profile() {
               {/* TEAMS */}
               <TabPanel>
                 {orgInfo && (
-                  <TeamTable
-                    data={orgInfo?.organization || null}
-                    refetch={refetch}
-                  />
+                  <TeamTable currentUser={orgInfo?.organization?.currentUser} />
                 )}
               </TabPanel>
               {/* ROLES */}

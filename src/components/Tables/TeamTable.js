@@ -1,5 +1,5 @@
-import { useMutation } from '@apollo/client'
-import React, { useMemo, useState } from 'react'
+import { useMutation, useQuery } from '@apollo/client'
+import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
@@ -34,9 +34,12 @@ import {
   useToast
 } from '@chakra-ui/react'
 
+import CustomLoader from 'components/CustomLoader'
+
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
+import { GetUsers } from 'graphQL/Queries'
 
 import { FaEllipsisV } from 'react-icons/fa'
 
@@ -50,7 +53,8 @@ function userTimeStart(row) {
   return timeStart
 }
 
-const TeamTable = ({ data, refetch }) => {
+const TeamTable = ({ currentUser }) => {
+  const org = localStorage.getItem('organization')
   const { userPermissions } = useGlobalState()
 
   const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
@@ -85,11 +89,19 @@ const TeamTable = ({ data, refetch }) => {
   } = useDisclosure()
   const [activeRow, setActiveRow] = useState(null)
   const [searchInput, setSearchInput] = useState('')
+  const [filterText, setFilterText] = useState('')
   const [deleteUser] = useMutation(deleteOrgUser)
 
   const [inviteUsers] = useMutation(InviteUser, {
     onCompleted: () => refetch()
   })
+
+  const { data, refetch } = useQuery(GetUsers, {
+    skip: !org || org === 'undefined' ? true : false,
+    variables: { search: filterText === '' ? undefined : filterText }
+  })
+
+  const { users } = data?.organization || ''
 
   // COLUMNS
   const columns = [
@@ -122,7 +134,7 @@ const TeamTable = ({ data, refetch }) => {
               <Text width={'fit-content'} fontSize={'14px'}>
                 {name}
               </Text>
-              {row.email === data.currentUser.email && (
+              {row.email === currentUser?.email && (
                 <Badge
                   variant='outline'
                   colorScheme='blue'
@@ -188,9 +200,6 @@ const TeamTable = ({ data, refetch }) => {
       id: 'joinedDate',
       name: 'JOINED',
       selector: (row) => {
-        const { invitationStatus } = row
-        const { invitationAcceptedAt } = row
-        const { createdAt } = row
         const timeStart = userTimeStart(row)
         return (
           <Tooltip label={getFullDateAndTime(timeStart)} placement={'top'}>
@@ -230,9 +239,7 @@ const TeamTable = ({ data, refetch }) => {
             <Portal>
               <MenuList size='sm'>
                 <MenuItem
-                  isDisabled={
-                    row.email === data.currentUser.email || !editUserRole
-                  }
+                  isDisabled={row.email === currentUser?.email || !editUserRole}
                   onClick={() => {
                     setActiveRow(row)
                     onRoleOpen()
@@ -241,9 +248,7 @@ const TeamTable = ({ data, refetch }) => {
                   Change Role
                 </MenuItem>
                 <MenuItem
-                  isDisabled={
-                    row.email === data.currentUser.email || !removeUser
-                  }
+                  isDisabled={row.email === currentUser?.email || !removeUser}
                   onClick={() => {
                     setActiveRow(row)
                     onOpen()
@@ -274,11 +279,32 @@ const TeamTable = ({ data, refetch }) => {
     }
   ]
 
-  // SEARCH COMPONENT
-  const handleSearch = () => console.log('hello')
-
   // CLEAR SERACH
-  const handleClear = () => setSearchInput('')
+  const handleClear = useCallback(async () => {
+    setSearchInput('')
+    setFilterText('')
+  }, [])
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = useCallback(
+    (e) => {
+      const { value } = e.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setSearchInput(value)
+      }
+    },
+    [handleClear]
+  )
+
+  // SEARCH COMPONENT
+  const handleSearch = useCallback(async (event) => {
+    const { value } = event.target
+    if (event.key === 'Enter') {
+      setFilterText(value)
+    }
+  }, [])
 
   // HEADER SECTION
   const subHeaderComponent = useMemo(() => {
@@ -298,7 +324,7 @@ const TeamTable = ({ data, refetch }) => {
           <SearchFilter
             id='team'
             filterText={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+            onChange={onSearchInputChange}
             onFilter={handleSearch}
             onClear={handleClear}
           />
@@ -333,7 +359,15 @@ const TeamTable = ({ data, refetch }) => {
         </Stack>
       </Flex>
     )
-  }, [searchInput, handleSearch, handleClear])
+  }, [
+    searchInput,
+    onSearchInputChange,
+    handleSearch,
+    handleClear,
+    onTeamOpen,
+    inviteUser,
+    refetch
+  ])
 
   const handleRemove = async () => {
     try {
@@ -376,30 +410,20 @@ const TeamTable = ({ data, refetch }) => {
 
   return (
     <>
-      {data ? (
-        <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
-            columns={columns}
-            data={data.users || []}
-            defaultSortAsc={false}
-            defaultSortFieldId={'joinedDate'}
-            subHeader
-            subHeaderComponent={subHeaderComponent}
-            customStyles={customStyles}
-            progressPending={data ? false : true}
-            responsive={true}
-          />
-        </Flex>
-      ) : (
-        <Flex
-          width={'100%'}
-          mt={4}
-          alignItems={'center'}
-          justifyContent={'center'}
-        >
-          <Text>No team data found</Text>
-        </Flex>
-      )}
+      <Flex flexDir={'column'} width={'100%'}>
+        <DataTable
+          columns={columns}
+          data={users || []}
+          defaultSortAsc={false}
+          defaultSortFieldId={'joinedDate'}
+          subHeader
+          subHeaderComponent={subHeaderComponent}
+          customStyles={customStyles}
+          progressPending={users ? false : true}
+          progressComponent={<CustomLoader />}
+          responsive={true}
+        />
+      </Flex>
 
       {/* ADD / UPDATE User */}
       {isTeamOpen && (
@@ -407,7 +431,7 @@ const TeamTable = ({ data, refetch }) => {
           refetch={refetch}
           isOpen={isTeamOpen}
           onClose={onTeamClose}
-          data={data?.currentUser}
+          data={currentUser}
         />
       )}
 
