@@ -150,217 +150,216 @@ function Profile() {
     )
   }
 
+  if (!org || org === 'undefined') {
+    return (
+      <Flex direction='column' pr={2} pl={5} pt={{ base: '120px', md: '75px' }}>
+        <OrgRegister />
+      </Flex>
+    )
+  }
+
   return (
-    <>
-      {orgInfo ? (
-        <Flex
-          direction='column'
-          pr={2}
-          pl={5}
-          pt={{ base: '120px', md: '75px' }}
-        >
-          {/*  HEADER */}
-          <Header
-            org={orgInfo?.organization}
-            user={orgInfo?.organization?.currentUser}
-            selectedTab={selectedTab}
-            refetch={refetch}
-            setSelectedTab={setSelectedTab}
-            setTabIndex={setTabIndex}
-            setPsIndex={setPsIndex}
-            tabs={tabs}
-          />
-          {/*  ORGANIZATION */}
-          {selectedTab === 'ORGANIZATION' && (
-            <Card>
-              <Tabs
-                variant='enclosed'
-                w={'100%'}
-                bg={'white'}
-                defaultIndex={tabIndex}
-                onChange={(e) => onTabChange(e)}
-              >
-                <TabList>
-                  {[
-                    'General',
-                    'Users',
-                    'Roles',
-                    'Feeds',
-                    'Checks',
-                    'Lists',
-                    'Legal'
-                  ].map((item, index) => (
-                    <Tab
-                      key={index}
-                      _focus={{ outline: 'none' }}
-                      display={
-                        (item === 'Lists' && !manageListing) ||
-                        (item === 'Feeds' && !manageFeeds) ||
-                        (item === 'Users' && !viewUsers?.value)
-                          ? 'none'
-                          : 'block'
-                      }
-                    >
-                      {item}
-                    </Tab>
-                  ))}
-                </TabList>
-                <TabPanels>
-                  {/* GEENRAL */}
-                  <TabPanel>
-                    <Grid
-                      width={'100%'}
-                      templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
-                      gap='22px'
-                    >
-                      <GeneralFeed orgInfo={orgInfo} refetch={refetch} />
-                    </Grid>
-                  </TabPanel>
-                  {/* TEAMS */}
-                  <TabPanel>
-                    {orgInfo && (
-                      <TeamTable
-                        data={orgInfo?.organization || null}
-                        refetch={refetch}
-                      />
-                    )}
-                  </TabPanel>
-                  {/* ROLES */}
-                  <TabPanel>
-                    <RoleTable
-                      tabIndex={tabIndex}
-                      data={roles?.organization?.organizationRoles}
-                      role={orgInfo?.organization?.currentUser?.role?.name}
-                      refetch={roleRefetch}
+    <Flex
+      flexDirection={'column'}
+      pr={2}
+      pl={5}
+      pt={{ base: '120px', md: '75px' }}
+    >
+      {/*  HEADER */}
+      <Header
+        org={orgInfo?.organization}
+        user={orgInfo?.organization?.currentUser}
+        selectedTab={selectedTab}
+        refetch={refetch}
+        setSelectedTab={setSelectedTab}
+        setTabIndex={setTabIndex}
+        setPsIndex={setPsIndex}
+        tabs={tabs}
+      />
+      {/*  ORGANIZATION */}
+      {selectedTab === 'ORGANIZATION' && (
+        <Card>
+          <Tabs
+            variant='enclosed'
+            w={'100%'}
+            bg={'white'}
+            defaultIndex={tabIndex}
+            onChange={(e) => onTabChange(e)}
+          >
+            <TabList>
+              {[
+                'General',
+                'Users',
+                'Roles',
+                'Feeds',
+                'Checks',
+                'Lists',
+                'Legal'
+              ].map((item, index) => (
+                <Tab
+                  key={index}
+                  _focus={{ outline: 'none' }}
+                  display={
+                    (item === 'Lists' && !manageListing) ||
+                    (item === 'Feeds' && !manageFeeds) ||
+                    (item === 'Users' && !viewUsers?.value)
+                      ? 'none'
+                      : 'block'
+                  }
+                >
+                  {item}
+                </Tab>
+              ))}
+            </TabList>
+            <TabPanels>
+              {/* GEENRAL */}
+              <TabPanel>
+                <Grid
+                  width={'100%'}
+                  templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
+                  gap='22px'
+                >
+                  <GeneralFeed orgInfo={orgInfo} refetch={refetch} />
+                </Grid>
+              </TabPanel>
+              {/* TEAMS */}
+              <TabPanel>
+                {orgInfo && (
+                  <TeamTable
+                    data={orgInfo?.organization || null}
+                    refetch={refetch}
+                  />
+                )}
+              </TabPanel>
+              {/* ROLES */}
+              <TabPanel>
+                <RoleTable
+                  tabIndex={tabIndex}
+                  data={roles?.organization?.organizationRoles}
+                  role={orgInfo?.organization?.currentUser?.role?.name}
+                  refetch={roleRefetch}
+                />
+              </TabPanel>
+              {/* FEEDS */}
+              <TabPanel display={manageFeeds ? 'block' : 'none'}>
+                {settingsData && (
+                  <Grid
+                    width={'100%'}
+                    templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
+                    gap='22px'
+                  >
+                    <AdvisoryFeeds
+                      data={settingsData}
+                      refetch={settingsRefetch}
                     />
-                  </TabPanel>
-                  {/* FEEDS */}
-                  <TabPanel display={manageFeeds ? 'block' : 'none'}>
-                    {settingsData && (
-                      <Grid
-                        width={'100%'}
-                        templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
-                        gap='22px'
-                      >
-                        <AdvisoryFeeds
-                          data={settingsData}
-                          refetch={settingsRefetch}
-                        />
-                        <ExploitFeeds
-                          data={settingsData}
-                          refetch={settingsRefetch}
-                        />
-                      </Grid>
-                    )}
-                  </TabPanel>
-                  {/* RULES */}
-                  <TabPanel>
-                    <ApiFeed />
-                  </TabPanel>
-                  {/* LISTS */}
-                  <TabPanel>
-                    <Grid
-                      width={'100%'}
-                      templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
-                      gap='22px'
-                    >
-                      <ComponentFeed
-                        data={orgInfo?.organization?.organizationComponents}
-                        refetch={refetch}
-                      />
-                    </Grid>
-                  </TabPanel>
-                  {/* LEGAL */}
-                  <TabPanel>
-                    <LegalTable
-                      data={mfc?.organizationManufacturers}
-                      refetch={mfcRefetch}
+                    <ExploitFeeds
+                      data={settingsData}
+                      refetch={settingsRefetch}
                     />
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            </Card>
-          )}
-
-          {/* PERSONAL  */}
-          {selectedTab === 'PERSONAL' && (
-            <Card>
-              <Tabs
-                variant='enclosed'
-                w={'100%'}
-                bg={'white'}
-                index={psIndex}
-                onChange={handleChange}
-              >
-                <TabList>
-                  {[
-                    'Personal Details',
-                    'Organizations',
-                    'Security Tokens',
-                    'Notifications'
-                  ].map((item, index) => (
-                    <Tab
-                      key={index}
-                      _focus={{ outline: 'none' }}
-                      isDisabled={
-                        orgInfo?.organization === null &&
-                        (item === 'Personal Details' ||
-                          item === 'Security Tokens')
-                      }
-                    >
-                      {item}
-                    </Tab>
-                  ))}
-                </TabList>
-                <TabPanels>
-                  {/* PERSONA DETAILS */}
-                  <TabPanel display={orgInfo?.organization ? 'block' : 'none'}>
-                    <PersonalInfo
-                      user={orgInfo?.organization?.currentUser || null}
-                      refetch={refetch}
-                    />
-                  </TabPanel>
-                  {/* ORG DETAILS */}
-                  <TabPanel>
-                    {isAdmin === true ? (
-                      <OrgTable
-                        data={allOrgs?.allOrganizations?.nodes || []}
-                        refetch={allOrgRefetch}
-                        isAdmin={isAdmin}
-                        activeOrg={orgInfo?.organization?.id || null}
-                      />
-                    ) : (
-                      <OrgTable
-                        data={orgs?.myOrganizations?.nodes || []}
-                        refetch={myOrgRefetch}
-                        isAdmin={isAdmin}
-                        activeOrg={orgInfo?.organization?.id || null}
-                      />
-                    )}
-                  </TabPanel>
-                  {/* SECURITY TOKEN */}
-                  <TabPanel display={orgInfo?.organization ? 'block' : 'none'}>
-                    <TokenInfo
-                      data={orgInfo?.organization?.currentUser?.apiKeys || []}
-                      refetch={refetch}
-                    />
-                  </TabPanel>
-
-                  {/* Notification Preferences */}
-                  <TabPanel>
-                    <NotificationChannels />
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            </Card>
-          )}
-        </Flex>
-      ) : (
-        <Flex pr={2} pl={5} pt={{ base: '120px', md: '75px' }}>
-          <OrgRegister />
-        </Flex>
+                  </Grid>
+                )}
+              </TabPanel>
+              {/* RULES */}
+              <TabPanel>
+                <ApiFeed />
+              </TabPanel>
+              {/* LISTS */}
+              <TabPanel>
+                <Grid
+                  width={'100%'}
+                  templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
+                  gap='22px'
+                >
+                  <ComponentFeed
+                    data={orgInfo?.organization?.organizationComponents}
+                    refetch={refetch}
+                  />
+                </Grid>
+              </TabPanel>
+              {/* LEGAL */}
+              <TabPanel>
+                <LegalTable
+                  data={mfc?.organizationManufacturers}
+                  refetch={mfcRefetch}
+                />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </Card>
       )}
-    </>
+
+      {/* PERSONAL  */}
+      {selectedTab === 'PERSONAL' && (
+        <Card>
+          <Tabs
+            variant='enclosed'
+            w={'100%'}
+            bg={'white'}
+            index={psIndex}
+            onChange={handleChange}
+          >
+            <TabList>
+              {[
+                'Personal Details',
+                'Organizations',
+                'Security Tokens',
+                'Notifications'
+              ].map((item, index) => (
+                <Tab
+                  key={index}
+                  _focus={{ outline: 'none' }}
+                  isDisabled={
+                    orgInfo?.organization === null &&
+                    (item === 'Personal Details' || item === 'Security Tokens')
+                  }
+                >
+                  {item}
+                </Tab>
+              ))}
+            </TabList>
+            <TabPanels>
+              {/* PERSONA DETAILS */}
+              <TabPanel display={orgInfo?.organization ? 'block' : 'none'}>
+                <PersonalInfo
+                  user={orgInfo?.organization?.currentUser || null}
+                  refetch={refetch}
+                />
+              </TabPanel>
+              {/* ORG DETAILS */}
+              <TabPanel>
+                {isAdmin === true ? (
+                  <OrgTable
+                    data={allOrgs?.allOrganizations?.nodes || []}
+                    refetch={allOrgRefetch}
+                    isAdmin={isAdmin}
+                    activeOrg={orgInfo?.organization?.id || null}
+                  />
+                ) : (
+                  <OrgTable
+                    data={orgs?.myOrganizations?.nodes || []}
+                    refetch={myOrgRefetch}
+                    isAdmin={isAdmin}
+                    activeOrg={orgInfo?.organization?.id || null}
+                  />
+                )}
+              </TabPanel>
+              {/* SECURITY TOKEN */}
+              <TabPanel display={orgInfo?.organization ? 'block' : 'none'}>
+                <TokenInfo
+                  data={orgInfo?.organization?.currentUser?.apiKeys || []}
+                  refetch={refetch}
+                />
+              </TabPanel>
+
+              {/* Notification Preferences */}
+              <TabPanel>
+                <NotificationChannels />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </Card>
+      )}
+    </Flex>
   )
 }
 
