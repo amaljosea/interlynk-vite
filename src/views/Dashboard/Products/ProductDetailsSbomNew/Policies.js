@@ -13,10 +13,17 @@ import {
   Heading,
   IconButton,
   Stack,
+  Table,
+  TableContainer,
   Tag,
   TagLabel,
+  Tbody,
+  Td,
   Text,
+  Th,
+  Thead,
   Tooltip,
+  Tr,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -53,6 +60,7 @@ const Policies = () => {
   const paginationSizes = [25, 50, 100]
   const [activeRow, setActiveRow] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
+  const [activePolicy, setActivePolicy] = useState('')
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
@@ -81,7 +89,27 @@ const Policies = () => {
     setIsNextActive(false)
   }
 
-  const handleSetRow = () => {}
+  // SET ROW LENGTH
+  const handleSetRow = useCallback(
+    async (e) => {
+      disablePaginationControl()
+      setTotalRows(Number(e.target.value))
+      await refetch({
+        variables: {
+          sbomId,
+          first: Number(e.target.value),
+          last: undefined,
+          after: undefined,
+          before: undefined
+        }
+      }).then((res) => {
+        if (res?.data) {
+          setPaginationControl(res.data)
+        }
+      })
+    },
+    [refetch, sbomId]
+  )
 
   // SUB HEADER
   const subHeader = useMemo(() => {
@@ -110,60 +138,28 @@ const Policies = () => {
       name: 'POLICY',
       selector: (row) => {
         const { policy } = row
-        return (
-          <Stack
-            direction='column'
-            alignItems={'flex-start'}
-            spacing={1}
-            my={3}
-          >
-            <Text>{policy?.name || ''}</Text>
-            <Text>{policy?.description || ''}</Text>
-          </Stack>
-        )
+        return <Text>{policy?.name || ''}</Text>
       },
-      width: '400px',
       wrap: true
     },
     {
       id: 'RESULT',
       name: 'RESULT',
       selector: (row) => {
-        const { resultWording } = row
-        return (
-          <Tag
-            minW={'120px'}
-            colorScheme={
-              resultWording === 'inform'
-                ? 'blue'
-                : resultWording === 'warn'
-                  ? 'orange'
-                  : 'red'
-            }
-          >
-            <TagLabel mx={'auto'} pt={0.5}>
-              {resultWording}
-            </TagLabel>
-          </Tag>
-        )
-      },
-      width: '250px',
-      wrap: true
-    },
-    {
-      id: 'RESULT_TYPE',
-      name: 'RESULT TYPE',
-      selector: (row) => {
         const { resultType } = row
         return (
           <Tag
             minW={'100px'}
             colorScheme={
-              resultType === 'fail'
-                ? 'red'
-                : resultType === 'warn'
-                  ? 'orange'
-                  : 'blue'
+              resultType === 'pass'
+                ? 'green'
+                : resultType === 'inform'
+                  ? 'blue'
+                  : resultType === 'warn'
+                    ? 'orange'
+                    : resultType === 'fail'
+                      ? 'red'
+                      : 'gray'
             }
           >
             <TagLabel mx={'auto'} pt={0.5} textTransform={'capitalize'}>
@@ -172,14 +168,13 @@ const Policies = () => {
           </Tag>
         )
       },
-      width: '250px',
       wrap: true
     },
     {
       id: 'VIOLATIONS',
       name: 'VIOLATIONS',
       selector: (row) => {
-        const { policyRuleViolations } = row
+        const { resultType, policyRuleViolations } = row
         return (
           <Tag
             width={'60px'}
@@ -188,12 +183,15 @@ const Policies = () => {
             }
           >
             <TagLabel mx={'auto'} pt={0.5}>
-              {policyRuleViolations?.totalCount || 0}
+              {resultType === 'pass' || resultType === 'skip'
+                ? 0
+                : policyRuleViolations?.totalCount}
             </TagLabel>
           </Tag>
         )
       },
-      width: '250px',
+      right: 'true',
+      width: '200px',
       wrap: true
     },
     // CREATED AT
@@ -205,19 +203,21 @@ const Policies = () => {
           {timeSince(row?.updatedAt)}
         </Tooltip>
       ),
+      width: '265px',
       right: 'true',
       wrap: true
     }
   ]
 
   const onCheckViolations = useCallback(
-    async (item) => {
+    async (name, item) => {
       console.log('item', item)
       await getViolations({
         variables: { sbomId, policyRuleId: item.id, first: totalRows }
       }).then((res) => {
         if (res?.data) {
           setActiveRow(item)
+          setActivePolicy(name)
           console.log(res?.data?.policyRuleViolations)
         }
       })
@@ -237,108 +237,93 @@ const Policies = () => {
       letter-spacing: 0.6px;
     `
     return (
-      <Box
-        width={'100%'}
+      <Flex
         p={5}
+        gap={6}
+        width={'100%'}
+        flexDir={'column'}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        <Heading
-          mt={2}
-          mb={5}
-          fontFamily={'inherit'}
-          fontSize={'sm'}
-          color={'#555'}
-          width={'95%'}
-          mx={'auto'}
-          textTransform={'uppercase'}
-        >
-          Policy Violations
-        </Heading>
-        <Grid
-          width={'95%'}
-          templateColumns='repeat(12, 1fr)'
-          gap={6}
-          mx={'auto'}
-          borderBottom={'1px solid #E2E8F0'}
-          py={2}
-        >
-          <GridItem colSpan={3}>
-            <CustomText>subject</CustomText>
-          </GridItem>
-          <GridItem colSpan={2}>
-            <CustomText>operator</CustomText>
-          </GridItem>
-          <GridItem colSpan={3}>
-            <CustomText>value</CustomText>
-          </GridItem>
-          <GridItem colSpan={2}>
-            <CustomText>violations</CustomText>
-          </GridItem>
-          <GridItem colSpan={2}>
-            <CustomText>action</CustomText>
-          </GridItem>
-        </Grid>
-        {policy?.policyRules?.length > 0 ? (
-          policy?.policyRules?.map((item, index) => (
-            <Grid
-              width={'95%'}
-              key={index}
-              alignItems={'center'}
-              templateColumns='repeat(12, 1fr)'
-              gap={6}
-              mb={1}
-              mx={'auto'}
-              py={2}
-              borderBottom={'1px solid #E2E8F0'}
-            >
-              <GridItem colSpan={3}>
-                <Text fontSize={'sm'} textTransform={'capitalize'}>
-                  {formatSubject(item?.subject)}
-                </Text>
-              </GridItem>
-              <GridItem colSpan={2}>
-                <Text fontSize={'sm'} textTransform={'lowercase'}>
-                  {item?.operatorWording}
-                </Text>
-              </GridItem>
-              <GridItem colSpan={3}>
-                <Text fontSize={'sm'} wordBreak={'break-all'}>
-                  {item?.value}
-                </Text>
-              </GridItem>
-              <GridItem colSpan={2}>
-                <Tag width={'50px'} colorScheme='blue'>
-                  <TagLabel mx={'auto'}>
-                    {item?.policyRuleViolations?.totalCount || 0}
-                  </TagLabel>
-                </Tag>
-              </GridItem>
-              <GridItem colSpan={2}>
-                <Tooltip label={'View Violations'}>
-                  <IconButton
-                    size='sm'
-                    icon={<FaEye />}
-                    colorScheme='blue'
-                    fontWeight={'medium'}
-                    hidden={item?.category === 'version'}
-                    onClick={() => onCheckViolations(item)}
-                  />
-                </Tooltip>
-              </GridItem>
-            </Grid>
-          ))
-        ) : (
-          <GridItem
-            width={'97.5%'}
-            mx={'auto'}
-            colSpan={12}
-            my={6}
-            textAlign={'center'}
+        <Box>
+          <CustomText>Description :</CustomText>
+          <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
+            {policy?.description || ''}
+          </Text>
+        </Box>
+        <Box>
+          <Heading
+            mb={2}
+            fontFamily={'inherit'}
+            fontSize={'sm'}
+            color={'#555'}
+            textTransform={'uppercase'}
           >
-            There are no records to display
-          </GridItem>
-        )}
-      </Box>
+            Results
+          </Heading>
+          <TableContainer>
+            <Table variant='striped'>
+              <Thead>
+                <Tr>
+                  {['subject', 'operator', 'value', 'violations', 'action'].map(
+                    (item, index) => (
+                      <Th
+                        fontFamily={'inherit'}
+                        key={index}
+                        color={'#718096'}
+                        isNumeric={item === 'action' || item === 'violations'}
+                      >
+                        {item}
+                      </Th>
+                    )
+                  )}
+                </Tr>
+              </Thead>
+              <Tbody>
+                {policy?.policyRules?.length > 0 &&
+                  policy?.policyRules?.map((item, index) => (
+                    <Tr key={index}>
+                      <Td>
+                        <Text fontSize={'sm'} textTransform={'capitalize'}>
+                          {`${item?.category} ${item?.name}`}
+                        </Text>
+                      </Td>
+                      <Td>
+                        <Text fontSize={'sm'} textTransform={'lowercase'}>
+                          {item?.operatorWording}
+                        </Text>
+                      </Td>
+                      <Td>
+                        <Text fontSize={'sm'} wordBreak={'break-all'}>
+                          {item?.value}
+                        </Text>
+                      </Td>
+                      <Td isNumeric>
+                        <Tag width={'80px'} colorScheme='blue'>
+                          <TagLabel mx={'auto'}>
+                            {item?.policyRuleViolations?.totalCount || 0}
+                          </TagLabel>
+                        </Tag>
+                      </Td>
+                      <Td isNumeric>
+                        <Tooltip label={'View Violations'}>
+                          <IconButton
+                            size='sm'
+                            icon={<FaEye />}
+                            colorScheme='blue'
+                            fontWeight={'medium'}
+                            onClick={() =>
+                              onCheckViolations(policy?.name, item)
+                            }
+                          />
+                        </Tooltip>
+                      </Td>
+                    </Tr>
+                  ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Flex>
     )
   }
 
@@ -423,6 +408,7 @@ const Policies = () => {
           isOpen={isOpen}
           onClose={onClose}
           activeRow={activeRow}
+          policy={activePolicy}
           data={violations?.policyRuleViolations}
           sbomId={sbomId}
           refetch={getViolations}

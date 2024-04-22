@@ -3644,6 +3644,7 @@ export const PolicyRuleViolations = gql`
         violationType
         component {
           name
+          version
           licensesExp
         }
         violation {

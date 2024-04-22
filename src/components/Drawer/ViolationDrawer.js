@@ -13,7 +13,6 @@ import {
   DrawerOverlay,
   Flex,
   Stack,
-  Tag,
   Text
 } from '@chakra-ui/react'
 
@@ -105,23 +104,29 @@ const ViolationDrawer = ({
       id: 'COMPONENT',
       name: 'COMPONENT',
       selector: (row) => {
-        const { violation } = row
-        return <Text my={2}>{violation?.name || ''}</Text>
+        const { component } = row
+        return <Text my={2}>{component?.name || ''}</Text>
       },
-      width: '350px',
-      wrap: true,
-      omit: category === 'license' || category === 'component' ? false : true
+      wrap: true
     },
     {
       id: 'VERSION',
       name: 'VERSION',
       selector: (row) => {
-        const { violation } = row
-        return <Text my={2}>{violation?.version || ''}</Text>
+        const { component } = row
+        return <Text my={2}>{component?.version || ''}</Text>
       },
-      width: '200px',
-      wrap: true,
-      omit: category === 'license' || category === 'component' ? false : true
+      wrap: true
+    },
+    {
+      id: 'LICENSE',
+      name: 'LICENSE',
+      selector: (row) => {
+        const { component } = row
+        return <Text my={2}>{component?.licensesExp || ''}</Text>
+      },
+      omit: category === 'license' ? false : true,
+      wrap: true
     },
     {
       id: 'VULN_ID',
@@ -143,7 +148,7 @@ const ViolationDrawer = ({
   }, [data])
 
   return (
-    <Drawer size='lg' isOpen={isOpen} placement='right' onClose={onClose}>
+    <Drawer size={'lg'} isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
@@ -169,11 +174,19 @@ const ViolationDrawer = ({
                 <span style={{ textTransform: 'capitalize' }}>{category}</span>{' '}
                 {name} {operatorWording} {value}
               </Text>
-              <Text fontWeight={'bold'} fontSize={'md'}>
+              <Text
+                fontWeight={'bold'}
+                fontSize={'md'}
+                hidden={category === 'version'}
+              >
                 Violations List
               </Text>
             </Stack>
-            <Box height={'85%'} overflowY={'scroll'}>
+            <Box
+              height={'85%'}
+              overflowY={'scroll'}
+              hidden={category === 'version'}
+            >
               <DataTable
                 responsive
                 columns={columns}
@@ -184,7 +197,14 @@ const ViolationDrawer = ({
                 persistTableHead
               />
             </Box>
-            <Box bg='white' position={'absolute'} left={0} right={0} bottom={2}>
+            <Box
+              bg='white'
+              position={'absolute'}
+              left={0}
+              right={0}
+              bottom={2}
+              hidden={category === 'version'}
+            >
               {data?.pageInfo && (
                 <Pagination
                   paginationSizes={paginationSizes}
