@@ -1,4 +1,5 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { client } from 'context/ApolloWrapper'
 import { useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import ReactSelect from 'react-select'
@@ -37,6 +38,7 @@ import { GetCompFilterData } from 'graphQL/Queries'
 import { ShareCompFilters } from 'graphQL/Queries'
 import { ShareProject } from 'graphQL/Queries'
 import { AllShareComponents } from 'graphQL/Queries'
+import { GetComponentData } from 'graphQL/Queries'
 
 import { FaFileDownload, FaLayerGroup } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
@@ -46,7 +48,7 @@ import CopyModal from './CopyModal'
 import DownloadModal from './DownloadModal'
 import SigningModal from './SigningModal'
 
-const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
+const SbomActions = ({ sbom, refetch }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const {
@@ -261,40 +263,43 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   }
 
   const fetchCompData = async () => {
-    await getCompData({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        search: searchInput !== '' ? searchInput : undefined,
-        ecosystem:
-          ecosystems.includes('all') || ecosystems.length === 0
-            ? undefined
-            : ecosystems,
-        kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-        licenses:
-          licenses.includes('all') || licenses.length === 0
-            ? undefined
-            : licenses,
-        supplierName:
-          suppliers.includes('all') || suppliers.length === 0
-            ? undefined
-            : suppliers,
-        primary: scope === 'primary' ? true : undefined,
-        internal: scope === 'internal' ? true : undefined,
-        first: totalRows,
-        field: field,
-        direction: direction
-      }
-    }).then((res) => {
-      if (res.data) {
-        const url = getProductVersionDetailPageUrl({
-          productgroupid: params.productgroupid,
-          productid: productId,
-          sbomid: sbomId
-        })
-        navigate(url)
-      }
-    })
+    await client
+      .query({
+        query: GetComponentData,
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          search: searchInput !== '' ? searchInput : undefined,
+          ecosystem:
+            ecosystems.includes('all') || ecosystems.length === 0
+              ? undefined
+              : ecosystems,
+          kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
+          licenses:
+            licenses.includes('all') || licenses.length === 0
+              ? undefined
+              : licenses,
+          supplierName:
+            suppliers.includes('all') || suppliers.length === 0
+              ? undefined
+              : suppliers,
+          primary: scope === 'primary' ? true : undefined,
+          internal: scope === 'internal' ? true : undefined,
+          first: totalRows,
+          field: field,
+          direction: direction
+        }
+      })
+      .then((res) => {
+        if (res.data) {
+          const url = getProductVersionDetailPageUrl({
+            productgroupid: params.productgroupid,
+            productid: productId,
+            sbomid: sbomId
+          })
+          navigate(url)
+        }
+      })
     // .finally(() => setActiveProdTab(2))
   }
 
@@ -308,7 +313,6 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
       if (res.data) {
         setTimeout(() => {
           setIsLoading(false)
-          prodRefetch({ id: product?.groupId })
           const url = getProductDetailPageUrl({
             productgroupid: params.productgroupid,
             productid: product?.groupId

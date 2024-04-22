@@ -4,6 +4,7 @@ import { checkIfCustomer } from 'utils/url'
 export const GetProjectsVendor = gql`
   query GetProjectsVendor($projectGroupId: Uuid!) {
     projectGroup(id: $projectGroupId) {
+      id
       name
       defaultProject {
         id
@@ -20,6 +21,7 @@ export const GetProjectsCustomer = gql`
   query GetProjectsCustomer($projectGroupId: Uuid!) {
     shareLynkQuery {
       projectGroup(id: $projectGroupId) {
+        id
         name
         defaultProject {
           id

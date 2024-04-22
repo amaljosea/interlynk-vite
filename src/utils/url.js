@@ -2,12 +2,25 @@ const getUserType = () => {
   return window.location.pathname.split('/')[1]
 }
 
+const getOldSearchParams = () => {
+  const oldSearchParams = new URLSearchParams(window.location.search)
+  const oldSearchParamsObj = {}
+  for (const [key, value] of oldSearchParams.entries()) {
+    oldSearchParamsObj[key] = value
+  }
+
+  return oldSearchParamsObj
+}
 export const appendParams = ({ url, paramsObj = {} }) => {
   const paramsLength = Object.keys(paramsObj).length
+  const old = getOldSearchParams()
 
   if (paramsLength) {
-    const searchParams = new URLSearchParams(paramsObj)
-    return `${url}?${searchParams.toString()}`
+    const newSearchParams = new URLSearchParams({
+      ...old,
+      ...paramsObj
+    })
+    return `${url}?${newSearchParams.toString()}`
   }
 
   return url

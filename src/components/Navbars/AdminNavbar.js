@@ -32,6 +32,8 @@ export default function AdminNavbar(props) {
 
   useQuery(GetUserPermissions, {
     skip: signedUrlParams ? true : false,
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-only',
     onCompleted: (data) => {
       const permissions = permissionList(
         data?.organization?.currentUser?.role?.permissionsMap || []
@@ -110,7 +112,11 @@ export default function AdminNavbar(props) {
     // paddingX = '30px'
   }
 
-  const { name: projectGroupName, defaultProjectId } = useProjectGroup({
+  const {
+    name: projectGroupName,
+    defaultProjectId,
+    projects
+  } = useProjectGroup({
     projectGroupId: params.productgroupid
   })
 
@@ -442,6 +448,7 @@ export default function AdminNavbar(props) {
             logoText={props.logoText}
             secondary={props.secondary}
             fixed={props.fixed}
+            projects={projects}
           />
         </GridItem>
       </Grid>

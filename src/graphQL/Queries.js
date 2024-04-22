@@ -3017,6 +3017,7 @@ export const GetSbomParts = gql`
             version
           }
           suppliers {
+            id
             name
             contactEmail
             contactName

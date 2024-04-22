@@ -6,7 +6,6 @@ import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { GetIcon, customStyles, getFullDateAndTime, timeSince } from 'utils'
 import { openSsf } from 'variables/general'
-import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
@@ -35,6 +34,7 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
+import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import GraphDrawer from 'components/Drawer/GraphDrawer'
@@ -42,15 +42,18 @@ import LinksDrawer from 'components/Drawer/LinksDrawer'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
+import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
 import {
   GetCompFilterData,
+  GetComponentData,
   GetComponentPath,
   ShareCompFilters
 } from 'graphQL/Queries'
+import { GetProductData } from 'graphQL/Queries'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import {
@@ -61,28 +64,99 @@ import {
   FaSitemap
 } from 'react-icons/fa'
 
-import Pagination from '../Pagination'
+import CompFilters from './CompFilters'
 
-const ComponentTable = ({
-  lifecycle,
-  data,
-  refetch,
-  primaryComp,
-  sbomRefetch,
-  activeComp,
-  setActiveComp
-}) => {
-  const location = useLocation()
+const Components = () => {
   const params = useParams()
-  const customerView = location.pathname.startsWith('/customer')
   const productId = params.productid
   const sbomId = params.sbomid
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const activeTab = queryParams.get('tab')
+  const customerView = location.pathname.startsWith('/customer')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+
+  const { userPermissions, totalRows, setTotalRows, prodCompState, dispatch } =
+    useGlobalState()
+  const {
+    field,
+    direction,
+    pageIndex,
+    searchInput,
+    ecosystems,
+    kinds,
+    licenses,
+    suppliers,
+    scope,
+    filters,
+    direct,
+    totalComp
+  } = prodCompState
+  const { prodCompDispatch } = dispatch
+
+  const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
+    value.includes(allValue) || value.length === 0 ? undefined : value
+
+  const compData = {
+    ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
+    kind: getUndefinedIfEmptyOrAll(kinds),
+    licenses: getUndefinedIfEmptyOrAll(licenses),
+    supplierName: getUndefinedIfEmptyOrAll(suppliers),
+    primary: scope === 'primary' ? true : undefined,
+    internal: scope === 'internal' ? true : undefined,
+    direct: direct === true ? true : undefined
+  }
+
+  // GET COMPONENT DATA
+  const { data, refetch, error } = useQuery(GetComponentData, {
+    fetchPolicy: activeTab === 'components' ? false : true,
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      last: undefined,
+      search: searchInput !== '' ? searchInput : undefined,
+      ...compData,
+      field: field,
+      direction: direction
+    }
+  })
+
+  const { components } = data?.sbom || ''
+
+  const { data: sbomData, refetch: sbomRefetch } = useQuery(GetProductData, {
+    skip: activeTab === 'components' ? false : true,
+    variables: { projectId: productId, sbomId }
+  })
+
+  const { lifecycle, primaryComponent } = sbomData?.sbom || ''
+
+  // GET COMPONENT FILTER HEADS
+  const { refetch: getCompFilters } = useQuery(
+    signedUrlParams ? ShareCompFilters : GetCompFilterData,
+    {
+      fetchPolicy: activeTab === 'components' ? false : true,
+      variables: {
+        projectId: signedUrlParams ? undefined : productId,
+        sbomId: sbomId
+      },
+      onCompleted: (data) => {
+        prodCompDispatch({
+          type: 'ADD_FILTER_HEADS',
+          payload: signedUrlParams
+            ? data?.shareLynkQuery?.sbom?.filters
+            : data?.sbom?.filters
+        })
+      }
+    }
+  )
+
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
 
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
+  const [activeComp, setActiveComp] = useState(null)
 
   const setPaginationControl = useCallback(
     (data) => {
@@ -107,44 +181,6 @@ const ComponentTable = ({
   }
   //end
 
-  const { userPermissions, totalRows, setTotalRows, prodCompState, dispatch } =
-    useGlobalState()
-  const {
-    field,
-    direction,
-    pageIndex,
-    searchInput,
-    ecosystems,
-    kinds,
-    licenses,
-    suppliers,
-    scope,
-    filters,
-    direct,
-    totalComp
-  } = prodCompState
-  const { prodCompDispatch } = dispatch
-
-  // GET COMPONENT FILTER HEADS
-  const { refetch: getCompFilters } = useQuery(
-    signedUrlParams ? ShareCompFilters : GetCompFilterData,
-    {
-      fetchPolicy: 'network-only',
-      variables: {
-        projectId: signedUrlParams ? undefined : productId,
-        sbomId: sbomId
-      },
-      onCompleted: (data) => {
-        prodCompDispatch({
-          type: 'ADD_FILTER_HEADS',
-          payload: signedUrlParams
-            ? data?.shareLynkQuery?.sbom?.filters
-            : data?.sbom?.filters
-        })
-      }
-    }
-  )
-
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const updateComponent = sboms?.supersededBy?.some(
     (permission) =>
@@ -161,19 +197,10 @@ const ComponentTable = ({
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       search: searchInput !== '' ? searchInput : undefined,
-      ecosystem:
-        ecosystems.includes('all') || ecosystems.length === 0
-          ? undefined
-          : ecosystems,
-      kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses:
-        licenses.includes('all') || licenses.length === 0
-          ? undefined
-          : licenses,
-      supplierName:
-        suppliers.includes('all') || suppliers.length === 0
-          ? undefined
-          : suppliers,
+      ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
+      kind: getUndefinedIfEmptyOrAll(kinds),
+      licenses: getUndefinedIfEmptyOrAll(licenses),
+      supplierName: getUndefinedIfEmptyOrAll(suppliers),
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
       direct: direct === true ? true : undefined,
@@ -721,9 +748,24 @@ const ComponentTable = ({
             projectId: productId,
             sbomId: sbomId,
             first: totalRows,
+            last: undefined,
+            searchInput: searchInput === '' ? undefined : searchInput,
+            ...compData,
             field: field,
             direction: direction
-          }).then((res) => res && setPaginationControl(res.data))
+          }).then((res) => {
+            if (res?.data) {
+              setPaginationControl(res.data)
+              getCompFilters({ projectId: productId, sbomId }).then(
+                (res) =>
+                  res?.data &&
+                  prodCompDispatch({
+                    type: 'ADD_FILTER_HEADS',
+                    payload: res?.data?.sbom?.filters
+                  })
+              )
+            }
+          })
         }
       })
     } catch (error) {
@@ -988,25 +1030,10 @@ const ComponentTable = ({
     setCompSearch('')
     disablePaginationControl()
     await refetch({
-      projectId: productId,
+      projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       search: undefined,
-      ecosystem:
-        ecosystems.includes('all') || ecosystems.length === 0
-          ? undefined
-          : ecosystems,
-      kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses:
-        licenses.includes('all') || licenses.length === 0
-          ? undefined
-          : licenses,
-      supplierName:
-        suppliers.includes('all') || suppliers.length === 0
-          ? undefined
-          : suppliers,
-      primary: scope === 'primary' ? true : undefined,
-      internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true : undefined,
+      ...compData,
       field: field,
       direction: direction,
       first: totalRows,
@@ -1020,19 +1047,15 @@ const ComponentTable = ({
       }
     })
   }, [
-    direct,
+    compData,
     direction,
-    ecosystems,
     field,
-    kinds,
-    licenses,
     prodCompDispatch,
     productId,
     refetch,
     sbomId,
-    scope,
     setPaginationControl,
-    suppliers,
+    signedUrlParams,
     totalRows
   ])
 
@@ -1059,26 +1082,11 @@ const ComponentTable = ({
           projectId: signedUrlParams ? undefined : productId,
           sbomId: sbomId,
           search: value,
-          ecosystem:
-            ecosystems.includes('all') || ecosystems.length === 0
-              ? undefined
-              : ecosystems,
-          kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-          licenses:
-            licenses.includes('all') || licenses.length === 0
-              ? undefined
-              : licenses,
-          supplierName:
-            suppliers.includes('all') || suppliers.length === 0
-              ? undefined
-              : suppliers,
-          primary: scope === 'primary' ? true : undefined,
-          internal: scope === 'internal' ? true : undefined,
-          direct: direct === true ? true : undefined,
           first: totalRows,
           last: undefined,
           after: undefined,
           before: undefined,
+          ...compData,
           field: field,
           direction: direction
         }).then((res) => {
@@ -1090,20 +1098,15 @@ const ComponentTable = ({
       }
     },
     [
-      direct,
+      compData,
       direction,
-      ecosystems,
       field,
-      kinds,
-      licenses,
       prodCompDispatch,
       productId,
       refetch,
       sbomId,
-      scope,
       setPaginationControl,
       signedUrlParams,
-      suppliers,
       totalRows
     ]
   )
@@ -1152,13 +1155,7 @@ const ComponentTable = ({
             onChange={onSearchInputChange}
           />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && (
-            <CompFilterMenu
-              refetch={refetch}
-              productId={productId}
-              sbomId={sbomId}
-            />
-          )}
+          {filters && <CompFilters />}
         </Stack>
         <Stack
           width={'100%'}
@@ -1198,9 +1195,6 @@ const ComponentTable = ({
     handleClear,
     onSearchInputChange,
     filters,
-    refetch,
-    productId,
-    sbomId,
     onCreateComponent,
     signedUrlParams,
     lifecycle,
@@ -1219,22 +1213,7 @@ const ComponentTable = ({
       last: before ? totalRows : undefined,
       before: before ? before : undefined,
       search: searchInput !== '' ? searchInput : undefined,
-      ecosystem:
-        ecosystems.includes('all') || ecosystems.length === 0
-          ? undefined
-          : ecosystems,
-      kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses:
-        licenses.includes('all') || licenses.length === 0
-          ? undefined
-          : licenses,
-      supplierName:
-        suppliers.includes('all') || suppliers.length === 0
-          ? undefined
-          : suppliers,
-      primary: scope === 'primary' ? true : undefined,
-      internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true : undefined,
+      ...compData,
       field: field,
       direction: direction
     }).then((res) => {
@@ -1245,83 +1224,62 @@ const ComponentTable = ({
   }
 
   const handleSort = async (column, sortDirection) => {
-    disablePaginationControl()
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      search: searchInput !== '' ? searchInput : undefined,
-      ecosystem:
-        ecosystems.includes('all') || ecosystems.length === 0
-          ? undefined
-          : ecosystems,
-      kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses:
-        licenses.includes('all') || licenses.length === 0
-          ? undefined
-          : licenses,
-      supplierName:
-        suppliers.includes('all') || suppliers.length === 0
-          ? undefined
-          : suppliers,
-      primary: scope === 'primary' ? true : undefined,
-      internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true : undefined,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res?.data)
-        prodCompDispatch({
-          type: 'SET_SORT_ORDER',
-          payload: {
-            field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-          }
-        })
+    prodCompDispatch({
+      type: 'SET_SORT_ORDER',
+      payload: {
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
       }
     })
   }
 
   const handlePreviousPage = async () => {
     disablePaginationControl()
-    handleRefetch(null, data.pageInfo.startCursor)
+    handleRefetch(null, components?.pageInfo?.startCursor)
     prodCompDispatch({
       type: 'DECREMENT_PAGE',
-      payload: data.pageInfo.startCursor
+      payload: components?.pageInfo?.startCursor
     })
   }
 
   const handleNextPage = async () => {
     disablePaginationControl()
-    handleRefetch(data.pageInfo.endCursor, null)
+    handleRefetch(components?.pageInfo?.endCursor, null)
     prodCompDispatch({
       type: 'INCREMENT_PAGE',
-      payload: { total: data.totalCount, after: data.pageInfo.endCursor }
+      payload: {
+        total: components?.totalCount,
+        after: components?.pageInfo?.endCursor
+      }
     })
   }
 
   useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
+    if (components) {
+      setIsPrevActive(components?.pageInfo?.hasPreviousPage)
+      setIsNextActive(components?.pageInfo?.hasNextPage)
     }
-  }, [data])
+  }, [components])
+
+  if (error) {
+    return (
+      <Card>
+        <Text>Something went wrong</Text>
+      </Card>
+    )
+  }
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'} height={'auto'}>
         <DataTable
           columns={columns}
-          data={data && data.nodes}
+          data={components?.nodes}
           onSort={handleSort}
           customStyles={customStyles}
           defaultSortAsc={false}
           defaultSortFieldId={field}
-          progressPending={data ? false : true}
+          progressPending={components ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
@@ -1334,12 +1292,12 @@ const ComponentTable = ({
       </Flex>
 
       {/* PAGINATION */}
-      {data?.pageInfo && (
+      {components?.pageInfo && (
         <Pagination
           paginationSizes={paginationSizes}
           pageIndex={pageIndex}
           totalRows={totalRows}
-          totalCount={data.totalCount}
+          totalCount={components?.totalCount}
           onPreviousPage={handlePreviousPage}
           onNextPage={handleNextPage}
           onSetRow={handleSetRow}
@@ -1370,7 +1328,7 @@ const ComponentTable = ({
               filterRefetch={getCompFilters}
               shortDesc={null}
               checkId={null}
-              primaryComp={primaryComp}
+              primaryComp={primaryComponent}
             />
           )}
 
@@ -1430,7 +1388,7 @@ const ComponentTable = ({
           fetchCompData={fetchCompData}
           filterRefetch={getCompFilters}
           sbomRefetch={sbomRefetch}
-          primaryComp={primaryComp}
+          primaryComp={primaryComponent}
           shortDesc={null}
           checkId={null}
           data={null}
@@ -1456,4 +1414,4 @@ const ComponentTable = ({
   )
 }
 
-export default ComponentTable
+export default Components

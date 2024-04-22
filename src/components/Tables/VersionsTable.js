@@ -301,7 +301,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       getProductVersionDetailPageUrl({
         productgroupid: params.productgroupid,
         productid: activeProd,
-        sbomid: id
+        sbomid: id,
+        tab: 'licenses'
       })
     )
   }
@@ -314,13 +315,17 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       name: 'VERSION',
       selector: (row) => {
         const { id, projectVersion } = row
+        const link = getProductVersionDetailPageUrl({
+          productgroupid: projectGroup.id,
+          productid: projectGroup.defaultProject.id,
+          sbomid: row.id,
+          paramsObj: {
+            tab: 'general'
+          }
+        })
         return (
           <Link
-            to={getProductVersionDetailPageUrl({
-              productgroupid: projectGroup.id,
-              productid: projectGroup.defaultProject.id,
-              sbomid: row.id
-            })}
+            to={link}
             onClick={() => {
               localStorage.setItem(
                 'currentSBOM',
@@ -352,7 +357,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
             to={getProductVersionDetailPageUrl({
               productgroupid: params.productgroupid,
               productid: activeProd,
-              sbomid: id
+              sbomid: id,
+              tab: 'components'
             })}
           >
             <Tag
@@ -409,7 +415,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         const link = getProductVersionDetailPageUrl({
           productgroupid: params.productgroupid,
           productid: activeProd,
-          sbomid: id
+          sbomid: id,
+          tab: 'vulnerabilities'
         })
         return (
           <Stack fontWeight={'medium'} direction={'row'}>

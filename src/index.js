@@ -16,7 +16,7 @@ import Dashboard from 'views/Dashboard/Dashboard'
 import Policies from 'views/Dashboard/Policies'
 import Products from 'views/Dashboard/Products'
 import ProductDetailsMain from 'views/Dashboard/Products/ProductDetailsMain.js'
-import ProductDetailsSbom from 'views/Dashboard/Products/ProductDetailsSbom.js'
+import ProductDetailsSbomNew from 'views/Dashboard/Products/ProductDetailsSbomNew/index.js'
 import ProductDetailsVul from 'views/Dashboard/Products/ProductDetailsVul.js'
 import ProductList from 'views/Dashboard/Products/ProductList'
 import Profile from 'views/Dashboard/Profile'
@@ -105,7 +105,7 @@ ReactDOM.render(
                   <Route
                     exact
                     path=':productgroupid/env/:productid/version/:sbomid'
-                    Component={ProductDetailsSbom}
+                    Component={ProductDetailsSbomNew}
                   />
                   <Route
                     exact

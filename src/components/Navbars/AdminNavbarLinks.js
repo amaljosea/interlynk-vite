@@ -1,5 +1,5 @@
 // Chakra Imports
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -38,9 +38,8 @@ import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useProjectGroup } from 'hooks/useProjectGroup'
 
-import { GetOrgName, GetProductTable } from 'graphQL/Queries'
+import { GetOrgName } from 'graphQL/Queries'
 
 import { FaExchangeAlt, FaRegKeyboard, FaSignOutAlt } from 'react-icons/fa'
 import { FaCode, FaInbox, FaSquareArrowUpRight, FaUser } from 'react-icons/fa6'
@@ -61,30 +60,20 @@ export default function HeaderLinks(props) {
   const userEmail = localStorage.getItem('userEmail')
 
   const {
-    totalRows,
     userName,
     setClearSelect,
     setSelectedSbom,
     setUserName,
     envName,
-    setEnvName,
-    prodState
+    setEnvName
   } = useGlobalState()
-  const { field, direction } = prodState
 
   const [fetchOrg, { data }] = useLazyQuery(GetOrgName, {
     fetchPolicy: 'network-only'
   })
-  const { data: groups } = useQuery(GetProductTable, {
-    skip: groups === undefined && !signedUrlParams ? false : true,
-    variables: { first: totalRows, direction, field }
-  })
 
-  const { projects } = useProjectGroup({
-    projectGroupId: params.productgroupid
-  })
-
-  const { variant, children, fixed, secondary, onOpen, ...rest } = props
+  const { projects } = props
+  const { secondary, ...rest } = props
 
   useEffect(() => {
     if (location.pathname.startsWith('/vendor')) {
@@ -156,42 +145,40 @@ export default function HeaderLinks(props) {
         </Link>
       )}
       {/* ENVIRONMENT */}
-      {(dashboardView || productId) &&
-        !vulnId &&
-        groups?.organization?.projectGroups?.nodes?.length > 0 && (
-          <Menu closeOnSelect={true}>
-            <MenuButton
-              as={Button}
-              size='sm'
-              colorScheme='blue'
-              fontWeight='medium'
-              fontSize='sm'
-              leftIcon={envIcon(envName)}
-              rightIcon={<ChevronDownIcon />}
-              textTransform='capitalize'
+      {(dashboardView || productId) && !vulnId && projects.length > 0 && (
+        <Menu closeOnSelect={true}>
+          <MenuButton
+            as={Button}
+            size='sm'
+            colorScheme='blue'
+            fontWeight='medium'
+            fontSize='sm'
+            leftIcon={envIcon(envName)}
+            rightIcon={<ChevronDownIcon />}
+            textTransform='capitalize'
+          >
+            {envName || 'Default'}
+          </MenuButton>
+          <MenuList>
+            <MenuOptionGroup
+              value={envName}
+              onChange={(value) => handleEnvChange(value)}
+              type='radio'
             >
-              {envName || 'Default'}
-            </MenuButton>
-            <MenuList>
-              <MenuOptionGroup
-                value={envName}
-                onChange={(value) => handleEnvChange(value)}
-                type='radio'
-              >
-                {['default', 'development', 'production'].map((item) => (
-                  <MenuItemOption
-                    key={item.id}
-                    value={item}
-                    fontSize='sm'
-                    textTransform={'capitalize'}
-                  >
-                    {item}
-                  </MenuItemOption>
-                ))}
-              </MenuOptionGroup>
-            </MenuList>
-          </Menu>
-        )}
+              {['default', 'development', 'production'].map((item) => (
+                <MenuItemOption
+                  key={item.id}
+                  value={item}
+                  fontSize='sm'
+                  textTransform={'capitalize'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      )}
       {productId && (
         <Popover isLazy>
           <PopoverTrigger>

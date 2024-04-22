@@ -60,17 +60,19 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     })
   }
 })
-const client = new ApolloClient({
+export const client = new ApolloClient({
   link: ApolloLink.from([errorLink, authLink, uploadLink]),
   cache: new InMemoryCache(),
   queryDeduplication: false,
   connectToDevTools: true,
   defaultOptions: {
     query: {
-      fetchPolicy: 'cache-and-network'
+      fetchPolicy: 'no-cache',
+      nextFetchPolicy: 'no-cache'
     },
     watchQuery: {
-      fetchPolicy: 'cache-and-network'
+      fetchPolicy: 'no-cache',
+      nextFetchPolicy: 'no-cache'
     }
   }
 })
