@@ -8,15 +8,19 @@ import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import {
   Box,
   Flex,
-  Grid,
-  GridItem,
   Heading,
   IconButton,
-  Stack,
+  Table,
+  TableContainer,
   Tag,
   TagLabel,
+  Tbody,
+  Td,
   Text,
+  Th,
+  Thead,
   Tooltip,
+  Tr,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -159,7 +163,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
         )
       },
       right: 'true',
-      width: '220px',
+      width: '200px',
       wrap: true
     },
     // CREATED AT
@@ -171,6 +175,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
           {timeSince(row?.updatedAt)}
         </Tooltip>
       ),
+      width: '265px',
       right: 'true',
       wrap: true
     }
@@ -211,96 +216,79 @@ const PolicyEvalTable = ({ data, refetch }) => {
         flexDir={'column'}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        <Box width={'95%'} mx={'auto'}>
+        <Box width={'100%'}>
           <CustomText>Description :</CustomText>
           <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
             {policy?.description || ''}
           </Text>
         </Box>
-        <Box width={'95%'} mx={'auto'}>
-          <Heading
-            mb={2}
-            fontFamily={'inherit'}
-            fontSize={'sm'}
-            color={'#555'}
-            textTransform={'uppercase'}
-          >
-            Results
+        <Box width={'100%'}>
+          <Heading mb={3} fontFamily={'inherit'} fontSize={'sm'} color={'#555'}>
+            RESULTS
           </Heading>
-          <Grid
-            templateColumns='repeat(12, 1fr)'
-            gap={6}
-            borderBottom={'1px solid #E2E8F0'}
-            py={2}
-          >
-            <GridItem colSpan={3}>
-              <CustomText>subject</CustomText>
-            </GridItem>
-            <GridItem colSpan={2}>
-              <CustomText>operator</CustomText>
-            </GridItem>
-            <GridItem colSpan={3}>
-              <CustomText>value</CustomText>
-            </GridItem>
-            <GridItem colSpan={2}>
-              <CustomText>violations</CustomText>
-            </GridItem>
-            <GridItem colSpan={2}>
-              <CustomText>action</CustomText>
-            </GridItem>
-          </Grid>
-          {policy?.policyRules?.length > 0 ? (
-            policy?.policyRules?.map((item, index) => (
-              <Grid
-                key={index}
-                alignItems={'center'}
-                templateColumns='repeat(12, 1fr)'
-                gap={6}
-                mb={1}
-                py={2}
-                borderBottom={'1px solid #E2E8F0'}
-              >
-                <GridItem colSpan={3}>
-                  <Text fontSize={'sm'} textTransform={'capitalize'}>
-                    {`${item?.category} ${item?.name}`}
-                  </Text>
-                </GridItem>
-                <GridItem colSpan={2}>
-                  <Text fontSize={'sm'} textTransform={'lowercase'}>
-                    {item?.operatorWording}
-                  </Text>
-                </GridItem>
-                <GridItem colSpan={3}>
-                  <Text fontSize={'sm'} wordBreak={'break-all'}>
-                    {item?.value}
-                  </Text>
-                </GridItem>
-                <GridItem colSpan={2}>
-                  <Tag width={'80px'} colorScheme='blue'>
-                    <TagLabel mx={'auto'}>
-                      {item?.policyRuleViolations?.totalCount || 0}
-                    </TagLabel>
-                  </Tag>
-                </GridItem>
-                <GridItem colSpan={2}>
-                  <Tooltip label={'View Violations'}>
-                    <IconButton
-                      size='sm'
-                      icon={<FaEye />}
-                      colorScheme='blue'
-                      fontWeight={'medium'}
-                      hidden={item?.category === 'version'}
-                      onClick={() => onCheckViolations(policy?.name, item)}
-                    />
-                  </Tooltip>
-                </GridItem>
-              </Grid>
-            ))
-          ) : (
-            <GridItem colSpan={12} my={6} textAlign={'center'}>
-              There are no records to display
-            </GridItem>
-          )}
+          <TableContainer>
+            <Table variant='striped'>
+              <Thead>
+                <Tr>
+                  {['subject', 'operator', 'value', 'violations', 'action'].map(
+                    (item, index) => (
+                      <Th
+                        fontFamily={'inherit'}
+                        key={index}
+                        color={'#718096'}
+                        isNumeric={item === 'action' || item === 'violations'}
+                      >
+                        {item}
+                      </Th>
+                    )
+                  )}
+                </Tr>
+              </Thead>
+              <Tbody>
+                {policy?.policyRules?.length > 0 &&
+                  policy?.policyRules?.map((item, index) => (
+                    <Tr key={index}>
+                      <Td>
+                        <Text fontSize={'sm'} textTransform={'capitalize'}>
+                          {`${item?.category} ${item?.name}`}
+                        </Text>
+                      </Td>
+                      <Td>
+                        <Text fontSize={'sm'} textTransform={'lowercase'}>
+                          {item?.operatorWording}
+                        </Text>
+                      </Td>
+                      <Td>
+                        <Text fontSize={'sm'} wordBreak={'break-all'}>
+                          {item?.value}
+                        </Text>
+                      </Td>
+                      <Td isNumeric>
+                        <Tag width={'80px'} colorScheme='blue'>
+                          <TagLabel mx={'auto'}>
+                            {item?.policyRuleViolations?.totalCount || 0}
+                          </TagLabel>
+                        </Tag>
+                      </Td>
+                      <Td isNumeric>
+                        <Tooltip label={'View Violations'}>
+                          <IconButton
+                            size='sm'
+                            icon={<FaEye />}
+                            colorScheme='blue'
+                            fontWeight={'medium'}
+                            hidden={item?.category === 'version'}
+                            onClick={() =>
+                              onCheckViolations(policy?.name, item)
+                            }
+                          />
+                        </Tooltip>
+                      </Td>
+                    </Tr>
+                  ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
         </Box>
       </Flex>
     )

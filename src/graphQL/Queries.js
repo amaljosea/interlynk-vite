@@ -3536,6 +3536,7 @@ export const GetProjectPolicies = gql`
         id
         isExcluded
         name
+        description
         operator
         organizationId
         resultType

@@ -18,8 +18,6 @@ import { RepeatIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
-  Grid,
-  GridItem,
   Heading,
   IconButton,
   Menu,
@@ -30,10 +28,17 @@ import {
   Select,
   Stack,
   Switch,
+  Table,
+  TableContainer,
   Tag,
   TagLabel,
+  Tbody,
+  Td,
   Text,
+  Th,
+  Thead,
   Tooltip,
+  Tr,
   useDisclosure,
   useToast
 } from '@chakra-ui/react'
@@ -403,17 +408,68 @@ const PolicyTable = ({ data, refetch }) => {
         flexDir={'column'}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        <Box width={'95%'} mx={'auto'}>
+        <Box>
           <CustomText>Description :</CustomText>
           <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
             {description || ''}
           </Text>
         </Box>
-        <Box width={'95%'} mx={'auto'}>
+        <Box>
           <Heading mb={3} fontFamily={'inherit'} fontSize={'sm'} color={'#555'}>
             CONDITIONS
           </Heading>
-          <Grid templateColumns='repeat(3, 1fr)' gap={6} mb={4}>
+          <TableContainer>
+            <Table variant='striped'>
+              <Thead>
+                <Tr>
+                  {['subject', 'operator', 'value'].map((item, index) => (
+                    <Th
+                      fontFamily={'inherit'}
+                      key={index}
+                      color={'#718096'}
+                      isNumeric={item === 'value'}
+                    >
+                      {item}
+                    </Th>
+                  ))}
+                </Tr>
+              </Thead>
+              <Tbody>
+                {policyRules?.map((item, index) => (
+                  <Tr key={index}>
+                    <Td>
+                      <Text fontSize={'sm'} textTransform={'capitalize'}>
+                        {formatSubject(item?.subject)}
+                      </Text>
+                    </Td>
+                    <Td>
+                      <Text fontSize={'sm'} textTransform={'lowercase'}>
+                        {updatedValue(item?.operator)}
+                      </Text>
+                    </Td>
+                    <Td isNumeric>
+                      <Text
+                        fontSize={'sm'}
+                        wordBreak={'break-all'}
+                        hidden={
+                          item?.operator === 'EXISTS' ||
+                          item?.operator === 'NOT_EXISTS'
+                        }
+                      >
+                        {item?.value}{' '}
+                        {item?.subject === 'VULNERABILITY_EPSS' &&
+                        (item?.operator === 'LESS_THAN' ||
+                          item?.operator === 'MORE_THAN')
+                          ? ' %'
+                          : ''}
+                      </Text>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
+          {/* <Grid templateColumns='repeat(3, 1fr)' gap={6} mb={4}>
             <GridItem>
               <CustomText>subject</CustomText>
             </GridItem>
@@ -461,7 +517,7 @@ const PolicyTable = ({ data, refetch }) => {
                 </Text>
               </GridItem>
             </Grid>
-          ))}
+          ))} */}
         </Box>
       </Flex>
     )
