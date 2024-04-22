@@ -28,7 +28,8 @@ const ViolationDrawer = ({
   onClose,
   refetch
 }) => {
-  const { id, category, name, operatorWording, value } = activeRow || null
+  const { id, subject, category, name, operatorWording, value } =
+    activeRow || null
   const paginationSizes = [25, 50, 100]
   const [currentPage, setCurrentPage] = useState(1)
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
@@ -174,6 +175,20 @@ const ViolationDrawer = ({
                 <span style={{ textTransform: 'capitalize' }}>{category}</span>{' '}
                 {name} {operatorWording} {value}
               </Text>
+              {subject === 'VERSION_AUTHOR' && (
+                <Text>
+                  <strong>Value:</strong>{' '}
+                  <span style={{ textTransform: 'capitalize' }}>{name}</span> -{' '}
+                  {value}
+                </Text>
+              )}
+              {subject === 'SBOM_SUPPLIER' && (
+                <Text>
+                  <strong>Value:</strong>{' '}
+                  <span style={{ textTransform: 'capitalize' }}>{name}</span> -{' '}
+                  {value}
+                </Text>
+              )}
               <Text
                 fontWeight={'bold'}
                 fontSize={'md'}

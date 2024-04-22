@@ -3686,6 +3686,17 @@ export const PolicyRuleViolations = gql`
                 name
               }
             }
+            suppliers {
+              contactEmail
+              contactName
+              name
+              url
+            }
+            authors {
+              email
+              name
+              phone
+            }
             projectVersion
           }
           ... on SbomComponent {

@@ -8,11 +8,8 @@ import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import {
   Box,
   Flex,
-  Grid,
-  GridItem,
   Heading,
   IconButton,
-  Stack,
   Table,
   TableContainer,
   Tag,
@@ -32,9 +29,7 @@ import ViolationDrawer from 'components/Drawer/ViolationDrawer'
 import Pagination from 'components/Pagination'
 
 import { SbomPolicyScan } from 'graphQL/Mutation'
-import { PolicySubjectOperators } from 'graphQL/Queries'
-import { PolicyResults } from 'graphQL/Queries'
-import { PolicyRuleViolations } from 'graphQL/Queries'
+import { PolicyResults, PolicyRuleViolations } from 'graphQL/Queries'
 
 import { BiScan } from 'react-icons/bi'
 import { FaEye } from 'react-icons/fa6'
@@ -51,10 +46,6 @@ const Policies = () => {
     variables: { sbomId }
   })
 
-  const { data: subOperators } = useQuery(PolicySubjectOperators, {
-    skip: activeTab === 'policies' ? false : true
-  })
-
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const paginationSizes = [25, 50, 100]
@@ -67,15 +58,6 @@ const Policies = () => {
 
   const [getViolations, { data: violations }] =
     useLazyQuery(PolicyRuleViolations)
-
-  const formatSubject = (value) => {
-    if (subOperators) {
-      const result = subOperators.policySubjectOperatorMapping.find(
-        (item) => item?.subject === value
-      )
-      return `${result?.category} ${result?.name}`
-    }
-  }
 
   const [policyScan] = useMutation(SbomPolicyScan)
 
@@ -211,7 +193,7 @@ const Policies = () => {
 
   const onCheckViolations = useCallback(
     async (name, item) => {
-      console.log('item', item)
+      // console.log('item', item)
       await getViolations({
         variables: { sbomId, policyRuleId: item.id, first: totalRows }
       }).then((res) => {
