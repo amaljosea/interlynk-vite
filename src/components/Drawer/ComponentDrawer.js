@@ -75,7 +75,6 @@ function ComponentDrawer(props) {
     primaryComp,
     fetchCompData,
     shortDesc,
-    filterRefetch,
     sbomRefetch
   } = props
   const { prodCompState, dispatch } = useGlobalState()
@@ -141,8 +140,16 @@ function ComponentDrawer(props) {
       setCompScope(scope)
       setIsPrimary(primary)
       setIsInternal(internal)
+      if (purl !== '') {
+        try {
+          PackageURL.fromString(purl)
+          setPURLInputValid(true)
+        } catch (ex) {
+          setPURLInputValid(false)
+        }
+      }
     }
-  }, [])
+  }, [data])
 
   // Health Check
   useEffect(() => {
