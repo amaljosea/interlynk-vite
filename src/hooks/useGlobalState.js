@@ -130,6 +130,7 @@ const GlobalStateProvider = ({ children }) => {
     severities: [],
     components: [],
     statues: [],
+    include: [],
     source: false,
     kev: '',
     epss: '',

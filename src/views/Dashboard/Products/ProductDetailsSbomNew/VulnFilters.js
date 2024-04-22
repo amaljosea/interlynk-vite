@@ -31,6 +31,7 @@ const VulnFilters = () => {
     components,
     statues,
     source,
+    include,
     kev,
     epss,
     filters,
@@ -96,6 +97,11 @@ const VulnFilters = () => {
 
   const onFilterDirect = (value) => {
     prodVulnDispatch({ type: 'FILTER_DIRECT', payload: value })
+  }
+
+  const onFilterInclude = (value) => {
+    console.log('value', value)
+    prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: value })
   }
 
   const handleSubmit = () => {
@@ -399,18 +405,38 @@ const VulnFilters = () => {
           </MenuList>
         </Menu>
       </Box>
-      {/* DIRECT */}
-      <Flex align='center' gap={2} hidden>
-        <Switch id='isDirect' isChecked={direct} onChange={onFilterDirect} />
-        <Text>Direct</Text>
-      </Flex>
+      {/* INCLUDE */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={false}>
+          {include.length !== 0 && <CheckMark />}
+          <MenuHeading title={'Include'} />
+          <MenuList>
+            <MenuOptionGroup
+              type='checkbox'
+              value={include}
+              onChange={onFilterInclude}
+            >
+              {['parts', 'retracted'].map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
       {/* ORIGIN */}
-      <Flex align='center' gap={2}>
+      <Flex align='center' gap={2} hidden>
         <Switch id='isDirect' isChecked={source} onChange={onFilterOrigin} />
         <Text>Parts</Text>
       </Flex>
       {/* RETRACTED */}
-      <Flex align='center' gap={2}>
+      <Flex align='center' gap={2} hidden>
         <Switch
           id='retracted'
           isChecked={retracted}

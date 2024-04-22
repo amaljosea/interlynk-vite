@@ -89,7 +89,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     dispatch
   } = useGlobalState()
   const { searchInput } = versionState
-  const { field, direction, source, retracted } = prodVulnState
+  const { field, direction, include } = prodVulnState
   const { prodVulnDispatch, prodCompDispatch, versionDispatch } = dispatch
 
   const paginationSizes = [25, 50, 100]
@@ -254,32 +254,17 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
   } = useDisclosure()
 
   const onFilterSev = async (id, version, value) => {
-    await getVulnData({
-      sbomId: id,
-      severity: value,
-      includeRetracted: retracted,
-      projectId: signedUrlParams ? undefined : activeProd,
-      source: source === true ? undefined : 'COMPONENT',
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      field: signedUrlParams ? undefined : field,
-      direction: signedUrlParams ? undefined : direction
-    }).then((res) => {
-      if (res.data) {
-        localStorage.setItem(
-          'currentSBOM',
-          JSON.stringify({ version: version, id: id })
-        )
-        if (signedUrlParams) {
-          localStorage.setItem('activeCsSbomTab', 2)
-        } else {
-          localStorage.setItem('activeSbomTab', 3)
-        }
-        prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-      }
-    })
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({ version: version, id: id })
+    )
+    if (signedUrlParams) {
+      localStorage.setItem('activeCsSbomTab', 2)
+    } else {
+      localStorage.setItem('activeSbomTab', 3)
+    }
+    prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+    prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
   }
 
   const handleListSbom = (row) => {
@@ -416,7 +401,9 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
           productgroupid: params.productgroupid,
           productid: activeProd,
           sbomid: id,
-          tab: 'vulnerabilities'
+          paramsObj: {
+            tab: 'vulnerabilities'
+          }
         })
         return (
           <Stack fontWeight={'medium'} direction={'row'}>

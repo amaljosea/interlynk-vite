@@ -129,7 +129,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
     )
     localStorage.setItem('activeSbomTab', 3)
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-    prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
+    prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
   }
 
   const removeDuplicates = (versions) => {
@@ -185,7 +185,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       selector: (row) => {
         console.log({ row })
 
-        const { id, project, projectId, projectVersion } = row
+        const { id, project, projectVersion } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
           <Link
@@ -211,7 +211,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       wrap: true,
       width: '140px',
       selector: (row) => {
-        const { id, project, projectId, stats } = row
+        const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
           <Link
@@ -243,7 +243,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       wrap: true,
       width: '120px',
       selector: (row) => {
-        const { id, project, projectId, stats } = row
+        const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
           <Link
@@ -274,7 +274,10 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
         const link = getProductVersionDetailPageUrl({
           productgroupid: project?.projectGroup?.id,
           productid: project?.id,
-          sbomid: id
+          sbomid: id,
+          paramsObj: {
+            tab: 'vulnerabilities'
+          }
         })
         return (
           <Flex direction={'row'} flexWrap={'wrap'} gap={2} my={2}>

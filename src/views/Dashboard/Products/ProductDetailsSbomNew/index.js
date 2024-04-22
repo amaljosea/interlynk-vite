@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import SbomInfo from './SbomInfo'
 import SbomTable from './SbomTable'
 

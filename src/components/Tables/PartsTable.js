@@ -183,7 +183,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       .then((res) => {
         if (res.data) {
           sbomRefetch({ projectId: prodId, sbomId: sbomId })
-          prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
+          prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
           refetch({ variables: { projectId: prodId, sbomId: sbomId } })
         }
       })

@@ -135,8 +135,8 @@ const SbomDetails = ({ sbomData }) => {
       setActiveCsSbomTab(3)
     } else {
       prodVulnDispatch({
-        type: 'FILTER_SOURCE',
-        payload: sbomParts?.length > 0 ? true : false
+        type: 'FILTER_INCLUDE',
+        payload: sbomParts?.length > 0 ? ['parts'] : []
       })
       setActiveTab('vulnerabilities')
     }
@@ -161,7 +161,10 @@ const SbomDetails = ({ sbomData }) => {
   const onFilterVuln = (value) => {
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-    prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
+    prodVulnDispatch({
+      type: 'FILTER_INCLUDE',
+      payload: sbomParts?.length > 0 ? ['parts'] : []
+    })
     if (signedUrlParams) {
       setActiveCsSbomTab(3)
     } else {

@@ -236,6 +236,7 @@ const Vulnerabilities = () => {
     components,
     statues,
     source,
+    include,
     kev,
     epss,
     filters,
@@ -254,6 +255,12 @@ const Vulnerabilities = () => {
     skip: activeTab === 'vulnerabilities' ? false : true,
     variables: { projectId: productId, sbomId }
   })
+
+  useEffect(() => {
+    if (sbomData?.sbom?.sbomParts?.length > 0) {
+      prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
+    }
+  }, [prodVulnDispatch, sbomData?.sbom?.sbomParts?.length])
 
   const filteredData = []
   const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
@@ -277,14 +284,14 @@ const Vulnerabilities = () => {
       first: totalRows,
       search: vulnSearch !== '' ? vulnSearch : undefined,
       severity: severities.length > 0 ? severities : undefined,
-      source: source === true ? undefined : 'COMPONENT',
+      source: include.includes('parts') ? undefined : 'COMPONENT',
       componentName: components.length > 0 ? components : undefined,
       status: statues.length > 0 ? statues : undefined,
       kev:
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
       direct: direct === 'direct only' ? true : undefined,
-      includeRetracted: retracted,
+      includeRetracted: include.includes('retracted') ? true : false,
       vexComplete: vexComplete === 'all' ? undefined : false,
       field: prodVulnState.field,
       direction: prodVulnState.direction
