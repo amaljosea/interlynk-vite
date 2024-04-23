@@ -54,7 +54,6 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const toast = useToast()
   const params = useParams()
   const productId = params.productid
-  const activeEnv = localStorage.getItem('activeEnv')
   const { totalRows, prodCompState, versionState, dispatch } = useGlobalState()
   const { expLicense } = prodCompState
   const { prodCompDispatch } = dispatch
@@ -228,7 +227,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
     setDisabled(true)
     createSbom({
       variables: {
-        projectId: activeEnv,
+        projectId: productId,
         spec: 'cyclonedx',
         specVersion: '1.4',
         format: 'json'

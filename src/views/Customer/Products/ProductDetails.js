@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import SBOM from 'views/Customer/Sbom'
 
 import {
@@ -30,17 +30,13 @@ import { ShareVulnData } from 'graphQL/Queries'
 import { FaLock, FaWindowMaximize } from 'react-icons/fa6'
 
 const ProductDetails = () => {
-  const location = useLocation()
-
   const params = useParams()
   const productId = params.productid
   const productGroupId = params.productgroupid
   const sbomId = params.sbomid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-
-  const activeProd = localStorage.getItem('publicEnv')
   const environment = localStorage.getItem('environment')
-  const [activeEnv, setActiveEnv] = useState(activeProd || '')
+  const [activeEnv, setActiveEnv] = useState(productId || '')
 
   const {
     totalRows,
@@ -119,8 +115,6 @@ const ProductDetails = () => {
       const env = data?.shareLynkQuery?.projectGroup?.projects.find(
         (item) => item.name === environment
       )
-      console.log('env', env)
-      localStorage.setItem('publicEnv', env?.id)
       setActiveEnv(env?.id)
     }
   }, [data, environment])

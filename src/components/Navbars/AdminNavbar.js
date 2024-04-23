@@ -32,8 +32,6 @@ export default function AdminNavbar(props) {
 
   useQuery(GetUserPermissions, {
     skip: signedUrlParams ? true : false,
-    fetchPolicy: 'network-only',
-    nextFetchPolicy: 'cache-only',
     onCompleted: (data) => {
       const permissions = permissionList(
         data?.organization?.currentUser?.role?.permissionsMap || []
@@ -54,7 +52,6 @@ export default function AdminNavbar(props) {
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const activeVuln = localStorage.getItem('activeVuln')
-  const activeEnv = localStorage.getItem('activeEnv')
   const currentProduct = (() => {
     try {
       return parseJSONSafely(localStorage.getItem('product'))
@@ -267,7 +264,7 @@ export default function AdminNavbar(props) {
                     parts
                       ? getProductVersionDetailPageUrl({
                           productgroupid: params.productgroupid,
-                          productid: activeEnv,
+                          productid: prodID,
                           sbomid: currentSBOM?.id
                         })
                       : ''

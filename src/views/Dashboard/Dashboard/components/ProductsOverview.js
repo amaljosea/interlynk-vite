@@ -8,8 +8,10 @@ import {
   normalizeSBOMVersion,
   timeSince
 } from 'utils'
-import { getProductVersionDetailPageUrl } from 'utils/url'
-import { getProductDetailPageUrl } from 'utils/url'
+import {
+  getProductDetailPageUrl,
+  getProductVersionDetailPageUrl
+} from 'utils/url'
 
 import { Flex, Heading, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
@@ -38,7 +40,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       sbomId: id,
       defaultEnv: projectGroup?.defaultProject?.id
     }
-    localStorage.setItem('activeEnv', project?.id)
     localStorage.setItem('product', JSON.stringify(product))
     localStorage.setItem('activeProdTab', 0)
     prodDispatch({
@@ -62,7 +63,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       name: projectGroup?.name,
       sbomId: id
     }
-    localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
     localStorage.setItem('product', JSON.stringify(product))
     localStorage.setItem(
       'currentSBOM',
@@ -83,7 +83,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       sbomId: id
     }
     localStorage.setItem('product', JSON.stringify(product))
-    localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
     localStorage.setItem(
       'currentSBOM',
       JSON.stringify({ version: projectVersion, id: item.id })
@@ -103,7 +102,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       sbomId: id
     }
     localStorage.setItem('product', JSON.stringify(product))
-    localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
     localStorage.setItem(
       'currentSBOM',
       JSON.stringify({ version: projectVersion, id: item.id })
@@ -122,7 +120,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       sbomId: id
     }
     localStorage.setItem('product', JSON.stringify(product))
-    localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
     localStorage.setItem(
       'currentSBOM',
       JSON.stringify({ version: version, id: id })
@@ -183,8 +180,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       wrap: true,
       width: '150px',
       selector: (row) => {
-        console.log({ row })
-
         const { id, project, projectVersion } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (

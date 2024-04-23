@@ -67,20 +67,18 @@ import {
 
 import Pagination from '../Pagination'
 
-const VersionsTable = ({ projectGroup, getVulnData }) => {
+const VersionsTable = ({ projectGroup }) => {
   const location = useLocation()
   const navigate = useNavigate()
+  const params = useParams()
+  const productGroupId = params.productgroupid
+  const productId = params.productid
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const activeProd = localStorage.getItem(
-    signedUrlParams ? 'publicEnv' : 'activeEnv'
-  )
-
   const {
     userPermissions,
     activeProdTab,
     setActiveSbomTab,
-    prodVulnState,
     clearSelect,
     setClearSelect,
     selectedSbom,
@@ -89,7 +87,6 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     dispatch
   } = useGlobalState()
   const { searchInput } = versionState
-  const { field, direction, include } = prodVulnState
   const { prodVulnDispatch, prodCompDispatch, versionDispatch } = dispatch
 
   const paginationSizes = [25, 50, 100]
@@ -102,32 +99,28 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
   const versionData = useMemo(() => {
     return {
-      id: activeProd,
+      id: productId,
       field: versionState?.field,
       direction: versionState?.direction
     }
-  }, [activeProd, versionState?.direction, versionState?.field])
+  }, [productId, versionState?.direction, versionState?.field])
 
   const [getAlternatives, { data: sbomAlts }] = useLazyQuery(
-    signedUrlParams ? GetShareSbomAlternatives : GetSbomAlternatives,
-    { fetchPolicy: 'network-only' }
+    signedUrlParams ? GetShareSbomAlternatives : GetSbomAlternatives
   )
 
   const [getVersions, { data: allVersions }] = useLazyQuery(
-    signedUrlParams ? GetShareSbomVersions : GetSbomVersions,
-    { fetchPolicy: 'network-only' }
+    signedUrlParams ? GetShareSbomVersions : GetSbomVersions
   )
 
   const [getDrift, { data: driftData }] = useLazyQuery(
-    signedUrlParams ? GetShareSbomDrift : GetSbomDrift,
-    { fetchPolicy: 'network-only' }
+    signedUrlParams ? GetShareSbomDrift : GetSbomDrift
   )
 
   const { data, refetch, error } = useQuery(
     signedUrlParams ? ShareVersionTable : GetVersionsTable,
     {
       skip: activeProdTab === 0 && !isToolOpen ? false : true,
-      fetchPolicy: 'network-only',
       variables: {
         ...versionData,
         first: totalRows,
@@ -225,7 +218,6 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       permission.key === 'archive_sbom' && permission.value === true
   )
 
-  const params = useParams()
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -270,7 +262,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
   const handleListSbom = (row) => {
     getAlternatives({
       variables: {
-        projectId: signedUrlParams ? undefined : activeProd,
+        projectId: signedUrlParams ? undefined : productId,
         sbomId: row?.id
       }
     })
@@ -284,10 +276,12 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     setActiveSbomTab(4)
     navigate(
       getProductVersionDetailPageUrl({
-        productgroupid: params.productgroupid,
-        productid: activeProd,
+        productgroupid: productGroupId,
+        productid: productId,
         sbomid: id,
-        tab: 'licenses'
+        paramsObj: {
+          tab: 'licenses'
+        }
       })
     )
   }
@@ -301,8 +295,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       selector: (row) => {
         const { id, projectVersion } = row
         const link = getProductVersionDetailPageUrl({
-          productgroupid: projectGroup.id,
-          productid: projectGroup.defaultProject.id,
+          productgroupid: productGroupId,
+          productid: productId,
           sbomid: row.id,
           paramsObj: {
             tab: 'general'
@@ -340,10 +334,12 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         return (
           <Link
             to={getProductVersionDetailPageUrl({
-              productgroupid: params.productgroupid,
-              productid: activeProd,
+              productgroupid: productGroupId,
+              productid: productId,
               sbomid: id,
-              tab: 'components'
+              paramsObj: {
+                tab: 'components'
+              }
             })}
           >
             <Tag
@@ -398,8 +394,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       selector: (row) => {
         const { stats, id, projectVersion } = row
         const link = getProductVersionDetailPageUrl({
-          productgroupid: params.productgroupid,
-          productid: activeProd,
+          productgroupid: productGroupId,
+          productid: productId,
           sbomid: id,
           paramsObj: {
             tab: 'vulnerabilities'
@@ -555,21 +551,19 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
           setIsLoading(false)
           setClearSelect(true)
           setSelectedSbom([])
-          refetch({ id: activeProd })
+          refetch({ id: productId })
           onDeleteClose()
         }, 2000)
       }
     })
   }
 
-  console.log('selectedSbom', selectedSbom)
-
   // REFRESH PRODUCTS
   const handleRefresh = useCallback(async () => {
     disablePaginationControl()
     setCurrentPage(1)
     await refetch({
-      id: activeProd,
+      id: productId,
       first: totalRows,
       after: undefined,
       before: undefined,
@@ -579,7 +573,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         setPaginationControl(res.data)
       }
     })
-  }, [activeProd, refetch, totalRows])
+  }, [productId, refetch, totalRows])
 
   const onBuildSbom = useCallback(() => {
     prodCompDispatch({ type: 'CLEAR_LICENSES' })
@@ -593,11 +587,11 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
   const handleCompare = useCallback(() => {
     setLoading(true)
     if (selectedSbom?.length === 2) {
-      getVersions({ variables: { id: activeProd } }).then(() => {
+      getVersions({ variables: { id: productId } }).then(() => {
         const versions = sortByUpdatedAt(selectedSbom)
         getDrift({
           variables: {
-            projectId: signedUrlParams ? undefined : activeProd,
+            projectId: signedUrlParams ? undefined : productId,
             subjectSbomId: versions[0]?.id,
             targetSbomId: versions[1]?.id
           }
@@ -615,7 +609,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       })
     }
   }, [
-    activeProd,
+    productId,
     getDrift,
     getVersions,
     onToolOpen,
@@ -748,7 +742,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
   const handleSort = async (column, sortDirection) => {
     await refetch({
-      id: activeProd,
+      id: productId,
       first: undefined,
       last: totalRows,
       after: undefined,
@@ -880,7 +874,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
           onClose={onSbomClose}
           data={projectGroup}
           refetch={refetch}
-          productId={activeProd}
+          productId={productId}
         />
       )}
 

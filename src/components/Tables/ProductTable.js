@@ -68,21 +68,26 @@ const ProductTable = ({ data, refetch }) => {
     }
   }, [data])
 
-  const setPaginationControl = (data) => {
-    if (signedUrlParams) {
-      setIsPrevActive(
-        data?.shareLynkQuery?.projectGroups?.pageInfo?.hasPreviousPage
-      )
-      setIsNextActive(
-        data?.shareLynkQuery?.projectGroups?.pageInfo?.hasNextPage
-      )
-    } else {
-      setIsPrevActive(
-        data?.organization?.projectGroups?.pageInfo?.hasPreviousPage
-      )
-      setIsNextActive(data?.organization?.projectGroups?.pageInfo?.hasNextPage)
-    }
-  }
+  const setPaginationControl = useCallback(
+    (data) => {
+      if (signedUrlParams) {
+        setIsPrevActive(
+          data?.shareLynkQuery?.projectGroups?.pageInfo?.hasPreviousPage
+        )
+        setIsNextActive(
+          data?.shareLynkQuery?.projectGroups?.pageInfo?.hasNextPage
+        )
+      } else {
+        setIsPrevActive(
+          data?.organization?.projectGroups?.pageInfo?.hasPreviousPage
+        )
+        setIsNextActive(
+          data?.organization?.projectGroups?.pageInfo?.hasNextPage
+        )
+      }
+    },
+    [signedUrlParams]
+  )
 
   const disablePaginationControl = () => {
     setIsPrevActive(false)
@@ -93,7 +98,6 @@ const ProductTable = ({ data, refetch }) => {
   const params = useParams()
   const productId = params.productid
 
-  const activeEnv = localStorage.getItem('activeEnv')
   const environment = localStorage.getItem('environment')
 
   const {
@@ -106,7 +110,7 @@ const ProductTable = ({ data, refetch }) => {
     dispatch
   } = useGlobalState()
 
-  const { field, direction, searchInput, pageIndex, enabled } = prodState
+  const { field, direction, searchInput, pageIndex } = prodState
   const { prodDispatch, prodCompDispatch } = dispatch
 
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
@@ -169,7 +173,7 @@ const ProductTable = ({ data, refetch }) => {
       sbomPermissions?.supersededBy?.some(
         (permission) => permission.key === 'create_sbom' && permission.value
       ),
-    [productPermissions]
+    [sbomPermissions]
   )
 
   const canUpdateProduct = useMemo(
@@ -216,7 +220,6 @@ const ProductTable = ({ data, refetch }) => {
 
   const handleOpenSbom = useCallback(
     (row) => {
-      localStorage.setItem('activeEnv', row?.defaultProject?.id)
       prodCompDispatch({ type: 'CLEAR_LICENSES' })
       setActiveRow(row)
       onSbomOpen()
@@ -245,7 +248,7 @@ const ProductTable = ({ data, refetch }) => {
         prodDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
     })
-  }, [refetch, totalRows, field, direction])
+  }, [refetch, totalRows, field, direction, setPaginationControl, prodDispatch])
 
   const handleClear = useCallback(async () => {
     setFilterText('')
@@ -264,7 +267,7 @@ const ProductTable = ({ data, refetch }) => {
         prodDispatch({ type: 'CLEAR_SEARCH_INPUT' })
       }
     })
-  }, [refetch, totalRows, prodDispatch])
+  }, [refetch, totalRows, field, direction, setPaginationControl, prodDispatch])
 
   const onSearchInputChange = useCallback(
     (event) => {
@@ -275,7 +278,7 @@ const ProductTable = ({ data, refetch }) => {
         setFilterText(value)
       }
     },
-    [handleClear, prodDispatch]
+    [handleClear]
   )
 
   const handleSearch = useCallback(
@@ -299,7 +302,15 @@ const ProductTable = ({ data, refetch }) => {
         })
       }
     },
-    [refetch, filterText, totalRows, prodDispatch]
+    [
+      filterText,
+      refetch,
+      totalRows,
+      field,
+      direction,
+      setPaginationControl,
+      prodDispatch
+    ]
   )
 
   const onFilterActive = useCallback(
@@ -320,7 +331,7 @@ const ProductTable = ({ data, refetch }) => {
         }
       })
     },
-    [refetch, totalRows, prodDispatch]
+    [refetch, totalRows, field, direction, setPaginationControl, prodDispatch]
   )
 
   const onSharelynkOpen = (row) => {
@@ -371,274 +382,262 @@ const ProductTable = ({ data, refetch }) => {
       </Flex>
     )
   }, [
-    searchInput,
-    signedUrlParams,
-    handleSearch,
+    filterText,
+    onSearchInputChange,
     handleClear,
-    handleRefresh,
+    handleSearch,
+    signedUrlParams,
     onFilterActive,
-    onSearchInputChange
+    onOpenProduct,
+    handleRefresh
   ])
 
   // COLUMNS
-  const columns = useMemo(
-    () => [
-      // ACTIVE
-      {
-        id: 'PROJECT_GROUPS_ENABLED',
-        name: 'ACTIVE',
-        selector: (row) => {
-          const { enabled, name } = row
-          return (
-            <Switch
-              name={name}
-              id={name}
-              size='md'
-              isChecked={enabled}
-              isDisabled={signedUrlParams}
-              onChange={() => {
-                setActiveRow(row)
-                onWarningOpen()
-              }}
-            />
-          )
-        },
-        width: '150px',
-        sortable: true
+  const columns = [
+    // ACTIVE
+    {
+      id: 'PROJECT_GROUPS_ENABLED',
+      name: 'ACTIVE',
+      selector: (row) => {
+        const { enabled, name } = row
+        return (
+          <Switch
+            name={name}
+            id={name}
+            size='md'
+            isChecked={enabled}
+            isDisabled={signedUrlParams}
+            onChange={() => {
+              setActiveRow(row)
+              onWarningOpen()
+            }}
+          />
+        )
       },
-      // PRODUCT
-      {
-        id: 'PROJECT_GROUPS_NAME',
-        name: 'PRODUCT',
-        selector: (row) => {
-          const { id, name, projects, defaultProject, description } = row
-          const product = { id: id, name: name, groupId: id }
-          const handleClick = () => {
-            setClearSelect(true)
-            setSelectedSbom([])
-            const env = projects?.find((item) => item.name === environment)
-            prodDispatch({
-              type: 'SET_CURRENT_PRODUCT',
-              payload: { id: env?.id || defaultProject?.id }
-            })
-            localStorage.setItem(
-              signedUrlParams ? 'publicEnv' : 'activeEnv',
-              env?.id || defaultProject?.id
-            )
-            localStorage.setItem('product', JSON.stringify(product))
-            localStorage.setItem('activeProdTab', 0)
-            setActiveSbomTab(0)
-          }
-          return (
-            <Stack
-              direction='column'
-              alignItems={'flex-start'}
-              spacing={1}
-              my={3}
+      width: '150px',
+      sortable: true
+    },
+    // PRODUCT
+    {
+      id: 'PROJECT_GROUPS_NAME',
+      name: 'PRODUCT',
+      selector: (row) => {
+        const { id, name, projects, defaultProject, description } = row
+        const product = { id: id, name: name, groupId: id }
+        const handleClick = () => {
+          setClearSelect(true)
+          setSelectedSbom([])
+          const env = projects?.find((item) => item.name === environment)
+          prodDispatch({
+            type: 'SET_CURRENT_PRODUCT',
+            payload: { id: env?.id || defaultProject?.id }
+          })
+          localStorage.setItem('product', JSON.stringify(product))
+          localStorage.setItem('activeProdTab', 0)
+          setActiveSbomTab(0)
+        }
+        return (
+          <Stack
+            direction='column'
+            alignItems={'flex-start'}
+            spacing={1}
+            my={3}
+          >
+            <Link
+              to={getProductDetailPageUrl({
+                productgroupid: row.id,
+                productid: row.defaultProject.id
+              })}
+              onClick={handleClick}
             >
+              <Text
+                fontSize={14}
+                color={'blue.500'}
+                minWidth='100%'
+                fontWeight={'medium'}
+              >
+                {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
+              </Text>
+            </Link>
+            <Text>
+              {description?.length > 50
+                ? description.substring(0, 50) + '....'
+                : description}
+            </Text>
+          </Stack>
+        )
+      },
+      wrap: true,
+      sortable: true
+    },
+    // ENVIRONMENT
+    {
+      id: 'ENVIRONMENTS',
+      name: 'ENVIRONMENTS',
+      selector: (row) => {
+        const { id, name, projects } = row
+        const product = { id: id, name: name, groupId: id }
+        const handleClick = (value) => {
+          const env = projects?.find((item) => item.name === value)
+          localStorage.setItem('product', JSON.stringify(product))
+          localStorage.setItem('environment', env?.name)
+          localStorage.setItem('activeProdTab', 0)
+          prodDispatch({
+            type: 'SET_CURRENT_PRODUCT',
+            payload: { id: env?.id }
+          })
+          setEnvName(env?.name)
+          setActiveSbomTab(0)
+        }
+        return (
+          <Stack direction={'row'} spacing={2} alignItems={'center'}>
+            <Tooltip label='Default'>
               <Link
                 to={getProductDetailPageUrl({
                   productgroupid: row.id,
                   productid: row.defaultProject.id
                 })}
-                onClick={handleClick}
+                onClick={() => handleClick('default')}
               >
-                <Text
-                  fontSize={14}
-                  color={'blue.500'}
-                  minWidth='100%'
-                  fontWeight={'medium'}
-                >
-                  {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
-                </Text>
+                <IconButton size='sm' colorScheme='blue' icon={<FaInbox />} />
               </Link>
-              <Text>
-                {description?.length > 50
-                  ? description.substring(0, 50) + '....'
-                  : description}
-              </Text>
-            </Stack>
-          )
-        },
-        wrap: true,
-        sortable: true
-      },
-      // ENVIRONMENT
-      {
-        id: 'ENVIRONMENTS',
-        name: 'ENVIRONMENTS',
-        selector: (row) => {
-          const { id, name, projects } = row
-          const product = { id: id, name: name, groupId: id }
-          const handleClick = (value) => {
-            const env = projects?.find((item) => item.name === value)
-            localStorage.setItem('product', JSON.stringify(product))
-            localStorage.setItem('environment', env?.name)
-            localStorage.setItem(
-              signedUrlParams ? 'publicEnv' : 'activeEnv',
-              env?.id
-            )
-            localStorage.setItem('activeProdTab', 0)
-            prodDispatch({
-              type: 'SET_CURRENT_PRODUCT',
-              payload: { id: env?.id }
-            })
-            setEnvName(env?.name)
-            setActiveSbomTab(0)
-          }
-          return (
-            <Stack direction={'row'} spacing={2} alignItems={'center'}>
-              <Tooltip label='Default'>
-                <Link
-                  to={getProductDetailPageUrl({
-                    productgroupid: row.id,
-                    productid: row.defaultProject.id
-                  })}
-                  onClick={() => handleClick('default')}
-                >
-                  <IconButton size='sm' colorScheme='blue' icon={<FaInbox />} />
-                </Link>
-              </Tooltip>
-              <Tooltip label='Development'>
-                <Link
-                  to={getProductDetailPageUrl({
-                    productgroupid: row.id,
-                    productid: projects?.find(
-                      (item) => item.name === 'development'
-                    ).id
-                  })}
-                  onClick={() => handleClick('development')}
-                >
-                  <IconButton size='sm' colorScheme='blue' icon={<FaCode />} />
-                </Link>
-              </Tooltip>
-              <Tooltip label='Production'>
-                <Link
-                  to={getProductDetailPageUrl({
-                    productgroupid: row.id,
-                    productid: projects?.find(
-                      (item) => item.name === 'production'
-                    ).id
-                  })}
-                  onClick={() => handleClick('production')}
-                >
-                  <IconButton
-                    size='sm'
-                    colorScheme='blue'
-                    icon={<FaSquareArrowUpRight />}
-                  />
-                </Link>
-              </Tooltip>
-            </Stack>
-          )
-        },
-        wrap: true
-      },
-      // VERSION
-      {
-        id: 'VERSIONS',
-        name: 'VERSIONS',
-        selector: (row) => {
-          const { projects } = row
-          const totalSbom = projects?.reduce(
-            (count, project) => count + project?.sboms?.length || 0,
-            0
-          )
-          return <Text>{totalSbom || 0}</Text>
-        },
-        wrap: true,
-        right: 'true'
-      },
-      // UPDATEDAT
-      {
-        id: 'PROJECT_GROUPS_UPDATED_AT',
-        name: 'UPDATED',
-        selector: (row) => {
-          const { updatedAt } = row
-          return (
-            <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
-              {timeSince(updatedAt)}
             </Tooltip>
-          )
-        },
-        sortable: true,
-        sortFunction: (a, b) => {
-          const dateA = new Date(a.updatedAt)
-          const dateB = new Date(b.updatedAt)
-          return dateA - dateB
-        },
-        wrap: true,
-        right: 'true'
+            <Tooltip label='Development'>
+              <Link
+                to={getProductDetailPageUrl({
+                  productgroupid: row.id,
+                  productid: projects?.find(
+                    (item) => item.name === 'development'
+                  ).id
+                })}
+                onClick={() => handleClick('development')}
+              >
+                <IconButton size='sm' colorScheme='blue' icon={<FaCode />} />
+              </Link>
+            </Tooltip>
+            <Tooltip label='Production'>
+              <Link
+                to={getProductDetailPageUrl({
+                  productgroupid: row.id,
+                  productid: projects?.find(
+                    (item) => item.name === 'production'
+                  ).id
+                })}
+                onClick={() => handleClick('production')}
+              >
+                <IconButton
+                  size='sm'
+                  colorScheme='blue'
+                  icon={<FaSquareArrowUpRight />}
+                />
+              </Link>
+            </Tooltip>
+          </Stack>
+        )
       },
-      // ACTIONS
-      {
-        id: 'ACTIONS',
-        name: 'ACTIONS',
-        selector: (row) => {
-          const { enabled, defaultProject } = row
-
-          return (
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                icon={<FaEllipsisV />}
-                variant='none'
-                color='gray.400'
-              />
-              <Portal>
-                <MenuList fontSize={'sm'}>
-                  {/* EDIT PRODUCT */}
-                  <MenuItem
-                    onClick={() => {
-                      setActiveRow(row)
-                      onOpen()
-                    }}
-                    isDisabled={!enabled || !canAddProduct}
-                  >
-                    Edit Product
-                  </MenuItem>
-                  <Divider />
-                  {/* UPLOAD SBOM */}
-                  <MenuItem
-                    onClick={() => {
-                      localStorage.setItem('activeEnv', defaultProject?.id)
-                      setActiveRow(row)
-                      onOpenUpload()
-                    }}
-                    isDisabled={!enabled || !canUpdateProduct || !canCreateSBOM}
-                  >
-                    Upload SBOM
-                  </MenuItem>
-                  {/* VIEW SHARELYNK */}
-                  <MenuItem
-                    isDisabled={!enabled || !canAddProduct}
-                    onClick={() => onSharelynkOpen(row)}
-                  >
-                    View ShareLynk
-                  </MenuItem>
-                  <Divider />
-                  {/* ARCHIVE PRODUCT GROUP */}
-                  <MenuItem
-                    color='red'
-                    onClick={() => {
-                      setActiveRow(row)
-                      onDeleteOpen()
-                    }}
-                    isDisabled={!canArchiveProduct}
-                  >
-                    Archive Product
-                  </MenuItem>
-                </MenuList>
-              </Portal>
-            </Menu>
-          )
-        },
-        right: 'true',
-        omit: signedUrlParams
-      }
-    ],
-    [setActiveRow, onWarningOpen, canArchiveProduct]
-  )
+      wrap: true
+    },
+    // VERSION
+    {
+      id: 'VERSIONS',
+      name: 'VERSIONS',
+      selector: (row) => {
+        const { projects } = row
+        const totalSbom = projects?.reduce(
+          (count, project) => count + project?.sboms?.length || 0,
+          0
+        )
+        return <Text>{totalSbom || 0}</Text>
+      },
+      wrap: true,
+      right: 'true'
+    },
+    // UPDATEDAT
+    {
+      id: 'PROJECT_GROUPS_UPDATED_AT',
+      name: 'UPDATED',
+      selector: (row) => {
+        const { updatedAt } = row
+        return (
+          <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
+            {timeSince(updatedAt)}
+          </Tooltip>
+        )
+      },
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB
+      },
+      wrap: true,
+      right: 'true'
+    },
+    // ACTIONS
+    {
+      id: 'ACTIONS',
+      name: 'ACTIONS',
+      selector: (row) => {
+        const { enabled } = row
+        return (
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              <MenuList fontSize={'sm'}>
+                {/* EDIT PRODUCT */}
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onOpen()
+                  }}
+                  isDisabled={!enabled || !canAddProduct}
+                >
+                  Edit Product
+                </MenuItem>
+                <Divider />
+                {/* UPLOAD SBOM */}
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onOpenUpload()
+                  }}
+                  isDisabled={!enabled || !canUpdateProduct || !canCreateSBOM}
+                >
+                  Upload SBOM
+                </MenuItem>
+                {/* VIEW SHARELYNK */}
+                <MenuItem
+                  isDisabled={!enabled || !canAddProduct}
+                  onClick={() => onSharelynkOpen(row)}
+                >
+                  View ShareLynk
+                </MenuItem>
+                <Divider />
+                {/* ARCHIVE PRODUCT GROUP */}
+                <MenuItem
+                  color='red'
+                  onClick={() => {
+                    setActiveRow(row)
+                    onDeleteOpen()
+                  }}
+                  isDisabled={!canArchiveProduct}
+                >
+                  Archive Product
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        )
+      },
+      right: 'true',
+      omit: signedUrlParams
+    }
+  ]
 
   const handleSort = useCallback(
     async (column, sortDirection) => {
@@ -661,7 +660,7 @@ const ProductTable = ({ data, refetch }) => {
         }
       })
     },
-    [refetch, totalRows, prodDispatch]
+    [refetch, totalRows, setPaginationControl, prodDispatch]
   )
 
   const handlePreviousPage = useCallback(async () => {
@@ -670,18 +669,18 @@ const ProductTable = ({ data, refetch }) => {
       first: undefined,
       last: totalRows,
       after: undefined,
-      before: data.pageInfo.startCursor,
+      before: data?.pageInfo?.startCursor,
       field,
       direction
     }).then((res) => {
       if (res.data) {
         prodDispatch({
           type: 'DECREMENT_PAGE',
-          payload: data.pageInfo.startCursor
+          payload: data?.pageInfo?.startCursor
         })
       }
     })
-  }, [refetch, totalRows, data, prodDispatch])
+  }, [refetch, totalRows, data, field, direction, prodDispatch])
 
   const handleNextPage = useCallback(async () => {
     disablePaginationControl()
@@ -697,11 +696,11 @@ const ProductTable = ({ data, refetch }) => {
       if (res.data) {
         prodDispatch({
           type: 'INCREMENT_PAGE',
-          payload: { total: data.totalCount, after: data.pageInfo.endCursor }
+          payload: { total: data?.totalCount, after: data?.pageInfo?.endCursor }
         })
       }
     })
-  }, [refetch, totalRows, data, prodDispatch])
+  }, [refetch, totalRows, data, field, direction, prodDispatch])
 
   const handleSetRow = useCallback(
     async (e) => {
@@ -722,7 +721,7 @@ const ProductTable = ({ data, refetch }) => {
         }
       })
     },
-    [refetch, setTotalRows, prodDispatch]
+    [refetch, field, direction, setPaginationControl, prodDispatch]
   )
 
   const dataTableProps = {
@@ -767,7 +766,7 @@ const ProductTable = ({ data, refetch }) => {
           data={activeRow}
           isOpen={isOpenUpload}
           onClose={onCloseUpload}
-          activeEnv={activeEnv}
+          activeEnv={productId}
         />
       )}
 
@@ -795,7 +794,7 @@ const ProductTable = ({ data, refetch }) => {
           refetch={refetch}
           description={activeRow.description}
           allProjects={data.nodes}
-          activeEnv={activeEnv}
+          activeEnv={productId}
         />
       )}
 

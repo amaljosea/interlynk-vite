@@ -1,5 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 import {
   Box,
@@ -23,18 +24,16 @@ import { FaBell } from 'react-icons/fa'
 import CheckMark from '../Misc/CheckMark'
 
 const NotificationMenuBell = () => {
+  const toast = useToast()
+  const params = useParams()
+  const productId = params.productid
   const [updatePreference] = useMutation(UpdateNotificationPreference)
   const { data } = useQuery(GetUserNotificationPreferences, {
     variables: {
-      envId: localStorage['activeEnv']
-    },
-    fetchPolicy: 'network-only'
+      envId: productId
+    }
   })
-  const [getChannelsInfo] = useLazyQuery(GetUserNotificationChannels, {
-    fetchPolicy: 'network-only'
-  })
-
-  const toast = useToast()
+  const [getChannelsInfo] = useLazyQuery(GetUserNotificationChannels)
 
   useEffect(() => {
     if (data) {

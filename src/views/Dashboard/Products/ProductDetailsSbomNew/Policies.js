@@ -200,7 +200,7 @@ const Policies = () => {
         if (res?.data) {
           setActiveRow(item)
           setActivePolicy(name)
-          console.log(res?.data?.policyRuleViolations)
+          // console.log(res?.data?.policyRuleViolations)
         }
       })
       onOpen()

@@ -1,4 +1,5 @@
 import { useMutation } from '@apollo/client'
+import { useParams } from 'react-router-dom'
 
 import {
   Button,
@@ -22,16 +23,16 @@ import { PolicyDelete } from 'graphQL/Mutation'
 
 const DeleteModal = ({ isOpen, onClose, data, refetch }) => {
   const toast = useToast()
+  const params = useParams()
+  const productId = params.productid
   const { id } = data
-  console.log('data', data)
-  const activeProd = localStorage.getItem('activeEnv')
-  const { totalRows, policyState, dispatch } = useGlobalState()
+  const { totalRows, policyState } = useGlobalState()
   const { searchInput } = policyState
   const [deletePolicy] = useMutation(PolicyDelete)
 
   const policyData = {
-    projectId: activeProd || undefined,
-    search: activeProd || searchInput === '' ? undefined : searchInput,
+    projectId: productId || undefined,
+    search: productId || searchInput === '' ? undefined : searchInput,
     first: totalRows
   }
 

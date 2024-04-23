@@ -1,4 +1,5 @@
 import { useMutation } from '@apollo/client'
+import { useParams } from 'react-router-dom'
 
 import {
   Button,
@@ -22,8 +23,9 @@ import { PolicyUpdate } from 'graphQL/Mutation'
 
 const WarnModal = ({ isOpen, onClose, data, refetch }) => {
   const toast = useToast()
+  const params = useParams()
+  const productId = params.productid
   const { id, isEnabled } = data
-  const activeProd = localStorage.getItem('activeEnv')
   const { totalRows, policyState } = useGlobalState()
   const { searchInput } = policyState
   const [updatePolicy] = useMutation(PolicyUpdate)
@@ -43,8 +45,8 @@ const WarnModal = ({ isOpen, onClose, data, refetch }) => {
       } else {
         refetch({
           variables: {
-            projectId: activeProd || undefined,
-            search: activeProd || searchInput === '' ? undefined : searchInput,
+            projectId: productId || undefined,
+            search: productId || searchInput === '' ? undefined : searchInput,
             first: totalRows
           }
         })

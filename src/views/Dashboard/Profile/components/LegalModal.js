@@ -42,7 +42,6 @@ const validateUrl = (url) => {
 }
 
 const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
-  console.log('orgs', orgs)
   const { totalRows } = useGlobalState()
   const [orgName, setOrgName] = useState('')
   const [url, setUrl] = useState('')

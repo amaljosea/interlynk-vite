@@ -85,7 +85,7 @@ export default function HeaderLinks(props) {
 
   useEffect(() => {
     if (!email && location.pathname.startsWith('/vendor')) {
-      logoutUser().then((r) => navigate('/auth'))
+      logoutUser().then(() => navigate('/auth'))
     }
   }, [location])
 
@@ -113,8 +113,6 @@ export default function HeaderLinks(props) {
           productgroupid: params.productgroupid
         })
       )
-      localStorage.setItem('publicEnv', project?.id)
-      localStorage.setItem('activeEnv', project?.id)
     }
 
     localStorage.setItem('environment', value)
@@ -165,9 +163,9 @@ export default function HeaderLinks(props) {
               onChange={(value) => handleEnvChange(value)}
               type='radio'
             >
-              {['default', 'development', 'production'].map((item) => (
+              {['default', 'development', 'production'].map((item, index) => (
                 <MenuItemOption
-                  key={item.id}
+                  key={index}
                   value={item}
                   fontSize='sm'
                   textTransform={'capitalize'}

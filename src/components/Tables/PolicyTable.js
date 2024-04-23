@@ -58,7 +58,6 @@ const PolicyTable = ({ data, refetch }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const activeProd = localStorage.getItem('activeEnv')
   const { totalRows, policyState, dispatch } = useGlobalState()
   const { pageIndex, searchInput } = policyState
   const { policyDispatch } = dispatch
@@ -86,8 +85,8 @@ const PolicyTable = ({ data, refetch }) => {
   const [deleteExclusion] = useMutation(DeletePolicyExclusion)
 
   const policyData = {
-    projectId: activeProd || undefined,
-    search: activeProd || searchInput === '' ? undefined : searchInput,
+    projectId: productId || undefined,
+    search: productId || searchInput === '' ? undefined : searchInput,
     first: totalRows
   }
 
@@ -122,14 +121,14 @@ const PolicyTable = ({ data, refetch }) => {
     disablePaginationControl()
     await refetch({
       variables: {
-        projectId: activeProd || undefined,
-        search: activeProd || searchInput === '' ? undefined : searchInput,
+        projectId: productId || undefined,
+        search: productId || searchInput === '' ? undefined : searchInput,
         first: totalRows
       }
     }).then(
       (res) => res?.data && policyDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
-  }, [activeProd, policyDispatch, refetch, searchInput, totalRows])
+  }, [policyDispatch, productId, refetch, searchInput, totalRows])
 
   const handlePreviousPage = () => {}
   const handleNextPage = () => {}
@@ -137,7 +136,7 @@ const PolicyTable = ({ data, refetch }) => {
 
   const handleCreateExclusion = async (id) => {
     await createExclusion({
-      variables: { policyId: id, projectId: activeProd }
+      variables: { policyId: id, projectId: productId }
     }).then((res) => {
       const errors = res?.data?.policyExclusionCreate?.errors
       if (errors?.length > 0) {
@@ -155,7 +154,7 @@ const PolicyTable = ({ data, refetch }) => {
 
   const handleDeleteExclusion = async (id) => {
     await deleteExclusion({
-      variables: { policyId: id, projectId: activeProd }
+      variables: { policyId: id, projectId: productId }
     }).then((res) => {
       const errors = res?.data?.policyExclusionDelete?.errors
       if (errors?.length > 0) {

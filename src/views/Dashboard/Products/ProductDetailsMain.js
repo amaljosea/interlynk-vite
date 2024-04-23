@@ -101,11 +101,9 @@ const ProductDetailsMain = () => {
     vexComplete
   } = prodVulnState
   const { prodVulnDispatch, globalVulnDispatch } = dispatch
-
-  const activeProd = localStorage.getItem('activeEnv')
   // const group = JSON.stringify(localStorage.getItem('product'))
   const environment = localStorage.getItem('environment')
-  const [activeEnv, setActiveEnv] = useState(activeProd || '')
+  const [activeEnv, setActiveEnv] = useState(productId || '')
 
   const product = userPermissions?.find(
     (item) => item.key === 'view_product_group'
@@ -284,7 +282,6 @@ const ProductDetailsMain = () => {
   // ON CHANGE ENV
   // const onChangeEnv = (value) => {
   //   globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-  //   localStorage.setItem('activeEnv', value)
   //   setActiveEnv(value)
   // }
 
@@ -364,7 +361,6 @@ const ProductDetailsMain = () => {
         (item) => item.name === environment
       )
       globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      localStorage.setItem('activeEnv', env?.id)
       setActiveEnv(env?.id)
     }
   }, [data, environment, globalVulnDispatch])
@@ -591,7 +587,7 @@ const ProductDetailsMain = () => {
                   <ChangeLog
                     data={prodLogs}
                     refetch={getLogs}
-                    activeEnv={activeProd}
+                    activeEnv={productId}
                   />
                 </TabPanel>
               </TabPanels>

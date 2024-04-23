@@ -76,8 +76,6 @@ const EnvironmentDrawer = ({
       if (res?.data) {
         if (id === activeEnv) {
           activeEnv = data?.projectGroup?.defaultProject?.id
-
-          localStorage.setItem('activeEnv', activeEnv)
           setActiveEnv(activeEnv)
         }
         refetch({

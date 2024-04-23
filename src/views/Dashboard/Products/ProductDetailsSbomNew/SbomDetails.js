@@ -96,7 +96,6 @@ const SbomDetails = ({ sbomData }) => {
       return null
     }
   })()
-  const id = localStorage.getItem('activeEnv')
   const { name } = currentProduct ? currentProduct : {}
   const currentSBOM = JSON.parse(localStorage.getItem(`currentSBOM`))
 
@@ -152,7 +151,7 @@ const SbomDetails = ({ sbomData }) => {
 
   const onSelectPolicy = () => {
     if (signedUrlParams) {
-      setActiveCsSbomTab(5)
+      return null
     } else {
       setActiveTab('policies')
     }
@@ -235,9 +234,8 @@ const SbomDetails = ({ sbomData }) => {
     } else {
       const url = getProductVersionDetailPageUrl({
         productgroupid: params.productgroupid,
-        productid: id,
-        sbomid: currentSBOM?.id,
-        paramsObj: {}
+        productid: projectId,
+        sbomid: currentSBOM?.id
       })
       return url
     }

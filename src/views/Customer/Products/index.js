@@ -28,7 +28,6 @@ function Index() {
             groupId: group?.id
           }
           localStorage.setItem('product', JSON.stringify(product))
-          localStorage.setItem('publicEnv', group?.defaultProject?.id)
           navigate(
             getProductDetailPageUrl({
               productgroupid: productGroupId,

@@ -24,8 +24,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { GetPrimaryComponent } from 'graphQL/Queries'
-import { GetSharPrimartComp } from 'graphQL/Queries'
+import { GetPrimaryComponent, GetSharPrimartComp } from 'graphQL/Queries'
 
 import {
   FaAngleLeft,
@@ -86,7 +85,6 @@ const SbomDetails = ({ sbom, getVulnData }) => {
       return null
     }
   })()
-  const id = localStorage.getItem('activeEnv')
   const { name } = currentProduct ? currentProduct : {}
   const currentSBOM = JSON.parse(localStorage.getItem(`currentSBOM`))
 
@@ -144,10 +142,10 @@ const SbomDetails = ({ sbom, getVulnData }) => {
   }
 
   const onSelectPolicy = () => {
-    localStorage.setItem('activeSbomTab', 5)
     if (signedUrlParams) {
-      setActiveCsSbomTab(5)
+      return null
     } else {
+      localStorage.setItem('activeSbomTab', 5)
       setActiveSbomTab(5)
     }
   }
@@ -243,9 +241,8 @@ const SbomDetails = ({ sbom, getVulnData }) => {
     } else {
       const url = getProductVersionDetailPageUrl({
         productgroupid: params.productgroupid,
-        productid: id,
-        sbomid: currentSBOM?.id,
-        paramsObj: {}
+        productid: productId,
+        sbomid: currentSBOM?.id
       })
       return url
     }
