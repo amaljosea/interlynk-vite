@@ -80,9 +80,7 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
 
   const handleCreate = (e) => {
     e.preventDefault()
-    if (orgs?.includes(orgName?.toLocaleLowerCase())) {
-      setError('Organization already exists')
-    } else if (url !== '' && !validateUrl(url)) {
+    if (url !== '' && !validateUrl(url)) {
       setIsValidUrl('Please enter a valid URL including http:// or https://')
     } else {
       createMfc({
@@ -101,9 +99,9 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
           setError(errors[0])
         } else {
           refetch({ first: totalRows })
+          onClose()
         }
       })
-      onClose()
     }
   }
 
@@ -130,9 +128,7 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
     if (existingData && existingData.length > 0) {
       mergedArray.push(...existingData)
     }
-    if (orgs?.includes(orgName?.toLocaleLowerCase())) {
-      setError('Organization already exists')
-    } else if (url !== '' && !validateUrl(url)) {
+    if (url !== '' && !validateUrl(url)) {
       setIsValidUrl('Please enter a valid URL including http:// or https://')
     } else {
       updateMfc({
@@ -148,9 +144,9 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
           setError(errors[0])
         } else {
           refetch({ first: totalRows })
+          onClose()
         }
       })
-      onClose()
     }
   }
 
