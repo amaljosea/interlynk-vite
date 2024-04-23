@@ -55,6 +55,12 @@ const authLink = setContext((_, { headers }) => {
   }
 })
 
+export const refetchActiveQueries = async () => {
+  await client.refetchQueries({
+    include: 'active'
+  })
+}
+
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (networkError?.statusCode === 401) {
     console.log('Unauthorized Access. Please log in.')

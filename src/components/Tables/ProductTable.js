@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
+import { refetchActiveQueries } from 'context/ApolloWrapper'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -780,7 +781,6 @@ const ProductTable = ({ data, refetch }) => {
       {isOpenProduct && (
         <ProductModal
           isOpen={isOpenProduct}
-          refetch={refetch}
           totalRows={totalRows}
           onClose={onCloseProduct}
           id={null}
@@ -797,7 +797,6 @@ const ProductTable = ({ data, refetch }) => {
           isOpen={isOpen}
           onClose={onClose}
           product={activeRow.name}
-          refetch={refetch}
           description={activeRow.description}
           allProjects={data.nodes}
           activeEnv={productId}

@@ -1,4 +1,5 @@
 import { useMutation } from '@apollo/client'
+import { refetchActiveQueries } from 'context/ApolloWrapper'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { errorMapping } from 'utils/errorUtils'
@@ -24,20 +25,13 @@ import {
 
 import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
 
-const ProductModal = ({
-  id,
-  isOpen,
-  onClose,
-  product,
-  description,
-  refetch
-}) => {
+const ProductModal = ({ id, isOpen, onClose, product, description }) => {
   const params = useParams()
   const [projectGroupCreate] = useMutation(CreateProjectGroup, {
-    onCompleted: () => refetch()
+    onCompleted: refetchActiveQueries
   })
   const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {
-    onCompleted: () => refetch()
+    onCompleted: refetchActiveQueries
   })
 
   const [productName, setProductName] = useState('')
