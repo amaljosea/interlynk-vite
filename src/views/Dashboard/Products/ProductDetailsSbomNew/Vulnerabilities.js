@@ -77,13 +77,7 @@ const statusColor = (status) => {
   }
 }
 
-const ExpandedComponent = ({
-  data,
-  setActiveRow,
-  onCvssOpen,
-  textColor,
-  filteredData
-}) => {
+const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
   const { vuln } = data
   const CustomText = styled(Text)`
     font-size: 13px;
@@ -206,9 +200,7 @@ const ExpandedComponent = ({
         </GridItem>
         {/* STATUS UPDATE */}
         <GridItem w='100%' colSpan={3}>
-          {data && (
-            <VexStatusComponent data={data} fixedVersions={filteredData} />
-          )}
+          {data && <VexStatusComponent data={data} />}
         </GridItem>
       </Grid>
     </Box>
@@ -256,7 +248,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     }
   }, [prodVulnDispatch, sbomData?.sbom?.sbomParts?.length])
 
-  const filteredData = []
   const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
 
   const range = {
@@ -1171,8 +1162,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
             expandableRowsComponentProps={{
               setActiveRow,
               onCvssOpen,
-              textColor,
-              filteredData
+              textColor
             }}
             selectableRows={!signedUrlParams}
             clearSelectedRows={toggleClear}
