@@ -47,7 +47,6 @@ const SbomDetails = ({ sbomData }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const parts = queryParams.get('parts')
-  const data = sbomData
 
   const setActiveTab = (value) => {
     const link = getProductVersionDetailPageUrl({
@@ -66,12 +65,12 @@ const SbomDetails = ({ sbomData }) => {
     policyResultMetrics,
     projectVersion,
     primaryComponent,
+    vulnRunStatus,
     updatedAt,
     lifecycle,
-    vulnRunStatus,
     stats,
     sbomParts
-  } = data || ''
+  } = sbomData || ''
   const { compCount, compLicenseCount, vulnStats } = stats || ''
   const { critical, high, medium, low, unknown } = vulnStats || ''
   const { prodCompState, setActiveCsSbomTab, dispatch } = useGlobalState()
@@ -316,58 +315,57 @@ const SbomDetails = ({ sbomData }) => {
             {primaryComponent?.description}
           </Text>
           {/* SCAN STATUS */}
-          {!signedUrlParams && (
-            <Flex
-              flexDir='row'
-              gap={2}
-              alignItems={'center'}
-              width='100%'
-              my={2}
-            >
-              <Tooltip label='Imported'>
-                <IconButton
-                  size='xs'
-                  colorScheme={'blue'}
-                  icon={<DownloadIcon />}
-                />
-              </Tooltip>
-              <Tooltip label='SBOM Checks'>
-                <IconButton
-                  size='xs'
-                  colorScheme={
-                    vulnRunStatus === 'FINISHED' ||
-                    vulnRunStatus === 'IN_PROGRESS'
-                      ? 'blue'
-                      : 'blackAlpha'
-                  }
-                  icon={<Search2Icon />}
-                />
-              </Tooltip>
-              <Tooltip label='Vulnerability Scan'>
-                <IconButton
-                  size='xs'
-                  colorScheme={
-                    vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
-                  }
-                  icon={<FaBug />}
-                />
-              </Tooltip>
-              <Tooltip label='Ready'>
-                <IconButton
-                  size='xs'
-                  colorScheme={
-                    vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
-                  }
-                  icon={<FaCircleCheck />}
-                />
-              </Tooltip>
-              {vulnRunStatus === 'IN_PROGRESS' && (
-                <Badge px={2} py={1} fontWeight={'semibold'}>
-                  Scanning...
-                </Badge>
-              )}
-            </Flex>
-          )}
+          <Flex
+            my={2}
+            gap={2}
+            width='100%'
+            flexDir='row'
+            alignItems={'center'}
+            hidden={signedUrlParams}
+          >
+            <Tooltip label='Imported'>
+              <IconButton
+                size='xs'
+                colorScheme={'blue'}
+                icon={<DownloadIcon />}
+              />
+            </Tooltip>
+            <Tooltip label='SBOM Checks'>
+              <IconButton
+                size='xs'
+                colorScheme={
+                  vulnRunStatus === 'FINISHED' ||
+                  vulnRunStatus === 'IN_PROGRESS'
+                    ? 'blue'
+                    : 'blackAlpha'
+                }
+                icon={<Search2Icon />}
+              />
+            </Tooltip>
+            <Tooltip label='Vulnerability Scan'>
+              <IconButton
+                size='xs'
+                colorScheme={
+                  vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
+                }
+                icon={<FaBug />}
+              />
+            </Tooltip>
+            <Tooltip label='Ready'>
+              <IconButton
+                size='xs'
+                colorScheme={
+                  vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
+                }
+                icon={<FaCircleCheck />}
+              />
+            </Tooltip>
+            {vulnRunStatus === 'IN_PROGRESS' && (
+              <Badge px={2} py={1} fontWeight={'semibold'}>
+                Scanning...
+              </Badge>
+            )}
+          </Flex>
           {/* UPDATED AT */}
           <Tooltip placement='top' label={getFullDateAndTime(updatedAt)}>
             <Text width={'fit-content'} fontSize='xs' cursor={'pointer'}>

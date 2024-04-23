@@ -7,7 +7,7 @@ import CardBody from 'components/Card/CardBody'
 
 import SbomDetails from './SbomDetails'
 
-const SbomInfo = ({ data, error, loading, refetch, vulnRunStatus }) => {
+const SbomInfo = ({ data, error, loading, refetch }) => {
   if (error) {
     return (
       <Card>

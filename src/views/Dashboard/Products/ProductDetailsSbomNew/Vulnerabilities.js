@@ -911,7 +911,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
             duration: 5000
           })
           sbomRefetch({ projectId: productId, sbomId: sbomId }).then(
-            (res) => res && setPaginationControl(res?.data)
+            (res) => res?.data && setPaginationControl(res?.data)
           )
           prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
         }
@@ -1121,39 +1121,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     },
     [prodVulnDispatch, refetch, setPaginationControl, setTotalRows, vulnData]
   )
-
-  // const handleSelect = (row) => {
-  //   const { componentVulnLogs, vexStatus, vexJustification, cdxResponse } = row
-  //   const item = componentVulnLogs[componentVulnLogs?.length - 1]
-  //   prodVulnDispatch({
-  //     type: 'ON_CHANGE_STATUS',
-  //     payload: { value: vexStatus?.id || '', name: vexStatus?.name || '' }
-  //   })
-  //   prodVulnDispatch({
-  //     type: 'ON_CHANGE_JUSTIFICATION',
-  //     payload: {
-  //       value: vexJustification?.id || '',
-  //       name: item?.justification || ''
-  //     }
-  //   })
-  //   prodVulnDispatch({
-  //     type: 'ON_CHANGE_RESPONSE',
-  //     payload: {
-  //       value: cdxResponse?.id || '',
-  //       name: item?.response ? capitalizeFirstLetter(item?.response) : ''
-  //     }
-  //   })
-  //   prodVulnDispatch({
-  //     type: 'SET_ACTION_STMT',
-  //     payload: item?.actionStmt || ''
-  //   })
-  //   prodVulnDispatch({ type: 'SET_SELECTED_TAG', payload: item?.fixedIn || '' })
-  //   prodVulnDispatch({ type: 'SET_DETAILS', payload: item?.detail || '' })
-  //   prodVulnDispatch({ type: 'SET_NOTES', payload: item?.note || '' })
-  //   prodVulnDispatch({ type: 'SET_IMPACT_DATA', payload: item?.impact || '' })
-  // }
-
-  // ON SELECT ROW
 
   useEffect(() => {
     if (vulns) {
