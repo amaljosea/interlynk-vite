@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import { getProductDetailPageUrl } from 'utils/url'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
@@ -53,6 +53,7 @@ import { FaCode, FaInbox, FaSquareArrowUpRight } from 'react-icons/fa6'
 import Pagination from '../Pagination'
 
 const ProductTable = ({ data, refetch }) => {
+  const navigate = useNavigate()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   //This part is needed for the pagination to work. (Modify with caution)
@@ -423,18 +424,29 @@ const ProductTable = ({ data, refetch }) => {
       name: 'PRODUCT',
       selector: (row) => {
         const { id, name, projects, defaultProject, description } = row
-        const product = { id: id, name: name, groupId: id }
         const handleClick = () => {
           setClearSelect(true)
           setSelectedSbom([])
           const env = projects?.find((item) => item.name === environment)
+          setEnvName(env ? env?.name : defaultProject?.name)
+          const product = {
+            id: id,
+            name: name,
+            groupId: id,
+            productId: env?.id || defaultProject?.id
+          }
           prodDispatch({
             type: 'SET_CURRENT_PRODUCT',
             payload: { id: env?.id || defaultProject?.id }
           })
+          const link = getProductDetailPageUrl({
+            productgroupid: id,
+            productid: env?.id || defaultProject?.id
+          })
           localStorage.setItem('product', JSON.stringify(product))
           localStorage.setItem('activeProdTab', 0)
           setActiveSbomTab(0)
+          navigate(link)
         }
         return (
           <Stack
@@ -443,22 +455,16 @@ const ProductTable = ({ data, refetch }) => {
             spacing={1}
             my={3}
           >
-            <Link
-              to={getProductDetailPageUrl({
-                productgroupid: row.id,
-                productid: row.defaultProject.id
-              })}
+            <Text
+              fontSize={14}
+              color={'blue.500'}
+              minWidth='100%'
+              fontWeight={'medium'}
               onClick={handleClick}
+              cursor={'pointer'}
             >
-              <Text
-                fontSize={14}
-                color={'blue.500'}
-                minWidth='100%'
-                fontWeight={'medium'}
-              >
-                {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
-              </Text>
-            </Link>
+              {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
+            </Text>
             <Text>
               {description?.length > 50
                 ? description.substring(0, 50) + '....'

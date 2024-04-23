@@ -84,11 +84,6 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
       uniqVersions.push({ label: project?.projectVersion })
     )
 
-  // const handleTabChange = (value) => {
-  //   localStorage.setItem('activeSbomTab', value)
-  //   setActiveSbomTab(value)
-  // }
-
   // ADD KEYBOARD SHORTCUT FOR TOGGLE DOWNLOAD MODAL
   const handleKeyDownload = (event) => {
     if (event.altKey && event.key === '3') {

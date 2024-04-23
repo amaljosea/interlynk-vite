@@ -110,43 +110,17 @@ const SbomDetails = ({ sbom, getVulnData }) => {
 
   const onSelectComp = () => {
     prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
-    localStorage.setItem('activeSbomTab', 2)
-    if (signedUrlParams) {
-      setActiveCsSbomTab(2)
-    } else {
-      setActiveSbomTab(2)
-    }
   }
 
   const onSelectVulns = () => {
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
-    localStorage.setItem('activeSbomTab', 3)
     if (signedUrlParams) {
-      setActiveCsSbomTab(3)
+      return null
     } else {
-      setActiveSbomTab(3)
       prodVulnDispatch({
         type: 'FILTER_SOURCE',
         payload: sbom?.sbomParts?.length > 0 ? true : false
       })
-    }
-  }
-
-  const onSelectLicenses = () => {
-    localStorage.setItem('activeSbomTab', 4)
-    if (signedUrlParams) {
-      setActiveCsSbomTab(4)
-    } else {
-      setActiveSbomTab(4)
-    }
-  }
-
-  const onSelectPolicy = () => {
-    if (signedUrlParams) {
-      return null
-    } else {
-      localStorage.setItem('activeSbomTab', 5)
-      setActiveSbomTab(5)
     }
   }
 
@@ -271,12 +245,7 @@ const SbomDetails = ({ sbom, getVulnData }) => {
           <Stack direction={'column'} spacing={1} alignItems={'left'}>
             {currentProduct && parts && currentSBOM && (
               <Link to={parentLink()} onClick={handlePart}>
-                <HStack
-                  onClick={() => {
-                    localStorage.setItem('activeSbomTab', 1)
-                    setActiveSbomTab(1)
-                  }}
-                >
+                <HStack>
                   <FaAngleLeft size={18} color='#3182CE' />
                   <Text
                     fontWeight={'semibold'}
@@ -430,7 +399,6 @@ const SbomDetails = ({ sbom, getVulnData }) => {
                   variant='subtle'
                   width={16}
                   colorScheme={'blue'}
-                  onClick={onSelectLicenses}
                 >
                   <TagLabel mx={'auto'}>{compLicenseCount}</TagLabel>
                 </Tag>
@@ -439,7 +407,6 @@ const SbomDetails = ({ sbom, getVulnData }) => {
                   mt={1}
                   fontSize={'xs'}
                   _hover={{ textDecoration: 'underline' }}
-                  onClick={onSelectLicenses}
                 >
                   Licenses
                 </Text>
@@ -526,7 +493,6 @@ const SbomDetails = ({ sbom, getVulnData }) => {
                   fontSize={'xs'}
                   style={{ cursor: 'pointer' }}
                   _hover={{ textDecoration: 'underline' }}
-                  onClick={onSelectPolicy}
                 >
                   Policy Results
                 </Text>

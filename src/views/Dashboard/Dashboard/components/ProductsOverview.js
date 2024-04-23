@@ -68,7 +68,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       'currentSBOM',
       JSON.stringify({ version: projectVersion, id: item?.id })
     )
-    localStorage.setItem('activeSbomTab', 0)
     setActiveSbomTab(0)
   }
 
@@ -87,7 +86,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       'currentSBOM',
       JSON.stringify({ version: projectVersion, id: item.id })
     )
-    localStorage.setItem('activeSbomTab', 2)
     setActiveSbomTab(2)
   }
 
@@ -106,7 +104,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       'currentSBOM',
       JSON.stringify({ version: projectVersion, id: item.id })
     )
-    localStorage.setItem('activeSbomTab', 4)
     setActiveSbomTab(4)
   }
 
@@ -124,7 +121,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       'currentSBOM',
       JSON.stringify({ version: version, id: id })
     )
-    localStorage.setItem('activeSbomTab', 3)
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
     prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
   }

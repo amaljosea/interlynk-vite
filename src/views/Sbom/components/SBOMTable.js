@@ -111,7 +111,6 @@ const SBOMTable = ({
   )
 
   const params = useParams()
-
   const productId = params.productid
   const sbomId = params.sbomid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
@@ -174,8 +173,7 @@ const SBOMTable = ({
   }
 
   const handleTabChange = (value) => {
-    localStorage.setItem('activeSbomTab', value)
-    setActiveSbomTab(value)
+    console.log(value)
   }
 
   useEffect(() => {

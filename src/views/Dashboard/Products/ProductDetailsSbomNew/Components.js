@@ -53,7 +53,6 @@ import {
   GetComponentPath,
   ShareCompFilters
 } from 'graphQL/Queries'
-import { GetProductData } from 'graphQL/Queries'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import {
@@ -66,7 +65,7 @@ import {
 
 import CompFilters from './CompFilters'
 
-const Components = () => {
+const Components = ({ sbomData, sbomRefetch }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
@@ -97,15 +96,17 @@ const Components = () => {
   const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
     value.includes(allValue) || value.length === 0 ? undefined : value
 
-  const compData = {
-    ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
-    kind: getUndefinedIfEmptyOrAll(kinds),
-    licenses: getUndefinedIfEmptyOrAll(licenses),
-    supplierName: getUndefinedIfEmptyOrAll(suppliers),
-    primary: scope === 'primary' ? true : undefined,
-    internal: scope === 'internal' ? true : undefined,
-    direct: direct === true ? true : undefined
-  }
+  const compData = useMemo(() => {
+    return {
+      ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
+      kind: getUndefinedIfEmptyOrAll(kinds),
+      licenses: getUndefinedIfEmptyOrAll(licenses),
+      supplierName: getUndefinedIfEmptyOrAll(suppliers),
+      primary: scope === 'primary' ? true : undefined,
+      internal: scope === 'internal' ? true : undefined,
+      direct: direct === true ? true : undefined
+    }
+  }, [direct, ecosystems, kinds, licenses, scope, suppliers])
 
   // GET COMPONENT DATA
   const { data, refetch, error } = useQuery(GetComponentData, {
@@ -124,12 +125,7 @@ const Components = () => {
 
   const { components } = data?.sbom || ''
 
-  const { data: sbomData, refetch: sbomRefetch } = useQuery(GetProductData, {
-    skip: activeTab === 'components' ? false : true,
-    variables: { projectId: productId, sbomId }
-  })
-
-  const { lifecycle, primaryComponent } = sbomData?.sbom || ''
+  const { lifecycle, primaryComponent } = sbomData || ''
 
   // GET COMPONENT FILTER HEADS
   const { refetch: getCompFilters } = useQuery(

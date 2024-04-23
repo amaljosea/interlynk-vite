@@ -302,7 +302,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     })
 
   const getComponents = () => {
-    localStorage.setItem('activeSbomTab', 2)
     getCompData({
       variables: {
         projectId: prodId,
@@ -325,14 +324,12 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     }).then((res) => {
       if (res.data) {
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-        localStorage.setItem('activeSbomTab', 3)
       }
     })
   }
 
   const onSelectPart = (part) => {
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
-    localStorage.setItem('activeSbomTab', 0)
     const { id, project, projectVersion } = part
     const { projectGroup } = project
     if (

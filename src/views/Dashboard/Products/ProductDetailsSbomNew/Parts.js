@@ -305,7 +305,6 @@ const Parts = ({ getVulnData, getCompData }) => {
     })
 
   const getComponents = () => {
-    localStorage.setItem('activeSbomTab', 2)
     getCompData({
       variables: {
         projectId: prodId,
@@ -317,25 +316,7 @@ const Parts = ({ getVulnData, getCompData }) => {
     })
   }
 
-  const onFilterSev = async (value) => {
-    await getVulnData({
-      projectId: prodId,
-      sbomId: sbomId,
-      severity: value,
-      first: totalRows,
-      field: prodVulnState.field,
-      direction: prodVulnState.direction
-    }).then((res) => {
-      if (res.data) {
-        prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-        localStorage.setItem('activeSbomTab', 3)
-      }
-    })
-  }
-
   const onSelectPart = (part) => {
-    prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
-    localStorage.setItem('activeSbomTab', 0)
     const { id, project, projectVersion } = part
     const { projectGroup } = project
     if (
@@ -411,6 +392,13 @@ const Parts = ({ getVulnData, getCompData }) => {
       )
     }
     setActiveProdTab(0)
+  }
+
+  const onFilterSev = (part, value) => {
+    prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
+    prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+    prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
+    onSelectPart(part)
   }
 
   // COLUMNS
@@ -498,18 +486,18 @@ const Parts = ({ getVulnData, getCompData }) => {
       name: 'COMPONENTS',
       selector: (row) => {
         const { part } = row
-
         const link = getProductVersionDetailPageUrl({
           productgroupid: params.productgroupid,
-          productid: part.project.id,
-          sbomid: part.id,
+          productid: part?.project?.id,
+          sbomid: part?.id,
           paramsObj: {
+            tab: 'components',
             parts: true
           }
         })
 
         return (
-          <Link to={link} onClick={getComponents}>
+          <Link to={link} onClick={() => onSelectPart(part)}>
             <Tag
               size='md'
               variant='subtle'
@@ -529,10 +517,21 @@ const Parts = ({ getVulnData, getCompData }) => {
       name: 'LICENSES',
       selector: (row) => {
         const { part } = row
+        const link = getProductVersionDetailPageUrl({
+          productgroupid: params.productgroupid,
+          productid: part?.project?.id,
+          sbomid: part?.id,
+          paramsObj: {
+            tab: 'licenses',
+            parts: true
+          }
+        })
         return (
-          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
-            <TagLabel mx={'auto'}> {part.stats.compLicenseCount}</TagLabel>
-          </Tag>
+          <Link to={link} onClick={() => onSelectPart(part)}>
+            <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
+              <TagLabel mx={'auto'}>{part.stats.compLicenseCount}</TagLabel>
+            </Tag>
+          </Link>
         )
       },
       width: '150px'
@@ -545,16 +544,19 @@ const Parts = ({ getVulnData, getCompData }) => {
         const link = getProductVersionDetailPageUrl({
           productgroupid: params.productgroupid,
           productid: part.project.id,
-          sbomid: part.id
+          sbomid: part.id,
+          paramsObj: {
+            tab: 'vulnerabilities',
+            parts: true
+          }
         })
-
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
             <Link to={link}>
               <VulnBadge
                 color='red'
                 label='Critical'
-                onClick={() => onFilterSev(['critical'])}
+                onClick={() => onFilterSev(part, ['critical'])}
               >
                 {part?.stats?.vulnStats?.critical || 0}
               </VulnBadge>
@@ -563,7 +565,7 @@ const Parts = ({ getVulnData, getCompData }) => {
               <VulnBadge
                 color='orange'
                 label='High'
-                onClick={() => onFilterSev(['high'])}
+                onClick={() => onFilterSev(part, ['high'])}
               >
                 {part?.stats?.vulnStats?.high || 0}
               </VulnBadge>
@@ -572,7 +574,7 @@ const Parts = ({ getVulnData, getCompData }) => {
               <VulnBadge
                 color='yellow'
                 label='Medium'
-                onClick={() => onFilterSev(['medium'])}
+                onClick={() => onFilterSev(part, ['medium'])}
               >
                 {part?.stats?.vulnStats?.medium || 0}
               </VulnBadge>
@@ -581,7 +583,7 @@ const Parts = ({ getVulnData, getCompData }) => {
               <VulnBadge
                 color='green'
                 label='Low'
-                onClick={() => onFilterSev(['low'])}
+                onClick={() => onFilterSev(part, ['low'])}
               >
                 {part?.stats?.vulnStats?.low || 0}
               </VulnBadge>
@@ -590,7 +592,7 @@ const Parts = ({ getVulnData, getCompData }) => {
               <VulnBadge
                 color='gray'
                 label='Unknown'
-                onClick={() => onFilterSev(['unknown'])}
+                onClick={() => onFilterSev(part, ['unknown'])}
               >
                 {part?.stats?.vulnStats?.unknown || 0}
               </VulnBadge>

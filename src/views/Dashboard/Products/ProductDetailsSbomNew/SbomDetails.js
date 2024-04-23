@@ -71,11 +71,10 @@ const SbomDetails = ({ sbomData }) => {
     vulnRunStatus,
     stats,
     sbomParts
-  } = data?.sbom || ''
+  } = data || ''
   const { compCount, compLicenseCount, vulnStats } = stats || ''
   const { critical, high, medium, low, unknown } = vulnStats || ''
-  const { prodCompState, setActiveSbomTab, setActiveCsSbomTab, dispatch } =
-    useGlobalState()
+  const { prodCompState, setActiveCsSbomTab, dispatch } = useGlobalState()
   const { field, direction } = prodCompState
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
@@ -234,7 +233,7 @@ const SbomDetails = ({ sbomData }) => {
     } else {
       const url = getProductVersionDetailPageUrl({
         productgroupid: params.productgroupid,
-        productid: projectId,
+        productid: currentProduct?.productId,
         sbomid: currentSBOM?.id
       })
       return url
@@ -264,12 +263,7 @@ const SbomDetails = ({ sbomData }) => {
           <Stack direction={'column'} spacing={1} alignItems={'left'}>
             {currentProduct && parts && currentSBOM && (
               <Link to={parentLink()} onClick={handlePart}>
-                <HStack
-                  onClick={() => {
-                    localStorage.setItem('activeSbomTab', 1)
-                    setActiveSbomTab(1)
-                  }}
-                >
+                <HStack>
                   <FaAngleLeft size={18} color='#3182CE' />
                   <Text
                     fontWeight={'semibold'}

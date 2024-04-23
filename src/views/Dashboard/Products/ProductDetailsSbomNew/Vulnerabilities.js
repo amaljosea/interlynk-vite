@@ -54,7 +54,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { ManualVulnScan } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
-  GetProductData,
   GetVulnData,
   GetVulnFilterData,
   ShareVulnFilters
@@ -216,7 +215,7 @@ const ExpandedComponent = ({
   )
 }
 
-const Vulnerabilities = () => {
+const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   const toast = useToast()
   const params = useParams()
   const productId = params.productid
@@ -250,11 +249,6 @@ const Vulnerabilities = () => {
     () => userPermissions?.find((item) => item.key === 'view_feeds'),
     [userPermissions]
   )
-
-  const { data: sbomData, refetch: sbomRefetch } = useQuery(GetProductData, {
-    skip: activeTab === 'vulnerabilities' ? false : true,
-    variables: { projectId: productId, sbomId }
-  })
 
   useEffect(() => {
     if (sbomData?.sbom?.sbomParts?.length > 0) {

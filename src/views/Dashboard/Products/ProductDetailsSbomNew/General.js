@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
@@ -48,7 +48,6 @@ import {
   supplierDelete,
   toolDelete
 } from 'graphQL/Mutation'
-import { GetProductData } from 'graphQL/Queries'
 
 const InfoLabel = ({ title, onClick }) => {
   return (
@@ -64,19 +63,12 @@ const InfoLabel = ({ title, onClick }) => {
   )
 }
 
-const General = () => {
+const General = ({ data, refetch, loading, error }) => {
   const location = useLocation()
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-
-  const { data, refetch, loading, error } = useQuery(GetProductData, {
-    skip: activeTab === 'general' ? false : true,
-    variables: { projectId: productId, sbomId }
-  })
 
   const {
     id,
@@ -87,7 +79,7 @@ const General = () => {
     authors,
     creationAt,
     tools
-  } = data?.sbom || ''
+  } = data || ''
 
   const { userPermissions, sbomState, dispatch } = useGlobalState()
   const { expLicense } = sbomState

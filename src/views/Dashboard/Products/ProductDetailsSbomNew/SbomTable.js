@@ -27,7 +27,7 @@ const tabs = [
   'changelog'
 ]
 
-const SbomTable = () => {
+const SbomTable = ({ data, refetch, loading, error }) => {
   const params = useParams()
   const navigate = useNavigate()
 
@@ -70,16 +70,21 @@ const SbomTable = () => {
           </TabList>
           <TabPanels>
             <TabPanel px={1}>
-              <General />
+              <General
+                data={data}
+                error={error}
+                loading={loading}
+                refetch={refetch}
+              />
             </TabPanel>
             <TabPanel px={0}>
               <Parts />
             </TabPanel>
             <TabPanel px={0}>
-              <Components />
+              <Components sbomData={data} sbomRefetch={refetch} />
             </TabPanel>
             <TabPanel px={0}>
-              <Vulnerabilities />
+              <Vulnerabilities sbomData={data} sbomRefetch={refetch} />
             </TabPanel>
             <TabPanel px={0}>
               <Licenses />

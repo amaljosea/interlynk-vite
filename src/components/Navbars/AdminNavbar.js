@@ -235,18 +235,11 @@ export default function AdminNavbar(props) {
               >
                 <Link
                   to={getProductDetailPageUrl({
-                    productgroupid: params.productgroupid,
-                    productid: defaultProjectId
+                    productgroupid: currentProduct?.groupId,
+                    productid: currentProduct.productId
                   })}
                   onClick={() => {
                     localStorage.removeItem('currentSBOM')
-                    if (signedUrlParams) {
-                      setActiveCsSbomTab(0)
-                      localStorage.setItem('activeCsSbomTab', 0)
-                    } else {
-                      setActiveSbomTab(0)
-                      localStorage.setItem('activeSbomTab', 0)
-                    }
                   }}
                 >
                   {projectGroupName}
@@ -263,16 +256,13 @@ export default function AdminNavbar(props) {
                   href={
                     parts
                       ? getProductVersionDetailPageUrl({
-                          productgroupid: params.productgroupid,
-                          productid: prodID,
+                          productgroupid: currentProduct?.groupId,
+                          productid: currentProduct.productId,
                           sbomid: currentSBOM?.id
                         })
                       : ''
                   }
-                  onClick={() => {
-                    localStorage.setItem('activeSbomTab', 0)
-                    setActiveSbomTab(0)
-                  }}
+                  onClick={() => setActiveSbomTab(0)}
                 >
                   {currentSBOM?.version}
                 </BreadcrumbLink>

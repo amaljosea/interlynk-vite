@@ -250,11 +250,6 @@ const VersionsTable = ({ projectGroup }) => {
       'currentSBOM',
       JSON.stringify({ version: version, id: id })
     )
-    if (signedUrlParams) {
-      localStorage.setItem('activeCsSbomTab', 2)
-    } else {
-      localStorage.setItem('activeSbomTab', 3)
-    }
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
     prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
   }
@@ -272,7 +267,6 @@ const VersionsTable = ({ projectGroup }) => {
 
   const onSelectLicenses = (row) => {
     const { id } = row
-    localStorage.setItem('activeSbomTab', 4)
     setActiveSbomTab(4)
     navigate(
       getProductVersionDetailPageUrl({
@@ -310,7 +304,6 @@ const VersionsTable = ({ projectGroup }) => {
                 'currentSBOM',
                 JSON.stringify({ version: projectVersion, id: id })
               )
-              localStorage.setItem('activeSbomTab', 0)
               prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
               setActiveSbomTab(0)
             }}
@@ -352,11 +345,6 @@ const VersionsTable = ({ projectGroup }) => {
                   'currentSBOM',
                   JSON.stringify({ version: projectVersion, id: id })
                 )
-                if (signedUrlParams) {
-                  localStorage.setItem('activeCsSbomTab', 1)
-                } else {
-                  localStorage.setItem('activeSbomTab', 2)
-                }
               }}
             >
               <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
