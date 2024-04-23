@@ -143,7 +143,7 @@ export default function HeaderLinks(props) {
         </Link>
       )}
       {/* ENVIRONMENT */}
-      {(dashboardView || productId) && !vulnId && projects.length > 0 && (
+      {(dashboardView || productId) && !vulnId && (
         <Menu closeOnSelect={true}>
           <MenuButton
             as={Button}
