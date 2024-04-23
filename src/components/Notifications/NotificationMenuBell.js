@@ -57,7 +57,7 @@ const NotificationMenuBell = () => {
     updatePreference({
       variables: {
         notificationPreferences: newPreference,
-        envId: localStorage['activeEnv']
+        envId: productId
       }
     }).then((res) => {
       setPreference(newPreference)
