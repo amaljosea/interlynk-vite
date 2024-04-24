@@ -14,8 +14,6 @@ import {
   MenuList,
   MenuOptionGroup,
   Stack,
-  Switch,
-  Text,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -32,6 +30,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     direction,
     severities,
     components,
+    include,
     statues,
     source,
     kev,
@@ -104,36 +103,6 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       field: field,
       direction: direction
     })
-  }
-
-  const onFilterOrigin = (e) => {
-    prodVulnDispatch({ type: 'FILTER_SOURCE', payload: e.target.checked })
-    handleRefetch(
-      e.target.checked,
-      severities,
-      components,
-      statues,
-      kev,
-      epss,
-      direct,
-      vexComplete,
-      retracted
-    )
-  }
-
-  const onFilterRetracted = (e) => {
-    prodVulnDispatch({ type: 'FILTER_RETRACTED', payload: e.target.checked })
-    handleRefetch(
-      source,
-      severities,
-      components,
-      statues,
-      kev,
-      epss,
-      direct,
-      vexComplete,
-      e.target.checked
-    )
   }
 
   const onFilterCompName = (value) => {
@@ -239,6 +208,11 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       vexComplete,
       retracted
     )
+  }
+
+  const onFilterInclude = (value) => {
+    console.log('value', value)
+    prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: value })
   }
 
   const handleSubmit = () => {
@@ -553,25 +527,31 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
           </MenuList>
         </Menu>
       </Box>
-      {/* DIRECT */}
-      <Flex align='center' gap={2} hidden>
-        <Switch id='isDirect' isChecked={direct} onChange={onFilterDirect} />
-        <Text>Direct</Text>
-      </Flex>
-      {/* ORIGIN */}
-      <Flex align='center' gap={2}>
-        <Switch id='isDirect' isChecked={source} onChange={onFilterOrigin} />
-        <Text>Parts</Text>
-      </Flex>
-      {/* RETRACTED */}
-      <Flex align='center' gap={2}>
-        <Switch
-          id='retracted'
-          isChecked={retracted}
-          onChange={onFilterRetracted}
-        />
-        <Text>Retracted</Text>
-      </Flex>
+      {/* INCLUDE */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={false}>
+          {include.length !== 0 && <CheckMark />}
+          <MenuHeading title={'Include'} />
+          <MenuList>
+            <MenuOptionGroup
+              type='checkbox'
+              value={include}
+              onChange={onFilterInclude}
+            >
+              {['parts', 'retracted'].map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
     </Stack>
   )
 }

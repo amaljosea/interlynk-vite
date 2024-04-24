@@ -2006,6 +2006,7 @@ export const ShareVulnData = gql`
     $field: ComponentVulnOrderByFields!
     $direction: OrderByDirection!
     $vexComplete: Boolean
+    $includeRetracted: Boolean
   ) {
     shareLynkQuery {
       sbom(id: $sbomId) {
@@ -2025,6 +2026,7 @@ export const ShareVulnData = gql`
           last: $last
           orderBy: { field: $field, direction: $direction }
           vexComplete: $vexComplete
+          includeRetracted: $includeRetracted
         ) {
           totalCount
           pageInfo {

@@ -430,20 +430,6 @@ const VulnFilters = () => {
           </MenuList>
         </Menu>
       </Box>
-      {/* ORIGIN */}
-      <Flex align='center' gap={2} hidden>
-        <Switch id='isDirect' isChecked={source} onChange={onFilterOrigin} />
-        <Text>Parts</Text>
-      </Flex>
-      {/* RETRACTED */}
-      <Flex align='center' gap={2} hidden>
-        <Switch
-          id='retracted'
-          isChecked={retracted}
-          onChange={onFilterRetracted}
-        />
-        <Text>Retracted</Text>
-      </Flex>
     </Stack>
   )
 }
