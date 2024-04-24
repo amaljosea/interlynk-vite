@@ -1,14 +1,21 @@
 import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
+import { Link } from 'react-router-dom'
 import { customStyles } from 'utils'
 import { getFullDateAndTime } from 'utils'
 import { timeSince } from 'utils'
 import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 
-import { EmailIcon, InfoIcon, PhoneIcon } from '@chakra-ui/icons'
+import {
+  EmailIcon,
+  ExternalLinkIcon,
+  InfoIcon,
+  PhoneIcon
+} from '@chakra-ui/icons'
 import {
   Flex,
+  Icon,
   IconButton,
   Menu,
   MenuButton,
@@ -125,14 +132,26 @@ const LegalTable = ({ data, refetch }) => {
       selector: (row) => (
         <Text textTransform={'capitalize'}>{row?.organizationName}</Text>
       ),
-      width: '400px',
+      width: '300px',
       wrap: true
     },
     // URL
     {
       id: 'URL',
       name: 'URL',
-      selector: (row) => <Text>{row?.url}</Text>,
+      selector: (row) => (
+        <Flex direction='row' alignItems={'center'} gap={2} my={3}>
+          <Link to={row?.url} target={'_blank'}>
+            <Icon
+              as={ExternalLinkIcon}
+              h={'16px'}
+              w={'16px'}
+              color={'blue.500'}
+            />
+          </Link>
+          <Text>{row?.url}</Text>
+        </Flex>
+      ),
       width: '250px',
       wrap: true
     },
@@ -171,6 +190,7 @@ const LegalTable = ({ data, refetch }) => {
           </Flex>
         )
       },
+      width: '250px',
       wrap: true
     },
     // CREATED AT
