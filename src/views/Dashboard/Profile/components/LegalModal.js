@@ -289,10 +289,7 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
                   gap={4}
                 >
                   <GridItem>
-                    <FormControl
-                      isRequired
-                      isInvalid={orgName !== '' && error !== ''}
-                    >
+                    <FormControl isRequired>
                       <FormLabel>Organization Name</FormLabel>
                       <Input
                         size='sm'
@@ -303,7 +300,6 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
                           setError('')
                         }}
                       />
-                      <FormErrorMessage>{error}</FormErrorMessage>
                     </FormControl>
                   </GridItem>
                   <GridItem>
@@ -416,6 +412,12 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
                       </GridItem>
                     </Grid>
                   ))}
+                {error !== '' && (
+                  <Alert status='error' borderRadius={4}>
+                    <AlertIcon />
+                    <AlertDescription fontSize={'sm'}>{error}</AlertDescription>
+                  </Alert>
+                )}
               </Flex>
             </ModalBody>
             <ModalFooter mt={4}>
