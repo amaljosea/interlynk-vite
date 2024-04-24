@@ -37,7 +37,7 @@ const SbomInfo = ({ data, error, loading, refetch }) => {
           gap={10}
         >
           <GridItem colSpan={3}>
-            <SbomDetails sbomData={data} />
+            <SbomDetails sbomData={data} refetch={refetch} />
           </GridItem>
           <GridItem colSpan={2} height={'fit-content'}>
             <SbomActions sbom={data} refetch={refetch} />

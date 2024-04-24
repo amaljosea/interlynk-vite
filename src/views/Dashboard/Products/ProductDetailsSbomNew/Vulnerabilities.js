@@ -1137,44 +1137,46 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     )
   }
 
+  if (vulnsPermissions?.value === false) {
+    return (
+      <Text mt={4} textAlign={'center'}>
+        You do not have permission to access this data
+      </Text>
+    )
+  }
+
   return (
     <>
-      {vulnsPermissions?.value === true ? (
-        <Flex flexDir={'column'} width={'100%'}>
-          {/* TABLE */}
-          <DataTable
-            className='data-table-container'
-            columns={columns}
-            data={vulns?.nodes}
-            customStyles={customStyles}
-            onSort={handleSort}
-            defaultSortAsc={false}
-            defaultSortFieldId={field}
-            progressPending={vulns ? false : true}
-            progressComponent={<CustomLoader />}
-            subHeader
-            subHeaderComponent={subHeader}
-            responsive={true}
-            expandableRows
-            expandOnRowClicked
-            persistTableHead
-            expandableRowsComponent={ExpandedComponent}
-            expandableRowsComponentProps={{
-              setActiveRow,
-              onCvssOpen,
-              textColor
-            }}
-            selectableRows={!signedUrlParams}
-            clearSelectedRows={toggleClear}
-            onSelectedRowsChange={handleChange}
-            onRowExpandToggled={(bool, row) => handleSelectRow(row, bool)}
-          />
-        </Flex>
-      ) : (
-        <Text mt={4} textAlign={'center'}>
-          You do not have permission to access this data
-        </Text>
-      )}
+      <Flex flexDir={'column'} width={'100%'}>
+        {/* TABLE */}
+        <DataTable
+          className='data-table-container'
+          columns={columns}
+          data={vulns?.nodes}
+          customStyles={customStyles}
+          onSort={handleSort}
+          defaultSortAsc={false}
+          defaultSortFieldId={field}
+          progressPending={vulns ? false : true}
+          progressComponent={<CustomLoader />}
+          subHeader
+          subHeaderComponent={subHeader}
+          responsive={true}
+          expandableRows
+          expandOnRowClicked
+          persistTableHead
+          expandableRowsComponent={ExpandedComponent}
+          expandableRowsComponentProps={{
+            setActiveRow,
+            onCvssOpen,
+            textColor
+          }}
+          selectableRows={!signedUrlParams}
+          clearSelectedRows={toggleClear}
+          onSelectedRowsChange={handleChange}
+          onRowExpandToggled={(bool, row) => handleSelectRow(row, bool)}
+        />
+      </Flex>
 
       {/* PAGINATION */}
       {vulns?.pageInfo && (

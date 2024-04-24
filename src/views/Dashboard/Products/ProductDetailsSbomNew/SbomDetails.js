@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, parseJSONSafely, timeSince } from 'utils'
@@ -11,7 +11,6 @@ import {
   HStack,
   Icon,
   IconButton,
-  Skeleton,
   Stack,
   Tag,
   TagLabel,
@@ -20,7 +19,6 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
 import GraphDrawer from 'components/Drawer/GraphDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
 
@@ -39,7 +37,7 @@ import {
 import { FaCircleCheck } from 'react-icons/fa6'
 import { MdPolicy } from 'react-icons/md'
 
-const SbomDetails = ({ sbomData }) => {
+const SbomDetails = ({ sbomData, refetch }) => {
   const navigate = useNavigate()
   const params = useParams()
   const projectId = params.productid
@@ -245,6 +243,18 @@ const SbomDetails = ({ sbomData }) => {
       handlePart()
     }
   })
+
+  useEffect(() => {
+    const refetchInterval = setInterval(() => {
+      if (sbomData && sbomData?.vulnRunStatus === 'IN_PROGRESS') {
+        refetch()
+      } else {
+        clearInterval(refetchInterval)
+      }
+    }, 5000)
+
+    return () => clearInterval(refetchInterval)
+  }, [sbomData, refetch])
 
   return (
     <>
