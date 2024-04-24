@@ -118,7 +118,7 @@ const PolicyEvalTable = ({ data, refetch }) => {
       id: 'RESULT',
       name: 'RESULT',
       selector: (row) => {
-        const { resultType } = row
+        const { result, resultType } = row
         return (
           <Tag
             minW={'100px'}
@@ -135,7 +135,15 @@ const PolicyEvalTable = ({ data, refetch }) => {
             }
           >
             <TagLabel mx={'auto'} pt={0.5} textTransform={'capitalize'}>
-              {resultType || ''}
+              {result === 'initialized'
+                ? 'Initialized'
+                : result === 'not_detected'
+                  ? 'Not Detected'
+                  : result === 'error'
+                    ? 'Error'
+                    : result === 'skipped'
+                      ? 'Skipped'
+                      : resultType}
             </TagLabel>
           </Tag>
         )
