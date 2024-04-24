@@ -58,7 +58,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { SbomPartCreate, SbomPartDelete } from 'graphQL/Mutation'
 import {
   CheckDeepParts,
-  GetProductData,
   GetProject,
   GetProjectGroups,
   GetSbomParts
@@ -66,7 +65,7 @@ import {
 
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 
-const Parts = ({ getVulnData, getCompData }) => {
+const Parts = ({ sbomRefetch }) => {
   const location = useLocation()
   const params = useParams()
   const sbomId = params.sbomid
@@ -74,15 +73,8 @@ const Parts = ({ getVulnData, getCompData }) => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const {
-    setActiveProdTab,
-    totalRows,
-    prodState,
-    prodCompState,
-    prodVulnState,
-    userPermissions,
-    dispatch
-  } = useGlobalState()
+  const { setActiveProdTab, totalRows, prodState, userPermissions, dispatch } =
+    useGlobalState()
   const { enabled, field, direction } = prodState
   const { prodVulnDispatch } = dispatch
 
@@ -157,11 +149,6 @@ const Parts = ({ getVulnData, getCompData }) => {
     }
   })
 
-  const { refetch: sbomRefetch } = useQuery(GetProductData, {
-    skip: newPartExists ? false : true,
-    variables: { projectId: prodId, sbomId: sbomId }
-  })
-
   const { data: partsData } = useQuery(GetSbomParts, {
     skip: selectedProd && selectedVersion ? false : true,
     variables: { projectId: selectedProd, sbomId: selectedVersion }
@@ -212,6 +199,7 @@ const Parts = ({ getVulnData, getCompData }) => {
     })
       .then((res) => {
         if (res.data) {
+          sbomRefetch({ projectId: prodId, sbomId: sbomId })
           refetch({ projectId: prodId, sbomId })
         }
       })
@@ -303,18 +291,6 @@ const Parts = ({ getVulnData, getCompData }) => {
         })
       }
     })
-
-  const getComponents = () => {
-    getCompData({
-      variables: {
-        projectId: prodId,
-        sbomId: sbomId,
-        first: totalRows,
-        field: prodCompState.field,
-        direction: prodCompState.direction
-      }
-    })
-  }
 
   const onSelectPart = (part) => {
     const { id, project, projectVersion } = part
