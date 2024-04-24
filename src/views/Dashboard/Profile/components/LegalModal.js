@@ -41,7 +41,7 @@ const validateUrl = (url) => {
   return urlRegex.test(url)
 }
 
-const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
+const LegalModal = ({ data, isOpen, onClose, refetch }) => {
   const { totalRows } = useGlobalState()
   const [orgName, setOrgName] = useState('')
   const [url, setUrl] = useState('')
@@ -75,6 +75,18 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
 
   const errorMessage = checkDataValidity(contacts)
 
+  const checkEmptyValues = (data) => {
+    for (let i = 0; i < data.length; i++) {
+      const { name, email, phone } = data[i]
+      if (name === '' && email === '' && phone === '') {
+        return 'Error: Some properties are empty'
+      }
+    }
+    return null
+  }
+
+  const emptyRow = checkEmptyValues(contacts)
+
   const [createMfc] = useMutation(OrganizationManufacturerCreate)
   const [updateMfc] = useMutation(OrganizationManufacturerUpdate)
 
@@ -87,11 +99,14 @@ const LegalModal = ({ orgs, data, isOpen, onClose, refetch }) => {
         variables: {
           orgName,
           url,
-          contacts: contacts?.map((item) => ({
-            name: item?.name,
-            email: item?.email,
-            phone: item?.phone
-          }))
+          contacts:
+            contacts?.length > 0 && emptyRow
+              ? undefined
+              : contacts?.map((item) => ({
+                  name: item?.name,
+                  email: item?.email,
+                  phone: item?.phone
+                }))
         }
       }).then((res) => {
         const errors = res?.data?.organizationManufacturerCreate?.errors
