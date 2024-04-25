@@ -132,7 +132,6 @@ const LegalTable = ({ data, refetch }) => {
       selector: (row) => (
         <Text textTransform={'capitalize'}>{row?.organizationName}</Text>
       ),
-      width: '300px',
       wrap: true
     },
     // URL
@@ -140,7 +139,13 @@ const LegalTable = ({ data, refetch }) => {
       id: 'URL',
       name: 'URL',
       selector: (row) => (
-        <Flex direction='row' alignItems={'center'} gap={2} my={3}>
+        <Flex
+          direction='row'
+          alignItems={'center'}
+          gap={2}
+          my={3}
+          hidden={row?.url ? false : true}
+        >
           <Link to={row?.url} target={'_blank'}>
             <Icon
               as={ExternalLinkIcon}
@@ -152,7 +157,6 @@ const LegalTable = ({ data, refetch }) => {
           <Text>{row?.url}</Text>
         </Flex>
       ),
-      width: '250px',
       wrap: true
     },
     // CONTACTS
@@ -190,7 +194,7 @@ const LegalTable = ({ data, refetch }) => {
           </Flex>
         )
       },
-      width: '250px',
+      minWidth: '250px',
       wrap: true
     },
     // CREATED AT
@@ -205,7 +209,6 @@ const LegalTable = ({ data, refetch }) => {
           </Tooltip>
         )
       },
-      width: '200px',
       right: 'true',
       sortable: false,
       sortFunction: (a, b) => {
@@ -232,7 +235,6 @@ const LegalTable = ({ data, refetch }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB
       },
-      width: '200px',
       right: 'true'
     },
     // ACTIONS
