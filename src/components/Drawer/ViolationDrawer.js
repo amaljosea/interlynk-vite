@@ -169,11 +169,12 @@ const ViolationDrawer = ({
           <Flex
             height={'100%'}
             flexDir={'column'}
+            justifyContent={'space-between'}
             width={'100%'}
             pos={'relative'}
             gap={2}
           >
-            <Stack spacing={2} direction={'column'} ml={3}>
+            <Stack spacing={2} direction={'column'}>
               <Text>
                 <strong>Policy:</strong> {policy}
               </Text>
@@ -230,14 +231,7 @@ const ViolationDrawer = ({
                 persistTableHead
               />
             </Box>
-            <Box
-              bg='white'
-              position={'absolute'}
-              left={0}
-              right={0}
-              bottom={2}
-              hidden={category === 'version'}
-            >
+            <Box bg='white' hidden={category === 'version'}>
               {data?.pageInfo && (
                 <Pagination
                   paginationSizes={paginationSizes}
