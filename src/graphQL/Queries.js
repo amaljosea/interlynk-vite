@@ -3688,6 +3688,10 @@ export const PolicyRuleViolations = gql`
                 name
               }
             }
+            primaryComponent {
+              name
+              version
+            }
             suppliers {
               contactEmail
               contactName

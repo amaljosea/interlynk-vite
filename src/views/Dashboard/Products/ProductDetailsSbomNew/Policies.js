@@ -128,7 +128,7 @@ const Policies = () => {
       id: 'RESULT',
       name: 'RESULT',
       selector: (row) => {
-        const { resultType } = row
+        const { result, resultType } = row
         return (
           <Tag
             minW={'100px'}
@@ -145,7 +145,15 @@ const Policies = () => {
             }
           >
             <TagLabel mx={'auto'} pt={0.5} textTransform={'capitalize'}>
-              {resultType || ''}
+              {result === 'initialized'
+                ? 'Initialized'
+                : result === 'not_detected'
+                  ? 'Pass'
+                  : result === 'error'
+                    ? 'Error'
+                    : result === 'skipped'
+                      ? 'Skipped'
+                      : resultType}
             </TagLabel>
           </Tag>
         )

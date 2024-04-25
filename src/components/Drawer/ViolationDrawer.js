@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils'
-import { updatedValue } from 'utils'
 
 import {
   Box,
@@ -105,8 +104,12 @@ const ViolationDrawer = ({
       id: 'COMPONENT',
       name: 'COMPONENT',
       selector: (row) => {
-        const { component } = row
-        return <Text my={2}>{component?.name || ''}</Text>
+        const { violation, component } = row
+        return (
+          <Text my={2}>
+            {component?.name || violation?.primaryComponent?.name || ''}
+          </Text>
+        )
       },
       wrap: true
     },
@@ -114,8 +117,12 @@ const ViolationDrawer = ({
       id: 'VERSION',
       name: 'VERSION',
       selector: (row) => {
-        const { component } = row
-        return <Text my={2}>{component?.version || ''}</Text>
+        const { violation, component } = row
+        return (
+          <Text my={2}>
+            {component?.version || violation?.primaryComponent?.version || ''}
+          </Text>
+        )
       },
       wrap: true
     },
@@ -189,6 +196,17 @@ const ViolationDrawer = ({
                   {value}
                 </Text>
               )}
+              {(subject === 'VERSION_PRIMARY' ||
+                subject === 'SBOM_PRIMARY_COMPONENT_RELATIONSHIPS') &&
+                data?.nodes?.length > 0 && (
+                  <Text>
+                    <strong>Value:</strong>{' '}
+                    <span style={{ textTransform: 'capitalize' }}>
+                      {data.nodes[0].violation?.primaryComponent?.name}
+                    </span>{' '}
+                    - {data.nodes[0].violation?.primaryComponent?.version}
+                  </Text>
+                )}
               <Text
                 fontWeight={'bold'}
                 fontSize={'md'}
