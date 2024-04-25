@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { filterEnvList, isDefaultEnv } from 'utils'
+import { filterEnvList } from 'utils'
 
 import {
   Alert,
@@ -34,8 +34,9 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
   const params = useParams()
   const toast = useToast()
   const { projects, name } = data || ''
+  const defaultENV = data?.projects?.find((item) => item?.name === 'default')
   const [sbomUpload, { loading, error }] = useMutation(UploadSbom)
-  const [selectedEnv, setSelectedEnv] = useState(activeEnv || projects[0].id)
+  const [selectedEnv, setSelectedEnv] = useState(activeEnv || defaultENV?.id)
   const [errorMessage, setErrorMessage] = useState('')
   const fileInputRef = useRef(null)
   const handleUpload = async (file) => {
@@ -81,10 +82,6 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
     }
   }
 
-  const defaultEnv = activeEnv
-    ? projects?.find((item) => item.id === activeEnv)?.name
-    : ''
-
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -116,9 +113,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
                   id='dataRetention'
                   value={selectedEnv}
                   onChange={(e) => setSelectedEnv(e.target.value)}
-                  textTransform={
-                    isDefaultEnv(defaultEnv) ? 'capitalize' : 'none'
-                  }
+                  textTransform={'capitalize'}
                 >
                   {projects?.length > 0 &&
                     filterEnvList(projects).map((item) => (
@@ -126,9 +121,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
                         key={item.id}
                         value={item.id}
                         style={{
-                          textTransform: isDefaultEnv(item.name)
-                            ? 'capitalize'
-                            : 'none'
+                          textTransform: 'capitalize'
                         }}
                       >
                         {item.name}
