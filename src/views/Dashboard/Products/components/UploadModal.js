@@ -33,12 +33,19 @@ import { MdOutlineFileUpload } from 'react-icons/md'
 const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
   const params = useParams()
   const toast = useToast()
+
   const { projects, name } = data || ''
-  const defaultENV = data?.projects?.find((item) => item?.name === 'default')
+  const environment = localStorage.getItem('environment')
+  const defaultENV = data?.projects?.find((item) =>
+    environment ? item?.name === environment : item?.name === 'default'
+  )
+
   const [sbomUpload, { loading, error }] = useMutation(UploadSbom)
+
   const [selectedEnv, setSelectedEnv] = useState(activeEnv || defaultENV?.id)
   const [errorMessage, setErrorMessage] = useState('')
   const fileInputRef = useRef(null)
+
   const handleUpload = async (file) => {
     await sbomUpload({ variables: { doc: file, projectId: selectedEnv } })
       .then((res) => {
