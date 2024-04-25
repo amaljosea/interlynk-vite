@@ -154,7 +154,7 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
           contacts: mergedArray
         }
       }).then((res) => {
-        const errors = res?.data?.OrganizationManufacturerUpdate?.errors
+        const errors = res?.data?.organizationManufacturerUpdate?.errors
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
