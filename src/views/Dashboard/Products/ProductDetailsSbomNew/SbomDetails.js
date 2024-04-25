@@ -247,14 +247,14 @@ const SbomDetails = ({ sbomData, refetch }) => {
   useEffect(() => {
     const refetchInterval = setInterval(() => {
       if (sbomData && sbomData?.vulnRunStatus === 'IN_PROGRESS') {
-        refetch()
+        refetch({ projectId, sbomId })
       } else {
         clearInterval(refetchInterval)
       }
     }, 5000)
 
     return () => clearInterval(refetchInterval)
-  }, [sbomData, refetch])
+  }, [sbomData, refetch, projectId, sbomId])
 
   return (
     <>

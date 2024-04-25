@@ -3,6 +3,7 @@ import { useLazyQuery, useMutation } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
+import { validateCpe } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 
@@ -134,13 +135,8 @@ function ComponentDrawer(props) {
       setGroupInfo(group)
       setCompName(name)
       setCompVersion(version)
-      setCpeValue(cpes?.length > 0 ? cpes[0] : '')
-      setPurlValue(purl || '')
-      setCompKind(kind)
-      setCompScope(scope)
-      setIsPrimary(primary)
-      setIsInternal(internal)
       if (purl !== '') {
+        setPurlValue(purl)
         try {
           PackageURL.fromString(purl)
           setPURLInputValid(true)
@@ -148,8 +144,21 @@ function ComponentDrawer(props) {
           setPURLInputValid(false)
         }
       }
+      if (cpes?.length > 0) {
+        setCpeValue(cpes[0])
+        const matches = validateCpe(cpes[0])
+        if (matches && cpes[0] !== '') {
+          prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: true })
+        } else {
+          prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: false })
+        }
+      }
+      setCompKind(kind)
+      setCompScope(scope)
+      setIsPrimary(primary)
+      setIsInternal(internal)
     }
-  }, [data])
+  }, [data, prodCompDispatch])
 
   // Health Check
   useEffect(() => {
@@ -164,7 +173,7 @@ function ComponentDrawer(props) {
       setCompName('dropwizard-core')
       setCompVersion('')
     }
-  }, [])
+  }, [shortDesc])
 
   const {
     isOpen: isInfoOpen,
@@ -429,7 +438,7 @@ function ComponentDrawer(props) {
         setComponent('')
       }
     })
-  }, [])
+  }, [getAllComps, productId, sbomId, signedUrlParams, totalComp])
 
   return (
     <>
