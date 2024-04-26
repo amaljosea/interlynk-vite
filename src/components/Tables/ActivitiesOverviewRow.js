@@ -1,19 +1,15 @@
 import React from 'react'
 import { getFullDateAndTime } from 'utils'
-import { purlString } from 'utils'
 
 import {
   Box,
   Flex,
   Icon,
-  Popover,
-  PopoverTrigger,
   Stack,
   Text,
   useColorModeValue
 } from '@chakra-ui/react'
 
-import PurlCard from 'components/Misc/PurlCard'
 import Tooltip from 'components/Tooltip'
 
 import {
@@ -26,25 +22,6 @@ import {
   FaTimesCircle,
   FaUpload
 } from 'react-icons/fa'
-
-const setColor = (type) => {
-  switch (type) {
-    case 'create':
-      return 'green'
-    case 'created':
-      return 'green'
-    case 'update':
-      return 'blue'
-    case 'updated':
-      return 'blue'
-    case 'modified':
-      return 'pink'
-    case 'destroyed':
-      return 'red'
-    case 'rerun':
-      return 'purple'
-  }
-}
 
 function valueToColor(action, event, orig, updated) {
   if (action == 'updated') {
@@ -126,16 +103,13 @@ function valueToText(action, event, orig, updated) {
   } else if (action == 'uploaded') {
     return `${updated}`
   } else if (action == 'failed') {
-    return `${updated}`
+    return `${updated?.substring(0, 100)}...`
   }
 }
 
 function ActivitiesOverviewRow(props) {
   const {
-    logo,
-    title,
     date,
-    color,
     index,
     arrLength,
     action,

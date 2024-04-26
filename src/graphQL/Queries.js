@@ -1919,6 +1919,14 @@ export const GetVulnData = gql`
           detail
           actionStmt
           fixedIn
+          externalUrls {
+            name
+            url
+          }
+          currentExternalUrls {
+            name
+            url
+          }
           vuln {
             vulnId
             desc
@@ -2041,6 +2049,14 @@ export const ShareVulnData = gql`
             isPart
             isFirstDegreePart
             cdxResponseId
+            externalUrls {
+              name
+              url
+            }
+            currentExternalUrls {
+              name
+              url
+            }
             vuln {
               vulnId
               desc
@@ -3798,6 +3814,37 @@ export const GetOrgManufacturers = gql`
           name
           phone
           email
+        }
+      }
+    }
+  }
+`
+
+export const IntersectingVulns = gql`
+  query IntersectingVulns($fromSbomId: Uuid!, $toSbomId: Uuid!) {
+    intersectingVulns(fromSbomId: $fromSbomId, toSbomId: $toSbomId) {
+      fromVuln {
+        id
+        vuln {
+          vulnId
+        }
+        vexStatus {
+          name
+        }
+      }
+      toVuln {
+        id
+        component {
+          name
+          version
+        }
+        vuln {
+          vulnId
+          source
+          sev
+        }
+        vexStatus {
+          name
         }
       }
     }

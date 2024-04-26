@@ -32,6 +32,11 @@ import {
   Icon,
   IconButton,
   Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
   Skeleton,
   Stack,
   Tag,
@@ -45,6 +50,7 @@ import {
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
+import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import CvssCard from 'components/Misc/CvssCard'
 import Pagination from 'components/Pagination'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
@@ -59,6 +65,13 @@ import {
   ShareVulnFilters
 } from 'graphQL/Queries'
 
+import {
+  FaEllipsisV,
+  FaGlobe,
+  FaHouseUser,
+  FaLightbulb,
+  FaSitemap
+} from 'react-icons/fa'
 import { FaBug, FaCopy, FaPen } from 'react-icons/fa6'
 
 import VulnFilters from './VulnFilters'
@@ -215,6 +228,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
+  const customerView = location.pathname.startsWith('/customer')
 
   const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } =
     useGlobalState()
@@ -315,6 +329,12 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
+  const {
+    isOpen: isLinkOpen,
+    onOpen: onLinkOpen,
+    onClose: onLinkClose
+  } = useDisclosure()
+
   const setPaginationControl = useCallback(
     (data) => {
       if (signedUrlParams) {
@@ -405,7 +425,15 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vuln, isPart, component } = row
+        const { vuln, isPart, component, externalUrls } = row
+        const website = externalUrls?.find((item) => item.name === 'website')
+        const distribution = externalUrls?.find(
+          (item) => item.name === 'distribution'
+        )
+        const issueTracker = externalUrls?.find(
+          (item) => item.name === 'issue-tracker'
+        )
+        const vcs = externalUrls?.find((item) => item.name === 'vcs')
         const { sbom } = component
         const { projectVersion, project } = sbom
         const { vulnInfo } = vuln
@@ -435,6 +463,61 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                   {project?.projectGroup?.name || ''} : {projectVersion || ''}
                 </Text>
               )}
+              {/* EXTERNAL REFERENCE */}
+              <Stack direction={'row'} alignItems={'center'}>
+                {/* WEBSITE */}
+                <Tooltip placement='top' label={website?.url}>
+                  <Link href={website?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      isDisabled={!website}
+                      colorScheme='gray'
+                      icon={<FaGlobe fontSize={16} />}
+                    />
+                  </Link>
+                </Tooltip>
+                {/* DISTRIBUTION */}
+                <Tooltip placement='top' label={vcs?.url}>
+                  <Link href={vcs?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      colorScheme='gray'
+                      isDisabled={!vcs}
+                      icon={<FaSitemap fontSize={16} />}
+                    />
+                  </Link>
+                </Tooltip>
+                {/* ADVISORIES */}
+                <Tooltip placement='top' label={issueTracker?.url}>
+                  <Link href={issueTracker?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      colorScheme='gray'
+                      isDisabled={!issueTracker}
+                      icon={<FaHouseUser fontSize={16} />}
+                    />
+                  </Link>
+                </Tooltip>
+                {/* SUPPORT */}
+                <Tooltip placement='top' label={distribution?.url}>
+                  <Link href={distribution?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      isDisabled={!distribution}
+                      colorScheme='gray'
+                      icon={<FaLightbulb fontSize={16} />}
+                    />
+                  </Link>
+                </Tooltip>
+              </Stack>
               {kev === true && (
                 <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
                   KEV
@@ -701,6 +784,39 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
       },
       wrap: true,
       right: 'true'
+    },
+    // ACTION
+    {
+      id: 'action',
+      name: 'ACTION',
+      selector: (row) => {
+        return (
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              aria-label='Options'
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              <MenuList size='sm'>
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onLinkOpen()
+                  }}
+                >
+                  Edit Links
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        )
+      },
+      wrap: true,
+      right: 'true',
+      omit: customerView ? true : false
     }
   ]
 
@@ -1193,6 +1309,16 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
         />
       )}
 
+      {isLinkOpen && (
+        <VulnLinkDrawer
+          data={activeRow}
+          isOpen={isLinkOpen}
+          onClose={onLinkClose}
+          refetch={refetch}
+          sbomId={sbomId}
+        />
+      )}
+
       {/* COPY DATA TABLE */}
       {isTableOpen && vulns && (
         <Drawer
@@ -1215,6 +1341,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
               {/* IMPORT WIZARD */}
               <ImportWizard
                 variant='circle'
+                refetch={refetch}
                 currentSbomId={sbomId}
                 currentProductId={productId}
                 onClose={onTableClose}

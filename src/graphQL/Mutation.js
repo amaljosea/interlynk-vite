@@ -2379,3 +2379,59 @@ export const OrganizationManufacturerDelete = gql`
     }
   }
 `
+
+export const ComponentVulnUpdate = gql`
+  mutation ComponentVulnUpdate(
+    $componentVulnId: Uuid!
+    $externalUrls: [ExternalUrlInput!]
+  ) {
+    componentVulnUpdate(
+      input: { componentVulnId: $componentVulnId, externalUrls: $externalUrls }
+    ) {
+      errors
+      componentVuln {
+        id
+      }
+    }
+  }
+`
+
+export const DispositionByParentUpdate = gql`
+  mutation DispositionByParentUpdate(
+    $componentVulnId: Uuid!
+    $externalUrls: [ExternalUrlInput!]
+    $sbomId: Uuid!
+  ) {
+    dispositionByParentUpdate(
+      input: {
+        currentSbomId: $sbomId
+        componentVulnId: $componentVulnId
+        externalUrls: $externalUrls
+      }
+    ) {
+      errors
+      dispositionByParent {
+        externalUrls {
+          name
+          url
+        }
+      }
+    }
+  }
+`
+
+export const ComponentVulnVexImport = gql`
+  mutation ComponentVulnVexImport(
+    $vulnsToImport: [ComponentVulnImportInput!]!
+  ) {
+    componentVulnVexImport(input: { vulnsToImport: $vulnsToImport }) {
+      errors
+      componentVulns {
+        id
+        vuln {
+          vulnId
+        }
+      }
+    }
+  }
+`

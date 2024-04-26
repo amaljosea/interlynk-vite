@@ -43,9 +43,8 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
 
   const containsSpace = /\s/.test(link)
 
-  const urls = []
-
   useEffect(() => {
+    const urls = []
     externalUrls?.map((item) => {
       urls.push({
         name: item.name,
