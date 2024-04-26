@@ -329,6 +329,7 @@ export const ProjectSettingUpdate = gql`
     $days: Float
     $autofix: Boolean
     $vulnscan: Boolean
+    $copyVexFromPrevious: Boolean
     $mfcId: Uuid
   ) {
     projectSettingUpdate(
@@ -339,6 +340,7 @@ export const ProjectSettingUpdate = gql`
         dataRetentionDays: $days
         automatedFixesEnabled: $autofix
         vulnScanningEnabled: $vulnscan
+        copyVexFromPrevious: $copyVexFromPrevious
         organizationManufacturerId: $mfcId
       }
     ) {

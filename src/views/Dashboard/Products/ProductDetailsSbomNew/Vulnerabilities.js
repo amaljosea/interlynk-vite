@@ -425,15 +425,20 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vuln, isPart, component, externalUrls } = row
-        const website = externalUrls?.find((item) => item.name === 'website')
-        const distribution = externalUrls?.find(
-          (item) => item.name === 'distribution'
-        )
-        const issueTracker = externalUrls?.find(
-          (item) => item.name === 'issue-tracker'
-        )
-        const vcs = externalUrls?.find((item) => item.name === 'vcs')
+        const { vuln, isPart, component, externalUrls, currentExternalUrls } =
+          row
+        const website =
+          externalUrls?.find((item) => item.name === 'website') ||
+          currentExternalUrls?.find((item) => item.name === 'website')
+        const distribution =
+          externalUrls?.find((item) => item.name === 'distribution') ||
+          currentExternalUrls?.find((item) => item.name === 'distribution')
+        const issueTracker =
+          externalUrls?.find((item) => item.name === 'issue-tracker') ||
+          currentExternalUrls?.find((item) => item.name === 'issue-tracker')
+        const vcs =
+          externalUrls?.find((item) => item.name === 'vcs') ||
+          currentExternalUrls?.find((item) => item.name === 'vcs')
         const { sbom } = component
         const { projectVersion, project } = sbom
         const { vulnInfo } = vuln
@@ -769,7 +774,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}
-            width={'150px'}
             textAlign={'right'}
           >
             {timeSince(row.vuln.updatedAt)}
@@ -782,6 +786,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
         const dateB = new Date(b.vuln.updatedAt)
         return dateA - dateB // Sort in descending order
       },
+      minWidth: '150px',
       wrap: true,
       right: 'true'
     },

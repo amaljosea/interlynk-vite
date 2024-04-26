@@ -506,6 +506,7 @@ export const GetProjectSettings = gql`
         dataRetentionDays
         internalCompMatchingEnabled
         vulnScanningEnabled
+        copyVexFromPrevious
         organizationManufacturer {
           id
           organizationName

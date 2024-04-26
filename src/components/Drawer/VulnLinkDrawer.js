@@ -34,6 +34,7 @@ import {
 } from '@chakra-ui/react'
 
 import { ComponentVulnUpdate } from 'graphQL/Mutation'
+import { DispositionByParentUpdate } from 'graphQL/Mutation'
 
 const areEqual = (arr1, arr2) => {
   if (arr1?.length !== arr2?.length) {
@@ -51,7 +52,7 @@ const areEqual = (arr1, arr2) => {
 
 const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
   console.log('data', data)
-  const { id, externalUrls, vuln } = data || ''
+  const { id, externalUrls, currentExternalUrls, vuln, isPart } = data || ''
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
   const [linksData, setLinksData] = useState([])
@@ -60,19 +61,35 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
   const [linkError, setLinkError] = useState('')
 
   const [addUrls] = useMutation(ComponentVulnUpdate)
+  const [addPartsUrls] = useMutation(DispositionByParentUpdate)
 
   const containsSpace = /\s/.test(link)
 
   useEffect(() => {
-    const urls = []
-    externalUrls?.map((item) => {
-      urls.push({
-        name: item.name,
-        url: item.url
+    if (externalUrls?.length > 0) {
+      const urls = []
+      externalUrls?.map((item) => {
+        urls.push({
+          name: item.name,
+          url: item.url
+        })
       })
-    })
-    setLinksData(urls)
+      setLinksData(urls)
+    }
   }, [externalUrls])
+
+  useEffect(() => {
+    if (currentExternalUrls?.length > 0) {
+      const urls = []
+      currentExternalUrls?.map((item) => {
+        urls.push({
+          name: item.name,
+          url: item.url
+        })
+      })
+      setLinksData(urls)
+    }
+  }, [currentExternalUrls])
 
   const handleTypeChange = (e) => {
     const { value } = e.target
@@ -121,25 +138,44 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
   }
 
   const handleSave = async () => {
-    await addUrls({
-      variables: {
-        sbomId,
-        componentVulnId: id,
-        externalUrls: linksData
-      }
-    }).then((res) => {
-      const errors = res?.data?.componentVulnUpdate?.errors
-      if (errors?.length > 0) {
-        setError(errors[0])
-      } else {
-        setError('')
-        refetch()
-        onClose()
-      }
-    })
+    if (isPart) {
+      await addPartsUrls({
+        variables: {
+          sbomId,
+          componentVulnId: id,
+          externalUrls: linksData
+        }
+      }).then((res) => {
+        const errors = res?.data?.dispositionByParentUpdate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
+        } else {
+          setError('')
+          refetch()
+          onClose()
+        }
+      })
+    } else {
+      await addUrls({
+        variables: {
+          componentVulnId: id,
+          externalUrls: linksData
+        }
+      }).then((res) => {
+        const errors = res?.data?.componentVulnUpdate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
+        } else {
+          setError('')
+          refetch()
+          onClose()
+        }
+      })
+    }
   }
 
-  const isEqual = areEqual(externalUrls, linksData)
+  const isExternalEqual = areEqual(externalUrls, linksData)
+  const isCurrentEqual = areEqual(currentExternalUrls, linksData)
 
   return (
     <Drawer size='sm' isOpen={isOpen} placement='right' onClose={onClose}>
@@ -279,7 +315,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
           <Button
             colorScheme='blue'
             onClick={handleSave}
-            isDisabled={isEqual === true ? true : false}
+            isDisabled={isPart ? isCurrentEqual : isExternalEqual}
           >
             Save
           </Button>

@@ -31,6 +31,7 @@ import { ProjectSettingUpdate } from 'graphQL/Mutation'
 
 const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
   const toast = useToast()
+  console.log('data', data)
   const { userPermissions } = useGlobalState()
   const [dataRetentionDays, setDataRetentionDays] = useState(0)
   const [projectSettingId, setProjectSettingId] = useState(null)
@@ -58,6 +59,7 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
         intcomp: id === 'internalComp' ? value : undefined,
         autofix: id === 'automation' ? value : undefined,
         vulnscan: id === 'vulnScan' ? value : undefined,
+        copyVexFromPrevious: id === 'copyVexFromPrevious' ? value : undefined,
         days: id === 'dataRetention' ? value : undefined,
         mfcId: orgMfc !== '' ? orgMfc : undefined
       }
@@ -103,6 +105,23 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Vulnerability Scan
+                </Text>
+              </Flex>
+              {/* COPY VEX FROM PREVIOUS */}
+              <Flex align='center'>
+                <Switch
+                  size='md'
+                  colorScheme='blue'
+                  me='10px'
+                  id='copyVexFromPrevious'
+                  isChecked={data?.copyVexFromPrevious}
+                  onChange={(e) =>
+                    onUpdate(e.target.checked, 'copyVexFromPrevious')
+                  }
+                  isDisabled={!enabled || !editControls}
+                />
+                <Text noOfLines={1} color='gray.500' fontWeight='400'>
+                  Copy Vex From Previous
                 </Text>
               </Flex>
               {/* APPLY CHECK */}

@@ -458,11 +458,12 @@ const VersionsTable = ({ projectGroup }) => {
         const { creationAt } = row
         return (
           <Tooltip label={getFullDateAndTime(creationAt)} placement='top'>
-            <Text>{timeSince(creationAt)}</Text>
+            <Text textAlign={'right'}>{timeSince(creationAt)}</Text>
           </Tooltip>
         )
       },
-      right: 'false',
+      minWidth: '150px',
+      right: 'true',
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a.creationAt)
@@ -474,11 +475,12 @@ const VersionsTable = ({ projectGroup }) => {
     {
       id: 'SBOMS_UPDATED_AT',
       name: 'UPDATED',
+      minWidth: '150px',
       selector: (row) => {
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
-            <Text>{timeSince(updatedAt)}</Text>
+            <Text textAlign={'right'}>{timeSince(updatedAt)}</Text>
           </Tooltip>
         )
       },
@@ -522,8 +524,7 @@ const VersionsTable = ({ projectGroup }) => {
           </Menu>
         )
       },
-      right: 'true',
-      width: '120px'
+      right: 'true'
     }
   ]
 
