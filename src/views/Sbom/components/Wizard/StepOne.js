@@ -70,19 +70,6 @@ const StepOne = ({
       setSelectedProd(currentProd?.id)
       setEnvName(currentProd?.name)
       setProductId(currentProd?.id)
-      // const filterVersion = [...currentProd.sboms].filter(
-      //   (item) => item.id !== currentSbomId
-      // )
-      // const currentIndex = filterVersion?.findIndex(
-      //   (item) => item.id === currentSbomId
-      // )
-      // if (currentIndex !== filterVersion.length - 1) {
-      //   setSelectedVersion(filterVersion[currentIndex + 1].id)
-      //   setSbomId(filterVersion[currentIndex + 1].id)
-      // } else {
-      //   setSelectedVersion('')
-      //   setSbomId('')
-      // }
     }
   }, [])
 

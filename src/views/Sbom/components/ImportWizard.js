@@ -1,16 +1,12 @@
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { Step, Steps, useSteps } from 'chakra-ui-steps'
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { findSimilarItems } from 'utils'
-import { getProductVersionDetailPageUrl } from 'utils/url'
 
-import { Button, Flex, useColorModeValue } from '@chakra-ui/react'
+import { Box, Button, Flex, useColorModeValue } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { updateCompVulnVex } from 'graphQL/Mutation'
-import { GetVulnData } from 'graphQL/Queries'
+import { ComponentVulnVexImport } from 'graphQL/Mutation'
 
 import StepOne from './Wizard/StepOne'
 import StepThree from './Wizard/StepThree'
@@ -18,22 +14,18 @@ import StepTwo from './Wizard/StepTwo'
 
 const ImportWizard = ({
   variant,
+  refetch,
   currentSbomId,
   currentProductId,
   onClose
 }) => {
-  const [compVexCreate] = useMutation(updateCompVulnVex)
-  const [getVulns] = useLazyQuery(GetVulnData)
+  const [compVexImport] = useMutation(ComponentVulnVexImport)
 
   const { prodVulnState, dispatch } = useGlobalState()
-  const { totalVulns, field, direction, importSbom, selectedVulns } =
-    prodVulnState
+  const { totalVulns, field, direction, selectedVulns } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
   const group = JSON.parse(localStorage.getItem('product'))
-
-  const params = useParams()
-  const navigate = useNavigate()
 
   const { nextStep, prevStep, activeStep } = useSteps({ initialStep: 0 })
 
@@ -45,57 +37,32 @@ const ImportWizard = ({
   const [uniqVersions, setUniqVersions] = useState([])
 
   const refetchCurrentVuln = async () => {
-    await getVulns({
-      variables: {
-        projectId: currentProductId,
-        sbomId: currentSbomId,
-        first: totalVulns,
-        field: field,
-        direction: direction
+    await refetch({
+      projectId: currentProductId,
+      sbomId: currentSbomId,
+      first: totalVulns,
+      last: undefined,
+      field: field,
+      direction: direction
+    }).then((res) => {
+      if (res.data) {
+        onClose()
       }
     })
-      .then((res) => {
-        if (res.data) {
-          const data = findSimilarItems(res.data.sbom.vulns.nodes, importSbom)
-          const filterData = data.filter((item) => item.importStatus !== null)
-          prodVulnDispatch({ type: 'UPDATE_MERGE_DATA', payload: filterData })
-        }
-      })
-      .finally(() => {
-        const url = getProductVersionDetailPageUrl({
-          productgroupid: params.productgroupid,
-          productid: currentProductId,
-          sbomid: currentSbomId
-        })
-        navigate(url)
-        onClose()
-      })
   }
 
   const handleSubmit = () => {
-    // console.log(selectedVulns)
-    if (selectedVulns.length > 0) {
-      selectedVulns.map((item) => {
-        compVexCreate({
-          variables: {
-            sbomId: currentSbomId,
-            compVulnId: item.id,
-            note: item.importNotes ? item.importNotes : undefined,
-            vexStatusId: item.importStatus.id,
-            vexJustificationId: item.importJustification
-              ? item.importJustification.id
-              : undefined,
-            impact: item.importStatement ? item.importStatement : undefined,
-            details: item.importDetail ? item.importDetail : undefined,
-            cdxResponseId: item.importResponse
-              ? item.importResponse
-              : undefined,
-            fixedIn: item.importFixedIn ? item.importFixedIn : undefined,
-            action: item.importActionStmt ? item.importActionStmt : undefined
-          }
+    const importData = []
+    if (selectedVulns?.length > 0) {
+      selectedVulns?.map((item) =>
+        importData?.push({
+          fromComponentVulnId: item?.fromVuln?.id,
+          toComponentVulnId: item?.toVuln?.id
         })
-      })
-      nextStep()
+      )
+      compVexImport({
+        variables: { vulnsToImport: importData }
+      }).then((res) => res?.data && nextStep())
     }
   }
 
@@ -121,15 +88,7 @@ const ImportWizard = ({
     },
     {
       label: 'Import',
-      component: (
-        <StepTwo
-          currentSbomId={currentSbomId}
-          currentProductId={currentProductId}
-          getVulns={getVulns}
-          productId={productId}
-          sbomId={sbomId}
-        />
-      )
+      component: <StepTwo currentSbomId={currentSbomId} sbomId={sbomId} />
     }
   ]
 
@@ -139,21 +98,23 @@ const ImportWizard = ({
 
   return (
     <Flex flexDir='column' width='100%'>
-      <Steps variant={variant} colorScheme='blue' activeStep={activeStep}>
-        {steps.map(({ label, component }, index) => (
-          <Step label={label} key={label}>
-            <Flex
-              width={'100%'}
-              flexDir={'column'}
-              alignItems={'center'}
-              justifyContent={'center'}
-              sx={{ p: 8, my: 8, rounded: 'md' }}
-            >
-              {component}
-            </Flex>
-          </Step>
-        ))}
-      </Steps>
+      <Box position='fixed' top={20} left={6} right={6}>
+        <Steps variant={variant} colorScheme='blue' activeStep={activeStep}>
+          {steps.map(({ label, component }, index) => (
+            <Step label={label} key={index}>
+              <Flex
+                width={'100%'}
+                flexDir={'column'}
+                alignItems={'center'}
+                justifyContent={'center'}
+                sx={{ p: 8, rounded: 'md' }}
+              >
+                {component}
+              </Flex>
+            </Step>
+          ))}
+        </Steps>
+      </Box>
       {hasCompletedAllSteps && (
         <Flex
           width={'100%'}
@@ -220,7 +181,7 @@ const ImportWizard = ({
                 variant='solid'
                 colorScheme='blue'
                 onClick={handleSubmit}
-                disabled={selectedVulns.length === 0}
+                disabled={selectedVulns?.length === 0}
               >
                 Submit
               </Button>

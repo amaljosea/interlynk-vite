@@ -20,8 +20,8 @@ const StepThree = () => {
       >
         <FaCheckCircle color='#48BB78' size={96} />
         <Heading fontWeight={'medium'} fontSize={20} fontFamily={'inherit'}>
-          {selectedVulns.length} out of {mergeData.length} vulnerability status
-          updated.
+          {/* {selectedVulns.length} out of {mergeData.length}  */}
+          Vulnerability status updated successfully.
         </Heading>
       </Stack>
     </Box>
