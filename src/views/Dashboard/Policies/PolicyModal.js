@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { updatedValue } from 'utils'
 
@@ -62,6 +62,14 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
     }
   ])
   const [deletedRules, setDeletedRules] = useState([])
+  const [isDisabled, setIsDisabled] = useState(false)
+
+  const disableButtonTemporarily = () => {
+    setIsDisabled(true)
+    setTimeout(() => {
+      setIsDisabled(false)
+    }, 3000)
+  }
 
   const [createPolicy] = useMutation(PolicyCreate)
   const [updatePolicy] = useMutation(PolicyUpdate)
@@ -244,8 +252,15 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
     setConditions(newData)
   }
 
+  const clearState = () => {
+    setName('')
+    setOperator('')
+    setResultType('')
+  }
+
   const handleCreate = (e) => {
     e.preventDefault()
+    disableButtonTemporarily()
     const rules = []
     if (conditions?.length > 0) {
       conditions?.map((item) =>
@@ -280,13 +295,11 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
         setError(errors[0])
       } else {
         handleRefetch()
+        setError('')
+        clearState()
+        onClose()
       }
     })
-    setError('')
-    setName('')
-    setOperator('')
-    setResultType('')
-    onClose()
   }
 
   let prevRules = []
@@ -331,14 +344,9 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
     deleteRules?.push({ id: item?.id, _destroy: true })
   )
 
-  const clearState = () => {
-    setName('')
-    setOperator('')
-    setResultType('')
-  }
-
   const handleUpdate = (e) => {
     e.preventDefault()
+    disableButtonTemporarily()
     if (prevRules?.length > 0) {
       updatePolicy({
         variables: {
@@ -356,6 +364,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
           setError(errors[0])
         } else {
           handleRefetch()
+          clearState()
           onClose()
         }
       })
@@ -377,6 +386,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
           setError(errors[0])
         } else {
           handleRefetch()
+          clearState()
           onClose()
         }
       })
@@ -398,11 +408,11 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
           setError(errors[0])
         } else {
           handleRefetch()
+          clearState()
           onClose()
         }
       })
     }
-    clearState()
   }
 
   const checkDataValidity = (data) => {
@@ -927,7 +937,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
               <Button
                 colorScheme='blue'
                 type='submit'
-                disabled={errorMessage || error !== ''}
+                disabled={errorMessage || error !== '' || isDisabled}
               >
                 {data ? 'Update' : 'Save'}
               </Button>
