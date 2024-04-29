@@ -55,9 +55,9 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
   const { id, externalUrls, currentExternalUrls, vuln, isPart } = data || ''
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
-  const [linksData, setLinksData] = useState([])
+  const [externalData, setExternalData] = useState([])
+  const [currentData, setCurrentData] = useState([])
   const [error, setError] = useState('')
-  const [typeError, setTypeError] = useState('')
   const [linkError, setLinkError] = useState('')
 
   const [addUrls] = useMutation(ComponentVulnUpdate)
@@ -74,7 +74,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
           url: item.url
         })
       })
-      setLinksData(urls)
+      setExternalData(urls)
     }
   }, [externalUrls])
 
@@ -87,21 +87,13 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
           url: item.url
         })
       })
-      setLinksData(urls)
+      setCurrentData(urls)
     }
   }, [currentExternalUrls])
 
   const handleTypeChange = (e) => {
-    const { value } = e.target
-    setType(value)
+    setType(e.target.value)
     setError('')
-    const isExists =
-      linksData.length > 0 && linksData.find((item) => item.name === value)
-    if (isExists) {
-      setTypeError('Link type already exists!')
-    } else {
-      setTypeError('')
-    }
   }
 
   const handleCheckUrl = () => {
@@ -127,14 +119,27 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
 
   const handleLinkAdd = (e) => {
     e.preventDefault()
-    setLinksData((prev) => [{ name: type, url: link }, ...prev])
+    if (isPart) {
+      setCurrentData((prev) => [{ name: type, url: link }, ...prev])
+    } else {
+      setExternalData((prev) => [{ name: type, url: link }, ...prev])
+    }
     setType('')
     setLink('')
   }
 
-  const handleLinkRemove = (id) => {
-    const updatedList = linksData.filter((_, index) => index !== id)
-    setLinksData(updatedList)
+  const handleLinkRemove = (link) => {
+    if (isPart) {
+      const currentList = currentData.filter(
+        (item) => item?.name !== link.name && item?.url !== link.url
+      )
+      setCurrentData(currentList)
+    } else {
+      const externalList = externalData.filter(
+        (item) => item?.name !== link.name && item?.url !== link.url
+      )
+      setExternalData(externalList)
+    }
   }
 
   const handleSave = async () => {
@@ -143,7 +148,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
         variables: {
           sbomId,
           componentVulnId: id,
-          externalUrls: linksData
+          externalUrls: currentData
         }
       }).then((res) => {
         const errors = res?.data?.dispositionByParentUpdate?.errors
@@ -155,27 +160,26 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
           onClose()
         }
       })
-    } else {
-      await addUrls({
-        variables: {
-          componentVulnId: id,
-          externalUrls: linksData
-        }
-      }).then((res) => {
-        const errors = res?.data?.componentVulnUpdate?.errors
-        if (errors?.length > 0) {
-          setError(errors[0])
-        } else {
-          setError('')
-          refetch()
-          onClose()
-        }
-      })
     }
+    await addUrls({
+      variables: {
+        componentVulnId: id,
+        externalUrls: externalData
+      }
+    }).then((res) => {
+      const errors = res?.data?.componentVulnUpdate?.errors
+      if (errors?.length > 0) {
+        setError(errors[0])
+      } else {
+        setError('')
+        refetch()
+        onClose()
+      }
+    })
   }
 
-  const isExternalEqual = areEqual(externalUrls, linksData)
-  const isCurrentEqual = areEqual(currentExternalUrls, linksData)
+  // const isExternalEqual = areEqual(externalUrls, externalData)
+  // const isCurrentEqual = areEqual(currentExternalUrls, currentData)
 
   return (
     <Drawer size='sm' isOpen={isOpen} placement='right' onClose={onClose}>
@@ -194,26 +198,14 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
           <form onSubmit={handleLinkAdd}>
             <Flex mt={4} direction={'column'} alignItems={'flex-start'} gap={3}>
               {/* NAME */}
-              <FormControl isRequired isInvalid={typeError}>
+              <FormControl isRequired>
                 <FormLabel>Type</FormLabel>
                 <Select value={type} onChange={handleTypeChange}>
                   <option value=''>-- Select --</option>
                   {[
-                    'vcs',
                     'issue-tracker',
-                    'website',
                     'advisories',
-                    'bom',
-                    'mailing-list',
-                    'social',
-                    'chat',
                     'documentation',
-                    'support',
-                    'distribution',
-                    'license',
-                    'build-meta',
-                    'build-system',
-                    'release-notes',
                     'other'
                   ].map((item, index) => (
                     <option key={index} value={item}>
@@ -221,7 +213,6 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
                     </option>
                   ))}
                 </Select>
-                <FormErrorMessage>{typeError}</FormErrorMessage>
               </FormControl>
               {/* URL */}
               <FormControl
@@ -243,11 +234,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
               <Button
                 colorScheme='blue'
                 type='submit'
-                isDisabled={
-                  !validateUrl(link.trim()) ||
-                  typeError !== '' ||
-                  linkError !== ''
-                }
+                isDisabled={!validateUrl(link.trim()) || linkError !== ''}
               >
                 Add
               </Button>
@@ -256,47 +243,68 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
                 <Text size='md' my={2}>
                   Existing Links
                 </Text>
-                {linksData.length > 0 ? (
+                {externalData?.length > 0 || currentData?.length > 0 ? (
                   <Table variant='simple' size='sm' mt={4}>
                     <Thead>
                       <Tr my='.8rem'>
-                        <Th pl={0} width={'260px'}>
-                          Link
-                        </Th>
+                        <Th pl={0}>Link</Th>
                         <Th pl={0}>Type</Th>
-                        {/* <Th pl={0}></Th> */}
+                        <Th pl={0}></Th>
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {linksData.map((item, index) => (
-                        <Tr key={index}>
-                          <Td
-                            pl={0}
-                            fontSize={'xs'}
-                            width={'260px'}
-                            wordBreak={'break-all'}
-                          >
-                            {item.url ? (
-                              <Tooltip label={item.url}>
-                                {item.url.length > 35
-                                  ? `${item.url.substring(0, 35)}...`
-                                  : item.url}
-                              </Tooltip>
-                            ) : null}
-                          </Td>
-                          <Td pl={0} fontSize={'xs'}>
-                            {item.name}
-                          </Td>
-                          {/* <Td pl={0}>
-                            <Icon
-                              as={DeleteIcon}
-                              color={'red'}
-                              cursor={'pointer'}
-                              onClick={() => handleLinkRemove(index)}
-                            />
-                          </Td> */}
-                        </Tr>
-                      ))}
+                      {externalData?.length > 0 &&
+                        externalData?.map((item, index) => (
+                          <Tr key={index}>
+                            <Td pl={0} fontSize={'xs'} wordBreak={'break-all'}>
+                              {item.url ? (
+                                <Tooltip label={item.url}>
+                                  {item.url.length > 35
+                                    ? `${item.url.substring(0, 35)}...`
+                                    : item.url}
+                                </Tooltip>
+                              ) : null}
+                            </Td>
+                            <Td pl={0} fontSize={'xs'}>
+                              {item.name}
+                            </Td>
+                            <Td pl={0}>
+                              <Icon
+                                as={DeleteIcon}
+                                color={'red'}
+                                cursor={'pointer'}
+                                display={isPart ? 'none' : 'block'}
+                                onClick={() => handleLinkRemove(item)}
+                              />
+                            </Td>
+                          </Tr>
+                        ))}
+                      {currentData?.length > 0 &&
+                        currentData?.map((item, index) => (
+                          <Tr key={index}>
+                            <Td pl={0} fontSize={'xs'} wordBreak={'break-all'}>
+                              {item.url ? (
+                                <Tooltip label={item.url}>
+                                  {item.url.length > 35
+                                    ? `${item.url.substring(0, 35)}...`
+                                    : item.url}
+                                </Tooltip>
+                              ) : null}
+                            </Td>
+                            <Td pl={0} fontSize={'xs'}>
+                              {item.name}
+                            </Td>
+                            <Td pl={0}>
+                              <Icon
+                                as={DeleteIcon}
+                                color={'red'}
+                                cursor={'pointer'}
+                                display={isPart ? 'block' : 'none'}
+                                onClick={() => handleLinkRemove(item)}
+                              />
+                            </Td>
+                          </Tr>
+                        ))}
                     </Tbody>
                   </Table>
                 ) : (
@@ -315,7 +323,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
           <Button
             colorScheme='blue'
             onClick={handleSave}
-            isDisabled={isPart ? isCurrentEqual : isExternalEqual}
+            // isDisabled={isPart ? isCurrentEqual : isExternalEqual}
           >
             Save
           </Button>

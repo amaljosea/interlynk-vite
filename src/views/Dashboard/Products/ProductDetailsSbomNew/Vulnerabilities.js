@@ -65,14 +65,16 @@ import {
   ShareVulnFilters
 } from 'graphQL/Queries'
 
+import { FaEllipsisV } from 'react-icons/fa'
 import {
-  FaEllipsisV,
-  FaGlobe,
-  FaHouseUser,
-  FaLightbulb,
-  FaSitemap
-} from 'react-icons/fa'
-import { FaBug, FaCopy, FaPen } from 'react-icons/fa6'
+  FaBookOpen,
+  FaBug,
+  FaBullhorn,
+  FaCopy,
+  FaLink,
+  FaListCheck,
+  FaPen
+} from 'react-icons/fa6'
 
 import VulnFilters from './VulnFilters'
 
@@ -427,18 +429,18 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
       selector: (row) => {
         const { vuln, isPart, component, externalUrls, currentExternalUrls } =
           row
-        const website =
-          externalUrls?.find((item) => item.name === 'website') ||
-          currentExternalUrls?.find((item) => item.name === 'website')
-        const distribution =
-          externalUrls?.find((item) => item.name === 'distribution') ||
-          currentExternalUrls?.find((item) => item.name === 'distribution')
-        const issueTracker =
-          externalUrls?.find((item) => item.name === 'issue-tracker') ||
-          currentExternalUrls?.find((item) => item.name === 'issue-tracker')
-        const vcs =
-          externalUrls?.find((item) => item.name === 'vcs') ||
-          currentExternalUrls?.find((item) => item.name === 'vcs')
+        const advisories = isPart
+          ? currentExternalUrls?.find((item) => item.name === 'advisories')
+          : externalUrls?.find((item) => item.name === 'advisories')
+        const documentation = isPart
+          ? currentExternalUrls?.find((item) => item.name === 'documentation')
+          : externalUrls?.find((item) => item.name === 'documentation')
+        const issueTracker = isPart
+          ? currentExternalUrls?.find((item) => item.name === 'issue-tracker')
+          : externalUrls?.find((item) => item.name === 'issue-tracker')
+        const other = isPart
+          ? currentExternalUrls?.find((item) => item.name === 'other')
+          : externalUrls?.find((item) => item.name === 'other')
         const { sbom } = component
         const { projectVersion, project } = sbom
         const { vulnInfo } = vuln
@@ -470,33 +472,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
               )}
               {/* EXTERNAL REFERENCE */}
               <Stack direction={'row'} alignItems={'center'}>
-                {/* WEBSITE */}
-                <Tooltip placement='top' label={website?.url}>
-                  <Link href={website?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      isDisabled={!website}
-                      colorScheme='gray'
-                      icon={<FaGlobe fontSize={16} />}
-                    />
-                  </Link>
-                </Tooltip>
-                {/* DISTRIBUTION */}
-                <Tooltip placement='top' label={vcs?.url}>
-                  <Link href={vcs?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      colorScheme='gray'
-                      isDisabled={!vcs}
-                      icon={<FaSitemap fontSize={16} />}
-                    />
-                  </Link>
-                </Tooltip>
-                {/* ADVISORIES */}
+                {/* issueTracker */}
                 <Tooltip placement='top' label={issueTracker?.url}>
                   <Link href={issueTracker?.url} isExternal>
                     <IconButton
@@ -505,20 +481,46 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                       variant='solid'
                       colorScheme='gray'
                       isDisabled={!issueTracker}
-                      icon={<FaHouseUser fontSize={16} />}
+                      icon={<FaListCheck fontSize={16} />}
                     />
                   </Link>
                 </Tooltip>
-                {/* SUPPORT */}
-                <Tooltip placement='top' label={distribution?.url}>
-                  <Link href={distribution?.url} isExternal>
+                {/* advisories */}
+                <Tooltip placement='top' label={advisories?.url}>
+                  <Link href={advisories?.url} isExternal>
                     <IconButton
                       type='button'
                       size='xs'
                       variant='solid'
-                      isDisabled={!distribution}
+                      isDisabled={!advisories}
                       colorScheme='gray'
-                      icon={<FaLightbulb fontSize={16} />}
+                      icon={<FaBullhorn color='#555' fontSize={16} />}
+                    />
+                  </Link>
+                </Tooltip>
+                {/* documentation */}
+                <Tooltip placement='top' label={documentation?.url}>
+                  <Link href={documentation?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      colorScheme='gray'
+                      isDisabled={!documentation}
+                      icon={<FaBookOpen color='#555' fontSize={16} />}
+                    />
+                  </Link>
+                </Tooltip>
+                {/* other */}
+                <Tooltip placement='top' label={other?.url}>
+                  <Link href={other?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      isDisabled={!other}
+                      colorScheme='gray'
+                      icon={<FaLink color='#555' fontSize={16} />}
                     />
                   </Link>
                 </Tooltip>
