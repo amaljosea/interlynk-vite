@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/react'
 import { ApolloWrapper } from 'context/ApolloWrapper.js'
+import { PartsContextWrapper } from 'context/PartsContext.js'
 import Cookies from 'js-cookie'
 import Reset from 'layouts/Reset'
 import Success from 'layouts/Success'
@@ -93,7 +94,14 @@ ReactDOM.render(
               <Route path={`register`} element={<Register />} />
               <Route path={`accept-user-invitation`} element={<Success />} />
               <Route path={`confirmation`} element={<Success />} />
-              <Route path={`vendor`} element={<AdminLayout />}>
+              <Route
+                path={`vendor`}
+                element={
+                  <PartsContextWrapper>
+                    <AdminLayout />
+                  </PartsContextWrapper>
+                }
+              >
                 <Route path={`dashboard`} element={<Dashboard />} />
                 <Route path={`products`} element={<Products />}>
                   <Route index element={<ProductList />} />

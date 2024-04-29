@@ -23,6 +23,7 @@ import GraphDrawer from 'components/Drawer/GraphDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePartsContext } from 'hooks/usePartsContext'
 
 import { GetPrimaryComponent } from 'graphQL/Queries'
 import { GetSharPrimartComp } from 'graphQL/Queries'
@@ -38,6 +39,7 @@ import { FaCircleCheck } from 'react-icons/fa6'
 import { MdPolicy } from 'react-icons/md'
 
 const SbomDetails = ({ sbomData, refetch }) => {
+  const partsContext = usePartsContext()
   const navigate = useNavigate()
   const params = useParams()
   const projectId = params.productid
@@ -168,74 +170,10 @@ const SbomDetails = ({ sbomData, refetch }) => {
   }
 
   const handlePart = () => {
-    const newData = { ...subProduct }
-    if (subProduct?.childFour) {
-      delete newData.childFour
-      localStorage.setItem('subProduct', JSON.stringify(newData))
-    } else if (subProduct?.childThree) {
-      delete newData.childThree
-      localStorage.setItem('subProduct', JSON.stringify(newData))
-    } else if (subProduct?.childTwo) {
-      delete newData.childTwo
-      localStorage.setItem('subProduct', JSON.stringify(newData))
-    } else if (subProduct?.childOne) {
-      delete newData.childOne
-      localStorage.setItem('subProduct', JSON.stringify(newData))
-    } else {
-      localStorage.removeItem('subProduct')
-    }
+    partsContext.pop()
   }
 
-  const parentLink = () => {
-    if (subProduct?.childFour) {
-      const url = getProductVersionDetailPageUrl({
-        productgroupid: params.productgroupid,
-        productid: subProduct?.childThree?.projectId,
-        sbomid: subProduct?.childThree?.sbomId,
-        paramsObj: {
-          parts: true
-        }
-      })
-      return url
-    } else if (subProduct?.childThree) {
-      const url = getProductVersionDetailPageUrl({
-        productgroupid: params.productgroupid,
-        productid: subProduct?.childTwo?.projectId,
-        sbomid: subProduct?.childTwo?.sbomId,
-        paramsObj: {
-          parts: true
-        }
-      })
-      return url
-    } else if (subProduct?.childTwo) {
-      const url = getProductVersionDetailPageUrl({
-        productgroupid: params.productgroupid,
-        productid: subProduct?.childOne?.projectId,
-        sbomid: subProduct?.childOne?.sbomId,
-        paramsObj: {
-          parts: true
-        }
-      })
-      return url
-    } else if (subProduct?.childOne) {
-      const url = getProductVersionDetailPageUrl({
-        productgroupid: params.productgroupid,
-        productid: subProduct?.projectId,
-        sbomid: subProduct?.sbomId,
-        paramsObj: {
-          parts: true
-        }
-      })
-      return url
-    } else {
-      const url = getProductVersionDetailPageUrl({
-        productgroupid: params.productgroupid,
-        productid: currentProduct?.productId,
-        sbomid: currentSBOM?.id
-      })
-      return url
-    }
-  }
+  console.log('partsContext sbomdetail', partsContext)
 
   useEffect(() => {
     window.onpopstate = () => {
@@ -270,29 +208,24 @@ const SbomDetails = ({ sbomData, refetch }) => {
         <Flex direction={'column'} gap={0.5}>
           {/* PRODUCT TITLE */}
           <Stack direction={'column'} spacing={1} alignItems={'left'}>
-            {currentProduct && parts && currentSBOM && (
-              <Link to={parentLink()} onClick={handlePart}>
-                <HStack>
-                  <FaAngleLeft size={18} color='#3182CE' />
-                  <Text
-                    fontWeight={'semibold'}
-                    fontSize={18}
-                    color={'blue.500'}
-                    textDecor={'underline'}
-                  >
-                    {subProduct?.childFour
-                      ? subProduct?.childThree?.name
-                      : subProduct?.childThree
-                        ? subProduct?.childTwo?.name
-                        : subProduct?.childTwo
-                          ? subProduct?.childOne?.name
-                          : subProduct?.childOne
-                            ? subProduct?.name
-                            : name}
-                  </Text>
-                </HStack>
-              </Link>
-            )}
+            {currentProduct &&
+              parts &&
+              currentSBOM &&
+              partsContext.latestPart && (
+                <Link to={partsContext.latestPart.url} onClick={handlePart}>
+                  <HStack>
+                    <FaAngleLeft size={18} color='#3182CE' />
+                    <Text
+                      fontWeight={'semibold'}
+                      fontSize={18}
+                      color={'blue.500'}
+                      textDecor={'underline'}
+                    >
+                      {partsContext.latestPart.projectGroupName}
+                    </Text>
+                  </HStack>
+                </Link>
+              )}
             <Flex
               direction={'row'}
               alignItems={'center'}

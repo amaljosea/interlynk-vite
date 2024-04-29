@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { parseJSONSafely, permissionList, truncatedValue } from 'utils'
+import { parseJSONSafely, permissionList } from 'utils'
 import { getProductVersionDetailPageUrl } from 'utils/url'
 import { getProductDetailPageUrl } from 'utils/url'
 
@@ -18,13 +18,16 @@ import {
 } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePartsContext } from 'hooks/usePartsContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
+import { useSbom } from 'hooks/useSbom'
 
 import { GetUserPermissions } from 'graphQL/Queries'
 
 import AdminNavbarLinks from './AdminNavbarLinks'
 
 export default function AdminNavbar(props) {
+  const partsContext = usePartsContext()
   const navigate = useNavigate()
   const { setActiveSbomTab, setActiveCsSbomTab, setUserPermissions } =
     useGlobalState()
@@ -52,33 +55,14 @@ export default function AdminNavbar(props) {
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const activeVuln = localStorage.getItem('activeVuln')
-  const currentProduct = (() => {
-    try {
-      return parseJSONSafely(localStorage.getItem('product'))
-    } catch (error) {
-      console.log(error)
-      return null
-    }
-  })()
-  const currentSBOM = (() => {
-    try {
-      return parseJSONSafely(localStorage.getItem('currentSBOM'))
-    } catch (error) {
-      console.log(error)
-      return null
-    }
-  })()
-  const subProduct = (() => {
-    try {
-      return parseJSONSafely(localStorage.getItem('subProduct'))
-    } catch (error) {
-      console.log(error)
-      return null
-    }
-  })()
 
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
+
+  const sbomHookData = useSbom({
+    projectId: params?.productid,
+    sbomId: params?.sbomid
+  })
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
@@ -109,79 +93,9 @@ export default function AdminNavbar(props) {
     // paddingX = '30px'
   }
 
-  const {
-    name: projectGroupName,
-    defaultProjectId,
-    projects
-  } = useProjectGroup({
+  const { name: projectGroupName, projects } = useProjectGroup({
     projectGroupId: params.productgroupid
   })
-
-  const newData = { ...subProduct }
-  const subProdData = {
-    name: subProduct?.name,
-    version: subProduct?.version,
-    projectId: subProduct?.projectId,
-    sbomId: subProduct?.sbomId
-  }
-
-  const removeChildOne = () => {
-    localStorage.setItem('subProduct', JSON.stringify({ ...subProdData }))
-    const url = getProductVersionDetailPageUrl({
-      productgroupid: params.productgroupid,
-      productid: subProduct?.projectId,
-      sbomid: subProduct?.sbomId,
-      paramsObj: {
-        parts: true
-      }
-    })
-    navigate(url)
-  }
-  const removeChildTwo = () => {
-    delete newData.childTwo
-    localStorage.setItem('subProduct', JSON.stringify(newData))
-    const url = getProductVersionDetailPageUrl({
-      productgroupid: params.productgroupid,
-      productid: subProduct?.childOne?.projectId,
-      sbomid: subProduct?.childOne?.sbomId,
-      paramsObj: {
-        parts: true
-      }
-    })
-    navigate(url)
-  }
-  const removeChildThree = () => {
-    delete newData.childThree
-    localStorage.setItem('subProduct', JSON.stringify(newData))
-    const url = getProductVersionDetailPageUrl({
-      productgroupid: params.productgroupid,
-      productid: subProduct?.childTwo?.projectId,
-      sbomid: subProduct?.childTwo?.sbomId,
-      paramsObj: {
-        parts: true
-      }
-    })
-    navigate(url)
-  }
-  const removeChildFour = () => {
-    delete newData.childFour
-    localStorage.setItem('subProduct', JSON.stringify(newData))
-    const url = getProductVersionDetailPageUrl({
-      productgroupid: params.productgroupid,
-      productid: subProduct?.childThree?.projectId,
-      sbomid: subProduct?.childThree?.sbomId,
-      paramsObj: {
-        parts: true
-      }
-    })
-    navigate(url)
-  }
-
-  useEffect(() => {
-    if (!parts) {
-      window.localStorage.removeItem('subProduct')
-    }
-  }, [parts])
 
   return (
     <Flex
@@ -228,15 +142,29 @@ export default function AdminNavbar(props) {
               <Link to={`/${path}/${category}`}>{category}</Link>
             </BreadcrumbItem>
 
+            {partsContext.parts.map((part, index) => {
+              return (
+                <BreadcrumbItem key={part.url} color={mainText}>
+                  <BreadcrumbLink
+                    onClick={() => {
+                      partsContext.goTo(index)
+                      navigate(part.url)
+                    }}
+                  >
+                    {part.projectGroupName} ({part.versionName})
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+              )
+            })}
             {projectGroupName && (
               <BreadcrumbItem
                 color={mainText}
-                isCurrentPage={sbomId && currentSBOM?.version ? false : true}
+                isCurrentPage={sbomId && sbomHookData?.version ? false : true}
               >
                 <Link
                   to={getProductDetailPageUrl({
-                    productgroupid: currentProduct?.groupId,
-                    productid: currentProduct.productId
+                    productgroupid: params.productgroupid,
+                    productid: params.productid
                   })}
                   onClick={() => {
                     localStorage.removeItem('currentSBOM')
@@ -246,8 +174,7 @@ export default function AdminNavbar(props) {
                 </Link>
               </BreadcrumbItem>
             )}
-
-            {sbomId && currentSBOM?.version && (
+            {sbomId && sbomHookData.versionName && (
               <BreadcrumbItem
                 color={mainText}
                 isCurrentPage={parts ? false : true}
@@ -256,15 +183,15 @@ export default function AdminNavbar(props) {
                   href={
                     parts
                       ? getProductVersionDetailPageUrl({
-                          productgroupid: currentProduct?.groupId,
-                          productid: currentProduct.productId,
-                          sbomid: currentSBOM?.id
+                          productgroupid: params.productgroupid,
+                          productid: params.productid,
+                          sbomid: params.sbomid
                         })
                       : ''
                   }
                   onClick={() => setActiveSbomTab(0)}
                 >
-                  {currentSBOM?.version}
+                  {sbomHookData.versionName}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             )}
@@ -272,159 +199,6 @@ export default function AdminNavbar(props) {
             {((prodID && category === 'vulnerabilities') || vulnId) && (
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink>{activeVuln || ''}</BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {subProduct && parts && (
-              <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink
-                  onClick={
-                    subProduct?.sbomId === sbomId ? null : removeChildOne
-                  }
-                >
-                  {truncatedValue(subProduct?.name)}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {subProduct && parts && (
-              <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink
-                  onClick={
-                    subProduct?.sbomId === sbomId ? null : removeChildOne
-                  }
-                >
-                  {truncatedValue(subProduct?.version)}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {/* -------------- CHILD ONE ------------ */}
-
-            {subProduct?.childOne && parts && (
-              <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink
-                  onClick={
-                    subProduct?.childOne?.sbomId === sbomId
-                      ? null
-                      : removeChildTwo
-                  }
-                >
-                  {truncatedValue(subProduct?.childOne?.name)}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {subProduct?.childOne && parts && (
-              <BreadcrumbItem
-                color={mainText}
-                onClick={
-                  subProduct?.childOne?.sbomId === sbomId
-                    ? null
-                    : removeChildTwo
-                }
-              >
-                <BreadcrumbLink
-                  onClick={
-                    subProduct?.childOne?.sbomId === sbomId
-                      ? null
-                      : removeChildTwo
-                  }
-                >
-                  {truncatedValue(subProduct?.childOne?.version)}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {/* -------------- CHILD TWO ------------ */}
-
-            {subProduct?.childTwo && parts && (
-              <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink
-                  onClick={
-                    subProduct?.childTwo?.sbomId === sbomId
-                      ? null
-                      : removeChildThree
-                  }
-                >
-                  {truncatedValue(subProduct?.childTwo?.name)}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {subProduct?.childTwo && parts && (
-              <BreadcrumbItem
-                color={mainText}
-                onClick={
-                  subProduct?.childTwo?.sbomId === sbomId
-                    ? null
-                    : removeChildThree
-                }
-              >
-                <BreadcrumbLink
-                  onClick={
-                    subProduct?.childTwo?.sbomId === sbomId
-                      ? null
-                      : removeChildThree
-                  }
-                >
-                  {truncatedValue(subProduct?.childTwo?.version)}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {/* -------------- CHILD THREE ------------ */}
-
-            {subProduct?.childThree && parts && (
-              <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink
-                  onClick={
-                    subProduct?.childThree?.sbomId === sbomId
-                      ? null
-                      : removeChildFour
-                  }
-                >
-                  {truncatedValue(subProduct?.childThree?.name)}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {subProduct?.childThree && parts && (
-              <BreadcrumbItem
-                color={mainText}
-                onClick={
-                  subProduct?.childThree?.sbomId === sbomId
-                    ? null
-                    : removeChildFour
-                }
-              >
-                <BreadcrumbLink
-                  onClick={
-                    subProduct?.childThree?.sbomId === sbomId
-                      ? null
-                      : removeChildFour
-                  }
-                >
-                  {truncatedValue(subProduct?.childThree?.version)}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {/* -------------- CHILD FOUR ------------ */}
-
-            {subProduct?.childFour && parts && (
-              <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink color={mainText}>
-                  {truncatedValue(subProduct?.childFour?.name)}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {subProduct?.childFour && parts && (
-              <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink color={mainText}>
-                  {truncatedValue(subProduct?.childFour?.version)}
-                </BreadcrumbLink>
               </BreadcrumbItem>
             )}
           </Breadcrumb>

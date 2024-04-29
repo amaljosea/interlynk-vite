@@ -53,6 +53,7 @@ import CustomLoader from 'components/CustomLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePartsContext } from 'hooks/usePartsContext'
 
 import { SbomPartCreate, SbomPartDelete } from 'graphQL/Mutation'
 import {
@@ -67,10 +68,15 @@ import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 const Parts = ({ sbomRefetch }) => {
   const location = useLocation()
   const params = useParams()
+  const partsContext = usePartsContext()
   const sbomId = params.sbomid
   const prodId = params.productid
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
+
+  console.log('PartsContext from page 1')
+
+  console.log('PartsContext from page', partsContext)
 
   const { setActiveProdTab, totalRows, prodState, userPermissions, dispatch } =
     useGlobalState()
@@ -292,81 +298,8 @@ const Parts = ({ sbomRefetch }) => {
       }
     })
 
-  const onSelectPart = (part) => {
-    const { id, project, projectVersion } = part
-    const { projectGroup } = project
-    if (
-      subProduct?.name &&
-      !subProduct?.childOne &&
-      !subProduct?.childTwo &&
-      !subProduct?.childThree &&
-      !subProduct?.childFour
-    ) {
-      localStorage.setItem(
-        'subProduct',
-        JSON.stringify({
-          ...subProduct,
-          childOne: {
-            name: projectGroup?.name,
-            version: projectVersion,
-            projectId: project?.id,
-            sbomId: id
-          }
-        })
-      )
-    } else {
-      localStorage.setItem(
-        'subProduct',
-        JSON.stringify({
-          name: projectGroup?.name,
-          version: projectVersion,
-          projectId: project?.id,
-          sbomId: id
-        })
-      )
-    }
-    if (subProduct?.childOne?.name) {
-      localStorage.setItem(
-        'subProduct',
-        JSON.stringify({
-          ...subProduct,
-          childTwo: {
-            name: projectGroup?.name,
-            version: projectVersion,
-            projectId: project?.id,
-            sbomId: id
-          }
-        })
-      )
-    }
-    if (subProduct?.childTwo?.name) {
-      localStorage.setItem(
-        'subProduct',
-        JSON.stringify({
-          ...subProduct,
-          childThree: {
-            name: projectGroup?.name,
-            version: projectVersion,
-            projectId: project?.id,
-            sbomId: id
-          }
-        })
-      )
-    }
-    if (subProduct?.childThree?.name) {
-      localStorage.setItem(
-        'subProduct',
-        JSON.stringify({
-          ...subProduct,
-          childFour: {
-            name: projectGroup?.name,
-            version: projectVersion,
-            projectId: project?.id,
-            sbomId: id
-          }
-        })
-      )
-    }
+  const onSelectPart = () => {
+    partsContext.push()
     setActiveProdTab(0)
   }
 
@@ -386,7 +319,7 @@ const Parts = ({ sbomRefetch }) => {
         const { part } = row
 
         const link = getProductVersionDetailPageUrl({
-          productgroupid: params.productgroupid,
+          productgroupid: part.project.projectGroup.id,
           productid: part.project.id,
           sbomid: part.id,
           paramsObj: {
@@ -395,7 +328,7 @@ const Parts = ({ sbomRefetch }) => {
         })
 
         return (
-          <Link to={link}>
+          <Link to={link} replace>
             <Text
               color={'blue.500'}
               minWidth='100%'
@@ -767,15 +700,16 @@ const Parts = ({ sbomRefetch }) => {
                   >
                     <option value={''}>-- Select --</option>
                     {allProjects?.organization?.projectGroups?.nodes
-                      .filter(
-                        (item) =>
-                          item.id !== group?.groupId &&
-                          item?.name !== subProduct?.name &&
-                          item?.name !== subProduct?.childOne?.name &&
-                          item?.name !== subProduct?.childTwo?.name &&
-                          item?.name !== subProduct?.childThree?.name &&
-                          item?.name !== subProduct?.childFour?.name
-                      )
+                      .filter((item) => {
+                        const previousUrls = partsContext.parts.map(
+                          (i) => i.url
+                        )
+                        const allUrl = [...previousUrls, location.pathname]
+                        const urlHasId = allUrl.find((url) =>
+                          url.includes(item.id)
+                        )
+                        return !urlHasId
+                      })
                       .map((item, index) => (
                         <option key={index} value={item.id}>
                           {item.name}
