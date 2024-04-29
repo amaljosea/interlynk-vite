@@ -133,15 +133,15 @@ const Policies = () => {
           <Tag
             minW={'100px'}
             colorScheme={
-              resultType === 'pass'
-                ? 'green'
-                : resultType === 'inform'
-                  ? 'blue'
-                  : resultType === 'warn'
-                    ? 'orange'
-                    : resultType === 'fail'
-                      ? 'red'
-                      : 'gray'
+              result === 'initialized'
+                ? 'blue'
+                : result === 'not_detected'
+                  ? 'green'
+                  : result === 'error'
+                    ? 'red'
+                    : result === 'skipped'
+                      ? 'gray'
+                      : 'orange'
             }
           >
             <TagLabel mx={'auto'} pt={0.5} textTransform={'capitalize'}>
