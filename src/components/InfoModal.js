@@ -1,3 +1,5 @@
+import { useParams } from 'react-router-dom'
+
 import { ArrowForwardIcon } from '@chakra-ui/icons'
 import {
   Button,
@@ -13,6 +15,8 @@ import {
 } from '@chakra-ui/react'
 
 const InfoModal = ({ isOpen, onClose, heading, body, url }) => {
+  const params = useParams()
+  const env = params.productid
   return (
     <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInBottom'>
       <ModalOverlay />
@@ -21,6 +25,15 @@ const InfoModal = ({ isOpen, onClose, heading, body, url }) => {
         <ModalCloseButton />
         <ModalBody>
           <Text>{body}</Text>
+          {env && heading === 'Manufacturer' && (
+            <Text mt={3}>{`Setup Manufacturer Identities under -`}</Text>
+          )}
+          {env && heading === 'Manufacturer' && (
+            <Text
+              fontWeight={'medium'}
+              mt={3}
+            >{`Settings > Organization > Legal`}</Text>
+          )}
           {url !== '' && (
             <Link href={url} isExternal>
               <Button

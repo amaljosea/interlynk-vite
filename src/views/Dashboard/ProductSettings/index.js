@@ -1,6 +1,7 @@
 import { useMutation } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
+import { InfoIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
@@ -24,6 +25,7 @@ import {
 } from '@chakra-ui/react'
 
 import CardBody from 'components/Card/CardBody'
+import InfoModal from 'components/InfoModal'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -38,6 +40,15 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
   const [checks, setChecks] = useState(false)
   const [internalComp, setInternalComp] = useState(false)
   const [orgMfc, setOrgMfc] = useState('')
+  const [infoHeading, setInfoHeading] = useState('')
+  const [infoText, setInfoText] = useState('')
+  const [infoUrl, setInfoUrl] = useState('')
+
+  const {
+    isOpen: isInfoOpen,
+    onOpen: onInfoOpen,
+    onClose: onInfoClose
+  } = useDisclosure()
 
   const product = userPermissions?.find((item) => item.key === 'view_product')
   const editControls = product?.supersededBy?.some(
@@ -77,10 +88,19 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
       })
   }
 
+  const onCheckMfc = useCallback(() => {
+    setInfoHeading(`Manufacturer`)
+    setInfoText(
+      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+    )
+    setInfoUrl(``)
+    onInfoOpen()
+  }, [onInfoOpen])
+
   useEffect(() => {
     if (data) {
       setProjectSettingId(data?.id || '')
-      setDataRetentionDays(data?.dataRetentionDays || '')
+      setDataRetentionDays(Number(data?.dataRetentionDays))
       setOrgMfc(data?.organizationManufacturer?.id || '')
     }
   }, [data])
@@ -191,7 +211,15 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
               </Select>
             </FormControl>
             <FormControl mt={4}>
-              <FormLabel>Manufacturer</FormLabel>
+              <FormLabel>
+                Manufacturer
+                <InfoIcon
+                  ml={2}
+                  color={'blue.500'}
+                  cursor={'pointer'}
+                  onClick={onCheckMfc}
+                />
+              </FormLabel>
               <Select
                 width={'400px'}
                 value={orgMfc}
@@ -288,6 +316,17 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
             </ModalFooter>
           </ModalContent>
         </Modal>
+      )}
+
+      {/* INFO MODAL */}
+      {isInfoOpen && (
+        <InfoModal
+          isOpen={isInfoOpen}
+          onClose={onInfoClose}
+          heading={infoHeading}
+          body={infoText}
+          url={infoUrl}
+        />
       )}
     </>
   )
