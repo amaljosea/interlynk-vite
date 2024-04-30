@@ -1,11 +1,13 @@
 // Chakra Imports
 import { useQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { parseJSONSafely, permissionList } from 'utils'
-import { getProductVersionDetailPageUrl } from 'utils/url'
-import { getProductDetailPageUrl } from 'utils/url'
+import { permissionList } from 'utils'
+import {
+  getProductDetailPageUrl,
+  getProductVersionDetailPageUrl
+} from 'utils/url'
 
 import {
   Breadcrumb,
@@ -29,8 +31,7 @@ import AdminNavbarLinks from './AdminNavbarLinks'
 export default function AdminNavbar(props) {
   const partsContext = usePartsContext()
   const navigate = useNavigate()
-  const { setActiveSbomTab, setActiveCsSbomTab, setUserPermissions } =
-    useGlobalState()
+  const { setActiveSbomTab, setUserPermissions } = useGlobalState()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   useQuery(GetUserPermissions, {
@@ -74,23 +75,12 @@ export default function AdminNavbar(props) {
   if (props.fixed === true)
     if (scrolled === true) {
       navbarPosition = 'fixed'
-      // navbarBg = useColorModeValue(
-      //   'linear-gradient(112.83deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.8) 110.84%)',
-      //   'linear-gradient(112.83deg, rgba(255, 255, 255, 0.21) 0%, rgba(255, 255, 255, 0) 110.84%)'
-      // )
-      // navbarBorder = useColorModeValue('#FFFFFF', 'rgba(255, 255, 255, 0.31)')
-      // navbarFilter = useColorModeValue(
-      //   'none',
-      //   'drop-shadow(0px 7px 23px rgba(0, 0, 0, 0.05))'
-      // )
     }
   if (props.secondary) {
-    // navbarBackdrop = 'none'
     navbarPosition = 'absolute'
     mainText = 'white'
     secondaryText = 'white'
     secondaryMargin = '22px'
-    // paddingX = '30px'
   }
 
   const { name: projectGroupName, projects } = useProjectGroup({
@@ -166,9 +156,6 @@ export default function AdminNavbar(props) {
                     productgroupid: params.productgroupid,
                     productid: params.productid
                   })}
-                  onClick={() => {
-                    localStorage.removeItem('currentSBOM')
-                  }}
                 >
                   {projectGroupName}
                 </Link>

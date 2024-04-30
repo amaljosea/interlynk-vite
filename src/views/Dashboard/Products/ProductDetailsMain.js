@@ -101,7 +101,6 @@ const ProductDetailsMain = () => {
     vexComplete
   } = prodVulnState
   const { prodVulnDispatch, globalVulnDispatch } = dispatch
-  // const group = JSON.stringify(localStorage.getItem('product'))
   const environment = localStorage.getItem('environment')
   const [activeEnv, setActiveEnv] = useState(productId || '')
 

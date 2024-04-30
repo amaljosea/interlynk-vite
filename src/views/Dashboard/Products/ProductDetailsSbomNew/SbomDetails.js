@@ -78,24 +78,6 @@ const SbomDetails = ({ sbomData, refetch }) => {
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const subProduct = (() => {
-    try {
-      return parseJSONSafely(localStorage.getItem('subProduct'))
-    } catch (error) {
-      console.log(error)
-      return null
-    }
-  })()
-  const currentProduct = (() => {
-    try {
-      return parseJSONSafely(localStorage.getItem('product'))
-    } catch (error) {
-      console.log(error)
-      return null
-    }
-  })()
-  const { name } = currentProduct ? currentProduct : {}
-  const currentSBOM = JSON.parse(localStorage.getItem(`currentSBOM`))
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -208,24 +190,21 @@ const SbomDetails = ({ sbomData, refetch }) => {
         <Flex direction={'column'} gap={0.5}>
           {/* PRODUCT TITLE */}
           <Stack direction={'column'} spacing={1} alignItems={'left'}>
-            {currentProduct &&
-              parts &&
-              currentSBOM &&
-              partsContext.latestPart && (
-                <Link to={partsContext.latestPart.url} onClick={handlePart}>
-                  <HStack>
-                    <FaAngleLeft size={18} color='#3182CE' />
-                    <Text
-                      fontWeight={'semibold'}
-                      fontSize={18}
-                      color={'blue.500'}
-                      textDecor={'underline'}
-                    >
-                      {partsContext.latestPart.projectGroupName}
-                    </Text>
-                  </HStack>
-                </Link>
-              )}
+            {projectId && parts && sbomId && partsContext.latestPart && (
+              <Link to={partsContext.latestPart.url} onClick={handlePart}>
+                <HStack>
+                  <FaAngleLeft size={18} color='#3182CE' />
+                  <Text
+                    fontWeight={'semibold'}
+                    fontSize={18}
+                    color={'blue.500'}
+                    textDecor={'underline'}
+                  >
+                    {partsContext.latestPart.projectGroupName}
+                  </Text>
+                </HStack>
+              </Link>
+            )}
             <Flex
               direction={'row'}
               alignItems={'center'}

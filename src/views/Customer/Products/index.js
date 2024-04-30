@@ -21,13 +21,6 @@ function Index() {
     if (productGroupId) {
       getProjectGroup({ variables: { id: productGroupId } }).then((res) => {
         if (res?.data) {
-          const group = res?.data?.shareLynkQuery?.projectGroup
-          const product = {
-            id: group?.id,
-            name: group?.name,
-            groupId: group?.id
-          }
-          localStorage.setItem('product', JSON.stringify(product))
           navigate(
             getProductDetailPageUrl({
               productgroupid: productGroupId,

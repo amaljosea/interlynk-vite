@@ -24,17 +24,16 @@ import { GetProjectGroup } from 'graphQL/Queries'
 const Filters = ({ data, refetch }) => {
   const params = useParams()
   const id = params.vulnerabilityid
+  const groupId = params.productgroupid
 
   const { totalRows, compVulnState, dispatch } = useGlobalState()
   const { searchInput, envs, statuses, versions, products, vexComplete } =
     compVulnState
   const { compVulnDispatch } = dispatch
 
-  const product = JSON.parse(localStorage.getItem('product'))
-
   const { data: project } = useQuery(GetProjectGroup, {
     skip: params?.name ? false : true,
-    variables: { id: product?.id }
+    variables: { id: groupId }
   })
 
   const onFilterVesion = async (value) => {

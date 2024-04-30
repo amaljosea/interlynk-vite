@@ -1,5 +1,5 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { envOrderList } from 'utils'
 
 import {
@@ -34,9 +34,6 @@ const StepOne = ({
 }) => {
   const { totalRows, prodState } = useGlobalState()
   const { enabled, field, direction } = prodState
-  const group = JSON.parse(localStorage.getItem('product'))
-
-  const [envName, setEnvName] = useState('')
 
   const { data } = useQuery(GetProjectGroups, {
     variables: {
@@ -68,7 +65,6 @@ const StepOne = ({
         (item) => item.id === currentProductId
       )
       setSelectedProd(currentProd?.id)
-      setEnvName(currentProd?.name)
       setProductId(currentProd?.id)
     }
   }, [])
@@ -83,8 +79,6 @@ const StepOne = ({
 
   const handleSelectProduct = (e) => {
     const { value } = e.target
-    const env = e.target.options[e.target.selectedIndex].text
-    setEnvName(env)
     setSelectedVersion('')
     setSelectedProd(value)
     setProductId(value)

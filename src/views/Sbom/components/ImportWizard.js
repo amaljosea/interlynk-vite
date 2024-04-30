@@ -1,6 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { Step, Steps, useSteps } from 'chakra-ui-steps'
 import { useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 import { Box, Button, Flex, useColorModeValue } from '@chakra-ui/react'
 
@@ -19,19 +20,20 @@ const ImportWizard = ({
   currentProductId,
   onClose
 }) => {
+  const params = useParams()
+  const groupId = params.productgroupid
+
   const [compVexImport] = useMutation(ComponentVulnVexImport)
 
   const { prodVulnState, dispatch } = useGlobalState()
   const { totalVulns, field, direction, selectedVulns } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const group = JSON.parse(localStorage.getItem('product'))
-
   const { nextStep, prevStep, activeStep } = useSteps({ initialStep: 0 })
 
   const [productId, setProductId] = useState('')
   const [sbomId, setSbomId] = useState('')
-  const [selectedGroup, setSelectedGroup] = useState(group?.groupId || '')
+  const [selectedGroup, setSelectedGroup] = useState(groupId || '')
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
   const [uniqVersions, setUniqVersions] = useState([])

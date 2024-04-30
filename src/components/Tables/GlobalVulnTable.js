@@ -52,7 +52,6 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const params = useParams()
   const projectGroupId = params.productgroupid
   const projectId = params.productid
-  const product = JSON.parse(localStorage.getItem('product'))
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const { globalVulnState, dispatch } = useGlobalState()

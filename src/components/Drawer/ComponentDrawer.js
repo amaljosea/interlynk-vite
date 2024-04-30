@@ -311,10 +311,6 @@ function ComponentDrawer(props) {
         setDisabled(false)
         if (isPrimary) {
           sbomRefetch({ projectId: productId, sbomId: sbomId })
-          localStorage.setItem(
-            'currentSBOM',
-            JSON.stringify({ version: compVersion, id: sbomId })
-          )
         }
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }

@@ -246,10 +246,6 @@ const VersionsTable = ({ projectGroup }) => {
   } = useDisclosure()
 
   const onFilterSev = async (id, version, value) => {
-    localStorage.setItem(
-      'currentSBOM',
-      JSON.stringify({ version: version, id: id })
-    )
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
     prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
   }
@@ -300,10 +296,6 @@ const VersionsTable = ({ projectGroup }) => {
           <Link
             to={link}
             onClick={() => {
-              localStorage.setItem(
-                'currentSBOM',
-                JSON.stringify({ version: projectVersion, id: id })
-              )
               prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
               setActiveSbomTab(0)
             }}
@@ -323,7 +315,7 @@ const VersionsTable = ({ projectGroup }) => {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
       selector: (row) => {
-        const { stats, id, projectVersion } = row
+        const { stats, id } = row
         return (
           <Link
             to={getProductVersionDetailPageUrl({
@@ -335,18 +327,7 @@ const VersionsTable = ({ projectGroup }) => {
               }
             })}
           >
-            <Tag
-              size='md'
-              variant='subtle'
-              width={16}
-              colorScheme={'blue'}
-              onClick={() => {
-                localStorage.setItem(
-                  'currentSBOM',
-                  JSON.stringify({ version: projectVersion, id: id })
-                )
-              }}
-            >
+            <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
               <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
             </Tag>
           </Link>

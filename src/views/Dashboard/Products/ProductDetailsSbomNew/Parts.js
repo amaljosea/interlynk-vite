@@ -74,9 +74,9 @@ const Parts = ({ sbomRefetch }) => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  console.log('PartsContext from page 1')
+  // console.log('PartsContext from page 1')
 
-  console.log('PartsContext from page', partsContext)
+  // console.log('PartsContext from page', partsContext)
 
   const { setActiveProdTab, totalRows, prodState, userPermissions, dispatch } =
     useGlobalState()
@@ -91,36 +91,7 @@ const Parts = ({ sbomRefetch }) => {
 
   const { sbomParts } = data?.sbom || ''
 
-  const group = JSON.parse(localStorage.getItem('product'))
-  const subProduct = (() => {
-    try {
-      return parseJSONSafely(localStorage.getItem('subProduct'))
-    } catch (error) {
-      console.log(error)
-      return null
-    }
-  })()
-  const currentSbom = (() => {
-    try {
-      return parseJSONSafely(localStorage.getItem('currentSBOM'))
-    } catch (error) {
-      console.log(error)
-      return null
-    }
-  })()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-
-  const filterData =
-    sbomParts?.length > 0 &&
-    sbomParts?.filter(
-      (item) =>
-        item?.part?.id !== currentSbom?.id &&
-        item?.part?.id !== subProduct?.sbomId &&
-        item?.part?.id !== subProduct?.childOne?.sbomId &&
-        item?.part?.id !== subProduct?.childTwo?.sbomId &&
-        item?.part?.id !== subProduct?.childThree?.sbomId &&
-        item?.part?.id !== subProduct?.childFour?.sbomId
-    )
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const updateSboms = sboms?.supersededBy?.some(
@@ -142,7 +113,6 @@ const Parts = ({ sbomRefetch }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [selectedGroup, setSelectedGroup] = useState('')
   const [envList, setEnvList] = useState([])
-  const [newPartExists, setNewPartExists] = useState(false)
 
   const { data: allProjects } = useQuery(GetProjectGroups, {
     skip: activeTab === 'parts' ? false : true,
@@ -178,7 +148,6 @@ const Parts = ({ sbomRefetch }) => {
   const [deleteSbomPart] = useMutation(SbomPartDelete)
 
   const handleCreatePart = async () => {
-    setNewPartExists(true)
     await createSbomPart({
       variables: { parentSbomId: sbomId, partSbomId: selectedVersion }
     })
@@ -191,7 +160,6 @@ const Parts = ({ sbomRefetch }) => {
         }
       })
       .finally(() => {
-        setNewPartExists(false)
         setSelectedGroup('')
         setSelectedProd('')
         setSelectedVersion('')
@@ -247,7 +215,6 @@ const Parts = ({ sbomRefetch }) => {
   const handleSelectProduct = (e) => {
     const { value } = e.target
     setSelectedProd(value)
-    const env = e.target.options[e.target.selectedIndex].text
     if (value === '') {
       setSelectedVersion('')
     } else {
@@ -349,7 +316,7 @@ const Parts = ({ sbomRefetch }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Text fontSize={14} my={2}>
+          <Text fontSize={14} my={2} textAlign='right'>
             {part?.projectVersion}
           </Text>
         )
@@ -616,15 +583,6 @@ const Parts = ({ sbomRefetch }) => {
 
           <Tooltip label='Add Part' placement='top'>
             <IconButton
-              display={
-                subProduct?.name &&
-                subProduct?.childOne?.name &&
-                subProduct?.childTwo?.name &&
-                subProduct?.childThree?.name &&
-                subProduct?.childFour?.name
-                  ? 'none'
-                  : 'flex'
-              }
               ref={addBtn}
               onClick={onOpen}
               icon={<AddIcon />}
@@ -645,14 +603,7 @@ const Parts = ({ sbomRefetch }) => {
         </Stack>
       </Flex>
     )
-  }, [
-    searchInput,
-    subProduct,
-    onOpen,
-    updateSboms,
-    signedUrlParams,
-    handleRefresh
-  ])
+  }, [searchInput, onOpen, updateSboms, signedUrlParams, handleRefresh])
 
   if (error) {
     return (
@@ -667,7 +618,7 @@ const Parts = ({ sbomRefetch }) => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={filterData}
+          data={sbomParts}
           customStyles={customStyles}
           persistTableHead
           subHeader

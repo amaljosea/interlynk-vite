@@ -147,13 +147,6 @@ const CheckModal = ({
               projectId: productId,
               sbomId: sbomId
             })
-            localStorage.setItem(
-              'currentSBOM',
-              JSON.stringify({
-                version: activeComp?.version,
-                id: sbomId
-              })
-            )
             onFilterRefetch()
             if (checkId) {
               healthRecheck({

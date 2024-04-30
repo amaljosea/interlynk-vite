@@ -444,7 +444,6 @@ const ProductTable = ({ data, refetch }) => {
             productgroupid: id,
             productid: env?.id || defaultProject?.id
           })
-          localStorage.setItem('product', JSON.stringify(product))
           localStorage.setItem('activeProdTab', 0)
           setActiveSbomTab(0)
           navigate(link)
@@ -482,11 +481,9 @@ const ProductTable = ({ data, refetch }) => {
       id: 'ENVIRONMENTS',
       name: 'ENVIRONMENTS',
       selector: (row) => {
-        const { id, name, projects } = row
-        const product = { id: id, name: name, groupId: id }
+        const { projects } = row
         const handleClick = (value) => {
           const env = projects?.find((item) => item.name === value)
-          localStorage.setItem('product', JSON.stringify(product))
           localStorage.setItem('environment', env?.name)
           localStorage.setItem('activeProdTab', 0)
           prodDispatch({

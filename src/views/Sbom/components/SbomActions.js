@@ -1,7 +1,7 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { useRef, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import ReactSelect from 'react-select'
 import { getProductVersionDetailPageUrl } from 'utils/url'
 import { getProductDetailPageUrl } from 'utils/url'
@@ -90,27 +90,16 @@ const SbomActions = ({ sbom, refetch }) => {
     (permission) => permission.key === 'sign_sbom' && permission.value === true
   )
 
-  const currentProduct = JSON.parse(localStorage.getItem(`product`))
-
   const navigate = useNavigate()
-  const location = useLocation()
   const params = useParams()
-
+  const groupId = params.productgroupid
   const productId = params.productid
   const sbomId = params.sbomid
-
-  const product = JSON.parse(localStorage.getItem('product'))
-  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const [status, setStatus] = useState('created')
   const [signedData, setSignedData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [selectedVersion, setSelectedVersion] = useState(null)
-
-  const urlParts = location.pathname.split('/')
-  const productIndex = urlParts.indexOf('products')
-  const productName =
-    productIndex !== -1 ? urlParts.slice(productIndex + 1).join('/') : ''
 
   const btnRef = useRef(null)
   const initialRef = useRef(null)
@@ -206,23 +195,8 @@ const SbomActions = ({ sbom, refetch }) => {
     await refetch({
       projectId: productId,
       sbomId: id
-    })
-      .then((res) => {
-        if (res.data) {
-          localStorage.setItem(
-            'currentSBOM',
-            JSON.stringify({
-              version: signedUrlParams
-                ? res?.data?.shareLynkQuery?.sbom?.projectVersion
-                : res?.data?.sbom?.projectVersion,
-              id: signedUrlParams
-                ? res?.data?.shareLynkQuery?.sbom?.id
-                : res?.data?.sbom?.id
-            })
-          )
-        }
-      })
-      .finally(() => {
+    }).then((res) => {
+      if (res.data) {
         const url = getProductVersionDetailPageUrl({
           productgroupid: params.productgroupid,
           productid: productId,
@@ -230,7 +204,8 @@ const SbomActions = ({ sbom, refetch }) => {
         })
         navigate(url)
         setActiveSbomTab(0)
-      })
+      }
+    })
   }
 
   const handleSBOMChange = (select) => {

@@ -471,7 +471,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
     {
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
-      selector: (row) => <p style={{ textWrap: 'pretty' }}>{row.version}</p>,
+      selector: (row) => <Text textAlign='right'>{row?.version}</Text>,
       width: '200px',
       wrap: true,
       sortable: true,

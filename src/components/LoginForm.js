@@ -49,7 +49,6 @@ const LoginForm = () => {
         console.log('response', response)
         const { status } = response.data
         if (status.code === 200) {
-          localStorage.removeItem('product')
           localStorage.setItem('username', status.data.user.name)
           localStorage.setItem('email', status.data.user.email)
           Cookies.set('authToken', response.headers.authorization)
