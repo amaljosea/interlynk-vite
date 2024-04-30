@@ -315,17 +315,15 @@ const General = ({ data, refetch, loading, error }) => {
                 </Flex>
               </Td>
               <Td pl={0}>
-                {!customerView && (
-                  <Button
-                    size='sm'
-                    isDisabled={
-                      status === 'signed' || !updateComponent || signedUrlParams
-                    }
-                    onClick={() => handleClick('tools')}
-                  >
-                    <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
-                  </Button>
-                )}
+                <Button
+                  size='sm'
+                  isDisabled={
+                    status === 'signed' || !updateComponent || signedUrlParams
+                  }
+                  onClick={() => handleClick('tools')}
+                >
+                  <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+                </Button>
               </Td>
             </Tr>
             {/* CREATED AT */}
@@ -369,17 +367,15 @@ const General = ({ data, refetch, loading, error }) => {
                 </Stack>
               </Td>
               <Td pl={0}>
-                {!customerView && (
-                  <Button
-                    size='sm'
-                    isDisabled={
-                      status === 'signed' || !updateComponent || signedUrlParams
-                    }
-                    onClick={() => handleClick('author')}
-                  >
-                    <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
-                  </Button>
-                )}
+                <Button
+                  size='sm'
+                  isDisabled={
+                    status === 'signed' || !updateComponent || signedUrlParams
+                  }
+                  onClick={() => handleClick('author')}
+                >
+                  <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+                </Button>
               </Td>
             </Tr>
             {/* SUPPLIERS */}
@@ -476,18 +472,16 @@ const General = ({ data, refetch, loading, error }) => {
                 </Flex>
               </Td>
               <Td pl={0}>
-                {!customerView && (
-                  <Button
-                    size='sm'
-                    ref={licenseBtn}
-                    isDisabled={
-                      status === 'signed' || !updateComponent || signedUrlParams
-                    }
-                    onClick={onLicenseOpen}
-                  >
-                    <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
-                  </Button>
-                )}
+                <Button
+                  size='sm'
+                  ref={licenseBtn}
+                  isDisabled={
+                    status === 'signed' || !updateComponent || signedUrlParams
+                  }
+                  onClick={onLicenseOpen}
+                >
+                  <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+                </Button>
               </Td>
             </Tr>
           </Tbody>
@@ -508,7 +502,7 @@ const General = ({ data, refetch, loading, error }) => {
       )}
 
       {/* SBOM LICENSE DRAWER */}
-      {isSBMOpen && data && !customerView && (
+      {isSBMOpen && data && (
         <Modal isOpen={isSBMOpen} onClose={onSBMClose}>
           <ModalOverlay />
           <ModalContent>
