@@ -1,7 +1,7 @@
 import { useLazyQuery } from '@apollo/client'
 import { useEffect } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { getFullDateAndTime, parseJSONSafely, timeSince } from 'utils'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { getFullDateAndTime, timeSince } from 'utils'
 import { getProductVersionDetailPageUrl } from 'utils/url'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
@@ -43,9 +43,6 @@ const SbomDetails = ({ sbomData, refetch }) => {
   const params = useParams()
   const projectId = params.productid
   const sbomId = params.sbomid
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const parts = queryParams.get('parts')
 
   const setActiveTab = (value) => {
     const link = getProductVersionDetailPageUrl({
@@ -162,7 +159,7 @@ const SbomDetails = ({ sbomData, refetch }) => {
         <Flex direction={'column'} gap={0.5}>
           {/* PRODUCT TITLE */}
           <Stack direction={'column'} spacing={1} alignItems={'left'}>
-            {projectId && parts && partsContext.latestPart && (
+            {projectId && partsContext.latestPart && (
               <Link to={partsContext.latestPart.url} onClick={handlePart}>
                 <HStack>
                   <FaAngleLeft size={18} color='#3182CE' />

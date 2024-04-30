@@ -83,7 +83,11 @@ export default function AdminNavbar(props) {
     secondaryMargin = '22px'
   }
 
-  const { name: projectGroupName, projects } = useProjectGroup({
+  const {
+    name: projectGroupName,
+    projects,
+    loading
+  } = useProjectGroup({
     projectGroupId: params.productgroupid
   })
 
@@ -132,21 +136,36 @@ export default function AdminNavbar(props) {
               <Link to={`/${path}/${category}`}>{category}</Link>
             </BreadcrumbItem>
 
-            {partsContext.parts.map((part, index) => {
-              return (
-                <BreadcrumbItem key={part.url} color={mainText}>
-                  <BreadcrumbLink
-                    onClick={() => {
-                      partsContext.goTo(index)
-                      navigate(part.url)
-                    }}
+            {!loading &&
+              partsContext.isParts &&
+              [
+                ...partsContext.parts,
+                {
+                  projectGroupName: projectGroupName,
+                  versionName: sbomHookData.versionName,
+                  url: null
+                }
+              ].map((part, index) => {
+                return (
+                  <BreadcrumbItem
+                    isCurrentPage={!!part.url}
+                    key={part.url}
+                    color={mainText}
                   >
-                    {part.projectGroupName} ({part.versionName})
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-              )
-            })}
-            {projectGroupName && (
+                    <BreadcrumbLink
+                      onClick={() => {
+                        if (part.url) {
+                          partsContext.goTo(index)
+                          navigate(part.url)
+                        }
+                      }}
+                    >
+                      {part.projectGroupName} ({part.versionName})
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                )
+              })}
+            {!partsContext.isParts && projectGroupName && (
               <BreadcrumbItem
                 color={mainText}
                 isCurrentPage={sbomId && sbomHookData?.version ? false : true}
@@ -161,7 +180,7 @@ export default function AdminNavbar(props) {
                 </Link>
               </BreadcrumbItem>
             )}
-            {sbomId && sbomHookData.versionName && (
+            {!partsContext.isParts && sbomId && sbomHookData.versionName && (
               <BreadcrumbItem
                 color={mainText}
                 isCurrentPage={parts ? false : true}
@@ -183,11 +202,12 @@ export default function AdminNavbar(props) {
               </BreadcrumbItem>
             )}
 
-            {((prodID && category === 'vulnerabilities') || vulnId) && (
-              <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink>{activeVuln || ''}</BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
+            {!partsContext.isParts &&
+              ((prodID && category === 'vulnerabilities') || vulnId) && (
+                <BreadcrumbItem color={mainText}>
+                  <BreadcrumbLink>{activeVuln || ''}</BreadcrumbLink>
+                </BreadcrumbItem>
+              )}
           </Breadcrumb>
         </GridItem>
         <GridItem colSpan={4} ml={'auto'}>

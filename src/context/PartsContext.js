@@ -19,26 +19,33 @@ export const useProductParts = () => {
 
   const partsQueryParam = queryParams.get('parts')
 
+  const isParts = partsQueryParam === 'true'
+
   const pop = () => {
     setParts(parts.slice(0, -1))
   }
 
   const push = () => {
-    setParts([
-      ...parts,
-      {
-        versionName,
-        projectGroupName,
-        url: getProductVersionDetailPageUrl({
-          productgroupid: params.productgroupid,
-          productid: params.productid,
-          sbomid: params.sbomid,
-          paramsObj: {
-            parts: true
-          }
-        })
+    const urlArgument = {
+      productgroupid: params.productgroupid,
+      productid: params.productid,
+      sbomid: params.sbomid
+    }
+
+    if (parts.length !== 0) {
+      urlArgument.paramsObj = {
+        parts: true
       }
-    ])
+    }
+
+    const url = getProductVersionDetailPageUrl(urlArgument)
+
+    const newPart = {
+      versionName,
+      projectGroupName,
+      url
+    }
+    setParts([...parts, newPart])
   }
 
   const goTo = (index) => {
@@ -46,19 +53,20 @@ export const useProductParts = () => {
   }
 
   useEffect(() => {
-    if (!partsQueryParam) {
+    if (!isParts) {
       setParts([])
     }
-    // only update when partsQueryParam change
+    // only update when isParts change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [partsQueryParam])
+  }, [isParts])
 
   return {
     latestPart: parts[parts.length - 1] || null,
     parts,
     pop,
     push,
-    goTo
+    goTo,
+    isParts
   }
 }
 
@@ -71,8 +79,6 @@ export const PartsContext = createContext({
 
 export const PartsContextWrapper = ({ children }) => {
   const value = useProductParts()
-
-  console.log('PartsContext:', value)
 
   return <PartsContext.Provider value={value}>{children}</PartsContext.Provider>
 }

@@ -37,7 +37,7 @@ export const GetProjectsCustomer = gql`
 
 export const useProjectGroup = ({ projectGroupId }) => {
   const isCustomer = checkIfCustomer()
-  const { data } = useQuery(
+  const { data, loading } = useQuery(
     isCustomer ? GetProjectsCustomer : GetProjectsVendor,
     {
       skip: !projectGroupId,
@@ -52,6 +52,7 @@ export const useProjectGroup = ({ projectGroupId }) => {
   return {
     projects: projectGroup?.projects || [],
     name: projectGroup?.name,
-    defaultProjectId: projectGroup?.defaultProject?.id
+    defaultProjectId: projectGroup?.defaultProject?.id,
+    loading
   }
 }
