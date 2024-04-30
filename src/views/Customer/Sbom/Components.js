@@ -1,30 +1,21 @@
 // Chakra imports
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { GetIcon, customStyles, getFullDateAndTime, timeSince } from 'utils'
 import { openSsf } from 'variables/general'
-import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
-import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import SupplierModal from 'views/Sbom/components/SupplierModal'
 
-import { AddIcon, RepeatIcon, ViewIcon } from '@chakra-ui/icons'
+import { RepeatIcon, ViewIcon } from '@chakra-ui/icons'
 import {
   Box,
-  Divider,
   Flex,
   Grid,
   GridItem,
   IconButton,
   Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
   Stack,
   Tag,
   TagCloseButton,
@@ -35,80 +26,33 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
+import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
-import GraphDrawer from 'components/Drawer/GraphDrawer'
-import LinksDrawer from 'components/Drawer/LinksDrawer'
-import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
+import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
-import {
-  GetCompFilterData,
-  GetComponentPath,
-  ShareCompFilters
-} from 'graphQL/Queries'
+import { ShareCompFilters, ShareComponentData } from 'graphQL/Queries'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
-import {
-  FaEllipsisV,
-  FaGlobe,
-  FaHouseUser,
-  FaLightbulb,
-  FaSitemap
-} from 'react-icons/fa'
+import { FaGlobe, FaHouseUser, FaLightbulb, FaSitemap } from 'react-icons/fa'
 
-import Pagination from '../Pagination'
+import CompFilters from './CompFilters'
 
-const ComponentTable = ({
-  lifecycle,
-  data,
-  refetch,
-  primaryComp,
-  sbomRefetch,
-  activeComp,
-  setActiveComp
-}) => {
-  const location = useLocation()
+const Components = ({ sbomData, sbomRefetch }) => {
   const params = useParams()
-  const customerView = location.pathname.startsWith('/customer')
   const productId = params.productid
   const sbomId = params.sbomid
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const activeTab = queryParams.get('tab')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  //This part is needed for the pagination to work. (Modify with caution)
-  const paginationSizes = [25, 50, 100]
 
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
-
-  const setPaginationControl = useCallback(
-    (data) => {
-      if (signedUrlParams) {
-        setIsPrevActive(
-          data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasPreviousPage
-        )
-        setIsNextActive(
-          data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasNextPage
-        )
-      } else {
-        setIsPrevActive(data?.sbom?.components?.pageInfo?.hasPreviousPage)
-        setIsNextActive(data?.sbom?.components?.pageInfo?.hasNextPage)
-      }
-    },
-    [signedUrlParams]
-  )
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
-  //end
-
-  const { userPermissions, totalRows, setTotalRows, prodCompState, dispatch } =
-    useGlobalState()
+  const { totalRows, setTotalRows, prodCompState, dispatch } = useGlobalState()
   const {
     field,
     direction,
@@ -120,40 +64,77 @@ const ComponentTable = ({
     suppliers,
     scope,
     filters,
-    direct,
-    totalComp
+    direct
   } = prodCompState
   const { prodCompDispatch } = dispatch
 
-  // GET COMPONENT FILTER HEADS
-  const { refetch: getCompFilters } = useQuery(
-    signedUrlParams ? ShareCompFilters : GetCompFilterData,
-    {
-      fetchPolicy: 'network-only',
-      variables: {
-        projectId: signedUrlParams ? undefined : productId,
-        sbomId: sbomId
-      },
-      onCompleted: (data) => {
-        prodCompDispatch({
-          type: 'ADD_FILTER_HEADS',
-          payload: signedUrlParams
-            ? data?.shareLynkQuery?.sbom?.filters
-            : data?.sbom?.filters
-        })
-      }
-    }
-  )
+  const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
+    value.includes(allValue) || value.length === 0 ? undefined : value
 
-  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const updateComponent = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom_components' && permission.value === true
-  )
-  const updateSboms = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom' && permission.value === true
-  )
+  const compData = useMemo(() => {
+    return {
+      ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
+      kind: getUndefinedIfEmptyOrAll(kinds),
+      licenses: getUndefinedIfEmptyOrAll(licenses),
+      supplierName: getUndefinedIfEmptyOrAll(suppliers),
+      primary: scope === 'primary' ? true : undefined,
+      internal: scope === 'internal' ? true : undefined,
+      direct: direct === true ? true : undefined
+    }
+  }, [direct, ecosystems, kinds, licenses, scope, suppliers])
+
+  // GET COMPONENT DATA
+  const { data, refetch, error } = useQuery(ShareComponentData, {
+    fetchPolicy: activeTab === 'components' ? false : true,
+    variables: {
+      sbomId: sbomId,
+      first: totalRows,
+      last: undefined,
+      search: searchInput !== '' ? searchInput : undefined,
+      ...compData,
+      field: field,
+      direction: direction
+    }
+  })
+
+  const { components } = data?.shareLynkQuery?.sbom || ''
+
+  const { primaryComponent } = sbomData || ''
+
+  // GET COMPONENT FILTER HEADS
+  const { refetch: getCompFilters } = useQuery(ShareCompFilters, {
+    fetchPolicy: activeTab === 'components' ? false : true,
+    variables: {
+      sbomId: sbomId
+    },
+    onCompleted: (data) => {
+      prodCompDispatch({
+        type: 'ADD_FILTER_HEADS',
+        payload: data?.shareLynkQuery?.sbom?.filters
+      })
+    }
+  })
+
+  //This part is needed for the pagination to work. (Modify with caution)
+  const paginationSizes = [25, 50, 100]
+
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+
+  const setPaginationControl = useCallback((data) => {
+    setIsPrevActive(
+      data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasPreviousPage
+    )
+    setIsNextActive(
+      data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasNextPage
+    )
+  }, [])
+
+  const disablePaginationControl = () => {
+    setIsPrevActive(false)
+    setIsNextActive(false)
+  }
+  //end
 
   const fetchCompData = useCallback(async () => {
     disablePaginationControl()
@@ -161,19 +142,10 @@ const ComponentTable = ({
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       search: searchInput !== '' ? searchInput : undefined,
-      ecosystem:
-        ecosystems.includes('all') || ecosystems.length === 0
-          ? undefined
-          : ecosystems,
-      kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses:
-        licenses.includes('all') || licenses.length === 0
-          ? undefined
-          : licenses,
-      supplierName:
-        suppliers.includes('all') || suppliers.length === 0
-          ? undefined
-          : suppliers,
+      ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
+      kind: getUndefinedIfEmptyOrAll(kinds),
+      licenses: getUndefinedIfEmptyOrAll(licenses),
+      supplierName: getUndefinedIfEmptyOrAll(suppliers),
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
       direct: direct === true ? true : undefined,
@@ -224,46 +196,11 @@ const ComponentTable = ({
     totalRows
   ])
 
-  const compBtn = useRef(null)
-  const linkRef = useRef(null)
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState('')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const [getComPath, { data: comPath }] = useLazyQuery(GetComponentPath)
-
-  const {
-    isOpen: isDelOpen,
-    onOpen: onDelOpen,
-    onClose: onDelClose
-  } = useDisclosure()
-  const {
-    isOpen: isGraphOpen,
-    onOpen: onGraphOpen,
-    onClose: onGraphClose
-  } = useDisclosure()
-  const {
-    isOpen: isSupOpen,
-    onOpen: onSupOpen,
-    onClose: onSupClose
-  } = useDisclosure()
-  const {
-    isOpen: isLinkOpen,
-    onOpen: onLinkOpen,
-    onClose: onLinkClose
-  } = useDisclosure()
-  const {
-    isOpen: isRelationOpen,
-    onOpen: onRelationOpen,
-    onClose: onRelationClose
-  } = useDisclosure()
-  const {
-    isOpen: isCompOpen,
-    onOpen: onCompOpen,
-    onClose: onCompClose,
-    onToggle: onCompToggle
-  } = useDisclosure()
   const {
     isOpen: isPurlOpen,
     onOpen: onPurlOpen,
@@ -274,41 +211,6 @@ const ComponentTable = ({
     onOpen: onCpeOpen,
     onClose: onCpeClose
   } = useDisclosure()
-
-  const onLicenseOpen = (row) => {
-    setActiveRow(row)
-    prodCompDispatch({ type: 'SET_LICENSES', payload: row })
-    onOpen()
-  }
-
-  const onCreateComponent = useCallback(() => {
-    prodCompDispatch({ type: 'CLEAR_LICENSES' })
-    onCompOpen()
-  }, [onCompOpen, prodCompDispatch])
-
-  const handleOpen = (row) => {
-    setActiveRow(row)
-    onRelationOpen()
-    getComPath({ variables: { compId: row.id, sbomId: sbomId } })
-  }
-
-  // ADD KEYBOARD SHORTCUT FOR TOGGLE COMPONENT DRAWER
-  const handleCompDown = useCallback(
-    (event) => {
-      if (event.altKey && event.key === '1') {
-        onCompToggle()
-      }
-    },
-    [onCompToggle]
-  )
-
-  // KEYBOARD EVENT LISTNER FOR COMPONENT DRAWER
-  useEffect(() => {
-    window.addEventListener('keydown', handleCompDown)
-    return () => {
-      window.removeEventListener('keydown', handleCompDown)
-    }
-  }, [handleCompDown])
 
   // COLUMNS
   const columns = [
@@ -612,91 +514,15 @@ const ComponentTable = ({
       id: 'action',
       name: 'ACTION',
       selector: (row) => {
-        const { suppliers, status, primary } = row
         return (
-          <>
-            {!customerView ? (
-              <Menu>
-                <MenuButton
-                  as={IconButton}
-                  aria-label='Options'
-                  icon={<FaEllipsisV />}
-                  variant='none'
-                  color='gray.400'
-                />
-                <Portal>
-                  <MenuList size='sm'>
-                    <MenuItem
-                      onClick={() => onLicenseOpen(row)}
-                      isDisabled={status === 'signed' || !updateComponent}
-                    >
-                      Edit Component
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => handleOpen(row)}
-                      isDisabled={!updateComponent}
-                    >
-                      Edit Relationships
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        setActiveRow(row)
-                        onSupOpen()
-                      }}
-                      isDisabled={status === 'signed' || !updateComponent}
-                    >
-                      {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        setActiveRow(row)
-                        onLinkOpen()
-                      }}
-                      isDisabled={status === 'signed' || !updateComponent}
-                    >
-                      Edit Links
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => handleGraphView(row)}
-                      isDisabled={
-                        status === 'signed' ||
-                        !updateComponent ||
-                        totalComp?.length === 1
-                      }
-                    >
-                      View Relationships
-                    </MenuItem>
-                    <Divider />
-                    {primary === false && (
-                      <MenuItem
-                        color='red'
-                        onClick={() => {
-                          setActiveRow(row)
-                          onDelOpen()
-                        }}
-                        isDisabled={
-                          status === 'signed' ||
-                          !updateComponent ||
-                          totalComp?.length === 1
-                        }
-                      >
-                        Delete
-                      </MenuItem>
-                    )}
-                  </MenuList>
-                </Portal>
-              </Menu>
-            ) : (
-              <IconButton
-                size='sm'
-                icon={<ViewIcon />}
-                onClick={() => {
-                  setActiveRow(row)
-                  onOpen()
-                }}
-              />
-            )}
-          </>
+          <IconButton
+            size='sm'
+            icon={<ViewIcon />}
+            onClick={() => {
+              setActiveRow(row)
+              onOpen()
+            }}
+          />
         )
       },
       wrap: true,
@@ -704,11 +530,6 @@ const ComponentTable = ({
       width: '120px'
     }
   ]
-
-  const handleGraphView = (row) => {
-    setActiveComp(row)
-    onGraphOpen()
-  }
 
   const [deleteSupplier] = useMutation(deleteComSupplier)
 
@@ -721,9 +542,24 @@ const ComponentTable = ({
             projectId: productId,
             sbomId: sbomId,
             first: totalRows,
+            last: undefined,
+            searchInput: searchInput === '' ? undefined : searchInput,
+            ...compData,
             field: field,
             direction: direction
-          }).then((res) => res && setPaginationControl(res.data))
+          }).then((res) => {
+            if (res?.data) {
+              setPaginationControl(res.data)
+              getCompFilters({ projectId: productId, sbomId }).then(
+                (res) =>
+                  res?.data &&
+                  prodCompDispatch({
+                    type: 'ADD_FILTER_HEADS',
+                    payload: res?.data?.sbom?.filters
+                  })
+              )
+            }
+          })
         }
       })
     } catch (error) {
@@ -988,25 +824,10 @@ const ComponentTable = ({
     setCompSearch('')
     disablePaginationControl()
     await refetch({
-      projectId: productId,
+      projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       search: undefined,
-      ecosystem:
-        ecosystems.includes('all') || ecosystems.length === 0
-          ? undefined
-          : ecosystems,
-      kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses:
-        licenses.includes('all') || licenses.length === 0
-          ? undefined
-          : licenses,
-      supplierName:
-        suppliers.includes('all') || suppliers.length === 0
-          ? undefined
-          : suppliers,
-      primary: scope === 'primary' ? true : undefined,
-      internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true : undefined,
+      ...compData,
       field: field,
       direction: direction,
       first: totalRows,
@@ -1020,19 +841,15 @@ const ComponentTable = ({
       }
     })
   }, [
-    direct,
+    compData,
     direction,
-    ecosystems,
     field,
-    kinds,
-    licenses,
     prodCompDispatch,
     productId,
     refetch,
     sbomId,
-    scope,
     setPaginationControl,
-    suppliers,
+    signedUrlParams,
     totalRows
   ])
 
@@ -1059,26 +876,11 @@ const ComponentTable = ({
           projectId: signedUrlParams ? undefined : productId,
           sbomId: sbomId,
           search: value,
-          ecosystem:
-            ecosystems.includes('all') || ecosystems.length === 0
-              ? undefined
-              : ecosystems,
-          kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-          licenses:
-            licenses.includes('all') || licenses.length === 0
-              ? undefined
-              : licenses,
-          supplierName:
-            suppliers.includes('all') || suppliers.length === 0
-              ? undefined
-              : suppliers,
-          primary: scope === 'primary' ? true : undefined,
-          internal: scope === 'internal' ? true : undefined,
-          direct: direct === true ? true : undefined,
           first: totalRows,
           last: undefined,
           after: undefined,
           before: undefined,
+          ...compData,
           field: field,
           direction: direction
         }).then((res) => {
@@ -1090,20 +892,15 @@ const ComponentTable = ({
       }
     },
     [
-      direct,
+      compData,
       direction,
-      ecosystems,
       field,
-      kinds,
-      licenses,
       prodCompDispatch,
       productId,
       refetch,
       sbomId,
-      scope,
       setPaginationControl,
       signedUrlParams,
-      suppliers,
       totalRows
     ]
   )
@@ -1152,44 +949,15 @@ const ComponentTable = ({
             onChange={onSearchInputChange}
           />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && (
-            <CompFilterMenu
-              refetch={refetch}
-              productId={productId}
-              sbomId={sbomId}
-            />
-          )}
+          {filters && <CompFilters />}
         </Stack>
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={2}
-          justifyContent={'flex-end'}
-        >
-          {/* CREATE COMPONENT */}
-          <Tooltip label='Add Component'>
-            <IconButton
-              ref={compBtn}
-              onClick={onCreateComponent}
-              icon={<AddIcon />}
-              colorScheme='blue'
-              variant='solid'
-              fontWeight='normal'
-              fontSize={'sm'}
-              hidden={signedUrlParams}
-              isDisabled={
-                lifecycle === 'signed' || !updateComponent || !updateSboms
-              }
-            />
-          </Tooltip>
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={fetchCompData}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            />
-          </Tooltip>
-        </Stack>
+        <Tooltip label='Refresh'>
+          <IconButton
+            onClick={fetchCompData}
+            colorScheme='blue'
+            icon={<RepeatIcon />}
+          />
+        </Tooltip>
       </Flex>
     )
   }, [
@@ -1198,14 +966,6 @@ const ComponentTable = ({
     handleClear,
     onSearchInputChange,
     filters,
-    refetch,
-    productId,
-    sbomId,
-    onCreateComponent,
-    signedUrlParams,
-    lifecycle,
-    updateComponent,
-    updateSboms,
     fetchCompData
   ])
 
@@ -1219,22 +979,7 @@ const ComponentTable = ({
       last: before ? totalRows : undefined,
       before: before ? before : undefined,
       search: searchInput !== '' ? searchInput : undefined,
-      ecosystem:
-        ecosystems.includes('all') || ecosystems.length === 0
-          ? undefined
-          : ecosystems,
-      kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses:
-        licenses.includes('all') || licenses.length === 0
-          ? undefined
-          : licenses,
-      supplierName:
-        suppliers.includes('all') || suppliers.length === 0
-          ? undefined
-          : suppliers,
-      primary: scope === 'primary' ? true : undefined,
-      internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true : undefined,
+      ...compData,
       field: field,
       direction: direction
     }).then((res) => {
@@ -1245,83 +990,62 @@ const ComponentTable = ({
   }
 
   const handleSort = async (column, sortDirection) => {
-    disablePaginationControl()
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      search: searchInput !== '' ? searchInput : undefined,
-      ecosystem:
-        ecosystems.includes('all') || ecosystems.length === 0
-          ? undefined
-          : ecosystems,
-      kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses:
-        licenses.includes('all') || licenses.length === 0
-          ? undefined
-          : licenses,
-      supplierName:
-        suppliers.includes('all') || suppliers.length === 0
-          ? undefined
-          : suppliers,
-      primary: scope === 'primary' ? true : undefined,
-      internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true : undefined,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res?.data)
-        prodCompDispatch({
-          type: 'SET_SORT_ORDER',
-          payload: {
-            field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-          }
-        })
+    prodCompDispatch({
+      type: 'SET_SORT_ORDER',
+      payload: {
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
       }
     })
   }
 
   const handlePreviousPage = async () => {
     disablePaginationControl()
-    handleRefetch(null, data.pageInfo.startCursor)
+    handleRefetch(null, components?.pageInfo?.startCursor)
     prodCompDispatch({
       type: 'DECREMENT_PAGE',
-      payload: data.pageInfo.startCursor
+      payload: components?.pageInfo?.startCursor
     })
   }
 
   const handleNextPage = async () => {
     disablePaginationControl()
-    handleRefetch(data.pageInfo.endCursor, null)
+    handleRefetch(components?.pageInfo?.endCursor, null)
     prodCompDispatch({
       type: 'INCREMENT_PAGE',
-      payload: { total: data.totalCount, after: data.pageInfo.endCursor }
+      payload: {
+        total: components?.totalCount,
+        after: components?.pageInfo?.endCursor
+      }
     })
   }
 
   useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
+    if (components) {
+      setIsPrevActive(components?.pageInfo?.hasPreviousPage)
+      setIsNextActive(components?.pageInfo?.hasNextPage)
     }
-  }, [data])
+  }, [components])
+
+  if (error) {
+    return (
+      <Card>
+        <Text>Something went wrong</Text>
+      </Card>
+    )
+  }
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'} height={'auto'}>
         <DataTable
           columns={columns}
-          data={data && data.nodes}
+          data={components?.nodes}
           onSort={handleSort}
           customStyles={customStyles}
           defaultSortAsc={false}
           defaultSortFieldId={field}
-          progressPending={data ? false : true}
+          progressPending={components ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
@@ -1334,12 +1058,12 @@ const ComponentTable = ({
       </Flex>
 
       {/* PAGINATION */}
-      {data?.pageInfo && (
+      {components?.pageInfo && (
         <Pagination
           paginationSizes={paginationSizes}
           pageIndex={pageIndex}
           totalRows={totalRows}
-          totalCount={data.totalCount}
+          totalCount={components?.totalCount}
           onPreviousPage={handlePreviousPage}
           onNextPage={handleNextPage}
           onSetRow={handleSetRow}
@@ -1348,92 +1072,17 @@ const ComponentTable = ({
         />
       )}
 
-      {isGraphOpen && activeComp && (
-        <GraphDrawer
-          isOpen={isGraphOpen}
-          onClose={onGraphClose}
-          primaryComp={null}
-          activeComp={activeComp}
-        />
-      )}
-
-      {/* ACTIONS */}
-      {activeRow !== null && (
-        <>
-          {isOpen && (
-            <ComponentDrawer
-              data={activeRow}
-              isOpen={isOpen}
-              onClose={onClose}
-              sbomRefetch={sbomRefetch}
-              fetchCompData={fetchCompData}
-              filterRefetch={getCompFilters}
-              shortDesc={null}
-              checkId={null}
-              primaryComp={primaryComp}
-            />
-          )}
-
-          {isDelOpen && (
-            <ComponentModal
-              isOpen={isDelOpen}
-              onClose={onDelClose}
-              id={activeRow.id}
-              sbomRefetch={sbomRefetch}
-              fetchCompData={fetchCompData}
-            />
-          )}
-
-          {isSupOpen && (
-            <SupplierModal
-              id={activeRow.id}
-              refetch={fetchCompData}
-              filterRefetch={getCompFilters}
-              isOpen={isSupOpen}
-              onClose={onSupClose}
-              data={activeRow}
-              shortDesc={null}
-              checkId={null}
-            />
-          )}
-
-          {isLinkOpen && (
-            <LinksDrawer
-              component={activeRow}
-              btnRef={linkRef}
-              isOpen={isLinkOpen}
-              onClose={onLinkClose}
-              fetchCompData={fetchCompData}
-              productId={productId}
-              sbomId={sbomId}
-            />
-          )}
-
-          {isRelationOpen && comPath && (
-            <RelationshipDrawer
-              isOpen={isRelationOpen}
-              onClose={onRelationClose}
-              data={activeRow}
-              compPath={comPath.component.pathToPrimary}
-              total={totalComp}
-              fetchCompData={fetchCompData}
-            />
-          )}
-        </>
-      )}
-
-      {/* COMPONENT DRAWER */}
-      {isCompOpen && (
+      {isOpen && (
         <ComponentDrawer
-          isOpen={isCompOpen}
-          onClose={onCompClose}
+          data={activeRow}
+          isOpen={isOpen}
+          onClose={onClose}
+          sbomRefetch={sbomRefetch}
           fetchCompData={fetchCompData}
           filterRefetch={getCompFilters}
-          sbomRefetch={sbomRefetch}
-          primaryComp={primaryComp}
           shortDesc={null}
           checkId={null}
-          data={null}
+          primaryComp={primaryComponent}
         />
       )}
 
@@ -1456,4 +1105,4 @@ const ComponentTable = ({
   )
 }
 
-export default ComponentTable
+export default Components

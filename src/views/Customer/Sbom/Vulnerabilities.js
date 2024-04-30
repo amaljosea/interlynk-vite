@@ -3,13 +3,13 @@ import { useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
+import { useLocation, useParams } from 'react-router-dom'
 import { getFullDateAndTime, sevColor, timeSince } from 'utils'
 import { customStyles } from 'utils'
 import { linkURl } from 'utils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import VulnFilterMenu from 'views/Sbom/components/VulnFilterMenu'
 
 import {
   ChevronDownIcon,
@@ -32,6 +32,11 @@ import {
   Icon,
   IconButton,
   Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
   Skeleton,
   Stack,
   Tag,
@@ -43,20 +48,32 @@ import {
   useToast
 } from '@chakra-ui/react'
 
+import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
+import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import CvssCard from 'components/Misc/CvssCard'
+import Pagination from 'components/Pagination'
+import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { ManualVulnScan } from 'graphQL/Mutation'
-import { GetVulnFilterData } from 'graphQL/Queries'
-import { FirstDegreePartVulns } from 'graphQL/Queries'
-import { ShareVulnFilters } from 'graphQL/Queries'
+import {
+  FirstDegreePartVulns,
+  ShareVulnData,
+  ShareVulnFilters
+} from 'graphQL/Queries'
 
+import {
+  FaEllipsisV,
+  FaGlobe,
+  FaHouseUser,
+  FaLightbulb,
+  FaSitemap
+} from 'react-icons/fa'
 import { FaBug, FaCopy, FaPen } from 'react-icons/fa6'
 
-import Pagination from '../Pagination'
-import VexStatusComponent from '../VulnerabilityVex/VexStatusComponent'
+import VulnFilters from './VulnFilters'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -72,13 +89,7 @@ const statusColor = (status) => {
   }
 }
 
-const ExpandedComponent = ({
-  data,
-  setActiveRow,
-  onCvssOpen,
-  textColor,
-  filteredData
-}) => {
+const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
   const { vuln } = data
   const CustomText = styled(Text)`
     font-size: 13px;
@@ -201,33 +212,98 @@ const ExpandedComponent = ({
         </GridItem>
         {/* STATUS UPDATE */}
         <GridItem w='100%' colSpan={3}>
-          {data && (
-            <VexStatusComponent data={data} fixedVersions={filteredData} />
-          )}
+          {data && <VexStatusComponent data={data} />}
         </GridItem>
       </Grid>
     </Box>
   )
 }
 
-const VulnTable = ({
-  data,
-  sbomData,
-  refetch,
-  productId,
-  sbomId,
-  filteredData,
-  sbomRefetch
-}) => {
+const Vulnerabilities = ({ sbomData }) => {
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const activeTab = queryParams.get('tab')
+
+  const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } =
+    useGlobalState()
+  const {
+    pageIndex,
+    field,
+    direction,
+    searchInput,
+    severities,
+    components,
+    statues,
+    source,
+    include,
+    kev,
+    epss,
+    filters,
+    direct,
+    retracted,
+    vexComplete
+  } = prodVulnState
+  const { prodVulnDispatch } = dispatch
+
+  const vulnsPermissions = useMemo(
+    () => userPermissions?.find((item) => item.key === 'view_feeds'),
+    [userPermissions]
+  )
+
+  useEffect(() => {
+    if (sbomData?.sbom?.sbomParts?.length > 0) {
+      prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
+    }
+  }, [prodVulnDispatch, sbomData?.sbom?.sbomParts?.length])
+
+  const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
+
+  const range = {
+    min: parseFloat(vulnEpss[0]) / 100,
+    max: parseFloat(vulnEpss[1]) / 100
+  }
+
+  // GET VULN DATA
+  const { data, refetch, error } = useQuery(ShareVulnData, {
+    skip: sbomId && activeTab === 'vulnerabilities' ? false : true,
+    variables: {
+      sbomId: sbomId,
+      first: totalRows,
+      search: vulnSearch !== '' ? vulnSearch : undefined,
+      severity: severities.length > 0 ? severities : undefined,
+      source: include.includes('parts') ? undefined : 'COMPONENT',
+      componentName: components.length > 0 ? components : undefined,
+      status: statues.length > 0 ? statues : undefined,
+      kev:
+        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
+      epss: epss !== '' && epss !== 'all' ? range : undefined,
+      direct: direct === 'direct only' ? true : undefined,
+      includeRetracted: include.includes('retracted') ? true : false,
+      vexComplete: vexComplete === 'all' ? undefined : false,
+      field: prodVulnState.field,
+      direction: prodVulnState.direction
+    }
+  })
+
+  const { vulns } = data?.shareLynkQuery?.sbom || ''
+
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const firstDegreePart = data?.nodes?.filter(
+  const firstDegreePart = vulns?.nodes?.filter(
     (item) => item.isFirstDegreePart === true
   )
   const componentVulnIds = firstDegreePart?.map((item) => item?.id)
   const sbomIds = firstDegreePart?.map((item) => item?.component?.sbom?.id)
 
   useQuery(FirstDegreePartVulns, {
-    skip: firstDegreePart && !signedUrlParams ? false : true,
+    skip:
+      firstDegreePart?.length > 0 &&
+      !signedUrlParams &&
+      activeTab === 'vulnerabilities'
+        ? false
+        : true,
     variables: { sbomIds, componentVulnIds },
     onCompleted: (data) => console.log('Parts', data)
   })
@@ -238,9 +314,6 @@ const VulnTable = ({
   const textColor = useColorModeValue('gray.700', 'white')
   const [activeRow, setActiveRow] = useState(null)
   const [vulnSearch, setVulnSearch] = useState('')
-  const [toggleClear, setToggleClear] = useState(false)
-  const [selectedVulns, setSelectedVulns] = useState([])
-  const [selectedGroup, setSelectedGroup] = useState('')
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
@@ -268,73 +341,23 @@ const VulnTable = ({
 
   //end
 
-  const toast = useToast()
-
-  const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } =
-    useGlobalState()
-  const {
-    pageIndex,
-    field,
-    direction,
-    searchInput,
-    severities,
-    components,
-    statues,
-    source,
-    kev,
-    epss,
-    filters,
-    direct,
-    retracted,
-    vexComplete
-  } = prodVulnState
-  const { prodVulnDispatch } = dispatch
-
   // GET VULN FILTER HEADS
-  useQuery(signedUrlParams ? ShareVulnFilters : GetVulnFilterData, {
-    fetchPolicy: 'cache-first',
+  useQuery(ShareVulnFilters, {
     variables: {
-      projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId
     },
     onCompleted: (data) => {
       prodVulnDispatch({
         type: 'ADD_FILTER_HEADS',
-        payload: signedUrlParams
-          ? data?.shareLynkQuery?.sbom?.filters
-          : data?.sbom?.filters
+        payload: data?.shareLynkQuery?.sbom?.filters
       })
     }
   })
 
-  const [onVulnScan] = useMutation(ManualVulnScan, {
-    fetchPolicy: 'network-only'
-  })
-
-  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const editVulns = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'edit_vulnerabilities' && permission.value === true
-  )
-
-  const handleChange = (state) => {
-    console.log('state', state)
-    setSelectedVulns(state?.selectedRows)
-    setSelectedGroup(
-      state?.selectedRows[0]?.component?.sbom?.project?.projectGroup?.id
-    )
-  }
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
   const {
     isOpen: isCvssOpen,
     onOpen: onCvssOpen,
     onClose: onCvssClose
-  } = useDisclosure()
-  const {
-    isOpen: isTableOpen,
-    onOpen: onTableOpen,
-    onClose: onTableClose
   } = useDisclosure()
 
   const cvssColor = (cvss) => {
@@ -357,7 +380,20 @@ const VulnTable = ({
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vuln, isPart, component } = row
+        const { vuln, isPart, component, externalUrls, currentExternalUrls } =
+          row
+        const website =
+          externalUrls?.find((item) => item.name === 'website') ||
+          currentExternalUrls?.find((item) => item.name === 'website')
+        const distribution =
+          externalUrls?.find((item) => item.name === 'distribution') ||
+          currentExternalUrls?.find((item) => item.name === 'distribution')
+        const issueTracker =
+          externalUrls?.find((item) => item.name === 'issue-tracker') ||
+          currentExternalUrls?.find((item) => item.name === 'issue-tracker')
+        const vcs =
+          externalUrls?.find((item) => item.name === 'vcs') ||
+          currentExternalUrls?.find((item) => item.name === 'vcs')
         const { sbom } = component
         const { projectVersion, project } = sbom
         const { vulnInfo } = vuln
@@ -387,6 +423,61 @@ const VulnTable = ({
                   {project?.projectGroup?.name || ''} : {projectVersion || ''}
                 </Text>
               )}
+              {/* EXTERNAL REFERENCE */}
+              <Stack direction={'row'} alignItems={'center'}>
+                {/* WEBSITE */}
+                <Tooltip placement='top' label={website?.url}>
+                  <Link href={website?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      isDisabled={!website}
+                      colorScheme='gray'
+                      icon={<FaGlobe fontSize={16} />}
+                    />
+                  </Link>
+                </Tooltip>
+                {/* DISTRIBUTION */}
+                <Tooltip placement='top' label={vcs?.url}>
+                  <Link href={vcs?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      colorScheme='gray'
+                      isDisabled={!vcs}
+                      icon={<FaSitemap fontSize={16} />}
+                    />
+                  </Link>
+                </Tooltip>
+                {/* ADVISORIES */}
+                <Tooltip placement='top' label={issueTracker?.url}>
+                  <Link href={issueTracker?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      colorScheme='gray'
+                      isDisabled={!issueTracker}
+                      icon={<FaHouseUser fontSize={16} />}
+                    />
+                  </Link>
+                </Tooltip>
+                {/* SUPPORT */}
+                <Tooltip placement='top' label={distribution?.url}>
+                  <Link href={distribution?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      isDisabled={!distribution}
+                      colorScheme='gray'
+                      icon={<FaLightbulb fontSize={16} />}
+                    />
+                  </Link>
+                </Tooltip>
+              </Stack>
               {kev === true && (
                 <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
                   KEV
@@ -638,7 +729,6 @@ const VulnTable = ({
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}
-            width={'150px'}
             textAlign={'right'}
           >
             {timeSince(row.vuln.updatedAt)}
@@ -651,35 +741,54 @@ const VulnTable = ({
         const dateB = new Date(b.vuln.updatedAt)
         return dateA - dateB // Sort in descending order
       },
+      minWidth: '150px',
       wrap: true,
       right: 'true'
     }
   ]
 
-  const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
-
-  const vulnData = {
-    sbomId: sbomId,
-    includeRetracted: retracted,
-    projectId: signedUrlParams ? undefined : productId,
-    vexComplete: vexComplete === true ? true : undefined,
-    search: searchInput !== '' ? searchInput : undefined,
-    source: source === true ? undefined : 'COMPONENT',
-    severity: severities.length > 0 ? severities : undefined,
-    componentName: components.length > 0 ? components : undefined,
-    status: statues.length > 0 ? statues : undefined,
-    kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
-    epss:
-      epss !== '' && epss !== 'all'
-        ? {
-            min: parseFloat(vulnEpss[0]) / 100,
-            max: parseFloat(vulnEpss[1]) / 100
-          }
-        : undefined,
-    direct: direct === true ? true : undefined,
-    field: field,
-    direction: direction
-  }
+  const vulnData = useMemo(() => {
+    return {
+      sbomId: sbomId,
+      includeRetracted: retracted,
+      projectId: signedUrlParams ? undefined : productId,
+      vexComplete: vexComplete === true ? true : undefined,
+      search: searchInput !== '' ? searchInput : undefined,
+      source: source === true ? undefined : 'COMPONENT',
+      severity: severities.length > 0 ? severities : undefined,
+      componentName: components.length > 0 ? components : undefined,
+      status: statues.length > 0 ? statues : undefined,
+      kev:
+        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
+      epss:
+        epss !== '' && epss !== 'all'
+          ? {
+              min: parseFloat(vulnEpss[0]) / 100,
+              max: parseFloat(vulnEpss[1]) / 100
+            }
+          : undefined,
+      direct: direct === true ? true : undefined,
+      field: field,
+      direction: direction
+    }
+  }, [
+    components,
+    direct,
+    direction,
+    epss,
+    field,
+    kev,
+    productId,
+    retracted,
+    sbomId,
+    searchInput,
+    severities,
+    signedUrlParams,
+    source,
+    statues,
+    vexComplete,
+    vulnEpss
+  ])
 
   // CLEAR SERACH
   const handleClear = useCallback(async () => {
@@ -814,45 +923,6 @@ const VulnTable = ({
     ]
   )
 
-  // SCAN VULN
-  const handleScan = useCallback(async () => {
-    disablePaginationControl()
-    await onVulnScan({
-      variables: { id: sbomId }
-    }).then((res) => {
-      if (sbomData?.vulnRunStatus === 'IN_PROGRESS') {
-        toast({
-          description: 'A scan is in-progress',
-          position: 'top',
-          status: 'info',
-          duration: 5000
-        })
-      } else {
-        if (res.data) {
-          toast({
-            description: 'Vulnerability re-scan started',
-            position: 'top',
-            status: 'success',
-            duration: 5000
-          })
-          sbomRefetch({ projectId: productId, sbomId: sbomId }).then(
-            (res) => res && setPaginationControl(res?.data)
-          )
-          prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        }
-      }
-    })
-  }, [
-    onVulnScan,
-    prodVulnDispatch,
-    productId,
-    sbomData?.vulnRunStatus,
-    sbomId,
-    sbomRefetch,
-    setPaginationControl,
-    toast
-  ])
-
   const handleRefresh = useCallback(() => {
     disablePaginationControl()
     refetch({ projectId: productId, sbomId: sbomId }).then((res) => {
@@ -884,11 +954,7 @@ const VulnTable = ({
           />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {filters ? (
-            <VulnFilterMenu
-              refetch={refetch}
-              productId={productId}
-              sbomId={sbomId}
-            />
+            <VulnFilters />
           ) : (
             <Stack direction='row' spacing={4}>
               {[1, 2, 3, 4].map((_, index) => (
@@ -897,74 +963,26 @@ const VulnTable = ({
             </Stack>
           )}
         </Flex>
-        <Stack direction='row' alignItems={'center'} width={'fit-content'}>
-          {/* UPDATE STATUES */}
-          {selectedVulns.length > 0 && (
-            <Tooltip label={'Set Status'}>
-              <IconButton
-                colorScheme='blue'
-                onClick={onOpen}
-                hidden={signedUrlParams}
-                icon={<FaPen />}
-              />
-            </Tooltip>
-          )}
-          {/* SCAN VULN */}
-          <Tooltip label={'Scan Vulnerabilities'}>
-            <IconButton
-              colorScheme='blue'
-              onClick={handleScan}
-              hidden={signedUrlParams}
-              icon={<FaBug />}
-            />
-          </Tooltip>
-          {/* IMPORT STATUS */}
-          <Tooltip label='Import Statuses'>
-            <IconButton
-              variant='solid'
-              colorScheme='blue'
-              fontWeight='normal'
-              fontSize={'sm'}
-              onClick={() => {
-                prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
-                onTableOpen()
-              }}
-              hidden={signedUrlParams}
-              isDisabled={!editVulns}
-              icon={<FaCopy size={18} />}
-            />
-          </Tooltip>
-          {/* REFRESH */}
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={handleRefresh}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            />
-          </Tooltip>
-        </Stack>
+        {/* REFRESH */}
+        <Tooltip label='Refresh'>
+          <IconButton
+            onClick={handleRefresh}
+            colorScheme='blue'
+            icon={<RepeatIcon />}
+          />
+        </Tooltip>
       </Flex>
     )
   }, [
-    vulnSearch,
-    onSearchInputChange,
-    handleSearch,
-    handleClear,
     filters,
-    refetch,
-    productId,
-    sbomId,
-    selectedVulns.length,
-    onOpen,
-    signedUrlParams,
-    handleScan,
-    editVulns,
+    handleClear,
     handleRefresh,
-    prodVulnDispatch,
-    onTableOpen
+    handleSearch,
+    onSearchInputChange,
+    vulnSearch
   ])
 
-  const handlePreviousPage = async () => {
+  const handlePreviousPage = useCallback(async () => {
     disablePaginationControl()
     setIsPrevActive(false)
     await refetch({
@@ -972,149 +990,109 @@ const VulnTable = ({
       first: undefined,
       last: totalRows,
       after: undefined,
-      before: data.pageInfo.startCursor
+      before: vulns.pageInfo.startCursor
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res?.data)
         prodVulnDispatch({
           type: 'DECREMENT_PAGE',
-          payload: data.pageInfo.startCursor
+          payload: vulns.pageInfo.startCursor
         })
       }
     })
-  }
+  }, [
+    vulns?.pageInfo?.startCursor,
+    prodVulnDispatch,
+    refetch,
+    setPaginationControl,
+    totalRows,
+    vulnData
+  ])
 
-  const handleNextPage = async () => {
+  const handleNextPage = useCallback(async () => {
     disablePaginationControl()
     setIsNextActive(false)
     await refetch({
       ...vulnData,
       first: totalRows,
       last: undefined,
-      after: data.pageInfo.endCursor,
+      after: vulns.pageInfo.endCursor,
       before: undefined
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res?.data)
         prodVulnDispatch({
           type: 'INCREMENT_PAGE',
-          payload: { total: data.totalCount, after: data.pageInfo.endCursor }
-        })
-      }
-    })
-  }
-
-  const handleSort = async (column, sortDirection) => {
-    disablePaginationControl()
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      signedParams: undefined,
-      search: searchInput !== '' ? searchInput : undefined,
-      source: source === true ? undefined : 'COMPONENT',
-      severity:
-        !severities.includes('all') && severities.length > 0
-          ? severities
-          : undefined,
-      componentName:
-        !components.includes('all') && components.length > 0
-          ? components
-          : undefined,
-      status:
-        !statues.includes('all') && statues.length > 0 ? statues : undefined,
-      kev:
-        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
-      epss:
-        epss === 'all' || epss === '0-0' || epss === ''
-          ? undefined
-          : {
-              min: parseFloat(vulnEpss[0]) / 100,
-              max: parseFloat(vulnEpss[1]) / 100
-            },
-      direct: direct === true ? true : undefined,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-        prodVulnDispatch({
-          type: 'SET_SORT_ORDER',
           payload: {
-            field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+            total: vulns.totalCount,
+            after: vulns?.pageInfo?.endCursor
           }
         })
-        window.scrollTo({ top: 0, behavior: 'smooth' })
       }
     })
+  }, [
+    prodVulnDispatch,
+    refetch,
+    setPaginationControl,
+    totalRows,
+    vulnData,
+    vulns?.pageInfo?.endCursor,
+    vulns?.totalCount
+  ])
+
+  const handleSort = (column, sortDirection) => {
+    prodVulnDispatch({
+      type: 'SET_SORT_ORDER',
+      payload: {
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   // SET ROW LENGTH
-  const handleSetRow = async (e) => {
-    disablePaginationControl()
-    setTotalRows(Number(e.target.value))
-    await refetch({
-      ...vulnData,
-      first: Number(e.target.value),
-      last: undefined,
-      after: undefined,
-      before: undefined
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-        prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      }
-    })
-  }
-
-  // const handleSelect = (row) => {
-  //   const { componentVulnLogs, vexStatus, vexJustification, cdxResponse } = row
-  //   const item = componentVulnLogs[componentVulnLogs?.length - 1]
-  //   prodVulnDispatch({
-  //     type: 'ON_CHANGE_STATUS',
-  //     payload: { value: vexStatus?.id || '', name: vexStatus?.name || '' }
-  //   })
-  //   prodVulnDispatch({
-  //     type: 'ON_CHANGE_JUSTIFICATION',
-  //     payload: {
-  //       value: vexJustification?.id || '',
-  //       name: item?.justification || ''
-  //     }
-  //   })
-  //   prodVulnDispatch({
-  //     type: 'ON_CHANGE_RESPONSE',
-  //     payload: {
-  //       value: cdxResponse?.id || '',
-  //       name: item?.response ? capitalizeFirstLetter(item?.response) : ''
-  //     }
-  //   })
-  //   prodVulnDispatch({
-  //     type: 'SET_ACTION_STMT',
-  //     payload: item?.actionStmt || ''
-  //   })
-  //   prodVulnDispatch({ type: 'SET_SELECTED_TAG', payload: item?.fixedIn || '' })
-  //   prodVulnDispatch({ type: 'SET_DETAILS', payload: item?.detail || '' })
-  //   prodVulnDispatch({ type: 'SET_NOTES', payload: item?.note || '' })
-  //   prodVulnDispatch({ type: 'SET_IMPACT_DATA', payload: item?.impact || '' })
-  // }
-
-  // ON SELECT ROW
+  const handleSetRow = useCallback(
+    async (e) => {
+      disablePaginationControl()
+      setTotalRows(Number(e.target.value))
+      await refetch({
+        ...vulnData,
+        first: Number(e.target.value),
+        last: undefined,
+        after: undefined,
+        before: undefined
+      }).then((res) => {
+        if (res.data) {
+          setPaginationControl(res.data)
+          prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        }
+      })
+    },
+    [prodVulnDispatch, refetch, setPaginationControl, setTotalRows, vulnData]
+  )
 
   useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
+    if (vulns) {
+      setIsPrevActive(vulns?.pageInfo?.hasPreviousPage)
+      setIsNextActive(vulns?.pageInfo?.hasNextPage)
     }
-  }, [data])
+  }, [vulns])
 
-  const handleSelectRow = (row, bool) => {
-    if (!bool) {
-      handleRefresh()
-    }
+  if (error) {
+    return (
+      <Card>
+        <Text>Something went wrong</Text>
+      </Card>
+    )
+  }
+
+  if (vulnsPermissions?.value === false) {
+    return (
+      <Text mt={4} textAlign={'center'}>
+        You do not have permission to access this data
+      </Text>
+    )
   }
 
   return (
@@ -1124,12 +1102,12 @@ const VulnTable = ({
         <DataTable
           className='data-table-container'
           columns={columns}
-          data={data && data.nodes}
+          data={vulns?.nodes}
           customStyles={customStyles}
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={field}
-          progressPending={data ? false : true}
+          progressPending={vulns ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
@@ -1141,72 +1119,23 @@ const VulnTable = ({
           expandableRowsComponentProps={{
             setActiveRow,
             onCvssOpen,
-            textColor,
-            filteredData
+            textColor
           }}
-          selectableRows={!signedUrlParams}
-          clearSelectedRows={toggleClear}
-          onSelectedRowsChange={handleChange}
-          onRowExpandToggled={(bool, row) => handleSelectRow(row, bool)}
         />
       </Flex>
 
       {/* PAGINATION */}
-      {data?.pageInfo && (
+      {vulns?.pageInfo && (
         <Pagination
           paginationSizes={paginationSizes}
           pageIndex={pageIndex}
           totalRows={totalRows}
-          totalCount={data?.totalCount}
+          totalCount={vulns?.totalCount}
           onPreviousPage={handlePreviousPage}
           onNextPage={handleNextPage}
           onSetRow={handleSetRow}
           hasNextPage={isNextActive}
           hasPreviousPage={isPrevActive}
-        />
-      )}
-
-      {/* COPY DATA TABLE */}
-      {isTableOpen && data && (
-        <Drawer
-          isOpen={isTableOpen}
-          placement='right'
-          size='full'
-          onClose={onTableClose}
-        >
-          <DrawerOverlay />
-          <DrawerContent>
-            <DrawerCloseButton
-              onClick={() => prodVulnDispatch({ type: 'RESET_IMPORT_SBOMS' })}
-            />
-            <DrawerHeader>
-              <Text fontSize={20} fontWeight={'medium'}>
-                Import Vulnerability Status
-              </Text>
-            </DrawerHeader>
-            <DrawerBody mt={2}>
-              {/* IMPORT WIZARD */}
-              <ImportWizard
-                variant='circle'
-                currentSbomId={sbomId}
-                currentProductId={productId}
-                onClose={onTableClose}
-              />
-            </DrawerBody>
-          </DrawerContent>
-        </Drawer>
-      )}
-
-      {isOpen && selectedVulns.length > 0 && (
-        <VexModal
-          isOpen={isOpen}
-          onClose={onClose}
-          refetch={refetch}
-          checkEquals={true}
-          selectedGroup={selectedGroup}
-          selectedVulns={selectedVulns}
-          setSelectedVulns={setSelectedVulns}
-          setToggleClear={setToggleClear}
         />
       )}
 
@@ -1222,4 +1151,4 @@ const VulnTable = ({
   )
 }
 
-export default VulnTable
+export default Vulnerabilities

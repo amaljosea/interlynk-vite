@@ -1,348 +1,107 @@
-import { useLazyQuery } from '@apollo/client'
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { getProductVersionDetailPageUrl } from 'utils/url'
 
-import {
-  Button,
-  Flex,
-  Skeleton,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text
-} from '@chakra-ui/react'
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
-import SbomLicenseTable from 'components/Licenses/SbomLicenseTable'
-import ComponentTable from 'components/Tables/ComponentTable'
-import GeneralDataRow from 'components/Tables/GeneralDataRow'
-import VulnTable from 'components/Tables/VulnTable'
-
-import { useGlobalState } from 'hooks/useGlobalState'
-
-import { GetShareLicensesTable } from 'graphQL/Queries'
+import Card from 'components/Card/Card.js'
 
 import { FaLock } from 'react-icons/fa6'
 
-const SbomTable = ({
-  status,
-  type,
-  data,
-  refetch,
-  filteredData,
-  vulnData,
-  getVulnData,
-  getCompData,
-  compData,
-  error
-}) => {
+import Components from './Components'
+import General from './General'
+import Licenses from './Licenses'
+import Vulnerabilities from './Vulnerabilities'
+
+const tabs = [
+  'general',
+  'parts',
+  'components',
+  'vulnerabilities',
+  'licenses',
+  'policies',
+  'support',
+  'checks',
+  'changelog'
+]
+
+const SbomTable = ({ data, refetch, loading, error }) => {
   const params = useParams()
-  const productId = params.productid
-  const sbomId = params.sbomid
-  const activeTab = Number(localStorage.getItem('activeCsSbomTab') || 0)
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const navigate = useNavigate()
 
-  const {
-    activeCsSbomTab,
-    setActiveCsSbomTab,
-    totalRows,
-    prodCompState,
-    prodVulnState,
-    dispatch
-  } = useGlobalState()
-  const { prodCompDispatch, prodVulnDispatch } = dispatch
-
-  const [setActiveComp] = useState(null)
-
-  // How often each tab should refetch the data (in minutes)
-  const fetchIntervalMinutes = {
-    General: 0,
-    Parts: 0,
-    Components: 0,
-    Vulnerabilities: 0.5,
-    Licenses: 0,
-    Policies: 0,
-    Support: 0,
-    Checks: 0,
-    'Change Log': 0
+  const onTabChange = (value) => {
+    const link = getProductVersionDetailPageUrl({
+      productgroupid: params.productgroupid,
+      productid: params.productid,
+      sbomid: params.sbomid,
+      paramsObj: {
+        tab: tabs[value]
+      }
+    })
+    navigate(link)
   }
 
-  const [lastFetchTime, setLastFetchTime] = useState({
-    General: null,
-    Parts: null,
-    Components: null,
-    Vulnerabilities: null,
-    Licenses: null,
-    Policies: null,
-    Support: null,
-    Checks: null,
-    'Change Log': null
-  })
-
-  const tabIndexToName = {
-    0: 'General',
-    1: 'Parts',
-    2: 'Components',
-    3: 'Vulnerabilities',
-    4: 'Licenses',
-    5: 'Policies',
-    6: 'Support',
-    7: 'Checks',
-    8: 'Change Log'
-  }
-
-  // GET LICENSES DATA
-  const [getLicensesData, { data: licensesData, refetch: licenseRefetch }] =
-    useLazyQuery(GetShareLicensesTable, { fetchPolicy: 'network-only' })
-
-  const shouldFetchData = (tabName) => {
-    const lastFetch = lastFetchTime[tabName]
-    const now = new Date()
-    if (!lastFetch) return true // If never fetched, fetch data
-    const minutesElapsed = (now - lastFetch) / 60000
-    return minutesElapsed >= fetchIntervalMinutes[tabName]
-  }
-
-  const updateLastFetchTime = (tabName) =>
-    setLastFetchTime({ ...lastFetchTime, [tabName]: new Date() })
-  const getUndefinedIfEmpty = (value) => (value !== '' ? value : undefined)
-  const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
-    value.includes(allValue) || value.length === 0 ? undefined : value
-
-  const handleTabChange = (value) => {
-    localStorage.setItem('activeCsSbomTab', value)
-    setActiveCsSbomTab(value)
-  }
-
-  const fetchTabData = (activeTab) => {
-    const commonParams = {
-      projectId: signedUrlParams ? undefined : productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined
-    }
-    const tabName = tabIndexToName[activeTab]
-    if (tabName === 'General' && shouldFetchData(tabName)) {
-      refetch({ ...commonParams }).then(() => updateLastFetchTime(tabName))
-    } else if (tabName === 'Components' && shouldFetchData(tabName)) {
-      const {
-        field,
-        direction,
-        searchInput,
-        ecosystems,
-        kinds,
-        licenses,
-        suppliers,
-        scope,
-        direct
-      } = prodCompState
-      getCompData({
-        ...commonParams,
-        search: getUndefinedIfEmpty(searchInput),
-        ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
-        kind: getUndefinedIfEmptyOrAll(kinds),
-        licenses: getUndefinedIfEmptyOrAll(licenses),
-        supplierName: getUndefinedIfEmptyOrAll(suppliers),
-        primary: scope === 'primary' ? true : undefined,
-        internal: scope === 'internal' ? true : undefined,
-        direct: direct === true ? true : undefined,
-        field: field,
-        direction: direction
-      }).then((res) => {
-        if (res.data) {
-          prodCompDispatch({
-            type: 'SET_TOTAL_COMP',
-            payload: res?.data?.shareLynkQuery?.sbom?.components?.totalCount
-          })
-          prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-          updateLastFetchTime(tabName)
-        }
-      })
-    } else if (tabName === 'Vulnerabilities' && shouldFetchData(tabName)) {
-      const {
-        field,
-        direction,
-        searchInput,
-        severities,
-        components,
-        statues,
-        source,
-        kev,
-        epss,
-        direct
-      } = prodVulnState
-      const vulnEpss =
-        epss !== 'all' && epss !== ''
-          ? epss.split('-').map((v) => parseFloat(v) / 10000)
-          : undefined
-      getVulnData({
-        ...commonParams,
-        search: getUndefinedIfEmpty(searchInput),
-        source: source === true ? undefined : 'COMPONENT',
-        severity: getUndefinedIfEmptyOrAll(severities),
-        componentName: getUndefinedIfEmptyOrAll(components),
-        status: getUndefinedIfEmptyOrAll(statues),
-        kev: kev === 'yes' ? true : kev === 'no' ? false : undefined,
-        epss:
-          epss !== '' && epss !== 'all'
-            ? {
-                min: parseFloat(vulnEpss[0]) / 100,
-                max: parseFloat(vulnEpss[1]) / 100
-              }
-            : undefined,
-        direct: direct === true ? true : undefined,
-        field: field,
-        direction: direction
-      }).then((res) => {
-        if (res.data) {
-          prodVulnDispatch({
-            type: 'SET_TOTAL_VULNS',
-            payload: res?.data?.shareLynkQuery?.sbom?.vulns?.totalCount
-          })
-          prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-          updateLastFetchTime(tabName)
-        }
-      })
-    } else if (tabName === 'Licenses' && shouldFetchData(tabName)) {
-      getLicensesData({ variables: { ...commonParams } }).then((res) => {
-        if (res.data) {
-          updateLastFetchTime(tabName)
-        }
-      })
-    }
-  }
-
-  useEffect(() => {
-    setActiveCsSbomTab(activeTab)
-    fetchTabData(activeTab)
-  }, [activeTab, setActiveCsSbomTab])
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const tab = queryParams.get('tab')
+  const activeTabNumber = Math.max(tabs.indexOf(tab), 0)
 
   return (
-    <Card>
-      <Tabs
-        variant='enclosed'
-        index={activeCsSbomTab}
-        onChange={(value) => handleTabChange(value)}
-      >
-        {/* TAB LIST */}
-        <TabList mt='20px'>
-          {Object.values(tabIndexToName).map((item, index) => (
-            <Tab
-              key={index}
-              _focus={{ outline: 'none' }}
-              isDisabled={
-                item === 'Parts' ||
-                item === 'Checks' ||
-                item === 'Change Log' ||
-                item === 'Support' ||
-                item === 'Policies'
-              }
-            >
-              {(item === 'Parts' ||
-                item === 'Checks' ||
-                item === 'Change Log' ||
-                item === 'Support' ||
-                item === 'Policies') && (
-                <FaLock color='darkgray' style={{ marginRight: '6px' }} />
-              )}
-              {item}
-            </Tab>
-          ))}
-        </TabList>
-        {/* TAB PANELS */}
-        <TabPanels>
-          {/* GENERAL TABLE */}
-          <TabPanel px={1}>
-            {data ? (
-              <GeneralDataRow
-                status={status}
-                type={type}
-                data={data}
-                refetch={refetch}
-              />
-            ) : (
-              <Flex width={'100%'} gap={4} direction={'column'}>
-                <Skeleton width={'100%'} height='20px' />
-                <Skeleton width={'100%'} height='20px' />
-                <Skeleton width={'100%'} height='20px' />
-                <Skeleton width={'100%'} height='20px' />
-                <Skeleton width={'100%'} height='20px' />
-              </Flex>
-            )}
-          </TabPanel>
-          {/* PARTS TABLE */}
-          <TabPanel px={1}></TabPanel>
-          {/* COMPONENT TABLE */}
-          <TabPanel px={0}>
-            {data && (
-              <ComponentTable
-                type={type}
-                lifecycle={data.lifecycle}
-                data={compData?.sbom?.components}
-                refetch={getCompData}
-                sbomRefetch={refetch}
-                setActiveComp={setActiveComp}
-                primaryComp={data.primaryComponent}
-              />
-            )}
-            {error && (
-              <Flex
-                py={10}
-                flexDirection={'column'}
-                gap={2}
-                width={'70%'}
-                mx={'auto'}
-                alignItems={'center'}
-                justifyContent={'center'}
+    <>
+      <Card>
+        <Tabs
+          isLazy
+          variant='enclosed'
+          index={activeTabNumber}
+          onChange={onTabChange}
+        >
+          <TabList mt='20px'>
+            {tabs.map((item, index) => (
+              <Tab
+                key={index}
+                textTransform={'capitalize'}
+                _focus={{ outline: 'none' }}
+                isDisabled={
+                  item === 'general' ||
+                  item === 'components' ||
+                  item === 'vulnerabilities' ||
+                  item === 'licenses'
+                    ? false
+                    : true
+                }
               >
-                <Text color={'red.500'} textAlign={'center'}>
-                  {error.message}
-                </Text>
-                <Text>Something went wrong. Please refresh this page</Text>
-                <Button
-                  mt={2}
-                  variant='solid'
-                  colorScheme='blue'
-                  fontWeight={'normal'}
-                  onClick={() => window.location.reload()}
-                >
-                  Refresh
-                </Button>
-              </Flex>
-            )}
-          </TabPanel>
-          {/* VUNERABILITIES TABLE */}
-          <TabPanel px={0}>
-            <VulnTable
-              data={vulnData?.sbom?.vulns}
-              sbomData={data}
-              sbomRefetch={refetch}
-              filteredData={filteredData}
-              refetch={getVulnData}
-              productId={productId}
-              sbomId={sbomId}
-            />
-          </TabPanel>
-          {/* LICENSES TABLE */}
-          <TabPanel px={0}>
-            <SbomLicenseTable
-              data={licensesData?.shareLynkQuery?.sbom?.componentLicenses}
-              refetch={licenseRefetch}
-            />
-          </TabPanel>
-          {/* SUPPORT TABLE */}
-          <TabPanel px={0}></TabPanel>
-          {/* CHECKS TABLE */}
-          <TabPanel px={1}></TabPanel>
-          {/* CHANGE LOG TABLE */}
-          <TabPanel px={1}></TabPanel>
-        </TabPanels>
-      </Tabs>
-    </Card>
+                {(item === 'parts' ||
+                  item === 'checks' ||
+                  item === 'changelog' ||
+                  item === 'support' ||
+                  item === 'policies') && (
+                  <FaLock color='darkgray' style={{ marginRight: '6px' }} />
+                )}
+                {item}
+              </Tab>
+            ))}
+          </TabList>
+          <TabPanels>
+            <TabPanel px={1}>
+              <General data={data} error={error} loading={loading} />
+            </TabPanel>
+            <TabPanel px={0}></TabPanel>
+            <TabPanel px={0}>
+              <Components sbomData={data} sbomRefetch={refetch} />
+            </TabPanel>
+            <TabPanel px={0}>
+              <Vulnerabilities sbomData={data} />
+            </TabPanel>
+            <TabPanel px={0}>
+              <Licenses />
+            </TabPanel>
+            <TabPanel px={0}></TabPanel>
+            <TabPanel px={0}></TabPanel>
+            <TabPanel px={0}></TabPanel>
+            <TabPanel px={0}></TabPanel>
+          </TabPanels>
+        </Tabs>
+      </Card>
+    </>
   )
 }
 

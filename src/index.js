@@ -13,6 +13,7 @@ import theme from 'theme/theme.js'
 import PubProducts from 'views/Customer/Products'
 import PubProductDetails from 'views/Customer/Products/ProductDetails'
 import PubProductList from 'views/Customer/Products/ProductList'
+import PubSbomDetails from 'views/Customer/Sbom/index.js'
 import Dashboard from 'views/Dashboard/Dashboard'
 import Policies from 'views/Dashboard/Policies'
 import Products from 'views/Dashboard/Products'
@@ -141,12 +142,7 @@ ReactDOM.render(
                   <Route
                     exact
                     path=':productgroupid/env/:productid/version/:sbomid'
-                    element={<PubProductDetails />}
-                  />
-                  <Route
-                    exact
-                    path=':productgroupid/env/:productid/vulnerability/:vulnerabilityid'
-                    element={<PubProductDetails />}
+                    element={<PubSbomDetails />}
                   />
                 </Route>
               </Route>

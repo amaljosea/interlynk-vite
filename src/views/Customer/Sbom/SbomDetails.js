@@ -1,6 +1,6 @@
 import { useLazyQuery } from '@apollo/client'
 import { useEffect } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, parseJSONSafely, timeSince } from 'utils'
 import { getProductVersionDetailPageUrl } from 'utils/url'
 
@@ -23,8 +23,10 @@ import GraphDrawer from 'components/Drawer/GraphDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePartsContext } from 'hooks/usePartsContext'
 
-import { GetPrimaryComponent, GetSharPrimartComp } from 'graphQL/Queries'
+import { GetPrimaryComponent } from 'graphQL/Queries'
+import { GetSharPrimartComp } from 'graphQL/Queries'
 
 import {
   FaAngleLeft,
@@ -36,38 +38,45 @@ import {
 import { FaCircleCheck } from 'react-icons/fa6'
 import { MdPolicy } from 'react-icons/md'
 
-const SbomDetails = ({ sbom, getVulnData }) => {
+const SbomDetails = ({ sbomData, refetch }) => {
+  const partsContext = usePartsContext()
+  const navigate = useNavigate()
+  const params = useParams()
+  const projectId = params.productid
+  const sbomId = params.sbomid
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const parts = queryParams.get('parts')
+
+  const setActiveTab = (value) => {
+    const link = getProductVersionDetailPageUrl({
+      productgroupid: params.productgroupid,
+      productid: params.productid,
+      sbomid: params.sbomid,
+      paramsObj: {
+        tab: value
+      }
+    })
+    navigate(link)
+  }
+
   const {
     project,
     policyResultMetrics,
     projectVersion,
     primaryComponent,
+    vulnRunStatus,
     updatedAt,
     lifecycle,
-    vulnRunStatus,
-    stats
-  } = sbom
-  const { compCount, compLicenseCount, vulnStats } = stats
-  const { critical, high, medium, low, unknown } = vulnStats
-  const {
-    totalRows,
-    prodCompState,
-    prodVulnState,
-    setActiveSbomTab,
-    setActiveCsSbomTab,
-    dispatch
-  } = useGlobalState()
+    stats,
+    sbomParts
+  } = sbomData || ''
+  const { compCount, compLicenseCount, vulnStats } = stats || ''
+  const { critical, high, medium, low, unknown } = vulnStats || ''
+  const { prodCompState, setActiveCsSbomTab, dispatch } = useGlobalState()
   const { field, direction } = prodCompState
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-
-  const params = useParams()
-  const productId = params.productid
-  const sbomId = params.sbomid
-
-  const parts = queryParams.get('parts')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const subProduct = (() => {
     try {
@@ -92,14 +101,13 @@ const SbomDetails = ({ sbom, getVulnData }) => {
 
   // GET PRIMARY COMPONENT
   const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(
-    signedUrlParams ? GetSharPrimartComp : GetPrimaryComponent,
+    GetSharPrimartComp,
     { fetchPolicy: 'network-only' }
   )
 
   const handleRelationView = async () => {
     await getPrimaryComp({
       variables: {
-        projectId: signedUrlParams ? undefined : productId,
         sbomId: sbomId,
         primary: true,
         field,
@@ -110,116 +118,34 @@ const SbomDetails = ({ sbom, getVulnData }) => {
 
   const onSelectComp = () => {
     prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
+    setActiveTab('components')
   }
 
   const onSelectVulns = () => {
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
-    if (signedUrlParams) {
-      return null
-    } else {
-      prodVulnDispatch({
-        type: 'FILTER_SOURCE',
-        payload: sbom?.sbomParts?.length > 0 ? true : false
-      })
-    }
+    prodVulnDispatch({
+      type: 'FILTER_INCLUDE',
+      payload: sbomParts?.length > 0 ? ['parts'] : []
+    })
+    setActiveTab('vulnerabilities')
+  }
+
+  const onSelectLicenses = () => {
+    setActiveTab('licenses')
   }
 
   const onFilterVuln = (value) => {
-    const { field, direction, source, retracted } = prodVulnState
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
-    getVulnData({
-      sbomId: sbomId,
-      includeRetracted: retracted,
-      projectId: signedUrlParams ? undefined : productId,
-      source: source === true ? undefined : 'COMPONENT',
-      severity: value || undefined,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      field: field,
-      direction: direction
-    }).then((res) => {
-      if (res.data) {
-        if (signedUrlParams) {
-          setActiveCsSbomTab(3)
-        } else {
-          setActiveSbomTab(3)
-        }
-        prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-        prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
-      }
+    prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+    prodVulnDispatch({
+      type: 'FILTER_INCLUDE',
+      payload: sbomParts?.length > 0 ? ['parts'] : []
     })
+    setActiveTab('vulnerabilities')
   }
 
   const handlePart = () => {
-    const newData = { ...subProduct }
-    if (subProduct?.childFour) {
-      delete newData.childFour
-      localStorage.setItem('subProduct', JSON.stringify(newData))
-    } else if (subProduct?.childThree) {
-      delete newData.childThree
-      localStorage.setItem('subProduct', JSON.stringify(newData))
-    } else if (subProduct?.childTwo) {
-      delete newData.childTwo
-      localStorage.setItem('subProduct', JSON.stringify(newData))
-    } else if (subProduct?.childOne) {
-      delete newData.childOne
-      localStorage.setItem('subProduct', JSON.stringify(newData))
-    } else {
-      localStorage.removeItem('subProduct')
-    }
-  }
-
-  const parentLink = () => {
-    if (subProduct?.childFour) {
-      const url = getProductVersionDetailPageUrl({
-        productgroupid: params.productgroupid,
-        productid: subProduct?.childThree?.projectId,
-        sbomid: subProduct?.childThree?.sbomId,
-        paramsObj: {
-          parts: true
-        }
-      })
-      return url
-    } else if (subProduct?.childThree) {
-      const url = getProductVersionDetailPageUrl({
-        productgroupid: params.productgroupid,
-        productid: subProduct?.childTwo?.projectId,
-        sbomid: subProduct?.childTwo?.sbomId,
-        paramsObj: {
-          parts: true
-        }
-      })
-      return url
-    } else if (subProduct?.childTwo) {
-      const url = getProductVersionDetailPageUrl({
-        productgroupid: params.productgroupid,
-        productid: subProduct?.childOne?.projectId,
-        sbomid: subProduct?.childOne?.sbomId,
-        paramsObj: {
-          parts: true
-        }
-      })
-      return url
-    } else if (subProduct?.childOne) {
-      const url = getProductVersionDetailPageUrl({
-        productgroupid: params.productgroupid,
-        productid: subProduct?.projectId,
-        sbomid: subProduct?.sbomId,
-        paramsObj: {
-          parts: true
-        }
-      })
-      return url
-    } else {
-      const url = getProductVersionDetailPageUrl({
-        productgroupid: params.productgroupid,
-        productid: productId,
-        sbomid: currentSBOM?.id
-      })
-      return url
-    }
+    partsContext.pop()
   }
 
   useEffect(() => {
@@ -228,6 +154,18 @@ const SbomDetails = ({ sbom, getVulnData }) => {
       handlePart()
     }
   })
+
+  useEffect(() => {
+    const refetchInterval = setInterval(() => {
+      if (sbomData && sbomData?.vulnRunStatus === 'IN_PROGRESS') {
+        refetch({ projectId, sbomId })
+      } else {
+        clearInterval(refetchInterval)
+      }
+    }, 5000)
+
+    return () => clearInterval(refetchInterval)
+  }, [sbomData, refetch, projectId, sbomId])
 
   return (
     <>
@@ -243,29 +181,24 @@ const SbomDetails = ({ sbom, getVulnData }) => {
         <Flex direction={'column'} gap={0.5}>
           {/* PRODUCT TITLE */}
           <Stack direction={'column'} spacing={1} alignItems={'left'}>
-            {currentProduct && parts && currentSBOM && (
-              <Link to={parentLink()} onClick={handlePart}>
-                <HStack>
-                  <FaAngleLeft size={18} color='#3182CE' />
-                  <Text
-                    fontWeight={'semibold'}
-                    fontSize={18}
-                    color={'blue.500'}
-                    textDecor={'underline'}
-                  >
-                    {subProduct?.childFour
-                      ? subProduct?.childThree?.name
-                      : subProduct?.childThree
-                        ? subProduct?.childTwo?.name
-                        : subProduct?.childTwo
-                          ? subProduct?.childOne?.name
-                          : subProduct?.childOne
-                            ? subProduct?.name
-                            : name}
-                  </Text>
-                </HStack>
-              </Link>
-            )}
+            {currentProduct &&
+              parts &&
+              currentSBOM &&
+              partsContext.latestPart && (
+                <Link to={partsContext.latestPart.url} onClick={handlePart}>
+                  <HStack>
+                    <FaAngleLeft size={18} color='#3182CE' />
+                    <Text
+                      fontWeight={'semibold'}
+                      fontSize={18}
+                      color={'blue.500'}
+                      textDecor={'underline'}
+                    >
+                      {partsContext.latestPart.projectGroupName}
+                    </Text>
+                  </HStack>
+                </Link>
+              )}
             <Flex
               direction={'row'}
               alignItems={'center'}
@@ -298,58 +231,57 @@ const SbomDetails = ({ sbom, getVulnData }) => {
             {primaryComponent?.description}
           </Text>
           {/* SCAN STATUS */}
-          {!signedUrlParams && (
-            <Flex
-              flexDir='row'
-              gap={2}
-              alignItems={'center'}
-              width='100%'
-              my={2}
-            >
-              <Tooltip label='Imported'>
-                <IconButton
-                  size='xs'
-                  colorScheme={'blue'}
-                  icon={<DownloadIcon />}
-                />
-              </Tooltip>
-              <Tooltip label='SBOM Checks'>
-                <IconButton
-                  size='xs'
-                  colorScheme={
-                    vulnRunStatus === 'FINISHED' ||
-                    vulnRunStatus === 'IN_PROGRESS'
-                      ? 'blue'
-                      : 'blackAlpha'
-                  }
-                  icon={<Search2Icon />}
-                />
-              </Tooltip>
-              <Tooltip label='Vulnerability Scan'>
-                <IconButton
-                  size='xs'
-                  colorScheme={
-                    vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
-                  }
-                  icon={<FaBug />}
-                />
-              </Tooltip>
-              <Tooltip label='Ready'>
-                <IconButton
-                  size='xs'
-                  colorScheme={
-                    vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
-                  }
-                  icon={<FaCircleCheck />}
-                />
-              </Tooltip>
-              {vulnRunStatus === 'IN_PROGRESS' && (
-                <Badge px={2} py={1} fontWeight={'semibold'}>
-                  Scanning...
-                </Badge>
-              )}
-            </Flex>
-          )}
+          <Flex
+            my={2}
+            gap={2}
+            width='100%'
+            flexDir='row'
+            alignItems={'center'}
+            hidden={signedUrlParams}
+          >
+            <Tooltip label='Imported'>
+              <IconButton
+                size='xs'
+                colorScheme={'blue'}
+                icon={<DownloadIcon />}
+              />
+            </Tooltip>
+            <Tooltip label='SBOM Checks'>
+              <IconButton
+                size='xs'
+                colorScheme={
+                  vulnRunStatus === 'FINISHED' ||
+                  vulnRunStatus === 'IN_PROGRESS'
+                    ? 'blue'
+                    : 'blackAlpha'
+                }
+                icon={<Search2Icon />}
+              />
+            </Tooltip>
+            <Tooltip label='Vulnerability Scan'>
+              <IconButton
+                size='xs'
+                colorScheme={
+                  vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
+                }
+                icon={<FaBug />}
+              />
+            </Tooltip>
+            <Tooltip label='Ready'>
+              <IconButton
+                size='xs'
+                colorScheme={
+                  vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
+                }
+                icon={<FaCircleCheck />}
+              />
+            </Tooltip>
+            {vulnRunStatus === 'IN_PROGRESS' && (
+              <Badge px={2} py={1} fontWeight={'semibold'}>
+                Scanning...
+              </Badge>
+            )}
+          </Flex>
           {/* UPDATED AT */}
           <Tooltip placement='top' label={getFullDateAndTime(updatedAt)}>
             <Text width={'fit-content'} fontSize='xs' cursor={'pointer'}>
@@ -399,6 +331,7 @@ const SbomDetails = ({ sbom, getVulnData }) => {
                   variant='subtle'
                   width={16}
                   colorScheme={'blue'}
+                  onClick={onSelectLicenses}
                 >
                   <TagLabel mx={'auto'}>{compLicenseCount}</TagLabel>
                 </Tag>
@@ -407,6 +340,7 @@ const SbomDetails = ({ sbom, getVulnData }) => {
                   mt={1}
                   fontSize={'xs'}
                   _hover={{ textDecoration: 'underline' }}
+                  onClick={onSelectLicenses}
                 >
                   Licenses
                 </Text>
