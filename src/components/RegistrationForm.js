@@ -4,7 +4,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { validPassword, validateEmail } from 'utils'
 
 import { CheckCircleIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-// chakra imports
 import {
   Alert,
   AlertDescription,

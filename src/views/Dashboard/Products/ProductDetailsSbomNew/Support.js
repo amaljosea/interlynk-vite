@@ -17,7 +17,6 @@ import {
   MenuItem,
   MenuList,
   Portal,
-  Skeleton,
   Stack,
   Switch,
   Tag,

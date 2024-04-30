@@ -1,5 +1,4 @@
 /*eslint-disable*/
-// chakra imports
 import InterlynkLogo from 'assets/img/logo.png'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'

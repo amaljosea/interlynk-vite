@@ -1,4 +1,3 @@
-import { useMutation } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 import { CSVLink } from 'react-csv'
 
@@ -13,13 +12,6 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Skeleton,
   Tab,
   TabList,
@@ -45,8 +37,6 @@ import CardHeader from 'components/Card/CardHeader'
 import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-
-import { UpdateImageVersion } from 'graphQL/Mutation'
 
 import { BiExport, BiImport } from 'react-icons/bi'
 // ICONS

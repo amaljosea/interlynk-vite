@@ -7,20 +7,11 @@ import {
   Flex,
   Icon,
   Tag,
-  TagLabel,
-  TagLeftIcon,
   Td,
   Text,
   Tr,
   useColorModeValue
 } from '@chakra-ui/react'
-
-import {
-  LetterCIcon,
-  LetterHIcon,
-  LetterLIcon,
-  LetterMIcon
-} from 'components/Icons/Icons'
 
 import { FaEllipsisV } from 'react-icons/fa'
 

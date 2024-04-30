@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react'
 import { timeSince } from 'utils'
 
 import { ExternalLinkIcon } from '@chakra-ui/icons'
@@ -12,8 +11,7 @@ import {
   Text,
   Tooltip,
   Tr,
-  useColorModeValue,
-  useDisclosure
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import { FaNeos, FaTools } from 'react-icons/fa'

@@ -1,4 +1,3 @@
-// Chakra imports
 // Assets
 import avatar2 from 'assets/img/avatars/avatar2.png'
 import avatar3 from 'assets/img/avatars/avatar3.png'

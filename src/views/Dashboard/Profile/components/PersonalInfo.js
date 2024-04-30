@@ -5,9 +5,6 @@ import { validPassword, validateEmail } from 'utils'
 
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Box,
   Button,
   Flex,

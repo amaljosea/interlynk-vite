@@ -1,9 +1,8 @@
-// Chakra imports
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 import { getDateFormat } from 'utils'
 
-import { ChevronDownIcon, RepeatIcon } from '@chakra-ui/icons'
+import { RepeatIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -20,7 +19,6 @@ import {
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 
 import { GetFeedLogs } from 'graphQL/Queries'

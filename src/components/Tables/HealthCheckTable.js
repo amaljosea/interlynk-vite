@@ -7,13 +7,11 @@ import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckFilterMenu from 'views/Sbom/components/CheckFilterMenu'
 import CheckModal from 'views/Sbom/components/CheckModal'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
-import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 
 import {
   Badge,
-  Box,
   Button,
   Flex,
   IconButton,
@@ -33,7 +31,6 @@ import LicenseModal from 'components/LicenseModal'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { sbomUpdate } from 'graphQL/Mutation'
-import { CreateAutomation } from 'graphQL/Mutation'
 import { UpdateComponent } from 'graphQL/Mutation'
 import { checkResultUpdate, recheckHealth } from 'graphQL/Mutation'
 import { GetCheckFilterData } from 'graphQL/Queries'

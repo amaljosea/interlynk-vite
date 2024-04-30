@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import {
   Divider,
   Grid,
-  Heading,
   Modal,
   ModalBody,
   ModalCloseButton,

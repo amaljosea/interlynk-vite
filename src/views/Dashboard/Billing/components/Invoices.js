@@ -1,4 +1,3 @@
-// Chakra imports
 import React from 'react'
 
 import { Button, Flex, Text, useColorModeValue } from '@chakra-ui/react'

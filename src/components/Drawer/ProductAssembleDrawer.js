@@ -18,8 +18,6 @@ import {
 } from '@chakra-ui/react'
 import { useToast } from '@chakra-ui/react'
 
-import { FaGithub } from 'react-icons/fa'
-
 function ProductAssembleDrawer(props) {
   const {
     isOpen,

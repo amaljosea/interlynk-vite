@@ -6,7 +6,6 @@ import { Flex, Td, Tr } from '@chakra-ui/react'
 import Tooltip from 'components/Tooltip'
 
 import { BiNote } from 'react-icons/bi'
-import { FaExpand } from 'react-icons/fa6'
 
 const VulLinkRow = ({
   username,

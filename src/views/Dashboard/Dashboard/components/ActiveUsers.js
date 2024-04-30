@@ -1,27 +1,12 @@
-// Chakra imports
 import React from 'react'
 
-import {
-  Box,
-  Flex,
-  SimpleGrid,
-  Text,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Box, Flex, Text, useColorModeValue } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card.js'
-import CardBody from 'components/Card/CardBody.js'
 import CardHeader from 'components/Card/CardHeader.js'
-// Custom icons
-import {
-  CartIcon,
-  RocketIcon,
-  StatsIcon,
-  WalletIcon
-} from 'components/Icons/Icons.js'
 
-import ChartStatistics from './ChartStatistics'
+// Custom icons
 
 const SBOMActivities = ({ title, percentage, chart }) => {
   const iconBoxInside = useColorModeValue('white', 'white')

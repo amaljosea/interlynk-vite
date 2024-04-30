@@ -2,7 +2,6 @@
 import signInImage from 'assets/img/signInImage.png'
 import React from 'react'
 
-// Chakra imports
 import {
   Box,
   Button,

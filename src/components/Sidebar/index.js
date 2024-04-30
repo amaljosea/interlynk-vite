@@ -1,5 +1,4 @@
 /*eslint-disable*/
-// chakra imports
 import { useState } from 'react'
 
 import { Box } from '@chakra-ui/react'

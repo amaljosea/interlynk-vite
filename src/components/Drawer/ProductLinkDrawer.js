@@ -1,7 +1,4 @@
-// Chakra imports
 import React, { useState } from 'react'
-import { useEffect } from 'react'
-import { productVersionsData } from 'variables/general'
 
 import { Button, Flex, Input, Spacer, Stack } from '@chakra-ui/react'
 import {
@@ -16,8 +13,6 @@ import {
   DrawerHeader,
   DrawerOverlay,
   FormLabel,
-  InputGroup,
-  Select,
   Tag,
   TagCloseButton,
   TagLabel,

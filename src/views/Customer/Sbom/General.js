@@ -12,7 +12,6 @@ import {
   Skeleton,
   Stack,
   Tag,
-  TagCloseButton,
   TagLabel,
   Text,
   useDisclosure

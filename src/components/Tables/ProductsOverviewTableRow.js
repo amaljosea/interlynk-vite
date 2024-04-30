@@ -1,24 +1,15 @@
 import React from 'react'
 
 import {
-  Center,
   Flex,
   Icon,
   Link,
   Tag,
-  TagLeftIcon,
   Td,
   Text,
   Tr,
   useColorModeValue
 } from '@chakra-ui/react'
-
-import {
-  FaCheckCircle,
-  FaExclamationTriangle,
-  FaInfo,
-  FaInfoCircle
-} from 'react-icons/fa'
 
 function ProductsOverviewTableRow(props) {
   const { logo, name, description, versions, sbom_links, risk_score } = props

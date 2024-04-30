@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 
 import { AddIcon } from '@chakra-ui/icons'
 import { Button, Flex, useDisclosure } from '@chakra-ui/react'

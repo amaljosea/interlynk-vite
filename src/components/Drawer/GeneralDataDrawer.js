@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince, validateEmail } from 'utils'
 
 import { DeleteIcon } from '@chakra-ui/icons'

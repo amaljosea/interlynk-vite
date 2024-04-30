@@ -1,4 +1,3 @@
-// Chakra imports
 import imageArchitect1 from 'assets/img/ImageArchitect1.png'
 import imageArchitect2 from 'assets/img/ImageArchitect2.png'
 import imageArchitect3 from 'assets/img/ImageArchitect3.png'

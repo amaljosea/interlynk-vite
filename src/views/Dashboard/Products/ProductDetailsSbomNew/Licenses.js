@@ -9,7 +9,6 @@ import {
   Box,
   Flex,
   IconButton,
-  Skeleton,
   Tag,
   TagLabel,
   Text,

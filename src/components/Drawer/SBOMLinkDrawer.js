@@ -1,5 +1,4 @@
-// Chakra imports
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import React, { useState } from 'react'
 import { useEffect } from 'react'
 
@@ -24,7 +23,6 @@ import {
 } from '@chakra-ui/react'
 
 import { UpdateShareLynk } from 'graphQL/Mutation'
-import { getAllScanners } from 'graphQL/Queries'
 
 function SBOMLinkDrawer(props) {
   const {

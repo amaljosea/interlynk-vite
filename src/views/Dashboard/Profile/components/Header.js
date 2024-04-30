@@ -1,4 +1,3 @@
-// Chakra imports
 import { useMutation } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -16,8 +15,6 @@ import {
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-
-import { useGlobalState } from 'hooks/useGlobalState'
 
 import { UploadProfileImage } from 'graphQL/Mutation'
 

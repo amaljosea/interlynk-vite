@@ -1,4 +1,3 @@
-// Chakra imports
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import React, { useEffect, useRef, useState } from 'react'

@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import {
   Button,

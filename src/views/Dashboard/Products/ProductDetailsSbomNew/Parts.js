@@ -6,8 +6,7 @@ import {
   capitalizeFirstLetter,
   customStyles,
   envOrderList,
-  isDefaultEnv,
-  parseJSONSafely
+  isDefaultEnv
 } from 'utils'
 import { getProductVersionDetailPageUrl } from 'utils/url'
 import SearchFilter from 'views/Sbom/components/SearchFilter'

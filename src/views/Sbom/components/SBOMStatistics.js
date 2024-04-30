@@ -1,13 +1,10 @@
-// Chakra imports
 import React from 'react'
 
 import {
   Flex,
   Stat,
-  StatHelpText,
   StatLabel,
   StatNumber,
-  Text,
   useColorModeValue
 } from '@chakra-ui/react'
 
@@ -15,7 +12,6 @@ import {
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import IconBox from 'components/Icons/IconBox'
-import { Separator } from 'components/Separator/Separator'
 
 const SBOMStatistics = ({ icon, title, description, amount }) => {
   const iconTeal = useColorModeValue('teal.300', 'teal.300')

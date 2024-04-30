@@ -1,4 +1,3 @@
-// Chakra imports
 import React from 'react'
 
 import { Box, Button, Flex, Icon, Portal, Spacer, Text } from '@chakra-ui/react'

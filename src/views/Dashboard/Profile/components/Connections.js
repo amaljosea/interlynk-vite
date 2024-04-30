@@ -1,4 +1,3 @@
-// Chakra imports
 import { useEffect, useState } from 'react'
 
 import { CheckIcon } from '@chakra-ui/icons'

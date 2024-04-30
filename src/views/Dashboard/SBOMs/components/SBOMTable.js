@@ -1,4 +1,3 @@
-// Chakra imports
 import { useMutation } from '@apollo/client'
 import React, { useEffect } from 'react'
 import { useState } from 'react'

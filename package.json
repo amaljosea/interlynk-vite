@@ -20,6 +20,7 @@
     "axios": "^1.6.7",
     "chakra-ui-steps": "^1.5.0",
     "date-fns": "^3.2.0",
+    "eslint-plugin-unused-imports": "^3.1.0",
     "framer-motion": "^4.1.17",
     "graphql": "^16.8.1",
     "js-cookie": "^3.0.5",
@@ -54,6 +55,7 @@
     "deploy": "npm run build",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
     "lint": "eslint --quiet  .",
+    "lint:fix": "eslint --fix .",
     "prepare": "husky install",
     "format": "pretty-quick --staged",
     "format:all": "prettier -w . && git add -A ."

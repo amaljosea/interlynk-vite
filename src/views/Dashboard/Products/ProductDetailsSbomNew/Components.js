@@ -1,4 +1,3 @@
-// Chakra imports
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'

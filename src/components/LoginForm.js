@@ -1,4 +1,3 @@
-// chakra imports
 import { useMutation } from '@apollo/client'
 import axios from 'axios'
 import Cookies from 'js-cookie'

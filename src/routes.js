@@ -17,7 +17,7 @@ import {
   FaRegSun,
   FaWindowMaximize
 } from 'react-icons/fa'
-import { FaHandshakeSimple, FaToolbox } from 'react-icons/fa6'
+import { FaToolbox } from 'react-icons/fa6'
 import { MdPolicy } from 'react-icons/md'
 
 export const dashRoutes = [

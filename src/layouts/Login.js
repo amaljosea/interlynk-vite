@@ -2,7 +2,6 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import theme from 'theme/theme.js'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'

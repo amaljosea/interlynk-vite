@@ -1,4 +1,3 @@
-// Chakra imports
 import { useMutation, useQuery } from '@apollo/client'
 import DataTable from 'react-data-table-component'
 import { sevColor } from 'utils'

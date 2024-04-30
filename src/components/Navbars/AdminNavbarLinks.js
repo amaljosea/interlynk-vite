@@ -1,4 +1,3 @@
-// Chakra Imports
 import { useLazyQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react'

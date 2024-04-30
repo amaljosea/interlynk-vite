@@ -1,12 +1,9 @@
-import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { useState } from 'react'
 
 import {
   Alert,
-  AlertIcon,
   Button,
-  Code,
   Flex,
   FormControl,
   FormLabel,

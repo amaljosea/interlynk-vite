@@ -1,5 +1,4 @@
-// Chakra imports
-import { useMutation, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -7,8 +6,6 @@ import { useLocation, useParams } from 'react-router-dom'
 import { getFullDateAndTime, sevColor, timeSince } from 'utils'
 import { customStyles } from 'utils'
 import { linkURl } from 'utils'
-import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
-import ImportWizard from 'views/Sbom/components/ImportWizard'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
@@ -20,23 +17,12 @@ import {
 import {
   Badge,
   Box,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
   Flex,
   Grid,
   GridItem,
   Icon,
   IconButton,
   Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
   Skeleton,
   Stack,
   Tag,
@@ -44,34 +30,24 @@ import {
   Text,
   Tooltip,
   useColorModeValue,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
-import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import CvssCard from 'components/Misc/CvssCard'
 import Pagination from 'components/Pagination'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { ManualVulnScan } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
   ShareVulnData,
   ShareVulnFilters
 } from 'graphQL/Queries'
 
-import {
-  FaEllipsisV,
-  FaGlobe,
-  FaHouseUser,
-  FaLightbulb,
-  FaSitemap
-} from 'react-icons/fa'
-import { FaBug, FaCopy, FaPen } from 'react-icons/fa6'
+import { FaGlobe, FaHouseUser, FaLightbulb, FaSitemap } from 'react-icons/fa'
 
 import VulnFilters from './VulnFilters'
 

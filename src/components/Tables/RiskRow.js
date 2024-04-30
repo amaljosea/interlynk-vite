@@ -1,13 +1,6 @@
 import React from 'react'
 
 import {
-  CopyIcon,
-  DeleteIcon,
-  ExternalLinkIcon,
-  LinkIcon,
-  SearchIcon
-} from '@chakra-ui/icons'
-import {
   Button,
   Flex,
   Icon,
@@ -18,13 +11,6 @@ import {
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
-
-import {
-  LetterCIcon,
-  LetterHIcon,
-  LetterLIcon,
-  LetterMIcon
-} from 'components/Icons/Icons'
 
 import { FaEllipsisV } from 'react-icons/fa'
 

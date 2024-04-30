@@ -1,21 +1,11 @@
-// Chakra imports
 import React from 'react'
 
-import {
-  Flex,
-  Icon,
-  Link,
-  Switch,
-  Text,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Flex, Switch, Text, useColorModeValue } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-
-import { FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa'
 
 const SBOMLinkDefaults = ({ title }) => {
   // Chakra color mode

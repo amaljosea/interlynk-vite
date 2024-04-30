@@ -1,5 +1,3 @@
-// chakra imports
-import PropTypes from 'prop-types'
 import React from 'react'
 
 import { Avatar, Flex, Text, useColorModeValue } from '@chakra-ui/react'

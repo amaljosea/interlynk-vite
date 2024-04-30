@@ -1,5 +1,4 @@
 import { useQuery } from '@apollo/client'
-import { PartsContextWrapper } from 'context/PartsContext'
 import { useParams } from 'react-router-dom'
 
 import { useGlobalState } from 'hooks/useGlobalState'

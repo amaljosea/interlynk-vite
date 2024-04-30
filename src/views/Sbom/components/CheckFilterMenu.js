@@ -2,7 +2,6 @@ import { useQuery } from '@apollo/client'
 
 import {
   Box,
-  Button,
   Menu,
   MenuItemOption,
   MenuList,

@@ -1,4 +1,3 @@
-// Chakra Imports
 import { useQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
 import React, { useState } from 'react'

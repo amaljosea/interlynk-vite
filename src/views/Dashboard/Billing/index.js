@@ -1,4 +1,3 @@
-// Chakra imports
 // Assets
 import BackgroundCard1 from 'assets/img/BackgroundCard1.png'
 import React from 'react'

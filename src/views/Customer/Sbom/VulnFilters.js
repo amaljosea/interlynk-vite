@@ -14,8 +14,6 @@ import {
   MenuList,
   MenuOptionGroup,
   Stack,
-  Switch,
-  Text,
   useDisclosure
 } from '@chakra-ui/react'
 

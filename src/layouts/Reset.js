@@ -1,4 +1,3 @@
-// chakra imports
 import DashboardBg from 'assets/img/dashboard.png'
 import InterlynkLogo from 'assets/img/logo.png'
 import Cookies from 'js-cookie'

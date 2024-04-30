@@ -1,4 +1,3 @@
-// Chakra imports
 // Assets
 import BgSignUp from 'assets/img/BgSignUp.png'
 import React from 'react'

@@ -1,4 +1,3 @@
-// Chakra imports
 import React, { useState } from 'react'
 
 import { Flex, Text, useColorModeValue, useDisclosure } from '@chakra-ui/react'

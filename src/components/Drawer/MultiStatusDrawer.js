@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React from 'react'
-import { useEffect } from 'react'
 import { useState } from 'react'
 
 import {
@@ -18,24 +17,13 @@ import {
   Select,
   SimpleGrid,
   Stack,
-  Table,
-  Tbody,
   Text,
   Textarea,
-  Th,
-  Thead,
-  chakra,
   useToast
 } from '@chakra-ui/react'
 
-import VulLinkRow from 'components/Tables/VulLinkRow'
-
 import { VexVulnCreate } from 'graphQL/Mutation'
-import {
-  getVexJustifications,
-  getVexLogs,
-  getVexStatuses
-} from 'graphQL/Queries'
+import { getVexStatuses } from 'graphQL/Queries'
 
 const MultiStatusDrawer = ({
   isOpen,

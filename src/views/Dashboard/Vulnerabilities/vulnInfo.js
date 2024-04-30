@@ -1,4 +1,3 @@
-// Chakra imports
 import { Link } from 'react-router-dom'
 import { getFullDateAndTime, linkURl } from 'utils'
 

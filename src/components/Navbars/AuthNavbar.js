@@ -1,4 +1,3 @@
-// Chakra imports
 import PropTypes from 'prop-types'
 import React from 'react'
 import { NavLink } from 'react-router-dom'
