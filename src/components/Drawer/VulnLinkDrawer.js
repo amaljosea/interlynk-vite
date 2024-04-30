@@ -36,22 +36,7 @@ import {
 import { ComponentVulnUpdate } from 'graphQL/Mutation'
 import { DispositionByParentUpdate } from 'graphQL/Mutation'
 
-const areEqual = (arr1, arr2) => {
-  if (arr1?.length !== arr2?.length) {
-    return false
-  }
-  arr1?.sort((a, b) => a.name.localeCompare(b.name))
-  arr2?.sort((a, b) => a.name.localeCompare(b.name))
-  for (let i = 0; i < arr1?.length; i++) {
-    if (arr1[i].name !== arr2[i].name || arr1[i].url !== arr2[i].url) {
-      return false
-    }
-  }
-  return true
-}
-
 const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
-  console.log('data', data)
   const { id, externalUrls, currentExternalUrls, vuln, isPart } = data || ''
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
@@ -68,8 +53,9 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
   useEffect(() => {
     if (externalUrls?.length > 0) {
       const urls = []
-      externalUrls?.map((item) => {
+      externalUrls?.map((item, index) => {
         urls.push({
+          id: index + 1,
           name: item.name,
           url: item.url
         })
@@ -81,8 +67,9 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
   useEffect(() => {
     if (currentExternalUrls?.length > 0) {
       const urls = []
-      currentExternalUrls?.map((item) => {
+      currentExternalUrls?.map((item, index) => {
         urls.push({
+          id: index + 1,
           name: item.name,
           url: item.url
         })
@@ -120,35 +107,37 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
   const handleLinkAdd = (e) => {
     e.preventDefault()
     if (isPart) {
-      setCurrentData((prev) => [{ name: type, url: link }, ...prev])
+      const id = currentData?.length + 1
+      setCurrentData((prev) => [{ id, name: type, url: link }, ...prev])
     } else {
-      setExternalData((prev) => [{ name: type, url: link }, ...prev])
+      const id = externalData?.length + 1
+      setExternalData((prev) => [{ id, name: type, url: link }, ...prev])
     }
     setType('')
     setLink('')
   }
 
-  const handleLinkRemove = (link) => {
+  const handleLinkRemove = (id) => {
     if (isPart) {
-      const currentList = currentData.filter(
-        (item) => item?.name !== link.name && item?.url !== link.url
-      )
+      const currentList = currentData.filter((item) => item?.id !== id)
       setCurrentData(currentList)
     } else {
-      const externalList = externalData.filter(
-        (item) => item?.name !== link.name && item?.url !== link.url
-      )
+      const externalList = externalData.filter((item) => item?.id !== id)
       setExternalData(externalList)
     }
   }
 
   const handleSave = async () => {
     if (isPart) {
+      const urls = []
+      currentData?.map((item) =>
+        urls.push({ name: item?.name, url: item?.url })
+      )
       await addPartsUrls({
         variables: {
           sbomId,
           componentVulnId: id,
-          externalUrls: currentData
+          externalUrls: urls
         }
       }).then((res) => {
         const errors = res?.data?.dispositionByParentUpdate?.errors
@@ -161,10 +150,14 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
         }
       })
     }
+    const extUrls = []
+    externalData?.map((item) =>
+      extUrls.push({ name: item?.name, url: item?.url })
+    )
     await addUrls({
       variables: {
         componentVulnId: id,
-        externalUrls: externalData
+        externalUrls: extUrls
       }
     }).then((res) => {
       const errors = res?.data?.componentVulnUpdate?.errors
@@ -177,9 +170,6 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
       }
     })
   }
-
-  // const isExternalEqual = areEqual(externalUrls, externalData)
-  // const isCurrentEqual = areEqual(currentExternalUrls, currentData)
 
   return (
     <Drawer size='sm' isOpen={isOpen} placement='right' onClose={onClose}>
@@ -274,7 +264,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
                                 color={'red'}
                                 cursor={'pointer'}
                                 display={isPart ? 'none' : 'block'}
-                                onClick={() => handleLinkRemove(item)}
+                                onClick={() => handleLinkRemove(item?.id)}
                               />
                             </Td>
                           </Tr>
@@ -320,11 +310,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
           <Button variant='outline' mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            colorScheme='blue'
-            onClick={handleSave}
-            // isDisabled={isPart ? isCurrentEqual : isExternalEqual}
-          >
+          <Button colorScheme='blue' onClick={handleSave}>
             Save
           </Button>
         </DrawerFooter>
