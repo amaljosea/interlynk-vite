@@ -3750,6 +3750,14 @@ export const GetUserNotificationChannels = gql`
   }
 `
 
+export const GetUserNotificationConfigs = gql`
+  query GetUserNotificationConfigs {
+    notificationConfigs {
+      slackWebhookUrl
+    }
+  }
+`
+
 export const ComponentVulnLogs = gql`
   query ComponentVulnLogs($vexLogableId: Uuid!) {
     componentVulnLogs(vexLogableId: $vexLogableId) {

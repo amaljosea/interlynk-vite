@@ -2330,6 +2330,18 @@ export const UpdateNotificationChannel = gql`
   }
 `
 
+export const UpdateNotificationConfig = gql`
+  mutation NotificationConfigUpdate(
+    $notificationConfigs: NotificationConfigInput!
+  ) {
+    notificationConfigUpdate(
+      input: { notificationConfigs: $notificationConfigs }
+    ) {
+      success
+    }
+  }
+`
+
 export const OrganizationManufacturerCreate = gql`
   mutation OrganizationManufacturerCreate(
     $orgName: String!
