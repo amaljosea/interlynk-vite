@@ -9,7 +9,6 @@ import {
   Box,
   Flex,
   IconButton,
-  Skeleton,
   Tag,
   TagLabel,
   Text,
@@ -20,34 +19,31 @@ import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
-import { GetSbomLicensesTable } from 'graphQL/Queries'
+import { GetShareLicensesTable } from 'graphQL/Queries'
 
 const Licenses = () => {
   const location = useLocation()
   const params = useParams()
-  const productId = params.productid
   const sbomId = params.sbomid
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { data, refetch, error } = useQuery(GetSbomLicensesTable, {
-    fetchPolicy: 'network-only',
-    skip: activeTab === 'licenses' ? false : true,
-    variables: {
-      projectId: productId,
-      sbomId: sbomId
-    }
-  })
-
-  const { componentLicenses } = data?.sbom || ''
-
   // PAGINATION
   const paginationSizes = [25, 50, 100]
-
   const [currentPage, setCurrentPage] = useState(1)
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
+
+  const { data, refetch, error } = useQuery(GetShareLicensesTable, {
+    skip: activeTab === 'licenses' ? false : true,
+    variables: {
+      sbomId: sbomId,
+      first: totalRows
+    }
+  })
+
+  const { componentLicenses } = data?.shareLynkQuery?.sbom || ''
 
   useEffect(() => {
     if (componentLicenses) {
@@ -57,8 +53,12 @@ const Licenses = () => {
   }, [componentLicenses])
 
   const setPaginationControl = (data) => {
-    setIsPrevActive(data.sbom?.componentLicenses?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data.sbom?.componentLicenses?.pageInfo?.hasNextPage)
+    setIsPrevActive(
+      data?.shareLynkQuery?.sbom?.componentLicenses?.pageInfo?.hasPreviousPage
+    )
+    setIsNextActive(
+      data?.shareLynkQuery?.sbom?.componentLicenses?.pageInfo?.hasNextPage
+    )
   }
 
   const disablePaginationControl = () => {
@@ -105,7 +105,6 @@ const Licenses = () => {
   const handleNextPage = useCallback(async () => {
     disablePaginationControl()
     setCurrentPage(currentPage + 1)
-
     await refetch({
       first: totalRows,
       last: undefined,
@@ -154,7 +153,6 @@ const Licenses = () => {
     {
       id: 'LICENSE_EXPRESSION',
       name: 'LICENSE EXPRESSION',
-      width: '20%',
       wrap: true,
       selector: ({ licenseExpression }) => {
         return (
@@ -170,7 +168,6 @@ const Licenses = () => {
     {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
-      width: '60%',
       wrap: true,
       selector: ({ components }) => {
         let sortedComponents = [...components]
@@ -207,7 +204,6 @@ const Licenses = () => {
       name: 'STATUS',
       wrap: true,
       sortable: true,
-      width: '20%',
       selector: ({ derivedState }) => {
         derivedState = derivedState?.toLowerCase() || 'Not Available'
         return (
@@ -237,21 +233,13 @@ const Licenses = () => {
   const ExpandedRow = ({ data: { components } }) => {
     let sortedComponents = [...components]
     sortedComponents.sort((a, b) => a.name.localeCompare(b.name))
-
     return (
       <Box
         width={'100%'}
         p={5}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        <Flex
-          direction='row'
-          py={5}
-          alignItems={'center'}
-          wrap='wrap'
-          gap={2}
-          marginLeft={'350px'}
-        >
+        <Flex direction='row' py={5} alignItems={'center'} wrap='wrap' gap={2}>
           {sortedComponents?.map((component, index) => (
             <Tag variant='subtle' key={index}>
               <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
