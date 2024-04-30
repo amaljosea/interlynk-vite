@@ -1330,7 +1330,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
       {isTableOpen && vulns && (
         <Drawer
           isOpen={isTableOpen}
-          placement='right'
+          placement='bottom'
           size='full'
           onClose={onTableClose}
         >

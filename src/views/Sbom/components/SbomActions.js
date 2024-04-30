@@ -315,7 +315,7 @@ const SbomActions = ({ sbom, refetch }) => {
           setIsLoading(false)
           const url = getProductDetailPageUrl({
             productgroupid: params.productgroupid,
-            productid: product?.groupId
+            productid: params.productid
           })
           navigate(url)
         }, 3000)
