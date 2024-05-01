@@ -105,46 +105,33 @@ const NotificationChannels = () => {
             onChange={() => handleSwitchChange(id)}
             isDisabled={['teams'].includes(id)}
           />
-          <Text
-            noOfLines={1}
-            color='gray.500'
-            fontWeight='400'
-            textTransform={'capitalize'}
-          >
+          <Text color='gray.500' fontWeight='400' textTransform={'capitalize'}>
             {id}
           </Text>
+          {id === 'slack' && notificationChannels[id] && (
+            <>
+              <Input
+                value={slackWebhookUrl}
+                onChange={(e) => {
+                  setSlackWebhookUrl(e.target.value)
+                  setIsChanged(true)
+                }}
+                placeholder='Paste Slack Webhook URL'
+                color='gray.600'
+                ml='20px'
+              />
+              <Button
+                colorScheme='blue'
+                ml='20px'
+                onClick={handleSaveWebhookUrl}
+                disabled={!isChanged}
+              >
+                Save
+              </Button>
+            </>
+          )}
         </Flex>
       ))}
-
-      {notificationChannels['slack'] && (
-        <Flex align='center' mb='20px'>
-          <Text
-            color='gray.500'
-            fontWeight='400'
-            textTransform={'capitalize'}
-            fontSize={'sm'}
-          >
-            Slack Webhook URL:
-          </Text>
-          <Input
-            value={slackWebhookUrl}
-            onChange={(e) => {
-              setSlackWebhookUrl(e.target.value)
-              setIsChanged(true)
-            }}
-            placeholder='Paste Slack Webhook URL'
-            color='gray.600'
-          />
-          <Button
-            colorScheme='blue'
-            ml='20px'
-            onClick={handleSaveWebhookUrl}
-            disabled={!isChanged}
-          >
-            Save
-          </Button>
-        </Flex>
-      )}
 
       <Text color='gray.500' fontSize='sm' mt='20px'>
         * Teams will be enabled soon
