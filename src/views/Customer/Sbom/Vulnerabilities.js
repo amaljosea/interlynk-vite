@@ -80,12 +80,7 @@ const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
       p={5}
       boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
     >
-      <Grid
-        templateColumns='repeat(5, 1fr)'
-        gap={12}
-        width={'90%'}
-        margin={'0 auto'}
-      >
+      <Grid templateColumns='repeat(5, 1fr)' gap={12}>
         {/* VULN DATA */}
         <GridItem
           w='100%'
@@ -187,7 +182,7 @@ const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
           </Box>
         </GridItem>
         {/* STATUS UPDATE */}
-        <GridItem w='100%' colSpan={3}>
+        <GridItem w='90%' ml='auto' colSpan={3}>
           {data && <VexStatusComponent data={data} />}
         </GridItem>
       </Grid>

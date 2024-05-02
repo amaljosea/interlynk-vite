@@ -386,7 +386,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
     },
     // LICENSES
     {
-      id: 'COMPONENTS_LICENSES',
+      id: 'COMPONENTS_LICENSES_EXP',
       name: 'LICENSES',
       width: '200px',
       selector: (row) => {
@@ -597,12 +597,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
         p={5}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        <Grid
-          templateColumns='repeat(3, 1fr)'
-          gap={6}
-          width={'80%'}
-          margin={'0 auto'}
-        >
+        <Grid templateColumns='repeat(3, 1fr)' gap={6}>
           <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
             <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
