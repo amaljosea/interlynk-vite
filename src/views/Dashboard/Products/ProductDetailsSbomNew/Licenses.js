@@ -243,14 +243,7 @@ const Licenses = () => {
         p={5}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        <Flex
-          direction='row'
-          py={5}
-          alignItems={'center'}
-          wrap='wrap'
-          gap={2}
-          marginLeft={'350px'}
-        >
+        <Flex direction='row' py={5} alignItems={'center'} wrap='wrap' gap={2}>
           {sortedComponents?.map((component, index) => (
             <Tag variant='subtle' key={index}>
               <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
