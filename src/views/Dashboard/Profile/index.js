@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
@@ -45,10 +45,22 @@ import Header from './components/Header'
 import PersonalInfo from './components/PersonalInfo'
 import TokenInfo from './components/TokenInfo'
 
+const orgTabs = [
+  'general',
+  'users',
+  'roles',
+  'feeds',
+  'checks',
+  'lists',
+  'legal'
+]
+
 function Profile() {
+  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
+  const activeTabNumber = Math.max(orgTabs.indexOf(activetab), 0)
   const org = localStorage.getItem('organization')
   const { totalRows, userPermissions } = useGlobalState()
 
@@ -56,6 +68,7 @@ function Profile() {
     { name: 'PERSONAL', icon: FaUserCircle },
     { name: 'ORGANIZATION', icon: FaBuilding }
   ]
+
   const viewOrg = userPermissions?.find(
     (item) => item.key === 'view_organization'
   )
@@ -91,11 +104,10 @@ function Profile() {
     variables: { first: totalRows, status: 'approved' }
   })
   const { data: roles, refetch: roleRefetch } = useQuery(GetRoles, {
-    skip: org === 'undefined' ? true : tabIndex === 2 ? false : true
+    skip: org === 'undefined' ? true : activetab === 'roles' ? false : true
   })
   const { data: mfc, refetch: mfcRefetch } = useQuery(GetOrgManufacturers, {
-    skip: org === 'undefined' ? true : tabIndex === 6 ? false : true,
-    fetchPolicy: 'network-only'
+    skip: org === 'undefined' ? true : activetab === 'legal' ? false : true
   })
   const { data: settingsData, refetch: settingsRefetch } = useQuery(
     GetOrgSettings,
@@ -104,39 +116,34 @@ function Profile() {
     }
   )
 
-  const onTabChange = (value) => setTabIndex(value)
-  const handleChange = (value) => setPsIndex(value)
-
-  useEffect(() => {
-    if (activetab === 'person') {
-      setSelectedTab('PERSONAL')
-      setPsIndex(0)
-    } else if (activetab === 'organization') {
-      setSelectedTab('PERSONAL')
-      setPsIndex(1)
-    } else if (activetab === 'token') {
-      setSelectedTab('PERSONAL')
-      setPsIndex(2)
-    } else if (activetab === 'general') {
-      setSelectedTab('ORGANIZATION')
-      setTabIndex(0)
-    } else if (activetab === 'team') {
-      setSelectedTab('ORGANIZATION')
-      setTabIndex(1)
-    } else if (activetab === 'roles') {
-      setSelectedTab('ORGANIZATION')
-      setTabIndex(2)
-    } else if (activetab === 'feeds') {
-      setSelectedTab('ORGANIZATION')
-      setTabIndex(3)
-    } else if (activetab === 'checks') {
-      setSelectedTab('ORGANIZATION')
-      setTabIndex(4)
-    } else if (activetab === 'lists') {
-      setSelectedTab('ORGANIZATION')
-      setTabIndex(5)
+  const onTabChange = (value) => {
+    switch (value) {
+      case 0:
+        navigate(`/vendor/settings?tab=general`)
+        break
+      case 1:
+        navigate(`/vendor/settings?tab=users`)
+        break
+      case 2:
+        navigate(`/vendor/settings?tab=roles`)
+        break
+      case 3:
+        navigate(`/vendor/settings?tab=feeds`)
+        break
+      case 4:
+        navigate(`/vendor/settings?tab=checks`)
+        break
+      case 5:
+        navigate(`/vendor/settings?tab=lists`)
+        break
+      case 6:
+        navigate(`/vendor/settings?tab=legal`)
+        break
+      default:
+        navigate(`/vendor/settings?tab=general`)
     }
-  }, [activetab, isAdmin])
+  }
+  const handleChange = (value) => setPsIndex(value)
 
   if (error) {
     return (
@@ -182,8 +189,8 @@ function Profile() {
             variant='enclosed'
             w={'100%'}
             bg={'white'}
-            defaultIndex={tabIndex}
-            onChange={(e) => onTabChange(e)}
+            defaultIndex={activeTabNumber}
+            onChange={onTabChange}
           >
             <TabList>
               {[
