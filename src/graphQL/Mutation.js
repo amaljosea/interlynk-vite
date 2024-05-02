@@ -782,6 +782,7 @@ export const CreateComponent = gql`
     $sbomId: Uuid!
     $kind: String!
     $name: String!
+    $description: String
     $version: String
     $group: String
     $licenses: LicenseInput
@@ -796,6 +797,7 @@ export const CreateComponent = gql`
         sbomId: $sbomId
         kind: $kind
         name: $name
+        description: $description
         version: $version
         group: $group
         licenses: $licenses
@@ -827,6 +829,7 @@ export const UpdateComponent = gql`
     $sbomId: Uuid!
     $kind: String
     $name: String
+    $description: String
     $version: String
     $group: String
     $licenses: LicenseInput
@@ -843,6 +846,7 @@ export const UpdateComponent = gql`
         sbomId: $sbomId
         kind: $kind
         name: $name
+        description: $description
         version: $version
         group: $group
         licenses: $licenses

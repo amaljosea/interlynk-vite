@@ -35,6 +35,7 @@ import {
   Select,
   Stack,
   Text,
+  Textarea,
   chakra,
   useDisclosure,
   useToast
@@ -98,6 +99,7 @@ function ComponentDrawer(props) {
 
   const [groupInfo, setGroupInfo] = useState('')
   const [compName, setCompName] = useState('')
+  const [compDesc, setCompDesc] = useState('')
   const [compVersion, setCompVersion] = useState('')
   const [compKind, setCompKind] = useState('')
   const [compScope, setCompScope] = useState('')
@@ -122,6 +124,7 @@ function ComponentDrawer(props) {
     if (data) {
       const {
         name,
+        description,
         version,
         kind,
         cpes,
@@ -133,6 +136,7 @@ function ComponentDrawer(props) {
       } = data
       setGroupInfo(group)
       setCompName(name)
+      setCompDesc(description)
       setCompVersion(version)
       if (purl !== '') {
         setPurlValue(purl)
@@ -234,6 +238,7 @@ function ComponentDrawer(props) {
         sbomId: sbomId,
         kind: compKind,
         name: compName,
+        description: compDesc,
         version: compVersion,
         group: groupInfo,
         scope: compScope,
@@ -289,6 +294,7 @@ function ComponentDrawer(props) {
         sbomId: sbomId,
         kind: compKind,
         name: compName,
+        description: compDesc,
         version: compVersion,
         group: groupInfo,
         scope: compScope,
@@ -391,6 +397,15 @@ function ComponentDrawer(props) {
     onInfoOpen()
   }
 
+  const onCheckDesc = () => {
+    setInfoHeading(`Description`)
+    setInfoText(
+      `A component description refers to the specific description or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software produc`
+    )
+    setInfoUrl(``)
+    onInfoOpen()
+  }
+
   const onCheckVersion = () => {
     setInfoHeading(`Version`)
     setInfoText(
@@ -474,6 +489,27 @@ function ComponentDrawer(props) {
                   placeholder='Enter name'
                   value={compName}
                   onChange={(e) => setCompName(e.target.value)}
+                />
+              </FormControl>
+              {/* Description */}
+              <FormControl isReadOnly={signedUrlParams}>
+                <FormLabel htmlFor='compDescription' fontSize={'sm'}>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                    <Text>Description</Text>
+                    <Icon
+                      as={InfoIcon}
+                      color={'blue.500'}
+                      cursor={'pointer'}
+                      onClick={onCheckDesc}
+                    />
+                  </Flex>
+                </FormLabel>
+                <Textarea
+                  size='md'
+                  fontSize={'sm'}
+                  placeholder='Add description'
+                  value={compDesc}
+                  onChange={(e) => setCompDesc(e.target.value)}
                 />
               </FormControl>
               {/* Version */}
