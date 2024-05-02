@@ -507,7 +507,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
     },
     // LICENSES
     {
-      id: 'COMPONENTS_LICENSES',
+      id: 'COMPONENTS_LICENSES_EXP',
       name: 'LICENSES',
       width: '200px',
       selector: (row) => {
