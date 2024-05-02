@@ -80,7 +80,6 @@ const RelationshipDrawer = ({
   const [isAdded, setIsAdded] = useState(false)
 
   const { data: allComponents } = useQuery(GetAllComponents, {
-    fetchPolicy: 'network-only',
     variables: {
       projectId: productId,
       sbomId: sbomId,
