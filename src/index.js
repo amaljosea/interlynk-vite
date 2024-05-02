@@ -1,48 +1,22 @@
 import * as Sentry from '@sentry/react'
+import { MainRoutes } from 'MainRoutes.js'
 import { ApolloWrapper } from 'context/ApolloWrapper.js'
-import { PartsContextWrapper } from 'context/PartsContext.js'
-import Cookies from 'js-cookie'
-import Reset from 'layouts/Reset'
-import Success from 'layouts/Success'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactGA from 'react-ga'
 import TagManager from 'react-gtm-module'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import theme from 'theme/theme.js'
-import PubProducts from 'views/Customer/Products'
-import PubProductDetails from 'views/Customer/Products/ProductDetails'
-import PubProductList from 'views/Customer/Products/ProductList'
-import PubSbomDetails from 'views/Customer/Sbom/index.js'
-import Dashboard from 'views/Dashboard/Dashboard'
-import Policies from 'views/Dashboard/Policies'
-import Products from 'views/Dashboard/Products'
-import ProductDetailsMain from 'views/Dashboard/Products/ProductDetailsMain.js'
-import ProductDetailsSbomNew from 'views/Dashboard/Products/ProductDetailsSbomNew/index.js'
-import ProductDetailsVul from 'views/Dashboard/Products/ProductDetailsVul.js'
-import ProductList from 'views/Dashboard/Products/ProductList'
-import Profile from 'views/Dashboard/Profile'
-import Support from 'views/Dashboard/Support'
-import Tools from 'views/Dashboard/Tools'
-import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 
 import { ChakraProvider } from '@chakra-ui/react'
 
 import ChatbotPreview from 'components/ChatbotPreview'
-import Licenses from 'components/Licenses'
 import ScrollToTop from 'components/ScrollToTop.js'
 
 import { GlobalStateProvider } from 'hooks/useGlobalState'
 
-import AdminLayout from './layouts/Admin.js'
-// import SBOMLayout from './layouts/SBOM.js'
-import AuthLayout from './layouts/Auth.js'
-import CustomerLayout from './layouts/Customer.js'
-import LoginLayout from './layouts/Login.js'
-import Register from './layouts/Register.js'
 import './main.css'
 
-const authToken = Cookies.get('authToken')
 const env = process.env.NODE_ENV
 
 const TRACKING_ID = '411749268'
@@ -79,75 +53,7 @@ ReactDOM.render(
           <ChatbotPreview env={env} />
           <ScrollToTop />
           <ApolloWrapper>
-            <Routes>
-              <Route
-                path=''
-                element={
-                  authToken ? (
-                    <Navigate replace to='/vendor/dashboard' />
-                  ) : (
-                    <Navigate replace to='/auth' />
-                  )
-                }
-              />
-              <Route path={`auth`} element={<AuthLayout />} />
-              <Route path={`reset_password`} element={<Reset />} />
-              <Route path={`register`} element={<Register />} />
-              <Route path={`accept-user-invitation`} element={<Success />} />
-              <Route path={`confirmation`} element={<Success />} />
-              <Route
-                path={`vendor`}
-                element={
-                  <PartsContextWrapper>
-                    <AdminLayout />
-                  </PartsContextWrapper>
-                }
-              >
-                <Route path={`dashboard`} element={<Dashboard />} />
-                <Route path={`products`} element={<Products />}>
-                  <Route index element={<ProductList />} />
-                  <Route
-                    exact
-                    path=':productgroupid/env/:productid'
-                    Component={ProductDetailsMain}
-                  />
-                  <Route
-                    exact
-                    path=':productgroupid/env/:productid/version/:sbomid'
-                    Component={ProductDetailsSbomNew}
-                  />
-                  <Route
-                    exact
-                    path=':productgroupid/env/:productid/vulnerability/:vulnerabilityid'
-                    Component={ProductDetailsVul}
-                  />
-                </Route>
-                {/* <Route path={`SAG`} element={<Sag />} /> */}
-                <Route path={`vulnerabilities`} element={<Vulnerabilities />} />
-                <Route path={`licenses`} element={<Licenses />} />
-                <Route path={`tools`} element={<Tools />} />
-                <Route path={`support`} element={<Support />} />
-                <Route path={`policies`} element={<Policies />} />
-                <Route path={`settings`} element={<Profile />} />
-              </Route>
-              <Route path={`login`} element={<LoginLayout />} />
-              <Route path={`customer`} element={<CustomerLayout />}>
-                <Route path={`products`} element={<PubProducts />}>
-                  <Route index element={<PubProductList />} />
-                  <Route
-                    exact
-                    path=':productgroupid/env/:productid'
-                    element={<PubProductDetails />}
-                  />
-                  <Route
-                    exact
-                    path=':productgroupid/env/:productid/version/:sbomid'
-                    element={<PubSbomDetails />}
-                  />
-                </Route>
-              </Route>
-              <Route path={`register`} element={<Register />} />
-            </Routes>
+            <MainRoutes />
           </ApolloWrapper>
         </ChakraProvider>
       </GlobalStateProvider>

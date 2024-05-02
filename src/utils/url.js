@@ -1,4 +1,4 @@
-const getUserType = () => {
+export const getUserType = () => {
   return window.location.pathname.split('/')[1]
 }
 

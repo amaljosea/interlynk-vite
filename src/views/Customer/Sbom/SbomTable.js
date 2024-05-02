@@ -1,9 +1,10 @@
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { getProductVersionDetailPageUrl } from 'utils/url'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
+
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { FaLock } from 'react-icons/fa6'
 
@@ -25,14 +26,12 @@ const tabs = [
 ]
 
 const SbomTable = ({ data, refetch, loading, error }) => {
-  const params = useParams()
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
   const navigate = useNavigate()
 
   const onTabChange = (value) => {
-    const link = getProductVersionDetailPageUrl({
-      productgroupid: params.productgroupid,
-      productid: params.productid,
-      sbomid: params.sbomid,
+    const link = generateProductVersionDetailPageUrlFromCurrentUrl({
       paramsObj: {
         tab: tabs[value]
       }

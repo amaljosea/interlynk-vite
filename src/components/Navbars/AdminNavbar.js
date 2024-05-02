@@ -3,10 +3,7 @@ import PropTypes from 'prop-types'
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { permissionList } from 'utils'
-import {
-  getProductDetailPageUrl,
-  getProductVersionDetailPageUrl
-} from 'utils/url'
+import { getProductDetailPageUrl } from 'utils/url'
 
 import {
   Breadcrumb,
@@ -20,6 +17,7 @@ import {
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import { useSbom } from 'hooks/useSbom'
 
@@ -32,6 +30,8 @@ export default function AdminNavbar(props) {
   const navigate = useNavigate()
   const { setActiveSbomTab, setUserPermissions } = useGlobalState()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
 
   useQuery(GetUserPermissions, {
     skip: signedUrlParams ? true : false,
@@ -187,11 +187,7 @@ export default function AdminNavbar(props) {
                 <BreadcrumbLink
                   href={
                     parts
-                      ? getProductVersionDetailPageUrl({
-                          productgroupid: params.productgroupid,
-                          productid: params.productid,
-                          sbomid: params.sbomid
-                        })
+                      ? generateProductVersionDetailPageUrlFromCurrentUrl()
                       : ''
                   }
                   onClick={() => setActiveSbomTab(0)}
