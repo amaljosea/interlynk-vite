@@ -740,8 +740,8 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                             <FormControl isRequired>
                               <Select
                                 size='sm'
-                                id='operator'
-                                name='operator'
+                                id='vulnStatus'
+                                name='vulnStatus'
                                 value={item?.value}
                                 onChange={(e) =>
                                   handleChange(e.target.value, item.id, 'value')
@@ -772,6 +772,52 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                               </Select>
                             </FormControl>
                           )}
+                          {item?.subject === 'COMPONENT_TYPE' &&
+                            (item?.operator === 'IS' ||
+                              item?.operator === 'IS_NOT' ||
+                              item?.operator === '') && (
+                              <FormControl isRequired>
+                                <Select
+                                  size='sm'
+                                  id='compType'
+                                  name='compType'
+                                  value={item?.value}
+                                  onChange={(e) =>
+                                    handleChange(
+                                      e.target.value,
+                                      item.id,
+                                      'value'
+                                    )
+                                  }
+                                  textTransform={'capitalize'}
+                                  fontSize='sm'
+                                >
+                                  <option value=''>-- Select --</option>
+                                  {[
+                                    'application',
+                                    'framework',
+                                    'library',
+                                    'container',
+                                    'platform',
+                                    'operating-system',
+                                    'device',
+                                    'device-driver',
+                                    'firmware',
+                                    'file',
+                                    'machine-learning-model',
+                                    'data'
+                                  ].map((item, index) => (
+                                    <option
+                                      key={index}
+                                      value={item}
+                                      style={{ textTransform: 'capitalize' }}
+                                    >
+                                      {item}
+                                    </option>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            )}
                           {item?.operator === 'RANGE' && (
                             <Stack
                               direction={'column'}
@@ -781,7 +827,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                                 <InputGroup size='sm'>
                                   <InputLeftAddon>Min</InputLeftAddon>
                                   <Input
-                                    width={100}
+                                    width={16}
                                     type={'number'}
                                     name='min'
                                     value={item?.min}
@@ -798,11 +844,15 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                                   {item?.subject === 'VULNERABILITY_EPSS' && (
                                     <InputRightAddon>%</InputRightAddon>
                                   )}
+                                  {item?.subject ===
+                                    'VULNERABILITY_STATUS_AGE' && (
+                                    <InputRightAddon>Days</InputRightAddon>
+                                  )}
                                 </InputGroup>
                                 <InputGroup size='sm'>
                                   <InputLeftAddon>Max</InputLeftAddon>
                                   <Input
-                                    width={100}
+                                    width={16}
                                     type={'number'}
                                     name='max'
                                     value={item?.max}
@@ -818,6 +868,10 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                                   />
                                   {item?.subject === 'VULNERABILITY_EPSS' && (
                                     <InputRightAddon>%</InputRightAddon>
+                                  )}
+                                  {item?.subject ===
+                                    'VULNERABILITY_STATUS_AGE' && (
+                                    <InputRightAddon>Days</InputRightAddon>
                                   )}
                                 </InputGroup>
                               </Flex>
@@ -876,6 +930,10 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                               </InputGroup>
                             )}
                           {item?.operator !== 'RANGE' &&
+                            item?.subject !== 'COMPONENT_TYPE' &&
+                            item?.subject !== 'VERSION_PRIMARY' &&
+                            item?.subject !==
+                              'SBOM_PRIMARY_COMPONENT_RELATIONSHIPS' &&
                             item?.subject !== 'VULNERABILITY_SEV' &&
                             item?.subject !== 'VULNERABILITY_EPSS' &&
                             item?.subject !== 'VULNERABILITY_STATUS' &&
