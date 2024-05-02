@@ -88,6 +88,60 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
       })
   }
 
+  const onCheckVulnScan = useCallback(() => {
+    setInfoHeading(`Vulnerability Scan`)
+    setInfoText(
+      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+    )
+    setInfoUrl(``)
+    onInfoOpen()
+  }, [onInfoOpen])
+
+  const onCheckVulnStatus = useCallback(() => {
+    setInfoHeading(`Retain Vulnerability Status`)
+    setInfoText(
+      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+    )
+    setInfoUrl(``)
+    onInfoOpen()
+  }, [onInfoOpen])
+
+  const onCheckHealth = useCallback(() => {
+    setInfoHeading(`Checks`)
+    setInfoText(
+      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+    )
+    setInfoUrl(``)
+    onInfoOpen()
+  }, [onInfoOpen])
+
+  const onCheckAutomation = useCallback(() => {
+    setInfoHeading(`Automation`)
+    setInfoText(
+      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+    )
+    setInfoUrl(``)
+    onInfoOpen()
+  }, [onInfoOpen])
+
+  const onCheckComponent = useCallback(() => {
+    setInfoHeading(`Internal Component Labeling`)
+    setInfoText(
+      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+    )
+    setInfoUrl(``)
+    onInfoOpen()
+  }, [onInfoOpen])
+
+  const onCheckRetaintion = useCallback(() => {
+    setInfoHeading(`Data Retaintion`)
+    setInfoText(
+      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+    )
+    setInfoUrl(``)
+    onInfoOpen()
+  }, [onInfoOpen])
+
   const onCheckMfc = useCallback(() => {
     setInfoHeading(`Manufacturer`)
     setInfoText(
@@ -125,6 +179,12 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Vulnerability Scan
+                  <InfoIcon
+                    ml={2}
+                    color={'blue.500'}
+                    cursor={'pointer'}
+                    onClick={onCheckVulnScan}
+                  />
                 </Text>
               </Flex>
               {/* COPY VEX FROM PREVIOUS */}
@@ -141,7 +201,13 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
                   isDisabled={!enabled || !editControls}
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
-                  Copy Vex From Previous
+                  Retain Vulnerability Status
+                  <InfoIcon
+                    ml={2}
+                    color={'blue.500'}
+                    cursor={'pointer'}
+                    onClick={onCheckVulnStatus}
+                  />
                 </Text>
               </Flex>
               {/* APPLY CHECK */}
@@ -157,6 +223,12 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Checks
+                  <InfoIcon
+                    ml={2}
+                    color={'blue.500'}
+                    cursor={'pointer'}
+                    onClick={onCheckHealth}
+                  />
                 </Text>
               </Flex>
               {/* APPLY AUTOMATION */}
@@ -172,6 +244,12 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Automation
+                  <InfoIcon
+                    ml={2}
+                    color={'blue.500'}
+                    cursor={'pointer'}
+                    onClick={onCheckAutomation}
+                  />
                 </Text>
               </Flex>
               {/* APPLY INTERNAL COMPONENTS */}
@@ -187,6 +265,12 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Internal Component Labeling
+                  <InfoIcon
+                    ml={2}
+                    color={'blue.500'}
+                    cursor={'pointer'}
+                    onClick={onCheckComponent}
+                  />
                 </Text>
               </Flex>
             </VStack>
@@ -194,7 +278,15 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
           {/* RIGHT */}
           <GridItem w='100%'>
             <FormControl>
-              <FormLabel>Retain Data For</FormLabel>
+              <FormLabel>
+                Retain Data For
+                <InfoIcon
+                  ml={2}
+                  color={'blue.500'}
+                  cursor={'pointer'}
+                  onClick={onCheckRetaintion}
+                />
+              </FormLabel>
               <Select
                 width={'400px'}
                 id='dataRetention'
