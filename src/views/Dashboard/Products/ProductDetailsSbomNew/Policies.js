@@ -146,7 +146,7 @@ const Policies = () => {
           >
             <TagLabel mx={'auto'} pt={0.5} textTransform={'capitalize'}>
               {result === 'initialized'
-                ? 'Initialized'
+                ? 'Running'
                 : result === 'not_detected'
                   ? 'Pass'
                   : result === 'error'
