@@ -160,7 +160,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Stack>
         )
       },
-      width: '280px',
+      width: '15%',
       sortable: true
     },
     // SEVERITY
@@ -183,7 +183,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
         )
       },
       sortable: true,
-      width: '150px',
+      width: '10%',
       wrap: true
     },
     // SOURCE
@@ -207,7 +207,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Tag>
         )
       },
-      width: '130px',
+      width: '9%',
       wrap: true,
       sortable: true
     },
@@ -231,7 +231,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Flex>
         )
       },
-      width: '130px',
+      width: '7%',
       wrap: true,
       sortable: true
     },
@@ -288,7 +288,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
         )
       },
       sortable: true,
-      width: '150px',
+      width: '12%',
       wrap: true
     },
     // STATUSES
@@ -329,7 +329,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Stack>
         )
       },
-      width: '350px',
+      width: '22%',
       wrap: true
     },
     // PUBLISHED AT
@@ -368,6 +368,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
         const dateB = new Date(b?.lastModifiedAt)
         return dateA - dateB // Sort in descending order
       },
+      width: '12%',
       wrap: true,
       right: 'true'
     }

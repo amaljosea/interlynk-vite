@@ -415,7 +415,7 @@ const ProductTable = ({ data, refetch }) => {
           />
         )
       },
-      width: '150px',
+      width: '8%',
       sortable: true
     },
     // PRODUCT
@@ -429,12 +429,6 @@ const ProductTable = ({ data, refetch }) => {
           setSelectedSbom([])
           const env = projects?.find((item) => item.name === environment)
           setEnvName(env ? env?.name : defaultProject?.name)
-          const product = {
-            id: id,
-            name: name,
-            groupId: id,
-            productId: env?.id || defaultProject?.id
-          }
           prodDispatch({
             type: 'SET_CURRENT_PRODUCT',
             payload: { id: env?.id || defaultProject?.id }
@@ -538,6 +532,7 @@ const ProductTable = ({ data, refetch }) => {
           </Stack>
         )
       },
+      width: '12%',
       wrap: true
     },
     // VERSION
@@ -637,6 +632,7 @@ const ProductTable = ({ data, refetch }) => {
           </Menu>
         )
       },
+      width: '10%',
       right: 'true',
       omit: signedUrlParams
     }

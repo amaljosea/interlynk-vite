@@ -218,15 +218,14 @@ const PolicyTable = ({ data, refetch }) => {
           />
         )
       },
-      width: '150px',
+      width: '8%',
       omit: productId
     },
     {
       id: 'POLICY',
       name: 'POLICY',
       selector: (row) => <Text my={4}>{row?.name}</Text>,
-      wrap: true,
-      width: '350px'
+      wrap: true
     },
     {
       id: 'CONDITIONS',
@@ -242,7 +241,7 @@ const PolicyTable = ({ data, refetch }) => {
           </TagLabel>
         </Tag>
       ),
-      width: '200px',
+      width: '12%',
       wrap: true
     },
     {
@@ -271,7 +270,7 @@ const PolicyTable = ({ data, refetch }) => {
           </Tag>
         )
       },
-      width: '250px',
+      width: '12%',
       wrap: true
     },
     // UPDATED AT
@@ -295,7 +294,6 @@ const PolicyTable = ({ data, refetch }) => {
         return (
           <Select
             size='sm'
-            width={'120px'}
             value={isExcluded ? 'no' : 'yes'}
             onChange={() =>
               isExcluded ? handleDeleteExclusion(id) : handleCreateExclusion(id)
@@ -317,7 +315,6 @@ const PolicyTable = ({ data, refetch }) => {
           </Select>
         )
       },
-      width: '200px',
       right: 'true',
       omit: !productId
     },
@@ -372,7 +369,7 @@ const PolicyTable = ({ data, refetch }) => {
           </Menu>
         )
       },
-      width: '100px',
+      width: '10%',
       right: 'true',
       omit: productId
     }

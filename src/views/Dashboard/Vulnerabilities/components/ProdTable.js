@@ -112,7 +112,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         )
       },
       wrap: true,
-      width: '200px',
+      width: '15%',
       omit: params?.name ? true : false
     },
     // VERSION
@@ -128,7 +128,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       ),
       wrap: true,
       right: 'true',
-      width: '250px'
+      width: '10%'
     },
     // VULN COMPONENT
     {
@@ -149,7 +149,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         )
       },
       wrap: true,
-      width: '400px'
+      width: '15%'
     },
     // ENV
     {
@@ -164,7 +164,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         )
       },
       wrap: true,
-      width: '220px'
+      width: '12%'
     },
     // STATUS
     {
@@ -197,7 +197,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
           {timeSince(row?.updatedAt)}
         </Tooltip>
       ),
-      width: '160px',
+      width: '12%',
       right: 'true',
       wrap: true
     }

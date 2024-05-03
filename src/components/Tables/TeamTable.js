@@ -149,7 +149,7 @@ const TeamTable = ({ currentUser }) => {
           </Flex>
         )
       },
-      width: '300px',
+      width: '20%',
       wrap: true
     },
     // AUTH
@@ -157,7 +157,8 @@ const TeamTable = ({ currentUser }) => {
       id: 'email',
       name: 'EMAIL',
       selector: (row) => <Text my={2}>{row?.email}</Text>,
-      wrap: true
+      wrap: true,
+      width: '20%'
     },
     // ROLE
     {
@@ -275,7 +276,7 @@ const TeamTable = ({ currentUser }) => {
         )
       },
       right: 'true',
-      width: '120px'
+      width: '10%'
     }
   ]
 

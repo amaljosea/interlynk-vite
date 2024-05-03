@@ -463,7 +463,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
         )
       },
       wrap: true,
-      width: '400px',
+      width: '18%',
       sortable: true
     },
     // VERSION
@@ -471,7 +471,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => <Text textAlign='right'>{row?.version}</Text>,
-      width: '200px',
+      width: '12%',
       wrap: true,
       sortable: true,
       right: 'true'
@@ -501,7 +501,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
         )
       },
       sortable: true,
-      width: '300px',
+      width: '20%',
       wrap: true,
       grow: 2
     },
@@ -509,7 +509,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
     {
       id: 'COMPONENTS_LICENSES_EXP',
       name: 'LICENSES',
-      width: '200px',
+      width: '10%',
       selector: (row) => {
         const { licenses, licensesExp, licensesCustom } = row
         const totalSpdx = licenses?.length > 1 && licenses.slice(1)
@@ -721,9 +721,9 @@ const Components = ({ sbomData, sbomRefetch }) => {
           </>
         )
       },
+      width: '10%',
       wrap: true,
-      right: 'true',
-      width: '120px'
+      right: 'true'
     }
   ]
 

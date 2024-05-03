@@ -226,7 +226,8 @@ const Licenses = () => {
             </TagLabel>
           </Tag>
         )
-      }
+      },
+      right: 'true'
     }
   ]
 

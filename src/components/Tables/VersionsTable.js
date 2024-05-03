@@ -283,7 +283,7 @@ const VersionsTable = ({ projectGroup }) => {
       id: 'SBOMS_PROJECT_VERSION',
       name: 'VERSION',
       selector: (row) => {
-        const { id, projectVersion } = row
+        const { projectVersion } = row
         const link = getProductVersionDetailPageUrl({
           productgroupid: productGroupId,
           productid: productId,
@@ -306,8 +306,8 @@ const VersionsTable = ({ projectGroup }) => {
           </Link>
         )
       },
+      width: '12%',
       wrap: true,
-      width: '250px',
       sortable: true
     },
     // COMPONENTS
@@ -333,7 +333,7 @@ const VersionsTable = ({ projectGroup }) => {
           </Link>
         )
       },
-      width: '150px'
+      width: '11%'
     },
     // LICENSES
     {
@@ -354,7 +354,7 @@ const VersionsTable = ({ projectGroup }) => {
           </Tag>
         )
       },
-      width: '150px'
+      width: '8%'
     },
     // VULNERABILITIES
     {
@@ -415,7 +415,7 @@ const VersionsTable = ({ projectGroup }) => {
           </Stack>
         )
       },
-      width: '360px'
+      width: '26%'
     },
     // STATUS
     {
@@ -429,7 +429,8 @@ const VersionsTable = ({ projectGroup }) => {
             <TagLabel mx={'auto'}>{lifecycle}</TagLabel>
           </Tag>
         )
-      }
+      },
+      width: '10%'
     },
     // CREATED AT
     {
@@ -443,7 +444,7 @@ const VersionsTable = ({ projectGroup }) => {
           </Tooltip>
         )
       },
-      minWidth: '150px',
+      width: '10%',
       right: 'true',
       sortable: true,
       sortFunction: (a, b) => {
@@ -456,7 +457,6 @@ const VersionsTable = ({ projectGroup }) => {
     {
       id: 'SBOMS_UPDATED_AT',
       name: 'UPDATED',
-      minWidth: '150px',
       selector: (row) => {
         const { updatedAt } = row
         return (
@@ -471,6 +471,7 @@ const VersionsTable = ({ projectGroup }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB
       },
+      width: '10%',
       right: 'true'
     },
     // ACTIONS

@@ -458,7 +458,7 @@ const Vulnerabilities = ({ sbomData }) => {
           </Flex>
         )
       },
-      width: '280px',
+      width: '15%',
       sortable: true
     },
     // COMPONENT
@@ -483,7 +483,7 @@ const Vulnerabilities = ({ sbomData }) => {
         )
       },
       wrap: true,
-      width: '250px',
+      width: '12%',
       sortable: true
     },
     // SEVERITY
@@ -508,7 +508,7 @@ const Vulnerabilities = ({ sbomData }) => {
           </Tag>
         )
       },
-      width: '140px',
+      width: '9%',
       sortable: true,
       wrap: true
     },
@@ -536,7 +536,7 @@ const Vulnerabilities = ({ sbomData }) => {
           </Tag>
         )
       },
-      width: '120px',
+      width: '9%',
       sortable: true,
       wrap: true
     },
@@ -569,7 +569,7 @@ const Vulnerabilities = ({ sbomData }) => {
           </Flex>
         )
       },
-      width: '120px',
+      width: '7%',
       sortable: true,
       wrap: true
     },
@@ -632,7 +632,7 @@ const Vulnerabilities = ({ sbomData }) => {
           </Flex>
         )
       },
-      width: '150px',
+      width: '10%',
       sortable: true,
       wrap: true
     },
@@ -654,7 +654,7 @@ const Vulnerabilities = ({ sbomData }) => {
         </Tooltip>
       ),
       wrap: true,
-      width: '180px',
+      width: '12%',
       sortable: true,
       right: 'true',
       omit: true
@@ -683,7 +683,6 @@ const Vulnerabilities = ({ sbomData }) => {
           </Tag>
         )
       },
-      width: '200px',
       wrap: true,
       sortable: true
     },
@@ -712,7 +711,7 @@ const Vulnerabilities = ({ sbomData }) => {
         const dateB = new Date(b.vuln.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      minWidth: '150px',
+      width: '10%',
       wrap: true,
       right: 'true'
     }

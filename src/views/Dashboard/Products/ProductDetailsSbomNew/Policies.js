@@ -181,7 +181,7 @@ const Policies = () => {
         )
       },
       right: 'true',
-      width: '200px',
+      width: '10%',
       wrap: true
     },
     // CREATED AT
@@ -193,7 +193,7 @@ const Policies = () => {
           {timeSince(row?.updatedAt)}
         </Tooltip>
       ),
-      width: '265px',
+      width: '14%',
       right: 'true',
       wrap: true
     }

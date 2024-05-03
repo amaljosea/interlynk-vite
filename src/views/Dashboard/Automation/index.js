@@ -115,7 +115,7 @@ const Automation = ({ data, refetch }) => {
         const { applicability } = row
         return <Text textTransform={'capitalize'}>{applicability}</Text>
       },
-      width: '160px',
+      width: '12%',
       wrap: true
     },
     // NAME
@@ -207,7 +207,7 @@ const Automation = ({ data, refetch }) => {
         )
       },
       right: 'true',
-      width: '120px'
+      width: '10%'
     }
   ]
 

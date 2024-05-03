@@ -158,7 +158,7 @@ const Changelog = () => {
       },
       sortable: true,
       wrap: true,
-      width: '90px'
+      width: '8%'
     },
     // CHANGED OBJECT
     {
@@ -382,7 +382,7 @@ const Changelog = () => {
         </Tooltip>
       ),
       sortable: true,
-      width: '200px',
+      width: '12%',
       right: 'true',
       wrap: true
     },
@@ -403,7 +403,7 @@ const Changelog = () => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      width: '180px',
+      width: '10%',
       right: 'true',
       wrap: true
     }

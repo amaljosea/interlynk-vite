@@ -306,8 +306,8 @@ const Parts = ({ sbomRefetch }) => {
           </Link>
         )
       },
-      wrap: true,
-      width: '200px'
+      width: '10%',
+      wrap: true
     },
     {
       id: 'VERSION',
@@ -320,7 +320,7 @@ const Parts = ({ sbomRefetch }) => {
           </Text>
         )
       },
-      width: '200px',
+      width: '10%',
       right: 'true',
       wrap: true
     },
@@ -354,7 +354,8 @@ const Parts = ({ sbomRefetch }) => {
               ))}
           </>
         )
-      }
+      },
+      width: '15%'
     },
     {
       id: 'COMPONENTS',
@@ -385,7 +386,7 @@ const Parts = ({ sbomRefetch }) => {
           </Link>
         )
       },
-      width: '150px'
+      width: '11%'
     },
     {
       id: 'LICENSES',
@@ -409,7 +410,7 @@ const Parts = ({ sbomRefetch }) => {
           </Link>
         )
       },
-      width: '150px'
+      width: '8%'
     },
     {
       id: 'VULNERABILITIES',
@@ -475,7 +476,7 @@ const Parts = ({ sbomRefetch }) => {
           </Stack>
         )
       },
-      width: '360px'
+      width: '26%'
     },
     {
       id: 'STATUS',
@@ -517,6 +518,7 @@ const Parts = ({ sbomRefetch }) => {
           </Menu>
         )
       },
+      width: '10%',
       right: 'true'
     }
   ]

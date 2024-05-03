@@ -528,7 +528,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           </Flex>
         )
       },
-      width: '280px',
+      width: '15%',
       sortable: true
     },
     // COMPONENT
@@ -553,7 +553,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
         )
       },
       wrap: true,
-      width: '250px',
+      width: '12%',
       sortable: true
     },
     // SEVERITY
@@ -578,7 +578,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           </Tag>
         )
       },
-      width: '140px',
+      width: '9%',
       sortable: true,
       wrap: true
     },
@@ -606,7 +606,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           </Tag>
         )
       },
-      width: '120px',
+      width: '9%',
       sortable: true,
       wrap: true
     },
@@ -639,7 +639,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           </Flex>
         )
       },
-      width: '120px',
+      width: '7%',
       sortable: true,
       wrap: true
     },
@@ -702,32 +702,9 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           </Flex>
         )
       },
-      width: '150px',
+      width: '10%',
       sortable: true,
       wrap: true
-    },
-    // VERSION
-    {
-      id: 'COMPONENTS_VERSION',
-      name: 'VERSION',
-      selector: (row) => (
-        <Tooltip label={row.component.version} placement='top'>
-          <Text
-            onClick={(e) => {
-              e.currentTarget.parentElement.click()
-            }}
-            textAlign='right'
-            my={2}
-          >
-            {row.component.version}
-          </Text>
-        </Tooltip>
-      ),
-      wrap: true,
-      width: '180px',
-      sortable: true,
-      right: 'true',
-      omit: true
     },
     // STATUS
     {
@@ -753,7 +730,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           </Tag>
         )
       },
-      width: '200px',
+      width: '12%',
       wrap: true,
       sortable: true
     },
@@ -782,7 +759,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
         const dateB = new Date(b.vuln.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      minWidth: '150px',
       wrap: true,
       right: 'true'
     },
@@ -815,6 +791,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           </Menu>
         )
       },
+      width: '10%',
       wrap: true,
       right: 'true',
       omit: customerView ? true : false

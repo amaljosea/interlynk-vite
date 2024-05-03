@@ -194,7 +194,7 @@ const LegalTable = ({ data, refetch }) => {
           </Flex>
         )
       },
-      minWidth: '250px',
+      minWidth: '16%',
       wrap: true
     },
     // CREATED AT
@@ -271,7 +271,7 @@ const LegalTable = ({ data, refetch }) => {
           </Menu>
         )
       },
-      width: '120px',
+      width: '10%',
       right: 'true'
     }
   ]

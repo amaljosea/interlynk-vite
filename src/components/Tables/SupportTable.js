@@ -300,7 +300,7 @@ const SupportTable = ({ data, refetch }) => {
           />
         )
       },
-      width: '110px',
+      width: '8%',
       omit: sbomId ? true : false,
       sortable: true
     },
@@ -316,7 +316,7 @@ const SupportTable = ({ data, refetch }) => {
         )
       },
       wrap: true,
-      width: '200px',
+      width: '12%',
       sortable: true
     },
     {
@@ -324,13 +324,13 @@ const SupportTable = ({ data, refetch }) => {
       name: 'IDS',
       selector: (row) => <Text my={4}>{row?.idUri}</Text>,
       wrap: true,
-      width: '320px'
+      width: '16%'
     },
     {
       id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_VERSION',
       name: 'VERSION',
       selector: (row) => row?.productVersion,
-      width: '150px',
+      width: '10%',
       wrap: true,
       sortable: true,
       omit: true
@@ -340,14 +340,14 @@ const SupportTable = ({ data, refetch }) => {
       name: 'DEPRECATED',
       selector: (row) =>
         row?.deprecated ? <CheckIcon color={'red.500'} /> : '',
-      width: '150px',
+      width: '10%',
       wrap: true
     },
     {
       id: 'OUTDATED',
       name: 'OUTDATED',
       selector: (row) => (row?.outdated ? <CheckIcon color={'red.500'} /> : ''),
-      width: '150px',
+      width: '9%',
       wrap: true
     },
     {
@@ -361,7 +361,7 @@ const SupportTable = ({ data, refetch }) => {
           </Tag>
         )
       },
-      width: '160px',
+      width: '12%',
       wrap: true
     },
     {
@@ -375,7 +375,7 @@ const SupportTable = ({ data, refetch }) => {
           </Tag>
         )
       },
-      width: '160px',
+      width: '12%',
       wrap: true
     },
     // UPDATED AT
@@ -403,6 +403,7 @@ const SupportTable = ({ data, refetch }) => {
         return (
           <Menu>
             <MenuButton
+              width={'10%'}
               as={IconButton}
               icon={<FaEllipsisV />}
               variant='none'
@@ -434,7 +435,6 @@ const SupportTable = ({ data, refetch }) => {
           </Menu>
         )
       },
-      width: '120px',
       right: 'true',
       omit: sbomId ? true : false
     }

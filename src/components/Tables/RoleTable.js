@@ -4,6 +4,7 @@ import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 
 import { Button, Flex, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
 
+import CustomLoader from 'components/CustomLoader'
 import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 
 const RoleTable = ({ data, role, tabIndex }) => {
@@ -51,7 +52,7 @@ const RoleTable = ({ data, role, tabIndex }) => {
         </Button>
       ),
       right: 'true',
-      width: '200px'
+      width: '14%'
     }
   ]
 
@@ -63,6 +64,7 @@ const RoleTable = ({ data, role, tabIndex }) => {
           data={data || []}
           customStyles={customStyles}
           progressPending={data ? false : true}
+          progressComponent={<CustomLoader />}
           responsive={true}
         />
       </Flex>

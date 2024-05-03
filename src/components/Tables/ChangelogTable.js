@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
@@ -92,7 +92,7 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
           </Tooltip>
         )
       },
-      width: '150px',
+      width: '8%',
       sortable: true
     },
     // PRIOR VALUE
@@ -165,19 +165,21 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      width: '14%',
+      width: '12%',
       right: 'true'
     }
   ]
 
-  const logData = {
-    id: activeEnv,
-    changeType: type?.length === 0 ? undefined : type,
-    changedBy: user?.length === 0 ? undefined : user,
-    changeObject: object?.length === 0 ? undefined : object,
-    field,
-    direction
-  }
+  const logData = useMemo(() => {
+    return {
+      id: activeEnv,
+      changeType: type?.length === 0 ? undefined : type,
+      changedBy: user?.length === 0 ? undefined : user,
+      changeObject: object?.length === 0 ? undefined : object,
+      field,
+      direction
+    }
+  }, [activeEnv, direction, field, object, type, user])
 
   const handlePreviousPage = async () => {
     disablePaginationControl()
@@ -223,27 +225,29 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
   }
 
   // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    disablePaginationControl()
+  const handleSearch = useCallback(
+    async (event) => {
+      disablePaginationControl()
+      const { value } = event.target
+      if (event.key === 'Enter' && value !== '') {
+        await refetch({
+          variables: {
+            search: value,
+            first: totalRows,
+            ...logData
+          }
+        }).then((res) => {
+          if (res.data) {
+            setPaginationControl(res.data)
+            prodLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+          }
+        })
+      }
+    },
+    [logData, prodLogDispatch, refetch, totalRows]
+  )
 
-    const { value } = event.target
-    if (event.key === 'Enter' && value !== '') {
-      await refetch({
-        variables: {
-          search: value,
-          first: totalRows,
-          ...logData
-        }
-      }).then((res) => {
-        if (res.data) {
-          setPaginationControl(res.data)
-          prodLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-        }
-      })
-    }
-  }
-
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     disablePaginationControl()
     await refetch({
       variables: {
@@ -260,10 +264,10 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
         })
       }
     })
-  }
+  }, [activeEnv, direction, field, prodLogDispatch, refetch, totalRows])
 
   // CLEAR SERACH
-  const handleClear = async () => {
+  const handleClear = useCallback(async () => {
     disablePaginationControl()
     setSearchInput('')
     await refetch({
@@ -280,17 +284,20 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
         })
       }
     })
-  }
+  }, [logData, prodLogDispatch, refetch, totalRows])
 
   // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    const { value } = e.target
-    if (value === '') {
-      handleClear()
-    } else {
-      setSearchInput(value)
-    }
-  }
+  const onSearchInputChange = useCallback(
+    (e) => {
+      const { value } = e.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setSearchInput(value)
+      }
+    },
+    [handleClear]
+  )
 
   // SORTING
   const handleSort = async (column, sortDirection) => {
@@ -380,6 +387,8 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
     onSearchInputChange,
     handleClear,
     handleSearch,
+    refetch,
+    activeEnv,
     handleRefresh
   ])
 

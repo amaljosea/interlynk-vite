@@ -763,7 +763,6 @@ const Checks = () => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      width: '150px',
       right: 'true'
     },
     // ACTION

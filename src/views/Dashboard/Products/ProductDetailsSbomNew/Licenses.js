@@ -169,7 +169,7 @@ const Licenses = () => {
     {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
-      width: '60%',
+      width: '50%',
       wrap: true,
       selector: ({ components }) => {
         let sortedComponents = [...components]
@@ -206,7 +206,6 @@ const Licenses = () => {
       name: 'STATUS',
       wrap: true,
       sortable: true,
-      width: '20%',
       selector: ({ derivedState }) => {
         derivedState = derivedState?.toLowerCase() || 'Not Available'
         return (
@@ -229,7 +228,8 @@ const Licenses = () => {
             </TagLabel>
           </Tag>
         )
-      }
+      },
+      right: 'true'
     }
   ]
 

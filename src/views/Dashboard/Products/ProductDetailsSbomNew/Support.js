@@ -317,7 +317,7 @@ const Support = () => {
           />
         )
       },
-      width: '110px',
+      width: '8%',
       omit: sbomId ? true : false,
       sortable: true
     },
@@ -333,7 +333,7 @@ const Support = () => {
         )
       },
       wrap: true,
-      width: '200px',
+      width: '20%',
       sortable: true
     },
     {
@@ -341,13 +341,13 @@ const Support = () => {
       name: 'IDS',
       selector: (row) => <Text my={4}>{row?.idUri}</Text>,
       wrap: true,
-      width: '320px'
+      width: '20%'
     },
     {
       id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_VERSION',
       name: 'VERSION',
       selector: (row) => row?.productVersion,
-      width: '150px',
+      width: '12%',
       wrap: true,
       sortable: true,
       omit: true
@@ -357,14 +357,14 @@ const Support = () => {
       name: 'DEPRECATED',
       selector: (row) =>
         row?.deprecated ? <CheckIcon color={'red.500'} /> : '',
-      width: '150px',
+      width: '12%',
       wrap: true
     },
     {
       id: 'OUTDATED',
       name: 'OUTDATED',
       selector: (row) => (row?.outdated ? <CheckIcon color={'red.500'} /> : ''),
-      width: '150px',
+      width: '12%',
       wrap: true
     },
     {
@@ -378,7 +378,7 @@ const Support = () => {
           </Tag>
         )
       },
-      width: '160px',
+      width: '12%',
       wrap: true
     },
     {
@@ -392,7 +392,7 @@ const Support = () => {
           </Tag>
         )
       },
-      width: '160px',
+      width: '12%',
       wrap: true
     },
     // UPDATED AT
@@ -451,7 +451,7 @@ const Support = () => {
           </Menu>
         )
       },
-      width: '120px',
+      width: '8%',
       right: 'true',
       omit: sbomId ? true : false
     }
