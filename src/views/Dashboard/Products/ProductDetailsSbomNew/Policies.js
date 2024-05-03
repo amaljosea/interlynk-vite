@@ -21,7 +21,8 @@ import {
   Thead,
   Tooltip,
   Tr,
-  useDisclosure
+  useDisclosure,
+  useToast
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -35,6 +36,7 @@ import { BiScan } from 'react-icons/bi'
 import { FaEye } from 'react-icons/fa6'
 
 const Policies = () => {
+  const toast = useToast()
   const params = useParams()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -96,9 +98,25 @@ const Policies = () => {
   // SUB HEADER
   const subHeader = useMemo(() => {
     const handleRefresh = async () => {
-      await policyScan({ variables: { sbomId } }).then(
-        (res) => res?.data && console.log(res?.data)
-      )
+      await policyScan({ variables: { sbomId } }).then((res) => {
+        const errors = res?.data?.sbomPolicyScan?.errors
+        if (errors?.length > 0) {
+          toast({
+            description: errors[0],
+            status: 'error',
+            position: 'top',
+            duration: 2000
+          })
+        } else {
+          toast({
+            description: 'Policy re-scan started',
+            status: 'success',
+            position: 'top',
+            duration: 2000
+          })
+          refetch({ sbomId })
+        }
+      })
     }
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
@@ -111,7 +129,7 @@ const Policies = () => {
         </Tooltip>
       </Flex>
     )
-  }, [policyScan, sbomId])
+  }, [policyScan, refetch, sbomId, toast])
 
   // COLUMNS
   const columns = [
@@ -146,7 +164,7 @@ const Policies = () => {
           >
             <TagLabel mx={'auto'} pt={0.5} textTransform={'capitalize'}>
               {result === 'initialized'
-                ? 'Running'
+                ? 'Checking'
                 : result === 'not_detected'
                   ? 'Pass'
                   : result === 'error'
