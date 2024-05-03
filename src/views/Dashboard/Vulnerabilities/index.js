@@ -51,7 +51,6 @@ const Vulnerabilities = () => {
   )
 
   const { data, refetch } = useQuery(GetGlobalVulns, {
-    fetchPolicy: 'network-only',
     skip:
       productPermissions?.value === true && vulnsPermissions?.value === true
         ? false
@@ -71,7 +70,6 @@ const Vulnerabilities = () => {
 
   const { data: vulnData, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
     skip: vulnId ? false : true,
-    fetchPolicy: 'network-only',
     variables: {
       id: vulnId,
       componentVulnId: vulnId,

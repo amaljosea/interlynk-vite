@@ -40,12 +40,23 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
+  const setPaginationControl = useCallback((data) => {
+    setIsPrevActive(data?.organization?.vulns?.pageInfo?.hasPreviousPage)
+    setIsNextActive(data?.organization?.vulns?.pageInfo?.hasNextPage)
+  }, [])
+
+  const disablePaginationControl = () => {
+    setIsPrevActive(false)
+    setIsNextActive(false)
+  }
+
   useEffect(() => {
     if (data) {
-      setIsPrevActive(data.pageInfo?.hasPreviousPage)
-      setIsNextActive(data.pageInfo?.hasNextPage)
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
     }
   }, [data])
+
   //end
 
   const params = useParams()
@@ -497,7 +508,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
 
   // ON PREV PAGE
   const handlePreviousPage = async () => {
-    setIsPrevActive(false)
+    disablePaginationControl()
     await refetch({
       field,
       direction,
@@ -510,18 +521,18 @@ const GlobalVulnTable = ({ data, refetch }) => {
     }).then((res) => {
       if (res.data) {
         const project = res?.data?.organization?.vulns
+        setPaginationControl(res?.data)
         globalVulnDispatch({
           type: 'DECREMENT_PAGE',
           payload: project?.pageInfo?.startCursor
         })
-        setIsPrevActive(project?.pageInfo?.hasPreviousPage)
       }
     })
   }
 
   // ON NEXT PAGE
   const handleNextPage = async () => {
-    setIsNextActive(false)
+    disablePaginationControl()
     await refetch({
       field,
       direction,
@@ -534,6 +545,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
     }).then((res) => {
       if (res.data) {
         const project = res?.data?.organization?.vulns
+        setPaginationControl(res?.data)
         globalVulnDispatch({
           type: 'INCREMENT_PAGE',
           payload: {
@@ -541,7 +553,6 @@ const GlobalVulnTable = ({ data, refetch }) => {
             after: project?.pageInfo?.endCursor
           }
         })
-        setIsNextActive(project?.pageInfo?.hasNextPage)
       }
     })
   }
@@ -550,34 +561,31 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const handleSetRow = async (e) => {
     const { value } = e.target
     setTotalRows(Number(value))
+    disablePaginationControl()
     await refetch({
       field,
       direction,
       first: Number(value),
+      last: undefined,
+      after: undefined,
+      before: undefined,
       search: searchInput !== '' ? searchInput : undefined,
       ...vulnData
-    }).then(
-      (res) => res.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-    )
+    }).then((res) => {
+      if (res?.data) {
+        setPaginationControl(res?.data)
+        globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      }
+    })
   }
 
   // SORTING
   const handleSort = async (column, sortDirection) => {
-    await refetch({
-      first: totalRows,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC',
-      search: searchInput !== '' ? searchInput : undefined,
-      ...vulnData
-    }).then((res) => {
-      if (res.data) {
-        globalVulnDispatch({
-          type: 'SET_SORT_ORDER',
-          payload: {
-            field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-          }
-        })
+    globalVulnDispatch({
+      type: 'SET_SORT_ORDER',
+      payload: {
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
       }
     })
   }
