@@ -1,7 +1,7 @@
 import { useLazyQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import { logoutUser } from 'utils/authUtils'
 import { getProductDetailPageUrl } from 'utils/url'
@@ -13,6 +13,7 @@ import {
   Icon,
   IconButton,
   Kbd,
+  Link,
   Menu,
   MenuButton,
   MenuDivider,
@@ -135,7 +136,7 @@ export default function HeaderLinks(props) {
     <Flex gap={4} alignItems='center' flexDirection='row'>
       {/* JOIN WAITLIST */}
       {signedUrlParams && (
-        <Link to='https://www.interlynk.io/sign-up' target='_blank'>
+        <Link href='https://www.interlynk.io/sign-up' isExternal>
           <Button colorScheme='blue' size='sm'>
             Sign up
           </Button>
@@ -251,7 +252,7 @@ export default function HeaderLinks(props) {
                 </Flex>
               </MenuItem>
               <MenuDivider />
-              <Link to={`/vendor/settings?tab=person`}>
+              <Link href={`/vendor/settings?tab=personal-details`}>
                 <MenuItem
                   icon={<SettingsIcon />}
                   display={data?.organization ? 'flex' : 'none'}
@@ -259,7 +260,7 @@ export default function HeaderLinks(props) {
                   Settings
                 </MenuItem>
               </Link>
-              <Link to='/vendor/settings?tab=organization'>
+              <Link href='/vendor/settings?tab=organizations'>
                 <MenuItem
                   icon={<FaExchangeAlt />}
                   display={data?.organization ? 'flex' : 'none'}

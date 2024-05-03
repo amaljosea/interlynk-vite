@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
+import { useLocation } from 'react-router-dom'
 
 import {
   Box,
@@ -18,15 +19,13 @@ import {
 import { UpdateOrganizationRole } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
 
-const PermissionDrawer = ({
-  isOpen,
-  onClose,
-  tabIndex,
-  selectedRole,
-  userRole
-}) => {
+const PermissionDrawer = ({ isOpen, onClose, selectedRole, userRole }) => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const activetab = queryParams.get('tab')
+
   const { data, refetch } = useQuery(GetAllPermissions, {
-    skip: tabIndex === 2 ? false : true
+    skip: activetab === 'roles' ? false : true
   })
   const [updateRole] = useMutation(UpdateOrganizationRole, {
     onCompleted: () => refetch()

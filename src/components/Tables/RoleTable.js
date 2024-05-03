@@ -7,7 +7,7 @@ import { Button, Flex, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 
-const RoleTable = ({ data, role, tabIndex }) => {
+const RoleTable = ({ data, role }) => {
   const [selectedRole, setSelectedRole] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -74,7 +74,6 @@ const RoleTable = ({ data, role, tabIndex }) => {
           isOpen={isOpen}
           onClose={onClose}
           selectedRole={selectedRole}
-          tabIndex={tabIndex}
           userRole={role}
         />
       )}

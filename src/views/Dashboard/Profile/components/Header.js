@@ -18,29 +18,18 @@ import CardBody from 'components/Card/CardBody.js'
 
 import { UploadProfileImage } from 'graphQL/Mutation'
 
-const Header = ({
-  org,
-  selectedTab,
-  setSelectedTab,
-  user,
-  tabs,
-  refetch,
-  setTabIndex,
-  setPsIndex
-}) => {
-  const navigate = useNavigate()
+const Header = ({ org, selectedTab, setSelectedTab, user, tabs, refetch }) => {
   const toast = useToast()
+  const navigate = useNavigate()
   const textColor = useColorModeValue('gray.700', 'white')
   const emailColor = useColorModeValue('gray.500', 'gray.300')
 
   const handleClick = (name) => {
     setSelectedTab(name)
     if (name === 'PERSONAL') {
-      navigate('/vendor/settings?tab=person')
-      setPsIndex(0)
+      navigate('/vendor/settings?tab=person-details')
     } else {
       navigate('/vendor/settings?tab=general')
-      setTabIndex(0)
     }
   }
 

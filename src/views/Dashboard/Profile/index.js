@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
@@ -28,11 +28,11 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import {
   AllOrganizations,
   GetOrg,
+  GetOrgManufacturers,
   GetOrgSettings,
   GetRoles,
   MyOrganizations
 } from 'graphQL/Queries'
-import { GetOrgManufacturers } from 'graphQL/Queries'
 
 import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 
@@ -55,23 +55,32 @@ const orgTabs = [
   'legal'
 ]
 
+const psTabs = [
+  'personal-details',
+  'organizations',
+  'security-tokens',
+  'notifications'
+]
+
 function Profile() {
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
-  const activeTabNumber = Math.max(orgTabs.indexOf(activetab), 0)
+  const activePsTabNumber = Math.max(psTabs.indexOf(activetab), 0)
+  const activeOrgTabNumber = Math.max(orgTabs.indexOf(activetab), 0)
   const org = localStorage.getItem('organization')
   const { totalRows, userPermissions } = useGlobalState()
 
-  const tabs = [
-    { name: 'PERSONAL', icon: FaUserCircle },
-    { name: 'ORGANIZATION', icon: FaBuilding }
-  ]
+  const tabs = useMemo(() => {
+    return [
+      { name: 'PERSONAL', icon: FaUserCircle },
+      { name: 'ORGANIZATION', icon: FaBuilding }
+    ]
+  }, [])
 
-  const viewOrg = userPermissions?.find(
-    (item) => item.key === 'view_organization'
-  )
+  const [selectedTab, setSelectedTab] = useState('')
+
   const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
   const viewFeeds = userPermissions?.find((item) => item.key === 'view_feeds')
   const manageFeeds = viewFeeds?.supersededBy?.some(
@@ -82,10 +91,6 @@ function Profile() {
     (permission) =>
       permission.key === 'manage_listing' && permission.value === true
   )
-
-  const [tabIndex, setTabIndex] = useState(0)
-  const [psIndex, setPsIndex] = useState(0)
-  const [selectedTab, setSelectedTab] = useState(tabs[1].name)
 
   const {
     data: orgInfo,
@@ -116,34 +121,22 @@ function Profile() {
     }
   )
 
-  const onTabChange = (value) => {
-    switch (value) {
-      case 0:
-        navigate(`/vendor/settings?tab=general`)
-        break
-      case 1:
-        navigate(`/vendor/settings?tab=users`)
-        break
-      case 2:
-        navigate(`/vendor/settings?tab=roles`)
-        break
-      case 3:
-        navigate(`/vendor/settings?tab=feeds`)
-        break
-      case 4:
-        navigate(`/vendor/settings?tab=checks`)
-        break
-      case 5:
-        navigate(`/vendor/settings?tab=lists`)
-        break
-      case 6:
-        navigate(`/vendor/settings?tab=legal`)
-        break
-      default:
-        navigate(`/vendor/settings?tab=general`)
-    }
+  const onOrgTabChange = (index) => {
+    navigate(`/vendor/settings?tab=${orgTabs[index]}`)
   }
-  const handleChange = (value) => setPsIndex(value)
+
+  const onPsTabChange = (index) => {
+    navigate(`/vendor/settings?tab=${psTabs[index]}`)
+  }
+
+  useEffect(() => {
+    const isOrgActive = orgTabs?.includes(activetab)
+    if (isOrgActive) {
+      setSelectedTab(tabs[1].name)
+    } else {
+      setSelectedTab(tabs[0].name)
+    }
+  }, [activetab, tabs])
 
   if (error) {
     return (
@@ -173,37 +166,28 @@ function Profile() {
     >
       {/*  HEADER */}
       <Header
-        org={orgInfo?.organization}
-        user={orgInfo?.organization?.currentUser}
-        selectedTab={selectedTab}
-        refetch={refetch}
-        setSelectedTab={setSelectedTab}
-        setTabIndex={setTabIndex}
-        setPsIndex={setPsIndex}
         tabs={tabs}
+        refetch={refetch}
+        selectedTab={selectedTab}
+        org={orgInfo?.organization}
+        setSelectedTab={setSelectedTab}
+        user={orgInfo?.organization?.currentUser}
       />
       {/*  ORGANIZATION */}
       {selectedTab === 'ORGANIZATION' && (
         <Card>
           <Tabs
-            variant='enclosed'
             w={'100%'}
             bg={'white'}
-            defaultIndex={activeTabNumber}
-            onChange={onTabChange}
+            variant='enclosed'
+            defaultIndex={activeOrgTabNumber}
+            onChange={onOrgTabChange}
           >
             <TabList>
-              {[
-                'General',
-                'Users',
-                'Roles',
-                'Feeds',
-                'Checks',
-                'Lists',
-                'Legal'
-              ].map((item, index) => (
+              {orgTabs.map((item, index) => (
                 <Tab
                   key={index}
+                  textTransform={'capitalize'}
                   _focus={{ outline: 'none' }}
                   display={
                     (item === 'Lists' && !manageListing) ||
@@ -237,7 +221,6 @@ function Profile() {
               {/* ROLES */}
               <TabPanel>
                 <RoleTable
-                  tabIndex={tabIndex}
                   data={roles?.organization?.organizationRoles}
                   role={orgInfo?.organization?.currentUser?.role?.name}
                   refetch={roleRefetch}
@@ -298,25 +281,21 @@ function Profile() {
             variant='enclosed'
             w={'100%'}
             bg={'white'}
-            index={psIndex}
-            onChange={handleChange}
+            defaultIndex={activePsTabNumber}
+            onChange={onPsTabChange}
           >
             <TabList>
-              {[
-                'Personal Details',
-                'Organizations',
-                'Security Tokens',
-                'Notifications'
-              ].map((item, index) => (
+              {psTabs.map((item, index) => (
                 <Tab
                   key={index}
+                  textTransform={'capitalize'}
                   _focus={{ outline: 'none' }}
                   isDisabled={
                     orgInfo?.organization === null &&
                     (item === 'Personal Details' || item === 'Security Tokens')
                   }
                 >
-                  {item}
+                  {item?.replace(/-/g, ' ')}
                 </Tab>
               ))}
             </TabList>
