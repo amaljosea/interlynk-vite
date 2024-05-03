@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { filterEnvList } from 'utils'
 
 import {
@@ -23,7 +23,10 @@ import { GetProjectGroup } from 'graphQL/Queries'
 
 const Filters = ({ data, refetch }) => {
   const params = useParams()
-  const id = params.vulnerabilityid
+  const vulnId = params.vulnerabilityid
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const id = queryParams.get('vulnId') || vulnId
   const groupId = params.productgroupid
 
   const { totalRows, compVulnState, dispatch } = useGlobalState()
