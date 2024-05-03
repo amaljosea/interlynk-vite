@@ -1524,6 +1524,34 @@ export const GetComponentData = gql`
   }
 `
 
+// GET TOTAL COMPONENTS
+export const GetTotalComponents = gql`
+  query GetTotalComponents(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ComponentOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      components(
+        sbomId: $sbomId
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+      }
+    }
+  }
+`
+
 // GET PRIMARY COMPONENT DATA
 export const GetPrimaryComponent = gql`
   query GetPrimaryComponent(

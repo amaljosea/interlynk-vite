@@ -1363,7 +1363,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
               onClose={onRelationClose}
               data={activeRow}
               compPath={comPath.component.pathToPrimary}
-              total={components?.totalCount}
               fetchCompData={fetchCompData}
             />
           )}

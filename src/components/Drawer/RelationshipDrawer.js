@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 
 import { ArrowDownIcon } from '@chakra-ui/icons'
 import {
@@ -39,8 +39,14 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import RelDeleteModal from 'components/RelDeleteModal'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
-import { GetAllComponents, GetCompDependency } from 'graphQL/Queries'
+import {
+  GetAllComponents,
+  GetCompDependency,
+  GetTotalComponents
+} from 'graphQL/Queries'
 
 const findShortestPath = (pathArray, currentShortestPath = []) => {
   if (!pathArray || pathArray.length === 0) {
@@ -62,13 +68,15 @@ const RelationshipDrawer = ({
   isOpen,
   onClose,
   data,
-  total,
   fetchCompData,
   compPath
 }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const activeTab = queryParams.get('tab')
 
   const { name, version, id } = data
 
@@ -79,13 +87,28 @@ const RelationshipDrawer = ({
   const [activeComp, setActiveComp] = useState(null)
   const [isAdded, setIsAdded] = useState(false)
 
-  const { data: allComponents } = useQuery(GetAllComponents, {
+  const { prodCompState } = useGlobalState()
+  const { field, direction } = prodCompState
+
+  const compState = {
+    projectId: productId,
+    sbomId: sbomId,
+    field: field,
+    direction: direction
+  }
+
+  const { data: compData } = useQuery(GetTotalComponents, {
+    fetchPolicy: activeTab === 'components' ? false : true,
     variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: total,
-      field: 'COMPONENTS_UPDATED_AT',
-      direction: 'DESC'
+      ...compState
+    }
+  })
+
+  const { data: allComponents } = useQuery(GetAllComponents, {
+    skip: compData ? false : true,
+    variables: {
+      ...compState,
+      first: compData?.sbom?.components?.totalCount
     },
     onCompleted: (data) => {
       if (data) {
