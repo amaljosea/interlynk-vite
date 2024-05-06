@@ -82,7 +82,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       id: 'PRODUCT',
       name: 'PRODUCT',
       wrap: true,
-      width: '12%',
       selector: (row) => {
         const { id, project } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -137,7 +136,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
       wrap: true,
-      width: '16%',
+      width: '12.25%',
       selector: (row) => {
         const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -169,7 +168,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       id: 'LICENSES',
       name: 'LICENSES',
       wrap: true,
-      width: '12%',
       selector: (row) => {
         const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -194,8 +192,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
     {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
-      wrap: true,
-      width: '36%',
+      width: '40%',
       selector: (row) => {
         const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -263,7 +260,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       id: 'IMPORTED',
       name: 'IMPORTED',
       wrap: true,
-      width: '13%',
       right: 'true',
       selector: (row) => {
         const { createdAt } = row
