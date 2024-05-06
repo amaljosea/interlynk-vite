@@ -1236,7 +1236,7 @@ export const GetShareSbomVersions = gql`
 export const GetShareSbomAlternatives = gql`
   query GetShareSbomAlternatives($sbomId: Uuid!) {
     shareLynkQuery {
-      sbom(sbomId: $sbomId) {
+      sbom(id: $sbomId) {
         projectVersion
         alternatives {
           id
