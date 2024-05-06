@@ -17,7 +17,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Stack,
   Tag,
   Text
 } from '@chakra-ui/react'
@@ -291,44 +290,31 @@ const SupplierModal = ({
           </ModalBody>
           <ModalFooter>
             <Flex
+              gap={2}
               width={'100%'}
-              justifyContent={'space-between'}
+              justifyContent={'flex-end'}
               alignItems={'center'}
             >
-              {checkId ? (
+              <Button colorScheme='gray' onClick={onClose}>
+                Cancel
+              </Button>
+              {data && data.suppliers?.length > 0 ? (
                 <Button
-                  fontSize={'sm'}
                   colorScheme='blue'
-                  onClick={onSaveRule}
+                  onClick={handleUpdate}
                   isDisabled={isInvalid}
                 >
-                  Save Rule
+                  Update
                 </Button>
               ) : (
-                <Text></Text>
-              )}
-              <Stack direction={'row'} spacing={2} alignItems={'center'}>
-                <Button colorScheme='gray' onClick={onClose}>
-                  Cancel
+                <Button
+                  colorScheme='blue'
+                  onClick={handleSave}
+                  isDisabled={isInvalid}
+                >
+                  Save
                 </Button>
-                {data && data.suppliers?.length > 0 ? (
-                  <Button
-                    colorScheme='blue'
-                    onClick={handleUpdate}
-                    isDisabled={isInvalid}
-                  >
-                    Update
-                  </Button>
-                ) : (
-                  <Button
-                    colorScheme='blue'
-                    onClick={handleSave}
-                    isDisabled={isInvalid}
-                  >
-                    Save
-                  </Button>
-                )}
-              </Stack>
+              )}
             </Flex>
           </ModalFooter>
         </ModalContent>

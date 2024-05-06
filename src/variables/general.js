@@ -11,6 +11,105 @@ import {
   FaTools
 } from 'react-icons/fa'
 
+export const ruleSubjectOperatorMapping = [
+  {
+    category: 'Component',
+    name: 'CPE',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Component CPE'
+  },
+  {
+    category: 'Component',
+    name: 'License',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Component License'
+  },
+  {
+    category: 'Component',
+    name: 'Name',
+    operators: ['Is'],
+    subject: 'Component Name'
+  },
+  {
+    category: 'Component',
+    name: 'PURL',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Component PURL'
+  },
+  {
+    category: 'Component',
+    name: 'Supplier',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Component Supplier'
+  },
+  {
+    category: 'Component',
+    name: 'Supplier: Organization Name',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Component Supplier: Organization Name'
+  },
+  {
+    category: 'Component',
+    name: 'Supplier: Contact Name',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Component Supplier: Contact Name'
+  },
+  {
+    category: 'Component',
+    name: 'Supplier: Contact Email',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Component Supplier: Contact Email'
+  },
+  {
+    category: 'Component',
+    name: 'Version',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Component Version'
+  },
+  {
+    category: 'Version',
+    name: 'Author',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Version Author'
+  },
+  {
+    category: 'Version',
+    name: 'Author: Name',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Version Author: Name'
+  },
+  {
+    category: 'Version',
+    name: 'Author: Email',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Version Author: Email'
+  },
+  {
+    category: 'Version',
+    name: 'Primary Component',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Version Primary Component'
+  },
+  {
+    category: 'Version',
+    name: 'Supplier',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Version Supplier'
+  },
+  {
+    category: 'Version',
+    name: 'Supplier: Contact Email',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Version Supplier: Contact Email'
+  },
+  {
+    category: 'Version',
+    name: 'Supplier: Organization Name',
+    operators: ['Is', 'Exists', 'Not Exists'],
+    subject: 'Version Supplier: Organization Name'
+  }
+]
+
 export const sagLabelTypes = [
   'all',
   'Apple Trusted Product',

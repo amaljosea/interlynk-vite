@@ -596,30 +596,22 @@ const CpeModal = ({
 
           <ModalFooter>
             <Flex
+              gap={2}
               width={'100%'}
-              justifyContent={'space-between'}
+              justifyContent={'flex-end'}
               alignItems={'center'}
             >
-              {checkId ? (
-                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
-                  Save Rule
-                </Button>
-              ) : (
-                <Text></Text>
-              )}
-              <Stack direction={'row'} spacing={2} alignItems={'center'}>
-                <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button
-                  fontSize={'sm'}
-                  variant='solid'
-                  colorScheme={'blue'}
-                  onClick={checkId ? handleComUpdate : handleSave}
-                >
-                  Save
-                </Button>
-              </Stack>
+              <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                fontSize={'sm'}
+                variant='solid'
+                colorScheme={'blue'}
+                onClick={checkId ? handleComUpdate : handleSave}
+              >
+                Save
+              </Button>
             </Flex>
           </ModalFooter>
         </ModalContent>

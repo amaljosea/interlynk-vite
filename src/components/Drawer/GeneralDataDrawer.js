@@ -19,7 +19,6 @@ import {
   FormLabel,
   Icon,
   Input,
-  Stack,
   Table,
   Tbody,
   Td,
@@ -621,32 +620,15 @@ const GeneralDataDrawer = ({
 
           <DrawerFooter>
             <Flex
+              gap={2}
               width={'100%'}
-              justifyContent={'space-between'}
+              justifyContent={'flex-end'}
               alignItems={'center'}
             >
-              {checkId ? (
-                <Button
-                  fontSize={'sm'}
-                  colorScheme='blue'
-                  onClick={onSaveRule}
-                  disabled={
-                    authorList.length === 0 && creationTools.length === 0
-                  }
-                >
-                  Save Rule
-                </Button>
-              ) : (
-                <Text></Text>
-              )}
-              <Stack direction={'row'} spacing={2} alignItems={'center'}>
-                <Button mr={3} onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button colorScheme='blue' onClick={handleSave}>
-                  Save
-                </Button>
-              </Stack>
+              <Button onClick={onClose}>Cancel</Button>
+              <Button colorScheme='blue' onClick={handleSave}>
+                Save
+              </Button>
             </Flex>
           </DrawerFooter>
         </DrawerContent>

@@ -1,26 +1,20 @@
-import { useMutation } from '@apollo/client'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
-import { timeSince } from 'utils'
+import { updatedValue } from 'utils'
 
-import { DeleteIcon, RepeatIcon, SettingsIcon } from '@chakra-ui/icons'
+import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
-  Button,
   Flex,
-  HStack,
   IconButton,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
   Stack,
   Switch,
-  Tag,
   Text,
   Tooltip,
   useDisclosure
@@ -31,11 +25,13 @@ import CustomLoader from 'components/CustomLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { DeleteAutomation, UpdateAutomation } from 'graphQL/Mutation'
+import { FaEllipsisV } from 'react-icons/fa'
 
-import UpdateRule from './components/UpdateRule'
+import CreateRule from './components/CreateRule'
+import DeleteWarning from './components/DeleteWarning'
+import StatusWarning from './components/StatusWarning'
 
-const Automation = ({ data, refetch }) => {
+const Automation = ({ refetch }) => {
   const params = useParams()
   const productId = params.productid
   const { totalRows, userPermissions, prodRulesState, dispatch } =
@@ -49,44 +45,37 @@ const Automation = ({ data, refetch }) => {
       permission.key === 'edit_product_automations' && permission.value === true
   )
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isRuleOpen,
+    onOpen: onRuleOpen,
+    onClose: onRuleClose
+  } = useDisclosure()
+  const {
+    isOpen: isActiveOpen,
+    onOpen: onActiveOpen,
+    onClose: onActiveClose
+  } = useDisclosure()
   const {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
     onClose: onDeleteClose
   } = useDisclosure()
 
+  const [rules, setRules] = useState([])
   const [activeRow, setActiveRow] = useState(null)
 
-  const [updateAutoCheck] = useMutation(UpdateAutomation, {
-    fetchPolicy: 'network-only',
-    onCompleted: () =>
-      refetch({ id: productId, first: totalRows, field, direction })
-  })
-  const [deleteAutoCheck] = useMutation(DeleteAutomation, {
-    fetchPolicy: 'network-only',
-    onCompleted: () =>
-      refetch({ id: productId, first: totalRows, field, direction })
-  })
-
-  const handleRemove = async () => {
-    await deleteAutoCheck({
-      variables: {
-        autoCheckId: activeRow?.id,
-        projectId: productId
-      }
-    }).then((res) => res.data && onDeleteClose())
+  const handleDelete = () => {
+    const newData = rules?.filter((item) => item.id !== activeRow?.id)
+    setRules(newData)
+    onDeleteClose()
   }
 
-  const handleStatus = async (row) => {
-    await updateAutoCheck({
-      variables: {
-        id: row.id,
-        projectId: productId,
-        condition: row.condition,
-        enabled: row.enabled ? false : true
-      }
-    })
+  const toggleStatus = () => {
+    const updatedRules = rules.map((rule) =>
+      rule.id === activeRow?.id ? { ...rule, active: !rule.active } : rule
+    )
+    setRules(updatedRules)
+    onActiveClose()
   }
 
   // COLUMNS
@@ -96,97 +85,91 @@ const Automation = ({ data, refetch }) => {
       id: 'active',
       name: 'ACTIVE',
       selector: (row) => {
-        const { enabled } = row
         return (
           <Switch
-            isChecked={enabled}
-            onChange={() => handleStatus(row)}
-            isDisabled={!editAutomations}
-          ></Switch>
+            isChecked={row?.active}
+            onChange={() => {
+              setActiveRow(row)
+              onActiveOpen()
+            }}
+          />
         )
       },
-      width: '8%'
+      width: '8%',
+      wrap: true
     },
     // RULE
     {
       id: 'rule',
-      name: 'RULE APPLIES TO',
+      name: 'RULE',
       selector: (row) => {
-        const { applicability } = row
-        return <Text textTransform={'capitalize'}>{applicability}</Text>
+        return <Text my={3}>{row?.rule}</Text>
       },
       width: '12%',
       wrap: true
     },
-    // NAME
+    // WHEN
     {
-      id: 'AUTO_CHECKS_LOOKUP_NAME',
-      name: 'NAME',
+      id: 'when',
+      name: 'WHEN',
       selector: (row) => {
-        const { lookup } = row
         return (
-          <Text textTransform={'capitalize'} my={2}>
-            {lookup?.comp_name}-{lookup?.comp_version}
-          </Text>
+          <Flex flexDir={'column'} gap={2} alignItems={'flex-start'} my={3}>
+            {row?.when?.map((item, index) => (
+              <Text
+                key={index}
+                bg={'blue.100'}
+                color={'blue.700'}
+                px={2}
+                py={1}
+                borderRadius={4}
+              >
+                {item?.subject}:{' '}
+                {item?.operator === 'Exists' || item?.operator === 'Not Exists'
+                  ? item?.operator
+                  : ''}
+                {item?.operator === 'Exists' || item?.operator === 'Not Exists'
+                  ? ''
+                  : item?.value}
+              </Text>
+            ))}
+          </Flex>
         )
       },
       wrap: true,
-      sortable: true
+      sortable: false
     },
-    // CONDITION
+    // THEN
     {
-      id: 'condition',
-      name: 'CONDITION',
+      id: 'then',
+      name: 'THEN',
       selector: (row) => {
-        const { condition } = row
-        return <Text textTransform={'capitalize'}>{condition}</Text>
-      }
-    },
-    // ATTRIBUTE
-    {
-      id: 'AUTO_CHECKS_ATTR_NAME',
-      name: 'ATTRIBUTE',
-      selector: (row) => {
-        const { attrName } = row
-        return <Tag colorScheme='blue'>{attrName}</Tag>
+        return <Text my={3}>{row?.then}</Text>
       },
-      sortable: true
+      wrap: true
     },
-    // FIX
+    // VALUE
     {
-      id: 'fix',
-      name: 'FIX',
+      id: 'value',
+      name: 'VALUE',
       selector: (row) => {
-        const { setTo } = row
+        const { value } = row
+        const keyValuePairs = Object.entries(value)
         return (
-          <HStack alignItems={'center'} justifyContent={'flex-start'} my={2}>
-            <Text>{JSON.stringify(setTo)}</Text>
-            <IconButton
-              size='sm'
-              onClick={() => {
-                setActiveRow(row)
-                onOpen()
-              }}
-              colorScheme='blue'
-              icon={<SettingsIcon />}
-              isDisabled={!editAutomations}
-            />
-          </HStack>
+          <Flex flexDir={'column'} gap={1} my={3}>
+            {keyValuePairs.map(([key, value], index) => (
+              <li key={index} style={{ listStyle: 'none' }}>
+                <strong style={{ textTransform: 'capitalize' }}>
+                  {updatedValue(key)}:
+                </strong>{' '}
+                {value}
+              </li>
+            ))}
+          </Flex>
         )
       },
       wrap: true,
-      width: '25%'
-    },
-    // UPDATED AT
-    {
-      id: 'AUTO_CHECKS_UPDATED_AT',
-      name: 'UPDATED',
-      selector: (row) => {
-        const { updatedAt } = row
-        return <Text>{timeSince(updatedAt)}</Text>
-      },
-      sortable: true,
-      right: 'true'
+      sortable: false
     },
     // ACTIONS
     {
@@ -194,16 +177,39 @@ const Automation = ({ data, refetch }) => {
       name: 'ACTIONS',
       selector: (row) => {
         return (
-          <IconButton
-            onClick={() => {
-              setActiveRow(row)
-              onDeleteOpen()
-            }}
-            size='sm'
-            icon={<DeleteIcon />}
-            colorScheme='red'
-            isDisabled={!editAutomations}
-          />
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              <MenuList fontSize={'sm'}>
+                {/* EDIT POLICY */}
+                <MenuItem
+                  isDisabled={!editAutomations}
+                  onClick={() => {
+                    setActiveRow(row)
+                    onRuleOpen()
+                  }}
+                >
+                  Edit Rule
+                </MenuItem>
+                {/* DELETE POLICY  */}
+                <MenuItem
+                  color='red'
+                  onClick={() => {
+                    setActiveRow(row)
+                    onDeleteOpen()
+                  }}
+                  isDisabled={!editAutomations}
+                >
+                  Archive Rule
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
         )
       },
       right: 'true',
@@ -239,17 +245,27 @@ const Automation = ({ data, refetch }) => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          <Tooltip label='Add Rule'>
+            <IconButton
+              onClick={() => {
+                setActiveRow(null)
+                onRuleOpen()
+              }}
+              colorScheme='blue'
+              icon={<AddIcon />}
+            />
+          </Tooltip>
           <Tooltip label='Refresh'>
             <IconButton
               onClick={handleRefresh}
               colorScheme='blue'
               icon={<RepeatIcon />}
-            ></IconButton>
+            />
           </Tooltip>
         </Stack>
       </Flex>
     )
-  }, [handleRefresh])
+  }, [onRuleOpen, handleRefresh])
 
   return (
     <>
@@ -257,10 +273,10 @@ const Automation = ({ data, refetch }) => {
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable
             columns={columns}
-            data={data?.nodes || []}
+            data={rules || []}
             customStyles={customStyles}
             onSort={handleSort}
-            progressPending={data ? false : true}
+            progressPending={rules ? false : true}
             progressComponent={<CustomLoader />}
             responsive={true}
             persistTableHead
@@ -270,41 +286,31 @@ const Automation = ({ data, refetch }) => {
         </Flex>
       </CardBody>
 
-      {activeRow && isOpen && (
-        <UpdateRule
-          isOpen={isOpen}
-          onClose={onClose}
+      {isRuleOpen && (
+        <CreateRule
+          rules={rules}
           data={activeRow}
-          refetch={refetch}
-          productId={productId}
+          isOpen={isRuleOpen}
+          onClose={onRuleClose}
+          setRules={setRules}
         />
       )}
 
-      {/* DELETE */}
-      {activeRow && isDeleteOpen && (
-        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Delete Automation Rule</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>
-                Deleting this automation rule will stop applying this change for
-                future imports of SBOM. Existing SBOM where the rule is already
-                applied will not be affected.
-              </Text>
-              <Text mt={4}>Are you sure you want to continue?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onDeleteClose}>
-                No
-              </Button>
-              <Button colorScheme='red' onClick={handleRemove}>
-                Yes
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+      {isDeleteOpen && (
+        <DeleteWarning
+          isOpen={isDeleteOpen}
+          onClose={onDeleteClose}
+          onDelete={handleDelete}
+        />
+      )}
+
+      {isActiveOpen && (
+        <StatusWarning
+          isOpen={isActiveOpen}
+          onClose={onActiveClose}
+          onToggle={toggleStatus}
+          data={activeRow}
+        />
       )}
     </>
   )

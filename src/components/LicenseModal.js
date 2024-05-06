@@ -11,9 +11,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  ModalOverlay,
-  Stack,
-  Text
+  ModalOverlay
 } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -140,34 +138,19 @@ const LicenseModal = ({
         </ModalBody>
         <ModalFooter>
           <Flex
+            gap={2}
             width={'100%'}
-            justifyContent={'space-between'}
+            justifyContent={'flex-end'}
             alignItems={'center'}
           >
-            {checkId ? (
-              <Button
-                fontSize={'sm'}
-                colorScheme='blue'
-                onClick={onSaveRule}
-                disabled={isInvalidLicense}
-              >
-                Save Rule
-              </Button>
-            ) : (
-              <Text></Text>
-            )}
-            <Stack direction={'row'} spacing={2} alignItems={'center'}>
-              <Button mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                colorScheme='blue'
-                onClick={handleUpdateSBOM}
-                disabled={isInvalidLicense}
-              >
-                Update
-              </Button>
-            </Stack>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button
+              colorScheme='blue'
+              onClick={handleUpdateSBOM}
+              disabled={isInvalidLicense}
+            >
+              Update
+            </Button>
           </Flex>
         </ModalFooter>
       </ModalContent>

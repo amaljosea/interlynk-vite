@@ -16,9 +16,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  ModalOverlay,
-  Stack,
-  Text
+  ModalOverlay
 } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -219,44 +217,31 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
           </ModalBody>
           <ModalFooter>
             <Flex
+              gap={2}
               width={'100%'}
-              justifyContent={'space-between'}
+              justifyContent={'flex-end'}
               alignItems={'center'}
             >
-              {checkId ? (
+              <Button colorScheme='gray' mr={3} onClick={onClose}>
+                Cancel
+              </Button>
+              {suppliers && suppliers.length > 0 ? (
                 <Button
-                  fontSize={'sm'}
                   colorScheme='blue'
-                  onClick={onSaveRule}
+                  onClick={handleUpdate}
                   disabled={isInvalid}
                 >
-                  Save Rule
+                  Update
                 </Button>
               ) : (
-                <Text></Text>
-              )}
-              <Stack direction={'row'} spacing={2} alignItems={'center'}>
-                <Button colorScheme='gray' mr={3} onClick={onClose}>
-                  Cancel
+                <Button
+                  colorScheme='blue'
+                  onClick={handleSave}
+                  disabled={isInvalid}
+                >
+                  Save
                 </Button>
-                {suppliers && suppliers.length > 0 ? (
-                  <Button
-                    colorScheme='blue'
-                    onClick={handleUpdate}
-                    disabled={isInvalid}
-                  >
-                    Update
-                  </Button>
-                ) : (
-                  <Button
-                    colorScheme='blue'
-                    onClick={handleSave}
-                    disabled={isInvalid}
-                  >
-                    Save
-                  </Button>
-                )}
-              </Stack>
+              )}
             </Flex>
           </ModalFooter>
         </ModalContent>

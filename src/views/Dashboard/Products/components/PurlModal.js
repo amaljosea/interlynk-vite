@@ -17,7 +17,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
-  Stack,
   Tag,
   Text,
   Textarea
@@ -824,44 +823,27 @@ const PurlModal = ({
 
           <ModalFooter>
             <Flex
+              gap={2}
               width={'100%'}
-              justifyContent={'space-between'}
+              justifyContent={'flex-end'}
               alignItems={'center'}
             >
-              {checkId ? (
-                <Button
-                  fontSize={'sm'}
-                  colorScheme='blue'
-                  onClick={onSaveRule}
-                  disabled={
-                    purlName === '' ||
-                    purlType === '' ||
-                    (purlType === 'swift' && namespace === '')
-                  }
-                >
-                  Save Rule
-                </Button>
-              ) : (
-                <Text></Text>
-              )}
-              <Stack direction={'row'} spacing={3} alignItems={'center'}>
-                <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button
-                  fontSize={'sm'}
-                  variant='solid'
-                  colorScheme={'blue'}
-                  onClick={checkId ? handleComUpdate : handleSave}
-                  disabled={
-                    purlName === '' ||
-                    purlType === '' ||
-                    (purlType === 'swift' && namespace === '')
-                  }
-                >
-                  Save
-                </Button>
-              </Stack>
+              <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                fontSize={'sm'}
+                variant='solid'
+                colorScheme={'blue'}
+                onClick={checkId ? handleComUpdate : handleSave}
+                disabled={
+                  purlName === '' ||
+                  purlType === '' ||
+                  (purlType === 'swift' && namespace === '')
+                }
+              >
+                Save
+              </Button>
             </Flex>
           </ModalFooter>
         </ModalContent>

@@ -24,7 +24,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
-  Stack,
   Tag,
   Text,
   Tooltip
@@ -442,21 +441,17 @@ const CheckModal = ({
 
           <ModalFooter>
             <Flex
+              gap={2}
               width={'100%'}
-              justifyContent={'space-between'}
+              justifyContent={'flex-end'}
               alignItems={'center'}
             >
-              <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
-                Save Rule
+              <Button fontSize={'sm'} onClick={onClose}>
+                Close
               </Button>
-              <Stack direction={'row'} spacing={2} alignItems={'center'}>
-                <Button fontSize={'sm'} onClick={onClose}>
-                  Close
-                </Button>
-                <Button fontSize={'sm'} colorScheme='blue' type='submit'>
-                  Save
-                </Button>
-              </Stack>
+              <Button fontSize={'sm'} colorScheme='blue' type='submit'>
+                Save
+              </Button>
             </Flex>
           </ModalFooter>
         </ModalContent>

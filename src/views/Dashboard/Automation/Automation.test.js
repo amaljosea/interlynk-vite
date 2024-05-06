@@ -18,6 +18,6 @@ test('Automation page renders correctly', () => {
       <Automation />
     </MockedProvider>
   )
-  const textElement = screen.getByText('RULE APPLIES TO')
+  const textElement = screen.getByText('RULE')
   expect(textElement).toBeInTheDocument()
 })
