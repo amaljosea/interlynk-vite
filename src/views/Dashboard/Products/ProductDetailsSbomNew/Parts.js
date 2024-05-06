@@ -719,7 +719,9 @@ const Parts = ({ sbomRefetch }) => {
                       <option value={''}>-- Select --</option>
                       {sbomVersions.map((item, index) => (
                         <option key={index} value={item.value}>
-                          {item.label}
+                          {item?.label?.length > 40
+                            ? `${item?.label?.substring(0, 40)}...`
+                            : item?.label}
                         </option>
                       ))}
                     </Select>
