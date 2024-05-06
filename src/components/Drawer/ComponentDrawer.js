@@ -400,7 +400,7 @@ function ComponentDrawer(props) {
   const onCheckDesc = () => {
     setInfoHeading(`Description`)
     setInfoText(
-      `A component description refers to the specific description or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software produc`
+      `A component description refers to the specific description or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software product.`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -409,7 +409,7 @@ function ComponentDrawer(props) {
   const onCheckVersion = () => {
     setInfoHeading(`Version`)
     setInfoText(
-      `A component version refers to the specific version or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software produc`
+      `A component version refers to the specific version or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software product.`
     )
     setInfoUrl(``)
     onInfoOpen()
