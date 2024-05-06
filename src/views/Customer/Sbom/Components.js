@@ -388,7 +388,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
     {
       id: 'COMPONENTS_LICENSES_EXP',
       name: 'LICENSES',
-      width: '10%',
+      width: '14%',
       selector: (row) => {
         const { licenses, licensesExp, licensesCustom } = row
         const totalSpdx = licenses?.length > 1 && licenses.slice(1)
@@ -408,12 +408,12 @@ const Components = ({ sbomData, sbomRefetch }) => {
                 {licenses.length > 0 && (
                   <Tooltip label={licenses[0]} placement={'top'}>
                     <Tag
+                      width={'150px'}
                       size={'md'}
                       variant='subtle'
                       colorScheme='green'
-                      width={'fit-content'}
                     >
-                      <TagLabel>{licenses[0]}</TagLabel>
+                      <TagLabel mx={'auto'}>{licenses[0]}</TagLabel>
                     </Tag>
                   </Tooltip>
                 )}
@@ -425,12 +425,12 @@ const Components = ({ sbomData, sbomRefetch }) => {
                     placement={'top'}
                   >
                     <Tag
+                      width={'150px'}
                       size={'md'}
                       variant='subtle'
                       colorScheme='green'
-                      width={'fit-content'}
                     >
-                      <TagLabel width={6}>{`+${totalSpdx.length}`}</TagLabel>
+                      <TagLabel mx={'auto'}>{`+${totalSpdx.length}`}</TagLabel>
                     </Tag>
                   </Tooltip>
                 )}
@@ -440,12 +440,12 @@ const Components = ({ sbomData, sbomRefetch }) => {
             {licensesExp && licensesExp !== '' && (
               <Tooltip label={licensesExp} placement={'top'}>
                 <Tag
+                  width={'150px'}
                   size={'md'}
                   variant='subtle'
                   colorScheme='green'
-                  width={'fit-content'}
                 >
-                  <TagLabel>{licensesExp}</TagLabel>
+                  <TagLabel mx={'auto'}>{licensesExp}</TagLabel>
                 </Tag>
               </Tooltip>
             )}
@@ -455,12 +455,12 @@ const Components = ({ sbomData, sbomRefetch }) => {
                 {licensesCustom.length > 0 && (
                   <Tooltip label={licensesCustom[0]} placement={'top'}>
                     <Tag
+                      width={'150px'}
                       size={'md'}
                       variant='subtle'
                       colorScheme='green'
-                      width={'fit-content'}
                     >
-                      <TagLabel>{licensesCustom[0]}</TagLabel>
+                      <TagLabel mx={'auto'}>{licensesCustom[0]}</TagLabel>
                     </Tag>
                   </Tooltip>
                 )}
@@ -472,12 +472,14 @@ const Components = ({ sbomData, sbomRefetch }) => {
                     placement={'top'}
                   >
                     <Tag
+                      width={'150px'}
                       size={'md'}
                       variant='subtle'
                       colorScheme='green'
-                      width={'fit-content'}
                     >
-                      <TagLabel>{`+${totalCustom.length}`}</TagLabel>
+                      <TagLabel
+                        mx={'auto'}
+                      >{`+${totalCustom.length}`}</TagLabel>
                     </Tag>
                   </Tooltip>
                 )}
@@ -486,7 +488,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
           </Flex>
         )
       },
-      right: 'true',
       sortable: true,
       wrap: true
     },
