@@ -208,7 +208,7 @@ const ProductDetailsMain = () => {
   })
 
   const [getLogs, { data: prodLogs }] = useLazyQuery(GetProjectLogs, {
-    skip: activeProdTab === 4 ? false : true,
+    skip: activeProdTab === 5 ? false : true,
     fetchPolicy: 'network-only'
   })
 

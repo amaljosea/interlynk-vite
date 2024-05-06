@@ -33,7 +33,6 @@ import { ProjectSettingUpdate } from 'graphQL/Mutation'
 
 const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
   const toast = useToast()
-  console.log('data', data)
   const { userPermissions } = useGlobalState()
   const [dataRetentionDays, setDataRetentionDays] = useState(0)
   const [projectSettingId, setProjectSettingId] = useState(null)
