@@ -21,23 +21,22 @@ import {
 } from '@chakra-ui/react'
 
 const SbomList = ({ isOpen, onClose, data }) => {
+  const columns = ['UPLOADED', 'COMPONENTS', 'LICENSES', 'STATUS', 'UPDATED AT']
   return (
     <Drawer size='xl' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>{data?.projectVersion + ' SBOM List'}</DrawerHeader>
+        <DrawerHeader>
+          {data?.projectVersion?.length > 40
+            ? `${data?.projectVersion?.substring(0, 40)}...`
+            : data?.projectVersion + ' SBOM List'}
+        </DrawerHeader>
         <DrawerBody>
           <Table variant='simple' m={0} p={0}>
             <Thead>
               <Tr>
-                {[
-                  'UPLOADED',
-                  'COMPONENTS',
-                  'LICENSES',
-                  'STATUS',
-                  'UPDATED AT'
-                ].map((item, index) => (
+                {columns.map((item, index) => (
                   <Th px={0} fontFamily={'inherit'} key={index}>
                     {item}
                   </Th>
