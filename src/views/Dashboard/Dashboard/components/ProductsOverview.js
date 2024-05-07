@@ -82,6 +82,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       id: 'PRODUCT',
       name: 'PRODUCT',
       wrap: true,
+      width: '150px',
       selector: (row) => {
         const { id, project } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -136,7 +137,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
       wrap: true,
-      width: '12.25%',
+      width: '150px',
       selector: (row) => {
         const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -145,7 +146,10 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
             to={generateProductVersionDetailPageUrlFromCurrentUrl({
               productgroupid: project?.projectGroup?.id,
               productid: project?.id,
-              sbomid: id
+              sbomid: id,
+              paramsObj: {
+                tab: 'components'
+              }
             })}
             style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
             onClick={() => (uniqueSbom ? onFilterComp(row) : null)}
@@ -168,6 +172,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       id: 'LICENSES',
       name: 'LICENSES',
       wrap: true,
+      width: '120px',
       selector: (row) => {
         const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -176,7 +181,10 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
             to={generateProductVersionDetailPageUrlFromCurrentUrl({
               productgroupid: project?.projectGroup?.id,
               productid: project?.id,
-              sbomid: id
+              sbomid: id,
+              paramsObj: {
+                tab: 'licenses'
+              }
             })}
             style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
             onClick={() => (uniqueSbom ? onFilterLicense(row) : null)}
@@ -192,7 +200,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
     {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
-      width: '40%',
+      width: '350px',
       selector: (row) => {
         const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -261,6 +269,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       name: 'IMPORTED',
       wrap: true,
       right: 'true',
+      width: '130px',
       selector: (row) => {
         const { createdAt } = row
         return (
