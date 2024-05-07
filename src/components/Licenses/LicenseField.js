@@ -53,10 +53,11 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
 
-  const [getLicense] = useLazyQuery(LicenseAutoComplete, {
+  const [getLicense, { loading }] = useLazyQuery(LicenseAutoComplete, {
     fetchPolicy: 'network-only'
   })
 
+  const [searchText, setSearchText] = useState('')
   const {
     isOpen: isInfoOpen,
     onOpen: onInfoOpen,
@@ -103,6 +104,10 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
       setLicenseList([])
     }
   }
+
+  useEffect(() => {
+    handleInputChange(searchText)
+  }, [searchText])
 
   const licenseInfo = `Component license refers to the licensing terms and conditions associated with a specific software component listed in the SBOM document.`
 
@@ -162,6 +167,8 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
           {/* LICENSE */}
           <ReactSelect
             isClearable
+            isLoading={loading}
+            noOptionsMessage={() => `Please search...`}
             isDisabled={isDisabled}
             styles={{
               control: (baseStyles, state) => {
@@ -170,7 +177,7 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
                   borderColor: state.isFocused ? 'inherit' : 'inherit',
                   fontSize: '14px',
                   padding: '2px 0',
-                  caretColor: state.options?.length === 0 && 'transparent',
+                  // caretColor: state.options?.length === 0 && 'transparent',
                   '&:hover': {
                     borderColor: '#CBD5E0'
                   }
@@ -185,7 +192,7 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
             value={licenseString}
             options={licenseList}
             onChange={onLicenseChange}
-            onInputChange={handleInputChange}
+            onInputChange={setSearchText}
             placeholder={'Enter License'}
             className='react-select'
           />
