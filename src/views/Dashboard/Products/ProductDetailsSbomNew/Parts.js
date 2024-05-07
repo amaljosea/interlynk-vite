@@ -8,7 +8,6 @@ import {
   envOrderList,
   isDefaultEnv
 } from 'utils'
-import { getProductVersionDetailPageUrl } from 'utils/url'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -53,6 +52,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { SbomPartCreate, SbomPartDelete } from 'graphQL/Mutation'
 import {
@@ -72,10 +72,8 @@ const Parts = ({ sbomRefetch }) => {
   const prodId = params.productid
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
-
-  // console.log('PartsContext from page 1')
-
-  // console.log('PartsContext from page', partsContext)
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
 
   const { setActiveProdTab, totalRows, prodState, userPermissions, dispatch } =
     useGlobalState()
@@ -284,7 +282,7 @@ const Parts = ({ sbomRefetch }) => {
       selector: (row) => {
         const { part } = row
 
-        const link = getProductVersionDetailPageUrl({
+        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           productgroupid: part.project.projectGroup.id,
           productid: part.project.id,
           sbomid: part.id,
@@ -362,8 +360,7 @@ const Parts = ({ sbomRefetch }) => {
       name: 'COMPONENTS',
       selector: (row) => {
         const { part } = row
-        const link = getProductVersionDetailPageUrl({
-          productgroupid: params.productgroupid,
+        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           productid: part?.project?.id,
           sbomid: part?.id,
           paramsObj: {
@@ -393,8 +390,7 @@ const Parts = ({ sbomRefetch }) => {
       name: 'LICENSES',
       selector: (row) => {
         const { part } = row
-        const link = getProductVersionDetailPageUrl({
-          productgroupid: params.productgroupid,
+        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           productid: part?.project?.id,
           sbomid: part?.id,
           paramsObj: {
@@ -417,8 +413,7 @@ const Parts = ({ sbomRefetch }) => {
       name: 'VULNERABILITIES',
       selector: (row) => {
         const { part } = row
-        const link = getProductVersionDetailPageUrl({
-          productgroupid: params.productgroupid,
+        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           productid: part.project.id,
           sbomid: part.id,
           paramsObj: {

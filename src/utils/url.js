@@ -28,35 +28,6 @@ export const appendParams = ({ url, paramsObj = {} }) => {
 
 export const checkIfCustomer = () => getUserType() === 'customer'
 
-export const getProductDetailPageUrl = ({
-  productgroupid,
-  productid,
-  paramsObj
-}) => {
-  const url = `/${getUserType()}/products/${productgroupid}/env/${productid}`
-  return appendParams({ url, paramsObj })
-}
-
-export const getProductVersionDetailPageUrl = ({
-  productgroupid,
-  productid,
-  sbomid,
-  paramsObj
-}) => {
-  const url = `/${getUserType()}/products/${productgroupid}/env/${productid}/version/${sbomid}`
-  return appendParams({ url, paramsObj })
-}
-
-export const getProductVulnerabilityDetailPageUrl = ({
-  productgroupid,
-  productid,
-  vulnerabilityid,
-  paramsObj
-}) => {
-  const url = `/${getUserType()}/products/${productgroupid}/env/${productid}/vulnerability/${vulnerabilityid}`
-  return appendParams({ url, paramsObj })
-}
-
 export const getShareLinklUrl = ({
   productgroupid,
   signedUrlParams,

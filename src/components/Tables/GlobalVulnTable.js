@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
-import { getProductVulnerabilityDetailPageUrl } from 'utils/url'
 import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -29,6 +28,7 @@ import CustomLoader from 'components/CustomLoader'
 import Round from 'components/Misc/Round'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import Pagination from '../Pagination'
 
@@ -39,6 +39,8 @@ const GlobalVulnTable = ({ data, refetch }) => {
 
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
+  const { generateProductVulnerabilityDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
 
   const setPaginationControl = useCallback((data) => {
     setIsPrevActive(data?.organization?.vulns?.pageInfo?.hasPreviousPage)
@@ -144,11 +146,11 @@ const GlobalVulnTable = ({ data, refetch }) => {
                 <Link
                   to={
                     params?.productgroupid
-                      ? getProductVulnerabilityDetailPageUrl({
-                          productgroupid: params.productgroupid,
-                          productid: params.productid,
-                          vulnerabilityid: id
-                        })
+                      ? generateProductVulnerabilityDetailPageUrlFromCurrentUrl(
+                          {
+                            vulnerabilityid: id
+                          }
+                        )
                       : `/${path}/vulnerabilities?vulnId=${id}`
                   }
                   onClick={() => localStorage.setItem('activeVuln', vulnId)}

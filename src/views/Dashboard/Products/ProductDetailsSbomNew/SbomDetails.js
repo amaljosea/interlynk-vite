@@ -2,7 +2,6 @@ import { useLazyQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
-import { getProductVersionDetailPageUrl } from 'utils/url'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
 import {
@@ -24,6 +23,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { GetPrimaryComponent } from 'graphQL/Queries'
 import { GetSharPrimartComp } from 'graphQL/Queries'
@@ -44,12 +44,11 @@ const SbomDetails = ({ sbomData, refetch }) => {
   const params = useParams()
   const projectId = params.productid
   const sbomId = params.sbomid
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
 
   const setActiveTab = (value) => {
-    const link = getProductVersionDetailPageUrl({
-      productgroupid: params.productgroupid,
-      productid: params.productid,
-      sbomid: params.sbomid,
+    const link = generateProductVersionDetailPageUrlFromCurrentUrl({
       paramsObj: {
         tab: value
       }

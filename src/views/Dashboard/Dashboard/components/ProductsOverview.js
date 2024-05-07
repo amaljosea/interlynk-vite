@@ -7,10 +7,6 @@ import {
   normalizeSBOMVersion,
   timeSince
 } from 'utils'
-import {
-  getProductDetailPageUrl,
-  getProductVersionDetailPageUrl
-} from 'utils/url'
 
 import { Flex, Heading, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
@@ -21,10 +17,14 @@ import CustomLoader from 'components/CustomLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 const ProductsOverview = ({ title, data, prodPermissions }) => {
   const { setActiveSbomTab, dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
+  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
 
   const handleClick = (prod) => {
     console.log('prod', prod)
@@ -87,7 +87,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
           <Link
-            to={getProductDetailPageUrl({
+            to={generateProductDetailPageUrlFromCurrentUrl({
               productgroupid: project?.projectGroup?.id,
               productid: project?.id
             })}
@@ -112,7 +112,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
           <Link
-            to={getProductVersionDetailPageUrl({
+            to={generateProductVersionDetailPageUrlFromCurrentUrl({
               productgroupid: project?.projectGroup?.id,
               productid: project?.id,
               sbomid: id
@@ -142,7 +142,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
           <Link
-            to={getProductVersionDetailPageUrl({
+            to={generateProductVersionDetailPageUrlFromCurrentUrl({
               productgroupid: project?.projectGroup?.id,
               productid: project?.id,
               sbomid: id
@@ -173,7 +173,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
           <Link
-            to={getProductVersionDetailPageUrl({
+            to={generateProductVersionDetailPageUrlFromCurrentUrl({
               productgroupid: project?.projectGroup?.id,
               productid: project?.id,
               sbomid: id
@@ -196,7 +196,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       selector: (row) => {
         const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
-        const link = getProductVersionDetailPageUrl({
+        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           productgroupid: project?.projectGroup?.id,
           productid: project?.id,
           sbomid: id,

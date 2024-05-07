@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { permissionList } from 'utils'
-import { getProductDetailPageUrl } from 'utils/url'
 
 import {
   Breadcrumb,
@@ -30,8 +29,10 @@ export default function AdminNavbar(props) {
   const navigate = useNavigate()
   const { setActiveSbomTab, setUserPermissions } = useGlobalState()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
-    useProductUrlContext()
+  const {
+    generateProductVersionDetailPageUrlFromCurrentUrl,
+    generateProductDetailPageUrlFromCurrentUrl
+  } = useProductUrlContext()
 
   useQuery(GetUserPermissions, {
     skip: signedUrlParams ? true : false,
@@ -169,12 +170,7 @@ export default function AdminNavbar(props) {
                 color={mainText}
                 isCurrentPage={sbomId && sbomHookData?.version ? false : true}
               >
-                <Link
-                  to={getProductDetailPageUrl({
-                    productgroupid: params.productgroupid,
-                    productid: params.productid
-                  })}
-                >
+                <Link to={generateProductDetailPageUrlFromCurrentUrl()}>
                   {projectGroupName}
                 </Link>
               </BreadcrumbItem>

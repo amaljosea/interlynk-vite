@@ -1,13 +1,15 @@
 import { useLocation, useParams } from 'react-router-dom'
 import createPersistedState from 'use-persisted-state'
-import { getProductVersionDetailPageUrl } from 'utils/url'
 
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useSbom } from 'hooks/useSbom'
 
 const usePartsState = createPersistedState('parts')
 const { createContext, useEffect } = require('react')
 
 export const useProductParts = () => {
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
   const [parts, setParts] = usePartsState([])
   const params = useParams()
   const location = useLocation()
@@ -26,11 +28,7 @@ export const useProductParts = () => {
   }
 
   const push = () => {
-    const urlArgument = {
-      productgroupid: params.productgroupid,
-      productid: params.productid,
-      sbomid: params.sbomid
-    }
+    const urlArgument = {}
 
     if (parts.length !== 0) {
       urlArgument.paramsObj = {
@@ -38,7 +36,7 @@ export const useProductParts = () => {
       }
     }
 
-    const url = getProductVersionDetailPageUrl(urlArgument)
+    const url = generateProductVersionDetailPageUrlFromCurrentUrl(urlArgument)
 
     const newPart = {
       versionName,

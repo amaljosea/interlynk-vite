@@ -3,8 +3,6 @@ import { client } from 'context/ApolloWrapper'
 import { useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ReactSelect from 'react-select'
-import { getProductVersionDetailPageUrl } from 'utils/url'
-import { getProductDetailPageUrl } from 'utils/url'
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
@@ -30,6 +28,7 @@ import {
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { sbomDelete } from 'graphQL/Mutation'
 import { GetProject } from 'graphQL/Queries'
@@ -50,6 +49,10 @@ import SigningModal from './SigningModal'
 
 const SbomActions = ({ sbom, refetch }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const {
+    generateProductVersionDetailPageUrlFromCurrentUrl,
+    generateProductDetailPageUrlFromCurrentUrl
+  } = useProductUrlContext()
 
   const {
     totalRows,
@@ -197,9 +200,7 @@ const SbomActions = ({ sbom, refetch }) => {
       sbomId: id
     }).then((res) => {
       if (res.data) {
-        const url = getProductVersionDetailPageUrl({
-          productgroupid: params.productgroupid,
-          productid: productId,
+        const url = generateProductVersionDetailPageUrlFromCurrentUrl({
           sbomid: id
         })
         navigate(url)
@@ -267,11 +268,7 @@ const SbomActions = ({ sbom, refetch }) => {
       })
       .then((res) => {
         if (res.data) {
-          const url = getProductVersionDetailPageUrl({
-            productgroupid: params.productgroupid,
-            productid: productId,
-            sbomid: sbomId
-          })
+          const url = generateProductVersionDetailPageUrlFromCurrentUrl()
           navigate(url)
         }
       })
@@ -288,10 +285,7 @@ const SbomActions = ({ sbom, refetch }) => {
       if (res.data) {
         setTimeout(() => {
           setIsLoading(false)
-          const url = getProductDetailPageUrl({
-            productgroupid: params.productgroupid,
-            productid: params.productid
-          })
+          const url = generateProductDetailPageUrlFromCurrentUrl()
           navigate(url)
         }, 3000)
       }

@@ -4,7 +4,6 @@ import { useEffect } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import { logoutUser } from 'utils/authUtils'
-import { getProductDetailPageUrl } from 'utils/url'
 
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import {
@@ -38,6 +37,7 @@ import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { GetOrgName } from 'graphQL/Queries'
 
@@ -45,6 +45,7 @@ import { FaExchangeAlt, FaRegKeyboard, FaSignOutAlt } from 'react-icons/fa'
 import { FaCode, FaInbox, FaSquareArrowUpRight, FaUser } from 'react-icons/fa6'
 
 export default function HeaderLinks(props) {
+  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const location = useLocation()
   const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
@@ -107,10 +108,8 @@ export default function HeaderLinks(props) {
     if (params.productgroupid) {
       const project = projects.find((p) => p.name === value)
       navigate(
-        getProductDetailPageUrl({
-          // todo: find productId here
-          productid: project.id,
-          productgroupid: params.productgroupid
+        generateProductDetailPageUrlFromCurrentUrl({
+          productid: project.id
         })
       )
     }

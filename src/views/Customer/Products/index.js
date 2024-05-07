@@ -1,13 +1,15 @@
 import { useLazyQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
-import { getProductDetailPageUrl } from 'utils/url'
 
 import { Flex } from '@chakra-ui/react'
+
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { ShareLynkProjectGroup } from 'graphQL/Queries'
 
 function Index() {
+  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const navigate = useNavigate()
   const params = useParams()
   const productGroupId = params.productgroupid
@@ -21,9 +23,8 @@ function Index() {
       getProjectGroup({ variables: { id: productGroupId } }).then((res) => {
         if (res?.data) {
           navigate(
-            getProductDetailPageUrl({
-              productgroupid: productGroupId,
-              productid: params.productid
+            generateProductDetailPageUrlFromCurrentUrl({
+              productgroupid: productGroupId
             })
           )
         }

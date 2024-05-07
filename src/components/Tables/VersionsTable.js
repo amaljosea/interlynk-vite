@@ -8,7 +8,6 @@ import {
   sortByUpdatedAt,
   timeSince
 } from 'utils'
-import { getProductVersionDetailPageUrl } from 'utils/url'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -46,6 +45,7 @@ import ToolsDrawer from 'components/Drawer/ToolsDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { sbomDelete } from 'graphQL/Mutation'
 import {
@@ -88,7 +88,8 @@ const VersionsTable = ({ projectGroup }) => {
   } = useGlobalState()
   const { searchInput } = versionState
   const { prodVulnDispatch, prodCompDispatch, versionDispatch } = dispatch
-
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
   const paginationSizes = [25, 50, 100]
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
   const [filterText, setFilterText] = useState(searchInput)
@@ -265,9 +266,7 @@ const VersionsTable = ({ projectGroup }) => {
     const { id } = row
     setActiveSbomTab(4)
     navigate(
-      getProductVersionDetailPageUrl({
-        productgroupid: productGroupId,
-        productid: productId,
+      generateProductVersionDetailPageUrlFromCurrentUrl({
         sbomid: id,
         paramsObj: {
           tab: 'licenses'
@@ -284,9 +283,7 @@ const VersionsTable = ({ projectGroup }) => {
       name: 'VERSION',
       selector: (row) => {
         const { projectVersion } = row
-        const link = getProductVersionDetailPageUrl({
-          productgroupid: productGroupId,
-          productid: productId,
+        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           sbomid: row.id,
           paramsObj: {
             tab: 'general'
@@ -318,9 +315,7 @@ const VersionsTable = ({ projectGroup }) => {
         const { stats, id } = row
         return (
           <Link
-            to={getProductVersionDetailPageUrl({
-              productgroupid: productGroupId,
-              productid: productId,
+            to={generateProductVersionDetailPageUrlFromCurrentUrl({
               sbomid: id,
               paramsObj: {
                 tab: 'components'
@@ -362,9 +357,7 @@ const VersionsTable = ({ projectGroup }) => {
       name: 'VULNERABILITIES',
       selector: (row) => {
         const { stats, id, projectVersion } = row
-        const link = getProductVersionDetailPageUrl({
-          productgroupid: productGroupId,
-          productid: productId,
+        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           sbomid: id,
           paramsObj: {
             tab: 'vulnerabilities'

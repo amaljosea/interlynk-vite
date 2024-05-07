@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
-import { getProductDetailPageUrl } from 'utils/url'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import StatusModal from 'views/Dashboard/Products/components/StatusModal'
@@ -43,6 +42,7 @@ import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import { GetSharelynks } from 'graphQL/Queries'
@@ -54,6 +54,7 @@ import Pagination from '../Pagination'
 
 const ProductTable = ({ data, refetch }) => {
   const navigate = useNavigate()
+  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   //This part is needed for the pagination to work. (Modify with caution)
@@ -433,7 +434,7 @@ const ProductTable = ({ data, refetch }) => {
             type: 'SET_CURRENT_PRODUCT',
             payload: { id: env?.id || defaultProject?.id }
           })
-          const link = getProductDetailPageUrl({
+          const link = generateProductDetailPageUrlFromCurrentUrl({
             productgroupid: id,
             productid: env?.id || defaultProject?.id
           })
@@ -490,7 +491,7 @@ const ProductTable = ({ data, refetch }) => {
           <Stack direction={'row'} spacing={2} alignItems={'center'}>
             <Tooltip label='Default'>
               <Link
-                to={getProductDetailPageUrl({
+                to={generateProductDetailPageUrlFromCurrentUrl({
                   productgroupid: row.id,
                   productid: row.defaultProject.id
                 })}
@@ -501,7 +502,7 @@ const ProductTable = ({ data, refetch }) => {
             </Tooltip>
             <Tooltip label='Development'>
               <Link
-                to={getProductDetailPageUrl({
+                to={generateProductDetailPageUrlFromCurrentUrl({
                   productgroupid: row.id,
                   productid: projects?.find(
                     (item) => item.name === 'development'
@@ -514,7 +515,7 @@ const ProductTable = ({ data, refetch }) => {
             </Tooltip>
             <Tooltip label='Production'>
               <Link
-                to={getProductDetailPageUrl({
+                to={generateProductDetailPageUrlFromCurrentUrl({
                   productgroupid: row.id,
                   productid: projects?.find(
                     (item) => item.name === 'production'
