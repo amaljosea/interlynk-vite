@@ -42,7 +42,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
   GetGlobalVulns,
-  GetProjectCheck,
   GetProjectGroup,
   GetProjectLogs,
   GetProjectPolicies,
@@ -82,7 +81,6 @@ const ProductDetailsMain = () => {
     setActiveProdTab,
     prodLogState,
     prodVulnState,
-    prodRulesState,
     globalVulnState,
     dispatch,
     userPermissions
@@ -186,17 +184,6 @@ const ProductDetailsMain = () => {
     GetProjectPolicies,
     { fetchPolicy: 'network-only' }
   )
-
-  const { data: rules, refetch: getRules } = useQuery(GetProjectCheck, {
-    fetchPolicy: 'network-only',
-    skip: activeProdTab === 2 ? false : true,
-    variables: {
-      id: activeEnv,
-      first: totalRows,
-      field: prodRulesState.field,
-      direction: prodRulesState.direction
-    }
-  })
 
   const [getSettings, { data: settings }] = useLazyQuery(GetProjectSettings, {
     skip: activeProdTab === 3 ? false : true,
@@ -559,10 +546,7 @@ const ProductDetailsMain = () => {
                 </TabPanel>
                 {/* AUTOMATIONS */}
                 <TabPanel px={0}>
-                  <Automation
-                    data={rules?.project?.autoChecks}
-                    refetch={getRules}
-                  />
+                  <Automation />
                 </TabPanel>
                 {/* SETTINGS */}
                 <TabPanel px={0}>

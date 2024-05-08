@@ -1,13 +1,20 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useMutation, useQuery } from '@apollo/client'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles } from 'utils'
-import { updatedValue } from 'utils'
+import {
+  customStyles,
+  getFullDateAndTime,
+  timeSince,
+  updatedValue
+} from 'utils'
 
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
+  List,
+  ListItem,
   Menu,
   MenuButton,
   MenuItem,
@@ -15,15 +22,25 @@ import {
   Portal,
   Stack,
   Switch,
+  Tag,
+  TagLabel,
   Text,
   Tooltip,
-  useDisclosure
+  useDisclosure,
+  useToast
 } from '@chakra-ui/react'
 
 import CardBody from 'components/Card/CardBody'
 import CustomLoader from 'components/CustomLoader'
+import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+
+import { AutomationRuleDelete, AutomationRuleUpdate } from 'graphQL/Mutation'
+import {
+  AutomationConditionSubjectFieldMapping,
+  GetProjectCheck
+} from 'graphQL/Queries'
 
 import { FaEllipsisV } from 'react-icons/fa'
 
@@ -31,13 +48,37 @@ import CreateRule from './components/CreateRule'
 import DeleteWarning from './components/DeleteWarning'
 import StatusWarning from './components/StatusWarning'
 
-const Automation = ({ refetch }) => {
+const Automation = () => {
+  const toast = useToast()
   const params = useParams()
   const productId = params.productid
-  const { totalRows, userPermissions, prodRulesState, dispatch } =
-    useGlobalState()
-  const { field, direction } = prodRulesState
-  const { prodRulesDispatch } = dispatch
+  const { activeProdTab, userPermissions, prodRulesState } = useGlobalState()
+  const { field, direction, pageIndex } = prodRulesState
+
+  const [activeRow, setActiveRow] = useState(null)
+
+  const paginationSizes = [25, 50, 100]
+  const [totalRows, setTotalRows] = useState(paginationSizes[0])
+
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+
+  const { data: subOperators } = useQuery(
+    AutomationConditionSubjectFieldMapping
+  )
+
+  const { data, refetch } = useQuery(GetProjectCheck, {
+    skip: activeProdTab === 2 ? false : true,
+    variables: {
+      id: productId,
+      first: totalRows
+    }
+  })
+
+  const { automationRules } = data?.project || ''
+
+  const [deleteRule] = useMutation(AutomationRuleDelete)
+  const [updateRule] = useMutation(AutomationRuleUpdate)
 
   const product = userPermissions?.find((item) => item.key === 'view_product')
   const editAutomations = product?.supersededBy?.some(
@@ -61,21 +102,53 @@ const Automation = ({ refetch }) => {
     onClose: onDeleteClose
   } = useDisclosure()
 
-  const [rules, setRules] = useState([])
-  const [activeRow, setActiveRow] = useState(null)
+  const setPaginationControl = useCallback((data) => {
+    setIsPrevActive(data?.project?.automationRules?.pageInfo?.hasPreviousPage)
+    setIsNextActive(data?.project?.automationRules?.pageInfo?.hasNextPage)
+  }, [])
 
-  const handleDelete = () => {
-    const newData = rules?.filter((item) => item.id !== activeRow?.id)
-    setRules(newData)
-    onDeleteClose()
+  const disablePaginationControl = () => {
+    setIsPrevActive(false)
+    setIsNextActive(false)
   }
 
-  const toggleStatus = () => {
-    const updatedRules = rules.map((rule) =>
-      rule.id === activeRow?.id ? { ...rule, active: !rule.active } : rule
-    )
-    setRules(updatedRules)
-    onActiveClose()
+  const handleDelete = async () => {
+    await deleteRule({ variables: { id: activeRow?.id } }).then((res) => {
+      const errors = res?.data?.automationRuleDelete?.errors
+      if (errors?.length > 0) {
+        toast({
+          description: errors[0],
+          status: 'error',
+          position: 'top',
+          duration: 2000
+        })
+      } else {
+        refetch()
+        onDeleteClose()
+      }
+    })
+  }
+
+  const toggleStatus = async () => {
+    await updateRule({
+      variables: {
+        id: activeRow?.id,
+        active: activeRow?.active === true ? false : true
+      }
+    }).then((res) => {
+      const errors = res?.data?.automationRuleUpdate?.errors
+      if (errors?.length > 0) {
+        toast({
+          description: errors[0],
+          status: 'error',
+          position: 'top',
+          duration: 2000
+        })
+      } else {
+        refetch()
+        onActiveClose()
+      }
+    })
   }
 
   // COLUMNS
@@ -103,73 +176,129 @@ const Automation = ({ refetch }) => {
       id: 'rule',
       name: 'RULE',
       selector: (row) => {
-        return <Text my={3}>{row?.rule}</Text>
+        return <Text my={3}>{row?.name}</Text>
       },
       width: '12%',
       wrap: true
     },
-    // WHEN
+    // SUBJECT
     {
-      id: 'when',
-      name: 'WHEN',
+      id: 'SUBJECT',
+      name: 'SUBJECT',
+      width: '10%',
       selector: (row) => {
+        const { automationConditions } = row
+        const actionField =
+          subOperators?.automationConditionSubjectFieldMapping?.find(
+            (item) => item?.key === automationConditions[0]?.field
+          )
         return (
-          <Flex flexDir={'column'} gap={2} alignItems={'flex-start'} my={3}>
-            {row?.when?.map((item, index) => (
-              <Text
-                key={index}
-                bg={'blue.100'}
-                color={'blue.700'}
-                px={2}
-                py={1}
-                borderRadius={4}
-              >
-                {item?.subject}:{' '}
-                {item?.operator === 'Exists' || item?.operator === 'Not Exists'
-                  ? item?.operator
-                  : ''}
-                {item?.operator === 'Exists' || item?.operator === 'Not Exists'
-                  ? ''
-                  : item?.value}
-              </Text>
-            ))}
-          </Flex>
+          <Tag size='md' variant='subtle' colorScheme='blue' width={'120px'}>
+            <TagLabel
+              style={{ textTransform: 'capitalize' }}
+              mt={0.2}
+              mx={'auto'}
+            >
+              {actionField?.subject || ''}
+            </TagLabel>
+          </Tag>
         )
-      },
-      wrap: true,
-      sortable: false
-    },
-    // THEN
-    {
-      id: 'then',
-      name: 'THEN',
-      selector: (row) => {
-        return <Text my={3}>{row?.then}</Text>
       },
       wrap: true
     },
-    // VALUE
+    // CONDITION
     {
-      id: 'value',
-      name: 'VALUE',
+      id: 'CONDITIONS',
+      name: 'CONDITIONS',
       selector: (row) => {
-        const { value } = row
-        const keyValuePairs = Object.entries(value)
+        const { automationConditions } = row
         return (
-          <Flex flexDir={'column'} gap={1} my={3}>
-            {keyValuePairs.map(([key, value], index) => (
-              <li key={index} style={{ listStyle: 'none' }}>
-                <strong style={{ textTransform: 'capitalize' }}>
-                  {updatedValue(key)}:
-                </strong>{' '}
-                {value}
-              </li>
+          <List spacing={3} my={3}>
+            {automationConditions.map((item, index) => (
+              <ListItem key={index}>
+                {
+                  subOperators?.automationConditionSubjectFieldMapping?.find(
+                    (sub) => sub?.key === item?.field
+                  )?.name
+                }{' '}
+                -{' '}
+                {item?.operator === 'exists' || item?.operator === 'not_exists'
+                  ? updatedValue(item?.operator)
+                  : item?.value}
+              </ListItem>
             ))}
-          </Flex>
+          </List>
         )
       },
       wrap: true,
       sortable: false
+    },
+    // CHANGES
+    {
+      id: 'CHANGES',
+      name: 'CHANGES',
+      selector: (row) => {
+        const { automationActions } = row
+        return (
+          <List spacing={3} my={3}>
+            {automationActions.map((item, index) => (
+              <ListItem key={index}>
+                {
+                  subOperators?.automationConditionSubjectFieldMapping?.find(
+                    (sub) => sub?.key === item?.field
+                  )?.name
+                }{' '}
+                - {item?.value}
+              </ListItem>
+            ))}
+          </List>
+        )
+      },
+      wrap: true,
+      sortable: false
+    },
+    // CREATED AT
+    {
+      id: 'CREATED_AT',
+      name: 'CREATED',
+      selector: (row) => {
+        const { createdAt } = row
+        return (
+          <Tooltip label={getFullDateAndTime(createdAt)} placement='top'>
+            <Text textAlign={'right'}>{timeSince(createdAt)}</Text>
+          </Tooltip>
+        )
+      },
+      width: '10%',
+      right: 'true',
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.createdAt)
+        const dateB = new Date(b.createdAt)
+        return dateA - dateB
+      }
+    },
+    // UPDATED AT
+    {
+      id: 'UPDATED_AT',
+      name: 'UPDATED',
+      selector: (row) => {
+        const { updatedAt } = row
+        return (
+          <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
+            <Text textAlign={'right'}>{timeSince(updatedAt)}</Text>
+          </Tooltip>
+        )
+      },
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB
+      },
+      width: '10%',
+      right: 'true',
+      omit: true
     },
     // ACTIONS
     {
@@ -217,25 +346,25 @@ const Automation = ({ refetch }) => {
     }
   ]
 
-  const handleSort = async (column, sortDirection) => {
-    refetch({
-      id: productId,
-      first: totalRows,
-      last: undefined,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-    }).then((res) => {
-      if (res.data) {
-        prodRulesDispatch({
-          type: 'SET_SORT_ORDER',
-          payload: {
-            field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-          }
-        })
-      }
-    })
-  }
+  // const handleSort = async (column, sortDirection) => {
+  //   refetch({
+  //     id: productId,
+  //     first: totalRows,
+  //     last: undefined,
+  //     field: column.id,
+  //     direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+  //   }).then((res) => {
+  //     if (res.data) {
+  //       prodRulesDispatch({
+  //         type: 'SET_SORT_ORDER',
+  //         payload: {
+  //           field: column.id,
+  //           direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+  //         }
+  //       })
+  //     }
+  //   })
+  // }
 
   const handleRefresh = useCallback(async () => {
     await refetch({ id: productId, first: totalRows, field, direction })
@@ -267,32 +396,103 @@ const Automation = ({ refetch }) => {
     )
   }, [onRuleOpen, handleRefresh])
 
+  // ON PREV PAGE
+  const handlePreviousPage = async () => {
+    disablePaginationControl()
+    await refetch({
+      id: productId,
+      first: undefined,
+      last: totalRows,
+      after: undefined,
+      before: automationRules?.pageInfo?.startCursor
+    }).then((res) => {
+      if (res?.data) {
+        setPaginationControl(res?.data)
+      }
+    })
+  }
+
+  // ON NEXT PAGE
+  const handleNextPage = async () => {
+    disablePaginationControl()
+    await refetch({
+      id: productId,
+      first: totalRows,
+      last: undefined,
+      after: automationRules?.pageInfo?.endCursor,
+      before: undefined
+    }).then((res) => {
+      if (res?.data) {
+        setPaginationControl(res?.data)
+      }
+    })
+  }
+
+  // ON SET ROW
+  const handleSetRow = async (e) => {
+    const { value } = e.target
+    setTotalRows(Number(value))
+    disablePaginationControl()
+    await refetch({
+      id: productId,
+      first: Number(value),
+      last: undefined,
+      after: undefined,
+      before: undefined
+    }).then((res) => {
+      if (res?.data) {
+        setPaginationControl(res?.data)
+      }
+    })
+  }
+
+  useEffect(() => {
+    if (automationRules) {
+      setIsPrevActive(automationRules?.pageInfo?.hasPreviousPage)
+      setIsNextActive(automationRules?.pageInfo?.hasNextPage)
+    }
+  }, [automationRules])
+
   return (
     <>
       <CardBody>
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable
-            columns={columns}
-            data={rules || []}
-            customStyles={customStyles}
-            onSort={handleSort}
-            progressPending={rules ? false : true}
-            progressComponent={<CustomLoader />}
-            responsive={true}
-            persistTableHead
             subHeader
+            persistTableHead
+            responsive={true}
+            columns={columns}
+            data={automationRules?.nodes || []}
+            // onSort={handleSort}
+            customStyles={customStyles}
+            progressComponent={<CustomLoader />}
+            progressPending={automationRules ? false : true}
             subHeaderComponent={subHeaderComponent}
           />
+
+          {data && (
+            <Pagination
+              paginationSizes={paginationSizes}
+              pageIndex={pageIndex}
+              totalRows={totalRows}
+              totalCount={data.totalCount}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
+              onSetRow={handleSetRow}
+              hasNextPage={isNextActive}
+              hasPreviousPage={isPrevActive}
+            />
+          )}
         </Flex>
       </CardBody>
 
       {isRuleOpen && (
         <CreateRule
-          rules={rules}
           data={activeRow}
+          refetch={refetch}
           isOpen={isRuleOpen}
           onClose={onRuleClose}
-          setRules={setRules}
+          subOperators={subOperators}
         />
       )}
 

@@ -1628,50 +1628,70 @@ export const CreateAutomation = gql`
   }
 `
 
-// UPDATE AUTOMATION
-export const UpdateAutomation = gql`
-  mutation UpdateAutomation(
-    $id: Uuid!
+// PROJECT AUT0MATION RULE CREATE
+export const AutomationRuleCreate = gql`
+  mutation AutomationRuleCreate(
+    $name: String
+    $description: String
     $projectId: Uuid!
-    $condition: AutoCheckCondition!
-    $enabled: Boolean!
-    $compName: String
-    $compVersion: String
-    $set: JSON
+    $automationActionsAttributes: [AutomationActionAttributesInput!]
+    $automationConditionsAttributes: [AutomationConditionAttributesInput!]
+    $active: Boolean
   ) {
-    autoCheckUpdate(
+    automationRuleCreate(
       input: {
-        id: $id
+        name: $name
+        description: $description
         projectId: $projectId
-        condition: $condition
-        enabled: $enabled
-        compName: $compName
-        compVersion: $compVersion
-        setTo: $set
+        automationConditionsAttributes: $automationConditionsAttributes
+        automationActionsAttributes: $automationActionsAttributes
+        active: $active
       }
     ) {
-      autoCheck {
+      errors
+      automationRule {
         id
-        applicability
-        condition
-        attrName
-        enabled
-        lookup
-        setTo
+      }
+    }
+  }
+`
+
+// PROJECT AUT0MATION RULE UPDATE
+export const AutomationRuleUpdate = gql`
+  mutation AutomationRuleUpdate(
+    $id: Uuid!
+    $active: Boolean
+    $name: String
+    $description: String
+    $automationActionsAttributes: [AutomationActionAttributesInput!]
+    $automationConditionsAttributes: [AutomationConditionAttributesInput!]
+  ) {
+    automationRuleUpdate(
+      input: {
+        id: $id
+        active: $active
+        name: $name
+        description: $description
+        automationConditionsAttributes: $automationConditionsAttributes
+        automationActionsAttributes: $automationActionsAttributes
+      }
+    ) {
+      automationRule {
+        id
       }
       errors
     }
   }
 `
 
-// DELETE AUTOMATION
-export const DeleteAutomation = gql`
-  mutation DeleteAutomation($autoCheckId: Uuid!, $projectId: Uuid!) {
-    autoCheckDelete(input: { id: $autoCheckId, projectId: $projectId }) {
-      autoCheck {
+// PROJECT AUT0MATION RULE DELETE
+export const AutomationRuleDelete = gql`
+  mutation AutomationRuleDelete($id: Uuid!) {
+    automationRuleDelete(input: { id: $id }) {
+      errors
+      automationRule {
         id
       }
-      errors
     }
   }
 `

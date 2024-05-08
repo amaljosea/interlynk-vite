@@ -188,7 +188,7 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
         </Stack>
       </Flex>
     )
-  }, [])
+  }, [onOpen, updateOrg])
 
   const onSwitch = (row) => {
     setActiveRow(row)

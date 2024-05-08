@@ -2372,6 +2372,7 @@ export const ShareProject = gql`
   }
 `
 
+// GET PROJECT AUTOMATIONS
 export const GetProjectCheck = gql`
   query GetProjectCheck(
     $id: Uuid!
@@ -2379,41 +2380,64 @@ export const GetProjectCheck = gql`
     $before: String
     $first: Int
     $last: Int
-    $field: AutoCheckOrderByFields!
-    $direction: OrderByDirection!
   ) {
     project(id: $id) {
-      id
-      autoChecks(
+      automationRules(
         after: $after
         before: $before
         first: $first
         last: $last
-        orderBy: { field: $field, direction: $direction }
       ) {
         totalCount
+        nodes {
+          active
+          createdAt
+          description
+          id
+          name
+          projectId
+          updatedAt
+          automationActions {
+            id
+            field
+            subject
+            value
+            automationRuleId
+          }
+          automationConditions {
+            automationRuleId
+            createdAt
+            field
+            operator
+            value
+            id
+            subject
+          }
+        }
         pageInfo {
           endCursor
           hasNextPage
-          startCursor
           hasPreviousPage
-        }
-        nodes {
-          applicability
-          attrName
-          condition
-          createdAt
-          enabled
-          lookup
-          id
-          setTo
-          updatedAt
+          startCursor
         }
       }
     }
   }
 `
 
+// GET AUTOMATION MAPPING
+export const AutomationConditionSubjectFieldMapping = gql`
+  query AutomationConditionSubjectFieldMapping {
+    automationConditionSubjectFieldMapping {
+      key
+      name
+      operators
+      subject
+    }
+  }
+`
+
+// GET PROJECT LOGS
 export const GetProjectLogs = gql`
   query GetProjectLogs(
     $id: Uuid!

@@ -1,5 +1,7 @@
+import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { ruleSubjectOperatorMapping } from 'variables/general'
+import { useParams } from 'react-router-dom'
+import { updatedValue } from 'utils'
 
 import {
   Alert,
@@ -11,8 +13,6 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Grid,
-  GridItem,
   Heading,
   IconButton,
   Input,
@@ -24,33 +24,36 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
-  Tag,
   Text
 } from '@chakra-ui/react'
 
+import { AutomationRuleCreate, AutomationRuleUpdate } from 'graphQL/Mutation'
+
 import { FaPlus, FaTrash } from 'react-icons/fa6'
 
-const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
-  const sortedData = ruleSubjectOperatorMapping.sort((a, b) =>
-    a?.category.localeCompare(b?.category)
-  )
-  const compCategory = ruleSubjectOperatorMapping
-    ?.filter((item) => item?.category === 'Component')
-    .map((item) => item?.subject)
-  const versionCategory = ruleSubjectOperatorMapping
-    ?.filter((item) => item?.category === 'Version')
-    .map((item) => item?.subject)
+const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
+  const params = useParams()
+  const projectId = params?.productid
 
-  const categories = [...new Set(sortedData?.map((item) => item.category))]
-  const optionsByCategory = categories.reduce((acc, category) => {
-    const options = ruleSubjectOperatorMapping
-      .filter((item) => item.category === category)
-      .map((item) => (
-        <option value={item.subject} key={item?.subject}>
-          {`${item?.category} ${item.name}`}
+  // console.log('data',data);
+
+  const { automationConditionSubjectFieldMapping } = subOperators || []
+
+  const sortedData = [...automationConditionSubjectFieldMapping]?.sort((a, b) =>
+    a?.subject.localeCompare(b?.subject)
+  )
+
+  const categories = [...new Set(sortedData?.map((item) => item.subject))]
+
+  const optionsByCategory = categories.reduce((acc, subject) => {
+    const options = automationConditionSubjectFieldMapping
+      ?.filter((item) => item.subject === subject)
+      ?.map((item) => (
+        <option value={item.key} key={item?.key}>
+          {item.name}
         </option>
       ))
-    acc[category] = options
+    acc[subject] = options
     return acc
   }, {})
 
@@ -59,36 +62,49 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
   const [conditions, setConditions] = useState([
     {
       id: 1,
+      category: '',
       subject: '',
       operator: '',
       value: '',
       list: [],
       subError: '',
       opError: '',
-      valError: ''
+      valError: '',
+      status: 'CREATED'
     }
   ])
-  const [then, setThen] = useState('')
-  const [newValue, setNewValue] = useState('')
-  const [authorName, setAuthorName] = useState('')
-  const [authorEmail, setAuthorEmail] = useState('')
-  const [orgName, setOrgName] = useState('')
-  const [orgUrl, setOrgUrl] = useState('')
-  const [supName, setSupName] = useState('')
-  const [supEmail, setSupEmail] = useState('')
-  const [compName, setCompName] = useState('')
-  const [compVersion, setCompVersion] = useState('')
-
-  const placeholderMsg = () => {
-    switch (then) {
-      case 'Component License':
-        return 'Add license'
-      case 'Component Version':
-        return 'Add Component version'
-      default:
-        return 'Add value'
+  const [actions, setActions] = useState([
+    {
+      id: 1,
+      value: '',
+      subject: '',
+      status: 'CREATED',
+      field: ''
     }
+  ])
+  const [deletedCondition, setDeletedCondition] = useState([])
+  const [deleteAction, setDeleteAction] = useState('')
+  const [isDisabled, setIsDisabled] = useState(false)
+
+  const disableButtonTemporarily = () => {
+    setIsDisabled(true)
+    setTimeout(() => {
+      setIsDisabled(false)
+    }, 3000)
   }
+
+  // console.log('compCategory', compCategory)
+  // console.log('conditions', conditions)
+
+  const isComponent = conditions?.some((item) => item?.category === 'component')
+  const isVersion = conditions?.some((item) => item?.category === 'version')
+
+  const [createRule] = useMutation(AutomationRuleCreate, {
+    onCompleted: (data) => data && refetch()
+  })
+  const [updateRule] = useMutation(AutomationRuleUpdate, {
+    onCompleted: (data) => data && refetch()
+  })
 
   const checkDataValidity = (data) => {
     for (let i = 0; i < data.length; i++) {
@@ -109,7 +125,15 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
 
   const errorMessage = checkDataValidity(conditions)
 
-  const hasSimilarRow = (data) => {
+  const submitError =
+    errorMessage ||
+    error !== '' ||
+    ruleName === '' ||
+    isDisabled ||
+    actions?.length === 0 ||
+    conditions?.length === 0
+
+  const hasSimilarConditions = (data) => {
     for (let i = 0; i < data.length; i++) {
       for (let j = i + 1; j < data.length; j++) {
         if (
@@ -124,8 +148,22 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
     return false
   }
 
-  const addRow = () => {
-    if (hasSimilarRow(conditions)) {
+  const hasSimilarActions = (data) => {
+    for (let i = 0; i < data.length; i++) {
+      for (let j = i + 1; j < data.length; j++) {
+        if (
+          data[i].field === data[j].field &&
+          data[i].value === data[j].value
+        ) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
+  const onAddCondtion = () => {
+    if (hasSimilarConditions(conditions)) {
       setError(
         `A row with the empty or same values already exists. Please update or remove it before continue.`
       )
@@ -142,29 +180,50 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
           list: [],
           subError: '',
           opError: '',
-          valError: ''
+          valError: '',
+          status: 'CREATED'
         }
       ])
     }
   }
 
-  const deleteRow = (rule) => {
+  const onAddAction = () => {
+    if (hasSimilarActions(actions)) {
+      setError(
+        `A row with the empty or same values already exists. Please update or remove it before continue.`
+      )
+    } else {
+      setError('')
+      const newId = conditions?.length + 1
+      setActions([
+        ...actions,
+        {
+          id: newId,
+          value: '',
+          subject: isComponent ? 'component' : 'version',
+          status: 'CREATED',
+          field: ''
+        }
+      ])
+    }
+  }
+
+  const onDeleteCondtion = (rule) => {
     setError('')
-    const rules = []
     const newData = conditions?.filter((item) => item.id !== rule?.id)
-    newData?.map((item, index) =>
-      rules?.push({
-        id: index + 1,
-        subject: item?.subject,
-        operator: item?.operator,
-        value: item?.value,
-        list: item?.list,
-        subError: item?.subError,
-        opError: item?.opError,
-        valError: item?.valError
-      })
-    )
-    setConditions(rules)
+    setConditions(newData)
+    if (rule?.status === 'ADDED') {
+      setDeletedCondition((prev) => [...prev, rule])
+    }
+  }
+
+  const onDeleteAction = (action) => {
+    setError('')
+    const newData = actions?.filter((item) => item.id !== action?.id)
+    setActions(newData)
+    if (action?.status === 'ADDED') {
+      setDeleteAction((prev) => [...prev, action])
+    }
   }
 
   const onNameChange = (e) => setRuleName(e.target.value)
@@ -197,18 +256,23 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
     setConditions(newData)
   }
 
-  const handleChange = (value, id, field) => {
+  const onCondtionChange = (value, id, field) => {
     setError('')
     const newData = conditions.map((item) => {
       if (item.id === id) {
         if (field === 'subject' && value !== '') {
-          const result = ruleSubjectOperatorMapping?.find(
-            (item) => item?.subject === value
+          const result = automationConditionSubjectFieldMapping?.find(
+            (item) => item?.key === value
           )
-          return { ...item, [field]: value, list: result?.operators }
+          return {
+            ...item,
+            [field]: value,
+            category: result?.subject,
+            list: result?.operators
+          }
         } else if (
           field === 'operator' &&
-          (value === 'Exists' || value === 'Not Exists')
+          (value === 'exists' || value === 'not_exists')
         ) {
           return { ...item, [field]: value, value: 'Defined' }
         } else {
@@ -220,77 +284,155 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
     setConditions(newData)
   }
 
-  const isAuthor = then === 'Version Author'
-  const isSupplier =
-    then === 'Version Supplier' || then === 'Component Supplier'
-  const isPrimaryComp = then === 'Version Primary Component'
-  const author = { author_name: authorName, author_email: authorEmail }
-  const supplier = {
-    organization: orgName,
-    url: orgUrl,
-    contact_name: supName,
-    contact_email: supEmail
-  }
-  const primaryComponent = {
-    component_name: compName,
-    component_version: compVersion
-  }
-  const ruleValue = isAuthor
-    ? author
-    : isSupplier
-      ? supplier
-      : isPrimaryComp
-        ? primaryComponent
-        : { value: newValue }
-
-  const handleCreate = () => {
-    setRules((prev) => [
-      {
-        id: rules?.length + 1,
-        active: true,
-        rule: ruleName,
-        when: conditions,
-        then: then,
-        value: ruleValue
-      },
-      ...prev
-    ])
-    onClose()
-  }
-
-  const handleUpdate = () => {
-    const updatedRules = rules.map((rule) =>
-      rule.id === data?.id
-        ? {
-            ...rule,
-            rule: ruleName,
-            when: conditions,
-            then: then,
-            value: ruleValue
+  const onActionChange = (value, id, field) => {
+    setError('')
+    const newData = actions.map((item) => {
+      if (item.id === id) {
+        if (field === 'field' && value !== '') {
+          return {
+            ...item,
+            [field]: value,
+            subject: isComponent ? 'component' : 'version'
           }
-        : rule
+        } else {
+          return { ...item, [field]: value }
+        }
+      }
+      return item
+    })
+    setActions(newData)
+  }
+
+  const conditionsAttributes = []
+  const actionsAttributes = []
+  conditions?.length > 0 &&
+    conditions?.map((item) =>
+      conditionsAttributes?.push({
+        id: item?.status === 'CREATED' ? undefined : item?.id,
+        subject: item?.category,
+        operator: item?.operator,
+        field: item?.subject,
+        value:
+          item?.operator === 'exists' || item?.operator === 'not_exists'
+            ? undefined
+            : item?.value
+      })
     )
-    setRules(updatedRules)
-    onClose()
+  actions?.length > 0 &&
+    actions?.map((item) =>
+      actionsAttributes?.push({
+        id: item?.status === 'CREATED' ? undefined : item?.id,
+        subject: item?.subject,
+        field: item?.field,
+        value: item?.value
+      })
+    )
+
+  const handleRuleCreate = async () => {
+    disableButtonTemporarily()
+    if (hasSimilarConditions(conditions)) {
+      setError(
+        `A row with the empty or same values already exists. Please update or remove it before continue.`
+      )
+    } else if (hasSimilarActions(actions)) {
+      setError(
+        `A row with the empty or same values already exists. Please update or remove it before continue.`
+      )
+    } else {
+      await createRule({
+        variables: {
+          name: ruleName,
+          active: true,
+          projectId: projectId,
+          automationConditionsAttributes: conditionsAttributes,
+          automationActionsAttributes: actionsAttributes
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleCreate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
+        } else {
+          onClose()
+        }
+      })
+    }
+  }
+
+  const handleRuleUpdate = () => {
+    disableButtonTemporarily()
+    if (deletedCondition?.length > 0) {
+      deletedCondition?.map((item) =>
+        conditionsAttributes?.push({ id: item?.id, _destroy: true })
+      )
+    }
+    if (deleteAction?.length > 0) {
+      deleteAction?.map((item) =>
+        actionsAttributes?.push({ id: item?.id, _destroy: true })
+      )
+    }
+    if (hasSimilarConditions(conditions)) {
+      setError(
+        `A row with the empty or same values already exists. Please update or remove it before continue.`
+      )
+    } else if (hasSimilarActions(actions)) {
+      setError(
+        `A row with the empty or same values already exists. Please update or remove it before continue.`
+      )
+    } else {
+      updateRule({
+        variables: {
+          id: data?.id,
+          name: ruleName,
+          active: data?.active,
+          automationConditionsAttributes: conditionsAttributes,
+          automationActionsAttributes: actionsAttributes
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleUpdate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
+        } else {
+          onClose()
+        }
+      })
+    }
   }
 
   useEffect(() => {
     if (data) {
-      const { rule, then, when, value } = data
-      setRuleName(rule)
-      setConditions(when?.length > 0 ? when : [])
-      setThen(then)
-      setNewValue(value?.value || '')
-      setAuthorName(value?.author_name || '')
-      setAuthorEmail(value?.author_email || '')
-      setOrgName(value?.organization || '')
-      setOrgUrl(value?.url || '')
-      setSupName(value?.contact_name || '')
-      setSupEmail(value?.contact_email || '')
-      setCompName(value?.component_name || '')
-      setCompVersion(value?.component_version || '')
+      const { name, automationActions, automationConditions } = data || ''
+      const allConditions = []
+      const allActions = []
+      automationConditions?.map((item) =>
+        allConditions.push({
+          id: item?.id,
+          category: item?.subject,
+          subject: item?.field,
+          operator: item?.operator,
+          value: item?.value,
+          list: automationConditionSubjectFieldMapping?.find(
+            (sub) => sub?.key === item?.field
+          ).operators,
+          subError: '',
+          opError: '',
+          valError: '',
+          status: 'ADDED'
+        })
+      )
+      automationActions?.map((item) =>
+        allActions.push({
+          id: item?.id,
+          status: 'ADDED',
+          field: item?.field,
+          value: item?.value,
+          subject: item?.subject
+        })
+      )
+      setRuleName(name)
+      setConditions(allConditions)
+      setActions(allActions)
     }
-  }, [data])
+  }, [data, automationConditionSubjectFieldMapping])
 
   return (
     <Modal
@@ -306,7 +448,7 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
         <ModalCloseButton />
         <ModalBody>
           <Flex flexDir={'column'} alignItems={'flex-start'} gap={4}>
-            <FormControl as={Flex} alignItems='flex-start' isRequired>
+            <FormControl as={Flex} alignItems='center' isRequired>
               <FormLabel htmlFor='ruleName'>Name</FormLabel>
               <Input
                 type='text'
@@ -317,24 +459,23 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
                 onChange={onNameChange}
               />
             </FormControl>
-            {/* WHEN */}
-            <Heading
-              fontWeight={'medium'}
-              fontFamily={'inherit'}
-              fontSize={'md'}
-            >
-              When the following conditions are met:
-            </Heading>
+
             <Flex
               width={'100%'}
               justifyContent={'space-between'}
               alignItems={'center'}
             >
-              <Tag colorScheme='blue'>Conditions</Tag>
+              <Heading
+                fontWeight={'medium'}
+                fontFamily={'inherit'}
+                fontSize={'md'}
+              >
+                When the following conditions are met :
+              </Heading>
               <IconButton
                 colorScheme='blue'
                 icon={<FaPlus />}
-                onClick={addRow}
+                onClick={onAddCondtion}
               />
             </Flex>
             {/* CONDITIONS */}
@@ -351,7 +492,7 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
                     <Select
                       value={item?.subject}
                       onChange={(e) =>
-                        handleChange(e.target.value, item.id, 'subject')
+                        onCondtionChange(e.target.value, item.id, 'subject')
                       }
                       onBlur={() => onSubjectBlur(item)}
                       placeholder='-- Subject --'
@@ -363,22 +504,20 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
                       // }
                     >
                       {conditions?.length > 1 &&
-                      conditions?.some((item) =>
-                        item?.subject?.includes('Component')
-                      )
+                      conditions?.some((item) => item?.category === 'component')
                         ? [...categories]
-                            ?.filter((item) => item !== 'Version')
+                            ?.filter((item) => item !== 'version')
                             .map((category) => (
                               <optgroup key={category} label={category}>
                                 {optionsByCategory[category]}
                               </optgroup>
                             ))
                         : conditions?.length > 1 &&
-                            conditions?.some((item) =>
-                              item?.subject?.includes('Version')
+                            conditions?.some(
+                              (item) => item?.category === 'version'
                             )
                           ? [...categories]
-                              ?.filter((item) => item !== 'Component')
+                              ?.filter((item) => item !== 'component')
                               .map((category) => (
                                 <optgroup key={category} label={category}>
                                   {optionsByCategory[category]}
@@ -398,15 +537,20 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
                       name='operator'
                       value={item?.operator}
                       onChange={(e) =>
-                        handleChange(e.target.value, item.id, 'operator')
+                        onCondtionChange(e.target.value, item.id, 'operator')
                       }
                       fontSize='sm'
                       placeholder='-- Opeator --'
                       onBlur={() => onOperatorBlur(item)}
+                      textTransform={'capitalize'}
                     >
                       {item?.list?.map((option) => (
-                        <option value={option} key={option}>
-                          {option}
+                        <option
+                          value={option}
+                          key={option}
+                          style={{ textTransform: 'capitalize' }}
+                        >
+                          {updatedValue(option)}
                         </option>
                       ))}
                     </Select>
@@ -419,11 +563,11 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
                       placeholder='Value'
                       value={item?.value}
                       onChange={(e) =>
-                        handleChange(e.target.value, item.id, 'value')
+                        onCondtionChange(e.target.value, item.id, 'value')
                       }
                       hidden={
-                        item?.operator === 'Exists' ||
-                        item?.operator === 'Not Exists'
+                        item?.operator === 'exists' ||
+                        item?.operator === 'not_exists'
                       }
                     />
                     <Flex gap={4} justifyContent={'space-between'}>
@@ -435,191 +579,97 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
                         ml={'auto'}
                         colorScheme='red'
                         icon={<FaTrash />}
-                        onClick={() => deleteRow(item)}
+                        onClick={() => onDeleteCondtion(item)}
                       />
                     </Flex>
                   </Flex>
                 </Flex>
               ))}
             <Divider />
-            <FormControl as={Flex} alignItems='flex-start'>
-              <FormLabel width='80px'>Then Set</FormLabel>
-              <Select
-                fontSize='sm'
-                value={then}
-                onChange={(e) => setThen(e.target.value)}
-                placeholder='-- Subject --'
-                textTransform={'capitalize'}
-                isDisabled={errorMessage || conditions?.length === 0}
-              >
-                {conditions?.some((item) =>
-                  compCategory?.includes(item?.subject)
-                )
-                  ? [...categories]
-                      ?.filter((item) => item !== 'Version')
-                      .map((category) => (
-                        <optgroup key={category} label={category}>
-                          {optionsByCategory[category]}
-                        </optgroup>
-                      ))
-                  : [...categories]
-                      ?.filter((item) => item !== 'Component')
-                      .map((category) => (
-                        <optgroup key={category} label={category}>
-                          {optionsByCategory[category]}
-                        </optgroup>
-                      ))}
-              </Select>
-            </FormControl>
-            {/* VALUES */}
-            <Grid
-              gap={4}
+            <Flex
               width={'100%'}
-              templateColumns='repeat(1, 1fr)'
-              alignItems={'flex-start'}
+              justifyContent={'space-between'}
+              alignItems={'center'}
             >
-              <GridItem
-                as={Flex}
-                alignIterms='flex-start'
-                display={isAuthor ? 'flex' : 'none'}
+              <Heading
+                fontWeight={'medium'}
+                fontFamily={'inherit'}
+                fontSize={'md'}
               >
-                <FormLabel width={'120px'}>Author Name</FormLabel>
-                <Input
-                  type={'text'}
-                  fontSize='sm'
-                  placeholder={'Author Name'}
-                  value={authorName}
-                  onChange={(e) => setAuthorName(e.target.value)}
-                />
-              </GridItem>
-              <GridItem
-                as={Flex}
-                alignIterms='flex-start'
-                display={isAuthor ? 'flex' : 'none'}
-              >
-                <FormLabel width={'120px'}>Author Email</FormLabel>
-                <Input
-                  type={'text'}
-                  fontSize='sm'
-                  placeholder={'Author Email'}
-                  value={authorEmail}
-                  onChange={(e) => setAuthorEmail(e.target.value)}
-                />
-              </GridItem>
-              <GridItem
-                as={Flex}
-                alignIterms='flex-start'
-                display={isSupplier ? 'flex' : 'none'}
-              >
-                <FormLabel width={'180px'}>Organization Name</FormLabel>
-                <Input
-                  type={'text'}
-                  fontSize='sm'
-                  placeholder={'Enter organization name'}
-                  value={orgName}
-                  onChange={(e) => setOrgName(e.target.value)}
-                />
-              </GridItem>
-              <GridItem
-                as={Flex}
-                alignIterms='flex-start'
-                display={isSupplier ? 'flex' : 'none'}
-              >
-                <FormLabel width={'40px'}>URL</FormLabel>
-                <Input
-                  type={'text'}
-                  fontSize='sm'
-                  placeholder={'Enter URL'}
-                  value={orgUrl}
-                  onChange={(e) => setOrgUrl(e.target.value)}
-                />
-              </GridItem>
-              <GridItem
-                as={Flex}
-                alignIterms='flex-start'
-                display={isSupplier ? 'flex' : 'none'}
-              >
-                <FormLabel width={'120px'}>Contact Name</FormLabel>
-                <Input
-                  type={'text'}
-                  fontSize='sm'
-                  placeholder={'Enter contact name'}
-                  value={supName}
-                  onChange={(e) => setSupName(e.target.value)}
-                />
-              </GridItem>
-              <GridItem
-                as={Flex}
-                alignIterms='flex-start'
-                display={isSupplier ? 'flex' : 'none'}
-              >
-                <FormLabel width={'120px'}>Contact Email</FormLabel>
-                <Input
-                  type={'text'}
-                  fontSize='sm'
-                  placeholder={'Enter contact email'}
-                  value={supEmail}
-                  onChange={(e) => setSupEmail(e.target.value)}
-                />
-              </GridItem>
-              <GridItem
-                as={Flex}
-                alignIterms='flex-start'
-                display={isPrimaryComp ? 'flex' : 'none'}
-              >
-                <FormLabel width={'160px'}>Comopnent Name</FormLabel>
-                <Input
-                  type={'text'}
-                  fontSize='sm'
-                  placeholder={'Enter component name'}
-                  value={compName}
-                  onChange={(e) => setCompName(e.target.value)}
-                />
-              </GridItem>
-              <GridItem
-                as={Flex}
-                alignIterms='flex-start'
-                display={isPrimaryComp ? 'flex' : 'none'}
-              >
-                <FormLabel width={'175px'}>Comopnent Version</FormLabel>
-                <Input
-                  type={'text'}
-                  fontSize='sm'
-                  placeholder={'Enter component version'}
-                  value={compVersion}
-                  onChange={(e) => setCompVersion(e.target.value)}
-                />
-              </GridItem>
-              <GridItem
-                as={Flex}
-                alignIterms='flex-start'
-                display={isSupplier ? 'flex' : 'none'}
-              >
-                <FormLabel width={'120px'}>Contact Email</FormLabel>
-                <Input
-                  type={'text'}
-                  fontSize='sm'
-                  placeholder={'Enter contact email'}
-                  value={supEmail}
-                  onChange={(e) => setSupEmail(e.target.value)}
-                />
-              </GridItem>
-              <GridItem
-                as={Flex}
-                alignIterms='flex-start'
-                hidden={isAuthor || isSupplier || isPrimaryComp}
-              >
-                <FormLabel width={'50px'}>Value</FormLabel>
-                <Input
-                  type={'text'}
-                  fontSize='sm'
-                  placeholder={placeholderMsg()}
-                  isDisabled={errorMessage || conditions?.length === 0}
-                  value={newValue}
-                  onChange={(e) => setNewValue(e.target.value)}
-                />
-              </GridItem>
-            </Grid>
+                Then set :
+              </Heading>
+              <IconButton
+                colorScheme='blue'
+                icon={<FaPlus />}
+                onClick={onAddAction}
+              />
+            </Flex>
+            {/* ACTIONS */}
+            {actions?.length > 0 &&
+              actions?.map((item, index) => (
+                <Flex
+                  gap={4}
+                  key={index}
+                  width={'100%'}
+                  alignItems={'flex-start'}
+                  justifyContent={'space-bewteen'}
+                >
+                  <FormControl as={Flex} alignItems='center'>
+                    <Select
+                      value={item?.field}
+                      onChange={(e) =>
+                        onActionChange(e.target.value, item.id, 'field')
+                      }
+                      placeholder='-- Subject --'
+                      fontSize='sm'
+                      textTransform={'capitalize'}
+                      isDisabled={errorMessage || conditions?.length === 0}
+                    >
+                      {conditions?.some(
+                        (item) => item?.category === 'component'
+                      )
+                        ? [...categories]
+                            ?.filter((item) => item !== 'version')
+                            .map((category) => (
+                              <optgroup key={category} label={category}>
+                                {optionsByCategory[category]}
+                              </optgroup>
+                            ))
+                        : [...categories]
+                            ?.filter((item) => item !== 'component')
+                            .map((category) => (
+                              <optgroup key={category} label={category}>
+                                {optionsByCategory[category]}
+                              </optgroup>
+                            ))}
+                    </Select>
+                  </FormControl>
+                  {/* VALUE */}
+                  <FormControl as={Flex} alignItems='center'>
+                    <Input
+                      type={'text'}
+                      fontSize='sm'
+                      placeholder={'Add value'}
+                      value={item.value}
+                      onChange={(e) =>
+                        onActionChange(e.target.value, item.id, 'value')
+                      }
+                      isDisabled={errorMessage || conditions?.length === 0}
+                    />
+                  </FormControl>
+                  <Flex gap={4} justifyContent={'space-between'}>
+                    {actions?.length > 1 && actions?.length - 1 !== index && (
+                      <Text pt={2}>and</Text>
+                    )}
+                    <IconButton
+                      ml={'auto'}
+                      colorScheme='red'
+                      icon={<FaTrash />}
+                      onClick={() => onDeleteAction(item)}
+                    />
+                  </Flex>
+                </Flex>
+              ))}
             {/* ERROR HANDLING */}
             {error !== '' && (
               <Alert status='error' borderRadius={4}>
@@ -637,18 +687,10 @@ const CreateRule = ({ data, rules, isOpen, onClose, setRules }) => {
           </Button>
           <Button
             colorScheme='blue'
-            isDisabled={
-              errorMessage ||
-              error !== '' ||
-              ruleName === '' ||
-              then === '' ||
-              (isAuthor && (authorName === '' || authorEmail === '')) ||
-              (isSupplier && orgName === '') ||
-              (!isAuthor && !isSupplier && !isPrimaryComp && newValue === '')
-            }
-            onClick={data ? handleUpdate : handleCreate}
+            isDisabled={submitError}
+            onClick={data ? handleRuleUpdate : handleRuleCreate}
           >
-            Create
+            {data ? 'Update' : 'Create'}
           </Button>
         </ModalFooter>
       </ModalContent>

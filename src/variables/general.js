@@ -15,24 +15,28 @@ export const ruleSubjectOperatorMapping = [
   {
     category: 'Component',
     name: 'CPE',
+    key: 'component_cpe',
     operators: ['Is', 'Exists', 'Not Exists'],
     subject: 'Component CPE'
   },
   {
     category: 'Component',
     name: 'License',
+    key: 'component_licenses_exp',
     operators: ['Is', 'Exists', 'Not Exists'],
     subject: 'Component License'
   },
   {
     category: 'Component',
     name: 'Name',
+    key: 'component_group',
     operators: ['Is'],
     subject: 'Component Name'
   },
   {
     category: 'Component',
     name: 'PURL',
+    key: 'component_purl',
     operators: ['Is', 'Exists', 'Not Exists'],
     subject: 'Component PURL'
   },
