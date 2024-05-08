@@ -17,7 +17,9 @@ import CardHeader from '../Card/CardHeader'
 
 const NotificationChannels = () => {
   const [slackWebhookUrl, setSlackWebhookUrl] = useState('')
-  const [isChanged, setIsChanged] = useState(false)
+  const [teamsWebhookUrl, setTeamsWebhookUrl] = useState('')
+  const [isSlackChanged, setIsSlackChanged] = useState(false)
+  const [isTeamsChanged, setIsTeamsChanged] = useState(false)
 
   const [updateChannel] = useMutation(UpdateNotificationChannel)
   const [updateConfig] = useMutation(UpdateNotificationConfig)
@@ -50,7 +52,9 @@ const NotificationChannels = () => {
       }
       setNotificationConfigs(notificationConfigs)
       setSlackWebhookUrl(notificationConfigs.slackWebhookUrl)
-      setIsChanged(false)
+      setTeamsWebhookUrl(notificationConfigs.teamsWebhookUrl)
+      setIsSlackChanged(false)
+      setIsTeamsChanged(false)
     }
   }, [configs])
 
@@ -70,7 +74,7 @@ const NotificationChannels = () => {
     })
   }
 
-  const handleSaveWebhookUrl = () => {
+  const handleSaveSlackWebhookUrl = (id) => {
     updateConfig({
       variables: {
         notificationConfigs: {
@@ -78,13 +82,29 @@ const NotificationChannels = () => {
         }
       }
     }).then((res) => {
-      console.log(notificationConfigs, slackWebhookUrl)
       res?.data?.notificationConfigUpdate?.success &&
         setNotificationConfigs({
           ...notificationConfigs,
           slackWebhookUrl
         })
-      setIsChanged(false)
+      setIsSlackChanged(false)
+    })
+  }
+
+  const handleSaveTeamsWebhookUrl = (id) => {
+    updateConfig({
+      variables: {
+        notificationConfigs: {
+          teamsWebhookUrl: teamsWebhookUrl
+        }
+      }
+    }).then((res) => {
+      res?.data?.notificationConfigUpdate?.success &&
+        setNotificationConfigs({
+          ...notificationConfigs,
+          teamsWebhookUrl
+        })
+      setIsTeamsChanged(false)
     })
   }
 
@@ -103,7 +123,6 @@ const NotificationChannels = () => {
             isChecked={notificationChannels[id]}
             me='20px'
             onChange={() => handleSwitchChange(id)}
-            isDisabled={['teams'].includes(id)}
           />
           <Text color='gray.500' fontWeight='400' textTransform={'capitalize'}>
             {id}
@@ -114,17 +133,39 @@ const NotificationChannels = () => {
                 value={slackWebhookUrl}
                 onChange={(e) => {
                   setSlackWebhookUrl(e.target.value)
-                  setIsChanged(true)
+                  setIsSlackChanged(true)
                 }}
                 placeholder='Paste Slack Webhook URL'
                 color='gray.600'
-                ml='20px'
+                ml='23px'
               />
               <Button
                 colorScheme='blue'
                 ml='20px'
-                onClick={handleSaveWebhookUrl}
-                disabled={!isChanged}
+                onClick={handleSaveSlackWebhookUrl}
+                disabled={!isSlackChanged}
+              >
+                Save
+              </Button>
+            </>
+          )}
+          {id === 'teams' && notificationChannels[id] && (
+            <>
+              <Input
+                value={teamsWebhookUrl}
+                onChange={(e) => {
+                  setTeamsWebhookUrl(e.target.value)
+                  setIsTeamsChanged(true)
+                }}
+                placeholder='Paste Teams Webhook URL'
+                color='gray.600'
+                ml='15px'
+              />
+              <Button
+                colorScheme='blue'
+                ml='20px'
+                onClick={handleSaveTeamsWebhookUrl}
+                disabled={!isTeamsChanged}
               >
                 Save
               </Button>
@@ -132,10 +173,6 @@ const NotificationChannels = () => {
           )}
         </Flex>
       ))}
-
-      <Text color='gray.500' fontSize='sm' mt='20px'>
-        * Teams will be enabled soon
-      </Text>
     </Card>
   )
 }

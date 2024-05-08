@@ -3782,6 +3782,7 @@ export const GetUserNotificationConfigs = gql`
   query GetUserNotificationConfigs {
     notificationConfigs {
       slackWebhookUrl
+      teamsWebhookUrl
     }
   }
 `
