@@ -16,7 +16,7 @@ import {
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { CreateAutomation, recheckHealth, sbomUpdate } from 'graphQL/Mutation'
+import { recheckHealth, sbomUpdate } from 'graphQL/Mutation'
 
 import LicenseField from './Licenses/LicenseField'
 
@@ -33,8 +33,8 @@ const LicenseModal = ({
   const sbomId = params.sbomid
 
   const { sbomState, dispatch } = useGlobalState()
-  const { licenseType, spdxLicenses, customLicenses, expLicense } = sbomState
-  const { sbomDispatch, prodCheckDispatch } = dispatch
+  const { expLicense } = sbomState
+  const { prodCheckDispatch } = dispatch
 
   const [isValid, setIsValid] = useState(true)
 
@@ -54,8 +54,6 @@ const LicenseModal = ({
   const [updateSbom] = useMutation(sbomUpdate, {
     onCompleted: () => handleRefetch()
   })
-
-  const [createAutoCheck] = useMutation(CreateAutomation)
 
   const onFilterRefetch = () => {
     filterRefetch({
@@ -97,29 +95,6 @@ const LicenseModal = ({
         .finally(() => onClose())
     } catch (error) {
       console.log(`Mutation error `, error)
-    }
-  }
-
-  const onSaveRule = async () => {
-    try {
-      await createAutoCheck({
-        variables: {
-          projectId: productId,
-          applicable: 'document',
-          condition: 'missing',
-          attr: licenseType,
-          enabled: true,
-          set: JSON.stringify(
-            {
-              value: expLicense || ''
-            },
-            null,
-            2
-          )
-        }
-      }).then((res) => res.data && handleUpdateSBOM())
-    } catch (error) {
-      console.log('Error', error)
     }
   }
 

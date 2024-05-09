@@ -33,11 +33,7 @@ import LicenseField from 'components/Licenses/LicenseField'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import {
-  CreateAutomation,
-  UpdateComponent,
-  recheckHealth
-} from 'graphQL/Mutation'
+import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 import { GetComponentData } from 'graphQL/Queries'
 
 const CheckModal = ({
@@ -62,15 +58,8 @@ const CheckModal = ({
   })
 
   const { setActiveSbomTab, prodCompState, dispatch } = useGlobalState()
-  const {
-    field,
-    direction,
-    spdxLicenses,
-    expLicense,
-    customLicenses,
-    totalComp,
-    licenseType
-  } = prodCompState
+  const { field, direction, spdxLicenses, expLicense, customLicenses } =
+    prodCompState
   const { prodCheckDispatch } = dispatch
 
   const now = new Date()
@@ -252,8 +241,6 @@ const CheckModal = ({
     }
   }
 
-  const [createAutoCheck] = useMutation(CreateAutomation)
-
   const isInvalidLicense =
     (shortDesc === 'Component has license/s specified' ||
       shortDesc === 'Componet has deprecated license/s' ||
@@ -261,42 +248,6 @@ const CheckModal = ({
     spdxLicenses.length === 0 &&
     expLicense === '' &&
     customLicenses.length === 0
-
-  const onSaveRule = async () => {
-    if (activeComp) {
-      await createAutoCheck({
-        variables: {
-          projectId: productId,
-          applicable: 'component',
-          condition: 'missing',
-          attr: 'primary',
-          enabled: true,
-          compName: activeComp.name,
-          compVersion: activeComp.version,
-          set: JSON.stringify({ value: true }, null, 2)
-        }
-      }).then((res) => res.data && handleComUpdate())
-    } else {
-      await createAutoCheck({
-        variables: {
-          projectId: productId,
-          applicable: 'component',
-          condition: 'missing',
-          attr: licenseType,
-          enabled: true,
-          compName: activeCheck?.component?.name,
-          compVersion: activeCheck?.component?.version,
-          set: JSON.stringify(
-            {
-              value: expLicense
-            },
-            null,
-            2
-          )
-        }
-      }).then((res) => res.data && onLicenseUpdate())
-    }
-  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>

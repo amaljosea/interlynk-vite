@@ -33,24 +33,20 @@ import {
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import {
-  CreateAutomation,
   authorCreate,
   recheckHealth,
   supplierCreate,
   supplierDelete,
-  toolCreate,
-  toolDelete
+  toolCreate
 } from 'graphQL/Mutation'
 
 const GeneralDataDrawer = ({
   isOpen,
   onClose,
-  btnRef,
   data,
   selectedKey,
   refetch,
-  checkId,
-  filterRefetch
+  checkId
 }) => {
   const toast = useToast()
   const params = useParams()
@@ -88,7 +84,6 @@ const GeneralDataDrawer = ({
   }
 
   const [createTool] = useMutation(toolCreate)
-  const [deleteTool] = useMutation(toolDelete)
 
   const [createAuthor] = useMutation(authorCreate)
 
@@ -98,20 +93,6 @@ const GeneralDataDrawer = ({
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
   })
-
-  const [createAutoCheck] = useMutation(CreateAutomation)
-
-  const onFilterRefetch = () => {
-    filterRefetch({
-      projectId: productId,
-      sbomId: sbomId
-    }).then((res) =>
-      prodCheckDispatch({
-        type: 'ADD_FILTER_HEADS',
-        payload: res.data.sbom.filters
-      })
-    )
-  }
 
   useEffect(() => {
     if (data) {
@@ -171,7 +152,7 @@ const GeneralDataDrawer = ({
           supplierId: id,
           sbomId: sbomId
         }
-      }).then((res) => {
+      }).then(() => {
         const updatedList = supplierList.filter((item) => item.id !== id)
         setSupplierList(updatedList)
       })
@@ -264,51 +245,6 @@ const GeneralDataDrawer = ({
         return 'License'
       case 'identifier':
         return 'Identifiers'
-    }
-  }
-
-  const onSaveRule = async () => {
-    if (authorList.length > 0) {
-      try {
-        await createAutoCheck({
-          variables: {
-            projectId: productId,
-            applicable: 'document',
-            condition: 'missing',
-            attr: 'author',
-            enabled: true,
-            set: JSON.stringify(
-              { name: authorList[0].name, email: authorList[0].email },
-              null,
-              2
-            )
-          }
-        }).then((res) => res.data && handleSave())
-      } catch (error) {
-        console.log('Error', error)
-      }
-    } else if (creationTools.length > 0) {
-      try {
-        await createAutoCheck({
-          variables: {
-            projectId: productId,
-            applicable: 'document',
-            condition: 'missing',
-            attr: 'tool',
-            enabled: true,
-            set: JSON.stringify(
-              {
-                name: creationTools[0].name,
-                version: creationTools[0].version
-              },
-              null,
-              2
-            )
-          }
-        }).then((res) => res.data && handleSave())
-      } catch (error) {
-        console.log('Error', error)
-      }
     }
   }
 

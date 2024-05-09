@@ -24,7 +24,6 @@ import {
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import {
-  CreateAutomation,
   addComSupplier,
   recheckHealth,
   updateComSupplier
@@ -103,7 +102,7 @@ const SupplierModal = ({
       setSupName(suppliers[0].contactName || '')
       setSupEmail(suppliers[0].contactEmail || '')
     }
-  }, [])
+  }, [data])
 
   const handleSave = async () => {
     await createSupplier({
@@ -142,31 +141,6 @@ const SupplierModal = ({
         id: data && data.suppliers && data.suppliers[0].id
       }
     }).then((res) => res.data && onClose())
-  }
-
-  const [createAutoCheck] = useMutation(CreateAutomation)
-
-  const onSaveRule = async () => {
-    try {
-      await createAutoCheck({
-        variables: {
-          projectId: productId,
-          applicable: 'component',
-          condition: 'missing',
-          attr: 'supplier',
-          enabled: true,
-          compName: activeCheck.name,
-          compVersion: activeCheck.version,
-          set: JSON.stringify(
-            { name: supName, contact_email: supEmail },
-            null,
-            2
-          )
-        }
-      }).then((res) => res.data && handleSave())
-    } catch (error) {
-      console.log('Error', error)
-    }
   }
 
   const handleCheckEmail = () => {

@@ -29,16 +29,12 @@ import CpeInput from 'components/CpeInput'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { CreateAutomation } from 'graphQL/Mutation'
 import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 
 const CpeModal = ({
-  data,
   isOpen,
   onClose,
   setCpeValue,
-  onUpdateCpe,
-  selectedCpe,
   cpeValue,
   activeComp,
   checkId,
@@ -119,7 +115,7 @@ const CpeModal = ({
         payload: 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*'
       })
     }
-  }, [cpeValue])
+  }, [cpeValue, prodCompDispatch])
 
   // ON BLUR UPDATE
   const onBlurUpdate = () => {
@@ -333,33 +329,6 @@ const CpeModal = ({
   const handleOnChange = (value, setStateFunc) => {
     if (!value.includes(':') && !value.includes('*')) {
       setStateFunc(value)
-    }
-  }
-
-  const [createAutoCheck] = useMutation(CreateAutomation)
-
-  const onSaveRule = async () => {
-    if (validateCpe(cpeString)) {
-      await createAutoCheck({
-        variables: {
-          projectId: productId,
-          applicable: 'component',
-          condition: 'missing',
-          attr: 'cpe',
-          enabled: true,
-          compName: activeCheck.name,
-          compVersion: activeCheck.version,
-          set: JSON.stringify(
-            {
-              value: cpeString
-            },
-            null,
-            2
-          )
-        }
-      }).then((res) => res.data && handleComUpdate())
-    } else {
-      setError('Invalid CPE')
     }
   }
 

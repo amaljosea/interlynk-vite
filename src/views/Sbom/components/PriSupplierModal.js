@@ -21,12 +21,7 @@ import {
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import {
-  CreateAutomation,
-  recheckHealth,
-  supplierCreate,
-  supplierUpdate
-} from 'graphQL/Mutation'
+import { recheckHealth, supplierCreate, supplierUpdate } from 'graphQL/Mutation'
 
 const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   const params = useParams()
@@ -91,7 +86,6 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
   })
-  const [createAutoCheck] = useMutation(CreateAutomation)
 
   useEffect(() => {
     if (suppliers && suppliers.length > 0) {
@@ -112,7 +106,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
         sbomId: sbomId
       }
     })
-      .then((res) => {
+      .then(() => {
         if (checkId) {
           prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
           healthRecheck({ variables: { sbomId: sbomId, checkId: checkId } })
@@ -131,27 +125,6 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
         id: suppliers[0].id
       }
     }).then((res) => res.data && onClose())
-  }
-
-  const onSaveRule = async () => {
-    try {
-      await createAutoCheck({
-        variables: {
-          projectId: productId,
-          applicable: 'document',
-          condition: 'missing',
-          attr: 'supplier',
-          enabled: true,
-          set: JSON.stringify(
-            { name: supName, contact_email: supEmail },
-            null,
-            2
-          )
-        }
-      }).then((res) => res.data && handleSave())
-    } catch (error) {
-      console.log('Error', error)
-    }
   }
 
   return (

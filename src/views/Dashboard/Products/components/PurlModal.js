@@ -27,7 +27,6 @@ import CpeInput from 'components/CpeInput'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
-import { CreateAutomation } from 'graphQL/Mutation'
 
 const typeOptions = [
   { value: '', label: '-- Select --' },
@@ -583,33 +582,6 @@ const PurlModal = ({
       onClose()
     } catch (error) {
       setIsValid(false)
-    }
-  }
-
-  const [createAutoCheck] = useMutation(CreateAutomation)
-
-  const onSaveRule = async () => {
-    try {
-      await createAutoCheck({
-        variables: {
-          projectId: productId,
-          applicable: 'component',
-          condition: 'missing',
-          attr: 'purl',
-          enabled: true,
-          compName: activeCheck.name,
-          compVersion: activeCheck.version,
-          set: JSON.stringify(
-            {
-              value: purlString
-            },
-            null,
-            2
-          )
-        }
-      }).then((res) => res.data && handleComUpdate())
-    } catch (error) {
-      console.log('Error', error)
     }
   }
 
