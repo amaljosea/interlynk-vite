@@ -271,7 +271,7 @@ const Automation = () => {
       },
       width: '10%',
       right: 'true',
-      sortable: true,
+      // sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a.createdAt)
         const dateB = new Date(b.createdAt)
@@ -290,7 +290,7 @@ const Automation = () => {
           </Tooltip>
         )
       },
-      sortable: true,
+      // sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)

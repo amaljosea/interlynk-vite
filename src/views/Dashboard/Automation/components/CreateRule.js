@@ -14,8 +14,9 @@ import {
   FormErrorMessage,
   FormLabel,
   Heading,
-  IconButton,
+  Icon,
   Input,
+  Kbd,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -23,8 +24,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
-  Text
+  Select
 } from '@chakra-ui/react'
 
 import { AutomationRuleCreate, AutomationRuleUpdate } from 'graphQL/Mutation'
@@ -194,7 +194,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
       )
     } else {
       setError('')
-      const newId = conditions?.length + 1
+      const newId = actions?.length + 1
       setActions([
         ...actions,
         {
@@ -448,8 +448,8 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
         <ModalCloseButton />
         <ModalBody>
           <Flex flexDir={'column'} alignItems={'flex-start'} gap={4}>
-            <FormControl as={Flex} alignItems='center' isRequired>
-              <FormLabel htmlFor='ruleName'>Name</FormLabel>
+            <FormControl isRequired>
+              <FormLabel htmlFor='ruleName'>Rule Name</FormLabel>
               <Input
                 type='text'
                 name='ruleName'
@@ -459,25 +459,13 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                 onChange={onNameChange}
               />
             </FormControl>
-
-            <Flex
-              width={'100%'}
-              justifyContent={'space-between'}
-              alignItems={'center'}
+            <Heading
+              fontWeight={'medium'}
+              fontFamily={'inherit'}
+              fontSize={'md'}
             >
-              <Heading
-                fontWeight={'medium'}
-                fontFamily={'inherit'}
-                fontSize={'md'}
-              >
-                When the following conditions are met :
-              </Heading>
-              <IconButton
-                colorScheme='blue'
-                icon={<FaPlus />}
-                onClick={onAddCondtion}
-              />
-            </Flex>
+              When the following conditions are met :
+            </Heading>
             {/* CONDITIONS */}
             {conditions?.length > 0 &&
               conditions?.map((item, index) => (
@@ -572,38 +560,37 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                     />
                     <Flex gap={4} justifyContent={'space-between'}>
                       {conditions?.length > 1 &&
-                        conditions?.length - 1 !== index && (
-                          <Text pt={2}>and</Text>
-                        )}
-                      <IconButton
+                        conditions?.length - 1 !== index && <Kbd>AND</Kbd>}
+                      <Icon
                         ml={'auto'}
-                        colorScheme='red'
-                        icon={<FaTrash />}
+                        mt={0.6}
+                        as={FaTrash}
+                        color={'red.500'}
+                        cursor={'pointer'}
                         onClick={() => onDeleteCondtion(item)}
                       />
                     </Flex>
                   </Flex>
                 </Flex>
               ))}
-            <Divider />
-            <Flex
-              width={'100%'}
-              justifyContent={'space-between'}
-              alignItems={'center'}
+            <Button
+              fontSize={'sm'}
+              colorScheme='blue'
+              variant='link'
+              fontWeight={'medium'}
+              leftIcon={<FaPlus />}
+              onClick={onAddCondtion}
             >
-              <Heading
-                fontWeight={'medium'}
-                fontFamily={'inherit'}
-                fontSize={'md'}
-              >
-                Then set :
-              </Heading>
-              <IconButton
-                colorScheme='blue'
-                icon={<FaPlus />}
-                onClick={onAddAction}
-              />
-            </Flex>
+              Add condition
+            </Button>
+            <Divider />
+            <Heading
+              fontWeight={'medium'}
+              fontFamily={'inherit'}
+              fontSize={'md'}
+            >
+              Then set actions :
+            </Heading>
             {/* ACTIONS */}
             {actions?.length > 0 &&
               actions?.map((item, index) => (
@@ -645,7 +632,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                     </Select>
                   </FormControl>
                   {/* VALUE */}
-                  <FormControl as={Flex} alignItems='center'>
+                  <FormControl as={Flex} alignItems='center' gap={4}>
                     <Input
                       type={'text'}
                       fontSize='sm'
@@ -656,20 +643,37 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                       }
                       isDisabled={errorMessage || conditions?.length === 0}
                     />
+                    <Flex gap={4} justifyContent={'space-between'}>
+                      {actions?.length > 1 && actions?.length - 1 !== index && (
+                        <Kbd>AND</Kbd>
+                      )}
+                      <Icon
+                        ml={'auto'}
+                        mt={0.6}
+                        as={FaTrash}
+                        color={'red.500'}
+                        cursor={'pointer'}
+                        onClick={() => onDeleteAction(item)}
+                        display={
+                          errorMessage || conditions?.length === 0
+                            ? 'none'
+                            : 'flex'
+                        }
+                      />
+                    </Flex>
                   </FormControl>
-                  <Flex gap={4} justifyContent={'space-between'}>
-                    {actions?.length > 1 && actions?.length - 1 !== index && (
-                      <Text pt={2}>and</Text>
-                    )}
-                    <IconButton
-                      ml={'auto'}
-                      colorScheme='red'
-                      icon={<FaTrash />}
-                      onClick={() => onDeleteAction(item)}
-                    />
-                  </Flex>
                 </Flex>
               ))}
+            <Button
+              fontSize={'sm'}
+              colorScheme='blue'
+              variant='link'
+              fontWeight={'medium'}
+              leftIcon={<FaPlus />}
+              onClick={onAddAction}
+            >
+              Add action
+            </Button>
             {/* ERROR HANDLING */}
             {error !== '' && (
               <Alert status='error' borderRadius={4}>
