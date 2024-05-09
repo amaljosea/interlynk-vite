@@ -250,7 +250,7 @@ export default function HeaderLinks(props) {
                   </Stack>
                 </Flex>
               </MenuItem>
-              <MenuDivider />
+              <MenuDivider hidden={!data?.organization} />
               <Link href={`/vendor/settings?tab=personal-details`}>
                 <MenuItem
                   icon={<SettingsIcon />}

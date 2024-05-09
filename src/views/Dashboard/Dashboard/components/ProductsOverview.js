@@ -20,7 +20,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 const ProductsOverview = ({ title, data, prodPermissions }) => {
-  const { setActiveSbomTab, dispatch } = useGlobalState()
+  const { dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
@@ -34,23 +34,10 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       type: 'SET_CURRENT_PRODUCT',
       payload: { id: projectId, sbomId: id }
     })
-    setActiveSbomTab(0)
     prodDispatch({
       type: 'SET_CURRENT_PRODUCT',
       payload: { id: projectId, sbomId: id }
     })
-  }
-
-  const onVersionClick = () => {
-    setActiveSbomTab(0)
-  }
-
-  const onFilterComp = () => {
-    setActiveSbomTab(2)
-  }
-
-  const onFilterLicense = () => {
-    setActiveSbomTab(4)
   }
 
   const onFilterSev = (value) => {
@@ -116,10 +103,12 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
             to={generateProductVersionDetailPageUrlFromCurrentUrl({
               productgroupid: project?.projectGroup?.id,
               productid: project?.id,
-              sbomid: id
+              sbomid: id,
+              paramsObj: {
+                tab: 'general'
+              }
             })}
             style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-            onClick={() => onVersionClick(row)}
           >
             <Text
               my={2}
@@ -152,7 +141,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
               }
             })}
             style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-            onClick={() => (uniqueSbom ? onFilterComp(row) : null)}
           >
             <Tag
               size='md'
@@ -187,7 +175,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
               }
             })}
             style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-            onClick={() => (uniqueSbom ? onFilterLicense(row) : null)}
           >
             <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
               <TagLabel mx={'auto'}>{stats?.compLicenseCount || 0}</TagLabel>

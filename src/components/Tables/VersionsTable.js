@@ -78,7 +78,6 @@ const VersionsTable = ({ projectGroup }) => {
   const {
     userPermissions,
     activeProdTab,
-    setActiveSbomTab,
     clearSelect,
     setClearSelect,
     selectedSbom,
@@ -264,7 +263,6 @@ const VersionsTable = ({ projectGroup }) => {
 
   const onSelectLicenses = (row) => {
     const { id } = row
-    setActiveSbomTab(4)
     navigate(
       generateProductVersionDetailPageUrlFromCurrentUrl({
         sbomid: id,
@@ -294,7 +292,6 @@ const VersionsTable = ({ projectGroup }) => {
             to={link}
             onClick={() => {
               prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
-              setActiveSbomTab(0)
             }}
           >
             <Text color={'blue.500'} minWidth='100%' my={3} fontSize={14}>

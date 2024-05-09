@@ -107,7 +107,6 @@ const ProductTable = ({ data, refetch }) => {
     setEnvName,
     setClearSelect,
     setSelectedSbom,
-    setActiveSbomTab,
     prodState,
     dispatch
   } = useGlobalState()
@@ -439,7 +438,6 @@ const ProductTable = ({ data, refetch }) => {
             productid: env?.id || defaultProject?.id
           })
           localStorage.setItem('activeProdTab', 0)
-          setActiveSbomTab(0)
           navigate(link)
         }
         return (
@@ -485,7 +483,6 @@ const ProductTable = ({ data, refetch }) => {
             payload: { id: env?.id }
           })
           setEnvName(env?.name)
-          setActiveSbomTab(0)
         }
         return (
           <Stack direction={'row'} spacing={2} alignItems={'center'}>

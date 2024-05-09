@@ -1,5 +1,6 @@
 import { useLazyQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import ReactSelect, { components } from 'react-select'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -23,6 +24,10 @@ import { LicenseAutoComplete } from 'graphQL/Queries'
 import InfoModal from '../InfoModal'
 
 const LicenseField = ({ isDisabled, sbomView, license }) => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const tab = queryParams.get('tab')
+
   useEffect(() => {
     if (license) {
       const payload = {
@@ -36,7 +41,7 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
     }
   }, [])
 
-  const { prodCompState, activeSbomTab, dispatch, sbomState } = useGlobalState()
+  const { prodCompState, dispatch, sbomState } = useGlobalState()
 
   const { prodCompDispatch, sbomDispatch } = dispatch
 
@@ -150,7 +155,7 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
           <FormLabel htmlFor={licenseType}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>Licenses</Text>
-              {activeSbomTab === 4 ? (
+              {tab === 'licenses' ? (
                 <Tooltip label={licenseInfo}>
                   <Icon as={InfoIcon} color={'blue.500'} />
                 </Tooltip>

@@ -27,7 +27,7 @@ import AdminNavbarLinks from './AdminNavbarLinks'
 export default function AdminNavbar(props) {
   const partsContext = usePartsContext()
   const navigate = useNavigate()
-  const { setActiveSbomTab, setUserPermissions } = useGlobalState()
+  const { setUserPermissions } = useGlobalState()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const {
     generateProductVersionDetailPageUrlFromCurrentUrl,
@@ -186,7 +186,6 @@ export default function AdminNavbar(props) {
                       ? generateProductVersionDetailPageUrlFromCurrentUrl()
                       : ''
                   }
-                  onClick={() => setActiveSbomTab(0)}
                 >
                   {sbomHookData.versionName}
                 </BreadcrumbLink>

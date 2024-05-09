@@ -26,7 +26,6 @@ const GlobalStateProvider = ({ children }) => {
   const [totalRows, setTotalRows] = useState(25)
   const [activeProdTab, setActiveProdTab] = useState(0)
   const [activeCsProdTab, setActiveCsProdTab] = useState(0)
-  const [activeSbomTab, setActiveSbomTab] = useState(0)
   const [activeCsSbomTab, setActiveCsSbomTab] = useState(0)
   const [activeDockerHub, setActiveDockerHub] = useState(true)
   const [vulnerabilitiesData, setVulnerabilitiesData] = useState([])
@@ -228,8 +227,6 @@ const GlobalStateProvider = ({ children }) => {
         setActiveProdTab,
         activeCsProdTab,
         setActiveCsProdTab,
-        activeSbomTab,
-        setActiveSbomTab,
         activeCsSbomTab,
         setActiveCsSbomTab,
         activeDockerHub,

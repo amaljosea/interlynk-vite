@@ -57,7 +57,7 @@ const CheckModal = ({
     fetchPolicy: 'network-only'
   })
 
-  const { setActiveSbomTab, prodCompState, dispatch } = useGlobalState()
+  const { prodCompState, dispatch } = useGlobalState()
   const { field, direction, spdxLicenses, expLicense, customLicenses } =
     prodCompState
   const { prodCheckDispatch } = dispatch
@@ -147,7 +147,6 @@ const CheckModal = ({
           }
         })
         .finally(() => {
-          setActiveSbomTab(0)
           onClose()
         })
     } catch (error) {

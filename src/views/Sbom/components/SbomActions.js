@@ -54,13 +54,8 @@ const SbomActions = ({ sbom, refetch }) => {
     generateProductDetailPageUrlFromCurrentUrl
   } = useProductUrlContext()
 
-  const {
-    totalRows,
-    setActiveSbomTab,
-    dispatch,
-    prodCompState,
-    userPermissions
-  } = useGlobalState()
+  const { totalRows, dispatch, prodCompState, userPermissions } =
+    useGlobalState()
   const {
     field,
     direction,
@@ -204,7 +199,6 @@ const SbomActions = ({ sbom, refetch }) => {
           sbomid: id
         })
         navigate(url)
-        setActiveSbomTab(0)
       }
     })
   }
@@ -232,7 +226,6 @@ const SbomActions = ({ sbom, refetch }) => {
           first: 100
         }
       }).then(() => {
-        setActiveSbomTab(2)
         onPrimaryOpen()
       })
     }

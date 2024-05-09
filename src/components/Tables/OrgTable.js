@@ -314,6 +314,7 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
                   )}
                   <MenuItem
                     isDisabled={superAdmin || !removeOrg}
+                    hidden={activeOrg !== id}
                     onClick={() => {
                       setActiveRow(row)
                       setLeaveError('')
