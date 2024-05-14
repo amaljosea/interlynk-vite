@@ -1,4 +1,5 @@
 import { useMutation } from '@apollo/client'
+import { refetchActiveQueries } from 'context/ApolloWrapper'
 import React, { useEffect, useState } from 'react'
 import CreatableSelect from 'react-select/creatable'
 
@@ -26,7 +27,7 @@ import {
 
 import { CreateLicense, UpdateLicense } from '../../graphQL/Mutation'
 
-const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
+const LicenseDrawer = ({ isOpen, onClose, data }) => {
   const [name, setName] = useState('')
   const [text, setText] = useState('')
   const [url, setUrl] = useState('')
@@ -72,7 +73,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
         osiApproved
       }
     })
-    await refetch()
+    refetchActiveQueries()
     onClose()
   }
 
@@ -94,7 +95,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
         osiApproved
       }
     })
-    await refetch()
+    refetchActiveQueries()
     onClose()
   }
 

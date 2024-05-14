@@ -42,7 +42,7 @@ const LicenseFilter = ({ onFilter }) => {
     newSpdx = [newSpdx[newSpdx.length - 1]] // only allow one filter item at a time
 
     setSpdx(newSpdx)
-    onFilter('spdx', newSpdx)
+    onFilter('licenseType', newSpdx)
   }
 
   const generateMenuItems = (availableFilters) => {

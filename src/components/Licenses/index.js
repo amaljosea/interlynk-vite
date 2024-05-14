@@ -1,26 +1,27 @@
-import { useQuery } from '@apollo/client'
-import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
+import { useState } from 'react'
 
 import { Flex } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetLicensesTable } from 'graphQL/Queries'
 
 import LicenseTable from './LicenseTable'
 
 const Licenses = () => {
-  const org = localStorage.getItem('organization')
-  const { data, refetch } = useQuery(GetLicensesTable, {
-    fetchPolicy: 'network-only',
-    skip: !org || org === 'undefined' ? true : false,
-    variables: {
-      direction: 'ASC',
-      first: 25
+  const [filters, setFilters] = useState({})
+  const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
+    GetLicensesTable,
+    {
+      selector: 'organization.licenses',
+      variables: {
+        direction: 'ASC',
+        ...filters
+      }
     }
-  })
-
-  const licenses = data?.organization?.licenses
+  )
 
   return (
     <Flex
@@ -29,13 +30,18 @@ const Licenses = () => {
       pr={2}
       pl={5}
     >
-      {!org || org === 'undefined' ? (
-        <OrgRegister />
-      ) : (
-        <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-          <LicenseTable data={licenses} refetch={refetch} />
-        </Card>
-      )}
+      <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+        <LicenseTable
+          loading={loading}
+          licenses={nodes}
+          paginationProps={paginationProps}
+          filters={filters}
+          setFilters={(newFilters) => {
+            setFilters(newFilters)
+            reset()
+          }}
+        />
+      </Card>
     </Flex>
   )
 }

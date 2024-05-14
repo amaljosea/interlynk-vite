@@ -11,8 +11,12 @@ const Pagination = ({
   onNextPage,
   onSetRow,
   hasPreviousPage,
-  hasNextPage
+  hasNextPage,
+  paginationHidden = false
 }) => {
+  if (paginationHidden) {
+    return null
+  }
   const totalPages = Math.ceil(totalCount / totalRows) || 1
 
   return (
