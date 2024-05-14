@@ -90,7 +90,7 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
   const onCheckVulnScan = useCallback(() => {
     setInfoHeading(`Vulnerability Scan`)
     setInfoText(
-      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+      `This setting lets you turn on or off vulnerability scanning for your system. It's best to keep this turned on.`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -99,7 +99,7 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
   const onCheckVulnStatus = useCallback(() => {
     setInfoHeading(`Retain Vulnerability Status`)
     setInfoText(
-      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+      `This settings lets you turn on or off copying of vulnerability status, when an sbom is imported, whose version matches an existing one.`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -108,7 +108,7 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
   const onCheckHealth = useCallback(() => {
     setInfoHeading(`Checks`)
     setInfoText(
-      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+      `This setting lets you decide whether to turn on or off SBOM checks when importing. These checks help you find any issues with the SBOMs you're bringing in.`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -117,7 +117,7 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
   const onCheckAutomation = useCallback(() => {
     setInfoHeading(`Automation`)
     setInfoText(
-      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+      `This setting decides whether the automation rules set up for the environment should run when importing SBOMs.`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -126,7 +126,7 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
   const onCheckComponent = useCallback(() => {
     setInfoHeading(`Internal Component Labeling`)
     setInfoText(
-      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+      `This setting lets you choose whether components are marked as internal when you import an SBOM.`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -135,7 +135,7 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
   const onCheckRetaintion = useCallback(() => {
     setInfoHeading(`Data Retaintion`)
     setInfoText(
-      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+      `This setting lets you choose how long the SBOM data is kept before it's deleted. Once it's gone, you can't get it back.`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -144,7 +144,7 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
   const onCheckMfc = useCallback(() => {
     setInfoHeading(`Manufacturer`)
     setInfoText(
-      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries`
+      `This setting allows you to select a manufacturer as the default for the environment. When sboms are exported, this is used to set the manufacturer.`
     )
     setInfoUrl(``)
     onInfoOpen()
