@@ -168,19 +168,15 @@ const Checks = () => {
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      search: searchInput !== '' ? searchInput : undefined,
-      checkId: rules.includes('all') || rules.length === 0 ? undefined : rules,
-      category:
-        categories.includes('all') || categories.length === 0
-          ? undefined
-          : categories,
-      severity:
-        severities.includes('all') || severities.length === 0
-          ? undefined
-          : severities,
-      status:
-        statues.includes('all') || statues.length === 0 ? undefined : statues,
       first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      search: getUndefinedIfEmpty(searchInput),
+      checkId: getUndefinedIfEmptyOrAll(rules),
+      category: getUndefinedIfEmptyOrAll(categories),
+      severity: getUndefinedIfEmptyOrAll(severities),
+      status: getUndefinedIfEmptyOrAll(statues),
       field: field,
       direction: direction
     }).then((res) => {
@@ -293,43 +289,8 @@ const Checks = () => {
   const handleClear = useCallback(async () => {
     disablePaginationControl()
     setCheckSearch('')
-    await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      search: undefined,
-      checkId: rules.includes('all') || rules.length === 0 ? undefined : rules,
-      category:
-        categories.includes('all') || categories.length === 0
-          ? undefined
-          : categories,
-      severity:
-        severities.includes('all') || severities.length === 0
-          ? undefined
-          : severities,
-      status:
-        statues.includes('all') || statues.length === 0 ? undefined : statues,
-      first: totalRows,
-      field: field,
-      direction: direction
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-        prodCheckDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-      }
-    })
-  }, [
-    categories,
-    direction,
-    field,
-    prodCheckDispatch,
-    productId,
-    refetch,
-    rules,
-    sbomId,
-    severities,
-    statues,
-    totalRows
-  ])
+    prodCheckDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+  }, [prodCheckDispatch])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -350,49 +311,10 @@ const Checks = () => {
       disablePaginationControl()
       const { value } = event.target
       if (event.key === 'Enter' && checkSearch !== '') {
-        await refetch({
-          projectId: productId,
-          sbomId: sbomId,
-          search: value,
-          checkId:
-            rules.includes('all') || rules.length === 0 ? undefined : rules,
-          category:
-            categories.includes('all') || categories.length === 0
-              ? undefined
-              : categories,
-          severity:
-            severities.includes('all') || severities.length === 0
-              ? undefined
-              : severities,
-          status:
-            statues.includes('all') || statues.length === 0
-              ? undefined
-              : statues,
-          first: totalRows,
-          field: field,
-          direction: direction
-        }).then((res) => {
-          if (res.data) {
-            setPaginationControl(res.data)
-            prodCheckDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-          }
-        })
+        prodCheckDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
       }
     },
-    [
-      categories,
-      checkSearch,
-      direction,
-      field,
-      prodCheckDispatch,
-      productId,
-      refetch,
-      rules,
-      sbomId,
-      severities,
-      statues,
-      totalRows
-    ]
+    [checkSearch, prodCheckDispatch]
   )
 
   // SET ROW LENGTH
