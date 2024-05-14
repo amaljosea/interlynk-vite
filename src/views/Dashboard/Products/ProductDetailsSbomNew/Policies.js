@@ -45,7 +45,7 @@ const Policies = () => {
 
   const { data, refetch } = useQuery(PolicyResults, {
     skip: activeTab === 'policies' ? false : true,
-    variables: { sbomId }
+    variables: { sbomId, first: totalRows }
   })
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -114,7 +114,7 @@ const Policies = () => {
             position: 'top',
             duration: 2000
           })
-          refetch({ sbomId })
+          refetch({ sbomId, first: totalRows, last: undefined })
         }
       })
     }

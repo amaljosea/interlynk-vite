@@ -59,6 +59,7 @@ const ViolationDrawer = ({
       }).then((res) => {
         if (res?.data) {
           setPaginationControl(res.data.policyRuleViolations)
+          setCurrentPage(1)
         }
       })
     },
