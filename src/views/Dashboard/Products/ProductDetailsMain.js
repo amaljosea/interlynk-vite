@@ -186,17 +186,14 @@ const ProductDetailsMain = () => {
   )
 
   const [getSettings, { data: settings }] = useLazyQuery(GetProjectSettings, {
-    skip: activeProdTab === 3 ? false : true,
-    fetchPolicy: 'network-only'
+    skip: activeProdTab === 3 ? false : true
   })
   const { data: mfc } = useQuery(GetOrgMfc, {
-    skip: activeProdTab === 3 ? false : true,
-    fetchPolicy: 'network-only'
+    skip: activeProdTab === 3 ? false : true
   })
 
   const [getLogs, { data: prodLogs }] = useLazyQuery(GetProjectLogs, {
-    skip: activeProdTab === 5 ? false : true,
-    fetchPolicy: 'network-only'
+    skip: activeProdTab === 5 ? false : true
   })
 
   const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')

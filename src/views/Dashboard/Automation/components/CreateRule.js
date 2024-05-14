@@ -35,8 +35,6 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
   const params = useParams()
   const projectId = params?.productid
 
-  // console.log('data',data);
-
   const { automationConditionSubjectFieldMapping } = subOperators || []
 
   const sortedData = [...automationConditionSubjectFieldMapping]?.sort((a, b) =>
@@ -93,11 +91,8 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
     }, 3000)
   }
 
-  // console.log('compCategory', compCategory)
-  // console.log('conditions', conditions)
-
   const isComponent = conditions?.some((item) => item?.category === 'component')
-  const isVersion = conditions?.some((item) => item?.category === 'version')
+  // const isVersion = conditions?.some((item) => item?.category === 'version')
 
   const [createRule] = useMutation(AutomationRuleCreate, {
     onCompleted: (data) => data && refetch()
@@ -106,13 +101,23 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
     onCompleted: (data) => data && refetch()
   })
 
-  const checkDataValidity = (data) => {
+  const checkActionValidity = (data) => {
+    for (let i = 0; i < data.length; i++) {
+      const { subject, field, value } = data[i]
+      if (subject === '' || field === '' || value === '') {
+        return 'Error: Some properties are empty'
+      }
+    }
+    return null
+  }
+
+  const checkConditionValidity = (data) => {
     for (let i = 0; i < data.length; i++) {
       const { subject, operator, value, subError, opError, valError } = data[i]
       if (
         subject === '' ||
         operator === '' ||
-        value === '' ||
+        (operator !== 'exists' && operator !== 'not_exists' && value === '') ||
         subError !== '' ||
         opError !== '' ||
         valError !== ''
@@ -123,10 +128,12 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
     return null
   }
 
-  const errorMessage = checkDataValidity(conditions)
+  const conditionErrorMessage = checkConditionValidity(conditions)
+  const actionErrorMessage = checkActionValidity(actions)
 
   const submitError =
-    errorMessage ||
+    conditionErrorMessage ||
+    actionErrorMessage ||
     error !== '' ||
     ruleName === '' ||
     isDisabled ||
@@ -270,11 +277,6 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
             category: result?.subject,
             list: result?.operators
           }
-        } else if (
-          field === 'operator' &&
-          (value === 'exists' || value === 'not_exists')
-        ) {
-          return { ...item, [field]: value, value: 'Defined' }
         } else {
           return { ...item, [field]: value }
         }
@@ -528,7 +530,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                         onCondtionChange(e.target.value, item.id, 'operator')
                       }
                       fontSize='sm'
-                      placeholder='-- Opeator --'
+                      placeholder='-- Operator --'
                       onBlur={() => onOperatorBlur(item)}
                       textTransform={'capitalize'}
                     >
@@ -544,32 +546,33 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                     </Select>
                     <FormErrorMessage>{item?.opError}</FormErrorMessage>
                   </FormControl>
-                  <Flex width={'50%'} alignItems={'center'} gap={4}>
-                    <Input
-                      type={'text'}
-                      fontSize='sm'
-                      placeholder='Value'
-                      value={item?.value}
-                      onChange={(e) =>
-                        onCondtionChange(e.target.value, item.id, 'value')
-                      }
-                      hidden={
-                        item?.operator === 'exists' ||
-                        item?.operator === 'not_exists'
-                      }
-                    />
-                    <Flex gap={4} justifyContent={'space-between'}>
-                      {conditions?.length > 1 &&
-                        conditions?.length - 1 !== index && <Kbd>AND</Kbd>}
+                  {item?.operator !== 'exists' &&
+                    item?.operator !== 'not_exists' && (
+                      <Flex width={'50%'} alignItems={'center'} gap={4}>
+                        <Input
+                          type={'text'}
+                          fontSize='sm'
+                          placeholder='Value'
+                          value={item?.value}
+                          onChange={(e) =>
+                            onCondtionChange(e.target.value, item.id, 'value')
+                          }
+                        />
+                      </Flex>
+                    )}
+                  <Flex gap={4} justifyContent={'space-between'}>
+                    {conditions?.length > 1 &&
+                      conditions?.length - 1 !== index && <Kbd mt={2}>AND</Kbd>}
+                    {conditions?.length > 1 && (
                       <Icon
                         ml={'auto'}
-                        mt={0.6}
+                        mt={2}
                         as={FaTrash}
                         color={'red.500'}
                         cursor={'pointer'}
                         onClick={() => onDeleteCondtion(item)}
                       />
-                    </Flex>
+                    )}
                   </Flex>
                 </Flex>
               ))}
@@ -610,7 +613,9 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                       placeholder='-- Subject --'
                       fontSize='sm'
                       textTransform={'capitalize'}
-                      isDisabled={errorMessage || conditions?.length === 0}
+                      isDisabled={
+                        conditionErrorMessage || conditions?.length === 0
+                      }
                     >
                       {conditions?.some(
                         (item) => item?.category === 'component'
@@ -641,25 +646,31 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                       onChange={(e) =>
                         onActionChange(e.target.value, item.id, 'value')
                       }
-                      isDisabled={errorMessage || conditions?.length === 0}
+                      isDisabled={
+                        conditionErrorMessage || conditions?.length === 0
+                      }
                     />
                     <Flex gap={4} justifyContent={'space-between'}>
                       {actions?.length > 1 && actions?.length - 1 !== index && (
                         <Kbd>AND</Kbd>
                       )}
-                      <Icon
-                        ml={'auto'}
-                        mt={0.6}
-                        as={FaTrash}
-                        color={'red.500'}
-                        cursor={'pointer'}
-                        onClick={() => onDeleteAction(item)}
-                        display={
-                          errorMessage || conditions?.length === 0
-                            ? 'none'
-                            : 'flex'
-                        }
-                      />
+                      {actions?.length > 1 && (
+                        <Icon
+                          ml={'auto'}
+                          mt={0.6}
+                          as={FaTrash}
+                          color={'red.500'}
+                          cursor={'pointer'}
+                          onClick={() => onDeleteAction(item)}
+                          display={
+                            conditionErrorMessage ||
+                            actionErrorMessage ||
+                            conditions?.length === 0
+                              ? 'none'
+                              : 'flex'
+                          }
+                        />
+                      )}
                     </Flex>
                   </FormControl>
                 </Flex>

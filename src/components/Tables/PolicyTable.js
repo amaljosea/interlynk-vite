@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import {
   customStyles,
   getFullDateAndTime,
@@ -55,12 +55,14 @@ import { FaEllipsisV, FaPlus } from 'react-icons/fa'
 
 const PolicyTable = ({ data, refetch }) => {
   const toast = useToast()
+  const location = useLocation()
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
   const { totalRows, policyState, dispatch } = useGlobalState()
   const { pageIndex, searchInput } = policyState
   const { policyDispatch } = dispatch
+  const activeTab = Number(localStorage.getItem('activeProdTab'))
 
   const paginationSizes = [25, 50, 100]
   const [activeRow, setActiveRow] = useState(null)
@@ -69,7 +71,10 @@ const PolicyTable = ({ data, refetch }) => {
   const [isNextActive, setIsNextActive] = useState(false)
 
   const { data: subOperators } = useQuery(PolicySubjectOperators, {
-    fetchPolicy: 'network-only'
+    skip:
+      activeTab === 4 || location?.pathname === '/vendor/policies'
+        ? false
+        : true
   })
 
   const formatSubject = (value) => {

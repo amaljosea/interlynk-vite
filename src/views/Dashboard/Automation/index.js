@@ -23,7 +23,6 @@ import {
   Stack,
   Switch,
   Tag,
-  TagLabel,
   Text,
   Tooltip,
   useDisclosure,
@@ -52,7 +51,8 @@ const Automation = () => {
   const toast = useToast()
   const params = useParams()
   const productId = params.productid
-  const { activeProdTab, userPermissions, prodRulesState } = useGlobalState()
+  const activeTab = Number(localStorage.getItem('activeProdTab'))
+  const { userPermissions, prodRulesState } = useGlobalState()
   const { field, direction, pageIndex } = prodRulesState
 
   const [activeRow, setActiveRow] = useState(null)
@@ -64,11 +64,14 @@ const Automation = () => {
   const [isNextActive, setIsNextActive] = useState(false)
 
   const { data: subOperators } = useQuery(
-    AutomationConditionSubjectFieldMapping
+    AutomationConditionSubjectFieldMapping,
+    {
+      skip: activeTab === 2 ? false : true
+    }
   )
 
   const { data, refetch } = useQuery(GetProjectCheck, {
-    skip: activeProdTab === 2 ? false : true,
+    skip: activeTab === 2 ? false : true,
     variables: {
       id: productId,
       first: totalRows
@@ -192,16 +195,17 @@ const Automation = () => {
           subOperators?.automationConditionSubjectFieldMapping?.find(
             (item) => item?.key === automationConditions[0]?.field
           )
+        const tagColor = actionField?.subject === 'component' ? 'blue' : 'green'
         return (
-          <Tag size='md' variant='subtle' colorScheme='blue' width={'120px'}>
-            <TagLabel
-              style={{ textTransform: 'capitalize' }}
-              mt={0.2}
-              mx={'auto'}
-            >
-              {actionField?.subject || ''}
-            </TagLabel>
-          </Tag>
+          <Tooltip
+            label={actionField?.subject}
+            textTransform={'capitalize'}
+            placement={'top'}
+          >
+            <Tag size='md' variant='solid' colorScheme={tagColor}>
+              {actionField?.subject === 'component' ? 'C' : 'V'}
+            </Tag>
+          </Tooltip>
         )
       },
       wrap: true
