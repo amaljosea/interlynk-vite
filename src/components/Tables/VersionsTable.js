@@ -2,12 +2,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import {
-  customStyles,
-  getFullDateAndTime,
-  sortByUpdatedAt,
-  timeSince
-} from 'utils'
+import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -548,13 +543,18 @@ const VersionsTable = ({ projectGroup }) => {
   const handleCompare = useCallback(() => {
     setLoading(true)
     if (selectedSbom?.length === 2) {
-      getVersions({ variables: { id: productId } }).then(() => {
-        const versions = sortByUpdatedAt(selectedSbom)
+      getVersions({
+        variables: {
+          ...versionData,
+          first: totalRows,
+          last: undefined
+        }
+      }).then(() => {
         getDrift({
           variables: {
             projectId: signedUrlParams ? undefined : productId,
-            subjectSbomId: versions[0]?.id,
-            targetSbomId: versions[1]?.id
+            subjectSbomId: selectedSbom[1]?.id,
+            targetSbomId: selectedSbom[0]?.id
           }
         }).then((res) => {
           if (res?.data) {
@@ -570,12 +570,14 @@ const VersionsTable = ({ projectGroup }) => {
       })
     }
   }, [
-    productId,
-    getDrift,
-    getVersions,
-    onToolOpen,
     selectedSbom,
-    signedUrlParams
+    getVersions,
+    versionData,
+    totalRows,
+    getDrift,
+    signedUrlParams,
+    productId,
+    onToolOpen
   ])
 
   // CLEAR SERACH

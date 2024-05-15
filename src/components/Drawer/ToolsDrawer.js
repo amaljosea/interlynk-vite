@@ -19,8 +19,6 @@ import Card from 'components/Card/Card'
 import SbomInfo from 'components/SbomInfo'
 import DiffTable from 'components/Tables/DiffTable'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 const ToolsDrawer = ({
   data,
   diffs,
@@ -30,7 +28,6 @@ const ToolsDrawer = ({
   isOpen,
   onClose
 }) => {
-  const { setSelectedSbom } = useGlobalState()
   const versionsOne = versionList?.nodes?.find(
     (item) => item?.id === selectedSbom[1]?.id
   )

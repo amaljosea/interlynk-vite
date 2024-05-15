@@ -1074,9 +1074,23 @@ export const GetVersionsTable = gql`
 
 // GET SBOM VERSIONS
 export const GetSbomVersions = gql`
-  query GetSbomVersions($id: Uuid!) {
+  query GetSbomVersions(
+    $id: Uuid!
+    $first: Int
+    $after: String
+    $last: Int
+    $before: String
+    $field: SbomOrderByFields!
+    $direction: OrderByDirection!
+  ) {
     project(id: $id) {
-      sbomVersions {
+      sbomVersions(
+        first: $first
+        after: $after
+        last: $last
+        before: $before
+        orderBy: { direction: $direction, field: $field }
+      ) {
         nodes {
           id
           creationAt
