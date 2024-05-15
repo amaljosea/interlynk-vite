@@ -17,6 +17,7 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
+import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { LicenseAutoComplete } from 'graphQL/Queries'
@@ -63,6 +64,8 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
   })
 
   const [searchText, setSearchText] = useState('')
+  const debouncedSearchTerm = useDebounce(searchText, 300)
+
   const {
     isOpen: isInfoOpen,
     onOpen: onInfoOpen,
@@ -111,8 +114,8 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
   }
 
   useEffect(() => {
-    handleInputChange(searchText)
-  }, [searchText])
+    handleInputChange(debouncedSearchTerm)
+  }, [debouncedSearchTerm])
 
   const licenseInfo = `Component license refers to the licensing terms and conditions associated with a specific software component listed in the SBOM document.`
 
