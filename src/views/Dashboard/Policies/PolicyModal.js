@@ -8,6 +8,7 @@ import {
   AlertIcon,
   Box,
   Button,
+  Checkbox,
   Flex,
   FormControl,
   Grid,
@@ -61,6 +62,8 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
       valError: ''
     }
   ])
+  const [isPrimary, setIsPrimary] = useState(false)
+  const [isInternal, setIsInternal] = useState(false)
   const [deletedRules, setDeletedRules] = useState([])
   const [isDisabled, setIsDisabled] = useState(false)
 
@@ -978,6 +981,27 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                       </GridItem>
                     </Grid>
                   ))}
+                <Flex alignItems={'center'} gap={3} mt={4}>
+                  <Text fontSize={'sm'} width={'fit-content'}>
+                    Does not apply to :
+                  </Text>
+                  <Stack spacing={5} direction='row'>
+                    <Checkbox
+                      size='sm'
+                      checked={isPrimary}
+                      onChange={(e) => setIsPrimary(e.target.checked)}
+                    >
+                      Primary Component
+                    </Checkbox>
+                    <Checkbox
+                      size='sm'
+                      checked={isInternal}
+                      onChange={(e) => setIsInternal(e.target.checked)}
+                    >
+                      Internal Component
+                    </Checkbox>
+                  </Stack>
+                </Flex>
                 {error !== '' && (
                   <Alert status='error' borderRadius={4}>
                     <AlertIcon />
