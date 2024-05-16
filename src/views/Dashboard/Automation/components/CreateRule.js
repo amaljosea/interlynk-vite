@@ -13,7 +13,6 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Heading,
   Icon,
   Input,
   Kbd,
@@ -461,121 +460,127 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                 onChange={onNameChange}
               />
             </FormControl>
-            <Heading
-              fontWeight={'medium'}
-              fontFamily={'inherit'}
-              fontSize={'md'}
-            >
-              When the following conditions are met :
-            </Heading>
             {/* CONDITIONS */}
-            {conditions?.length > 0 &&
-              conditions?.map((item, index) => (
-                <Flex
-                  gap={4}
-                  key={index}
-                  width={'100%'}
-                  alignItems={'flex-start'}
-                  justifyContent={'space-bewteen'}
-                >
-                  <FormControl width={'40%'} isInvalid={item?.subError !== ''}>
-                    <Select
-                      value={item?.subject}
-                      onChange={(e) =>
-                        onCondtionChange(e.target.value, item.id, 'subject')
-                      }
-                      onBlur={() => onSubjectBlur(item)}
-                      placeholder='-- Subject --'
-                      fontSize='sm'
-                      onBlurCapture={() => onSubjectBlur(item)}
-                      textTransform={'capitalize'}
-                      // pointerEvents={
-                      //   conditions?.length - 1 === index ? 'auto' : 'none'
-                      // }
+            <FormControl>
+              <FormLabel htmlFor='conditions'>
+                When the following conditions are met :
+              </FormLabel>
+              {conditions?.length > 0 &&
+                conditions?.map((item, index) => (
+                  <Flex
+                    gap={4}
+                    mt={2}
+                    key={index}
+                    width={'100%'}
+                    alignItems={'flex-start'}
+                    justifyContent={'space-bewteen'}
+                  >
+                    <FormControl
+                      width={'40%'}
+                      isInvalid={item?.subError !== ''}
                     >
-                      {conditions?.length > 1 &&
-                      conditions?.some((item) => item?.category === 'component')
-                        ? [...categories]
-                            ?.filter((item) => item !== 'version')
-                            .map((category) => (
-                              <optgroup key={category} label={category}>
-                                {optionsByCategory[category]}
-                              </optgroup>
-                            ))
-                        : conditions?.length > 1 &&
-                            conditions?.some(
-                              (item) => item?.category === 'version'
-                            )
+                      <Select
+                        value={item?.subject}
+                        onChange={(e) =>
+                          onCondtionChange(e.target.value, item.id, 'subject')
+                        }
+                        onBlur={() => onSubjectBlur(item)}
+                        placeholder='-- Subject --'
+                        fontSize='sm'
+                        onBlurCapture={() => onSubjectBlur(item)}
+                        textTransform={'capitalize'}
+                        // pointerEvents={
+                        //   conditions?.length - 1 === index ? 'auto' : 'none'
+                        // }
+                      >
+                        {conditions?.length > 1 &&
+                        conditions?.some(
+                          (item) => item?.category === 'component'
+                        )
                           ? [...categories]
-                              ?.filter((item) => item !== 'component')
+                              ?.filter((item) => item !== 'version')
                               .map((category) => (
                                 <optgroup key={category} label={category}>
                                   {optionsByCategory[category]}
                                 </optgroup>
                               ))
-                          : categories.map((category) => (
-                              <optgroup key={category} label={category}>
-                                {optionsByCategory[category]}
-                              </optgroup>
-                            ))}
-                    </Select>
-                    <FormErrorMessage>{item?.subError}</FormErrorMessage>
-                  </FormControl>
-                  <FormControl width={'20%'} isInvalid={item?.opError !== ''}>
-                    <Select
-                      id='operator'
-                      name='operator'
-                      value={item?.operator}
-                      onChange={(e) =>
-                        onCondtionChange(e.target.value, item.id, 'operator')
-                      }
-                      fontSize='sm'
-                      placeholder='-- Operator --'
-                      onBlur={() => onOperatorBlur(item)}
-                      textTransform={'capitalize'}
-                    >
-                      {item?.list?.map((option) => (
-                        <option
-                          value={option}
-                          key={option}
-                          style={{ textTransform: 'capitalize' }}
-                        >
-                          {updatedValue(option)}
-                        </option>
-                      ))}
-                    </Select>
-                    <FormErrorMessage>{item?.opError}</FormErrorMessage>
-                  </FormControl>
-                  {item?.operator !== 'exists' &&
-                    item?.operator !== 'not_exists' && (
-                      <Flex width={'50%'} alignItems={'center'} gap={4}>
-                        <Input
-                          type={'text'}
-                          fontSize='sm'
-                          placeholder='Value'
-                          value={item?.value}
-                          onChange={(e) =>
-                            onCondtionChange(e.target.value, item.id, 'value')
-                          }
+                          : conditions?.length > 1 &&
+                              conditions?.some(
+                                (item) => item?.category === 'version'
+                              )
+                            ? [...categories]
+                                ?.filter((item) => item !== 'component')
+                                .map((category) => (
+                                  <optgroup key={category} label={category}>
+                                    {optionsByCategory[category]}
+                                  </optgroup>
+                                ))
+                            : categories.map((category) => (
+                                <optgroup key={category} label={category}>
+                                  {optionsByCategory[category]}
+                                </optgroup>
+                              ))}
+                      </Select>
+                      <FormErrorMessage>{item?.subError}</FormErrorMessage>
+                    </FormControl>
+                    <FormControl width={'20%'} isInvalid={item?.opError !== ''}>
+                      <Select
+                        id='operator'
+                        name='operator'
+                        value={item?.operator}
+                        onChange={(e) =>
+                          onCondtionChange(e.target.value, item.id, 'operator')
+                        }
+                        fontSize='sm'
+                        placeholder='-- Operator --'
+                        onBlur={() => onOperatorBlur(item)}
+                        textTransform={'capitalize'}
+                      >
+                        {item?.list?.map((option) => (
+                          <option
+                            value={option}
+                            key={option}
+                            style={{ textTransform: 'capitalize' }}
+                          >
+                            {updatedValue(option)}
+                          </option>
+                        ))}
+                      </Select>
+                      <FormErrorMessage>{item?.opError}</FormErrorMessage>
+                    </FormControl>
+                    {item?.operator !== 'exists' &&
+                      item?.operator !== 'not_exists' && (
+                        <Flex width={'50%'} alignItems={'center'} gap={4}>
+                          <Input
+                            type={'text'}
+                            fontSize='sm'
+                            placeholder='Value'
+                            value={item?.value}
+                            onChange={(e) =>
+                              onCondtionChange(e.target.value, item.id, 'value')
+                            }
+                          />
+                        </Flex>
+                      )}
+                    <Flex gap={4} justifyContent={'space-between'}>
+                      {conditions?.length > 1 &&
+                        conditions?.length - 1 !== index && (
+                          <Kbd mt={2}>AND</Kbd>
+                        )}
+                      {conditions?.length > 1 && (
+                        <Icon
+                          ml={'auto'}
+                          mt={2}
+                          as={FaTrash}
+                          color={'red.500'}
+                          cursor={'pointer'}
+                          onClick={() => onDeleteCondtion(item)}
                         />
-                      </Flex>
-                    )}
-                  <Flex gap={4} justifyContent={'space-between'}>
-                    {conditions?.length > 1 &&
-                      conditions?.length - 1 !== index && <Kbd mt={2}>AND</Kbd>}
-                    {conditions?.length > 1 && (
-                      <Icon
-                        ml={'auto'}
-                        mt={2}
-                        as={FaTrash}
-                        color={'red.500'}
-                        cursor={'pointer'}
-                        onClick={() => onDeleteCondtion(item)}
-                      />
-                    )}
+                      )}
+                    </Flex>
                   </Flex>
-                </Flex>
-              ))}
+                ))}
+            </FormControl>
             <Button
               fontSize={'sm'}
               colorScheme='blue'
@@ -587,94 +592,90 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
               Add condition
             </Button>
             <Divider />
-            <Heading
-              fontWeight={'medium'}
-              fontFamily={'inherit'}
-              fontSize={'md'}
-            >
-              Then set actions :
-            </Heading>
             {/* ACTIONS */}
-            {actions?.length > 0 &&
-              actions?.map((item, index) => (
-                <Flex
-                  gap={4}
-                  key={index}
-                  width={'100%'}
-                  alignItems={'flex-start'}
-                  justifyContent={'space-bewteen'}
-                >
-                  <FormControl as={Flex} alignItems='center'>
-                    <Select
-                      value={item?.field}
-                      onChange={(e) =>
-                        onActionChange(e.target.value, item.id, 'field')
-                      }
-                      placeholder='-- Subject --'
-                      fontSize='sm'
-                      textTransform={'capitalize'}
-                      isDisabled={
-                        conditionErrorMessage || conditions?.length === 0
-                      }
-                    >
-                      {conditions?.some(
-                        (item) => item?.category === 'component'
-                      )
-                        ? [...categories]
-                            ?.filter((item) => item !== 'version')
-                            .map((category) => (
-                              <optgroup key={category} label={category}>
-                                {optionsByCategory[category]}
-                              </optgroup>
-                            ))
-                        : [...categories]
-                            ?.filter((item) => item !== 'component')
-                            .map((category) => (
-                              <optgroup key={category} label={category}>
-                                {optionsByCategory[category]}
-                              </optgroup>
-                            ))}
-                    </Select>
-                  </FormControl>
-                  {/* VALUE */}
-                  <FormControl as={Flex} alignItems='center' gap={4}>
-                    <Input
-                      type={'text'}
-                      fontSize='sm'
-                      placeholder={'Add value'}
-                      value={item.value}
-                      onChange={(e) =>
-                        onActionChange(e.target.value, item.id, 'value')
-                      }
-                      isDisabled={
-                        conditionErrorMessage || conditions?.length === 0
-                      }
-                    />
-                    <Flex gap={4} justifyContent={'space-between'}>
-                      {actions?.length > 1 && actions?.length - 1 !== index && (
-                        <Kbd>AND</Kbd>
-                      )}
-                      {actions?.length > 1 && (
-                        <Icon
-                          ml={'auto'}
-                          mt={0.6}
-                          as={FaTrash}
-                          color={'red.500'}
-                          cursor={'pointer'}
-                          onClick={() => onDeleteAction(item)}
-                          display={
-                            conditionErrorMessage ||
-                            actionErrorMessage ||
-                            conditions?.length === 0
-                              ? 'none'
-                              : 'flex'
-                          }
-                        />
-                      )}
-                    </Flex>
-                  </FormControl>
-                </Flex>
-              ))}
+            <FormControl>
+              <FormLabel htmlFor='actions'>Then set actions :</FormLabel>
+              {actions?.length > 0 &&
+                actions?.map((item, index) => (
+                  <Flex
+                    gap={4}
+                    mt={2}
+                    key={index}
+                    width={'100%'}
+                    alignItems={'flex-start'}
+                    justifyContent={'space-bewteen'}
+                  >
+                    <FormControl as={Flex} alignItems='center'>
+                      <Select
+                        value={item?.field}
+                        onChange={(e) =>
+                          onActionChange(e.target.value, item.id, 'field')
+                        }
+                        placeholder='-- Subject --'
+                        fontSize='sm'
+                        textTransform={'capitalize'}
+                        isDisabled={
+                          conditionErrorMessage || conditions?.length === 0
+                        }
+                      >
+                        {conditions?.some(
+                          (item) => item?.category === 'component'
+                        )
+                          ? [...categories]
+                              ?.filter((item) => item !== 'version')
+                              .map((category) => (
+                                <optgroup key={category} label={category}>
+                                  {optionsByCategory[category]}
+                                </optgroup>
+                              ))
+                          : [...categories]
+                              ?.filter((item) => item !== 'component')
+                              .map((category) => (
+                                <optgroup key={category} label={category}>
+                                  {optionsByCategory[category]}
+                                </optgroup>
+                              ))}
+                      </Select>
+                    </FormControl>
+                    {/* VALUE */}
+                    <FormControl as={Flex} alignItems='center' gap={4}>
+                      <Input
+                        type={'text'}
+                        fontSize='sm'
+                        placeholder={'Add value'}
+                        value={item.value}
+                        onChange={(e) =>
+                          onActionChange(e.target.value, item.id, 'value')
+                        }
+                        isDisabled={
+                          conditionErrorMessage || conditions?.length === 0
+                        }
+                      />
+                      <Flex gap={4} justifyContent={'space-between'}>
+                        {actions?.length > 1 &&
+                          actions?.length - 1 !== index && <Kbd>AND</Kbd>}
+                        {actions?.length > 1 && (
+                          <Icon
+                            ml={'auto'}
+                            mt={0.6}
+                            as={FaTrash}
+                            color={'red.500'}
+                            cursor={'pointer'}
+                            onClick={() => onDeleteAction(item)}
+                            display={
+                              conditionErrorMessage ||
+                              actionErrorMessage ||
+                              conditions?.length === 0
+                                ? 'none'
+                                : 'flex'
+                            }
+                          />
+                        )}
+                      </Flex>
+                    </FormControl>
+                  </Flex>
+                ))}
+            </FormControl>
             <Button
               fontSize={'sm'}
               colorScheme='blue'

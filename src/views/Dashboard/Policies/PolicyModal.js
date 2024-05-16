@@ -9,16 +9,18 @@ import {
   Box,
   Button,
   Checkbox,
+  Divider,
   Flex,
   FormControl,
+  FormLabel,
   Grid,
   GridItem,
-  Heading,
-  IconButton,
+  Icon,
   Input,
   InputGroup,
   InputLeftAddon,
   InputRightAddon,
+  Kbd,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -29,7 +31,8 @@ import {
   Select,
   Stack,
   Text,
-  Textarea
+  Textarea,
+  Tooltip
 } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -92,7 +95,8 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
           key={item?.subject}
           style={{ textTransform: 'capitalize' }}
         >
-          {`${item?.category} ${item.name}`}
+          {/* {`${item?.category} ${item.name}`} */}
+          {item.name}
         </option>
       ))
     acc[category] = options
@@ -451,6 +455,24 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
   const blockInvalidChar = (e) =>
     ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()
 
+  const getIcon = (subject) => {
+    if (subject.startsWith('VULNERABILITY')) return <Text>🐞</Text>
+    if (subject.startsWith('LICENSE')) return <Text>🔑</Text>
+    if (subject.startsWith('COMPONENT')) return <Text>⚙️</Text>
+    if (subject.startsWith('SBOM') || subject.startsWith('VERSION'))
+      return <Text>🗃️</Text>
+    return null
+  }
+
+  const getLabel = (subject) => {
+    if (subject.startsWith('VULNERABILITY')) return 'Vulnerability'
+    if (subject.startsWith('LICENSE')) return 'License'
+    if (subject.startsWith('COMPONENT')) return 'Component'
+    if (subject.startsWith('SBOM') || subject.startsWith('VERSION'))
+      return 'SBOM'
+    return null
+  }
+
   useEffect(() => {
     if (data && plSubjects) {
       setName(data?.name || '')
@@ -497,6 +519,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
         isOpen={isOpen}
         onClose={onClose}
         closeOnOverlayClick={false}
+        motionPreset='slideInBottom'
       >
         <ModalOverlay />
         <form onSubmit={data ? handleUpdate : handleCreate}>
@@ -504,46 +527,44 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
             <ModalHeader>{data ? 'Edit' : 'Create'} Policy</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Flex width={'100%'} direction={'column'} gap={4}>
-                <Flex alignItems={'center'} gap={3}>
-                  <Text>Policy:</Text>
-                  <FormControl isRequired>
-                    <Input
-                      size='sm'
-                      type='text'
-                      name='name'
-                      placeholder='Enter name'
-                      value={name}
-                      onChange={onNameChange}
-                    />
-                  </FormControl>
-                </Flex>
-                <Flex alignItems={'flex-start'} gap={3}>
-                  <Text>Description:</Text>
-                  <FormControl>
-                    <Textarea
-                      size='sm'
-                      type='text'
-                      name='desc'
-                      placeholder='Enter description'
-                      value={desc}
-                      onChange={onDescChange}
-                    />
-                  </FormControl>
-                </Flex>
-                <Flex
-                  flexDir={'column'}
-                  alignItems={'flex-start'}
-                  gap={3}
-                  flexWrap={'wrap'}
-                >
-                  <Flex alignItems={'center'} gap={3}>
-                    <Text>will</Text>
-                    <FormControl width={200} isRequired>
+              <Flex
+                width={'100%'}
+                alignItems={'flex-start'}
+                direction={'column'}
+                gap={4}
+              >
+                {/* POLICY NAME */}
+                <FormControl isRequired>
+                  <FormLabel htmlFor='policyName'>Name</FormLabel>
+                  <Input
+                    type='text'
+                    name='policyName'
+                    fontSize='sm'
+                    placeholder='Enter name'
+                    value={name}
+                    onChange={onNameChange}
+                  />
+                </FormControl>
+                {/* POLICY DESCTIPTION */}
+                <FormControl>
+                  <FormLabel htmlFor='policyDesc'>Description</FormLabel>
+                  <Textarea
+                    size='sm'
+                    type='text'
+                    name='policyDesc'
+                    placeholder='Enter description'
+                    value={desc}
+                    onChange={onDescChange}
+                  />
+                </FormControl>
+                {/* POLICY RESULT AND TYPE */}
+                <Grid width={'100%'} templateColumns='repeat(2, 1fr)' gap={6}>
+                  <GridItem>
+                    <FormControl isRequired>
+                      <FormLabel htmlFor='policyResult'>Result</FormLabel>
                       <Select
-                        size='sm'
-                        id='resultType'
-                        name='resultType'
+                        id='policyResult'
+                        name='policyResult'
                         value={resultType}
                         onChange={onResultChange}
                         textTransform={'capitalize'}
@@ -561,14 +582,13 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                         ))}
                       </Select>
                     </FormControl>
-                  </Flex>
-                  <Flex alignItems={'center'} gap={3}>
-                    <Text>when</Text>
-                    <FormControl width={200} isRequired>
+                  </GridItem>
+                  <GridItem>
+                    <FormControl isRequired>
+                      <FormLabel htmlFor='policyType'>Type</FormLabel>
                       <Select
-                        size='sm'
-                        id='operator'
-                        name='operator'
+                        id='policyType'
+                        name='policyType'
                         value={operator}
                         onChange={onOperatorChange}
                         textTransform={'capitalize'}
@@ -586,41 +606,33 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                         ))}
                       </Select>
                     </FormControl>
-                  </Flex>
-                  <Text>conditions are met:</Text>
-                </Flex>
-                <Flex
-                  width={'100%'}
-                  my={2}
-                  justifyContent={'space-between'}
-                  alignItems={'center'}
-                >
-                  <Heading
-                    fontWeight={'medium'}
-                    fontFamily={'inherit'}
-                    fontSize={'md'}
-                  >
-                    Conditions
-                  </Heading>
-                  <IconButton
-                    size='sm'
-                    colorScheme='blue'
-                    icon={<FaPlus />}
-                    onClick={addRow}
-                  />
-                </Flex>
-                {conditions?.length > 0 &&
-                  conditions?.map((item, index) => (
-                    <Grid
-                      key={index}
-                      gap={4}
-                      templateColumns='repeat(12, 1fr)'
-                      alignItems={'flex-start'}
-                    >
-                      <GridItem colSpan={3}>
-                        <FormControl>
+                  </GridItem>
+                </Grid>
+                <Divider />
+                {/* CONDITIONS */}
+                <FormControl isRequired>
+                  <FormLabel htmlFor='conditions'>Conditions</FormLabel>
+                  {conditions?.length > 0 &&
+                    conditions?.map((item, index) => (
+                      <Flex
+                        gap={4}
+                        mt={3}
+                        key={index}
+                        width={'100%'}
+                        alignItems={'flex-start'}
+                        justifyContent={'space-bewteen'}
+                      >
+                        <Box hidden={item?.subject === ''} mt={2}>
+                          <Tooltip
+                            label={getLabel(item?.subject)}
+                            placement='top'
+                          >
+                            {getIcon(item.subject)}
+                          </Tooltip>
+                        </Box>
+                        {/* SUBJECT */}
+                        <FormControl width={'30%'}>
                           <Select
-                            size='sm'
                             value={item?.subject}
                             onChange={(e) =>
                               handleChange(e.target.value, item.id, 'subject')
@@ -643,11 +655,9 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                             </Text>
                           )}
                         </FormControl>
-                      </GridItem>
-                      <GridItem colSpan={3}>
-                        <FormControl>
+                        {/* OPERATOR */}
+                        <FormControl width={'20%'}>
                           <Select
-                            size='sm'
                             id='operator'
                             name='operator'
                             value={item?.operator}
@@ -657,13 +667,13 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                             fontSize='sm'
                             placeholder='-- Select Opeator --'
                             onBlur={() => onOperatorBlur(item)}
-                            textTransform={'lowercase'}
+                            textTransform={'capitalize'}
                           >
                             {item?.list?.map((option) => (
                               <option
                                 value={option}
                                 key={option}
-                                style={{ textTransform: 'lowercase' }}
+                                style={{ textTransform: 'capitalize' }}
                               >
                                 {updatedValue(option)}
                               </option>
@@ -675,13 +685,11 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                             </Text>
                           )}
                         </FormControl>
-                      </GridItem>
-                      <GridItem colSpan={6}>
-                        <Flex alignItems={'center'} gap={2}>
+                        {/* VALUE */}
+                        <Flex alignItems={'center'} gap={4} width={'30%'}>
                           {item?.subject === 'VULNERABILITY_SEV' && (
                             <FormControl isRequired>
                               <Select
-                                size='sm'
                                 id='operator'
                                 name='operator'
                                 value={item?.value}
@@ -717,10 +725,10 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                           {item?.subject === 'VULNERABILITY_KEV' && (
                             <FormControl isRequired>
                               <Select
-                                size='sm'
                                 id='operator'
                                 name='operator'
                                 value={item?.value}
+                                fontSize={'sm'}
                                 onChange={(e) =>
                                   handleChange(e.target.value, item.id, 'value')
                                 }
@@ -742,7 +750,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                           {item?.subject === 'VULNERABILITY_STATUS' && (
                             <FormControl isRequired>
                               <Select
-                                size='sm'
                                 id='vulnStatus'
                                 name='vulnStatus'
                                 value={item?.value}
@@ -775,13 +782,45 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                               </Select>
                             </FormControl>
                           )}
+                          {item?.subject ===
+                            'VULNERABILITY_STATUS_COMPLETENESS' &&
+                            item?.operator === 'IS' && (
+                              <FormControl isRequired>
+                                <Select
+                                  id='statusCompleteness'
+                                  name='statusCompleteness'
+                                  value={item?.value}
+                                  onChange={(e) =>
+                                    handleChange(
+                                      e.target.value,
+                                      item.id,
+                                      'value'
+                                    )
+                                  }
+                                  textTransform={'capitalize'}
+                                  fontSize='sm'
+                                >
+                                  <option value=''>-- Select --</option>
+                                  {['complete', 'incomplete'].map(
+                                    (item, index) => (
+                                      <option
+                                        key={index}
+                                        value={item}
+                                        style={{ textTransform: 'capitalize' }}
+                                      >
+                                        {item}
+                                      </option>
+                                    )
+                                  )}
+                                </Select>
+                              </FormControl>
+                            )}
                           {item?.subject === 'COMPONENT_TYPE' &&
                             (item?.operator === 'IS' ||
                               item?.operator === 'IS_NOT' ||
                               item?.operator === '') && (
                               <FormControl isRequired>
                                 <Select
-                                  size='sm'
                                   id='compType'
                                   name='compType'
                                   value={item?.value}
@@ -827,8 +866,10 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                               alignItems={'flex-start'}
                             >
                               <Flex alignItems={'center'} gap={4}>
-                                <InputGroup size='sm'>
-                                  <InputLeftAddon>Min</InputLeftAddon>
+                                <InputGroup>
+                                  <InputLeftAddon fontSize={'sm'}>
+                                    Min
+                                  </InputLeftAddon>
                                   <Input
                                     width={16}
                                     type={'number'}
@@ -845,15 +886,21 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                                     onBlur={() => handleBlur(item)}
                                   />
                                   {item?.subject === 'VULNERABILITY_EPSS' && (
-                                    <InputRightAddon>%</InputRightAddon>
+                                    <InputRightAddon fontSize={'sm'}>
+                                      %
+                                    </InputRightAddon>
                                   )}
                                   {item?.subject ===
                                     'VULNERABILITY_STATUS_AGE' && (
-                                    <InputRightAddon>Days</InputRightAddon>
+                                    <InputRightAddon fontSize={'sm'}>
+                                      Days
+                                    </InputRightAddon>
                                   )}
                                 </InputGroup>
-                                <InputGroup size='sm'>
-                                  <InputLeftAddon>Max</InputLeftAddon>
+                                <InputGroup>
+                                  <InputLeftAddon fontSize={'sm'}>
+                                    Max
+                                  </InputLeftAddon>
                                   <Input
                                     width={16}
                                     type={'number'}
@@ -870,11 +917,15 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                                     onBlur={() => handleBlur(item)}
                                   />
                                   {item?.subject === 'VULNERABILITY_EPSS' && (
-                                    <InputRightAddon>%</InputRightAddon>
+                                    <InputRightAddon fontSize={'sm'}>
+                                      %
+                                    </InputRightAddon>
                                   )}
                                   {item?.subject ===
                                     'VULNERABILITY_STATUS_AGE' && (
-                                    <InputRightAddon>Days</InputRightAddon>
+                                    <InputRightAddon fontSize={'sm'}>
+                                      Days
+                                    </InputRightAddon>
                                   )}
                                 </InputGroup>
                               </Flex>
@@ -889,10 +940,10 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                             (item?.operator === 'LESS_THAN' ||
                               item?.operator === 'MORE_THAN' ||
                               item?.operator === '') && (
-                              <InputGroup size='sm'>
+                              <InputGroup>
                                 <Input
                                   type='number'
-                                  size='sm'
+                                  fontSize={'sm'}
                                   placeholder='Value'
                                   value={item?.value}
                                   onChange={(e) =>
@@ -904,17 +955,19 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                                   }
                                   onKeyDown={blockInvalidChar}
                                 />
-                                <InputRightAddon>Days</InputRightAddon>
+                                <InputRightAddon fontSize={'sm'}>
+                                  Days
+                                </InputRightAddon>
                               </InputGroup>
                             )}
                           {item?.subject === 'VULNERABILITY_EPSS' &&
                             (item?.operator === 'LESS_THAN' ||
                               item?.operator === 'MORE_THAN' ||
                               item?.operator === '') && (
-                              <InputGroup size='sm'>
+                              <InputGroup>
                                 <Input
                                   type='number'
-                                  size='sm'
+                                  fontSize='sm'
                                   placeholder='Value'
                                   value={item?.value}
                                   onChange={(e) =>
@@ -936,6 +989,8 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                             item?.subject !== 'COMPONENT_TYPE' &&
                             item?.subject !== 'VERSION_PRIMARY' &&
                             item?.subject !==
+                              'VULNERABILITY_STATUS_COMPLETENESS' &&
+                            item?.subject !==
                               'SBOM_PRIMARY_COMPONENT_RELATIONSHIPS' &&
                             item?.subject !== 'VULNERABILITY_SEV' &&
                             item?.subject !== 'VULNERABILITY_EPSS' &&
@@ -944,7 +999,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                             item?.subject !== 'VULNERABILITY_STATUS_AGE' && (
                               <Input
                                 type={'text'}
-                                size='sm'
+                                fontSize='sm'
                                 placeholder='Value'
                                 value={item?.value}
                                 onChange={(e) =>
@@ -956,52 +1011,61 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                                 }
                               />
                             )}
-                          <Flex
-                            width={'100%'}
-                            gap={4}
-                            justifyContent={'space-between'}
-                          >
-                            <Box>
-                              {conditions?.length > 1 &&
-                                conditions?.length - 1 !== index && (
-                                  <Text>
-                                    {operator === 'ALL' ? 'and' : 'or'}
-                                  </Text>
-                                )}
-                            </Box>
-                            <IconButton
-                              ml={'auto'}
-                              size='sm'
-                              colorScheme='red'
-                              icon={<FaTrash />}
-                              onClick={() => deleteRow(item)}
-                            />
+                          <Flex gap={4} justifyContent={'space-between'}>
+                            {conditions?.length > 1 &&
+                              conditions?.length - 1 !== index && (
+                                <Kbd mt={2}>
+                                  {operator === 'ALL' ? 'AND' : 'OR'}
+                                </Kbd>
+                              )}
+                            {conditions?.length > 1 && (
+                              <Icon
+                                ml={'auto'}
+                                mt={2}
+                                as={FaTrash}
+                                color={'red.500'}
+                                cursor={'pointer'}
+                                onClick={() => deleteRow(item)}
+                              />
+                            )}
                           </Flex>
                         </Flex>
-                      </GridItem>
-                    </Grid>
-                  ))}
-                <Flex alignItems={'center'} gap={3} mt={4}>
-                  <Text fontSize={'sm'} width={'fit-content'}>
-                    Does not apply to :
-                  </Text>
-                  <Stack spacing={5} direction='row'>
+                      </Flex>
+                    ))}
+                </FormControl>
+                {/* ADD CONDITIONS */}
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  variant='link'
+                  fontWeight={'medium'}
+                  leftIcon={<FaPlus />}
+                  onClick={addRow}
+                >
+                  Add condition
+                </Button>
+                <Divider />
+                {/* APPLY CONDITION */}
+                <FormControl>
+                  <FormLabel htmlFor='doesNptapplyTo'>
+                    Does not apply to
+                  </FormLabel>
+                  <Stack spacing={5} direction='row' mt={3}>
                     <Checkbox
-                      size='sm'
                       checked={isPrimary}
                       onChange={(e) => setIsPrimary(e.target.checked)}
                     >
-                      Primary Component
+                      <Text fontSize={'sm'}>Primary Component</Text>
                     </Checkbox>
                     <Checkbox
-                      size='sm'
                       checked={isInternal}
                       onChange={(e) => setIsInternal(e.target.checked)}
                     >
-                      Internal Component
+                      <Text fontSize={'sm'}>Internal Component</Text>
                     </Checkbox>
                   </Stack>
-                </Flex>
+                </FormControl>
+                {/* ERROR HANDLING */}
                 {error !== '' && (
                   <Alert status='error' borderRadius={4}>
                     <AlertIcon />
