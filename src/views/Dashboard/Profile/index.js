@@ -253,7 +253,7 @@ function Profile() {
               <TabPanel>
                 <Grid
                   width={'100%'}
-                  templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
+                  templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
                   gap='22px'
                 >
                   <ComponentFeed

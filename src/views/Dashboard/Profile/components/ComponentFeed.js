@@ -88,9 +88,13 @@ const ComponentFeed = ({ data, refetch }) => {
 
   return (
     <Card p={0}>
-      <CardHeader p='12px 0' mb='8px'>
+      <CardHeader p='12px 0' mb='8px' as={Flex} flexDirection='column'>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
           Internal Components
+        </Text>
+        <Text fontSize={'sm'}>
+          Clicking on apply will mark the component name matching this list as
+          internal.
         </Text>
       </CardHeader>
       {data && (
