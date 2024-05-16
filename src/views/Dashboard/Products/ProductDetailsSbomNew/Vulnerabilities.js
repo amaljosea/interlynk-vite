@@ -318,7 +318,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
 
   const textColor = useColorModeValue('gray.700', 'white')
   const [activeRow, setActiveRow] = useState(null)
-  const [vulnSearch, setVulnSearch] = useState('')
+  const [vulnSearch, setVulnSearch] = useState(searchInput)
   const [toggleClear, setToggleClear] = useState(false)
   const [selectedVulns, setSelectedVulns] = useState([])
   const [selectedGroup, setSelectedGroup] = useState('')

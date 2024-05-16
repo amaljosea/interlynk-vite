@@ -134,7 +134,7 @@ const Changelog = () => {
 
   //end
 
-  const [logSearch, setLogSearch] = useState('')
+  const [logSearch, setLogSearch] = useState(searchInput)
 
   // COLUMNS
   const columns = [

@@ -160,7 +160,7 @@ const Checks = () => {
   const [cpeList, setCpeList] = useState([])
   const [cpeValue, setCpeValue] = useState('')
   const [selectedCpe, setSelectedCpe] = useState(null)
-  const [checkSearch, setCheckSearch] = useState('')
+  const [checkSearch, setCheckSearch] = useState(searchInput)
   const [activeRow, setActiveRow] = useState(null)
 
   const fetchCheckData = () => {

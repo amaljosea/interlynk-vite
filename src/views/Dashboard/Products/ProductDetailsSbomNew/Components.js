@@ -249,7 +249,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const compBtn = useRef(null)
   const linkRef = useRef(null)
   const [activeRow, setActiveRow] = useState(null)
-  const [compSearch, setCompSearch] = useState('')
+  const [compSearch, setCompSearch] = useState(searchInput)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 

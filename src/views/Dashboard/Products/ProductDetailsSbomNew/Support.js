@@ -71,7 +71,7 @@ const Support = () => {
   const [activeRow, setActiveRow] = useState(null)
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
-  const [filterText, setFilterText] = useState('')
+  const [filterText, setFilterText] = useState(searchInput)
 
   const setPaginationControl = (data) => {
     setIsPrevActive(data?.pageInfo?.hasPreviousPage)
