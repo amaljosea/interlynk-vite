@@ -3406,37 +3406,6 @@ export const GetSbomDrift = gql`
     }
   }
 `
-// GET SBOM DRIFT
-export const GetShareSbomDrift = gql`
-  query GetSharedSbomDrift($subjectSbomId: Uuid!, $targetSbomId: Uuid!) {
-    shareLynkQuery {
-      sbom(id: $subjectSbomId) {
-        id
-        spec
-        sbomDrift(targetSbomId: $targetSbomId) {
-          subjectComponentId
-          subjectComponent {
-            name
-            version
-            purl
-            cpes
-            licensesExp
-          }
-          targetComponentId
-          targetComponent {
-            name
-            version
-            purl
-            cpes
-            licensesExp
-          }
-          diffTags
-          diffType
-        }
-      }
-    }
-  }
-`
 
 // GET PROJECT GROUPS FOR SBOM DRIFT
 export const GetProductsForSbomDrift = gql`
@@ -3939,6 +3908,209 @@ export const IntersectingVulns = gql`
         vexStatus {
           name
         }
+      }
+    }
+  }
+`
+
+export const CompareQueryCustomer = gql`
+  query GetSharedSbomDrift($subjectSbomId: Uuid!, $targetSbomId: Uuid!) {
+    shareLynkQuery {
+      diffs: sbom(id: $subjectSbomId) {
+        id
+        spec
+        sbomDrift(targetSbomId: $targetSbomId) {
+          subjectComponentId
+          subjectComponent {
+            name
+            version
+            purl
+            cpes
+            licensesExp
+          }
+          targetComponentId
+          targetComponent {
+            name
+            version
+            purl
+            cpes
+            licensesExp
+          }
+          diffTags
+          diffType
+        }
+      }
+      sbomTwo: sbom(id: $targetSbomId) {
+        id
+        creationAt
+        projectVersion
+        project {
+          name
+          projectGroup {
+            name
+          }
+        }
+        licensesExp
+        tools {
+          id
+          name
+          version
+          vendor
+          updatedAt
+        }
+        project {
+          name
+        }
+        authors {
+          id
+          name
+          email
+          updatedAt
+        }
+        suppliers {
+          id
+          name
+          url
+          contactEmail
+          contactName
+        }
+      }
+      sbomOne: sbom(id: $subjectSbomId) {
+        id
+        creationAt
+        projectVersion
+        project {
+          name
+          projectGroup {
+            name
+          }
+        }
+        licensesExp
+        tools {
+          id
+          name
+          version
+          vendor
+          updatedAt
+        }
+        project {
+          name
+        }
+        authors {
+          id
+          name
+          email
+          updatedAt
+        }
+        suppliers {
+          id
+          name
+          url
+          contactEmail
+          contactName
+        }
+      }
+    }
+  }
+`
+export const CompareQueryVendor = gql`
+  query GetSbomDrift(
+    $subjectSbomId: Uuid!
+    $projectId: Uuid!
+    $targetSbomId: Uuid!
+  ) {
+    diffs: sbom(projectId: $projectId, sbomId: $subjectSbomId) {
+      id
+      spec
+      sbomDrift(targetSbomId: $targetSbomId) {
+        subjectComponentId
+        subjectComponent {
+          name
+          version
+          purl
+          cpes
+          licensesExp
+        }
+        targetComponentId
+        targetComponent {
+          name
+          version
+          purl
+          cpes
+          licensesExp
+        }
+        diffTags
+        diffType
+      }
+    }
+    sbomTwo: sbom(projectId: $projectId, sbomId: $targetSbomId) {
+      id
+      creationAt
+      projectVersion
+      project {
+        name
+        projectGroup {
+          name
+        }
+      }
+      licensesExp
+      tools {
+        id
+        name
+        version
+        vendor
+        updatedAt
+      }
+      project {
+        name
+      }
+      authors {
+        id
+        name
+        email
+        updatedAt
+      }
+      suppliers {
+        id
+        name
+        url
+        contactEmail
+        contactName
+      }
+    }
+    sbomOne: sbom(projectId: $projectId, sbomId: $subjectSbomId) {
+      id
+      creationAt
+      projectVersion
+      project {
+        name
+        projectGroup {
+          name
+        }
+      }
+      licensesExp
+      tools {
+        id
+        name
+        version
+        vendor
+        updatedAt
+      }
+      project {
+        name
+      }
+      authors {
+        id
+        name
+        email
+        updatedAt
+      }
+      suppliers {
+        id
+        name
+        url
+        contactEmail
+        contactName
       }
     }
   }

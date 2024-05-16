@@ -19,24 +19,20 @@ import Card from 'components/Card/Card'
 import SbomInfo from 'components/SbomInfo'
 import DiffTable from 'components/Tables/DiffTable'
 
-const ToolsDrawer = ({
-  data,
-  diffs,
-  setData,
-  selectedSbom,
-  versionList,
-  isOpen,
-  onClose
-}) => {
-  const versionsOne = versionList?.nodes?.find(
-    (item) => item?.id === selectedSbom[1]?.id
-  )
-  const versionsTwo = versionList?.nodes?.find(
-    (item) => item?.id === selectedSbom[0]?.id
-  )
+import { useSbomCompare } from 'hooks/useSbomCompare'
+
+const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
+  const { sbomOne, sbomTwo, isLoading, diffs } = useSbomCompare({
+    sbomIdOne,
+    sbomIdTwo
+  })
+
+  if (isLoading) {
+    return null
+  }
 
   return (
-    <Drawer size='full' isOpen={isOpen} placement='bottom' onClose={onClose}>
+    <Drawer size='full' isOpen={true} placement='bottom' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton mt={2} />
@@ -53,7 +49,7 @@ const ToolsDrawer = ({
                 h='450px'
                 overflowY='scroll'
               >
-                {versionsOne && (
+                {sbomOne && (
                   <Flex width={'100%'} flexDirection={'column'}>
                     {/* HEADIING */}
                     <Stack>
@@ -64,8 +60,8 @@ const ToolsDrawer = ({
                           fontFamily={'inherit'}
                           size='md'
                         >
-                          {versionsOne?.project?.projectGroup?.name} :{' '}
-                          {versionsOne?.projectVersion}
+                          {sbomOne?.project?.projectGroup?.name} :{' '}
+                          {sbomOne?.projectVersion}
                         </Heading>
                       </Flex>
                       <Tag
@@ -74,11 +70,11 @@ const ToolsDrawer = ({
                         width={'fit-content'}
                         textTransform={'capitalize'}
                       >
-                        {versionsOne?.project?.name}
+                        {sbomOne?.project?.name}
                       </Tag>
                     </Stack>
                     {/* DETAILS */}
-                    <SbomInfo data={versionsOne} />
+                    <SbomInfo data={sbomOne} />
                   </Flex>
                 )}
               </Card>
@@ -86,7 +82,7 @@ const ToolsDrawer = ({
             {/* SBOM TWO */}
             <GridItem w='100%'>
               <Card bg={'red.100'} px={6} h='450px' overflowY='scroll'>
-                {versionsTwo && (
+                {sbomTwo && (
                   <Flex width='100%' flexWrap={'wrap'} flexDirection={'column'}>
                     {/* HEADIING */}
                     <Stack>
@@ -96,8 +92,8 @@ const ToolsDrawer = ({
                         fontFamily={'inherit'}
                         size='md'
                       >
-                        {versionsTwo?.project?.projectGroup?.name} :{' '}
-                        {versionsTwo?.projectVersion}
+                        {sbomTwo?.project?.projectGroup?.name} :{' '}
+                        {sbomTwo?.projectVersion}
                       </Heading>
                       <Tag
                         variant='solid'
@@ -105,11 +101,11 @@ const ToolsDrawer = ({
                         width={'fit-content'}
                         textTransform={'capitalize'}
                       >
-                        {versionsTwo?.project?.name}
+                        {sbomTwo?.project?.name}
                       </Tag>
                     </Stack>
                     {/* DETAILS */}
-                    <SbomInfo data={versionsTwo} />
+                    <SbomInfo data={sbomTwo} />
                   </Flex>
                 )}
               </Card>
@@ -118,11 +114,9 @@ const ToolsDrawer = ({
           {/* SBOM DIFFERENCE */}
           <DiffTable
             diffs={diffs}
-            data={data}
-            setData={setData}
-            isLoading={diffs?.sbomDrift ? false : true}
-            sbomOne={versionsOne}
-            sbomTwo={versionsTwo}
+            isLoading={isLoading}
+            sbomOne={sbomOne}
+            sbomTwo={sbomTwo}
           />
         </DrawerBody>
       </DrawerContent>

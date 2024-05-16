@@ -1,7 +1,7 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -45,11 +45,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { sbomDelete } from 'graphQL/Mutation'
 import {
   GetSbomAlternatives,
-  GetSbomDrift,
-  GetSbomVersions,
   GetShareSbomAlternatives,
-  GetShareSbomDrift,
-  GetShareSbomVersions,
   GetVersionsTable,
   ShareVersionTable
 } from 'graphQL/Queries'
@@ -63,12 +59,9 @@ import {
 import Pagination from '../Pagination'
 
 const VersionsTable = ({ projectGroup }) => {
-  const location = useLocation()
   const navigate = useNavigate()
   const params = useParams()
-  const productGroupId = params.productgroupid
   const productId = params.productid
-  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const {
     userPermissions,
@@ -89,8 +82,6 @@ const VersionsTable = ({ projectGroup }) => {
   const [filterText, setFilterText] = useState(searchInput)
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [drifts, setDrifts] = useState([])
 
   const versionData = useMemo(() => {
     return {
@@ -102,14 +93,6 @@ const VersionsTable = ({ projectGroup }) => {
 
   const [getAlternatives, { data: sbomAlts }] = useLazyQuery(
     signedUrlParams ? GetShareSbomAlternatives : GetSbomAlternatives
-  )
-
-  const [getVersions, { data: allVersions }] = useLazyQuery(
-    signedUrlParams ? GetShareSbomVersions : GetSbomVersions
-  )
-
-  const [getDrift, { data: driftData }] = useLazyQuery(
-    signedUrlParams ? GetShareSbomDrift : GetSbomDrift
   )
 
   const { data, refetch, error } = useQuery(
@@ -540,46 +523,6 @@ const VersionsTable = ({ projectGroup }) => {
     setSelectedSbom(state?.selectedRows)
   }
 
-  const handleCompare = useCallback(() => {
-    setLoading(true)
-    if (selectedSbom?.length === 2) {
-      getVersions({
-        variables: {
-          ...versionData,
-          first: totalRows,
-          last: undefined
-        }
-      }).then(() => {
-        getDrift({
-          variables: {
-            projectId: signedUrlParams ? undefined : productId,
-            subjectSbomId: selectedSbom[1]?.id,
-            targetSbomId: selectedSbom[0]?.id
-          }
-        }).then((res) => {
-          if (res?.data) {
-            setDrifts(
-              signedUrlParams
-                ? res?.data?.shareLynkQuery?.sbom?.sbomDrift
-                : res?.data?.sbom?.sbomDrift
-            )
-            setLoading(false)
-            onToolOpen()
-          }
-        })
-      })
-    }
-  }, [
-    selectedSbom,
-    getVersions,
-    versionData,
-    totalRows,
-    getDrift,
-    signedUrlParams,
-    productId,
-    onToolOpen
-  ])
-
   // CLEAR SERACH
   const handleClear = useCallback(async () => {
     setFilterText('')
@@ -660,10 +603,10 @@ const VersionsTable = ({ projectGroup }) => {
           {selectedSbom?.length === 2 && (
             <Tooltip label='Compare Version'>
               <IconButton
-                onClick={handleCompare}
+                onClick={onToolOpen}
                 colorScheme='blue'
                 icon={<FaCodeCompare />}
-                isLoading={loading}
+                isLoading={isToolOpen}
               ></IconButton>
             </Tooltip>
           )}
@@ -694,8 +637,8 @@ const VersionsTable = ({ projectGroup }) => {
     handleClear,
     handleSearch,
     selectedSbom?.length,
-    handleCompare,
-    loading,
+    onToolOpen,
+    isToolOpen,
     projectGroup?.enabled,
     createSbom,
     signedUrlParams,
@@ -849,21 +792,11 @@ const VersionsTable = ({ projectGroup }) => {
         />
       )}
 
-      {isToolOpen && allVersions && (
+      {isToolOpen && (
         <ToolsDrawer
-          versionList={
-            signedUrlParams
-              ? allVersions?.shareLynkQuery?.project?.sbomVersions
-              : allVersions?.project?.sbomVersions
-          }
-          diffs={
-            signedUrlParams ? driftData?.shareLynkQuery?.sbom : driftData?.sbom
-          }
-          data={drifts}
-          isOpen={isToolOpen}
+          sbomIdOne={selectedSbom[0]?.id}
+          sbomIdTwo={selectedSbom[1]?.id}
           onClose={onToolClose}
-          setData={setDrifts}
-          selectedSbom={selectedSbom}
         />
       )}
     </>
