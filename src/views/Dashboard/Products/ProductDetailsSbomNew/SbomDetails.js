@@ -1,4 +1,4 @@
-import { useLazyQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
@@ -27,6 +27,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { GetPrimaryComponent } from 'graphQL/Queries'
 import { GetSharPrimartComp } from 'graphQL/Queries'
+import { GetProjectSettings } from 'graphQL/Queries'
 
 import {
   FaAngleLeft,
@@ -35,7 +36,7 @@ import {
   FaCube,
   FaCubes
 } from 'react-icons/fa'
-import { FaCircleCheck } from 'react-icons/fa6'
+import { FaCircleCheck, FaTag } from 'react-icons/fa6'
 import { MdPolicy } from 'react-icons/md'
 
 const SbomDetails = ({ sbomData, refetch }) => {
@@ -82,6 +83,12 @@ const SbomDetails = ({ sbomData, refetch }) => {
     signedUrlParams ? GetSharPrimartComp : GetPrimaryComponent,
     { fetchPolicy: 'network-only' }
   )
+
+  const { data: settings } = useQuery(GetProjectSettings, {
+    variables: { id: projectId }
+  })
+
+  const { projectSetting } = settings?.project || ''
 
   const handleRelationView = async () => {
     await getPrimaryComp({
@@ -255,19 +262,36 @@ const SbomDetails = ({ sbomData, refetch }) => {
               <IconButton
                 size='xs'
                 colorScheme={
-                  vulnRunStatus === 'FINISHED' ||
-                  vulnRunStatus === 'IN_PROGRESS'
+                  (vulnRunStatus === 'FINISHED' ||
+                    vulnRunStatus === 'IN_PROGRESS') &&
+                  projectSetting?.checksEnabled === true
                     ? 'blue'
                     : 'blackAlpha'
                 }
                 icon={<Search2Icon />}
               />
             </Tooltip>
+            <Tooltip label='Apply Internal'>
+              <IconButton
+                size='xs'
+                colorScheme={
+                  (vulnRunStatus === 'FINISHED' ||
+                    vulnRunStatus === 'IN_PROGRESS') &&
+                  projectSetting?.internalCompMatchingEnabled === true
+                    ? 'blue'
+                    : 'blackAlpha'
+                }
+                icon={<FaTag />}
+              />
+            </Tooltip>
             <Tooltip label='Vulnerability Scan'>
               <IconButton
                 size='xs'
                 colorScheme={
-                  vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
+                  vulnRunStatus === 'FINISHED' &&
+                  projectSetting?.vulnScanningEnabled === true
+                    ? 'blue'
+                    : 'blackAlpha'
                 }
                 icon={<FaBug />}
               />
