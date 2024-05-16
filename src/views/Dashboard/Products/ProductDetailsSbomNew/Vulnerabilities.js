@@ -64,6 +64,7 @@ import {
   ShareVulnFilters
 } from 'graphQL/Queries'
 
+import { BsCircleHalf } from 'react-icons/bs'
 import { FaEllipsisV } from 'react-icons/fa'
 import {
   FaBookOpen,
@@ -553,7 +554,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
         )
       },
       wrap: true,
-      width: '12%',
+      width: '10.99%',
       sortable: true
     },
     // SEVERITY
@@ -606,7 +607,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           </Tag>
         )
       },
-      width: '9%',
+      width: '8.2%',
       sortable: true,
       wrap: true
     },
@@ -711,7 +712,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
       id: 'VEX_STATUSES_NAME',
       name: 'STATUS',
       selector: (row) => {
-        const { vexStatus } = row
+        const { vexStatus, isComplete } = row
         return (
           <Tag
             onClick={(e) => {
@@ -719,18 +720,25 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
             }}
             size='md'
             variant='solid'
-            width={'130px'}
+            width={'160px'}
             colorScheme={statusColor(
               vexStatus ? vexStatus.name : 'Unspecified'
             )}
           >
-            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
+            <TagLabel
+              style={{ textTransform: 'capitalize' }}
+              mx={'auto'}
+              as={Flex}
+              gap={2}
+              alignItems='center'
+            >
+              {isComplete === false && <BsCircleHalf />}{' '}
               {vexStatus !== null ? vexStatus.name : 'Unspecified'}
             </TagLabel>
           </Tag>
         )
       },
-      width: '12%',
+      width: '13%',
       wrap: true,
       sortable: true
     },
