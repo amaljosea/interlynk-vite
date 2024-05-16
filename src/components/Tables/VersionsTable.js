@@ -725,6 +725,13 @@ const VersionsTable = ({ projectGroup }) => {
     })
   }
 
+  const disableRowCheckBox = (row) => {
+    if (selectedSbom.length >= 2) {
+      return !selectedSbom.some((selectedRow) => selectedRow.id === row.id)
+    }
+    return false
+  }
+
   const dataTableProps = {
     columns: columns,
     data: versions?.nodes || [],
@@ -740,7 +747,8 @@ const VersionsTable = ({ projectGroup }) => {
     persistTableHead: true,
     selectableRows: true,
     clearSelectedRows: clearSelect,
-    onSelectedRowsChange: handleChange
+    onSelectedRowsChange: handleChange,
+    selectableRowDisabled: disableRowCheckBox
   }
 
   if (error)
