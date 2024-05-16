@@ -34,8 +34,8 @@ import { GetConnectedSbom } from 'graphQL/Queries'
 
 import { FaFolderTree } from 'react-icons/fa6'
 
-import Filters from './Filters'
 import VexModal from './VexModal'
+import VulnFilters from './VulnsFilter'
 
 const VulnProdTable = ({ data, vuln, refetch }) => {
   const params = useParams()
@@ -280,7 +280,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
             onClear={handleClear}
             onChange={onSearchInputChange}
           />
-          <Filters data={vuln} refetch={refetch} />
+          <VulnFilters data={vuln} refetch={refetch} />
         </Stack>
         {/* UPDATE STATUES */}
         {selectedVulns.length > 0 && (

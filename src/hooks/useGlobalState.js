@@ -1,6 +1,5 @@
 import {
   compVulnReducer,
-  globalVulnReducer,
   policyReducer,
   prodCheckReducer,
   prodCompReducer,
@@ -49,22 +48,6 @@ const GlobalStateProvider = ({ children }) => {
     field: 'SBOMS_CREATED_AT',
     direction: 'DESC',
     searchInput: '',
-    pageIndex: 1
-  })
-  // GLOBAL VULNERABILITIES
-  const [globalVulnState, globalVulnDispatch] = useReducer(globalVulnReducer, {
-    field: 'VULNS_VULN_ID',
-    direction: 'DESC',
-    after: '',
-    before: '',
-    searchInput: '',
-    severities: [],
-    products: [],
-    statues: [],
-    kev: '',
-    epss: '',
-    minEpss: 0,
-    maxEpss: 0,
     pageIndex: 1
   })
   // SINGLE VULNERABILITIES
@@ -245,7 +228,6 @@ const GlobalStateProvider = ({ children }) => {
         setClearSelect,
         selectedSbom,
         setSelectedSbom,
-        globalVulnState,
         compVulnState,
         prodState,
         prodLogState,
@@ -260,7 +242,6 @@ const GlobalStateProvider = ({ children }) => {
         supportState,
         policyState,
         dispatch: {
-          globalVulnDispatch,
           compVulnDispatch,
           prodDispatch,
           prodLogDispatch,

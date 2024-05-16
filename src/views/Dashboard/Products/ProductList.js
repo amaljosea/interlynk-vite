@@ -22,8 +22,7 @@ function ProductList() {
     prodCompDispatch,
     prodVulnDispatch,
     prodCheckDispatch,
-    sbomLogDispatch,
-    globalVulnDispatch
+    sbomLogDispatch
   } = dispatch
 
   const location = useLocation()
@@ -71,7 +70,6 @@ function ProductList() {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
       prodCheckDispatch({ type: 'CLEAR_PROD_CHECK' })
       sbomLogDispatch({ type: 'CLEAR_SBOM_LOG' })
-      globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
     }
   }, [product])
 

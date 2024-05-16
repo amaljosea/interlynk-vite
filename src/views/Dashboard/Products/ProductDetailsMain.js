@@ -33,22 +33,24 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
+import NotificationMenuBell from 'components/Notifications/NotificationMenuBell'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import PolicyTable from 'components/Tables/PolicyTable'
 import VersionsTable from 'components/Tables/VersionsTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
   GetGlobalVulns,
+  GetOrgMfc,
   GetProjectGroup,
   GetProjectLogs,
   GetProjectPolicies,
   GetProjectSettings,
   GetVulnData
 } from 'graphQL/Queries'
-import { GetOrgMfc } from 'graphQL/Queries'
 
 import {
   FaBoxArchive,
@@ -59,7 +61,6 @@ import {
   FaWindowMaximize
 } from 'react-icons/fa6'
 
-import NotificationMenuBell from '../../../components/Notifications/NotificationMenuBell'
 import Automation from '../Automation'
 import ChangeLog from '../Changelog'
 import Settings from '../ProductSettings'
@@ -81,7 +82,6 @@ const ProductDetailsMain = () => {
     setActiveProdTab,
     prodLogState,
     prodVulnState,
-    globalVulnState,
     dispatch,
     userPermissions
   } = useGlobalState()
@@ -98,7 +98,7 @@ const ProductDetailsMain = () => {
     direct,
     vexComplete
   } = prodVulnState
-  const { prodVulnDispatch, globalVulnDispatch } = dispatch
+  const { prodVulnDispatch } = dispatch
   const environment = localStorage.getItem('environment')
   const [activeEnv, setActiveEnv] = useState(productId || '')
 
@@ -130,60 +130,32 @@ const ProductDetailsMain = () => {
   )
   // GET PROJECT DATA
   const { data, refetch, loading, error } = useQuery(GetProjectGroup, {
-    fetchPolicy: 'network-only',
     variables: { id: productGroupId }
   })
 
-  const epssRange =
-    globalVulnState.epss !== 'all' &&
-    globalVulnState.epss !== '' &&
-    globalVulnState.epss?.split('-')
-  const vulnRange = {
-    min: parseFloat(epssRange[0]) / 100,
-    max: parseFloat(epssRange[1]) / 100
-  }
   // GET VULN DATA
-  const { data: globalVulnData, refetch: globalVulnRefetch } = useQuery(
-    GetGlobalVulns,
-    {
-      fetchPolicy: 'network-only',
-      skip: activeProdTab === 1 ? false : true,
-      variables: {
-        first: totalRows,
-        projectIds: [activeEnv],
-        projectGroupIds: [productGroupId],
-        field: globalVulnState.field,
-        direction: globalVulnState.direction,
-        search:
-          globalVulnState.searchInput !== ''
-            ? globalVulnState.searchInput
-            : undefined,
-        severity:
-          globalVulnState.severities?.length === 0
-            ? undefined
-            : globalVulnState.severities,
-        status:
-          globalVulnState.statues?.length === 0
-            ? undefined
-            : globalVulnState.statues,
-        kev:
-          globalVulnState.kev === 'yes'
-            ? true
-            : globalVulnState.kev === 'false'
-              ? false
-              : undefined,
-        epss:
-          globalVulnState.epss === 'all' || globalVulnState.epss === ''
-            ? undefined
-            : vulnRange
-      }
+  const [filters, setFilters] = useState({
+    field: 'VULNS_VULN_ID',
+    direction: 'DESC'
+  })
+
+  const {
+    nodes,
+    paginationProps,
+    reset,
+    loading: globalVulnloading
+  } = usePaginatatedQuery(GetGlobalVulns, {
+    skip: activeProdTab === 1 ? false : true,
+    selector: 'organization.vulns',
+    variables: {
+      projectGroupIds: [productGroupId],
+      projectIds: [productId],
+      ...filters
     }
-  )
+  })
+
   // GET POLICY DATA
-  const [getPolicyData, { data: policyData }] = useLazyQuery(
-    GetProjectPolicies,
-    { fetchPolicy: 'network-only' }
-  )
+  const [getPolicyData, { data: policyData }] = useLazyQuery(GetProjectPolicies)
 
   const [getSettings, { data: settings }] = useLazyQuery(GetProjectSettings, {
     skip: activeProdTab === 3 ? false : true
@@ -206,7 +178,6 @@ const ProductDetailsMain = () => {
   // GET VULN DATA
   const { refetch: vulnRefetch } = useQuery(GetVulnData, {
     skip: sbomId && vulnsPermissions?.value === true ? false : true,
-    fetchPolicy: 'network-only',
     variables: {
       projectId: productId || activeEnv,
       sbomId: sbomId,
@@ -264,7 +235,6 @@ const ProductDetailsMain = () => {
 
   // ON CHANGE ENV
   // const onChangeEnv = (value) => {
-  //   globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
   //   setActiveEnv(value)
   // }
 
@@ -285,9 +255,8 @@ const ProductDetailsMain = () => {
   useEffect(() => {
     if (sbomId === null) {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
-      globalVulnDispatch({ type: 'CLEAR_GLOBAL_VULN' })
     }
-  }, [globalVulnDispatch, prodVulnDispatch, sbomId])
+  }, [prodVulnDispatch, sbomId])
 
   useEffect(() => {
     if (activeTab === 0) {
@@ -343,10 +312,9 @@ const ProductDetailsMain = () => {
       const env = data?.projectGroup?.projects.find(
         (item) => item.name === environment
       )
-      globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
       setActiveEnv(env?.id)
     }
-  }, [data, environment, globalVulnDispatch])
+  }, [data, environment])
 
   if (loading) {
     return (
@@ -537,8 +505,14 @@ const ProductDetailsMain = () => {
                 {/* VULNERABILITIES */}
                 <TabPanel px={0}>
                   <GlobalVulnTable
-                    data={globalVulnData?.organization?.vulns}
-                    refetch={globalVulnRefetch}
+                    loading={globalVulnloading}
+                    vulns={nodes}
+                    paginationProps={paginationProps}
+                    filters={filters}
+                    setFilters={(newFilters) => {
+                      setFilters(newFilters)
+                      reset()
+                    }}
                   />
                 </TabPanel>
                 {/* AUTOMATIONS */}

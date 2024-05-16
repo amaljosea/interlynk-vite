@@ -1,22 +1,17 @@
 import { useQuery } from '@apollo/client'
-import { useMemo, useRef } from 'react'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
+import { filterEnvList } from 'utils'
 
 import {
   Box,
-  Button,
   Flex,
-  Input,
-  InputGroup,
-  InputLeftAddon,
-  InputRightAddon,
   Menu,
-  MenuDivider,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
   Stack,
-  useDisclosure
+  Switch,
+  Text
 } from '@chakra-ui/react'
 
 import CheckMark from 'components/Misc/CheckMark'
@@ -24,225 +19,109 @@ import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { GetProductNames } from 'graphQL/Queries'
+import { GetProjectGroup } from 'graphQL/Queries'
 
-const VulnsFilters = ({ refetch }) => {
+const VulnFilters = ({ data, refetch }) => {
   const params = useParams()
+  const vulnId = params.vulnerabilityid
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const id = queryParams.get('vulnId') || vulnId
+  const groupId = params.productgroupid
 
-  const { totalRows, globalVulnState, prodState, userPermissions, dispatch } =
-    useGlobalState()
-  const {
-    field,
-    direction,
-    severities,
-    products,
-    statues,
-    kev,
-    epss,
-    minEpss,
-    maxEpss
-  } = globalVulnState
-  const { globalVulnDispatch } = dispatch
+  const { totalRows, compVulnState, dispatch } = useGlobalState()
+  const { searchInput, envs, statuses, versions, products, vexComplete } =
+    compVulnState
+  const { compVulnDispatch } = dispatch
 
-  const productPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_product_group'),
-    [userPermissions]
-  )
-
-  const { data } = useQuery(GetProductNames, {
-    skip:
-      window.location.pathname.startsWith(`/vendor/products`) ||
-      productPermissions?.value === false
-        ? true
-        : false,
-    fetchPolicy: 'network-only',
-    variables: {
-      first: totalRows,
-      enabled: true,
-      field: prodState?.field,
-      direction: prodState?.direction
-    }
+  const { data: project } = useQuery(GetProjectGroup, {
+    skip: params?.name ? false : true,
+    variables: { id: groupId }
   })
 
-  const minRef = useRef()
-  const maxRef = useRef()
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const onMinKeyDown = (e) => {
-    if (e.key === 'ArrowRight') {
-      e.preventDefault()
-      maxRef.current.focus()
-    }
-  }
-
-  const onMaxKeyDown = (e) => {
-    if (e.key === 'ArrowLeft') {
-      e.preventDefault()
-      minRef.current.focus()
-    }
-  }
-
-  const handleRefetch = async (groupIds, severities, statuses, kev, epss) => {
-    const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
-    const range = {
-      min: parseFloat(epssRange[0]) / 100,
-      max: parseFloat(epssRange[1]) / 100
-    }
+  const onFilterVesion = async (value) => {
     await refetch({
+      id,
+      vexComplete,
       first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      projectGroupIds:
-        groupIds?.includes('all') || groupIds?.length === 0
-          ? undefined
-          : groupIds,
-      severity:
-        severities?.includes('all') || severities?.length === 0
-          ? undefined
-          : severities,
-      status:
-        statuses.includes('all') || statuses?.length === 0
-          ? undefined
-          : statuses,
-      kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
-      epss: epss === 'all' || epss === '' ? undefined : range,
-      field,
-      direction
-    })
+      search: searchInput !== '' ? searchInput : undefined,
+      projectNames: envs?.length === 0 ? undefined : envs,
+      statuses: statuses?.length === 0 ? undefined : statuses,
+      versions: value.includes('all') || value.length === 0 ? undefined : value
+    }).then(() => compVulnDispatch({ type: 'FILTER_VERSION', payload: value }))
   }
 
-  const onFilterProduct = async (value) => {
-    handleRefetch(value, severities, statues, kev, epss)
-    globalVulnDispatch({ type: 'FILTER_PRODUCT', payload: value })
-  }
-
-  const onFilterSeverity = async (value) => {
-    handleRefetch(products, value, statues, kev, epss)
-    globalVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+  const onFilterEnv = async (value) => {
+    await refetch({
+      id,
+      vexComplete,
+      first: totalRows,
+      search: searchInput !== '' ? searchInput : undefined,
+      versions: versions?.length === 0 ? undefined : versions,
+      statuses: statuses?.length === 0 ? undefined : statuses,
+      projectNames:
+        value.includes('all') || value.length === 0 ? undefined : value
+    }).then(() => compVulnDispatch({ type: 'FILTER_ENV', payload: value }))
   }
 
   const onFilterStatus = async (value) => {
-    handleRefetch(products, severities, value, kev, epss)
-    globalVulnDispatch({ type: 'FILTER_STATUS', payload: value })
+    await refetch({
+      id,
+      vexComplete,
+      first: totalRows,
+      search: searchInput !== '' ? searchInput : undefined,
+      projectNames: envs?.length === 0 ? undefined : envs,
+      versions: versions?.length === 0 ? undefined : versions,
+      statuses: value.includes('all') || value.length === 0 ? undefined : value
+    }).then(() => compVulnDispatch({ type: 'FILTER_STATUS', payload: value }))
   }
 
-  const onFilterKev = async (value) => {
-    handleRefetch(products, severities, statues, value, epss)
-    globalVulnDispatch({ type: 'FILTER_KEV', payload: value })
+  const onFilterComplete = async (e) => {
+    await refetch({
+      id,
+      vexComplete: e.target.checked === true ? true : undefined,
+      first: totalRows,
+      search: searchInput !== '' ? searchInput : undefined,
+      projectNames: envs?.length === 0 ? undefined : envs,
+      versions: versions?.length === 0 ? undefined : versions,
+      statuses: statuses?.length === 0 ? undefined : statuses
+    }).then(() =>
+      compVulnDispatch({
+        type: 'FILTER_COMPLETE',
+        payload: vexComplete === true ? true : undefined
+      })
+    )
   }
 
-  const onFilterEpss = async (value) => {
-    handleRefetch(products, severities, statues, kev, value)
-    globalVulnDispatch({ type: 'FILTER_EPSS', payload: value })
-  }
-
-  const handleSubmit = async () => {
-    handleRefetch(products, severities, statues, kev, `${minEpss}-${maxEpss}`)
-    globalVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` })
-    onClose()
-  }
+  const envList = project && filterEnvList(project?.projectGroup?.projects)
 
   return (
-    <Stack direction={'row'} alignItems={'center'} gap={1}>
+    <Stack direction={'row'} alignItems={'center'} gap={2}>
       {/* PRODUCTS */}
-      {data && (
-        <Box
-          width={'fit-content'}
-          position={'relative'}
-          display={params?.name ? 'none' : 'block'}
-        >
-          <Menu closeOnSelect={false}>
-            {products?.length !== 0 && !products.includes('all') && (
-              <CheckMark />
-            )}
-            <MenuHeading title={'Product'} />
-            <MenuList minH={'auto'} maxH={'300px'} overflowY={'scroll'}>
-              <MenuOptionGroup
-                type='checkbox'
-                value={products}
-                onChange={onFilterProduct}
-              >
-                <MenuItemOption value={'all'} fontSize={'sm'}>
-                  All
-                </MenuItemOption>
-                {data?.organization?.projectGroups?.nodes?.map(
-                  (item, index) => (
-                    <MenuItemOption key={index} value={item.id} fontSize={'sm'}>
-                      {item.name}
-                    </MenuItemOption>
-                  )
-                )}
-              </MenuOptionGroup>
-            </MenuList>
-          </Menu>
-        </Box>
-      )}
-      {/* SEVERITY */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'} position={'relative'} display={'none'}>
         <Menu closeOnSelect={false}>
-          {severities?.length !== 0 && !severities.includes('all') && (
-            <CheckMark />
-          )}
-          <MenuHeading title={'Severity'} />
-          <MenuList>
+          {products.length !== 0 && !products.includes('all') && <CheckMark />}
+          <MenuHeading title={'Product'} />
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type='checkbox'
-              value={severities}
-              onChange={onFilterSeverity}
+              value={products}
+              onChange={(value) => console.log(value)}
             >
-              {['all', 'critical', 'high', 'medium', 'low', 'unknown'].map(
-                (item, index) => (
-                  <MenuItemOption
-                    key={index}
-                    value={item}
-                    fontSize={'sm'}
-                    textTransform={'capitalize'}
-                  >
-                    {item}
-                  </MenuItemOption>
-                )
-              )}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* STATUSES */}
-      <Box width={'fit-content'} position={'relative'} hidden>
-        <Menu closeOnSelect={false}>
-          {statues.length !== 0 && !statues.includes('all') && <CheckMark />}
-          <MenuHeading title={'Status'} />
-          <MenuList>
-            <MenuOptionGroup
-              type='checkbox'
-              value={statues}
-              onChange={onFilterStatus}
-            >
-              {['all', 'Affected', 'Fixed', 'In Triage', 'Not Affected'].map(
-                (item, index) => (
-                  <MenuItemOption
-                    key={index}
-                    value={item}
-                    fontSize={'sm'}
-                    textTransform={'capitalize'}
-                  >
-                    {item}
-                  </MenuItemOption>
-                )
-              )}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* KEV */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false}>
-          {kev !== 'all' && kev !== '' && <CheckMark />}
-          <MenuHeading title={'KEV'} />
-          <MenuList>
-            <MenuOptionGroup type='radio' value={kev} onChange={onFilterKev}>
-              {['all', 'yes', 'no'].map((item, index) => (
+              {[
+                'all',
+                'amqp-client',
+                'commons-text',
+                'guava',
+                'h2',
+                'http2-hpack',
+                'http2-server'
+              ].map((item, index) => (
                 <MenuItemOption
                   key={index}
                   value={item}
@@ -256,79 +135,133 @@ const VulnsFilters = ({ refetch }) => {
           </MenuList>
         </Menu>
       </Box>
-      {/* EPSS */}
+      {/* VERSIONS */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false} isOpen={isOpen} onClose={onClose}>
-          {epss !== '' && epss !== 'all' && <CheckMark />}
-          <MenuHeading title={'EPSS'} onClick={onOpen} />
-          <MenuList>
-            <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
+        <Menu closeOnSelect={false}>
+          {versions.length !== 0 && !versions.includes('all') && <CheckMark />}
+          <MenuHeading title={'Versions'} />
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
+            <MenuOptionGroup
+              type='checkbox'
+              value={versions}
+              onChange={onFilterVesion}
+            >
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {['0-0.1', '0.1-1', '1-10', '10-100'].map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                  {`${item} %`}
-                </MenuItemOption>
-              ))}
+              {data?.sbomVersions?.length > 0 &&
+                data?.sbomVersions.map((item, index) => (
+                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                    {item || 'Unversioned'}
+                  </MenuItemOption>
+                ))}
             </MenuOptionGroup>
-            <MenuDivider />
-            <Flex flexDirection={'column'} alignItems={'flex-start'}>
-              <Stack direction={'column'} alignItems={'center'} pl={8}>
-                <InputGroup size='sm'>
-                  <InputLeftAddon width={14}>Min</InputLeftAddon>
-                  <Input
-                    type='number'
-                    width={'64px'}
-                    id='minValue'
-                    name='minValue'
-                    value={minEpss}
-                    ref={minRef}
-                    onKeyDown={onMinKeyDown}
-                    onChange={(e) =>
-                      globalVulnDispatch({
-                        type: 'SET_MIN_EPSS',
-                        payload: e.target.value
-                      })
-                    }
-                  />
-                  <InputRightAddon>%</InputRightAddon>
-                </InputGroup>
-                <InputGroup size='sm'>
-                  <InputLeftAddon width={14}>Max</InputLeftAddon>
-                  <Input
-                    type='number'
-                    width={'64px'}
-                    id='maxValue'
-                    name='maxValue'
-                    value={maxEpss}
-                    ref={maxRef}
-                    onKeyDown={onMaxKeyDown}
-                    onChange={(e) =>
-                      globalVulnDispatch({
-                        type: 'SET_MAX_EPSS',
-                        payload: e.target.value
-                      })
-                    }
-                  />
-                  <InputRightAddon>%</InputRightAddon>
-                </InputGroup>
-              </Stack>
-              <Button
-                ml={8}
-                my={3}
-                size='sm'
-                onClick={handleSubmit}
-                isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}
-              >
-                Submit
-              </Button>
-            </Flex>
           </MenuList>
         </Menu>
       </Box>
+      {/* ENVIRONMENT */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={false}>
+          {envs.length !== 0 && !envs.includes('all') && <CheckMark />}
+          <MenuHeading title={'Environment'} />
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
+            <MenuOptionGroup
+              type='checkbox'
+              value={envs}
+              onChange={onFilterEnv}
+            >
+              <MenuItemOption
+                value={'all'}
+                fontSize={'sm'}
+                textTransform={'capitalize'}
+              >
+                all
+              </MenuItemOption>
+              {params?.name
+                ? envList.map((item, index) => (
+                    <MenuItemOption
+                      key={index}
+                      value={item.name}
+                      fontSize={'sm'}
+                      textTransform={'capitalize'}
+                    >
+                      {item.name}
+                    </MenuItemOption>
+                  ))
+                : ['default', 'development', 'production', 'others'].map(
+                    (item, index) => (
+                      <MenuItemOption
+                        key={index}
+                        value={item}
+                        fontSize={'sm'}
+                        textTransform={'capitalize'}
+                      >
+                        {item}
+                      </MenuItemOption>
+                    )
+                  )}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
+      {/* STATUSES */}
+      <Box width={'fit-content'} position={'relative'} hidden>
+        <Menu closeOnSelect={false}>
+          {statuses.length !== 0 && !statuses.includes('all') && <CheckMark />}
+          <MenuHeading title={'Status'} />
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
+            <MenuOptionGroup
+              type='checkbox'
+              value={statuses}
+              onChange={onFilterStatus}
+            >
+              {[
+                'all',
+                'Unspecified',
+                'In Triage',
+                'Not Affected',
+                'Affected',
+                'Fixed'
+              ].map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
+      {/* INCOMPLETE STATUS */}
+      <Flex align='center' gap={2}>
+        <Switch
+          id='incompleteStatus'
+          isChecked={vexComplete}
+          onChange={onFilterComplete}
+        />
+        <Text>Completed</Text>
+      </Flex>
     </Stack>
   )
 }
 
-export default VulnsFilters
+export default VulnFilters

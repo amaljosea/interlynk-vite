@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 
 import { Flex, Text } from '@chakra-ui/react'
@@ -8,6 +8,7 @@ import Card from 'components/Card/Card'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetGlobalVulnData, GetGlobalVulns } from 'graphQL/Queries'
 
@@ -21,25 +22,13 @@ const Vulnerabilities = () => {
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
   const org = localStorage.getItem('organization')
 
-  const { totalRows, globalVulnState, compVulnState, userPermissions } =
-    useGlobalState()
+  const { totalRows, compVulnState, userPermissions } = useGlobalState()
   const { vexComplete } = compVulnState
-  const {
-    field,
-    direction,
-    searchInput,
-    severities,
-    products,
-    statues,
-    kev,
-    epss
-  } = globalVulnState
 
-  const epssRange = epss !== 'all' && epss !== '' && epss?.split('-')
-  const range = {
-    min: parseFloat(epssRange[0]) / 100,
-    max: parseFloat(epssRange[1]) / 100
-  }
+  const [filters, setFilters] = useState({
+    field: 'VULNS_VULN_ID',
+    direction: 'DESC'
+  })
 
   const productPermissions = useMemo(
     () => userPermissions?.find((item) => item.key === 'view_product_group'),
@@ -50,23 +39,19 @@ const Vulnerabilities = () => {
     [userPermissions]
   )
 
-  const { data, refetch } = useQuery(GetGlobalVulns, {
-    skip:
-      productPermissions?.value === true && vulnsPermissions?.value === true
-        ? false
-        : true,
-    variables: {
-      first: totalRows,
-      field: field,
-      direction: direction,
-      search: searchInput !== '' ? searchInput : undefined,
-      projectGroupIds: products?.length === 0 ? undefined : products,
-      severity: severities?.length === 0 ? undefined : severities,
-      status: statues?.length === 0 ? undefined : statues,
-      kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
-      epss: epss === 'all' || epss === '' ? undefined : range
+  const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
+    GetGlobalVulns,
+    {
+      skip:
+        productPermissions?.value === true && vulnsPermissions?.value === true
+          ? false
+          : true,
+      selector: 'organization.vulns',
+      variables: {
+        ...filters
+      }
     }
-  })
+  )
 
   const { data: vulnData, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
     skip: vulnId ? false : true,
@@ -121,7 +106,16 @@ const Vulnerabilities = () => {
         {vulnsPermissions?.value === false ? (
           <Text>You are not allowed to access this data</Text>
         ) : (
-          <GlobalVulnTable data={data?.organization?.vulns} refetch={refetch} />
+          <GlobalVulnTable
+            loading={loading}
+            vulns={nodes}
+            paginationProps={paginationProps}
+            filters={filters}
+            setFilters={(newFilters) => {
+              setFilters(newFilters)
+              reset()
+            }}
+          />
         )}
       </Card>
     </Flex>

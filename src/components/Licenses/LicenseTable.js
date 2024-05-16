@@ -237,7 +237,6 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           customStyles={customStyles}
           defaultSortAsc={false}
           defaultSortFieldId={'UPDATED_AT'}
-          // progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           onSort={(column, sortDirection) => {
             setFilters((oldFilters) => ({

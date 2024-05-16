@@ -113,7 +113,6 @@ export default function HeaderLinks(props) {
         })
       )
     }
-
     localStorage.setItem('environment', value)
     setEnvName(value)
     setClearSelect(true)

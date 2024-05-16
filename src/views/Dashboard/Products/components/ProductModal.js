@@ -41,7 +41,7 @@ const ProductModal = ({ id, isOpen, onClose, product, description }) => {
   useEffect(() => {
     setProductName(product)
     setProductDesc(description)
-  }, [id])
+  }, [description, product])
 
   const updateProduct = async (e) => {
     e.preventDefault()

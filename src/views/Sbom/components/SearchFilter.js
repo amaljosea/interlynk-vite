@@ -20,7 +20,6 @@ const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress)
-
     return () => {
       window.removeEventListener('keydown', handleKeyPress)
     }

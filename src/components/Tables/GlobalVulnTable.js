@@ -1,22 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { refetchActiveQueries } from 'context/ApolloWrapper'
 import DataTable from 'react-data-table-component'
 import { Link, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
-import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
+import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  ExternalLinkIcon,
-  RepeatIcon
+  ExternalLinkIcon
 } from '@chakra-ui/icons'
 import {
   Badge,
   Divider,
   Flex,
   Icon,
-  IconButton,
   Stack,
   Tag,
   TagLabel,
@@ -27,60 +24,23 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import Round from 'components/Misc/Round'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import Pagination from '../Pagination'
 
-const GlobalVulnTable = ({ data, refetch }) => {
-  //This part is needed for the pagination to work. (Modify with caution)
-  const paginationSizes = [25, 50, 100]
-  const [totalRows, setTotalRows] = useState(paginationSizes[0])
-
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
+const GlobalVulnTable = ({
+  vulns,
+  loading,
+  paginationProps,
+  filters,
+  setFilters
+}) => {
+  const { field } = filters
   const { generateProductVulnerabilityDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const setPaginationControl = useCallback((data) => {
-    setIsPrevActive(data?.organization?.vulns?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data?.organization?.vulns?.pageInfo?.hasNextPage)
-  }, [])
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
-
-  useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
-    }
-  }, [data])
-
-  //end
-
   const params = useParams()
-  const projectGroupId = params.productgroupid
-  const projectId = params.productid
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
-
-  const { globalVulnState, dispatch } = useGlobalState()
-  const {
-    pageIndex,
-    field,
-    direction,
-    searchInput,
-    severities,
-    products,
-    statues,
-    kev,
-    epss
-  } = globalVulnState
-  const { globalVulnDispatch } = dispatch
-
-  const [filterText, setFilterText] = useState(searchInput)
 
   const cvssColor = (cvss) => {
     if (cvss >= 9.0) {
@@ -103,24 +63,6 @@ const GlobalVulnTable = ({ data, refetch }) => {
       return `https://nvd.nist.gov/vuln/detail/${id}`
     }
   }
-
-  const epssRange = epss !== 'all' && epss !== '' && epss?.split('-')
-  const range = useMemo(() => {
-    return {
-      min: parseFloat(epssRange[0]) / 100,
-      max: parseFloat(epssRange[1]) / 100
-    }
-  }, [epssRange])
-
-  const vulnData = useMemo(() => {
-    return {
-      projectGroupIds: products?.length === 0 ? undefined : products,
-      severity: severities?.length === 0 ? undefined : severities,
-      status: statues?.length === 0 ? undefined : statues,
-      kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
-      epss: epss === 'all' || epss === '' ? undefined : range
-    }
-  }, [epss, kev, products, range, severities, statues])
 
   // COLUMNS
   const columns = [
@@ -387,209 +329,21 @@ const GlobalVulnTable = ({ data, refetch }) => {
     }
   ]
 
-  // SEARCH COMPONENT
-  const handleSearch = useCallback(
-    async (event) => {
-      const { value } = event.target
-      if (event.key === 'Enter' && filterText !== '') {
-        refetch({
-          field,
-          direction,
-          search: value,
-          first: totalRows,
-          ...vulnData
-        }).then(
-          (res) =>
-            res?.data &&
-            globalVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-        )
-      }
-    },
-    [
-      direction,
-      field,
-      filterText,
-      globalVulnDispatch,
-      refetch,
-      totalRows,
-      vulnData
-    ]
-  )
-
-  // CLEAR SERACH
-  const handleClear = useCallback(async () => {
-    setFilterText('')
-    await refetch({
-      field,
-      direction,
-      search: undefined,
-      first: totalRows,
-      ...vulnData
-    }).then(
-      (res) => res?.data && globalVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-    )
-  }, [direction, field, globalVulnDispatch, refetch, totalRows, vulnData])
-
-  // CLEAR SERACH
-  const handleRefresh = useCallback(async () => {
-    await refetch({
-      field,
-      direction,
-      first: totalRows,
-      projectIds: projectId ? [projectId] : undefined,
-      projectGroupIds: projectGroupId ? [projectGroupId] : undefined
-    }).then(
-      (res) => res?.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-    )
-  }, [
-    projectGroupId,
-    direction,
-    field,
-    globalVulnDispatch,
-    projectId,
-    refetch,
-    totalRows
-  ])
-
-  // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = useCallback(
-    (e) => {
-      const { value } = e.target
-      if (value === '') {
-        handleClear()
-      } else {
-        setFilterText(value)
-      }
-    },
-    [handleClear]
-  )
-
   // HEADER
-  const subHeader = useMemo(() => {
-    return (
-      <Flex width={'100%'} alignItems={'center'} gap={3}>
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={4}
-          alignItems={'flex-start'}
-        >
-          <SearchFilter
-            id='globalVulns'
-            filterText={filterText}
-            onFilter={handleSearch}
-            onClear={handleClear}
-            onChange={onSearchInputChange}
-          />
-          <VulnsFilters refetch={refetch} />
-        </Stack>
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={2}
-          justifyContent={'flex-end'}
-        >
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={handleRefresh}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            />
-          </Tooltip>
-        </Stack>
-      </Flex>
-    )
-  }, [
-    filterText,
-    handleSearch,
-    handleClear,
-    onSearchInputChange,
-    refetch,
-    handleRefresh
-  ])
-
-  // ON PREV PAGE
-  const handlePreviousPage = async () => {
-    disablePaginationControl()
-    await refetch({
-      field,
-      direction,
-      first: undefined,
-      last: totalRows,
-      after: undefined,
-      before: data?.pageInfo?.startCursor,
-      search: searchInput !== '' ? searchInput : undefined,
-      ...vulnData
-    }).then((res) => {
-      if (res.data) {
-        const project = res?.data?.organization?.vulns
-        setPaginationControl(res?.data)
-        globalVulnDispatch({
-          type: 'DECREMENT_PAGE',
-          payload: project?.pageInfo?.startCursor
-        })
-      }
-    })
-  }
-
-  // ON NEXT PAGE
-  const handleNextPage = async () => {
-    disablePaginationControl()
-    await refetch({
-      field,
-      direction,
-      first: totalRows,
-      last: undefined,
-      after: data?.pageInfo?.endCursor,
-      before: undefined,
-      search: searchInput !== '' ? searchInput : undefined,
-      ...vulnData
-    }).then((res) => {
-      if (res.data) {
-        const project = res?.data?.organization?.vulns
-        setPaginationControl(res?.data)
-        globalVulnDispatch({
-          type: 'INCREMENT_PAGE',
-          payload: {
-            total: project?.totalCount,
-            after: project?.pageInfo?.endCursor
-          }
-        })
-      }
-    })
-  }
-
-  // ON SET ROW
-  const handleSetRow = async (e) => {
-    const { value } = e.target
-    setTotalRows(Number(value))
-    disablePaginationControl()
-    await refetch({
-      field,
-      direction,
-      first: Number(value),
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      search: searchInput !== '' ? searchInput : undefined,
-      ...vulnData
-    }).then((res) => {
-      if (res?.data) {
-        setPaginationControl(res?.data)
-        globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      }
-    })
-  }
+  const subHeaderComponent = (
+    <SubHeader
+      handleRefresh={() => refetchActiveQueries()}
+      setFilters={setFilters}
+    />
+  )
 
   // SORTING
-  const handleSort = async (column, sortDirection) => {
-    globalVulnDispatch({
-      type: 'SET_SORT_ORDER',
-      payload: {
-        field: column.id,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-      }
-    })
+  const handleSort = (column, sortDirection) => {
+    setFilters((oldFilters) => ({
+      ...oldFilters,
+      field: column?.id,
+      direction: sortDirection.toUpperCase()
+    }))
   }
 
   return (
@@ -598,33 +352,18 @@ const GlobalVulnTable = ({ data, refetch }) => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          keyField='PUBLISHED'
-          data={data?.nodes || []}
+          data={vulns}
           onSort={handleSort}
           defaultSortFieldId={field}
-          defaultSortAsc={false}
           customStyles={customStyles}
-          progressPending={data ? false : true}
+          progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader
-          subHeaderComponent={subHeader}
+          subHeaderComponent={subHeaderComponent}
           responsive
           persistTableHead
         />
-
-        {data && (
-          <Pagination
-            paginationSizes={paginationSizes}
-            pageIndex={pageIndex}
-            totalRows={totalRows}
-            totalCount={data.totalCount}
-            onPreviousPage={handlePreviousPage}
-            onNextPage={handleNextPage}
-            onSetRow={handleSetRow}
-            hasNextPage={isNextActive}
-            hasPreviousPage={isPrevActive}
-          />
-        )}
+        <Pagination {...paginationProps} />
       </Flex>
     </>
   )

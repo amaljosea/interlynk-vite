@@ -5,21 +5,25 @@ import { useState } from 'react'
 const PAGINATION_SIZES = [25, 50, 100]
 const DEFAULT_PAGINATION_SIZE = PAGINATION_SIZES[0]
 
-export const usePaginatatedQuery = (QUERY, { selector, variables = {} }) => {
+export const usePaginatatedQuery = (
+  QUERY,
+  { skip, selector, variables = {} }
+) => {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(DEFAULT_PAGINATION_SIZE)
 
   const DEFAULT_PAGINATION_VARIABLES = {
-    after: null,
-    before: null,
+    after: undefined,
+    before: undefined,
     first: pageSize,
-    last: null
+    last: undefined
   }
 
   const [paginationVariables, setPaginationVariables] = useState(
     DEFAULT_PAGINATION_VARIABLES
   )
   const { data, loading, previousData } = useQuery(QUERY, {
+    skip: skip,
     variables: {
       ...variables,
       ...paginationVariables
@@ -33,9 +37,9 @@ export const usePaginatatedQuery = (QUERY, { selector, variables = {} }) => {
   const onPreviousPage = () => {
     setPage(page - 1)
     setPaginationVariables({
-      after: null,
+      after: undefined,
       before: startCursor,
-      first: null,
+      first: undefined,
       last: pageSize
     })
   }
@@ -44,9 +48,9 @@ export const usePaginatatedQuery = (QUERY, { selector, variables = {} }) => {
     setPage(page + 1)
     setPaginationVariables({
       after: endCursor,
-      before: null,
+      before: undefined,
       first: pageSize,
-      last: null
+      last: undefined
     })
   }
 
