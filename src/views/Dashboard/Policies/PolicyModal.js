@@ -627,7 +627,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                             label={getLabel(item?.subject)}
                             placement='top'
                           >
-                            {getIcon(item.subject)}
+                            <Box>{getIcon(item.subject)}</Box>
                           </Tooltip>
                         </Box>
                         {/* SUBJECT */}
