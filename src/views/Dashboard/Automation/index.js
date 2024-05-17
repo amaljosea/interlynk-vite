@@ -336,7 +336,7 @@ const Automation = () => {
                     setActiveRow(row)
                     onDeleteOpen()
                   }}
-                  isDisabled={!editAutomations}
+                  isDisabled={!editAutomations || row?.isSystem}
                 >
                   Archive Rule
                 </MenuItem>

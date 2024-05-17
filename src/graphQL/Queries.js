@@ -2411,12 +2411,14 @@ export const GetProjectCheck = gql`
           name
           projectId
           updatedAt
+          isSystem
           automationActions {
             id
             field
             subject
             value
             automationRuleId
+            operator
           }
           automationConditions {
             automationRuleId

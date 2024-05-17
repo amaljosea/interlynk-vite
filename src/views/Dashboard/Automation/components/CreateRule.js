@@ -76,12 +76,15 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
       value: '',
       subject: '',
       status: 'CREATED',
+      operator: 'set',
       field: ''
     }
   ])
   const [deletedCondition, setDeletedCondition] = useState([])
   const [deleteAction, setDeleteAction] = useState('')
   const [isDisabled, setIsDisabled] = useState(false)
+
+  const isSystem = actions?.some((item) => item?.operator === 'copy')
 
   const disableButtonTemporarily = () => {
     setIsDisabled(true)
@@ -207,6 +210,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
           id: newId,
           value: '',
           subject: isComponent ? 'component' : 'version',
+          operator: 'set',
           status: 'CREATED',
           field: ''
         }
@@ -425,6 +429,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
           id: item?.id,
           status: 'ADDED',
           field: item?.field,
+          operator: item?.operator,
           value: item?.value,
           subject: item?.subject
         })
@@ -445,7 +450,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Create Rule</ModalHeader>
+        <ModalHeader>{data ? 'Update' : 'Create'} Rule</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Flex flexDir={'column'} alignItems={'flex-start'} gap={4}>
@@ -462,9 +467,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
             </FormControl>
             {/* CONDITIONS */}
             <FormControl>
-              <FormLabel htmlFor='conditions'>
-                When the following conditions are met :
-              </FormLabel>
+              <FormLabel htmlFor='conditions'>Conditions</FormLabel>
               {conditions?.length > 0 &&
                 conditions?.map((item, index) => (
                   <Flex
@@ -489,9 +492,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                         fontSize='sm'
                         onBlurCapture={() => onSubjectBlur(item)}
                         textTransform={'capitalize'}
-                        // pointerEvents={
-                        //   conditions?.length - 1 === index ? 'auto' : 'none'
-                        // }
+                        pointerEvents={isSystem ? 'none' : 'auto'}
                       >
                         {conditions?.length > 1 &&
                         conditions?.some(
@@ -535,6 +536,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                         placeholder='-- Operator --'
                         onBlur={() => onOperatorBlur(item)}
                         textTransform={'capitalize'}
+                        pointerEvents={isSystem ? 'none' : 'auto'}
                       >
                         {item?.list?.map((option) => (
                           <option
@@ -588,13 +590,14 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
               fontWeight={'medium'}
               leftIcon={<FaPlus />}
               onClick={onAddCondtion}
+              isDisabled={isSystem}
             >
               Add condition
             </Button>
             <Divider />
             {/* ACTIONS */}
             <FormControl>
-              <FormLabel htmlFor='actions'>Then set actions :</FormLabel>
+              <FormLabel htmlFor='actions'>Actions</FormLabel>
               {actions?.length > 0 &&
                 actions?.map((item, index) => (
                   <Flex
@@ -605,6 +608,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                     alignItems={'flex-start'}
                     justifyContent={'space-bewteen'}
                   >
+                    {/* SUBJECT */}
                     <FormControl as={Flex} alignItems='center'>
                       <Select
                         value={item?.field}
@@ -617,6 +621,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                         isDisabled={
                           conditionErrorMessage || conditions?.length === 0
                         }
+                        pointerEvents={isSystem ? 'none' : 'auto'}
                       >
                         {conditions?.some(
                           (item) => item?.category === 'component'
@@ -637,6 +642,17 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                               ))}
                       </Select>
                     </FormControl>
+                    {/* OPERATOR */}
+                    <Input
+                      width='130px'
+                      fontSize={'sm'}
+                      textTransform={'capitalize'}
+                      defaultValue={item?.operator}
+                      pointerEvents={'none'}
+                      isDisabled={
+                        conditionErrorMessage || conditions?.length === 0
+                      }
+                    />
                     {/* VALUE */}
                     <FormControl as={Flex} alignItems='center' gap={4}>
                       <Input
@@ -644,6 +660,9 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                         fontSize='sm'
                         placeholder={'Add value'}
                         value={item.value}
+                        pointerEvents={
+                          item?.operator === 'copy' ? 'none' : 'auto'
+                        }
                         onChange={(e) =>
                           onActionChange(e.target.value, item.id, 'value')
                         }
@@ -663,9 +682,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                             cursor={'pointer'}
                             onClick={() => onDeleteAction(item)}
                             display={
-                              conditionErrorMessage ||
-                              actionErrorMessage ||
-                              conditions?.length === 0
+                              conditionErrorMessage || conditions?.length === 0
                                 ? 'none'
                                 : 'flex'
                             }
@@ -683,6 +700,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
               fontWeight={'medium'}
               leftIcon={<FaPlus />}
               onClick={onAddAction}
+              isDisabled={isSystem}
             >
               Add action
             </Button>
@@ -703,7 +721,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
           </Button>
           <Button
             colorScheme='blue'
-            isDisabled={submitError}
+            isDisabled={submitError || isSystem}
             onClick={data ? handleRuleUpdate : handleRuleCreate}
           >
             {data ? 'Update' : 'Create'}
