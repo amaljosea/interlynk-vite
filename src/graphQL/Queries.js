@@ -3564,6 +3564,8 @@ export const GetPolicies = gql`
         operator
         resultType
         updatedAt
+        excludeInternalComponent
+        excludePrimaryComponent
         policyRules {
           id
           operator

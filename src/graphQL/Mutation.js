@@ -2108,6 +2108,8 @@ export const PolicyCreate = gql`
     $isEnabled: Boolean
     $operator: PolicyOperatorEnum!
     $resultType: PolicyResultTypeEnum!
+    $excludeInternalComponent: Boolean
+    $excludePrimaryComponent: Boolean
     $policyRulesAttributes: [PolicyPolicyRuleInput!]
   ) {
     policyCreate(
@@ -2117,6 +2119,8 @@ export const PolicyCreate = gql`
         isEnabled: $isEnabled
         operator: $operator
         resultType: $resultType
+        excludeInternalComponent: $excludeInternalComponent
+        excludePrimaryComponent: $excludePrimaryComponent
         policyRulesAttributes: $policyRulesAttributes
       }
     ) {
@@ -2147,6 +2151,8 @@ export const PolicyUpdate = gql`
     $isEnabled: Boolean
     $operator: PolicyOperatorEnum
     $resultType: PolicyResultTypeEnum
+    $excludeInternalComponent: Boolean
+    $excludePrimaryComponent: Boolean
     $policyRulesAttributes: [PolicyPolicyRuleInput!]
   ) {
     policyUpdate(
@@ -2157,6 +2163,8 @@ export const PolicyUpdate = gql`
         isEnabled: $isEnabled
         operator: $operator
         resultType: $resultType
+        excludeInternalComponent: $excludeInternalComponent
+        excludePrimaryComponent: $excludePrimaryComponent
         policyRulesAttributes: $policyRulesAttributes
       }
     ) {

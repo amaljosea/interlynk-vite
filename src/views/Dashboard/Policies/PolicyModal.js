@@ -39,8 +39,8 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
 
-import { FaTrash } from 'react-icons/fa'
-import { FaPlus } from 'react-icons/fa6'
+import { FaBalanceScale, FaBox, FaBug, FaCube, FaTrash } from 'react-icons/fa'
+import { FaCubes, FaPlus } from 'react-icons/fa'
 
 const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
   const { totalRows, policyState } = useGlobalState()
@@ -292,6 +292,8 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
         name,
         desc,
         isEnabled: true,
+        excludeInternalComponent: isInternal,
+        excludePrimaryComponent: isPrimary,
         operator: operator === '' ? undefined : operator,
         resultType: resultType === '' ? undefined : resultType,
         policyRulesAttributes: rules?.length > 0 ? rules : undefined
@@ -361,6 +363,8 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
           name,
           desc,
           isEnabled: data?.isEnabled,
+          excludeInternalComponent: isInternal,
+          excludePrimaryComponent: isPrimary,
           operator: operator === '' ? undefined : operator,
           resultType: resultType === '' ? undefined : resultType,
           policyRulesAttributes: prevRules
@@ -456,12 +460,12 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
     ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()
 
   const getIcon = (subject) => {
-    if (subject.startsWith('VULNERABILITY')) return <Text>🐞</Text>
-    if (subject.startsWith('LICENSE')) return <Text>🔑</Text>
-    if (subject.startsWith('COMPONENT')) return <Text>⚙️</Text>
+    if (subject.startsWith('VULNERABILITY')) return FaBug
+    if (subject.startsWith('LICENSE')) return FaBalanceScale
+    if (subject.startsWith('COMPONENT')) return FaCube
     if (subject.startsWith('SBOM') || subject.startsWith('VERSION'))
-      return <Text>🗃️</Text>
-    return null
+      return FaCubes
+    return FaBox
   }
 
   const getLabel = (subject) => {
@@ -475,8 +479,11 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
 
   useEffect(() => {
     if (data && plSubjects) {
+      console.log(data)
       setName(data?.name || '')
       setDesc(data?.description || '')
+      setIsInternal(data?.excludeInternalComponent)
+      setIsPrimary(data?.excludePrimaryComponent)
       setOperator(
         data?.operator === 'any' ? 'ANY' : data?.operator === 'all' ? 'ALL' : ''
       )
@@ -561,7 +568,9 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                 <Grid width={'100%'} templateColumns='repeat(2, 1fr)' gap={6}>
                   <GridItem>
                     <FormControl isRequired>
-                      <FormLabel htmlFor='policyResult'>Result</FormLabel>
+                      <FormLabel htmlFor='policyResult'>
+                        Policy Result
+                      </FormLabel>
                       <Select
                         id='policyResult'
                         name='policyResult'
@@ -585,7 +594,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                   </GridItem>
                   <GridItem>
                     <FormControl isRequired>
-                      <FormLabel htmlFor='policyType'>Type</FormLabel>
+                      <FormLabel htmlFor='policyType'>On Conditions</FormLabel>
                       <Select
                         id='policyType'
                         name='policyType'
@@ -627,7 +636,12 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                             label={getLabel(item?.subject)}
                             placement='top'
                           >
-                            <Box>{getIcon(item.subject)}</Box>
+                            <Box>
+                              <Icon
+                                color='blue.500'
+                                as={getIcon(item.subject)}
+                              />
+                            </Box>
                           </Tooltip>
                         </Box>
                         {/* SUBJECT */}
@@ -667,13 +681,13 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                             fontSize='sm'
                             placeholder='-- Select Opeator --'
                             onBlur={() => onOperatorBlur(item)}
-                            textTransform={'capitalize'}
+                            textTransform={'lowercase'}
                           >
                             {item?.list?.map((option) => (
                               <option
                                 value={option}
                                 key={option}
-                                style={{ textTransform: 'capitalize' }}
+                                style={{ textTransform: 'lowercase' }}
                               >
                                 {updatedValue(option)}
                               </option>
@@ -1052,16 +1066,16 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                   </FormLabel>
                   <Stack spacing={5} direction='row' mt={3}>
                     <Checkbox
-                      checked={isPrimary}
+                      isChecked={isPrimary}
                       onChange={(e) => setIsPrimary(e.target.checked)}
                     >
                       <Text fontSize={'sm'}>Primary Component</Text>
                     </Checkbox>
                     <Checkbox
-                      checked={isInternal}
+                      isChecked={isInternal}
                       onChange={(e) => setIsInternal(e.target.checked)}
                     >
-                      <Text fontSize={'sm'}>Internal Component</Text>
+                      <Text fontSize={'sm'}>Internal Components</Text>
                     </Checkbox>
                   </Stack>
                 </FormControl>
