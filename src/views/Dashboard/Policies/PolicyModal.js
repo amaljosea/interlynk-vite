@@ -35,15 +35,11 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import { PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
 
 import { FaPlus, FaTrash } from 'react-icons/fa'
 
 const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
-  const { totalRows, policyState } = useGlobalState()
-  const { searchInput } = policyState
   const [name, setName] = useState('')
   const [desc, setDesc] = useState('')
   const [operator, setOperator] = useState('')
@@ -103,12 +99,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
   }, {})
 
   const handleRefetch = () => {
-    refetch({
-      variables: {
-        search: searchInput === '' ? undefined : searchInput,
-        first: totalRows
-      }
-    })
+    refetch()
   }
 
   const onNameChange = (e) => {

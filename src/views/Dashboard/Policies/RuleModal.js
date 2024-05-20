@@ -25,15 +25,11 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import { CreatePolicyRule, UpdatePolicyRule } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
 
 const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
   const toast = useToast()
-  const { totalRows, policyState } = useGlobalState()
-  const { searchInput } = policyState
 
   const [operator, setOperator] = useState('')
   const [subject, setSubject] = useState('')
@@ -56,12 +52,7 @@ const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
   const [onUpdateRule] = useMutation(UpdatePolicyRule)
 
   const handleRefetch = () => {
-    refetch({
-      variables: {
-        search: searchInput === '' ? undefined : searchInput,
-        first: totalRows
-      }
-    })
+    refetch()
   }
 
   const isInvalid =

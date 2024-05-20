@@ -1,5 +1,4 @@
 import { useMutation } from '@apollo/client'
-import { useParams } from 'react-router-dom'
 
 import {
   Button,
@@ -17,17 +16,11 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import { PolicyUpdate } from 'graphQL/Mutation'
 
 const WarnModal = ({ isOpen, onClose, data, refetch }) => {
   const toast = useToast()
-  const params = useParams()
-  const productId = params.productid
   const { id, isEnabled } = data
-  const { totalRows, policyState } = useGlobalState()
-  const { searchInput } = policyState
   const [updatePolicy] = useMutation(PolicyUpdate)
 
   const toggleStatus = async () => {
@@ -43,13 +36,7 @@ const WarnModal = ({ isOpen, onClose, data, refetch }) => {
           duration: 2000
         })
       } else {
-        refetch({
-          variables: {
-            projectId: productId || undefined,
-            search: productId || searchInput === '' ? undefined : searchInput,
-            first: totalRows
-          }
-        })
+        refetch()
         onClose()
       }
     })

@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import {
@@ -46,29 +46,21 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
 
 import { FaEllipsisV, FaPlus } from 'react-icons/fa'
 
-const PolicyTable = ({ data, refetch }) => {
+const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
   const toast = useToast()
   const location = useLocation()
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const { totalRows, policyState, dispatch } = useGlobalState()
-  const { pageIndex, searchInput } = policyState
-  const { policyDispatch } = dispatch
   const activeTab = Number(localStorage.getItem('activeProdTab'))
 
-  const paginationSizes = [25, 50, 100]
   const [activeRow, setActiveRow] = useState(null)
   const [activeRule, setActiveRule] = useState(null)
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
 
   const { data: subOperators } = useQuery(PolicySubjectOperators, {
     skip:
@@ -89,22 +81,6 @@ const PolicyTable = ({ data, refetch }) => {
   const [createExclusion] = useMutation(PolicyExclusionCreate)
   const [deleteExclusion] = useMutation(DeletePolicyExclusion)
 
-  const policyData = {
-    projectId: productId || undefined,
-    search: productId || searchInput === '' ? undefined : searchInput,
-    first: totalRows
-  }
-
-  const setPaginationControl = (data) => {
-    setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data?.pageInfo?.hasNextPage)
-  }
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
-
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
     isOpen: isWarningOpen,
@@ -122,22 +98,9 @@ const PolicyTable = ({ data, refetch }) => {
     onClose: onRuleClose
   } = useDisclosure()
 
-  const handleRefresh = useCallback(async () => {
-    disablePaginationControl()
-    await refetch({
-      variables: {
-        projectId: productId || undefined,
-        search: productId || searchInput === '' ? undefined : searchInput,
-        first: totalRows
-      }
-    }).then(
-      (res) => res?.data && policyDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-    )
-  }, [policyDispatch, productId, refetch, searchInput, totalRows])
-
-  const handlePreviousPage = () => {}
-  const handleNextPage = () => {}
-  const handleSetRow = () => {}
+  const handleRefresh = useCallback(() => {
+    refetch()
+  }, [refetch])
 
   const handleCreateExclusion = async (id) => {
     await createExclusion({
@@ -152,7 +115,7 @@ const PolicyTable = ({ data, refetch }) => {
           duration: 2000
         })
       } else {
-        refetch({ variables: { ...policyData } })
+        handleRefresh()
       }
     })
   }
@@ -170,7 +133,7 @@ const PolicyTable = ({ data, refetch }) => {
           duration: 2000
         })
       } else {
-        refetch({ variables: { ...policyData } })
+        handleRefresh
       }
     })
   }
@@ -452,6 +415,7 @@ const PolicyTable = ({ data, refetch }) => {
                       <Text
                         fontSize={'sm'}
                         wordBreak={'break-all'}
+                        textTransform={'capitalize'}
                         hidden={
                           item?.operator === 'EXISTS' ||
                           item?.operator === 'NOT_EXISTS'
@@ -524,21 +488,14 @@ const PolicyTable = ({ data, refetch }) => {
     )
   }
 
-  useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
-    }
-  }, [data])
-
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data?.nodes || []}
+          data={data || []}
           customStyles={customStyles}
-          progressPending={data ? false : true}
+          progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
@@ -551,19 +508,7 @@ const PolicyTable = ({ data, refetch }) => {
         />
 
         {/* PAGINATION */}
-        {data?.pageInfo && (
-          <Pagination
-            paginationSizes={paginationSizes}
-            pageIndex={pageIndex}
-            totalRows={totalRows}
-            totalCount={data?.totalCount}
-            onPreviousPage={handlePreviousPage}
-            onNextPage={handleNextPage}
-            onSetRow={handleSetRow}
-            hasNextPage={isNextActive}
-            hasPreviousPage={isPrevActive}
-          />
-        )}
+        {<Pagination {...paginationProps} />}
       </Flex>
 
       {isOpen && (
