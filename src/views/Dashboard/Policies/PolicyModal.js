@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { updatedValue } from 'utils'
+import { getIcon, getLabel, updatedValue } from 'utils'
 
 import {
   Alert,
@@ -39,8 +39,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
 
-import { FaBalanceScale, FaBox, FaBug, FaCube, FaTrash } from 'react-icons/fa'
-import { FaCubes, FaPlus } from 'react-icons/fa'
+import { FaPlus, FaTrash } from 'react-icons/fa'
 
 const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
   const { totalRows, policyState } = useGlobalState()
@@ -190,11 +189,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
         if (field === 'subject' && value !== '') {
           const result = plSubjects?.find((item) => item?.subject === value)
           return { ...item, [field]: value, list: result?.operators }
-        } else if (
-          field === 'operator' &&
-          (value === 'EXISTS' || value === 'NOT_EXISTS')
-        ) {
-          return { ...item, [field]: value, value: 'Defined' }
         } else if (
           field === 'operator' &&
           (value === 'MORE_THAN' || value === 'LESS_THAN')
@@ -441,7 +435,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
       if (
         subject === '' ||
         operator === '' ||
-        value === '' ||
+        (operator !== 'exists' && operator !== 'not_exists' && value === '') ||
         min === '' ||
         max === '' ||
         subError !== '' ||
@@ -458,24 +452,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
 
   const blockInvalidChar = (e) =>
     ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()
-
-  const getIcon = (subject) => {
-    if (subject.startsWith('VULNERABILITY')) return FaBug
-    if (subject.startsWith('LICENSE')) return FaBalanceScale
-    if (subject.startsWith('COMPONENT')) return FaCube
-    if (subject.startsWith('SBOM') || subject.startsWith('VERSION'))
-      return FaCubes
-    return FaBox
-  }
-
-  const getLabel = (subject) => {
-    if (subject.startsWith('VULNERABILITY')) return 'Vulnerability'
-    if (subject.startsWith('LICENSE')) return 'License'
-    if (subject.startsWith('COMPONENT')) return 'Component'
-    if (subject.startsWith('SBOM') || subject.startsWith('VERSION'))
-      return 'SBOM'
-    return null
-  }
 
   useEffect(() => {
     if (data && plSubjects) {
@@ -576,10 +552,9 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                         name='policyResult'
                         value={resultType}
                         onChange={onResultChange}
-                        textTransform={'capitalize'}
+                        placeholder={'-- select --'}
                         fontSize='sm'
                       >
-                        <option value=''>-- Select --</option>
                         {['INFORM', 'WARN', 'FAIL'].map((item, index) => (
                           <option
                             key={index}
@@ -600,10 +575,9 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                         name='policyType'
                         value={operator}
                         onChange={onOperatorChange}
-                        textTransform={'capitalize'}
+                        placeholder={'-- select --'}
                         fontSize='sm'
                       >
-                        <option value=''>-- Select --</option>
                         {['ANY', 'ALL'].map((item, index) => (
                           <option
                             key={index}
@@ -652,10 +626,9 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                               handleChange(e.target.value, item.id, 'subject')
                             }
                             onBlur={() => onSubjectBlur(item)}
-                            placeholder='-- Select Subject --'
+                            placeholder='-- subject --'
                             fontSize='sm'
                             onBlurCapture={() => onSubjectBlur(item)}
-                            textTransform={'capitalize'}
                           >
                             {categories.map((category) => (
                               <optgroup key={category} label={category}>
@@ -679,7 +652,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                               handleChange(e.target.value, item.id, 'operator')
                             }
                             fontSize='sm'
-                            placeholder='-- Select Opeator --'
+                            placeholder='-- operator --'
                             onBlur={() => onOperatorBlur(item)}
                             textTransform={'lowercase'}
                           >
@@ -717,7 +690,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                                   item?.operator === 'NOT_EXISTS'
                                 }
                               >
-                                <option value=''>-- Select --</option>
+                                <option value=''>-- select --</option>
                                 {[
                                   'critical',
                                   'high',
@@ -748,7 +721,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                                 }
                                 textTransform={'capitalize'}
                               >
-                                <option value=''>-- Select --</option>
+                                <option value=''>-- select --</option>
                                 {[true, false].map((item, index) => (
                                   <option
                                     key={index}
@@ -777,7 +750,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                                   item?.operator === 'NOT_EXISTS'
                                 }
                               >
-                                <option value=''>-- Select --</option>
+                                <option value=''>-- select --</option>
                                 {[
                                   'In Triage',
                                   'Not Affected',
@@ -814,7 +787,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                                   textTransform={'capitalize'}
                                   fontSize='sm'
                                 >
-                                  <option value=''>-- Select --</option>
+                                  <option value=''>-- select --</option>
                                   {['complete', 'incomplete'].map(
                                     (item, index) => (
                                       <option
@@ -848,7 +821,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                                   textTransform={'capitalize'}
                                   fontSize='sm'
                                 >
-                                  <option value=''>-- Select --</option>
+                                  <option value=''>-- select --</option>
                                   {[
                                     'application',
                                     'framework',
