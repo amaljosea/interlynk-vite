@@ -1,5 +1,5 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useLazyQuery, useMutation } from '@apollo/client'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
@@ -38,8 +38,10 @@ import CustomLoader from 'components/CustomLoader'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ToolsDrawer from 'components/Drawer/ToolsDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
+import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { sbomDelete } from 'graphQL/Mutation'
@@ -55,8 +57,6 @@ import {
   FaEllipsisVertical,
   FaScrewdriverWrench
 } from 'react-icons/fa6'
-
-import Pagination from '../Pagination'
 
 const VersionsTable = ({ projectGroup }) => {
   const navigate = useNavigate()
@@ -74,116 +74,35 @@ const VersionsTable = ({ projectGroup }) => {
     dispatch
   } = useGlobalState()
   const { searchInput } = versionState
-  const { prodVulnDispatch, prodCompDispatch, versionDispatch } = dispatch
+  const { prodVulnDispatch, prodCompDispatch } = dispatch
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
-  const paginationSizes = [25, 50, 100]
-  const [totalRows, setTotalRows] = useState(paginationSizes[0])
   const [filterText, setFilterText] = useState(searchInput)
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [activeRow, setActiveRow] = useState(null)
 
-  const versionData = useMemo(() => {
-    return {
-      id: productId,
-      field: versionState?.field,
-      direction: versionState?.direction
-    }
-  }, [productId, versionState?.direction, versionState?.field])
+  const [filters, setFilters] = useState({
+    field: 'SBOMS_CREATED_AT',
+    direction: 'DESC'
+  })
 
   const [getAlternatives, { data: sbomAlts }] = useLazyQuery(
     signedUrlParams ? GetShareSbomAlternatives : GetSbomAlternatives
   )
 
-  const { data, refetch, error } = useQuery(
+  const { nodes, paginationProps, loading, refetch } = usePaginatatedQuery(
     signedUrlParams ? ShareVersionTable : GetVersionsTable,
     {
       skip: activeProdTab === 0 && !isToolOpen ? false : true,
+      selector: signedUrlParams
+        ? 'shareLynkQuery.project.sbomVersions'
+        : 'project.sbomVersions',
       variables: {
-        ...versionData,
-        first: totalRows,
-        last: undefined,
-        search: searchInput !== '' ? searchInput : undefined
+        id: productId,
+        ...filters
       },
       onCompleted: () => setClearSelect(false)
     }
-  )
-
-  const versions = signedUrlParams
-    ? data?.shareLynkQuery?.project?.sbomVersions
-    : data?.project?.sbomVersions
-
-  //This part is needed for the pagination to work. (Modify with caution)
-
-  useEffect(() => {
-    if (versions) {
-      setIsPrevActive(versions?.pageInfo?.hasPreviousPage)
-      setIsNextActive(versions?.pageInfo?.hasNextPage)
-    }
-  }, [versions])
-
-  const setPaginationControl = (data) => {
-    setIsPrevActive(data.project?.sbomVersions?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data.project?.sbomVersions?.pageInfo?.hasNextPage)
-  }
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
-  //end
-
-  const handleNextPage = useCallback(async () => {
-    disablePaginationControl()
-    setCurrentPage(currentPage + 1)
-    await refetch({
-      ...versionData,
-      first: totalRows,
-      last: undefined,
-      after: versions?.pageInfo?.endCursor,
-      before: undefined
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-      }
-    })
-  }, [currentPage, refetch, versionData, totalRows, versions])
-
-  const handlePreviousPage = useCallback(async () => {
-    disablePaginationControl()
-    setCurrentPage(currentPage - 1)
-    await refetch({
-      ...versionData,
-      first: undefined,
-      last: totalRows,
-      after: undefined,
-      before: versions?.pageInfo?.startCursor
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-      }
-    })
-  }, [currentPage, refetch, versionData, totalRows, versions])
-
-  const handleSetRow = useCallback(
-    async (e) => {
-      const newTotalRows = Number(e.target.value)
-      setCurrentPage(1)
-      setTotalRows(newTotalRows)
-      disablePaginationControl()
-      await refetch({
-        ...versionData,
-        first: newTotalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined
-      }).then((res) => {
-        if (res.data) {
-          setPaginationControl(res.data)
-        }
-      })
-    },
-    [refetch, versionData]
   )
 
   const sbom = userPermissions?.find((item) => item.key === 'view_sbom')
@@ -195,10 +114,6 @@ const VersionsTable = ({ projectGroup }) => {
     (permission) =>
       permission.key === 'archive_sbom' && permission.value === true
   )
-
-  const [isLoading, setIsLoading] = useState(false)
-  const [activeRow, setActiveRow] = useState(null)
-  const [currentPage, setCurrentPage] = useState(1)
 
   const [deleteSbom] = useMutation(sbomDelete)
 
@@ -223,7 +138,7 @@ const VersionsTable = ({ projectGroup }) => {
     onClose: onSbomClose
   } = useDisclosure()
 
-  const onFilterSev = async (id, version, value) => {
+  const onFilterSev = async (value) => {
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
     prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
   }
@@ -331,7 +246,7 @@ const VersionsTable = ({ projectGroup }) => {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
       selector: (row) => {
-        const { stats, id, projectVersion } = row
+        const { stats, id } = row
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           sbomid: id,
           paramsObj: {
@@ -340,42 +255,27 @@ const VersionsTable = ({ projectGroup }) => {
         })
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
-            <Link
-              to={link}
-              onClick={() => onFilterSev(id, projectVersion, ['critical'])}
-            >
+            <Link to={link} onClick={() => onFilterSev(['critical'])}>
               <VulnBadge color='red' label='Critical'>
                 {stats?.vulnStats?.critical || 0}
               </VulnBadge>
             </Link>
-            <Link
-              to={link}
-              onClick={() => onFilterSev(id, projectVersion, ['high'])}
-            >
+            <Link to={link} onClick={() => onFilterSev(['high'])}>
               <VulnBadge color='orange' label='High'>
                 {stats?.vulnStats?.high || 0}
               </VulnBadge>
             </Link>
-            <Link
-              to={link}
-              onClick={() => onFilterSev(id, projectVersion, ['medium'])}
-            >
+            <Link to={link} onClick={() => onFilterSev(['medium'])}>
               <VulnBadge color='yellow' label='Medium'>
                 {stats?.vulnStats?.medium || 0}
               </VulnBadge>
             </Link>
-            <Link
-              to={link}
-              onClick={() => onFilterSev(id, projectVersion, ['low'])}
-            >
+            <Link to={link} onClick={() => onFilterSev(['low'])}>
               <VulnBadge color='green' label='Low'>
                 {stats?.vulnStats?.low || 0}
               </VulnBadge>
             </Link>
-            <Link
-              to={link}
-              onClick={() => onFilterSev(id, projectVersion, ['unknown'])}
-            >
+            <Link to={link} onClick={() => onFilterSev(['unknown'])}>
               <VulnBadge color='gray' label='Unknown'>
                 {stats?.vulnStats?.unknown || 0}
               </VulnBadge>
@@ -499,20 +399,8 @@ const VersionsTable = ({ projectGroup }) => {
 
   // REFRESH PRODUCTS
   const handleRefresh = useCallback(async () => {
-    disablePaginationControl()
-    setCurrentPage(1)
-    await refetch({
-      id: productId,
-      first: totalRows,
-      after: undefined,
-      before: undefined,
-      last: undefined
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-      }
-    })
-  }, [productId, refetch, totalRows])
+    refetch()
+  }, [refetch])
 
   const onBuildSbom = useCallback(() => {
     prodCompDispatch({ type: 'CLEAR_LICENSES' })
@@ -523,20 +411,21 @@ const VersionsTable = ({ projectGroup }) => {
     setSelectedSbom(state?.selectedRows)
   }
 
+  const setSearchFilter = (value) => {
+    setFilters((oldFilter) => ({
+      ...oldFilter,
+      search: value
+    }))
+  }
+
   // CLEAR SERACH
   const handleClear = useCallback(async () => {
     setFilterText('')
-    await refetch({
-      ...versionData,
-      first: totalRows,
-      search: undefined,
-      last: undefined,
-      after: undefined,
-      before: undefined
-    }).then(
-      (res) => res?.data && versionDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-    )
-  }, [refetch, totalRows, versionData, versionDispatch])
+    setFilters((oldFilter) => ({
+      ...oldFilter,
+      search: undefined
+    }))
+  }, [])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -552,25 +441,15 @@ const VersionsTable = ({ projectGroup }) => {
   )
 
   // SEARCH COMPONENT
-  const handleSearch = useCallback(
-    async (event) => {
-      const { value } = event.target
-      if (event.key === 'Enter' && filterText !== '') {
-        refetch({
-          ...versionData,
-          search: value,
-          first: totalRows,
-          after: undefined,
-          before: undefined
-        }).then(
-          (res) =>
-            res?.data &&
-            versionDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-        )
-      }
-    },
-    [filterText, refetch, totalRows, versionData, versionDispatch]
-  )
+  const handleSearch = useCallback((event) => {
+    const {
+      key,
+      target: { value }
+    } = event
+    if (key === 'Enter') {
+      setSearchFilter(value)
+    }
+  }, [])
 
   const subHeaderComponent = useMemo(() => {
     return (
@@ -646,26 +525,12 @@ const VersionsTable = ({ projectGroup }) => {
     handleRefresh
   ])
 
-  const handleSort = async (column, sortDirection) => {
-    await refetch({
-      id: productId,
-      first: undefined,
-      last: totalRows,
-      after: undefined,
-      before: undefined,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-    }).then((res) => {
-      if (res.data) {
-        versionDispatch({
-          type: 'SET_SORT_ORDER',
-          payload: {
-            field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-          }
-        })
-      }
-    })
+  const handleSort = (column, sortDirection) => {
+    setFilters((oldFilters) => ({
+      ...oldFilters,
+      field: column?.id,
+      direction: sortDirection.toUpperCase()
+    }))
   }
 
   const disableRowCheckBox = (row) => {
@@ -677,14 +542,14 @@ const VersionsTable = ({ projectGroup }) => {
 
   const dataTableProps = {
     columns: columns,
-    data: versions?.nodes || [],
+    data: nodes || [],
     customStyles: customStyles,
     onSort: handleSort,
     defaultSortFieldId: versionState?.field,
     defaultSortAsc: false,
     subHeader: true,
     subHeaderComponent: subHeaderComponent,
-    progressPending: !versions,
+    progressPending: loading,
     progressComponent: <CustomLoader />,
     responsive: true,
     persistTableHead: true,
@@ -694,30 +559,11 @@ const VersionsTable = ({ projectGroup }) => {
     selectableRowDisabled: disableRowCheckBox
   }
 
-  if (error)
-    return (
-      <Text textAlign={'center'} my={2}>
-        Something went wrong
-      </Text>
-    )
-
   return (
     <>
       <Flex flexDir={'column'} width={'100%'} className='version_table'>
         <DataTable {...dataTableProps} />
-        {versions?.pageInfo && (
-          <Pagination
-            paginationSizes={paginationSizes}
-            pageIndex={currentPage}
-            totalRows={totalRows}
-            totalCount={versions.totalCount}
-            onPreviousPage={handlePreviousPage}
-            onNextPage={handleNextPage}
-            onSetRow={handleSetRow}
-            hasNextPage={isNextActive}
-            hasPreviousPage={isPrevActive}
-          />
-        )}
+        {!loading && <Pagination {...paginationProps} />}
       </Flex>
 
       {/* DELETE VERSION */}
@@ -770,12 +616,12 @@ const VersionsTable = ({ projectGroup }) => {
       )}
 
       {/* SBOM LIST */}
-      {isListOpen && versions && (
+      {isListOpen && nodes && (
         <SbomList
           data={
             signedUrlParams ? sbomAlts?.shareLynkQuery?.sbom : sbomAlts?.sbom
           }
-          sboms={versions}
+          sboms={nodes}
           isOpen={isListOpen}
           onClose={onListClose}
         />
