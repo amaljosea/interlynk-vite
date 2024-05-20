@@ -1035,8 +1035,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
       </Flex>
 
       {/* PAGINATION */}
-      {!loading && <Pagination {...paginationProps} />}
-
+      <Pagination {...paginationProps} />
       {isLinkOpen && (
         <VulnLinkDrawer
           data={activeRow}

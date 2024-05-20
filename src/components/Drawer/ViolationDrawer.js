@@ -162,7 +162,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
               />
             </Box>
             <Box bg='white' hidden={category === 'version'}>
-              {!loading && <Pagination {...paginationProps} />}
+              <Pagination {...paginationProps} />
             </Box>
           </Flex>
         </DrawerBody>

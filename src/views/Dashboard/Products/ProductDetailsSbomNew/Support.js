@@ -358,7 +358,7 @@ const Support = () => {
         />
 
         {/* PAGINATION */}
-        {!loading && <Pagination {...paginationProps} />}
+        <Pagination {...paginationProps} />
       </Flex>
 
       {isOpen && (

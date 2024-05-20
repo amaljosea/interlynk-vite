@@ -476,8 +476,7 @@ const Changelog = () => {
           subHeaderComponent={subHeaderComponentMemo}
           responsive={true}
         />
-        {/* PAGINATION */}
-        {!loading && <Pagination {...paginationProps} />}
+        <Pagination {...paginationProps} />
       </Flex>
 
       {isOpen && (

@@ -563,7 +563,7 @@ const VersionsTable = ({ projectGroup }) => {
     <>
       <Flex flexDir={'column'} width={'100%'} className='version_table'>
         <DataTable {...dataTableProps} />
-        {!loading && <Pagination {...paginationProps} />}
+        <Pagination {...paginationProps} />
       </Flex>
 
       {/* DELETE VERSION */}

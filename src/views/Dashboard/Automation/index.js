@@ -382,7 +382,7 @@ const Automation = () => {
             subHeaderComponent={subHeaderComponent}
           />
 
-          {!loading && <Pagination {...paginationProps} />}
+          <Pagination {...paginationProps} />
         </Flex>
       </CardBody>
 

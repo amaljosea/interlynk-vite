@@ -193,7 +193,7 @@ const Licenses = () => {
           expandableRowsComponent={ExpandedRow}
         />
         {/* PAGINATION */}
-        {!loading && <Pagination {...paginationProps} />}
+        <Pagination {...paginationProps} />
       </Flex>
     </>
   )

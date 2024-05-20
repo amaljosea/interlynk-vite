@@ -713,7 +713,7 @@ const Checks = () => {
           responsive={true}
         />
         {/* PAGINATION */}
-        {!loading && <Pagination {...paginationProps} />}
+        <Pagination {...paginationProps} />
       </Flex>
 
       {/* ACTIONS */}
