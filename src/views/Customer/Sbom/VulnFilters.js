@@ -22,13 +22,12 @@ import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const VulnFilters = () => {
+const VulnFilters = ({ reset }) => {
   const { prodVulnState, dispatch } = useGlobalState()
   const {
     severities,
     components,
     statues,
-    source,
     include,
     kev,
     epss,
@@ -36,7 +35,6 @@ const VulnFilters = () => {
     minEpss,
     maxEpss,
     direct,
-    retracted,
     vexComplete
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
@@ -61,158 +59,164 @@ const VulnFilters = () => {
     }
   }
 
-  const onFilterOrigin = (e) => {
-    prodVulnDispatch({ type: 'FILTER_SOURCE', payload: e.target.checked })
-  }
-
-  const onFilterRetracted = (e) => {
-    prodVulnDispatch({ type: 'FILTER_RETRACTED', payload: e.target.checked })
-  }
-
   const onFilterCompName = (value) => {
     prodVulnDispatch({ type: 'FILTER_COMPONENT', payload: value })
+    reset()
   }
 
   const onFilterSeverity = (value) => {
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+    reset()
   }
 
   const onFilterStatus = (value) => {
     prodVulnDispatch({ type: 'FILTER_STATUS', payload: value })
+    reset()
   }
 
   const onFilterComplete = (value) => {
     prodVulnDispatch({ type: 'FILTER_COMPLETE', payload: value })
+    reset()
   }
 
   const onFilterKev = (value) => {
     prodVulnDispatch({ type: 'FILTER_KEV', payload: value })
+    reset()
   }
 
   const onFilterEpss = (value) => {
     prodVulnDispatch({ type: 'FILTER_EPSS', payload: value })
+    reset()
   }
 
   const onFilterDirect = (value) => {
     prodVulnDispatch({ type: 'FILTER_DIRECT', payload: value })
+    reset()
   }
 
   const onFilterInclude = (value) => {
-    console.log('value', value)
     prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: value })
+    reset()
   }
 
   const handleSubmit = () => {
     prodVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` })
+    reset()
     onClose()
   }
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* COMPONENT */}
-      <Menu closeOnSelect={false}>
-        <MenuHeading title={'Component'} />
-        <MenuList
-          minH={'auto'}
-          maxH={'400px'}
-          overflow={'hidden'}
-          overflowY={'scroll'}
-        >
-          <MenuOptionGroup
-            title='Dependency'
-            type='radio'
-            value={direct}
-            onChange={onFilterDirect}
-            textAlign={'left'}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={false}>
+          {(direct !== 'all' || components?.length > 0) && <CheckMark />}
+          <MenuHeading title={'Component'} />
+          <MenuList
+            minH={'auto'}
+            maxH={'400px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
           >
-            {['all', 'direct only'].map((item, index) => (
-              <MenuItemOption
-                key={index}
-                value={item}
-                textTransform={'capitalize'}
-                fontSize={'sm'}
-              >
-                {item}
-              </MenuItemOption>
-            ))}
-          </MenuOptionGroup>
-          <MenuDivider />
-          <MenuOptionGroup
-            title='Name'
-            type='checkbox'
-            textAlign={'left'}
-            value={components}
-            onChange={onFilterCompName}
-            fontSize='sm'
-          >
-            {vulnCompNames?.map((item, index) => (
-              <MenuItemOption
-                key={index}
-                value={item}
-                fontSize={'sm'}
-                textTransform={'capitalize'}
-              >
-                {item}
-              </MenuItemOption>
-            ))}
-          </MenuOptionGroup>
-        </MenuList>
-      </Menu>
+            <MenuOptionGroup
+              title='Dependency'
+              type='radio'
+              value={direct}
+              onChange={onFilterDirect}
+              textAlign={'left'}
+            >
+              {['all', 'direct only'].map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  textTransform={'capitalize'}
+                  fontSize={'sm'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+            <MenuDivider />
+            <MenuOptionGroup
+              title='Name'
+              type='checkbox'
+              textAlign={'left'}
+              value={components}
+              onChange={onFilterCompName}
+              fontSize='sm'
+            >
+              {vulnCompNames?.map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
       {/* STATUS */}
-      <Menu closeOnSelect={false}>
-        <MenuHeading title={'Status'} />
-        <MenuList
-          minH={'auto'}
-          maxH={'400px'}
-          overflow={'hidden'}
-          overflowY={'scroll'}
-        >
-          <MenuOptionGroup
-            title='Completeness'
-            value={vexComplete}
-            onChange={onFilterComplete}
-            type='radio'
-            textAlign={'left'}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={false}>
+          {(vexComplete !== 'all' || statues?.length > 0) && <CheckMark />}
+          <MenuHeading title={'Status'} />
+          <MenuList
+            minH={'auto'}
+            maxH={'400px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
           >
-            {['all', 'incomplete only'].map((item, index) => (
-              <MenuItemOption
-                key={index}
-                value={item}
-                textTransform={'capitalize'}
-                fontSize={'sm'}
-              >
-                {item}
-              </MenuItemOption>
-            ))}
-          </MenuOptionGroup>
-          <MenuDivider />
-          <MenuOptionGroup
-            title='Values'
-            type='checkbox'
-            textAlign={'left'}
-            value={statues}
-            onChange={onFilterStatus}
-            fontSize={'sm'}
-          >
-            {[
-              'Unspecified',
-              'In Triage',
-              'Not Affected',
-              'Affected',
-              'Fixed'
-            ].map((item, index) => (
-              <MenuItemOption
-                key={index}
-                value={item}
-                fontSize={'sm'}
-                textTransform={'capitalize'}
-              >
-                {item}
-              </MenuItemOption>
-            ))}
-          </MenuOptionGroup>
-        </MenuList>
-      </Menu>
+            <MenuOptionGroup
+              title='Completeness'
+              value={vexComplete}
+              onChange={onFilterComplete}
+              type='radio'
+              textAlign={'left'}
+            >
+              {['all', 'incomplete only'].map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  textTransform={'capitalize'}
+                  fontSize={'sm'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+            <MenuDivider />
+            <MenuOptionGroup
+              title='Values'
+              type='checkbox'
+              textAlign={'left'}
+              value={statues}
+              onChange={onFilterStatus}
+              fontSize={'sm'}
+            >
+              {[
+                'Unspecified',
+                'In Triage',
+                'Not Affected',
+                'Affected',
+                'Fixed'
+              ].map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
