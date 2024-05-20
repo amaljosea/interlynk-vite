@@ -433,6 +433,13 @@ function ComponentDrawer(props) {
     onInfoOpen()
   }
 
+  const isInvalid =
+    compKind === '' ||
+    compName === '' ||
+    compVersion === '' ||
+    !isValid ||
+    disabled
+
   useEffect(() => {
     getAllComps({
       variables: {
@@ -800,13 +807,7 @@ function ComponentDrawer(props) {
                 <Button
                   colorScheme='blue'
                   onClick={handleCreateCom}
-                  isDisabled={
-                    compKind === '' ||
-                    compName === '' ||
-                    compVersion === '' ||
-                    !isValid ||
-                    disabled
-                  }
+                  isDisabled={isInvalid}
                 >
                   Save
                 </Button>
@@ -814,7 +815,7 @@ function ComponentDrawer(props) {
                 <Button
                   colorScheme='blue'
                   onClick={handleUpdateCom}
-                  isDisabled={!compKind || !isValid || disabled}
+                  isDisabled={isInvalid}
                 >
                   Update
                 </Button>
