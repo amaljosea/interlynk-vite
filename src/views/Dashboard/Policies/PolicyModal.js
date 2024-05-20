@@ -426,7 +426,7 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
       if (
         subject === '' ||
         operator === '' ||
-        (operator !== 'exists' && operator !== 'not_exists' && value === '') ||
+        (operator !== 'EXISTS' && operator !== 'NOT_EXISTS' && value === '') ||
         min === '' ||
         max === '' ||
         subError !== '' ||
@@ -974,7 +974,9 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                             item?.subject !== 'VULNERABILITY_EPSS' &&
                             item?.subject !== 'VULNERABILITY_STATUS' &&
                             item?.subject !== 'VULNERABILITY_KEV' &&
-                            item?.subject !== 'VULNERABILITY_STATUS_AGE' && (
+                            item?.subject !== 'VULNERABILITY_STATUS_AGE' &&
+                            item?.operator !== 'EXISTS' &&
+                            item?.operator !== 'NOT_EXISTS' && (
                               <Input
                                 type={'text'}
                                 fontSize='sm'
@@ -982,10 +984,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                                 value={item?.value}
                                 onChange={(e) =>
                                   handleChange(e.target.value, item.id, 'value')
-                                }
-                                hidden={
-                                  item?.operator === 'EXISTS' ||
-                                  item?.operator === 'NOT_EXISTS'
                                 }
                               />
                             )}
