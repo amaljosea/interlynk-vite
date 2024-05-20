@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import {
   Box,
   Menu,
@@ -12,31 +14,39 @@ import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const LogFilters = () => {
-  const { sbomLogState, dispatch } = useGlobalState()
-  const { filters, users, objects, types } = sbomLogState
+const LogFilters = ({ setLogState }) => {
+  const { sbomLogState } = useGlobalState()
+  const { filters } = sbomLogState
   const { logChangeBys, logChangeObjects, logChangeTypes } = filters || ''
-  const { sbomLogDispatch } = dispatch
 
+  const [users, setUser] = useState([])
   const onFilterChangeBy = (value) => {
-    sbomLogDispatch({
-      type: 'FILTER_USER',
-      payload: value.includes('all') ? [] : value
-    })
+    const filterValue = value?.includes('all') ? undefined : value
+    setUser(value?.includes('all') ? [] : value)
+    setLogState((oldFilters) => ({
+      ...oldFilters,
+      changedBy: filterValue
+    }))
   }
 
+  const [objects, setObjects] = useState([])
   const onFilterChangeObj = (value) => {
-    sbomLogDispatch({
-      type: 'FILTER_OBJECT',
-      payload: value
-    })
+    const filterValue = value?.includes('all') ? undefined : value
+    setObjects(value?.includes('all') ? [] : value)
+    setLogState((oldFilters) => ({
+      ...oldFilters,
+      changeObject: filterValue
+    }))
   }
 
+  const [types, setTypes] = useState([])
   const onFilterChangeType = (value) => {
-    sbomLogDispatch({
-      type: 'FILTER_TYPE',
-      payload: value
-    })
+    const filterValue = value?.includes('all') ? undefined : value
+    setTypes(value?.includes('all') ? [] : value)
+    setLogState((oldFilters) => ({
+      ...oldFilters,
+      changeType: filterValue
+    }))
   }
 
   return (

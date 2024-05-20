@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
@@ -18,15 +18,14 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
-import { GetSbomLogFilters } from 'graphQL/Queries'
-import { GetChangeLogs } from 'graphQL/Queries'
+import { GetChangeLogs, GetSbomLogFilters } from 'graphQL/Queries'
 
 import LogFilters from './LogFilters'
 
@@ -57,40 +56,32 @@ const Changelog = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { totalRows, setTotalRows, sbomLogState, dispatch } = useGlobalState()
-  const {
-    filters,
-    field,
-    direction,
-    pageIndex,
-    searchInput,
-    users,
-    objects,
-    types
-  } = sbomLogState
+  const { sbomLogState, dispatch } = useGlobalState()
+  const { filters, searchInput } = sbomLogState
   const { sbomLogDispatch } = dispatch
 
-  const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
-    value.includes(allValue) || value.length === 0 ? undefined : value
-
-  // GET CHANGE LOG DATA
-  const { data, refetch, error } = useQuery(GetChangeLogs, {
-    skip: activeTab === 'changelog' ? false : true,
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      search: searchInput !== '' ? searchInput : undefined,
-      changedBy: getUndefinedIfEmptyOrAll(users),
-      changeObject: getUndefinedIfEmptyOrAll(objects),
-      changeType: getUndefinedIfEmptyOrAll(types),
-      field,
-      direction
-    }
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [activeRow, setActiveRow] = useState('')
+  const [logSearch, setLogSearch] = useState(searchInput)
+  const [logState, setLogState] = useState({
+    field: 'ACTIVITY_LOGS_CREATED_AT',
+    direction: 'DESC'
   })
 
-  const { activityLogs } = data?.sbom || ''
+  const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
+    GetChangeLogs,
+    {
+      skip: activeTab === 'changelog' ? false : true,
+      selector: 'sbom.activityLogs',
+      variables: {
+        sbomId: sbomId,
+        projectId: productId,
+        ...logState
+      }
+    }
+  )
+
+  const { field } = paginationProps
 
   // GET SBOM CHANGELOG FILTER HEADS
   useQuery(GetSbomLogFilters, {
@@ -105,36 +96,6 @@ const Changelog = () => {
         payload: data?.sbom?.activityLogFilters
       })
   })
-
-  //This part is needed for the pagination to work. (Modify with caution)
-  const paginationSizes = [25, 50, 100]
-
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
-  const [activeRow, setActiveRow] = useState('')
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
-
-  useEffect(() => {
-    if (activityLogs) {
-      setIsPrevActive(activityLogs?.pageInfo?.hasPreviousPage)
-      setIsNextActive(activityLogs?.pageInfo?.hasNextPage)
-    }
-  }, [activityLogs])
-
-  const setPaginationControl = (data) => {
-    setIsPrevActive(data?.sbom?.activityLogs?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data?.sbom?.activityLogs?.pageInfo?.hasNextPage)
-  }
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
-
-  //end
-
-  const [logSearch, setLogSearch] = useState(searchInput)
 
   // COLUMNS
   const columns = [
@@ -409,69 +370,21 @@ const Changelog = () => {
     }
   ]
 
-  const handlePreviousPage = async () => {
-    disablePaginationControl()
-    await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: undefined,
-      last: totalRows,
-      after: undefined,
-      before: activityLogs?.pageInfo?.startCursor,
-      field: field,
-      direction: direction
-    }).then(
-      (res) =>
-        res?.data &&
-        sbomLogDispatch({
-          type: 'DECREMENT_PAGE',
-          payload: data?.pageInfo?.startCursor
-        })
-    )
-  }
-
-  const handleNextPage = async () => {
-    disablePaginationControl()
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: activityLogs?.pageInfo?.endCursor,
-      before: undefined,
-      field: field,
-      direction: direction
-    }).then(
-      (res) =>
-        res?.data &&
-        sbomLogDispatch({
-          type: 'INCREMENT_PAGE',
-          payload: {
-            total: activityLogs?.totalCount,
-            after: activityLogs?.pageInfo?.endCursor
-          }
-        })
-    )
+  const setSearchFilter = (value) => {
+    setLogState((oldFilter) => ({
+      ...oldFilter,
+      search: value
+    }))
   }
 
   // CLEAR SERACH
   const handleClear = useCallback(async () => {
-    disablePaginationControl()
     setLogSearch('')
-    await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      search: undefined,
-      first: totalRows
-    }).then((res) => {
-      if (res?.data) {
-        setPaginationControl(res?.data)
-        sbomLogDispatch({
-          type: 'CLEAR_SEARCH_INPUT'
-        })
-      }
-    })
-  }, [productId, refetch, sbomId, sbomLogDispatch, totalRows])
+    setLogState((oldFilter) => ({
+      ...oldFilter,
+      search: undefined
+    }))
+  }, [])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -487,74 +400,22 @@ const Changelog = () => {
   )
 
   // SEARCH COMPONENT
-  const handleSearch = useCallback(
-    async (event) => {
-      disablePaginationControl()
-      const { value } = event.target
-      if (event.key === 'Enter' && logSearch !== '') {
-        await refetch({
-          projectId: productId,
-          sbomId: sbomId,
-          search: value,
-          first: totalRows,
-          last: undefined,
-          after: undefined,
-          before: undefined
-        }).then((res) => {
-          if (res.data) {
-            setPaginationControl(res?.data)
-            sbomLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-          }
-        })
-      }
-    },
-    [logSearch, productId, refetch, sbomId, sbomLogDispatch, totalRows]
-  )
-
-  // SET ROW LENGTH
-  const handleSetRow = async (e) => {
-    disablePaginationControl()
-
-    setTotalRows(Number(e.target.value))
-    await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: Number(e.target.value),
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      field: field,
-      direction: direction
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res?.data)
-        sbomLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      }
-    })
-  }
+  const handleSearch = useCallback(async (event) => {
+    const {
+      key,
+      target: { value }
+    } = event
+    if (key === 'Enter') {
+      setSearchFilter(value)
+    }
+  }, [])
 
   const handleSort = async (column, sortDirection) => {
-    disablePaginationControl()
-
-    await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res?.data)
-        sbomLogDispatch({
-          type: 'SET_SORT_ORDER',
-          payload: {
-            field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-          }
-        })
-      }
-    })
+    setLogState((oldFilters) => ({
+      ...oldFilters,
+      field: column?.id,
+      direction: sortDirection.toUpperCase()
+    }))
   }
 
   const subHeaderComponentMemo = useMemo(() => {
@@ -578,60 +439,46 @@ const Changelog = () => {
             onClear={handleClear}
           />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && <LogFilters />}
+          {filters && <LogFilters setLogState={setLogState} />}
         </Stack>
         <Tooltip label='Refresh'>
           <IconButton
-            onClick={handleClear}
+            onClick={() => refetch()}
             colorScheme='blue'
             icon={<RepeatIcon />}
           />
         </Tooltip>
       </Flex>
     )
-  }, [logSearch, onSearchInputChange, handleSearch, handleClear, filters])
-
-  if (error) {
-    return (
-      <Card>
-        <Text>Something went wrong</Text>
-      </Card>
-    )
-  }
+  }, [
+    logSearch,
+    onSearchInputChange,
+    handleSearch,
+    handleClear,
+    filters,
+    refetch
+  ])
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'} position={'relative'}>
         <DataTable
           columns={columns}
-          data={activityLogs?.nodes}
+          data={nodes}
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={field}
           customStyles={customStyles}
-          progressPending={activityLogs ? false : true}
+          progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader
           persistTableHead
           subHeaderComponent={subHeaderComponentMemo}
           responsive={true}
         />
+        {/* PAGINATION */}
+        {!loading && <Pagination {...paginationProps} />}
       </Flex>
-
-      {/* PAGINATION */}
-      {activityLogs && (
-        <Pagination
-          paginationSizes={paginationSizes}
-          pageIndex={pageIndex}
-          totalRows={totalRows}
-          totalCount={activityLogs?.totalCount}
-          onPreviousPage={handlePreviousPage}
-          onNextPage={handleNextPage}
-          onSetRow={handleSetRow}
-          hasNextPage={isNextActive}
-          hasPreviousPage={isPrevActive}
-        />
-      )}
 
       {isOpen && (
         <PurlCard value={activeRow} isOpen={isOpen} onClose={onClose} />
