@@ -16,7 +16,7 @@ import {
   FormErrorMessage,
   FormLabel,
   HStack,
-  IconButton,
+  Icon,
   Input,
   Modal,
   ModalBody,
@@ -393,75 +393,69 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
                     </Checkbox>
                   </FormControl>
                 </HStack>
-                {data ? (
-                  <FormControl isRequired mt={1}>
-                    <FormLabel>PURL / CPE</FormLabel>
-                    <Input
-                      type='text'
-                      value={idUri}
-                      onChange={(e) => {
-                        setIdUri(e.target.value)
-                        setError('')
-                      }}
-                      onBlur={onUriBlur}
-                    />
-                  </FormControl>
-                ) : (
-                  <Stack>
-                    <Flex
-                      width={'100%'}
-                      my={2}
-                      justifyContent={'space-between'}
-                      alignItems={'center'}
-                    >
-                      <FormControl isRequired>
-                        <FormLabel>IDs</FormLabel>
-                      </FormControl>
-                      <IconButton
-                        size='xs'
-                        colorScheme='blue'
-                        icon={<FaPlus />}
-                        onClick={addRow}
-                        isDisabled={error !== ''}
+                <Stack alignItems={'flex-start'} gap={2}>
+                  <FormControl isRequired>
+                    <FormLabel>IDs</FormLabel>
+                    {data ? (
+                      <Input
+                        type='text'
+                        value={idUri}
+                        onChange={(e) => {
+                          setIdUri(e.target.value)
+                          setError('')
+                        }}
+                        onBlur={onUriBlur}
                       />
-                    </Flex>
-                    {IDs?.length > 0 &&
-                      IDs?.map((item) => (
-                        <Flex
-                          key={item?.id}
-                          width={'100%'}
-                          gap={4}
-                          justifyContent={'space-between'}
-                          alignItems={'flex-start'}
-                        >
-                          <FormControl>
-                            <Input
-                              fontSize={'sm'}
-                              placeholder='Enter PURL / CPE'
-                              type='text'
-                              alue={item?.value}
-                              onChange={(e) =>
-                                handleIdChange(e.target.value, item.id)
-                              }
-                              onBlur={() => onIdBlur(item)}
-                            />
-                            {item?.error !== '' && (
-                              <Text mt={1} color={'red.500'} fontSize={'sm'}>
-                                {item?.error}
-                              </Text>
-                            )}
-                          </FormControl>
-                          <IconButton
-                            ml={'auto'}
-                            size='xs'
-                            colorScheme='red'
-                            icon={<FaTrash />}
-                            onClick={() => deleteRow(item?.id)}
-                          />
-                        </Flex>
-                      ))}
-                  </Stack>
-                )}
+                    ) : (
+                      <Flex flexDirection={'column'} gap={2}>
+                        {IDs?.length > 0 &&
+                          IDs?.map((item) => (
+                            <Flex
+                              key={item?.id}
+                              width={'100%'}
+                              gap={4}
+                              justifyContent={'space-between'}
+                              alignItems={'center'}
+                            >
+                              <Input
+                                fontSize={'sm'}
+                                placeholder='Enter PURL / CPE'
+                                type='text'
+                                alue={item?.value}
+                                onChange={(e) =>
+                                  handleIdChange(e.target.value, item.id)
+                                }
+                                onBlur={() => onIdBlur(item)}
+                              />
+                              {item?.error !== '' && (
+                                <Text mt={1} color={'red.500'} fontSize={'sm'}>
+                                  {item?.error}
+                                </Text>
+                              )}
+                              <Icon
+                                as={FaTrash}
+                                color={'red.500'}
+                                cursor={'pointer'}
+                                onClick={() => deleteRow(item?.id)}
+                              />
+                            </Flex>
+                          ))}
+                      </Flex>
+                    )}
+                  </FormControl>
+                  <Button
+                    fontSize={'sm'}
+                    colorScheme='blue'
+                    variant='link'
+                    fontWeight={'medium'}
+                    leftIcon={<FaPlus />}
+                    onClick={addRow}
+                    isDisabled={error !== ''}
+                    hidden={data}
+                  >
+                    Add ID
+                  </Button>
+                </Stack>
                 {error !== '' && (
                   <Alert status='error' borderRadius={4}>
                     <AlertIcon />
