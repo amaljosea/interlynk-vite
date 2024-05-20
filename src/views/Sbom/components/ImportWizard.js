@@ -26,7 +26,7 @@ const ImportWizard = ({
   const [compVexImport] = useMutation(ComponentVulnVexImport)
 
   const { prodVulnState, dispatch } = useGlobalState()
-  const { totalVulns, field, direction, selectedVulns } = prodVulnState
+  const { selectedVulns } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
   const { nextStep, prevStep, activeStep } = useSteps({ initialStep: 0 })
@@ -38,19 +38,9 @@ const ImportWizard = ({
   const [selectedVersion, setSelectedVersion] = useState('')
   const [uniqVersions, setUniqVersions] = useState([])
 
-  const refetchCurrentVuln = async () => {
-    await refetch({
-      projectId: currentProductId,
-      sbomId: currentSbomId,
-      first: totalVulns,
-      last: undefined,
-      field: field,
-      direction: direction
-    }).then((res) => {
-      if (res.data) {
-        onClose()
-      }
-    })
+  const refetchCurrentVuln = () => {
+    refetch()
+    onClose()
   }
 
   const handleSubmit = () => {

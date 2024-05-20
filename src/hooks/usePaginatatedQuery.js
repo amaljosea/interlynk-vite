@@ -22,7 +22,7 @@ export const usePaginatatedQuery = (
   const [paginationVariables, setPaginationVariables] = useState(
     DEFAULT_PAGINATION_VARIABLES
   )
-  const { data, loading, previousData } = useQuery(QUERY, {
+  const { data, loading, previousData, refetch } = useQuery(QUERY, {
     skip: skip,
     variables: {
       ...variables,
@@ -71,6 +71,7 @@ export const usePaginatatedQuery = (
       setPaginationVariables(DEFAULT_PAGINATION_VARIABLES)
       setPage(1)
     },
+    refetch: () => refetch(),
     paginationProps: {
       paginationHidden: !resource,
       paginationSizes: PAGINATION_SIZES,

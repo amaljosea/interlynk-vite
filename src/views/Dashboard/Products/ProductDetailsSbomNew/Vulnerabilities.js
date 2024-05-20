@@ -3,9 +3,13 @@ import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
-import { getFullDateAndTime, sevColor, timeSince } from 'utils'
-import { customStyles } from 'utils'
-import { linkURl } from 'utils'
+import {
+  customStyles,
+  getFullDateAndTime,
+  linkURl,
+  sevColor,
+  timeSince
+} from 'utils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -47,7 +51,6 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import CvssCard from 'components/Misc/CvssCard'
@@ -55,13 +58,17 @@ import Pagination from 'components/Pagination'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { ManualVulnScan } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
+  GetCdxResponses,
   GetVulnData,
   GetVulnFilterData,
-  ShareVulnFilters
+  ShareVulnFilters,
+  getVexJustifications,
+  getVexStatuses
 } from 'graphQL/Queries'
 
 import { BsCircleHalf } from 'react-icons/bs'
@@ -92,7 +99,15 @@ const statusColor = (status) => {
   }
 }
 
-const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
+const ExpandedComponent = ({
+  data,
+  setActiveRow,
+  onCvssOpen,
+  textColor,
+  allVexStatus,
+  allVexJustify,
+  allCdx
+}) => {
   const { vuln } = data
   const CustomText = styled(Text)`
     font-size: 13px;
@@ -210,7 +225,14 @@ const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
         </GridItem>
         {/* STATUS UPDATE */}
         <GridItem w='90%' ml={'auto'} colSpan={3}>
-          {data && <VexStatusComponent data={data} />}
+          {data && (
+            <VexStatusComponent
+              data={data}
+              allVexStatus={allVexStatus}
+              allVexJustify={allVexJustify}
+              allCdx={allCdx}
+            />
+          )}
         </GridItem>
       </Grid>
     </Box>
@@ -227,23 +249,19 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   const activeTab = queryParams.get('tab')
   const customerView = location.pathname.startsWith('/customer')
 
-  const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } =
+  const { userPermissions, totalRows, prodVulnState, dispatch } =
     useGlobalState()
   const {
-    pageIndex,
     field,
-    direction,
     searchInput,
     severities,
     components,
     statues,
-    source,
     include,
     kev,
     epss,
     filters,
     direct,
-    retracted,
     vexComplete
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
@@ -266,38 +284,47 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     max: parseFloat(vulnEpss[1]) / 100
   }
 
-  // GET VULN DATA
-  const { data, refetch, error } = useQuery(GetVulnData, {
-    skip:
-      sbomId &&
-      vulnsPermissions?.value === true &&
-      activeTab === 'vulnerabilities'
-        ? false
-        : true,
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      search: vulnSearch !== '' ? vulnSearch : undefined,
-      severity: severities.length > 0 ? severities : undefined,
-      source: include.includes('parts') ? undefined : 'COMPONENT',
-      componentName: components.length > 0 ? components : undefined,
-      status: statues.length > 0 ? statues : undefined,
-      kev:
-        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
-      epss: epss !== '' && epss !== 'all' ? range : undefined,
-      direct: direct === 'direct only' ? true : undefined,
-      includeRetracted: include.includes('retracted') ? true : false,
-      vexComplete: vexComplete === 'all' ? undefined : false,
-      field: prodVulnState.field,
-      direction: prodVulnState.direction
-    }
-  })
+  const { data: allVexStatus } = useQuery(getVexStatuses)
+  const { data: allVexJustify } = useQuery(getVexJustifications)
+  const { data: allCdx } = useQuery(GetCdxResponses)
 
-  const { vulns } = data?.sbom || ''
+  const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
+    GetVulnData,
+    {
+      skip:
+        sbomId &&
+        vulnsPermissions?.value === true &&
+        activeTab === 'vulnerabilities'
+          ? false
+          : true,
+      selector: 'sbom.vulns',
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        search: searchInput !== '' ? searchInput : undefined,
+        severity: severities.length > 0 ? severities : undefined,
+        source: include.includes('parts') ? undefined : 'COMPONENT',
+        componentName: components.length > 0 ? components : undefined,
+        status: statues.length > 0 ? statues : undefined,
+        kev:
+          kev === 'all' || kev === ''
+            ? undefined
+            : kev === 'yes'
+              ? true
+              : false,
+        epss: epss !== '' && epss !== 'all' ? range : undefined,
+        direct: direct === 'direct only' ? true : undefined,
+        includeRetracted: include.includes('retracted') ? true : false,
+        vexComplete: vexComplete === 'all' ? undefined : false,
+        field: prodVulnState.field,
+        direction: prodVulnState.direction
+      }
+    }
+  )
 
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const firstDegreePart = vulns?.nodes?.filter(
+  const firstDegreePart = nodes?.filter(
     (item) => item.isFirstDegreePart === true
   )
   const componentVulnIds = firstDegreePart?.map((item) => item?.id)
@@ -314,47 +341,18 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     onCompleted: (data) => console.log('Parts', data)
   })
 
-  //This part is needed for the pagination to work. (Modify with caution)
-  const paginationSizes = [25, 50, 100]
-
   const textColor = useColorModeValue('gray.700', 'white')
   const [activeRow, setActiveRow] = useState(null)
   const [vulnSearch, setVulnSearch] = useState(searchInput)
   const [toggleClear, setToggleClear] = useState(false)
   const [selectedVulns, setSelectedVulns] = useState([])
   const [selectedGroup, setSelectedGroup] = useState('')
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
 
   const {
     isOpen: isLinkOpen,
     onOpen: onLinkOpen,
     onClose: onLinkClose
   } = useDisclosure()
-
-  const setPaginationControl = useCallback(
-    (data) => {
-      if (signedUrlParams) {
-        setIsPrevActive(
-          data?.shareLynkQuery?.sbom?.vulns?.pageInfo?.hasPreviousPage
-        )
-        setIsNextActive(
-          data?.shareLynkQuery?.sbom?.vulns?.pageInfo?.hasNextPage
-        )
-      } else {
-        setIsPrevActive(data?.sbom?.vulns?.pageInfo?.hasPreviousPage)
-        setIsNextActive(data?.sbom?.vulns?.pageInfo?.hasNextPage)
-      }
-    },
-    [signedUrlParams]
-  )
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
-
-  //end
 
   // GET VULN FILTER HEADS
   useQuery(signedUrlParams ? ShareVulnFilters : GetVulnFilterData, {
@@ -372,9 +370,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     }
   })
 
-  const [onVulnScan] = useMutation(ManualVulnScan, {
-    fetchPolicy: 'network-only'
-  })
+  const [onVulnScan] = useMutation(ManualVulnScan)
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const editVulns = sboms?.supersededBy?.some(
@@ -806,103 +802,11 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     }
   ]
 
-  const vulnData = useMemo(() => {
-    return {
-      sbomId: sbomId,
-      includeRetracted: retracted,
-      projectId: signedUrlParams ? undefined : productId,
-      vexComplete: vexComplete === true ? true : undefined,
-      search: searchInput !== '' ? searchInput : undefined,
-      source: source === true ? undefined : 'COMPONENT',
-      severity: severities.length > 0 ? severities : undefined,
-      componentName: components.length > 0 ? components : undefined,
-      status: statues.length > 0 ? statues : undefined,
-      kev:
-        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
-      epss:
-        epss !== '' && epss !== 'all'
-          ? {
-              min: parseFloat(vulnEpss[0]) / 100,
-              max: parseFloat(vulnEpss[1]) / 100
-            }
-          : undefined,
-      direct: direct === true ? true : undefined,
-      field: field,
-      direction: direction
-    }
-  }, [
-    components,
-    direct,
-    direction,
-    epss,
-    field,
-    kev,
-    productId,
-    retracted,
-    sbomId,
-    searchInput,
-    severities,
-    signedUrlParams,
-    source,
-    statues,
-    vexComplete,
-    vulnEpss
-  ])
-
   // CLEAR SERACH
   const handleClear = useCallback(async () => {
-    disablePaginationControl()
     setVulnSearch('')
-    await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      search: undefined,
-      source: source === true ? undefined : 'COMPONENT',
-      severity: severities.length > 0 ? severities : undefined,
-      componentName: components.length > 0 ? components : undefined,
-      status: statues.length > 0 ? statues : undefined,
-      kev:
-        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
-      epss:
-        epss !== '' && epss !== 'all'
-          ? {
-              min: parseFloat(vulnEpss[0]) / 100,
-              max: parseFloat(vulnEpss[1]) / 100
-            }
-          : undefined,
-      direct: direct === true ? true : undefined,
-      vexComplete: vexComplete === true ? true : undefined,
-      field: field,
-      direction: direction,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-        prodVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-      }
-    })
-  }, [
-    components,
-    direct,
-    direction,
-    epss,
-    field,
-    kev,
-    prodVulnDispatch,
-    productId,
-    refetch,
-    sbomId,
-    setPaginationControl,
-    severities,
-    source,
-    statues,
-    totalRows,
-    vexComplete,
-    vulnEpss
-  ])
+    prodVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+  }, [prodVulnDispatch])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -920,71 +824,16 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   // SEARCH COMPONENT
   const handleSearch = useCallback(
     async (event) => {
-      disablePaginationControl()
       const { value } = event.target
       if (event.key === 'Enter') {
-        await refetch({
-          projectId: signedUrlParams ? undefined : productId,
-          sbomId: sbomId,
-          search: value !== '' ? value : undefined,
-          source: source === true ? undefined : 'COMPONENT',
-          severity: severities.length > 0 ? severities : undefined,
-          componentName: components.length > 0 ? components : undefined,
-          status: statues.length > 0 ? statues : undefined,
-          kev:
-            kev === 'all' || kev === ''
-              ? undefined
-              : kev === 'yes'
-                ? true
-                : false,
-          epss:
-            epss !== '' && epss !== 'all'
-              ? {
-                  min: parseFloat(vulnEpss[0]) / 100,
-                  max: parseFloat(vulnEpss[1]) / 100
-                }
-              : undefined,
-          direct: direct === true ? true : undefined,
-          vexComplete: vexComplete === true ? true : undefined,
-          first: totalRows,
-          last: undefined,
-          after: undefined,
-          before: undefined,
-          field: field,
-          direction: direction
-        }).then((res) => {
-          if (res.data) {
-            setPaginationControl(res.data)
-            prodVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-          }
-        })
+        prodVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
       }
     },
-    [
-      components,
-      direct,
-      direction,
-      epss,
-      field,
-      kev,
-      prodVulnDispatch,
-      productId,
-      refetch,
-      sbomId,
-      setPaginationControl,
-      severities,
-      signedUrlParams,
-      source,
-      statues,
-      totalRows,
-      vexComplete,
-      vulnEpss
-    ]
+    [prodVulnDispatch]
   )
 
   // SCAN VULN
   const handleScan = useCallback(async () => {
-    disablePaginationControl()
     await onVulnScan({
       variables: { id: sbomId }
     }).then((res) => {
@@ -1004,7 +853,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
             duration: 5000
           })
           sbomRefetch({ projectId: productId, sbomId: sbomId }).then(
-            (res) => res?.data && setPaginationControl(res?.data)
+            (res) => res?.data && console.log(res?.data)
           )
           prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
         }
@@ -1017,16 +866,12 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     sbomData?.vulnRunStatus,
     sbomId,
     sbomRefetch,
-    setPaginationControl,
     toast
   ])
 
   const handleRefresh = useCallback(() => {
-    disablePaginationControl()
-    refetch({ projectId: productId, sbomId: sbomId }).then((res) => {
-      res && setPaginationControl(res.data)
-    })
-  }, [productId, refetch, sbomId, setPaginationControl])
+    refetch()
+  }, [refetch])
 
   const subHeader = useMemo(() => {
     return (
@@ -1125,64 +970,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     vulnSearch
   ])
 
-  const handlePreviousPage = useCallback(async () => {
-    disablePaginationControl()
-    setIsPrevActive(false)
-    await refetch({
-      ...vulnData,
-      first: undefined,
-      last: totalRows,
-      after: undefined,
-      before: vulns.pageInfo.startCursor
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res?.data)
-        prodVulnDispatch({
-          type: 'DECREMENT_PAGE',
-          payload: vulns.pageInfo.startCursor
-        })
-      }
-    })
-  }, [
-    vulns?.pageInfo?.startCursor,
-    prodVulnDispatch,
-    refetch,
-    setPaginationControl,
-    totalRows,
-    vulnData
-  ])
-
-  const handleNextPage = useCallback(async () => {
-    disablePaginationControl()
-    setIsNextActive(false)
-    await refetch({
-      ...vulnData,
-      first: totalRows,
-      last: undefined,
-      after: vulns.pageInfo.endCursor,
-      before: undefined
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res?.data)
-        prodVulnDispatch({
-          type: 'INCREMENT_PAGE',
-          payload: {
-            total: vulns.totalCount,
-            after: vulns?.pageInfo?.endCursor
-          }
-        })
-      }
-    })
-  }, [
-    prodVulnDispatch,
-    refetch,
-    setPaginationControl,
-    totalRows,
-    vulnData,
-    vulns?.pageInfo?.endCursor,
-    vulns?.totalCount
-  ])
-
   const handleSort = (column, sortDirection) => {
     prodVulnDispatch({
       type: 'SET_SORT_ORDER',
@@ -1194,34 +981,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // SET ROW LENGTH
-  const handleSetRow = useCallback(
-    async (e) => {
-      disablePaginationControl()
-      setTotalRows(Number(e.target.value))
-      await refetch({
-        ...vulnData,
-        first: Number(e.target.value),
-        last: undefined,
-        after: undefined,
-        before: undefined
-      }).then((res) => {
-        if (res.data) {
-          setPaginationControl(res.data)
-          prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        }
-      })
-    },
-    [prodVulnDispatch, refetch, setPaginationControl, setTotalRows, vulnData]
-  )
-
-  useEffect(() => {
-    if (vulns) {
-      setIsPrevActive(vulns?.pageInfo?.hasPreviousPage)
-      setIsNextActive(vulns?.pageInfo?.hasNextPage)
-    }
-  }, [vulns])
-
   const handleSelectRow = useCallback(
     (row, bool) => {
       if (!bool) {
@@ -1230,14 +989,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     },
     [handleRefresh]
   )
-
-  if (error) {
-    return (
-      <Card>
-        <Text>Something went wrong</Text>
-      </Card>
-    )
-  }
 
   if (vulnsPermissions?.value === false) {
     return (
@@ -1254,12 +1005,12 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
         <DataTable
           className='data-table-container'
           columns={columns}
-          data={vulns?.nodes}
+          data={nodes}
           customStyles={customStyles}
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={field}
-          progressPending={vulns ? false : true}
+          progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
@@ -1271,7 +1022,10 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           expandableRowsComponentProps={{
             setActiveRow,
             onCvssOpen,
-            textColor
+            textColor,
+            allVexStatus,
+            allVexJustify,
+            allCdx
           }}
           selectableRows={!signedUrlParams}
           clearSelectedRows={toggleClear}
@@ -1281,32 +1035,20 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
       </Flex>
 
       {/* PAGINATION */}
-      {vulns?.pageInfo && (
-        <Pagination
-          paginationSizes={paginationSizes}
-          pageIndex={pageIndex}
-          totalRows={totalRows}
-          totalCount={vulns?.totalCount}
-          onPreviousPage={handlePreviousPage}
-          onNextPage={handleNextPage}
-          onSetRow={handleSetRow}
-          hasNextPage={isNextActive}
-          hasPreviousPage={isPrevActive}
-        />
-      )}
+      {!loading && <Pagination {...paginationProps} />}
 
       {isLinkOpen && (
         <VulnLinkDrawer
           data={activeRow}
+          refetch={refetch}
           isOpen={isLinkOpen}
           onClose={onLinkClose}
-          refetch={refetch}
           sbomId={sbomId}
         />
       )}
 
       {/* COPY DATA TABLE */}
-      {isTableOpen && vulns && (
+      {isTableOpen && nodes && (
         <Drawer
           isOpen={isTableOpen}
           placement='bottom'
@@ -1341,8 +1083,8 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
         <VexModal
           isOpen={isOpen}
           onClose={onClose}
-          refetch={refetch}
           checkEquals={true}
+          refetch={refetch}
           selectedGroup={selectedGroup}
           selectedVulns={selectedVulns}
           setSelectedVulns={setSelectedVulns}

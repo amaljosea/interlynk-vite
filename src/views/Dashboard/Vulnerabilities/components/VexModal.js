@@ -23,8 +23,6 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import { updateBulkCompVex } from 'graphQL/Mutation'
 import {
   GetCdxResponses,
@@ -45,13 +43,9 @@ const VexModal = ({
   setToggleClear
 }) => {
   const toast = useToast()
-  const { totalRows, prodVulnState } = useGlobalState()
-  const { field, direction } = prodVulnState
 
   const params = useParams()
-  const productId = params.productid
   const sbomId = params.sbomid
-  const vulnId = params.vulnerabilityid
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
@@ -73,22 +67,12 @@ const VexModal = ({
   const { data: allCdx } = useQuery(GetCdxResponses)
 
   const [compVexCreate] = useMutation(updateBulkCompVex, {
-    fetchPolicy: 'network-only',
-    onCompleted: () => {
-      if (sbomId) {
-        refetch({
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          last: undefined,
-          field,
-          direction
-        })
-      } else {
-        refetch({ id: vulnId, first: totalRows, last: undefined })
+    onCompleted: (data) => {
+      if (data) {
+        refetch()
+        setSelectedVulns([])
+        setToggleClear(true)
       }
-      setSelectedVulns([])
-      setToggleClear(true)
     }
   })
 
