@@ -1,5 +1,5 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
@@ -24,13 +24,13 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import LicenseModal from 'components/LicenseModal'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import {
   UpdateComponent,
@@ -61,26 +61,9 @@ const Checks = () => {
   const activeTab = queryParams.get('tab')
   const customerView = location.pathname.startsWith('/customer')
 
-  const { userPermissions, totalRows, setTotalRows, prodCheckState, dispatch } =
-    useGlobalState()
-  const {
-    field,
-    direction,
-    pageIndex,
-    searchInput,
-    rules,
-    categories,
-    severities,
-    statues,
-    filters,
-    after,
-    before
-  } = prodCheckState
+  const { userPermissions, prodCheckState, dispatch } = useGlobalState()
+  const { searchInput, filters } = prodCheckState
   const { prodCompDispatch, prodCheckDispatch, sbomDispatch } = dispatch
-
-  const getUndefinedIfEmpty = (value) => (value !== '' ? value : undefined)
-  const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
-    value.includes(allValue) || value.length === 0 ? undefined : value
 
   const { data: prodData } = useQuery(GetProductData, {
     skip: activeTab === 'checks' ? false : true,
@@ -89,25 +72,25 @@ const Checks = () => {
 
   const { sbom: sbomData } = prodData || ''
 
-  // GET HEALTH CHECK DATA
-  const { data, refetch, error } = useQuery(GetCheckResults, {
-    skip: activeTab === 'checks' ? false : true,
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      search: getUndefinedIfEmpty(searchInput),
-      checkId: getUndefinedIfEmptyOrAll(rules),
-      category: getUndefinedIfEmptyOrAll(categories),
-      severity: getUndefinedIfEmptyOrAll(severities),
-      status: getUndefinedIfEmptyOrAll(statues),
-      field: field || 'CHECK_RESULTS_UPDATED_AT',
-      direction: direction || 'DESC'
-    }
+  const [checkState, setCheckState] = useState({
+    field: 'CHECK_RESULTS_UPDATED_AT',
+    direction: 'DESC'
   })
 
-  const { checkResults } = data?.sbom || ''
+  const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
+    GetCheckResults,
+    {
+      skip: activeTab === 'checks' ? false : true,
+      selector: 'sbom.checkResults',
+      variables: {
+        sbomId: sbomId,
+        projectId: productId,
+        ...checkState
+      }
+    }
+  )
+
+  const { totalRows } = paginationProps
 
   // GET HEALTH CHECK FILTER HEADS
   const { refetch: filterRefetch } = useQuery(GetCheckFilterData, {
@@ -122,29 +105,6 @@ const Checks = () => {
         payload: data?.sbom?.filters
       })
   })
-
-  const paginationSizes = [25, 50, 100]
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
-
-  useEffect(() => {
-    if (checkResults) {
-      setIsPrevActive(checkResults?.pageInfo?.hasPreviousPage)
-      setIsNextActive(checkResults?.pageInfo?.hasNextPage)
-    }
-  }, [checkResults])
-
-  const setPaginationControl = (data) => {
-    setIsPrevActive(data.sbom?.checkResults?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data.sbom?.checkResults?.pageInfo?.hasNextPage)
-  }
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
-
-  //end
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const editChecks = sboms?.supersededBy?.some(
@@ -163,31 +123,8 @@ const Checks = () => {
   const [checkSearch, setCheckSearch] = useState(searchInput)
   const [activeRow, setActiveRow] = useState(null)
 
-  const fetchCheckData = () => {
-    disablePaginationControl()
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      search: getUndefinedIfEmpty(searchInput),
-      checkId: getUndefinedIfEmptyOrAll(rules),
-      category: getUndefinedIfEmptyOrAll(categories),
-      severity: getUndefinedIfEmptyOrAll(severities),
-      status: getUndefinedIfEmptyOrAll(statues),
-      field: field,
-      direction: direction
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-      }
-    })
-  }
-
   const [updateResult] = useMutation(checkResultUpdate, {
-    onCompleted: () => fetchCheckData()
+    onCompleted: () => refetch()
   })
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
@@ -261,7 +198,7 @@ const Checks = () => {
   } = useDisclosure()
 
   const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => fetchCheckData()
+    onCompleted: () => refetch()
   })
 
   const handleReCheck = useCallback(() => {
@@ -285,12 +222,21 @@ const Checks = () => {
     }
   }, [healthRecheck, sbomId, toast])
 
+  const setSearchFilter = (value) => {
+    setCheckState((oldFilter) => ({
+      ...oldFilter,
+      search: value
+    }))
+  }
+
   // CLEAR SERACH
-  const handleClear = useCallback(async () => {
-    disablePaginationControl()
+  const handleClear = useCallback(() => {
     setCheckSearch('')
-    prodCheckDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-  }, [prodCheckDispatch])
+    setCheckState((oldFilter) => ({
+      ...oldFilter,
+      search: undefined
+    }))
+  }, [])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -306,37 +252,15 @@ const Checks = () => {
   )
 
   // SEARCH COMPONENT
-  const handleSearch = useCallback(
-    async (event) => {
-      disablePaginationControl()
-      const { value } = event.target
-      if (event.key === 'Enter' && checkSearch !== '') {
-        prodCheckDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      }
-    },
-    [checkSearch, prodCheckDispatch]
-  )
-
-  // SET ROW LENGTH
-  const handleSetRow = async (e) => {
-    disablePaginationControl()
-    setTotalRows(Number(e.target.value))
-    await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: Number(e.target.value),
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      field: field,
-      direction: direction
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-        prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      }
-    })
-  }
+  const handleSearch = useCallback((event) => {
+    const {
+      key,
+      target: { value }
+    } = event
+    if (key === 'Enter') {
+      setSearchFilter(value)
+    }
+  }, [])
 
   // SUB HEADER
   const subHeader = useMemo(() => {
@@ -362,7 +286,7 @@ const Checks = () => {
           />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && <CheckFilters />}
+          {filters && <CheckFilters setCheckState={setCheckState} />}
         </Stack>
 
         <Tooltip label='Re-Check'>
@@ -762,101 +686,13 @@ const Checks = () => {
     }
   ]
 
-  const handleRefetch = (after, before) => {
-    disablePaginationControl()
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: after ? totalRows : undefined,
-      after: after,
-      last: before ? totalRows : undefined,
-      before: before,
-      search: searchInput !== '' ? searchInput : undefined,
-      checkId: rules.includes('all') || rules.length === 0 ? undefined : rules,
-      category:
-        categories.includes('all') || categories.length === 0
-          ? undefined
-          : categories,
-      severity:
-        severities.includes('all') || severities.length === 0
-          ? undefined
-          : severities,
-      status:
-        statues.includes('all') || statues.length === 0 ? undefined : statues,
-      field: field,
-      direction: direction
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-      }
-    })
-  }
-
-  // SORT FUNCTION
-  const handleSort = async (column, sortDirection) => {
-    disablePaginationControl()
-    await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: after !== '' ? totalRows : undefined,
-      after: after !== '' ? after : undefined,
-      last: before !== '' ? totalRows : undefined,
-      before: before !== '' ? before : undefined,
-      search: searchInput !== '' ? searchInput : undefined,
-      checkId: rules.includes('all') || rules.length === 0 ? undefined : rules,
-      category:
-        categories.includes('all') || categories.length === 0
-          ? undefined
-          : categories,
-      severity:
-        severities.includes('all') || severities.length === 0
-          ? undefined
-          : severities,
-      status:
-        statues.includes('all') || statues.length === 0 ? undefined : statues,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-        prodCheckDispatch({
-          type: 'SET_SORT_ORDER',
-          payload: {
-            field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-          }
-        })
-      }
-    })
-  }
-
-  const handlePreviousPage = async () => {
-    disablePaginationControl()
-    prodCheckDispatch({
-      type: 'DECREMENT_PAGE',
-      payload: checkResults?.pageInfo?.startCursor
-    })
-    handleRefetch(null, checkResults?.pageInfo?.startCursor)
-  }
-
-  const handleNextPage = async () => {
-    disablePaginationControl()
-    prodCheckDispatch({
-      type: 'INCREMENT_PAGE',
-      payload: {
-        total: checkResults?.totalCount,
-        after: checkResults?.pageInfo?.endCursor
-      }
-    })
-    handleRefetch(checkResults?.pageInfo?.endCursor, null)
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <Text>Something went wrong</Text>
-      </Card>
-    )
+  // SORTING
+  const handleSort = (column, sortDirection) => {
+    setCheckState((oldFilters) => ({
+      ...oldFilters,
+      field: column?.id,
+      direction: sortDirection.toUpperCase()
+    }))
   }
 
   return (
@@ -864,34 +700,21 @@ const Checks = () => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={checkResults?.nodes}
+          data={nodes}
           onSort={handleSort}
           defaultSortAsc={false}
-          defaultSortFieldId={field}
+          defaultSortFieldId={checkState?.field}
           customStyles={customStyles}
-          progressPending={checkResults ? false : true}
+          progressPending={loading}
           progressComponent={<CustomLoader />}
           persistTableHead
           subHeader
           subHeaderComponent={subHeader}
           responsive={true}
         />
+        {/* PAGINATION */}
+        {!loading && <Pagination {...paginationProps} />}
       </Flex>
-
-      {/* PAGINATION */}
-      {checkResults && (
-        <Pagination
-          paginationSizes={paginationSizes}
-          pageIndex={pageIndex}
-          totalRows={totalRows}
-          totalCount={checkResults?.totalCount}
-          onPreviousPage={handlePreviousPage}
-          onNextPage={handleNextPage}
-          onSetRow={handleSetRow}
-          hasNextPage={isNextActive}
-          hasPreviousPage={isPrevActive}
-        />
-      )}
 
       {/* ACTIONS */}
       {activeRow !== null && (
@@ -903,7 +726,7 @@ const Checks = () => {
               onClose={onDataLicenseClose}
               checkId={activeRow.organizationRule.rule.friendlyId}
               filterRefetch={filterRefetch}
-              refetch={fetchCheckData}
+              refetch={refetch}
               data={sbomData}
             />
           )}
@@ -914,7 +737,7 @@ const Checks = () => {
               id={activeRow.id}
               componentId={null}
               totalRows={totalRows}
-              refetch={fetchCheckData}
+              refetch={refetch}
               filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -930,7 +753,7 @@ const Checks = () => {
               activeCheck={activeRow}
               componentId={activeRow.component.id}
               totalRows={totalRows}
-              refetch={fetchCheckData}
+              refetch={refetch}
               filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -944,7 +767,7 @@ const Checks = () => {
             <CheckModal
               id={activeRow.component.id}
               totalRows={totalRows}
-              refetch={fetchCheckData}
+              refetch={refetch}
               filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -958,7 +781,7 @@ const Checks = () => {
             <SupplierModal
               activeCheck={activeRow.component}
               btnRef={supplierBtn}
-              refetch={fetchCheckData}
+              refetch={refetch}
               filterRefetch={filterRefetch}
               isOpen={isSupplierOpen}
               onClose={onSupplierClose}
@@ -972,7 +795,7 @@ const Checks = () => {
             <CheckModal
               activeCheck={activeRow}
               totalRows={totalRows}
-              refetch={fetchCheckData}
+              refetch={refetch}
               filterRefetch={filterRefetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
@@ -991,7 +814,7 @@ const Checks = () => {
               purlValue={purlValue}
               activeCheck={activeRow.component}
               totalRows={totalRows}
-              refetch={fetchCheckData}
+              refetch={refetch}
               filterRefetch={filterRefetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
               getCpe={getCpe}
@@ -1009,7 +832,7 @@ const Checks = () => {
               onUpdateCpe={handleUpdateCpe}
               selectedCpe={selectedCpe}
               activeCheck={activeRow.component}
-              refetch={fetchCheckData}
+              refetch={refetch}
               filterRefetch={filterRefetch}
               totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -1025,7 +848,7 @@ const Checks = () => {
               btnRef={creationToolBtn}
               data={null}
               selectedKey={'tools'}
-              refetch={fetchCheckData}
+              refetch={refetch}
               filterRefetch={filterRefetch}
               totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -1040,8 +863,8 @@ const Checks = () => {
               btnRef={authorBtn}
               data={null}
               selectedKey={'author'}
-              refetch={fetchCheckData}
-              filterRefetch={fetchCheckData}
+              refetch={refetch}
+              filterRefetch={filterRefetch}
               totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
               getCpe={getCpe}
@@ -1051,7 +874,7 @@ const Checks = () => {
           {/* DOCUMENT SUPPLIER DRAWER */}
           {isDocSupOpen && (
             <PriSupplierModal
-              refetch={fetchCheckData}
+              refetch={refetch}
               filterRefetch={filterRefetch}
               isOpen={isDocSupOpen}
               onClose={onDocSupClose}

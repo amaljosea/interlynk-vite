@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client'
+import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
 import {
@@ -17,14 +18,13 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { GetOrgRules } from 'graphQL/Queries'
 
-const CheckFilters = () => {
+const CheckFilters = ({ setCheckState }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { prodCheckState, dispatch } = useGlobalState()
-  const { filters, rules, categories, severities, statues } = prodCheckState
-  const { prodCheckDispatch } = dispatch
+  const { prodCheckState } = useGlobalState()
+  const { filters } = prodCheckState
 
   const { data } = useQuery(GetOrgRules, {
     skip: activeTab === 'checks' ? false : true,
@@ -36,32 +36,44 @@ const CheckFilters = () => {
 
   const { checkCategories, checkStatuses } = filters || ''
 
+  const [rules, setRules] = useState([])
   const onFilterCheckId = (value) => {
-    prodCheckDispatch({
-      type: 'FILTER_RULE',
-      payload: value
-    })
+    const filterValue = value?.includes('all') ? undefined : value
+    setRules(value?.includes('all') ? [] : value)
+    setCheckState((oldFilters) => ({
+      ...oldFilters,
+      checkId: filterValue
+    }))
   }
 
+  const [categories, setCategories] = useState([])
   const onFilterCategory = (value) => {
-    prodCheckDispatch({
-      type: 'FILTER_CATEGORY',
-      payload: value
-    })
+    const filterValue = value?.includes('all') ? undefined : value
+    setCategories(value?.includes('all') ? [] : value)
+    setCheckState((oldFilters) => ({
+      ...oldFilters,
+      category: filterValue
+    }))
   }
 
+  const [severities, setSeverities] = useState([])
   const onFilterSeverity = (value) => {
-    prodCheckDispatch({
-      type: 'FILTER_SEVERITY',
-      payload: value
-    })
+    const filterValue = value?.includes('all') ? undefined : value
+    setSeverities(value?.includes('all') ? [] : value)
+    setCheckState((oldFilters) => ({
+      ...oldFilters,
+      severity: filterValue
+    }))
   }
 
+  const [statues, setStatues] = useState([])
   const onFilterStatus = (value) => {
-    prodCheckDispatch({
-      type: 'FILTER_STATUS',
-      payload: value
-    })
+    const filterValue = value?.includes('all') ? undefined : value
+    setStatues(value?.includes('all') ? [] : value)
+    setCheckState((oldFilters) => ({
+      ...oldFilters,
+      status: filterValue
+    }))
   }
 
   return (
