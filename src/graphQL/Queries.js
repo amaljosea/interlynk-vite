@@ -599,7 +599,7 @@ export const GetGlobalVulns = gql`
     $before: String
     $search: String
     $severity: [String!]
-    $projectIds: [Uuid!]
+    $projectNames: [String!]
     $projectGroupIds: [Uuid!]
     $status: [String!]
     $kev: Boolean
@@ -614,7 +614,7 @@ export const GetGlobalVulns = gql`
         before: $before
         last: $last
         search: $search
-        projectIds: $projectIds
+        projectNames: $projectNames
         projectGroupIds: $projectGroupIds
         status: $status
         severity: $severity

@@ -42,7 +42,6 @@ const GlobalVulnsFilters = ({ setFilters }) => {
       productPermissions?.value === false
         ? true
         : false,
-    fetchPolicy: 'network-only',
     variables: {
       first: totalRows,
       enabled: true,
@@ -50,6 +49,8 @@ const GlobalVulnsFilters = ({ setFilters }) => {
       direction: prodState?.direction
     }
   })
+
+  const envList = ['all', 'default', 'development', 'production']
 
   const minRef = useRef()
   const maxRef = useRef()
@@ -70,6 +71,16 @@ const GlobalVulnsFilters = ({ setFilters }) => {
     }
   }
 
+  // FILTER BY ENVIRONMENT
+  const [envs, setEnvs] = useState([])
+  const onFilterEnv = (value) => {
+    const filterValue = value?.includes('all') ? undefined : value
+    setEnvs(value?.includes('all') ? [] : value)
+    setFilters((oldFilters) => ({
+      ...oldFilters,
+      projectNames: filterValue
+    }))
+  }
   // FILTER BY PRODUCT
   const [products, setProducts] = useState([])
   const onFilterProduct = (value) => {
@@ -148,6 +159,35 @@ const GlobalVulnsFilters = ({ setFilters }) => {
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
+      {/* ENVIRONMENT */}
+      <Box
+        width={'fit-content'}
+        position={'relative'}
+        display={params?.productgroupid ? 'none' : 'block'}
+      >
+        <Menu closeOnSelect={false}>
+          {envs.length !== 0 && !envs.includes('all') && <CheckMark />}
+          <MenuHeading title={'Environment'} />
+          <MenuList>
+            <MenuOptionGroup
+              type='checkbox'
+              value={envs}
+              onChange={onFilterEnv}
+            >
+              {envList.map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
       {/* PRODUCTS */}
       <Box
         width={'fit-content'}
