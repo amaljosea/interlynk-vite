@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import {
@@ -34,6 +34,7 @@ import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { AutomationRuleDelete, AutomationRuleUpdate } from 'graphQL/Mutation'
 import {
@@ -52,16 +53,9 @@ const Automation = () => {
   const params = useParams()
   const productId = params.productid
   const activeTab = Number(localStorage.getItem('activeProdTab'))
-  const { userPermissions, prodRulesState } = useGlobalState()
-  const { field, direction, pageIndex } = prodRulesState
+  const { userPermissions } = useGlobalState()
 
   const [activeRow, setActiveRow] = useState(null)
-
-  const paginationSizes = [25, 50, 100]
-  const [totalRows, setTotalRows] = useState(paginationSizes[0])
-
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
 
   const { data: subOperators } = useQuery(
     AutomationConditionSubjectFieldMapping,
@@ -70,15 +64,16 @@ const Automation = () => {
     }
   )
 
-  const { data, refetch } = useQuery(GetProjectCheck, {
-    skip: activeTab === 2 ? false : true,
-    variables: {
-      id: productId,
-      first: totalRows
+  const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
+    GetProjectCheck,
+    {
+      skip: activeTab === 2 ? false : true,
+      selector: 'project.automationRules',
+      variables: {
+        id: productId
+      }
     }
-  })
-
-  const { automationRules } = data?.project || ''
+  )
 
   const [deleteRule] = useMutation(AutomationRuleDelete)
   const [updateRule] = useMutation(AutomationRuleUpdate)
@@ -104,16 +99,6 @@ const Automation = () => {
     onOpen: onDeleteOpen,
     onClose: onDeleteClose
   } = useDisclosure()
-
-  const setPaginationControl = useCallback((data) => {
-    setIsPrevActive(data?.project?.automationRules?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data?.project?.automationRules?.pageInfo?.hasNextPage)
-  }, [])
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
 
   const handleDelete = async () => {
     await deleteRule({ variables: { id: activeRow?.id } }).then((res) => {
@@ -350,29 +335,9 @@ const Automation = () => {
     }
   ]
 
-  // const handleSort = async (column, sortDirection) => {
-  //   refetch({
-  //     id: productId,
-  //     first: totalRows,
-  //     last: undefined,
-  //     field: column.id,
-  //     direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-  //   }).then((res) => {
-  //     if (res.data) {
-  //       prodRulesDispatch({
-  //         type: 'SET_SORT_ORDER',
-  //         payload: {
-  //           field: column.id,
-  //           direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-  //         }
-  //       })
-  //     }
-  //   })
-  // }
-
-  const handleRefresh = useCallback(async () => {
-    await refetch({ id: productId, first: totalRows, field, direction })
-  }, [direction, field, productId, refetch, totalRows])
+  const handleRefresh = useCallback(() => {
+    refetch()
+  }, [refetch])
 
   const subHeaderComponent = useMemo(() => {
     return (
@@ -400,63 +365,6 @@ const Automation = () => {
     )
   }, [onRuleOpen, handleRefresh])
 
-  // ON PREV PAGE
-  const handlePreviousPage = async () => {
-    disablePaginationControl()
-    await refetch({
-      id: productId,
-      first: undefined,
-      last: totalRows,
-      after: undefined,
-      before: automationRules?.pageInfo?.startCursor
-    }).then((res) => {
-      if (res?.data) {
-        setPaginationControl(res?.data)
-      }
-    })
-  }
-
-  // ON NEXT PAGE
-  const handleNextPage = async () => {
-    disablePaginationControl()
-    await refetch({
-      id: productId,
-      first: totalRows,
-      last: undefined,
-      after: automationRules?.pageInfo?.endCursor,
-      before: undefined
-    }).then((res) => {
-      if (res?.data) {
-        setPaginationControl(res?.data)
-      }
-    })
-  }
-
-  // ON SET ROW
-  const handleSetRow = async (e) => {
-    const { value } = e.target
-    setTotalRows(Number(value))
-    disablePaginationControl()
-    await refetch({
-      id: productId,
-      first: Number(value),
-      last: undefined,
-      after: undefined,
-      before: undefined
-    }).then((res) => {
-      if (res?.data) {
-        setPaginationControl(res?.data)
-      }
-    })
-  }
-
-  useEffect(() => {
-    if (automationRules) {
-      setIsPrevActive(automationRules?.pageInfo?.hasPreviousPage)
-      setIsNextActive(automationRules?.pageInfo?.hasNextPage)
-    }
-  }, [automationRules])
-
   return (
     <>
       <CardBody>
@@ -466,27 +374,15 @@ const Automation = () => {
             persistTableHead
             responsive={true}
             columns={columns}
-            data={automationRules?.nodes || []}
+            data={nodes}
             // onSort={handleSort}
             customStyles={customStyles}
             progressComponent={<CustomLoader />}
-            progressPending={automationRules ? false : true}
+            progressPending={loading}
             subHeaderComponent={subHeaderComponent}
           />
 
-          {data && (
-            <Pagination
-              paginationSizes={paginationSizes}
-              pageIndex={pageIndex}
-              totalRows={totalRows}
-              totalCount={data.totalCount}
-              onPreviousPage={handlePreviousPage}
-              onNextPage={handleNextPage}
-              onSetRow={handleSetRow}
-              hasNextPage={isNextActive}
-              hasPreviousPage={isPrevActive}
-            />
-          )}
+          {!loading && <Pagination {...paginationProps} />}
         </Flex>
       </CardBody>
 

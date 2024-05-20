@@ -7,7 +7,7 @@ const DEFAULT_PAGINATION_SIZE = PAGINATION_SIZES[0]
 
 export const usePaginatatedQuery = (
   QUERY,
-  { skip, selector, variables = {} }
+  { skip, selector, onCompleted, variables = {} }
 ) => {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(DEFAULT_PAGINATION_SIZE)
@@ -27,7 +27,8 @@ export const usePaginatatedQuery = (
     variables: {
       ...variables,
       ...paginationVariables
-    }
+    },
+    onCompleted: onCompleted
   })
 
   const resource = get(data || previousData, selector)
