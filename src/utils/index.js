@@ -48,6 +48,8 @@ import { LetterHIcon } from 'components/Icons/Icons'
 import { LetterMIcon } from 'components/Icons/Icons'
 import { LetterLIcon } from 'components/Icons/Icons'
 
+import { FaBalanceScale, FaBox, FaBug, FaCube, FaCubes } from 'react-icons/fa'
+
 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 export const getConImg = (name) => {
@@ -798,4 +800,22 @@ export const parseJSONSafely = (str) => {
 export const updatedValue = (operator) => {
   // Capitalize the operator and replace underscores with spaces
   return operator?.replace(/_/g, ' ')?.replace(/\b\w/g, (c) => c)
+}
+
+export const getIcon = (subject) => {
+  const sub = String(subject).toUpperCase()
+  if (sub.startsWith('VULNERABILITY')) return FaBug
+  if (sub.startsWith('LICENSE')) return FaBalanceScale
+  if (sub.startsWith('COMPONENT')) return FaCube
+  if (sub.startsWith('SBOM') || sub.startsWith('VERSION')) return FaCubes
+  return FaBox
+}
+
+export const getLabel = (subject) => {
+  const sub = String(subject).toUpperCase()
+  if (sub.startsWith('VULNERABILITY')) return 'Vulnerability'
+  if (sub.startsWith('LICENSE')) return 'License'
+  if (sub.startsWith('COMPONENT')) return 'Component'
+  if (sub.startsWith('SBOM') || sub.startsWith('VERSION')) return 'SBOM'
+  return 'S'
 }

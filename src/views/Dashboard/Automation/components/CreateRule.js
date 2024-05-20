@@ -1,12 +1,13 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { updatedValue } from 'utils'
+import { getIcon, getLabel, updatedValue } from 'utils'
 
 import {
   Alert,
   AlertDescription,
   AlertIcon,
+  Box,
   Button,
   Divider,
   Flex,
@@ -23,12 +24,28 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select
+  Select,
+  Tooltip
 } from '@chakra-ui/react'
 
 import { AutomationRuleCreate, AutomationRuleUpdate } from 'graphQL/Mutation'
 
 import { FaPlus, FaTrash } from 'react-icons/fa6'
+
+const SubjectIcon = ({ subject, isSystem = { isSystem } }) => {
+  return (
+    <Box hidden={subject === ''} mt={2}>
+      <Tooltip label={getLabel(subject)} placement='top'>
+        <Box>
+          <Icon
+            color={isSystem ? 'gray.300' : 'blue.500'}
+            as={getIcon(subject)}
+          />
+        </Box>
+      </Tooltip>
+    </Box>
+  )
+}
 
 const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
   const params = useParams()
@@ -450,7 +467,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>{data ? 'Update' : 'Create'} Rule</ModalHeader>
+        <ModalHeader>{data ? 'Edit' : 'Create'} Rule</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Flex flexDir={'column'} alignItems={'flex-start'} gap={4}>
@@ -479,6 +496,9 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                     alignItems={'flex-start'}
                     justifyContent={'space-bewteen'}
                   >
+                    {/* ICON */}
+                    <SubjectIcon subject={item?.subject} isSystem={isSystem} />
+                    {/* SUBJECT */}
                     <FormControl
                       width={'40%'}
                       isInvalid={item?.subError !== ''}
@@ -525,6 +545,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                       </Select>
                       <FormErrorMessage>{item?.subError}</FormErrorMessage>
                     </FormControl>
+                    {/* OPERATOR */}
                     <FormControl width={'20%'} isInvalid={item?.opError !== ''}>
                       <Select
                         id='operator'
@@ -536,14 +557,12 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                         fontSize='sm'
                         placeholder='-- Operator --'
                         onBlur={() => onOperatorBlur(item)}
-                        textTransform={'capitalize'}
                         isDisabled={isSystem}
                       >
                         {item?.list?.map((option) => (
                           <option
                             value={option}
                             key={option}
-                            style={{ textTransform: 'capitalize' }}
                           >
                             {updatedValue(option)}
                           </option>
@@ -609,6 +628,8 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                     alignItems={'flex-start'}
                     justifyContent={'space-bewteen'}
                   >
+                    {/* ICON */}
+                    <SubjectIcon subject={item?.subject} isSystem={isSystem} />
                     {/* SUBJECT */}
                     <FormControl as={Flex} alignItems='center'>
                       <Select
@@ -670,7 +691,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                         isDisabled={
                           conditionErrorMessage ||
                           conditions?.length === 0 ||
-                          item?.operator === 'copy'
+                          isSystem
                         }
                       />
                       <Flex gap={4} justifyContent={'space-between'}>
