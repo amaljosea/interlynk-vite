@@ -463,6 +463,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                 placeholder='Enter rule name'
                 value={ruleName}
                 onChange={onNameChange}
+                pointerEvents={isSystem ? 'none' : 'auto'}
               />
             </FormControl>
             {/* CONDITIONS */}
@@ -492,7 +493,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                         fontSize='sm'
                         onBlurCapture={() => onSubjectBlur(item)}
                         textTransform={'capitalize'}
-                        pointerEvents={isSystem ? 'none' : 'auto'}
+                        isDisabled={isSystem}
                       >
                         {conditions?.length > 1 &&
                         conditions?.some(
@@ -536,7 +537,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                         placeholder='-- Operator --'
                         onBlur={() => onOperatorBlur(item)}
                         textTransform={'capitalize'}
-                        pointerEvents={isSystem ? 'none' : 'auto'}
+                        isDisabled={isSystem}
                       >
                         {item?.list?.map((option) => (
                           <option
@@ -619,9 +620,10 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                         fontSize='sm'
                         textTransform={'capitalize'}
                         isDisabled={
-                          conditionErrorMessage || conditions?.length === 0
+                          conditionErrorMessage ||
+                          conditions?.length === 0 ||
+                          isSystem
                         }
-                        pointerEvents={isSystem ? 'none' : 'auto'}
                       >
                         {conditions?.some(
                           (item) => item?.category === 'component'
@@ -650,7 +652,9 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                       defaultValue={item?.operator}
                       pointerEvents={'none'}
                       isDisabled={
-                        conditionErrorMessage || conditions?.length === 0
+                        conditionErrorMessage ||
+                        conditions?.length === 0 ||
+                        isSystem
                       }
                     />
                     {/* VALUE */}
@@ -660,14 +664,13 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                         fontSize='sm'
                         placeholder={'Add value'}
                         value={item.value}
-                        pointerEvents={
-                          item?.operator === 'copy' ? 'none' : 'auto'
-                        }
                         onChange={(e) =>
                           onActionChange(e.target.value, item.id, 'value')
                         }
                         isDisabled={
-                          conditionErrorMessage || conditions?.length === 0
+                          conditionErrorMessage ||
+                          conditions?.length === 0 ||
+                          item?.operator === 'copy'
                         }
                       />
                       <Flex gap={4} justifyContent={'space-between'}>
