@@ -1,5 +1,4 @@
-import { useQuery } from '@apollo/client'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
@@ -15,9 +14,10 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
+
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetSbomLicensesTable } from 'graphQL/Queries'
 
@@ -29,103 +29,20 @@ const Licenses = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { data, refetch, error } = useQuery(GetSbomLicensesTable, {
-    fetchPolicy: 'network-only',
-    skip: activeTab === 'licenses' ? false : true,
-    variables: {
-      projectId: productId,
-      sbomId: sbomId
-    }
-  })
-
-  const { componentLicenses } = data?.sbom || ''
-
-  // PAGINATION
-  const paginationSizes = [25, 50, 100]
-
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalRows, setTotalRows] = useState(paginationSizes[0])
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
-
-  useEffect(() => {
-    if (componentLicenses) {
-      setIsPrevActive(componentLicenses?.pageInfo?.hasPreviousPage)
-      setIsNextActive(componentLicenses?.pageInfo?.hasNextPage)
-    }
-  }, [componentLicenses])
-
-  const setPaginationControl = (data) => {
-    setIsPrevActive(data.sbom?.componentLicenses?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data.sbom?.componentLicenses?.pageInfo?.hasNextPage)
-  }
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
-
-  const handlePreviousPage = useCallback(async () => {
-    disablePaginationControl()
-    setCurrentPage(currentPage - 1)
-
-    await refetch({
-      first: undefined,
-      last: totalRows,
-      after: undefined,
-      before: componentLicenses?.pageInfo?.startCursor
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
+  const { nodes, paginationProps, loading, refetch } = usePaginatatedQuery(
+    GetSbomLicensesTable,
+    {
+      skip: activeTab === 'licenses' ? false : true,
+      selector: 'sbom.componentLicenses',
+      variables: {
+        projectId: productId,
+        sbomId: sbomId
       }
-    })
-  }, [currentPage, refetch, totalRows, componentLicenses])
-
-  const handleSetRow = useCallback(
-    async (e) => {
-      const newTotalRows = Number(e.target.value)
-      setCurrentPage(1)
-      setTotalRows(newTotalRows)
-      disablePaginationControl()
-      await refetch({
-        first: newTotalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined
-      }).then((res) => {
-        if (res.data) {
-          setPaginationControl(res.data)
-        }
-      })
-    },
-    [refetch, setTotalRows]
+    }
   )
 
-  const handleNextPage = useCallback(async () => {
-    disablePaginationControl()
-    setCurrentPage(currentPage + 1)
-
-    await refetch({
-      first: totalRows,
-      last: undefined,
-      after: componentLicenses?.pageInfo?.endCursor,
-      before: undefined
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-      }
-    })
-  }, [currentPage, refetch, totalRows, componentLicenses])
-
-  // PAGINATION END
-
-  const handleRefresh = useCallback(async () => {
-    disablePaginationControl()
-    await refetch({}).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-      }
-    })
+  const handleRefresh = useCallback(() => {
+    refetch()
   }, [refetch])
 
   const subHeaderComponent = useMemo(() => {
@@ -256,24 +173,16 @@ const Licenses = () => {
     )
   }
 
-  if (error) {
-    return (
-      <Card>
-        <Text>Something went wrong</Text>
-      </Card>
-    )
-  }
-
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={componentLicenses?.nodes}
+          data={nodes}
           customStyles={customStyles}
           defaultSortAsc={false}
           defaultSortFieldId={'UPDATED_AT'}
-          progressPending={componentLicenses ? false : true}
+          progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeaderComponent}
@@ -283,22 +192,9 @@ const Licenses = () => {
           expandOnRowClicked
           expandableRowsComponent={ExpandedRow}
         />
+        {/* PAGINATION */}
+        {!loading && <Pagination {...paginationProps} />}
       </Flex>
-
-      {/* PAGINATION */}
-      {componentLicenses?.pageInfo && (
-        <Pagination
-          paginationSizes={paginationSizes}
-          pageIndex={currentPage}
-          totalRows={totalRows}
-          totalCount={componentLicenses?.totalCount}
-          onPreviousPage={handlePreviousPage}
-          onNextPage={handleNextPage}
-          onSetRow={handleSetRow}
-          hasNextPage={isNextActive}
-          hasPreviousPage={isPrevActive}
-        />
-      )}
     </>
   )
 }
