@@ -3,7 +3,6 @@ import { useState } from 'react'
 
 import {
   Button,
-  Code,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -34,29 +33,27 @@ const ComponentFeed = ({ data, refetch }) => {
   const [updateComp] = useMutation(updateOrgComp)
   const [deleteComp] = useMutation(deleteOrgComp)
 
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter' && isMatch) {
-      if (activeId !== null) {
-        updateComp({
-          variables: {
-            id: activeId,
-            match: compName
-          }
+  const handleAdd = () => {
+    if (activeId !== null) {
+      updateComp({
+        variables: {
+          id: activeId,
+          match: compName
+        }
+      })
+        .then((res) => res.data && refetch())
+        .finally(() => {
+          setCompName('')
+          setActiveId(null)
         })
-          .then((res) => res.data && refetch())
-          .finally(() => {
-            setCompName('')
-            setActiveId(null)
-          })
-      } else {
-        createComp({
-          variables: {
-            match: compName
-          }
-        })
-          .then((res) => res.data && refetch())
-          .finally(() => setCompName(''))
-      }
+    } else {
+      createComp({
+        variables: {
+          match: compName
+        }
+      })
+        .then((res) => res.data && refetch())
+        .finally(() => setCompName(''))
     }
   }
 
@@ -97,54 +94,42 @@ const ComponentFeed = ({ data, refetch }) => {
           internal.
         </Text>
       </CardHeader>
-      {data && (
-        <CardBody px='5px'>
-          <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
+      <CardBody px='5px' display={data ? 'block' : 'none'}>
+        <Stack direction={'column'} alignItems={'flex-start'} gap={2}>
+          <Flex alignItems={'center'} gap={1}>
             <FormControl isInvalid={!isMatch && compName !== ''}>
               <Input
                 placeholder='*mystring*'
                 width={'500px'}
                 value={compName}
                 onChange={handleChange}
-                onKeyDown={handleKeyDown}
                 bg={'white'}
               />
               {compName !== '' && !isMatch && (
                 <FormErrorMessage>Invalid regular expression</FormErrorMessage>
               )}
-              <Text fontSize={'xs'} mt={2}>
-                Please <Code colorScheme='blue'>enter</Code> to add a name or a
-                regular expression
-              </Text>
             </FormControl>
-
-            {data.length > 0 && (
-              <Flex
-                flexDirection={'row'}
-                flexWrap={'wrap'}
-                spacing={2}
-                gap={2}
-                mt={2}
-              >
-                {data.map((item, index) => (
-                  <Tag key={index} variant='solid' colorScheme={'blue'}>
-                    <TagLabel onClick={() => handleUpdate(item)}>
-                      {item.matchStr}
-                    </TagLabel>
-                    <TagCloseButton onClick={() => handleDeleteComp(item.id)} />
-                  </Tag>
-                ))}
-              </Flex>
-            )}
-
-            <Stack direction={'row'} spacing={4} alignItems={'center'}>
-              <Button fontWeight={'medium'} variant='solid' colorScheme='blue'>
-                Apply
-              </Button>
-            </Stack>
+            <Button
+              fontWeight={'medium'}
+              colorScheme='blue'
+              onClick={handleAdd}
+            >
+              Apply
+            </Button>
           </Flex>
-        </CardBody>
-      )}
+          <Flex flexDirection={'row'} flexWrap={'wrap'} spacing={2} gap={2}>
+            {data?.length > 0 &&
+              data?.map((item, index) => (
+                <Tag key={index} variant='subtle' colorScheme={'blue'}>
+                  <TagLabel onClick={() => handleUpdate(item)}>
+                    {item.matchStr}
+                  </TagLabel>
+                  <TagCloseButton onClick={() => handleDeleteComp(item.id)} />
+                </Tag>
+              ))}
+          </Flex>
+        </Stack>
+      </CardBody>
     </Card>
   )
 }
