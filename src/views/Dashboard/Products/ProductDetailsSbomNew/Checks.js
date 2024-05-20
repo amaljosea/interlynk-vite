@@ -77,9 +77,8 @@ const Checks = () => {
     direction: 'DESC'
   })
 
-  const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
-    GetCheckResults,
-    {
+  const { nodes, paginationProps, refetch, loading, reset } =
+    usePaginatatedQuery(GetCheckResults, {
       skip: activeTab === 'checks' ? false : true,
       selector: 'sbom.checkResults',
       variables: {
@@ -87,8 +86,7 @@ const Checks = () => {
         projectId: productId,
         ...checkState
       }
-    }
-  )
+    })
 
   const { totalRows } = paginationProps
 
@@ -222,12 +220,16 @@ const Checks = () => {
     }
   }, [healthRecheck, sbomId, toast])
 
-  const setSearchFilter = (value) => {
-    setCheckState((oldFilter) => ({
-      ...oldFilter,
-      search: value
-    }))
-  }
+  const setSearchFilter = useCallback(
+    (value) => {
+      setCheckState((oldFilter) => ({
+        ...oldFilter,
+        search: value
+      }))
+      reset()
+    },
+    [reset]
+  )
 
   // CLEAR SERACH
   const handleClear = useCallback(() => {
@@ -236,7 +238,8 @@ const Checks = () => {
       ...oldFilter,
       search: undefined
     }))
-  }, [])
+    reset()
+  }, [reset])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -252,15 +255,18 @@ const Checks = () => {
   )
 
   // SEARCH COMPONENT
-  const handleSearch = useCallback((event) => {
-    const {
-      key,
-      target: { value }
-    } = event
-    if (key === 'Enter') {
-      setSearchFilter(value)
-    }
-  }, [])
+  const handleSearch = useCallback(
+    (event) => {
+      const {
+        key,
+        target: { value }
+      } = event
+      if (key === 'Enter') {
+        setSearchFilter(value)
+      }
+    },
+    [setSearchFilter]
+  )
 
   // SUB HEADER
   const subHeader = useMemo(() => {
@@ -286,7 +292,14 @@ const Checks = () => {
           />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && <CheckFilters setCheckState={setCheckState} />}
+          {filters && (
+            <CheckFilters
+              setCheckState={(newFilters) => {
+                setCheckState(newFilters)
+                reset()
+              }}
+            />
+          )}
         </Stack>
 
         <Tooltip label='Re-Check'>
@@ -307,7 +320,8 @@ const Checks = () => {
     handleSearch,
     handleClear,
     filters,
-    handleReCheck
+    handleReCheck,
+    reset
   ])
 
   const handleOpenLicense = () => {

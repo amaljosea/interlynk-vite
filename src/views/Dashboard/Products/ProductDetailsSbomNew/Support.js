@@ -62,9 +62,8 @@ const Support = () => {
   const [activeRow, setActiveRow] = useState(null)
   const [filterText, setFilterText] = useState(searchInput)
 
-  const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
-    GetSbomSupportTab,
-    {
+  const { nodes, paginationProps, refetch, loading, reset } =
+    usePaginatatedQuery(GetSbomSupportTab, {
       skip: activeTab === 'support' ? false : true,
       selector: 'sbom.supports',
       variables: {
@@ -72,19 +71,22 @@ const Support = () => {
         projectId: projectId,
         ...filters
       }
-    }
-  )
+    })
 
   const handleRefresh = useCallback(() => {
     refetch()
   }, [refetch])
 
-  const setSearchFilter = (value) => {
-    setFilters((oldFilter) => ({
-      ...oldFilter,
-      search: value
-    }))
-  }
+  const setSearchFilter = useCallback(
+    (value) => {
+      setFilters((oldFilter) => ({
+        ...oldFilter,
+        search: value
+      }))
+      reset()
+    },
+    [reset]
+  )
 
   // CLEAR SERACH
   const handleClear = useCallback(() => {
@@ -93,7 +95,8 @@ const Support = () => {
       ...oldFilter,
       search: undefined
     }))
-  }, [])
+    reset()
+  }, [reset])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -109,15 +112,18 @@ const Support = () => {
   )
 
   // SEARCH COMPONENT
-  const handleSearch = useCallback((event) => {
-    const {
-      key,
-      target: { value }
-    } = event
-    if (key === 'Enter') {
-      setSearchFilter(value)
-    }
-  }, [])
+  const handleSearch = useCallback(
+    (event) => {
+      const {
+        key,
+        target: { value }
+      } = event
+      if (key === 'Enter') {
+        setSearchFilter(value)
+      }
+    },
+    [setSearchFilter]
+  )
 
   // SUB HEADER
   const subHeader = useMemo(() => {

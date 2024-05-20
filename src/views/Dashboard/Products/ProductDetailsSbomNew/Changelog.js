@@ -68,9 +68,8 @@ const Changelog = () => {
     direction: 'DESC'
   })
 
-  const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
-    GetChangeLogs,
-    {
+  const { nodes, paginationProps, refetch, loading, reset } =
+    usePaginatatedQuery(GetChangeLogs, {
       skip: activeTab === 'changelog' ? false : true,
       selector: 'sbom.activityLogs',
       variables: {
@@ -78,8 +77,7 @@ const Changelog = () => {
         projectId: productId,
         ...logState
       }
-    }
-  )
+    })
 
   const { field } = paginationProps
 
@@ -370,12 +368,16 @@ const Changelog = () => {
     }
   ]
 
-  const setSearchFilter = (value) => {
-    setLogState((oldFilter) => ({
-      ...oldFilter,
-      search: value
-    }))
-  }
+  const setSearchFilter = useCallback(
+    (value) => {
+      setLogState((oldFilter) => ({
+        ...oldFilter,
+        search: value
+      }))
+      reset()
+    },
+    [reset]
+  )
 
   // CLEAR SERACH
   const handleClear = useCallback(async () => {
@@ -384,7 +386,8 @@ const Changelog = () => {
       ...oldFilter,
       search: undefined
     }))
-  }, [])
+    reset()
+  }, [reset])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -400,15 +403,18 @@ const Changelog = () => {
   )
 
   // SEARCH COMPONENT
-  const handleSearch = useCallback(async (event) => {
-    const {
-      key,
-      target: { value }
-    } = event
-    if (key === 'Enter') {
-      setSearchFilter(value)
-    }
-  }, [])
+  const handleSearch = useCallback(
+    async (event) => {
+      const {
+        key,
+        target: { value }
+      } = event
+      if (key === 'Enter') {
+        setSearchFilter(value)
+      }
+    },
+    [setSearchFilter]
+  )
 
   const handleSort = async (column, sortDirection) => {
     setLogState((oldFilters) => ({
@@ -439,7 +445,14 @@ const Changelog = () => {
             onClear={handleClear}
           />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && <LogFilters setLogState={setLogState} />}
+          {filters && (
+            <LogFilters
+              setLogState={(newFilters) => {
+                setLogState(newFilters)
+                reset()
+              }}
+            />
+          )}
         </Stack>
         <Tooltip label='Refresh'>
           <IconButton
@@ -456,6 +469,7 @@ const Changelog = () => {
     handleSearch,
     handleClear,
     filters,
+    reset,
     refetch
   ])
 

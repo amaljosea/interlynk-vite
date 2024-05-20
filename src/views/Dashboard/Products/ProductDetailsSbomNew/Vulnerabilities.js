@@ -288,9 +288,8 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   const { data: allVexJustify } = useQuery(getVexJustifications)
   const { data: allCdx } = useQuery(GetCdxResponses)
 
-  const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
-    GetVulnData,
-    {
+  const { nodes, paginationProps, refetch, loading, reset } =
+    usePaginatatedQuery(GetVulnData, {
       skip:
         sbomId &&
         vulnsPermissions?.value === true &&
@@ -320,8 +319,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
         field: prodVulnState.field,
         direction: prodVulnState.direction
       }
-    }
-  )
+    })
 
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const firstDegreePart = nodes?.filter(
@@ -806,7 +804,8 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   const handleClear = useCallback(async () => {
     setVulnSearch('')
     prodVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-  }, [prodVulnDispatch])
+    reset()
+  }, [prodVulnDispatch, reset])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -827,9 +826,10 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
       const { value } = event.target
       if (event.key === 'Enter') {
         prodVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        reset()
       }
     },
-    [prodVulnDispatch]
+    [prodVulnDispatch, reset]
   )
 
   // SCAN VULN
@@ -856,6 +856,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
             (res) => res?.data && console.log(res?.data)
           )
           prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+          reset()
         }
       }
     })
@@ -863,6 +864,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     onVulnScan,
     prodVulnDispatch,
     productId,
+    reset,
     sbomData?.vulnRunStatus,
     sbomId,
     sbomRefetch,
@@ -897,7 +899,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {filters ? (
-            <VulnFilters />
+            <VulnFilters reset={() => reset()} />
           ) : (
             <Stack direction='row' spacing={4}>
               {[1, 2, 3, 4].map((_, index) => (
@@ -965,6 +967,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     onSearchInputChange,
     onTableOpen,
     prodVulnDispatch,
+    reset,
     selectedVulns.length,
     signedUrlParams,
     vulnSearch

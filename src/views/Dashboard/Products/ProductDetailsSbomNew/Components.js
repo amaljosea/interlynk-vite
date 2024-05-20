@@ -158,7 +158,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
       permission.key === 'update_sbom' && permission.value === true
   )
 
-  const fetchCompData = refetch
+  const fetchCompData = () => reset()
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -908,7 +908,8 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const handleClear = useCallback(async () => {
     setCompSearch('')
     prodCompDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-  }, [prodCompDispatch])
+    reset()
+  }, [prodCompDispatch, reset])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -929,9 +930,10 @@ const Components = ({ sbomData, sbomRefetch }) => {
       const { value } = event.target
       if (event.key === 'Enter' && value !== '') {
         prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        reset()
       }
     },
-    [prodCompDispatch]
+    [prodCompDispatch, reset]
   )
 
   // HEADER SECTION
@@ -957,7 +959,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
             onChange={onSearchInputChange}
           />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && <CompFilters />}
+          {filters && <CompFilters reset={() => reset()} />}
         </Stack>
         <Stack
           width={'100%'}
@@ -983,10 +985,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
           </Tooltip>
           <Tooltip label='Refresh'>
             <IconButton
-              onClick={() => {
-                reset()
-                refetch()
-              }}
+              onClick={() => refetch()}
               colorScheme='blue'
               icon={<RepeatIcon />}
             />
@@ -1070,7 +1069,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
               isOpen={isOpen}
               onClose={onClose}
               sbomRefetch={sbomRefetch}
-              fetchCompData={fetchCompData}
+              fetchCompData={() => refetch()}
               filterRefetch={getCompFilters}
               shortDesc={null}
               checkId={null}
