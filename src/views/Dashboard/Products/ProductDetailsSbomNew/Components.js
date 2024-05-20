@@ -44,6 +44,7 @@ import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
 import {
@@ -74,12 +75,10 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const customerView = location.pathname.startsWith('/customer')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const { userPermissions, totalRows, setTotalRows, prodCompState, dispatch } =
-    useGlobalState()
+  const { userPermissions, prodCompState, dispatch } = useGlobalState()
   const {
     field,
     direction,
-    pageIndex,
     searchInput,
     ecosystems,
     kinds,
@@ -108,21 +107,22 @@ const Components = ({ sbomData, sbomRefetch }) => {
   }, [direct, ecosystems, kinds, licenses, scope, suppliers])
 
   // GET COMPONENT DATA
-  const { data, refetch, error } = useQuery(GetComponentData, {
-    fetchPolicy: activeTab === 'components' ? false : true,
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      search: searchInput !== '' ? searchInput : undefined,
-      ...compData,
-      field: field,
-      direction: direction
-    }
-  })
+  const { nodes, refetch, error, paginationProps, reset, loading } =
+    usePaginatatedQuery(GetComponentData, {
+      selector: 'sbom.components',
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        search: searchInput !== '' ? searchInput : undefined,
+        ...compData,
+        field: field,
+        direction: direction
+      }
+    })
 
-  const { components } = data?.sbom || ''
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, [loading])
 
   const { lifecycle, primaryComponent } = sbomData || ''
 
@@ -146,35 +146,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
     }
   )
 
-  //This part is needed for the pagination to work. (Modify with caution)
-  const paginationSizes = [25, 50, 100]
-
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
   const [activeComp, setActiveComp] = useState(null)
-
-  const setPaginationControl = useCallback(
-    (data) => {
-      if (signedUrlParams) {
-        setIsPrevActive(
-          data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasPreviousPage
-        )
-        setIsNextActive(
-          data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasNextPage
-        )
-      } else {
-        setIsPrevActive(data?.sbom?.components?.pageInfo?.hasPreviousPage)
-        setIsNextActive(data?.sbom?.components?.pageInfo?.hasNextPage)
-      }
-    },
-    [signedUrlParams]
-  )
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
-  //end
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const updateComponent = sboms?.supersededBy?.some(
@@ -186,65 +158,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
       permission.key === 'update_sbom' && permission.value === true
   )
 
-  const fetchCompData = useCallback(async () => {
-    disablePaginationControl()
-    await refetch({
-      projectId: signedUrlParams ? undefined : productId,
-      sbomId: sbomId,
-      search: searchInput !== '' ? searchInput : undefined,
-      ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
-      kind: getUndefinedIfEmptyOrAll(kinds),
-      licenses: getUndefinedIfEmptyOrAll(licenses),
-      supplierName: getUndefinedIfEmptyOrAll(suppliers),
-      primary: scope === 'primary' ? true : undefined,
-      internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true : undefined,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      field: field,
-      direction: direction
-    })
-      .then((res) => {
-        res && setPaginationControl(res.data)
-        prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        prodCompDispatch({
-          type: 'SET_TOTAL_COMP',
-          payload: res?.data?.sbom?.components?.totalCount
-        })
-        getCompFilters({
-          projectId: signedUrlParams ? undefined : productId,
-          sbomId: sbomId
-        }).then((res) =>
-          prodCompDispatch({
-            type: 'ADD_FILTER_HEADS',
-            payload: signedUrlParams
-              ? res?.data?.shareLynkQuery?.sbom?.filters
-              : res?.data?.sbom?.filters
-          })
-        )
-      })
-      .finally(() => window.scrollTo({ top: 0, behavior: 'smooth' }))
-  }, [
-    direct,
-    direction,
-    ecosystems,
-    field,
-    getCompFilters,
-    kinds,
-    licenses,
-    prodCompDispatch,
-    productId,
-    refetch,
-    sbomId,
-    scope,
-    searchInput,
-    setPaginationControl,
-    signedUrlParams,
-    suppliers,
-    totalRows
-  ])
+  const fetchCompData = refetch
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -732,36 +646,13 @@ const Components = ({ sbomData, sbomRefetch }) => {
     setActiveComp(row)
     onGraphOpen()
   }
-
   const [deleteSupplier] = useMutation(deleteComSupplier)
 
   const handleSupRemove = async (id) => {
     try {
       await deleteSupplier({ variables: { id: id } }).then((res) => {
         if (res.data) {
-          disablePaginationControl()
-          refetch({
-            projectId: productId,
-            sbomId: sbomId,
-            first: totalRows,
-            last: undefined,
-            searchInput: searchInput === '' ? undefined : searchInput,
-            ...compData,
-            field: field,
-            direction: direction
-          }).then((res) => {
-            if (res?.data) {
-              setPaginationControl(res.data)
-              getCompFilters({ projectId: productId, sbomId }).then(
-                (res) =>
-                  res?.data &&
-                  prodCompDispatch({
-                    type: 'ADD_FILTER_HEADS',
-                    payload: res?.data?.sbom?.filters
-                  })
-              )
-            }
-          })
+          refetch()
         }
       })
     } catch (error) {
@@ -856,11 +747,8 @@ const Components = ({ sbomData, sbomRefetch }) => {
                         ` ${item.name}`
                       )}
                     </Text>
-                    {!signedUrlParams && (
-                      <TagCloseButton
-                        onClick={() => handleSupRemove(item.id)}
-                      />
-                    )}
+                    onClick={() => handleSupRemove(item.id)}
+                    {!signedUrlParams && <TagCloseButton />}
                   </Tag>
                 ))}
             </VStack>
@@ -1019,36 +907,8 @@ const Components = ({ sbomData, sbomRefetch }) => {
   // CLEAR SERACH
   const handleClear = useCallback(async () => {
     setCompSearch('')
-    disablePaginationControl()
-    await refetch({
-      projectId: signedUrlParams ? undefined : productId,
-      sbomId: sbomId,
-      search: undefined,
-      ...compData,
-      field: field,
-      direction: direction,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-        prodCompDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-      }
-    })
-  }, [
-    compData,
-    direction,
-    field,
-    prodCompDispatch,
-    productId,
-    refetch,
-    sbomId,
-    setPaginationControl,
-    signedUrlParams,
-    totalRows
-  ])
+    prodCompDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+  }, [prodCompDispatch])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -1068,60 +928,11 @@ const Components = ({ sbomData, sbomRefetch }) => {
     async (event) => {
       const { value } = event.target
       if (event.key === 'Enter' && value !== '') {
-        disablePaginationControl()
-        await refetch({
-          projectId: signedUrlParams ? undefined : productId,
-          sbomId: sbomId,
-          search: value,
-          first: totalRows,
-          last: undefined,
-          after: undefined,
-          before: undefined,
-          ...compData,
-          field: field,
-          direction: direction
-        }).then((res) => {
-          if (res.data) {
-            setPaginationControl(res.data)
-            prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-          }
-        })
+        prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
       }
     },
-    [
-      compData,
-      direction,
-      field,
-      prodCompDispatch,
-      productId,
-      refetch,
-      sbomId,
-      setPaginationControl,
-      signedUrlParams,
-      totalRows
-    ]
+    [prodCompDispatch]
   )
-
-  // SET ROW LENGTH
-  const handleSetRow = async (e) => {
-    setTotalRows(Number(e.target.value))
-    disablePaginationControl()
-    await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: Number(e.target.value),
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      field: field,
-      direction: direction
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-        prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      }
-    })
-  }
 
   // HEADER SECTION
   const subHeader = useMemo(() => {
@@ -1172,7 +983,10 @@ const Components = ({ sbomData, sbomRefetch }) => {
           </Tooltip>
           <Tooltip label='Refresh'>
             <IconButton
-              onClick={fetchCompData}
+              onClick={() => {
+                reset()
+                refetch()
+              }}
               colorScheme='blue'
               icon={<RepeatIcon />}
             />
@@ -1191,28 +1005,9 @@ const Components = ({ sbomData, sbomRefetch }) => {
     lifecycle,
     updateComponent,
     updateSboms,
-    fetchCompData
+    reset,
+    refetch
   ])
-
-  const handleRefetch = async (after, before) => {
-    disablePaginationControl()
-    await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: after ? totalRows : undefined,
-      after: after ? after : undefined,
-      last: before ? totalRows : undefined,
-      before: before ? before : undefined,
-      search: searchInput !== '' ? searchInput : undefined,
-      ...compData,
-      field: field,
-      direction: direction
-    }).then((res) => {
-      if (res?.data) {
-        setPaginationControl(res?.data)
-      }
-    })
-  }
 
   const handleSort = async (column, sortDirection) => {
     prodCompDispatch({
@@ -1223,34 +1018,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
       }
     })
   }
-
-  const handlePreviousPage = async () => {
-    disablePaginationControl()
-    handleRefetch(null, components?.pageInfo?.startCursor)
-    prodCompDispatch({
-      type: 'DECREMENT_PAGE',
-      payload: components?.pageInfo?.startCursor
-    })
-  }
-
-  const handleNextPage = async () => {
-    disablePaginationControl()
-    handleRefetch(components?.pageInfo?.endCursor, null)
-    prodCompDispatch({
-      type: 'INCREMENT_PAGE',
-      payload: {
-        total: components?.totalCount,
-        after: components?.pageInfo?.endCursor
-      }
-    })
-  }
-
-  useEffect(() => {
-    if (components) {
-      setIsPrevActive(components?.pageInfo?.hasPreviousPage)
-      setIsNextActive(components?.pageInfo?.hasNextPage)
-    }
-  }, [components])
 
   if (error) {
     return (
@@ -1265,12 +1032,12 @@ const Components = ({ sbomData, sbomRefetch }) => {
       <Flex flexDir={'column'} width={'100%'} height={'auto'}>
         <DataTable
           columns={columns}
-          data={components?.nodes}
+          data={nodes}
           onSort={handleSort}
           customStyles={customStyles}
           defaultSortAsc={false}
           defaultSortFieldId={field}
-          progressPending={components ? false : true}
+          progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
@@ -1283,19 +1050,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
       </Flex>
 
       {/* PAGINATION */}
-      {components?.pageInfo && (
-        <Pagination
-          paginationSizes={paginationSizes}
-          pageIndex={pageIndex}
-          totalRows={totalRows}
-          totalCount={components?.totalCount}
-          onPreviousPage={handlePreviousPage}
-          onNextPage={handleNextPage}
-          onSetRow={handleSetRow}
-          hasNextPage={isNextActive}
-          hasPreviousPage={isPrevActive}
-        />
-      )}
+      <Pagination {...paginationProps} />
 
       {isGraphOpen && activeComp && (
         <GraphDrawer

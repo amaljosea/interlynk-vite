@@ -71,8 +71,11 @@ export const usePaginatatedQuery = (
       setPaginationVariables(DEFAULT_PAGINATION_VARIABLES)
       setPage(1)
     },
+    // it is good not to allow any variables for refetch
+    // if you need to change the variables, pass it as props, it will rerender
     refetch: () => refetch(),
     paginationProps: {
+      loading,
       paginationHidden: !resource,
       paginationSizes: PAGINATION_SIZES,
       totalCount: resource?.totalCount,

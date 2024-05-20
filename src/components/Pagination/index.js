@@ -12,8 +12,12 @@ const Pagination = ({
   onSetRow,
   hasPreviousPage,
   hasNextPage,
-  paginationHidden = false
+  paginationHidden = false,
+  loading
 }) => {
+  if (loading) {
+    return null
+  }
   if (paginationHidden) {
     return null
   }
