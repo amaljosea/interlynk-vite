@@ -1,5 +1,4 @@
-import { useLazyQuery } from '@apollo/client'
-import { useEffect } from 'react'
+import { useState } from 'react'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import { Flex } from '@chakra-ui/react'
@@ -7,34 +6,26 @@ import { Flex } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import SupportTable from 'components/Tables/SupportTable'
 
-import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetSupportTab } from 'graphQL/Queries'
 
 const Support = () => {
   const org = localStorage.getItem('organization')
-  const { totalRows, supportState } = useGlobalState()
-  const { searchInput, field, direction } = supportState
 
-  // GET COMPONENT SUPPORT INFO
-  const [getSupportData, { data }] = useLazyQuery(GetSupportTab)
+  const [filters, setFilters] = useState({
+    field: 'COMPONENT_SUPPORT_OVERRIDES_UPDATED_AT',
+    direction: 'DESC'
+  })
 
-  useEffect(() => {
-    if (org !== 'undefined' && data === undefined) {
-      getSupportData({
-        variables: {
-          search: searchInput === '' ? undefined : searchInput,
-          first: totalRows,
-          field: field,
-          direction: direction
-        }
-      }).then((res) => {
-        if (res?.data) {
-          console.log('Support data', res.data)
-        }
-      })
-    }
-  }, [])
+  const { nodes, paginationProps, reset, loading, refetch } =
+    usePaginatatedQuery(GetSupportTab, {
+      skip: org !== 'undefined' ? false : true,
+      selector: 'supports',
+      variables: {
+        ...filters
+      }
+    })
 
   return (
     <Flex
@@ -47,7 +38,17 @@ const Support = () => {
         <OrgRegister />
       ) : (
         <Card>
-          <SupportTable data={data?.supports} refetch={getSupportData} />
+          <SupportTable
+            loading={loading}
+            data={nodes}
+            refetch={refetch}
+            paginationProps={paginationProps}
+            filters={filters}
+            setFilters={(newFilters) => {
+              setFilters(newFilters)
+              reset()
+            }}
+          />
         </Card>
       )}
     </Flex>

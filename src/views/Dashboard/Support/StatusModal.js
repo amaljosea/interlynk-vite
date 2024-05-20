@@ -16,23 +16,12 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import { UpdateCompSupportOverride } from 'graphQL/Mutation'
 
 const StatusModal = ({ isOpen, onClose, data, refetch }) => {
   const toast = useToast()
   const { id, enabled } = data
-  const { totalRows, supportState } = useGlobalState()
-  const { searchInput, field, direction } = supportState
   const [updateSupport] = useMutation(UpdateCompSupportOverride)
-
-  const supportData = {
-    search: searchInput === '' ? undefined : searchInput,
-    first: totalRows,
-    field: field,
-    direction: direction
-  }
 
   const onChangeStatus = async () => {
     await updateSupport({
@@ -47,7 +36,7 @@ const StatusModal = ({ isOpen, onClose, data, refetch }) => {
           position: 'top'
         })
       } else {
-        refetch({ variables: { ...supportData } })
+        refetch()
         onClose()
       }
     })

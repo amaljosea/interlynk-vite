@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
@@ -27,19 +27,21 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaPlus } from 'react-icons/fa6'
 
-const SupportTable = ({ data, refetch }) => {
+const SupportTable = ({
+  data,
+  loading,
+  paginationProps,
+  filters,
+  setFilters,
+  refetch
+}) => {
   const params = useParams()
-  const projectId = params.productid
   const sbomId = params.sbomid
 
-  const { totalRows, setTotalRows, supportState, dispatch } = useGlobalState()
-  const { pageIndex, searchInput, field, direction } = supportState
-  const { supportDispatch } = dispatch
+  const { search, field } = filters
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -53,83 +55,31 @@ const SupportTable = ({ data, refetch }) => {
     onClose: onDeleteClose
   } = useDisclosure()
 
-  const paginationSizes = [25, 50, 100]
   const [activeRow, setActiveRow] = useState(null)
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
-  const [filterText, setFilterText] = useState('')
+  const [filterText, setFilterText] = useState(search || '')
 
-  const setPaginationControl = (data) => {
-    setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data?.pageInfo?.hasNextPage)
-  }
+  const handleRefresh = useCallback(() => {
+    refetch()
+  }, [refetch])
 
-  const handleRefetch = async (after, before) => {
-    disablePaginationControl()
-    await refetch({
-      variables: {
-        search: searchInput === '' ? undefined : searchInput,
-        first: after ? totalRows : undefined,
-        after: after ? after : undefined,
-        last: before ? totalRows : undefined,
-        before: before ? before : undefined,
-        field,
-        direction
-      }
-    }).then((res) => {
-      if (res?.data) {
-        console.log('res', res?.data?.supports)
-        setPaginationControl(res?.data?.supports)
-      }
-    })
-  }
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
-
-  const handleRefresh = useCallback(async () => {
-    disablePaginationControl()
-    if (sbomId) {
-      await refetch({ variables: { projectId, sbomId } })
-    } else {
-      await refetch({
-        variables: {
-          search: searchInput === '' ? undefined : searchInput,
-          first: totalRows,
-          field,
-          direction
-        }
-      }).then(
-        (res) => res?.data && supportDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-      )
-    }
-  }, [
-    direction,
-    field,
-    projectId,
-    refetch,
-    sbomId,
-    searchInput,
-    supportDispatch,
-    totalRows
-  ])
+  const setSearchFilter = useCallback(
+    (value) => {
+      setFilters((oldFilter) => ({
+        ...oldFilter,
+        search: value
+      }))
+    },
+    [setFilters]
+  )
 
   // CLEAR SERACH
-  const handleClear = useCallback(async () => {
+  const handleClear = useCallback(() => {
     setFilterText('')
-    await refetch({
-      variables: {
-        search: undefined,
-        first: totalRows,
-        field: field,
-        direction: direction
-      }
-    }).then(
-      (res) => res?.data && supportDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-    )
-  }, [direction, field, refetch, supportDispatch, totalRows])
+    setFilters((oldFilter) => ({
+      ...oldFilter,
+      search: undefined
+    }))
+  }, [setFilters])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -146,77 +96,24 @@ const SupportTable = ({ data, refetch }) => {
 
   // SEARCH COMPONENT
   const handleSearch = useCallback(
-    async (event) => {
-      const { value } = event.target
-      if (event.key === 'Enter' && filterText !== '') {
-        refetch({
-          variables: { search: value, first: totalRows, field, direction }
-        }).then(
-          (res) =>
-            res?.data &&
-            supportDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-        )
+    (event) => {
+      const {
+        key,
+        target: { value }
+      } = event
+      if (key === 'Enter') {
+        setSearchFilter(value)
       }
     },
-    [direction, field, filterText, refetch, supportDispatch, totalRows]
+    [setSearchFilter]
   )
 
   const handleSort = async (column, sortDirection) => {
-    await refetch({
-      variables: {
-        search: searchInput === '' ? undefined : searchInput,
-        first: totalRows,
-        field: column.id,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-      }
-    }).then((res) => {
-      if (res.data) {
-        supportDispatch({
-          type: 'SET_SORT_ORDER',
-          payload: {
-            field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-          }
-        })
-      }
-    })
-  }
-
-  // SET ROW LENGTH
-  const handleSetRow = async (e) => {
-    setTotalRows(Number(e.target.value))
-    disablePaginationControl()
-    await refetch({
-      variables: {
-        search: searchInput === '' ? undefined : searchInput,
-        first: Number(e.target.value),
-        field: field,
-        direction: direction
-      }
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-        supportDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      }
-    })
-  }
-
-  const handlePreviousPage = async () => {
-    disablePaginationControl()
-    handleRefetch(null, data.pageInfo.startCursor)
-    supportDispatch({
-      type: 'DECREMENT_PAGE',
-      payload: data.pageInfo.startCursor
-    })
-  }
-
-  const handleNextPage = async () => {
-    disablePaginationControl()
-    handleRefetch(data.pageInfo.endCursor, null)
-    supportDispatch({
-      type: 'INCREMENT_PAGE',
-      payload: { total: data.totalCount, after: data.pageInfo.endCursor }
-    })
+    setFilters((oldFilters) => ({
+      ...oldFilters,
+      field: column?.id,
+      direction: sortDirection.toUpperCase()
+    }))
   }
 
   // SUB HEADER
@@ -440,24 +337,17 @@ const SupportTable = ({ data, refetch }) => {
     }
   ]
 
-  useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
-    }
-  }, [data])
-
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data?.nodes || []}
+          data={data || []}
           customStyles={customStyles}
           onSort={handleSort}
           defaultSortFieldId={field}
           defaultSortAsc={false}
-          progressPending={data ? false : true}
+          progressPending={loading}
           persistTableHead
           subHeader
           subHeaderComponent={subHeader}
@@ -466,24 +356,12 @@ const SupportTable = ({ data, refetch }) => {
         />
 
         {/* PAGINATION */}
-        {data?.pageInfo && (
-          <Pagination
-            paginationSizes={paginationSizes}
-            pageIndex={pageIndex}
-            totalRows={totalRows}
-            totalCount={data?.totalCount}
-            onPreviousPage={handlePreviousPage}
-            onNextPage={handleNextPage}
-            onSetRow={handleSetRow}
-            hasNextPage={isNextActive}
-            hasPreviousPage={isPrevActive}
-          />
-        )}
+        <Pagination {...paginationProps} />
       </Flex>
 
       {isOpen && (
         <SupportModal
-          supports={data?.nodes || []}
+          supports={data || []}
           data={activeRow}
           isOpen={isOpen}
           onClose={onClose}

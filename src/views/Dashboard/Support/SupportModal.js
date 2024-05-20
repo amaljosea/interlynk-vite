@@ -29,8 +29,6 @@ import {
   Text
 } from '@chakra-ui/react'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import {
   CreateCompSupportOverride,
   UpdateCompSupportOverride
@@ -39,9 +37,6 @@ import {
 import { FaPlus, FaTrash } from 'react-icons/fa'
 
 const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
-  const { totalRows, supportState } = useGlobalState()
-  const { searchInput, field, direction } = supportState
-
   const [idUri, setIdUri] = useState('')
   const [productName, setProductName] = useState('')
   const [productVersion, setProductVersion] = useState('')
@@ -57,16 +52,7 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
   const [createSupport] = useMutation(CreateCompSupportOverride)
   const [updateSupport] = useMutation(UpdateCompSupportOverride)
 
-  const handleRefetch = () => {
-    refetch({
-      variables: {
-        search: searchInput === '' ? undefined : searchInput,
-        first: totalRows,
-        field: field,
-        direction: direction
-      }
-    })
-  }
+  const handleRefetch = () => refetch()
 
   const hasSimilarRow = (data) => {
     for (let i = 0; i < data.length; i++) {
