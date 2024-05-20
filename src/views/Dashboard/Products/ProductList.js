@@ -1,5 +1,4 @@
-import { useQuery } from '@apollo/client'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
 
@@ -9,21 +8,15 @@ import { Flex, Text } from '@chakra-ui/react'
 import ProductTable from 'components/Tables/ProductTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetProductTable } from 'graphQL/Queries'
 
 import OrgRegister from '../Profile/components/OrgRegister'
 
 function ProductList() {
-  const { totalRows, prodState, userPermissions, dispatch } = useGlobalState()
-  const { data, field, direction, enabled, searchInput } = prodState
-  const {
-    prodDispatch,
-    prodCompDispatch,
-    prodVulnDispatch,
-    prodCheckDispatch,
-    sbomLogDispatch
-  } = dispatch
+  const { userPermissions, dispatch } = useGlobalState()
+  const { prodDispatch, prodCompDispatch, prodVulnDispatch } = dispatch
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -35,43 +28,41 @@ function ProductList() {
     [userPermissions]
   )
 
-  const {
-    data: groups,
-    refetch,
-    error
-  } = useQuery(GetProductTable, {
-    skip: productPermissions?.value === true ? false : true,
-    variables: {
-      search: searchInput !== '' ? searchInput : undefined,
-      enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
-      direction: direction,
-      first: totalRows,
-      field: field
-    },
-    onCompleted: (data) =>
-      prodDispatch({
-        type: 'GET_DATA',
-        payload: data?.organization?.projectGroups
-      })
+  const [filters, setFilters] = useState({
+    field: 'PROJECT_GROUPS_UPDATED_AT',
+    direction: 'DESC',
+    enabled: true
   })
 
+  const { nodes, paginationProps, reset, refetch, loading, error } =
+    usePaginatatedQuery(GetProductTable, {
+      skip: productPermissions?.value === true ? false : true,
+      selector: 'organization.projectGroups',
+      variables: {
+        ...filters
+      },
+      onCompleted: (data) =>
+        prodDispatch({
+          type: 'GET_DATA',
+          payload: data?.organization?.projectGroups
+        })
+    })
+
   useEffect(() => {
-    if (data && data.projects && !error) {
+    if (nodes) {
       prodDispatch({
         type: 'SET_TOTAL_PRODUCT',
-        payload: data.projects.totalCount
+        payload: nodes.totalCount
       })
     }
-  }, [data])
+  }, [nodes, prodDispatch])
 
   useEffect(() => {
     if (product === null) {
       prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
-      prodCheckDispatch({ type: 'CLEAR_PROD_CHECK' })
-      sbomLogDispatch({ type: 'CLEAR_SBOM_LOG' })
     }
-  }, [product])
+  }, [prodCompDispatch, prodVulnDispatch, product])
 
   if (!org || org === 'undefined') {
     return <OrgRegister />
@@ -97,8 +88,16 @@ function ProductList() {
 
   return (
     <ProductTable
-      data={groups?.organization?.projectGroups}
+      data={nodes}
+      loading={loading}
       refetch={refetch}
+      filters={filters}
+      reset={() => reset()}
+      paginationProps={paginationProps}
+      setFilters={(newFilters) => {
+        setFilters(newFilters)
+        reset()
+      }}
     />
   )
 }

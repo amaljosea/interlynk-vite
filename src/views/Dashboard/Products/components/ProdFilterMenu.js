@@ -10,21 +10,22 @@ import {
 import CheckMark from 'components/Misc/CheckMark'
 import MenuHeading from 'components/Misc/MenuHeading'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
-const ProdFilterMenu = ({ onFilter }) => {
-  const { prodState } = useGlobalState()
-  const { enabled } = prodState
-
+const ProdFilterMenu = ({ enabled, onFilter }) => {
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* ACTIVE */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
-          {enabled !== '' && enabled !== 'all' && <CheckMark />}
+          {enabled !== undefined && <CheckMark />}
           <MenuHeading title={'Active'} />
           <MenuList>
-            <MenuOptionGroup type='radio' value={enabled} onChange={onFilter}>
+            <MenuOptionGroup
+              type='radio'
+              value={
+                enabled === true ? 'yes' : enabled === false ? 'no' : 'all'
+              }
+              onChange={onFilter}
+            >
               {['all', 'yes', 'no'].map((item, index) => (
                 <MenuItemOption
                   key={index}

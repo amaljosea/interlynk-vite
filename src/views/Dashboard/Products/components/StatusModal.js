@@ -16,20 +16,14 @@ import {
   UnorderedList
 } from '@chakra-ui/react'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import { UpdateProjectGroup } from 'graphQL/Mutation'
 
 const StatusModal = ({ isOpen, onClose, group, grouId, refetch }) => {
-  const { totalRows, prodState } = useGlobalState()
-  const { field, direction } = prodState
   const [isLoading, setIsLoading] = useState(false)
 
   const { id, enabled } = group
 
-  const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {
-    onCompleted: () => refetch({ first: totalRows })
-  })
+  const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
 
   // TOGGLE STATUS
   const toggleStatus = async () => {
@@ -46,11 +40,7 @@ const StatusModal = ({ isOpen, onClose, group, grouId, refetch }) => {
           if (grouId) {
             refetch({ id: id })
           } else {
-            refetch({
-              first: totalRows,
-              field,
-              direction
-            })
+            refetch()
           }
         }
       })
