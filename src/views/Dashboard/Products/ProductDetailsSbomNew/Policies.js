@@ -1,6 +1,6 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import styled from '@emotion/styled'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
@@ -29,8 +29,10 @@ import CustomLoader from 'components/CustomLoader'
 import ViolationDrawer from 'components/Drawer/ViolationDrawer'
 import Pagination from 'components/Pagination'
 
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+
 import { SbomPolicyScan } from 'graphQL/Mutation'
-import { PolicyResults, PolicyRuleViolations } from 'graphQL/Queries'
+import { PolicyResults } from 'graphQL/Queries'
 
 import { BiScan } from 'react-icons/bi'
 import { FaEye } from 'react-icons/fa6'
@@ -38,62 +40,28 @@ import { FaEye } from 'react-icons/fa6'
 const Policies = () => {
   const toast = useToast()
   const params = useParams()
+  const sbomId = params.sbomid
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
-  const sbomId = params.sbomid
 
-  const { data, refetch } = useQuery(PolicyResults, {
-    skip: activeTab === 'policies' ? false : true,
-    variables: { sbomId, first: totalRows }
-  })
+  const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
+    PolicyResults,
+    {
+      skip: activeTab === 'policies' ? false : true,
+      selector: 'policyResults',
+      variables: {
+        sbomId
+      }
+    }
+  )
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const paginationSizes = [25, 50, 100]
   const [activeRow, setActiveRow] = useState(null)
-  const [currentPage, setCurrentPage] = useState(1)
   const [activePolicy, setActivePolicy] = useState('')
-  const [totalRows, setTotalRows] = useState(paginationSizes[0])
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
-
-  const [getViolations, { data: violations }] =
-    useLazyQuery(PolicyRuleViolations)
 
   const [policyScan] = useMutation(SbomPolicyScan)
-
-  const setPaginationControl = (data) => {
-    setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data?.pageInfo?.hasNextPage)
-  }
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
-
-  // SET ROW LENGTH
-  const handleSetRow = useCallback(
-    async (e) => {
-      disablePaginationControl()
-      setTotalRows(Number(e.target.value))
-      await refetch({
-        variables: {
-          sbomId,
-          first: Number(e.target.value),
-          last: undefined,
-          after: undefined,
-          before: undefined
-        }
-      }).then((res) => {
-        if (res?.data) {
-          setPaginationControl(res.data)
-        }
-      })
-    },
-    [refetch, sbomId]
-  )
 
   // SUB HEADER
   const subHeader = useMemo(() => {
@@ -114,7 +82,7 @@ const Policies = () => {
             position: 'top',
             duration: 2000
           })
-          refetch({ sbomId, first: totalRows, last: undefined })
+          refetch()
         }
       })
     }
@@ -218,20 +186,12 @@ const Policies = () => {
   ]
 
   const onCheckViolations = useCallback(
-    async (name, item) => {
-      // console.log('item', item)
-      await getViolations({
-        variables: { sbomId, policyRuleId: item.id, first: totalRows }
-      }).then((res) => {
-        if (res?.data) {
-          setActiveRow(item)
-          setActivePolicy(name)
-          // console.log(res?.data?.policyRuleViolations)
-        }
-      })
+    (name, item) => {
+      setActiveRow(item)
+      setActivePolicy(name)
       onOpen()
     },
-    [getViolations, onOpen, sbomId, totalRows]
+    [onOpen]
   )
 
   // EXPAND VIEW
@@ -335,57 +295,14 @@ const Policies = () => {
     )
   }
 
-  const handlePreviousPage = useCallback(async () => {
-    disablePaginationControl()
-    setCurrentPage(currentPage - 1)
-    await refetch({
-      variables: {
-        sbomId: sbomId,
-        first: undefined,
-        last: totalRows,
-        after: undefined,
-        before: data?.pageInfo?.startCursor
-      }
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-      }
-    })
-  }, [currentPage, refetch, sbomId, totalRows, data?.pageInfo?.startCursor])
-
-  const handleNextPage = useCallback(async () => {
-    disablePaginationControl()
-    setCurrentPage(currentPage + 1)
-    await refetch({
-      variables: {
-        sbomId: sbomId,
-        first: totalRows,
-        last: undefined,
-        after: data?.pageInfo?.endCursor,
-        before: undefined
-      }
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-      }
-    })
-  }, [currentPage, refetch, sbomId, totalRows, data?.pageInfo?.endCursor])
-
-  useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
-    }
-  }, [data])
-
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data?.policyResults?.nodes || []}
+          data={nodes || []}
           customStyles={customStyles}
-          progressPending={data ? false : true}
+          progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
@@ -396,30 +313,16 @@ const Policies = () => {
           expandableRowsComponent={ExpandedComponent}
         />
 
-        {data?.pageInfo && (
-          <Pagination
-            paginationSizes={paginationSizes}
-            pageIndex={currentPage}
-            totalRows={totalRows}
-            totalCount={data?.totalCount}
-            onPreviousPage={handlePreviousPage}
-            onNextPage={handleNextPage}
-            onSetRow={handleSetRow}
-            hasNextPage={isNextActive}
-            hasPreviousPage={isPrevActive}
-          />
-        )}
+        <Pagination {...paginationProps} />
       </Flex>
 
       {isOpen && (
         <ViolationDrawer
           isOpen={isOpen}
+          sbomId={sbomId}
           onClose={onClose}
           activeRow={activeRow}
           policy={activePolicy}
-          data={violations?.policyRuleViolations}
-          sbomId={sbomId}
-          refetch={getViolations}
         />
       )}
     </>

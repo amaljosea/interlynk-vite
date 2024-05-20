@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils'
 
@@ -18,87 +17,24 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
-const ViolationDrawer = ({
-  policy,
-  activeRow,
-  data,
-  sbomId,
-  isOpen,
-  onClose,
-  refetch
-}) => {
-  const { id, subject, category, name, operatorWording, value } =
-    activeRow || null
-  const paginationSizes = [25, 50, 100]
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalRows, setTotalRows] = useState(paginationSizes[0])
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
-  const setPaginationControl = (data) => {
-    setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data?.pageInfo?.hasNextPage)
-  }
+import { PolicyRuleViolations } from 'graphQL/Queries'
 
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
+const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
+  const { subject, category, name, operatorWording, value } = activeRow || null
 
-  // SET ROW LENGTH
-  const handleSetRow = useCallback(
-    async (e) => {
-      disablePaginationControl()
-      setTotalRows(Number(e.target.value))
-      await refetch({
-        variables: {
-          sbomId,
-          policyRuleId: id,
-          first: Number(e.target.value)
-        }
-      }).then((res) => {
-        if (res?.data) {
-          setPaginationControl(res.data.policyRuleViolations)
-          setCurrentPage(1)
-        }
-      })
-    },
-    [id, refetch, sbomId]
+  const { nodes, paginationProps, loading } = usePaginatatedQuery(
+    PolicyRuleViolations,
+    {
+      skip: activeRow?.id ? false : true,
+      selector: 'policyRuleViolations',
+      variables: {
+        sbomId,
+        policyRuleId: activeRow?.id
+      }
+    }
   )
-
-  const handlePreviousPage = useCallback(async () => {
-    disablePaginationControl()
-    setCurrentPage(currentPage - 1)
-    await refetch({
-      variables: {
-        sbomId: sbomId,
-        policyRuleId: id,
-        last: totalRows,
-        before: data?.pageInfo?.startCursor
-      }
-    }).then((res) => {
-      if (res?.data) {
-        setPaginationControl(res.data.policyRuleViolations)
-      }
-    })
-  }, [currentPage, data?.pageInfo?.startCursor, id, refetch, sbomId, totalRows])
-
-  const handleNextPage = useCallback(async () => {
-    disablePaginationControl()
-    setCurrentPage(currentPage + 1)
-    await refetch({
-      variables: {
-        sbomId: sbomId,
-        policyRuleId: id,
-        first: totalRows,
-        after: data?.pageInfo?.endCursor
-      }
-    }).then((res) => {
-      if (res?.data) {
-        setPaginationControl(res.data.policyRuleViolations)
-      }
-    })
-  }, [currentPage, data?.pageInfo?.endCursor, id, refetch, sbomId, totalRows])
 
   const columns = [
     {
@@ -149,13 +85,6 @@ const ViolationDrawer = ({
     }
   ]
 
-  useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
-    }
-  }, [data])
-
   return (
     <Drawer size={'lg'} isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
@@ -200,13 +129,13 @@ const ViolationDrawer = ({
               )}
               {(subject === 'VERSION_PRIMARY' ||
                 subject === 'SBOM_PRIMARY_COMPONENT_RELATIONSHIPS') &&
-                data?.nodes?.length > 0 && (
+                nodes?.length > 0 && (
                   <Text>
                     <strong>Value:</strong>{' '}
                     <span style={{ textTransform: 'capitalize' }}>
-                      {data.nodes[0].violation?.primaryComponent?.name}
+                      {nodes[0].violation?.primaryComponent?.name}
                     </span>{' '}
-                    - {data.nodes[0].violation?.primaryComponent?.version}
+                    - {nodes[0].violation?.primaryComponent?.version}
                   </Text>
                 )}
               <Text
@@ -225,27 +154,15 @@ const ViolationDrawer = ({
               <DataTable
                 responsive
                 columns={columns}
-                data={data?.nodes || []}
+                data={nodes || []}
                 customStyles={customStyles}
-                progressPending={data ? false : true}
+                progressPending={loading}
                 progressComponent={<CustomLoader />}
                 persistTableHead
               />
             </Box>
             <Box bg='white' hidden={category === 'version'}>
-              {data?.pageInfo && (
-                <Pagination
-                  paginationSizes={paginationSizes}
-                  pageIndex={currentPage}
-                  totalRows={totalRows}
-                  totalCount={data?.totalCount}
-                  onPreviousPage={handlePreviousPage}
-                  onNextPage={handleNextPage}
-                  onSetRow={handleSetRow}
-                  hasNextPage={isNextActive}
-                  hasPreviousPage={isPrevActive}
-                />
-              )}
+              {!loading && <Pagination {...paginationProps} />}
             </Box>
           </Flex>
         </DrawerBody>
