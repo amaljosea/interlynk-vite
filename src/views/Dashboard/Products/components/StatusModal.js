@@ -35,7 +35,7 @@ const StatusModal = ({ isOpen, onClose, group, grouId, refetch }) => {
       }
     })
       .then((res) => {
-        if (res?.data) {
+        if (res?.data?.projectGroupUpdate?.errors?.length === 0) {
           setIsLoading(false)
           if (grouId) {
             refetch({ id: id })
