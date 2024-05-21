@@ -159,6 +159,33 @@ const GlobalVulnsFilters = ({ setFilters }) => {
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
+      {/* PRODUCTS */}
+      <Box
+        width={'fit-content'}
+        position={'relative'}
+        display={params?.productgroupid ? 'none' : 'block'}
+      >
+        <Menu closeOnSelect={false}>
+          {products?.length !== 0 && !products.includes('all') && <CheckMark />}
+          <MenuHeading title={'Product'} />
+          <MenuList minH={'auto'} maxH={'300px'} overflowY={'scroll'}>
+            <MenuOptionGroup
+              type='checkbox'
+              value={products}
+              onChange={onFilterProduct}
+            >
+              <MenuItemOption value={'all'} fontSize={'sm'}>
+                All
+              </MenuItemOption>
+              {data?.organization?.projectGroups?.nodes?.map((item) => (
+                <MenuItemOption key={item.id} value={item.id} fontSize={'sm'}>
+                  {item.name}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
       {/* ENVIRONMENT */}
       <Box
         width={'fit-content'}
@@ -182,33 +209,6 @@ const GlobalVulnsFilters = ({ setFilters }) => {
                   textTransform={'capitalize'}
                 >
                   {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* PRODUCTS */}
-      <Box
-        width={'fit-content'}
-        position={'relative'}
-        display={params?.productgroupid ? 'none' : 'block'}
-      >
-        <Menu closeOnSelect={false}>
-          {products?.length !== 0 && !products.includes('all') && <CheckMark />}
-          <MenuHeading title={'Product'} />
-          <MenuList minH={'auto'} maxH={'300px'} overflowY={'scroll'}>
-            <MenuOptionGroup
-              type='checkbox'
-              value={products}
-              onChange={onFilterProduct}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {data?.organization?.projectGroups?.nodes?.map((item) => (
-                <MenuItemOption key={item.id} value={item.id} fontSize={'sm'}>
-                  {item.name}
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
