@@ -10,6 +10,7 @@ import PubProductDetails from 'views/Customer/Products/ProductDetails'
 import PubProductList from 'views/Customer/Products/ProductList'
 import PubSbomDetails from 'views/Customer/Sbom/index.js'
 import Dashboard from 'views/Dashboard/Dashboard'
+import Inbox from 'views/Dashboard/Inbox/index.js'
 import Policies from 'views/Dashboard/Policies'
 import Products from 'views/Dashboard/Products'
 import ProductDetailsMain from 'views/Dashboard/Products/ProductDetailsMain.js'
@@ -90,6 +91,7 @@ export const MainRoutes = () => {
           <Route path={`tools`} element={<Tools />} />
           <Route path={`support`} element={<Support />} />
           <Route path={`policies`} element={<Policies />} />
+          <Route path={`inbox`} element={<Inbox />} />
           <Route path={`settings`} element={<Profile />} />
         </Route>
         <Route path={`login`} element={<LoginLayout />} />

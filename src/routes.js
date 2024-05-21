@@ -17,7 +17,7 @@ import {
   FaRegSun,
   FaWindowMaximize
 } from 'react-icons/fa'
-import { FaToolbox } from 'react-icons/fa6'
+import { FaInbox, FaToolbox } from 'react-icons/fa6'
 import { MdPolicy } from 'react-icons/md'
 
 export const dashRoutes = [
@@ -86,6 +86,13 @@ export const dashRoutes = [
     name: 'Policies',
     icon: <MdPolicy color='inherit' />,
     component: Policies,
+    layout: '/vendor'
+  },
+  {
+    path: '/inbox',
+    name: 'Inbox',
+    icon: <FaInbox color='inherit' />,
+    component: () => 'Inbox',
     layout: '/vendor'
   },
   {
