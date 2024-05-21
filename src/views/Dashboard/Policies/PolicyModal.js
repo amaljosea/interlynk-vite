@@ -177,9 +177,32 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
     setError('')
     const newData = conditions.map((item) => {
       if (item.id === id) {
-        if (field === 'subject' && value !== '') {
+        if (field === 'subject' && value === '') {
+          return {
+            ...item,
+            [field]: value,
+            subError: 'Please select any subject'
+          }
+        } else if (field === 'subject' && value !== '') {
           const result = plSubjects?.find((item) => item?.subject === value)
-          return { ...item, [field]: value, list: result?.operators }
+          return {
+            ...item,
+            [field]: value,
+            list: result?.operators,
+            subError: ''
+          }
+        } else if (field === 'operator' && value === '') {
+          return {
+            ...item,
+            [field]: value,
+            opError: 'Please select any operator'
+          }
+        } else if (field === 'operator' && value !== '') {
+          return {
+            ...item,
+            [field]: value,
+            opError: ''
+          }
         } else if (
           field === 'operator' &&
           (value === 'MORE_THAN' || value === 'LESS_THAN')
@@ -187,34 +210,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
           return { ...item, [field]: value, value: '' }
         } else {
           return { ...item, [field]: value }
-        }
-      }
-      return item
-    })
-    setConditions(newData)
-  }
-
-  const onSubjectBlur = (rule) => {
-    const newData = conditions.map((item) => {
-      if (item.id === rule?.id) {
-        if (rule?.subject === '') {
-          return { ...item, subError: 'Please select any subject' }
-        } else {
-          return { ...item, subError: '' }
-        }
-      }
-      return item
-    })
-    setConditions(newData)
-  }
-
-  const onOperatorBlur = (rule) => {
-    const newData = conditions.map((item) => {
-      if (item.id === rule?.id) {
-        if (rule?.operator === '') {
-          return { ...item, opError: 'Please select any operator' }
-        } else {
-          return { ...item, opError: '' }
         }
       }
       return item
@@ -612,14 +607,12 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                         {/* SUBJECT */}
                         <FormControl width={'30%'}>
                           <Select
+                            fontSize='sm'
                             value={item?.subject}
                             onChange={(e) =>
                               handleChange(e.target.value, item.id, 'subject')
                             }
-                            onBlur={() => onSubjectBlur(item)}
                             placeholder='-- subject --'
-                            fontSize='sm'
-                            onBlurCapture={() => onSubjectBlur(item)}
                           >
                             {categories.map((category) => (
                               <optgroup key={category} label={category}>
@@ -638,13 +631,12 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
                           <Select
                             id='operator'
                             name='operator'
+                            fontSize='sm'
                             value={item?.operator}
                             onChange={(e) =>
                               handleChange(e.target.value, item.id, 'operator')
                             }
-                            fontSize='sm'
                             placeholder='-- operator --'
-                            onBlur={() => onOperatorBlur(item)}
                             textTransform={'lowercase'}
                           >
                             {item?.list?.map((option) => (

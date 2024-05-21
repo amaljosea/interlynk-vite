@@ -287,15 +287,34 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
     setError('')
     const newData = conditions.map((item) => {
       if (item.id === id) {
-        if (field === 'subject' && value !== '') {
+        if (field === 'subject' && value === '') {
+          return {
+            ...item,
+            [field]: value,
+            subError: 'Select any subject'
+          }
+        } else if (field === 'subject' && value !== '') {
           const result = automationConditionSubjectFieldMapping?.find(
             (item) => item?.key === value
           )
           return {
             ...item,
             [field]: value,
+            subError: '',
             category: result?.subject,
             list: result?.operators
+          }
+        } else if (field === 'operator' && value === '') {
+          return {
+            ...item,
+            [field]: value,
+            opError: 'Select any operator'
+          }
+        } else if (field === 'operator' && value !== '') {
+          return {
+            ...item,
+            [field]: value,
+            opError: ''
           }
         } else {
           return { ...item, [field]: value }
@@ -560,10 +579,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
                         isDisabled={isSystem}
                       >
                         {item?.list?.map((option) => (
-                          <option
-                            value={option}
-                            key={option}
-                          >
+                          <option value={option} key={option}>
                             {updatedValue(option)}
                           </option>
                         ))}
