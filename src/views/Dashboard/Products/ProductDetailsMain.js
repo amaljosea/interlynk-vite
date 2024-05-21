@@ -155,7 +155,18 @@ const ProductDetailsMain = () => {
   })
 
   // GET POLICY DATA
-  const [getPolicyData, { data: policyData }] = useLazyQuery(GetProjectPolicies)
+  const {
+    nodes: policyData,
+    paginationProps: policyPaginationProps,
+    refetch: policyRefetch,
+    loading: policyloading
+  } = usePaginatatedQuery(GetProjectPolicies, {
+    skip: activeProdTab === 4 ? false : true,
+    selector: 'projectPolicies',
+    variables: {
+      projectId: activeEnv
+    }
+  })
 
   const [getSettings, { data: settings }] = useLazyQuery(GetProjectSettings, {
     skip: activeProdTab === 3 ? false : true
@@ -270,11 +281,6 @@ const ProductDetailsMain = () => {
       getSettings({
         variables: { id: activeEnv }
       })
-    } else if (activeTab === 4) {
-      setActiveProdTab(4)
-      getPolicyData({
-        variables: { projectId: activeEnv, first: totalRows }
-      }).then((res) => console.log(res?.data))
     } else if (activeTab === 5) {
       setActiveProdTab(5)
       getLogs({
@@ -295,7 +301,6 @@ const ProductDetailsMain = () => {
     activeEnv,
     setActiveProdTab,
     getSettings,
-    getPolicyData,
     totalRows,
     getLogs,
     searchInput,
@@ -532,8 +537,10 @@ const ProductDetailsMain = () => {
                 {/* POLICIES */}
                 <TabPanel px={0}>
                   <PolicyTable
-                    data={policyData?.projectPolicies}
-                    refetch={getPolicyData}
+                    data={policyData}
+                    loading={policyloading}
+                    refetch={policyRefetch}
+                    paginationProps={policyPaginationProps}
                   />
                 </TabPanel>
                 {/* CHANGE LOG */}

@@ -133,7 +133,7 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
           duration: 2000
         })
       } else {
-        handleRefresh
+        handleRefresh()
       }
     })
   }
