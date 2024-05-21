@@ -158,7 +158,10 @@ const Components = ({ sbomData, sbomRefetch }) => {
       permission.key === 'update_sbom' && permission.value === true
   )
 
-  const fetchCompData = () => reset()
+  const fetchCompData = () => {
+    reset()
+    refetch()
+  }
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -747,8 +750,10 @@ const Components = ({ sbomData, sbomRefetch }) => {
                         ` ${item.name}`
                       )}
                     </Text>
-                    onClick={() => handleSupRemove(item.id)}
-                    {!signedUrlParams && <TagCloseButton />}
+                    <TagCloseButton
+                      hidden={signedUrlParams}
+                      onClick={() => handleSupRemove(item.id)}
+                    />
                   </Tag>
                 ))}
             </VStack>
@@ -1069,7 +1074,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
               isOpen={isOpen}
               onClose={onClose}
               sbomRefetch={sbomRefetch}
-              fetchCompData={() => refetch()}
+              fetchCompData={fetchCompData}
               filterRefetch={getCompFilters}
               shortDesc={null}
               checkId={null}

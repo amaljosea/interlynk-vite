@@ -51,6 +51,7 @@ import {
   useToast
 } from '@chakra-ui/react'
 
+import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
 import CustomLoader from 'components/CustomLoader'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import CvssCard from 'components/Misc/CvssCard'
@@ -84,7 +85,6 @@ import {
 } from 'react-icons/fa6'
 
 import VulnFilters from './VulnFilters'
-import JiraCreateIssueModal from "components/Connections/JiraCreateIssueModal"
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -887,8 +887,9 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   ])
 
   const handleRefresh = useCallback(() => {
+    reset()
     refetch()
-  }, [refetch])
+  }, [refetch, reset])
 
   const subHeader = useMemo(() => {
     return (

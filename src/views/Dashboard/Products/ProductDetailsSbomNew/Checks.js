@@ -90,6 +90,11 @@ const Checks = () => {
 
   const { totalRows } = paginationProps
 
+  const handleRefetch = () => {
+    reset()
+    refetch()
+  }
+
   // GET HEALTH CHECK FILTER HEADS
   const { refetch: filterRefetch } = useQuery(GetCheckFilterData, {
     skip: activeTab === 'checks' ? false : true,
@@ -122,7 +127,7 @@ const Checks = () => {
   const [activeRow, setActiveRow] = useState(null)
 
   const [updateResult] = useMutation(checkResultUpdate, {
-    onCompleted: () => refetch()
+    onCompleted: () => handleRefetch()
   })
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
@@ -196,7 +201,7 @@ const Checks = () => {
   } = useDisclosure()
 
   const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => refetch()
+    onCompleted: () => handleRefetch()
   })
 
   const handleReCheck = useCallback(() => {
@@ -740,7 +745,7 @@ const Checks = () => {
               onClose={onDataLicenseClose}
               checkId={activeRow.organizationRule.rule.friendlyId}
               filterRefetch={filterRefetch}
-              refetch={refetch}
+              refetch={handleRefetch}
               data={sbomData}
             />
           )}
@@ -751,7 +756,7 @@ const Checks = () => {
               id={activeRow.id}
               componentId={null}
               totalRows={totalRows}
-              refetch={refetch}
+              refetch={handleRefetch}
               filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -767,7 +772,7 @@ const Checks = () => {
               activeCheck={activeRow}
               componentId={activeRow.component.id}
               totalRows={totalRows}
-              refetch={refetch}
+              refetch={handleRefetch}
               filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -781,7 +786,7 @@ const Checks = () => {
             <CheckModal
               id={activeRow.component.id}
               totalRows={totalRows}
-              refetch={refetch}
+              refetch={handleRefetch}
               filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -795,7 +800,7 @@ const Checks = () => {
             <SupplierModal
               activeCheck={activeRow.component}
               btnRef={supplierBtn}
-              refetch={refetch}
+              refetch={handleRefetch}
               filterRefetch={filterRefetch}
               isOpen={isSupplierOpen}
               onClose={onSupplierClose}
@@ -809,7 +814,7 @@ const Checks = () => {
             <CheckModal
               activeCheck={activeRow}
               totalRows={totalRows}
-              refetch={refetch}
+              refetch={handleRefetch}
               filterRefetch={filterRefetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
@@ -828,7 +833,7 @@ const Checks = () => {
               purlValue={purlValue}
               activeCheck={activeRow.component}
               totalRows={totalRows}
-              refetch={refetch}
+              refetch={handleRefetch}
               filterRefetch={filterRefetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
               getCpe={getCpe}
@@ -846,7 +851,7 @@ const Checks = () => {
               onUpdateCpe={handleUpdateCpe}
               selectedCpe={selectedCpe}
               activeCheck={activeRow.component}
-              refetch={refetch}
+              refetch={handleRefetch}
               filterRefetch={filterRefetch}
               totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -862,7 +867,7 @@ const Checks = () => {
               btnRef={creationToolBtn}
               data={null}
               selectedKey={'tools'}
-              refetch={refetch}
+              refetch={handleRefetch}
               filterRefetch={filterRefetch}
               totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -877,7 +882,7 @@ const Checks = () => {
               btnRef={authorBtn}
               data={null}
               selectedKey={'author'}
-              refetch={refetch}
+              refetch={handleRefetch}
               filterRefetch={filterRefetch}
               totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -888,7 +893,7 @@ const Checks = () => {
           {/* DOCUMENT SUPPLIER DRAWER */}
           {isDocSupOpen && (
             <PriSupplierModal
-              refetch={refetch}
+              refetch={handleRefetch}
               filterRefetch={filterRefetch}
               isOpen={isDocSupOpen}
               onClose={onDocSupClose}
