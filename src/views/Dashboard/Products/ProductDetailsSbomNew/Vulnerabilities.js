@@ -84,6 +84,7 @@ import {
 } from 'react-icons/fa6'
 
 import VulnFilters from './VulnFilters'
+import JiraCreateIssueModal from "components/Connections/JiraCreateIssueModal"
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -350,6 +351,12 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     isOpen: isLinkOpen,
     onOpen: onLinkOpen,
     onClose: onLinkClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isJiraOpen,
+    onOpen: onJiraOpen,
+    onClose: onJiraClose
   } = useDisclosure()
 
   // GET VULN FILTER HEADS
@@ -788,6 +795,14 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                 >
                   Edit Links
                 </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onJiraOpen()
+                  }}
+                >
+                  Create Jira Ticket
+                </MenuItem>
               </MenuList>
             </Portal>
           </Menu>
@@ -1048,7 +1063,13 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           sbomId={sbomId}
         />
       )}
-
+      {isJiraOpen && (
+        <JiraCreateIssueModal
+          isOpen={isJiraOpen}
+          onClose={onJiraClose}
+          row={activeRow}
+        />
+      )}
       {/* COPY DATA TABLE */}
       {isTableOpen && nodes && (
         <Drawer
@@ -1100,6 +1121,14 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           isOpen={isCvssOpen}
           onClose={onCvssClose}
           value={activeRow?.vuln?.cvssVector}
+        />
+      )}
+
+      {isJiraOpen && (
+        <JiraCreateIssueModal
+          isOpen={isJiraOpen}
+          onClose={onJiraClose}
+          row={activeRow}
         />
       )}
     </>

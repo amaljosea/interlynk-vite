@@ -158,8 +158,6 @@ const SbomDetails = ({ sbomData, refetch }) => {
     partsContext.pop()
   }
 
-  console.log('partsContext sbomdetail', partsContext)
-
   useEffect(() => {
     window.onpopstate = () => {
       console.log(`Pressed back button`)

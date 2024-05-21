@@ -36,6 +36,7 @@ import {
 
 import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 
+import Connections from '../../../components/Connections/Connections'
 import AdvisoryFeeds from './components/AdvisoryFeeds'
 import ApiFeed from './components/ApiFeed'
 import ComponentFeed from './components/ComponentFeed'
@@ -52,7 +53,8 @@ const orgTabs = [
   'feeds',
   'checks',
   'lists',
-  'legal'
+  'legal',
+  'connections'
 ]
 
 const psTabs = [
@@ -268,6 +270,9 @@ function Profile() {
                   data={mfc?.organizationManufacturers}
                   refetch={mfcRefetch}
                 />
+              </TabPanel>
+              <TabPanel>
+                <Connections />
               </TabPanel>
             </TabPanels>
           </Tabs>

@@ -2374,6 +2374,42 @@ export const UpdateNotificationConfig = gql`
   }
 `
 
+export const VerifyJiraConfigs = gql`
+  mutation VerifyJiraConfigs($jiraConfigs: String!) {
+    verifyJiraConfigs(input: { jiraConfigs: $jiraConfigs }) {
+      success
+    }
+  }
+`
+
+export const CreateJiraTicket = gql`
+  mutation CreateJiraTicket(
+    $project: String!
+    $issueType: String!
+    $summary: String!
+    $description: String
+    $priority: String
+    $labels: [String!]
+    $assignee: String
+    $reporter: String
+  ) {
+    createJiraTicket(
+      input: {
+        project: $project
+        issueType: $issueType
+        summary: $summary
+        description: $description
+        priority: $priority
+        labels: $labels
+        assignee: $assignee
+        reporter: $reporter
+      }
+    ) {
+      success
+    }
+  }
+`
+
 export const OrganizationManufacturerCreate = gql`
   mutation OrganizationManufacturerCreate(
     $orgName: String!

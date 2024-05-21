@@ -3798,6 +3798,27 @@ export const GetUserNotificationConfigs = gql`
   }
 `
 
+export const GetJiraConfigs = gql`
+  query GetUserNotificationConfigs {
+    notificationConfigs {
+      jiraConfigs
+    }
+  }
+`
+
+export const GetJiraOptions = gql`
+  query GetJiraOptions {
+    jiraOptions {
+      projects
+      issueTypes
+      assignees
+      reporters
+      labels
+      priorities
+    }
+  }
+`
+
 export const ComponentVulnLogs = gql`
   query ComponentVulnLogs($vexLogableId: Uuid!) {
     componentVulnLogs(vexLogableId: $vexLogableId) {
