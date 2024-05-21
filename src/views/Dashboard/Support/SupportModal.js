@@ -405,7 +405,6 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
                     fontWeight={'medium'}
                     leftIcon={<FaPlus />}
                     onClick={addRow}
-                    isDisabled={error !== ''}
                     hidden={data}
                   >
                     Add ID
