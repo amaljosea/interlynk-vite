@@ -115,7 +115,7 @@ const VulnFilters = ({ reset }) => {
           <MenuHeading title={'Component'} />
           <MenuList
             minH={'auto'}
-            maxH={'400px'}
+            maxH={'300px'}
             overflow={'hidden'}
             overflowY={'scroll'}
           >
