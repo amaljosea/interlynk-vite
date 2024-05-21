@@ -42,9 +42,7 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
   const [productVersion, setProductVersion] = useState('')
   const [error, setError] = useState('')
   const [eol, setEol] = useState(null)
-  const [isValidEol, setIsValidEol] = useState(true)
   const [eos, setEos] = useState(null)
-  const [isValidEos, setIsValidEos] = useState(true)
   const [deprecated, setDeprecated] = useState(false)
   const [outdated, setOutdated] = useState(false)
   const [IDs, setIDs] = useState([{ id: 1, value: '', error: '' }])
@@ -154,42 +152,17 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
   }
 
   const handleEolChange = (newDate) => {
-    const currentDate = new Date()
-    console.log('newDate', newDate)
-    const isValidDate = newDate && !isNaN(newDate) && newDate?._d > currentDate
     setEol(newDate._d)
-    if (isValidDate) {
-      setIsValidEol(true)
-    } else {
-      if (typeof newDate === 'string' && newDate === '') {
-        setIsValidEol(true)
-      } else {
-        setIsValidEol(false)
-      }
-    }
   }
 
   const handleEosChange = (newDate) => {
-    const currentDate = new Date()
-    const isValidDate = newDate && !isNaN(newDate) && newDate?._d > currentDate
     setEos(newDate._d)
-    if (isValidDate) {
-      setIsValidEos(true)
-    } else {
-      if (typeof newDate === 'string' && newDate === '') {
-        setIsValidEos(true)
-      } else {
-        setIsValidEos(false)
-      }
-    }
   }
 
   const isInvalid =
     idUri === '' ||
     productName === '' ||
     error !== '' ||
-    !isValidEol ||
-    !isValidEos ||
     idUri === productName ||
     idUri === productVersion
 
@@ -322,7 +295,7 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
                   />
                   <FormErrorMessage>Invalid version</FormErrorMessage>
                 </FormControl>
-                <FormControl isInvalid={!isValidEol}>
+                <FormControl>
                   <FormLabel mb={1} htmlFor='expire'>
                     End of life
                   </FormLabel>
@@ -335,14 +308,8 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
                       onPaste: (e) => e.preventDefault()
                     }}
                   />
-                  {!isValidEol && (
-                    <FormErrorMessage>
-                      {' '}
-                      Please enter a valid expiry date{' '}
-                    </FormErrorMessage>
-                  )}
                 </FormControl>
-                <FormControl isInvalid={!isValidEos}>
+                <FormControl>
                   <FormLabel mb={1} htmlFor='expire'>
                     End of service
                   </FormLabel>
@@ -355,11 +322,6 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
                       onPaste: (e) => e.preventDefault()
                     }}
                   />
-                  {!isValidEos && (
-                    <FormErrorMessage>
-                      Please enter a valid expiry date
-                    </FormErrorMessage>
-                  )}
                 </FormControl>
                 <HStack>
                   <FormControl>
@@ -401,24 +363,31 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
                               width={'100%'}
                               gap={4}
                               justifyContent={'space-between'}
-                              alignItems={'center'}
+                              alignItems={'items-start'}
                             >
-                              <Input
-                                fontSize={'sm'}
-                                placeholder='Enter PURL / CPE'
-                                type='text'
-                                alue={item?.value}
-                                onChange={(e) =>
-                                  handleIdChange(e.target.value, item.id)
-                                }
-                                onBlur={() => onIdBlur(item)}
-                              />
-                              {item?.error !== '' && (
-                                <Text mt={1} color={'red.500'} fontSize={'sm'}>
-                                  {item?.error}
-                                </Text>
-                              )}
+                              <Stack width={'100%'}>
+                                <Input
+                                  fontSize={'sm'}
+                                  placeholder='Enter PURL / CPE'
+                                  type='text'
+                                  alue={item?.value}
+                                  onChange={(e) =>
+                                    handleIdChange(e.target.value, item.id)
+                                  }
+                                  onBlur={() => onIdBlur(item)}
+                                />
+                                {item?.error !== '' && (
+                                  <Text
+                                    mt={1}
+                                    color={'red.500'}
+                                    fontSize={'sm'}
+                                  >
+                                    {item?.error}
+                                  </Text>
+                                )}
+                              </Stack>
                               <Icon
+                                mt={2}
                                 as={FaTrash}
                                 color={'red.500'}
                                 cursor={'pointer'}
