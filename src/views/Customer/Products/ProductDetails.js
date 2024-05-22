@@ -24,8 +24,7 @@ import VersionsTable from 'components/Tables/VersionsTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { ShareLynkProjectGroup } from 'graphQL/Queries'
-import { ShareVulnData } from 'graphQL/Queries'
+import { ShareLynkProjectGroup, ShareVulnData } from 'graphQL/Queries'
 
 import { FaLock, FaWindowMaximize } from 'react-icons/fa6'
 
@@ -37,6 +36,15 @@ const ProductDetails = () => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const environment = localStorage.getItem('environment')
   const [activeEnv, setActiveEnv] = useState(productId || '')
+
+  const tabs = [
+    'versions',
+    'vulnerabilities',
+    'automation rules',
+    'settings',
+    'policies',
+    'change log'
+  ]
 
   const {
     totalRows,
@@ -61,11 +69,13 @@ const ProductDetails = () => {
 
   const { data, refetch, loading, error } = useQuery(ShareLynkProjectGroup, {
     skip: sbomId,
-    fetchPolicy: 'network-only',
     variables: {
       id: productGroupId
     }
   })
+
+  const { projectGroup } = data?.shareLynkQuery || ''
+  const { name, description } = projectGroup || ''
 
   const handleTabChange = (value) => {
     localStorage.setItem('activeCsProdTab', value)
@@ -82,7 +92,6 @@ const ProductDetails = () => {
   // GET VULN DATA
   const { data: vulnData, refetch: vulnRefetch } = useQuery(ShareVulnData, {
     skip: sbomId ? false : true,
-    fetchPolicy: 'network-only',
     variables: {
       projectId: signedUrlParams ? undefined : productId || activeEnv,
       sbomId: sbomId,
@@ -153,55 +162,47 @@ const ProductDetails = () => {
     <>
       <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
         {/* INFO SECTION */}
-        <Card>
+        <Card display={data ? 'block' : 'none'}>
           <CardBody>
-            {data && (
-              <Grid
-                width={'100%'}
-                templateColumns='repeat(5, 1fr)'
-                alignItems={'top'}
-                gap={10}
-              >
-                {/* PRODUCT INFORMATIONS */}
-                <GridItem colSpan={3}>
-                  <Flex
-                    direction={'row'}
-                    alignItems={'flex-start'}
-                    gap={5}
-                    width={'100%'}
-                  >
-                    <Icon
-                      as={FaWindowMaximize}
-                      h={'64px'}
-                      w={'64px'}
-                      color='blue.300'
-                    />
-                    <Flex direction={'column'} gap={0.5}>
-                      {/* PRODUCT TITLE */}
-                      <Stack
-                        direction={'column'}
-                        spacing={1}
-                        alignItems={'left'}
-                      >
-                        <Text fontWeight={'semibold'} fontSize={25}>
-                          {data?.shareLynkQuery?.projectGroup?.name || ''}
-                        </Text>
-                      </Stack>
-                      {/* PRODUCT DESCRIPTION */}
-                      <Text fontSize={'sm'}>
-                        {data?.shareLynkQuery?.projectGroup?.description || ''}
+            <Grid
+              width={'100%'}
+              templateColumns='repeat(12, 1fr)'
+              alignItems={'top'}
+              gap={10}
+            >
+              {/* PRODUCT INFORMATIONS */}
+              <GridItem colSpan={10}>
+                <Flex
+                  direction={'row'}
+                  alignItems={'flex-start'}
+                  gap={5}
+                  width={'100%'}
+                >
+                  <Icon
+                    as={FaWindowMaximize}
+                    h={'64px'}
+                    w={'64px'}
+                    color='blue.300'
+                  />
+                  <Flex direction={'column'} gap={0.5}>
+                    {/* PRODUCT TITLE */}
+                    <Stack direction={'column'} spacing={1} alignItems={'left'}>
+                      <Text fontWeight={'semibold'} fontSize={25}>
+                        {name || ''}
                       </Text>
-                    </Flex>
+                    </Stack>
+                    {/* PRODUCT DESCRIPTION */}
+                    <Text fontSize={'sm'}>{description || ''}</Text>
                   </Flex>
-                </GridItem>
-                {/* PRODUCT ACTIONS */}
-                <GridItem colSpan={2}></GridItem>
-              </Grid>
-            )}
+                </Flex>
+              </GridItem>
+              {/* PRODUCT ACTIONS */}
+              <GridItem colSpan={2}></GridItem>
+            </Grid>
           </CardBody>
         </Card>
         {/* TAB SECTION */}
-        <Card>
+        <Card display={data ? 'block' : 'none'}>
           <CardBody>
             <Tabs
               variant='enclosed'
@@ -211,31 +212,14 @@ const ProductDetails = () => {
               onChange={(value) => handleTabChange(value)}
             >
               <TabList>
-                {[
-                  'versions',
-                  'vulnerabilities',
-                  'automation rules',
-                  'settings',
-                  'policies',
-                  'change log'
-                ].map((item, index) => (
+                {tabs.map((item, index) => (
                   <Tab
                     key={index}
                     _focus={{ outline: 'none' }}
                     textTransform={'capitalize'}
-                    isDisabled={
-                      item === 'automation rules' ||
-                      item === 'settings' ||
-                      item === 'change log' ||
-                      item === 'vulnerabilities' ||
-                      item === 'policies'
-                    }
+                    isDisabled={item === 'versions' ? false : true}
                   >
-                    {(item === 'automation rules' ||
-                      item === 'settings' ||
-                      item === 'change log' ||
-                      item === 'vulnerabilities' ||
-                      item === 'policies') && (
+                    {item !== 'versions' && (
                       <FaLock color='darkgray' style={{ marginRight: '6px' }} />
                     )}
                     {item}
@@ -245,13 +229,11 @@ const ProductDetails = () => {
               <TabPanels>
                 {/* VERSIONS */}
                 <TabPanel px={0}>
-                  {data && (
-                    <VersionsTable
-                      productId={activeEnv}
-                      projectGroup={data?.shareLynkQuery?.projectGroup}
-                      getVulnData={vulnRefetch}
-                    />
-                  )}
+                  <VersionsTable
+                    productId={activeEnv}
+                    projectGroup={projectGroup}
+                    getVulnData={vulnRefetch}
+                  />
                 </TabPanel>
               </TabPanels>
             </Tabs>

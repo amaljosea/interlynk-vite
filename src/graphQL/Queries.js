@@ -3870,6 +3870,25 @@ export const GetSbomName = gql`
   }
 `
 
+export const GetSharedSbomData = gql`
+  query GetSharedSbomData($sbomId: Uuid!) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        id
+        projectVersion
+        project {
+          id
+          name
+          projectGroup {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`
+
 export const GetOrgManufacturers = gql`
   query GetOrgManufacturers(
     $after: String

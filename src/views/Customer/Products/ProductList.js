@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client'
+import { useState } from 'react'
 import { displayErrorMessage } from 'utils'
 
 import { WarningTwoIcon } from '@chakra-ui/icons'
@@ -7,16 +7,24 @@ import { Flex, Text } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import ProductTable from 'components/Tables/ProductTable'
 
-import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { ShareLynkProjectGroups } from 'graphQL/Queries'
 
 const ProductList = () => {
-  const { prodState } = useGlobalState()
-  const { field, direction } = prodState
-  const { data, error, refetch } = useQuery(ShareLynkProjectGroups, {
-    variables: { first: 25, field, direction }
+  const [filters, setFilters] = useState({
+    field: 'PROJECT_GROUPS_UPDATED_AT',
+    direction: 'DESC',
+    enabled: true
   })
+
+  const { nodes, paginationProps, reset, refetch, loading, error } =
+    usePaginatatedQuery(ShareLynkProjectGroups, {
+      selector: 'shareLynkQuery.projectGroups',
+      variables: {
+        ...filters
+      }
+    })
 
   if (error) {
     return (
@@ -33,8 +41,16 @@ const ProductList = () => {
 
   return (
     <ProductTable
-      data={data?.shareLynkQuery?.projectGroups}
+      data={nodes}
+      loading={loading}
       refetch={refetch}
+      filters={filters}
+      reset={() => reset()}
+      paginationProps={paginationProps}
+      setFilters={(newFilters) => {
+        setFilters(newFilters)
+        reset()
+      }}
     />
   )
 }
