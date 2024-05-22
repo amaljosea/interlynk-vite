@@ -75,12 +75,11 @@ const PurlModal = ({
   activeComp
 }) => {
   const params = useParams()
-  const productId = params.productid
   const sbomId = params.sbomid
 
   const { prodCompState, dispatch } = useGlobalState()
   const { purlString } = prodCompState
-  const { prodCompDispatch, prodCheckDispatch } = dispatch
+  const { prodCompDispatch } = dispatch
 
   const [purlType, setPurlType] = useState('')
   const [namespace, setNamespace] = useState('')
@@ -93,26 +92,6 @@ const PurlModal = ({
   const [purlVersionList, setPurlVersionList] = useState([])
   const purlVersionRef = useRef()
   const [qualifiers, setQualifiers] = useState('')
-
-  const validPurlTypes = [
-    'bitbucket',
-    'compose',
-    'conan',
-    'docker',
-    'generic',
-    'github',
-    'golang',
-    'hex',
-    'hackage',
-    'huggingface',
-    'oci',
-    'qpkg',
-    'rpm',
-    'swid',
-    'swift',
-    'alpm',
-    'apk'
-  ]
 
   // const hasNamespace = validPurlTypes.includes(purlType)
 
@@ -149,36 +128,29 @@ const PurlModal = ({
     pypi: []
   }
 
-  const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => refetch()
-  })
+  const [healthRecheck] = useMutation(recheckHealth)
   const [updateComponent] = useMutation(UpdateComponent)
 
   const handleComUpdate = async () => {
-    try {
-      await updateComponent({
-        variables: {
-          id: activeCheck.id,
-          sbomId: sbomId,
-          purl: purlString
+    await updateComponent({
+      variables: {
+        id: activeCheck.id,
+        sbomId: sbomId,
+        purl: purlString
+      }
+    })
+      .then(() => {
+        if (checkId) {
+          healthRecheck({
+            variables: {
+              checkId: checkId,
+              compId: activeCheck.id,
+              sbomId: sbomId
+            }
+          }).then((res) => res?.data && refetch())
         }
       })
-        .then(() => {
-          if (checkId) {
-            prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
-            healthRecheck({
-              variables: {
-                checkId: checkId,
-                compId: activeCheck.id,
-                sbomId: sbomId
-              }
-            })
-          }
-        })
-        .finally(() => onClose())
-    } catch (error) {
-      console.log('Mutation error', error)
-    }
+      .finally(() => onClose())
   }
 
   const isAutoComplete =

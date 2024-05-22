@@ -62,7 +62,7 @@ const Checks = () => {
   const customerView = location.pathname.startsWith('/customer')
 
   const { userPermissions, prodCheckState, dispatch } = useGlobalState()
-  const { searchInput, filters } = prodCheckState
+  const { searchInput } = prodCheckState
   const { prodCompDispatch, prodCheckDispatch, sbomDispatch } = dispatch
 
   const { data: prodData } = useQuery(GetProductData, {
@@ -90,24 +90,26 @@ const Checks = () => {
 
   const { totalRows } = paginationProps
 
-  const handleRefetch = () => {
+  // GET HEALTH CHECK FILTER HEADS
+  const { data: filterHead, refetch: filterRefetch } = useQuery(
+    GetCheckFilterData,
+    {
+      fetchPolicy: 'network-only',
+      skip: activeTab === 'checks' ? false : true,
+      variables: {
+        projectId: productId,
+        sbomId
+      }
+    }
+  )
+
+  console.log('filterHead', filterHead)
+
+  const handleRefetch = useCallback(() => {
     reset()
     refetch()
-  }
-
-  // GET HEALTH CHECK FILTER HEADS
-  const { refetch: filterRefetch } = useQuery(GetCheckFilterData, {
-    skip: activeTab === 'checks' ? false : true,
-    variables: {
-      projectId: productId,
-      sbomId
-    },
-    onCompleted: (data) =>
-      prodCheckDispatch({
-        type: 'ADD_FILTER_HEADS',
-        payload: data?.sbom?.filters
-      })
-  })
+    filterRefetch()
+  }, [filterRefetch, refetch, reset])
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const editChecks = sboms?.supersededBy?.some(
@@ -126,9 +128,7 @@ const Checks = () => {
   const [checkSearch, setCheckSearch] = useState(searchInput)
   const [activeRow, setActiveRow] = useState(null)
 
-  const [updateResult] = useMutation(checkResultUpdate, {
-    onCompleted: () => handleRefetch()
-  })
+  const [updateResult] = useMutation(checkResultUpdate)
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [updateComponent] = useMutation(UpdateComponent)
@@ -200,30 +200,25 @@ const Checks = () => {
     onClose: onCpeClose
   } = useDisclosure()
 
-  const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => handleRefetch()
-  })
+  const [healthRecheck] = useMutation(recheckHealth)
 
-  const handleReCheck = useCallback(() => {
-    try {
-      healthRecheck({
-        variables: {
-          sbomId: sbomId
-        }
-      }).then((res) => {
-        if (res.data) {
-          toast({
-            description: 'Health re-check successfully',
-            status: 'success',
-            duration: 3000,
-            position: 'top'
-          })
-        }
-      })
-    } catch (error) {
-      console.log('Mutation error', error)
-    }
-  }, [healthRecheck, sbomId, toast])
+  const handleReCheck = useCallback(async () => {
+    await healthRecheck({
+      variables: {
+        sbomId: sbomId
+      }
+    }).then((res) => {
+      if (res.data) {
+        handleRefetch()
+        toast({
+          description: 'Health re-check successfully',
+          status: 'success',
+          duration: 3000,
+          position: 'top'
+        })
+      }
+    })
+  }, [handleRefetch, healthRecheck, sbomId, toast])
 
   const setSearchFilter = useCallback(
     (value) => {
@@ -297,8 +292,9 @@ const Checks = () => {
           />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && (
+          {filterHead && (
             <CheckFilters
+              filters={filterHead?.sbom?.filters}
               setCheckState={(newFilters) => {
                 setCheckState(newFilters)
                 reset()
@@ -324,7 +320,7 @@ const Checks = () => {
     onSearchInputChange,
     handleSearch,
     handleClear,
-    filters,
+    filterHead,
     handleReCheck,
     reset
   ])
@@ -376,7 +372,7 @@ const Checks = () => {
     })
       .then((res) => {
         if (res.data) {
-          prodCheckDispatch({ type: 'CLEAR_PROD_CHECK' })
+          handleRefetch()
           healthRecheck({
             variables: {
               checkId: row.organizationRule.rule.friendlyId,
@@ -488,22 +484,16 @@ const Checks = () => {
   }
 
   const updateIssue = async (id) => {
-    try {
-      await updateResult({
-        variables: {
-          id: id,
-          status: 'ignored'
-        }
-      })
-    } catch (error) {
-      console.log('Mutation error', error)
-      toast({
-        description: error,
-        status: 'error',
-        position: 'bottom',
-        duration: 3000
-      })
-    }
+    await updateResult({
+      variables: {
+        id: id,
+        status: 'ignored'
+      }
+    }).then((res) => {
+      if (res?.data) {
+        handleRefetch()
+      }
+    })
   }
 
   const handleCreateCpe = (string) => {
@@ -744,7 +734,6 @@ const Checks = () => {
               isOpen={isDataLicenseOpen}
               onClose={onDataLicenseClose}
               checkId={activeRow.organizationRule.rule.friendlyId}
-              filterRefetch={filterRefetch}
               refetch={handleRefetch}
               data={sbomData}
             />
@@ -787,7 +776,6 @@ const Checks = () => {
               id={activeRow.component.id}
               totalRows={totalRows}
               refetch={handleRefetch}
-              filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
               isOpen={isTypeOpen}
@@ -801,7 +789,6 @@ const Checks = () => {
               activeCheck={activeRow.component}
               btnRef={supplierBtn}
               refetch={handleRefetch}
-              filterRefetch={filterRefetch}
               isOpen={isSupplierOpen}
               onClose={onSupplierClose}
               data={null}
@@ -815,7 +802,6 @@ const Checks = () => {
               activeCheck={activeRow}
               totalRows={totalRows}
               refetch={handleRefetch}
-              filterRefetch={filterRefetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               isOpen={isOpen}
@@ -834,7 +820,6 @@ const Checks = () => {
               activeCheck={activeRow.component}
               totalRows={totalRows}
               refetch={handleRefetch}
-              filterRefetch={filterRefetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
               getCpe={getCpe}
             />
@@ -852,7 +837,6 @@ const Checks = () => {
               selectedCpe={selectedCpe}
               activeCheck={activeRow.component}
               refetch={handleRefetch}
-              filterRefetch={filterRefetch}
               totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
               getCpe={getCpe}
@@ -868,7 +852,6 @@ const Checks = () => {
               data={null}
               selectedKey={'tools'}
               refetch={handleRefetch}
-              filterRefetch={filterRefetch}
               totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
@@ -894,7 +877,6 @@ const Checks = () => {
           {isDocSupOpen && (
             <PriSupplierModal
               refetch={handleRefetch}
-              filterRefetch={filterRefetch}
               isOpen={isDocSupOpen}
               onClose={onDocSupClose}
               suppliers={null}

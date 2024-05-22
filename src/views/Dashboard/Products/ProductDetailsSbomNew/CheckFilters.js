@@ -14,17 +14,12 @@ import {
 import CheckMark from 'components/Misc/CheckMark'
 import MenuHeading from 'components/Misc/MenuHeading'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import { GetOrgRules } from 'graphQL/Queries'
 
-const CheckFilters = ({ setCheckState }) => {
+const CheckFilters = ({ filters, setCheckState }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
-
-  const { prodCheckState } = useGlobalState()
-  const { filters } = prodCheckState
 
   const { data } = useQuery(GetOrgRules, {
     skip: activeTab === 'checks' ? false : true,
@@ -185,7 +180,7 @@ const CheckFilters = ({ setCheckState }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {statues.length !== 0 && <CheckMark />}
-          <MenuHeading title={'Status'} />
+          <MenuHeading title={'Resolution'} />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'

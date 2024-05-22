@@ -43,7 +43,6 @@ const CheckModal = ({
   refetch,
   shortDesc,
   checkId,
-  filterRefetch,
   componentId
 }) => {
   const params = useParams()
@@ -57,10 +56,9 @@ const CheckModal = ({
     fetchPolicy: 'network-only'
   })
 
-  const { prodCompState, dispatch } = useGlobalState()
+  const { prodCompState } = useGlobalState()
   const { field, direction, spdxLicenses, expLicense, customLicenses } =
     prodCompState
-  const { prodCheckDispatch } = dispatch
 
   const now = new Date()
   const currentTime = now.toISOString().slice(0, 16)
@@ -72,9 +70,7 @@ const CheckModal = ({
   const [isValid, setIsValid] = useState(true)
   const [error, setError] = useState('')
 
-  const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => refetch()
-  })
+  const [healthRecheck] = useMutation(recheckHealth)
 
   const [updateComponent] = useMutation(UpdateComponent)
 
@@ -106,84 +102,51 @@ const CheckModal = ({
         (res) => res.data && setComponentList(res.data.sbom.components.nodes)
       )
     }
-  }, [isOpen])
-
-  const onFilterRefetch = () => {
-    filterRefetch({
-      projectId: productId,
-      sbomId: sbomId
-    }).then((res) =>
-      prodCheckDispatch({
-        type: 'ADD_FILTER_HEADS',
-        payload: res.data.sbom.filters
-      })
-    )
-  }
+  }, [direction, field, getCompData, isOpen, productId, sbomId])
 
   const handleComUpdate = async () => {
-    try {
-      await updateComponent({
-        variables: {
-          id: activeComp.id,
-          sbomId: sbomId,
-          primary: true
+    await updateComponent({
+      variables: {
+        id: activeComp.id,
+        sbomId: sbomId,
+        primary: true
+      }
+    })
+      .then(() => {
+        if (checkId) {
+          healthRecheck({
+            variables: {
+              checkId: checkId,
+              sbomId: sbomId
+            }
+          }).then((res) => res?.data && refetch())
         }
       })
-        .then((res) => {
-          if (res.data) {
-            refetch({
-              projectId: productId,
-              sbomId: sbomId
-            })
-            onFilterRefetch()
-            if (checkId) {
-              healthRecheck({
-                variables: {
-                  checkId: checkId,
-                  sbomId: sbomId
-                }
-              })
-            }
-          }
-        })
-        .finally(() => {
-          onClose()
-        })
-    } catch (error) {
-      console.log('Mutation error', error)
-    }
+      .finally(() => onClose())
   }
 
   const onLicenseUpdate = async () => {
-    try {
-      await updateComponent({
-        variables: {
-          id: componentId,
-          sbomId: sbomId,
-          licenses: {
-            licensesExp: expLicense || ''
-          }
+    await updateComponent({
+      variables: {
+        id: componentId,
+        sbomId: sbomId,
+        licenses: {
+          licensesExp: expLicense || ''
+        }
+      }
+    })
+      .then(() => {
+        if (checkId) {
+          healthRecheck({
+            variables: {
+              compId: componentId,
+              checkId: checkId,
+              sbomId: sbomId
+            }
+          }).then((res) => res?.data && refetch())
         }
       })
-        .then((res) => {
-          if (res.data) {
-            onFilterRefetch()
-          }
-          if (checkId) {
-            prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
-            healthRecheck({
-              variables: {
-                compId: componentId,
-                checkId: checkId,
-                sbomId: sbomId
-              }
-            })
-          }
-        })
-        .finally(() => onClose())
-    } catch (error) {
-      console.log('Mutation error', error)
-    }
+      .finally(() => onClose())
   }
 
   const handleComponentChange = (e) => {
@@ -262,7 +225,6 @@ const CheckModal = ({
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-
             {activeCheck && (
               <Flex
                 width='100%'
@@ -281,9 +243,9 @@ const CheckModal = ({
             )}
             {shortDesc === 'Document has a primary component' && (
               <Flex
+                gap={4}
                 flexDirection={'column'}
                 alignItems={'flex-start'}
-                gap={4}
                 position={'relative'}
               >
                 <FormControl isRequired>

@@ -20,82 +20,42 @@ import { recheckHealth, sbomUpdate } from 'graphQL/Mutation'
 
 import LicenseField from './Licenses/LicenseField'
 
-const LicenseModal = ({
-  data,
-  isOpen,
-  onClose,
-  checkId,
-  filterRefetch,
-  refetch
-}) => {
+const LicenseModal = ({ data, isOpen, onClose, checkId, refetch }) => {
   const params = useParams()
-  const productId = params.productid
   const sbomId = params.sbomid
 
-  const { sbomState, dispatch } = useGlobalState()
+  const { sbomState } = useGlobalState()
   const { expLicense } = sbomState
-  const { prodCheckDispatch } = dispatch
 
   const [isValid, setIsValid] = useState(true)
 
   const isInvalidLicense = expLicense === ''
 
-  const handleRefetch = () => {
-    refetch({
-      projectId: productId,
-      sbomId: sbomId
-    })
-  }
+  const [healthRecheck] = useMutation(recheckHealth)
 
-  const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => refetch()
-  })
-
-  const [updateSbom] = useMutation(sbomUpdate, {
-    onCompleted: () => handleRefetch()
-  })
-
-  const onFilterRefetch = () => {
-    filterRefetch({
-      projectId: productId,
-      sbomId: sbomId
-    }).then((res) =>
-      prodCheckDispatch({
-        type: 'ADD_FILTER_HEADS',
-        payload: res.data.sbom.filters
-      })
-    )
-  }
+  const [updateSbom] = useMutation(sbomUpdate)
 
   const handleUpdateSBOM = async () => {
-    try {
-      await updateSbom({
-        variables: {
-          id: data.id,
-          spec: data.spec,
-          licenses: {
-            licensesExp: expLicense || ''
-          }
+    await updateSbom({
+      variables: {
+        id: data.id,
+        spec: data.spec,
+        licenses: {
+          licensesExp: expLicense || ''
+        }
+      }
+    })
+      .then(() => {
+        if (checkId) {
+          healthRecheck({
+            variables: {
+              checkId: checkId,
+              sbomId: sbomId
+            }
+          }).then((res) => res?.data && refetch())
         }
       })
-        .then((res) => {
-          if (res.data) {
-            onFilterRefetch()
-            if (checkId) {
-              prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
-              healthRecheck({
-                variables: {
-                  checkId: checkId,
-                  sbomId: sbomId
-                }
-              })
-            }
-          }
-        })
-        .finally(() => onClose())
-    } catch (error) {
-      console.log(`Mutation error `, error)
-    }
+      .finally(() => onClose())
   }
 
   return (

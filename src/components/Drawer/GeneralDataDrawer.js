@@ -30,8 +30,6 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import {
   authorCreate,
   recheckHealth,
@@ -50,11 +48,7 @@ const GeneralDataDrawer = ({
 }) => {
   const toast = useToast()
   const params = useParams()
-  const productId = params.productid
   const sbomId = params.sbomid
-
-  const { dispatch } = useGlobalState()
-  const { prodCheckDispatch } = dispatch
 
   const [toolName, setToolName] = useState('')
   const [toolVersion, setToolVersion] = useState('')
@@ -90,9 +84,7 @@ const GeneralDataDrawer = ({
   const [createSupplier] = useMutation(supplierCreate)
   const [deleteSupplier] = useMutation(supplierDelete)
 
-  const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => refetch()
-  })
+  const [healthRecheck] = useMutation(recheckHealth)
 
   useEffect(() => {
     if (data) {
@@ -187,14 +179,7 @@ const GeneralDataDrawer = ({
             sbomID: sbomId
           }
         })
-          .then((res) => {
-            if (res) {
-              refetch({
-                productId: productId,
-                sbomId: sbomId
-              })
-            }
-          })
+          .then((res) => console.log(res?.data))
           .catch((error) => console.log(error))
       })
     }
@@ -208,26 +193,18 @@ const GeneralDataDrawer = ({
             sbomId: sbomId
           }
         })
-          .then((res) => {
-            if (res) {
-              refetch({
-                productId: productId,
-                sbomId: sbomId
-              })
-            }
-          })
+          .then((res) => console.log(res?.data))
           .catch((error) => console.log(error))
       })
     }
 
     if (checkId && (creationTools.length > 0 || authorList.length > 0)) {
-      prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
       healthRecheck({
         variables: {
           checkId: checkId,
           sbomId: sbomId
         }
-      })
+      }).then((res) => res?.data && refetch())
     }
 
     onClose()

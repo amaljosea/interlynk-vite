@@ -21,8 +21,6 @@ import {
   Text
 } from '@chakra-ui/react'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import {
   addComSupplier,
   recheckHealth,
@@ -36,15 +34,10 @@ const SupplierModal = ({
   refetch,
   data,
   checkId,
-  filterRefetch,
   activeCheck
 }) => {
   const params = useParams()
-  const productId = params.productid
   const sbomId = params.sbomid
-
-  const { dispatch } = useGlobalState()
-  const { prodCompDispatch, prodCheckDispatch } = dispatch
 
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')
@@ -56,17 +49,6 @@ const SupplierModal = ({
 
   const containsSpace = /\s/.test(orgUrl)
 
-  const onFilterRefetch = () => {
-    filterRefetch({ projectId: productId, sbomId: sbomId }).then(
-      (res) =>
-        res.data &&
-        prodCompDispatch({
-          type: 'ADD_FILTER_HEADS',
-          payload: res.data.sbom.filters
-        })
-    )
-  }
-
   const onSupplierChange = (e) => {
     const { value } = e.target
     setSupName(value)
@@ -77,22 +59,9 @@ const SupplierModal = ({
     }
   }
 
-  const [createSupplier] = useMutation(addComSupplier, {
-    onCompleted: () => {
-      refetch()
-      onFilterRefetch()
-    }
-  })
-  const [updateSupplier] = useMutation(updateComSupplier, {
-    onCompleted: () => {
-      refetch()
-      onFilterRefetch()
-    }
-  })
-
-  const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => refetch()
-  })
+  const [createSupplier] = useMutation(addComSupplier)
+  const [updateSupplier] = useMutation(updateComSupplier)
+  const [healthRecheck] = useMutation(recheckHealth)
 
   useEffect(() => {
     if (data && data?.suppliers?.length > 0) {
@@ -114,18 +83,15 @@ const SupplierModal = ({
         componentId: activeCheck ? activeCheck.id : id
       }
     })
-      .then((res) => {
-        if (res.data) {
-          if (checkId) {
-            prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
-            healthRecheck({
-              variables: {
-                sbomId: sbomId,
-                checkId: checkId,
-                compId: activeCheck.id
-              }
-            })
-          }
+      .then(() => {
+        if (checkId) {
+          healthRecheck({
+            variables: {
+              sbomId: sbomId,
+              checkId: checkId,
+              compId: activeCheck.id
+            }
+          }).then((res) => res?.data && refetch())
         }
       })
       .finally(() => onClose())

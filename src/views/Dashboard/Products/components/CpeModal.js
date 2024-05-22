@@ -66,11 +66,9 @@ const CpeModal = ({
 
   const { prodCompState, dispatch } = useGlobalState()
   const { cpeString } = prodCompState
-  const { prodCompDispatch, prodCheckDispatch } = dispatch
+  const { prodCompDispatch } = dispatch
 
-  const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => refetch()
-  })
+  const [healthRecheck] = useMutation(recheckHealth)
   const [updateComponent] = useMutation(UpdateComponent)
 
   // UPDATE FIELDS DATA FROM API
@@ -181,16 +179,13 @@ const CpeModal = ({
       })
         .then(() => {
           if (checkId) {
-            prodCheckDispatch({
-              type: 'FETCH_DATA_SUCCESS'
-            })
             healthRecheck({
               variables: {
                 checkId: checkId,
                 compId: activeCheck.id,
                 sbomId: sbomId
               }
-            })
+            }).then((res) => res?.data && refetch())
           }
         })
         .finally(() => onClose())

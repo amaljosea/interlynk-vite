@@ -19,17 +19,11 @@ import {
   ModalOverlay
 } from '@chakra-ui/react'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import { recheckHealth, supplierCreate, supplierUpdate } from 'graphQL/Mutation'
 
 const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   const params = useParams()
-  const productId = params.productid
   const sbomId = params.sbomid
-
-  const { dispatch } = useGlobalState()
-  const { prodCheckDispatch } = dispatch
 
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')
@@ -75,17 +69,9 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
     (supEmail !== '' && !validateEmail(supEmail)) ||
     (orgUrl !== '' && !validateUrl(orgUrl))
 
-  const handleRefetch = () => refetch({ productId: productId, sbomId: sbomId })
-
-  const [createSupplier] = useMutation(supplierCreate, {
-    onCompleted: () => handleRefetch()
-  })
-  const [updateSupplier] = useMutation(supplierUpdate, {
-    onCompleted: () => handleRefetch()
-  })
-  const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => refetch()
-  })
+  const [createSupplier] = useMutation(supplierCreate)
+  const [updateSupplier] = useMutation(supplierUpdate)
+  const [healthRecheck] = useMutation(recheckHealth)
 
   useEffect(() => {
     if (suppliers && suppliers.length > 0) {
@@ -108,8 +94,9 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
     })
       .then(() => {
         if (checkId) {
-          prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
-          healthRecheck({ variables: { sbomId: sbomId, checkId: checkId } })
+          healthRecheck({
+            variables: { sbomId: sbomId, checkId: checkId }
+          }).then((res) => res?.data && refetch())
         }
       })
       .finally(() => onClose())
