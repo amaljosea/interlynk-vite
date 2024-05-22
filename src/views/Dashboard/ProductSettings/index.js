@@ -31,7 +31,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
 
-const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
+const Settings = ({ enabled, data, refetch, mfc }) => {
   const toast = useToast()
   const { userPermissions } = useGlobalState()
   const [dataRetentionDays, setDataRetentionDays] = useState(0)
@@ -74,7 +74,7 @@ const Settings = ({ enabled, data, refetch, activeEnv, mfc }) => {
         mfcId: orgMfc !== '' ? orgMfc : undefined
       }
     })
-      .then((res) => res.data && refetch({ variables: { id: activeEnv } }))
+      .then((res) => res.data && refetch())
       .finally(() => {
         if (id === 'dataRetention') {
           toast({
