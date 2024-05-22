@@ -17,7 +17,6 @@ import {
 } from '@chakra-ui/react'
 
 const RequestModal = ({ data, isOpen, onClose }) => {
-  const [title, setTitle] = useState('')
   const [email, setEmail] = useState('')
   const [productName, setProductName] = useState('')
   const [productVersion, setProductVersion] = useState('')
@@ -42,18 +41,10 @@ const RequestModal = ({ data, isOpen, onClose }) => {
       <ModalOverlay />
       <form onSubmit={data ? handleUpdate : handleCreate}>
         <ModalContent>
-          <ModalHeader>{data ? 'Edit' : 'Add'} Request</ModalHeader>
+          <ModalHeader>Request SBOM</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Flex width={'100%'} direction={'column'} gap={4}>
-              <FormControl isRequired>
-                <FormLabel>Title</FormLabel>
-                <Input
-                  type='text'
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-              </FormControl>
               <FormControl isRequired>
                 <FormLabel>Email</FormLabel>
                 <Input

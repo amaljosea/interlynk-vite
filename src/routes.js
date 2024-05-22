@@ -35,6 +35,13 @@ export const dashRoutes = [
     component: Products,
     layout: '/vendor'
   },
+  {
+    path: '/inbox',
+    name: 'Inbox',
+    icon: <FaInbox color='inherit' />,
+    component: () => 'Inbox',
+    layout: '/vendor'
+  },
   /*
   { path: '/SAG', name: 'SAG', icon: <FaHandshakeSimple color='inherit' size={18} />, component: Products, layout: '/vendor'
   },
@@ -86,13 +93,6 @@ export const dashRoutes = [
     name: 'Policies',
     icon: <MdPolicy color='inherit' />,
     component: Policies,
-    layout: '/vendor'
-  },
-  {
-    path: '/inbox',
-    name: 'Inbox',
-    icon: <FaInbox color='inherit' />,
-    component: () => 'Inbox',
     layout: '/vendor'
   },
   {

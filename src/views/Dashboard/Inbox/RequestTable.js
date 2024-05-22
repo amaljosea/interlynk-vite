@@ -98,7 +98,7 @@ const RequestTable = ({ data, loading, filters, setFilters }) => {
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Stack spacing={2} alignItems={'center'} direction={'row'}>
+        <Stack spacing={3} alignItems={'center'} direction={'row'}>
           {/* SEARCH COMPONENTS */}
           <SearchFilter
             id='support'
@@ -111,7 +111,7 @@ const RequestTable = ({ data, loading, filters, setFilters }) => {
           <Filters setFilters={setFilters} />
         </Stack>
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          <Tooltip label='Add Request'>
+          <Tooltip label='Request SBOM'>
             <IconButton
               colorScheme='blue'
               onClick={() => {
