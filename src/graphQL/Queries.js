@@ -4140,3 +4140,18 @@ export const CompareQueryVendor = gql`
     }
   }
 `
+
+export const getInternalComponents = gql`
+  query Organization {
+    organization {
+      id
+      organizationComponents {
+        id
+        matchStr
+        organizationId
+        updatedAt
+        createdAt
+      }
+    }
+  }
+`

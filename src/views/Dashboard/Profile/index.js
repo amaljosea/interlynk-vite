@@ -39,10 +39,10 @@ import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 import Connections from '../../../components/Connections/Connections'
 import AdvisoryFeeds from './components/AdvisoryFeeds'
 import ApiFeed from './components/ApiFeed'
-import ComponentFeed from './components/ComponentFeed'
 import ExploitFeeds from './components/ExploitFeeds'
 import GeneralFeed from './components/GeneralFeed'
 import Header from './components/Header'
+import { InternalComponents } from './components/InternalComponents'
 import PersonalInfo from './components/PersonalInfo'
 import TokenInfo from './components/TokenInfo'
 
@@ -253,16 +253,7 @@ function Profile() {
               </TabPanel>
               {/* LISTS */}
               <TabPanel>
-                <Grid
-                  width={'100%'}
-                  templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
-                  gap='22px'
-                >
-                  <ComponentFeed
-                    data={orgInfo?.organization?.organizationComponents}
-                    refetch={refetch}
-                  />
-                </Grid>
+                <InternalComponents />
               </TabPanel>
               {/* LEGAL */}
               <TabPanel>
