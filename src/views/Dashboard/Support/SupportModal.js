@@ -392,6 +392,7 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
                                 color={'red.500'}
                                 cursor={'pointer'}
                                 onClick={() => deleteRow(item?.id)}
+                                display={item?.id === 1 ? 'none' : 'flex'}
                               />
                             </Flex>
                           ))}
