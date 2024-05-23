@@ -17,6 +17,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Text,
   useToast
 } from '@chakra-ui/react'
 
@@ -38,6 +39,7 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const [showApiToken, setShowApiToken] = useState(false)
+  const [success, setSuccess] = useState(false)
 
   const [updateConfig] = useMutation(UpdateNotificationConfig)
   const [verifyJiraConfigs] = useMutation(VerifyJiraConfigs)
@@ -107,15 +109,7 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
       setIsLoading(false)
       if (res?.data?.verifyJiraConfigs?.success) {
         resetChanges()
-        toast({
-          title: 'Connection successfully verified.',
-          description:
-            'Your JIRA configuration has been successfully verified.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
-        })
+        setSuccess(true)
       } else {
         toast({
           title: 'Connection failed.',
@@ -207,6 +201,9 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
           </FormControl>
         </ModalBody>
         <ModalFooter>
+          <Text color='green.500' fontSize='sm' mr='auto'>
+            {success && 'Verified successfully!'}
+          </Text>
           <Button variant='unstyled' colorScheme='red' onClick={onClose}>
             Cancel
           </Button>

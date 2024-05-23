@@ -1124,14 +1124,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           value={activeRow?.vuln?.cvssVector}
         />
       )}
-
-      {isJiraOpen && (
-        <JiraCreateIssueModal
-          isOpen={isJiraOpen}
-          onClose={onJiraClose}
-          row={activeRow}
-        />
-      )}
     </>
   )
 }

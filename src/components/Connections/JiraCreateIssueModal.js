@@ -63,9 +63,36 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
     const vulnId = row.vuln?.vulnId || 'N/A'
     const desc = row.vuln?.desc || 'N/A'
     const nvdAliasId = row.vuln?.nvdAliasId || 'N/A'
+    const component = row.component?.name || 'N/A'
+    const sev = row.vuln?.sev || 'N/A'
+    const cvssVector = row.vuln?.cvssVector || 'N/A'
+    const cvssScore = row.vuln?.cvssScore || 'N/A'
+    const epssPercentile = row.vuln?.vulnInfo?.epssPercentile || 'N/A'
+    const epssScore = row.vuln?.vulnInfo?.epssScore || 'N/A'
+    const kev = row.vuln?.vulnInfo?.kev === true ? 'True' : 'False' || 'N/A'
+    const vexStatus = row.vexStatus?.name || 'N/A'
+    const actionStmt = row.actionStmt || 'N/A'
+    const impact = row.impact || 'N/A'
+    const justification = row.vexJustification?.name || 'N/A'
+
+    console.log(row)
 
     setDescription(
-      `Vulnerability: ${vulnId}\n\nDescription: ${desc}\n\nNVD ID: ${nvdAliasId}\n\nComponent: ${row.component?.name}\n\nSeverity: ${row.vuln?.sev}\n\n`
+      `Vulnerability: ${vulnId}\n
+      Description: ${desc}\n
+      NVD ID: ${nvdAliasId}\n
+      Component: ${component}\n
+      Severity: ${sev}\n
+      CVSS Vector: ${cvssVector}\n
+      CVSS Score: ${cvssScore}\n
+      EPSS Percentile: ${epssPercentile}\n
+      EPSS Score: ${epssScore}\n
+      KEV: ${kev}\n
+      Status: ${vexStatus}\n
+      Action Statement: ${actionStmt}\n
+      Impact: ${impact}\n
+      Justification: ${justification}\n
+      `
     )
     setSummary(`[Vulnerability]: ${vulnId}`)
   }, [])
@@ -93,7 +120,6 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
           isClosable: true,
           position: 'top'
         })
-        onClose()
       }
     }
   }, [configs])
