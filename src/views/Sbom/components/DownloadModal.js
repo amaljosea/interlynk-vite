@@ -4,6 +4,7 @@ import { useState } from 'react'
 import {
   Button,
   Checkbox,
+  Divider,
   Flex,
   FormLabel,
   Modal,
@@ -16,6 +17,8 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  Tag,
+  Text,
   useToast
 } from '@chakra-ui/react'
 
@@ -135,7 +138,7 @@ const DownloadModal = ({
           <FormLabel align='center' pt='30px'>
             File Format
           </FormLabel>
-          <Stack direction='column' gap='20px' mt={2}>
+          <Stack direction='column' gap='20px' mt={2} mb={4}>
             <RadioGroup value={format} onChange={(value) => setFormat(value)}>
               <Stack spacing={4} direction='row'>
                 <Radio value='json'>JSON</Radio>
@@ -151,6 +154,25 @@ const DownloadModal = ({
                 Include Vulnerabilities
               </Checkbox>
             </Stack>
+          </Stack>
+          <Divider />
+          <Stack spacing={3} py={3} mt={2}>
+            <Flex
+              alignItems={'center'}
+              gap={2}
+              justifyContent={'space-between'}
+            >
+              <Text fontSize={'sm'}>File Name - </Text>
+              <Tag colorScheme='blue'>{`${productName}-${version}.${type}.xml`}</Tag>
+            </Flex>
+            <Flex
+              alignItems={'center'}
+              gap={2}
+              justifyContent={'space-between'}
+            >
+              <Text fontSize={'sm'}>Document Version - </Text>
+              <Tag colorScheme='blue'>{version}</Tag>{' '}
+            </Flex>
           </Stack>
         </ModalBody>
         <ModalFooter>
