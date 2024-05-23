@@ -5,7 +5,7 @@ import { customStyles } from 'utils'
 import { getFullDateAndTime } from 'utils'
 import { timeSince } from 'utils'
 
-import { AddIcon, EditIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
@@ -19,6 +19,7 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import CustomLoader from 'components/CustomLoader'
+import { RegexHighlighter } from 'components/RegexHighlighter'
 
 import { getInternalComponents } from 'graphQL/Queries'
 
@@ -34,12 +35,15 @@ export const InternalComponents = () => {
   const columns = [
     {
       name: 'Regular Expression',
-      selector: 'matchStr'
+      grow: 3,
+      selector: (row) => {
+        return <RegexHighlighter>{row.matchStr}</RegexHighlighter>
+      }
     },
     {
       name: 'Case Insensitive',
-      selector: () => {
-        return <Text my={2}>Case Insensitive</Text>
+      selector: (row) => {
+        return <Text my={2}>{row.ignoreCase ? 'Yes' : 'No'}</Text>
       }
     },
     {
@@ -63,12 +67,12 @@ export const InternalComponents = () => {
       }
     },
     {
-      name: 'Actions',
+      name: '',
       selector: (row) => {
         return (
           <div>
             <DeleteInternalComponent internalComponent={row} />
-            <IconButton
+            {/* <IconButton
               colorScheme='blue'
               ml={4}
               size='sm'
@@ -79,7 +83,7 @@ export const InternalComponents = () => {
               icon={<EditIcon />}
             >
               Update
-            </IconButton>
+            </IconButton> */}
           </div>
         )
       }

@@ -17,6 +17,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  UnorderedList,
   useToast
 } from '@chakra-ui/react'
 
@@ -32,9 +33,9 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
   const isEdit = !!internalComponent
   const [matchStr, setMatchStr] = useState(internalComponent?.matchStr || '')
   const [errorText, setErrorText] = useState(null)
-  const [ignoreCase, setIgnoreCase] = useState(false)
+  const [ignoreCase, setIgnoreCase] = useState(!!internalComponent?.ignoreCase)
   const toast = useToast()
-  const mutateText = isEdit ? 'Update' : 'Create'
+  const mutateText = isEdit ? 'Update' : 'Tag'
 
   const [mutate, { loading }] = useMutation(
     isEdit ? updateOrgComp : createOrgComp,
@@ -94,6 +95,7 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
             <FormControl isInvalid={!!errorText} isRequired>
               <FormLabel>Regular Expression</FormLabel>
               <Input
+                autoFocus
                 placeholder='orgname'
                 required
                 value={matchStr}
@@ -101,28 +103,10 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
                 bg={'white'}
               />
               {!!errorText && <FormErrorMessage>{errorText}</FormErrorMessage>}
-              <Box py={3}>
-                <Text>Examples:</Text>
-                <ul type='none'>
-                  <li>
-                    <strong>^interlynk</strong>: Tags components with names
-                    <strong> starting with </strong> "interlynk"
-                  </li>
-                  <li>
-                    <strong>interlynk</strong>: Tags components with "interlynk"
-                    <strong>anywhere </strong> in their names.
-                  </li>
-                  <li>
-                    <strong>interlynk$</strong>: Tags components with names{' '}
-                    <strong>ending with</strong>
-                    "interlynk."
-                  </li>
-                </ul>
-              </Box>
             </FormControl>
             <FormControl mt={3}>
               <Checkbox
-                value={ignoreCase}
+                defaultChecked={ignoreCase}
                 onChange={() => {
                   setIgnoreCase(!ignoreCase)
                 }}
@@ -130,6 +114,28 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
                 Case insensitive
               </Checkbox>
             </FormControl>
+            <Box py={3}>
+              <Text>Tips:</Text>
+              <UnorderedList mx={10}>
+                <li>{'// are not required'}</li>
+                <li>
+                  <strong>^myname</strong> matches components whose name{' '}
+                  <strong>start with myname</strong>
+                </li>
+                <li>
+                  <strong>myname$</strong> matches components whose name{' '}
+                  <strong>ends with myname</strong>
+                </li>
+                <li>
+                  <strong>myname </strong> matches components whose name
+                  <strong> includes myname</strong>
+                </li>
+              </UnorderedList>
+              <Text>Note:</Text>
+              <UnorderedList mx={10}>
+                <li>All existing and future components will be tagged</li>
+              </UnorderedList>
+            </Box>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme='gray' mr={3} onClick={onClose}>

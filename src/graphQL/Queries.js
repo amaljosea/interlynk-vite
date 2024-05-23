@@ -4167,6 +4167,7 @@ export const getInternalComponents = gql`
       organizationComponents {
         id
         matchStr
+        ignoreCase
         organizationId
         updatedAt
         createdAt

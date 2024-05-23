@@ -67,8 +67,9 @@ export const DeleteInternalComponent = ({ internalComponent }) => {
           }
         >
           <Text>
-            Are you sure want to delete internal component with regular
-            expression "{internalComponent.matchStr}"
+            Components tagged "internal" with regular expression "
+            {internalComponent.matchStr}", will be untagged. Do you want to
+            proceed?
           </Text>
         </ConfirmationModal>
       )}
