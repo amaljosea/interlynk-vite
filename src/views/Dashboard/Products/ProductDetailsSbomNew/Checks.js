@@ -664,7 +664,7 @@ const Checks = () => {
               </Stack>
             )}
 
-            {status === 'manually-resolved' && (
+            {status === 'resolved' && (
               <Button
                 size='sm'
                 width={'70px'}
