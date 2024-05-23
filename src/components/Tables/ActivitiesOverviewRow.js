@@ -12,6 +12,7 @@ import {
 
 import Tooltip from 'components/Tooltip'
 
+import { BsBack } from 'react-icons/bs'
 import {
   FaDownload,
   FaEdit,
@@ -38,7 +39,7 @@ function valueToColor(action, event, orig, updated) {
     } else {
       return 'green.500'
     }
-  } else if (action == 'tool') {
+  } else if (action == 'tool' || action === 'retracted') {
     return 'blue.500'
   } else if (action == 'auto_check') {
     return 'purple.500'
@@ -64,6 +65,8 @@ function valueToIcon(action, event, orig, updated) {
     }
   } else if (action == 'created') {
     return FaHammer
+  } else if (action == 'retracted') {
+    return BsBack
   } else if (action == 'tool') {
     return FaHammer
   } else if (action == 'auto_check') {
@@ -94,6 +97,8 @@ function valueToText(action, event, orig, updated) {
     }
   } else if (action == 'created') {
     return `${updated}`
+  } else if (action == 'retracted') {
+    return `${orig}`
   } else if (action == 'tool') {
     return `${updated}`
   } else if (action == 'auto_check') {
