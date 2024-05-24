@@ -44,7 +44,7 @@ export const DeleteInternalComponent = ({ internalComponent }) => {
             })
           }}
           confirmText='Delete'
-          header='Delete internal component?'
+          header='UnTag internal component?'
           footer={
             <>
               <Button mr={3} onClick={onCancel}>
@@ -61,7 +61,7 @@ export const DeleteInternalComponent = ({ internalComponent }) => {
                   })
                 }}
               >
-                Delete
+                UnTag
               </Button>
             </>
           }
@@ -82,7 +82,7 @@ export const DeleteInternalComponent = ({ internalComponent }) => {
           setIsConfirming(true)
         }}
       >
-        Delete
+        UnTag
       </IconButton>
     </>
   )
