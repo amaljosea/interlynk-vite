@@ -15,9 +15,9 @@ import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const CompFilters = ({ reset }) => {
+const CompFilters = ({ filters, reset }) => {
   const { prodCompState, dispatch } = useGlobalState()
-  const { filters, ecosystems, kinds, licenses, suppliers, scope, direct } =
+  const { ecosystems, kinds, licenses, suppliers, scope, direct } =
     prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -26,7 +26,7 @@ const CompFilters = ({ reset }) => {
     kinds: filterKinds,
     supplierNames: filterSuppliers,
     licenses: filterLicenses
-  } = filters
+  } = filters || ''
 
   const onFilterEcosystem = (value) => {
     prodCompDispatch({

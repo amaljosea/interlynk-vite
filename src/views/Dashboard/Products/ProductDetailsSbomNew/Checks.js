@@ -103,8 +103,6 @@ const Checks = () => {
     }
   )
 
-  console.log('filterHead', filterHead)
-
   const handleRefetch = useCallback(() => {
     reset()
     refetch()

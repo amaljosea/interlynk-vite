@@ -1452,8 +1452,7 @@ export const GetComponentData = gql`
     $internal: Boolean
     $primary: Boolean
     $direct: Boolean
-    $field: ComponentOrderByFields!
-    $direction: OrderByDirection!
+    $orderBy: ComponentOrderByInput
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
@@ -1471,7 +1470,7 @@ export const GetComponentData = gql`
         internal: $internal
         primary: $primary
         direct: $direct
-        orderBy: { field: $field, direction: $direction }
+        orderBy: $orderBy
       ) {
         totalCount
         pageInfo {
@@ -3858,6 +3857,10 @@ export const GetSbomName = gql`
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
       projectVersion
+      primaryComponent {
+        name
+        version
+      }
       project {
         id
         name

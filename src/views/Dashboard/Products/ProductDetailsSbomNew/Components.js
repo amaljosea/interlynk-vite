@@ -50,8 +50,7 @@ import { deleteComSupplier } from 'graphQL/Mutation'
 import {
   GetCompFilterData,
   GetComponentData,
-  GetComponentPath,
-  ShareCompFilters
+  GetComponentPath
 } from 'graphQL/Queries'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -85,7 +84,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
     licenses,
     suppliers,
     scope,
-    filters,
     direct,
     totalComp
   } = prodCompState
@@ -106,17 +104,18 @@ const Components = ({ sbomData, sbomRefetch }) => {
     }
   }, [direct, ecosystems, kinds, licenses, scope, suppliers])
 
+  const orderBy = { field, direction }
+
   // GET COMPONENT DATA
   const { nodes, refetch, error, paginationProps, reset, loading } =
     usePaginatatedQuery(GetComponentData, {
       selector: 'sbom.components',
       variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        search: searchInput !== '' ? searchInput : undefined,
         ...compData,
-        field: field,
-        direction: direction
+        sbomId: sbomId,
+        projectId: productId,
+        search: searchInput !== '' ? searchInput : undefined,
+        orderBy: searchInput === '' ? orderBy : undefined
       }
     })
 
@@ -127,21 +126,13 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const { lifecycle, primaryComponent } = sbomData || ''
 
   // GET COMPONENT FILTER HEADS
-  const { refetch: getCompFilters } = useQuery(
-    signedUrlParams ? ShareCompFilters : GetCompFilterData,
+  const { data: compFilters, refetch: getCompFilters } = useQuery(
+    GetCompFilterData,
     {
-      fetchPolicy: activeTab === 'components' ? false : true,
+      skip: activeTab === 'components' ? false : true,
       variables: {
-        projectId: signedUrlParams ? undefined : productId,
+        projectId: productId,
         sbomId: sbomId
-      },
-      onCompleted: (data) => {
-        prodCompDispatch({
-          type: 'ADD_FILTER_HEADS',
-          payload: signedUrlParams
-            ? data?.shareLynkQuery?.sbom?.filters
-            : data?.sbom?.filters
-        })
       }
     }
   )
@@ -161,6 +152,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const fetchCompData = () => {
     reset()
     refetch()
+    getCompFilters()
   }
 
   const compBtn = useRef(null)
@@ -964,7 +956,10 @@ const Components = ({ sbomData, sbomRefetch }) => {
             onChange={onSearchInputChange}
           />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && <CompFilters reset={() => reset()} />}
+          <CompFilters
+            filters={compFilters?.sbom?.filters}
+            reset={() => reset()}
+          />
         </Stack>
         <Stack
           width={'100%'}
@@ -1003,7 +998,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
     handleSearch,
     handleClear,
     onSearchInputChange,
-    filters,
+    compFilters?.sbom?.filters,
     onCreateComponent,
     signedUrlParams,
     lifecycle,
@@ -1040,7 +1035,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
           onSort={handleSort}
           customStyles={customStyles}
           defaultSortAsc={false}
-          defaultSortFieldId={field}
+          // defaultSortFieldId={field}
           progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader

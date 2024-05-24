@@ -13,10 +13,25 @@ export const useSbom = ({ projectId, sbomId }) => {
     }
   })
 
+  const getVersionName = () => {
+    if (signedUrlParams) {
+      return (
+        data?.shareLynkQuery?.sbom?.primaryComponent?.version ||
+        data?.shareLynkQuery?.sbom?.projectVersion
+      )
+    } else {
+      const primaryComponent = data?.sbom?.primaryComponent
+
+      if (primaryComponent) {
+        return `${primaryComponent.name} ${primaryComponent.version ? ':' : ''} ${data?.sbom?.projectVersion}`
+      }
+
+      return data?.sbom?.projectVersion
+    }
+  }
+
   return {
-    versionName: signedUrlParams
-      ? data?.shareLynkQuery?.sbom?.projectVersion
-      : data?.sbom?.projectVersion,
+    versionName: getVersionName(),
     projectGroupName: signedUrlParams
       ? data?.shareLynkQuery?.sbom?.project?.projectGroup?.name
       : data?.sbom?.project?.projectGroup?.name

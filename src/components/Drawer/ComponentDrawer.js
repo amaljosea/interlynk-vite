@@ -89,10 +89,12 @@ function ComponentDrawer(props) {
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [createComponent] = useMutation(CreateComponent, {
-    onCompleted: () => fetchCompData()
+    onCompleted: () => fetchCompData(),
+    refetchQueries: 'active'
   })
   const [updateComponent] = useMutation(UpdateComponent, {
-    onCompleted: () => fetchCompData()
+    onCompleted: () => fetchCompData(),
+    refetchQueries: 'active'
   })
 
   const cpeRef = useRef()
@@ -119,6 +121,13 @@ function ComponentDrawer(props) {
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
   const [disabled, setDisabled] = useState(false)
+
+  const disableButtonTemporarily = () => {
+    setDisabled(true)
+    setTimeout(() => {
+      setDisabled(false)
+    }, 3000)
+  }
 
   useEffect(() => {
     if (data) {
@@ -232,7 +241,7 @@ function ComponentDrawer(props) {
   }
 
   const handleCreateCom = () => {
-    setDisabled(true)
+    disableButtonTemporarily()
     createComponent({
       variables: {
         sbomId: sbomId,
@@ -251,7 +260,6 @@ function ComponentDrawer(props) {
     })
       .then((res) => {
         if (res.data) {
-          setDisabled(false)
           sbomRefetch({ projectId: productId, sbomId: sbomId })
           prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
           addRelation({
@@ -271,23 +279,12 @@ function ComponentDrawer(props) {
           isClosable: true,
           duration: 2000
         })
+        onClose()
       })
-    onClose()
-    setGroupInfo('')
-    setCompName('')
-    setCompVersion('')
-    setCompKind('')
-    setCompScope('')
-    setCpeValue('')
-    setPurlValue('')
-    setIsPrimary(false)
-    setIsInternal(false)
-    setRelation('')
-    setIsValid(true)
   }
 
   const handleUpdateCom = () => {
-    setDisabled(true)
+    disableButtonTemporarily()
     updateComponent({
       variables: {
         id: data?.id,
@@ -313,25 +310,11 @@ function ComponentDrawer(props) {
       }
     }).then((res) => {
       if (res.data) {
-        setDisabled(false)
-        if (isPrimary) {
-          sbomRefetch({ projectId: productId, sbomId: sbomId })
-        }
+        sbomRefetch({ projectId: productId, sbomId: sbomId })
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        onClose()
       }
     })
-    onClose()
-    setGroupInfo('')
-    setCompName('')
-    setCompVersion('')
-    setCompKind('')
-    setCompScope('')
-    setCpeValue('')
-    setPurlValue('')
-    setIsPrimary(false)
-    setIsInternal(false)
-    setRelation('')
-    setIsValid(true)
   }
 
   const handleCreateCpe = (string) => {
