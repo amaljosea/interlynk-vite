@@ -158,20 +158,17 @@ const DownloadModal = ({
           <Divider />
           <Stack spacing={3} py={3} mt={2}>
             <Flex
-              alignItems={'center'}
               gap={2}
+              alignItems={'center'}
               justifyContent={'space-between'}
             >
-              <Text fontSize={'sm'}>File Name - </Text>
-              <Tag colorScheme='blue'>{`${productName}-${version}.${type}.xml`}</Tag>
-            </Flex>
-            <Flex
-              alignItems={'center'}
-              gap={2}
-              justifyContent={'space-between'}
-            >
-              <Text fontSize={'sm'}>Document Version - </Text>
-              <Tag colorScheme='blue'>{version}</Tag>{' '}
+              <Text fontSize={'sm'} width='100px'>
+                File Name
+              </Text>
+              <Tag
+                colorScheme='blue'
+                textAlign={'right'}
+              >{`${productName}-${version}.${type}.xml`}</Tag>
             </Flex>
           </Stack>
         </ModalBody>
