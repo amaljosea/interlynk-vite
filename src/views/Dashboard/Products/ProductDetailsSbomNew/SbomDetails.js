@@ -34,10 +34,19 @@ import {
   FaBalanceScale,
   FaBug,
   FaCube,
-  FaCubes
+  FaCubes,
+  FaRobot
 } from 'react-icons/fa'
 import { FaCircleCheck, FaTag } from 'react-icons/fa6'
 import { MdPolicy } from 'react-icons/md'
+
+const SettingsTag = ({ icon, label, color }) => {
+  return (
+    <Tooltip label={label}>
+      <IconButton size='xs' icon={icon} colorScheme={color} />
+    </Tooltip>
+  )
+}
 
 const SbomDetails = ({ sbomData, refetch }) => {
   const partsContext = usePartsContext()
@@ -89,6 +98,13 @@ const SbomDetails = ({ sbomData, refetch }) => {
   })
 
   const { projectSetting } = settings?.project || ''
+  const {
+    checksEnabled,
+    vulnScanningEnabled: vulnScan,
+    internalCompMatchingEnabled: internalComp,
+    automatedFixesEnabled
+  } = projectSetting || ''
+  const hasFinished = vulnRunStatus === 'FINISHED'
 
   const handleRelationView = async () => {
     await getPrimaryComp({
@@ -167,7 +183,7 @@ const SbomDetails = ({ sbomData, refetch }) => {
 
   useEffect(() => {
     const refetchInterval = setInterval(() => {
-      if (sbomData && sbomData?.vulnRunStatus === 'IN_PROGRESS') {
+      if (vulnRunStatus === 'IN_PROGRESS') {
         refetch({ projectId, sbomId })
       } else {
         clearInterval(refetchInterval)
@@ -175,7 +191,7 @@ const SbomDetails = ({ sbomData, refetch }) => {
     }, 5000)
 
     return () => clearInterval(refetchInterval)
-  }, [sbomData, refetch, projectId, sbomId])
+  }, [refetch, projectId, sbomId, vulnRunStatus])
 
   return (
     <>
@@ -242,67 +258,43 @@ const SbomDetails = ({ sbomData, refetch }) => {
           </Text>
           {/* SCAN STATUS */}
           <Flex
-            my={2}
+            mb={2}
             gap={2}
             width='100%'
             flexDir='row'
             alignItems={'center'}
             hidden={signedUrlParams}
           >
-            <Tooltip label='Imported'>
-              <IconButton
-                size='xs'
-                colorScheme={'blue'}
-                icon={<DownloadIcon />}
-              />
-            </Tooltip>
-            <Tooltip label='SBOM Checks'>
-              <IconButton
-                size='xs'
-                colorScheme={
-                  (vulnRunStatus === 'FINISHED' ||
-                    vulnRunStatus === 'IN_PROGRESS') &&
-                  projectSetting?.checksEnabled === true
-                    ? 'blue'
-                    : 'blackAlpha'
-                }
-                icon={<Search2Icon />}
-              />
-            </Tooltip>
-            <Tooltip label='Apply Internal'>
-              <IconButton
-                size='xs'
-                colorScheme={
-                  (vulnRunStatus === 'FINISHED' ||
-                    vulnRunStatus === 'IN_PROGRESS') &&
-                  projectSetting?.internalCompMatchingEnabled === true
-                    ? 'blue'
-                    : 'blackAlpha'
-                }
-                icon={<FaTag />}
-              />
-            </Tooltip>
-            <Tooltip label='Vulnerability Scan'>
-              <IconButton
-                size='xs'
-                colorScheme={
-                  vulnRunStatus === 'FINISHED' &&
-                  projectSetting?.vulnScanningEnabled === true
-                    ? 'blue'
-                    : 'blackAlpha'
-                }
-                icon={<FaBug />}
-              />
-            </Tooltip>
-            <Tooltip label='Ready'>
-              <IconButton
-                size='xs'
-                colorScheme={
-                  vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
-                }
-                icon={<FaCircleCheck />}
-              />
-            </Tooltip>
+            <SettingsTag
+              color={'blue'}
+              label={'Imported'}
+              icon={<DownloadIcon />}
+            />
+            <SettingsTag
+              color={checksEnabled ? 'blue' : 'blackAlpha'}
+              label={'Checks'}
+              icon={<Search2Icon />}
+            />
+            <SettingsTag
+              color={internalComp ? 'blue' : 'blackAlpha'}
+              label={'Internal Labeling'}
+              icon={<FaTag />}
+            />
+            <SettingsTag
+              color={automatedFixesEnabled ? 'blue' : 'blackAlpha'}
+              label={'Automation'}
+              icon={<FaRobot />}
+            />
+            <SettingsTag
+              color={hasFinished && vulnScan ? 'blue' : 'blackAlpha'}
+              label={'Vulnerability Scan'}
+              icon={<FaBug />}
+            />
+            <SettingsTag
+              label={'Ready'}
+              color={hasFinished ? 'blue' : 'blackAlpha'}
+              icon={<FaCircleCheck />}
+            />
             {vulnRunStatus === 'IN_PROGRESS' && (
               <Badge px={2} py={1} fontWeight={'semibold'}>
                 Scanning...

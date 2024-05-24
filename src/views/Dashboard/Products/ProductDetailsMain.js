@@ -53,7 +53,7 @@ import {
   GetVulnData
 } from 'graphQL/Queries'
 
-import { FaBug, FaTag } from 'react-icons/fa'
+import { FaBug, FaRobot, FaTag } from 'react-icons/fa'
 import {
   FaBoxArchive,
   FaPenToSquare,
@@ -167,8 +167,12 @@ const ProductDetailsMain = () => {
   )
 
   const { projectSetting } = settings?.project || ''
-  const { checksEnabled, vulnScanningEnabled, internalCompMatchingEnabled } =
-    projectSetting || ''
+  const {
+    checksEnabled,
+    vulnScanningEnabled,
+    internalCompMatchingEnabled,
+    automatedFixesEnabled
+  } = projectSetting || ''
 
   // GET VULN DATA
   const [filters, setFilters] = useState({
@@ -420,6 +424,11 @@ const ProductDetailsMain = () => {
                         icon={<FaBug />}
                         label={'Vulnerability Scan'}
                         settings={vulnScanningEnabled}
+                      />
+                      <SettingsTag
+                        icon={<FaRobot />}
+                        label={'Automation'}
+                        settings={automatedFixesEnabled}
                       />
                     </Stack>
                   </Flex>
