@@ -39,7 +39,11 @@ function valueToColor(action, event, orig, updated) {
     } else {
       return 'green.500'
     }
-  } else if (action == 'tool' || action === 'retracted') {
+  } else if (
+    action == 'tool' ||
+    action === 'retracted' ||
+    action === 'restored'
+  ) {
     return 'blue.500'
   } else if (action == 'auto_check') {
     return 'purple.500'
@@ -65,7 +69,7 @@ function valueToIcon(action, event, orig, updated) {
     }
   } else if (action == 'created') {
     return FaHammer
-  } else if (action == 'retracted') {
+  } else if (action == 'retracted' || action == 'restored') {
     return BsBack
   } else if (action == 'tool') {
     return FaHammer
@@ -97,7 +101,7 @@ function valueToText(action, event, orig, updated) {
     }
   } else if (action == 'created') {
     return `${updated}`
-  } else if (action == 'retracted') {
+  } else if (action == 'retracted' || action == 'restored') {
     return `${orig}`
   } else if (action == 'tool') {
     return `${updated}`
