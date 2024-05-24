@@ -1,5 +1,5 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import {
@@ -274,6 +274,20 @@ const Parts = ({ sbomRefetch }) => {
     onSelectPart(part)
   }
 
+  useEffect(() => {
+    const refetchInterval = setInterval(() => {
+      const inProgress = sbomParts?.some(
+        (item) => item?.vulnRunStatus === 'IN_PROGRESS'
+      )
+      if (inProgress) {
+        refetch()
+      } else {
+        clearInterval(refetchInterval)
+      }
+    }, 5000)
+    return () => clearInterval(refetchInterval)
+  }, [sbomParts, refetch])
+
   // COLUMNS
   const columns = [
     {
@@ -412,7 +426,7 @@ const Parts = ({ sbomRefetch }) => {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
       selector: (row) => {
-        const { part } = row
+        const { part, vulnRunStatus } = row
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           productid: part.project.id,
           sbomid: part.id,
@@ -428,6 +442,7 @@ const Parts = ({ sbomRefetch }) => {
                 color='red'
                 label='Critical'
                 onClick={() => onFilterSev(part, ['critical'])}
+                status={vulnRunStatus}
               >
                 {part?.stats?.vulnStats?.critical || 0}
               </VulnBadge>
@@ -437,6 +452,7 @@ const Parts = ({ sbomRefetch }) => {
                 color='orange'
                 label='High'
                 onClick={() => onFilterSev(part, ['high'])}
+                status={vulnRunStatus}
               >
                 {part?.stats?.vulnStats?.high || 0}
               </VulnBadge>
@@ -446,6 +462,7 @@ const Parts = ({ sbomRefetch }) => {
                 color='yellow'
                 label='Medium'
                 onClick={() => onFilterSev(part, ['medium'])}
+                status={vulnRunStatus}
               >
                 {part?.stats?.vulnStats?.medium || 0}
               </VulnBadge>
@@ -455,6 +472,7 @@ const Parts = ({ sbomRefetch }) => {
                 color='green'
                 label='Low'
                 onClick={() => onFilterSev(part, ['low'])}
+                status={vulnRunStatus}
               >
                 {part?.stats?.vulnStats?.low || 0}
               </VulnBadge>
@@ -464,6 +482,7 @@ const Parts = ({ sbomRefetch }) => {
                 color='gray'
                 label='Unknown'
                 onClick={() => onFilterSev(part, ['unknown'])}
+                status={vulnRunStatus}
               >
                 {part?.stats?.vulnStats?.unknown || 0}
               </VulnBadge>

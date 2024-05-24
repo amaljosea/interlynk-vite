@@ -1061,6 +1061,7 @@ export const GetVersionsTable = gql`
           updatedAt
           lifecycle
           projectVersion
+          vulnRunStatus
           stats {
             compCount
             compLicenseCount
@@ -3109,6 +3110,7 @@ export const GetSbomParts = gql`
           createdAt
           creationAt
           projectVersion
+          vulnRunStatus
           project {
             id
             name

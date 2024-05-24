@@ -1,5 +1,5 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
@@ -166,6 +166,20 @@ const VersionsTable = ({ projectGroup }) => {
     )
   }
 
+  useEffect(() => {
+    const refetchInterval = setInterval(() => {
+      const inProgress = nodes?.some(
+        (item) => item?.vulnRunStatus === 'IN_PROGRESS'
+      )
+      if (inProgress) {
+        refetch()
+      } else {
+        clearInterval(refetchInterval)
+      }
+    }, 5000)
+    return () => clearInterval(refetchInterval)
+  }, [nodes, refetch])
+
   // COLUMNS
   const columns = [
     // VERSION
@@ -246,7 +260,7 @@ const VersionsTable = ({ projectGroup }) => {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
       selector: (row) => {
-        const { stats, id } = row
+        const { stats, id, vulnRunStatus } = row
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           sbomid: id,
           paramsObj: {
@@ -256,27 +270,27 @@ const VersionsTable = ({ projectGroup }) => {
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
             <Link to={link} onClick={() => onFilterSev(['critical'])}>
-              <VulnBadge color='red' label='Critical'>
+              <VulnBadge color='red' label='Critical' status={vulnRunStatus}>
                 {stats?.vulnStats?.critical || 0}
               </VulnBadge>
             </Link>
             <Link to={link} onClick={() => onFilterSev(['high'])}>
-              <VulnBadge color='orange' label='High'>
+              <VulnBadge color='orange' label='High' status={vulnRunStatus}>
                 {stats?.vulnStats?.high || 0}
               </VulnBadge>
             </Link>
             <Link to={link} onClick={() => onFilterSev(['medium'])}>
-              <VulnBadge color='yellow' label='Medium'>
+              <VulnBadge color='yellow' label='Medium' status={vulnRunStatus}>
                 {stats?.vulnStats?.medium || 0}
               </VulnBadge>
             </Link>
             <Link to={link} onClick={() => onFilterSev(['low'])}>
-              <VulnBadge color='green' label='Low'>
+              <VulnBadge color='green' label='Low' status={vulnRunStatus}>
                 {stats?.vulnStats?.low || 0}
               </VulnBadge>
             </Link>
             <Link to={link} onClick={() => onFilterSev(['unknown'])}>
-              <VulnBadge color='gray' label='Unknown'>
+              <VulnBadge color='gray' label='Unknown' status={vulnRunStatus}>
                 {stats?.vulnStats?.unknown || 0}
               </VulnBadge>
             </Link>
