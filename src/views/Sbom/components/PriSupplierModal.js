@@ -38,7 +38,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   const onSupplierChange = (e) => {
     const { value } = e.target
     setSupName(value)
-    if (value.length < 4 || value.length > 256) {
+    if ((value.length > 0 && value.length < 4) || value.length > 256) {
       setSupplierError('Input must be between 4 and 256 characters')
     } else {
       setSupplierError('')
@@ -64,7 +64,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   }
 
   const isInvalid =
-    (supName === '' && supEmail === '' && orgName === '' && orgUrl === '') ||
+    orgName === '' ||
     supplierError !== '' ||
     (supEmail !== '' && !validateEmail(supEmail)) ||
     (orgUrl !== '' && !validateUrl(orgUrl))
@@ -111,7 +111,9 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
         contactEmail: supEmail,
         id: suppliers[0].id
       }
-    }).then((res) => res.data && onClose())
+    })
+      .then((res) => res?.data && refetch())
+      .finally(() => onClose())
   }
 
   return (
@@ -124,7 +126,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
           <ModalBody>
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* ORG NAME */}
-              <FormControl>
+              <FormControl isRequired>
                 <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
                 <Input
                   placeholder='Enter organization name'
@@ -185,23 +187,13 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
               <Button colorScheme='gray' mr={3} onClick={onClose}>
                 Cancel
               </Button>
-              {suppliers && suppliers.length > 0 ? (
-                <Button
-                  colorScheme='blue'
-                  onClick={handleUpdate}
-                  disabled={isInvalid}
-                >
-                  Update
-                </Button>
-              ) : (
-                <Button
-                  colorScheme='blue'
-                  onClick={handleSave}
-                  disabled={isInvalid}
-                >
-                  Save
-                </Button>
-              )}
+              <Button
+                colorScheme='blue'
+                onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
+                disabled={isInvalid}
+              >
+                {suppliers?.length > 0 ? 'Update' : 'Save'}
+              </Button>
             </Flex>
           </ModalFooter>
         </ModalContent>
