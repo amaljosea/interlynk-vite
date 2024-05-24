@@ -642,7 +642,7 @@ export const validateCpe = (value) => {
 
 export const validateUrl = (url) => {
   const urlRegex =
-    /^(?:(?:https?|ftp):\/\/)?(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,})+(?:\/[\w-]*)*(?:\/[\w\-]+(?:\.[a-zA-Z]{2,})?)?(?:\?[\w%=&]*)?(?:#[\w\-]*)?$/
+    /^(?:(?:https?|ftp):\/\/)?(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+(?::\d{2,5})?(?:\/[\w\-._~:\/?#\[\]@!\$&'()*+,;=%]*)?$/
   return urlRegex.test(url)
 }
 
