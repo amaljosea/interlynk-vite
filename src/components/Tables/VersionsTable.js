@@ -460,7 +460,7 @@ const VersionsTable = ({ projectGroup }) => {
       key,
       target: { value }
     } = event
-    if (key === 'Enter') {
+    if (key === 'Enter' && value !== '') {
       setSearchFilter(value)
     }
   }, [])

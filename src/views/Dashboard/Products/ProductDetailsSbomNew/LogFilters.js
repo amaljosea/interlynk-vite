@@ -6,11 +6,7 @@ import CheckMark from 'components/Misc/CheckMark'
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
-const LogFilters = ({ setLogState }) => {
-  const { sbomLogState } = useGlobalState()
-  const { filters } = sbomLogState
+const LogFilters = ({ filters, setLogState }) => {
   const { logChangeBys, logChangeObjects, logChangeTypes } = filters || ''
 
   const [users, setUser] = useState([])

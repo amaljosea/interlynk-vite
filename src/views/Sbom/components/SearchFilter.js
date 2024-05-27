@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 import { CloseIcon } from '@chakra-ui/icons'
 import { Box, Input } from '@chakra-ui/react'
 
 const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
   const searchInputRef = useRef()
+  const value = filterText?.replace(/\s+/g, '')
 
   const focusSearchInput = () => {
     if (searchInputRef?.current) {
@@ -12,18 +13,18 @@ const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
     }
   }
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = useCallback((e) => {
     if (e.ctrlKey && e.key === '/') {
       focusSearchInput()
     }
-  }
+  }, [])
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress)
     return () => {
       window.removeEventListener('keydown', handleKeyPress)
     }
-  }, [])
+  }, [handleKeyPress])
 
   return (
     <>
@@ -34,11 +35,11 @@ const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
           type='text'
           placeholder='Search'
           ref={searchInputRef}
-          value={filterText}
+          value={value}
           onChange={onChange}
           onKeyDown={onFilter}
         />
-        {filterText !== '' && (
+        {value !== '' && (
           <CloseIcon
             w={'18px'}
             h={'18px'}

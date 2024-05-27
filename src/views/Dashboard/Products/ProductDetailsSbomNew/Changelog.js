@@ -22,7 +22,6 @@ import CustomLoader from 'components/CustomLoader'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetChangeLogs, GetSbomLogFilters } from 'graphQL/Queries'
@@ -56,13 +55,9 @@ const Changelog = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { sbomLogState, dispatch } = useGlobalState()
-  const { filters, searchInput } = sbomLogState
-  const { sbomLogDispatch } = dispatch
-
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [activeRow, setActiveRow] = useState('')
-  const [logSearch, setLogSearch] = useState(searchInput)
+  const [logSearch, setLogSearch] = useState('')
   const [logState, setLogState] = useState({
     field: 'ACTIVITY_LOGS_CREATED_AT',
     direction: 'DESC'
@@ -83,18 +78,15 @@ const Changelog = () => {
   const { field } = paginationProps
 
   // GET SBOM CHANGELOG FILTER HEADS
-  useQuery(GetSbomLogFilters, {
+  const { data: filters } = useQuery(GetSbomLogFilters, {
     skip: activeTab === 'changelog' ? false : true,
     variables: {
       projectId: productId,
       sbomId
-    },
-    onCompleted: (data) =>
-      sbomLogDispatch({
-        type: 'ADD_FILTER_HEADS',
-        payload: data?.sbom?.activityLogFilters
-      })
+    }
   })
+
+  const { activityLogFilters } = filters?.sbom || ''
 
   // COLUMNS
   const columns = [
@@ -381,7 +373,7 @@ const Changelog = () => {
   )
 
   // CLEAR SERACH
-  const handleClear = useCallback(async () => {
+  const handleClear = useCallback(() => {
     setLogSearch('')
     setLogState((oldFilter) => ({
       ...oldFilter,
@@ -410,7 +402,7 @@ const Changelog = () => {
         key,
         target: { value }
       } = event
-      if (key === 'Enter') {
+      if (key === 'Enter' && value !== '') {
         setSearchFilter(value)
       }
     },
@@ -446,14 +438,13 @@ const Changelog = () => {
             onClear={handleClear}
           />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && (
-            <LogFilters
-              setLogState={(newFilters) => {
-                setLogState(newFilters)
-                reset()
-              }}
-            />
-          )}
+          <LogFilters
+            filters={activityLogFilters}
+            setLogState={(newFilters) => {
+              setLogState(newFilters)
+              reset()
+            }}
+          />
         </Stack>
         <Tooltip label='Refresh'>
           <IconButton
@@ -469,7 +460,7 @@ const Changelog = () => {
     onSearchInputChange,
     handleSearch,
     handleClear,
-    filters,
+    activityLogFilters,
     reset,
     refetch
   ])

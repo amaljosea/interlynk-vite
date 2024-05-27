@@ -225,7 +225,7 @@ const ProductTable = ({
         key,
         target: { value }
       } = event
-      if (key === 'Enter') {
+      if (key === 'Enter' && value !== '') {
         setSearchFilter(value)
       }
     },

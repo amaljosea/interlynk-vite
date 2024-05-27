@@ -50,8 +50,6 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
   const [createSupport] = useMutation(CreateCompSupportOverride)
   const [updateSupport] = useMutation(UpdateCompSupportOverride)
 
-  const handleRefetch = () => refetch()
-
   const hasSimilarRow = (data) => {
     for (let i = 0; i < data.length; i++) {
       for (let j = i + 1; j < data.length; j++) {
@@ -197,7 +195,7 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
               if (errors?.length > 0) {
                 setError(errors[0])
               } else {
-                handleRefetch()
+                refetch()
                 onClose()
               }
             })
@@ -234,7 +232,7 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
-          handleRefetch()
+          refetch()
           setIdUri('')
           setProductName('')
           setProductVersion('')

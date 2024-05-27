@@ -39,7 +39,7 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
       setValue(data.setTo.value || '')
       setCondition(data.condition)
     }
-  }, [])
+  }, [data])
 
   const handleUpdate = async () => {
     await updateAutoCheck({

@@ -61,9 +61,8 @@ const Checks = () => {
   const activeTab = queryParams.get('tab')
   const customerView = location.pathname.startsWith('/customer')
 
-  const { userPermissions, prodCheckState, dispatch } = useGlobalState()
-  const { searchInput } = prodCheckState
-  const { prodCompDispatch, prodCheckDispatch, sbomDispatch } = dispatch
+  const { userPermissions, dispatch } = useGlobalState()
+  const { prodCompDispatch, sbomDispatch } = dispatch
 
   const { data: prodData } = useQuery(GetProductData, {
     skip: activeTab === 'checks' ? false : true,
@@ -123,7 +122,7 @@ const Checks = () => {
   const [cpeList, setCpeList] = useState([])
   const [cpeValue, setCpeValue] = useState('')
   const [selectedCpe, setSelectedCpe] = useState(null)
-  const [checkSearch, setCheckSearch] = useState(searchInput)
+  const [checkSearch, setCheckSearch] = useState('')
   const [activeRow, setActiveRow] = useState(null)
 
   const [updateResult] = useMutation(checkResultUpdate)
@@ -259,7 +258,7 @@ const Checks = () => {
         key,
         target: { value }
       } = event
-      if (key === 'Enter') {
+      if (key === 'Enter' && value !== '') {
         setSearchFilter(value)
       }
     },
@@ -338,7 +337,6 @@ const Checks = () => {
     })
       .then((res) => {
         if (res.data) {
-          prodCheckDispatch({ type: 'CLEAR_PROD_CHECK' })
           healthRecheck({
             variables: {
               checkId: row.organizationRule.rule.friendlyId,

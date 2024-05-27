@@ -1,15 +1,10 @@
 import {
   compVulnReducer,
-  policyReducer,
-  prodCheckReducer,
   prodCompReducer,
-  prodLogReducer,
   prodReducer,
   prodRulesReducer,
   prodVulnReducer,
-  sbomLogReducer,
   sbomReducer,
-  supportReducer,
   toolsReducer,
   versionReducer
 } from 'context/reducers'
@@ -65,15 +60,6 @@ const GlobalStateProvider = ({ children }) => {
   const [prodRulesState, prodRulesDispatch] = useReducer(prodRulesReducer, {
     field: 'AUTO_CHECKS_UPDATED_AT',
     direction: 'DESC',
-    pageIndex: 1
-  })
-  const [prodLogState, prodLogDispatch] = useReducer(prodLogReducer, {
-    field: 'ACTIVITY_LOGS_CREATED_AT',
-    direction: 'DESC',
-    searchInput: '',
-    type: [],
-    user: [],
-    object: [],
     pageIndex: 1
   })
   const [prodCompState, prodCompDispatch] = useReducer(prodCompReducer, {
@@ -140,19 +126,6 @@ const GlobalStateProvider = ({ children }) => {
     upstream: false,
     retracted: false
   })
-  const [prodCheckState, prodCheckDispatch] = useReducer(prodCheckReducer, {
-    field: 'CHECK_RESULTS_UPDATED_AT',
-    direction: 'DESC',
-    after: '',
-    before: '',
-    searchInput: '',
-    pageIndex: 1,
-    rules: [],
-    categories: [],
-    severities: [],
-    statues: [],
-    filters: null
-  })
   const [sbomState, sbomDispatch] = useReducer(sbomReducer, {
     licenseType: 'license_exp',
     spdxLicenses: [],
@@ -162,27 +135,6 @@ const GlobalStateProvider = ({ children }) => {
     expLicense: '',
     licenseString: []
   })
-  const [sbomLogState, sbomLogDispatch] = useReducer(sbomLogReducer, {
-    field: 'ACTIVITY_LOGS_CREATED_AT',
-    direction: 'DESC',
-    after: '',
-    before: '',
-    searchInput: '',
-    pageIndex: 1,
-    users: [],
-    objects: [],
-    types: [],
-    filters: null
-  })
-  // SBOM VERSIONS
-  const [supportState, supportDispatch] = useReducer(supportReducer, {
-    pageIndex: 1,
-    searchInput: '',
-    after: '',
-    before: '',
-    field: 'COMPONENT_SUPPORT_OVERRIDES_UPDATED_AT',
-    direction: 'DESC'
-  })
   // SBOM VERSIONS
   const [toolsState, toolsDispatch] = useReducer(toolsReducer, {
     drifts: [],
@@ -190,15 +142,6 @@ const GlobalStateProvider = ({ children }) => {
     component: '',
     searchInput: '',
     filters: null
-  })
-  // POLICIES
-  const [policyState, policyDispatch] = useReducer(policyReducer, {
-    pageIndex: 1,
-    searchInput: '',
-    after: '',
-    before: '',
-    field: 'POLICIES_UPDATED_AT',
-    direction: 'DESC'
   })
 
   return (
@@ -230,31 +173,21 @@ const GlobalStateProvider = ({ children }) => {
         setSelectedSbom,
         compVulnState,
         prodState,
-        prodLogState,
         prodCompState,
         prodVulnState,
-        prodCheckState,
         prodRulesState,
-        sbomLogState,
         sbomState,
         versionState,
         toolsState,
-        supportState,
-        policyState,
         dispatch: {
           compVulnDispatch,
           prodDispatch,
-          prodLogDispatch,
           prodCompDispatch,
           prodVulnDispatch,
-          prodCheckDispatch,
           prodRulesDispatch,
-          sbomLogDispatch,
           sbomDispatch,
           versionDispatch,
-          toolsDispatch,
-          supportDispatch,
-          policyDispatch
+          toolsDispatch
         }
       }}
     >

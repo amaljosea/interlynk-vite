@@ -837,7 +837,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   const handleSearch = useCallback(
     async (event) => {
       const { value } = event.target
-      if (event.key === 'Enter') {
+      if (event.key === 'Enter' && value !== '') {
         prodVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
         reset()
       }

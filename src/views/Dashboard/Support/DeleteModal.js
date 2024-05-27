@@ -16,23 +16,12 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import { DeleteCompSupportOverride } from 'graphQL/Mutation'
 
 const DeleteModal = ({ isOpen, onClose, data, refetch }) => {
   const { id } = data
   const toast = useToast()
-  const { totalRows, supportState } = useGlobalState()
-  const { searchInput, field, direction } = supportState
   const [deleteSupport] = useMutation(DeleteCompSupportOverride)
-
-  const supportData = {
-    search: searchInput === '' ? undefined : searchInput,
-    first: totalRows,
-    field,
-    direction
-  }
 
   const onDeleteSupport = async () => {
     await deleteSupport({ variables: { id } }).then((res) => {
@@ -45,7 +34,7 @@ const DeleteModal = ({ isOpen, onClose, data, refetch }) => {
           duration: 3000
         })
       } else {
-        refetch({ variables: { ...supportData } })
+        refetch()
         onClose()
       }
     })
@@ -61,11 +50,11 @@ const DeleteModal = ({ isOpen, onClose, data, refetch }) => {
           <Text>Archiving this entry will: </Text>
           <UnorderedList>
             <Flex flexDir={'column'} gap={1} mt={4}>
-              {[
-                `Remove this support detail from existing products`,
-              ].map((item, index) => (
-                <ListItem key={index}>{item}</ListItem>
-              ))}
+              {[`Remove this support detail from existing products`].map(
+                (item, index) => (
+                  <ListItem key={index}>{item}</ListItem>
+                )
+              )}
             </Flex>
           </UnorderedList>
           <Text mt={10}>Are you sure you wish to continue ?</Text>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
@@ -10,6 +10,9 @@ import { Flex, IconButton, Stack, Tag, Text, Tooltip } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+
+import { GetProjectLogs } from 'graphQL/Queries'
 
 import Pagination from '../Pagination'
 
@@ -32,45 +35,24 @@ const setColor = (type) => {
   }
 }
 
-const ChangelogTable = ({ data, refetch, activeEnv }) => {
-  //This part is needed for the pagination to work. (Modify with caution)
-  const paginationSizes = [25, 50, 100]
+const ChangelogTable = ({ activeEnv }) => {
+  const { activeProdTab } = useGlobalState()
 
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
-
-  useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
-    }
-  }, [data])
-
-  const setPaginationControl = (data) => {
-    setIsPrevActive(data.project?.activityLogs?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data.project?.activityLogs?.pageInfo?.hasNextPage)
-  }
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
-
-  //end
-
-  const { totalRows, setTotalRows, prodLogState, dispatch } = useGlobalState()
-  const {
-    field,
-    direction,
-    pageIndex,
-    searchInput: search,
-    type,
-    object,
-    user
-  } = prodLogState
-  const { prodLogDispatch } = dispatch
-
+  const [prodLogState, setProdLogState] = useState({
+    field: 'ACTIVITY_LOGS_CREATED_AT',
+    direction: 'DESC'
+  })
   const [searchInput, setSearchInput] = useState('')
+
+  const { nodes, paginationProps, refetch, loading, reset } =
+    usePaginatatedQuery(GetProjectLogs, {
+      skip: activeProdTab === 5 ? false : true,
+      selector: 'project.activityLogs',
+      variables: {
+        id: activeEnv,
+        ...prodLogState
+      }
+    })
 
   // COLUMNS
   const columns = [
@@ -170,121 +152,45 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
     }
   ]
 
-  const logData = useMemo(() => {
-    return {
-      id: activeEnv,
-      changeType: type?.length === 0 ? undefined : type,
-      changedBy: user?.length === 0 ? undefined : user,
-      changeObject: object?.length === 0 ? undefined : object,
-      field,
-      direction
-    }
-  }, [activeEnv, direction, field, object, type, user])
+  const handleRefresh = useCallback(async () => {
+    reset()
+    refetch()
+  }, [refetch, reset])
 
-  const handlePreviousPage = async () => {
-    disablePaginationControl()
+  const setSearchFilter = useCallback(
+    (value) => {
+      setProdLogState((oldFilter) => ({
+        ...oldFilter,
+        search: value
+      }))
+      reset()
+    },
+    [reset]
+  )
 
-    await refetch({
-      variables: {
-        last: totalRows,
-        before: data.pageInfo.startCursor,
-        search: search !== '' ? search : undefined,
-        ...logData
-      }
-    }).then(
-      (res) =>
-        res.data &&
-        prodLogDispatch({
-          type: 'DECREMENT_PAGE',
-          payload: data.pageInfo.startCursor
-        })
-    )
-  }
-
-  const handleNextPage = async () => {
-    disablePaginationControl()
-
-    await refetch({
-      variables: {
-        first: totalRows,
-        after: data?.pageInfo?.endCursor,
-        search: search !== '' ? search : undefined,
-        ...logData
-      }
-    }).then(
-      (res) =>
-        res.data &&
-        prodLogDispatch({
-          type: 'INCREMENT_PAGE',
-          payload: {
-            total: data.totalCount,
-            after: data.pageInfo.endCursor
-          }
-        })
-    )
-  }
+  // CLEAR SERACH
+  const handleClear = useCallback(() => {
+    setSearchInput('')
+    setProdLogState((oldFilter) => ({
+      ...oldFilter,
+      search: undefined
+    }))
+    reset()
+  }, [reset])
 
   // SEARCH COMPONENT
   const handleSearch = useCallback(
     async (event) => {
-      disablePaginationControl()
-      const { value } = event.target
-      if (event.key === 'Enter' && value !== '') {
-        await refetch({
-          variables: {
-            search: value,
-            first: totalRows,
-            ...logData
-          }
-        }).then((res) => {
-          if (res.data) {
-            setPaginationControl(res.data)
-            prodLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-          }
-        })
+      const {
+        key,
+        target: { value }
+      } = event
+      if (key === 'Enter' && value !== '') {
+        setSearchFilter(value)
       }
     },
-    [logData, prodLogDispatch, refetch, totalRows]
+    [setSearchFilter]
   )
-
-  const handleRefresh = useCallback(async () => {
-    disablePaginationControl()
-    await refetch({
-      variables: {
-        id: activeEnv,
-        first: totalRows,
-        field,
-        direction
-      }
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-        prodLogDispatch({
-          type: 'CLEAR_STATE'
-        })
-      }
-    })
-  }, [activeEnv, direction, field, prodLogDispatch, refetch, totalRows])
-
-  // CLEAR SERACH
-  const handleClear = useCallback(async () => {
-    disablePaginationControl()
-    setSearchInput('')
-    await refetch({
-      variables: {
-        search: undefined,
-        first: totalRows,
-        ...logData
-      }
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-        prodLogDispatch({
-          type: 'CLEAR_SEARCH_INPUT'
-        })
-      }
-    })
-  }, [logData, prodLogDispatch, refetch, totalRows])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -300,56 +206,15 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
   )
 
   // SORTING
-  const handleSort = async (column, sortDirection) => {
-    disablePaginationControl()
-
-    await refetch({
-      variables: {
-        id: activeEnv,
-        first: totalRows,
-        search: search !== '' ? search : undefined,
-        changeType: type?.length === 0 ? undefined : type,
-        changedBy: user?.length === 0 ? undefined : user,
-        changeObject: object?.length === 0 ? undefined : object,
-        field: column.id,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-      }
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-        prodLogDispatch({
-          type: 'SET_SORT_ORDER',
-          payload: {
-            field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-          }
-        })
-      }
-    })
+  const handleSort = (column, sortDirection) => {
+    setProdLogState((oldFilters) => ({
+      ...oldFilters,
+      field: column?.id,
+      direction: sortDirection.toUpperCase()
+    }))
   }
 
-  // SET ROW LENGTH
-  const handleSetRow = async (e) => {
-    disablePaginationControl()
-
-    setTotalRows(Number(e.target.value))
-    await refetch({
-      variables: {
-        search: search !== '' ? search : undefined,
-        first: Number(e.target.value),
-        ...logData
-      }
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-        prodLogDispatch({
-          type: 'FETCH_DATA_SUCCESS'
-        })
-      }
-    })
-  }
-
-  const subHeaderComponentMemo = useMemo(() => {
+  const subHeader = useMemo(() => {
     return (
       <Flex
         width={'100%'}
@@ -371,7 +236,13 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
             onFilter={handleSearch}
           />
 
-          <ChangelogFilterMenu refetch={refetch} id={activeEnv} />
+          <ChangelogFilterMenu
+            id={activeEnv}
+            setFilter={(newFilters) => {
+              setProdLogState(newFilters)
+              reset()
+            }}
+          />
         </Stack>
         <Tooltip label='Refresh'>
           <IconButton
@@ -387,44 +258,32 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
     onSearchInputChange,
     handleClear,
     handleSearch,
-    refetch,
     activeEnv,
-    handleRefresh
+    handleRefresh,
+    reset
   ])
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
-          columns={columns}
-          data={data && data.nodes}
-          customStyles={customStyles}
-          defaultSortAsc={false}
-          defaultSortFieldId={field}
           subHeader
-          progressPending={data ? false : true}
-          progressComponent={<CustomLoader />}
-          subHeaderComponent={subHeaderComponentMemo}
-          onSort={handleSort}
-          responsive={true}
+          data={nodes}
           persistTableHead
+          columns={columns}
+          responsive={true}
+          onSort={handleSort}
+          defaultSortAsc={false}
+          progressPending={loading}
+          customStyles={customStyles}
+          subHeaderComponent={subHeader}
+          progressComponent={<CustomLoader />}
+          defaultSortFieldId={prodLogState?.field}
         />
       </Flex>
 
       {/* PAGINATION */}
-      {data && (
-        <Pagination
-          paginationSizes={paginationSizes}
-          pageIndex={pageIndex}
-          totalRows={totalRows}
-          totalCount={data.totalCount}
-          onPreviousPage={handlePreviousPage}
-          onNextPage={handleNextPage}
-          onSetRow={handleSetRow}
-          hasNextPage={isNextActive}
-          hasPreviousPage={isPrevActive}
-        />
-      )}
+      <Pagination {...paginationProps} />
     </>
   )
 }

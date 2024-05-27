@@ -27,7 +27,6 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetSbomSupportTab } from 'graphQL/Queries'
@@ -43,9 +42,6 @@ const Support = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { supportState } = useGlobalState()
-  const { searchInput } = supportState
-
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
     isOpen: isActiveOpen,
@@ -60,7 +56,7 @@ const Support = () => {
 
   const [filters, setFilters] = useState({})
   const [activeRow, setActiveRow] = useState(null)
-  const [filterText, setFilterText] = useState(searchInput)
+  const [filterText, setFilterText] = useState('')
 
   const { nodes, paginationProps, refetch, loading, reset } =
     usePaginatatedQuery(GetSbomSupportTab, {
@@ -74,8 +70,9 @@ const Support = () => {
     })
 
   const handleRefresh = useCallback(() => {
+    reset()
     refetch()
-  }, [refetch])
+  }, [refetch, reset])
 
   const setSearchFilter = useCallback(
     (value) => {
@@ -373,7 +370,7 @@ const Support = () => {
           data={activeRow}
           isOpen={isOpen}
           onClose={onClose}
-          refetch={refetch}
+          refetch={handleRefresh}
         />
       )}
 
@@ -382,7 +379,7 @@ const Support = () => {
           data={activeRow}
           isOpen={isDeleteOpen}
           onClose={onDeleteClose}
-          refetch={refetch}
+          refetch={handleRefresh}
         />
       )}
 
@@ -391,7 +388,7 @@ const Support = () => {
           data={activeRow}
           isOpen={isActiveOpen}
           onClose={onActiveClose}
-          refetch={refetch}
+          refetch={handleRefresh}
         />
       )}
     </>

@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client'
+import { useState } from 'react'
 
 import {
   Box,
@@ -17,68 +18,44 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { GetLogFilters } from 'graphQL/Queries'
 
-const ChangelogFilterMenu = ({ id, refetch }) => {
-  const { totalRows, activeProdTab, prodLogState, dispatch } = useGlobalState()
-  const { field, direction, searchInput, user, type, object } = prodLogState
-  const { prodLogDispatch } = dispatch
+const ChangelogFilterMenu = ({ id, setFilter }) => {
+  const { activeProdTab } = useGlobalState()
+
+  const [user, setUser] = useState([])
+  const [type, setType] = useState([])
+  const [object, setObject] = useState([])
 
   const { data, error, loading } = useQuery(GetLogFilters, {
+    fetchPolicy: 'network-only',
     skip: activeProdTab === 5 ? false : true,
-    variables: { id: id },
-    fetchPolicy: 'network-only'
+    variables: { id: id }
   })
 
-  const logData = {
-    id,
-    field,
-    direction,
-    first: totalRows,
-    search: searchInput !== '' ? searchInput : undefined
+  const onFilterType = (value) => {
+    const filterValue = value?.includes('all') ? undefined : value
+    setType(value?.includes('all') ? [] : value)
+    setFilter((oldFilters) => ({
+      ...oldFilters,
+      changeType: filterValue
+    }))
   }
 
-  const onFilterType = async (value) => {
-    await refetch({
-      variables: {
-        changeType: value.includes('all') ? undefined : value,
-        changedBy: user?.length === 0 ? undefined : user,
-        changeObject: object?.length === 0 ? undefined : object,
-        ...logData
-      }
-    }).then((res) => {
-      if (res.data) {
-        prodLogDispatch({ type: 'FILTER_TYPE', payload: value })
-      }
-    })
+  const onFilterUser = (value) => {
+    const filterValue = value?.includes('all') ? undefined : value
+    setUser(value?.includes('all') ? [] : value)
+    setFilter((oldFilters) => ({
+      ...oldFilters,
+      changedBy: filterValue
+    }))
   }
 
-  const onFilterUser = async (value) => {
-    await refetch({
-      variables: {
-        changeType: type?.length === 0 ? undefined : type,
-        changedBy: value.includes('all') ? undefined : value,
-        changeObject: object?.length === 0 ? undefined : object,
-        ...logData
-      }
-    }).then((res) => {
-      if (res.data) {
-        prodLogDispatch({ type: 'FILTER_USER', payload: value })
-      }
-    })
-  }
-
-  const onFilterObject = async (value) => {
-    await refetch({
-      variables: {
-        changeType: type?.length === 0 ? undefined : type,
-        changedBy: user?.length === 0 ? undefined : user,
-        changeObject: value.includes('all') ? undefined : value,
-        ...logData
-      }
-    }).then((res) => {
-      if (res.data) {
-        prodLogDispatch({ type: 'FILTER_OBJECT', payload: value })
-      }
-    })
+  const onFilterObject = (value) => {
+    const filterValue = value?.includes('all') ? undefined : value
+    setObject(value?.includes('all') ? [] : value)
+    setFilter((oldFilters) => ({
+      ...oldFilters,
+      changeObject: filterValue
+    }))
   }
 
   if (loading) return <Text pt={2}>Loading...</Text>

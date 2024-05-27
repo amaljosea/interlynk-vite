@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -35,6 +35,7 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
 import NotificationMenuBell from 'components/Notifications/NotificationMenuBell'
+import ChangelogTable from 'components/Tables/ChangelogTable'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import PolicyTable from 'components/Tables/PolicyTable'
 import VersionsTable from 'components/Tables/VersionsTable'
@@ -47,7 +48,6 @@ import {
   GetGlobalVulns,
   GetOrgMfc,
   GetProjectGroup,
-  GetProjectLogs,
   GetProjectPolicies,
   GetProjectSettings,
   GetVulnData
@@ -64,7 +64,6 @@ import {
 } from 'react-icons/fa6'
 
 import Automation from '../Automation'
-import ChangeLog from '../Changelog'
 import Settings from '../ProductSettings'
 import ProductModal from './components/ProductModal'
 import StatusModal from './components/StatusModal'
@@ -103,12 +102,10 @@ const ProductDetailsMain = () => {
     totalRows,
     activeProdTab,
     setActiveProdTab,
-    prodLogState,
     prodVulnState,
     dispatch,
     userPermissions
   } = useGlobalState()
-  const { field, direction, searchInput, type, user, object } = prodLogState
 
   const {
     searchInput: vulnSearch,
@@ -213,10 +210,6 @@ const ProductDetailsMain = () => {
     skip: activeProdTab === 3 ? false : true
   })
 
-  const [getLogs, { data: prodLogs }] = useLazyQuery(GetProjectLogs, {
-    skip: activeProdTab === 5 ? false : true
-  })
-
   const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
 
   const range = {
@@ -310,33 +303,8 @@ const ProductDetailsMain = () => {
       setActiveProdTab(4)
     } else if (activeTab === 5) {
       setActiveProdTab(5)
-      getLogs({
-        variables: {
-          search: searchInput !== '' ? searchInput : undefined,
-          changeType: type?.length === 0 ? undefined : type,
-          changedBy: user?.length === 0 ? undefined : user,
-          changeObject: object?.length === 0 ? undefined : object,
-          id: activeEnv,
-          first: totalRows,
-          field: field,
-          direction: direction
-        }
-      })
     }
-  }, [
-    activeTab,
-    activeEnv,
-    setActiveProdTab,
-    settings,
-    totalRows,
-    getLogs,
-    searchInput,
-    type,
-    user,
-    object,
-    field,
-    direction
-  ])
+  }, [activeTab, setActiveProdTab])
 
   useEffect(() => {
     if (environment && data) {
@@ -555,11 +523,7 @@ const ProductDetailsMain = () => {
                 </TabPanel>
                 {/* CHANGE LOG */}
                 <TabPanel px={0}>
-                  <ChangeLog
-                    data={prodLogs}
-                    refetch={getLogs}
-                    activeEnv={productId}
-                  />
+                  <ChangelogTable activeEnv={productId} />
                 </TabPanel>
               </TabPanels>
             </Tabs>
