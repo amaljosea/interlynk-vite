@@ -89,6 +89,9 @@ export const client = new ApolloClient({
       fetchPolicy: 'no-cache',
       nextFetchPolicy: 'no-cache'
     },
+    mutate: {
+      refetchQueries: 'active'
+    },
     watchQuery: {
       fetchPolicy: 'no-cache',
       nextFetchPolicy: 'no-cache'
