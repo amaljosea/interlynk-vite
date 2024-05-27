@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
@@ -19,6 +19,7 @@ import {
   DrawerOverlay,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Icon,
   IconButton,
@@ -66,6 +67,8 @@ function ComponentDrawer(props) {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
+  const queryParams = new URLSearchParams(location.search)
+  const activeTab = queryParams.get('tab')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const customerView = location.pathname.startsWith('/customer')
 
@@ -82,9 +85,6 @@ function ComponentDrawer(props) {
   const { licenseType, purlString, expLicense, totalComp } = prodCompState
   const { prodCompDispatch } = dispatch
 
-  const [getAllComps, { data: allComponents }] = useLazyQuery(
-    signedUrlParams ? AllShareComponents : GetAllComponents
-  )
   const [addRelation] = useMutation(CreateCompRelation)
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
@@ -121,6 +121,29 @@ function ComponentDrawer(props) {
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
   const [disabled, setDisabled] = useState(false)
+  const [allComps, setAllComps] = useState([])
+
+  const { data: allComponents } = useQuery(
+    signedUrlParams ? AllShareComponents : GetAllComponents,
+    {
+      fetchPolicy: 'network-only',
+      skip: activeTab === 'components' ? false : true,
+      variables: {
+        projectId: signedUrlParams ? undefined : productId,
+        sbomId: sbomId,
+        first: totalComp
+      },
+      onCompleted: (data) => {
+        const { components } = data?.sbom || ''
+        const result = components?.nodes?.map((item) => item?.version)
+        setAllComps(result)
+        setRelation('')
+        setComponent('')
+      }
+    }
+  )
+
+  const isExists = allComps?.includes(compVersion)
 
   const disableButtonTemporarily = () => {
     setDisabled(true)
@@ -206,6 +229,11 @@ function ComponentDrawer(props) {
     isOpen: isWarningOpen,
     onOpen: onWarningOpen,
     onClose: onWarningClose
+  } = useDisclosure()
+  const {
+    isOpen: isVersionOpen,
+    onOpen: onVersionOpen,
+    onClose: onVersionClose
   } = useDisclosure()
 
   const handlePURLInputChange = (e) => {
@@ -312,6 +340,7 @@ function ComponentDrawer(props) {
       if (res.data) {
         sbomRefetch({ projectId: productId, sbomId: sbomId })
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        onVersionClose()
         onClose()
       }
     })
@@ -423,23 +452,6 @@ function ComponentDrawer(props) {
     !isValid ||
     disabled
 
-  useEffect(() => {
-    getAllComps({
-      variables: {
-        projectId: signedUrlParams ? undefined : productId,
-        field: signedUrlParams ? undefined : 'COMPONENTS_UPDATED_AT',
-        direction: signedUrlParams ? undefined : 'DESC',
-        sbomId: sbomId,
-        first: totalComp
-      }
-    }).then((res) => {
-      if (res.data) {
-        setRelation('')
-        setComponent('')
-      }
-    })
-  }, [getAllComps, productId, sbomId, signedUrlParams, totalComp])
-
   return (
     <>
       <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
@@ -503,7 +515,10 @@ function ComponentDrawer(props) {
                 />
               </FormControl>
               {/* Version */}
-              <FormControl isReadOnly={signedUrlParams}>
+              <FormControl
+                isReadOnly={signedUrlParams}
+                isInvalid={data?.version !== compVersion && isExists}
+              >
                 <FormLabel htmlFor='compVersion' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
@@ -527,6 +542,10 @@ function ComponentDrawer(props) {
                   value={compVersion}
                   onChange={(e) => setCompVersion(e.target.value)}
                 />
+                <FormErrorMessage>
+                  This version of the product already exists. Continuing will
+                  override one of these versions.
+                </FormErrorMessage>
               </FormControl>
               {/* GROUP */}
               <FormControl isReadOnly={signedUrlParams}>
@@ -786,23 +805,19 @@ function ComponentDrawer(props) {
               <Button mr={3} onClick={onClose}>
                 Cancel
               </Button>
-              {!data ? (
-                <Button
-                  colorScheme='blue'
-                  onClick={handleCreateCom}
-                  isDisabled={isInvalid}
-                >
-                  Save
-                </Button>
-              ) : (
-                <Button
-                  colorScheme='blue'
-                  onClick={handleUpdateCom}
-                  isDisabled={isInvalid}
-                >
-                  Update
-                </Button>
-              )}
+              <Button
+                colorScheme='blue'
+                onClick={
+                  isExists
+                    ? onVersionOpen
+                    : data
+                      ? handleUpdateCom
+                      : handleCreateCom
+                }
+                isDisabled={isInvalid}
+              >
+                {data ? 'Update' : 'Save'}
+              </Button>
             </DrawerFooter>
           )}
         </DrawerContent>
@@ -879,6 +894,32 @@ function ComponentDrawer(props) {
                   onWarningClose()
                 }}
               >
+                Yes
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+
+      {/* VERSION WARNING */}
+      {isVersionOpen && (
+        <Modal isOpen={isVersionOpen} onClose={onVersionClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Version</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                This version of the product already exists. Continuing will
+                override one of these versions.
+              </Text>
+              <Text mt={6}>Are you sure you wish to continue ?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={onVersionClose}>
+                No
+              </Button>
+              <Button colorScheme={'red'} onClick={handleUpdateCom}>
                 Yes
               </Button>
             </ModalFooter>

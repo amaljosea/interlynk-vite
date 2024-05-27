@@ -110,12 +110,19 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const { nodes, refetch, error, paginationProps, reset, loading } =
     usePaginatatedQuery(GetComponentData, {
       selector: 'sbom.components',
+      skip: activeTab === 'components' ? false : true,
       variables: {
         ...compData,
         sbomId: sbomId,
         projectId: productId,
         search: searchInput !== '' ? searchInput : undefined,
         orderBy: searchInput === '' ? orderBy : undefined
+      },
+      onCompleted: (data) => {
+        prodCompDispatch({
+          type: 'SET_TOTAL_COMP',
+          payload: data?.sbom?.components?.totalCount
+        })
       }
     })
 

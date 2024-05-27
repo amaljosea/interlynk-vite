@@ -1816,8 +1816,6 @@ export const GetAllComponents = gql`
     $last: Int
     $after: String
     $before: String
-    $field: ComponentOrderByFields!
-    $direction: OrderByDirection!
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
@@ -1827,20 +1825,9 @@ export const GetAllComponents = gql`
         before: $before
         first: $first
         last: $last
-        orderBy: { field: $field, direction: $direction }
       ) {
-        totalCount
-        pageInfo {
-          endCursor
-          hasNextPage
-          startCursor
-          hasPreviousPage
-        }
         nodes {
-          id
-          name
           version
-          primary
         }
       }
     }
