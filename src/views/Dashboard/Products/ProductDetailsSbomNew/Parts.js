@@ -341,29 +341,29 @@ const Parts = ({ sbomRefetch }) => {
       name: 'SUPPLIER',
       selector: (row) => {
         const { part } = row
+        const { suppliers } = part
         return (
           <>
-            {part.suppliers.length > 0 &&
-              part.suppliers.map((item, index) => (
-                <Tooltip
+            {suppliers?.map((item, index) => (
+              <Tooltip
+                key={index}
+                label={`${item?.name || item.contactName || ''} ${item.contactEmail && `- ${item.contactEmail}`}`}
+                placement='top'
+              >
+                <Tag
+                  size={'md'}
                   key={index}
-                  label={`${item.contactName} ${item.contactEmail && `- ${item.contactEmail}`}`}
-                  placement='top'
+                  fontSize={14}
+                  variant='subtle'
+                  colorScheme='orange'
                 >
-                  <Tag
-                    size={'md'}
-                    key={index}
-                    fontSize={14}
-                    variant='subtle'
-                    colorScheme='orange'
-                  >
-                    <TagLabel>
-                      {item.contactName || ''}
-                      {item.contactEmail && ` - ${item.contactEmail}`}
-                    </TagLabel>
-                  </Tag>
-                </Tooltip>
-              ))}
+                  <TagLabel>
+                    {item?.name || item?.contactName || ''}
+                    {item?.contactEmail && ` - ${item?.contactEmail}`}
+                  </TagLabel>
+                </Tag>
+              </Tooltip>
+            ))}
           </>
         )
       },
