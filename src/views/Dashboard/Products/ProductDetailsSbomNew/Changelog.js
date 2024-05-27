@@ -75,7 +75,8 @@ const Changelog = () => {
       variables: {
         sbomId: sbomId,
         projectId: productId,
-        ...logState
+        ...logState,
+        search: logState.search || undefined
       }
     })
 
