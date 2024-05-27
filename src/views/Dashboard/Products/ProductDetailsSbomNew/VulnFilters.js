@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react'
 
 import CheckMark from 'components/Misc/CheckMark'
+import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -43,7 +44,7 @@ const VulnFilters = ({ reset }) => {
   const maxRef = useRef()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const { vulnCompNames, vulnStatuses } = filters
+  const { vulnCompNames } = filters || ''
 
   const onMinKeyDown = (e) => {
     if (e.key === 'ArrowRight') {
@@ -167,7 +168,7 @@ const VulnFilters = ({ reset }) => {
           <MenuHeading title={'Status'} />
           <MenuList
             minH={'auto'}
-            maxH={'400px'}
+            maxH={'300px'}
             overflow={'hidden'}
             overflowY={'scroll'}
           >
@@ -223,95 +224,11 @@ const VulnFilters = ({ reset }) => {
         <Menu closeOnSelect={false}>
           {severities.length !== 0 && <CheckMark />}
           <MenuHeading title={'Severity'} />
-          <MenuList>
-            <MenuOptionGroup
-              type='checkbox'
-              value={severities}
-              onChange={onFilterSeverity}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {['critical', 'high', 'medium', 'low', 'unknown']?.map(
-                (item, index) => (
-                  <MenuItemOption
-                    key={index}
-                    value={item}
-                    fontSize={'sm'}
-                    textTransform={'capitalize'}
-                  >
-                    {item}
-                  </MenuItemOption>
-                )
-              )}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* COMPONENT NAME */}
-      <Box width={'fit-content'} position={'relative'} hidden>
-        <Menu closeOnSelect={false}>
-          {components.length !== 0 && <CheckMark />}
-          <MenuHeading title={'Component'} />
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
-              value={components}
-              onChange={onFilterCompName}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {vulnCompNames?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* STATUS */}
-      <Box width={'fit-content'} position={'relative'} hidden>
-        <Menu closeOnSelect={false}>
-          {statues.length !== 0 && <CheckMark />}
-          <MenuHeading title={'Status'} />
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
-              value={statues}
-              onChange={onFilterStatus}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {vulnStatuses?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
+          <CustomList
+            options={['critical', 'high', 'medium', 'low', 'unknown']}
+            value={severities}
+            onChange={onFilterSeverity}
+          />
         </Menu>
       </Box>
       {/* KEV */}
@@ -319,20 +236,12 @@ const VulnFilters = ({ reset }) => {
         <Menu closeOnSelect={false}>
           {kev !== 'all' && kev !== '' && <CheckMark />}
           <MenuHeading title={'KEV'} />
-          <MenuList>
-            <MenuOptionGroup type='radio' value={kev} onChange={onFilterKev}>
-              {['all', 'yes', 'no'].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
+          <CustomList
+            type='radio'
+            options={['yes', 'no']}
+            value={kev}
+            onChange={onFilterKev}
+          />
         </Menu>
       </Box>
       {/* EPSS */}

@@ -178,9 +178,7 @@ const GeneralDataDrawer = ({
             vendor: item.vendor,
             sbomID: sbomId
           }
-        })
-          .then((res) => console.log(res?.data))
-          .catch((error) => console.log(error))
+        }).then((res) => res?.data && refetch())
       })
     }
 
@@ -192,9 +190,7 @@ const GeneralDataDrawer = ({
             email: item.email,
             sbomId: sbomId
           }
-        })
-          .then((res) => console.log(res?.data))
-          .catch((error) => console.log(error))
+        }).then((res) => res?.data && refetch())
       })
     }
 

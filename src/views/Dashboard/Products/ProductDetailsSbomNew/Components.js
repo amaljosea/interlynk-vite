@@ -644,15 +644,9 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const [deleteSupplier] = useMutation(deleteComSupplier)
 
   const handleSupRemove = async (id) => {
-    try {
-      await deleteSupplier({ variables: { id: id } }).then((res) => {
-        if (res.data) {
-          refetch()
-        }
-      })
-    } catch (error) {
-      console.log(`Mutation error`, error)
-    }
+    await deleteSupplier({ variables: { id: id } }).then(
+      (res) => res.data && fetchCompData()
+    )
   }
 
   // EXPAND SECTION

@@ -92,11 +92,12 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
         sbomId: sbomId
       }
     })
-      .then(() => {
+      .then((res) => {
+        res?.data && refetch()
         if (checkId) {
           healthRecheck({
             variables: { sbomId: sbomId, checkId: checkId }
-          }).then((res) => res?.data && refetch())
+          })
         }
       })
       .finally(() => onClose())

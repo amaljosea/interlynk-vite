@@ -40,7 +40,6 @@ import {
   MenuItem,
   MenuList,
   Portal,
-  Skeleton,
   Stack,
   Tag,
   TagLabel,
@@ -261,7 +260,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     include,
     kev,
     epss,
-    filters,
     direct,
     vexComplete
   } = prodVulnState
@@ -914,15 +912,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
             onClear={handleClear}
           />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters ? (
-            <VulnFilters reset={() => reset()} />
-          ) : (
-            <Stack direction='row' spacing={4}>
-              {[1, 2, 3, 4].map((_, index) => (
-                <Skeleton key={index} width={'100px'} height={'38px'} />
-              ))}
-            </Stack>
-          )}
+          <VulnFilters reset={() => reset()} />
         </Flex>
         <Stack direction='row' alignItems={'center'} width={'fit-content'}>
           {/* UPDATE STATUES */}
@@ -974,7 +964,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     )
   }, [
     editVulns,
-    filters,
     handleClear,
     handleRefresh,
     handleScan,

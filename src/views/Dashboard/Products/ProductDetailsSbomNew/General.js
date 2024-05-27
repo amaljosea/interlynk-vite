@@ -130,22 +130,17 @@ const General = ({ data, refetch, loading, error }) => {
     onClose: onInfoClose
   } = useDisclosure()
 
-  const handleRefetch = () => refetch({ projectId: productId, sbomId })
-
   const [deleteSupplier] = useMutation(supplierDelete)
   const [deleteTool] = useMutation(toolDelete)
   const [deleteAuthor] = useMutation(authorDelete)
   const [updateSbom] = useMutation(sbomUpdate, {
-    onCompleted: () => handleRefetch()
+    onCompleted: () => refetch()
   })
 
   const handleToolRemove = async (id) => {
     try {
       await deleteTool({ variables: { toolID: id, sbomID: sbomId } })
-        .then(
-          (res) =>
-            res?.data && refetch({ productId: productId, sbomId: sbomId })
-        )
+        .then((res) => res?.data && refetch())
         .finally(() => onDelClose())
     } catch (error) {
       console.log(`Mutation error`, error)
@@ -173,8 +168,10 @@ const General = ({ data, refetch, loading, error }) => {
     )
   }
 
+  // const onRemoveLicense = async () => console.log('License');
+
   const onLicenseOpen = () => {
-    sbomDispatch({ type: 'SET_LICENSES', payload: data?.sbom })
+    sbomDispatch({ type: 'SET_LICENSES', payload: licensesExp })
     onSBMOpen()
   }
 
@@ -342,12 +339,11 @@ const General = ({ data, refetch, loading, error }) => {
                 <InfoLabel title={`Authors`} onClick={onCheckAuthor} />
               </Td>
               <Td pl={0}>
-                <Stack spacing={2} direction={'column'}>
+                <Stack spacing={2} direction={'column'} my={2}>
                   {authors &&
                     authors.length > 0 &&
                     authors.map((item, index) => (
                       <Tag
-                        my={2}
                         size={'md'}
                         key={index}
                         variant='subtle'
@@ -467,6 +463,9 @@ const General = ({ data, refetch, loading, error }) => {
                       width={'fit-content'}
                     >
                       <TagLabel>{licensesExp}</TagLabel>
+                      {updateComponent && (
+                        <TagCloseButton onClick={onUpdateLicense} />
+                      )}
                     </Tag>
                   )}
                 </Flex>
@@ -494,7 +493,7 @@ const General = ({ data, refetch, loading, error }) => {
           isOpen={isOpen}
           onClose={onClose}
           btnRef={btnRef}
-          data={data?.sbom}
+          data={data}
           selectedKey={selectedKey}
           refetch={refetch}
           checkId={null}
@@ -507,7 +506,7 @@ const General = ({ data, refetch, loading, error }) => {
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>
-              {licenses?.length > 0 ? 'Update' : 'Add'} License
+              {licensesExp?.length > 0 ? 'Update' : 'Add'} License
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
@@ -515,6 +514,7 @@ const General = ({ data, refetch, loading, error }) => {
                 sbomView={true}
                 isValid={isValid}
                 setIsValid={setIsValid}
+                license={licensesExp}
               />
             </ModalBody>
             <ModalFooter>

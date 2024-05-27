@@ -52,7 +52,7 @@ const SupplierModal = ({
   const onSupplierChange = (e) => {
     const { value } = e.target
     setSupName(value)
-    if (value.length < 4 || value.length > 256) {
+    if ((value.length > 0 && value.length < 4) || value.length > 256) {
       setNameError('Input must be between 4 and 256 characters')
     } else {
       setNameError('')
@@ -62,6 +62,8 @@ const SupplierModal = ({
   const [createSupplier] = useMutation(addComSupplier)
   const [updateSupplier] = useMutation(updateComSupplier)
   const [healthRecheck] = useMutation(recheckHealth)
+
+  const { suppliers } = data || ''
 
   useEffect(() => {
     if (data && data?.suppliers?.length > 0) {
@@ -83,7 +85,8 @@ const SupplierModal = ({
         componentId: activeCheck ? activeCheck.id : id
       }
     })
-      .then(() => {
+      .then((res) => {
+        res?.data && refetch()
         if (checkId) {
           healthRecheck({
             variables: {
@@ -91,7 +94,7 @@ const SupplierModal = ({
               checkId: checkId,
               compId: activeCheck.id
             }
-          }).then((res) => res?.data && refetch())
+          })
         }
       })
       .finally(() => onClose())
@@ -106,7 +109,9 @@ const SupplierModal = ({
         contactEmail: supEmail,
         id: data && data.suppliers && data.suppliers[0].id
       }
-    }).then((res) => res.data && onClose())
+    })
+      .then((res) => res.data && refetch())
+      .finally(() => onClose())
   }
 
   const handleCheckEmail = () => {
@@ -128,9 +133,8 @@ const SupplierModal = ({
   }
 
   const isInvalid =
-    (supName === '' && supEmail === '' && orgName === '' && orgUrl === '') ||
     orgName === '' ||
-    (supName !== '' && nameError !== '') ||
+    nameError !== '' ||
     (supEmail !== '' && !validateEmail(supEmail)) ||
     (orgUrl !== '' && !validateUrl(orgUrl))
 
@@ -138,7 +142,6 @@ const SupplierModal = ({
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-
         <ModalContent>
           <ModalHeader>
             {data && data.suppliers?.length > 0 ? 'Edit' : 'Add'} Supplier
@@ -238,23 +241,13 @@ const SupplierModal = ({
               <Button colorScheme='gray' onClick={onClose}>
                 Cancel
               </Button>
-              {data && data.suppliers?.length > 0 ? (
-                <Button
-                  colorScheme='blue'
-                  onClick={handleUpdate}
-                  isDisabled={isInvalid}
-                >
-                  Update
-                </Button>
-              ) : (
-                <Button
-                  colorScheme='blue'
-                  onClick={handleSave}
-                  isDisabled={isInvalid}
-                >
-                  Save
-                </Button>
-              )}
+              <Button
+                colorScheme='blue'
+                onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
+                isDisabled={isInvalid}
+              >
+                {suppliers?.length > 0 ? 'Update' : 'Save'}
+              </Button>
             </Flex>
           </ModalFooter>
         </ModalContent>
