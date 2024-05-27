@@ -161,6 +161,7 @@ const DownloadModal = ({
               gap={2}
               alignItems={'center'}
               justifyContent={'space-between'}
+              flexWrap={'wrap'}
             >
               <Text fontSize={'sm'} width='100px'>
                 File Name
@@ -168,6 +169,8 @@ const DownloadModal = ({
               <Tag
                 colorScheme='blue'
                 textAlign={'right'}
+                wordBreak={'break-all'}
+                p={2}
               >{`${productName}-${version}.${type}.xml`}</Tag>
             </Flex>
           </Stack>
