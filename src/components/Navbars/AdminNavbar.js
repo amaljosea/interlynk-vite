@@ -91,6 +91,10 @@ export default function AdminNavbar(props) {
     projectGroupId: params.productgroupid
   })
 
+  const filterText = (item) => {
+    return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
+  }
+
   return (
     <Flex
       position={navbarPosition}
@@ -160,7 +164,8 @@ export default function AdminNavbar(props) {
                         }
                       }}
                     >
-                      {part.projectGroupName} ({part.versionName})
+                      {filterText(part.projectGroupName)} (
+                      {filterText(part.versionName)})
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                 )
@@ -171,7 +176,7 @@ export default function AdminNavbar(props) {
                 isCurrentPage={sbomId && sbomHookData?.version ? false : true}
               >
                 <Link to={generateProductDetailPageUrlFromCurrentUrl()}>
-                  {projectGroupName}
+                  {filterText(projectGroupName)}
                 </Link>
               </BreadcrumbItem>
             )}
@@ -187,7 +192,7 @@ export default function AdminNavbar(props) {
                       : ''
                   }
                 >
-                  {sbomHookData.versionName}
+                  {filterText(sbomHookData.versionName)}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             )}
