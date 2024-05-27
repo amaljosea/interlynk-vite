@@ -1,4 +1,5 @@
 export const loadHubSpotScript = (env) => {
+  console.log('ENV', env)
   if (env === 'production') {
     const scriptSrc = '//js-na1.hs-scripts.com/39814957.js'
     const script = document.createElement('script')
@@ -8,5 +9,7 @@ export const loadHubSpotScript = (env) => {
     return () => {
       document.body.removeChild(script)
     }
+  } else {
+    return null
   }
 }
