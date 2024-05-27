@@ -20,6 +20,7 @@ import {
 } from '@chakra-ui/react'
 
 import CheckMark from 'components/Misc/CheckMark'
+import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -49,8 +50,6 @@ const GlobalVulnsFilters = ({ setFilters }) => {
       direction: prodState?.direction
     }
   })
-
-  const envList = ['all', 'default', 'development', 'production']
 
   const minRef = useRef()
   const maxRef = useRef()
@@ -195,24 +194,11 @@ const GlobalVulnsFilters = ({ setFilters }) => {
         <Menu closeOnSelect={false}>
           {envs.length !== 0 && !envs.includes('all') && <CheckMark />}
           <MenuHeading title={'Environment'} />
-          <MenuList>
-            <MenuOptionGroup
-              type='checkbox'
-              value={envs}
-              onChange={onFilterEnv}
-            >
-              {envList.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
+          <CustomList
+            options={['default', 'development', 'production']}
+            value={envs}
+            onChange={onFilterEnv}
+          />
         </Menu>
       </Box>
       {/* SEVERITY */}
@@ -222,26 +208,11 @@ const GlobalVulnsFilters = ({ setFilters }) => {
             <CheckMark />
           )}
           <MenuHeading title={'Severity'} />
-          <MenuList>
-            <MenuOptionGroup
-              type='checkbox'
-              value={severities}
-              onChange={onFilterSeverity}
-            >
-              {['all', 'critical', 'high', 'medium', 'low', 'unknown'].map(
-                (item, index) => (
-                  <MenuItemOption
-                    key={index}
-                    value={item}
-                    fontSize={'sm'}
-                    textTransform={'capitalize'}
-                  >
-                    {item}
-                  </MenuItemOption>
-                )
-              )}
-            </MenuOptionGroup>
-          </MenuList>
+          <CustomList
+            options={['critical', 'high', 'medium', 'low', 'unknown']}
+            value={severities}
+            onChange={onFilterSeverity}
+          />
         </Menu>
       </Box>
       {/* STATUSES */}
@@ -249,26 +220,11 @@ const GlobalVulnsFilters = ({ setFilters }) => {
         <Menu closeOnSelect={false}>
           {statues.length !== 0 && !statues.includes('all') && <CheckMark />}
           <MenuHeading title={'Status'} />
-          <MenuList>
-            <MenuOptionGroup
-              type='checkbox'
-              value={statues}
-              onChange={onFilterStatus}
-            >
-              {['all', 'Affected', 'Fixed', 'In Triage', 'Not Affected'].map(
-                (item, index) => (
-                  <MenuItemOption
-                    key={index}
-                    value={item}
-                    fontSize={'sm'}
-                    textTransform={'capitalize'}
-                  >
-                    {item}
-                  </MenuItemOption>
-                )
-              )}
-            </MenuOptionGroup>
-          </MenuList>
+          <CustomList
+            options={['Affected', 'Fixed', 'In Triage', 'Not Affected']}
+            value={statues}
+            onChange={onFilterStatus}
+          />
         </Menu>
       </Box>
       {/* KEV */}
@@ -276,20 +232,12 @@ const GlobalVulnsFilters = ({ setFilters }) => {
         <Menu closeOnSelect={false}>
           {kev !== 'all' && kev !== '' && <CheckMark />}
           <MenuHeading title={'KEV'} />
-          <MenuList>
-            <MenuOptionGroup type='radio' value={kev} onChange={onFilterKev}>
-              {['all', 'yes', 'no'].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
+          <CustomList
+            type='radio'
+            options={['yes', 'no']}
+            value={kev}
+            onChange={onFilterKev}
+          />
         </Menu>
       </Box>
       {/* EPSS */}

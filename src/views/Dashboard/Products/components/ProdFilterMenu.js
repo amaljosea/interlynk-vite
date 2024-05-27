@@ -1,13 +1,7 @@
-import {
-  Box,
-  Menu,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
-  Stack
-} from '@chakra-ui/react'
+import { Box, Menu, Stack } from '@chakra-ui/react'
 
 import CheckMark from 'components/Misc/CheckMark'
+import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 const ProdFilterMenu = ({ enabled, onFilter }) => {
@@ -18,26 +12,12 @@ const ProdFilterMenu = ({ enabled, onFilter }) => {
         <Menu closeOnSelect={false}>
           {enabled !== undefined && <CheckMark />}
           <MenuHeading title={'Active'} />
-          <MenuList>
-            <MenuOptionGroup
-              type='radio'
-              value={
-                enabled === true ? 'yes' : enabled === false ? 'no' : 'all'
-              }
-              onChange={onFilter}
-            >
-              {['all', 'yes', 'no'].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
+          <CustomList
+            type='radio'
+            options={['yes', 'no']}
+            value={enabled === true ? 'yes' : enabled === false ? 'no' : 'all'}
+            onChange={onFilter}
+          />
         </Menu>
       </Box>
     </Stack>
