@@ -230,11 +230,6 @@ function ComponentDrawer(props) {
     onOpen: onWarningOpen,
     onClose: onWarningClose
   } = useDisclosure()
-  const {
-    isOpen: isVersionOpen,
-    onOpen: onVersionOpen,
-    onClose: onVersionClose
-  } = useDisclosure()
 
   const handlePURLInputChange = (e) => {
     const { value } = e.target
@@ -340,7 +335,6 @@ function ComponentDrawer(props) {
       if (res.data) {
         sbomRefetch({ projectId: productId, sbomId: sbomId })
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        onVersionClose()
         onClose()
       }
     })
@@ -807,13 +801,7 @@ function ComponentDrawer(props) {
               </Button>
               <Button
                 colorScheme='blue'
-                onClick={
-                  isExists
-                    ? onVersionOpen
-                    : data
-                      ? handleUpdateCom
-                      : handleCreateCom
-                }
+                onClick={data ? handleUpdateCom : handleCreateCom}
                 isDisabled={isInvalid}
               >
                 {data ? 'Update' : 'Save'}
@@ -894,32 +882,6 @@ function ComponentDrawer(props) {
                   onWarningClose()
                 }}
               >
-                Yes
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
-
-      {/* VERSION WARNING */}
-      {isVersionOpen && (
-        <Modal isOpen={isVersionOpen} onClose={onVersionClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Version</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>
-                This version of the product already exists. Continuing will
-                override one of these versions.
-              </Text>
-              <Text mt={6}>Are you sure you wish to continue ?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onVersionClose}>
-                No
-              </Button>
-              <Button colorScheme={'red'} onClick={handleUpdateCom}>
                 Yes
               </Button>
             </ModalFooter>
