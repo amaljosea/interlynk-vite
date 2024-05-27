@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { useQuery } from '@apollo/client'
 import { useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'

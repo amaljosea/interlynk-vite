@@ -23,6 +23,7 @@ import Tools from 'views/Dashboard/Tools'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 
 import Licenses from 'components/Licenses'
+import { SentryTest } from 'components/SentryTest.js'
 
 import AdminLayout from './layouts/Admin.js'
 import AuthLayout from './layouts/Auth.js'
@@ -111,6 +112,7 @@ export const MainRoutes = () => {
           </Route>
         </Route>
         <Route path={`register`} element={<Register />} />
+        <Route path={`sentry-test`} element={<SentryTest />} />
       </Route>
     </Routes>
   )

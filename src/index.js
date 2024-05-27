@@ -25,21 +25,16 @@ env === 'production' && ReactGA.initialize(TRACKING_ID)
 env === 'production' && TagManager.initialize(tagManagerArgs)
 
 Sentry.init({
-  dsn: 'https://a54aeaf934a655793d8b33ac62b1db8d@o4505997805682688.ingest.sentry.io/4505997807976448',
+  environment: window.location.hostname,
+  dsn: 'https://e40ec0eba58f05f311d64e966f4b6f5b@o4507255029891072.ingest.us.sentry.io/4507255031857152',
   integrations: [
-    new Sentry.BrowserTracing({
-      // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-      tracePropagationTargets: [
-        // 'localhost:3001',
-        'https://app.interlynk.io',
-        'https://api.interlynk.io/login',
-        'https://api.interlynk.io/lynkapi'
-      ]
-    }),
-    new Sentry.Replay()
+    Sentry.browserTracingIntegration(),
+    Sentry.replayIntegration()
   ],
   // Performance Monitoring
-  tracesSampleRate: 1.0, // Capture 100% of the transactions, reduce in production!
+  tracesSampleRate: 1.0, //  Capture 100% of the transactions
+  // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
+  tracePropagationTargets: ['localhost', /^https:\/\/yourserver\.io\/api/],
   // Session Replay
   replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
   replaysOnErrorSampleRate: 1.0 // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
