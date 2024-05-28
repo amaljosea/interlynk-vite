@@ -5,7 +5,6 @@ import { getFullDateAndTime, timeSince } from 'utils'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
 import {
-  Badge,
   Flex,
   HStack,
   Icon,
@@ -25,9 +24,11 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { GetPrimaryComponent } from 'graphQL/Queries'
-import { GetSharPrimartComp } from 'graphQL/Queries'
-import { GetProjectSettings } from 'graphQL/Queries'
+import {
+  GetPrimaryComponent,
+  GetProjectSettings,
+  GetSharPrimartComp
+} from 'graphQL/Queries'
 
 import {
   FaAngleLeft,
@@ -295,11 +296,6 @@ const SbomDetails = ({ sbomData, refetch }) => {
               color={hasFinished ? 'blue' : 'blackAlpha'}
               icon={<FaCircleCheck />}
             />
-            {vulnRunStatus === 'IN_PROGRESS' && (
-              <Badge px={2} py={1} fontWeight={'semibold'}>
-                Scanning...
-              </Badge>
-            )}
           </Flex>
           {/* UPDATED AT */}
           <Tooltip placement='top' label={getFullDateAndTime(updatedAt)}>
@@ -373,37 +369,42 @@ const SbomDetails = ({ sbomData, refetch }) => {
                   <VulnBadge
                     color='red'
                     label='Critical'
+                    status={vulnRunStatus}
                     onClick={() => onFilterVuln(['critical'])}
                   >
-                    {critical ? critical : 0}
+                    {critical || 0}
                   </VulnBadge>
                   <VulnBadge
                     color='orange'
                     label='High'
+                    status={vulnRunStatus}
                     onClick={() => onFilterVuln(['high'])}
                   >
-                    {high ? high : 0}
+                    {high || 0}
                   </VulnBadge>
                   <VulnBadge
                     color='yellow'
                     label='Medium'
+                    status={vulnRunStatus}
                     onClick={() => onFilterVuln(['medium'])}
                   >
-                    {medium ? medium : 0}
+                    {medium || 0}
                   </VulnBadge>
                   <VulnBadge
                     color='green'
                     label='Low'
+                    status={vulnRunStatus}
                     onClick={() => onFilterVuln(['low'])}
                   >
-                    {low ? low : 0}
+                    {low || 0}
                   </VulnBadge>
                   <VulnBadge
                     color='gray'
                     label='Unknown'
+                    status={vulnRunStatus}
                     onClick={() => onFilterVuln(['unknown'])}
                   >
-                    {unknown ? unknown : 0}
+                    {unknown || 0}
                   </VulnBadge>
                 </Stack>
                 <Text
