@@ -51,4 +51,12 @@ describe('validateUrl', () => {
     )
     expect(validateUrl('https://example.com/resource#<>')).toBe(false)
   })
+
+  it('should return true for known valid URL', () => {
+    expect(
+      validateUrl(
+        'https://serverName.com/deepLinkAction.do?userName=peter%40nable%2Ecom&password=Hello%25There&method=defaultDashboard'
+      )
+    ).toBe(true)
+  })
 })
