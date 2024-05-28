@@ -21,7 +21,7 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import { UpdateNotificationConfig, VerifyJiraConfigs } from 'graphQL/Mutation'
+import { UpdateJiraSecret, VerifyJiraConfigs } from 'graphQL/Mutation'
 
 const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
   const toast = useToast()
@@ -40,16 +40,16 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
 
   const [showApiToken, setShowApiToken] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [failure, setFaliure] = useState(false)
 
-  const [updateConfig] = useMutation(UpdateNotificationConfig)
+  const [updateJiraSecret] = useMutation(UpdateJiraSecret)
   const [verifyJiraConfigs] = useMutation(VerifyJiraConfigs)
 
   useEffect(() => {
     if (data) {
-      const configs = JSON.parse(data.notificationConfigs.jiraConfigs)
-      setJiraApiToken(configs?.jiraApiToken)
-      setJiraHost(configs?.jiraHost)
-      setJiraUsername(configs?.jiraUsername)
+      setJiraApiToken(data.jiraSecret?.apiToken)
+      setJiraHost(data.jiraSecret?.host)
+      setJiraUsername(data.jiraSecret?.username)
     }
   }, [data])
 
@@ -64,14 +64,20 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
   }, [jiraHost, jiraUsername, jiraApiToken])
 
   const handleSave = () => {
-    updateConfig({
-      variables: {
-        notificationConfigs: {
-          jiraConfigs: isSaveDisabled ? JSON.stringify({}) : jiraConfigs
-        }
+    let payload = {}
+    if (!isSaveDisabled) {
+      payload = {
+        host: jiraHost,
+        username: jiraUsername,
+        apiToken: jiraApiToken
       }
+    } else {
+      payload = {}
+    }
+    updateJiraSecret({
+      variables: payload
     }).then((res) => {
-      if (res?.data?.notificationConfigUpdate?.success) {
+      if (res?.data?.jiraSecretUpdate?.success) {
         setGreenCheck(!isSaveDisabled)
         resetChanges()
         refetch()
@@ -110,16 +116,10 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
       if (res?.data?.verifyJiraConfigs?.success) {
         resetChanges()
         setSuccess(true)
+        setFaliure(false)
       } else {
-        toast({
-          title: 'Connection failed.',
-          description:
-            'Invalid JIRA configuration. Please re-check your values.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
-        })
+        setFaliure(true)
+        setSuccess(false)
       }
     })
   }
@@ -201,9 +201,16 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
           </FormControl>
         </ModalBody>
         <ModalFooter>
-          <Text color='green.500' fontSize='sm' mr='auto'>
-            {success && 'Verified successfully!'}
-          </Text>
+          {success && (
+            <Text color='green.500' fontSize='sm' mr='auto'>
+              {'Verified successfully!'}
+            </Text>
+          )}
+          {failure && (
+            <Text color='red.500' fontSize='sm' mr='auto'>
+              {'Verification failed!'}
+            </Text>
+          )}
           <Button variant='unstyled' colorScheme='red' onClick={onClose}>
             Cancel
           </Button>

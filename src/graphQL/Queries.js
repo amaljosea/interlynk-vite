@@ -3786,10 +3786,12 @@ export const GetUserNotificationConfigs = gql`
   }
 `
 
-export const GetJiraConfigs = gql`
-  query GetUserNotificationConfigs {
-    notificationConfigs {
-      jiraConfigs
+export const GetJiraSecret = gql`
+  query GetJiraSecret {
+    jiraSecret {
+      host
+      username
+      apiToken
     }
   }
 `

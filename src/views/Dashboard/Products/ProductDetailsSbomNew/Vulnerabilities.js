@@ -64,6 +64,7 @@ import { ManualVulnScan } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
   GetCdxResponses,
+  GetJiraSecret,
   GetVulnData,
   GetVulnFilterData,
   ShareVulnFilters,
@@ -240,6 +241,12 @@ const ExpandedComponent = ({
 }
 
 const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
+  const { data: configs } = useQuery(GetJiraSecret, {
+    fetchPolicy: 'network-only'
+  })
+
+  const [jiraConfigWarning, setJiraConfigWarning] = useState(false)
+
   const toast = useToast()
   const params = useParams()
   const productId = params.productid
@@ -269,6 +276,14 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     () => userPermissions?.find((item) => item.key === 'view_feeds'),
     [userPermissions]
   )
+
+  useEffect(() => {
+    if (configs) {
+      if (!configs?.jiraSecret?.apiToken) {
+        setJiraConfigWarning(true)
+      }
+    }
+  }, [configs])
 
   useEffect(() => {
     if (sbomData?.sbom?.sbomParts?.length > 0) {
@@ -382,7 +397,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   )
 
   const handleChange = (state) => {
-    console.log('state', state)
     setSelectedVulns(state?.selectedRows)
     setSelectedGroup(
       state?.selectedRows[0]?.component?.sbom?.project?.projectGroup?.id
@@ -795,8 +809,20 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                 </MenuItem>
                 <MenuItem
                   onClick={() => {
-                    setActiveRow(row)
-                    onJiraOpen()
+                    if (jiraConfigWarning) {
+                      toast({
+                        title: 'Jira Configuration not set.',
+                        description:
+                          'Please configure Jira connections in the Organization Settings -> Connections.',
+                        status: 'error',
+                        duration: 5000,
+                        isClosable: true,
+                        position: 'top'
+                      })
+                    } else {
+                      setActiveRow(row)
+                      onJiraOpen()
+                    }
                   }}
                 >
                   Create Jira Ticket

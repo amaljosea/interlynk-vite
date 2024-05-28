@@ -21,14 +21,10 @@ import {
 } from '@chakra-ui/react'
 
 import { CreateJiraTicket } from 'graphQL/Mutation'
-import { GetJiraConfigs, GetJiraOptions } from 'graphQL/Queries'
+import { GetJiraOptions } from 'graphQL/Queries'
 
 const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
   const { data: options } = useQuery(GetJiraOptions, {
-    fetchPolicy: 'network-only'
-  })
-
-  const { data: configs } = useQuery(GetJiraConfigs, {
     fetchPolicy: 'network-only'
   })
 
@@ -75,8 +71,6 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
     const impact = row.impact || 'N/A'
     const justification = row.vexJustification?.name || 'N/A'
 
-    console.log(row)
-
     setDescription(
       `Vulnerability: ${vulnId}\n
       Description: ${desc}\n
@@ -104,25 +98,6 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
       setIsCreateDisabled(true)
     }
   }, [summary, project, issueType])
-
-  useEffect(() => {
-    if (configs) {
-      if (
-        configs.notificationConfigs.jiraConfigs === '{}' ||
-        !configs.notificationConfigs.jiraConfigs
-      ) {
-        toast({
-          title: 'Jira Configuration not set.',
-          description:
-            'Please configure Jira connections in the Organization Settings -> Connections.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
-        })
-      }
-    }
-  }, [configs])
 
   useEffect(() => {
     if (options) {

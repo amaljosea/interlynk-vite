@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { CheckIcon } from '@chakra-ui/icons'
 import { Button, Flex, Text, useDisclosure } from '@chakra-ui/react'
 
-import { GetJiraConfigs } from 'graphQL/Queries'
+import { GetJiraSecret } from 'graphQL/Queries'
 
 import { FaJira } from 'react-icons/fa'
 
@@ -14,7 +14,7 @@ import CardHeader from '../Card/CardHeader'
 import JiraConfigModal from './JiraConfigModal'
 
 const Connections = () => {
-  const { data, refetch } = useQuery(GetJiraConfigs, {
+  const { data, refetch } = useQuery(GetJiraSecret, {
     fetchPolicy: 'network-only'
   })
 
@@ -23,8 +23,7 @@ const Connections = () => {
   const [greenCheck, setGreenCheck] = useState(false)
 
   useEffect(() => {
-    const jiraConfigs = data?.notificationConfigs?.jiraConfigs
-    if (jiraConfigs && jiraConfigs !== '{}') {
+    if (data?.jiraSecret?.apiToken) {
       setGreenCheck(true)
     }
   }, [data])

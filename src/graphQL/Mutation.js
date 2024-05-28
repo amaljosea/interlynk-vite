@@ -2378,6 +2378,20 @@ export const UpdateNotificationConfig = gql`
   }
 `
 
+export const UpdateJiraSecret = gql`
+  mutation JiraSecretUpdate(
+    $host: String
+    $username: String
+    $apiToken: String
+  ) {
+    jiraSecretUpdate(
+      input: { host: $host, username: $username, apiToken: $apiToken }
+    ) {
+      success
+    }
+  }
+`
+
 export const VerifyJiraConfigs = gql`
   mutation VerifyJiraConfigs($jiraConfigs: String!) {
     verifyJiraConfigs(input: { jiraConfigs: $jiraConfigs }) {
