@@ -14,14 +14,15 @@ export const useProductParts = () => {
   const params = useParams()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const { versionName, projectGroupName } = useSbom({
-    projectId: params?.productid,
-    sbomId: params?.sbomid
-  })
 
   const partsQueryParam = queryParams.get('parts')
-
   const isParts = partsQueryParam === 'true'
+
+  const { versionName, projectGroupName } = useSbom({
+    projectId: params?.productid,
+    sbomId: params?.sbomid,
+    skip: !isParts
+  })
 
   const pop = () => {
     setParts(parts.slice(0, -1))

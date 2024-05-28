@@ -1,6 +1,6 @@
-import { useQuery } from '@apollo/client'
+import { client } from 'context/ApolloWrapper'
 import PropTypes from 'prop-types'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { permissionList } from 'utils'
 
@@ -34,15 +34,20 @@ export default function AdminNavbar(props) {
     generateProductDetailPageUrlFromCurrentUrl
   } = useProductUrlContext()
 
-  useQuery(GetUserPermissions, {
-    skip: signedUrlParams ? true : false,
-    onCompleted: (data) => {
+  useEffect(() => {
+    const shouldFetch = !signedUrlParams
+    const queryUserPermission = async () => {
+      const { data } = await client.query({ query: GetUserPermissions })
       const permissions = permissionList(
         data?.organization?.currentUser?.role?.permissionsMap || []
       )
       setUserPermissions(permissions)
     }
-  })
+    if (shouldFetch) {
+      // not using useQuery to call the GetUserPermissions only once
+      queryUserPermission()
+    }
+  }, [setUserPermissions, signedUrlParams])
 
   const [scrolled] = useState(false)
   const { tabRes } = props
@@ -62,7 +67,8 @@ export default function AdminNavbar(props) {
 
   const sbomHookData = useSbom({
     projectId: params?.productid,
-    sbomId: params?.sbomid
+    sbomId: params?.sbomid,
+    skip: !params?.sbomid
   })
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
