@@ -5,6 +5,9 @@ import { getFullDateAndTime, timeSince, validateEmail } from 'utils'
 
 import { DeleteIcon } from '@chakra-ui/icons'
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
   Button,
   Drawer,
   DrawerBody,
@@ -66,6 +69,13 @@ const GeneralDataDrawer = ({
   const [supplierList, setSupplierList] = useState([])
 
   const [authorError, setAuthorError] = useState('')
+  const [error, setError] = useState('')
+
+  const toolsNotAdded =
+    selectedKey === 'tools' &&
+    (toolVendor !== '' || toolName !== '' || toolVersion !== '')
+  const authorNotAdded =
+    selectedKey === 'author' && (authorName !== '' || authorEmail !== '')
 
   const onAuthorChange = (e) => {
     const { value } = e.target
@@ -96,6 +106,7 @@ const GeneralDataDrawer = ({
 
   const handleAuthorAdd = async (e) => {
     e.preventDefault()
+    setError('')
     setAuthorList((prev) => [
       {
         name: authorName,
@@ -154,6 +165,7 @@ const GeneralDataDrawer = ({
   }
 
   const handleToolAdd = async () => {
+    setError('')
     setCreationTools((prev) => [
       {
         name: toolName,
@@ -169,41 +181,49 @@ const GeneralDataDrawer = ({
   }
 
   const handleSave = () => {
-    if (creationTools.length > 0) {
-      creationTools.map((item) => {
-        createTool({
-          variables: {
-            name: item.name,
-            version: item.version,
-            vendor: item.vendor,
-            sbomID: sbomId
-          }
-        }).then((res) => res?.data && refetch())
-      })
-    }
+    if (toolsNotAdded) {
+      setError('Please add tools before save')
+    } else if (authorNotAdded) {
+      setError('Please add author before save')
+    } else {
+      setError('')
 
-    if (authorList.length > 0) {
-      authorList.map((item) => {
-        createAuthor({
+      if (creationTools.length > 0) {
+        creationTools.map((item) => {
+          createTool({
+            variables: {
+              name: item.name,
+              version: item.version,
+              vendor: item.vendor,
+              sbomID: sbomId
+            }
+          }).then((res) => res?.data && refetch())
+        })
+      }
+
+      if (authorList.length > 0) {
+        authorList.map((item) => {
+          createAuthor({
+            variables: {
+              name: item.name,
+              email: item.email,
+              sbomId: sbomId
+            }
+          }).then((res) => res?.data && refetch())
+        })
+      }
+
+      if (checkId && (creationTools.length > 0 || authorList.length > 0)) {
+        healthRecheck({
           variables: {
-            name: item.name,
-            email: item.email,
+            checkId: checkId,
             sbomId: sbomId
           }
         }).then((res) => res?.data && refetch())
-      })
-    }
+      }
 
-    if (checkId && (creationTools.length > 0 || authorList.length > 0)) {
-      healthRecheck({
-        variables: {
-          checkId: checkId,
-          sbomId: sbomId
-        }
-      }).then((res) => res?.data && refetch())
+      onClose()
     }
-
-    onClose()
   }
 
   const heading = (name) => {
@@ -264,6 +284,14 @@ const GeneralDataDrawer = ({
                     onChange={(e) => setToolVersion(e.target.value)}
                   />
                 </FormControl>
+                {error !== '' && (
+                  <Alert status='error' borderRadius={4}>
+                    <AlertIcon />
+                    <AlertDescription fontSize={'sm'} pr={2}>
+                      {error}
+                    </AlertDescription>
+                  </Alert>
+                )}
                 <Button
                   colorScheme='blue'
                   onClick={handleToolAdd}
@@ -366,7 +394,6 @@ const GeneralDataDrawer = ({
                     />
                     <FormErrorMessage>{authorError}</FormErrorMessage>
                   </FormControl>
-
                   <FormControl
                     isInvalid={
                       !validateEmail(authorEmail) && authorEmail !== ''
@@ -383,7 +410,14 @@ const GeneralDataDrawer = ({
                       <FormErrorMessage>Email is invalid</FormErrorMessage>
                     )}
                   </FormControl>
-
+                  {error !== '' && (
+                    <Alert status='error' borderRadius={4}>
+                      <AlertIcon />
+                      <AlertDescription fontSize={'sm'} pr={2}>
+                        {error}
+                      </AlertDescription>
+                    </Alert>
+                  )}
                   <Button
                     colorScheme='blue'
                     type='submit'
