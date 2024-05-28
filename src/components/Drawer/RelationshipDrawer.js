@@ -139,11 +139,7 @@ const RelationshipDrawer = ({
     }
   }, [compDependency])
 
-  const list = dependsOnList?.filter((item) => item.toComp.id === component)
-
-  const recentComp = Math.max(
-    ...dependsOnList.map((item) => new Date(item.updatedAt).getTime())
-  )
+  const list = dependsOnList?.filter((item) => item?.toComp?.id === component)
 
   const handleAdd = () => {
     addRelation({
@@ -262,8 +258,8 @@ const RelationshipDrawer = ({
                       >
                         <option value=''>-- Select --</option>
                         {[...allComponents.sbom.components.nodes]
-                          .filter((com) => com.name !== name)
-                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .filter((com) => com?.name !== name)
+                          .sort((a, b) => a?.name?.localeCompare(b?.name))
                           .map((item, idx) => (
                             <option key={idx} value={item.id}>
                               {item.name}-{item.version}

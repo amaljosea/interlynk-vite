@@ -1073,6 +1073,17 @@ export const GetVersionsTable = gql`
   }
 `
 
+// GET ALL PRIMARY VERSIONS
+export const GetAllSboms = gql`
+  query GetAllSboms($id: Uuid!) {
+    project(id: $id) {
+      sboms {
+        projectVersion
+      }
+    }
+  }
+`
+
 // GET SBOM VERSIONS
 export const GetSbomVersions = gql`
   query GetSbomVersions(
@@ -1827,6 +1838,7 @@ export const GetAllComponents = gql`
         last: $last
       ) {
         nodes {
+          name
           version
         }
       }
@@ -1851,7 +1863,10 @@ export const AllShareComponents = gql`
           first: $first
           last: $last
         ) {
-          totalCount
+          nodes {
+            name
+            version
+          }
         }
       }
     }

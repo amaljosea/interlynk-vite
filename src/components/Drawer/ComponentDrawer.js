@@ -53,22 +53,18 @@ import {
   CreateComponent,
   UpdateComponent
 } from 'graphQL/Mutation'
-import {
-  AllShareComponents,
-  CpeAutoComplete,
-  GetAllComponents
-} from 'graphQL/Queries'
+import { CpeAutoComplete, GetAllComponents, GetAllSboms } from 'graphQL/Queries'
 
 import { FaExpandAlt } from 'react-icons/fa'
 
 function ComponentDrawer(props) {
   const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const activeTab = queryParams.get('tab')
   const toast = useToast()
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const customerView = location.pathname.startsWith('/customer')
 
@@ -121,29 +117,39 @@ function ComponentDrawer(props) {
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
   const [disabled, setDisabled] = useState(false)
-  const [allComps, setAllComps] = useState([])
+  const [allVersions, setAllVersions] = useState([])
+  const [allComponents, setAllComponents] = useState([])
 
-  const { data: allComponents } = useQuery(
-    signedUrlParams ? AllShareComponents : GetAllComponents,
-    {
-      fetchPolicy: 'network-only',
-      skip: activeTab === 'components' ? false : true,
-      variables: {
-        projectId: signedUrlParams ? undefined : productId,
-        sbomId: sbomId,
-        first: totalComp
-      },
-      onCompleted: (data) => {
-        const { components } = data?.sbom || ''
-        const result = components?.nodes?.map((item) => item?.version)
-        setAllComps(result)
-        setRelation('')
-        setComponent('')
+  useQuery(GetAllComponents, {
+    fetchPolicy: 'network-only',
+    skip: activeTab === 'components' && signedUrlParams === null ? false : true,
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalComp
+    },
+    onCompleted: (data) => {
+      data && setAllComponents(data?.sbom?.components?.nodes)
+      setRelation('')
+      setComponent('')
+    }
+  })
+
+  useQuery(GetAllSboms, {
+    fetchPolicy: 'network-only',
+    skip: activeTab === 'components' && signedUrlParams === null ? false : true,
+    variables: {
+      id: productId
+    },
+    onCompleted: (data) => {
+      if (data) {
+        const result = data?.project?.sboms?.map((item) => item?.projectVersion)
+        setAllVersions(result)
       }
     }
-  )
+  })
 
-  const isExists = allComps?.includes(compVersion)
+  const isExists = allVersions?.includes(compVersion)
 
   const disableButtonTemporarily = () => {
     setDisabled(true)
@@ -744,8 +750,12 @@ function ComponentDrawer(props) {
                 </Checkbox>
               </FormControl>
               {/* ADD RELATION */}
-              {!data && (
-                <>
+              {signedUrlParams === null && (
+                <Flex
+                  display={data ? 'none' : 'flex'}
+                  flexDir={'column'}
+                  gap={3}
+                >
                   <Text>Relationships</Text>
                   <FormControl>
                     <FormLabel htmlFor='relation' color='gray.600'>
@@ -767,47 +777,43 @@ function ComponentDrawer(props) {
                       )}
                     </Select>
                   </FormControl>
-                  {allComponents && (
-                    <FormControl>
-                      <FormLabel htmlFor='component' color='gray.600'>
-                        Component
-                      </FormLabel>
-                      <Select
-                        id='component'
-                        size='sm'
-                        value={component}
-                        onChange={(e) => setComponent(e.target.value)}
-                        mb={10}
-                      >
-                        <option value=''>-- Select --</option>
-                        {[...allComponents.sbom.components.nodes]
-                          .sort((a, b) => a.name.localeCompare(b.name))
-                          .map((item, idx) => (
-                            <option key={idx} value={item.id}>
-                              {item.name}-{item.version}
-                            </option>
-                          ))}
-                      </Select>
-                    </FormControl>
-                  )}
-                </>
+                  <FormControl>
+                    <FormLabel htmlFor='component' color='gray.600'>
+                      Component
+                    </FormLabel>
+                    <Select
+                      id='component'
+                      size='sm'
+                      value={component}
+                      onChange={(e) => setComponent(e.target.value)}
+                      mb={10}
+                    >
+                      <option value=''>-- Select --</option>
+                      {[...allComponents]
+                        .sort((a, b) => a?.name?.localeCompare(b?.name))
+                        .map((item, idx) => (
+                          <option key={idx} value={item.id}>
+                            {item.name}-{item.version}
+                          </option>
+                        ))}
+                    </Select>
+                  </FormControl>
+                </Flex>
               )}
             </Stack>
           </DrawerBody>
-          {!customerView && (
-            <DrawerFooter borderTopWidth='1px'>
-              <Button mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                colorScheme='blue'
-                onClick={data ? handleUpdateCom : handleCreateCom}
-                isDisabled={isInvalid}
-              >
-                {data ? 'Update' : 'Save'}
-              </Button>
-            </DrawerFooter>
-          )}
+          <DrawerFooter borderTopWidth='1px' hidden={signedUrlParams !== null}>
+            <Button mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={data ? handleUpdateCom : handleCreateCom}
+              isDisabled={isInvalid}
+            >
+              {data ? 'Update' : 'Save'}
+            </Button>
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
 
