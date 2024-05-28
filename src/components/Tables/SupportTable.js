@@ -25,6 +25,8 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import CpeCard from 'components/Misc/CpeCard'
+import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
 import { FaEllipsisV } from 'react-icons/fa'
@@ -53,6 +55,11 @@ const SupportTable = ({
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
     onClose: onDeleteClose
+  } = useDisclosure()
+  const {
+    isOpen: isCardOpen,
+    onOpen: onCardOpen,
+    onClose: onCardClose
   } = useDisclosure()
 
   const [activeRow, setActiveRow] = useState(null)
@@ -219,7 +226,18 @@ const SupportTable = ({
     {
       id: 'IDS',
       name: 'IDS',
-      selector: (row) => <Text my={4}>{row?.idUri}</Text>,
+      selector: (row) => (
+        <Text
+          my={4}
+          cursor={'pointer'}
+          onClick={() => {
+            setActiveRow(row)
+            onCardOpen()
+          }}
+        >
+          {row?.idUri}
+        </Text>
+      ),
       wrap: true,
       width: '16%'
     },
@@ -384,6 +402,22 @@ const SupportTable = ({
           isOpen={isActiveOpen}
           onClose={onActiveClose}
           refetch={refetch}
+        />
+      )}
+
+      {isCardOpen && activeRow?.idUri?.startsWith('pkg') && (
+        <PurlCard
+          value={activeRow?.idUri}
+          isOpen={isCardOpen}
+          onClose={onCardClose}
+        />
+      )}
+
+      {isCardOpen && activeRow?.idUri?.startsWith('cpe') && (
+        <CpeCard
+          value={activeRow?.idUri}
+          isOpen={isCardOpen}
+          onClose={onCardClose}
         />
       )}
     </>
