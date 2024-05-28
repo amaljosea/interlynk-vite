@@ -1,7 +1,8 @@
 import { useMutation } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { typeOptions } from 'utils'
 
 import {
   Button,
@@ -19,48 +20,19 @@ import {
   Select,
   Tag,
   Text,
-  Textarea
+  Textarea,
+  useToast
 } from '@chakra-ui/react'
 
 import CpeInput from 'components/CpeInput'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
-
-const typeOptions = [
-  { value: '', label: '-- Select --' },
-  { value: 'alpm', label: 'alpm' },
-  { value: 'apk', label: 'apk' },
-  { value: 'bitbucket', label: 'bitbucket' },
-  { value: 'bitnami', label: 'bitnami' },
-  { value: 'cocoapods', label: 'cocoapods' },
-  { value: 'cargo', label: 'cargo' },
-  { value: 'composer', label: 'composer' },
-  { value: 'conan', label: 'conan' },
-  { value: 'conda', label: 'conda' },
-  { value: 'cran', label: 'cran' },
-  { value: 'deb', label: 'deb' },
-  { value: 'docker', label: 'docker' },
-  { value: 'gem', label: 'gem' },
-  { value: 'generic', label: 'generic' },
-  { value: 'github', label: 'github' },
-  { value: 'golang', label: 'golang' },
-  { value: 'hex', label: 'hex' },
-  { value: 'hackage', label: 'hackage' },
-  { value: 'huggingface', label: 'huggingface' },
-  { value: 'maven', label: 'maven' },
-  { value: 'mlflow', label: 'mlflow' },
-  { value: 'npm', label: 'npm' },
-  { value: 'nuget', label: 'nuget' },
-  { value: 'qpkg', label: 'qpkg' },
-  { value: 'oci', label: 'oci' },
-  { value: 'pub', label: 'pub' },
-  { value: 'pypi', label: 'pypi' },
-  { value: 'rpm', label: 'rpm' },
-  { value: 'swid', label: 'swid' },
-  { value: 'swift', label: 'swift' }
-]
+import {
+  AutomationRuleCreate,
+  UpdateComponent,
+  recheckHealth
+} from 'graphQL/Mutation'
 
 const PurlModal = ({
   data,
@@ -68,14 +40,19 @@ const PurlModal = ({
   onClose,
   setPurlValue,
   refetch,
-  checkId,
   getCpe,
-  activeCheck,
+  activeRow,
   setIsValid,
   activeComp
 }) => {
+  const { status, component } = activeRow || ''
+  const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
+
+  const toast = useToast()
   const params = useParams()
+  const navigate = useNavigate()
   const sbomId = params.sbomid
+  const productId = params.productid
 
   const { prodCompState, dispatch } = useGlobalState()
   const { purlString } = prodCompState
@@ -134,17 +111,17 @@ const PurlModal = ({
   const handleComUpdate = async () => {
     await updateComponent({
       variables: {
-        id: activeCheck.id,
+        id: component?.id,
         sbomId: sbomId,
         purl: purlString
       }
     })
       .then(() => {
-        if (checkId) {
+        if (friendlyId) {
           healthRecheck({
             variables: {
-              checkId: checkId,
-              compId: activeCheck.id,
+              checkId: friendlyId,
+              compId: component?.id,
               sbomId: sbomId
             }
           }).then((res) => res?.data && refetch())
@@ -557,17 +534,82 @@ const PurlModal = ({
     }
   }
 
-  console.log('activeCheck', activeCheck)
+  const [createRule] = useMutation(AutomationRuleCreate)
+
+  const conditionsAttributes = [
+    {
+      subject: 'component',
+      operator: 'is',
+      field: 'component_name',
+      value: component?.name
+    },
+    {
+      subject: 'component',
+      operator: 'is',
+      field: 'component_version',
+      value: component?.version
+    }
+  ]
+
+  const actionsAttributes = [
+    {
+      subject: 'component',
+      field: 'component_purl',
+      value: purlString
+    }
+  ]
+
+  const handleRuleCreate = async () => {
+    if (status === 'resolved') {
+      localStorage.setItem('activeProdTab', 2)
+      navigate(`/vendor/products/${params.productgroupid}/env/${productId}`)
+    } else {
+      await createRule({
+        variables: {
+          name: shortDesc,
+          active: true,
+          projectId: productId,
+          automationConditionsAttributes: conditionsAttributes,
+          automationActionsAttributes: actionsAttributes
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleCreate?.errors
+        if (errors?.length > 0) {
+          console.log(errors[0])
+        } else {
+          toast({
+            description: 'Rule added successfully',
+            duration: 3000,
+            status: 'success',
+            position: 'top'
+          })
+          onClose()
+        }
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (status === 'resolved') {
+      const pkg = PackageURL.fromString(component?.purl)
+      setPurlName(pkg?.name)
+      setNamespace(pkg?.namespace)
+      setPurlType(pkg?.type)
+      setPurlVersion(pkg?.version)
+      setQualifiers(pkg?.qualifiers)
+      setPurlValue(pkg.toString())
+    }
+  }, [component?.purl, setPurlValue, status])
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInBottom'>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>PURL Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {activeCheck && (
+            {component && (
               <Flex
                 width='100%'
                 direction={'row'}
@@ -577,12 +619,8 @@ const PurlModal = ({
                 gap={2}
                 mb={6}
               >
-                <Text wordBreak={'break-all'}>
-                  {activeCheck.name ? activeCheck.name : ''}
-                </Text>
-                {activeCheck.version && (
-                  <Tag colorScheme='blue'>{activeCheck.version}</Tag>
-                )}
+                <Text wordBreak={'break-all'}>{component?.name || ''}</Text>
+                <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
               </Flex>
             )}
             {activeComp && (
@@ -772,6 +810,15 @@ const PurlModal = ({
               justifyContent={'flex-end'}
               alignItems={'center'}
             >
+              <Button
+                hidden={friendlyId ? false : true}
+                fontSize={'sm'}
+                colorScheme='blue'
+                mr={'auto'}
+                onClick={handleRuleCreate}
+              >
+                {status === 'resolved' ? 'View Rule' : 'Save as Rule'}
+              </Button>
               <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
                 Cancel
               </Button>
@@ -779,7 +826,8 @@ const PurlModal = ({
                 fontSize={'sm'}
                 variant='solid'
                 colorScheme={'blue'}
-                onClick={checkId ? handleComUpdate : handleSave}
+                onClick={friendlyId ? handleComUpdate : handleSave}
+                hidden={status === 'resolved'}
                 disabled={
                   purlName === '' ||
                   purlType === '' ||

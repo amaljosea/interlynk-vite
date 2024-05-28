@@ -528,6 +528,8 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
           selectedCpe={selectedCpe}
           getCpe={getCpe}
           activeComp={data?.defaultProject}
+          activeRow={null}
+          refetch={null}
         />
       )}
     </>

@@ -369,6 +369,9 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
       })
     )
 
+  console.log('conditionsAttributes', conditionsAttributes)
+  console.log('actionsAttributes', actionsAttributes)
+
   const handleRuleCreate = async () => {
     disableButtonTemporarily()
     if (hasSimilarConditions(conditions)) {

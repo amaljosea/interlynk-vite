@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
@@ -18,7 +18,8 @@ import {
   ModalHeader,
   ModalOverlay,
   Tag,
-  Text
+  Text,
+  useToast
 } from '@chakra-ui/react'
 
 import {
@@ -26,18 +27,17 @@ import {
   recheckHealth,
   updateComSupplier
 } from 'graphQL/Mutation'
+import { AutomationRuleCreate } from 'graphQL/Mutation'
 
-const SupplierModal = ({
-  id,
-  isOpen,
-  onClose,
-  refetch,
-  data,
-  checkId,
-  activeCheck
-}) => {
+const SupplierModal = ({ id, isOpen, onClose, refetch, data, activeRow }) => {
+  const toast = useToast()
   const params = useParams()
+  const navigate = useNavigate()
   const sbomId = params.sbomid
+  const productId = params.productid
+
+  const { status, component } = activeRow || ''
+  const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
 
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')
@@ -82,17 +82,17 @@ const SupplierModal = ({
         url: orgUrl,
         contactName: supName,
         contactEmail: supEmail,
-        componentId: activeCheck ? activeCheck.id : id
+        componentId: component?.id || id
       }
     })
       .then((res) => {
         res?.data && refetch()
-        if (checkId) {
+        if (friendlyId) {
           healthRecheck({
             variables: {
               sbomId: sbomId,
-              checkId: checkId,
-              compId: activeCheck.id
+              checkId: friendlyId,
+              compId: component?.id
             }
           })
         }
@@ -132,15 +132,119 @@ const SupplierModal = ({
     setIsValidUrl('')
   }
 
+  const [createRule] = useMutation(AutomationRuleCreate)
+
+  const conditionsAttributes = [
+    {
+      subject: 'component',
+      operator: 'is',
+      field: 'component_name',
+      value: component?.name
+    },
+    {
+      subject: 'component',
+      operator: 'is',
+      field: 'component_version',
+      value: component?.version
+    },
+    {
+      subject: 'component',
+      operator: 'not_exists',
+      field: 'component_supplier_name',
+      value: undefined
+    },
+    {
+      subject: 'component',
+      operator: 'not_exists',
+      field: 'component_supplier_url',
+      value: undefined
+    },
+    {
+      subject: 'component',
+      operator: 'not_exists',
+      field: 'component_supplier_contact_name',
+      value: undefined
+    },
+    {
+      subject: 'component',
+      operator: 'not_exists',
+      field: 'component_supplier_contact_email',
+      value: undefined
+    }
+  ]
+
+  const actionsAttributes = [
+    {
+      subject: 'component',
+      field: 'component_supplier_name',
+      value: orgName
+    },
+    {
+      subject: 'component',
+      field: 'component_supplier_url',
+      value: orgUrl
+    },
+    {
+      subject: 'component',
+      field: 'component_supplier_contact_name',
+      value: supName
+    },
+    {
+      subject: 'component',
+      field: 'component_supplier_contact_email',
+      value: supEmail
+    }
+  ]
+
+  const handleRuleCreate = async () => {
+    if (status === 'resolved') {
+      localStorage.setItem('activeProdTab', 2)
+      navigate(`/vendor/products/${params.productgroupid}/env/${productId}`)
+    } else {
+      await createRule({
+        variables: {
+          name: shortDesc,
+          active: true,
+          projectId: productId,
+          automationConditionsAttributes: conditionsAttributes,
+          automationActionsAttributes: actionsAttributes
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleCreate?.errors
+        if (errors?.length > 0) {
+          console.log(errors[0])
+        } else {
+          toast({
+            description: 'Rule added successfully',
+            duration: 3000,
+            status: 'success',
+            position: 'top'
+          })
+          onClose()
+        }
+      })
+    }
+  }
+
   const isInvalid =
     orgName === '' ||
     nameError !== '' ||
     (supEmail !== '' && !validateEmail(supEmail)) ||
     (orgUrl !== '' && !validateUrl(orgUrl))
 
+  useEffect(() => {
+    if (status === 'resolved' && component?.suppliers?.length > 0) {
+      const { suppliers } = component
+      setOrgName(suppliers[0]?.name)
+      setOrgUrl(suppliers[0]?.url)
+      setSupName(suppliers[0]?.contactName)
+      setSupEmail(suppliers[0]?.contactEmail)
+    }
+  }, [component, status])
+
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInBottom'>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
@@ -164,20 +268,19 @@ const SupplierModal = ({
                 <Tag colorScheme='blue'>{data.version}</Tag>
               </Flex>
             )}
-            {activeCheck && (
-              <Flex
-                width='100%'
-                direction={'row'}
-                alignItems={'center'}
-                justifyContent={'flex-start'}
-                wrap={'wrap'}
-                gap={2}
-                mb={6}
-              >
-                <Text wordBreak={'break-all'}>{activeCheck?.name}</Text>
-                <Tag colorScheme='blue'>{activeCheck?.version}</Tag>
-              </Flex>
-            )}
+            <Flex
+              hidden={component ? false : true}
+              width='100%'
+              direction={'row'}
+              alignItems={'center'}
+              justifyContent={'flex-start'}
+              wrap={'wrap'}
+              gap={2}
+              mb={6}
+            >
+              <Text wordBreak={'break-all'}>{component?.name || '-'}</Text>
+              <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
+            </Flex>
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* ORG NAME */}
               <FormControl isRequired>
@@ -238,13 +341,24 @@ const SupplierModal = ({
               justifyContent={'flex-end'}
               alignItems={'center'}
             >
+              <Button
+                hidden={friendlyId ? false : true}
+                fontSize={'sm'}
+                colorScheme='blue'
+                mr={'auto'}
+                onClick={handleRuleCreate}
+                isDisabled={isInvalid}
+              >
+                {status === 'resolved' ? 'View Rule' : 'Save as Rule'}
+              </Button>
               <Button colorScheme='gray' onClick={onClose}>
                 Cancel
               </Button>
               <Button
                 colorScheme='blue'
-                onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
                 isDisabled={isInvalid}
+                hidden={status === 'resolved'}
+                onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
               >
                 {suppliers?.length > 0 ? 'Update' : 'Save'}
               </Button>

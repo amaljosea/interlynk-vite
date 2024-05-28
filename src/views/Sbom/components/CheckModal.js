@@ -1,6 +1,6 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
@@ -26,28 +26,30 @@ import {
   Select,
   Tag,
   Text,
-  Tooltip
+  Tooltip,
+  useToast
 } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
+import {
+  AutomationRuleCreate,
+  UpdateComponent,
+  recheckHealth
+} from 'graphQL/Mutation'
 import { GetComponentData } from 'graphQL/Queries'
 
-const CheckModal = ({
-  activeCheck,
-  isOpen,
-  onClose,
-  refetch,
-  shortDesc,
-  checkId,
-  componentId
-}) => {
+const CheckModal = ({ isOpen, onClose, refetch, activeRow, componentId }) => {
+  const toast = useToast()
   const params = useParams()
+  const navigate = useNavigate()
   const productId = params.productid
   const sbomId = params.sbomid
+
+  const { status, component } = activeRow || ''
+  const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
 
   const compRef = useRef()
 
@@ -55,6 +57,8 @@ const CheckModal = ({
   const [getCompData, { data }] = useLazyQuery(GetComponentData, {
     fetchPolicy: 'network-only'
   })
+
+  const [createRule] = useMutation(AutomationRuleCreate)
 
   const { prodCompState } = useGlobalState()
   const { field, direction, spdxLicenses, expLicense, customLicenses } =
@@ -113,10 +117,10 @@ const CheckModal = ({
       }
     })
       .then(() => {
-        if (checkId) {
+        if (friendlyId) {
           healthRecheck({
             variables: {
-              checkId: checkId,
+              checkId: friendlyId,
               sbomId: sbomId
             }
           }).then((res) => res?.data && refetch())
@@ -136,11 +140,11 @@ const CheckModal = ({
       }
     })
       .then(() => {
-        if (checkId) {
+        if (friendlyId) {
           healthRecheck({
             variables: {
               compId: componentId,
-              checkId: checkId,
+              checkId: friendlyId,
               sbomId: sbomId
             }
           }).then((res) => res?.data && refetch())
@@ -181,16 +185,18 @@ const CheckModal = ({
     }
   }
 
+  const isPrimary = shortDesc === 'Document has a primary component'
+  const isComponentLicense =
+    shortDesc === 'Component has license/s specified' ||
+    shortDesc === 'Componet has deprecated license/s' ||
+    shortDesc === 'Component has restrictive licenses specified'
+
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!isInvalidLicense) {
-      if (shortDesc === 'Document has a primary component') {
+      if (isPrimary) {
         handleComUpdate()
-      } else if (
-        shortDesc === 'Component has license/s specified' ||
-        shortDesc === 'Componet has deprecated license/s' ||
-        shortDesc === 'Component has restrictive licenses specified'
-      ) {
+      } else if (isComponentLicense) {
         onLicenseUpdate()
       } else {
         onClose()
@@ -203,6 +209,67 @@ const CheckModal = ({
     }
   }
 
+  const getConditionsAttributes = () => {
+    if (isComponentLicense) {
+      return [
+        {
+          subject: 'component',
+          operator: 'is',
+          field: 'component_name',
+          value: component?.name
+        },
+        {
+          subject: 'component',
+          operator: 'is',
+          field: 'component_version',
+          value: component?.version
+        }
+      ]
+    }
+  }
+
+  const getActionsAttributes = () => {
+    if (isComponentLicense) {
+      return [
+        {
+          subject: 'component',
+          field: 'component_licenses_exp',
+          value: expLicense
+        }
+      ]
+    }
+  }
+
+  const handleRuleCreate = async () => {
+    if (status === 'resolved') {
+      localStorage.setItem('activeProdTab', 2)
+      navigate(`/vendor/products/${params.productgroupid}/env/${productId}`)
+    } else {
+      await createRule({
+        variables: {
+          name: shortDesc,
+          active: true,
+          projectId: productId,
+          automationConditionsAttributes: getConditionsAttributes(),
+          automationActionsAttributes: getActionsAttributes()
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleCreate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
+        } else {
+          toast({
+            description: 'Rule added successfully',
+            duration: 3000,
+            status: 'success',
+            position: 'top'
+          })
+          onClose()
+        }
+      })
+    }
+  }
+
   const isInvalidLicense =
     (shortDesc === 'Component has license/s specified' ||
       shortDesc === 'Componet has deprecated license/s' ||
@@ -212,7 +279,7 @@ const CheckModal = ({
     customLicenses.length === 0
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInBottom'>
       <ModalOverlay />
       <form onSubmit={handleSubmit}>
         <ModalContent>
@@ -225,22 +292,21 @@ const CheckModal = ({
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            {activeCheck && (
-              <Flex
-                width='100%'
-                direction={'row'}
-                alignItems={'center'}
-                justifyContent={'flex-start'}
-                wrap={'wrap'}
-                gap={2}
-                mb={6}
-              >
-                <Text fontWeight={'medium'} wordBreak={'break-all'}>
-                  {activeCheck?.component?.name}
-                </Text>
-                <Tag colorScheme='blue'>{activeCheck?.component?.version}</Tag>
-              </Flex>
-            )}
+            <Flex
+              hidden={component ? false : true}
+              width='100%'
+              direction={'row'}
+              alignItems={'center'}
+              justifyContent={'flex-start'}
+              wrap={'wrap'}
+              gap={2}
+              mb={6}
+            >
+              <Text fontWeight={'medium'} wordBreak={'break-all'}>
+                {component?.name || '-'}
+              </Text>
+              <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
+            </Flex>
             {shortDesc === 'Document has a primary component' && (
               <Flex
                 gap={4}
@@ -347,6 +413,7 @@ const CheckModal = ({
                 sbomView={false}
                 isValid={isValid}
                 setIsValid={setIsValid}
+                license={status === 'resolved' ? component?.licensesExp : ''}
               />
             )}
           </ModalBody>
@@ -358,10 +425,23 @@ const CheckModal = ({
               justifyContent={'flex-end'}
               alignItems={'center'}
             >
+              <Button
+                fontSize={'sm'}
+                colorScheme='blue'
+                mr={'auto'}
+                onClick={handleRuleCreate}
+              >
+                {status === 'resolved' ? 'View Rule' : 'Save as Rule'}
+              </Button>
               <Button fontSize={'sm'} onClick={onClose}>
                 Close
               </Button>
-              <Button fontSize={'sm'} colorScheme='blue' type='submit'>
+              <Button
+                fontSize={'sm'}
+                colorScheme='blue'
+                type='submit'
+                hidden={status === 'resolved'}
+              >
                 Save
               </Button>
             </Flex>

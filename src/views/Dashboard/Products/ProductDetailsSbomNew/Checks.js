@@ -10,6 +10,7 @@ import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 
+import { CheckIcon } from '@chakra-ui/icons'
 import {
   Badge,
   Button,
@@ -124,14 +125,12 @@ const Checks = () => {
   const [selectedCpe, setSelectedCpe] = useState(null)
   const [checkSearch, setCheckSearch] = useState('')
   const [activeRow, setActiveRow] = useState(null)
-
   const [updateResult] = useMutation(checkResultUpdate)
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [updateComponent] = useMutation(UpdateComponent)
   const [updateSbom] = useMutation(sbomUpdate)
 
-  const supplierBtn = useRef(null)
   const creationToolBtn = useRef(null)
   const authorBtn = useRef(null)
 
@@ -391,63 +390,56 @@ const Checks = () => {
 
   const handleOpen = (row) => {
     const { organizationRule } = row
-
+    const { shortDesc } = organizationRule?.rule || ''
     setActiveRow(row)
-
     // TIMESTAMP SELECTOR UI
-    if (organizationRule.rule.shortDesc === 'Document creation timestamp') {
+    if (shortDesc === 'Document creation timestamp') {
       return onOpen()
     }
 
     // CREATION TOOL SIDE DRAWER
-    if (
-      organizationRule.rule.shortDesc === 'Document has creation tools present'
-    ) {
+    if (shortDesc === 'Document has creation tools present') {
       return onCreationOpen()
     }
 
     // AUTHOR SIDE DRAWER
-    if (organizationRule.rule.shortDesc === 'Document has authors present') {
+    if (shortDesc === 'Document has authors present') {
       return onAuthorOpen()
     }
 
     // SUPPLIER SIDE DRAWER
-    if (organizationRule.rule.shortDesc === 'Document has suppliers present') {
+    if (shortDesc === 'Document has suppliers present') {
       return onDocSupOpen()
     }
 
     // SUPPLIER SIDE DRAWER
-    if (
-      organizationRule.rule.shortDesc === 'Document has data license specified'
-    ) {
+    if (shortDesc === 'Document has data license specified') {
       sbomDispatch({ type: 'CLEAR_LICENSES' })
       return onDataLicenseOpen()
     }
 
     // PRIMARY COMPONENT SELECTOR MODAL
-    if (
-      organizationRule.rule.shortDesc === 'Document has a primary component'
-    ) {
+    if (shortDesc === 'Document has a primary component') {
       return onPrimaryOpen()
     }
 
     // COMPONENT TYPE SELECTOR MODAL
     if (
-      organizationRule.rule.shortDesc === 'Component has a valid type' ||
-      organizationRule.rule.shortDesc === 'Component has a type'
+      shortDesc === 'Component has a valid type' ||
+      shortDesc === 'Component has a type'
     ) {
       return onTypeOpen()
     }
 
     // COMPONENT ADD SUPPLIER MODAL
-    if (organizationRule.rule.shortDesc === 'Component has a supplier') {
+    if (shortDesc === 'Component has a supplier') {
       return onSupplierOpen()
     }
 
     // PURL MODAL
     if (
-      organizationRule.rule.shortDesc === 'Component has a purl' ||
-      organizationRule.rule.shortDesc === 'Component has a valid purl'
+      shortDesc === 'Component has a purl' ||
+      shortDesc === 'Component has a valid purl'
     ) {
       prodCompDispatch({
         type: 'SET_PURL_STRING',
@@ -458,8 +450,8 @@ const Checks = () => {
 
     // CPE MODAL
     if (
-      organizationRule.rule.shortDesc === 'Component has a valid cpe' ||
-      organizationRule.rule.shortDesc === 'Component has a cpe'
+      shortDesc === 'Component has a valid cpe' ||
+      shortDesc === 'Component has a cpe'
     ) {
       prodCompDispatch({
         type: 'SET_CPE_STRING',
@@ -470,10 +462,9 @@ const Checks = () => {
 
     // COMPONENT LICENSE SELECTOR MODAL
     if (
-      organizationRule.rule.shortDesc === 'Component has license/s specified' ||
-      organizationRule.rule.shortDesc === 'Componet has deprecated license/s' ||
-      organizationRule.rule.shortDesc ===
-        'Component has restrictive licenses specified'
+      shortDesc === 'Component has license/s specified' ||
+      shortDesc === 'Componet has deprecated license/s' ||
+      shortDesc === 'Component has restrictive licenses specified'
     ) {
       return handleOpenLicense()
     }
@@ -528,6 +519,18 @@ const Checks = () => {
       setCpeList(updatedData)
       setCpeValue('')
       setSelectedCpe(null)
+    }
+  }
+
+  const onCheckOpen = (row) => {
+    const { organizationRule } = row
+    const { shortDesc } = organizationRule?.rule || ''
+    if (shortDesc === 'Component has a unique identifier') {
+      handleComUpdate(row)
+    } else if (shortDesc === 'Document has a unique identifier') {
+      handleSbomUpdate(row)
+    } else {
+      handleOpen(row)
     }
   }
 
@@ -633,15 +636,7 @@ const Checks = () => {
                     colorScheme='blue'
                     fontWeight='normal'
                     icon={<BiSolidWrench size={18} />}
-                    onClick={() =>
-                      row.organizationRule.rule.shortDesc ===
-                      'Component has a unique identifier'
-                        ? handleComUpdate(row)
-                        : row.organizationRule.rule.shortDesc ===
-                            'Document has a unique identifier'
-                          ? handleSbomUpdate(row)
-                          : handleOpen(row)
-                    }
+                    onClick={() => onCheckOpen(row)}
                     disabled={customerView || !editChecks || !updateSboms}
                   />
                 </Tooltip>
@@ -663,12 +658,13 @@ const Checks = () => {
             {status === 'resolved' && (
               <Button
                 size='sm'
-                width={'70px'}
                 fontSize={'xs'}
                 variant='solid'
                 colorScheme='whatsapp'
+                onClick={() => onCheckOpen(row)}
+                leftIcon={<CheckIcon />}
               >
-                Fixed
+                View
               </Button>
             )}
 
@@ -735,45 +731,39 @@ const Checks = () => {
             />
           )}
 
-          {/*  COMPONENT PRIMARY MODAL */}
+          {/* COMPONENT PRIMARY MODAL */}
           {isPrimaryOpen && (
             <CheckModal
               id={activeRow.id}
               componentId={null}
-              totalRows={totalRows}
               refetch={handleRefetch}
               filterRefetch={filterRefetch}
-              shortDesc={activeRow.organizationRule.rule.shortDesc}
-              checkId={activeRow.organizationRule.rule.friendlyId}
+              activeRow={activeRow}
               isOpen={isPrimaryOpen}
               onClose={onPrimaryClose}
               getCpe={getCpe}
             />
           )}
 
-          {/*  COMPONENT LICENSE MODAL */}
+          {/* COMPONENT LICENSE MODAL */}
           {isLicenseOpen && (
             <CheckModal
               activeCheck={activeRow}
               componentId={activeRow.component.id}
-              totalRows={totalRows}
               refetch={handleRefetch}
               filterRefetch={filterRefetch}
-              shortDesc={activeRow.organizationRule.rule.shortDesc}
-              checkId={activeRow.organizationRule.rule.friendlyId}
+              activeRow={activeRow}
               isOpen={isLicenseOpen}
               onClose={onLicenseClose}
             />
           )}
 
-          {/*  COMPONENT TYPE MODAL */}
+          {/* COMPONENT TYPE MODAL */}
           {isTypeOpen && (
             <CheckModal
               id={activeRow.component.id}
-              totalRows={totalRows}
               refetch={handleRefetch}
-              shortDesc={activeRow.organizationRule.rule.shortDesc}
-              checkId={activeRow.organizationRule.rule.friendlyId}
+              activeRow={activeRow}
               isOpen={isTypeOpen}
               onClose={onTypeClose}
             />
@@ -782,24 +772,20 @@ const Checks = () => {
           {/* SUPPLIER MODAL */}
           {isSupplierOpen && (
             <SupplierModal
-              activeCheck={activeRow.component}
-              btnRef={supplierBtn}
+              id={null}
+              data={null}
+              activeRow={activeRow}
               refetch={handleRefetch}
               isOpen={isSupplierOpen}
               onClose={onSupplierClose}
-              data={null}
-              checkId={activeRow.organizationRule.rule.friendlyId}
-              totalRows={totalRows}
             />
           )}
 
           {isOpen && (
             <CheckModal
               activeCheck={activeRow}
-              totalRows={totalRows}
               refetch={handleRefetch}
-              checkId={activeRow.organizationRule.rule.friendlyId}
-              shortDesc={activeRow.organizationRule.rule.shortDesc}
+              activeRow={activeRow}
               isOpen={isOpen}
               onClose={onClose}
             />
@@ -813,10 +799,8 @@ const Checks = () => {
               onClose={onPurlClose}
               setPurlValue={setPurlValue}
               purlValue={purlValue}
-              activeCheck={activeRow.component}
-              totalRows={totalRows}
+              activeRow={activeRow}
               refetch={handleRefetch}
-              checkId={activeRow.organizationRule.rule.friendlyId}
               getCpe={getCpe}
             />
           )}
@@ -828,14 +812,14 @@ const Checks = () => {
               isOpen={isCpeOpen}
               onClose={onCpeClose}
               cpeValue={cpeValue}
+              setCpeValue={setCpeValue}
               onCreateCpe={handleCreateCpe}
               onUpdateCpe={handleUpdateCpe}
               selectedCpe={selectedCpe}
-              activeCheck={activeRow.component}
+              activeRow={activeRow}
               refetch={handleRefetch}
-              totalRows={totalRows}
-              checkId={activeRow.organizationRule.rule.friendlyId}
               getCpe={getCpe}
+              activeComp={null}
             />
           )}
 
@@ -849,7 +833,7 @@ const Checks = () => {
               selectedKey={'tools'}
               refetch={handleRefetch}
               totalRows={totalRows}
-              checkId={activeRow.organizationRule.rule.friendlyId}
+              activeRow={activeRow}
             />
           )}
 
@@ -863,8 +847,7 @@ const Checks = () => {
               selectedKey={'author'}
               refetch={handleRefetch}
               filterRefetch={filterRefetch}
-              totalRows={totalRows}
-              checkId={activeRow.organizationRule.rule.friendlyId}
+              activeRow={activeRow}
               getCpe={getCpe}
             />
           )}
@@ -872,13 +855,11 @@ const Checks = () => {
           {/* DOCUMENT SUPPLIER DRAWER */}
           {isDocSupOpen && (
             <PriSupplierModal
+              suppliers={null}
               refetch={handleRefetch}
               isOpen={isDocSupOpen}
               onClose={onDocSupClose}
-              suppliers={null}
-              totalRows={totalRows}
-              checkId={activeRow.organizationRule.rule.friendlyId}
-              shortDesc={activeRow.organizationRule.rule.shortDesc}
+              activeRow={activeRow}
               getCpe={getCpe}
             />
           )}

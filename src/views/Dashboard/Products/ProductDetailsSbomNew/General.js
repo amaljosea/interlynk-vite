@@ -535,14 +535,13 @@ const General = ({ data, refetch, loading, error }) => {
       )}
 
       {/* SUPPLIER MODAL */}
-      {isSupOpen && data && (
+      {isSupOpen && (
         <PriSupplierModal
           refetch={refetch}
           isOpen={isSupOpen}
           onClose={onSupClose}
           suppliers={suppliers}
-          checkId={null}
-          shortDesc={null}
+          activeRow={null}
         />
       )}
 

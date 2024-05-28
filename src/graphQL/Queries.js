@@ -2240,6 +2240,17 @@ export const GetCheckResults = gql`
           sbomId
           sbom {
             spec
+            authors {
+              name
+              email
+              updatedAt
+            }
+            suppliers {
+              name
+              url
+              contactEmail
+              contactName
+            }
           }
           componentId
           primary
@@ -2250,6 +2261,14 @@ export const GetCheckResults = gql`
             name
             version
             licensesExp
+            purl
+            cpes
+            suppliers {
+              name
+              url
+              contactEmail
+              contactName
+            }
           }
           organizationRule {
             severity

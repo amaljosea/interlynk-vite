@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { validateCpe } from 'utils'
 
 import {
@@ -22,14 +22,19 @@ import {
   Stack,
   Tag,
   Text,
-  Textarea
+  Textarea,
+  useToast
 } from '@chakra-ui/react'
 
 import CpeInput from 'components/CpeInput'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
+import {
+  AutomationRuleCreate,
+  UpdateComponent,
+  recheckHealth
+} from 'graphQL/Mutation'
 
 const CpeModal = ({
   isOpen,
@@ -37,13 +42,18 @@ const CpeModal = ({
   setCpeValue,
   cpeValue,
   activeComp,
-  checkId,
   refetch,
   getCpe,
-  activeCheck
+  activeRow
 }) => {
+  const { status, component } = activeRow || ''
+  const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
+
+  const toast = useToast()
   const params = useParams()
+  const navigate = useNavigate()
   const sbomId = params.sbomid
+  const productId = params.productid
 
   const [error, setError] = useState('')
   const [vendor, setVendor] = useState('')
@@ -172,17 +182,17 @@ const CpeModal = ({
     if (validateCpe(cpeString)) {
       await updateComponent({
         variables: {
-          id: activeCheck.id,
+          id: component?.id,
           sbomId: sbomId,
           cpes: [cpeString]
         }
       })
         .then(() => {
-          if (checkId) {
+          if (friendlyId) {
             healthRecheck({
               variables: {
-                checkId: checkId,
-                compId: activeCheck.id,
+                checkId: friendlyId,
+                compId: component?.id,
                 sbomId: sbomId
               }
             }).then((res) => res?.data && refetch())
@@ -325,15 +335,81 @@ const CpeModal = ({
     }
   }
 
+  const [createRule] = useMutation(AutomationRuleCreate)
+
+  const conditionsAttributes = [
+    {
+      subject: 'component',
+      operator: 'is',
+      field: 'component_name',
+      value: component?.name
+    },
+    {
+      subject: 'component',
+      operator: 'is',
+      field: 'component_version',
+      value: component?.version
+    }
+  ]
+
+  const actionsAttributes = [
+    {
+      subject: 'component',
+      field: 'component_cpe',
+      value: cpeString
+    }
+  ]
+
+  const handleRuleCreate = async () => {
+    if (status === 'resolved') {
+      localStorage.setItem('activeProdTab', 2)
+      navigate(`/vendor/products/${params.productgroupid}/env/${productId}`)
+    } else {
+      await createRule({
+        variables: {
+          name: shortDesc,
+          active: true,
+          projectId: productId,
+          automationConditionsAttributes: conditionsAttributes,
+          automationActionsAttributes: actionsAttributes
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleCreate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
+        } else {
+          toast({
+            description: 'Rule added successfully',
+            duration: 3000,
+            status: 'success',
+            position: 'top'
+          })
+          onClose()
+        }
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (status === 'resolved') {
+      setCpeValue(component?.cpes[0] || '')
+    }
+  }, [component?.cpes, prodCompDispatch, setCpeValue, status])
+
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} size={'2xl'}>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        size={'2xl'}
+        motionPreset='slideInBottom'
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>CPE Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {activeCheck && (
+            {component && (
               <Flex
                 width='100%'
                 direction={'row'}
@@ -343,12 +419,8 @@ const CpeModal = ({
                 gap={2}
                 mb={6}
               >
-                <Text wordBreak={'break-all'}>
-                  {activeCheck.name ? activeCheck.name : ''}
-                </Text>
-                {activeCheck.version && (
-                  <Tag colorScheme='blue'>{activeCheck.version}</Tag>
-                )}
+                <Text wordBreak={'break-all'}>{component?.name || ''}</Text>
+                <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
               </Flex>
             )}
             {activeComp && (
@@ -563,6 +635,15 @@ const CpeModal = ({
               justifyContent={'flex-end'}
               alignItems={'center'}
             >
+              <Button
+                hidden={friendlyId ? false : true}
+                fontSize={'sm'}
+                colorScheme='blue'
+                mr={'auto'}
+                onClick={handleRuleCreate}
+              >
+                {status === 'resolved' ? 'View Rule' : 'Save as Rule'}
+              </Button>
               <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
                 Cancel
               </Button>
@@ -570,7 +651,8 @@ const CpeModal = ({
                 fontSize={'sm'}
                 variant='solid'
                 colorScheme={'blue'}
-                onClick={checkId ? handleComUpdate : handleSave}
+                onClick={friendlyId ? handleComUpdate : handleSave}
+                hidden={status === 'resolved'}
               >
                 Save
               </Button>

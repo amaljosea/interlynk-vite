@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
@@ -16,14 +16,28 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  ModalOverlay
+  ModalOverlay,
+  useToast
 } from '@chakra-ui/react'
 
 import { recheckHealth, supplierCreate, supplierUpdate } from 'graphQL/Mutation'
+import { AutomationRuleCreate } from 'graphQL/Mutation'
 
-const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
+const PriSupplierModal = ({
+  isOpen,
+  onClose,
+  refetch,
+  suppliers,
+  activeRow
+}) => {
+  const toast = useToast()
   const params = useParams()
+  const navigate = useNavigate()
   const sbomId = params.sbomid
+  const productId = params.productid
+
+  const { status, sbom } = activeRow || ''
+  const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
 
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')
@@ -94,9 +108,9 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
     })
       .then((res) => {
         res?.data && refetch()
-        if (checkId) {
+        if (friendlyId) {
           healthRecheck({
-            variables: { sbomId: sbomId, checkId: checkId }
+            variables: { sbomId: sbomId, checkId: friendlyId }
           })
         }
       })
@@ -117,12 +131,104 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
       .finally(() => onClose())
   }
 
+  const [createRule] = useMutation(AutomationRuleCreate)
+
+  const conditionsAttributes = [
+    {
+      subject: 'version',
+      operator: 'not_exists',
+      field: 'version_supplier_name',
+      value: undefined
+    },
+    {
+      subject: 'version',
+      operator: 'not_exists',
+      field: 'version_supplier_url',
+      value: undefined
+    },
+    {
+      subject: 'version',
+      operator: 'not_exists',
+      field: 'version_supplier_contact_name',
+      value: undefined
+    },
+    {
+      subject: 'version',
+      operator: 'not_exists',
+      field: 'version_supplier_contact_email',
+      value: undefined
+    }
+  ]
+
+  const actionsAttributes = [
+    {
+      subject: 'version',
+      field: 'version_supplier_name',
+      value: orgName
+    },
+    {
+      subject: 'version',
+      field: 'version_supplier_url',
+      value: orgUrl
+    },
+    {
+      subject: 'version',
+      field: 'version_supplier_contact_name',
+      value: supName
+    },
+    {
+      subject: 'version',
+      field: 'version_supplier_contact_email',
+      value: supEmail
+    }
+  ]
+
+  const handleRuleCreate = async () => {
+    if (status === 'resolved') {
+      localStorage.setItem('activeProdTab', 2)
+      navigate(`/vendor/products/${params.productgroupid}/env/${productId}`)
+    } else {
+      await createRule({
+        variables: {
+          name: shortDesc,
+          active: true,
+          projectId: productId,
+          automationConditionsAttributes: conditionsAttributes,
+          automationActionsAttributes: actionsAttributes
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleCreate?.errors
+        if (errors?.length > 0) {
+          console.log(errors[0])
+        } else {
+          toast({
+            description: 'Rule added successfully',
+            duration: 3000,
+            status: 'success',
+            position: 'top'
+          })
+          onClose()
+        }
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (status === 'resolved' && sbom?.suppliers?.length > 0) {
+      const { suppliers } = sbom
+      setOrgName(suppliers[0]?.name)
+      setOrgUrl(suppliers[0]?.url)
+      setSupName(suppliers[0]?.contactName)
+      setSupEmail(suppliers[0]?.contactEmail)
+    }
+  }, [sbom, status])
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add {checkId ? 'SBOM' : ''} Supplier</ModalHeader>
+          <ModalHeader>Add {friendlyId ? 'SBOM' : ''} Supplier</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Flex width={'100%'} direction={'column'} gap={4}>
@@ -185,13 +291,24 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
               justifyContent={'flex-end'}
               alignItems={'center'}
             >
+              <Button
+                hidden={friendlyId ? false : true}
+                fontSize={'sm'}
+                colorScheme='blue'
+                mr={'auto'}
+                onClick={handleRuleCreate}
+                isDisabled={isInvalid}
+              >
+                {status === 'resolved' ? 'View Rule' : 'Save as Rule'}
+              </Button>
               <Button colorScheme='gray' mr={3} onClick={onClose}>
                 Cancel
               </Button>
               <Button
                 colorScheme='blue'
+                isDisabled={isInvalid}
+                hidden={status === 'resolved'}
                 onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
-                disabled={isInvalid}
               >
                 {suppliers?.length > 0 ? 'Update' : 'Save'}
               </Button>
