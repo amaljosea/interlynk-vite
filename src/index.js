@@ -17,12 +17,12 @@ import { GlobalStateProvider } from 'hooks/useGlobalState'
 
 import './main.css'
 
-const env = process.env.NODE_ENV
+const { hostname } = window.location
 
 const TRACKING_ID = '411749268'
 const tagManagerArgs = { gtmId: 'G-VDPMCV382D' }
-env === 'production' && ReactGA.initialize(TRACKING_ID)
-env === 'production' && TagManager.initialize(tagManagerArgs)
+hostname === 'app.interlynk.io' && ReactGA.initialize(TRACKING_ID)
+hostname === 'app.interlynk.io' && TagManager.initialize(tagManagerArgs)
 
 Sentry.init({
   environment: window.location.hostname,
@@ -45,7 +45,7 @@ ReactDOM.render(
     <BrowserRouter>
       <GlobalStateProvider>
         <ChakraProvider theme={theme} resetCSS={true}>
-          <ChatbotPreview env={env} />
+          <ChatbotPreview />
           <ScrollToTop />
           <ApolloWrapper>
             <MainRoutes />

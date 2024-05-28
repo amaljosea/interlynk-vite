@@ -1,6 +1,5 @@
-export const loadHubSpotScript = (env) => {
-  console.log('ENV', env)
-  if (env === 'production') {
+export const loadHubSpotScript = (hostname) => {
+  if (hostname === 'app.interlynk.io') {
     const scriptSrc = '//js-na1.hs-scripts.com/39814957.js'
     const script = document.createElement('script')
     script.src = scriptSrc
