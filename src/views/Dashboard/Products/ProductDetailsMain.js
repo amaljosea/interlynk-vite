@@ -25,6 +25,7 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
+  Tag,
   Text,
   Tooltip,
   UnorderedList,
@@ -488,6 +489,14 @@ const ProductDetailsMain = () => {
                 </TabPanel>
                 {/* VULNERABILITIES */}
                 <TabPanel px={0}>
+                  <Tag
+                    size='lg'
+                    colorScheme='orange'
+                    hidden={vulnScanningEnabled}
+                    mb={4}
+                  >
+                    Automatic Vulnerabilty Scanning is Disabled Under Settings
+                  </Tag>
                   <GlobalVulnTable
                     loading={globalVulnloading}
                     vulns={nodes}
@@ -501,6 +510,14 @@ const ProductDetailsMain = () => {
                 </TabPanel>
                 {/* AUTOMATIONS */}
                 <TabPanel px={0}>
+                  <Tag
+                    size='lg'
+                    colorScheme='orange'
+                    hidden={automatedFixesEnabled}
+                    mb={4}
+                  >
+                    Automation Rule is Disabled Under Settings
+                  </Tag>
                   <Automation />
                 </TabPanel>
                 {/* SETTINGS */}
