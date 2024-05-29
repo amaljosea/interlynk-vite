@@ -221,46 +221,40 @@ const Parts = ({ sbomRefetch }) => {
     }
   }
 
-  const activeGroup =
-    allProjects &&
-    allProjects?.organization?.projectGroups?.nodes.find(
+  const getSbomVersions = () => {
+    if (!selectedGroup) {
+      return []
+    }
+
+    if (!selectedProd) {
+      return []
+    }
+
+    const activeGroup = allProjects?.organization?.projectGroups?.nodes.find(
       (item) => item.id === selectedGroup
     )
 
-  const product = activeGroup?.projects?.find(
-    (item) => item.id === selectedProd
-  )
+    const activeEnv = activeGroup?.projects?.find(
+      (item) => item.id === selectedProd
+    )
 
-  const existingVersions = []
+    const allSboms = activeEnv.sboms
 
-  sbomParts?.map((item) =>
-    existingVersions.push({
-      group: item?.part?.project?.projectGroup?.name,
-      env: item?.part?.project?.name,
-      version: item?.part?.projectVersion
+    const allowedSboms = allSboms.filter((item) => {
+      const previousUrls = partsContext.parts.map((i) => i.url)
+      const allUrl = [...previousUrls, location.pathname]
+      const urlHasId = allUrl.find((url) => url.includes(item.id))
+      return !urlHasId
     })
-  )
 
-  const sbomVersions = []
+    return allowedSboms.map((sbom) => ({
+      label: sbom?.projectVersion,
+      value: sbom?.id,
+      creationAt: sbom?.createdAt
+    }))
+  }
 
-  product?.sboms?.length > 0 &&
-    product.sboms.map((project) => {
-      const myProduct = {
-        group: product?.projectGroup?.name,
-        env: product?.name,
-        version: project?.projectVersion
-      }
-      const isVersionIncluded = existingVersions?.some(
-        (item) => JSON.stringify(item) === JSON.stringify(myProduct)
-      )
-      if (!isVersionIncluded) {
-        sbomVersions.push({
-          label: project?.projectVersion,
-          value: project?.id,
-          creationAt: project?.createdAt
-        })
-      }
-    })
+  const sbomVersions = getSbomVersions()
 
   const onSelectPart = () => {
     partsContext.push()
@@ -665,22 +659,13 @@ const Parts = ({ sbomRefetch }) => {
                     onChange={handleSelectGroup}
                   >
                     <option value={''}>-- Select --</option>
-                    {allProjects?.organization?.projectGroups?.nodes
-                      .filter((item) => {
-                        const previousUrls = partsContext.parts.map(
-                          (i) => i.url
-                        )
-                        const allUrl = [...previousUrls, location.pathname]
-                        const urlHasId = allUrl.find((url) =>
-                          url.includes(item.id)
-                        )
-                        return !urlHasId
-                      })
-                      .map((item, index) => (
+                    {allProjects?.organization?.projectGroups?.nodes.map(
+                      (item, index) => (
                         <option key={index} value={item.id}>
                           {item.name}
                         </option>
-                      ))}
+                      )
+                    )}
                   </Select>
                 </FormControl>
                 {/* ENVIRONMENTS */}

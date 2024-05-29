@@ -21,7 +21,7 @@ export const useProductParts = () => {
   const { versionName, projectGroupName } = useSbom({
     projectId: params?.productid,
     sbomId: params?.sbomid,
-    skip: !isParts
+    skip: !(params?.sbomid && params?.productid)
   })
 
   const pop = () => {
