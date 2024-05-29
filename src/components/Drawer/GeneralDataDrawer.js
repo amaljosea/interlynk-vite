@@ -347,13 +347,13 @@ const GeneralDataDrawer = ({
                             .map((item, index) => (
                               <Tr key={index}>
                                 <Td pl={0} fontSize={'xs'}>
+                                  {item.vendor}
+                                </Td>
+                                <Td pl={0} fontSize={'xs'}>
                                   {item.name}
                                 </Td>
                                 <Td pl={0} fontSize={'xs'}>
                                   {item.version}
-                                </Td>
-                                <Td pl={0} fontSize={'xs'}>
-                                  {item.vendor}
                                 </Td>
                                 <Td pl={0} fontSize={'xs'}>
                                   {timeSince(item.updatedAt)}
