@@ -1667,6 +1667,7 @@ export const AutomationRuleUpdate = gql`
     $active: Boolean
     $name: String
     $description: String
+    $priority: Int
     $automationActionsAttributes: [AutomationActionAttributesInput!]
     $automationConditionsAttributes: [AutomationConditionAttributesInput!]
   ) {
@@ -1675,6 +1676,7 @@ export const AutomationRuleUpdate = gql`
         id: $id
         active: $active
         name: $name
+        priority: $priority
         description: $description
         automationConditionsAttributes: $automationConditionsAttributes
         automationActionsAttributes: $automationActionsAttributes

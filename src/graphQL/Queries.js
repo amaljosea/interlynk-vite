@@ -2428,6 +2428,7 @@ export const GetProjectCheck = gql`
           projectId
           updatedAt
           isSystem
+          priority
           automationActions {
             id
             field

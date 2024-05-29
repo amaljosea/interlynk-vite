@@ -759,13 +759,14 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
           </Flex>
         </ModalBody>
         <ModalFooter mt={2}>
-          <Button colorScheme='gray' mr={3} onClick={onClose}>
+          <Button colorScheme='gray' mr={3} onClick={onClose} hidden={isSystem}>
             Cancel
           </Button>
           <Button
             colorScheme='blue'
-            isDisabled={submitError || isSystem}
+            isDisabled={submitError}
             onClick={data ? handleRuleUpdate : handleRuleCreate}
+            hidden={isSystem}
           >
             {data ? 'Update' : 'Create'}
           </Button>
