@@ -25,6 +25,8 @@ import { updateOrgComp } from 'graphQL/Mutation'
 import { createOrgComp } from 'graphQL/Mutation'
 import { getInternalComponents } from 'graphQL/Queries'
 
+import { TextRegex } from './TestRegex'
+
 const checkIfRegexError = (text) => text.includes('not a valid regex')
 const checkIfDuplicateError = (text) =>
   text.includes('str has already been taken')
@@ -79,9 +81,8 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
   }
 
   return (
-    <Modal isOpen={true} onClose={onClose} size={'2xl'}>
+    <Modal isOpen={true} onClose={onClose} size='6xl'>
       <ModalOverlay />
-
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -92,50 +93,57 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
           <ModalHeader>{mutateText} Internal Component</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <FormControl isInvalid={!!errorText} isRequired>
-              <FormLabel>Regular Expression</FormLabel>
-              <Input
-                autoFocus
-                placeholder='orgname'
-                required
-                value={matchStr}
-                onChange={(e) => setMatchStr(e.target.value)}
-                bg={'white'}
-              />
-              {!!errorText && <FormErrorMessage>{errorText}</FormErrorMessage>}
-            </FormControl>
-            <FormControl mt={3}>
-              <Checkbox
-                defaultChecked={ignoreCase}
-                onChange={() => {
-                  setIgnoreCase(!ignoreCase)
-                }}
-              >
-                Case insensitive
-              </Checkbox>
-            </FormControl>
-            <Box py={3}>
-              <Text>Tips:</Text>
-              <UnorderedList mx={10}>
-                <li>{'// are not required'}</li>
-                <li>
-                  <strong>^myname</strong> matches components whose name{' '}
-                  <strong>start with myname</strong>
-                </li>
-                <li>
-                  <strong>myname$</strong> matches components whose name{' '}
-                  <strong>ends with myname</strong>
-                </li>
-                <li>
-                  <strong>myname </strong> matches components whose name
-                  <strong> includes myname</strong>
-                </li>
-              </UnorderedList>
-              <Text>Note:</Text>
-              <UnorderedList mx={10}>
-                <li>All existing and future components will be tagged</li>
-              </UnorderedList>
-            </Box>
+            <div>
+              <div>
+                <FormControl isInvalid={!!errorText} isRequired>
+                  <FormLabel>Regular Expression</FormLabel>
+                  <Input
+                    autoFocus
+                    placeholder='orgname'
+                    required
+                    value={matchStr}
+                    onChange={(e) => setMatchStr(e.target.value)}
+                    bg={'white'}
+                  />
+                  {!!errorText && (
+                    <FormErrorMessage>{errorText}</FormErrorMessage>
+                  )}
+                </FormControl>
+                <FormControl mt={3}>
+                  <Checkbox
+                    defaultChecked={ignoreCase}
+                    onChange={() => {
+                      setIgnoreCase(!ignoreCase)
+                    }}
+                  >
+                    Case insensitive
+                  </Checkbox>
+                </FormControl>
+                <Box py={3}>
+                  <Text fontWeight='bold'>Tips:</Text>
+                  <UnorderedList mx={10}>
+                    <li>{'// are not required'}</li>
+                    <li>
+                      <strong>^myname</strong> matches components whose name{' '}
+                      <strong>start with myname</strong>
+                    </li>
+                    <li>
+                      <strong>myname$</strong> matches components whose name{' '}
+                      <strong>ends with myname</strong>
+                    </li>
+                    <li>
+                      <strong>myname </strong> matches components whose name
+                      <strong> includes myname</strong>
+                    </li>
+                  </UnorderedList>
+                  <Text fontWeight='bold'>Note:</Text>
+                  <UnorderedList mx={10}>
+                    <li>All existing and future components will be tagged</li>
+                  </UnorderedList>
+                </Box>
+              </div>
+              <TextRegex regex={matchStr} />
+            </div>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme='gray' mr={3} onClick={onClose}>
