@@ -449,12 +449,9 @@ const ProductTable = ({
       id: 'VERSIONS',
       name: 'VERSIONS',
       selector: (row) => {
-        const { projects } = row
-        const totalSbom = projects?.reduce(
-          (count, project) => count + project?.sboms?.length || 0,
-          0
-        )
-        return <Text>{totalSbom || 0}</Text>
+        const { sbomsCount } = row
+
+        return <Text>{sbomsCount || 0}</Text>
       },
       wrap: true,
       right: 'true'

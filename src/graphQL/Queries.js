@@ -386,21 +386,15 @@ export const GetProductTable = gql`
           id
           name
           enabled
+          sbomsCount
           defaultProject {
             id
           }
           projects {
             id
             name
-            description
-            updatedAt
-            enabled
-            sboms {
-              id
-            }
           }
           description
-          enabled
           updatedAt
         }
       }
