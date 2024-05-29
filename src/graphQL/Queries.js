@@ -2234,6 +2234,7 @@ export const GetCheckResults = gql`
           sbomId
           sbom {
             spec
+            licensesExp
             authors {
               name
               email

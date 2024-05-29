@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
@@ -32,7 +32,6 @@ const PriSupplierModal = ({
 }) => {
   const toast = useToast()
   const params = useParams()
-  const navigate = useNavigate()
   const sbomId = params.sbomid
   const productId = params.productid
 
@@ -184,33 +183,28 @@ const PriSupplierModal = ({
   ]
 
   const handleRuleCreate = async () => {
-    if (status === 'resolved') {
-      localStorage.setItem('activeProdTab', 2)
-      navigate(`/vendor/products/${params.productgroupid}/env/${productId}`)
-    } else {
-      await createRule({
-        variables: {
-          name: shortDesc,
-          active: true,
-          projectId: productId,
-          automationConditionsAttributes: conditionsAttributes,
-          automationActionsAttributes: actionsAttributes
-        }
-      }).then((res) => {
-        const errors = res?.data?.automationRuleCreate?.errors
-        if (errors?.length > 0) {
-          console.log(errors[0])
-        } else {
-          toast({
-            description: 'Rule added successfully',
-            duration: 3000,
-            status: 'success',
-            position: 'top'
-          })
-          onClose()
-        }
-      })
-    }
+    await createRule({
+      variables: {
+        name: shortDesc,
+        active: true,
+        projectId: productId,
+        automationConditionsAttributes: conditionsAttributes,
+        automationActionsAttributes: actionsAttributes
+      }
+    }).then((res) => {
+      const errors = res?.data?.automationRuleCreate?.errors
+      if (errors?.length > 0) {
+        console.log(errors[0])
+      } else {
+        toast({
+          description: 'Rule added successfully',
+          duration: 3000,
+          status: 'success',
+          position: 'top'
+        })
+        onClose()
+      }
+    })
   }
 
   useEffect(() => {
@@ -299,7 +293,7 @@ const PriSupplierModal = ({
                 onClick={handleRuleCreate}
                 isDisabled={isInvalid}
               >
-                {status === 'resolved' ? 'View Rule' : 'Save as Rule'}
+                Save as Rule
               </Button>
               <Button colorScheme='gray' mr={3} onClick={onClose}>
                 Cancel

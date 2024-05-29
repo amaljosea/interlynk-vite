@@ -1,6 +1,6 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
@@ -44,7 +44,6 @@ import { GetComponentData } from 'graphQL/Queries'
 const CheckModal = ({ isOpen, onClose, refetch, activeRow, componentId }) => {
   const toast = useToast()
   const params = useParams()
-  const navigate = useNavigate()
   const productId = params.productid
   const sbomId = params.sbomid
 
@@ -241,33 +240,28 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, componentId }) => {
   }
 
   const handleRuleCreate = async () => {
-    if (status === 'resolved') {
-      localStorage.setItem('activeProdTab', 2)
-      navigate(`/vendor/products/${params.productgroupid}/env/${productId}`)
-    } else {
-      await createRule({
-        variables: {
-          name: shortDesc,
-          active: true,
-          projectId: productId,
-          automationConditionsAttributes: getConditionsAttributes(),
-          automationActionsAttributes: getActionsAttributes()
-        }
-      }).then((res) => {
-        const errors = res?.data?.automationRuleCreate?.errors
-        if (errors?.length > 0) {
-          setError(errors[0])
-        } else {
-          toast({
-            description: 'Rule added successfully',
-            duration: 3000,
-            status: 'success',
-            position: 'top'
-          })
-          onClose()
-        }
-      })
-    }
+    await createRule({
+      variables: {
+        name: shortDesc,
+        active: true,
+        projectId: productId,
+        automationConditionsAttributes: getConditionsAttributes(),
+        automationActionsAttributes: getActionsAttributes()
+      }
+    }).then((res) => {
+      const errors = res?.data?.automationRuleCreate?.errors
+      if (errors?.length > 0) {
+        setError(errors[0])
+      } else {
+        toast({
+          description: 'Rule added successfully',
+          duration: 3000,
+          status: 'success',
+          position: 'top'
+        })
+        onClose()
+      }
+    })
   }
 
   const isInvalidLicense =
@@ -431,7 +425,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, componentId }) => {
                 mr={'auto'}
                 onClick={handleRuleCreate}
               >
-                {status === 'resolved' ? 'View Rule' : 'Save as Rule'}
+                Save as Rule
               </Button>
               <Button fontSize={'sm'} onClick={onClose}>
                 Close

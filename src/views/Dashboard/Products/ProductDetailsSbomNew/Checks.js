@@ -46,9 +46,7 @@ import {
   GetProductData
 } from 'graphQL/Queries'
 
-import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
-import { GoSkip } from 'react-icons/go'
 
 import CheckFilters from './CheckFilters'
 
@@ -470,19 +468,6 @@ const Checks = () => {
     }
   }
 
-  const updateIssue = async (id) => {
-    await updateResult({
-      variables: {
-        id: id,
-        status: 'ignored'
-      }
-    }).then((res) => {
-      if (res?.data) {
-        handleRefetch()
-      }
-    })
-  }
-
   const handleCreateCpe = (string) => {
     const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
@@ -624,35 +609,20 @@ const Checks = () => {
       id: 'RESOLUTION',
       name: 'RESOLUTION',
       selector: (row) => {
-        const { status, id } = row
+        const { status } = row
         return (
           <>
             {status === 'unresolved' && (
-              <Stack direction={'row'} alignItems={'center'} spacing={2}>
-                <Tooltip label='Fix'>
-                  <IconButton
-                    size='sm'
-                    variant='solid'
-                    colorScheme='blue'
-                    fontWeight='normal'
-                    icon={<BiSolidWrench size={18} />}
-                    onClick={() => onCheckOpen(row)}
-                    disabled={customerView || !editChecks || !updateSboms}
-                  />
-                </Tooltip>
-
-                <Tooltip label='Ignore'>
-                  <IconButton
-                    size='sm'
-                    variant='solid'
-                    colorScheme='blue'
-                    fontWeight='normal'
-                    icon={<GoSkip size={18} />}
-                    onClick={() => updateIssue(id)}
-                    disabled={customerView || !editChecks || !updateSboms}
-                  />
-                </Tooltip>
-              </Stack>
+              <Button
+                size='sm'
+                variant='solid'
+                colorScheme='blue'
+                fontWeight='normal'
+                onClick={() => onCheckOpen(row)}
+                disabled={customerView || !editChecks || !updateSboms}
+              >
+                Fixed
+              </Button>
             )}
 
             {status === 'resolved' && (
@@ -665,18 +635,6 @@ const Checks = () => {
                 leftIcon={<CheckIcon />}
               >
                 View
-              </Button>
-            )}
-
-            {status === 'ignored' && (
-              <Button
-                width={'70px'}
-                size='sm'
-                fontSize={'xs'}
-                variant='solid'
-                colorScheme='blackAlpha'
-              >
-                Ignored
               </Button>
             )}
           </>
@@ -725,7 +683,7 @@ const Checks = () => {
             <LicenseModal
               isOpen={isDataLicenseOpen}
               onClose={onDataLicenseClose}
-              checkId={activeRow.organizationRule.rule.friendlyId}
+              activeRow={activeRow}
               refetch={handleRefetch}
               data={sbomData}
             />

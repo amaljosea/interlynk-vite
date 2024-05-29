@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { typeOptions } from 'utils'
 
 import {
@@ -50,7 +50,6 @@ const PurlModal = ({
 
   const toast = useToast()
   const params = useParams()
-  const navigate = useNavigate()
   const sbomId = params.sbomid
   const productId = params.productid
 
@@ -560,33 +559,28 @@ const PurlModal = ({
   ]
 
   const handleRuleCreate = async () => {
-    if (status === 'resolved') {
-      localStorage.setItem('activeProdTab', 2)
-      navigate(`/vendor/products/${params.productgroupid}/env/${productId}`)
-    } else {
-      await createRule({
-        variables: {
-          name: shortDesc,
-          active: true,
-          projectId: productId,
-          automationConditionsAttributes: conditionsAttributes,
-          automationActionsAttributes: actionsAttributes
-        }
-      }).then((res) => {
-        const errors = res?.data?.automationRuleCreate?.errors
-        if (errors?.length > 0) {
-          console.log(errors[0])
-        } else {
-          toast({
-            description: 'Rule added successfully',
-            duration: 3000,
-            status: 'success',
-            position: 'top'
-          })
-          onClose()
-        }
-      })
-    }
+    await createRule({
+      variables: {
+        name: shortDesc,
+        active: true,
+        projectId: productId,
+        automationConditionsAttributes: conditionsAttributes,
+        automationActionsAttributes: actionsAttributes
+      }
+    }).then((res) => {
+      const errors = res?.data?.automationRuleCreate?.errors
+      if (errors?.length > 0) {
+        console.log(errors[0])
+      } else {
+        toast({
+          description: 'Rule added successfully',
+          duration: 3000,
+          status: 'success',
+          position: 'top'
+        })
+        onClose()
+      }
+    })
   }
 
   useEffect(() => {
@@ -817,7 +811,7 @@ const PurlModal = ({
                 mr={'auto'}
                 onClick={handleRuleCreate}
               >
-                {status === 'resolved' ? 'View Rule' : 'Save as Rule'}
+                Save as Rule
               </Button>
               <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
                 Cancel
