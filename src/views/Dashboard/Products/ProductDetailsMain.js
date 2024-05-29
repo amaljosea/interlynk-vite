@@ -490,12 +490,13 @@ const ProductDetailsMain = () => {
                 {/* VULNERABILITIES */}
                 <TabPanel px={0}>
                   <Tag
-                    size='lg'
+                    size='sm'
                     colorScheme='orange'
                     hidden={vulnScanningEnabled}
                     mb={4}
                   >
-                    Automatic Vulnerabilty Scanning is Disabled Under Settings
+                    Automatic vulnerabilty scan is disabled under Product
+                    Settings
                   </Tag>
                   <GlobalVulnTable
                     loading={globalVulnloading}
@@ -511,12 +512,12 @@ const ProductDetailsMain = () => {
                 {/* AUTOMATIONS */}
                 <TabPanel px={0}>
                   <Tag
-                    size='lg'
+                    size='sm'
                     colorScheme='orange'
                     hidden={automatedFixesEnabled}
                     mb={4}
                   >
-                    Automation Rule is Disabled Under Settings
+                    Automation is disabled under Product Settings
                   </Tag>
                   <Automation />
                 </TabPanel>
