@@ -14,7 +14,6 @@ import {
   Flex,
   FormControl,
   FormErrorMessage,
-  FormHelperText,
   FormLabel,
   HStack,
   Icon,
@@ -396,10 +395,6 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
                           ))}
                       </Flex>
                     )}
-                    <FormHelperText>
-                      <p>ID should be either a CPE or PURL</p>
-                      <p>ID uses only product-name & version fields.</p>
-                    </FormHelperText>
                   </FormControl>
                   <Button
                     fontSize={'sm'}
