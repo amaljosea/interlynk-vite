@@ -149,13 +149,9 @@ const Policies = () => {
       name: 'VIOLATIONS',
       selector: (row) => {
         const { resultType, policyRuleViolations } = row
+        const { totalCount } = policyRuleViolations || ''
         return (
-          <Tag
-            width={'60px'}
-            colorScheme={
-              policyRuleViolations?.totalCount === 0 ? 'red' : 'blue'
-            }
-          >
+          <Tag width={'60px'} colorScheme={totalCount === 0 ? 'green' : 'blue'}>
             <TagLabel mx={'auto'} pt={0.5}>
               {resultType === 'pass' || resultType === 'skip'
                 ? 0
