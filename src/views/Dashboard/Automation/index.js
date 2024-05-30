@@ -9,15 +9,9 @@ import {
   updatedValue
 } from 'utils'
 
-import {
-  AddIcon,
-  ArrowDownIcon,
-  ArrowUpIcon,
-  RepeatIcon
-} from '@chakra-ui/icons'
+import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
   Flex,
-  HStack,
   IconButton,
   List,
   ListItem,
@@ -49,6 +43,7 @@ import {
 } from 'graphQL/Queries'
 
 import { FaEllipsisV } from 'react-icons/fa'
+import { MdDragIndicator } from 'react-icons/md'
 
 import CreateRule from './components/CreateRule'
 import DeleteWarning from './components/DeleteWarning'
@@ -82,7 +77,9 @@ const Automation = () => {
   )
 
   const [deleteRule] = useMutation(AutomationRuleDelete)
-  const [updateRule] = useMutation(AutomationRuleUpdate)
+  const [updateRule] = useMutation(AutomationRuleUpdate, {
+    fetchPolicy: 'network-only'
+  })
 
   const product = userPermissions?.find((item) => item.key === 'view_product')
   const editAutomations = product?.supersededBy?.some(
@@ -145,30 +142,49 @@ const Automation = () => {
     })
   }
 
-  const onChangeOrder = async (row, direction) => {
-    const { priority } = row
-    await updateRule({
-      variables: {
-        id: row?.id,
-        priority: direction === 'up' ? priority - 1 : priority + 1
-      }
-    }).then((res) => {
-      const errors = res?.data?.automationRuleUpdate?.errors
-      if (errors?.length > 0) {
-        toast({
-          description: errors[0],
-          status: 'error',
-          position: 'top',
-          duration: 2000
-        })
-      } else {
-        refetch()
-      }
-    })
+  const moveRow = (e, row) => {
+    e.preventDefault()
+    if (row) {
+      updateRule({
+        variables: {
+          id: activeRow?.id,
+          priority: row?.priority
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleUpdate?.errors
+        if (errors?.length > 0) {
+          toast({
+            description: errors[0],
+            status: 'error',
+            position: 'top',
+            duration: 2000
+          })
+        } else {
+          refetch()
+        }
+      })
+    }
   }
 
   // COLUMNS
   const columns = [
+    // ACTIVE
+    {
+      id: 'priority',
+      name: '',
+      selector: (row) => {
+        return (
+          <div
+            draggable
+            onDrag={() => setActiveRow(row)}
+            onDrop={(e) => moveRow(e, row)}
+          >
+            <MdDragIndicator size={20} cursor={'move'} color='darkgray' />
+          </div>
+        )
+      },
+      width: '5%'
+    },
     // ACTIVE
     {
       id: 'active',
@@ -321,65 +337,44 @@ const Automation = () => {
     {
       id: 'actions',
       name: 'ACTIONS',
-      selector: (row, index) => {
+      selector: (row) => {
         const { isSystem } = row
         return (
-          <HStack>
-            {/* PRIORITY */}
-            <HStack>
-              <IconButton
-                size='xs'
-                bg={'blue.100'}
-                icon={<ArrowUpIcon />}
-                cursor={'pointer'}
-                display={index === 0 ? 'none' : 'flex'}
-                onClick={() => onChangeOrder(row, 'up')}
-              />
-              <IconButton
-                size='xs'
-                bg={'blue.100'}
-                icon={<ArrowDownIcon />}
-                cursor={'pointer'}
-                display={index === nodes?.length - 1 ? 'none' : 'flex'}
-                onClick={() => onChangeOrder(row, 'down')}
-              />
-            </HStack>
-            <Menu>
-              <MenuButton
-                size='sm'
-                as={IconButton}
-                icon={<FaEllipsisV />}
-                variant='none'
-                color='gray.400'
-              />
-              <Portal>
-                <MenuList fontSize={'sm'}>
-                  {/* EDIT POLICY */}
-                  <MenuItem
-                    isDisabled={!editAutomations}
-                    onClick={() => {
-                      setActiveRow(row)
-                      onRuleOpen()
-                    }}
-                  >
-                    {isSystem ? 'View' : 'Edit'} Rule
-                  </MenuItem>
-                  {/* DELETE POLICY  */}
-                  <MenuItem
-                    color='red'
-                    onClick={() => {
-                      setActiveRow(row)
-                      onDeleteOpen()
-                    }}
-                    isDisabled={!editAutomations}
-                    hidden={isSystem}
-                  >
-                    Archive Rule
-                  </MenuItem>
-                </MenuList>
-              </Portal>
-            </Menu>
-          </HStack>
+          <Menu>
+            <MenuButton
+              size='sm'
+              as={IconButton}
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              <MenuList fontSize={'sm'}>
+                {/* EDIT POLICY */}
+                <MenuItem
+                  isDisabled={!editAutomations}
+                  onClick={() => {
+                    setActiveRow(row)
+                    onRuleOpen()
+                  }}
+                >
+                  {isSystem ? 'View' : 'Edit'} Rule
+                </MenuItem>
+                {/* DELETE POLICY  */}
+                <MenuItem
+                  color='red'
+                  onClick={() => {
+                    setActiveRow(row)
+                    onDeleteOpen()
+                  }}
+                  isDisabled={!editAutomations}
+                  hidden={isSystem}
+                >
+                  Archive Rule
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
         )
       },
       right: 'true',
@@ -433,7 +428,6 @@ const Automation = () => {
             progressPending={loading}
             subHeaderComponent={subHeaderComponent}
           />
-
           <Pagination {...paginationProps} />
         </Flex>
       </CardBody>
