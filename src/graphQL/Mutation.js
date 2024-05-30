@@ -1641,6 +1641,7 @@ export const AutomationRuleCreate = gql`
     $automationActionsAttributes: [AutomationActionAttributesInput!]
     $automationConditionsAttributes: [AutomationConditionAttributesInput!]
     $active: Boolean
+    $tag: String
   ) {
     automationRuleCreate(
       input: {
@@ -1650,6 +1651,7 @@ export const AutomationRuleCreate = gql`
         automationConditionsAttributes: $automationConditionsAttributes
         automationActionsAttributes: $automationActionsAttributes
         active: $active
+        tag: $tag
       }
     ) {
       errors

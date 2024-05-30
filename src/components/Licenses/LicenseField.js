@@ -1,5 +1,5 @@
 import { useLazyQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import ReactSelect, { components } from 'react-select'
 
@@ -24,7 +24,7 @@ import { LicenseAutoComplete } from 'graphQL/Queries'
 
 import InfoModal from '../InfoModal'
 
-const LicenseField = ({ isDisabled, sbomView, license }) => {
+const LicenseField = ({ resolved, sbomView, license }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const tab = queryParams.get('tab')
@@ -40,7 +40,7 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
     return () => {
       dispatcher({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field while unmounting
     }
-  }, [])
+  }, [dispatcher, license])
 
   const { prodCompState, dispatch, sbomState } = useGlobalState()
 
@@ -80,42 +80,45 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
     setLicenseType(selected[0]?.type)
   }
 
-  const handleInputChange = (value) => {
-    if (value !== '') {
-      dispatcher({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field
+  const handleInputChange = useCallback(
+    (value) => {
+      if (value !== '') {
+        dispatcher({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field
 
-      getLicense({
-        variables: {
-          search: value
-        }
-      }).then((res) => {
-        if (res.data) {
-          const licenses = res.data.licenseAutoComplete?.result?.map(
-            (license) => {
-              return {
-                value: license.value,
-                label: license.value,
-                type: license.type
+        getLicense({
+          variables: {
+            search: value
+          }
+        }).then((res) => {
+          if (res.data) {
+            const licenses = res.data.licenseAutoComplete?.result?.map(
+              (license) => {
+                return {
+                  value: license.value,
+                  label: license.value,
+                  type: license.type
+                }
               }
-            }
-          )
+            )
 
-          //Remove duplicates values if any. Doing this since filtering over 25 entries is not expensive
-          const uniqueLicenses = licenses?.filter(
-            (v, i, a) => a.findIndex((t) => t.value === v.value) === i
-          )
+            //Remove duplicates values if any. Doing this since filtering over 25 entries is not expensive
+            const uniqueLicenses = licenses?.filter(
+              (v, i, a) => a.findIndex((t) => t.value === v.value) === i
+            )
 
-          setLicenseList(uniqueLicenses)
-        }
-      })
-    } else {
-      setLicenseList([])
-    }
-  }
+            setLicenseList(uniqueLicenses)
+          }
+        })
+      } else {
+        setLicenseList([])
+      }
+    },
+    [dispatcher, getLicense]
+  )
 
   useEffect(() => {
     handleInputChange(debouncedSearchTerm)
-  }, [debouncedSearchTerm])
+  }, [debouncedSearchTerm, handleInputChange])
 
   const licenseInfo = `Component license refers to the licensing terms and conditions associated with a specific software component listed in the SBOM document.`
 
@@ -151,6 +154,19 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
     )
   }
 
+  const Menu = (props) => {
+    console.log(props)
+    return resolved ? null : (
+      <components.Menu {...props}>{props.children}</components.Menu>
+    )
+  }
+
+  const MenuList = (props) => {
+    return resolved ? null : (
+      <components.MenuList {...props}>{props.children}</components.MenuList>
+    )
+  }
+
   return (
     <>
       <VStack spacing={4} alignItems={'flex-start'}>
@@ -174,10 +190,10 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
           </FormLabel>
           {/* LICENSE */}
           <ReactSelect
-            isClearable
+            isClearable={resolved ? false : true}
+            isSearchable={resolved ? false : true}
             isLoading={loading}
             noOptionsMessage={() => `Please search...`}
-            isDisabled={isDisabled}
             styles={{
               control: (baseStyles, state) => {
                 return {
@@ -195,6 +211,8 @@ const LicenseField = ({ isDisabled, sbomView, license }) => {
             components={{
               DropdownIndicator: () => null,
               IndicatorSeparator: () => null,
+              Menu,
+              MenuList,
               Option
             }}
             value={licenseString}

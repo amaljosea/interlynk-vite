@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
@@ -18,25 +18,33 @@ import {
   ModalHeader,
   ModalOverlay,
   Tag,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
 
 import {
+  AutomationRuleCreate,
   addComSupplier,
   recheckHealth,
   updateComSupplier
 } from 'graphQL/Mutation'
-import { AutomationRuleCreate } from 'graphQL/Mutation'
 
-const SupplierModal = ({ id, isOpen, onClose, refetch, data, activeRow }) => {
-  const toast = useToast()
+const SupplierModal = ({
+  id,
+  data,
+  isOpen,
+  onClose,
+  refetch,
+  activeRow,
+  ruleExists
+}) => {
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
+  const navigate = useNavigate()
 
   const { status, component } = activeRow || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
+  const resolved = status === 'resolved'
 
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')
@@ -74,8 +82,8 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, data, activeRow }) => {
     }
   }, [data])
 
-  const handleSave = async () => {
-    await createSupplier({
+  const handleSave = () => {
+    createSupplier({
       variables: {
         name: orgName,
         url: orgUrl,
@@ -99,8 +107,8 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, data, activeRow }) => {
       .finally(() => onClose())
   }
 
-  const handleUpdate = async () => {
-    await updateSupplier({
+  const handleUpdate = () => {
+    updateSupplier({
       variables: {
         name: orgName,
         url: orgUrl,
@@ -176,48 +184,52 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, data, activeRow }) => {
     {
       subject: 'component',
       field: 'component_supplier_name',
-      value: orgName
+      value: orgName || undefined
     },
     {
       subject: 'component',
       field: 'component_supplier_url',
-      value: orgUrl
+      value: orgUrl || undefined
     },
     {
       subject: 'component',
       field: 'component_supplier_contact_name',
-      value: supName
+      value: supName || undefined
     },
     {
       subject: 'component',
       field: 'component_supplier_contact_email',
-      value: supEmail
+      value: supEmail || undefined
     }
   ]
 
+  const filterActions = actionsAttributes?.filter(
+    (item) => item?.value !== undefined
+  )
+
   const handleRuleCreate = async () => {
-    await createRule({
-      variables: {
-        name: shortDesc,
-        active: true,
-        projectId: productId,
-        automationConditionsAttributes: conditionsAttributes,
-        automationActionsAttributes: actionsAttributes
-      }
-    }).then((res) => {
-      const errors = res?.data?.automationRuleCreate?.errors
-      if (errors?.length > 0) {
-        console.log(errors[0])
-      } else {
-        toast({
-          description: 'Rule added successfully',
-          duration: 3000,
-          status: 'success',
-          position: 'top'
-        })
-        onClose()
-      }
-    })
+    if (ruleExists) {
+      localStorage.setItem('activeProdTab', 2)
+      navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
+    } else {
+      await createRule({
+        variables: {
+          name: shortDesc,
+          active: true,
+          tag: friendlyId,
+          projectId: productId,
+          automationConditionsAttributes: conditionsAttributes,
+          automationActionsAttributes: filterActions
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleCreate?.errors
+        if (errors?.length > 0) {
+          console.log(errors[0])
+        } else {
+          handleSave()
+        }
+      })
+    }
   }
 
   const isInvalid =
@@ -277,7 +289,7 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, data, activeRow }) => {
             </Flex>
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* ORG NAME */}
-              <FormControl isRequired>
+              <FormControl isRequired isDisabled={resolved}>
                 <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
                 <Input
                   placeholder='Enter organization name'
@@ -287,6 +299,7 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, data, activeRow }) => {
               </FormControl>
               {/* ORG URL */}
               <FormControl
+                isDisabled={resolved}
                 isInvalid={
                   (orgUrl !== '' && !validateUrl(orgUrl)) || containsSpace
                 }
@@ -301,7 +314,10 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, data, activeRow }) => {
                 <FormErrorMessage>{isValidUrl}</FormErrorMessage>
               </FormControl>
               {/* SUPPLIER NAME */}
-              <FormControl isInvalid={supName !== '' && nameError !== ''}>
+              <FormControl
+                isInvalid={supName !== '' && nameError !== ''}
+                isDisabled={resolved}
+              >
                 <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
                 <Input
                   placeholder='Enter supplier name'
@@ -312,6 +328,7 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, data, activeRow }) => {
               </FormControl>
               {/* SUPPLIER EMAIL */}
               <FormControl
+                isDisabled={resolved}
                 isInvalid={supEmail !== '' && !validateEmail(supEmail)}
               >
                 <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
@@ -343,7 +360,7 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, data, activeRow }) => {
                 onClick={handleRuleCreate}
                 isDisabled={isInvalid}
               >
-                Save as Rule
+                {ruleExists ? 'View' : 'Save as'} Rule
               </Button>
               <Button colorScheme='gray' onClick={onClose}>
                 Cancel
@@ -351,7 +368,7 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, data, activeRow }) => {
               <Button
                 colorScheme='blue'
                 isDisabled={isInvalid}
-                hidden={status === 'resolved'}
+                hidden={resolved}
                 onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
               >
                 {suppliers?.length > 0 ? 'Update' : 'Save'}

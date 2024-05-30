@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { typeOptions } from 'utils'
 
 import {
@@ -20,8 +20,7 @@ import {
   Select,
   Tag,
   Text,
-  Textarea,
-  useToast
+  Textarea
 } from '@chakra-ui/react'
 
 import CpeInput from 'components/CpeInput'
@@ -43,15 +42,17 @@ const PurlModal = ({
   getCpe,
   activeRow,
   setIsValid,
-  activeComp
+  activeComp,
+  ruleExists
 }) => {
   const { status, component } = activeRow || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
+  const resolved = status === 'resolved'
 
-  const toast = useToast()
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
+  const navigate = useNavigate()
 
   const { prodCompState, dispatch } = useGlobalState()
   const { purlString } = prodCompState
@@ -68,6 +69,14 @@ const PurlModal = ({
   const [purlVersionList, setPurlVersionList] = useState([])
   const purlVersionRef = useRef()
   const [qualifiers, setQualifiers] = useState('')
+  const [isDisabled, setIsDisabled] = useState(false)
+
+  const disableButtonTemporarily = () => {
+    setIsDisabled(true)
+    setTimeout(() => {
+      setIsDisabled(false)
+    }, 3000)
+  }
 
   // const hasNamespace = validPurlTypes.includes(purlType)
 
@@ -107,8 +116,8 @@ const PurlModal = ({
   const [healthRecheck] = useMutation(recheckHealth)
   const [updateComponent] = useMutation(UpdateComponent)
 
-  const handleComUpdate = async () => {
-    await updateComponent({
+  const handleComUpdate = () => {
+    updateComponent({
       variables: {
         id: component?.id,
         sbomId: sbomId,
@@ -547,8 +556,18 @@ const PurlModal = ({
       operator: 'is',
       field: 'component_version',
       value: component?.version
+    },
+    {
+      subject: 'component',
+      operator: 'not_exists',
+      field: 'component_purl',
+      value: undefined
     }
   ]
+
+  const filterConditions = conditionsAttributes?.filter(
+    (item) => item?.field !== 'component_purl'
+  )
 
   const actionsAttributes = [
     {
@@ -559,28 +578,32 @@ const PurlModal = ({
   ]
 
   const handleRuleCreate = async () => {
-    await createRule({
-      variables: {
-        name: shortDesc,
-        active: true,
-        projectId: productId,
-        automationConditionsAttributes: conditionsAttributes,
-        automationActionsAttributes: actionsAttributes
-      }
-    }).then((res) => {
-      const errors = res?.data?.automationRuleCreate?.errors
-      if (errors?.length > 0) {
-        console.log(errors[0])
-      } else {
-        toast({
-          description: 'Rule added successfully',
-          duration: 3000,
-          status: 'success',
-          position: 'top'
-        })
-        onClose()
-      }
-    })
+    if (ruleExists) {
+      localStorage.setItem('activeProdTab', 2)
+      navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
+    } else {
+      disableButtonTemporarily()
+      await createRule({
+        variables: {
+          active: true,
+          name: shortDesc,
+          tag: friendlyId,
+          projectId: productId,
+          automationConditionsAttributes:
+            shortDesc === 'Component has a purl'
+              ? conditionsAttributes
+              : filterConditions,
+          automationActionsAttributes: actionsAttributes
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleCreate?.errors
+        if (errors?.length > 0) {
+          console.log(errors[0])
+        } else {
+          handleComUpdate()
+        }
+      })
+    }
   }
 
   useEffect(() => {
@@ -637,7 +660,7 @@ const PurlModal = ({
             )}
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* Package URL */}
-              <FormControl>
+              <FormControl isDisabled={resolved}>
                 <FormLabel>Package URL</FormLabel>
                 <Textarea
                   type='text'
@@ -654,7 +677,7 @@ const PurlModal = ({
                 />
               </FormControl>
               {/* Type */}
-              <FormControl>
+              <FormControl isDisabled={resolved}>
                 <FormLabel htmlFor='packageType'>Package Type</FormLabel>
                 <Select
                   size='md'
@@ -678,6 +701,7 @@ const PurlModal = ({
               purlType === 'gem' ? (
                 <CpeInput
                   name='namespace'
+                  isDisabled={resolved}
                   inputValue={namespace}
                   setInputValue={setNamespace}
                   cpeList={namespaceList}
@@ -688,7 +712,7 @@ const PurlModal = ({
                 />
               ) : namespaceOptions[purlType] &&
                 namespaceOptions[purlType].length > 0 ? (
-                <FormControl>
+                <FormControl isDisabled={resolved}>
                   <FormLabel>Namespace</FormLabel>
                   <Select
                     size='md'
@@ -708,6 +732,7 @@ const PurlModal = ({
                 </FormControl>
               ) : (
                 <FormControl
+                  isDisabled={resolved}
                   display={
                     purlType === 'nuget' || purlType === 'oci'
                       ? 'none'
@@ -731,6 +756,7 @@ const PurlModal = ({
               {isAutoComplete ? (
                 <CpeInput
                   name='packageName'
+                  isDisabled={resolved}
                   inputValue={purlName}
                   setInputValue={setPurlName}
                   cpeList={purlNameList}
@@ -740,7 +766,7 @@ const PurlModal = ({
                   onChange={onNameInputChange}
                 />
               ) : (
-                <FormControl>
+                <FormControl isDisabled={resolved}>
                   <FormLabel>Package Name</FormLabel>
                   <Input
                     type='text'
@@ -756,17 +782,18 @@ const PurlModal = ({
               {/* Version */}
               {isAutoComplete ? (
                 <CpeInput
+                  validation={false}
+                  isDisabled={resolved}
                   name='packageVersion'
                   inputValue={purlVersion}
                   setInputValue={setPurlVersion}
                   cpeList={purlVersionList}
                   setCpeList={setPurlVersionList}
                   inputRef={purlVersionRef}
-                  validation={false}
                   onChange={onVersionInputChange}
                 />
               ) : (
-                <FormControl>
+                <FormControl isDisabled={resolved}>
                   <FormLabel>Version</FormLabel>
                   <Input
                     size='md'
@@ -781,7 +808,7 @@ const PurlModal = ({
                 </FormControl>
               )}
               {/* Qualifiers */}
-              <FormControl>
+              <FormControl isDisabled={resolved}>
                 <FormLabel>Qualifiers</FormLabel>
                 <Input
                   size='md'
@@ -805,13 +832,15 @@ const PurlModal = ({
               alignItems={'center'}
             >
               <Button
+                mr={'auto'}
+                isDisabled={isDisabled}
+                isLoading={isDisabled}
                 hidden={friendlyId ? false : true}
                 fontSize={'sm'}
                 colorScheme='blue'
-                mr={'auto'}
                 onClick={handleRuleCreate}
               >
-                Save as Rule
+                {ruleExists ? 'View' : 'Save as'} Rule
               </Button>
               <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
                 Cancel
@@ -821,7 +850,7 @@ const PurlModal = ({
                 variant='solid'
                 colorScheme={'blue'}
                 onClick={friendlyId ? handleComUpdate : handleSave}
-                hidden={status === 'resolved'}
+                hidden={resolved}
                 disabled={
                   purlName === '' ||
                   purlType === '' ||

@@ -4206,3 +4206,15 @@ export const getInternalComponents = gql`
     }
   }
 `
+
+export const GetExistingRules = gql`
+  query GetExistingRules($id: Uuid!, $tag: String) {
+    project(id: $id) {
+      automationRules(tag: $tag, first: 1) {
+        nodes {
+          id
+        }
+      }
+    }
+  }
+`

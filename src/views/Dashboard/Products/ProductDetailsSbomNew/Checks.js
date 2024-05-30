@@ -46,6 +46,7 @@ import {
   GetCheckResults,
   GetProductData
 } from 'graphQL/Queries'
+import { GetExistingRules } from 'graphQL/Queries'
 
 import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
@@ -89,8 +90,6 @@ const Checks = () => {
       }
     })
 
-  const { totalRows } = paginationProps
-
   // GET HEALTH CHECK FILTER HEADS
   const { data: filterHead, refetch: filterRefetch } = useQuery(
     GetCheckFilterData,
@@ -126,10 +125,13 @@ const Checks = () => {
   const [selectedCpe, setSelectedCpe] = useState(null)
   const [checkSearch, setCheckSearch] = useState('')
   const [activeRow, setActiveRow] = useState(null)
-  const [updateResult] = useMutation(checkResultUpdate)
+  const [ruleExists, setRuleExists] = useState(false)
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
+  const [getRules, { loading: loadingRules }] = useLazyQuery(GetExistingRules)
+  const [updateResult] = useMutation(checkResultUpdate)
   const [updateComponent] = useMutation(UpdateComponent)
+  const [healthRecheck] = useMutation(recheckHealth)
   const [updateSbom] = useMutation(sbomUpdate)
 
   const creationToolBtn = useRef(null)
@@ -202,8 +204,6 @@ const Checks = () => {
     onOpen: onCardOpen,
     onClose: onCardClose
   } = useDisclosure()
-
-  const [healthRecheck] = useMutation(recheckHealth)
 
   const handleReCheck = useCallback(async () => {
     await healthRecheck({
@@ -396,9 +396,10 @@ const Checks = () => {
   }
 
   const handleOpen = (row) => {
+    setActiveRow(row)
     const { organizationRule } = row
     const { shortDesc } = organizationRule?.rule || ''
-    setActiveRow(row)
+
     // TIMESTAMP SELECTOR UI
     if (shortDesc === 'Document creation timestamp') {
       return onOpen()
@@ -517,14 +518,25 @@ const Checks = () => {
   }
 
   const onCheckOpen = (row) => {
+    setActiveRow(row)
     const { organizationRule } = row
-    const { shortDesc } = organizationRule?.rule || ''
+    const { shortDesc, friendlyId } = organizationRule?.rule || ''
     if (shortDesc === 'Component has a unique identifier') {
       handleComUpdate(row)
     } else if (shortDesc === 'Document has a unique identifier') {
       handleSbomUpdate(row)
     } else {
-      handleOpen(row)
+      getRules({ variables: { id: productId, tag: friendlyId } })
+        .then((res) => {
+          console.log(res?.data)
+          const result = res?.data?.project?.automationRules?.nodes
+          if (result?.length > 0) {
+            setRuleExists(true)
+          } else {
+            setRuleExists(false)
+          }
+        })
+        .finally(() => handleOpen(row))
     }
   }
 
@@ -683,6 +695,7 @@ const Checks = () => {
             {status === 'resolved' && (
               <Button
                 size='sm'
+                isLoading={activeRow?.id === id && loadingRules}
                 fontSize={'xs'}
                 variant='solid'
                 colorScheme='whatsapp'
@@ -713,18 +726,18 @@ const Checks = () => {
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
-          columns={columns}
+          subHeader
           data={nodes}
+          persistTableHead
+          columns={columns}
+          responsive={true}
           onSort={handleSort}
           defaultSortAsc={false}
-          defaultSortFieldId={checkState?.field}
-          customStyles={customStyles}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
-          persistTableHead
-          subHeader
+          customStyles={customStyles}
           subHeaderComponent={subHeader}
-          responsive={true}
+          progressComponent={<CustomLoader />}
+          defaultSortFieldId={checkState?.field}
         />
         {/* PAGINATION */}
         <Pagination {...paginationProps} />
@@ -736,49 +749,52 @@ const Checks = () => {
           {/* SBOM DATA LICENSES DRAWER */}
           {isDataLicenseOpen && (
             <LicenseModal
-              isOpen={isDataLicenseOpen}
-              onClose={onDataLicenseClose}
+              data={sbomData}
               activeRow={activeRow}
               refetch={handleRefetch}
-              data={sbomData}
+              isOpen={isDataLicenseOpen}
+              onClose={onDataLicenseClose}
             />
           )}
 
           {/* COMPONENT PRIMARY MODAL */}
           {isPrimaryOpen && (
             <CheckModal
+              getCpe={getCpe}
               id={activeRow.id}
               componentId={null}
-              refetch={handleRefetch}
-              filterRefetch={filterRefetch}
               activeRow={activeRow}
               isOpen={isPrimaryOpen}
+              refetch={handleRefetch}
+              ruleExists={ruleExists}
               onClose={onPrimaryClose}
-              getCpe={getCpe}
+              filterRefetch={filterRefetch}
             />
           )}
 
           {/* COMPONENT LICENSE MODAL */}
           {isLicenseOpen && (
             <CheckModal
-              activeCheck={activeRow}
-              componentId={activeRow.component.id}
-              refetch={handleRefetch}
-              filterRefetch={filterRefetch}
               activeRow={activeRow}
               isOpen={isLicenseOpen}
+              activeCheck={activeRow}
+              ruleExists={ruleExists}
+              refetch={handleRefetch}
               onClose={onLicenseClose}
+              filterRefetch={filterRefetch}
+              componentId={activeRow.component.id}
             />
           )}
 
           {/* COMPONENT TYPE MODAL */}
           {isTypeOpen && (
             <CheckModal
-              id={activeRow.component.id}
-              refetch={handleRefetch}
-              activeRow={activeRow}
               isOpen={isTypeOpen}
               onClose={onTypeClose}
+              activeRow={activeRow}
+              refetch={handleRefetch}
+              ruleExists={ruleExists}
+              id={activeRow.component.id}
             />
           )}
 
@@ -790,17 +806,19 @@ const Checks = () => {
               activeRow={activeRow}
               refetch={handleRefetch}
               isOpen={isSupplierOpen}
+              ruleExists={ruleExists}
               onClose={onSupplierClose}
             />
           )}
 
           {isOpen && (
             <CheckModal
-              activeCheck={activeRow}
-              refetch={handleRefetch}
-              activeRow={activeRow}
               isOpen={isOpen}
               onClose={onClose}
+              activeRow={activeRow}
+              ruleExists={ruleExists}
+              activeCheck={activeRow}
+              refetch={handleRefetch}
             />
           )}
 
@@ -808,13 +826,14 @@ const Checks = () => {
           {isPurlOpen && (
             <PurlModal
               data={null}
+              getCpe={getCpe}
               isOpen={isPurlOpen}
-              onClose={onPurlClose}
-              setPurlValue={setPurlValue}
               purlValue={purlValue}
               activeRow={activeRow}
+              onClose={onPurlClose}
               refetch={handleRefetch}
-              getCpe={getCpe}
+              ruleExists={ruleExists}
+              setPurlValue={setPurlValue}
             />
           )}
 
@@ -822,58 +841,61 @@ const Checks = () => {
           {isCpeOpen && (
             <CpeModal
               data={null}
+              getCpe={getCpe}
+              activeComp={null}
               isOpen={isCpeOpen}
-              onClose={onCpeClose}
               cpeValue={cpeValue}
+              onClose={onCpeClose}
+              activeRow={activeRow}
+              ruleExists={ruleExists}
+              refetch={handleRefetch}
+              selectedCpe={selectedCpe}
               setCpeValue={setCpeValue}
               onCreateCpe={handleCreateCpe}
               onUpdateCpe={handleUpdateCpe}
-              selectedCpe={selectedCpe}
-              activeRow={activeRow}
-              refetch={handleRefetch}
-              getCpe={getCpe}
-              activeComp={null}
             />
           )}
 
           {/* CREATION TOOLS DRAWER */}
           {isCreationOpen && (
             <GeneralDataDrawer
-              isOpen={isCreationOpen}
-              onClose={onCreationClose}
-              btnRef={creationToolBtn}
               data={null}
               selectedKey={'tools'}
-              refetch={handleRefetch}
-              totalRows={totalRows}
               activeRow={activeRow}
+              refetch={handleRefetch}
+              isOpen={isCreationOpen}
+              ruleExists={ruleExists}
+              btnRef={creationToolBtn}
+              onClose={onCreationClose}
             />
           )}
 
           {/* AUTHOR DRAWER */}
           {isAuthorOpen && (
             <GeneralDataDrawer
-              isOpen={isAuthorOpen}
-              onClose={onAuthorClose}
-              btnRef={authorBtn}
               data={null}
+              getCpe={getCpe}
+              btnRef={authorBtn}
+              activeRow={activeRow}
+              isOpen={isAuthorOpen}
               selectedKey={'author'}
+              onClose={onAuthorClose}
+              ruleExists={ruleExists}
               refetch={handleRefetch}
               filterRefetch={filterRefetch}
-              activeRow={activeRow}
-              getCpe={getCpe}
             />
           )}
 
           {/* DOCUMENT SUPPLIER DRAWER */}
           {isDocSupOpen && (
             <PriSupplierModal
-              suppliers={null}
-              refetch={handleRefetch}
-              isOpen={isDocSupOpen}
-              onClose={onDocSupClose}
-              activeRow={activeRow}
               getCpe={getCpe}
+              suppliers={null}
+              activeRow={activeRow}
+              isOpen={isDocSupOpen}
+              ruleExists={ruleExists}
+              refetch={handleRefetch}
+              onClose={onDocSupClose}
             />
           )}
         </>

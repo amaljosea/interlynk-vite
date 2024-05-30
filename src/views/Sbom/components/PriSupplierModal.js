@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
@@ -16,8 +16,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  ModalOverlay,
-  useToast
+  ModalOverlay
 } from '@chakra-ui/react'
 
 import { recheckHealth, supplierCreate, supplierUpdate } from 'graphQL/Mutation'
@@ -28,15 +27,17 @@ const PriSupplierModal = ({
   onClose,
   refetch,
   suppliers,
-  activeRow
+  activeRow,
+  ruleExists
 }) => {
-  const toast = useToast()
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
+  const navigate = useNavigate()
 
   const { status, sbom } = activeRow || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
+  const resolved = status === 'resolved'
 
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')
@@ -95,8 +96,8 @@ const PriSupplierModal = ({
     }
   }, [suppliers])
 
-  const handleSave = async () => {
-    await createSupplier({
+  const handleSave = () => {
+    createSupplier({
       variables: {
         name: orgName,
         url: orgUrl,
@@ -116,8 +117,8 @@ const PriSupplierModal = ({
       .finally(() => onClose())
   }
 
-  const handleUpdate = async () => {
-    await updateSupplier({
+  const handleUpdate = () => {
+    updateSupplier({
       variables: {
         name: orgName,
         url: orgUrl,
@@ -163,48 +164,52 @@ const PriSupplierModal = ({
     {
       subject: 'version',
       field: 'version_supplier_name',
-      value: orgName
+      value: orgName || undefined
     },
     {
       subject: 'version',
       field: 'version_supplier_url',
-      value: orgUrl
+      value: orgUrl || undefined
     },
     {
       subject: 'version',
       field: 'version_supplier_contact_name',
-      value: supName
+      value: supName || undefined
     },
     {
       subject: 'version',
       field: 'version_supplier_contact_email',
-      value: supEmail
+      value: supEmail || undefined
     }
   ]
 
+  const filterActions = actionsAttributes?.filter(
+    (item) => item?.value !== undefined
+  )
+
   const handleRuleCreate = async () => {
-    await createRule({
-      variables: {
-        name: shortDesc,
-        active: true,
-        projectId: productId,
-        automationConditionsAttributes: conditionsAttributes,
-        automationActionsAttributes: actionsAttributes
-      }
-    }).then((res) => {
-      const errors = res?.data?.automationRuleCreate?.errors
-      if (errors?.length > 0) {
-        console.log(errors[0])
-      } else {
-        toast({
-          description: 'Rule added successfully',
-          duration: 3000,
-          status: 'success',
-          position: 'top'
-        })
-        onClose()
-      }
-    })
+    if (ruleExists) {
+      localStorage.setItem('activeProdTab', 2)
+      navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
+    } else {
+      await createRule({
+        variables: {
+          name: shortDesc,
+          active: true,
+          tag: friendlyId,
+          projectId: productId,
+          automationConditionsAttributes: conditionsAttributes,
+          automationActionsAttributes: filterActions
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleCreate?.errors
+        if (errors?.length > 0) {
+          console.log(errors[0])
+        } else {
+          handleSave()
+        }
+      })
+    }
   }
 
   useEffect(() => {
@@ -227,7 +232,7 @@ const PriSupplierModal = ({
           <ModalBody>
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* ORG NAME */}
-              <FormControl isRequired>
+              <FormControl isRequired isDisabled={resolved}>
                 <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
                 <Input
                   placeholder='Enter organization name'
@@ -237,6 +242,7 @@ const PriSupplierModal = ({
               </FormControl>
               {/* ORG URL */}
               <FormControl
+                isDisabled={resolved}
                 isInvalid={
                   (orgUrl !== '' && !validateUrl(orgUrl)) || containsSpace
                 }
@@ -251,7 +257,7 @@ const PriSupplierModal = ({
                 <FormErrorMessage>{isValidUrl}</FormErrorMessage>
               </FormControl>
               {/* SUPPLIER NAME */}
-              <FormControl isInvalid={supplierError}>
+              <FormControl isInvalid={supplierError} isDisabled={resolved}>
                 <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
                 <Input
                   placeholder='Enter supplier name'
@@ -262,6 +268,7 @@ const PriSupplierModal = ({
               </FormControl>
               {/* SUPPLIER EMAIL */}
               <FormControl
+                isDisabled={resolved}
                 isInvalid={supEmail !== '' && !validateEmail(supEmail)}
               >
                 <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
@@ -293,7 +300,7 @@ const PriSupplierModal = ({
                 onClick={handleRuleCreate}
                 isDisabled={isInvalid}
               >
-                Save as Rule
+                {ruleExists ? 'View' : 'Save as'} Rule
               </Button>
               <Button colorScheme='gray' mr={3} onClick={onClose}>
                 Cancel
@@ -301,7 +308,7 @@ const PriSupplierModal = ({
               <Button
                 colorScheme='blue'
                 isDisabled={isInvalid}
-                hidden={status === 'resolved'}
+                hidden={resolved}
                 onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
               >
                 {suppliers?.length > 0 ? 'Update' : 'Save'}

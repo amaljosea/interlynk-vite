@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince, validateEmail } from 'utils'
 
 import {
@@ -27,8 +27,7 @@ import {
   Th,
   Thead,
   Tooltip,
-  Tr,
-  useToast
+  Tr
 } from '@chakra-ui/react'
 
 import {
@@ -44,15 +43,17 @@ const GeneralDataDrawer = ({
   data,
   selectedKey,
   refetch,
-  activeRow
+  activeRow,
+  ruleExists
 }) => {
-  const toast = useToast()
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
+  const navigate = useNavigate()
 
   const { status, sbom } = activeRow || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
+  const resolved = status === 'resolved'
 
   const [toolName, setToolName] = useState('')
   const [toolVersion, setToolVersion] = useState('')
@@ -230,28 +231,28 @@ const GeneralDataDrawer = ({
   ]
 
   const handleRuleCreate = async () => {
-    await createRule({
-      variables: {
-        name: shortDesc,
-        active: true,
-        projectId: productId,
-        automationConditionsAttributes: conditionsAttributes,
-        automationActionsAttributes: actionsAttributes
-      }
-    }).then((res) => {
-      const errors = res?.data?.automationRuleCreate?.errors
-      if (errors?.length > 0) {
-        console.log(errors[0])
-      } else {
-        toast({
-          description: 'Rule added successfully',
-          duration: 3000,
-          status: 'success',
-          position: 'top'
-        })
-        onClose()
-      }
-    })
+    if (ruleExists) {
+      localStorage.setItem('activeProdTab', 2)
+      navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
+    } else {
+      await createRule({
+        variables: {
+          active: true,
+          name: shortDesc,
+          tag: friendlyId,
+          projectId: productId,
+          automationConditionsAttributes: conditionsAttributes,
+          automationActionsAttributes: actionsAttributes
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleCreate?.errors
+        if (errors?.length > 0) {
+          console.log(errors[0])
+        } else {
+          handleSave()
+        }
+      })
+    }
   }
 
   return (
@@ -270,7 +271,7 @@ const GeneralDataDrawer = ({
           <DrawerBody>
             {selectedKey === 'tools' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                <FormControl isRequired>
+                <FormControl isRequired hidden={resolved}>
                   <FormLabel htmlFor='toolVendor'>Vendor Name</FormLabel>
                   <Input
                     id='toolVendor'
@@ -279,7 +280,7 @@ const GeneralDataDrawer = ({
                     onChange={(e) => setToolVendor(e.target.value)}
                   />
                 </FormControl>
-                <FormControl isRequired>
+                <FormControl isRequired hidden={resolved}>
                   <FormLabel htmlFor='toolName'>Tool Name</FormLabel>
                   <Input
                     id='toolName'
@@ -288,7 +289,7 @@ const GeneralDataDrawer = ({
                     onChange={(e) => setToolName(e.target.value)}
                   />
                 </FormControl>
-                <FormControl isRequired>
+                <FormControl isRequired hidden={resolved}>
                   <FormLabel htmlFor='toolVersion'>Version</FormLabel>
                   <Input
                     id='toolVersion'
@@ -308,7 +309,10 @@ const GeneralDataDrawer = ({
                 <Button
                   colorScheme='blue'
                   onClick={handleToolAdd}
-                  disabled={!toolName || !toolVersion || !toolVendor}
+                  hidden={resolved}
+                  disabled={
+                    !toolName || !toolVersion || !toolVendor || resolved
+                  }
                 >
                   Add
                 </Button>
@@ -324,7 +328,7 @@ const GeneralDataDrawer = ({
                         <Tr my='.8rem'>
                           {['Vendor Name', 'Tool Name', 'Version', 'Added'].map(
                             (item, index) => (
-                              <Th key={index} pl={0}>
+                              <Th fontFamily={'inherit'} key={index} pl={0}>
                                 {item}
                               </Th>
                             )
@@ -398,7 +402,11 @@ const GeneralDataDrawer = ({
             {selectedKey === 'author' && (
               <form onSubmit={handleAuthorAdd}>
                 <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                  <FormControl isRequired isInvalid={authorError}>
+                  <FormControl
+                    isRequired
+                    isInvalid={authorError}
+                    hidden={resolved}
+                  >
                     <Input
                       type='text'
                       placeholder='Author Name*'
@@ -408,6 +416,7 @@ const GeneralDataDrawer = ({
                     <FormErrorMessage>{authorError}</FormErrorMessage>
                   </FormControl>
                   <FormControl
+                    hidden={resolved}
                     isInvalid={
                       !validateEmail(authorEmail) && authorEmail !== ''
                     }
@@ -434,6 +443,7 @@ const GeneralDataDrawer = ({
                   <Button
                     colorScheme='blue'
                     type='submit'
+                    hidden={resolved}
                     disabled={
                       !authorName ||
                       !authorEmail ||
@@ -452,8 +462,10 @@ const GeneralDataDrawer = ({
                       <Table variant='simple' size='sm' mt={4}>
                         <Thead>
                           <Tr my='.8rem'>
-                            <Th pl={0}>Name</Th>
-                            <Th pl={0} width={'120px'}>
+                            <Th fontFamily={'inherit'} pl={0}>
+                              Name
+                            </Th>
+                            <Th fontFamily={'inherit'} pl={0} width={'120px'}>
                               Updated At
                             </Th>
                           </Tr>
@@ -507,24 +519,20 @@ const GeneralDataDrawer = ({
             <Flex
               gap={2}
               width={'100%'}
-              justifyContent={'flex-end'}
               alignItems={'center'}
+              justifyContent={'flex-end'}
             >
               <Button
-                hidden={friendlyId ? false : true}
+                mr={'auto'}
                 fontSize={'sm'}
                 colorScheme='blue'
-                mr={'auto'}
                 onClick={handleRuleCreate}
+                hidden={friendlyId ? false : true}
               >
-                Save as Rule
+                {ruleExists ? 'View' : 'Save as'} Rule
               </Button>
               <Button onClick={onClose}>Cancel</Button>
-              <Button
-                colorScheme='blue'
-                onClick={handleSave}
-                hidden={status === 'resolved'}
-              >
+              <Button colorScheme='blue' onClick={handleSave} hidden={resolved}>
                 Save
               </Button>
             </Flex>

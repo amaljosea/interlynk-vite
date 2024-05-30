@@ -19,6 +19,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 const CpeInput = ({
   name,
+  isDisabled,
   inputValue,
   setInputValue,
   cpeList,
@@ -157,6 +158,7 @@ const CpeInput = ({
       ref={inputRef}
     >
       <FormControl
+        isDisabled={isDisabled}
         isInvalid={name === 'cpe' && inputValue !== '' && !isCpeValid}
       >
         {name !== 'cpe' && (

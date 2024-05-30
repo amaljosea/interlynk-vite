@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { validateCpe } from 'utils'
 
 import {
@@ -22,8 +22,7 @@ import {
   Stack,
   Tag,
   Text,
-  Textarea,
-  useToast
+  Textarea
 } from '@chakra-ui/react'
 
 import CpeInput from 'components/CpeInput'
@@ -44,15 +43,16 @@ const CpeModal = ({
   activeComp,
   refetch,
   getCpe,
-  activeRow
+  activeRow,
+  ruleExists
 }) => {
   const { status, component } = activeRow || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
-
-  const toast = useToast()
+  const resolved = status === 'resolved'
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
+  const navigate = useNavigate()
 
   const [error, setError] = useState('')
   const [vendor, setVendor] = useState('')
@@ -72,6 +72,14 @@ const CpeModal = ({
   const [targetSoftware, setTargetSoftware] = useState('')
   const [hardware, setHardware] = useState('')
   const [other, setOther] = useState('')
+  const [isDisabled, setIsDisabled] = useState(false)
+
+  const disableButtonTemporarily = () => {
+    setIsDisabled(true)
+    setTimeout(() => {
+      setIsDisabled(false)
+    }, 3000)
+  }
 
   const { prodCompState, dispatch } = useGlobalState()
   const { cpeString } = prodCompState
@@ -177,9 +185,9 @@ const CpeModal = ({
   }
 
   // ON CPE UPDATE
-  const handleComUpdate = async () => {
+  const handleComUpdate = () => {
     if (validateCpe(cpeString)) {
-      await updateComponent({
+      updateComponent({
         variables: {
           id: component?.id,
           sbomId: sbomId,
@@ -348,8 +356,18 @@ const CpeModal = ({
       operator: 'is',
       field: 'component_version',
       value: component?.version
+    },
+    {
+      subject: 'component',
+      operator: 'not_exists',
+      field: 'component_cpe',
+      value: undefined
     }
   ]
+
+  const filterConditions = conditionsAttributes?.filter(
+    (item) => item?.field !== 'component_cpe'
+  )
 
   const actionsAttributes = [
     {
@@ -360,28 +378,32 @@ const CpeModal = ({
   ]
 
   const handleRuleCreate = async () => {
-    await createRule({
-      variables: {
-        name: shortDesc,
-        active: true,
-        projectId: productId,
-        automationConditionsAttributes: conditionsAttributes,
-        automationActionsAttributes: actionsAttributes
-      }
-    }).then((res) => {
-      const errors = res?.data?.automationRuleCreate?.errors
-      if (errors?.length > 0) {
-        setError(errors[0])
-      } else {
-        toast({
-          description: 'Rule added successfully',
-          duration: 3000,
-          status: 'success',
-          position: 'top'
-        })
-        onClose()
-      }
-    })
+    if (ruleExists) {
+      localStorage.setItem('activeProdTab', 2)
+      navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
+    } else {
+      disableButtonTemporarily()
+      await createRule({
+        variables: {
+          active: true,
+          name: shortDesc,
+          tag: friendlyId,
+          projectId: productId,
+          automationConditionsAttributes:
+            shortDesc === 'Component has a cpe'
+              ? conditionsAttributes
+              : filterConditions,
+          automationActionsAttributes: actionsAttributes
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleCreate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
+        } else {
+          handleComUpdate()
+        }
+      })
+    }
   }
 
   useEffect(() => {
@@ -437,7 +459,7 @@ const CpeModal = ({
             )}
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* CPE STRING */}
-              <FormControl>
+              <FormControl isDisabled={resolved}>
                 <FormLabel htmlFor='cpeString'>CPE String</FormLabel>
                 <Textarea
                   type='text'
@@ -456,7 +478,7 @@ const CpeModal = ({
               </FormControl>
               <Grid templateColumns='repeat(2, 1fr)' gap={6}>
                 {/* PART */}
-                <FormControl>
+                <FormControl isDisabled={resolved}>
                   <FormLabel htmlFor='type'>Part</FormLabel>
                   <Select
                     id='part'
@@ -475,6 +497,7 @@ const CpeModal = ({
                 {/* VENDOR */}
                 <CpeInput
                   name='vendor'
+                  isDisabled={resolved}
                   inputValue={vendor}
                   setInputValue={setVendor}
                   cpeList={vendorList}
@@ -486,6 +509,7 @@ const CpeModal = ({
                 {/* PRODUCT */}
                 <CpeInput
                   name='product'
+                  isDisabled={resolved}
                   inputValue={product}
                   setInputValue={setProduct}
                   cpeList={productList}
@@ -497,6 +521,7 @@ const CpeModal = ({
                 {/* VERSION */}
                 <CpeInput
                   name='version'
+                  isDisabled={resolved}
                   inputValue={version}
                   setInputValue={setVersion}
                   cpeList={versionList}
@@ -506,7 +531,7 @@ const CpeModal = ({
                   onChange={onVersionInputChange}
                 />
                 {/* UPDATE */}
-                <FormControl>
+                <FormControl isDisabled={resolved}>
                   <FormLabel>Update</FormLabel>
                   <Input
                     type='text'
@@ -519,7 +544,7 @@ const CpeModal = ({
                   />
                 </FormControl>
                 {/* EDITION */}
-                <FormControl>
+                <FormControl isDisabled={resolved}>
                   <FormLabel>Edition</FormLabel>
                   <Input
                     type='text'
@@ -532,7 +557,7 @@ const CpeModal = ({
                   />
                 </FormControl>
                 {/* LANGUAGE */}
-                <FormControl>
+                <FormControl isDisabled={resolved}>
                   <FormLabel>Language</FormLabel>
                   <Input
                     type='text'
@@ -547,7 +572,7 @@ const CpeModal = ({
                   />
                 </FormControl>
                 {/* SW EDITION */}
-                <FormControl>
+                <FormControl isDisabled={resolved}>
                   <FormLabel>SW Edition</FormLabel>
                   <Input
                     type='text'
@@ -562,7 +587,7 @@ const CpeModal = ({
                   />
                 </FormControl>
                 {/* TARGET SOFTWARE */}
-                <FormControl>
+                <FormControl isDisabled={resolved}>
                   <FormLabel>Target Software</FormLabel>
                   <Input
                     type='text'
@@ -577,7 +602,7 @@ const CpeModal = ({
                   />
                 </FormControl>
                 {/* TARGET HARDWARE */}
-                <FormControl>
+                <FormControl isDisabled={resolved}>
                   <FormLabel htmlFor='targetHardware'>
                     Target Hardware
                   </FormLabel>
@@ -606,16 +631,16 @@ const CpeModal = ({
                   </Stack>
                 </FormControl>
                 {/* OTHERE */}
-                <FormControl>
+                <FormControl isDisabled={resolved}>
                   <FormLabel>Other</FormLabel>
                   <Input
+                    size='md'
                     type='text'
                     value={other}
-                    size='md'
                     fontSize={'sm'}
-                    onChange={(e) => handleOnChange(e.target.value, setOther)}
                     onBlur={onBlurOther}
                     placeholder='Enter other'
+                    onChange={(e) => handleOnChange(e.target.value, setOther)}
                   />
                 </FormControl>
               </Grid>
@@ -626,27 +651,29 @@ const CpeModal = ({
             <Flex
               gap={2}
               width={'100%'}
-              justifyContent={'flex-end'}
               alignItems={'center'}
+              justifyContent={'flex-end'}
             >
               <Button
-                hidden={friendlyId ? false : true}
+                mr={'auto'}
                 fontSize={'sm'}
                 colorScheme='blue'
-                mr={'auto'}
+                isLoading={isDisabled}
+                isDisabled={isDisabled}
                 onClick={handleRuleCreate}
+                hidden={friendlyId ? false : true}
               >
-                Save as Rule
+                {ruleExists ? 'View' : 'Save as'} Rule
               </Button>
               <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
                 Cancel
               </Button>
               <Button
                 fontSize={'sm'}
-                variant='solid'
                 colorScheme={'blue'}
-                onClick={friendlyId ? handleComUpdate : handleSave}
+                variant='solid'
                 hidden={status === 'resolved'}
+                onClick={friendlyId ? handleComUpdate : handleSave}
               >
                 Save
               </Button>
