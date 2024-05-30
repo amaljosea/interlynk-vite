@@ -735,6 +735,8 @@ export const GetGlobalVulnData = gql`
           id
           name
           version
+          group
+          kind
           sbom {
             id
             createdAt
@@ -2001,6 +2003,8 @@ export const GetVulnData = gql`
           component {
             name
             version
+            group
+            kind
             sbom {
               id
               createdAt
@@ -2256,6 +2260,8 @@ export const GetCheckResults = gql`
             name
             version
             licensesExp
+            group
+            kind
             purl
             cpes
             suppliers {
@@ -3344,6 +3350,7 @@ export const GetSbomLicensesTable = gql`
           }
           components {
             name
+            version
           }
           derivedState
         }

@@ -28,6 +28,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import LicenseModal from 'components/LicenseModal'
+import ComponentCard from 'components/Misc/ComponentCard'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -46,7 +47,9 @@ import {
   GetProductData
 } from 'graphQL/Queries'
 
+import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
+import { GoSkip } from 'react-icons/go'
 
 import CheckFilters from './CheckFilters'
 
@@ -192,6 +195,12 @@ const Checks = () => {
     isOpen: isCpeOpen,
     onOpen: onCpeOpen,
     onClose: onCpeClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isCardOpen,
+    onOpen: onCardOpen,
+    onClose: onCardClose
   } = useDisclosure()
 
   const [healthRecheck] = useMutation(recheckHealth)
@@ -519,6 +528,19 @@ const Checks = () => {
     }
   }
 
+  const updateIssue = async (id) => {
+    await updateResult({
+      variables: {
+        id: id,
+        status: 'ignored'
+      }
+    }).then((res) => {
+      if (res?.data) {
+        handleRefetch()
+      }
+    })
+  }
+
   // COLUMNS
   const columns = [
     // HEALTH CHECK ID
@@ -560,28 +582,31 @@ const Checks = () => {
       selector: (row) => {
         const { organizationRule, component } = row
         return (
-          <Tooltip label={organizationRule.rule.longDesc} placement='top'>
-            <Stack spacing={2} my={3}>
-              {component !== null && (
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  width={'fit-content'}
-                  colorScheme='blue'
-                  variant='subtle'
-                >
-                  {component.name}
-                </Badge>
-              )}
-              <Text>
-                {organizationRule.rule.longDesc !== null
-                  ? `${organizationRule.rule.shortDesc?.substring(0, 300)}${
-                      organizationRule.rule.shortDesc.length > 300 ? '...' : ''
-                    }`
-                  : ''}
-              </Text>
-            </Stack>
-          </Tooltip>
+          <Stack spacing={2} my={3}>
+            {component !== null && (
+              <Badge
+                fontSize={'sm'}
+                variant='subtle'
+                colorScheme='blue'
+                cursor={'pointer'}
+                width={'fit-content'}
+                fontWeight={'medium'}
+                onClick={() => {
+                  setActiveRow(component)
+                  onCardOpen()
+                }}
+              >
+                {component.name}
+              </Badge>
+            )}
+            <Text>
+              {organizationRule.rule.longDesc !== null
+                ? `${organizationRule.rule.shortDesc?.substring(0, 300)}${
+                    organizationRule.rule.shortDesc.length > 300 ? '...' : ''
+                  }`
+                : ''}
+            </Text>
+          </Stack>
         )
       },
       sortable: true,
@@ -609,16 +634,46 @@ const Checks = () => {
       id: 'RESOLUTION',
       name: 'RESOLUTION',
       selector: (row) => {
-        const { status } = row
+        const { status, id } = row
+        const { friendlyId } = row?.organizationRule?.rule || ''
+        const fixedIDs = ['SB-HC-4', 'SB-HC-5', 'SB-HC-6', 'SB-HC-16']
+        const fixedByDefault = fixedIDs.includes(friendlyId)
         return (
           <>
-            {status === 'unresolved' && (
+            {status === 'unresolved' && !fixedByDefault && (
+              <Stack direction={'row'} alignItems={'center'} spacing={2}>
+                <Tooltip label='Fix'>
+                  <IconButton
+                    size='sm'
+                    variant='solid'
+                    colorScheme='blue'
+                    fontWeight='normal'
+                    icon={<BiSolidWrench size={18} />}
+                    onClick={() => onCheckOpen(row)}
+                    disabled={customerView || !editChecks || !updateSboms}
+                  />
+                </Tooltip>
+
+                <Tooltip label='Ignore'>
+                  <IconButton
+                    size='sm'
+                    variant='solid'
+                    colorScheme='blue'
+                    fontWeight='normal'
+                    icon={<GoSkip size={18} />}
+                    onClick={() => updateIssue(id)}
+                    disabled={customerView || !editChecks || !updateSboms}
+                  />
+                </Tooltip>
+              </Stack>
+            )}
+
+            {fixedByDefault && (
               <Button
                 size='sm'
                 variant='solid'
                 colorScheme='blue'
                 fontWeight='normal'
-                onClick={() => onCheckOpen(row)}
                 disabled={customerView || !editChecks || !updateSboms}
               >
                 Fixed
@@ -822,6 +877,14 @@ const Checks = () => {
             />
           )}
         </>
+      )}
+
+      {isCardOpen && (
+        <ComponentCard
+          isOpen={isCardOpen}
+          onClose={onCardClose}
+          data={activeRow}
+        />
       )}
     </>
   )

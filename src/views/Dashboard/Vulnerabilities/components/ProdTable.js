@@ -27,6 +27,8 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import ConnectedSbomDrawer from 'components/Drawer/ConnectedSbomDrawer'
+import ComponentCard from 'components/Misc/ComponentCard'
+import VersionCard from 'components/Misc/VersionCard'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -55,6 +57,18 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     onClose: onSbomClose
   } = useDisclosure()
 
+  const {
+    isOpen: isCardOpen,
+    onOpen: onCardOpen,
+    onClose: onCardClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isVCardOpen,
+    onOpen: onVCardOpen,
+    onClose: onVCardClose
+  } = useDisclosure()
+
   const [statusResults, setStatusResults] = useState([])
   const [selectedVulns, setSelectedVulns] = useState([])
   const [selectedGroup, setSelectedGroup] = useState('')
@@ -62,6 +76,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
   const [toggleClear, setToggleClear] = useState(false)
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
+  const [activeRow, setActiveRow] = useState(null)
 
   const handlePreview = async (row) => {
     const { id, component } = row
@@ -100,14 +115,22 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
           <Flex flexDir={'row'} my={3} gap={2} alignItems={'center'}>
             <Tooltip label='Also affected'>
               <IconButton
-                isDisabled={!component?.sbom?.hasConnectedSboms}
-                icon={<FaFolderTree />}
-                onClick={() => handlePreview(row)}
                 size='xs'
                 colorScheme='blue'
+                icon={<FaFolderTree />}
+                onClick={() => handlePreview(row)}
+                isDisabled={!component?.sbom?.hasConnectedSboms}
               />
             </Tooltip>
-            <Text>{component?.sbom?.project?.projectGroup?.name || ''}</Text>
+            <Text
+              cursor={'pointer'}
+              onClick={() => {
+                setActiveRow(component)
+                onVCardOpen()
+              }}
+            >
+              {component?.sbom?.project?.projectGroup?.name || ''}
+            </Text>
           </Flex>
         )
       },
@@ -138,10 +161,15 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         const { component } = row
         return (
           <Stack
-            direction='column'
-            alignItems={'flex-start'}
-            spacing={1}
             my={3}
+            spacing={1}
+            direction='column'
+            cursor={'pointer'}
+            alignItems={'flex-start'}
+            onClick={() => {
+              setActiveRow(component)
+              onCardOpen()
+            }}
           >
             <Text>{component?.name || ''}</Text>
             <Text>{component?.version || ''}</Text>
@@ -501,6 +529,22 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
           selectedVulns={selectedVulns}
           setSelectedVulns={setSelectedVulns}
           setToggleClear={setToggleClear}
+        />
+      )}
+
+      {isCardOpen && (
+        <ComponentCard
+          isOpen={isCardOpen}
+          onClose={onCardClose}
+          data={activeRow}
+        />
+      )}
+
+      {isVCardOpen && (
+        <VersionCard
+          isOpen={isVCardOpen}
+          onClose={onVCardClose}
+          data={activeRow}
         />
       )}
     </>

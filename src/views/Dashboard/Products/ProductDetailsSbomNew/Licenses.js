@@ -29,15 +29,17 @@ const Licenses = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { nodes, paginationProps, loading, refetch, reset } =
-    usePaginatatedQuery(GetSbomLicensesTable, {
+  const { nodes, paginationProps, loading, refetch } = usePaginatatedQuery(
+    GetSbomLicensesTable,
+    {
       skip: activeTab === 'licenses' ? false : true,
       selector: 'sbom.componentLicenses',
       variables: {
         projectId: productId,
         sbomId: sbomId
       }
-    })
+    }
+  )
 
   const handleRefresh = useCallback(() => {
     refetch()

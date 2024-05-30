@@ -123,10 +123,10 @@ const Changelog = () => {
             <Stack direction={'column'} spacing={0} my={2}>
               <Tag
                 fontSize={'sm'}
-                width={'fit-content'}
-                fontWeight={'medium'}
-                colorScheme='blue'
                 overflow={'auto'}
+                colorScheme='blue'
+                fontWeight={'medium'}
+                width={'fit-content'}
               >
                 <TagLabel>
                   {loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}
