@@ -133,7 +133,7 @@ const CpeInput = ({
         prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: false })
       }
     }
-  }, [inputValue])
+  }, [inputValue, prodCompDispatch, validation])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -141,13 +141,12 @@ const CpeInput = ({
         setCpeList([])
       }
     }
-
     document.addEventListener('click', handleClickOutside)
 
     return () => {
       document.removeEventListener('click', handleClickOutside)
     }
-  }, [])
+  }, [inputRef, setCpeList])
 
   return (
     <VStack

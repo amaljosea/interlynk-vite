@@ -40,21 +40,16 @@ import {
 } from 'graphQL/Mutation'
 import { GetComponentData } from 'graphQL/Queries'
 
-const CheckModal = ({
-  isOpen,
-  onClose,
-  refetch,
-  activeRow,
-  componentId,
-  ruleExists
-}) => {
+const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
   const navigate = useNavigate()
 
   const { status, component } = activeRow || ''
+  const { id: componentId } = component || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
+  const resolved = status === 'resolved'
 
   const compRef = useRef()
 
@@ -69,13 +64,26 @@ const CheckModal = ({
   const { field, direction, expLicense } = prodCompState
 
   const now = new Date()
+  const timestamp = currentTime
   const currentTime = now.toISOString().slice(0, 16)
-  const [timestamp, setTimestamp] = useState(currentTime)
   const [comp, setComp] = useState('')
-  const [compType, setCompType] = useState('')
+  const [compType, setCompType] = useState(component?.kind || '')
+  const [compVersion, setCompVersion] = useState(component?.version || '')
   const [componentList, setComponentList] = useState([])
   const [activeComp, setActiveComp] = useState(null)
   const [error, setError] = useState('')
+
+  const isPrimary = shortDesc === 'Document has a primary component'
+  const isComponentType = shortDesc === 'Component has a type'
+  const isComponentVersion = shortDesc === 'Component has a version'
+  const isComponentLicense =
+    shortDesc === 'Component has license/s specified' ||
+    shortDesc === 'Componet has deprecated license/s' ||
+    shortDesc === 'Component has restrictive licenses specified'
+
+  const isInvalidLicense = isComponentLicense && expLicense === ''
+
+  const isEmptyVersion = isComponentVersion && compVersion === ''
 
   const [healthRecheck] = useMutation(recheckHealth)
   const [updateComponent] = useMutation(UpdateComponent)
@@ -113,31 +121,13 @@ const CheckModal = ({
   const handleComUpdate = () => {
     updateComponent({
       variables: {
-        id: activeComp.id,
+        primary: true,
         sbomId: sbomId,
-        primary: true
-      }
-    })
-      .then(() => {
-        if (friendlyId) {
-          healthRecheck({
-            variables: {
-              checkId: friendlyId,
-              sbomId: sbomId
-            }
-          }).then((res) => res?.data && refetch())
-        }
-      })
-      .finally(() => onClose())
-  }
-
-  const onLicenseUpdate = () => {
-    updateComponent({
-      variables: {
-        id: componentId,
-        sbomId: sbomId,
+        id: isPrimary ? activeComp?.id : componentId,
+        kind: compType !== '' ? compType : undefined,
+        version: compVersion !== '' ? compVersion : undefined,
         licenses: {
-          licensesExp: expLicense || ''
+          licensesExp: expLicense || undefined
         }
       }
     })
@@ -145,9 +135,9 @@ const CheckModal = ({
         if (friendlyId) {
           healthRecheck({
             variables: {
-              compId: componentId,
+              sbomId: sbomId,
               checkId: friendlyId,
-              sbomId: sbomId
+              compId: isPrimary ? activeComp?.id : componentId
             }
           }).then((res) => res?.data && refetch())
         }
@@ -180,6 +170,8 @@ const CheckModal = ({
         return 'Component Type'
       case 'Component has license/s specified':
         return 'Component License'
+      case 'Component has a version':
+        return 'Component Version'
       case 'Componet has deprecated license/s':
         return 'Component License'
       case 'Component has restrictive licenses specified':
@@ -187,32 +179,16 @@ const CheckModal = ({
     }
   }
 
-  const isPrimary = shortDesc === 'Document has a primary component'
-  const isComponentLicense =
-    shortDesc === 'Component has license/s specified' ||
-    shortDesc === 'Componet has deprecated license/s' ||
-    shortDesc === 'Component has restrictive licenses specified'
-
-  const isInvalidLicense =
-    (shortDesc === 'Component has license/s specified' ||
-      shortDesc === 'Componet has deprecated license/s' ||
-      shortDesc === 'Component has restrictive licenses specified') &&
-    expLicense === ''
-
   const handleSubmit = () => {
-    if (!isInvalidLicense) {
-      if (isPrimary) {
-        handleComUpdate()
-      } else if (isComponentLicense) {
-        onLicenseUpdate()
-      } else {
-        onClose()
-      }
+    if (
+      isPrimary ||
+      isComponentType ||
+      isComponentVersion ||
+      isComponentLicense
+    ) {
+      handleComUpdate()
     } else {
-      setError('Please add value')
-      setTimeout(() => {
-        setError('')
-      }, 2000)
+      onClose()
     }
   }
 
@@ -238,6 +214,21 @@ const CheckModal = ({
           value: undefined
         }
       ]
+    } else if (isComponentVersion) {
+      return [
+        {
+          subject: 'component',
+          operator: 'is',
+          field: 'component_name',
+          value: component?.name
+        },
+        {
+          subject: 'component',
+          operator: 'not_exists',
+          field: 'component_version',
+          value: undefined
+        }
+      ]
     }
   }
 
@@ -252,6 +243,14 @@ const CheckModal = ({
           subject: 'component',
           field: 'component_licenses_exp',
           value: expLicense
+        }
+      ]
+    } else if (isComponentVersion) {
+      return [
+        {
+          subject: 'component',
+          field: 'component_version',
+          value: compVersion
         }
       ]
     }
@@ -313,6 +312,7 @@ const CheckModal = ({
             </Text>
             <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
           </Flex>
+
           {shortDesc === 'Document has a primary component' && (
             <Flex
               gap={4}
@@ -320,7 +320,7 @@ const CheckModal = ({
               alignItems={'flex-start'}
               position={'relative'}
             >
-              <FormControl isRequired>
+              <FormControl isRequired isDisabled={resolved}>
                 <FormLabel>Select</FormLabel>
                 <Input value={comp} onChange={handleComponentChange} />
               </FormControl>
@@ -364,7 +364,7 @@ const CheckModal = ({
           )}
 
           {shortDesc === 'Document creation timestamp' && (
-            <FormControl isRequired>
+            <FormControl isRequired isDisabled={resolved}>
               <FormLabel>Created At</FormLabel>
               <Input
                 placeholder='Select Time'
@@ -378,7 +378,7 @@ const CheckModal = ({
 
           {(shortDesc === 'Component has a type' ||
             shortDesc === 'Component has a valid type') && (
-            <FormControl>
+            <FormControl isDisabled={resolved}>
               <FormLabel fontSize={'sm'}>
                 <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                   <Text>Type</Text>
@@ -412,13 +412,23 @@ const CheckModal = ({
             </FormControl>
           )}
 
+          {shortDesc === 'Component has a version' && (
+            <FormControl isRequired isDisabled={resolved}>
+              <FormLabel>Version</FormLabel>
+              <Input
+                value={compVersion}
+                onChange={(e) => setCompVersion(e.target.value)}
+              />
+            </FormControl>
+          )}
+
           {(shortDesc === 'Component has license/s specified' ||
             shortDesc === 'Componet has deprecated license/s' ||
             shortDesc === 'Component has restrictive licenses specified') && (
             <LicenseField
               sbomView={false}
-              resolved={status === 'resolved'}
-              license={status === 'resolved' ? component?.licensesExp : ''}
+              resolved={resolved}
+              license={resolved ? component?.licensesExp : ''}
             />
           )}
         </ModalBody>
@@ -427,15 +437,16 @@ const CheckModal = ({
           <Flex
             gap={2}
             width={'100%'}
-            justifyContent={'flex-end'}
             alignItems={'center'}
+            justifyContent={'flex-end'}
           >
             <Button
-              fontSize={'sm'}
-              colorScheme='blue'
               mr={'auto'}
+              fontSize={'sm'}
               onClick={handleRuleCreate}
-              hidden={!isComponentLicense}
+              hidden={!isComponentLicense && !isComponentVersion}
+              isDisabled={isInvalidLicense || isEmptyVersion}
+              colorScheme={ruleExists ? 'green' : 'blue'}
             >
               {ruleExists ? 'View' : 'Save as'} Rule
             </Button>
@@ -445,8 +456,9 @@ const CheckModal = ({
             <Button
               fontSize={'sm'}
               colorScheme='blue'
-              hidden={status === 'resolved'}
               onClick={handleSubmit}
+              isDisabled={isInvalidLicense || isEmptyVersion}
+              hidden={resolved}
             >
               Save
             </Button>

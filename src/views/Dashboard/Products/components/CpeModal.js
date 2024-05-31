@@ -74,6 +74,9 @@ const CpeModal = ({
   const [other, setOther] = useState('')
   const [isDisabled, setIsDisabled] = useState(false)
 
+  const isInvalid =
+    type === '' || vendor === '' || product === '' || version === ''
+
   const disableButtonTemporarily = () => {
     setIsDisabled(true)
     setTimeout(() => {
@@ -657,11 +660,11 @@ const CpeModal = ({
               <Button
                 mr={'auto'}
                 fontSize={'sm'}
-                colorScheme='blue'
                 isLoading={isDisabled}
-                isDisabled={isDisabled}
                 onClick={handleRuleCreate}
                 hidden={friendlyId ? false : true}
+                isDisabled={isDisabled || isInvalid}
+                colorScheme={ruleExists ? 'green' : 'blue'}
               >
                 {ruleExists ? 'View' : 'Save as'} Rule
               </Button>
@@ -670,8 +673,9 @@ const CpeModal = ({
               </Button>
               <Button
                 fontSize={'sm'}
-                colorScheme={'blue'}
                 variant='solid'
+                colorScheme={'blue'}
+                isDisabled={isInvalid}
                 hidden={status === 'resolved'}
                 onClick={friendlyId ? handleComUpdate : handleSave}
               >

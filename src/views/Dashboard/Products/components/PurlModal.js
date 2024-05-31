@@ -80,6 +80,11 @@ const PurlModal = ({
 
   // const hasNamespace = validPurlTypes.includes(purlType)
 
+  const isInvalid =
+    purlName === '' ||
+    purlType === '' ||
+    (purlType === 'swift' && namespace === '')
+
   const namespaceOptions = {
     alpm: [
       { value: '', label: '-- Select --' },
@@ -833,12 +838,12 @@ const PurlModal = ({
             >
               <Button
                 mr={'auto'}
-                isDisabled={isDisabled}
-                isLoading={isDisabled}
-                hidden={friendlyId ? false : true}
                 fontSize={'sm'}
-                colorScheme='blue'
+                isLoading={isDisabled}
+                isDisabled={isDisabled || isInvalid}
                 onClick={handleRuleCreate}
+                hidden={friendlyId ? false : true}
+                colorScheme={ruleExists ? 'green' : 'blue'}
               >
                 {ruleExists ? 'View' : 'Save as'} Rule
               </Button>
@@ -846,16 +851,12 @@ const PurlModal = ({
                 Cancel
               </Button>
               <Button
-                fontSize={'sm'}
                 variant='solid'
-                colorScheme={'blue'}
-                onClick={friendlyId ? handleComUpdate : handleSave}
+                fontSize={'sm'}
                 hidden={resolved}
-                disabled={
-                  purlName === '' ||
-                  purlType === '' ||
-                  (purlType === 'swift' && namespace === '')
-                }
+                colorScheme={'blue'}
+                isDisabled={isInvalid}
+                onClick={friendlyId ? handleComUpdate : handleSave}
               >
                 Save
               </Button>

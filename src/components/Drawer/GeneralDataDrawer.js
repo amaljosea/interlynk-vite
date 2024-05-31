@@ -525,9 +525,9 @@ const GeneralDataDrawer = ({
               <Button
                 mr={'auto'}
                 fontSize={'sm'}
-                colorScheme='blue'
                 onClick={handleRuleCreate}
                 hidden={friendlyId ? false : true}
+                colorScheme={ruleExists ? 'green' : 'blue'}
               >
                 {ruleExists ? 'View' : 'Save as'} Rule
               </Button>

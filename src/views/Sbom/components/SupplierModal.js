@@ -353,12 +353,12 @@ const SupplierModal = ({
               alignItems={'center'}
             >
               <Button
-                hidden={friendlyId ? false : true}
                 fontSize={'sm'}
-                colorScheme='blue'
                 mr={'auto'}
-                onClick={handleRuleCreate}
                 isDisabled={isInvalid}
+                onClick={handleRuleCreate}
+                hidden={friendlyId ? false : true}
+                colorScheme={ruleExists ? 'green' : 'blue'}
               >
                 {ruleExists ? 'View' : 'Save as'} Rule
               </Button>

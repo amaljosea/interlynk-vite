@@ -52,6 +52,7 @@ import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
 import { GoSkip } from 'react-icons/go'
 
+import FixedModal from '../components/FixedModal'
 import CheckFilters from './CheckFilters'
 
 const Checks = () => {
@@ -203,6 +204,18 @@ const Checks = () => {
     isOpen: isCardOpen,
     onOpen: onCardOpen,
     onClose: onCardClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isFixedOpen,
+    onOpen: onFixedOpen,
+    onClose: onFixedClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isVersionOpen,
+    onOpen: onVersionOpen,
+    onClose: onVersionClose
   } = useDisclosure()
 
   const handleReCheck = useCallback(async () => {
@@ -437,6 +450,11 @@ const Checks = () => {
       shortDesc === 'Component has a type'
     ) {
       return onTypeOpen()
+    }
+
+    // COMPONENT VERSION SELECTOR MODAL
+    if (shortDesc === 'Component has a version') {
+      return onVersionOpen()
     }
 
     // COMPONENT ADD SUPPLIER MODAL
@@ -684,25 +702,40 @@ const Checks = () => {
               <Button
                 size='sm'
                 variant='solid'
-                colorScheme='blue'
+                fontSize={'xs'}
                 fontWeight='normal'
+                colorScheme='whatsapp'
+                leftIcon={<CheckIcon />}
+                onClick={() => onFixedOpen()}
                 disabled={customerView || !editChecks || !updateSboms}
               >
-                Fixed
+                View
               </Button>
             )}
 
             {status === 'resolved' && (
               <Button
                 size='sm'
-                isLoading={activeRow?.id === id && loadingRules}
                 fontSize={'xs'}
                 variant='solid'
                 colorScheme='whatsapp'
-                onClick={() => onCheckOpen(row)}
                 leftIcon={<CheckIcon />}
+                onClick={() => onCheckOpen(row)}
+                isLoading={activeRow?.id === id && loadingRules}
               >
                 View
+              </Button>
+            )}
+
+            {status === 'ignored' && (
+              <Button
+                size='sm'
+                width={'74px'}
+                fontSize={'xs'}
+                variant='solid'
+                colorScheme='blackAlpha'
+              >
+                Ignored
               </Button>
             )}
           </>
@@ -761,7 +794,6 @@ const Checks = () => {
           {isPrimaryOpen && (
             <CheckModal
               getCpe={getCpe}
-              id={activeRow.id}
               componentId={null}
               activeRow={activeRow}
               isOpen={isPrimaryOpen}
@@ -772,17 +804,27 @@ const Checks = () => {
             />
           )}
 
+          {/* COMPONENT VERSION MODAL */}
+          {isVersionOpen && (
+            <CheckModal
+              activeRow={activeRow}
+              isOpen={isVersionOpen}
+              ruleExists={ruleExists}
+              refetch={handleRefetch}
+              onClose={onVersionClose}
+              filterRefetch={filterRefetch}
+            />
+          )}
+
           {/* COMPONENT LICENSE MODAL */}
           {isLicenseOpen && (
             <CheckModal
               activeRow={activeRow}
               isOpen={isLicenseOpen}
-              activeCheck={activeRow}
               ruleExists={ruleExists}
               refetch={handleRefetch}
               onClose={onLicenseClose}
               filterRefetch={filterRefetch}
-              componentId={activeRow.component.id}
             />
           )}
 
@@ -907,6 +949,10 @@ const Checks = () => {
           onClose={onCardClose}
           data={activeRow}
         />
+      )}
+
+      {isFixedOpen && (
+        <FixedModal isOpen={isFixedOpen} onClose={onFixedClose} />
       )}
     </>
   )
