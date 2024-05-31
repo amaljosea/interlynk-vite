@@ -6,14 +6,16 @@ import { Box, Button, Text, Textarea, Tooltip } from '@chakra-ui/react'
 import { FaCircleCheck } from 'react-icons/fa6'
 import { IoIosCloseCircle } from 'react-icons/io'
 
-export const TextRegex = ({ regex }) => {
+export const TextRegex = ({ regex, ignoreCase }) => {
   const [items, setItems] = useState([{ id: uuidv4(), value: '' }])
 
   return (
     <div>
       <Text fontWeight='bold'>Test Regular Expression</Text>
       {items.map((item) => {
-        const isMatch = new RegExp(regex).test(item.value)
+        const isMatch = new RegExp(regex).test(
+          ignoreCase ? item.value.toLowerCase() : item.value
+        )
         const color = isMatch ? 'green' : 'red'
         return (
           <Box display='flex' key={item.id} m={1}>

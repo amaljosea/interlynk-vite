@@ -68,24 +68,9 @@ export const InternalComponents = () => {
     },
     {
       name: '',
+      right: true,
       selector: (row) => {
-        return (
-          <div>
-            <DeleteInternalComponent internalComponent={row} />
-            {/* <IconButton
-              colorScheme='blue'
-              ml={4}
-              size='sm'
-              onClick={() => {
-                setIsOpen(true)
-                setEditingRow(row)
-              }}
-              icon={<EditIcon />}
-            >
-              Update
-            </IconButton> */}
-          </div>
-        )
+        return <DeleteInternalComponent internalComponent={row} />
       }
     }
   ]

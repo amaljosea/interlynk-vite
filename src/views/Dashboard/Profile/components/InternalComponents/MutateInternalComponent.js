@@ -142,7 +142,7 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
                   </UnorderedList>
                 </Box>
               </div>
-              <TextRegex regex={matchStr} />
+              <TextRegex regex={matchStr} ignoreCase={ignoreCase} />
             </div>
           </ModalBody>
           <ModalFooter>
