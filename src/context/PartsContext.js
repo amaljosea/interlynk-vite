@@ -1,8 +1,8 @@
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import createPersistedState from 'use-persisted-state'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useSbom } from 'hooks/useSbom'
 
 const usePartsState = createPersistedState('parts')
 const { createContext, useEffect } = require('react')
@@ -11,18 +11,15 @@ export const useProductParts = () => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
   const [parts, setParts] = usePartsState([])
-  const params = useParams()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
 
   const partsQueryParam = queryParams.get('parts')
   const isParts = partsQueryParam === 'true'
 
-  const { versionName, projectGroupName } = useSbom({
-    projectId: params?.productid,
-    sbomId: params?.sbomid,
-    skip: !(params?.sbomid && params?.productid)
-  })
+  const { sbomHookData } = useGlobalQueryContext()
+
+  const { versionName, projectGroupName } = sbomHookData
 
   const pop = () => {
     setParts(parts.slice(0, -1))

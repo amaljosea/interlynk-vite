@@ -5,7 +5,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { GetProductData } from 'graphQL/Queries'
 
-import SbomInfo from './SbomInfo'
+// import SbomInfo from './SbomInfo'
 import SbomTable from './SbomTable'
 
 const ProductDetailsSbomNew = () => {
@@ -27,12 +27,12 @@ const ProductDetailsSbomNew = () => {
 
   return (
     <>
-      <SbomInfo
+      {/* <SbomInfo
         data={data?.sbom}
         error={error}
         loading={loading}
         refetch={refetch}
-      />
+      /> */}
       <SbomTable
         data={data?.sbom}
         error={error}

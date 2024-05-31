@@ -1,3 +1,4 @@
+import { GlobalQueryContextWrapper } from 'context/GlobalQueryContext.js'
 import { PartsContextWrapper } from 'context/PartsContext.js'
 import { ProductUrlContextWrapper } from 'context/ProductUrlContext.js'
 import Cookies from 'js-cookie'
@@ -36,7 +37,9 @@ const authToken = Cookies.get('authToken')
 
 const MainWrapper = () => (
   <ProductUrlContextWrapper>
-    <Outlet />
+    <GlobalQueryContextWrapper>
+      <Outlet />
+    </GlobalQueryContextWrapper>
   </ProductUrlContextWrapper>
 )
 

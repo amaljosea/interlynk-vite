@@ -14,11 +14,11 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
-import { useSbom } from 'hooks/useSbom'
 
 import { GetUserPermissions } from 'graphQL/Queries'
 
@@ -65,11 +65,7 @@ export default function AdminNavbar(props) {
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
 
-  const sbomHookData = useSbom({
-    projectId: params?.productid,
-    sbomId: params?.sbomid,
-    skip: !params?.sbomid
-  })
+  const { sbomHookData } = useGlobalQueryContext()
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')

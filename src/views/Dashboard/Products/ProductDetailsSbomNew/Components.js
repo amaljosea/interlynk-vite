@@ -69,8 +69,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const productId = params.productid
   const sbomId = params.sbomid
   const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
   const customerView = location.pathname.startsWith('/customer')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
@@ -110,7 +108,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const { nodes, refetch, error, paginationProps, reset, loading } =
     usePaginatatedQuery(GetComponentData, {
       selector: 'sbom.components',
-      skip: activeTab === 'components' ? false : true,
       variables: {
         ...compData,
         sbomId: sbomId,
@@ -136,7 +133,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const { data: compFilters, refetch: getCompFilters } = useQuery(
     GetCompFilterData,
     {
-      skip: activeTab === 'components' ? false : true,
       variables: {
         projectId: productId,
         sbomId: sbomId

@@ -68,15 +68,7 @@ function ComponentDrawer(props) {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const customerView = location.pathname.startsWith('/customer')
 
-  const {
-    isOpen,
-    onClose,
-    data,
-    primaryComp,
-    fetchCompData,
-    shortDesc,
-    sbomRefetch
-  } = props
+  const { isOpen, onClose, data, primaryComp, shortDesc } = props
   const { prodCompState, dispatch } = useGlobalState()
   const { licenseType, purlString, expLicense, totalComp } = prodCompState
   const { prodCompDispatch } = dispatch
@@ -84,14 +76,8 @@ function ComponentDrawer(props) {
   const [addRelation] = useMutation(CreateCompRelation)
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
-  const [createComponent] = useMutation(CreateComponent, {
-    onCompleted: () => fetchCompData(),
-    refetchQueries: 'active'
-  })
-  const [updateComponent] = useMutation(UpdateComponent, {
-    onCompleted: () => fetchCompData(),
-    refetchQueries: 'active'
-  })
+  const [createComponent] = useMutation(CreateComponent)
+  const [updateComponent] = useMutation(UpdateComponent)
 
   const cpeRef = useRef()
 
@@ -289,7 +275,6 @@ function ComponentDrawer(props) {
     })
       .then((res) => {
         if (res.data) {
-          sbomRefetch({ projectId: productId, sbomId: sbomId })
           prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
           addRelation({
             variables: {
@@ -339,7 +324,6 @@ function ComponentDrawer(props) {
       }
     }).then((res) => {
       if (res.data) {
-        sbomRefetch({ projectId: productId, sbomId: sbomId })
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
         onClose()
       }
