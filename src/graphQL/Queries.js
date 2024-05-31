@@ -4218,3 +4218,17 @@ export const GetExistingRules = gql`
     }
   }
 `
+
+export const GetSelectedUser = gql`
+  query GetSelectedUser {
+    organization {
+      users {
+        name
+        email
+        role {
+          name
+        }
+      }
+    }
+  }
+`

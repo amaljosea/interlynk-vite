@@ -5,9 +5,18 @@ import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { RepeatIcon } from '@chakra-ui/icons'
-import { Flex, IconButton, Stack, Tag, Text, Tooltip } from '@chakra-ui/react'
+import {
+  Flex,
+  IconButton,
+  Stack,
+  Tag,
+  Text,
+  Tooltip,
+  useDisclosure
+} from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import UserCard from 'components/Misc/UserCard'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -43,6 +52,13 @@ const ChangelogTable = ({ activeEnv }) => {
     direction: 'DESC'
   })
   const [searchInput, setSearchInput] = useState('')
+  const [activeRow, setActiveRow] = useState('')
+
+  const {
+    isOpen: isUserOpen,
+    onOpen: onUserOpen,
+    onClose: onUserClose
+  } = useDisclosure()
 
   const { nodes, paginationProps, refetch, loading, reset } =
     usePaginatatedQuery(GetProjectLogs, {
@@ -125,7 +141,15 @@ const ChangelogTable = ({ activeEnv }) => {
       name: 'BY',
       selector: (row) => (
         <Tooltip placement='top' label={row.changedBy}>
-          {row.changedBy}
+          <Text
+            cursor={'pointer'}
+            onClick={() => {
+              setActiveRow(row)
+              onUserOpen()
+            }}
+          >
+            {row.changedBy}
+          </Text>
         </Tooltip>
       ),
       right: 'true',
@@ -280,10 +304,18 @@ const ChangelogTable = ({ activeEnv }) => {
           progressComponent={<CustomLoader />}
           defaultSortFieldId={prodLogState?.field}
         />
+
+        {/* PAGINATION */}
+        <Pagination {...paginationProps} />
       </Flex>
 
-      {/* PAGINATION */}
-      <Pagination {...paginationProps} />
+      {isUserOpen && (
+        <UserCard
+          name={activeRow?.changedBy}
+          isOpen={isUserOpen}
+          onClose={onUserClose}
+        />
+      )}
     </>
   )
 }

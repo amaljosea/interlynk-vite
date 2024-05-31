@@ -15,15 +15,12 @@ import {
 const CompTag = ({ children }) => (
   <Tag
     py={1}
-    width={'130px'}
     ml={'auto'}
     size='sm'
     variant='subtle'
     colorScheme={'blue'}
     wordBreak={'break-all'}
-    textAlign={'center'}
-    alignItems={'center'}
-    justifyContent={'center'}
+    textAlign={'right'}
   >
     {children}
   </Tag>

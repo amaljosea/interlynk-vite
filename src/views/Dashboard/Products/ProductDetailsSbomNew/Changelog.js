@@ -20,6 +20,7 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import PurlCard from 'components/Misc/PurlCard'
+import UserCard from 'components/Misc/UserCard'
 import Pagination from 'components/Pagination'
 
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -56,6 +57,11 @@ const Changelog = () => {
   const activeTab = queryParams.get('tab')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isUserOpen,
+    onOpen: onUserOpen,
+    onClose: onUserClose
+  } = useDisclosure()
   const [activeRow, setActiveRow] = useState('')
   const [logSearch, setLogSearch] = useState('')
   const [logState, setLogState] = useState({
@@ -330,7 +336,15 @@ const Changelog = () => {
       name: 'BY',
       selector: (row) => (
         <Tooltip placement='top' label={row.changedBy}>
-          {row.changedBy}
+          <Text
+            cursor={'pointer'}
+            onClick={() => {
+              setActiveRow(row)
+              onUserOpen()
+            }}
+          >
+            {row.changedBy}
+          </Text>
         </Tooltip>
       ),
       sortable: true,
@@ -487,6 +501,14 @@ const Changelog = () => {
 
       {isOpen && (
         <PurlCard value={activeRow} isOpen={isOpen} onClose={onClose} />
+      )}
+
+      {isUserOpen && (
+        <UserCard
+          name={activeRow?.changedBy}
+          isOpen={isUserOpen}
+          onClose={onUserClose}
+        />
       )}
     </>
   )
