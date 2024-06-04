@@ -5,7 +5,7 @@ import { Flex, Grid, GridItem, Skeleton, Text } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 
-import SbomDetails from './SbomDetails'
+import SbomDetails from './SbomDetails/index'
 
 const SbomInfo = ({ data, error, loading, refetch }) => {
   if (error) {
@@ -39,8 +39,14 @@ const SbomInfo = ({ data, error, loading, refetch }) => {
           <GridItem colSpan={3}>
             <SbomDetails sbomData={data} refetch={refetch} />
           </GridItem>
-          <GridItem colSpan={2} height={'fit-content'}>
-            <SbomActions sbom={data} refetch={refetch} />
+          <GridItem colSpan={2} height='100%'>
+            <Flex
+              direction='column'
+              justifyContent='space-between'
+              height='100%'
+            >
+              <SbomActions sbom={data} refetch={refetch} />
+            </Flex>
           </GridItem>
         </Grid>
       </CardBody>

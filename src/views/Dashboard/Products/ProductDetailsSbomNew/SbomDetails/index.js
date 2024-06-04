@@ -330,37 +330,6 @@ const SbomDetails = ({ sbomData, refetch }) => {
                 </Text>
               </Flex>
             </Stack>
-            {/* LICENSES */}
-            <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
-              <Icon
-                mt={1}
-                h={'20px'}
-                w={'20px'}
-                color='#777'
-                as={FaBalanceScale}
-              />
-              <Flex flexDir={'column'} alignItems={'center'}>
-                <Tag
-                  cursor={'pointer'}
-                  size='md'
-                  variant='subtle'
-                  width={16}
-                  colorScheme={'blue'}
-                  onClick={onSelectLicenses}
-                >
-                  <TagLabel mx={'auto'}>{compLicenseCount}</TagLabel>
-                </Tag>
-                <Text
-                  cursor={'pointer'}
-                  mt={1}
-                  fontSize={'xs'}
-                  _hover={{ textDecoration: 'underline' }}
-                  onClick={onSelectLicenses}
-                >
-                  Licenses
-                </Text>
-              </Flex>
-            </Stack>
             {/* VULNERABILITIES */}
             <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
               <Icon mt={1} h={4} w={4} color='#777' as={FaBug} />
@@ -418,8 +387,46 @@ const SbomDetails = ({ sbomData, refetch }) => {
                 </Text>
               </Flex>
             </Stack>
-            {/* POLICY RESULTS */}
+          </Flex>
+          <Flex mt={4}>
+            {/* LICENSES */}
             <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
+              <Icon
+                mt={1}
+                h={'20px'}
+                w={'20px'}
+                color='#777'
+                as={FaBalanceScale}
+              />
+              <Flex flexDir={'column'} alignItems={'center'}>
+                <Tag
+                  cursor={'pointer'}
+                  size='md'
+                  variant='subtle'
+                  width={16}
+                  colorScheme={'blue'}
+                  onClick={onSelectLicenses}
+                >
+                  <TagLabel mx={'auto'}>{compLicenseCount}</TagLabel>
+                </Tag>
+                <Text
+                  cursor={'pointer'}
+                  mt={1}
+                  fontSize={'xs'}
+                  _hover={{ textDecoration: 'underline' }}
+                  onClick={onSelectLicenses}
+                >
+                  Licenses
+                </Text>
+              </Flex>
+            </Stack>
+            {/* POLICY RESULTS */}
+            <Stack
+              direction={'row'}
+              alignItems={'flex-start'}
+              spacing={2}
+              ml={10}
+            >
               <Icon mt={1} h={5} w={5} color='#777' as={MdPolicy} />
               <Flex flexDir={'column'} alignItems={'center'}>
                 <Stack fontWeight={'medium'} direction={'row'}>

@@ -66,6 +66,7 @@ import {
 
 import Automation from '../Automation'
 import Settings from '../ProductSettings'
+import { ProductGraphs } from './ProductGraphs'
 import ProductModal from './components/ProductModal'
 import StatusModal from './components/StatusModal'
 import UploadModal from './components/UploadModal'
@@ -456,6 +457,7 @@ const ProductDetailsMain = () => {
               </GridItem>
             </Grid>
           </CardBody>
+          <ProductGraphs />
         </Card>
         {/* TAB SECTION */}
         <Card display={data ? 'block' : 'none'}>

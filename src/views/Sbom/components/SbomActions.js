@@ -45,6 +45,7 @@ import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
 import DownloadModal from './DownloadModal'
+import { ScoresProgress } from './ScoresProgress'
 import SigningModal from './SigningModal'
 
 const SbomActions = ({ sbom, refetch }) => {
@@ -382,7 +383,7 @@ const SbomActions = ({ sbom, refetch }) => {
           ></IconButton>
         </Tooltip>
       </Flex>
-
+      <ScoresProgress />
       {/* DOWNLOAD SBOM */}
       {isOpen && (
         <DownloadModal
