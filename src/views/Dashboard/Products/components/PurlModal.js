@@ -122,6 +122,7 @@ const PurlModal = ({
   const [updateComponent] = useMutation(UpdateComponent)
 
   const handleComUpdate = () => {
+    disableButtonTemporarily()
     updateComponent({
       variables: {
         id: component?.id,
@@ -855,7 +856,7 @@ const PurlModal = ({
                 fontSize={'sm'}
                 hidden={resolved}
                 colorScheme={'blue'}
-                isDisabled={isInvalid}
+                isDisabled={isInvalid || isDisabled}
                 onClick={friendlyId ? handleComUpdate : handleSave}
               >
                 Save

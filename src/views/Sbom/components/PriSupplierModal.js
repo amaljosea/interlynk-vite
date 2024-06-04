@@ -46,6 +46,14 @@ const PriSupplierModal = ({
   const [supEmail, setSupEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [supplierError, setSupplierError] = useState('')
+  const [isDisabled, setIsDisabled] = useState(false)
+
+  const disableButtonTemporarily = () => {
+    setIsDisabled(true)
+    setTimeout(() => {
+      setIsDisabled(false)
+    }, 3000)
+  }
 
   const containsSpace = /\s/.test(orgUrl)
 
@@ -97,6 +105,7 @@ const PriSupplierModal = ({
   }, [suppliers])
 
   const handleSave = () => {
+    disableButtonTemporarily()
     createSupplier({
       variables: {
         name: orgName,
@@ -192,6 +201,7 @@ const PriSupplierModal = ({
       localStorage.setItem('activeProdTab', 2)
       navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
     } else {
+      disableButtonTemporarily()
       await createRule({
         variables: {
           name: shortDesc,
@@ -295,7 +305,7 @@ const PriSupplierModal = ({
               <Button
                 mr={'auto'}
                 fontSize={'sm'}
-                isDisabled={isInvalid}
+                isDisabled={isInvalid || isDisabled}
                 onClick={handleRuleCreate}
                 hidden={friendlyId ? false : true}
                 colorScheme={ruleExists ? 'green' : 'blue'}
@@ -307,7 +317,7 @@ const PriSupplierModal = ({
               </Button>
               <Button
                 colorScheme='blue'
-                isDisabled={isInvalid}
+                isDisabled={isInvalid || isDisabled}
                 hidden={resolved}
                 onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
               >

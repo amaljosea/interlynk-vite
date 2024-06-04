@@ -189,6 +189,7 @@ const CpeModal = ({
 
   // ON CPE UPDATE
   const handleComUpdate = () => {
+    disableButtonTemporarily()
     if (validateCpe(cpeString)) {
       updateComponent({
         variables: {
@@ -675,7 +676,7 @@ const CpeModal = ({
                 fontSize={'sm'}
                 variant='solid'
                 colorScheme={'blue'}
-                isDisabled={isInvalid}
+                isDisabled={isInvalid || isDisabled}
                 hidden={status === 'resolved'}
                 onClick={friendlyId ? handleComUpdate : handleSave}
               >

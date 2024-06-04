@@ -71,7 +71,15 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
   const [compVersion, setCompVersion] = useState(component?.version || '')
   const [componentList, setComponentList] = useState([])
   const [activeComp, setActiveComp] = useState(null)
+  const [isDisabled, setIsDisabled] = useState(false)
   const [error, setError] = useState('')
+
+  const disableButtonTemporarily = () => {
+    setIsDisabled(true)
+    setTimeout(() => {
+      setIsDisabled(false)
+    }, 3000)
+  }
 
   const isPrimary = shortDesc === 'Document has a primary component'
   const isComponentType = shortDesc === 'Component has a type'
@@ -119,6 +127,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
   }, [direction, field, getCompData, isOpen, productId, sbomId])
 
   const handleComUpdate = () => {
+    disableButtonTemporarily()
     updateComponent({
       variables: {
         primary: true,
@@ -261,6 +270,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
       localStorage.setItem('activeProdTab', 2)
       navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
     } else {
+      disableButtonTemporarily()
       await createRule({
         variables: {
           active: true,
@@ -445,7 +455,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
               fontSize={'sm'}
               onClick={handleRuleCreate}
               hidden={!isComponentLicense && !isComponentVersion}
-              isDisabled={isInvalidLicense || isEmptyVersion}
+              isDisabled={isInvalidLicense || isEmptyVersion || isDisabled}
               colorScheme={ruleExists ? 'green' : 'blue'}
             >
               {ruleExists ? 'View' : 'Save as'} Rule
@@ -457,7 +467,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
               fontSize={'sm'}
               colorScheme='blue'
               onClick={handleSubmit}
-              isDisabled={isInvalidLicense || isEmptyVersion}
+              isDisabled={isInvalidLicense || isEmptyVersion || isDisabled}
               hidden={resolved}
             >
               Save

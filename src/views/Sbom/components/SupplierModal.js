@@ -53,6 +53,14 @@ const SupplierModal = ({
   const [nameError, setNameError] = useState('')
   const [supEmail, setSupEmail] = useState('')
   const [emailError, setEmailError] = useState('')
+  const [isDisabled, setIsDisabled] = useState(false)
+
+  const disableButtonTemporarily = () => {
+    setIsDisabled(true)
+    setTimeout(() => {
+      setIsDisabled(false)
+    }, 3000)
+  }
 
   const containsSpace = /\s/.test(orgUrl)
 
@@ -83,6 +91,7 @@ const SupplierModal = ({
   }, [data])
 
   const handleSave = () => {
+    disableButtonTemporarily()
     createSupplier({
       variables: {
         name: orgName,
@@ -108,6 +117,7 @@ const SupplierModal = ({
   }
 
   const handleUpdate = () => {
+    disableButtonTemporarily()
     updateSupplier({
       variables: {
         name: orgName,
@@ -212,6 +222,7 @@ const SupplierModal = ({
       localStorage.setItem('activeProdTab', 2)
       navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
     } else {
+      disableButtonTemporarily()
       await createRule({
         variables: {
           name: shortDesc,
@@ -233,6 +244,7 @@ const SupplierModal = ({
   }
 
   const isInvalid =
+    isDisabled ||
     orgName === '' ||
     nameError !== '' ||
     (supEmail !== '' && !validateEmail(supEmail)) ||

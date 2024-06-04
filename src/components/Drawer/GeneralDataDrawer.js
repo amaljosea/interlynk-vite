@@ -65,7 +65,15 @@ const GeneralDataDrawer = ({
   const [existingAuthors, setExistingAuthors] = useState([])
   const [authorList, setAuthorList] = useState([])
   const [authorError, setAuthorError] = useState('')
+  const [isDisabled, setIsDisabled] = useState(false)
   const [error, setError] = useState('')
+
+  const disableButtonTemporarily = () => {
+    setIsDisabled(true)
+    setTimeout(() => {
+      setIsDisabled(false)
+    }, 3000)
+  }
 
   const toolsNotAdded =
     selectedKey === 'tools' &&
@@ -139,6 +147,7 @@ const GeneralDataDrawer = ({
       setError('Please add author before save')
     } else {
       setError('')
+      disableButtonTemporarily()
 
       if (creationTools.length > 0) {
         creationTools.map((item) => {
@@ -235,6 +244,7 @@ const GeneralDataDrawer = ({
       localStorage.setItem('activeProdTab', 2)
       navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
     } else {
+      disableButtonTemporarily()
       await createRule({
         variables: {
           active: true,
@@ -525,6 +535,7 @@ const GeneralDataDrawer = ({
               <Button
                 mr={'auto'}
                 fontSize={'sm'}
+                isDisabled={isDisabled}
                 onClick={handleRuleCreate}
                 hidden={friendlyId ? false : true}
                 colorScheme={ruleExists ? 'green' : 'blue'}
@@ -532,7 +543,12 @@ const GeneralDataDrawer = ({
                 {ruleExists ? 'View' : 'Save as'} Rule
               </Button>
               <Button onClick={onClose}>Cancel</Button>
-              <Button colorScheme='blue' onClick={handleSave} hidden={resolved}>
+              <Button
+                colorScheme='blue'
+                onClick={handleSave}
+                hidden={resolved}
+                isDisabled={isDisabled}
+              >
                 Save
               </Button>
             </Flex>
