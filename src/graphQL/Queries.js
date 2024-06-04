@@ -1841,6 +1841,33 @@ export const GetAllComponents = gql`
     }
   }
 `
+// GET ALL VUNERABILITIES
+export const GetAllVulnerabilities = gql`
+  query GetVulnData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ComponentVulnOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      vulns(
+        sbomId: $sbomId
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+      }
+    }
+  }
+`
+
 // GET ALL SHARE COMPONENTS
 export const AllShareComponents = gql`
   query AllShareComponents(
