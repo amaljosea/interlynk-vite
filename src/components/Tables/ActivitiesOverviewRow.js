@@ -23,6 +23,7 @@ import {
   FaTimesCircle,
   FaUpload
 } from 'react-icons/fa'
+import { FaArrowsRotate } from 'react-icons/fa6'
 
 function valueToColor(action, event, orig, updated) {
   if (action == 'updated') {
@@ -42,7 +43,8 @@ function valueToColor(action, event, orig, updated) {
   } else if (
     action == 'tool' ||
     action === 'retracted' ||
-    action === 'restored'
+    action === 'restored' ||
+    action === 'replaced'
   ) {
     return 'blue.500'
   } else if (action == 'auto_check') {
@@ -69,6 +71,8 @@ function valueToIcon(action, event, orig, updated) {
     }
   } else if (action == 'created') {
     return FaHammer
+  } else if (action == 'replaced') {
+    return FaArrowsRotate
   } else if (action == 'retracted' || action == 'restored') {
     return BsBack
   } else if (action == 'tool') {
