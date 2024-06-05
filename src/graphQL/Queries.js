@@ -4235,9 +4235,19 @@ export const getInternalComponents = gql`
 `
 
 export const GetExistingRules = gql`
-  query GetExistingRules($id: Uuid!, $tag: String) {
+  query GetExistingRules(
+    $id: Uuid!
+    $checkIdentifier: [String!]
+    $checkComponent: [String!]
+    $checkVersion: [String!]
+  ) {
     project(id: $id) {
-      automationRules(tag: $tag, first: 1) {
+      automationRules(
+        first: 1
+        checkIdentifier: $checkIdentifier
+        checkComponent: $checkComponent
+        checkVersion: $checkVersion
+      ) {
         nodes {
           id
         }

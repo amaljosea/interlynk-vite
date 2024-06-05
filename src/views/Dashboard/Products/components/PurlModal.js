@@ -46,6 +46,7 @@ const PurlModal = ({
   ruleExists
 }) => {
   const { status, component } = activeRow || ''
+  const { name, version } = component || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
 
@@ -593,8 +594,10 @@ const PurlModal = ({
         variables: {
           active: true,
           name: shortDesc,
-          tag: friendlyId,
           projectId: productId,
+          checkComponent: name,
+          checkVersion: version,
+          checkIdentifier: friendlyId,
           automationConditionsAttributes:
             shortDesc === 'Component has a purl'
               ? conditionsAttributes

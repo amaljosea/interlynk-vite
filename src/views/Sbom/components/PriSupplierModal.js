@@ -204,10 +204,10 @@ const PriSupplierModal = ({
       disableButtonTemporarily()
       await createRule({
         variables: {
-          name: shortDesc,
           active: true,
-          tag: friendlyId,
+          name: shortDesc,
           projectId: productId,
+          checkIdentifier: friendlyId,
           automationConditionsAttributes: conditionsAttributes,
           automationActionsAttributes: filterActions
         }

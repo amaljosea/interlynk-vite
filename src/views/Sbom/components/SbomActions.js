@@ -28,6 +28,7 @@ import {
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { sbomDelete } from 'graphQL/Mutation'
@@ -38,6 +39,7 @@ import { ShareCompFilters } from 'graphQL/Queries'
 import { ShareProject } from 'graphQL/Queries'
 import { AllShareComponents } from 'graphQL/Queries'
 import { GetComponentData } from 'graphQL/Queries'
+import { GetCheckResults } from 'graphQL/Queries'
 
 import { FaFileDownload, FaLayerGroup } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
@@ -212,6 +214,20 @@ const SbomActions = ({ sbom, refetch }) => {
     setSelectedVersion(select)
     refetchSBOM(select.value)
   }
+
+  const { nodes } = usePaginatatedQuery(GetCheckResults, {
+    skip: isPrimaryOpen ? false : true,
+    selector: 'sbom.checkResults',
+    variables: {
+      sbomId: sbomId,
+      projectId: productId,
+      checkId: ['SB-HC-10'],
+      field: 'CHECK_RESULTS_UPDATED_AT',
+      direction: 'DESC'
+    }
+  })
+
+  const activeRow = nodes?.length > 0 ? nodes[0] : null
 
   const handleEditSbom = () => {
     if (sbom?.primaryComponent) {
@@ -401,12 +417,11 @@ const SbomActions = ({ sbom, refetch }) => {
       {/*  SET PRIMARY COMPONENT */}
       {isPrimaryOpen && allComponents && (
         <CheckModal
+          ruleExists={null}
           refetch={refetch}
-          shortDesc={'Document has a primary component'}
-          checkId={null}
           isOpen={isPrimaryOpen}
-          components={allComponents?.sbom?.components?.nodes}
           onClose={onPrimaryClose}
+          activeRow={activeRow}
         />
       )}
 

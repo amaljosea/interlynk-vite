@@ -249,8 +249,8 @@ const GeneralDataDrawer = ({
         variables: {
           active: true,
           name: shortDesc,
-          tag: friendlyId,
           projectId: productId,
+          checkIdentifier: friendlyId,
           automationConditionsAttributes: conditionsAttributes,
           automationActionsAttributes: actionsAttributes
         }

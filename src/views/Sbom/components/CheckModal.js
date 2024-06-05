@@ -47,7 +47,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
   const navigate = useNavigate()
 
   const { status, component } = activeRow || ''
-  const { id: componentId } = component || ''
+  const { id: componentId, name, version } = component || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
 
@@ -275,8 +275,10 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
         variables: {
           active: true,
           name: shortDesc,
-          tag: friendlyId,
           projectId: productId,
+          checkComponent: name,
+          checkVersion: version,
+          checkIdentifier: friendlyId,
           automationConditionsAttributes:
             shortDesc === 'Component has license/s specified'
               ? getConditionsAttributes()

@@ -47,6 +47,7 @@ const CpeModal = ({
   ruleExists
 }) => {
   const { status, component } = activeRow || ''
+  const { name: compName, version: compVersion } = component || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
   const params = useParams()
@@ -391,8 +392,10 @@ const CpeModal = ({
         variables: {
           active: true,
           name: shortDesc,
-          tag: friendlyId,
           projectId: productId,
+          checkComponent: compName,
+          checkVersion: compVersion,
+          checkIdentifier: friendlyId,
           automationConditionsAttributes:
             shortDesc === 'Component has a cpe'
               ? conditionsAttributes

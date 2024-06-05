@@ -1636,22 +1636,26 @@ export const CreateAutomation = gql`
 export const AutomationRuleCreate = gql`
   mutation AutomationRuleCreate(
     $name: String
-    $description: String
+    $active: Boolean
     $projectId: Uuid!
+    $description: String
+    $checkVersion: String
+    $checkComponent: String
+    $checkIdentifier: String
     $automationActionsAttributes: [AutomationActionAttributesInput!]
     $automationConditionsAttributes: [AutomationConditionAttributesInput!]
-    $active: Boolean
-    $tag: String
   ) {
     automationRuleCreate(
       input: {
         name: $name
-        description: $description
+        active: $active
         projectId: $projectId
+        description: $description
+        checkVersion: $checkVersion
+        checkComponent: $checkComponent
+        checkIdentifier: $checkIdentifier
         automationConditionsAttributes: $automationConditionsAttributes
         automationActionsAttributes: $automationActionsAttributes
-        active: $active
-        tag: $tag
       }
     ) {
       errors

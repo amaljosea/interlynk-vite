@@ -537,14 +537,22 @@ const Checks = () => {
 
   const onCheckOpen = (row) => {
     setActiveRow(row)
-    const { organizationRule } = row
+    const { component, organizationRule } = row
+    const { name, version } = component || ''
     const { shortDesc, friendlyId } = organizationRule?.rule || ''
     if (shortDesc === 'Component has a unique identifier') {
       handleComUpdate(row)
     } else if (shortDesc === 'Document has a unique identifier') {
       handleSbomUpdate(row)
     } else {
-      getRules({ variables: { id: productId, tag: friendlyId } })
+      getRules({
+        variables: {
+          id: productId,
+          checkIdentifier: friendlyId,
+          checkComponent: component ? name : undefined,
+          checkVersion: component ? version : undefined
+        }
+      })
         .then((res) => {
           console.log(res?.data)
           const result = res?.data?.project?.automationRules?.nodes
@@ -793,14 +801,11 @@ const Checks = () => {
           {/* COMPONENT PRIMARY MODAL */}
           {isPrimaryOpen && (
             <CheckModal
-              getCpe={getCpe}
-              componentId={null}
               activeRow={activeRow}
               isOpen={isPrimaryOpen}
               refetch={handleRefetch}
               ruleExists={ruleExists}
               onClose={onPrimaryClose}
-              filterRefetch={filterRefetch}
             />
           )}
 
@@ -812,7 +817,6 @@ const Checks = () => {
               ruleExists={ruleExists}
               refetch={handleRefetch}
               onClose={onVersionClose}
-              filterRefetch={filterRefetch}
             />
           )}
 
@@ -824,7 +828,6 @@ const Checks = () => {
               ruleExists={ruleExists}
               refetch={handleRefetch}
               onClose={onLicenseClose}
-              filterRefetch={filterRefetch}
             />
           )}
 
@@ -836,7 +839,6 @@ const Checks = () => {
               activeRow={activeRow}
               refetch={handleRefetch}
               ruleExists={ruleExists}
-              id={activeRow.component.id}
             />
           )}
 
@@ -859,7 +861,6 @@ const Checks = () => {
               onClose={onClose}
               activeRow={activeRow}
               ruleExists={ruleExists}
-              activeCheck={activeRow}
               refetch={handleRefetch}
             />
           )}

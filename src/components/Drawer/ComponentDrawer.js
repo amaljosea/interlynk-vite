@@ -123,7 +123,7 @@ function ComponentDrawer(props) {
 
   useQuery(GetAllSboms, {
     fetchPolicy: 'network-only',
-    skip: activeTab === 'components' && signedUrlParams === null ? false : true,
+    skip: signedUrlParams === null ? false : true,
     variables: {
       id: productId
     },
@@ -568,7 +568,6 @@ function ComponentDrawer(props) {
                   <option value='' style={{ background: 'lightgray' }}>
                     -- Select --
                   </option>
-                  \
                   {[
                     'application',
                     'framework',

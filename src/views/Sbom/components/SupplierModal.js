@@ -43,6 +43,7 @@ const SupplierModal = ({
   const navigate = useNavigate()
 
   const { status, component } = activeRow || ''
+  const { name, version } = component || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
 
@@ -225,10 +226,12 @@ const SupplierModal = ({
       disableButtonTemporarily()
       await createRule({
         variables: {
-          name: shortDesc,
           active: true,
-          tag: friendlyId,
+          name: shortDesc,
           projectId: productId,
+          checkComponent: name,
+          checkVersion: version,
+          checkIdentifier: friendlyId,
           automationConditionsAttributes: conditionsAttributes,
           automationActionsAttributes: filterActions
         }
