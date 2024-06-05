@@ -369,11 +369,10 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
       })
     )
 
-  console.log('conditionsAttributes', conditionsAttributes)
-  console.log('actionsAttributes', actionsAttributes)
+  // console.log('conditionsAttributes', conditionsAttributes)
+  // console.log('actionsAttributes', actionsAttributes)
 
-  const handleRuleCreate = async () => {
-    disableButtonTemporarily()
+  const handleRuleCreate = () => {
     if (hasSimilarConditions(conditions)) {
       setError(
         `A row with the empty or same values already exists. Please update or remove it before continue.`
@@ -383,7 +382,8 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
         `A row with the empty or same values already exists. Please update or remove it before continue.`
       )
     } else {
-      await createRule({
+      disableButtonTemporarily()
+      createRule({
         variables: {
           name: ruleName,
           active: true,
@@ -403,7 +403,6 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
   }
 
   const handleRuleUpdate = () => {
-    disableButtonTemporarily()
     if (deletedCondition?.length > 0) {
       deletedCondition?.map((item) =>
         conditionsAttributes?.push({ id: item?.id, _destroy: true })
@@ -423,6 +422,7 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
         `A row with the empty or same values already exists. Please update or remove it before continue.`
       )
     } else {
+      disableButtonTemporarily()
       updateRule({
         variables: {
           id: data?.id,
