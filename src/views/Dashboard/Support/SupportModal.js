@@ -159,7 +159,6 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
 
   const isInvalid =
     idUri === '' ||
-    productName === '' ||
     error !== '' ||
     idUri === productName ||
     idUri === productVersion
@@ -425,11 +424,7 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
               <Button
                 colorScheme='blue'
                 type='submit'
-                isDisabled={
-                  data
-                    ? isInvalid
-                    : errorMessage || productName === '' || error !== ''
-                }
+                isDisabled={data ? isInvalid : errorMessage || error !== ''}
               >
                 {data ? 'Update' : 'Save'}
               </Button>
