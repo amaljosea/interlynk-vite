@@ -840,7 +840,6 @@ const PurlModal = ({
               <Button
                 mr={'auto'}
                 fontSize={'sm'}
-                isLoading={isDisabled}
                 isDisabled={isDisabled || isInvalid}
                 onClick={handleRuleCreate}
                 hidden={friendlyId ? false : true}

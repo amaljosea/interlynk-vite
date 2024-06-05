@@ -661,7 +661,6 @@ const CpeModal = ({
               <Button
                 mr={'auto'}
                 fontSize={'sm'}
-                isLoading={isDisabled}
                 onClick={handleRuleCreate}
                 hidden={friendlyId ? false : true}
                 isDisabled={isDisabled || isInvalid}
