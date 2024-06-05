@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { gql, useLazyQuery, useQuery } from '@apollo/client'
 import { useState } from 'react'
 
 import {
@@ -32,14 +32,30 @@ import {
 
 import {
   DownloadSBOM,
-  GetTotalComponents,
+  GetCheckResults,
+  GetOrgName,
   SignedSbomDownload
 } from 'graphQL/Queries'
-import { GetCheckResults } from 'graphQL/Queries'
-import { GetAllVulnerabilities } from 'graphQL/Queries'
-import { GetOrgName } from 'graphQL/Queries'
 
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
+
+const QUERY = gql`
+  query Organization($projectId: Uuid!, $sbomId: Uuid!, $checkId: [String!]) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      components(sbomId: $sbomId) {
+        totalCount
+      }
+      unresolvedCheckResults: checkResults(
+        sbomId: $sbomId
+        status: ["unresolved"]
+        checkId: $checkId
+      ) {
+        totalCount
+      }
+    }
+  }
+`
 
 const DownloadModal = ({
   finalRef,
@@ -60,31 +76,150 @@ const DownloadModal = ({
   )
 
   const { data: orgData } = useQuery(GetOrgName, {
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'network-only',
+    skip: isOpen ? false : true
   })
 
-  const { data: compData } = useQuery(GetTotalComponents, {
-    fetchPolicy: 'network-only',
-    variables: {
-      sbomId: sbomId,
-      projectId: productId,
-      field: 'COMPONENTS_UPDATED_AT',
-      direction: 'DESC'
+  const ntiaData = [
+    {
+      id: 1,
+      category: 'SBOM Timestamp',
+      name: 'SB-HC-5',
+      type: 'check'
+    },
+    {
+      id: 2,
+      category: 'SBOM Supplier Name',
+      name: 'SB-HC-8',
+      type: 'check'
+    },
+    {
+      id: 3,
+      category: 'SBOM Unique Identifier',
+      name: 'SB-HC-4',
+      type: 'check'
+    },
+    {
+      id: 4,
+      category: 'SBOM Author Name',
+      name: 'SB-HC-7',
+      type: 'check'
+    },
+    {
+      id: 5,
+      category: 'Component Name',
+      name: 'SB-HC-11',
+      type: 'count'
+    },
+    {
+      id: 6,
+      category: 'Component Version',
+      name: 'SB-HC-12',
+      type: 'count'
+    },
+    {
+      id: 7,
+      category: 'Component Supplier Name',
+      name: 'SB-HC-15',
+      type: 'count'
+    },
+    {
+      id: 8,
+      category: 'Component Unique Identifier',
+      name: 'SB-HC-16',
+      type: 'count'
+    },
+    {
+      id: 9,
+      category: 'Component Relationships',
+      name: 'SB-HC-10',
+      type: 'count'
     }
-  })
+  ]
 
-  const { data: vulnData } = useQuery(GetAllVulnerabilities, {
-    fetchPolicy: 'network-only',
+  const fdaData = [
+    {
+      id: 1,
+      category: 'Known Vulnerabilities',
+      name: 'vulns',
+      type: 'check'
+    },
+    {
+      id: 2,
+      category: 'SBOM Timestamp',
+      name: 'SB-HC-5',
+      type: 'check'
+    },
+    {
+      id: 3,
+      category: 'SBOM Supplier Name',
+      name: 'SB-HC-8',
+      type: 'check'
+    },
+    {
+      id: 4,
+      category: 'SBOM Unique Identifier',
+      name: 'SB-HC-4',
+      type: 'check'
+    },
+    {
+      id: 5,
+      category: 'SBOM Author Name',
+      name: 'SB-HC-7',
+      type: 'check'
+    },
+    {
+      id: 6,
+      category: 'Component Name',
+      name: 'SB-HC-11',
+      type: 'count'
+    },
+    {
+      id: 7,
+      category: 'Component Version',
+      name: 'SB-HC-12',
+      type: 'count'
+    },
+    {
+      id: 8,
+      category: 'Component Supplier Name',
+      name: 'SB-HC-15',
+      type: 'count'
+    },
+    {
+      id: 9,
+      category: 'Component Unique Identifier',
+      name: 'SB-HC-16',
+      type: 'count'
+    },
+    {
+      id: 10,
+      category: 'Component Relationships',
+      name: 'SB-HC-10',
+      type: 'count'
+    },
+    {
+      id: 11,
+      category: 'Component Support Level',
+      name: `support`,
+      type: 'count'
+    }
+  ]
+
+  const checkId = ntiaData.map((item) => item?.name)
+
+  const { data } = useQuery(QUERY, {
+    skip: isOpen ? false : true,
     variables: {
       sbomId: sbomId,
       projectId: productId,
-      field: 'COMPONENT_VULNS_UPDATED_AT',
-      direction: 'DESC'
+      checkId
     }
   })
 
   const { data: checkData } = useQuery(GetCheckResults, {
     fetchPolicy: 'network-only',
+    skip: isOpen ? false : true,
     variables: {
       sbomId: sbomId,
       projectId: productId,
@@ -96,10 +231,9 @@ const DownloadModal = ({
       data && setTotalRows(data?.sbom?.checkResults?.totalCount)
   })
 
-  const { components } = compData?.sbom || ''
+  const { components, unresolvedCheckResults } = data?.sbom || ''
   const { totalCount: totalComponents } = components || ''
-  const { vulns } = vulnData?.sbom || ''
-  const { totalCount: totalVulns } = vulns || ''
+  const { totalCount: totalUnresolvedChecks } = unresolvedCheckResults || ''
   const { checkResults } = checkData?.sbom || ''
   const { nodes: checkNodes } = checkResults || ''
   const { organization } = orgData || ''
@@ -176,126 +310,12 @@ const DownloadModal = ({
     }
   }
 
-  const ntiaData = [
-    {
-      id: 1,
-      category: 'SBOM Timestamp',
-      name: 'SB-HC-5',
-      type: 'check',
-      value: true
-    },
-    {
-      id: 2,
-      category: 'SBOM Supplier Name',
-      name: 'SB-HC-8',
-      type: 'check',
-      value: true
-    },
-    {
-      id: 3,
-      category: 'SBOM Unique Identifier',
-      name: 'SB-HC-4',
-      type: 'check',
-      value: true
-    },
-    {
-      id: 4,
-      category: 'SBOM Author Name',
-      name: 'SB-HC-7',
-      type: 'check',
-      value: true
-    },
-    {
-      id: 5,
-      category: 'Component Name',
-      name: 'SB-HC-11',
-      type: 'count',
-      value: '33/70'
-    },
-    {
-      id: 6,
-      category: 'Component Version',
-      name: 'SB-HC-12',
-      type: 'count',
-      value: '33/70'
-    },
-    {
-      id: 7,
-      category: 'Component Supplier Name',
-      name: 'SB-HC-15',
-      type: 'count',
-      value: '33/70'
-    },
-    {
-      id: 8,
-      category: 'Component Unique Identifier',
-      name: ' SB-HC-16',
-      count: '33/70'
-    },
-    {
-      id: 9,
-      category: 'Component Relationships',
-      name: 'SB-HC-10',
-      count: '33/70'
-    }
-  ]
-
-  const fdaData = [
-    { id: 1, category: 'Known Vulnerabilities', value: '' },
-    {
-      id: 2,
-      category: 'SBOM Timestamp',
-      value: 'SB-HC-5'
-    },
-    {
-      id: 3,
-      category: 'SBOM Supplier Name',
-      value: 'SB-HC-8'
-    },
-    {
-      id: 4,
-      category: 'SBOM Unique Identifier',
-      value: 'SB-HC-4'
-    },
-    {
-      id: 5,
-      category: 'SBOM Author Name',
-      value: 'SB-HC-7'
-    },
-    {
-      id: 6,
-      category: 'Component Name',
-      value: 'SB-HC-11'
-    },
-    {
-      id: 7,
-      category: 'Component Version',
-      value: 'SB-HC-12'
-    },
-    {
-      id: 8,
-      category: 'Component Supplier Name',
-      value: 'SB-HC-15'
-    },
-    {
-      id: 9,
-      category: 'Component Unique Identifier',
-      value: 'SB-HC-16'
-    },
-    { id: 10, category: 'Component Relationships', value: 'SB-HC-10' },
-    {
-      id: 11,
-      category: 'Component Support Level',
-      value: `0/${totalComponents}`
-    }
-  ]
-
   const ntiaMaxScore = 4 + totalComponents * 5
-  const fdaMaxScore = 4 + totalComponents * 6
-  const ntiaActualScore = ntiaData?.reduce((acc, row) => acc + row.id, 0)
-  const fdaActualScore = fdaData?.reduce((acc, row) => acc + row.id, 0)
+  const fdaMaxScore = 5 + totalComponents * 6
+  const ntiaActualScore = ntiaMaxScore - totalUnresolvedChecks
+  const fdaActualScore = fdaMaxScore - (totalUnresolvedChecks + totalComponents)
 
-  const getNtiaValue = (check) => {
+  const getValue = (check) => {
     const filterChecks = checkNodes?.filter(
       (item) =>
         item?.organizationRule?.rule?.friendlyId === check &&
@@ -304,14 +324,18 @@ const DownloadModal = ({
     return filterChecks?.length > 0 ? false : true
   }
 
-  const getNtiaCount = (check) => {
-    const filterChecks = checkNodes?.filter(
-      (item) => item?.organizationRule?.rule?.friendlyId === check
-    )
-    const unresolvedChecks = filterChecks?.filter(
-      (item) => item?.status === 'unresolved'
-    )
-    return `${totalComponents - unresolvedChecks?.length || 0}/${totalComponents || 0}`
+  const getCount = (check) => {
+    if (check === 'support') {
+      return `0 / ${totalComponents}`
+    } else {
+      const filterChecks = checkNodes?.filter(
+        (item) => item?.organizationRule?.rule?.friendlyId === check
+      )
+      const unresolvedChecks = filterChecks?.filter(
+        (item) => item?.status === 'unresolved'
+      )
+      return `${totalComponents - unresolvedChecks?.length || 0} / ${totalComponents || 0}`
+    }
   }
 
   const NTIA = () => {
@@ -329,14 +353,14 @@ const DownloadModal = ({
               >
                 {item?.type === 'check' ? (
                   <>
-                    {getNtiaValue(item?.name) === true ? (
+                    {getValue(item?.name) === true ? (
                       <FaCheckCircle color='green' size={16} />
                     ) : (
                       <FaTimesCircle color='red' size={16} />
                     )}
                   </>
                 ) : (
-                  getNtiaCount(item?.name)
+                  getCount(item?.name)
                 )}
               </Button>
             </GridItem>
@@ -357,9 +381,20 @@ const DownloadModal = ({
               ml={'auto'}
               width={'100px'}
               _hover={{ background: '#EDF2F7' }}
-              isLoading={vulnData ? false : true}
+              isLoading={checkNodes ? false : true}
             >
-              {item?.value === '' ? totalVulns : item?.value}
+              {item?.type === 'check' ? (
+                <>
+                  {getValue(item?.name) === true ||
+                  item?.category === 'vulns' ? (
+                    <FaCheckCircle color='green' size={16} />
+                  ) : (
+                    <FaTimesCircle color='red' size={16} />
+                  )}
+                </>
+              ) : (
+                getCount(item?.name)
+              )}
             </Button>
           </Grid>
         ))}
@@ -370,13 +405,18 @@ const DownloadModal = ({
   const checklists = [
     {
       name: 'NTIA Minimum Elements',
-      score: `${ntiaActualScore || 0}/${ntiaMaxScore || 0}`,
+      score: `${ntiaActualScore || 0} / ${ntiaMaxScore || 0}`,
       data: <NTIA />
     },
-    { name: 'FDA 510(K) Compliance', score: '27/33', data: <FDA /> },
+    {
+      name: 'FDA 510(K) Compliance',
+      score: `${fdaActualScore || 0} / ${fdaMaxScore || 0}`,
+      data: <FDA />
+    },
     {
       name: 'BSI TR-03183',
-      score: `${fdaActualScore || 0}/${fdaMaxScore || 0}`,
+      score: '',
+      // score: `${fdaActualScore || 0}/${fdaMaxScore || 0}`,
       data: <Text>Coming soon...</Text>
     }
   ]
@@ -430,7 +470,7 @@ const DownloadModal = ({
               alignItems={'center'}
               justifyContent={'space-between'}
             >
-              <Text fontSize={'sm'} width='100px'>
+              <Text fontWeight={'medium'} fontSize={'sm'} width='100px'>
                 File Name
               </Text>
               <Tag
@@ -464,7 +504,11 @@ const DownloadModal = ({
                         justifyContent={'space-between'}
                       >
                         <Text fontSize={'sm'}>{item?.name}</Text>
-                        <Button size='xs' ml={'auto'}>
+                        <Button
+                          size='xs'
+                          ml={'auto'}
+                          hidden={item?.score === ''}
+                        >
                           {item?.score}
                         </Button>
                       </Flex>
