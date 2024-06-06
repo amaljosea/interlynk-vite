@@ -328,12 +328,7 @@ const VersionsTable = ({ projectGroup }) => {
       },
       width: '10%',
       right: 'true',
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.creationAt)
-        const dateB = new Date(b.creationAt)
-        return dateA - dateB
-      }
+      sortable: true
     },
     // UPDATED AT
     {
@@ -348,11 +343,6 @@ const VersionsTable = ({ projectGroup }) => {
         )
       },
       sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
-        return dateA - dateB
-      },
       width: '10%',
       right: 'true'
     },
