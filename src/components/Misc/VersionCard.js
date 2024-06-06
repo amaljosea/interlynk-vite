@@ -8,23 +8,10 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
-  Tag,
   Text
 } from '@chakra-ui/react'
 
-const VersionTag = ({ children }) => (
-  <Tag
-    py={1}
-    size='sm'
-    ml={'auto'}
-    variant='subtle'
-    colorScheme={'blue'}
-    wordBreak={'break-all'}
-    textAlign={'right'}
-  >
-    {children}
-  </Tag>
-)
+import CustomTag from './CustomTag'
 
 const VersionCard = ({ data, isOpen, onClose }) => {
   const { sbom } = data || ''
@@ -39,17 +26,17 @@ const VersionCard = ({ data, isOpen, onClose }) => {
           <Stack spacing={2} py={3}>
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
               <Text fontSize={'sm'}>Product</Text>
-              <VersionTag>{project?.projectGroup?.name || '-'}</VersionTag>
+              <CustomTag>{project?.projectGroup?.name || '-'}</CustomTag>
             </Grid>
             <Divider />
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
               <Text fontSize={'sm'}>Version</Text>
-              <VersionTag>{primaryComponent?.version || '-'}</VersionTag>
+              <CustomTag>{primaryComponent?.version || '-'}</CustomTag>
             </Grid>
             <Divider />
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
               <Text fontSize={'sm'}>SBOM File</Text>
-              <VersionTag>{primaryComponent?.name || '-'}</VersionTag>
+              <CustomTag>{primaryComponent?.name || '-'}</CustomTag>
             </Grid>
           </Stack>
         </ModalBody>

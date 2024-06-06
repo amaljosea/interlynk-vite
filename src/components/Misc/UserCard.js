@@ -10,25 +10,12 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
-  Tag,
   Text
 } from '@chakra-ui/react'
 
 import { GetSelectedUser } from 'graphQL/Queries'
 
-const UserTag = ({ children }) => (
-  <Tag
-    py={1}
-    ml={'auto'}
-    size='sm'
-    variant='subtle'
-    colorScheme={'blue'}
-    wordBreak={'break-all'}
-    textAlign={'right'}
-  >
-    {children}
-  </Tag>
-)
+import CustomTag from './CustomTag'
 
 const UserCard = ({ name, isOpen, onClose }) => {
   const isSystem = name === 'system'
@@ -48,19 +35,19 @@ const UserCard = ({ name, isOpen, onClose }) => {
           <Stack spacing={2} py={3}>
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
               <Text fontSize={'sm'}>Name</Text>
-              <UserTag>
+              <CustomTag>
                 {isSystem ? 'System' : currentUser?.name || '-'}
-              </UserTag>
+              </CustomTag>
             </Grid>
             <Divider />
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
               <Text fontSize={'sm'}>Email</Text>
-              <UserTag>{currentUser?.email || '-'}</UserTag>
+              <CustomTag>{currentUser?.email || '-'}</CustomTag>
             </Grid>
             <Divider />
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
               <Text fontSize={'sm'}>Role</Text>
-              <UserTag>{currentUser?.role?.name || '-'}</UserTag>
+              <CustomTag>{currentUser?.role?.name || '-'}</CustomTag>
             </Grid>
           </Stack>
         </ModalBody>

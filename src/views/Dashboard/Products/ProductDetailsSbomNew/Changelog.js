@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
@@ -19,13 +19,19 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import ComponentCard from 'components/Misc/ComponentCard'
 import PurlCard from 'components/Misc/PurlCard'
 import UserCard from 'components/Misc/UserCard'
+import VersionCard from 'components/Misc/VersionCard'
+import VulnCard from 'components/Misc/VulnCard'
 import Pagination from 'components/Pagination'
 
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetChangeLogs, GetSbomLogFilters } from 'graphQL/Queries'
+import { GetComponentData } from 'graphQL/Queries'
+import { GetProductData } from 'graphQL/Queries'
+import { GetVulnData } from 'graphQL/Queries'
 
 import LogFilters from './LogFilters'
 
@@ -62,6 +68,21 @@ const Changelog = () => {
     onOpen: onUserOpen,
     onClose: onUserClose
   } = useDisclosure()
+  const {
+    isOpen: isCardOpen,
+    onOpen: onCardOpen,
+    onClose: onCardClose
+  } = useDisclosure()
+  const {
+    isOpen: isVCardOpen,
+    onOpen: onVCardOpen,
+    onClose: onVCardClose
+  } = useDisclosure()
+  const {
+    isOpen: isVulnOpen,
+    onOpen: onVulnOpen,
+    onClose: onVulnClose
+  } = useDisclosure()
   const [activeRow, setActiveRow] = useState('')
   const [logSearch, setLogSearch] = useState('')
   const [logState, setLogState] = useState({
@@ -80,6 +101,57 @@ const Changelog = () => {
         search: logState.search || undefined
       }
     })
+
+  const [getComponent] = useLazyQuery(GetComponentData)
+  const [getSbom] = useLazyQuery(GetProductData)
+  const [getVuln] = useLazyQuery(GetVulnData)
+
+  const onSelect = (row) => {
+    const { loggableType, loggablePrefix, event, updated } = row
+    const searchInput = loggablePrefix.split(' ')
+    if (event === 'vulns' && updated?.startsWith('CVE')) {
+      getVuln({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          search: updated,
+          field: 'COMPONENT_VULNS_UPDATED_AT',
+          direction: 'DESC'
+        }
+      })
+        .then((res) => {
+          if (res?.data) {
+            const vulns = res?.data?.sbom?.vulns?.nodes
+            vulns?.length > 0 && setActiveRow(vulns[0])
+          }
+        })
+        .finally(() => onVulnOpen())
+    } else if (loggableType === 'Sbom') {
+      getSbom({
+        variables: {
+          sbomId: sbomId,
+          projectId: productId
+        }
+      })
+        .then((res) => res?.data && setActiveRow(res?.data))
+        .finally(() => onVCardOpen())
+    } else {
+      getComponent({
+        variables: {
+          sbomId: sbomId,
+          projectId: productId,
+          search: searchInput[0]
+        }
+      })
+        .then((res) => {
+          if (res?.data) {
+            const components = res?.data?.sbom?.components?.nodes
+            components?.length > 0 && setActiveRow(components[0])
+          }
+        })
+        .finally(() => onCardOpen())
+    }
+  }
 
   const { field } = paginationProps
 
@@ -125,22 +197,22 @@ const Changelog = () => {
       selector: (row) => {
         const { event, loggablePrefix, loggableType } = row
         return (
-          <Tooltip placement='top' label={loggablePrefix}>
-            <Stack direction={'column'} spacing={0} my={2}>
-              <Tag
-                fontSize={'sm'}
-                overflow={'auto'}
-                colorScheme='blue'
-                fontWeight={'medium'}
-                width={'fit-content'}
-              >
-                <TagLabel>
-                  {loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}
-                </TagLabel>
-              </Tag>
-              <Text>{event}</Text>
-            </Stack>
-          </Tooltip>
+          <Stack direction={'column'} spacing={0} my={2}>
+            <Tag
+              fontSize={'sm'}
+              overflow={'auto'}
+              colorScheme='blue'
+              cursor={'pointer'}
+              fontWeight={'medium'}
+              width={'fit-content'}
+              onClick={() => onSelect(row)}
+            >
+              <TagLabel>
+                {loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}
+              </TagLabel>
+            </Tag>
+            <Text>{event}</Text>
+          </Stack>
         )
       },
       wrap: true,
@@ -321,7 +393,13 @@ const Changelog = () => {
                     </Flex>
                   ))
                 ) : (
-                  <Text whiteSpace={'wrap'}>{updated}</Text>
+                  <Text
+                    whiteSpace={'wrap'}
+                    cursor={'pointer'}
+                    onClick={() => onSelect(row)}
+                  >
+                    {updated}
+                  </Text>
                 )}
               </Box>
             </Tooltip>
@@ -509,6 +587,26 @@ const Changelog = () => {
           isOpen={isUserOpen}
           onClose={onUserClose}
         />
+      )}
+
+      {isCardOpen && (
+        <ComponentCard
+          isOpen={isCardOpen}
+          onClose={onCardClose}
+          data={activeRow}
+        />
+      )}
+
+      {isVCardOpen && (
+        <VersionCard
+          isOpen={isVCardOpen}
+          onClose={onVCardClose}
+          data={activeRow}
+        />
+      )}
+
+      {isVulnOpen && (
+        <VulnCard isOpen={isVulnOpen} onClose={onVulnClose} data={activeRow} />
       )}
     </>
   )
