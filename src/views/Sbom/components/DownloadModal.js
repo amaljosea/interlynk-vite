@@ -30,10 +30,11 @@ import {
   useToast
 } from '@chakra-ui/react'
 
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
+
 import {
   DownloadSBOM,
   GetCheckResults,
-  GetOrgName,
   SignedSbomDownload
 } from 'graphQL/Queries'
 
@@ -75,8 +76,7 @@ const DownloadModal = ({
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
   )
 
-  const { data: orgData } = useQuery(GetOrgName, {
-    fetchPolicy: 'network-only',
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures({
     skip: isOpen && !signedUrlParams ? false : true
   })
 
@@ -236,9 +236,6 @@ const DownloadModal = ({
   const { totalCount: totalUnresolvedChecks } = unresolvedCheckResults || ''
   const { checkResults } = checkData?.sbom || ''
   const { nodes: checkNodes } = checkResults || ''
-  const { organization } = orgData || ''
-
-  const isDemo = organization?.name === 'Interlynk - Demo'
 
   const [spec, setSpec] = useState('cyclonedx')
   const [format, setFormat] = useState('json')
@@ -482,7 +479,9 @@ const DownloadModal = ({
               >{`${productName}-${version}.${type}.xml`}</Tag>
             </Flex>
             <FormControl
-              display={isDemo && !signedUrlParams ? 'block' : 'none'}
+              display={
+                shouldShowDemoFeatures && !signedUrlParams ? 'block' : 'none'
+              }
             >
               <FormLabel>Compliance Checklist</FormLabel>
               <Accordion mt={3} allowMultiple>

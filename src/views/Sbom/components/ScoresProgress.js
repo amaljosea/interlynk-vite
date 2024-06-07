@@ -1,22 +1,22 @@
 import { useParams } from 'react-router-dom'
-import { shouldShowDemoFeatures } from 'utils/shouldShowDemoFeatures'
 
 import { Box, Progress, Stack, Text } from '@chakra-ui/react'
 
 import { useQualityScore } from 'hooks/useQualityScore'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 export const ScoresProgress = () => {
   const params = useParams()
 
-  const showDemoFeatures = shouldShowDemoFeatures()
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const productId = params.productid
   const sbomId = params.sbomid
 
-  const { qualityScore, maxScore, currentScore, loading } = useQualityScore({
+  const { qualityScore, loading } = useQualityScore({
     projectId: productId,
     sbomId,
-    skip: !showDemoFeatures
+    skip: !shouldShowDemoFeatures
   })
 
   const getColor = () => {
@@ -29,7 +29,7 @@ export const ScoresProgress = () => {
     }
   }
 
-  if (!shouldShowDemoFeatures()) {
+  if (!shouldShowDemoFeatures) {
     return null
   }
 

@@ -2,9 +2,10 @@
 import { gql, useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 import { Bar, BarChart, Line, LineChart, Tooltip, XAxis } from 'recharts'
-import { shouldShowDemoFeatures } from 'utils/shouldShowDemoFeatures'
 
 import { Box, Flex, Text } from '@chakra-ui/react'
+
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 const QUERY = gql`
   query Project($projectId: Uuid!) {
@@ -109,6 +110,7 @@ const policyData = [
 ]
 
 export const ProductGraphs = () => {
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const params = useParams()
   const productId = params.productid
 
@@ -191,7 +193,7 @@ export const ProductGraphs = () => {
     return <Box mt={8}>Loading...</Box>
   }
 
-  if (!shouldShowDemoFeatures()) {
+  if (!shouldShowDemoFeatures) {
     return null
   }
   return (
