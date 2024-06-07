@@ -181,6 +181,8 @@ const RelationshipDrawer = ({
     onClose()
   }
 
+  console.log('component', component)
+
   return (
     <Drawer
       size='lg'
@@ -338,12 +340,12 @@ const RelationshipDrawer = ({
                           {[...dependsOnList]
                             .sort(
                               (a, b) =>
-                                new Date(b.updatedAt) - new Date(a.updatedAt)
+                                new Date(b?.updatedAt) - new Date(a?.updatedAt)
                             )
                             .map((comp, index) => (
                               <Tooltip
                                 key={index}
-                                label={comp.toComp.name}
+                                label={comp?.toComp?.name}
                                 placement='top'
                               >
                                 <Tag
@@ -355,8 +357,8 @@ const RelationshipDrawer = ({
                                   width={'fit-content'}
                                 >
                                   <TagLabel>
-                                    {comp.toComp.name?.substring(0, 50)}-
-                                    {comp.toComp.version}
+                                    {comp?.toComp?.name?.substring(0, 50)}-
+                                    {comp?.toComp?.version}
                                   </TagLabel>
                                   <TagCloseButton
                                     onClick={() => {

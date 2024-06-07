@@ -1834,6 +1834,7 @@ export const GetAllComponents = gql`
         last: $last
       ) {
         nodes {
+          id
           name
           version
         }
