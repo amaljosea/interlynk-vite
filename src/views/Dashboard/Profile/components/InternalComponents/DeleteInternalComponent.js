@@ -1,23 +1,20 @@
+import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 
 import { DeleteIcon } from '@chakra-ui/icons'
+import { Button, IconButton, Text, useToast } from '@chakra-ui/react'
 
 import { ConfirmationModal } from 'components/Modal/ConfirmationModal'
 
+import { deleteOrgComp } from 'graphQL/Mutation'
 import { getInternalComponents } from 'graphQL/Queries'
-
-const { useMutation } = require('@apollo/client')
-const { IconButton, Text, Button, useToast } = require('@chakra-ui/react')
-const { deleteOrgComp } = require('graphQL/Mutation')
 
 export const DeleteInternalComponent = ({ internalComponent }) => {
   const { id } = internalComponent
   const [isConfirming, setIsConfirming] = useState(false)
   const toast = useToast()
 
-  const onCancel = () => {
-    setIsConfirming(false)
-  }
+  const onCancel = () => setIsConfirming(false)
 
   const [deleteComp, { loading: deleting }] = useMutation(deleteOrgComp, {
     refetchQueries: [getInternalComponents],
@@ -67,9 +64,12 @@ export const DeleteInternalComponent = ({ internalComponent }) => {
           }
         >
           <Text>
-            Components tagged "internal" with regular expression "
-            {internalComponent.matchStr}", will be untagged. Do you want to
-            proceed?
+            Components tagged <span style={{ fontWeight: 600 }}>internal</span>{' '}
+            with regular expression{' '}
+            <span style={{ fontWeight: 600 }}>
+              {internalComponent.matchStr}
+            </span>
+            , will be untagged. Do you want to proceed ?
           </Text>
         </ConfirmationModal>
       )}

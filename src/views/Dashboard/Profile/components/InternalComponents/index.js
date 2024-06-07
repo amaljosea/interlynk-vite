@@ -34,20 +34,23 @@ export const InternalComponents = () => {
 
   const columns = [
     {
-      name: 'Regular Expression',
+      id: 'REGULAR_EXPRESSION',
+      name: 'REGULAR EXPRESSION',
       grow: 3,
       selector: (row) => {
         return <RegexHighlighter>{row.matchStr}</RegexHighlighter>
       }
     },
     {
-      name: 'Case Insensitive',
+      id: 'CASE_INSENSITIVE',
+      name: 'CASE INSENSITIVE',
       selector: (row) => {
         return <Text my={2}>{row.ignoreCase ? 'Yes' : 'No'}</Text>
       }
     },
     {
-      name: 'Created',
+      id: 'CREATED',
+      name: 'CREATED',
       selector: (row) => {
         return (
           <Tooltip label={getFullDateAndTime(row.createdAt)} placement={'top'}>
@@ -57,7 +60,8 @@ export const InternalComponents = () => {
       }
     },
     {
-      name: 'Updated',
+      id: 'UPDATED',
+      name: 'UPDATED',
       selector: (row) => {
         return (
           <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
@@ -67,7 +71,8 @@ export const InternalComponents = () => {
       }
     },
     {
-      name: '',
+      id: 'ACTION',
+      name: 'ACTION',
       right: true,
       selector: (row) => {
         return <DeleteInternalComponent internalComponent={row} />
