@@ -77,7 +77,7 @@ const DownloadModal = ({
 
   const { data: orgData } = useQuery(GetOrgName, {
     fetchPolicy: 'network-only',
-    skip: isOpen ? false : true
+    skip: isOpen && !signedUrlParams ? false : true
   })
 
   const ntiaData = [
@@ -209,7 +209,7 @@ const DownloadModal = ({
   const checkId = ntiaData.map((item) => item?.name)
 
   const { data } = useQuery(QUERY, {
-    skip: isOpen ? false : true,
+    skip: isOpen && !signedUrlParams ? false : true,
     variables: {
       sbomId: sbomId,
       projectId: productId,
@@ -219,7 +219,7 @@ const DownloadModal = ({
 
   const { data: checkData } = useQuery(GetCheckResults, {
     fetchPolicy: 'network-only',
-    skip: isOpen ? false : true,
+    skip: isOpen && !signedUrlParams ? false : true,
     variables: {
       sbomId: sbomId,
       projectId: productId,
@@ -481,13 +481,11 @@ const DownloadModal = ({
                 wordBreak={'break-all'}
               >{`${productName}-${version}.${type}.xml`}</Tag>
             </Flex>
-            <FormControl>
+            <FormControl
+              display={isDemo && !signedUrlParams ? 'block' : 'none'}
+            >
               <FormLabel>Compliance Checklist</FormLabel>
-              <Accordion
-                mt={3}
-                allowMultiple
-                display={isDemo ? 'block' : 'none'}
-              >
+              <Accordion mt={3} allowMultiple>
                 {checklists.map((item, index) => (
                   <AccordionItem key={index}>
                     <AccordionButton

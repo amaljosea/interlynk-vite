@@ -17,7 +17,7 @@ const QUERY = gql`
     }
   }
 `
-
+const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 const SBOM_LEVEL_CHECKS_COUNT = 7
 const COMPONENT_LEVEL_CHECKS_COUNT = 13
 
@@ -46,6 +46,7 @@ export const useQualityScore = ({ projectId, sbomId }) => {
     sbomId
   })
   const { data, loading } = useQuery(QUERY, {
+    skip: sbomId && !signedUrlParams ? false : true,
     variables: {
       projectId,
       sbomId

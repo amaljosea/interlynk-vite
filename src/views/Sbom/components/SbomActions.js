@@ -399,7 +399,7 @@ const SbomActions = ({ sbom, refetch }) => {
           ></IconButton>
         </Tooltip>
       </Flex>
-      <ScoresProgress />
+      {signedUrlParams ? '' : <ScoresProgress />}
       {/* DOWNLOAD SBOM */}
       {isOpen && (
         <DownloadModal
