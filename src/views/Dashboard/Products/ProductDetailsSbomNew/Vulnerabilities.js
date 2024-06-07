@@ -460,6 +460,15 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
         const { projectVersion, project } = sbom
         const { vulnInfo } = vuln
         const { kev } = vulnInfo ? vulnInfo : ''
+
+        const getUrl = (url) => {
+          if (url?.startsWith('http')) {
+            return url
+          } else {
+            return `http://${url}`
+          }
+        }
+
         return (
           <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
             <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
@@ -489,7 +498,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
               <Stack direction={'row'} alignItems={'center'}>
                 {/* issueTracker */}
                 <Tooltip placement='top' label={issueTracker?.url}>
-                  <Link href={issueTracker?.url} isExternal>
+                  <Link href={getUrl(issueTracker?.url)} isExternal>
                     <IconButton
                       type='button'
                       size='xs'
@@ -502,7 +511,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                 </Tooltip>
                 {/* advisories */}
                 <Tooltip placement='top' label={advisories?.url}>
-                  <Link href={advisories?.url} isExternal>
+                  <Link href={getUrl(advisories?.url)} isExternal>
                     <IconButton
                       type='button'
                       size='xs'
@@ -515,7 +524,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                 </Tooltip>
                 {/* documentation */}
                 <Tooltip placement='top' label={documentation?.url}>
-                  <Link href={documentation?.url} isExternal>
+                  <Link href={getUrl(documentation?.url)} isExternal>
                     <IconButton
                       type='button'
                       size='xs'
@@ -528,7 +537,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                 </Tooltip>
                 {/* other */}
                 <Tooltip placement='top' label={other?.url}>
-                  <Link href={other?.url} isExternal>
+                  <Link href={getUrl(other?.url)} isExternal>
                     <IconButton
                       type='button'
                       size='xs'

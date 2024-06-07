@@ -289,8 +289,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
                                 as={DeleteIcon}
                                 color={'red'}
                                 cursor={'pointer'}
-                                display={isPart ? 'block' : 'none'}
-                                onClick={() => handleLinkRemove(item)}
+                                onClick={() => handleLinkRemove(item?.id)}
                               />
                             </Td>
                           </Tr>
