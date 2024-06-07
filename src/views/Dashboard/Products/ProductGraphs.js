@@ -1,11 +1,10 @@
 /* eslint-disable no-unreachable */
 import { gql, useQuery } from '@apollo/client'
-import React from 'react'
 import { useParams } from 'react-router-dom'
 import { Bar, BarChart, Line, LineChart, Tooltip, XAxis } from 'recharts'
 import { shouldShowDemoFeatures } from 'utils/shouldShowDemoFeatures'
 
-import { Box, Text } from '@chakra-ui/react'
+import { Box, Flex, Text } from '@chakra-ui/react'
 
 const QUERY = gql`
   query Project($projectId: Uuid!) {
@@ -36,12 +35,81 @@ const QUERY = gql`
     }
   }
 `
+
+const vulnData = [
+  {
+    id: 1,
+    name: 'Critical',
+    dataKey: 'stats.vulnStats.critical',
+    stroke: 'red'
+  },
+  {
+    id: 2,
+    name: 'High',
+    dataKey: 'stats.vulnStats.high',
+    stroke: 'orange'
+  },
+  {
+    id: 3,
+    name: 'Medium',
+    dataKey: 'stats.vulnStats.medium',
+    stroke: '#cbbb08'
+  },
+  {
+    id: 4,
+    name: 'Low',
+    dataKey: 'stats.vulnStats.low',
+    stroke: 'green'
+  },
+  {
+    id: 5,
+    name: 'Unknown',
+    dataKey: 'stats.vulnStats.unknown',
+    stroke: 'gray'
+  }
+]
+
+const policyData = [
+  {
+    id: 1,
+    name: 'Failed',
+    dataKey: 'policyResultMetrics.failedCount',
+    stroke: 'red'
+  },
+  {
+    id: 2,
+    name: 'Warn',
+    dataKey: 'policyResultMetrics.warnCount',
+    stroke: '#cbbb08'
+  },
+  {
+    id: 3,
+    name: 'Inform',
+    dataKey: 'policyResultMetrics.informCount',
+    stroke: 'blue'
+  },
+  {
+    id: 4,
+    name: 'Passed',
+    dataKey: 'policyResultMetrics.passedCount',
+    stroke: 'green'
+  },
+  {
+    id: 5,
+    name: 'Skipped',
+    dataKey: 'policyResultMetrics.skippedCount',
+    stroke: 'orange'
+  },
+  {
+    id: 6,
+    name: 'Error',
+    dataKey: 'policyResultMetrics.errorCount',
+    stroke: 'gray'
+  }
+]
+
 export const ProductGraphs = () => {
-  // temp setup
-  // return null
-
   const params = useParams()
-
   const productId = params.productid
 
   const { data, loading } = useQuery(QUERY, {
@@ -79,106 +147,69 @@ export const ProductGraphs = () => {
 
   const nodesReversed = [...nodes].reverse()
 
-  console.l
+  const SimpleBarChat = ({ label, dataKey, color }) => {
+    return (
+      <Flex flexDir={'column'} alignItems={'center'}>
+        <BarChart width={200} height={40} data={nodesReversed}>
+          <Bar name={`${label} Count`} dataKey={dataKey} fill={color} />
+          <XAxis dataKey='name' hide />
+          <Tooltip position={{ x: 100, y: -50 }} />
+        </BarChart>
+        <Text fontSize={'xs'} cursor={'pointer'}>
+          {`${label} Trend`}
+        </Text>
+      </Flex>
+    )
+  }
+
+  const SimpleLineChat = ({ label, data }) => {
+    return (
+      <Flex flexDir={'column'} alignItems={'center'}>
+        <LineChart width={200} height={40} data={nodesReversed}>
+          {data?.map((item) => (
+            <Line
+              key={item.id}
+              stroke={item.stroke}
+              name={item.name}
+              dataKey={item.dataKey}
+            />
+          ))}
+          <XAxis dataKey='name' hide />
+          <Tooltip
+            position={{ x: 100, y: label === 'Vulnerability' ? -50 : -200 }}
+            wrapperStyle={{ zIndex: 9999 }}
+          />
+        </LineChart>
+        <Text cursor={'pointer'} fontSize={'xs'}>
+          {`${label} Trend`}
+        </Text>
+      </Flex>
+    )
+  }
 
   if (loading) {
-    return 'Loading...'
+    return <Box mt={8}>Loading...</Box>
   }
 
   if (!shouldShowDemoFeatures()) {
     return null
   }
   return (
-    <Box display='flex' justifyContent='space-between'>
-      <Box>
-        <Box>
-          <BarChart width={100} height={40} data={nodesReversed}>
-            <Bar
-              name='Component count'
-              dataKey='stats.compCount'
-              fill='#3182ce'
-            />
-            <XAxis dataKey='name' hide />
-            <Tooltip position={{ x: 100, y: -50 }} />
-          </BarChart>
-          <Text>Component trend</Text>
-        </Box>
-        <Box>
-          <BarChart width={100} height={40} data={nodesReversed}>
-            <Bar
-              dataKey='stats.compLicenseCount'
-              fill='#3182ce'
-              name='License count'
-            />
-            <XAxis dataKey='name' hide />
-            <Tooltip position={{ x: 100, y: -50 }} />
-          </BarChart>
-          <Text>License trend</Text>
-        </Box>
-      </Box>
-      <Box>
-        <Box>
-          <LineChart width={100} height={40} data={nodesReversed}>
-            <Line
-              name='Critical'
-              dataKey='stats.vulnStats.critical'
-              stroke='red'
-            />
-            <Line name='High' dataKey='stats.vulnStats.high' stroke='orange' />
-            <Line
-              name='Medium'
-              dataKey='stats.vulnStats.medium'
-              stroke='#cbbb08'
-            />
-            <Line name='Low' dataKey='stats.vulnStats.low' stroke='green' />
-            <Line
-              name='Unknown'
-              dataKey='stats.vulnStats.unknown'
-              stroke='gray'
-            />
-            <XAxis dataKey='name' hide />
-            <Tooltip position={{ x: 100, y: -50 }} />
-          </LineChart>
-          Vulnerability trend
-        </Box>
-        <Box>
-          <LineChart width={100} height={40} data={nodesReversed}>
-            <Line
-              name='Failed'
-              dataKey='policyResultMetrics.failedCount'
-              stroke='red'
-            />
-            <Line
-              name='Warn'
-              dataKey='policyResultMetrics.warnCount'
-              stroke='#cbbb08'
-            />
-            <Line
-              name='Inform'
-              dataKey='policyResultMetrics.informCount'
-              stroke='blue'
-            />
-            <Line
-              name='Passed'
-              dataKey='policyResultMetrics.passedCount'
-              stroke='green'
-            />
-            <Line
-              name='Skipped'
-              dataKey='policyResultMetrics.skippedCount'
-              stroke='orange'
-            />
-            <Line
-              name='Error'
-              dataKey='policyResultMetrics.errorCount'
-              stroke='gray'
-            />
-            <XAxis dataKey='name' hide />
-            <Tooltip position={{ x: 100, y: -200 }} />
-          </LineChart>
-          Policy trend
-        </Box>
-      </Box>
+    <Box display='flex' justifyContent='space-between' mt={8}>
+      <Flex flexWrap={'wrap'} alignItems={'center'} gap={12}>
+        <SimpleBarChat
+          color='#3182ce'
+          label={'Component'}
+          dataKey='stats.compCount'
+        />
+        <SimpleBarChat
+          color='#3182ce'
+          label={'License'}
+          dataKey='stats.compLicenseCount'
+        />
+        <SimpleLineChat data={vulnData} label={'Vulnerability'} />
+        <SimpleLineChat data={policyData} label={'Policy'} />
+      </Flex>
       <Box>
         {/* <Box>
           <LineChart width={100} height={40} data={data3}>
