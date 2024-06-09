@@ -4,6 +4,8 @@ import { Flex } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 
+import { GetRequests } from '../../../graphQL/Queries'
+import { usePaginatatedQuery } from '../../../hooks/usePaginatatedQuery'
 import OrgRegister from '../Profile/components/OrgRegister'
 import RequestTable from './RequestTable'
 
@@ -15,57 +17,16 @@ const Inbox = () => {
     direction: 'DESC'
   })
 
-  // const { nodes, paginationProps, reset, loading, refetch } =
-  //   usePaginatatedQuery(GetSupportTab, {
-  //     skip: org !== 'undefined' ? false : true,
-  //     selector: 'supports',
-  //     variables: {
-  //       ...filters
-  //     }
-  //   })
-
-  const data = [
+  const { nodes, paginationProps, reset, refetch } = usePaginatatedQuery(
+    GetRequests,
     {
-      id: 1,
-      email: 'sp@interlynk.io',
-      productName: 'lynk-dash-app',
-      productVersion: '1.3',
-      status: 'Uploaded',
-      requested: `${new Date().toLocaleDateString()}`
-    },
-    {
-      id: 2,
-      email: 'ritesh@interlynk.io',
-      productName: 'lynk-api',
-      productVersion: '2.2',
-      status: 'Sent',
-      requested: `${new Date().toLocaleDateString()}`
-    },
-    {
-      id: 3,
-      email: 'hasseb@interlynk.io',
-      productName: 'dropwizard',
-      productVersion: '3.0',
-      status: 'Declined',
-      requested: `${new Date().toLocaleDateString()}`
-    },
-    {
-      id: 4,
-      email: 'sijin@interlynk.io',
-      productName: 'calibrator',
-      productVersion: '2.0',
-      status: 'Canceled',
-      requested: `${new Date().toLocaleDateString()}`
-    },
-    {
-      id: 5,
-      email: 'amal@interlynk.io',
-      productName: 'biotronix',
-      productVersion: '4.2',
-      status: 'Bounced',
-      requested: `${new Date().toLocaleDateString()}`
+      skip: org !== 'undefined' ? false : true,
+      selector: 'requests',
+      variables: {
+        ...filters
+      }
     }
-  ]
+  )
 
   return (
     <Flex
@@ -79,14 +40,15 @@ const Inbox = () => {
       ) : (
         <Card>
           <RequestTable
-            data={data}
+            data={nodes}
             loading={false}
-            // paginationProps={paginationProps}
+            paginationProps={paginationProps}
             filters={filters}
             setFilters={(newFilters) => {
               setFilters(newFilters)
-              // reset()
+              reset()
             }}
+            refetch={refetch}
           />
         </Card>
       )}

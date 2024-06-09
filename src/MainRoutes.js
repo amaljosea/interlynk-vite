@@ -31,6 +31,7 @@ import AuthLayout from './layouts/Auth.js'
 import CustomerLayout from './layouts/Customer.js'
 import LoginLayout from './layouts/Login.js'
 import Register from './layouts/Register.js'
+import RequestSbomUpload from './layouts/RequestSbomUpload'
 import './main.css'
 
 const authToken = Cookies.get('authToken')
@@ -116,6 +117,7 @@ export const MainRoutes = () => {
         </Route>
         <Route path={`register`} element={<Register />} />
         <Route path={`sentry-test`} element={<SentryTest />} />
+        <Route path='request-sbom-upload' element={<RequestSbomUpload />} />
       </Route>
     </Routes>
   )

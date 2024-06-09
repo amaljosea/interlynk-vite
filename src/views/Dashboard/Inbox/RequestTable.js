@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils'
@@ -22,15 +23,27 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import SearchFilter from 'components/Licenses/LicenseSearchFilter'
 
+import { RequestCancel, RequestResend } from 'graphQL/Mutation'
+
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaPlus } from 'react-icons/fa6'
 
 import Filters from './Filters'
+import RequestAcceptModal from './RequestAcceptModal'
 import RequestModal from './RequestModal'
 
-const RequestTable = ({ data, loading, filters, setFilters }) => {
+const RequestTable = ({ data, loading, filters, setFilters, refetch }) => {
+  const [resendRequest] = useMutation(RequestResend)
+  const [cancelRequest] = useMutation(RequestCancel)
+
   const { field, search } = filters
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const {
+    isOpen: isAcceptOpen,
+    onOpen: onAcceptOpen,
+    onClose: onAcceptClose
+  } = useDisclosure()
 
   const [filterText, setFilterText] = useState(search || '')
   const [activeRow, setActiveRow] = useState(null)
@@ -80,7 +93,9 @@ const RequestTable = ({ data, loading, filters, setFilters }) => {
     [handleClear]
   )
 
-  const handleRefresh = useCallback(() => {}, [])
+  const handleRefresh = useCallback(() => {
+    refetch()
+  }, [])
 
   const handleSort = async (column, sortDirection) => {
     setFilters((oldFilters) => ({
@@ -141,6 +156,27 @@ const RequestTable = ({ data, loading, filters, setFilters }) => {
     setFilters
   ])
 
+  const handleResend = (row) => {
+    resendRequest({
+      variables: {
+        id: row.id
+      }
+    })
+  }
+
+  const handleCancel = (row) => {
+    cancelRequest({
+      variables: {
+        id: row.id
+      }
+    })
+  }
+
+  const handleAccept = (row) => {
+    onAcceptOpen()
+    setActiveRow(row)
+  }
+
   const getColor = (status) => {
     switch (status) {
       case 'Sent':
@@ -153,6 +189,8 @@ const RequestTable = ({ data, loading, filters, setFilters }) => {
         return 'blue'
       case 'Declined':
         return 'red'
+      case 'Accepted':
+        return 'green'
     }
   }
 
@@ -179,7 +217,7 @@ const RequestTable = ({ data, loading, filters, setFilters }) => {
     {
       id: 'REQUESTED',
       name: 'REQUESTED',
-      selector: (row) => <Text my={4}>{row?.requested}</Text>,
+      selector: (row) => <Text my={4}>{row?.requestedAt}</Text>,
       wrap: true
     },
     {
@@ -196,7 +234,7 @@ const RequestTable = ({ data, loading, filters, setFilters }) => {
     {
       id: 'ACTION',
       name: 'ACTION',
-      selector: () => {
+      selector: (row) => {
         return (
           <Menu>
             <MenuButton
@@ -208,8 +246,9 @@ const RequestTable = ({ data, loading, filters, setFilters }) => {
             />
             <Portal>
               <MenuList fontSize={'sm'}>
-                <MenuItem>Resend</MenuItem>
-                <MenuItem>Cancel</MenuItem>
+                <MenuItem onClick={() => handleAccept(row)}>Accept</MenuItem>
+                <MenuItem onClick={() => handleResend(row)}>Resend</MenuItem>
+                <MenuItem onClick={() => handleCancel(row)}>Cancel</MenuItem>
                 <MenuItem>Review</MenuItem>
                 <MenuItem color='red'>Archive</MenuItem>
               </MenuList>
@@ -244,6 +283,13 @@ const RequestTable = ({ data, loading, filters, setFilters }) => {
       </Flex>
 
       {isOpen && <RequestModal isOpen={isOpen} onClose={onClose} data={null} />}
+      {isAcceptOpen && (
+        <RequestAcceptModal
+          isOpen={isAcceptOpen}
+          onClose={onAcceptClose}
+          data={activeRow}
+        />
+      )}
     </>
   )
 }

@@ -2154,6 +2154,114 @@ export const PolicyCreate = gql`
   }
 `
 
+export const RequestCreate = gql`
+  mutation RequestCreate(
+    $email: String!
+    $productName: String
+    $productVersion: String
+    $notes: String
+  ) {
+    requestCreate(
+      input: {
+        email: $email
+        productName: $productName
+        productVersion: $productVersion
+        notes: $notes
+      }
+    ) {
+      request {
+        id
+        email
+        productName
+        productVersion
+        requestedAt
+        status
+      }
+      errors
+    }
+  }
+`
+
+export const RequestResend = gql`
+  mutation RequestResend($id: Uuid!) {
+    requestResend(input: { id: $id }) {
+      request {
+        id
+        email
+        productName
+        productVersion
+        requestedAt
+        status
+      }
+      errors
+    }
+  }
+`
+
+export const RequestCancel = gql`
+  mutation RequestCancel($id: Uuid!) {
+    requestCancel(input: { id: $id }) {
+      request {
+        id
+        email
+        productName
+        productVersion
+        requestedAt
+        status
+      }
+      errors
+    }
+  }
+`
+
+export const RequestAccept = gql`
+  mutation RequestAccept($id: Uuid!, $projectId: Uuid!) {
+    requestAccept(input: { id: $id, projectId: $projectId }) {
+      request {
+        id
+        email
+        productName
+        productVersion
+        requestedAt
+        status
+      }
+      errors
+    }
+  }
+`
+
+export const RequestDecline = gql`
+  mutation RequestDecline($id: Uuid!, $token: String!) {
+    requestDecline(input: { id: $id, token: $token }) {
+      request {
+        id
+        email
+        productName
+        productVersion
+        requestedAt
+        status
+      }
+      errors
+    }
+  }
+`
+
+export const RequestUploadSbom = gql`
+  mutation RequestUploadSbom($id: Uuid!, $token: String!, $file: Upload!) {
+    requestUploadSbom(input: { id: $id, token: $token, file: $file }) {
+      request {
+        id
+        email
+        productName
+        productVersion
+        requestedAt
+        status
+      }
+      errors
+    }
+  }
+`
+
 // UPDATE POLICY
 export const PolicyUpdate = gql`
   mutation PolicyUpdate(

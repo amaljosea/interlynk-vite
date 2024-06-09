@@ -3638,6 +3638,57 @@ export const GetPolicies = gql`
   }
 `
 
+export const GetRequests = gql`
+  query GetRequests(
+    $search: String
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+  ) {
+    requests(
+      search: $search
+      after: $after
+      before: $before
+      first: $first
+      last: $last
+    ) {
+      totalCount
+      nodes {
+        id
+        email
+        productName
+        productVersion
+        requestedAt
+        status
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+    }
+  }
+`
+
+export const GetProductNamesForRequest = gql`
+  query GetProductNamesForRequest {
+    organization {
+      projectGroups(enabled: true) {
+        nodes {
+          id
+          name
+          projects {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`
+
 // GET POLICY SUBJECTS
 export const PolicySubjectOperators = gql`
   query PolicySubjectOperators {

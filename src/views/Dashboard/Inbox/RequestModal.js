@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 
 import {
@@ -16,17 +17,33 @@ import {
   Textarea
 } from '@chakra-ui/react'
 
+import { RequestCreate } from 'graphQL/Mutation'
+
 const RequestModal = ({ data, isOpen, onClose }) => {
   const [email, setEmail] = useState('')
   const [productName, setProductName] = useState('')
   const [productVersion, setProductVersion] = useState('')
   const [notes, setNotes] = useState('')
 
+  const [createRequest] = useMutation(RequestCreate)
+
   const handleUpdate = (e) => {
     e.preventDefault()
   }
   const handleCreate = (e) => {
     e.preventDefault()
+    createRequest({
+      variables: {
+        email,
+        productName,
+        productVersion,
+        notes
+      }
+    }).then((res) => {
+      if (!res?.data?.requestCreate?.errors) {
+        onClose()
+      }
+    })
   }
 
   return (
