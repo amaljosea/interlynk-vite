@@ -40,7 +40,7 @@ const RequestModal = ({ data, isOpen, onClose }) => {
         notes
       }
     }).then((res) => {
-      if (!res?.data?.requestCreate?.errors) {
+      if (res?.data?.requestCreate?.errors?.length === 0) {
         onClose()
       }
     })
