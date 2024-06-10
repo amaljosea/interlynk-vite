@@ -1,8 +1,9 @@
-import { useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
+  Box,
   Button,
   FormControl,
   FormLabel,
@@ -21,7 +22,12 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import { UpdateJiraSecret, VerifyJiraConfigs } from 'graphQL/Mutation'
+import {
+  CreateJiraConnection,
+  DeleteJiraConnection,
+  UpdateJiraConnection
+} from 'graphQL/Mutation'
+import { VerifyJiraToken } from 'graphQL/Queries'
 
 const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
   const toast = useToast()
@@ -29,7 +35,6 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
   const [jiraApiToken, setJiraApiToken] = useState('')
   const [jiraHost, setJiraHost] = useState('')
   const [jiraUsername, setJiraUsername] = useState('')
-  const [jiraConfigs, setJiraConfigs] = useState({})
 
   const [isJiraHostChanged, setIsJiraHostChanged] = useState(false)
   const [isJiraUsernameChanged, setIsJiraUsernameChanged] = useState(false)
@@ -40,44 +45,35 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
 
   const [showApiToken, setShowApiToken] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [failure, setFaliure] = useState(false)
+  const [failure, setFailure] = useState(false)
 
-  const [updateJiraSecret] = useMutation(UpdateJiraSecret)
-  const [verifyJiraConfigs] = useMutation(VerifyJiraConfigs)
+  const [verificationDetails, setVerificationDetails] = useState(null)
+
+  const [updateJiraSecret] = useMutation(UpdateJiraConnection)
+  const [createJiraSecret] = useMutation(CreateJiraConnection)
+  const [deleteJiraSecret] = useMutation(DeleteJiraConnection)
+  const [verifyJiraToken, { data: verifyData, loading: verifyLoading }] =
+    useLazyQuery(VerifyJiraToken, {
+      fetchPolicy: 'network-only'
+    })
 
   useEffect(() => {
     if (data) {
-      setJiraApiToken(data.jiraSecret?.apiToken)
-      setJiraHost(data.jiraSecret?.host)
-      setJiraUsername(data.jiraSecret?.username)
+      setJiraApiToken(data.connection?.apiToken)
+      setJiraHost(data.connection?.url)
+      setJiraUsername(data.connection?.userName)
     }
   }, [data])
 
-  useEffect(() => {
-    setJiraConfigs(
-      JSON.stringify({
-        jiraApiToken,
-        jiraHost,
-        jiraUsername
-      })
-    )
-  }, [jiraHost, jiraUsername, jiraApiToken])
-
   const handleSave = () => {
-    let payload = {}
-    if (!isSaveDisabled) {
-      payload = {
-        host: jiraHost,
-        username: jiraUsername,
+    createJiraSecret({
+      variables: {
+        url: jiraHost,
+        userName: jiraUsername,
         apiToken: jiraApiToken
       }
-    } else {
-      payload = {}
-    }
-    updateJiraSecret({
-      variables: payload
     }).then((res) => {
-      if (res?.data?.jiraSecretUpdate?.success) {
+      if (res?.data?.jiraConnectionCreate?.errors?.length === 0) {
         setGreenCheck(!isSaveDisabled)
         resetChanges()
         refetch()
@@ -104,22 +100,100 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
     })
   }
 
+  const handleUpdate = () => {
+    updateJiraSecret({
+      variables: {
+        id: data?.id,
+        url: jiraHost,
+        userName: jiraUsername,
+        apiToken: jiraApiToken
+      }
+    }).then((res) => {
+      if (res?.data?.jiraConnectionUpdate?.errors?.length === 0) {
+        setGreenCheck(!isSaveDisabled)
+        resetChanges()
+        refetch()
+        onClose()
+        toast({
+          title: 'Configuration saved.',
+          description: 'Your JIRA configuration has been successfully updated.',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+          position: 'top'
+        })
+      } else {
+        toast({
+          title: 'Saving failed.',
+          description:
+            'An error occurred while updating your JIRA configuration.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'top'
+        })
+      }
+    })
+  }
+
   const handleVerify = () => {
     setIsLoading(true)
 
-    verifyJiraConfigs({
+    verifyJiraToken({
       variables: {
-        jiraConfigs: jiraConfigs
+        userName: jiraUsername,
+        apiToken: jiraApiToken,
+        url: jiraHost
+      }
+    })
+      .then((res) => {
+        setIsLoading(false)
+        if (res?.data?.organization?.jiraVerify) {
+          resetChanges()
+          setSuccess(true)
+          setFailure(false)
+          setVerificationDetails(res.data.organization.jiraVerify)
+        } else {
+          setFailure(true)
+          setSuccess(false)
+        }
+      })
+      .catch(() => {
+        setIsLoading(false)
+        setFailure(true)
+        setSuccess(false)
+      })
+  }
+
+  const handleDelete = () => {
+    deleteJiraSecret({
+      variables: {
+        organizationConnectionId: data?.id
       }
     }).then((res) => {
-      setIsLoading(false)
-      if (res?.data?.verifyJiraConfigs?.success) {
-        resetChanges()
-        setSuccess(true)
-        setFaliure(false)
+      if (res?.data?.jiraConnectionDelete?.errors?.length === 0) {
+        // handle success
+        refetch()
+        onClose()
+        toast({
+          title: 'Configuration deleted.',
+          description: 'Your JIRA configuration has been successfully deleted.',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+          position: 'top'
+        })
       } else {
-        setFaliure(true)
-        setSuccess(false)
+        // handle failure
+        toast({
+          title: 'Deletion failed.',
+          description:
+            'An error occurred while deleting your JIRA configuration.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'top'
+        })
       }
     })
   }
@@ -199,6 +273,46 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
               </InputRightElement>
             </InputGroup>
           </FormControl>
+          {verificationDetails && (
+            <Box
+              mt={4}
+              p={4}
+              border='1px'
+              borderColor='gray.200'
+              borderRadius='md'
+              boxShadow='md'
+              bg='gray.50'
+            >
+              <Text fontWeight='bold' mb={2}>
+                Verification Details:
+              </Text>
+              <Text>
+                <strong>Email:</strong> {verificationDetails.email}
+              </Text>
+              <Text>
+                <strong>Name:</strong> {verificationDetails.name}
+              </Text>
+              <Text>
+                <strong>Account ID:</strong> {verificationDetails.accountId}
+              </Text>
+              <Text>
+                <strong>Account Type:</strong> {verificationDetails.accountType}
+              </Text>
+              <Text>
+                <strong>URL:</strong> {verificationDetails.url}
+              </Text>
+              <Text>
+                <strong>Version:</strong> {verificationDetails.version}
+              </Text>
+              <Text>
+                <strong>Deployment Type:</strong>{' '}
+                {verificationDetails.deploymentType}
+              </Text>
+              <Text>
+                <strong>Server Title:</strong> {verificationDetails.serverTitle}
+              </Text>
+            </Box>
+          )}
         </ModalBody>
         <ModalFooter>
           {success && (
@@ -211,25 +325,28 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
               {'Verification failed!'}
             </Text>
           )}
-          <Button variant='unstyled' colorScheme='red' onClick={onClose}>
-            Cancel
-          </Button>
           {saveOrVerify ? (
             <Button
               colorScheme='blue'
               ml={3}
               onClick={handleVerify}
-              isLoading={isLoading}
+              isLoading={isLoading || verifyLoading}
             >
               Verify
             </Button>
           ) : (
             <Button
-              colorScheme={isSaveDisabled ? 'red' : 'green'}
+              colorScheme={isSaveDisabled ? 'blue' : 'green'}
               ml={3}
-              onClick={handleSave}
+              onClick={data ? handleUpdate : handleSave}
+              isDisabled={isSaveDisabled}
             >
-              {isSaveDisabled ? 'Reset' : 'Save'}
+              {data ? 'Update' : 'Save'}
+            </Button>
+          )}
+          {data && (
+            <Button colorScheme='red' ml={3} onClick={handleDelete}>
+              Delete
             </Button>
           )}
         </ModalFooter>

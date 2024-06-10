@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import ReactSelect from 'react-select'
 import CreatableSelect from 'react-select/creatable'
@@ -20,15 +20,19 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import { CreateJiraTicket } from 'graphQL/Mutation'
-import { GetJiraOptions } from 'graphQL/Queries'
+import { CreateJiraIssue } from 'graphQL/Mutation'
+import { GetJiraOptions, GetJiraProjects } from 'graphQL/Queries'
 
 const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
-  const { data: options } = useQuery(GetJiraOptions, {
+  const { data: projectOptions } = useQuery(GetJiraProjects, {
     fetchPolicy: 'network-only'
   })
 
-  const [createJiraTicket] = useMutation(CreateJiraTicket)
+  const [getOptions, { data: options }] = useLazyQuery(GetJiraOptions, {
+    fetchPolicy: 'network-only'
+  })
+
+  const [createJiraIssue] = useMutation(CreateJiraIssue)
 
   const toast = useToast()
 
@@ -49,7 +53,11 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
   const [labels, setLabels] = useState([])
   const [label, setLabel] = useState([])
 
-  const [priorities, setPriorities] = useState([])
+  const [priorities, setPriorities] = useState([
+    { value: 'Medium', label: 'Medium' },
+    { value: 'High', label: 'High' },
+    { value: 'Low', label: 'Low' }
+  ])
   const [priority, setPriority] = useState('')
 
   const [description, setDescription] = useState('')
@@ -101,38 +109,32 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
 
   useEffect(() => {
     if (options) {
-      setProjects(
-        options.jiraOptions.projects?.map((project) => ({
-          value: project,
-          label: project
-        }))
-      )
       setIssueTypes(
-        options.jiraOptions.issueTypes?.map((issueType) => ({
-          value: issueType,
-          label: issueType
+        options.jira?.issueTypes?.map((issueType) => ({
+          value: issueType.id,
+          label: issueType.name
         }))
       )
       setAssignees(
-        options.jiraOptions.assignees?.map((assignee) => ({
-          value: assignee,
-          label: assignee
+        options.jira?.users?.map((assignee) => ({
+          value: assignee.accountId,
+          label: assignee.name
         }))
       )
       setReporters(
-        options.jiraOptions.reporters?.map((reporter) => ({
-          value: reporter,
-          label: reporter
+        options.jira?.users?.map((reporter) => ({
+          value: reporter.accountId,
+          label: reporter.name
         }))
       )
       setLabels(
-        options.jiraOptions.labels?.map((label) => ({
+        options.jira?.labels?.map((label) => ({
           value: label,
           label: label
         }))
       )
       setPriorities(
-        options.jiraOptions.priorities?.map((priority) => ({
+        options.jira?.priorities?.map((priority) => ({
           value: priority,
           label: priority
         }))
@@ -140,12 +142,24 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
     }
   }, [options])
 
+  useEffect(() => {
+    if (projectOptions) {
+      setProjects(
+        projectOptions.jira.projects?.map((project) => ({
+          value: project.key,
+          label: project.name
+        }))
+      )
+    }
+  }, [projectOptions])
+
   const handleCreate = () => {
-    createJiraTicket({
+    createJiraIssue({
       variables: {
         summary,
-        project: project.value,
-        issueType: issueType.value,
+        componentVulnId: row?.id,
+        projectKey: project.value,
+        issueTypeId: issueType.value,
         assignee: assignee.value,
         reporter: reporter.value,
         labels: label?.map((l) => l.value),
@@ -153,7 +167,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
         description
       }
     }).then((res) => {
-      if (res?.data?.createJiraTicket?.success) {
+      if (res?.data?.jiraIssueCreate?.errors?.length === 0) {
         toast({
           title: 'Jira Issue created.',
           description: 'Your Jira Issue has been successfully created.',
@@ -204,7 +218,10 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
                 value={project}
                 placeholder='Project'
                 options={projects}
-                onChange={(e) => setProject(e)}
+                onChange={(e) => {
+                  getOptions({ variables: { pKey: e.value } })
+                  setProject(e)
+                }}
               />
             </FormControl>
 
@@ -218,23 +235,23 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
               />
             </FormControl>
 
-            <FormControl>
-              <FormLabel>Assignee</FormLabel>
-              <ReactSelect
-                value={assignee}
-                placeholder='Assignee'
-                options={assignees}
-                onChange={(e) => setAssignee(e)}
-              />
-            </FormControl>
-
-            <FormControl>
+            <FormControl isRequired>
               <FormLabel>Reporter</FormLabel>
               <ReactSelect
                 value={reporter}
                 placeholder='Reporter'
                 options={reporters}
                 onChange={(e) => setReporter(e)}
+              />
+            </FormControl>
+
+            <FormControl isRequired>
+              <FormLabel>Assignee</FormLabel>
+              <ReactSelect
+                value={assignee}
+                placeholder='Assignee'
+                options={assignees}
+                onChange={(e) => setAssignee(e)}
               />
             </FormControl>
 

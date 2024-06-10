@@ -65,7 +65,7 @@ import { ManualVulnScan } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
   GetCdxResponses,
-  GetJiraSecret,
+  GetConnections,
   GetVulnData,
   GetVulnFilterData,
   ShareVulnFilters,
@@ -242,7 +242,7 @@ const ExpandedComponent = ({
 }
 
 const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
-  const { data: configs } = useQuery(GetJiraSecret, {
+  const { data: configs } = useQuery(GetConnections, {
     fetchPolicy: 'network-only'
   })
 
@@ -280,7 +280,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
 
   useEffect(() => {
     if (configs) {
-      if (!configs?.jiraSecret?.apiToken) {
+      if (!configs?.organization?.connections?.nodes[0]?.connection) {
         setJiraConfigWarning(true)
       }
     }

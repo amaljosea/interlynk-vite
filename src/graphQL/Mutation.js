@@ -2494,56 +2494,6 @@ export const UpdateNotificationConfig = gql`
   }
 `
 
-export const UpdateJiraSecret = gql`
-  mutation JiraSecretUpdate(
-    $host: String
-    $username: String
-    $apiToken: String
-  ) {
-    jiraSecretUpdate(
-      input: { host: $host, username: $username, apiToken: $apiToken }
-    ) {
-      success
-    }
-  }
-`
-
-export const VerifyJiraConfigs = gql`
-  mutation VerifyJiraConfigs($jiraConfigs: String!) {
-    verifyJiraConfigs(input: { jiraConfigs: $jiraConfigs }) {
-      success
-    }
-  }
-`
-
-export const CreateJiraTicket = gql`
-  mutation CreateJiraTicket(
-    $project: String!
-    $issueType: String!
-    $summary: String!
-    $description: String
-    $priority: String
-    $labels: [String!]
-    $assignee: String
-    $reporter: String
-  ) {
-    createJiraTicket(
-      input: {
-        project: $project
-        issueType: $issueType
-        summary: $summary
-        description: $description
-        priority: $priority
-        labels: $labels
-        assignee: $assignee
-        reporter: $reporter
-      }
-    ) {
-      success
-    }
-  }
-`
-
 export const OrganizationManufacturerCreate = gql`
   mutation OrganizationManufacturerCreate(
     $orgName: String!
@@ -2648,6 +2598,112 @@ export const ComponentVulnVexImport = gql`
           vulnId
         }
       }
+    }
+  }
+`
+
+export const CreateJiraConnection = gql`
+  mutation CreateJiraConnection(
+    $userName: String!
+    $apiToken: String!
+    $url: String!
+  ) {
+    jiraConnectionCreate(
+      input: { userName: $userName, apiToken: $apiToken, url: $url }
+    ) {
+      organizationConnection {
+        id
+        enabled
+        connection {
+          ... on JiraConnection {
+            userName
+            apiToken
+            url
+          }
+        }
+      }
+      errors
+    }
+  }
+`
+
+export const UpdateJiraConnection = gql`
+  mutation UpdateJiraConnection(
+    $id: ID!
+    $userName: String
+    $apiToken: String
+    $url: String
+    $enabled: Boolean
+  ) {
+    jiraConnectionUpdate(
+      input: {
+        userName: $userName
+        apiToken: $apiToken
+        url: $url
+        organizationConnectionId: $id
+        enabled: $enabled
+      }
+    ) {
+      organizationConnection {
+        id
+        enabled
+        connection {
+          ... on JiraConnection {
+            userName
+            apiToken
+            url
+          }
+        }
+      }
+      errors
+    }
+  }
+`
+
+export const DeleteJiraConnection = gql`
+  mutation DeleteJiraConnection($organizationConnectionId: ID!) {
+    jiraConnectionDelete(
+      input: { organizationConnectionId: $organizationConnectionId }
+    ) {
+      errors
+      organizationConnection {
+        id
+      }
+    }
+  }
+`
+
+export const CreateJiraIssue = gql`
+  mutation CreateJiraIssue(
+    $componentVulnId: ID!
+    $projectKey: String!
+    $summary: String!
+    $description: String!
+    $issueTypeId: String!
+    $reporter: String!
+    $assignee: String
+  ) {
+    jiraIssueCreate(
+      input: {
+        componentVulnId: $componentVulnId
+        projectKey: $projectKey
+        summary: $summary
+        description: $description
+        issueTypeId: $issueTypeId
+        reporter: $reporter
+        assignee: $assignee
+      }
+    ) {
+      jiraIssueUrl
+      errors
+    }
+  }
+`
+
+export const DeleteJiraIssue = gql`
+  mutation DeleteJiraIssue($componentVulnId: ID!) {
+    jiraIssueDelete(input: { componentVulnId: $componentVulnId }) {
+      errors
     }
   }
 `

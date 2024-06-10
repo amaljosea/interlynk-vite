@@ -3902,29 +3902,6 @@ export const GetUserNotificationConfigs = gql`
   }
 `
 
-export const GetJiraSecret = gql`
-  query GetJiraSecret {
-    jiraSecret {
-      host
-      username
-      apiToken
-    }
-  }
-`
-
-export const GetJiraOptions = gql`
-  query GetJiraOptions {
-    jiraOptions {
-      projects
-      issueTypes
-      assignees
-      reporters
-      labels
-      priorities
-    }
-  }
-`
-
 export const ComponentVulnLogs = gql`
   query ComponentVulnLogs($vexLogableId: Uuid!) {
     componentVulnLogs(vexLogableId: $vexLogableId) {
@@ -4317,6 +4294,75 @@ export const GetSelectedUser = gql`
         role {
           name
         }
+      }
+    }
+  }
+`
+
+export const GetConnections = gql`
+  query GetConnections {
+    organization {
+      id
+      name
+      connections {
+        nodes {
+          id
+          enabled
+          connection {
+            ... on JiraConnection {
+              userName
+              apiToken
+              url
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const VerifyJiraToken = gql`
+  query VerifyJiraToken($userName: String!, $apiToken: String!, $url: String!) {
+    organization {
+      jiraVerify(userName: $userName, apiToken: $apiToken, url: $url) {
+        email
+        name
+        accountId
+        accountType
+        url
+        version
+        deploymentType
+        serverTitle
+      }
+    }
+  }
+`
+
+export const GetJiraProjects = gql`
+  query JiraInformation {
+    jira {
+      projects {
+        id
+        name
+        key
+      }
+    }
+  }
+`
+
+export const GetJiraOptions = gql`
+  query JiraInformation($pKey: ID!) {
+    jira {
+      users {
+        email
+        name
+        accountId
+        accountType
+        active
+      }
+      issueTypes(projectKey: $pKey) {
+        id
+        name
       }
     }
   }
