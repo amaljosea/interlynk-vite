@@ -17,7 +17,8 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useDisclosure
+  useDisclosure,
+  useToast
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -33,6 +34,8 @@ import RequestAcceptModal from './RequestAcceptModal'
 import RequestModal from './RequestModal'
 
 const RequestTable = ({ data, loading, filters, setFilters, refetch }) => {
+  const toast = useToast()
+
   const [resendRequest] = useMutation(RequestResend)
   const [cancelRequest] = useMutation(RequestCancel)
 
@@ -161,6 +164,16 @@ const RequestTable = ({ data, loading, filters, setFilters, refetch }) => {
       variables: {
         id: row.id
       }
+    }).then((res) => {
+      if (res?.data?.requestResend?.errors?.length === 0) {
+        toast({
+          title: 'Request Resent',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+          position: 'top'
+        })
+      }
     })
   }
 
@@ -168,6 +181,16 @@ const RequestTable = ({ data, loading, filters, setFilters, refetch }) => {
     cancelRequest({
       variables: {
         id: row.id
+      }
+    }).then((res) => {
+      if (res?.data?.requestCancel?.errors?.length === 0) {
+        toast({
+          title: 'Request Cancelled',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+          position: 'top'
+        })
       }
     })
   }
