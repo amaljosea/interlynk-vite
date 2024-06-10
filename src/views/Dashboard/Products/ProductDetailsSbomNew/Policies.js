@@ -45,14 +45,16 @@ const Policies = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { nodes, paginationProps, refetch, loading, reset } =
-    usePaginatatedQuery(PolicyResults, {
+  const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
+    PolicyResults,
+    {
       skip: activeTab === 'policies' ? false : true,
       selector: 'policyResults',
       variables: {
         sbomId
       }
-    })
+    }
+  )
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 

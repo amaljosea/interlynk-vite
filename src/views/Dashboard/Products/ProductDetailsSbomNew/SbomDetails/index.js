@@ -29,6 +29,7 @@ import {
   GetProjectSettings,
   GetSharPrimartComp
 } from 'graphQL/Queries'
+import { PolicyResultsType } from 'graphQL/Queries'
 
 import {
   FaAngleLeft,
@@ -97,6 +98,15 @@ const SbomDetails = ({ sbomData, refetch }) => {
   const { data: settings } = useQuery(GetProjectSettings, {
     variables: { id: projectId }
   })
+
+  const { data: policies } = useQuery(PolicyResultsType, {
+    skip: sbomId ? false : true,
+    variables: { sbomId: sbomId, first: 100 }
+  })
+
+  const { nodes } = policies?.policyResults || ''
+  const isInitialized = nodes?.some((item) => item?.result === 'initialized')
+  const policyStatus = isInitialized ? 'IN_PROGRESS' : ' COMPLETED'
 
   const { projectSetting } = settings?.project || ''
   const {
@@ -429,23 +439,31 @@ const SbomDetails = ({ sbomData, refetch }) => {
             >
               <Icon mt={1} h={5} w={5} color='#777' as={MdPolicy} />
               <Flex flexDir={'column'} alignItems={'center'}>
-                <Stack fontWeight={'medium'} direction={'row'}>
-                  <VulnBadge color='red' label='Fail'>
+                <Stack direction={'row'}>
+                  <VulnBadge color='orange' status={policyStatus} label='Fail'>
                     {policyResultMetrics?.failedCount || 0}
                   </VulnBadge>
-                  <VulnBadge color='yellow' label='Warn'>
+                  <VulnBadge color='orange' status={policyStatus} label='Warn'>
                     {policyResultMetrics?.warnCount || 0}
                   </VulnBadge>
-                  <VulnBadge color='blue' label='Inform'>
+                  <VulnBadge
+                    color='orange'
+                    status={policyStatus}
+                    label='Inform'
+                  >
                     {policyResultMetrics?.informCount || 0}
                   </VulnBadge>
-                  <VulnBadge color='green' label='Pass'>
+                  <VulnBadge color='green' status={policyStatus} label='Pass'>
                     {policyResultMetrics?.passedCount || 0}
                   </VulnBadge>
-                  <VulnBadge color='orange' label='Skipped'>
+                  <VulnBadge
+                    color='orange'
+                    status={policyStatus}
+                    label='Skipped'
+                  >
                     {policyResultMetrics?.skippedCount || 0}
                   </VulnBadge>
-                  <VulnBadge color='gray' label='Error'>
+                  <VulnBadge color='gray' status={policyStatus} label='Error'>
                     {policyResultMetrics?.errorCount || 0}
                   </VulnBadge>
                 </Stack>

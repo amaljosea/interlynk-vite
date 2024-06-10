@@ -3801,6 +3801,17 @@ export const PolicyResults = gql`
   }
 `
 
+// GET POLICY RESULT TYPE
+export const PolicyResultsType = gql`
+  query PolicyResultsType($sbomId: Uuid!, $first: Int) {
+    policyResults(sbomId: [$sbomId], first: $first) {
+      nodes {
+        result
+      }
+    }
+  }
+`
+
 // GET POLICY RULE VIOLATIONS
 export const PolicyRuleViolations = gql`
   query PolicyRuleViolations(

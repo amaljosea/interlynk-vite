@@ -41,10 +41,7 @@ const calculateQualityScore = (data) => {
 }
 
 export const useQualityScore = ({ projectId, sbomId }) => {
-  console.log({
-    projectId,
-    sbomId
-  })
+  // console.log({ projectId, sbomId })
   const { data, loading } = useQuery(QUERY, {
     skip: sbomId && !signedUrlParams ? false : true,
     variables: {
