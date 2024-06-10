@@ -21,7 +21,7 @@ export const useSbom = ({ projectId, sbomId, skip = false }) => {
       )
     } else {
       const primaryComponent = data?.sbom?.primaryComponent
-      if (primaryComponent) {
+      if (primaryComponent?.name && primaryComponent?.version) {
         return primaryComponent?.version
       }
       return data?.sbom?.projectVersion
