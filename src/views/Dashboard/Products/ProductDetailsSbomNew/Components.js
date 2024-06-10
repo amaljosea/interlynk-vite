@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { GetIcon, customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 import { openSsf } from 'variables/general'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -42,6 +43,7 @@ import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
+import { ProgressBar } from 'components/ProgressBar'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -386,6 +388,25 @@ const Components = ({ sbomData, sbomRefetch }) => {
       width: '12%',
       wrap: true,
       sortable: true,
+      right: 'true'
+    },
+    {
+      id: 'COMPONENTS_HEALTH',
+      name: 'HEALTH',
+      selector: (row) => (
+        <ProgressBar
+          value={
+            getComponentHealthScoreFromLocalData({
+              componentName: row?.name,
+              componentVersion: row?.version
+            }).healthScore
+          }
+          text='Health Score'
+        />
+      ),
+      width: '12%',
+      wrap: true,
+      sortable: false,
       right: 'true'
     },
     // PURL
