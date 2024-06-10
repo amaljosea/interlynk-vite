@@ -63,7 +63,7 @@ const SbomTable = ({ data, refetch, loading, error }) => {
                 textTransform={'capitalize'}
                 _focus={{ outline: 'none' }}
               >
-                {item}
+                {item === 'changelog' ? 'change log' : item}
               </Tab>
             ))}
           </TabList>
