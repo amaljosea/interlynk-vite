@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { filterEnvList } from 'utils'
 
@@ -8,7 +8,7 @@ import {
   AlertIcon,
   AlertTitle,
   Box,
-  Button,
+  Flex,
   FormControl,
   FormHelperText,
   FormLabel,
@@ -19,6 +19,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Progress,
   Select,
   Stack,
   Tag,
@@ -27,8 +28,6 @@ import {
 } from '@chakra-ui/react'
 
 import { UploadSbom } from 'graphQL/Mutation'
-
-import { MdOutlineFileUpload } from 'react-icons/md'
 
 const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
   const params = useParams()
@@ -40,11 +39,10 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
     environment ? item?.name === environment : item?.name === 'default'
   )
 
-  const [sbomUpload, { loading, error }] = useMutation(UploadSbom)
+  const [sbomUpload, { error, loading }] = useMutation(UploadSbom)
 
   const [selectedEnv, setSelectedEnv] = useState(activeEnv || defaultENV?.id)
   const [errorMessage, setErrorMessage] = useState('')
-  const fileInputRef = useRef(null)
 
   const handleUpload = async (file) => {
     await sbomUpload({ variables: { doc: file, projectId: selectedEnv } })
@@ -70,6 +68,39 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
         }
       })
       .finally(() => onClose())
+  }
+
+  const [isDragActive, setIsDragActive] = useState(false)
+
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragActive(true)
+  }
+
+  const handleDragLeave = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragActive(false)
+  }
+
+  const handleDrop = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragActive(false)
+    const droppedFiles = Array.from(e.dataTransfer.files)
+    if (droppedFiles?.length > 0) {
+      const validExtensions = ['xml', 'json']
+      const fileExtension = droppedFiles[0].name.split('.').pop().toLowerCase()
+      if (validExtensions.includes(fileExtension)) {
+        setErrorMessage('')
+        handleUpload(droppedFiles[0])
+      } else {
+        setErrorMessage(
+          'Invalid file type, only .xml and .json files are allowed.'
+        )
+      }
+    }
   }
 
   const handleFileChange = async (event) => {
@@ -112,7 +143,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
                 </AlertTitle>
               </Alert>
             )}
-            <Stack spacing={4}>
+            <Stack spacing={6} mb={4}>
               <FormControl>
                 <FormLabel>Environment</FormLabel>
                 <Select
@@ -140,29 +171,40 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
                   JSON and XML formats and SPDX 2.2 and 2.3 in JSON format.{' '}
                 </FormHelperText>
               </FormControl>
-              <FormLabel htmlFor='file' width={'100%'} cursor={'pointer'}>
+              <Box
+                p={5}
+                borderWidth={2}
+                borderRadius='md'
+                textAlign='center'
+                overflow={'hidden'}
+                onDrop={handleDrop}
+                borderStyle='dashed'
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                borderColor={isDragActive ? 'teal.500' : 'gray.200'}
+                onClick={() => document.getElementById('fileInput').click()}
+              >
                 <Input
+                  id='fileInput'
                   type='file'
-                  id='file'
-                  ref={fileInputRef}
+                  accept='application/json'
                   style={{ display: 'none' }}
-                  accept='.xml,.json'
                   onChange={handleFileChange}
                 />
-                <Button
-                  fontWeight={'medium'}
-                  my={4}
-                  width={'full'}
-                  colorScheme='blue'
-                  name='file'
-                  leftIcon={<MdOutlineFileUpload size={24} />}
-                  loadingText='Uploading....'
-                  isLoading={loading}
-                  onClick={() => fileInputRef?.current?.click()}
+                <Flex
+                  height={20}
+                  alignItems={'center'}
+                  justifyContent={'center'}
                 >
-                  Upload File
-                </Button>
-              </FormLabel>
+                  <Text hidden={loading}>
+                    {isDragActive
+                      ? 'Drop the files here ...'
+                      : 'Drag & drop file here, or click to select file'}
+                  </Text>
+                  <Text hidden={!loading}>Uploading ...</Text>
+                </Flex>
+              </Box>
+              {loading && <Progress size='xs' isIndeterminate />}
             </Stack>
             {error && (
               <Box mb={4}>
