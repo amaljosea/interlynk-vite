@@ -4,7 +4,12 @@ import { useMemo } from 'react'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 
 const QUERY = gql`
-  query Organization($projectId: Uuid!, $sbomId: Uuid!) {
+  query Organization($projectId: Uuid!, $sbomId: Uuid!, $sbomIds: [ID!]!) {
+    complianceReports(sbomIds: $sbomIds, reportFormat: NTIA) {
+      nodes {
+        score
+      }
+    }
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
       components(sbomId: $sbomId, first: 999999999) {
@@ -15,35 +20,10 @@ const QUERY = gql`
           version
         }
       }
-      unresolvedCheckResults: checkResults(
-        sbomId: $sbomId
-        status: ["unresolved"]
-      ) {
-        totalCount
-      }
     }
   }
 `
 const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-const SBOM_LEVEL_CHECKS_COUNT = 7
-const COMPONENT_LEVEL_CHECKS_COUNT = 13
-
-const calculateQualityScore = (data) => {
-  if (!data) {
-    return {
-      qualityScore: null
-    }
-  }
-  const componentsCount = data.sbom.components.totalCount
-  const maxScore =
-    SBOM_LEVEL_CHECKS_COUNT + componentsCount * COMPONENT_LEVEL_CHECKS_COUNT
-  const unresolvedCheckResultsCount =
-    data.sbom.unresolvedCheckResults.totalCount
-  const currentScore = maxScore - unresolvedCheckResultsCount
-  const percentageScore = (currentScore * 100) / maxScore
-
-  return { qualityScore: round(percentageScore, 1) }
-}
 
 const calculateHealthScore = (data) => {
   if (!data) {
@@ -75,13 +55,14 @@ export const useSbomScores = ({ projectId, sbomId }) => {
     skip: sbomId && !signedUrlParams ? false : true,
     variables: {
       projectId,
-      sbomId
+      sbomId,
+      sbomIds: [sbomId]
     }
   })
 
   const { qualityScore, healthScore } = useMemo(() => {
-    const { qualityScore } = calculateQualityScore(data)
-    const { healthScore } = calculateHealthScore(data)
+    const qualityScore = round(data?.complianceReports?.nodes[0]?.score, 2) || 0
+    const { healthScore = 0 } = calculateHealthScore(data)
 
     return {
       qualityScore,

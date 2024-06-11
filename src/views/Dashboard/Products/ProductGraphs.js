@@ -1,13 +1,14 @@
 /* eslint-disable no-unreachable */
 import { gql, useQuery } from '@apollo/client'
+import { round } from 'lodash'
 import { useParams } from 'react-router-dom'
-import { Bar, BarChart, Line, LineChart, Tooltip, XAxis } from 'recharts'
+import { Bar, BarChart, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { Box, Flex, Text } from '@chakra-ui/react'
 
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
-const QUERY = gql`
+const QUERY_A = gql`
   query Project($projectId: Uuid!) {
     project(id: $projectId) {
       id
@@ -37,7 +38,58 @@ const QUERY = gql`
   }
 `
 
-const vulnData = [
+const QUERY_B = gql`
+  query Organization($sbomIds: [ID!]!) {
+    complianceReports(sbomIds: $sbomIds, reportFormat: NTIA) {
+      nodes {
+        score
+      }
+    }
+  }
+`
+
+const SimpleBarChat = ({ label, dataKey, color, data }) => {
+  return (
+    <Flex flexDir={'column'} alignItems={'center'}>
+      <BarChart width={200} height={40} data={data}>
+        <Bar name={`${label} Count`} dataKey={dataKey} fill={color} />
+        <XAxis dataKey='name' hide />
+        <Tooltip position={{ x: 100, y: -50 }} />
+      </BarChart>
+      <Text fontSize={'xs'} cursor={'pointer'}>
+        {`${label} Trend`}
+      </Text>
+    </Flex>
+  )
+}
+
+const SimpleLineChat = ({ label, config, data }) => {
+  return (
+    <Flex flexDir={'column'} alignItems={'center'}>
+      <LineChart width={200} height={40} data={data}>
+        {config?.map((item) => (
+          <Line
+            key={item.id}
+            stroke={item.stroke}
+            name={item.name}
+            dataKey={item.dataKey}
+          />
+        ))}
+        <YAxis hide tickFormatter={(value) => value.toFixed(2)} />
+        <XAxis dataKey='name' hide />
+        <Tooltip
+          position={{ x: 100, y: label === 'Vulnerability' ? -50 : -200 }}
+          wrapperStyle={{ zIndex: 9999 }}
+        />
+      </LineChart>
+      <Text cursor={'pointer'} fontSize={'xs'}>
+        {`${label} Trend`}
+      </Text>
+    </Flex>
+  )
+}
+
+const vulnConfig = [
   {
     id: 1,
     name: 'Critical',
@@ -70,7 +122,7 @@ const vulnData = [
   }
 ]
 
-const policyData = [
+const policyConfig = [
   {
     id: 1,
     name: 'Failed',
@@ -114,11 +166,26 @@ export const ProductGraphs = () => {
   const params = useParams()
   const productId = params.productid
 
-  const { data, loading } = useQuery(QUERY, {
+  const { data, loading } = useQuery(QUERY_A, {
     variables: {
       projectId: productId
     }
   })
+
+  const items = data?.project?.sbomVersions?.nodes
+  const count = items?.length
+  const sbomIds = items?.map((i) => i.id)
+
+  const { data: dataB, loading: loadingB } = useQuery(QUERY_B, {
+    skip: !data,
+    variables: {
+      sbomIds
+    }
+  })
+
+  if (loading || loadingB) {
+    return <Box mt={8}>Loading...</Box>
+  }
 
   const nodes =
     data?.project?.sbomVersions?.nodes.map((node) => {
@@ -147,50 +214,15 @@ export const ProductGraphs = () => {
       }
     }) || []
 
+  const formattedScores = dataB?.complianceReports?.nodes.map((i) => ({
+    score: round(i.score, 2)
+  }))
+
   const nodesReversed = [...nodes].reverse()
+  const nodesBReversed = [...(formattedScores || [])].reverse()
 
-  const SimpleBarChat = ({ label, dataKey, color }) => {
-    return (
-      <Flex flexDir={'column'} alignItems={'center'}>
-        <BarChart width={200} height={40} data={nodesReversed}>
-          <Bar name={`${label} Count`} dataKey={dataKey} fill={color} />
-          <XAxis dataKey='name' hide />
-          <Tooltip position={{ x: 100, y: -50 }} />
-        </BarChart>
-        <Text fontSize={'xs'} cursor={'pointer'}>
-          {`${label} Trend`}
-        </Text>
-      </Flex>
-    )
-  }
-
-  const SimpleLineChat = ({ label, data }) => {
-    return (
-      <Flex flexDir={'column'} alignItems={'center'}>
-        <LineChart width={200} height={40} data={nodesReversed}>
-          {data?.map((item) => (
-            <Line
-              key={item.id}
-              stroke={item.stroke}
-              name={item.name}
-              dataKey={item.dataKey}
-            />
-          ))}
-          <XAxis dataKey='name' hide />
-          <Tooltip
-            position={{ x: 100, y: label === 'Vulnerability' ? -50 : -200 }}
-            wrapperStyle={{ zIndex: 9999 }}
-          />
-        </LineChart>
-        <Text cursor={'pointer'} fontSize={'xs'}>
-          {`${label} Trend`}
-        </Text>
-      </Flex>
-    )
-  }
-
-  if (loading) {
-    return <Box mt={8}>Loading...</Box>
+  if (count <= 1) {
+    return null
   }
 
   if (!shouldShowDemoFeatures) {
@@ -203,14 +235,30 @@ export const ProductGraphs = () => {
           color='#3182ce'
           label={'Component'}
           dataKey='stats.compCount'
+          data={nodesReversed}
         />
         <SimpleBarChat
           color='#3182ce'
           label={'License'}
           dataKey='stats.compLicenseCount'
+          data={nodesReversed}
         />
-        <SimpleLineChat data={vulnData} label={'Vulnerability'} />
-        <SimpleLineChat data={policyData} label={'Policy'} />
+        <SimpleLineChat
+          config={vulnConfig}
+          data={nodesReversed}
+          label={'Vulnerability'}
+        />
+        <SimpleLineChat
+          config={policyConfig}
+          data={nodesReversed}
+          label={'Policy'}
+        />
+        <SimpleBarChat
+          color='#3182ce'
+          label={'Quality Score'}
+          dataKey='score'
+          data={nodesBReversed}
+        />
       </Flex>
       <Box>
         {/* <Box>
