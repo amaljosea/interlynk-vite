@@ -1,4 +1,4 @@
-import { gql, useLazyQuery, useQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import { useState } from 'react'
 
 import {
@@ -30,33 +30,13 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
-
 import {
   DownloadSBOM,
-  GetCheckResults,
+  GetSbomQualityScores,
   SignedSbomDownload
 } from 'graphQL/Queries'
 
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
-
-const QUERY = gql`
-  query Organization($projectId: Uuid!, $sbomId: Uuid!, $checkId: [String!]) {
-    sbom(projectId: $projectId, sbomId: $sbomId) {
-      id
-      components(sbomId: $sbomId) {
-        totalCount
-      }
-      unresolvedCheckResults: checkResults(
-        sbomId: $sbomId
-        status: ["unresolved"]
-        checkId: $checkId
-      ) {
-        totalCount
-      }
-    }
-  }
-`
 
 const DownloadModal = ({
   finalRef,
@@ -71,171 +51,21 @@ const DownloadModal = ({
   const toast = useToast()
   const activeUser = localStorage.getItem('email')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const [totalRows, setTotalRows] = useState(25)
   const [getData] = useLazyQuery(
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
   )
 
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures({
-    skip: isOpen && !signedUrlParams ? false : true
-  })
-
-  const ntiaData = [
-    {
-      id: 1,
-      category: 'SBOM Timestamp',
-      name: 'SB-HC-5',
-      type: 'check'
-    },
-    {
-      id: 2,
-      category: 'SBOM Supplier Name',
-      name: 'SB-HC-8',
-      type: 'check'
-    },
-    {
-      id: 3,
-      category: 'SBOM Unique Identifier',
-      name: 'SB-HC-4',
-      type: 'check'
-    },
-    {
-      id: 4,
-      category: 'SBOM Author Name',
-      name: 'SB-HC-7',
-      type: 'check'
-    },
-    {
-      id: 5,
-      category: 'Component Name',
-      name: 'SB-HC-11',
-      type: 'count'
-    },
-    {
-      id: 6,
-      category: 'Component Version',
-      name: 'SB-HC-12',
-      type: 'count'
-    },
-    {
-      id: 7,
-      category: 'Component Supplier Name',
-      name: 'SB-HC-15',
-      type: 'count'
-    },
-    {
-      id: 8,
-      category: 'Component Unique Identifier',
-      name: 'SB-HC-16',
-      type: 'count'
-    },
-    {
-      id: 9,
-      category: 'Component Relationships',
-      name: 'SB-HC-10',
-      type: 'count'
-    }
-  ]
-
-  const fdaData = [
-    {
-      id: 1,
-      category: 'Known Vulnerabilities',
-      name: 'vulns',
-      type: 'check'
-    },
-    {
-      id: 2,
-      category: 'SBOM Timestamp',
-      name: 'SB-HC-5',
-      type: 'check'
-    },
-    {
-      id: 3,
-      category: 'SBOM Supplier Name',
-      name: 'SB-HC-8',
-      type: 'check'
-    },
-    {
-      id: 4,
-      category: 'SBOM Unique Identifier',
-      name: 'SB-HC-4',
-      type: 'check'
-    },
-    {
-      id: 5,
-      category: 'SBOM Author Name',
-      name: 'SB-HC-7',
-      type: 'check'
-    },
-    {
-      id: 6,
-      category: 'Component Name',
-      name: 'SB-HC-11',
-      type: 'count'
-    },
-    {
-      id: 7,
-      category: 'Component Version',
-      name: 'SB-HC-12',
-      type: 'count'
-    },
-    {
-      id: 8,
-      category: 'Component Supplier Name',
-      name: 'SB-HC-15',
-      type: 'count'
-    },
-    {
-      id: 9,
-      category: 'Component Unique Identifier',
-      name: 'SB-HC-16',
-      type: 'count'
-    },
-    {
-      id: 10,
-      category: 'Component Relationships',
-      name: 'SB-HC-10',
-      type: 'count'
-    },
-    {
-      id: 11,
-      category: 'Component Support Level',
-      name: `support`,
-      type: 'count'
-    }
-  ]
-
-  const checkId = ntiaData.map((item) => item?.name)
-
-  const { data } = useQuery(QUERY, {
+  const { data: ntia, loading: ntiaLoading } = useQuery(GetSbomQualityScores, {
     skip: isOpen && !signedUrlParams ? false : true,
-    variables: {
-      sbomId: sbomId,
-      projectId: productId,
-      checkId
-    }
+    variables: { sbomIds: [sbomId], reportFormat: 'NTIA' }
   })
-
-  const { data: checkData } = useQuery(GetCheckResults, {
-    fetchPolicy: 'network-only',
+  const { data: fda, loading: fdaLoading } = useQuery(GetSbomQualityScores, {
     skip: isOpen && !signedUrlParams ? false : true,
-    variables: {
-      sbomId: sbomId,
-      projectId: productId,
-      field: 'CHECK_RESULTS_UPDATED_AT',
-      direction: 'DESC',
-      first: totalRows
-    },
-    onCompleted: (data) =>
-      data && setTotalRows(data?.sbom?.checkResults?.totalCount)
+    variables: { sbomIds: [sbomId], reportFormat: 'FDA' }
   })
 
-  const { components, unresolvedCheckResults } = data?.sbom || ''
-  const { totalCount: totalComponents } = components || ''
-  const { totalCount: totalUnresolvedChecks } = unresolvedCheckResults || ''
-  const { checkResults } = checkData?.sbom || ''
-  const { nodes: checkNodes } = checkResults || ''
+  const { nodes: ntiaData } = ntia?.complianceReports || ''
+  const { nodes: fdaData } = fda?.complianceReports || ''
 
   const [spec, setSpec] = useState('cyclonedx')
   const [format, setFormat] = useState('json')
@@ -307,57 +137,33 @@ const DownloadModal = ({
     }
   }
 
-  const ntiaMaxScore = 4 + totalComponents * 5
-  const fdaMaxScore = 5 + totalComponents * 6
-  const ntiaActualScore = ntiaMaxScore - totalUnresolvedChecks
-  const fdaActualScore = fdaMaxScore - (totalUnresolvedChecks + totalComponents)
+  const sbomCategory = ['Timestamp', 'Supplier Name', 'Unique ID', 'Author']
 
-  const getValue = (check) => {
-    const filterChecks = checkNodes?.filter(
-      (item) =>
-        item?.organizationRule?.rule?.friendlyId === check &&
-        item?.status === 'unresolved'
-    )
-    return filterChecks?.length > 0 ? false : true
-  }
-
-  const getCount = (check) => {
-    if (check === 'support') {
-      return `0 / ${totalComponents}`
-    } else {
-      const filterChecks = checkNodes?.filter(
-        (item) => item?.organizationRule?.rule?.friendlyId === check
-      )
-      const unresolvedChecks = filterChecks?.filter(
-        (item) => item?.status === 'unresolved'
-      )
-      return `${totalComponents - unresolvedChecks?.length || 0} / ${totalComponents || 0}`
-    }
-  }
-
-  const NTIA = () => {
+  const ScoreBoard = ({ data, loading }) => {
     return (
       <>
-        {ntiaData?.map((item, index) => (
+        {data?.scoreByCategory?.map((item, index) => (
           <Grid key={index} templateColumns='repeat(2, 1fr)' gap={6} mb={3}>
-            <GridItem fontSize={'xs'}>{item?.category}</GridItem>
-            <GridItem fontSize={'xs'} textAlign={'right'} ml={'auto'}>
+            <GridItem fontSize={'xs'} textTransform={'capitalize'}>
+              {item?.category}
+            </GridItem>
+            <GridItem fontSize={'xs'} ml={'auto'}>
               <Button
                 size='xs'
-                width={'100px'}
+                width={'80px'}
+                isLoading={loading}
                 _hover={{ background: '#EDF2F7' }}
-                isLoading={checkNodes ? false : true}
               >
-                {item?.type === 'check' ? (
+                {sbomCategory?.includes(item?.category) ? (
                   <>
-                    {getValue(item?.name) === true ? (
+                    {item?.score === 100 ? (
                       <FaCheckCircle color='green' size={16} />
                     ) : (
                       <FaTimesCircle color='red' size={16} />
                     )}
                   </>
                 ) : (
-                  getCount(item?.name)
+                  <span> {Math.round(item?.score)} / 100</span>
                 )}
               </Button>
             </GridItem>
@@ -367,53 +173,32 @@ const DownloadModal = ({
     )
   }
 
-  const FDA = () => {
-    return (
-      <>
-        {fdaData?.map((item, index) => (
-          <Grid key={index} templateColumns='repeat(2, 1fr)' gap={6} mb={3}>
-            <GridItem fontSize={'xs'}>{item?.category}</GridItem>
-            <Button
-              size='xs'
-              ml={'auto'}
-              width={'100px'}
-              _hover={{ background: '#EDF2F7' }}
-              isLoading={checkNodes ? false : true}
-            >
-              {item?.type === 'check' ? (
-                <>
-                  {getValue(item?.name) === true ||
-                  item?.category === 'vulns' ? (
-                    <FaCheckCircle color='green' size={16} />
-                  ) : (
-                    <FaTimesCircle color='red' size={16} />
-                  )}
-                </>
-              ) : (
-                getCount(item?.name)
-              )}
-            </Button>
-          </Grid>
-        ))}
-      </>
-    )
-  }
-
   const checklists = [
     {
       name: 'NTIA Minimum Elements',
-      score: `${ntiaActualScore || 0} / ${ntiaMaxScore || 0}`,
-      data: <NTIA />
+      loading: ntiaLoading,
+      score: ntiaData?.length > 0 ? Math.round(ntiaData[0].score) : 0,
+      data: (
+        <ScoreBoard
+          loading={ntiaLoading}
+          data={ntiaData?.length > 0 ? ntiaData[0] : []}
+        />
+      )
     },
     {
       name: 'FDA 510(K) Compliance',
-      score: `${fdaActualScore || 0} / ${fdaMaxScore || 0}`,
-      data: <FDA />
+      loading: fdaLoading,
+      score: fdaData?.length > 0 ? Math.round(fdaData[0].score) : 0,
+      data: (
+        <ScoreBoard
+          loading={fdaLoading}
+          data={fdaData?.length > 0 ? fdaData[0] : []}
+        />
+      )
     },
     {
       name: 'BSI TR-03183',
       score: '',
-      // score: `${fdaActualScore || 0}/${fdaMaxScore || 0}`,
       data: <Text>Coming soon...</Text>
     }
   ]
@@ -421,10 +206,10 @@ const DownloadModal = ({
   return (
     <Modal
       size='lg'
-      finalFocusRef={finalRef}
-      initialFocusRef={initialRef}
       isOpen={isOpen}
       onClose={onClose}
+      finalFocusRef={finalRef}
+      initialFocusRef={initialRef}
     >
       <ModalOverlay />
       <ModalContent>
@@ -478,11 +263,7 @@ const DownloadModal = ({
                 wordBreak={'break-all'}
               >{`${productName}-${version}.${type}.xml`}</Tag>
             </Flex>
-            <FormControl
-              display={
-                shouldShowDemoFeatures && !signedUrlParams ? 'block' : 'none'
-              }
-            >
+            <FormControl display={!signedUrlParams ? 'block' : 'none'}>
               <FormLabel>Compliance Checklist</FormLabel>
               <Accordion mt={3} allowMultiple>
                 {checklists.map((item, index) => (
@@ -504,9 +285,10 @@ const DownloadModal = ({
                         <Button
                           size='xs'
                           ml={'auto'}
+                          isLoading={item?.loading}
                           hidden={item?.score === ''}
                         >
-                          {item?.score}
+                          {item?.score} / 100
                         </Button>
                       </Flex>
                       <AccordionIcon ml={2} />

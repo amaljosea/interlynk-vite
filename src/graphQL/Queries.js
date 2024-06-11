@@ -4391,3 +4391,22 @@ export const GetJiraOptions = gql`
     }
   }
 `
+
+// GET SBOM QUALITY SCORE
+export const GetSbomQualityScores = gql`
+  query GetSbomQualityScores(
+    $sbomIds: [ID!]!
+    $reportFormat: ComplianceReportFormat
+  ) {
+    complianceReports(sbomIds: $sbomIds, reportFormat: $reportFormat) {
+      nodes {
+        reportFormat
+        score
+        scoreByCategory {
+          category
+          score
+        }
+      }
+    }
+  }
+`
