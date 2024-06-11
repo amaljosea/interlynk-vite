@@ -8,6 +8,7 @@ import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 
 import { CheckIcon, InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
+  Badge,
   Button,
   Checkbox,
   Drawer,
@@ -35,6 +36,7 @@ import {
   ModalOverlay,
   Select,
   Stack,
+  Tag,
   Text,
   Textarea,
   chakra,
@@ -842,20 +844,30 @@ function ComponentDrawer(props) {
                 <br />
                 From:
                 <br />
-                <Text as='em'>
+                <Tag py={1} wordBreak={'break-all'}>
                   {primaryComp?.name ? primaryComp?.name : 'None'}
                   {primaryComp?.version ? `- ${primaryComp?.version}` : ''}
-                </Text>
+                </Tag>
                 <br />
                 <br />
                 To:
                 <br />
-                <Text as='em'>
+                <Tag py={1} wordBreak={'break-all'}>
                   {primaryComp?.name === compName ? 'None' : compName}
                   {primaryComp?.name === compName ? '' : `- ${compVersion}`}
-                </Text>
+                </Tag>
               </Text>
               <br />
+              <Tag
+                py={1}
+                variant='subtle'
+                colorScheme='red'
+                hidden={!isExists}
+                wordBreak={'break-all'}
+              >
+                This version of the product already exists. Continuing will
+                override one of these versions.
+              </Tag>
               <Text mt={6}>Are you sure you wish to continue ?</Text>
             </ModalBody>
             <ModalFooter>
