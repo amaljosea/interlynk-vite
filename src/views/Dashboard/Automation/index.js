@@ -176,6 +176,7 @@ const Automation = () => {
         return (
           <div
             draggable
+            style={{ padding: '1rem' }}
             onDrag={() => setActiveRow(row)}
             onDrop={(e) => moveRow(e, row)}
           >
