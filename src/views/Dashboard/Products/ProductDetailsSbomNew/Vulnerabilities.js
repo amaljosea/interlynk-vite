@@ -66,6 +66,7 @@ import {
   FirstDegreePartVulns,
   GetCdxResponses,
   GetConnections,
+  GetDefaultJiraProduct,
   GetVulnData,
   GetVulnFilterData,
   ShareVulnFilters,
@@ -242,15 +243,20 @@ const ExpandedComponent = ({
 }
 
 const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
+  const params = useParams()
+  const productId = params.productid
+
   const { data: configs } = useQuery(GetConnections, {
     fetchPolicy: 'network-only'
+  })
+
+  const { data: settings } = useQuery(GetDefaultJiraProduct, {
+    variables: { id: productId }
   })
 
   const [jiraConfigWarning, setJiraConfigWarning] = useState(false)
 
   const toast = useToast()
-  const params = useParams()
-  const productId = params.productid
   const sbomId = params.sbomid
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -1103,6 +1109,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           isOpen={isJiraOpen}
           onClose={onJiraClose}
           row={activeRow}
+          defaultProject={settings?.project?.projectSetting?.jiraProject}
         />
       )}
       {/* COPY DATA TABLE */}

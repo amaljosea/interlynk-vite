@@ -172,7 +172,7 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
       }
     }).then((res) => {
       if (res?.data?.jiraConnectionDelete?.errors?.length === 0) {
-        // handle success
+        setGreenCheck(false)
         refetch()
         onClose()
         toast({

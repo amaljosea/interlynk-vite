@@ -335,6 +335,7 @@ export const ProjectSettingUpdate = gql`
     $vulnscan: Boolean
     $copyVexFromPrevious: Boolean
     $mfcId: Uuid
+    $jiraProject: String
   ) {
     projectSettingUpdate(
       input: {
@@ -346,6 +347,7 @@ export const ProjectSettingUpdate = gql`
         vulnScanningEnabled: $vulnscan
         copyVexFromPrevious: $copyVexFromPrevious
         organizationManufacturerId: $mfcId
+        jiraProject: $jiraProject
       }
     ) {
       projectSetting {
@@ -355,6 +357,7 @@ export const ProjectSettingUpdate = gql`
         dataRetentionDays
         internalCompMatchingEnabled
         vulnScanningEnabled
+        jiraProject
       }
       errors
     }

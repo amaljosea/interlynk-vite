@@ -1,5 +1,6 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
+import ReactSelect from 'react-select'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
@@ -30,8 +31,24 @@ import InfoModal from 'components/InfoModal'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
+import { GetJiraProjects } from 'graphQL/Queries'
 
 const Settings = ({ enabled, data, refetch, mfc }) => {
+  const { data: projectOptions } = useQuery(GetJiraProjects, {
+    fetchPolicy: 'network-only'
+  })
+
+  useEffect(() => {
+    if (projectOptions) {
+      setProjects(
+        projectOptions.jira?.projects?.map((project) => ({
+          value: project.key,
+          label: project.name
+        }))
+      )
+    }
+  }, [projectOptions])
+
   const toast = useToast()
   const { userPermissions } = useGlobalState()
   const [dataRetentionDays, setDataRetentionDays] = useState(0)
@@ -39,9 +56,11 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
   const [checks, setChecks] = useState(false)
   const [internalComp, setInternalComp] = useState(false)
   const [orgMfc, setOrgMfc] = useState('')
+  const [jiraProject, setJiraProject] = useState('')
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
+  const [projects, setProjects] = useState([])
 
   const {
     isOpen: isInfoOpen,
@@ -71,7 +90,8 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
         vulnscan: id === 'vulnScan' ? value : undefined,
         copyVexFromPrevious: id === 'copyVexFromPrevious' ? value : undefined,
         days: id === 'dataRetention' ? value : undefined,
-        mfcId: orgMfc !== '' ? orgMfc : undefined
+        mfcId: orgMfc !== '' ? orgMfc : undefined,
+        jiraProject: jiraProject?.value
       }
     })
       .then((res) => res.data && refetch())
@@ -150,11 +170,24 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
     onInfoOpen()
   }, [onInfoOpen])
 
+  const onCheckJira = useCallback(() => {
+    setInfoHeading(`Jira Default Project`)
+    setInfoText(
+      `This setting allows you to select a default Jira project. Please configure Jira in the Organizarion settings.`
+    )
+    setInfoUrl(``)
+    onInfoOpen()
+  }, [onInfoOpen])
+
   useEffect(() => {
     if (data) {
       setProjectSettingId(data?.id || '')
       setDataRetentionDays(Number(data?.dataRetentionDays))
       setOrgMfc(data?.organizationManufacturer?.id || '')
+      setJiraProject({
+        value: data?.jiraProject,
+        label: data?.jiraProject
+      })
     }
   }, [data])
 
@@ -323,6 +356,28 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                   </option>
                 ))}
               </Select>
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>
+                Jira Default Project
+                <InfoIcon
+                  ml={2}
+                  color={'blue.500'}
+                  cursor={'pointer'}
+                  onClick={onCheckJira}
+                />
+              </FormLabel>
+              <ReactSelect
+                value={jiraProject}
+                placeholder='Project'
+                options={projects}
+                styles={{
+                  container: (provided) => ({ ...provided, width: '400px' })
+                }}
+                onChange={(e) => {
+                  setJiraProject(e)
+                }}
+              />
             </FormControl>
             {editControls === true && (
               <Button

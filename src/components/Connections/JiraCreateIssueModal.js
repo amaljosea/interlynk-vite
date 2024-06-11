@@ -23,7 +23,7 @@ import {
 import { CreateJiraIssue } from 'graphQL/Mutation'
 import { GetJiraOptions, GetJiraProjects } from 'graphQL/Queries'
 
-const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
+const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
   const { data: projectOptions } = useQuery(GetJiraProjects, {
     fetchPolicy: 'network-only'
   })
@@ -97,6 +97,15 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
       `
     )
     setSummary(`[Vulnerability]: ${vulnId}`)
+
+    setProject({
+      value: defaultProject,
+      label: defaultProject
+    })
+
+    if (defaultProject) {
+      getOptions({ variables: { pKey: defaultProject } })
+    }
   }, [])
 
   useEffect(() => {
@@ -145,7 +154,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
   useEffect(() => {
     if (projectOptions) {
       setProjects(
-        projectOptions.jira.projects?.map((project) => ({
+        projectOptions.jira?.projects?.map((project) => ({
           value: project.key,
           label: project.name
         }))
@@ -213,7 +222,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
 
           <Grid pt='15px' pb='15px' templateColumns='repeat(2, 1fr)' gap={6}>
             <FormControl isRequired>
-              <FormLabel>Project</FormLabel>
+              <FormLabel>Project (Default Selected)</FormLabel>
               <ReactSelect
                 value={project}
                 placeholder='Project'
@@ -252,27 +261,6 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
                 placeholder='Assignee'
                 options={assignees}
                 onChange={(e) => setAssignee(e)}
-              />
-            </FormControl>
-
-            <FormControl>
-              <FormLabel>Labels</FormLabel>
-              <CreatableSelect
-                isMulti
-                value={label}
-                placeholder='Labels'
-                options={labels}
-                onChange={(e) => setLabel(e)}
-              />
-            </FormControl>
-
-            <FormControl>
-              <FormLabel>Priority</FormLabel>
-              <ReactSelect
-                value={priority}
-                placeholder='Priority'
-                options={priorities}
-                onChange={(e) => setPriority(e)}
               />
             </FormControl>
           </Grid>

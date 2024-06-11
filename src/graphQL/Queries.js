@@ -501,10 +501,23 @@ export const GetProjectSettings = gql`
         internalCompMatchingEnabled
         vulnScanningEnabled
         copyVexFromPrevious
+        jiraProject
         organizationManufacturer {
           id
           organizationName
         }
+      }
+    }
+  }
+`
+
+export const GetDefaultJiraProduct = gql`
+  query GetProjectSettings($id: Uuid!) {
+    project(id: $id) {
+      id
+      projectSetting {
+        id
+        jiraProject
       }
     }
   }
@@ -4363,7 +4376,7 @@ export const GetJiraProjects = gql`
 
 export const GetJiraOptions = gql`
   query JiraInformation($pKey: ID!) {
-    jira {
+    jira(projectKey: $pKey) {
       users {
         email
         name
