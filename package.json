@@ -46,7 +46,7 @@
     "spdx-expression-validate": "^2.0.0",
     "styled-components": "^6.1.11",
     "use-persisted-state": "^0.3.3",
-    "uuid": "^9.0.1"
+    "uuid": "^10.0.0"
   },
   "resolutions": {
     "react-error-overlay": "6.0.9"
