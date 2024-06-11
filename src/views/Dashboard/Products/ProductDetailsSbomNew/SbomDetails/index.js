@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
@@ -24,12 +24,13 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
+import { SbomPolicyScan } from 'graphQL/Mutation'
 import {
   GetPrimaryComponent,
   GetProjectSettings,
-  GetSharPrimartComp
+  GetSharPrimartComp,
+  PolicyResultsType
 } from 'graphQL/Queries'
-import { PolicyResultsType } from 'graphQL/Queries'
 
 import {
   FaAngleLeft,
@@ -89,6 +90,8 @@ const SbomDetails = ({ sbomData, refetch }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
+  const [policyScan] = useMutation(SbomPolicyScan)
+
   // GET PRIMARY COMPONENT
   const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(
     signedUrlParams ? GetSharPrimartComp : GetPrimaryComponent,
@@ -99,14 +102,17 @@ const SbomDetails = ({ sbomData, refetch }) => {
     variables: { id: projectId }
   })
 
-  const { data: policies } = useQuery(PolicyResultsType, {
-    skip: sbomId ? false : true,
-    variables: { sbomId: sbomId, first: 100 }
-  })
+  const { data: policies, refetch: policyRefetch } = useQuery(
+    PolicyResultsType,
+    {
+      skip: sbomId ? false : true,
+      variables: { sbomId: sbomId, first: 100 }
+    }
+  )
 
   const { nodes } = policies?.policyResults || ''
   const isInitialized = nodes?.some((item) => item?.result === 'initialized')
-  const policyStatus = isInitialized ? 'IN_PROGRESS' : ' COMPLETED'
+  const policyStatus = isInitialized ? 'IN_PROGRESS' : 'COMPLETED'
 
   const { projectSetting } = settings?.project || ''
   const {
@@ -194,15 +200,29 @@ const SbomDetails = ({ sbomData, refetch }) => {
 
   useEffect(() => {
     const refetchInterval = setInterval(() => {
-      if (vulnRunStatus === 'IN_PROGRESS') {
-        refetch({ projectId, sbomId })
+      if (isInitialized) {
+        policyRefetch()
+        refetch()
       } else {
         clearInterval(refetchInterval)
       }
     }, 5000)
-
     return () => clearInterval(refetchInterval)
-  }, [refetch, projectId, sbomId, vulnRunStatus])
+  }, [sbomId, isInitialized, refetch, policyRefetch])
+
+  useEffect(() => {
+    const refetchInterval = setInterval(() => {
+      if (vulnRunStatus === 'IN_PROGRESS') {
+        refetch()
+      } else if (isInitialized) {
+        policyRefetch()
+        refetch()
+      } else {
+        clearInterval(refetchInterval)
+      }
+    }, 5000)
+    return () => clearInterval(refetchInterval)
+  }, [refetch, vulnRunStatus, isInitialized, policyRefetch])
 
   return (
     <>
@@ -440,17 +460,13 @@ const SbomDetails = ({ sbomData, refetch }) => {
               <Icon mt={1} h={5} w={5} color='#777' as={MdPolicy} />
               <Flex flexDir={'column'} alignItems={'center'}>
                 <Stack direction={'row'}>
-                  <VulnBadge color='orange' status={policyStatus} label='Fail'>
+                  <VulnBadge color='red' status={policyStatus} label='Fail'>
                     {policyResultMetrics?.failedCount || 0}
                   </VulnBadge>
-                  <VulnBadge color='orange' status={policyStatus} label='Warn'>
+                  <VulnBadge color='yellow' status={policyStatus} label='Warn'>
                     {policyResultMetrics?.warnCount || 0}
                   </VulnBadge>
-                  <VulnBadge
-                    color='orange'
-                    status={policyStatus}
-                    label='Inform'
-                  >
+                  <VulnBadge color='blue' status={policyStatus} label='Inform'>
                     {policyResultMetrics?.informCount || 0}
                   </VulnBadge>
                   <VulnBadge color='green' status={policyStatus} label='Pass'>

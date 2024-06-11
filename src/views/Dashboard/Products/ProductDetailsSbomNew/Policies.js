@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import styled from '@emotion/styled'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
@@ -10,6 +10,7 @@ import {
   Flex,
   Heading,
   IconButton,
+  Spinner,
   Table,
   TableContainer,
   Tag,
@@ -56,6 +57,8 @@ const Policies = () => {
     }
   )
 
+  const isInitialized = nodes?.some((item) => item?.result === 'initialized')
+
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const [activeRow, setActiveRow] = useState(null)
@@ -86,6 +89,7 @@ const Policies = () => {
         }
       })
     }
+
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         <Tooltip label='Policy Scan'>
@@ -98,6 +102,23 @@ const Policies = () => {
       </Flex>
     )
   }, [policyScan, refetch, sbomId, toast])
+
+  const getColor = (result) => {
+    switch (result) {
+      case 'inform':
+        return 'blue'
+      case 'pass':
+        return 'green'
+      case 'warn':
+        return 'yellow'
+      case 'fail':
+        return 'red'
+      case 'skipped':
+        return 'orange'
+      case 'error':
+        return 'gray'
+    }
+  }
 
   // COLUMNS
   const columns = [
@@ -114,32 +135,12 @@ const Policies = () => {
       id: 'RESULT',
       name: 'RESULT',
       selector: (row) => {
-        const { result, resultType } = row
+        const { resultType } = row
+
         return (
-          <Tag
-            minW={'100px'}
-            colorScheme={
-              result === 'initialized'
-                ? 'blue'
-                : result === 'not_detected'
-                  ? 'green'
-                  : result === 'error'
-                    ? 'red'
-                    : result === 'skipped'
-                      ? 'gray'
-                      : 'orange'
-            }
-          >
+          <Tag minW={'100px'} colorScheme={getColor(resultType)}>
             <TagLabel mx={'auto'} pt={0.5} textTransform={'capitalize'}>
-              {result === 'initialized'
-                ? 'Checking'
-                : result === 'not_detected'
-                  ? 'Pass'
-                  : result === 'error'
-                    ? 'Error'
-                    : result === 'skipped'
-                      ? 'Skipped'
-                      : resultType}
+              {resultType}
             </TagLabel>
           </Tag>
         )
@@ -152,12 +153,12 @@ const Policies = () => {
       selector: (row) => {
         const { resultType, policyRuleViolations } = row
         const { totalCount } = policyRuleViolations || ''
+        const countZero = resultType === 'pass' || resultType === 'skip'
+        if (isInitialized) return <Spinner size='xs' mt={0.5} />
         return (
           <Tag width={'60px'} colorScheme={totalCount === 0 ? 'green' : 'blue'}>
             <TagLabel mx={'auto'} pt={0.5}>
-              {resultType === 'pass' || resultType === 'skip'
-                ? 0
-                : policyRuleViolations?.totalCount}
+              {countZero ? 0 : policyRuleViolations?.totalCount}
             </TagLabel>
           </Tag>
         )
@@ -290,6 +291,17 @@ const Policies = () => {
       </Flex>
     )
   }
+
+  useEffect(() => {
+    const refetchInterval = setInterval(() => {
+      if (isInitialized) {
+        refetch()
+      } else {
+        clearInterval(refetchInterval)
+      }
+    }, 5000)
+    return () => clearInterval(refetchInterval)
+  }, [sbomId, isInitialized, refetch])
 
   return (
     <>
