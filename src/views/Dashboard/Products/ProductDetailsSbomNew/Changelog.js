@@ -28,10 +28,13 @@ import Pagination from 'components/Pagination'
 
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
-import { GetChangeLogs, GetSbomLogFilters } from 'graphQL/Queries'
-import { GetComponentData } from 'graphQL/Queries'
-import { GetProductData } from 'graphQL/Queries'
-import { GetVulnData } from 'graphQL/Queries'
+import {
+  GetChangeLogs,
+  GetComponentData,
+  GetProductData,
+  GetSbomLogFilters,
+  GetVulnData
+} from 'graphQL/Queries'
 
 import LogFilters from './LogFilters'
 
@@ -107,9 +110,9 @@ const Changelog = () => {
   const [getVuln] = useLazyQuery(GetVulnData)
 
   const onSelect = (row) => {
-    const { loggableType, loggablePrefix, event, updated } = row
+    const { loggableType, loggablePrefix, updated } = row
     const searchInput = loggablePrefix.split(' ')
-    if (event === 'vulns' && updated?.startsWith('CVE')) {
+    if (loggableType === 'ComponentVuln') {
       getVuln({
         variables: {
           projectId: productId,
@@ -196,6 +199,7 @@ const Changelog = () => {
       name: 'CHANGED',
       selector: (row) => {
         const { event, loggablePrefix, loggableType } = row
+        console.log('loggableType', loggableType)
         return (
           <Stack direction={'column'} spacing={0} my={2}>
             <Tag
