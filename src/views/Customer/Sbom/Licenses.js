@@ -1,5 +1,4 @@
-import { useQuery } from '@apollo/client'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
@@ -19,6 +18,8 @@ import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+
 import { GetShareLicensesTable } from 'graphQL/Queries'
 
 const Licenses = () => {
@@ -28,108 +29,19 @@ const Licenses = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  // PAGINATION
-  const paginationSizes = [25, 50, 100]
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalRows, setTotalRows] = useState(paginationSizes[0])
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
-
-  const { data, refetch, error } = useQuery(GetShareLicensesTable, {
-    skip: activeTab === 'licenses' ? false : true,
-    variables: {
-      sbomId: sbomId,
-      first: totalRows
-    }
-  })
-
-  const { componentLicenses } = data?.shareLynkQuery?.sbom || ''
-
-  useEffect(() => {
-    if (componentLicenses) {
-      setIsPrevActive(componentLicenses?.pageInfo?.hasPreviousPage)
-      setIsNextActive(componentLicenses?.pageInfo?.hasNextPage)
-    }
-  }, [componentLicenses])
-
-  const setPaginationControl = (data) => {
-    setIsPrevActive(
-      data?.shareLynkQuery?.sbom?.componentLicenses?.pageInfo?.hasPreviousPage
-    )
-    setIsNextActive(
-      data?.shareLynkQuery?.sbom?.componentLicenses?.pageInfo?.hasNextPage
-    )
-  }
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
-  }
-
-  const handlePreviousPage = useCallback(async () => {
-    disablePaginationControl()
-    setCurrentPage(currentPage - 1)
-
-    await refetch({
-      first: undefined,
-      last: totalRows,
-      after: undefined,
-      before: componentLicenses?.pageInfo?.startCursor
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-      }
+  const { nodes, loading, error, refetch, paginationProps } =
+    usePaginatatedQuery(GetShareLicensesTable, {
+      skip: activeTab !== 'licenses',
+      selector: 'shareLynkQuery.sbom.componentLicenses',
+      variables: { sbomId }
     })
-  }, [currentPage, refetch, totalRows, componentLicenses])
-
-  const handleSetRow = useCallback(
-    async (e) => {
-      const newTotalRows = Number(e.target.value)
-      setCurrentPage(1)
-      setTotalRows(newTotalRows)
-      disablePaginationControl()
-      await refetch({
-        first: newTotalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined
-      }).then((res) => {
-        if (res.data) {
-          setPaginationControl(res.data)
-        }
-      })
-    },
-    [refetch, setTotalRows]
-  )
-
-  const handleNextPage = useCallback(async () => {
-    disablePaginationControl()
-    setCurrentPage(currentPage + 1)
-    await refetch({
-      first: totalRows,
-      last: undefined,
-      after: componentLicenses?.pageInfo?.endCursor,
-      before: undefined
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-      }
-    })
-  }, [currentPage, refetch, totalRows, componentLicenses])
-
-  // PAGINATION END
 
   const handleRefresh = useCallback(async () => {
-    disablePaginationControl()
-    await refetch({}).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-      }
-    })
+    await refetch()
   }, [refetch])
 
-  const subHeaderComponent = useMemo(() => {
-    return (
+  const subHeaderComponent = useMemo(
+    () => (
       <Flex
         width={'100%'}
         alignItems={'center'}
@@ -141,30 +53,26 @@ const Licenses = () => {
             onClick={handleRefresh}
             colorScheme='blue'
             icon={<RepeatIcon />}
-          ></IconButton>
+          />
         </Tooltip>
       </Flex>
-    )
-  }, [handleRefresh])
+    ),
+    [handleRefresh]
+  )
 
-  // COLUMNS
   const columns = [
-    // LICENSE EXPRESSION
     {
       id: 'LICENSE_EXPRESSION',
       name: 'LICENSE EXPRESSION',
       wrap: true,
-      selector: ({ licenseExpression }) => {
-        return (
-          <Flex direction='row' alignItems={'center'} gap={2}>
-            <Text my={3} fontWeight={'medium'}>
-              {licenseExpression || 'Not Available'}
-            </Text>
-          </Flex>
-        )
-      }
+      selector: ({ licenseExpression }) => (
+        <Flex direction='row' alignItems={'center'} gap={2}>
+          <Text my={3} fontWeight={'medium'}>
+            {licenseExpression || 'Not Available'}
+          </Text>
+        </Flex>
+      )
     },
-    // COMPONENTS
     {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
@@ -198,7 +106,6 @@ const Licenses = () => {
         )
       }
     },
-    // STATUS
     {
       id: 'STATUS',
       name: 'STATUS',
@@ -266,11 +173,11 @@ const Licenses = () => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={componentLicenses?.nodes}
+          data={nodes || []}
           customStyles={customStyles}
           defaultSortAsc={false}
           defaultSortFieldId={'UPDATED_AT'}
-          progressPending={componentLicenses ? false : true}
+          progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeaderComponent}
@@ -282,20 +189,7 @@ const Licenses = () => {
         />
       </Flex>
 
-      {/* PAGINATION */}
-      {componentLicenses?.pageInfo && (
-        <Pagination
-          paginationSizes={paginationSizes}
-          pageIndex={currentPage}
-          totalRows={totalRows}
-          totalCount={componentLicenses?.totalCount}
-          onPreviousPage={handlePreviousPage}
-          onNextPage={handleNextPage}
-          onSetRow={handleSetRow}
-          hasNextPage={isNextActive}
-          hasPreviousPage={isPrevActive}
-        />
-      )}
+      <Pagination {...paginationProps} />
     </>
   )
 }
