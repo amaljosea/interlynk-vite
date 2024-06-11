@@ -192,7 +192,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
                   onChange={handleFileChange}
                 />
                 <Flex
-                  height={20}
+                  height={32}
                   alignItems={'center'}
                   justifyContent={'center'}
                 >
