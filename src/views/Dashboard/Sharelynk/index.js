@@ -17,61 +17,46 @@ const Sharelynk = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = useRef()
 
-  const { data, refetch, loading } = useQuery(GetAllShareLynks)
-
-  // useEffect(() => {
-  //   if (data) {
-  //     console.log(`Data`, data)
-  //   }
-  // }, [data])
+  const { data, refetch } = useQuery(GetAllShareLynks)
 
   return (
     <>
-      <Flex
-        flexDirection='column'
-        width={'100%'}
-        alignItems={'center'}
-        px={2}
-        justifyContent={'space-between'}
-        pt={{ base: '120px', md: '74px' }}
-      >
-        <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-          <CardHeader mb={5}>
-            <Flex
-              width={'100%'}
-              direction={'row'}
-              justifyContent={'flex-end'}
-              alignItems={'center'}
+      <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+        <CardHeader mb={5}>
+          <Flex
+            width={'100%'}
+            direction={'row'}
+            justifyContent={'flex-end'}
+            alignItems={'center'}
+          >
+            <Button
+              width={'120px'}
+              colorScheme='blue'
+              fontSize={'sm'}
+              leftIcon={<AddIcon />}
+              onClick={onOpen}
             >
-              <Button
-                width={'120px'}
-                colorScheme='blue'
-                fontSize={'sm'}
-                leftIcon={<AddIcon />}
-                onClick={onOpen}
-              >
-                Share Lynk
-              </Button>
-            </Flex>
-          </CardHeader>
-          <CardBody mt={5}>
-            {data && (
-              <LynkTable
-                captions={[
-                  'Active',
-                  'Users',
-                  'Products',
-                  'Updated At',
-                  'Link',
-                  'Actions'
-                ]}
-                data={data}
-                refetch={refetch}
-              />
-            )}
-          </CardBody>
-        </Card>
-      </Flex>
+              Share Lynk
+            </Button>
+          </Flex>
+        </CardHeader>
+        <CardBody mt={5}>
+          {data && (
+            <LynkTable
+              captions={[
+                'Active',
+                'Users',
+                'Products',
+                'Updated At',
+                'Link',
+                'Actions'
+              ]}
+              data={data}
+              refetch={refetch}
+            />
+          )}
+        </CardBody>
+      </Card>
 
       {/* share lynk drawer */}
       {isOpen && (

@@ -17,7 +17,7 @@ import CardBody from 'components/Card/CardBody.js'
 import IconBox from 'components/Icons/IconBox'
 
 const MiniStatistics = ({ title, amount, icon }) => {
-  const iconBlue = useColorModeValue('blue.300', 'blue.300')
+  const iconBlue = useColorModeValue('blue.500', 'blue.300')
   const textColor = useColorModeValue('gray.700', 'white')
 
   return (

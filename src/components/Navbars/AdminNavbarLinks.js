@@ -82,13 +82,13 @@ export default function HeaderLinks(props) {
     } else if (location.pathname.startsWith('/customer')) {
       setUserName(userEmail)
     }
-  }, [])
+  }, [email, location, name, setUserName, userEmail])
 
   useEffect(() => {
     if (!email && location.pathname.startsWith('/vendor')) {
       logoutUser().then(() => navigate('/auth'))
     }
-  }, [location])
+  }, [email, location, navigate])
 
   // Chakra Color Mode
   let navbarIcon = useColorModeValue('gray.500', 'gray.200')
@@ -236,14 +236,12 @@ export default function HeaderLinks(props) {
               <MenuItem>
                 <Flex flexDirection='row' alignItems={'flex-start'} gap={3}>
                   <Icon as={FaUser} width={2.5} mt={1} />
-                  <Stack direction={'column'} spacing={-2}>
-                    <Text mt={0} mb={0}>
-                      {name}
-                    </Text>
-                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
+                  <Stack direction={'column'} spacing={-1}>
+                    <Text>{name}</Text>
+                    <Text fontSize={'sm'} color={'#718096'}>
                       {email}
                     </Text>
-                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
+                    <Text fontSize={'sm'} color={'#718096'}>
                       {data?.organization?.name || ''}
                     </Text>
                   </Stack>

@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
-import { Flex } from '@chakra-ui/react'
-
 import Card from 'components/Card/Card'
 import SupportTable from 'components/Tables/SupportTable'
 
@@ -27,31 +25,22 @@ const Support = () => {
       }
     })
 
+  if (!org || org === 'undefined') return <OrgRegister />
+
   return (
-    <Flex
-      flexDirection='column'
-      pt={{ base: '120px', md: '74px' }}
-      pr={2}
-      pl={5}
-    >
-      {!org || org === 'undefined' ? (
-        <OrgRegister />
-      ) : (
-        <Card>
-          <SupportTable
-            loading={loading}
-            data={nodes}
-            refetch={refetch}
-            paginationProps={paginationProps}
-            filters={filters}
-            setFilters={(newFilters) => {
-              setFilters(newFilters)
-              reset()
-            }}
-          />
-        </Card>
-      )}
-    </Flex>
+    <Card>
+      <SupportTable
+        loading={loading}
+        data={nodes}
+        refetch={refetch}
+        paginationProps={paginationProps}
+        filters={filters}
+        setFilters={(newFilters) => {
+          setFilters(newFilters)
+          reset()
+        }}
+      />
+    </Card>
   )
 }
 

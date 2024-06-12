@@ -20,8 +20,7 @@ import CustomLoader from 'components/CustomLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { GetOrg } from 'graphQL/Queries'
-import { GetOrgMetrics } from 'graphQL/Queries'
+import { GetOrg, GetOrgMetrics } from 'graphQL/Queries'
 
 import { FaBug, FaCube, FaLayerGroup, FaWindowMaximize } from 'react-icons/fa'
 
@@ -88,29 +87,11 @@ export default function Dashboard() {
     )
   }
 
-  if (eOrg && eOrgMetric) {
-    return (
-      <Flex
-        flexDirection='column'
-        pt={{ base: '120px', md: '74px' }}
-        gap={'24px'}
-        pr={2}
-        pl={5}
-      >
-        <OrgRegister />
-      </Flex>
-    )
-  }
+  if (eOrg && eOrgMetric) return <OrgRegister />
 
   if (loading) {
     return (
-      <Flex
-        flexDirection='column'
-        pt={{ base: '120px', md: '74px' }}
-        gap={'24px'}
-        pr={2}
-        pl={5}
-      >
+      <Flex width={'100%'} flexDirection='column' gap={6}>
         <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
           {[1, 2, 3, 4].map((_, index) => (
             <Card key={index}>
@@ -137,99 +118,65 @@ export default function Dashboard() {
   }
 
   return (
-    <>
-      {data && (
-        <Flex
-          width={'100%'}
-          flexDirection='column'
-          pt={{ base: '120px', md: '74px' }}
-          pr={2}
-          pl={5}
-        >
-          {data.organization ? (
-            <Flex flexDirection='column'>
-              {/* STATS */}
-              <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
-                <MiniStatistics
-                  title={'Products'}
-                  amount={metrics?.organizationMetric?.projectCount}
-                  percentage={9}
-                  icon={
-                    <FaWindowMaximize
-                      h={'24px'}
-                      w={'24px'}
-                      color={iconBoxInside}
-                    />
-                  }
-                />
-                <MiniStatistics
-                  title={'Versions'}
-                  amount={metrics?.organizationMetric?.versionCount}
-                  icon={
-                    <FaLayerGroup h={'24px'} w={'24px'} color={iconBoxInside} />
-                  }
-                />
-                <MiniStatistics
-                  title={'Components'}
-                  amount={metrics?.organizationMetric?.componentCount}
-                  icon={<FaCube h={'24px'} w={'24px'} color={iconBoxInside} />}
-                />
-                <MiniStatistics
-                  title={'Vulnerabilities'}
-                  amount={metrics?.organizationMetric?.vulnsMetric}
-                  icon={<FaBug h={'24px'} w={'24px'} color={iconBoxInside} />}
-                />
-              </SimpleGrid>
-              {/* GRAPHS */}
-              <Grid
-                templateColumns={{ sm: '1fr', lg: '1.3fr 1.7fr' }}
-                templateRows={{ sm: 'repeat(2, 1fr)', lg: '1fr' }}
-                mb={{ lg: '26px' }}
-                gap='24px'
-              >
-                {/* TODO: 1.0 Add back in when ready
-                <RiskScoreOverview
-                  title={'Risk Score'}
-                  percentage={-24}
-                  chart={<LineChart />}
-                />
-                <SBOMActivities
-                  title={'Activities'}
-                  percentage={23}
-                  chart={<BarChart />}
-                />
-                */}
-              </Grid>
-              {/* LIST */}
-              <Grid
-                templateColumns='repeat(12, 1fr)'
-                gap={'24px'}
-                flexWrap={'wrap'}
-              >
-                {/* RECENT IMPORTS */}
-                <GridItem colSpan={8} w='100%'>
-                  <ProductsOverview
-                    title={'Recent Imports'}
-                    data={metrics?.organizationMetric?.latestVersions}
-                    prodPermissions={productPermissions}
-                  />
-                </GridItem>
-                {/* LATEST ACTIVITIES */}
-                <GridItem colSpan={4} w='100%'>
-                  <ActivitiesOverview
-                    title={'Recent Activities'}
-                    amount={metrics?.organizationMetric?.latestActivity?.length}
-                    data={metrics?.organizationMetric?.latestActivity}
-                    prodPermissions={productPermissions}
-                  />
-                </GridItem>
-              </Grid>
-            </Flex>
-          ) : (
-            <OrgRegister />
-          )}
+    <Flex width={'100%'} flexDirection='column'>
+      {data.organization ? (
+        <Flex flexDirection='column' gap={6}>
+          {/* STATS */}
+          <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
+            <MiniStatistics
+              title={'Products'}
+              amount={metrics?.organizationMetric?.projectCount}
+              percentage={9}
+              icon={
+                <FaWindowMaximize h={'24px'} w={'24px'} color={iconBoxInside} />
+              }
+            />
+            <MiniStatistics
+              title={'Versions'}
+              amount={metrics?.organizationMetric?.versionCount}
+              icon={
+                <FaLayerGroup h={'24px'} w={'24px'} color={iconBoxInside} />
+              }
+            />
+            <MiniStatistics
+              title={'Components'}
+              amount={metrics?.organizationMetric?.componentCount}
+              icon={<FaCube h={'24px'} w={'24px'} color={iconBoxInside} />}
+            />
+            <MiniStatistics
+              title={'Vulnerabilities'}
+              amount={metrics?.organizationMetric?.vulnsMetric}
+              icon={<FaBug h={'24px'} w={'24px'} color={iconBoxInside} />}
+            />
+          </SimpleGrid>
+          {/* LIST */}
+          <Grid
+            templateColumns='repeat(12, 1fr)'
+            gap={'24px'}
+            flexWrap={'wrap'}
+          >
+            {/* RECENT IMPORTS */}
+            <GridItem colSpan={8} w='100%'>
+              <ProductsOverview
+                title={'Recent Imports'}
+                data={metrics?.organizationMetric?.latestVersions}
+                prodPermissions={productPermissions}
+              />
+            </GridItem>
+            {/* LATEST ACTIVITIES */}
+            <GridItem colSpan={4} w='100%'>
+              <ActivitiesOverview
+                title={'Recent Activities'}
+                amount={metrics?.organizationMetric?.latestActivity?.length}
+                data={metrics?.organizationMetric?.latestActivity}
+                prodPermissions={productPermissions}
+              />
+            </GridItem>
+          </Grid>
         </Flex>
+      ) : (
+        <OrgRegister />
       )}
-    </>
+    </Flex>
   )
 }

@@ -254,7 +254,7 @@ const Compare = ({ selectedSboms }) => {
   }
 
   return (
-    <>
+    <Flex flexDirection='column' gap={6}>
       {/* HEADER */}
       <Card p={5}>
         <Flex
@@ -634,7 +634,7 @@ const Compare = ({ selectedSboms }) => {
           sbomTwo={secondSbomInfo}
         />
       </Card>
-    </>
+    </Flex>
   )
 }
 

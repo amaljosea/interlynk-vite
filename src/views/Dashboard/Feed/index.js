@@ -78,19 +78,8 @@ function Advisories() {
     })
   }
 
-  // useEffect(() => {
-  //   if (feedData) {
-  //     console.log(`feedLogs`, feedData.feedLogs)
-  //   }
-  // }, [feedData])
-
   return (
-    <Flex
-      direction='column'
-      flexDirection='column'
-      pt={{ base: '120px', md: '74px' }}
-      px={2}
-    >
+    <>
       <Timeline
         setFormattedDate={setFormattedDate}
         formattedDate={formattedDate}
@@ -215,7 +204,7 @@ function Advisories() {
           />
         )}
       </Card>
-    </Flex>
+    </>
   )
 }
 

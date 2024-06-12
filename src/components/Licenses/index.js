@@ -1,7 +1,5 @@
 import { useState } from 'react'
 
-import { Flex } from '@chakra-ui/react'
-
 import Card from 'components/Card/Card'
 
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -24,25 +22,18 @@ const Licenses = () => {
   )
 
   return (
-    <Flex
-      flexDirection='column'
-      pt={{ base: '120px', md: '74px' }}
-      pr={2}
-      pl={5}
-    >
-      <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-        <LicenseTable
-          loading={loading}
-          licenses={nodes}
-          paginationProps={paginationProps}
-          filters={filters}
-          setFilters={(newFilters) => {
-            setFilters(newFilters)
-            reset()
-          }}
-        />
-      </Card>
-    </Flex>
+    <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+      <LicenseTable
+        loading={loading}
+        licenses={nodes}
+        paginationProps={paginationProps}
+        filters={filters}
+        setFilters={(newFilters) => {
+          setFilters(newFilters)
+          reset()
+        }}
+      />
+    </Card>
   )
 }
 

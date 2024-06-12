@@ -160,12 +160,7 @@ function Profile() {
   }
 
   return (
-    <Flex
-      flexDirection={'column'}
-      pr={2}
-      pl={5}
-      pt={{ base: '120px', md: '75px' }}
-    >
+    <>
       {/*  HEADER */}
       <Header
         tabs={tabs}
@@ -337,7 +332,7 @@ function Profile() {
           </Tabs>
         </Card>
       )}
-    </Flex>
+    </>
   )
 }
 

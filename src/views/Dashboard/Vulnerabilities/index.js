@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 
-import { Flex, Text } from '@chakra-ui/react'
+import { Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
@@ -63,28 +63,15 @@ const Vulnerabilities = () => {
     }
   })
 
-  if (!org || org === 'undefined') {
-    return (
-      <Flex
-        flexDirection='column'
-        pt={{ base: '120px', md: '74px' }}
-        pr={2}
-        pl={5}
-      >
-        <OrgRegister />
-      </Flex>
-    )
-  }
+  if (!org || org === 'undefined') return <OrgRegister />
 
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
     return (
-      <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
-        <VulnInfo
-          data={vulnData?.vuln}
-          componentVulns={vulnData?.componentVulns}
-          refetch={getVulnData}
-        />
-      </Flex>
+      <VulnInfo
+        data={vulnData?.vuln}
+        componentVulns={vulnData?.componentVulns}
+        refetch={getVulnData}
+      />
     )
   }
 
@@ -96,29 +83,22 @@ const Vulnerabilities = () => {
     )
 
   return (
-    <Flex
-      flexDirection='column'
-      pt={{ base: '120px', md: '74px' }}
-      pr={2}
-      pl={5}
-    >
-      <Card>
-        {vulnsPermissions?.value === false ? (
-          <Text>You are not allowed to access this data</Text>
-        ) : (
-          <GlobalVulnTable
-            loading={loading}
-            vulns={nodes}
-            paginationProps={paginationProps}
-            filters={filters}
-            setFilters={(newFilters) => {
-              setFilters(newFilters)
-              reset()
-            }}
-          />
-        )}
-      </Card>
-    </Flex>
+    <Card>
+      {vulnsPermissions?.value === false ? (
+        <Text>You are not allowed to access this data</Text>
+      ) : (
+        <GlobalVulnTable
+          loading={loading}
+          vulns={nodes}
+          paginationProps={paginationProps}
+          filters={filters}
+          setFilters={(newFilters) => {
+            setFilters(newFilters)
+            reset()
+          }}
+        />
+      )}
+    </Card>
   )
 }
 
