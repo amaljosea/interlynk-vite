@@ -199,7 +199,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
                   <Text hidden={loading}>
                     {isDragActive
                       ? 'Drop the files here ...'
-                      : 'Drag & drop file here, or click to select file'}
+                      : 'Drop SBOM here, or click to select a file'}
                   </Text>
                   <Text hidden={!loading}>Uploading ...</Text>
                 </Flex>
