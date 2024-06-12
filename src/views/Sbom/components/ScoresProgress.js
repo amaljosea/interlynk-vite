@@ -21,10 +21,6 @@ export const ScoresProgress = () => {
     skip: !shouldShowDemoFeatures
   })
 
-  if (!shouldShowDemoFeatures) {
-    return null
-  }
-
   return (
     <Stack spacing={3}>
       <ProgressBar
@@ -32,11 +28,13 @@ export const ScoresProgress = () => {
         loading={loading}
         text='SBOM Quality Score'
       />
-      <ProgressBar
-        value={healthScore}
-        loading={loading}
-        text='SBOM Health Score'
-      />
+      {shouldShowDemoFeatures && (
+        <ProgressBar
+          value={healthScore}
+          loading={loading}
+          text='SBOM Health Score'
+        />
+      )}
     </Stack>
   )
 }

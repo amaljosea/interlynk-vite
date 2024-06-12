@@ -25,14 +25,14 @@ const QUERY = gql`
 `
 const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-const calculateHealthScore = (data) => {
-  if (!data) {
+export const calculateHealthScore = (sbom) => {
+  if (!sbom) {
     return {
       healthScore: 0
     }
   }
 
-  const healthScores = data.sbom.components.nodes.map(
+  const healthScores = sbom.components.nodes.map(
     (node) =>
       getComponentHealthScoreFromLocalData({
         componentName: node.name,
@@ -43,7 +43,7 @@ const calculateHealthScore = (data) => {
     return acc + hs
   }, 0)
 
-  const componentsCount = data.sbom.components.totalCount
+  const componentsCount = sbom.components.totalCount
 
   return {
     healthScore: round(sum / componentsCount, 2)
@@ -62,7 +62,7 @@ export const useSbomScores = ({ projectId, sbomId }) => {
 
   const { qualityScore, healthScore } = useMemo(() => {
     const qualityScore = round(data?.complianceReports?.nodes[0]?.score, 2) || 0
-    const { healthScore = 0 } = calculateHealthScore(data)
+    const { healthScore = 0 } = calculateHealthScore(data?.sbom)
 
     return {
       qualityScore,

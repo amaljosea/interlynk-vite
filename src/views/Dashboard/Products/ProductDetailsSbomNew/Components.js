@@ -47,6 +47,7 @@ import { ProgressBar } from 'components/ProgressBar'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
 import {
@@ -210,6 +211,8 @@ const Components = ({ sbomData, sbomRefetch }) => {
     onOpen: onCpeOpen,
     onClose: onCpeClose
   } = useDisclosure()
+
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const onLicenseOpen = (row) => {
     setActiveRow(row)
@@ -393,6 +396,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
     {
       id: 'COMPONENTS_HEALTH',
       name: 'HEALTH',
+      omit: !shouldShowDemoFeatures,
       selector: (row) => (
         <ProgressBar
           value={

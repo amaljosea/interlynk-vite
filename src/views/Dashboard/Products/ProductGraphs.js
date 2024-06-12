@@ -6,9 +6,10 @@ import { Bar, BarChart, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { Box, Flex, Text } from '@chakra-ui/react'
 
+import { calculateHealthScore } from 'hooks/useSbomScores'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
-const QUERY_A = gql`
+const SBOM_LIST_WITH_DATA_QUERY = gql`
   query Project($projectId: Uuid!) {
     project(id: $projectId) {
       id
@@ -38,15 +39,41 @@ const QUERY_A = gql`
   }
 `
 
-const QUERY_B = gql`
-  query Organization($sbomIds: [ID!]!) {
-    complianceReports(sbomIds: $sbomIds, reportFormat: NTIA) {
-      nodes {
-        score
+const getSingleQuery = ({ sbomId, productId, index }) => {
+  const query = `
+   sbom${index + 1} : sbom(projectId: "${productId}", sbomId: "${sbomId}") {
+      id
+      projectVersion
+      components(sbomId: "${sbomId}", first: 999999999) {
+        totalCount
+        nodes {
+          id
+          name
+          version
+        }
       }
     }
-  }
-`
+  `
+
+  return query
+}
+
+const getLatestLatestSbomWithComponentsQuery = ({ sbomIds, productId }) => {
+  return sbomIds.reduce((acc, sbomId, index) => {
+    return (
+      acc +
+      getSingleQuery({
+        sbomId,
+        productId,
+        index
+      })
+    )
+  }, '')
+}
+
+const tooltipCustom = (
+  <Tooltip position={{ x: 0, y: 70 }} wrapperStyle={{ zIndex: 9999 }} />
+)
 
 const SimpleBarChat = ({ label, dataKey, color, data }) => {
   return (
@@ -54,7 +81,7 @@ const SimpleBarChat = ({ label, dataKey, color, data }) => {
       <BarChart width={200} height={40} data={data}>
         <Bar name={`${label} Count`} dataKey={dataKey} fill={color} />
         <XAxis dataKey='name' hide />
-        <Tooltip position={{ x: 100, y: -50 }} />
+        {tooltipCustom}
       </BarChart>
       <Text fontSize={'xs'} cursor={'pointer'}>
         {`${label} Trend`}
@@ -77,10 +104,7 @@ const SimpleLineChat = ({ label, config, data }) => {
         ))}
         <YAxis hide tickFormatter={(value) => value.toFixed(2)} />
         <XAxis dataKey='name' hide />
-        <Tooltip
-          position={{ x: 100, y: label === 'Vulnerability' ? -50 : -200 }}
-          wrapperStyle={{ zIndex: 9999 }}
-        />
+        {tooltipCustom}
       </LineChart>
       <Text cursor={'pointer'} fontSize={'xs'}>
         {`${label} Trend`}
@@ -166,7 +190,7 @@ export const ProductGraphs = () => {
   const params = useParams()
   const productId = params.productid
 
-  const { data, loading } = useQuery(QUERY_A, {
+  const { data, loading } = useQuery(SBOM_LIST_WITH_DATA_QUERY, {
     variables: {
       projectId: productId
     }
@@ -176,14 +200,29 @@ export const ProductGraphs = () => {
   const count = items?.length
   const sbomIds = items?.map((i) => i.id)
 
-  const { data: dataB, loading: loadingB } = useQuery(QUERY_B, {
+  const dynamicQuery = data
+    ? getLatestLatestSbomWithComponentsQuery({ sbomIds, productId })
+    : ''
+
+  const QUERY_QUALITY_SCORE = gql`
+  query Organization($sbomIds: [ID!]!) {
+    complianceReports(sbomIds: $sbomIds, reportFormat: NTIA) {
+      nodes {
+        score
+      }
+    }
+    ${dynamicQuery}
+  }
+`
+
+  const { data: dataQs, loading: loadingQs } = useQuery(QUERY_QUALITY_SCORE, {
     skip: !data,
     variables: {
       sbomIds
     }
   })
 
-  if (loading || loadingB) {
+  if (loading || loadingQs) {
     return <Box mt={8}>Loading...</Box>
   }
 
@@ -214,22 +253,34 @@ export const ProductGraphs = () => {
       }
     }) || []
 
-  const formattedScores = dataB?.complianceReports?.nodes.map((i) => ({
+  const formattedScores = dataQs?.complianceReports?.nodes.map((i) => ({
     score: round(i.score, 2)
   }))
 
   const nodesReversed = [...nodes].reverse()
   const nodesBReversed = [...(formattedScores || [])].reverse()
 
-  if (count <= 1) {
+  if (count <= 2) {
     return null
   }
 
-  if (!shouldShowDemoFeatures) {
-    return null
-  }
+  const healthScore = nodesReversed.reduce((acc, item, index) => {
+    const sbomWithData = dataQs[`sbom${index + 1}`]
+    const { healthScore } = calculateHealthScore(sbomWithData)
+    return [
+      ...acc,
+      { name: sbomWithData.projectVersion, healthScore: healthScore }
+    ]
+  }, [])
+
+  const healthScoreReversed = [...healthScore].reverse()
+  const scoreFinal = healthScoreReversed.map((item, index) => ({
+    ...item,
+    qualityScore: nodesBReversed[index].score
+  }))
+
   return (
-    <Box display='flex' justifyContent='space-between' mt={8}>
+    <Box display='flex' justifyContent='center' mt={8}>
       <Flex flexWrap={'wrap'} alignItems={'center'} gap={12}>
         <SimpleBarChat
           color='#3182ce'
@@ -256,24 +307,18 @@ export const ProductGraphs = () => {
         <SimpleBarChat
           color='#3182ce'
           label={'Quality Score'}
-          dataKey='score'
-          data={nodesBReversed}
+          dataKey='qualityScore'
+          data={scoreFinal}
         />
+        {shouldShowDemoFeatures && (
+          <SimpleBarChat
+            color='#3182ce'
+            label={'Health Score'}
+            dataKey='healthScore'
+            data={scoreFinal}
+          />
+        )}
       </Flex>
-      <Box>
-        {/* <Box>
-          <LineChart width={100} height={40} data={data3}>
-            <Line type='monotone' dataKey='pv' stroke='#8884d8' />
-          </LineChart>
-          Quality score trend
-        </Box>
-        <Box>
-          <LineChart width={100} height={40} data={data2}>
-            <Line type='monotone' dataKey='uv' stroke='black' />
-          </LineChart>
-          Health score trend
-        </Box> */}
-      </Box>
     </Box>
   )
 }
