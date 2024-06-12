@@ -109,12 +109,12 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
   }, [])
 
   useEffect(() => {
-    if (summary && project && issueType) {
+    if (summary && project && issueType && reporter && assignee) {
       setIsCreateDisabled(false)
     } else {
       setIsCreateDisabled(true)
     }
-  }, [summary, project, issueType])
+  }, [summary, project, issueType, reporter, assignee])
 
   useEffect(() => {
     if (options) {
@@ -163,6 +163,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
   }, [projectOptions])
 
   const handleCreate = () => {
+    setIsCreateDisabled(true)
     createJiraIssue({
       variables: {
         summary,
@@ -187,6 +188,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
         })
         onClose()
       } else {
+        setIsCreateDisabled(false)
         toast({
           title: 'Jira Issue creation failed.',
           description: 'An error occurred while creating your Jira Issue.',
