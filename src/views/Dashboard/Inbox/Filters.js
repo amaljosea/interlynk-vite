@@ -12,7 +12,11 @@ import {
 import CheckMark from 'components/Misc/CheckMark'
 import MenuHeading from 'components/Misc/MenuHeading'
 
-const Filters = ({ setFilters }) => {
+const Filters = ({ setFilters, data }) => {
+  const emailList = [...new Set(data?.map((item) => item.email))]
+  const productList = [...new Set(data?.map((item) => item.productName))]
+  const statusList = [...new Set(data?.map((item) => item.status))]
+
   const [email, setEmail] = useState([])
   const [product, setProduct] = useState([])
   const [status, setStatus] = useState([])
@@ -55,13 +59,7 @@ const Filters = ({ setFilters }) => {
               value={email}
               onChange={onFilterEmail}
             >
-              {[
-                'All',
-                'sp@interlynk.io',
-                'rcn@interlynk.io',
-                'sijin@interlynk.io',
-                'amal@interlynk.io'
-              ].map((item, index) => (
+              {emailList?.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>
@@ -81,14 +79,7 @@ const Filters = ({ setFilters }) => {
               value={product}
               onChange={onFilterProduct}
             >
-              {[
-                'All',
-                'biotronix',
-                'lynk-api',
-                'lynk-dash-app',
-                'calibrator',
-                'dropwizard'
-              ].map((item, index) => (
+              {productList?.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>
@@ -108,14 +99,7 @@ const Filters = ({ setFilters }) => {
               value={status}
               onChange={onFilterStatus}
             >
-              {[
-                'all',
-                'sent',
-                'bounced',
-                'canceled',
-                'declined',
-                'uploaded'
-              ].map((item, index) => (
+              {statusList?.map((item, index) => (
                 <MenuItemOption
                   key={index}
                   value={item}

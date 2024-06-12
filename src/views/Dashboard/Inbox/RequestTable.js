@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles } from 'utils'
+import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 
 import { RepeatIcon } from '@chakra-ui/icons'
 import {
@@ -29,11 +29,19 @@ import { RequestCancel, RequestResend } from 'graphQL/Mutation'
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaPlus } from 'react-icons/fa6'
 
+import Pagination from '../../../components/Pagination'
 import Filters from './Filters'
 import RequestAcceptModal from './RequestAcceptModal'
 import RequestModal from './RequestModal'
 
-const RequestTable = ({ data, loading, filters, setFilters, refetch }) => {
+const RequestTable = ({
+  data,
+  loading,
+  filters,
+  setFilters,
+  refetch,
+  paginationProps
+}) => {
   const toast = useToast()
 
   const [resendRequest] = useMutation(RequestResend)
@@ -126,7 +134,7 @@ const RequestTable = ({ data, loading, filters, setFilters, refetch }) => {
             onFilter={handleSearch}
           />
           {/* FILTERS */}
-          <Filters setFilters={setFilters} />
+          <Filters setFilters={setFilters} data={data} />
         </Stack>
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
           <Tooltip label='Request SBOM'>
@@ -240,7 +248,11 @@ const RequestTable = ({ data, loading, filters, setFilters, refetch }) => {
     {
       id: 'REQUESTED',
       name: 'REQUESTED',
-      selector: (row) => <Text my={4}>{row?.requestedAt}</Text>,
+      selector: (row) => (
+        <Tooltip label={getFullDateAndTime(row?.requestedAt)} placement={'top'}>
+          {timeSince(row?.requestedAt)}
+        </Tooltip>
+      ),
       wrap: true
     },
     {
@@ -269,11 +281,16 @@ const RequestTable = ({ data, loading, filters, setFilters, refetch }) => {
             />
             <Portal>
               <MenuList fontSize={'sm'}>
-                <MenuItem onClick={() => handleAccept(row)}>Accept</MenuItem>
+                <MenuItem
+                  isDisabled={row.status === 'Sent'}
+                  onClick={() => handleAccept(row)}
+                >
+                  Accept
+                </MenuItem>
                 <MenuItem onClick={() => handleResend(row)}>Resend</MenuItem>
-                <MenuItem onClick={() => handleCancel(row)}>Cancel</MenuItem>
-                <MenuItem>Review</MenuItem>
-                <MenuItem color='red'>Archive</MenuItem>
+                <MenuItem color='red' onClick={() => handleCancel(row)}>
+                  Cancel
+                </MenuItem>
               </MenuList>
             </Portal>
           </Menu>
@@ -300,10 +317,9 @@ const RequestTable = ({ data, loading, filters, setFilters, refetch }) => {
           progressComponent={<CustomLoader />}
           responsive={true}
         />
-
-        {/* PAGINATION */}
-        {/* <Pagination {...paginationProps} /> */}
       </Flex>
+
+      <Pagination {...paginationProps} />
 
       {isOpen && <RequestModal isOpen={isOpen} onClose={onClose} data={null} />}
       {isAcceptOpen && (

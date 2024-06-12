@@ -3658,13 +3658,22 @@ export const GetRequests = gql`
     $before: String
     $first: Int
     $last: Int
+    $status: [String!]
+    $product: [String!]
+    $email: [String!]
+    $field: RequestOrderByFields!
+    $direction: OrderByDirection!
   ) {
     requests(
       search: $search
+      status: $status
+      product: $product
+      email: $email
       after: $after
       before: $before
       first: $first
       last: $last
+      orderBy: { field: $field, direction: $direction }
     ) {
       totalCount
       nodes {

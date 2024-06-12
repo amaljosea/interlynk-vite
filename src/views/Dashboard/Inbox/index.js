@@ -13,7 +13,7 @@ const Inbox = () => {
   const org = localStorage.getItem('organization')
 
   const [filters, setFilters] = useState({
-    field: '',
+    field: 'REQUESTS_REQUESTED_AT',
     direction: 'DESC'
   })
 
