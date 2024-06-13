@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 
 const QUERY = gql`
-  query Organization($projectId: Uuid!, $sbomId: Uuid!, $sbomIds: [ID!]!) {
+  query SingleSbomScore($projectId: Uuid!, $sbomId: Uuid!, $sbomIds: [ID!]!) {
     complianceReports(sbomIds: $sbomIds, reportFormat: NTIA) {
       nodes {
         score
