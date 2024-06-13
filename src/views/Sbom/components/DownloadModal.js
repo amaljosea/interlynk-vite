@@ -139,6 +139,16 @@ const DownloadModal = ({
 
   const sbomCategory = ['Timestamp', 'Supplier Name', 'Unique ID', 'Author']
 
+  const getBgColor = (score) => {
+    if (score === 0) {
+      return '#FED7D7'
+    } else if (score === 100) {
+      return '#C6F6D5'
+    } else {
+      return '#FEEBC8'
+    }
+  }
+
   const ScoreBoard = ({ data, loading }) => {
     return (
       <>
@@ -152,7 +162,8 @@ const DownloadModal = ({
                 size='xs'
                 width={'80px'}
                 isLoading={loading}
-                _hover={{ background: '#EDF2F7' }}
+                bg={getBgColor(item?.score)}
+                _hover={{ background: getBgColor(item?.score) }}
               >
                 {sbomCategory?.includes(item?.category) ? (
                   <>
@@ -163,7 +174,7 @@ const DownloadModal = ({
                     )}
                   </>
                 ) : (
-                  <span> {Math.round(item?.score)} / 100</span>
+                  <span> {Math.round(item?.score)} %</span>
                 )}
               </Button>
             </GridItem>
@@ -264,7 +275,7 @@ const DownloadModal = ({
               >{`${productName}-${version}.${type}.xml`}</Tag>
             </Flex>
             <FormControl display={!signedUrlParams ? 'block' : 'none'}>
-              <FormLabel>Compliance Checklist</FormLabel>
+              <FormLabel>Compliance Checks</FormLabel>
               <Accordion mt={3} allowMultiple>
                 {checklists.map((item, index) => (
                   <AccordionItem key={index}>
@@ -288,7 +299,7 @@ const DownloadModal = ({
                           isLoading={item?.loading}
                           hidden={item?.score === ''}
                         >
-                          {item?.score} / 100
+                          {item?.score} %
                         </Button>
                       </Flex>
                       <AccordionIcon ml={2} />
