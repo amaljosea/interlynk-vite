@@ -869,10 +869,7 @@ export const UpdateComponent = gql`
         id
         name
         version
-        group
-        kind
         primary
-        internal
         purl
         cpes
       }

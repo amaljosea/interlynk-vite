@@ -88,6 +88,8 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
     shortDesc === 'Component has license/s specified' ||
     shortDesc === 'Componet has deprecated license/s' ||
     shortDesc === 'Component has restrictive licenses specified'
+  const isComponent =
+    isPrimary || isComponentType || isComponentVersion || isComponentLicense
 
   const isInvalidLicense = isComponentLicense && expLicense === ''
 
@@ -130,18 +132,18 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
     disableButtonTemporarily()
     updateComponent({
       variables: {
-        primary: true,
         sbomId: sbomId,
         id: isPrimary ? activeComp?.id : componentId,
-        kind: compType !== '' ? compType : undefined,
-        version: compVersion !== '' ? compVersion : undefined,
+        primary: isPrimary ? true : undefined,
+        kind: isComponentType ? compType : undefined,
+        version: isComponentVersion ? compVersion : undefined,
         licenses: {
-          licensesExp: expLicense || undefined
+          licensesExp: isPrimary ? undefined : expLicense || undefined
         }
       }
     })
-      .then(() => {
-        if (friendlyId) {
+      .then((res) => {
+        if (res?.data) {
           healthRecheck({
             variables: {
               sbomId: sbomId,
@@ -189,12 +191,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
   }
 
   const handleSubmit = () => {
-    if (
-      isPrimary ||
-      isComponentType ||
-      isComponentVersion ||
-      isComponentLicense
-    ) {
+    if (isComponent) {
       handleComUpdate()
     } else {
       onClose()
@@ -265,13 +262,13 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
     }
   }
 
-  const handleRuleCreate = async () => {
+  const handleRuleCreate = () => {
     if (ruleExists) {
       localStorage.setItem('activeProdTab', 2)
       navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
     } else {
       disableButtonTemporarily()
-      await createRule({
+      createRule({
         variables: {
           active: true,
           name: shortDesc,
@@ -290,7 +287,11 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
-          handleSubmit()
+          if (isComponent) {
+            handleComUpdate()
+          } else {
+            onClose()
+          }
         }
       })
     }
