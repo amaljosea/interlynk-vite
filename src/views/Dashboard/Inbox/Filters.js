@@ -81,7 +81,7 @@ const Filters = ({ setFilters, data }) => {
             >
               {productList?.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                  {item}
+                  {item ? item : '(Blanks)'}
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>

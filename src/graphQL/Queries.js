@@ -3685,7 +3685,9 @@ export const GetRequests = gql`
         productName
         productVersion
         requestedAt
+        uploadedAt
         status
+        blob
       }
       pageInfo {
         endCursor

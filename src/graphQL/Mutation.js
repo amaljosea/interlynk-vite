@@ -2262,6 +2262,22 @@ export const RequestUploadSbom = gql`
   }
 `
 
+export const RequestValidate = gql`
+  mutation RequestValidate($id: Uuid!, $token: String!) {
+    requestValidate(input: { id: $id, token: $token }) {
+      request {
+        id
+        email
+        productName
+        productVersion
+        requestedAt
+        status
+      }
+      errors
+    }
+  }
+`
+
 // UPDATE POLICY
 export const PolicyUpdate = gql`
   mutation PolicyUpdate(

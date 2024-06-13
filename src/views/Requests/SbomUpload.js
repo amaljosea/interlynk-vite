@@ -1,5 +1,5 @@
-import { useMutation } from '@apollo/client'
-import { useRef, useState } from 'react'
+import { useMutation, useQuery } from '@apollo/client'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import {
@@ -16,7 +16,11 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import { RequestDecline, RequestUploadSbom } from 'graphQL/Mutation'
+import {
+  RequestDecline,
+  RequestUploadSbom,
+  RequestValidate
+} from 'graphQL/Mutation'
 
 import { FaUpload } from 'react-icons/fa'
 
@@ -30,8 +34,29 @@ const SbomUpload = () => {
 
   const [declineRequest] = useMutation(RequestDecline)
   const [uploadSbom] = useMutation(RequestUploadSbom)
+  const [validateRequest] = useMutation(RequestValidate)
 
   const [isUploadVisible, setIsUploadVisible] = useState(true)
+
+  useEffect(() => {
+    validateRequest({
+      variables: {
+        id: id,
+        token: token
+      }
+    }).then((res) => {
+      if (res.data?.requestValidate?.errors?.length > 0) {
+        setIsUploadVisible(false)
+        toast({
+          description: res.data?.requestValidate.errors[0],
+          status: 'error',
+          duration: 4000,
+          isClosable: true,
+          position: 'top'
+        })
+      }
+    })
+  }, [id, token])
 
   const onDecline = () => {
     declineRequest({

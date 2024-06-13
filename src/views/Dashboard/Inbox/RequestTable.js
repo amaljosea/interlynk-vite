@@ -256,6 +256,25 @@ const RequestTable = ({
       wrap: true
     },
     {
+      id: 'RESPONDED',
+      name: 'RESPONDED',
+      selector: (row) => (
+        <>
+          {row?.uploadedAt ? (
+            <Tooltip
+              label={getFullDateAndTime(row?.uploadedAt)}
+              placement={'top'}
+            >
+              {timeSince(row?.uploadedAt)}
+            </Tooltip>
+          ) : (
+            <Text>...</Text>
+          )}
+        </>
+      ),
+      wrap: true
+    },
+    {
       id: 'STATUS',
       name: 'STATUS',
       selector: (row) => (
@@ -282,13 +301,17 @@ const RequestTable = ({
             <Portal>
               <MenuList fontSize={'sm'}>
                 <MenuItem
-                  isDisabled={row.status === 'Sent'}
+                  isDisabled={!row.blob}
                   onClick={() => handleAccept(row)}
                 >
                   Accept
                 </MenuItem>
                 <MenuItem onClick={() => handleResend(row)}>Resend</MenuItem>
-                <MenuItem color='red' onClick={() => handleCancel(row)}>
+                <MenuItem
+                  isDisabled={row.blob || row.status === 'Canceled'}
+                  color='red'
+                  onClick={() => handleCancel(row)}
+                >
                   Cancel
                 </MenuItem>
               </MenuList>
