@@ -44,6 +44,7 @@ const VulnCard = ({ data, isOpen, onClose }) => {
               <Text fontSize={'sm'}>EPSS</Text>
               <CustomTag>{epssScores || '-'}</CustomTag>
             </Grid>
+            <Divider />
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
               <Text fontSize={'sm'}>KEV</Text>
               <CustomTag>{kev || '-'}</CustomTag>
