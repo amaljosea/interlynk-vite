@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
 import ReactSelect from 'react-select'
+import { capitalizeFirstLetter } from 'utils'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
@@ -34,6 +35,18 @@ import { ProjectSettingUpdate } from 'graphQL/Mutation'
 import { GetJiraProjects } from 'graphQL/Queries'
 
 const Settings = ({ enabled, data, refetch, mfc }) => {
+  const {
+    id,
+    dataRetentionDays,
+    jiraProject,
+    checksEnabled,
+    organizationManufacturer,
+    automatedFixesEnabled,
+    internalCompMatchingEnabled,
+    copyVexFromPrevious,
+    vulnScanningEnabled
+  } = data || ''
+
   const { data: projectOptions } = useQuery(GetJiraProjects, {
     fetchPolicy: 'network-only'
   })
@@ -51,12 +64,8 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
 
   const toast = useToast()
   const { userPermissions } = useGlobalState()
-  const [dataRetentionDays, setDataRetentionDays] = useState(0)
-  const [projectSettingId, setProjectSettingId] = useState(null)
   const [checks, setChecks] = useState(false)
   const [internalComp, setInternalComp] = useState(false)
-  const [orgMfc, setOrgMfc] = useState('')
-  const [jiraProject, setJiraProject] = useState('')
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
@@ -80,30 +89,29 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
 
   const { isOpen: isCompOpen, onClose: onCompClose } = useDisclosure()
 
-  const onUpdate = async (value, id) => {
+  const onUpdate = async (value, field) => {
     await updateSettings({
       variables: {
-        id: projectSettingId,
-        checks: id === 'checks' ? value : undefined,
-        intcomp: id === 'internalComp' ? value : undefined,
-        autofix: id === 'automation' ? value : undefined,
-        vulnscan: id === 'vulnScan' ? value : undefined,
-        copyVexFromPrevious: id === 'copyVexFromPrevious' ? value : undefined,
-        days: id === 'dataRetention' ? value : undefined,
-        mfcId: orgMfc !== '' ? orgMfc : undefined,
-        jiraProject: jiraProject?.value
+        id,
+        checks: field === 'checks' ? value : undefined,
+        intcomp: field === 'internalComp' ? value : undefined,
+        autofix: field === 'automation' ? value : undefined,
+        vulnscan: field === 'vulnScan' ? value : undefined,
+        copyVexFromPrevious:
+          field === 'copyVexFromPrevious' ? value : undefined,
+        days: field === 'dataRetention' ? Number(value) : undefined,
+        mfcId: field === 'manufacturer' ? value : undefined,
+        jiraProject: field === 'jira' ? value : undefined
       }
     })
       .then((res) => res.data && refetch())
       .finally(() => {
-        if (id === 'dataRetention') {
-          toast({
-            description: `Settings updated successfully`,
-            position: 'top',
-            status: 'success',
-            duration: 3000
-          })
-        }
+        toast({
+          description: `${capitalizeFirstLetter(field)} updated successfully`,
+          position: 'top',
+          status: 'success',
+          duration: 3000
+        })
       })
   }
 
@@ -179,17 +187,18 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
     onInfoOpen()
   }, [onInfoOpen])
 
-  useEffect(() => {
-    if (data) {
-      setProjectSettingId(data?.id || '')
-      setDataRetentionDays(Number(data?.dataRetentionDays))
-      setOrgMfc(data?.organizationManufacturer?.id || '')
-      setJiraProject({
-        value: data?.jiraProject,
-        label: data?.jiraProject
-      })
+  const customStyle = (baseStyles, state) => {
+    return {
+      ...baseStyles,
+      borderColor: state.isFocused ? 'inherit' : 'inherit',
+      fontSize: '14px',
+      padding: '2px 0',
+      width: '400px',
+      '&:hover': {
+        borderColor: '#CBD5E0'
+      }
     }
-  }, [data])
+  }
 
   return (
     <>
@@ -205,7 +214,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                   colorScheme='blue'
                   me='10px'
                   id='vulnScan'
-                  isChecked={data?.vulnScanningEnabled}
+                  isChecked={vulnScanningEnabled || false}
                   onChange={(e) => onUpdate(e.target.checked, 'vulnScan')}
                   isDisabled={!enabled || !editControls}
                 />
@@ -226,7 +235,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                   colorScheme='blue'
                   me='10px'
                   id='copyVexFromPrevious'
-                  isChecked={data?.copyVexFromPrevious}
+                  isChecked={copyVexFromPrevious || false}
                   onChange={(e) =>
                     onUpdate(e.target.checked, 'copyVexFromPrevious')
                   }
@@ -249,7 +258,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                   colorScheme='blue'
                   me='10px'
                   id='checks'
-                  isChecked={data?.checksEnabled}
+                  isChecked={checksEnabled || false}
                   onChange={(e) => onUpdate(e.target.checked, 'checks')}
                   isDisabled={!enabled || !editControls}
                 />
@@ -270,7 +279,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                   colorScheme='blue'
                   me='10px'
                   id='automation'
-                  isChecked={data?.automatedFixesEnabled}
+                  isChecked={automatedFixesEnabled || false}
                   onChange={(e) => onUpdate(e.target.checked, 'automation')}
                   isDisabled={!enabled || !editControls}
                 />
@@ -291,7 +300,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                   colorScheme='blue'
                   me='10px'
                   id='internalComp'
-                  isChecked={data?.internalCompMatchingEnabled}
+                  isChecked={internalCompMatchingEnabled || false}
                   onChange={(e) => onUpdate(e.target.checked, 'internalComp')}
                   isDisabled={!enabled || !editControls}
                 />
@@ -322,8 +331,8 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
               <Select
                 width={'400px'}
                 id='dataRetention'
-                value={dataRetentionDays}
-                onChange={(e) => setDataRetentionDays(e.target.value)}
+                value={Number(dataRetentionDays) || 0}
+                onChange={(e) => onUpdate(e.target.value, 'dataRetention')}
                 isDisabled={!enabled || !editControls}
               >
                 {[1, 30, 90, 365, 0].map((item, index) => (
@@ -346,8 +355,9 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
               </FormLabel>
               <Select
                 width={'400px'}
-                value={orgMfc}
-                onChange={(e) => setOrgMfc(e.target.value)}
+                value={organizationManufacturer?.id || ''}
+                onChange={(e) => onUpdate(e.target.value, 'manufacturer')}
+                isDisabled={!enabled || !editControls}
               >
                 <option value={''}>-- Select --</option>
                 {mfc?.nodes?.map((item, index) => (
@@ -368,30 +378,15 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                 />
               </FormLabel>
               <ReactSelect
-                value={jiraProject}
+                value={{ value: jiraProject || '', label: jiraProject || '' }}
                 placeholder='Project'
                 options={projects}
                 styles={{
-                  container: (provided) => ({ ...provided, width: '400px' })
+                  control: (baseStyles, state) => customStyle(baseStyles, state)
                 }}
-                onChange={(e) => {
-                  setJiraProject(e)
-                }}
+                onChange={(e) => onUpdate(e.value, 'jira')}
               />
             </FormControl>
-            {editControls === true && (
-              <Button
-                colorScheme='blue'
-                variant='solid'
-                mt={4}
-                isDisabled={!enabled}
-                onClick={() =>
-                  onUpdate(Number(dataRetentionDays), 'dataRetention')
-                }
-              >
-                Update
-              </Button>
-            )}
           </GridItem>
         </Grid>
       </CardBody>
