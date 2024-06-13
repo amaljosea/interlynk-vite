@@ -159,12 +159,13 @@ function ComponentDrawer(props) {
         internal,
         group,
         scope
-      } = data
+      } = data || ''
       setGroupInfo(group)
       setCompName(name)
       setCompDesc(description)
       setCompVersion(version)
-      if (purl !== '') {
+      console.log('purl', purl)
+      if (purl !== null) {
         setPurlValue(purl)
         try {
           PackageURL.fromString(purl)
@@ -172,6 +173,9 @@ function ComponentDrawer(props) {
         } catch (ex) {
           setPURLInputValid(false)
         }
+      } else {
+        setPurlValue('')
+        setPURLInputValid(true)
       }
       if (cpes?.length > 0) {
         setCpeValue(cpes[0])
@@ -603,7 +607,7 @@ function ComponentDrawer(props) {
               {/* PURL INPUI */}
               <FormControl
                 isReadOnly={customerView}
-                isInvalid={purlValue !== '' && !isPURLInputValid}
+                isInvalid={!isPURLInputValid}
               >
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>

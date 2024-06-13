@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { GetIcon, customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { isUnknown } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 import { openSsf } from 'variables/general'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -256,7 +257,8 @@ const Components = ({ sbomData, sbomRefetch }) => {
       id: 'COMPONENTS_NAME',
       name: 'NAME',
       selector: (row) => {
-        const { purl, name, primary, internal, externalUrls } = row
+        const { purl, cpes, name, primary, internal, externalUrls } = row
+        const unknown = isUnknown(cpes, purl)
         const website = externalUrls?.find((item) => item.name === 'website')
         const distribution = externalUrls?.find(
           (item) => item.name === 'distribution'
@@ -265,26 +267,20 @@ const Components = ({ sbomData, sbomRefetch }) => {
           (item) => item.name === 'issue-tracker'
         )
         const vcs = externalUrls?.find((item) => item.name === 'vcs')
+        const icon = unknown ? (
+          <BsFillPatchQuestionFill color='#4299E1' fontSize={24} />
+        ) : (
+          GetIcon(purl.split('/')[0])
+        )
         return (
           <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
             <GridItem colSpan={1} width={'50px'}>
-              {purl !== null && purl !== '' ? (
-                <IconButton
-                  isRound={true}
-                  variant='solid'
-                  colorScheme='gray'
-                  icon={GetIcon(purl.split('/')[0])}
-                />
-              ) : (
-                <IconButton
-                  isRound={true}
-                  variant='solid'
-                  colorScheme='gray'
-                  icon={
-                    <BsFillPatchQuestionFill color='#4299E1' fontSize={24} />
-                  }
-                />
-              )}
+              <IconButton
+                isRound={true}
+                variant='solid'
+                colorScheme='gray'
+                icon={icon}
+              />
             </GridItem>
             <GridItem
               colSpan={6}
@@ -294,9 +290,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
               gap={2}
             >
               {/* COMPONENT NAME */}
-              <Tooltip placement='top' label={name}>
-                <Text data-tag='allowRowEvents'>{name}</Text>
-              </Tooltip>
+              <Text data-tag='allowRowEvents'>{name}</Text>
               {/* EXTERNAL REFERENCE */}
               <Stack direction={'row'} alignItems={'center'}>
                 {/* WEBSITE */}

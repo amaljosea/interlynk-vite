@@ -853,3 +853,20 @@ export const typeOptions = [
   { value: 'swid', label: 'swid' },
   { value: 'swift', label: 'swift' }
 ]
+
+export const isUnknown = (cpes, purl) => {
+  let isValid
+  if (purl !== '') {
+    try {
+      PackageURL.fromString(purl)
+      isValid = true
+    } catch (ex) {
+      isValid = false
+    }
+  }
+  if (cpes?.length === 0 && isValid === false) {
+    return true
+  } else {
+    return false
+  }
+}

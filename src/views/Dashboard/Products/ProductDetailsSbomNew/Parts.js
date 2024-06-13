@@ -8,6 +8,8 @@ import {
   envOrderList,
   isDefaultEnv
 } from 'utils'
+import { isUnknown } from 'utils'
+import { GetIcon } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -19,6 +21,8 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Grid,
+  GridItem,
   HStack,
   IconButton,
   ListItem,
@@ -62,6 +66,7 @@ import {
   GetSbomParts
 } from 'graphQL/Queries'
 
+import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 
 const Parts = ({ sbomRefetch }) => {
@@ -289,6 +294,9 @@ const Parts = ({ sbomRefetch }) => {
       name: 'NAME',
       selector: (row) => {
         const { part } = row
+        const { primaryComponent } = part || ''
+        const { purl, cpes } = primaryComponent || ''
+        const unknown = isUnknown(cpes, purl)
 
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           productgroupid: part.project.projectGroup.id,
@@ -299,17 +307,39 @@ const Parts = ({ sbomRefetch }) => {
           }
         })
 
+        const icon = unknown ? (
+          <BsFillPatchQuestionFill color='#4299E1' fontSize={24} />
+        ) : (
+          GetIcon(purl.split('/')[0])
+        )
+
         return (
-          <Link to={link} replace>
-            <Text
-              color={'blue.500'}
-              minWidth='100%'
-              fontSize={14}
-              onClick={() => onSelectPart(part)}
-            >
-              {part.project.projectGroup.name}
-            </Text>
-          </Link>
+          <Grid
+            my={3}
+            gap={2}
+            alignItems={'center'}
+            templateColumns='repeat(7, 1fr)'
+          >
+            <GridItem colSpan={1} width={'50px'}>
+              <IconButton
+                isRound={true}
+                variant='solid'
+                colorScheme='gray'
+                icon={icon}
+              />
+            </GridItem>
+            <GridItem colSpan={6}>
+              <Link to={link} replace>
+                <Text
+                  fontSize={14}
+                  color={'blue.500'}
+                  onClick={() => onSelectPart(part)}
+                >
+                  {part?.project?.projectGroup?.name}
+                </Text>
+              </Link>
+            </GridItem>
+          </Grid>
         )
       },
       width: '10%',
@@ -335,7 +365,7 @@ const Parts = ({ sbomRefetch }) => {
       name: 'SUPPLIER',
       selector: (row) => {
         const { part } = row
-        const { suppliers } = part
+        const { suppliers } = part || ''
         return (
           <>
             {suppliers?.map((item, index) => (

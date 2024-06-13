@@ -3193,6 +3193,8 @@ export const GetSbomParts = gql`
             id
             name
             version
+            purl
+            cpes
           }
           suppliers {
             id
