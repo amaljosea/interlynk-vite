@@ -578,7 +578,7 @@ const VersionsTable = ({ projectGroup }) => {
             <ModalHeader>Delete Version</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Tag colorScheme='blue' mb={3}>
+              <Tag py={1} colorScheme='blue' mb={3} wordBreak={'break-all'}>
                 {activeRow?.projectVersion}
               </Tag>
               <Text>Deleting this version will: </Text>
