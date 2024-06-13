@@ -580,7 +580,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
             direction='column'
             cursor={'pointer'}
             alignItems={'flex-start'}
-            onClick={(e) => {
+            onClick={() => {
               // e.currentTarget.parentElement.click()
               setActiveRow(row)
               onCardOpen()
@@ -1041,12 +1041,8 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   }
 
   const handleSelectRow = useCallback(
-    (row, bool) => {
-      if (!bool) {
-        handleRefresh()
-      }
-    },
-    [handleRefresh]
+    (row, bool) => !bool && refetch(),
+    [refetch]
   )
 
   if (vulnsPermissions?.value === false) {

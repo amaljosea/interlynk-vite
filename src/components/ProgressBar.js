@@ -31,7 +31,7 @@ export const ProgressBar = ({ value, loading, text }) => {
           display='flex'
           alignItems='center'
           justifyContent='center'
-          color={value < 50 ? 'black' : 'white'}
+          color={value <= 60 ? 'black' : 'white'}
           fontWeight='medium'
           fontSize={'xs'}
         >

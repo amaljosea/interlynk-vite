@@ -227,7 +227,11 @@ export const ProductGraphs = () => {
   })
 
   if (error || errorQs) {
-    return 'Error'
+    return (
+      <Box color='red' mt={8}>
+        Graph data not found !
+      </Box>
+    )
   }
 
   if (loading || loadingQs) {
