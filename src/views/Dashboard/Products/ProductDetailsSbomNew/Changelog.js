@@ -561,6 +561,15 @@ const Changelog = () => {
     refetch
   ])
 
+  const rowStyles = [
+    {
+      when: (row) => row?.copiedFromId !== null,
+      style: {
+        backgroundColor: '#EDF2F7'
+      }
+    }
+  ]
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'} position={'relative'}>
@@ -576,6 +585,7 @@ const Changelog = () => {
           subHeader
           persistTableHead
           subHeaderComponent={subHeaderComponentMemo}
+          conditionalRowStyles={rowStyles}
           responsive={true}
         />
         <Pagination {...paginationProps} />

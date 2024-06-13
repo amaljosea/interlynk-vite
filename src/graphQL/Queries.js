@@ -2374,7 +2374,6 @@ export const GetChangeLogs = gql`
         orderBy: { field: $field, direction: $direction }
       ) {
         totalCount
-        totalCount
         pageInfo {
           endCursor
           hasNextPage
@@ -2391,6 +2390,7 @@ export const GetChangeLogs = gql`
           changedBy
           loggablePrefix
           loggableType
+          copiedFromId
         }
       }
     }
