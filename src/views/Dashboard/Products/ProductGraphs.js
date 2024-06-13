@@ -190,7 +190,7 @@ export const ProductGraphs = () => {
   const params = useParams()
   const productId = params.productid
 
-  const { data, loading } = useQuery(SBOM_LIST_WITH_DATA_QUERY, {
+  const { data, loading, error } = useQuery(SBOM_LIST_WITH_DATA_QUERY, {
     variables: {
       projectId: productId
     }
@@ -215,12 +215,20 @@ export const ProductGraphs = () => {
   }
 `
 
-  const { data: dataQs, loading: loadingQs } = useQuery(QUERY_QUALITY_SCORE, {
+  const {
+    data: dataQs,
+    loading: loadingQs,
+    error: errorQs
+  } = useQuery(QUERY_QUALITY_SCORE, {
     skip: !data,
     variables: {
       sbomIds
     }
   })
+
+  if (error || errorQs) {
+    return 'Error'
+  }
 
   if (loading || loadingQs) {
     return <Box mt={8}>Loading...</Box>
@@ -253,9 +261,10 @@ export const ProductGraphs = () => {
       }
     }) || []
 
-  const formattedScores = dataQs?.complianceReports?.nodes.map((i) => ({
-    score: round(i.score, 2)
-  }))
+  const formattedScores =
+    dataQs?.complianceReports?.nodes.map((i) => ({
+      score: round(i.score, 2)
+    })) || []
 
   const nodesReversed = [...nodes].reverse()
   const nodesBReversed = [...(formattedScores || [])].reverse()
@@ -264,14 +273,16 @@ export const ProductGraphs = () => {
     return null
   }
 
-  const healthScore = nodesReversed.reduce((acc, item, index) => {
-    const sbomWithData = dataQs[`sbom${index + 1}`]
-    const { healthScore } = calculateHealthScore(sbomWithData)
-    return [
-      ...acc,
-      { name: sbomWithData.projectVersion, healthScore: healthScore }
-    ]
-  }, [])
+  const healthScore = dataQs
+    ? nodesReversed.reduce((acc, item, index) => {
+        const sbomWithData = dataQs[`sbom${index + 1}`]
+        const { healthScore } = calculateHealthScore(sbomWithData)
+        return [
+          ...acc,
+          { name: sbomWithData.projectVersion, healthScore: healthScore }
+        ]
+      }, [])
+    : []
 
   const healthScoreReversed = [...healthScore].reverse()
   const scoreFinal = healthScoreReversed.map((item, index) => ({
