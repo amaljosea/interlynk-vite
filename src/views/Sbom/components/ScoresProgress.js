@@ -32,7 +32,7 @@ export const ScoresProgress = () => {
         <ProgressBar
           value={healthScore}
           loading={loading}
-          text='SBOM Health Score'
+          text='Version Health Score'
         />
       )}
     </Stack>

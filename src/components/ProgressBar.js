@@ -1,41 +1,48 @@
-import { Box, Progress, Text } from '@chakra-ui/react'
+import { Box, Text } from '@chakra-ui/react'
 
 export const ProgressBar = ({ value, loading, text }) => {
-  const getColor = () => {
-    if (value < 30) {
-      return 'red'
-    } else if (value >= 30 && value <= 70) {
-      return 'blue'
-    } else {
-      return 'green'
-    }
-  }
-
   return (
     <Box>
-      <Box position='relative' display='inline-block' width='100%'>
-        <Progress
-          size='lg'
-          height={'1.5rem'}
-          value={value}
-          colorScheme={getColor()}
-          borderRadius={'0.375rem'}
-          isIndeterminate={loading}
+      <Box
+        height={6}
+        width='100%'
+        overflow={'hidden'}
+        position='relative'
+        borderLeftRadius={'md'}
+        borderRightRadius={'md'}
+        display='inline-block'
+      >
+        <Box
+          height={'100%'}
+          width={'100%'}
+          position={'absolute'}
+          borderLeftRadius={'lg'}
+          borderRightRadius={'lg'}
+          sx={{
+            background:
+              'linear-gradient(90deg, rgba(245,101,101,1) 0%, rgba(236,201,75,1) 50%, rgba(72,187,120,1) 100%)'
+          }}
         />
         <Box
-          position='absolute'
+          right={0}
+          pos={'absolute'}
+          height={'100%'}
+          bg={'gray.100'}
+          width={value === 0 ? '100%' : `${100 - Math.round(value)}%`}
+        />
+        <Box
           top='0'
           left='0'
           width='100%'
           height='100%'
           display='flex'
-          alignItems='center'
-          justifyContent='center'
-          color={value <= 60 ? 'black' : 'white'}
-          fontWeight='medium'
           fontSize={'xs'}
+          alignItems='center'
+          fontWeight='medium'
+          position='absolute'
+          justifyContent='center'
         >
-          <Text>{value} / 100</Text>
+          <Text>{loading ? `Loading...` : `${Math.round(value)} %`}</Text>
         </Box>
       </Box>
       {text && (
