@@ -607,6 +607,7 @@ export const GetGlobalVulns = gql`
     $search: String
     $severity: [String!]
     $projectNames: [String!]
+    $projectIds: [Uuid!]
     $projectGroupIds: [Uuid!]
     $status: [String!]
     $kev: Boolean
@@ -628,6 +629,7 @@ export const GetGlobalVulns = gql`
         kev: $kev
         epss: $epss
         orderBy: { field: $field, direction: $direction }
+        projectIds: $projectIds
       ) {
         totalCount
         pageInfo {

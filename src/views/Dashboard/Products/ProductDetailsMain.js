@@ -158,12 +158,13 @@ const ProductDetailsMain = () => {
   const { projectGroup } = data || ''
   const { id, name, description, enabled } = projectGroup || ''
 
-  const { data: settings, refetch: refetchSettings } = useQuery(
-    GetProjectSettings,
-    {
-      variables: { id: activeEnv }
-    }
-  )
+  const {
+    data: settings,
+    loading: settingsLoading,
+    refetch: refetchSettings
+  } = useQuery(GetProjectSettings, {
+    variables: { id: activeEnv }
+  })
 
   const { projectSetting } = settings?.project || ''
   const {
@@ -491,15 +492,17 @@ const ProductDetailsMain = () => {
                 </TabPanel>
                 {/* VULNERABILITIES */}
                 <TabPanel px={0}>
-                  <Tag
-                    size='sm'
-                    colorScheme='orange'
-                    hidden={vulnScanningEnabled}
-                    mb={4}
-                  >
-                    Automatic vulnerabilty scan is disabled under Product
-                    Settings
-                  </Tag>
+                  {!settingsLoading && (
+                    <Tag
+                      size='sm'
+                      mb={4}
+                      colorScheme='orange'
+                      hidden={vulnScanningEnabled}
+                    >
+                      Automatic vulnerabilty scan is disabled under Product
+                      Settings
+                    </Tag>
+                  )}
                   <GlobalVulnTable
                     loading={globalVulnloading}
                     vulns={nodes}
