@@ -856,13 +856,15 @@ export const typeOptions = [
 
 export const isUnknown = (cpes, purl) => {
   let isValid
-  if (purl !== '') {
+  if (purl !== '' || purl !== null) {
     try {
       PackageURL.fromString(purl)
       isValid = true
     } catch (ex) {
       isValid = false
     }
+  } else {
+    isValid = false
   }
   if (cpes?.length === 0 && isValid === false) {
     return true

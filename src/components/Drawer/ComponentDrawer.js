@@ -607,7 +607,7 @@ function ComponentDrawer(props) {
               {/* PURL INPUI */}
               <FormControl
                 isReadOnly={customerView}
-                isInvalid={!isPURLInputValid}
+                isInvalid={purlValue !== '' && !isPURLInputValid}
               >
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
