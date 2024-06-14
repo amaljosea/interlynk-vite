@@ -28,6 +28,7 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
   const { data: productNames } = useQuery(GetProductNamesForRequest)
 
   const [projectId, setProjectId] = useState('')
+  const [productName, setProductName] = useState('')
   const [projectIds, setProjectIds] = useState([])
 
   const handleAccept = async (e) => {
@@ -41,13 +42,20 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
     })
 
     if (!res?.data?.requestAccept?.errors?.length > 0) {
+      toast({
+        description: `SBOM copied into Product ${productName}`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+        position: 'top'
+      })
       onClose()
     } else {
       toast({
         title: 'Error',
         description: "Couldn't accept request",
         status: 'error',
-        duration: 3000,
+        duration: 5000,
         isClosable: true,
         position: 'top'
       })
@@ -56,6 +64,7 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
 
   const handleProductChange = (e) => {
     const projectGroupId = e.target.value
+    setProductName(e.target.options[e.target.selectedIndex].text)
 
     const projectGroup = productNames?.organization?.projectGroups?.nodes?.find(
       (group) => group.id === projectGroupId

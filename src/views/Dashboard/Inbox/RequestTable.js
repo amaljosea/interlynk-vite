@@ -33,6 +33,7 @@ import Pagination from '../../../components/Pagination'
 import Filters from './Filters'
 import RequestAcceptModal from './RequestAcceptModal'
 import RequestModal from './RequestModal'
+import WarningModal from './WarningModal'
 
 const RequestTable = ({
   data,
@@ -54,6 +55,12 @@ const RequestTable = ({
     isOpen: isAcceptOpen,
     onOpen: onAcceptOpen,
     onClose: onAcceptClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isWarningOpen,
+    onOpen: onWarningOpen,
+    onClose: onWarningClose
   } = useDisclosure()
 
   const [filterText, setFilterText] = useState(search || '')
@@ -175,9 +182,9 @@ const RequestTable = ({
     }).then((res) => {
       if (res?.data?.requestResend?.errors?.length === 0) {
         toast({
-          title: 'Request Resent',
+          description: 'Request Resent',
           status: 'success',
-          duration: 3000,
+          duration: 5000,
           isClosable: true,
           position: 'top'
         })
@@ -193,9 +200,9 @@ const RequestTable = ({
     }).then((res) => {
       if (res?.data?.requestCancel?.errors?.length === 0) {
         toast({
-          title: 'Request Cancelled',
+          description: 'Request Cancelled',
           status: 'success',
-          duration: 3000,
+          duration: 5000,
           isClosable: true,
           position: 'top'
         })
@@ -310,7 +317,10 @@ const RequestTable = ({
                 <MenuItem
                   isDisabled={row.blob || row.status === 'Canceled'}
                   color='red'
-                  onClick={() => handleCancel(row)}
+                  onClick={() => {
+                    onWarningOpen()
+                    setActiveRow(row)
+                  }}
                 >
                   Cancel
                 </MenuItem>
@@ -345,11 +355,21 @@ const RequestTable = ({
       <Pagination {...paginationProps} />
 
       {isOpen && <RequestModal isOpen={isOpen} onClose={onClose} data={null} />}
+
       {isAcceptOpen && (
         <RequestAcceptModal
           isOpen={isAcceptOpen}
           onClose={onAcceptClose}
           data={activeRow}
+        />
+      )}
+
+      {isWarningOpen && (
+        <WarningModal
+          isOpen={isWarningOpen}
+          onClose={onWarningClose}
+          handleCancel={handleCancel}
+          row={activeRow}
         />
       )}
     </>

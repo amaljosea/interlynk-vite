@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   Button,
@@ -14,24 +14,35 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Textarea
+  Textarea,
+  useToast
 } from '@chakra-ui/react'
 
 import { RequestCreate } from 'graphQL/Mutation'
 
-const RequestModal = ({ data, isOpen, onClose }) => {
+const RequestModal = ({ isOpen, onClose }) => {
+  const toast = useToast()
+
   const [email, setEmail] = useState('')
   const [productName, setProductName] = useState('')
   const [productVersion, setProductVersion] = useState('')
   const [notes, setNotes] = useState('')
 
+  const [isSaveDisabled, setIsSaveDisabled] = useState(false)
+
   const [createRequest] = useMutation(RequestCreate)
 
-  const handleUpdate = (e) => {
-    e.preventDefault()
-  }
+  useEffect(() => {
+    if (email === '') {
+      setIsSaveDisabled(true)
+    } else {
+      setIsSaveDisabled(false)
+    }
+  }, [email])
+
   const handleCreate = (e) => {
     e.preventDefault()
+    setIsSaveDisabled(true)
     createRequest({
       variables: {
         email,
@@ -41,7 +52,16 @@ const RequestModal = ({ data, isOpen, onClose }) => {
       }
     }).then((res) => {
       if (res?.data?.requestCreate?.errors?.length === 0) {
+        toast({
+          description: 'SBOM request is being sent to the email',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+          position: 'top'
+        })
         onClose()
+      } else {
+        setIsSaveDisabled(false)
       }
     })
   }
@@ -56,7 +76,7 @@ const RequestModal = ({ data, isOpen, onClose }) => {
       closeOnEsc={false}
     >
       <ModalOverlay />
-      <form onSubmit={data ? handleUpdate : handleCreate}>
+      <form onSubmit={handleCreate}>
         <ModalContent>
           <ModalHeader>Request SBOM</ModalHeader>
           <ModalCloseButton />
@@ -100,8 +120,12 @@ const RequestModal = ({ data, isOpen, onClose }) => {
             <Button colorScheme='gray' mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme='blue' type='submit'>
-              {data ? 'Update' : 'Save'}
+            <Button
+              isDisabled={isSaveDisabled}
+              colorScheme='blue'
+              type='submit'
+            >
+              Save
             </Button>
           </ModalFooter>
         </ModalContent>
