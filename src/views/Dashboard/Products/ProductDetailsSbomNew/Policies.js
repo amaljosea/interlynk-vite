@@ -155,10 +155,11 @@ const Policies = () => {
         const { totalCount } = policyRuleViolations || ''
         const countZero = resultType === 'pass' || resultType === 'skip'
         if (isInitialized) return <Spinner size='xs' mt={0.5} />
+        const vColor = totalCount === 0 ? 'green' : getColor(resultType)
         return (
-          <Tag width={'60px'} colorScheme={totalCount === 0 ? 'green' : 'blue'}>
+          <Tag width={'60px'} colorScheme={vColor}>
             <TagLabel mx={'auto'} pt={0.5}>
-              {countZero ? 0 : policyRuleViolations?.totalCount}
+              {countZero ? 0 : totalCount}
             </TagLabel>
           </Tag>
         )
