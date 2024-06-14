@@ -110,14 +110,14 @@ const Changelog = () => {
   const [getVuln] = useLazyQuery(GetVulnData)
 
   const onSelect = (row) => {
-    const { loggableType, loggablePrefix, updated } = row
+    const { loggableType, loggablePrefix } = row
     const searchInput = loggablePrefix.split(' ')
     if (loggableType === 'ComponentVuln') {
       getVuln({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          search: updated,
+          search: loggablePrefix,
           field: 'COMPONENT_VULNS_UPDATED_AT',
           direction: 'DESC'
         }
@@ -199,7 +199,6 @@ const Changelog = () => {
       name: 'CHANGED',
       selector: (row) => {
         const { event, loggablePrefix, loggableType } = row
-        console.log('loggableType', loggableType)
         return (
           <Stack direction={'column'} spacing={0} my={2}>
             <Tag
