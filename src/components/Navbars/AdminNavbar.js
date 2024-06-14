@@ -91,7 +91,10 @@ export default function AdminNavbar(props) {
       justifyContent={'space-between'}
     >
       <GridItem colSpan={8}>
-        <Breadcrumb separator={<ChevronRightIcon color='gray.500' />}>
+        <Breadcrumb
+          separator={<ChevronRightIcon color='gray.500' />}
+          fontSize={'sm'}
+        >
           <BreadcrumbItem color={mainText}>
             <Link
               to={
@@ -104,11 +107,9 @@ export default function AdminNavbar(props) {
               Interlynk
             </Link>
           </BreadcrumbItem>
-
           <BreadcrumbItem color={mainText} textTransform={'capitalize'}>
             <Link to={`/${path}/${category}`}>{category}</Link>
           </BreadcrumbItem>
-
           {!loading &&
             partsContext.isParts &&
             [
@@ -165,7 +166,6 @@ export default function AdminNavbar(props) {
               </BreadcrumbLink>
             </BreadcrumbItem>
           )}
-
           {!partsContext.isParts &&
             ((prodID && category === 'vulnerabilities') || vulnId) && (
               <BreadcrumbItem color={mainText}>
