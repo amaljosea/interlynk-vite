@@ -1,14 +1,18 @@
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
+import { KBarProvider } from 'kbar'
 import React, { useEffect } from 'react'
 import { Outlet, redirect, useNavigate } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 
 import { Box, Flex, Stack } from '@chakra-ui/react'
 
+import Kbar from 'components/Kbar'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
+
+import { FaRegFile } from 'react-icons/fa6'
 
 import { getActiveNavbar, getActiveRoute } from '../utils'
 import { logoutUser } from '../utils/authUtils'
@@ -29,6 +33,44 @@ export default function Admin() {
     const currentTime = Date.now() / 1000
     return decodedToken.exp < currentTime
   }
+
+  const actions = [
+    {
+      id: 'home',
+      name: 'Home',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/dashboard')
+    },
+    {
+      id: 'products',
+      name: 'Products',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/products')
+    },
+    {
+      id: 'inbox',
+      name: 'Inbox',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/inbox')
+    },
+    {
+      id: 'vulnerabilities',
+      name: 'Vulnerabilities',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/vulnerabilities')
+    },
+    {
+      id: 'policies',
+      name: 'Policies',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/policies')
+    }
+  ]
 
   useEffect(() => {
     if (authToken) {
@@ -58,34 +100,37 @@ export default function Admin() {
   }, [])
 
   return (
-    <Stack
-      spacing={0}
-      width={'100%'}
-      direction={'row'}
-      alignItems={'flex-start'}
-      bg='rgba(0,0,0,0.04)'
-    >
-      <Box pos={'sticky'} top={0}>
-        <Sidebar routes={dashRoutes} />
-      </Box>
-      <Flex width={'100%'} flexDir={'column'}>
-        <Box
-          top={0}
-          bg={'white'}
-          zIndex={111}
-          pos={'sticky'}
-          borderBottom={'1px solid #E2E8F0'}
-        >
-          <AdminNavbar
-            tabRes={tabRes}
-            brandText={getActiveRoute(dashRoutes)}
-            secondary={getActiveNavbar(dashRoutes)}
-          />
+    <KBarProvider actions={actions} options={{ enableHistory: true }}>
+      <Kbar />
+      <Stack
+        spacing={0}
+        width={'100%'}
+        direction={'row'}
+        alignItems={'flex-start'}
+        bg='rgba(0,0,0,0.04)'
+      >
+        <Box pos={'sticky'} top={0}>
+          <Sidebar routes={dashRoutes} />
         </Box>
-        <Box my={6} px={10}>
-          <Outlet />
-        </Box>
-      </Flex>
-    </Stack>
+        <Flex width={'100%'} flexDir={'column'}>
+          <Box
+            top={0}
+            bg={'white'}
+            zIndex={111}
+            pos={'sticky'}
+            borderBottom={'1px solid #E2E8F0'}
+          >
+            <AdminNavbar
+              tabRes={tabRes}
+              brandText={getActiveRoute(dashRoutes)}
+              secondary={getActiveNavbar(dashRoutes)}
+            />
+          </Box>
+          <Box my={6} px={10}>
+            <Outlet />
+          </Box>
+        </Flex>
+      </Stack>
+    </KBarProvider>
   )
 }

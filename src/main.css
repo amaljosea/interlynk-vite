@@ -125,3 +125,73 @@
 .version_table .rdt_TableHead input[type='checkbox'] {
   display: none;
 }
+
+/* KBAR */
+.kbar_positioner {
+  z-index: 1111;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+}
+
+.kbar_animator {
+  gap: 4;
+  width: 35rem;
+  display: flex;
+  border-radius: 5px;
+  overflow: hidden;
+  background: white;
+  flex-direction: column;
+}
+
+.kbar_search_container {
+  gap: 12px;
+  display: flex;
+  padding: 1rem;
+  font-weight: 600;
+  align-items: center;
+}
+
+.kbar_search {
+  width: 100%;
+  overflow: hidden;
+}
+
+.kbar_search:focus {
+  outline: none;
+  border: none;
+}
+
+.kbar_result_container {
+  display: flex;
+  flex-direction: column;
+}
+
+.kbar_result_body {
+  border-top: 1px solid #e2e8f0;
+  padding: 0.5rem 0;
+}
+
+.kbar_result_header {
+  font-size: small;
+  text-transform: capitalize;
+  font-weight: 600;
+  color: #4a5568;
+  letter-spacing: 0.005em;
+  padding: 0.5rem 1rem;
+}
+
+.kbar_result_item_container {
+  display: flex;
+  padding: 0.5rem 1rem;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.kbar_result_item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-start;
+  border-radius: 5px;
+}

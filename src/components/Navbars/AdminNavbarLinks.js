@@ -1,16 +1,21 @@
 import { useLazyQuery } from '@apollo/client'
+import { useKBar } from 'kbar'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import { logoutUser } from 'utils/authUtils'
 
-import { ChevronDownIcon } from '@chakra-ui/icons'
+import { ChevronDownIcon, SearchIcon } from '@chakra-ui/icons'
 import {
+  Box,
   Button,
   Flex,
   Icon,
   IconButton,
+  Input,
+  InputGroup,
+  InputLeftElement,
   Kbd,
   Link,
   Menu,
@@ -50,6 +55,7 @@ export default function HeaderLinks(props) {
   const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const params = useParams()
+  const { query } = useKBar()
 
   const productId = params.productid
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
@@ -130,8 +136,23 @@ export default function HeaderLinks(props) {
     }
   }
 
+  const detectOS = () => {
+    const { userAgent } = window.navigator
+    if (/Windows NT 10.0/.test(userAgent)) return 'Windows 10'
+    if (/Windows NT 6.2/.test(userAgent)) return 'Windows 8'
+    if (/Windows NT 6.1/.test(userAgent)) return 'Windows 7'
+    if (/Windows NT 6.0/.test(userAgent)) return 'Windows Vista'
+    if (/Windows NT 5.1/.test(userAgent)) return 'Windows XP'
+    if (/Mac OS X 10[._]\d+/.test(userAgent)) return 'Mac OS X'
+    if (/Linux/.test(userAgent)) return 'Linux'
+    if (/Android/.test(userAgent)) return 'Android'
+    if (/iPhone|iPad|iPod/.test(userAgent)) return 'iOS'
+    return 'Unknown'
+  }
+  const os = detectOS()
+
   return (
-    <Flex gap={4} alignItems='center' flexDirection='row'>
+    <Flex gap={3} alignItems='center' flexDirection='row'>
       {/* JOIN WAITLIST */}
       {signedUrlParams && (
         <Link href='https://www.interlynk.io/sign-up' isExternal>
@@ -140,6 +161,16 @@ export default function HeaderLinks(props) {
           </Button>
         </Link>
       )}
+      {/* SEARCH */}
+      <InputGroup size='sm' width={'250px'} pos={'relative'}>
+        <InputLeftElement>
+          <SearchIcon color={'gray.400'} />
+        </InputLeftElement>
+        <Input borderRadius={6} placeholder='Search..' onClick={query.toggle} />
+        <Box pos={'absolute'} top={'0.2rem'} right={1.5}>
+          <Kbd>{os?.startsWith('Windows') ? 'Ctrl' : 'Cmd'}</Kbd> <Kbd>K</Kbd>
+        </Box>
+      </InputGroup>
       {/* ENVIRONMENT */}
       {(dashboardView || productId) && !vulnId && (
         <Menu closeOnSelect={true}>

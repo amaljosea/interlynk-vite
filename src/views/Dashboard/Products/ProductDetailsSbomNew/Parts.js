@@ -310,7 +310,7 @@ const Parts = ({ sbomRefetch }) => {
         const icon = unknown ? (
           <BsFillPatchQuestionFill color='#4299E1' fontSize={24} />
         ) : (
-          GetIcon(purl.split('/')[0])
+          GetIcon(purl?.split('/')[0])
         )
 
         return (
