@@ -17,7 +17,7 @@ import CustomTag from './CustomTag'
 
 const ComponentCard = ({ data, isOpen, onClose }) => {
   const { name, version, kind, purl } = data || ''
-  const pkg = purl !== '' ? PackageURL.fromString(purl) : ''
+  const pkg = purl ? PackageURL.fromString(purl) : ''
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />

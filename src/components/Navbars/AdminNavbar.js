@@ -27,23 +27,10 @@ export default function AdminNavbar(props) {
   const partsContext = usePartsContext()
   const navigate = useNavigate()
   const { setUserPermissions } = useGlobalState()
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
   } = useProductUrlContext()
-
-  useQuery(GetUserPermissions, {
-    skip: signedUrlParams !== '' ? true : false,
-    onCompleted: (data) => {
-      if (data) {
-        const result =
-          data?.organization?.currentUser?.role?.permissionsMap || []
-        const permissions = permissionList(result)
-        setUserPermissions(permissions)
-      }
-    }
-  })
 
   const location = useLocation()
   const params = useParams()
@@ -53,6 +40,18 @@ export default function AdminNavbar(props) {
   const sbomId = params.sbomid
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
+
+  useQuery(GetUserPermissions, {
+    skip: location?.pathname?.startsWith('/customer') ? true : false,
+    onCompleted: (data) => {
+      if (data) {
+        const result =
+          data?.organization?.currentUser?.role?.permissionsMap || []
+        const permissions = permissionList(result)
+        setUserPermissions(permissions)
+      }
+    }
+  })
 
   const activeVuln = localStorage.getItem('activeVuln')
 
@@ -86,7 +85,7 @@ export default function AdminNavbar(props) {
       alignItems={'center'}
       justifyContent={'space-between'}
     >
-      <GridItem colSpan={8}>
+      <GridItem colSpan={7}>
         <Breadcrumb
           separator={<ChevronRightIcon color='gray.500' />}
           fontSize={'sm'}
@@ -170,7 +169,7 @@ export default function AdminNavbar(props) {
             )}
         </Breadcrumb>
       </GridItem>
-      <GridItem colSpan={4} ml={'auto'}>
+      <GridItem colSpan={5} ml={'auto'}>
         <AdminNavbarLinks
           onOpen={props.onOpen}
           logoText={props.logoText}
