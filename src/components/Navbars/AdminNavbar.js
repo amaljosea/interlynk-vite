@@ -1,6 +1,5 @@
-import { client } from 'context/ApolloWrapper'
+import { useQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
-import React, { useEffect } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { permissionList } from 'utils'
 
@@ -34,20 +33,17 @@ export default function AdminNavbar(props) {
     generateProductDetailPageUrlFromCurrentUrl
   } = useProductUrlContext()
 
-  useEffect(() => {
-    const shouldFetch = !signedUrlParams
-    const queryUserPermission = async () => {
-      const { data } = await client.query({ query: GetUserPermissions })
-      const permissions = permissionList(
-        data?.organization?.currentUser?.role?.permissionsMap || []
-      )
-      setUserPermissions(permissions)
+  useQuery(GetUserPermissions, {
+    skip: signedUrlParams !== '' ? true : false,
+    onCompleted: (data) => {
+      if (data) {
+        const result =
+          data?.organization?.currentUser?.role?.permissionsMap || []
+        const permissions = permissionList(result)
+        setUserPermissions(permissions)
+      }
     }
-    if (shouldFetch) {
-      // not using useQuery to call the GetUserPermissions only once
-      queryUserPermission()
-    }
-  }, [setUserPermissions, signedUrlParams])
+  })
 
   const location = useLocation()
   const params = useParams()

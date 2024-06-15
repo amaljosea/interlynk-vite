@@ -162,11 +162,20 @@ export default function HeaderLinks(props) {
         </Link>
       )}
       {/* SEARCH */}
-      <InputGroup size='sm' width={'250px'} pos={'relative'}>
+      <InputGroup
+        size='sm'
+        width={'250px'}
+        pos={'relative'}
+        display={signedUrlParams ? 'none' : 'block'}
+      >
         <InputLeftElement>
           <SearchIcon color={'gray.400'} />
         </InputLeftElement>
-        <Input borderRadius={6} placeholder='Search..' onClick={query.toggle} />
+        <Input
+          borderRadius={6}
+          placeholder='Search..'
+          onClick={query?.toggle}
+        />
         <Box pos={'absolute'} top={'0.2rem'} right={1.5}>
           <Kbd>{os?.startsWith('Windows') ? 'Ctrl' : 'Cmd'}</Kbd> <Kbd>K</Kbd>
         </Box>

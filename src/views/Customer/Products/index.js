@@ -2,8 +2,6 @@ import { useLazyQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 
-import { Flex } from '@chakra-ui/react'
-
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { ShareLynkProjectGroup } from 'graphQL/Queries'
@@ -32,11 +30,7 @@ function Index() {
     }
   }, [])
 
-  return (
-    <Flex flexDirection='column' pt={'74px'} pr={2} pl={5}>
-      <Outlet />
-    </Flex>
-  )
+  return <Outlet />
 }
 
 export default Index
