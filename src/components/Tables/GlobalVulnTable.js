@@ -18,7 +18,8 @@ import {
   Tag,
   TagLabel,
   Text,
-  Tooltip
+  Tooltip,
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -38,6 +39,9 @@ const GlobalVulnTable = ({
   const { field } = filters
   const { generateProductVulnerabilityDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const params = useParams()
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
@@ -261,24 +265,20 @@ const GlobalVulnTable = ({
         } = metrics
         return (
           <Stack fontWeight={'medium'} direction={'row'} my={2}>
-            <Round bg='gray.200' label='Unspecified'>
+            <Round bg='gray' label='Unspecified'>
               {unspecifiedCount}
             </Round>
-            <Round bg='blue.100' label='In Triage'>
+            <Round bg='blue' label='In Triage'>
               {inTriageCount}
             </Round>
-            <Round bg='red.100' label='Affected'>
+            <Round bg='red' label='Affected'>
               {affectedCount}
             </Round>
-            <Divider
-              orientation='vertical'
-              colorScheme={'gray.900'}
-              height={10}
-            />
-            <Round bg='orange.100' label='Fixed'>
+            <Divider orientation='vertical' colorScheme={'gray'} height={10} />
+            <Round bg='orange' label='Fixed'>
               {fixedCount}
             </Round>
-            <Round bg='green.100' label='Not Affected'>
+            <Round bg='green' label='Not Affected'>
               {notAffectedCount}
             </Round>
           </Stack>
@@ -293,7 +293,9 @@ const GlobalVulnTable = ({
       name: 'PUBLISHED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.publishedAt)} placement={'top'}>
-          <Text textAlign={'right'}>{timeSince(row?.publishedAt)}</Text>
+          <Text color={textColor} textAlign={'right'}>
+            {timeSince(row?.publishedAt)}
+          </Text>
         </Tooltip>
       ),
       sortable: true,
@@ -314,7 +316,9 @@ const GlobalVulnTable = ({
           label={getFullDateAndTime(row?.lastModifiedAt)}
           placement={'top'}
         >
-          <Text textAlign={'right'}>{timeSince(row?.lastModifiedAt)}</Text>
+          <Text color={textColor} textAlign={'right'}>
+            {timeSince(row?.lastModifiedAt)}
+          </Text>
         </Tooltip>
       ),
       sortable: true,
@@ -355,7 +359,7 @@ const GlobalVulnTable = ({
           data={vulns}
           onSort={handleSort}
           defaultSortFieldId={field}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader

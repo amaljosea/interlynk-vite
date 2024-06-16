@@ -47,6 +47,7 @@ import {
   Text,
   Tooltip,
   UnorderedList,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -79,6 +80,9 @@ const Parts = ({ sbomRefetch }) => {
   const activeTab = queryParams.get('tab')
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { setActiveProdTab, totalRows, prodState, userPermissions, dispatch } =
     useGlobalState()
@@ -351,7 +355,7 @@ const Parts = ({ sbomRefetch }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Text fontSize={14} my={2} textAlign='right'>
+          <Text color={textColor} fontSize={14} my={2} textAlign='right'>
             {part?.projectVersion}
           </Text>
         )
@@ -658,7 +662,7 @@ const Parts = ({ sbomRefetch }) => {
         <DataTable
           columns={columns}
           data={sbomParts}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           persistTableHead
           subHeader
           progressPending={sbomParts ? false : true}

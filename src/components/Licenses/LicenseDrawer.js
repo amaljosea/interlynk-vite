@@ -1,7 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { refetchActiveQueries } from 'context/ApolloWrapper'
 import React, { useEffect, useState } from 'react'
-import CreatableSelect from 'react-select/creatable'
 
 import {
   Button,
@@ -24,6 +23,8 @@ import {
   Text,
   Textarea
 } from '@chakra-ui/react'
+
+import LynkSelect from 'components/LynkSelect'
 
 import { CreateLicense, UpdateLicense } from '../../graphQL/Mutation'
 
@@ -216,7 +217,7 @@ const LicenseDrawer = ({ isOpen, onClose, data }) => {
 
                 <FormControl>
                   <FormLabel htmlFor='url'>Attribution Keys</FormLabel>
-                  <CreatableSelect
+                  <LynkSelect
                     isMulti
                     name='attributionKeys'
                     id='attributionKeys'
@@ -229,14 +230,6 @@ const LicenseDrawer = ({ isOpen, onClose, data }) => {
                     onChange={(values) =>
                       setAttributionKeys(values?.map((v) => v.value))
                     }
-                    styles={{
-                      placeholder: (defaultStyles) => {
-                        return {
-                          ...defaultStyles,
-                          fontSize: 'small'
-                        }
-                      }
-                    }}
                   />
                 </FormControl>
 

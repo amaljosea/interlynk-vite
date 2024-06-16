@@ -18,6 +18,7 @@ import {
   Tag,
   TagLabel,
   Text,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -32,6 +33,8 @@ import { SubHeaderComponent } from './SubHeaderComponent'
 
 const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
   const [activeRow, setActiveRow] = useState(null)
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -59,7 +62,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
                 isRound={true}
                 variant='solid'
                 colorScheme='gray'
-                icon={<FaScaleBalanced fontSize={16} />}
+                icon={<FaScaleBalanced color={textColor} fontSize={16} />}
               />
             </GridItem>
             <GridItem
@@ -69,7 +72,9 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
               flexDirection={'column'}
               gap={2}
             >
-              <Text data-tag='allowRowEvents'>{name}</Text>
+              <Text color={textColor} data-tag='allowRowEvents'>
+                {name}
+              </Text>
               <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
                 {(shortId || spdxId) && (
                   <Tag
@@ -112,7 +117,9 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           attribution = 'Not Available'
         }
         return (
-          <Text textTransform='capitalize'>{attribution.toLowerCase()}</Text>
+          <Text color={textColor} textTransform='capitalize'>
+            {attribution.toLowerCase()}
+          </Text>
         )
       }
     },
@@ -126,7 +133,11 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
         if (!copyLeft || copyLeft === 'UNKNOWN') {
           copyLeft = 'Not Available'
         }
-        return <Text textTransform='capitalize'>{copyLeft.toLowerCase()}</Text>
+        return (
+          <Text color={textColor} textTransform='capitalize'>
+            {copyLeft.toLowerCase()}
+          </Text>
+        )
       }
     },
     // REQUIRES SOURCE CODE
@@ -140,7 +151,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           sourceDistribution = 'Not Available'
         }
         return (
-          <Text textTransform='capitalize'>
+          <Text color={textColor} textTransform='capitalize'>
             {sourceDistribution.toLowerCase()}
           </Text>
         )
@@ -156,7 +167,9 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           modifications = 'Not Available'
         }
         return (
-          <Text textTransform='capitalize'>{modifications.toLowerCase()}</Text>
+          <Text color={textColor} textTransform='capitalize'>
+            {modifications.toLowerCase()}
+          </Text>
         )
       }
     },
@@ -234,7 +247,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           subHeaderComponent={subHeaderComponent}
           columns={columns}
           data={licenses}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           defaultSortAsc={false}
           defaultSortFieldId={'UPDATED_AT'}
           progressComponent={<CustomLoader />}

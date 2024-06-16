@@ -2,7 +2,6 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import ReactSelect from 'react-select'
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
@@ -26,20 +25,23 @@ import {
 } from '@chakra-ui/react'
 
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
+import LynkSelect from 'components/LynkSelect'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { sbomDelete } from 'graphQL/Mutation'
-import { GetProject } from 'graphQL/Queries'
-import { GetAllComponents } from 'graphQL/Queries'
-import { GetCompFilterData } from 'graphQL/Queries'
-import { ShareCompFilters } from 'graphQL/Queries'
-import { ShareProject } from 'graphQL/Queries'
-import { AllShareComponents } from 'graphQL/Queries'
-import { GetComponentData } from 'graphQL/Queries'
-import { GetCheckResults } from 'graphQL/Queries'
+import {
+  AllShareComponents,
+  GetAllComponents,
+  GetCheckResults,
+  GetCompFilterData,
+  GetComponentData,
+  GetProject,
+  ShareCompFilters,
+  ShareProject
+} from 'graphQL/Queries'
 
 import { FaFileDownload, FaLayerGroup } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
@@ -87,13 +89,12 @@ const SbomActions = ({ sbom, refetch }) => {
       permission.key === 'update_sbom' && permission.value === true
   )
 
-  const signSboms = sboms?.supersededBy?.some(
-    (permission) => permission.key === 'sign_sbom' && permission.value === true
-  )
+  // const signSboms = sboms?.supersededBy?.some(
+  //   (permission) => permission.key === 'sign_sbom' && permission.value === true
+  // )
 
   const navigate = useNavigate()
   const params = useParams()
-  const groupId = params.productgroupid
   const productId = params.productid
   const sbomId = params.sbomid
 
@@ -122,7 +123,7 @@ const SbomActions = ({ sbom, refetch }) => {
   const [deleteSbom] = useMutation(sbomDelete)
 
   // DISCLOUSERS
-  const { isOpen, onOpen, onClose, onToggle } = useDisclosure()
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
     isOpen: isSBMOpen,
@@ -314,25 +315,13 @@ const SbomActions = ({ sbom, refetch }) => {
         {/* SBOM VERSIONS */}
         <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
           <FaLayerGroup size={21} color='#4299E1' />
-          <ReactSelect
-            styles={{
-              control: (baseStyles, state) => ({
-                ...baseStyles,
-                borderColor: state.isFocused ? 'inherit' : 'inherit',
-                fontSize: '14px',
-                padding: '2px 0',
-                '&:hover': {
-                  borderColor: '#CBD5E0'
-                }
-              })
-            }}
+          <LynkSelect
             components={{
               DropdownIndicator: () => null,
               IndicatorSeparator: () => null
             }}
             value={selectedVersion}
             onChange={handleSBOMChange}
-            className='react-select'
             isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
             type='text'
             placeholder='Search versions'

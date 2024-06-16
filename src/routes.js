@@ -36,10 +36,10 @@ export const dashRoutes = [
     layout: '/vendor'
   },
   {
-    path: '/inbox',
+    path: '/requests',
     name: 'Requests',
     icon: <FaFileImport color='inherit' />,
-    component: () => 'Inbox',
+    component: () => 'Requests',
     layout: '/vendor'
   },
   /*

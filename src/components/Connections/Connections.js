@@ -48,7 +48,6 @@ const Connections = () => {
               borderRadius='lg'
               overflow='hidden'
               boxShadow='lg'
-              bg='white'
             >
               <Flex align='center' justify='center' direction='column'>
                 <FaJira size='25px' color='#0070f3' />

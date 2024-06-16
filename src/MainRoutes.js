@@ -11,7 +11,6 @@ import PubProductDetails from 'views/Customer/Products/ProductDetails'
 import PubProductList from 'views/Customer/Products/ProductList'
 import PubSbomDetails from 'views/Customer/Sbom/index.js'
 import Dashboard from 'views/Dashboard/Dashboard'
-import Inbox from 'views/Dashboard/Inbox/index.js'
 import Policies from 'views/Dashboard/Policies'
 import Products from 'views/Dashboard/Products'
 import ProductDetailsMain from 'views/Dashboard/Products/ProductDetailsMain.js'
@@ -19,6 +18,7 @@ import ProductDetailsSbomNew from 'views/Dashboard/Products/ProductDetailsSbomNe
 import ProductDetailsVul from 'views/Dashboard/Products/ProductDetailsVul.js'
 import ProductList from 'views/Dashboard/Products/ProductList'
 import Profile from 'views/Dashboard/Profile'
+import Requests from 'views/Dashboard/Requests/index.js'
 import Support from 'views/Dashboard/Support'
 import Tools from 'views/Dashboard/Tools'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
@@ -96,7 +96,7 @@ export const MainRoutes = () => {
           <Route path={`tools`} element={<Tools />} />
           <Route path={`support`} element={<Support />} />
           <Route path={`policies`} element={<Policies />} />
-          <Route path={`inbox`} element={<Inbox />} />
+          <Route path={`requests`} element={<Requests />} />
           <Route path={`settings`} element={<Profile />} />
         </Route>
         <Route path={`login`} element={<LoginLayout />} />

@@ -22,6 +22,7 @@ import {
   TagLabel,
   Text,
   Tooltip,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -43,6 +44,8 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
   const params = useParams()
   const id = params.vulnerabilityid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { totalRows, setTotalRows, compVulnState, dispatch } = useGlobalState()
   const { pageIndex, searchInput, envs, statuses, versions } = compVulnState
@@ -123,6 +126,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
               />
             </Tooltip>
             <Text
+              color={textColor}
               cursor={'pointer'}
               onClick={() => {
                 setActiveRow(component)
@@ -144,7 +148,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row?.component?.sbom?.projectVersion} placement='top'>
-          <Text my={2} textAlign={'right'}>
+          <Text color={textColor} my={2} textAlign={'right'}>
             {row?.component?.sbom?.projectVersion}
           </Text>
         </Tooltip>
@@ -171,8 +175,8 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
               onCardOpen()
             }}
           >
-            <Text>{component?.name || ''}</Text>
-            <Text>{component?.version || ''}</Text>
+            <Text color={textColor}>{component?.name || ''}</Text>
+            <Text color={textColor}>{component?.version || ''}</Text>
           </Stack>
         )
       },
@@ -186,7 +190,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       selector: (row) => {
         const { component } = row
         return (
-          <Text textTransform={'capitalize'}>
+          <Text color={textColor} textTransform={'capitalize'}>
             {component?.sbom?.project?.name || ''}
           </Text>
         )
@@ -222,7 +226,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
-          {timeSince(row?.updatedAt)}
+          <Text color={textColor}>{timeSince(row?.updatedAt)}</Text>
         </Tooltip>
       ),
       width: '12%',
@@ -449,7 +453,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         <DataTable
           columns={columns}
           data={statusResults || []}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader

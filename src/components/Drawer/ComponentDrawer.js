@@ -8,7 +8,6 @@ import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 
 import { CheckIcon, InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
-  Badge,
   Button,
   Checkbox,
   Drawer,
@@ -100,7 +99,7 @@ function ComponentDrawer(props) {
   const [isInternal, setIsInternal] = useState(false)
   const [relation, setRelation] = useState('')
   const [component, setComponent] = useState('')
-  const [isValid, setIsValid] = useState(true)
+  const [isValid] = useState(true)
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')

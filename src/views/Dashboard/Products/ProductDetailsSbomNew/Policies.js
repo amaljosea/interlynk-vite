@@ -22,6 +22,7 @@ import {
   Thead,
   Tooltip,
   Tr,
+  useColorModeValue,
   useDisclosure,
   useToast
 } from '@chakra-ui/react'
@@ -45,6 +46,9 @@ const Policies = () => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
     PolicyResults,
@@ -127,7 +131,7 @@ const Policies = () => {
       name: 'POLICY',
       selector: (row) => {
         const { policy } = row
-        return <Text>{policy?.name || ''}</Text>
+        return <Text color={textColor}>{policy?.name || ''}</Text>
       },
       wrap: true
     },
@@ -174,7 +178,7 @@ const Policies = () => {
       name: 'LAST CHECKED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
-          {timeSince(row?.updatedAt)}
+          <Text color={textColor}>{timeSince(row?.updatedAt)}</Text>
         </Tooltip>
       ),
       width: '14%',
@@ -198,7 +202,7 @@ const Policies = () => {
     const CustomText = styled(Text)`
       font-size: 12px;
       font-weight: bold;
-      color: #333;
+      color: ${textColor};
       text-transform: uppercase;
       letter-spacing: 0.6px;
     `
@@ -212,7 +216,13 @@ const Policies = () => {
       >
         <Box>
           <CustomText>Description :</CustomText>
-          <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
+          <Text
+            color={textColor}
+            width={'90%'}
+            mt={1}
+            fontSize={14}
+            wordBreak={'break-all'}
+          >
             {policy?.description || ''}
           </Text>
         </Box>
@@ -221,7 +231,7 @@ const Policies = () => {
             mb={2}
             fontFamily={'inherit'}
             fontSize={'sm'}
-            color={'#555'}
+            color={textColor}
             textTransform={'uppercase'}
           >
             Results
@@ -235,7 +245,7 @@ const Policies = () => {
                       <Th
                         fontFamily={'inherit'}
                         key={index}
-                        color={'#718096'}
+                        color={textColor}
                         isNumeric={item === 'action' || item === 'violations'}
                       >
                         {item}
@@ -249,17 +259,29 @@ const Policies = () => {
                   policy?.policyRules?.map((item, index) => (
                     <Tr key={index}>
                       <Td>
-                        <Text fontSize={'sm'} textTransform={'capitalize'}>
+                        <Text
+                          color={textColor}
+                          fontSize={'sm'}
+                          textTransform={'capitalize'}
+                        >
                           {`${item?.category} ${item?.name}`}
                         </Text>
                       </Td>
                       <Td>
-                        <Text fontSize={'sm'} textTransform={'lowercase'}>
+                        <Text
+                          color={textColor}
+                          fontSize={'sm'}
+                          textTransform={'lowercase'}
+                        >
                           {item?.operatorWording}
                         </Text>
                       </Td>
                       <Td>
-                        <Text fontSize={'sm'} wordBreak={'break-all'}>
+                        <Text
+                          color={textColor}
+                          fontSize={'sm'}
+                          wordBreak={'break-all'}
+                        >
                           {item?.value}
                         </Text>
                       </Td>
@@ -310,7 +332,7 @@ const Policies = () => {
         <DataTable
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader

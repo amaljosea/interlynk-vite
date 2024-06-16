@@ -34,6 +34,7 @@ import {
   TagLabel,
   Text,
   Tooltip,
+  useColorModeValue,
   useDisclosure,
   useToast
 } from '@chakra-ui/react'
@@ -56,6 +57,9 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
   const toast = useToast()
   const [leaveError, setLeaveError] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { totalRows, userPermissions } = useGlobalState()
 
@@ -204,7 +208,9 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
         const { name, id } = row
         return (
           <Stack direction={'row'} my={3} alignItems={'center'}>
-            <Text fontSize={14}>{name}</Text>
+            <Text color={textColor} fontSize={14}>
+              {name}
+            </Text>
             {activeOrg === id && (
               <Badge
                 variant='outline'
@@ -226,7 +232,11 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
       name: 'CONTACT',
       selector: (row) => {
         const { email } = row
-        return <Text fontSize={14}>{email}</Text>
+        return (
+          <Text color={textColor} fontSize={14}>
+            {email}
+          </Text>
+        )
       },
       wrap: true
     },
@@ -236,13 +246,14 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
       selector: (row) => {
         const { url } = row
         return (
-          <Link
-            href={url}
-            isExternal
-            fontSize={14}
-            _hover={{ color: 'blue.500' }}
-          >
-            {url}
+          <Link href={url} isExternal>
+            <Text
+              color={textColor}
+              _hover={{ color: 'blue.500' }}
+              fontSize={14}
+            >
+              {url}
+            </Text>
           </Link>
         )
       },
@@ -274,7 +285,9 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
-            <Text textTransform={'capitalize'}>{timeSince(updatedAt)}</Text>
+            <Text color={textColor} textTransform={'capitalize'}>
+              {timeSince(updatedAt)}
+            </Text>
           </Tooltip>
         )
       },
@@ -343,7 +356,7 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
           persistTableHead
           responsive={true}
           columns={columns}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           data={data || []}
           progressComponent={<CustomLoader />}
           progressPending={data ? false : true}

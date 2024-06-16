@@ -5,6 +5,7 @@ import DataTable from 'react-data-table-component'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
 import { getFullDateAndTime } from 'utils'
+import { customStyles } from 'utils'
 
 import { AddIcon } from '@chakra-ui/icons'
 import {
@@ -34,6 +35,7 @@ import {
   Text,
   Tooltip,
   useClipboard,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -48,25 +50,11 @@ import {
 
 import { FaEllipsisV } from 'react-icons/fa'
 
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
-
 const TokenInfo = ({ data, refetch }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const tokenRef = useRef(null)
 
@@ -239,7 +227,7 @@ const TokenInfo = ({ data, refetch }) => {
       wrap: true,
       selector: (row) => (
         <Tooltip label={row.notes} placement='top'>
-          <Text my={2}>
+          <Text color={textColor} my={2}>
             {row.notes.length > 30
               ? `${row.notes.substring(0, 30)}...`
               : row.notes}
@@ -251,14 +239,20 @@ const TokenInfo = ({ data, refetch }) => {
     {
       id: 'tokenMask',
       name: 'TOKEN MASK',
-      selector: (row) => <Text my={2}>{row.tokenMask}</Text>,
+      selector: (row) => (
+        <Text color={textColor} my={2}>
+          {row.tokenMask}
+        </Text>
+      ),
       wrap: true
     },
     // CREATED
     {
       id: 'created',
       name: 'CREATED',
-      selector: (row) => <Text>{getFullDateAndTime(row.createdAt)}</Text>,
+      selector: (row) => (
+        <Text color={textColor}>{getFullDateAndTime(row.createdAt)}</Text>
+      ),
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a.createdAt)
@@ -272,7 +266,9 @@ const TokenInfo = ({ data, refetch }) => {
     {
       id: 'updated',
       name: 'UPDATED',
-      selector: (row) => <Text>{getFullDateAndTime(row.updatedAt)}</Text>,
+      selector: (row) => (
+        <Text color={textColor}>{getFullDateAndTime(row.updatedAt)}</Text>
+      ),
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
@@ -287,7 +283,7 @@ const TokenInfo = ({ data, refetch }) => {
       id: 'expires',
       name: 'EXPIRES',
       selector: (row) => (
-        <Text>
+        <Text color={textColor}>
           {row.expiresAt ? getFullDateAndTime(row.expiresAt) : 'No Expiration'}
         </Text>
       ),
@@ -391,7 +387,7 @@ const TokenInfo = ({ data, refetch }) => {
           defaultSortFieldId={'updated'}
           persistTableHead
           responsive={true}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           progressComponent={<CustomLoader />}
           progressPending={data ? false : true}
           subHeaderComponent={subHeaderComponent}

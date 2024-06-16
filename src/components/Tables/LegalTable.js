@@ -46,7 +46,9 @@ const LegalTable = ({ data, refetch }) => {
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
-  const textColor = useColorModeValue('gray.700', 'white')
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const iconColor = useColorModeValue('#718096', '#F7FAFC')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -130,7 +132,9 @@ const LegalTable = ({ data, refetch }) => {
       id: 'ORG_NAME',
       name: 'ORGANIZATION NAME',
       selector: (row) => (
-        <Text textTransform={'capitalize'}>{row?.organizationName}</Text>
+        <Text color={textColor} textTransform={'capitalize'}>
+          {row?.organizationName}
+        </Text>
       ),
       wrap: true
     },
@@ -154,7 +158,7 @@ const LegalTable = ({ data, refetch }) => {
               color={'blue.500'}
             />
           </Link>
-          <Text>{row?.url}</Text>
+          <Text color={textColor}>{row?.url}</Text>
         </Flex>
       ),
       wrap: true
@@ -179,16 +183,16 @@ const LegalTable = ({ data, refetch }) => {
                     <EmailIcon color={'blue.500'} boxSize={4} />
                   </Tooltip>
                 ) : (
-                  <EmailIcon color={'blackAlpha.500'} boxSize={4} />
+                  <EmailIcon color={iconColor} boxSize={4} />
                 )}
                 {item?.phone ? (
                   <Tooltip placement='top' label={item?.phone}>
                     <PhoneIcon color={'blue.500'} boxSize={3} />
                   </Tooltip>
                 ) : (
-                  <PhoneIcon color={'blackAlpha.500'} boxSize={3} />
+                  <PhoneIcon color={iconColor} boxSize={3} />
                 )}
-                <Text>{item?.name || ''}</Text>
+                <Text color={textColor}>{item?.name || ''}</Text>
               </Flex>
             ))}
           </Flex>
@@ -205,7 +209,7 @@ const LegalTable = ({ data, refetch }) => {
         const { createdAt } = row
         return (
           <Tooltip label={getFullDateAndTime(createdAt)} placement='top'>
-            <Text>{timeSince(createdAt)}</Text>
+            <Text color={textColor}>{timeSince(createdAt)}</Text>
           </Tooltip>
         )
       },
@@ -225,7 +229,7 @@ const LegalTable = ({ data, refetch }) => {
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
-            <Text>{timeSince(updatedAt)}</Text>
+            <Text color={textColor}>{timeSince(updatedAt)}</Text>
           </Tooltip>
         )
       },
@@ -282,7 +286,7 @@ const LegalTable = ({ data, refetch }) => {
         <DataTable
           columns={columns}
           data={data?.nodes || []}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader

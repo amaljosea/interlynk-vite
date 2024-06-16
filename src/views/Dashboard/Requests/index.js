@@ -7,7 +7,7 @@ import { usePaginatatedQuery } from '../../../hooks/usePaginatatedQuery'
 import OrgRegister from '../Profile/components/OrgRegister'
 import RequestTable from './RequestTable'
 
-const Inbox = () => {
+const Requests = () => {
   const org = localStorage.getItem('organization')
 
   const [filters, setFilters] = useState({
@@ -45,4 +45,4 @@ const Inbox = () => {
   )
 }
 
-export default Inbox
+export default Requests

@@ -21,6 +21,7 @@ import {
   Tag,
   Text,
   Tooltip,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -42,6 +43,9 @@ const SupportTable = ({
 }) => {
   const params = useParams()
   const sbomId = params.sbomid
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { search, field } = filters
 
@@ -214,8 +218,8 @@ const SupportTable = ({
       selector: (row) => {
         return (
           <Stack my={4}>
-            <Text>{row?.productName}</Text>
-            <Text>{row?.productVersion}</Text>
+            <Text color={textColor}>{row?.productName}</Text>
+            <Text color={textColor}>{row?.productVersion}</Text>
           </Stack>
         )
       },
@@ -229,6 +233,7 @@ const SupportTable = ({
       selector: (row) => (
         <Text
           my={4}
+          color={textColor}
           cursor={'pointer'}
           onClick={() => {
             setActiveRow(row)
@@ -244,7 +249,7 @@ const SupportTable = ({
     {
       id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_VERSION',
       name: 'VERSION',
-      selector: (row) => row?.productVersion,
+      selector: (row) => <Text color={textColor}>{row?.productVersion}</Text>,
       width: '10%',
       wrap: true,
       sortable: true,
@@ -299,7 +304,7 @@ const SupportTable = ({
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-          {timeSince(row.updatedAt)}
+          <Text color={textColor}>{timeSince(row.updatedAt)}</Text>
         </Tooltip>
       ),
       right: 'true',
@@ -361,7 +366,7 @@ const SupportTable = ({
         <DataTable
           columns={columns}
           data={data || []}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           onSort={handleSort}
           defaultSortFieldId={field}
           defaultSortAsc={false}

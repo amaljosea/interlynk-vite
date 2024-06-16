@@ -21,6 +21,7 @@ import {
   TagLabel,
   Text,
   Tooltip,
+  useColorModeValue,
   useDisclosure,
   useToast
 } from '@chakra-ui/react'
@@ -64,6 +65,9 @@ const Checks = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
   const customerView = location.pathname.startsWith('/customer')
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { userPermissions, dispatch } = useGlobalState()
   const { prodCompDispatch, sbomDispatch } = dispatch
@@ -587,7 +591,7 @@ const Checks = () => {
       name: 'CHECK ID',
       selector: (row) => {
         const { organizationRule } = row
-        return <Text>{organizationRule.rule.friendlyId}</Text>
+        return <Text color={textColor}>{organizationRule.rule.friendlyId}</Text>
       },
       sortable: true,
       width: '10%'
@@ -637,7 +641,7 @@ const Checks = () => {
                 {component.name}
               </Badge>
             )}
-            <Text>
+            <Text color={textColor}>
               {organizationRule.rule.longDesc !== null
                 ? `${organizationRule.rule.shortDesc?.substring(0, 300)}${
                     organizationRule.rule.shortDesc.length > 300 ? '...' : ''
@@ -656,7 +660,7 @@ const Checks = () => {
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-          {timeSince(row.updatedAt)}
+          <Text color={textColor}>{timeSince(row.updatedAt)}</Text>
         </Tooltip>
       ),
       sortable: true,
@@ -775,7 +779,7 @@ const Checks = () => {
           onSort={handleSort}
           defaultSortAsc={false}
           progressPending={loading}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
           defaultSortFieldId={checkState?.field}

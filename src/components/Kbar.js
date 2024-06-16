@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom'
 import { getUserType } from 'utils/url'
 
 import { SearchIcon } from '@chakra-ui/icons'
+import { useColorModeValue } from '@chakra-ui/system'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -25,6 +26,9 @@ const Kbar = () => {
   const { results } = useMatches()
   const userType = getUserType()
   const navigate = useNavigate()
+
+  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
+  const textHoverColor = useColorModeValue('#EDF2F7', '#2D3748')
 
   const { userPermissions } = useGlobalState()
   const productPermissions = useMemo(
@@ -63,7 +67,7 @@ const Kbar = () => {
   return (
     <KBarPortal>
       <KBarPositioner className='kbar_positioner'>
-        <KBarAnimator className='kbar_animator'>
+        <KBarAnimator className='kbar_animator' style={{ background: bgColor }}>
           <div className='kbar_search_container'>
             {/* search icon */}
             <SearchIcon color={'gray.500'} />
@@ -84,7 +88,7 @@ const Kbar = () => {
                       // each single item
                       <div
                         className='kbar_result_item_container'
-                        style={{ background: active ? '#EDF2F7' : 'none' }}
+                        style={{ background: active ? textHoverColor : 'none' }}
                       >
                         <div className='kbar_result_item'>
                           {/* icon */}

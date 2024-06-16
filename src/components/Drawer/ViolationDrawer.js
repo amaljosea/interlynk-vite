@@ -11,7 +11,8 @@ import {
   DrawerOverlay,
   Flex,
   Stack,
-  Text
+  Text,
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -23,6 +24,8 @@ import { PolicyRuleViolations } from 'graphQL/Queries'
 
 const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
   const { subject, category, name, operatorWording, value } = activeRow || null
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { nodes, paginationProps, loading } = usePaginatatedQuery(
     PolicyRuleViolations,
@@ -43,7 +46,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       selector: (row) => {
         const { violation, component } = row
         return (
-          <Text my={2}>
+          <Text color={textColor} my={2}>
             {component?.name || violation?.primaryComponent?.name || ''}
           </Text>
         )
@@ -56,7 +59,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       selector: (row) => {
         const { violation, component } = row
         return (
-          <Text my={2}>
+          <Text color={textColor} my={2}>
             {component?.version || violation?.primaryComponent?.version || ''}
           </Text>
         )
@@ -68,7 +71,11 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       name: 'LICENSE',
       selector: (row) => {
         const { component } = row
-        return <Text my={2}>{component?.licensesExp || ''}</Text>
+        return (
+          <Text color={textColor} my={2}>
+            {component?.licensesExp || ''}
+          </Text>
+        )
       },
       omit: category === 'license' ? false : true,
       wrap: true
@@ -78,7 +85,11 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       name: 'VULN ID',
       selector: (row) => {
         const { violation } = row
-        return <Text my={2}>{violation?.vuln?.vulnId || ''}</Text>
+        return (
+          <Text color={textColor} my={2}>
+            {violation?.vuln?.vulnId || ''}
+          </Text>
+        )
       },
       wrap: true,
       omit: category === 'vulnerability' ? false : true
@@ -155,13 +166,13 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
                 responsive
                 columns={columns}
                 data={nodes || []}
-                customStyles={customStyles}
+                customStyles={customStyles(headColor)}
                 progressPending={loading}
                 progressComponent={<CustomLoader />}
                 persistTableHead
               />
             </Box>
-            <Box bg='white' hidden={category === 'version'}>
+            <Box hidden={category === 'version'}>
               <Pagination {...paginationProps} />
             </Box>
           </Flex>

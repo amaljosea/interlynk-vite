@@ -1,19 +1,19 @@
-import { Box, Flex, Tooltip } from '@chakra-ui/react'
+import { Tag, Tooltip } from '@chakra-ui/react'
 
 const Round = ({ bg, children, label }) => {
   return (
     <Tooltip label={label} placement='top'>
-      <Box
+      <Tag
         width={10}
         height={10}
-        as={Flex}
         alignItems={'center'}
         justifyContent={'center'}
         borderRadius={'full'}
-        bg={bg}
+        variant={'subtle'}
+        colorScheme={bg}
       >
         {children}
-      </Box>
+      </Tag>
     </Tooltip>
   )
 }

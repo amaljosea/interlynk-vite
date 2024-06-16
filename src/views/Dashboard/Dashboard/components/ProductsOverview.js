@@ -1,14 +1,18 @@
 import React from 'react'
 import DataTable from 'react-data-table-component'
 import { Link } from 'react-router-dom'
-import {
-  customStyles,
-  getFullDateAndTime,
-  normalizeSBOMVersion,
-  timeSince
-} from 'utils'
+import { getFullDateAndTime, normalizeSBOMVersion, timeSince } from 'utils'
+import { customStyles } from 'utils'
 
-import { Flex, Heading, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
+import {
+  Flex,
+  Heading,
+  Tag,
+  TagLabel,
+  Text,
+  Tooltip,
+  useColorModeValue
+} from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card'
@@ -25,6 +29,9 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const handleClick = (prod) => {
     console.log('prod', prod)
@@ -261,7 +268,9 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
         const { createdAt } = row
         return (
           <Tooltip placement='top' label={getFullDateAndTime(createdAt)}>
-            <Text textAlign={'right'}>{timeSince(createdAt)}</Text>
+            <Text color={textColor} textAlign={'right'}>
+              {timeSince(createdAt)}
+            </Text>
           </Tooltip>
         )
       }
@@ -269,7 +278,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
   ]
 
   return (
-    <Card>
+    <Card maxH='100%'>
       {prodPermissions?.value === false ? (
         <Flex width={'100%'} flexDir={'column'} gap={4}>
           <Heading m={0} fontSize={'lg'} fontFamily={'inherit'}>
@@ -289,7 +298,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
               persistTableHead
               columns={columns}
               data={data || []}
-              customStyles={customStyles}
+              customStyles={customStyles(headColor)}
               progressPending={data ? false : true}
               progressComponent={<CustomLoader />}
             />

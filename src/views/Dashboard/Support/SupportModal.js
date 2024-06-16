@@ -26,7 +26,8 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
-  Text
+  Text,
+  useColorMode
 } from '@chakra-ui/react'
 
 import {
@@ -46,6 +47,9 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
   const [deprecated, setDeprecated] = useState(false)
   const [outdated, setOutdated] = useState(false)
   const [IDs, setIDs] = useState([{ id: 1, value: '', error: '' }])
+
+  const { colorMode } = useColorMode()
+  const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
 
   const [createSupport] = useMutation(CreateCompSupportOverride)
   const [updateSupport] = useMutation(UpdateCompSupportOverride)
@@ -299,9 +303,13 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
                     value={eol}
                     timeFormat={false}
                     onChange={handleEolChange}
+                    className={react_datatime}
                     inputProps={{
                       onCopy: (e) => e.preventDefault(),
-                      onPaste: (e) => e.preventDefault()
+                      onPaste: (e) => e.preventDefault(),
+                      style: {
+                        background: 'none'
+                      }
                     }}
                   />
                 </FormControl>
@@ -313,9 +321,13 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
                     value={eos}
                     timeFormat={false}
                     onChange={handleEosChange}
+                    className={react_datatime}
                     inputProps={{
                       onCopy: (e) => e.preventDefault(),
-                      onPaste: (e) => e.preventDefault()
+                      onPaste: (e) => e.preventDefault(),
+                      style: {
+                        background: 'none'
+                      }
                     }}
                   />
                 </FormControl>

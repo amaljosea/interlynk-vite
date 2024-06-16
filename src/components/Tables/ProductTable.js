@@ -2,7 +2,8 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { getFullDateAndTime, timeSince } from 'utils'
+import { customStyles } from 'utils'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import StatusModal from 'views/Dashboard/Products/components/StatusModal'
@@ -33,6 +34,7 @@ import {
   Text,
   Tooltip,
   UnorderedList,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -63,6 +65,9 @@ const ProductTable = ({
   const navigate = useNavigate()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { search, enabled, field } = filters
   const { totalRows } = paginationProps
@@ -368,7 +373,7 @@ const ProductTable = ({
             >
               {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
             </Text>
-            <Text>
+            <Text color={textColor}>
               {description?.length > 50
                 ? description.substring(0, 50) + '....'
                 : description}
@@ -451,7 +456,7 @@ const ProductTable = ({
       selector: (row) => {
         const { sbomsCount } = row
 
-        return <Text>{sbomsCount || 0}</Text>
+        return <Text color={textColor}>{sbomsCount || 0}</Text>
       },
       wrap: true,
       right: 'true'
@@ -464,7 +469,7 @@ const ProductTable = ({
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
-            {timeSince(updatedAt)}
+            <Text color={textColor}>{timeSince(updatedAt)}</Text>
           </Tooltip>
         )
       },
@@ -556,7 +561,7 @@ const ProductTable = ({
     columns: columns,
     data: data || [],
     onSort: handleSort,
-    customStyles: customStyles,
+    customStyles: customStyles(headColor),
     defaultSortFieldId: field,
     defaultSortAsc: false,
     subHeader: true,

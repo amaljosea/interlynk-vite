@@ -69,10 +69,17 @@ function Profile() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
-  const activePsTabNumber = Math.max(psTabs.indexOf(activetab), 0)
   const activeOrgTabNumber = Math.max(orgTabs.indexOf(activetab), 0)
   const org = localStorage.getItem('organization')
   const { totalRows, userPermissions } = useGlobalState()
+
+  const [psIndex, setPsIndex] = useState(0)
+
+  useEffect(() => {
+    if (activetab) {
+      setPsIndex(Math.max(psTabs.indexOf(activetab), 0))
+    }
+  }, [activetab])
 
   const tabs = useMemo(() => {
     return [
@@ -175,7 +182,6 @@ function Profile() {
         <Card>
           <Tabs
             w={'100%'}
-            bg={'white'}
             variant='enclosed'
             defaultIndex={activeOrgTabNumber}
             onChange={onOrgTabChange}
@@ -269,10 +275,9 @@ function Profile() {
       {selectedTab === 'PERSONAL' && (
         <Card>
           <Tabs
-            variant='enclosed'
             w={'100%'}
-            bg={'white'}
-            defaultIndex={activePsTabNumber}
+            variant='enclosed'
+            index={psIndex}
             onChange={onPsTabChange}
           >
             <TabList>

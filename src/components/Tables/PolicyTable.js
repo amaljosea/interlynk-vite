@@ -39,6 +39,7 @@ import {
   Thead,
   Tooltip,
   Tr,
+  useColorModeValue,
   useDisclosure,
   useToast
 } from '@chakra-ui/react'
@@ -58,6 +59,9 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
   const productId = params.productid
   const sbomId = params.sbomid
   const activeTab = Number(localStorage.getItem('activeProdTab'))
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const [activeRow, setActiveRow] = useState(null)
   const [activeRule, setActiveRule] = useState(null)
@@ -192,7 +196,11 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
     {
       id: 'POLICY',
       name: 'POLICY',
-      selector: (row) => <Text my={4}>{row?.name}</Text>,
+      selector: (row) => (
+        <Text color={textColor} my={4}>
+          {row?.name}
+        </Text>
+      ),
       wrap: true
     },
     {
@@ -247,7 +255,7 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
-          {timeSince(row?.updatedAt)}
+          <Text color={textColor}>{timeSince(row?.updatedAt)}</Text>
         </Tooltip>
       ),
       right: 'true',
@@ -266,10 +274,8 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
             onChange={() =>
               isExcluded ? handleDeleteExclusion(id) : handleCreateExclusion(id)
             }
-            bg={isExcluded ? 'red.200' : 'green.200'}
-            border={'none'}
+            color={textColor}
             textTransform={'capitalize'}
-            variant={'outline'}
           >
             {['yes', 'no'].map((itm, index) => (
               <option
@@ -379,7 +385,12 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
           </Text>
         </Box>
         <Box>
-          <Heading mb={3} fontFamily={'inherit'} fontSize={'sm'} color={'#555'}>
+          <Heading
+            mb={3}
+            fontFamily={'inherit'}
+            fontSize={'sm'}
+            color={textColor}
+          >
             CONDITIONS
           </Heading>
           <TableContainer>
@@ -402,17 +413,26 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
                 {policyRules?.map((item, index) => (
                   <Tr key={index}>
                     <Td>
-                      <Text fontSize={'sm'} textTransform={'capitalize'}>
+                      <Text
+                        color={textColor}
+                        fontSize={'sm'}
+                        textTransform={'capitalize'}
+                      >
                         {formatSubject(item?.subject)}
                       </Text>
                     </Td>
                     <Td>
-                      <Text fontSize={'sm'} textTransform={'lowercase'}>
+                      <Text
+                        color={textColor}
+                        fontSize={'sm'}
+                        textTransform={'lowercase'}
+                      >
                         {updatedValue(item?.operator)}
                       </Text>
                     </Td>
                     <Td isNumeric>
                       <Text
+                        color={textColor}
                         fontSize={'sm'}
                         wordBreak={'break-all'}
                         textTransform={'capitalize'}
@@ -494,7 +514,7 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
         <DataTable
           columns={columns}
           data={data || []}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader

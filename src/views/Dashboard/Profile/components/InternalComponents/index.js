@@ -27,10 +27,12 @@ import { DeleteInternalComponent } from './DeleteInternalComponent'
 import { UpdateInternalComponent } from './MutateInternalComponent'
 
 export const InternalComponents = () => {
-  const textColor = useColorModeValue('gray.700', 'white')
   const [isOpen, setIsOpen] = useState(false)
   const [editingRow, setEditingRow] = useState(null)
   const { data, loading } = useQuery(getInternalComponents)
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const columns = [
     {
@@ -45,7 +47,11 @@ export const InternalComponents = () => {
       id: 'CASE_INSENSITIVE',
       name: 'CASE INSENSITIVE',
       selector: (row) => {
-        return <Text my={2}>{row.ignoreCase ? 'Yes' : 'No'}</Text>
+        return (
+          <Text color={textColor} my={2}>
+            {row.ignoreCase ? 'Yes' : 'No'}
+          </Text>
+        )
       }
     },
     {
@@ -65,7 +71,7 @@ export const InternalComponents = () => {
       selector: (row) => {
         return (
           <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-            {timeSince(row.updatedAt)}
+            <Text color={textColor}>{timeSince(row.updatedAt)}</Text>
           </Tooltip>
         )
       }
@@ -137,7 +143,7 @@ export const InternalComponents = () => {
         responsive
         columns={columns}
         data={data?.organization?.organizationComponents}
-        customStyles={customStyles}
+        customStyles={customStyles(headColor)}
         progressPending={loading}
         progressComponent={<CustomLoader />}
         persistTableHead

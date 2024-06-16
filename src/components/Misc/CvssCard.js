@@ -12,14 +12,24 @@ import {
   Stack,
   Tag,
   TagLabel,
-  Text
+  Text,
+  useColorModeValue
 } from '@chakra-ui/react'
 
-const CvssText = ({ children }) => (
-  <Text fontSize='xs' textAlign={'left'} fontWeight={'medium'} color={'#222'}>
-    {children}
-  </Text>
-)
+const CvssText = ({ children }) => {
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  return (
+    <Text
+      c
+      fontSize='xs'
+      textAlign={'left'}
+      fontWeight={'medium'}
+      color={textColor}
+    >
+      {children}
+    </Text>
+  )
+}
 
 const CvssTag = ({ value, red, orange, children }) => (
   <Tag

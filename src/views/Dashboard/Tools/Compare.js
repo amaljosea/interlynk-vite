@@ -1,6 +1,5 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import React, { useEffect, useMemo, useState } from 'react'
-import ReactSelect from 'react-select'
 import { envOrderList, sortByUpdatedAt } from 'utils'
 
 import {
@@ -20,10 +19,12 @@ import {
   Select,
   Stack,
   Tag,
-  Text
+  Text,
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import LynkSelect from 'components/LynkSelect'
 import SbomInfo from 'components/SbomInfo'
 import DiffTable from 'components/Tables/DiffTable'
 
@@ -42,6 +43,8 @@ const Compare = ({ selectedSboms }) => {
   const { prodState, userPermissions, dispatch } = useGlobalState()
   const { field, direction } = prodState
   const { toolsDispatch } = dispatch
+
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -283,7 +286,7 @@ const Compare = ({ selectedSboms }) => {
         </Flex>
       </Card>
       {/* SBOM SELECTIONS */}
-      <Grid templateColumns='repeat(2, 1fr)' gap={6}>
+      <Grid templateColumns='repeat(2, 1fr)' gap={6} color={textColor}>
         {/* SBOM ONE */}
         <GridItem w='100%'>
           <Card border={'2px solid green'} p={8} h='450px' overflowY='scroll'>
@@ -296,7 +299,6 @@ const Compare = ({ selectedSboms }) => {
                 <Stack>
                   <Heading
                     fontWeight={'semibold'}
-                    color={'#333'}
                     fontFamily={'inherit'}
                     size='md'
                   >
@@ -328,9 +330,8 @@ const Compare = ({ selectedSboms }) => {
               )}
               {firstSbomInfo && !selectedSboms && (
                 <IconButton
-                  icon={<FaX />}
+                  icon={<FaX color={textColor} />}
                   size='sm'
-                  colorScheme='blackAlpha'
                   onClick={onClearOne}
                 />
               )}
@@ -342,15 +343,10 @@ const Compare = ({ selectedSboms }) => {
                 {/* PROJECT GROUPS */}
                 {data?.organization?.projectGroups?.nodes?.length > 0 && (
                   <FormControl fontSize={'sm'}>
-                    <FormLabel
-                      htmlFor='groupOne'
-                      fontSize='md'
-                      color='gray.600'
-                    >
+                    <FormLabel htmlFor='groupOne' fontSize='md'>
                       Product
                     </FormLabel>
                     <Select
-                      bg={'white'}
                       name='groupOne'
                       id='groupOne'
                       isDisabled={selectedSboms?.length > 0}
@@ -370,15 +366,10 @@ const Compare = ({ selectedSboms }) => {
                 )}
                 {/* ENVIRONMENT */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel
-                    htmlFor='productOne'
-                    fontSize='md'
-                    color='gray.600'
-                  >
+                  <FormLabel htmlFor='productOne' fontSize='md'>
                     Environment
                   </FormLabel>
                   <Select
-                    bg={'white'}
                     name='productOne'
                     id='productOne'
                     isDisabled={selectedSboms?.length > 0}
@@ -401,26 +392,11 @@ const Compare = ({ selectedSboms }) => {
                 </FormControl>
                 {/* VERSION */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel
-                    htmlFor='versionOne'
-                    fontSize='md'
-                    color='gray.600'
-                  >
+                  <FormLabel htmlFor='versionOne' fontSize='md'>
                     Version
                   </FormLabel>
                   {uniqVersionsOne.length > 0 ? (
-                    <ReactSelect
-                      styles={{
-                        control: (baseStyles, state) => ({
-                          ...baseStyles,
-                          borderColor: state.isFocused ? 'inherit' : 'inherit',
-                          fontSize: '14px',
-                          padding: '2px 0',
-                          '&:hover': {
-                            borderColor: '#CBD5E0'
-                          }
-                        })
-                      }}
+                    <LynkSelect
                       components={{
                         DropdownIndicator: () => null,
                         IndicatorSeparator: () => null
@@ -431,7 +407,6 @@ const Compare = ({ selectedSboms }) => {
                         setSelectedProdTwo('')
                         setSelectedVersionTwo(null)
                       }}
-                      className='react-select'
                       isSearchable
                       type='text'
                       placeholder='Select versions'
@@ -441,7 +416,7 @@ const Compare = ({ selectedSboms }) => {
                       noOptionsMessage={() => null}
                     />
                   ) : (
-                    <Alert borderRadius={'md'} py={'8px'} bg='white'>
+                    <Alert borderRadius={'md'} py={'8px'}>
                       <AlertIcon />
                       <AlertDescription>No version available</AlertDescription>
                     </Alert>
@@ -459,7 +434,6 @@ const Compare = ({ selectedSboms }) => {
                 <Stack>
                   <Heading
                     fontWeight={'semibold'}
-                    color={'#333'}
                     fontFamily={'inherit'}
                     size='md'
                   >
@@ -491,9 +465,8 @@ const Compare = ({ selectedSboms }) => {
               )}
               {secondSbomInfo && !selectedSboms && (
                 <IconButton
-                  icon={<FaX />}
+                  icon={<FaX color={textColor} />}
                   size='sm'
-                  colorScheme='blackAlpha'
                   onClick={onClearTwo}
                 />
               )}
@@ -505,15 +478,10 @@ const Compare = ({ selectedSboms }) => {
                 {/* PROJECT GROUPS */}
                 {data?.organization?.projectGroups?.nodes?.length > 0 && (
                   <FormControl fontSize={'sm'}>
-                    <FormLabel
-                      htmlFor='groupTwo'
-                      fontSize='md'
-                      color='gray.600'
-                    >
+                    <FormLabel htmlFor='groupTwo' fontSize='md'>
                       Product
                     </FormLabel>
                     <Select
-                      bg={'white'}
                       name='groupTwo'
                       id='groupTwo'
                       isDisabled={selectedVersionOne === null}
@@ -533,15 +501,10 @@ const Compare = ({ selectedSboms }) => {
                 )}
                 {/* ENVIRONMENT */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel
-                    htmlFor='productTwo'
-                    fontSize='md'
-                    color='gray.600'
-                  >
+                  <FormLabel htmlFor='productTwo' fontSize='md'>
                     Environment
                   </FormLabel>
                   <Select
-                    bg={'white'}
                     name='productTwo'
                     id='productTwo'
                     value={selectedProdTwo}
@@ -564,33 +527,17 @@ const Compare = ({ selectedSboms }) => {
                 </FormControl>
                 {/* VERSION */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel
-                    htmlFor='versionTwo'
-                    fontSize='md'
-                    color='gray.600'
-                  >
+                  <FormLabel htmlFor='versionTwo' fontSize='md'>
                     Version
                   </FormLabel>
                   {uniqVersionsTwo?.length > 0 ? (
-                    <ReactSelect
-                      styles={{
-                        control: (baseStyles, state) => ({
-                          ...baseStyles,
-                          borderColor: state.isFocused ? 'inherit' : 'inherit',
-                          fontSize: '14px',
-                          padding: '2px 0',
-                          '&:hover': {
-                            borderColor: '#CBD5E0'
-                          }
-                        })
-                      }}
+                    <LynkSelect
                       components={{
                         DropdownIndicator: () => null,
                         IndicatorSeparator: () => null
                       }}
                       value={selectedVersionTwo}
                       onChange={(value) => setSelectedVersionTwo(value)}
-                      className='react-select'
                       isSearchable
                       type='text'
                       placeholder='Select versions'
@@ -600,7 +547,7 @@ const Compare = ({ selectedSboms }) => {
                       isDisabled={selectedVersionOne === null}
                     />
                   ) : (
-                    <Alert borderRadius={'md'} py={'8px'} bg='white'>
+                    <Alert borderRadius={'md'} py={'8px'}>
                       <AlertIcon />
                       <AlertDescription>No version available</AlertDescription>
                     </Alert>

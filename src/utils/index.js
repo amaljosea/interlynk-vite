@@ -386,7 +386,7 @@ export const formattedTime = (initiated, completed) => {
 
   const seconds = Math.floor(timeTakenInMillis / 1000)
   const minutes = Math.floor(seconds / 60)
-  const hours = Math.floor(minutes / 60)
+  // const hours = Math.floor(minutes / 60)
 
   const timeTaken = `${minutes % 60}m ${seconds % 60}s`
 
@@ -581,20 +581,55 @@ export const findUniqueItems = (currentArray, importArray) => {
   return uniqueItems
 }
 
-export const customStyles = {
-  headCells: {
-    style: {
-      width: '100%',
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
+export const customStyles = (headColor) => {
+  return {
+    headCells: {
+      style: {
+        fontFamily: 'inherit',
+        fontWeight: 700,
+        backgroundColor: 'transparent', // change this to the desired color
+        color: headColor // change this to the desired text color
+      }
+    },
+    cells: {
+      style: {
+        backgroundColor: 'transparent' // cell background color
+      }
+    },
+    rows: {
+      style: {
+        backgroundColor: 'transparent' // row background color
+      },
+      stripedStyle: {
+        backgroundColor: 'transparent' // striped row background color
+      }
+    },
+    table: {
+      style: {
+        backgroundColor: 'transparent' // entire table background color
+      }
+    },
+    progress: {
+      style: {
+        backgroundColor: 'transparent' // progress component background color
+      }
+    },
+    subHeader: {
+      style: {
+        padding: 0,
+        backgroundColor: 'transparent' // sub-header background color
+      }
+    },
+    noData: {
+      style: {
+        backgroundColor: 'transparent',
+        color: headColor
+      }
+    },
+    expanderRow: {
+      style: {
+        backgroundColor: 'transparent' // expandable row background color
+      }
     }
   }
 }
@@ -636,12 +671,14 @@ export const removeDuplicates = (arr) => {
 
 export const validateCpe = (value) => {
   const cpeRegex =
+    // eslint-disable-next-line no-useless-escape
     /^cpe:2\.3:[aho\*\-]?(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-])?)(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){4}$/
   return cpeRegex.test(value)
 }
 
 export const validateUrl = (url) => {
   const urlRegex =
+    // eslint-disable-next-line no-useless-escape
     /^(?:(?:https?|ftp):\/\/)?(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+(?::\d{2,5})?(?:\/[\w\-._~:\/?#\[\]@!\$&'()*+,;=%]*)?$/
   return urlRegex.test(url)
 }

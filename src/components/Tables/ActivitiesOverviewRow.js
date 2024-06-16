@@ -134,7 +134,8 @@ function ActivitiesOverviewRow(props) {
     onOpen,
     onCpeOpen
   } = props
-  const textColor = useColorModeValue('gray.600', 'white.300')
+  const eventColor = useColorModeValue('gray.600', 'gray.400')
+  const textColor = useColorModeValue('gray.600', 'gray.200')
 
   const handleClick = (event) => {
     if (event === 'purl') {
@@ -171,13 +172,14 @@ function ActivitiesOverviewRow(props) {
         ></Box>
       </Flex>
       <Stack
+        mb={1}
         direction={'column'}
-        spacing={0}
+        spacing={0.5}
         cursor={'pointer'}
         wordBreak={'break-all'}
         onClick={() => handleClick(event)}
       >
-        <Text fontSize='sm' color={textColor} fontWeight='normal'>
+        <Text fontSize='sm' color={eventColor} fontWeight='normal'>
           {event} by {changedBy}
         </Text>
         <Text

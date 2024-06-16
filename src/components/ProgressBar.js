@@ -1,6 +1,9 @@
-import { Box, Text } from '@chakra-ui/react'
+import { Box, Text, useColorModeValue } from '@chakra-ui/react'
 
 export const ProgressBar = ({ value, loading, text }) => {
+  const bgColor = useColorModeValue('gray.100', 'gray.600')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+
   return (
     <Box>
       <Box
@@ -27,7 +30,7 @@ export const ProgressBar = ({ value, loading, text }) => {
           right={0}
           pos={'absolute'}
           height={'100%'}
-          bg={'gray.100'}
+          bg={bgColor}
           width={value === 0 ? '100%' : `${100 - Math.round(value)}%`}
         />
         <Box
@@ -42,7 +45,9 @@ export const ProgressBar = ({ value, loading, text }) => {
           position='absolute'
           justifyContent='center'
         >
-          <Text>{loading ? `Loading...` : `${Math.round(value)} %`}</Text>
+          <Text color={textColor}>
+            {loading ? `Loading...` : `${Math.round(value)} %`}
+          </Text>
         </Box>
       </Box>
       {text && (
@@ -51,6 +56,7 @@ export const ProgressBar = ({ value, loading, text }) => {
           top={0}
           textAlign={'center'}
           fontSize={'xs'}
+          color={textColor}
           style={{ cursor: 'pointer' }}
         >
           {text}

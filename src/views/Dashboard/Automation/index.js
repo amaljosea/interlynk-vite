@@ -25,6 +25,7 @@ import {
   Tag,
   Text,
   Tooltip,
+  useColorModeValue,
   useDisclosure,
   useToast
 } from '@chakra-ui/react'
@@ -55,6 +56,9 @@ const Automation = () => {
   const productId = params.productid
   const activeTab = Number(localStorage.getItem('activeProdTab'))
   const { userPermissions } = useGlobalState()
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const [activeRow, setActiveRow] = useState(null)
 
@@ -209,7 +213,11 @@ const Automation = () => {
       id: 'rule',
       name: 'RULE',
       selector: (row) => {
-        return <Text my={3}>{row?.name}</Text>
+        return (
+          <Text color={textColor} my={3}>
+            {row?.name}
+          </Text>
+        )
       },
       width: '12%',
       wrap: true
@@ -247,7 +255,7 @@ const Automation = () => {
       selector: (row) => {
         const { automationConditions } = row
         return (
-          <List spacing={3} my={3}>
+          <List spacing={3} my={3} color={textColor}>
             {automationConditions.map((item, index) => (
               <ListItem key={index}>
                 {
@@ -274,7 +282,7 @@ const Automation = () => {
       selector: (row) => {
         const { automationActions } = row
         return (
-          <List spacing={3} my={3}>
+          <List spacing={3} my={3} color={textColor}>
             {automationActions.map((item, index) => (
               <ListItem key={index}>
                 {
@@ -299,7 +307,9 @@ const Automation = () => {
         const { createdAt } = row
         return (
           <Tooltip label={getFullDateAndTime(createdAt)} placement='top'>
-            <Text textAlign={'right'}>{timeSince(createdAt)}</Text>
+            <Text color={textColor} textAlign={'right'}>
+              {timeSince(createdAt)}
+            </Text>
           </Tooltip>
         )
       },
@@ -320,7 +330,9 @@ const Automation = () => {
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
-            <Text textAlign={'right'}>{timeSince(updatedAt)}</Text>
+            <Text color={textColor} textAlign={'right'}>
+              {timeSince(updatedAt)}
+            </Text>
           </Tooltip>
         )
       },
@@ -424,7 +436,7 @@ const Automation = () => {
             columns={columns}
             data={nodes}
             // onSort={handleSort}
-            customStyles={customStyles}
+            customStyles={customStyles(headColor)}
             progressComponent={<CustomLoader />}
             progressPending={loading}
             subHeaderComponent={subHeaderComponent}

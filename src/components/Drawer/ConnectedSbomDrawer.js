@@ -12,16 +12,14 @@ import {
   TagLabel,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr
 } from '@chakra-ui/react'
 
 const ConnectedSbomDrawer = ({ data, isOpen, onClose }) => {
-  console.log('data', data)
   return (
-    <Drawer size='lg' isOpen={isOpen} placement='right' onClose={onClose}>
+    <Drawer size='xl' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
@@ -34,8 +32,8 @@ const ConnectedSbomDrawer = ({ data, isOpen, onClose }) => {
                   (item, index) => (
                     <Th
                       px={0}
-                      fontFamily={'inherit'}
                       key={index}
+                      fontFamily={'inherit'}
                       textAlign={item === 'STATUS' ? 'right' : 'left'}
                     >
                       {item}
@@ -50,27 +48,16 @@ const ConnectedSbomDrawer = ({ data, isOpen, onClose }) => {
                   const { project, projectVersion } = item
                   return (
                     <Tr key={index}>
-                      <Td px={0} fontSize={'sm'} width='250px'>
-                        <Text wordBreak={'break-all'}>
-                          {project?.projectGroup?.name || ''}
-                        </Text>
+                      <Td pl={0} fontSize={'sm'} wordBreak={'break-all'}>
+                        {project?.projectGroup?.name || ''}
                       </Td>
-                      <Td px={0} fontSize={'sm'} width='150px'>
-                        <Text wordBreak={'break-all'}>
-                          {projectVersion || ''}
-                        </Text>
+                      <Td pl={0} fontSize={'sm'} wordBreak={'break-all'}>
+                        {projectVersion || ''}
                       </Td>
-                      <Td px={0} fontSize={'sm'} width='150px'>
-                        <Text wordBreak={'break-all'}>
-                          {project?.name || ''}
-                        </Text>
+                      <Td pl={0} fontSize={'sm'} wordBreak={'break-all'}>
+                        {project?.name || ''}
                       </Td>
-                      <Td
-                        px={0}
-                        fontSize={'sm'}
-                        width='300px'
-                        textAlign={'right'}
-                      >
+                      <Td pr={0} fontSize={'sm'} textAlign={'right'}>
                         <Tag
                           size='md'
                           variant='solid'

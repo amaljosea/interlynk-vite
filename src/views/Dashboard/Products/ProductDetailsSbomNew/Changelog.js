@@ -15,6 +15,7 @@ import {
   TagLabel,
   Text,
   Tooltip,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -64,6 +65,9 @@ const Changelog = () => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -214,7 +218,7 @@ const Changelog = () => {
                 {loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}
               </TagLabel>
             </Tag>
-            <Text>{event}</Text>
+            <Text color={textColor}>{event}</Text>
           </Stack>
         )
       },
@@ -236,6 +240,7 @@ const Changelog = () => {
           return (
             <Text
               my={3}
+              color={textColor}
               cursor={'pointer'}
               onClick={() => {
                 setActiveRow(orig)
@@ -304,7 +309,9 @@ const Changelog = () => {
                     </Flex>
                   ))
                 ) : (
-                  <Text whiteSpace={'wrap'}>{orig}</Text>
+                  <Text color={textColor} whiteSpace={'wrap'}>
+                    {orig}
+                  </Text>
                 )}
               </Box>
             </Tooltip>
@@ -327,6 +334,7 @@ const Changelog = () => {
           return (
             <Text
               my={3}
+              color={textColor}
               cursor={'pointer'}
               onClick={() => {
                 setActiveRow(updated)
@@ -397,6 +405,7 @@ const Changelog = () => {
                   ))
                 ) : (
                   <Text
+                    color={textColor}
                     whiteSpace={'wrap'}
                     cursor={'pointer'}
                     onClick={() => onSelect(row)}
@@ -418,6 +427,7 @@ const Changelog = () => {
       selector: (row) => (
         <Tooltip placement='top' label={row.changedBy}>
           <Text
+            color={textColor}
             cursor={'pointer'}
             onClick={() => {
               setActiveRow(row)
@@ -440,7 +450,9 @@ const Changelog = () => {
       selector: (row) => (
         <Box width={'fit-content'}>
           <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-            <Text width={'fit-content'}>{timeSince(row.updatedAt)}</Text>
+            <Text color={textColor} width={'fit-content'}>
+              {timeSince(row.updatedAt)}
+            </Text>
           </Tooltip>
         </Box>
       ),
@@ -578,7 +590,7 @@ const Changelog = () => {
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={field}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader

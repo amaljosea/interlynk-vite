@@ -17,7 +17,7 @@ import CardBody from 'components/Card/CardBody.js'
 import IconBox from 'components/Icons/IconBox'
 
 const MiniStatistics = ({ title, amount, icon }) => {
-  const iconBlue = useColorModeValue('blue.500', 'blue.300')
+  const activeBg = useColorModeValue('blue.500', 'blue.500')
   const textColor = useColorModeValue('gray.700', 'white')
 
   return (
@@ -59,7 +59,7 @@ const MiniStatistics = ({ title, amount, icon }) => {
               )}
             </Box>
           </Stat>
-          <IconBox h={'45px'} w={'45px'} bg={iconBlue}>
+          <IconBox h={'45px'} w={'45px'} color={'white'} bg={activeBg}>
             {icon}
           </IconBox>
         </Flex>

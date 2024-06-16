@@ -30,6 +30,7 @@ import {
   TagLabel,
   Text,
   Tooltip,
+  useColorModeValue,
   useDisclosure,
   useToast
 } from '@chakra-ui/react'
@@ -56,6 +57,9 @@ function userTimeStart(row) {
 const TeamTable = ({ currentUser }) => {
   const org = localStorage.getItem('organization')
   const { userPermissions } = useGlobalState()
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
   const inviteUser = viewUsers?.supersededBy?.some(
@@ -131,7 +135,7 @@ const TeamTable = ({ currentUser }) => {
               direction={'row'}
               alignItems={'center'}
             >
-              <Text width={'fit-content'} fontSize={'14px'}>
+              <Text color={textColor} width={'fit-content'} fontSize={'14px'}>
                 {name}
               </Text>
               {row.email === currentUser?.email && (
@@ -156,7 +160,11 @@ const TeamTable = ({ currentUser }) => {
     {
       id: 'email',
       name: 'EMAIL',
-      selector: (row) => <Text my={2}>{row?.email}</Text>,
+      selector: (row) => (
+        <Text color={textColor} my={2}>
+          {row?.email}
+        </Text>
+      ),
       wrap: true,
       width: '20%'
     },
@@ -165,7 +173,9 @@ const TeamTable = ({ currentUser }) => {
       id: 'role',
       name: 'ROLE',
       selector: (row) => (
-        <Text textTransform={'capitalize'}>{row?.role?.name || ''}</Text>
+        <Text color={textColor} textTransform={'capitalize'}>
+          {row?.role?.name || ''}
+        </Text>
       )
     },
     // STATUS
@@ -204,7 +214,7 @@ const TeamTable = ({ currentUser }) => {
         const timeStart = userTimeStart(row)
         return (
           <Tooltip label={getFullDateAndTime(timeStart)} placement={'top'}>
-            <Text textTransform={'capitalize'}>
+            <Text color={textColor} textTransform={'capitalize'}>
               {timeStart ? timeSince(timeStart) : ''}
             </Text>
           </Tooltip>
@@ -419,7 +429,7 @@ const TeamTable = ({ currentUser }) => {
           defaultSortFieldId={'joinedDate'}
           subHeader
           subHeaderComponent={subHeaderComponent}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           progressPending={users ? false : true}
           progressComponent={<CustomLoader />}
           responsive={true}

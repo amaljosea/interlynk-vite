@@ -15,8 +15,14 @@ import { linkStyles } from './components/link'
 import { breakpoints } from './foundations/breakpoints'
 import { globalStyles } from './styles'
 
+const config = {
+  initialColorMode: 'light',
+  useSystemColorMode: false
+}
+
 // import { mode } from "@chakra-ui/theme-tools";
 export default extendTheme(
+  // Breakpoints
   {
     breakpoints,
     components: {
@@ -28,7 +34,8 @@ export default extendTheme(
         }
       }
     }
-  }, // Breakpoints
+  },
+  config,
   globalStyles,
   buttonStyles, // Button styles
   badgeStyles, // Badge styles

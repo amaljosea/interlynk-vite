@@ -1,8 +1,15 @@
 import InterlynkLogo from 'assets/img/logo.png'
 import { Link, useLocation } from 'react-router-dom'
 
-import { Divider, Flex, IconButton, Img, Tooltip } from '@chakra-ui/react'
+import {
+  Divider,
+  Flex,
+  Img,
+  Tooltip,
+  useColorModeValue
+} from '@chakra-ui/react'
 
+import IconBox from 'components/Icons/IconBox'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 
 import useAnalyticsEventTracker from 'hooks/useAnalyticsEventTracker'
@@ -25,6 +32,9 @@ const SidebarContent = ({ routes }) => {
       ? routes
       : routes?.filter((item) => item?.name !== 'SAG')
 
+  const activeBg = useColorModeValue('blue.500', 'blue.500')
+  const inActiveBg = useColorModeValue('gray.100', 'gray.700')
+
   const activeRoute = (routeName) => {
     const parts = routeName.split('/')
     const name = parts[2]
@@ -38,6 +48,7 @@ const SidebarContent = ({ routes }) => {
   const createLinks = (routes) => {
     return routes.map((prop) => {
       const isActive = activeRoute(prop.layout + prop.path) === 'active'
+
       return (
         <Tooltip key={prop.name} label={prop.name} placement='right'>
           <Link
@@ -48,12 +59,14 @@ const SidebarContent = ({ routes }) => {
             }
             onClick={() => gaEventTracker(prop.name)}
           >
-            <IconButton
-              icon={prop.icon}
-              borderRadius={'lg'}
+            <IconBox
+              h={'40px'}
+              w={'40px'}
               color={isActive ? 'white' : 'blue.500'}
-              colorScheme={isActive ? 'blue' : 'gray'}
-            />
+              bg={isActive ? activeBg : inActiveBg}
+            >
+              {prop.icon}
+            </IconBox>
           </Link>
         </Tooltip>
       )

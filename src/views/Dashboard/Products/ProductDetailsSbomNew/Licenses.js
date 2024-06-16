@@ -11,7 +11,8 @@ import {
   Tag,
   TagLabel,
   Text,
-  Tooltip
+  Tooltip,
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -28,6 +29,9 @@ const Licenses = () => {
   const sbomId = params.sbomid
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { nodes, paginationProps, loading, refetch } = usePaginatatedQuery(
     GetSbomLicensesTable,
@@ -75,7 +79,7 @@ const Licenses = () => {
       selector: ({ licenseExpression }) => {
         return (
           <Flex direction='row' alignItems={'center'} gap={2}>
-            <Text my={3} fontWeight={'medium'}>
+            <Text color={textColor} my={3} fontWeight={'medium'}>
               {licenseExpression || 'Not Available'}
             </Text>
           </Flex>
@@ -108,7 +112,7 @@ const Licenses = () => {
                 {sortedComponents[0].name}
               </TagLabel>
             </Tag>
-            <Text>
+            <Text color={textColor}>
               {sortedComponents.length > 1
                 ? `+${sortedComponents.length - 1} more`
                 : ''}
@@ -179,7 +183,7 @@ const Licenses = () => {
         <DataTable
           columns={columns}
           data={nodes}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           defaultSortAsc={false}
           defaultSortFieldId={'UPDATED_AT'}
           progressPending={loading}

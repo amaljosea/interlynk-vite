@@ -477,7 +477,6 @@ const CpeModal = ({
                   value={cpeString}
                   fontSize='16px'
                   fontStyle={'bold'}
-                  color='black'
                   onChange={(e) => console.log(e.target.value)}
                   disabled
                 />

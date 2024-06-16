@@ -5,14 +5,14 @@ import React, { useEffect } from 'react'
 import { Outlet, redirect, useNavigate } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 
-import { Box, Flex, Stack } from '@chakra-ui/react'
+import { Box, Flex, Stack, useColorMode } from '@chakra-ui/react'
 
 import Kbar from 'components/Kbar'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 
-import { FaRegFile } from 'react-icons/fa6'
+import { FaMoon, FaRegFile, FaSun } from 'react-icons/fa6'
 
 import { getActiveNavbar, getActiveRoute } from '../utils'
 import { logoutUser } from '../utils/authUtils'
@@ -21,6 +21,7 @@ export default function Admin() {
   const authToken = Cookies.get('authToken')
   const tabRes = window.matchMedia('(max-width: 1199px)')
   const navigate = useNavigate()
+  const { colorMode, setColorMode } = useColorMode()
 
   document.documentElement.dir = 'ltr'
   // Chakra Color Mode
@@ -50,11 +51,11 @@ export default function Admin() {
       perform: () => navigate('/vendor/products')
     },
     {
-      id: 'inbox',
-      name: 'Inbox',
+      id: 'requests',
+      name: 'Requests',
       section: 'navigation',
       icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/inbox')
+      perform: () => navigate('/vendor/requests')
     },
     {
       id: 'vulnerabilities',
@@ -69,6 +70,20 @@ export default function Admin() {
       section: 'navigation',
       icon: <FaRegFile color='#718096' />,
       perform: () => navigate('/vendor/policies')
+    },
+    {
+      id: 'dark',
+      name: 'Dark Mode',
+      section: 'utilities',
+      icon: <FaMoon color='#718096' />,
+      perform: () => setColorMode('dark')
+    },
+    {
+      id: 'light',
+      name: 'Light Mode',
+      section: 'utilities',
+      icon: <FaSun color='#718096' />,
+      perform: () => setColorMode('light')
     }
   ]
 
@@ -115,10 +130,10 @@ export default function Admin() {
         <Flex width={'100%'} flexDir={'column'}>
           <Box
             top={0}
-            bg={'white'}
             zIndex={111}
             pos={'sticky'}
-            borderBottom={'1px solid #E2E8F0'}
+            bg={colorMode === 'light' ? 'white' : 'gray.900'}
+            borderBottom={`1px solid ${colorMode === 'light' ? '#E2E8F0' : '#1A202C'}`}
           >
             <AdminNavbar
               tabRes={tabRes}

@@ -2,7 +2,8 @@ import { useLazyQuery, useMutation } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { getFullDateAndTime, timeSince } from 'utils'
+import { customStyles } from 'utils'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -31,6 +32,7 @@ import {
   Text,
   Tooltip,
   UnorderedList,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -80,6 +82,9 @@ const VersionsTable = ({ projectGroup }) => {
   const [filterText, setFilterText] = useState(searchInput)
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const [filters, setFilters] = useState({
     field: 'SBOMS_CREATED_AT',
@@ -322,7 +327,9 @@ const VersionsTable = ({ projectGroup }) => {
         const { creationAt } = row
         return (
           <Tooltip label={getFullDateAndTime(creationAt)} placement='top'>
-            <Text textAlign={'right'}>{timeSince(creationAt)}</Text>
+            <Text color={textColor} textAlign={'right'}>
+              {timeSince(creationAt)}
+            </Text>
           </Tooltip>
         )
       },
@@ -338,7 +345,9 @@ const VersionsTable = ({ projectGroup }) => {
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
-            <Text textAlign={'right'}>{timeSince(updatedAt)}</Text>
+            <Text color={textColor} textAlign={'right'}>
+              {timeSince(updatedAt)}
+            </Text>
           </Tooltip>
         )
       },
@@ -547,7 +556,7 @@ const VersionsTable = ({ projectGroup }) => {
   const dataTableProps = {
     columns: columns,
     data: nodes || [],
-    customStyles: customStyles,
+    customStyles: customStyles(headColor),
     onSort: handleSort,
     defaultSortFieldId: versionState?.field,
     defaultSortAsc: false,
@@ -565,7 +574,7 @@ const VersionsTable = ({ projectGroup }) => {
 
   return (
     <>
-      <Flex flexDir={'column'} width={'100%'} className='version_table'>
+      <Flex flexDir={'column'} width={'100%'}>
         <DataTable {...dataTableProps} />
         <Pagination {...paginationProps} />
       </Flex>

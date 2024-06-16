@@ -17,6 +17,7 @@ import {
   TagLabel,
   Text,
   Tooltip,
+  useColorModeValue,
   useDisclosure,
   useToast
 } from '@chakra-ui/react'
@@ -44,6 +45,8 @@ const RequestTable = ({
   paginationProps
 }) => {
   const toast = useToast()
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const [resendRequest] = useMutation(RequestResend)
   const [cancelRequest] = useMutation(RequestCancel)
@@ -113,7 +116,7 @@ const RequestTable = ({
 
   const handleRefresh = useCallback(() => {
     refetch()
-  }, [])
+  }, [refetch])
 
   const handleSort = async (column, sortDirection) => {
     setFilters((oldFilters) => ({
@@ -165,6 +168,7 @@ const RequestTable = ({
       </Flex>
     )
   }, [
+    data,
     filterText,
     handleClear,
     handleRefresh,
@@ -237,7 +241,7 @@ const RequestTable = ({
     {
       id: 'EMAIL',
       name: 'EMAIL',
-      selector: (row) => <Text>{row?.email}</Text>
+      selector: (row) => <Text color={textColor}>{row?.email}</Text>
     },
     {
       id: 'PRODUCT',
@@ -245,8 +249,8 @@ const RequestTable = ({
       selector: (row) => {
         return (
           <Stack my={4}>
-            <Text>{row?.productName}</Text>
-            <Text>{row?.productVersion}</Text>
+            <Text color={textColor}>{row?.productName}</Text>
+            <Text color={textColor}>{row?.productVersion}</Text>
           </Stack>
         )
       },
@@ -257,7 +261,7 @@ const RequestTable = ({
       name: 'REQUESTED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.requestedAt)} placement={'top'}>
-          {timeSince(row?.requestedAt)}
+          <Text color={textColor}>{timeSince(row?.requestedAt)}</Text>
         </Tooltip>
       ),
       wrap: true
@@ -275,7 +279,7 @@ const RequestTable = ({
               {timeSince(row?.uploadedAt)}
             </Tooltip>
           ) : (
-            <Text>...</Text>
+            <Text color={textColor}>...</Text>
           )}
         </>
       ),
@@ -339,7 +343,7 @@ const RequestTable = ({
         <DataTable
           columns={columns}
           data={data}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           onSort={handleSort}
           defaultSortFieldId={field}
           defaultSortAsc={false}

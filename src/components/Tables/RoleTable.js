@@ -2,7 +2,14 @@ import { useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 
-import { Button, Flex, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
+import {
+  Button,
+  Flex,
+  Text,
+  Tooltip,
+  useColorModeValue,
+  useDisclosure
+} from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import PermissionDrawer from 'components/Drawer/PermissionDrawer'
@@ -10,6 +17,8 @@ import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 const RoleTable = ({ data, role }) => {
   const [selectedRole, setSelectedRole] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const columns = [
     // NAME
@@ -17,7 +26,7 @@ const RoleTable = ({ data, role }) => {
       id: 'name',
       name: 'NAME',
       selector: (row) => (
-        <Text textTransform={'capitalize'} my={2}>
+        <Text color={textColor} textTransform={'capitalize'} my={2}>
           {row?.name}
         </Text>
       ),
@@ -29,7 +38,9 @@ const RoleTable = ({ data, role }) => {
       name: 'CREATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.createdAt)} placement='top'>
-          <Text textTransform={'lowercase'}>{timeSince(row?.createdAt)}</Text>
+          <Text color={textColor} textTransform={'lowercase'}>
+            {timeSince(row?.createdAt)}
+          </Text>
         </Tooltip>
       ),
       right: 'true'
@@ -62,7 +73,7 @@ const RoleTable = ({ data, role }) => {
         <DataTable
           columns={columns}
           data={data || []}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           responsive={true}

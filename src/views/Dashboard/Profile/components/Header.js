@@ -21,7 +21,8 @@ import { UploadProfileImage } from 'graphQL/Mutation'
 const Header = ({ org, selectedTab, setSelectedTab, user, tabs, refetch }) => {
   const toast = useToast()
   const navigate = useNavigate()
-  const textColor = useColorModeValue('gray.700', 'white')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const iconColor = useColorModeValue('#EDF2F7', '#2D3748')
   const emailColor = useColorModeValue('gray.500', 'gray.300')
 
   const handleClick = (name) => {
@@ -207,7 +208,7 @@ const Header = ({ org, selectedTab, setSelectedTab, user, tabs, refetch }) => {
               >
                 <Flex align='center' justifyContent='center'>
                   <tab.icon
-                    color={`${selectedTab == tab.name ? 'white' : '#3182CE'}`}
+                    color={`${selectedTab == tab.name ? iconColor : '#3182CE'}`}
                     w='100%'
                     h='100%'
                   />

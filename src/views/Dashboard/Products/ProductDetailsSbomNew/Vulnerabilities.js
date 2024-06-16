@@ -137,21 +137,21 @@ const ExpandedComponent = ({
           {/* Description */}
           <Box>
             <CustomText>Description :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text color={textColor} mt={1} fontSize={14}>
               {vuln.desc}
             </Text>
           </Box>
           {/* Published At  */}
           <Box>
             <CustomText>Published:</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text color={textColor} mt={1} fontSize={14}>
               {getFullDateAndTime(vuln.publishedAt)}
             </Text>
           </Box>
           {/* Last Modified At */}
           <Box>
             <CustomText>Last Modified:</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text color={textColor} mt={1} fontSize={14}>
               {getFullDateAndTime(vuln.lastModifiedAt)}
             </Text>
           </Box>
@@ -218,7 +218,7 @@ const ExpandedComponent = ({
           {/* EPSS Percentile */}
           <Box>
             <CustomText>EPSS Percentile :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text color={textColor} mt={1} fontSize={14}>
               {vuln?.vulnInfo?.epssPercentile
                 ? (vuln?.vulnInfo?.epssPercentile * 100).toFixed()
                 : 0}{' '}
@@ -245,6 +245,8 @@ const ExpandedComponent = ({
 const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   const params = useParams()
   const productId = params.productid
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { data: configs } = useQuery(GetConnections, {
     fetchPolicy: 'network-only'
@@ -360,7 +362,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     onCompleted: (data) => console.log('Parts', data)
   })
 
-  const textColor = useColorModeValue('gray.700', 'white')
   const [activeRow, setActiveRow] = useState(null)
   const [vulnSearch, setVulnSearch] = useState(searchInput)
   const [toggleClear, setToggleClear] = useState(false)
@@ -494,6 +495,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
               {isPart && (
                 <Text
                   fontSize={'xs'}
+                  color={textColor}
                   fontWeight={'medium'}
                   width={'fit-content'}
                 >
@@ -511,7 +513,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                       variant='solid'
                       colorScheme='gray'
                       isDisabled={!issueTracker}
-                      icon={<FaListCheck fontSize={16} />}
+                      icon={<FaListCheck color={textColor} fontSize={16} />}
                     />
                   </Link>
                 </Tooltip>
@@ -524,7 +526,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                       variant='solid'
                       isDisabled={!advisories}
                       colorScheme='gray'
-                      icon={<FaBullhorn color='#555' fontSize={16} />}
+                      icon={<FaBullhorn color={textColor} fontSize={16} />}
                     />
                   </Link>
                 </Tooltip>
@@ -537,7 +539,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                       variant='solid'
                       colorScheme='gray'
                       isDisabled={!documentation}
-                      icon={<FaBookOpen color='#555' fontSize={16} />}
+                      icon={<FaBookOpen color={textColor} fontSize={16} />}
                     />
                   </Link>
                 </Tooltip>
@@ -550,7 +552,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                       variant='solid'
                       isDisabled={!other}
                       colorScheme='gray'
-                      icon={<FaLink color='#555' fontSize={16} />}
+                      icon={<FaLink color={textColor} fontSize={16} />}
                     />
                   </Link>
                 </Tooltip>
@@ -586,8 +588,8 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
               onCardOpen()
             }}
           >
-            <Text>{component?.name || ''}</Text>
-            <Text>{component?.version || ''}</Text>
+            <Text color={textColor}>{component?.name || ''}</Text>
+            <Text color={textColor}>{component?.version || ''}</Text>
           </Stack>
         )
       },
@@ -790,6 +792,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           placement={'top'}
         >
           <Text
+            color={textColor}
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}
@@ -1061,7 +1064,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           className='data-table-container'
           columns={columns}
           data={nodes}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={field}

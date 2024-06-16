@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import DataTable from 'react-data-table-component'
 import { sevColor } from 'utils'
+import { customStyles } from 'utils'
 
 import { Flex, Select, Switch, Text, useColorModeValue } from '@chakra-ui/react'
 
@@ -13,19 +14,9 @@ import CustomLoader from 'components/CustomLoader'
 import { orgRuleUpdate } from 'graphQL/Mutation'
 import { GetOrgRules } from 'graphQL/Queries'
 
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  }
-}
-
 const ApiFeed = () => {
-  const textColor = useColorModeValue('gray.700', 'white')
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { data, refetch } = useQuery(GetOrgRules, {
     variables: {
@@ -66,7 +57,7 @@ const ApiFeed = () => {
       id: 'RULES_FRIENDLY_ID',
       name: 'CHECK ID',
       width: '10%',
-      selector: (row) => row.rule.friendlyId,
+      selector: (row) => <Text color={textColor}>{row.rule.friendlyId}</Text>,
       sortable: true,
       sortFunction: (a, b) => {
         const extractNumber = (str) => str.match(/\d+/) || [-1] // Extracts the number from the string
@@ -83,8 +74,10 @@ const ApiFeed = () => {
         const { rule } = row
         return (
           <Flex direction='column' rowGap={1} my={3}>
-            <Text fontSize={'sm'}>{rule.shortDesc}</Text>
-            <Text fontSize={'12px'} color={'#666'}>
+            <Text color={textColor} fontSize={'sm'}>
+              {rule.shortDesc}
+            </Text>
+            <Text color={textColor} fontSize={'12px'}>
               {rule.longDesc}
             </Text>
           </Flex>
@@ -106,9 +99,9 @@ const ApiFeed = () => {
             id={id}
             width={'130px'}
             value={severity}
+            color={textColor}
             onChange={(e) => handleStatusChange(id, e.target.value)}
-            bg={sevColor(severity.toLowerCase()) + '.200'}
-            variant={'outline'}
+            bg={sevColor(severity.toLowerCase()) + '.300'}
           >
             {options.map((itm, index) => (
               <option key={index} value={itm.value}>
@@ -171,7 +164,7 @@ const ApiFeed = () => {
             data={data && data.organization.organizationRules}
             defaultSortAsc={true}
             defaultSortFieldId={'RULES_FRIENDLY_ID'}
-            customStyles={customStyles}
+            customStyles={customStyles(headColor)}
             progressPending={data ? false : true}
             progressComponent={<CustomLoader />}
             responsive={true}

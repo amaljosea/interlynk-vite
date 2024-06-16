@@ -464,9 +464,8 @@ const ProductDetailsMain = () => {
         <Card display={data ? 'block' : 'none'}>
           <CardBody>
             <Tabs
-              variant='enclosed'
               w={'100%'}
-              bg={'white'}
+              variant='enclosed'
               index={activeProdTab}
               onChange={(value) => handleTabChange(value)}
             >

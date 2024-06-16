@@ -181,8 +181,6 @@ const RelationshipDrawer = ({
     onClose()
   }
 
-  console.log('component', component)
-
   return (
     <Drawer
       size='lg'

@@ -8,7 +8,7 @@ import TagManager from 'react-gtm-module'
 import { BrowserRouter } from 'react-router-dom'
 import theme from 'theme/theme.js'
 
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
 
 import ChatbotPreview from 'components/ChatbotPreview'
 import ScrollToTop from 'components/ScrollToTop.js'
@@ -45,6 +45,7 @@ ReactDOM.render(
     <BrowserRouter>
       <GlobalStateProvider>
         <ChakraProvider theme={theme} resetCSS={true}>
+          <ColorModeScript initialColorMode={theme?.config?.initialColorMode} />
           <ChatbotPreview />
           <ScrollToTop />
           <ApolloWrapper>

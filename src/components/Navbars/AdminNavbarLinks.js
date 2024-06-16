@@ -2,7 +2,7 @@ import { useLazyQuery } from '@apollo/client'
 import { useKBar } from 'kbar'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import { logoutUser } from 'utils/authUtils'
 
@@ -17,7 +17,6 @@ import {
   InputGroup,
   InputLeftElement,
   Kbd,
-  Link,
   Menu,
   MenuButton,
   MenuDivider,
@@ -26,13 +25,9 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Popover,
-  PopoverBody,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTrigger,
   Stack,
   Text,
+  useColorMode,
   useColorModeValue
 } from '@chakra-ui/react'
 
@@ -46,8 +41,15 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { GetOrgName } from 'graphQL/Queries'
 
-import { FaExchangeAlt, FaRegKeyboard, FaSignOutAlt } from 'react-icons/fa'
-import { FaCode, FaInbox, FaSquareArrowUpRight, FaUser } from 'react-icons/fa6'
+import { FaExchangeAlt, FaSignOutAlt } from 'react-icons/fa'
+import {
+  FaCode,
+  FaInbox,
+  FaMoon,
+  FaSquareArrowUpRight,
+  FaSun,
+  FaUser
+} from 'react-icons/fa6'
 
 export default function HeaderLinks(props) {
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
@@ -59,6 +61,9 @@ export default function HeaderLinks(props) {
 
   const productId = params.productid
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
+
+  const { colorMode, toggleColorMode, setColorMode } = useColorMode()
+  const bgColor = useColorModeValue('#EDF2F7', '#2D3748')
 
   const dashboardView = location.pathname === '/vendor/dashboard'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
@@ -105,10 +110,11 @@ export default function HeaderLinks(props) {
 
   const handleLogout = async () => {
     await logoutUser()
+    setColorMode('light')
     navigate('/auth')
   }
 
-  const shortcuts = [{ key: 'Ctrl + /', title: 'Search' }]
+  // const shortcuts = [{ key: 'Ctrl + /', title: 'Search' }]
 
   const handleEnvChange = (value) => {
     if (params.productgroupid) {
@@ -172,9 +178,11 @@ export default function HeaderLinks(props) {
           <SearchIcon color={'gray.400'} />
         </InputLeftElement>
         <Input
+          bg={bgColor}
+          border='none'
           borderRadius={6}
           placeholder='Search..'
-          onClick={query?.toggle}
+          onClick={query.toggle}
         />
         <Box pos={'absolute'} top={'0.2rem'} right={1.5}>
           <Kbd>{os?.startsWith('Windows') ? 'Ctrl' : 'Cmd'}</Kbd> <Kbd>K</Kbd>
@@ -184,11 +192,11 @@ export default function HeaderLinks(props) {
       {(dashboardView || productId) && !vulnId && (
         <Menu closeOnSelect={true}>
           <MenuButton
-            as={Button}
             size='sm'
+            as={Button}
+            fontSize='sm'
             colorScheme='blue'
             fontWeight='medium'
-            fontSize='sm'
             leftIcon={envIcon(envName)}
             rightIcon={<ChevronDownIcon />}
             textTransform='capitalize'
@@ -215,33 +223,12 @@ export default function HeaderLinks(props) {
           </MenuList>
         </Menu>
       )}
-      {productId && (
-        <Popover isLazy>
-          <PopoverTrigger>
-            <IconButton
-              m={0}
-              p={0}
-              variant='ghost'
-              icon={<FaRegKeyboard fontSize={24} color='darkgray' />}
-            />
-          </PopoverTrigger>
-          <PopoverContent pos={'relative'} right={10}>
-            <PopoverHeader fontWeight='medium'>
-              Keyboard Shortcuts
-            </PopoverHeader>
-            <PopoverBody>
-              <Flex gap={2} direction={'column'}>
-                {shortcuts.map((item, index) => (
-                  <Stack key={index} direction={'row'} alignItems={'center'}>
-                    <Kbd>{item.key}</Kbd>
-                    <Text fontSize={'sm'}> - {item.title}</Text>
-                  </Stack>
-                ))}
-              </Flex>
-            </PopoverBody>
-          </PopoverContent>
-        </Popover>
-      )}
+      {/* DARK MODE */}
+      <IconButton
+        size='sm'
+        onClick={toggleColorMode}
+        icon={colorMode === 'light' ? <FaMoon /> : <FaSun />}
+      />
       {!signedUrlParams && (
         <Menu>
           <MenuButton
@@ -288,7 +275,7 @@ export default function HeaderLinks(props) {
                 </Flex>
               </MenuItem>
               <MenuDivider hidden={!data?.organization} />
-              <Link href={`/vendor/settings?tab=personal-details`}>
+              <Link to={`/vendor/settings?tab=personal-details`}>
                 <MenuItem
                   icon={<SettingsIcon />}
                   display={data?.organization ? 'flex' : 'none'}
@@ -296,7 +283,7 @@ export default function HeaderLinks(props) {
                   Settings
                 </MenuItem>
               </Link>
-              <Link href='/vendor/settings?tab=organizations'>
+              <Link to='/vendor/settings?tab=organizations'>
                 <MenuItem
                   icon={<FaExchangeAlt />}
                   display={data?.organization ? 'flex' : 'none'}

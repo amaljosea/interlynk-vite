@@ -139,7 +139,6 @@
   display: flex;
   border-radius: 5px;
   overflow: hidden;
-  background: white;
   flex-direction: column;
 }
 
@@ -154,6 +153,7 @@
 .kbar_search {
   width: 100%;
   overflow: hidden;
+  background: transparent;
 }
 
 .kbar_search:focus {
@@ -194,4 +194,56 @@
   gap: 12px;
   justify-content: flex-start;
   border-radius: 5px;
+}
+
+/* DataTable.css */
+.rdt_TableCol {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.rdt_Table {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.rdt_TableHeadRow {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.rdt_Table {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.rdt_TableRow {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.ezkotw {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.ubHnu {
+  color: darkgray !important;
+}
+
+.light_picker .rdtPicker {
+  background: white !important;
+}
+
+.dark_picker .rdtPicker {
+  background: #2d3748 !important;
+}
+
+.rdtPicker td.rdtDay:hover,
+.rdtPicker td.rdtHour:hover,
+.rdtPicker td.rdtMinute:hover,
+.rdtPicker td.rdtSecond:hover,
+.rdtPicker .rdtTimeToggle:hover {
+  background: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }

@@ -21,6 +21,7 @@ import {
   Tag,
   Text,
   Tooltip,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -43,6 +44,9 @@ const Support = () => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -220,8 +224,8 @@ const Support = () => {
       selector: (row) => {
         return (
           <Stack my={4}>
-            <Text>{row?.productName}</Text>
-            <Text>{row?.productVersion}</Text>
+            <Text color={textColor}>{row?.productName}</Text>
+            <Text color={textColor}>{row?.productVersion}</Text>
           </Stack>
         )
       },
@@ -235,6 +239,7 @@ const Support = () => {
       selector: (row) => (
         <Text
           my={4}
+          color={textColor}
           cursor={'pointer'}
           onClick={() => {
             setActiveRow(row)
@@ -250,7 +255,7 @@ const Support = () => {
     {
       id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_VERSION',
       name: 'VERSION',
-      selector: (row) => row?.productVersion,
+      selector: (row) => <Text color={textColor}>{row?.productVersion}</Text>,
       width: '12%',
       wrap: true,
       sortable: true,
@@ -305,7 +310,7 @@ const Support = () => {
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-          {timeSince(row.updatedAt)}
+          <Text color={textColor}>{timeSince(row.updatedAt)}</Text>
         </Tooltip>
       ),
       right: 'true',
@@ -367,7 +372,7 @@ const Support = () => {
         <DataTable
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           defaultSortFieldId={filters.field}
           defaultSortAsc={false}
           progressPending={loading}

@@ -1,7 +1,7 @@
 import { useLazyQuery } from '@apollo/client'
-import { Fragment, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import ReactSelect, { components } from 'react-select'
+import { components } from 'react-select'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
@@ -16,6 +16,8 @@ import {
   VStack,
   useDisclosure
 } from '@chakra-ui/react'
+
+import LynkSelect from 'components/LynkSelect'
 
 import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -189,25 +191,11 @@ const LicenseField = ({ resolved, sbomView, license }) => {
             </Flex>
           </FormLabel>
           {/* LICENSE */}
-          <ReactSelect
+          <LynkSelect
             isClearable={resolved ? false : true}
             isSearchable={resolved ? false : true}
             isLoading={loading}
             noOptionsMessage={() => `Please search...`}
-            styles={{
-              control: (baseStyles, state) => {
-                return {
-                  ...baseStyles,
-                  borderColor: state.isFocused ? 'inherit' : 'inherit',
-                  fontSize: '14px',
-                  padding: '2px 0',
-                  // caretColor: state.options?.length === 0 && 'transparent',
-                  '&:hover': {
-                    borderColor: '#CBD5E0'
-                  }
-                }
-              }
-            }}
             components={{
               DropdownIndicator: () => null,
               IndicatorSeparator: () => null,
@@ -220,7 +208,6 @@ const LicenseField = ({ resolved, sbomView, license }) => {
             onChange={onLicenseChange}
             onInputChange={setSearchText}
             placeholder={'Enter License'}
-            className='react-select'
           />
           {licenseType && (
             <Flex justifyContent='flex-end'>
