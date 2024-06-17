@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
-import ReactSelect from 'react-select'
 import { capitalizeFirstLetter } from 'utils'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -28,6 +27,7 @@ import {
 
 import CardBody from 'components/Card/CardBody'
 import InfoModal from 'components/InfoModal'
+import LynkSelect from 'components/LynkSelect'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -186,19 +186,6 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
     setInfoUrl(``)
     onInfoOpen()
   }, [onInfoOpen])
-
-  const customStyle = (baseStyles, state) => {
-    return {
-      ...baseStyles,
-      borderColor: state.isFocused ? 'inherit' : 'inherit',
-      fontSize: '14px',
-      padding: '2px 0',
-      width: '400px',
-      '&:hover': {
-        borderColor: '#CBD5E0'
-      }
-    }
-  }
 
   return (
     <>
@@ -367,7 +354,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                 ))}
               </Select>
             </FormControl>
-            <FormControl mt={4}>
+            <FormControl mt={4} width={'400px'}>
               <FormLabel>
                 Jira Default Project
                 <InfoIcon
@@ -377,14 +364,11 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                   onClick={onCheckJira}
                 />
               </FormLabel>
-              <ReactSelect
-                value={{ value: jiraProject || '', label: jiraProject || '' }}
-                placeholder='Project'
+              <LynkSelect
                 options={projects}
-                styles={{
-                  control: (baseStyles, state) => customStyle(baseStyles, state)
-                }}
+                placeholder='Project'
                 onChange={(e) => onUpdate(e.value, 'jira')}
+                value={{ value: jiraProject || '', label: jiraProject || '' }}
               />
             </FormControl>
           </GridItem>
