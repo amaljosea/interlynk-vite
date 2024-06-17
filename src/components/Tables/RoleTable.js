@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 
+import { AddIcon } from '@chakra-ui/icons'
 import {
-  Button,
   Flex,
+  IconButton,
   Text,
   Tooltip,
   useColorModeValue,
@@ -13,6 +14,8 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import PermissionDrawer from 'components/Drawer/PermissionDrawer'
+
+import { FaUserLock } from 'react-icons/fa6'
 
 const RoleTable = ({ data, role }) => {
   const [selectedRole, setSelectedRole] = useState(null)
@@ -50,42 +53,53 @@ const RoleTable = ({ data, role }) => {
       id: 'action',
       name: 'ACTION',
       selector: (row) => (
-        <Button
+        <IconButton
+          size='sm'
           variant='solid'
           colorScheme='blue'
-          size='sm'
+          icon={<FaUserLock />}
           onClick={() => {
             setSelectedRole(row?.name)
             onOpen()
           }}
-        >
-          Permissions
-        </Button>
+        />
       ),
-      right: 'true',
-      width: '14%'
+      right: 'true'
     }
   ]
+
+  // HEADER SECTION
+  const subHeader = useMemo(() => {
+    return (
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+        <Tooltip label='Add Role'>
+          <IconButton colorScheme='blue' icon={<AddIcon />} />
+        </Tooltip>
+      </Flex>
+    )
+  }, [])
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
+          subHeader
+          responsive={true}
           columns={columns}
           data={data || []}
-          customStyles={customStyles(headColor)}
-          progressPending={data ? false : true}
+          subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
-          responsive={true}
+          progressPending={data ? false : true}
+          customStyles={customStyles(headColor)}
         />
       </Flex>
 
       {isOpen && (
         <PermissionDrawer
+          userRole={role}
           isOpen={isOpen}
           onClose={onClose}
           selectedRole={selectedRole}
-          userRole={role}
         />
       )}
     </>

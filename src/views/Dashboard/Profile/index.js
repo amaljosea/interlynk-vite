@@ -117,7 +117,7 @@ function Profile() {
     skip: org === 'undefined' ? true : isAdmin === true ? false : true,
     variables: { first: totalRows, status: 'approved' }
   })
-  const { data: roles, refetch: roleRefetch } = useQuery(GetRoles, {
+  const { data: roles } = useQuery(GetRoles, {
     skip: org === 'undefined' ? true : activetab === 'roles' ? false : true
   })
   const { data: mfc, refetch: mfcRefetch } = useQuery(GetOrgManufacturers, {
@@ -226,7 +226,6 @@ function Profile() {
                 <RoleTable
                   data={roles?.organization?.organizationRoles}
                   role={orgInfo?.organization?.currentUser?.role?.name}
-                  refetch={roleRefetch}
                 />
               </TabPanel>
               {/* FEEDS */}
