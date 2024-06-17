@@ -21,6 +21,8 @@ import {
   Text
 } from '@chakra-ui/react'
 
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
+
 import {
   AutomationRuleCreate,
   addComSupplier,
@@ -41,6 +43,7 @@ const SupplierModal = ({
   const sbomId = params.sbomid
   const productId = params.productid
   const navigate = useNavigate()
+  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const { status, component } = activeRow || ''
   const { name, version } = component || ''
@@ -221,7 +224,7 @@ const SupplierModal = ({
   const handleRuleCreate = async () => {
     if (ruleExists) {
       localStorage.setItem('activeProdTab', 2)
-      navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
+      navigate(generateProductDetailPageUrlFromCurrentUrl())
     } else {
       disableButtonTemporarily()
       await createRule({

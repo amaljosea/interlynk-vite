@@ -30,6 +30,8 @@ import {
   Tr
 } from '@chakra-ui/react'
 
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
+
 import {
   AutomationRuleCreate,
   authorCreate,
@@ -50,6 +52,7 @@ const GeneralDataDrawer = ({
   const sbomId = params.sbomid
   const productId = params.productid
   const navigate = useNavigate()
+  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const { status, sbom } = activeRow || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
@@ -242,7 +245,7 @@ const GeneralDataDrawer = ({
   const handleRuleCreate = async () => {
     if (ruleExists) {
       localStorage.setItem('activeProdTab', 2)
-      navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
+      navigate(generateProductDetailPageUrlFromCurrentUrl())
     } else {
       disableButtonTemporarily()
       await createRule({

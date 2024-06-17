@@ -28,6 +28,7 @@ import {
 import CpeInput from 'components/CpeInput'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import {
   AutomationRuleCreate,
@@ -54,6 +55,7 @@ const CpeModal = ({
   const sbomId = params.sbomid
   const productId = params.productid
   const navigate = useNavigate()
+  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const [error, setError] = useState('')
   const [vendor, setVendor] = useState('')
@@ -385,7 +387,7 @@ const CpeModal = ({
   const handleRuleCreate = async () => {
     if (ruleExists) {
       localStorage.setItem('activeProdTab', 2)
-      navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
+      navigate(generateProductDetailPageUrlFromCurrentUrl())
     } else {
       disableButtonTemporarily()
       await createRule({

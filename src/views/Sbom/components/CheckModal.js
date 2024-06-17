@@ -32,6 +32,7 @@ import {
 import LicenseField from 'components/Licenses/LicenseField'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import {
   AutomationRuleCreate,
@@ -45,6 +46,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
   const productId = params.productid
   const sbomId = params.sbomid
   const navigate = useNavigate()
+  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const { status, component } = activeRow || ''
   const { id: componentId, name, version } = component || ''
@@ -265,7 +267,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
   const handleRuleCreate = () => {
     if (ruleExists) {
       localStorage.setItem('activeProdTab', 2)
-      navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
+      navigate(generateProductDetailPageUrlFromCurrentUrl())
     } else {
       disableButtonTemporarily()
       createRule({

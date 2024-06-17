@@ -19,6 +19,8 @@ import {
   ModalOverlay
 } from '@chakra-ui/react'
 
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
+
 import { recheckHealth, supplierCreate, supplierUpdate } from 'graphQL/Mutation'
 import { AutomationRuleCreate } from 'graphQL/Mutation'
 
@@ -34,6 +36,7 @@ const PriSupplierModal = ({
   const sbomId = params.sbomid
   const productId = params.productid
   const navigate = useNavigate()
+  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const { status, sbom } = activeRow || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
@@ -199,7 +202,7 @@ const PriSupplierModal = ({
   const handleRuleCreate = async () => {
     if (ruleExists) {
       localStorage.setItem('activeProdTab', 2)
-      navigate(`/vendor/products/${params?.productgroupid}/env/${productId}`)
+      navigate(generateProductDetailPageUrlFromCurrentUrl())
     } else {
       disableButtonTemporarily()
       await createRule({
