@@ -35,6 +35,7 @@ import {
   Text,
   Tooltip,
   useClipboard,
+  useColorMode,
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
@@ -52,6 +53,9 @@ import { FaEllipsisV } from 'react-icons/fa'
 
 const TokenInfo = ({ data, refetch }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const { colorMode } = useColorMode()
+  const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -437,12 +441,16 @@ const TokenInfo = ({ data, refetch }) => {
                   </FormLabel>
                   <Datetime
                     value={selectedDate}
+                    className={react_datatime}
                     onChange={handleDateChange}
                     inputProps={{
                       placeholder: 'Select Date and Time',
                       disabled: token !== '',
                       onCopy: (e) => e.preventDefault(),
-                      onPaste: (e) => e.preventDefault()
+                      onPaste: (e) => e.preventDefault(),
+                      style: {
+                        background: 'none'
+                      }
                     }}
                   />
                   {!isValidDate && (
