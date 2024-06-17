@@ -3,6 +3,9 @@ import { Bar, BarChart, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { Flex, Text } from '@chakra-ui/react'
 
+import Card from 'components/Card/Card'
+import CardBody from 'components/Card/CardBody'
+
 export const SBOM_LIST_WITH_DATA_QUERY = gql`
   query SbomListWithGraphData($projectId: Uuid!) {
     project(id: $projectId) {
@@ -39,39 +42,47 @@ const tooltipCustom = (
 
 export const SimpleBarChat = ({ label, dataKey, color, data }) => {
   return (
-    <Flex flexDir={'column'} alignItems={'center'}>
-      <BarChart width={200} height={40} data={data}>
-        <Bar name={`${label} Count`} dataKey={dataKey} fill={color} />
-        <XAxis dataKey='name' hide />
-        {tooltipCustom}
-      </BarChart>
-      <Text fontSize={'xs'} cursor={'pointer'}>
-        {`${label} Trend`}
-      </Text>
-    </Flex>
+    <Card>
+      <CardBody>
+        <Flex width={'100%'} flexDir={'column'} alignItems={'center'}>
+          <BarChart width={200} height={40} data={data}>
+            <Bar name={`${label} Count`} dataKey={dataKey} fill={color} />
+            <XAxis dataKey='name' hide />
+            {tooltipCustom}
+          </BarChart>
+          <Text fontSize={'xs'} cursor={'pointer'}>
+            {`${label} Trend`}
+          </Text>
+        </Flex>
+      </CardBody>
+    </Card>
   )
 }
 
 export const SimpleLineChat = ({ label, config, data }) => {
   return (
-    <Flex flexDir={'column'} alignItems={'center'}>
-      <LineChart width={200} height={40} data={data}>
-        {config?.map((item) => (
-          <Line
-            key={item.id}
-            stroke={item.stroke}
-            name={item.name}
-            dataKey={item.dataKey}
-          />
-        ))}
-        <YAxis hide tickFormatter={(value) => value.toFixed(2)} />
-        <XAxis dataKey='name' hide />
-        {tooltipCustom}
-      </LineChart>
-      <Text cursor={'pointer'} fontSize={'xs'}>
-        {`${label} Trend`}
-      </Text>
-    </Flex>
+    <Card>
+      <CardBody>
+        <Flex width={'100%'} flexDir={'column'} alignItems={'center'}>
+          <LineChart width={200} height={40} data={data}>
+            {config?.map((item) => (
+              <Line
+                key={item.id}
+                stroke={item.stroke}
+                name={item.name}
+                dataKey={item.dataKey}
+              />
+            ))}
+            <YAxis hide tickFormatter={(value) => value.toFixed(2)} />
+            <XAxis dataKey='name' hide />
+            {tooltipCustom}
+          </LineChart>
+          <Text cursor={'pointer'} fontSize={'xs'}>
+            {`${label} Trend`}
+          </Text>
+        </Flex>
+      </CardBody>
+    </Card>
   )
 }
 

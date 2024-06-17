@@ -126,7 +126,6 @@ export default function Dashboard() {
             <MiniStatistics
               title={'Products'}
               amount={metrics?.organizationMetric?.projectCount}
-              percentage={9}
               icon={
                 <FaWindowMaximize h={'24px'} w={'24px'} color={iconBoxInside} />
               }

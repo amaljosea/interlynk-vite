@@ -71,13 +71,7 @@ const SbomActions = ({ sbom, refetch }) => {
     suppliers,
     scope
   } = prodCompState
-  const {
-    prodCompDispatch,
-    prodVulnDispatch,
-    prodCheckDispatch,
-    sbomLogDispatch,
-    sbomDispatch
-  } = dispatch
+  const { prodCompDispatch, prodVulnDispatch, sbomDispatch } = dispatch
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const archiveSboms = sboms?.supersededBy?.some(
@@ -210,8 +204,6 @@ const SbomActions = ({ sbom, refetch }) => {
   const handleSBOMChange = (select) => {
     prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
-    prodCheckDispatch({ type: 'CLEAR_PROD_CHECK' })
-    sbomLogDispatch({ type: 'CLEAR_SBOM_LOG' })
     setSelectedVersion(select)
     refetchSBOM(select.value)
   }

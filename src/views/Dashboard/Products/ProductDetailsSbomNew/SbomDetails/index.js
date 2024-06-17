@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
@@ -24,7 +24,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { SbomPolicyScan } from 'graphQL/Mutation'
 import {
   GetPrimaryComponent,
   GetProjectSettings,
@@ -89,8 +88,6 @@ const SbomDetails = ({ sbomData, refetch }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const [policyScan] = useMutation(SbomPolicyScan)
 
   // GET PRIMARY COMPONENT
   const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(

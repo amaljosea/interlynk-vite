@@ -458,8 +458,9 @@ const ProductDetailsMain = () => {
               </GridItem>
             </Grid>
           </CardBody>
-          <ProductGraphs />
         </Card>
+        {/* PRODUCT GRAPHS */}
+        <ProductGraphs />
         {/* TAB SECTION */}
         <Card display={data ? 'block' : 'none'}>
           <CardBody>

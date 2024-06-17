@@ -1,7 +1,10 @@
 import { useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 
-import { Box, Flex } from '@chakra-ui/react'
+import { SimpleGrid, Skeleton } from '@chakra-ui/react'
+
+import Card from 'components/Card/Card'
+import CardBody from 'components/Card/CardBody'
 
 import { ScoreGraphs } from './ScoreGraphs'
 import {
@@ -32,7 +35,17 @@ export const ProductGraphs = () => {
   }
 
   if (loading) {
-    return <Box mt={8}>Loading...</Box>
+    return (
+      <SimpleGrid width={'100%'} columns={5} spacing='24px'>
+        {[1, 2, 3, 4, 5].map((item, index) => (
+          <Card key={index}>
+            <CardBody>
+              <Skeleton width={'100%'} height={8} />
+            </CardBody>
+          </Card>
+        ))}
+      </SimpleGrid>
+    )
   }
 
   if (count <= 2) {
@@ -42,32 +55,26 @@ export const ProductGraphs = () => {
   const graphData = formatDataForGraph(items)
 
   return (
-    <Box display='flex' justifyContent='center' mt={8}>
-      <Flex flexWrap={'wrap'} alignItems={'center'} gap={12}>
-        <SimpleBarChat
-          color='#3182ce'
-          label={'Component'}
-          dataKey='stats.compCount'
-          data={graphData}
-        />
-        <SimpleBarChat
-          color='#3182ce'
-          label={'License'}
-          dataKey='stats.compLicenseCount'
-          data={graphData}
-        />
-        <SimpleLineChat
-          config={vulnConfig}
-          data={graphData}
-          label={'Vulnerability'}
-        />
-        <SimpleLineChat
-          config={policyConfig}
-          data={graphData}
-          label={'Policy'}
-        />
-        <ScoreGraphs sbomIds={sbomIds} />
-      </Flex>
-    </Box>
+    <SimpleGrid width={'100%'} columns={5} spacing='24px'>
+      <SimpleBarChat
+        color='#3182ce'
+        label={'Component'}
+        dataKey='stats.compCount'
+        data={graphData}
+      />
+      <SimpleBarChat
+        color='#3182ce'
+        label={'License'}
+        dataKey='stats.compLicenseCount'
+        data={graphData}
+      />
+      <SimpleLineChat
+        config={vulnConfig}
+        data={graphData}
+        label={'Vulnerability'}
+      />
+      <SimpleLineChat config={policyConfig} data={graphData} label={'Policy'} />
+      <ScoreGraphs sbomIds={sbomIds} />
+    </SimpleGrid>
   )
 }
