@@ -29,6 +29,7 @@ import {
   Text,
   Tooltip,
   UnorderedList,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -72,12 +73,14 @@ import StatusModal from './components/StatusModal'
 import UploadModal from './components/UploadModal'
 
 const SettingsTag = ({ icon, label, settings }) => {
+  const scanColor = useColorModeValue('blackAlpha', 'whiteAlpha')
+
   return (
     <Tooltip label={`${label} ${settings ? 'Enabled' : 'Disabled'}`}>
       <IconButton
         size='xs'
-        colorScheme={settings ? 'blue' : 'blackAlpha'}
         icon={icon}
+        colorScheme={settings ? 'blue' : scanColor}
       />
     </Tooltip>
   )

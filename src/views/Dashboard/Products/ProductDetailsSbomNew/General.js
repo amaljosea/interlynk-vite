@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
@@ -10,6 +10,7 @@ import {
   Flex,
   HStack,
   Icon,
+  IconButton,
   Link,
   Modal,
   ModalBody,
@@ -68,7 +69,6 @@ const General = ({ data, refetch, loading, error }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const {
     id,
@@ -96,9 +96,9 @@ const General = ({ data, refetch, loading, error }) => {
   )
 
   const btnRef = useRef(null)
-  const licenseBtn = useRef(null)
   const status = 'created'
   const textColor = useColorModeValue('gray.700', 'white')
+  const iconColor = useColorModeValue('blue.500', 'gray.100')
   const customerView = location.pathname.startsWith('/customer')
   const [selectedKey, setSelectedKey] = useState('')
   const [activeTool, setActiveTool] = useState(null)
@@ -187,12 +187,17 @@ const General = ({ data, refetch, loading, error }) => {
       .finally(() => onSBMClose())
   }
 
+  const isInvalid = status === 'signed' || !updateComponent || customerView
+
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
-  const handleSBMDown = (event) => {
-    if (event.altKey && event.key === '2') {
-      onSBMToggle()
-    }
-  }
+  const handleSBMDown = useCallback(
+    (event) => {
+      if (event.altKey && event.key === '2') {
+        onSBMToggle()
+      }
+    },
+    [onSBMToggle]
+  )
 
   const onCheckTool = () => {
     setInfoHeading(`Creation Tool`)
@@ -236,7 +241,7 @@ const General = ({ data, refetch, loading, error }) => {
     return () => {
       window.removeEventListener('keydown', handleSBMDown)
     }
-  }, [])
+  }, [handleSBMDown])
 
   if (loading) {
     return (
@@ -312,15 +317,12 @@ const General = ({ data, refetch, loading, error }) => {
                 </Flex>
               </Td>
               <Td pl={0}>
-                <Button
+                <IconButton
                   size='sm'
-                  isDisabled={
-                    status === 'signed' || !updateComponent || signedUrlParams
-                  }
+                  isDisabled={isInvalid}
+                  icon={<EditIcon color={iconColor} />}
                   onClick={() => handleClick('tools')}
-                >
-                  <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
-                </Button>
+                />
               </Td>
             </Tr>
             {/* CREATED AT */}
@@ -363,15 +365,12 @@ const General = ({ data, refetch, loading, error }) => {
                 </Stack>
               </Td>
               <Td pl={0}>
-                <Button
+                <IconButton
                   size='sm'
-                  isDisabled={
-                    status === 'signed' || !updateComponent || signedUrlParams
-                  }
+                  isDisabled={isInvalid}
+                  icon={<EditIcon color={iconColor} />}
                   onClick={() => handleClick('author')}
-                >
-                  <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
-                </Button>
+                />
               </Td>
             </Tr>
             {/* SUPPLIERS */}
@@ -419,17 +418,12 @@ const General = ({ data, refetch, loading, error }) => {
                 </HStack>
               </Td>
               <Td pl={0}>
-                {!customerView && (
-                  <Button
-                    size='sm'
-                    isDisabled={
-                      status === 'signed' || !updateComponent || signedUrlParams
-                    }
-                    onClick={onSupOpen}
-                  >
-                    <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
-                  </Button>
-                )}
+                <IconButton
+                  size='sm'
+                  isDisabled={isInvalid}
+                  icon={<EditIcon color={iconColor} />}
+                  onClick={onSupOpen}
+                />
               </Td>
             </Tr>
             {/* LICENSES */}
@@ -471,16 +465,12 @@ const General = ({ data, refetch, loading, error }) => {
                 </Flex>
               </Td>
               <Td pl={0}>
-                <Button
+                <IconButton
                   size='sm'
-                  ref={licenseBtn}
-                  isDisabled={
-                    status === 'signed' || !updateComponent || signedUrlParams
-                  }
+                  isDisabled={isInvalid}
+                  icon={<EditIcon color={iconColor} />}
                   onClick={onLicenseOpen}
-                >
-                  <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
-                </Button>
+                />
               </Td>
             </Tr>
           </Tbody>

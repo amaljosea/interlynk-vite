@@ -14,6 +14,7 @@ import {
   TagLabel,
   Text,
   Tooltip,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -86,6 +87,7 @@ const SbomDetails = ({ sbomData, refetch }) => {
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const scanColor = useColorModeValue('blackAlpha', 'whiteAlpha')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -243,8 +245,8 @@ const SbomDetails = ({ sbomData, refetch }) => {
                   <HStack>
                     <FaAngleLeft size={18} color='#3182CE' />
                     <Text
-                      fontWeight={'semibold'}
                       fontSize={18}
+                      fontWeight={'semibold'}
                       color={'blue.500'}
                       textDecor={'underline'}
                     >
@@ -253,20 +255,15 @@ const SbomDetails = ({ sbomData, refetch }) => {
                   </HStack>
                 </Link>
               )}
-            <Flex
-              direction={'row'}
-              alignItems={'center'}
-              flexWrap={'wrap'}
-              gap={2}
-            >
-              <Text fontWeight={'semibold'} fontSize={25}>
-                {project?.projectGroup?.name}
-              </Text>
-            </Flex>
+            <Text fontWeight={'semibold'} fontSize={25}>
+              {project?.projectGroup?.name}
+            </Text>
           </Stack>
           <Flex flexDir={'row'} gap={1} alignItems={'center'} flexWrap={'wrap'}>
-            <Text fontSize={22}>{primaryComponent?.name}</Text>
-            <Text fontSize={22}>{primaryComponent?.version ? ':' : ''}</Text>
+            {primaryComponent?.name && (
+              <Text fontSize={22}>{primaryComponent?.name}</Text>
+            )}
+            {primaryComponent?.version && <Text fontSize={22}>:</Text>}
             <Text mr={2} fontSize={22}>
               {projectVersion}
             </Text>
@@ -299,28 +296,28 @@ const SbomDetails = ({ sbomData, refetch }) => {
               icon={<DownloadIcon />}
             />
             <SettingsTag
-              color={checksEnabled ? 'blue' : 'blackAlpha'}
+              color={checksEnabled ? 'blue' : scanColor}
               label={'Checks'}
               icon={<Search2Icon />}
             />
             <SettingsTag
-              color={internalComp ? 'blue' : 'blackAlpha'}
+              color={internalComp ? 'blue' : scanColor}
               label={'Internal Labeling'}
               icon={<FaTag />}
             />
             <SettingsTag
-              color={automatedFixesEnabled ? 'blue' : 'blackAlpha'}
+              color={automatedFixesEnabled ? 'blue' : scanColor}
               label={'Automation'}
               icon={<FaRobot />}
             />
             <SettingsTag
-              color={hasFinished && vulnScan ? 'blue' : 'blackAlpha'}
+              color={hasFinished && vulnScan ? 'blue' : scanColor}
               label={'Vulnerability Scan'}
               icon={<FaBug />}
             />
             <SettingsTag
               label={'Ready'}
-              color={hasFinished ? 'blue' : 'blackAlpha'}
+              color={hasFinished ? 'blue' : scanColor}
               icon={<FaCircleCheck />}
             />
           </Flex>
