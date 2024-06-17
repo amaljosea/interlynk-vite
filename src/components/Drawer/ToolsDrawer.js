@@ -12,7 +12,8 @@ import {
   GridItem,
   Heading,
   Stack,
-  Tag
+  Tag,
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
@@ -26,6 +27,10 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
     sbomIdOne,
     sbomIdTwo
   })
+
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const sbomOneColor = useColorModeValue('green.100', 'gray.800')
+  const sbomTwoColor = useColorModeValue('red.100', 'gray.800')
 
   if (isLoading) {
     return null
@@ -44,7 +49,7 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
             <GridItem w='100%'>
               <Card
                 width='100%'
-                bg={'green.100'}
+                bg={sbomOneColor}
                 px={6}
                 h='450px'
                 overflowY='scroll'
@@ -56,7 +61,7 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
                       <Flex alignItems={'flex-end'} gap={1}>
                         <Heading
                           fontWeight={'semibold'}
-                          color={'#333'}
+                          color={textColor}
                           fontFamily={'inherit'}
                           size='md'
                         >
@@ -81,14 +86,14 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
             </GridItem>
             {/* SBOM TWO */}
             <GridItem w='100%'>
-              <Card bg={'red.100'} px={6} h='450px' overflowY='scroll'>
+              <Card bg={sbomTwoColor} px={6} h='450px' overflowY='scroll'>
                 {sbomTwo && (
                   <Flex width='100%' flexWrap={'wrap'} flexDirection={'column'}>
                     {/* HEADIING */}
                     <Stack>
                       <Heading
                         fontWeight={'semibold'}
-                        color={'#333'}
+                        color={textColor}
                         fontFamily={'inherit'}
                         size='md'
                       >

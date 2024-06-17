@@ -23,6 +23,8 @@ const ImportWizard = ({
   const params = useParams()
   const groupId = params.productgroupid
 
+  const bgColor = useColorModeValue('gray.50', 'gray.700')
+
   const [compVexImport] = useMutation(ComponentVulnVexImport)
 
   const { prodVulnState, dispatch } = useGlobalState()
@@ -84,13 +86,11 @@ const ImportWizard = ({
     }
   ]
 
-  const isLastStep = activeStep === steps.length - 1
   const hasCompletedAllSteps = activeStep === steps.length
-  const bg = useColorModeValue('gray.50')
 
   return (
     <Flex flexDir='column' width='100%'>
-      <Box position='fixed' top={20} left={6} right={6}>
+      <Box pos={'fixed'} top={20} left={6} right={6}>
         <Steps variant={variant} colorScheme='blue' activeStep={activeStep}>
           {steps.map(({ label, component }, index) => (
             <Step label={label} key={index}>
@@ -122,12 +122,12 @@ const ImportWizard = ({
         width='100%'
         justify='flex-end'
         gap={4}
+        bg={bgColor}
         pos={'absolute'}
         bottom={0}
         right={0}
         py={5}
         pr={8}
-        bg={'white'}
       >
         {hasCompletedAllSteps ? (
           <Button

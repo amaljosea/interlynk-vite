@@ -15,6 +15,7 @@ import {
   TagLabel,
   Text,
   Tooltip,
+  useColorMode,
   useColorModeValue
 } from '@chakra-ui/react'
 
@@ -47,7 +48,9 @@ const linkURl = (type, id) => {
 }
 
 const StepTwo = ({ sbomId, currentSbomId }) => {
-  const textColor = useColorModeValue('gray.700', 'white')
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { colorMode } = useColorMode()
   const { prodVulnState, dispatch } = useGlobalState()
   const { selectedVulns } = prodVulnState
   const { prodVulnDispatch } = dispatch
@@ -55,6 +58,8 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
   const { data, error } = useQuery(IntersectingVulns, {
     variables: { fromSbomId: sbomId, toSbomId: currentSbomId }
   })
+
+  const tableClassName = colorMode === 'light' ? 'diff_light' : 'diff_dark'
 
   // COLUMNS
   const columns = [
@@ -127,8 +132,8 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
             spacing={1}
             my={3}
           >
-            <Text>{toVuln?.component?.name || ''}</Text>
-            <Text>{toVuln?.component?.version || ''}</Text>
+            <Text color={textColor}>{toVuln?.component?.name || ''}</Text>
+            <Text color={textColor}>{toVuln?.component?.version || ''}</Text>
           </Stack>
         )
       },
@@ -211,16 +216,17 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
     )
 
   return (
-    <Box width={'100%'} mx={'auto'}>
+    <Box width={'100%'} mx={'auto'} mb={10}>
       <Heading fontWeight={'medium'} fontSize={'lg'} fontFamily={'inherit'}>
         Select common vulnerabilities for status update
       </Heading>
-      <Flex mt={5} flexDir={'column'} width={'100%'} mb={4}>
+      <Flex mt={5} flexDir={'column'} width={'100%'}>
         <DataTable
-          columns={columns}
-          data={data?.intersectingVulns || []}
-          customStyles={customStyles}
           subHeader
+          columns={columns}
+          className={tableClassName}
+          data={data?.intersectingVulns || []}
+          customStyles={customStyles(headColor)}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeaderComponent={subHeaderComponentMemo}

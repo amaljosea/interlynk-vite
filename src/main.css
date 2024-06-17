@@ -196,30 +196,16 @@
   border-radius: 5px;
 }
 
-/* DataTable.css */
-.rdt_TableCol {
-  background: transparent !important;
-  background-color: transparent !important;
-}
-
-.rdt_Table {
-  background: transparent !important;
-  background-color: transparent !important;
-}
-
 .rdt_TableHeadRow {
-  background: transparent !important;
   background-color: transparent !important;
 }
 
-.rdt_Table {
-  background: transparent !important;
-  background-color: transparent !important;
+.diff_light .rdt_TableHeadRow {
+  background-color: #fff !important;
 }
 
-.rdt_TableRow {
-  background: transparent !important;
-  background-color: transparent !important;
+.diff_dark .rdt_TableHeadRow {
+  background-color: #2d3748 !important;
 }
 
 .ezkotw {
@@ -246,4 +232,9 @@
 .rdtPicker .rdtTimeToggle:hover {
   background: rgba(0, 0, 0, 0.1);
   cursor: pointer;
+}
+
+.chakra-steps {
+  position: sticky;
+  top: 10;
 }
