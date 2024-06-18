@@ -11,6 +11,27 @@ import {
   FaTools
 } from 'react-icons/fa'
 
+export const settingsData = {
+  introduction: {
+    name: 'Introduction',
+    slug: '/docs',
+    children: {
+      overview: {
+        name: 'Overview',
+        slug: '/docs/overview',
+        component: () => <p>Text</p>,
+        section: 'Overview'
+      },
+      gettingStarted: {
+        name: 'Getting started',
+        slug: '/docs/getting-started',
+        component: () => <p>Text</p>,
+        section: 'Overview'
+      }
+    }
+  }
+}
+
 export const ruleSubjectOperatorMapping = [
   {
     category: 'Component',

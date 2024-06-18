@@ -33,8 +33,8 @@ const Connections = () => {
 
   return (
     <>
-      <Card p='16px'>
-        <CardHeader p='12px 5px' mb='12px'>
+      <Card p={0}>
+        <CardHeader p='12px 0' mb='12px'>
           <Text fontSize='lg' fontWeight='bold'>
             Connected Accounts
           </Text>

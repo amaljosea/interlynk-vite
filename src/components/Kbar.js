@@ -8,7 +8,7 @@ import {
   useMatches,
   useRegisterActions
 } from 'kbar'
-import { useMemo } from 'react'
+import { Fragment, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getUserType } from 'utils/url'
 
@@ -16,6 +16,8 @@ import { SearchIcon } from '@chakra-ui/icons'
 import { useColorModeValue } from '@chakra-ui/system'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import useSettingActions from 'hooks/useSettingActions'
+import useThemeActions from 'hooks/useThemeAction'
 
 import { GetProductTable } from 'graphQL/Queries'
 
@@ -23,7 +25,7 @@ import { FaRegWindowMaximize } from 'react-icons/fa'
 
 const Kbar = () => {
   // hooks
-  const { results } = useMatches()
+  const { results, rootActionId } = useMatches()
   const userType = getUserType()
   const navigate = useNavigate()
 
@@ -62,7 +64,71 @@ const Kbar = () => {
     )
   }
 
+  useThemeActions()
+  useSettingActions()
   useRegisterActions(data, [productData])
+
+  const ResultItem = ({ item, active, currentRootActionId }) => {
+    const ancestors = useMemo(() => {
+      if (!currentRootActionId) return item.ancestors
+      const index = item?.ancestors?.findIndex(
+        (ancestor) => ancestor?.id === currentRootActionId
+      )
+      return item?.ancestors?.slice(index + 1)
+    }, [item.ancestors, currentRootActionId])
+
+    if (typeof item === 'string') {
+      return <div className='kbar_result_header'>{item}</div>
+    }
+
+    return (
+      <div
+        className='kbar_result_item_container'
+        style={{ background: active ? textHoverColor : 'none' }}
+      >
+        <div className='kbar_result_item'>
+          {/* icon */}
+          <div>{item?.icon}</div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div>
+              {ancestors.length > 0 &&
+                ancestors.map((ancestor) => (
+                  <Fragment key={ancestor.id}>
+                    <span
+                      style={{
+                        opacity: 0.5,
+                        marginRight: 8,
+                        fontSize: '14px'
+                      }}
+                    >
+                      {ancestor.name}
+                    </span>
+                    <span
+                      style={{
+                        marginRight: 8
+                      }}
+                    >
+                      &rsaquo;
+                    </span>
+                  </Fragment>
+                ))}
+              {/* name */}
+              <span
+                className='kbar_result_item_name'
+                style={{ fontSize: '14px' }}
+              >
+                {item.name}
+              </span>
+            </div>
+            {/* subtitle */}
+            {item.subtitle && (
+              <span style={{ fontSize: 12 }}>{item.subtitle}</span>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <KBarPortal>
@@ -80,30 +146,13 @@ const Kbar = () => {
               <div className='kbar_result_body'>
                 <KBarResults
                   items={results}
-                  onRender={({ item, active }) =>
-                    typeof item === 'string' ? (
-                      // section header
-                      <div className='kbar_result_header'>{item}</div>
-                    ) : (
-                      // each single item
-                      <div
-                        className='kbar_result_item_container'
-                        style={{ background: active ? textHoverColor : 'none' }}
-                      >
-                        <div className='kbar_result_item'>
-                          {/* icon */}
-                          <div>{item?.icon}</div>
-                          {/* name and subtitle */}
-                          <div
-                            className='kbar_result_item_name'
-                            style={{ fontSize: '14px' }}
-                          >
-                            {item?.name}
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  }
+                  onRender={({ item, active }) => (
+                    <ResultItem
+                      item={item}
+                      active={active}
+                      currentRootActionId={rootActionId}
+                    />
+                  )}
                 />
               </div>
             )}

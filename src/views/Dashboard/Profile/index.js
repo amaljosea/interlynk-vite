@@ -69,15 +69,19 @@ function Profile() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
-  const activeOrgTabNumber = Math.max(orgTabs.indexOf(activetab), 0)
   const org = localStorage.getItem('organization')
   const { totalRows, userPermissions } = useGlobalState()
 
+  const [orgIndex, setOrgIndex] = useState(0)
   const [psIndex, setPsIndex] = useState(0)
 
   useEffect(() => {
     if (activetab) {
-      setPsIndex(Math.max(psTabs.indexOf(activetab), 0))
+      if (orgTabs?.includes(activetab)) {
+        setOrgIndex(Math.max(orgTabs.indexOf(activetab), 0))
+      } else {
+        setPsIndex(Math.max(psTabs.indexOf(activetab), 0))
+      }
     }
   }, [activetab])
 
@@ -183,7 +187,7 @@ function Profile() {
           <Tabs
             w={'100%'}
             variant='enclosed'
-            defaultIndex={activeOrgTabNumber}
+            index={orgIndex}
             onChange={onOrgTabChange}
           >
             <TabList>

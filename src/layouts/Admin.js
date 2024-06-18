@@ -12,7 +12,7 @@ import Kbar from 'components/Kbar'
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 
-import { FaMoon, FaRegFile, FaSun } from 'react-icons/fa6'
+import { FaRegFile } from 'react-icons/fa6'
 
 import { getActiveNavbar, getActiveRoute } from '../utils'
 import { logoutUser } from '../utils/authUtils'
@@ -21,7 +21,7 @@ export default function Admin() {
   const authToken = Cookies.get('authToken')
   const tabRes = window.matchMedia('(max-width: 1199px)')
   const navigate = useNavigate()
-  const { colorMode, setColorMode } = useColorMode()
+  const { colorMode } = useColorMode()
 
   document.documentElement.dir = 'ltr'
   // Chakra Color Mode
@@ -70,20 +70,6 @@ export default function Admin() {
       section: 'navigation',
       icon: <FaRegFile color='#718096' />,
       perform: () => navigate('/vendor/policies')
-    },
-    {
-      id: 'dark',
-      name: 'Dark Mode',
-      section: 'utilities',
-      icon: <FaMoon color='#718096' />,
-      perform: () => setColorMode('dark')
-    },
-    {
-      id: 'light',
-      name: 'Light Mode',
-      section: 'utilities',
-      icon: <FaSun color='#718096' />,
-      perform: () => setColorMode('light')
     }
   ]
 

@@ -173,10 +173,10 @@
 
 .kbar_result_header {
   font-size: small;
-  text-transform: capitalize;
+  text-transform: uppercase;
   font-weight: 600;
   color: #4a5568;
-  letter-spacing: 0.005em;
+  letter-spacing: 0.01rem;
   padding: 0.5rem 1rem;
 }
 

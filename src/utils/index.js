@@ -581,6 +581,15 @@ export const findUniqueItems = (currentArray, importArray) => {
   return uniqueItems
 }
 
+export function generateRandomId(length = 12) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+  let randomId = ''
+  for (let i = 0; i < length; i++) {
+    randomId += characters.charAt(Math.floor(Math.random() * characters.length))
+  }
+  return randomId
+}
+
 export const customStyles = (headColor) => {
   return {
     headCells: {
