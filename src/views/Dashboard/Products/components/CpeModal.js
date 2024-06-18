@@ -193,28 +193,32 @@ const CpeModal = ({
   // ON CPE UPDATE
   const handleComUpdate = () => {
     disableButtonTemporarily()
-    if (validateCpe(cpeString)) {
-      updateComponent({
-        variables: {
-          id: component?.id,
-          sbomId: sbomId,
-          cpes: [cpeString]
-        }
-      })
-        .then(() => {
-          if (friendlyId) {
-            healthRecheck({
-              variables: {
-                checkId: friendlyId,
-                compId: component?.id,
-                sbomId: sbomId
-              }
-            }).then((res) => res?.data && refetch())
+    if (resolved) {
+      onClose()
+    } else {
+      if (validateCpe(cpeString)) {
+        updateComponent({
+          variables: {
+            id: component?.id,
+            sbomId: sbomId,
+            cpes: [cpeString]
           }
         })
-        .finally(() => onClose())
-    } else {
-      setError('Invalid CPE')
+          .then(() => {
+            if (friendlyId) {
+              healthRecheck({
+                variables: {
+                  checkId: friendlyId,
+                  compId: component?.id,
+                  sbomId: sbomId
+                }
+              }).then((res) => res?.data && refetch())
+            }
+          })
+          .finally(() => onClose())
+      } else {
+        setError('Invalid CPE')
+      }
     }
   }
 

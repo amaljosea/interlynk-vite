@@ -126,25 +126,29 @@ const PurlModal = ({
 
   const handleComUpdate = () => {
     disableButtonTemporarily()
-    updateComponent({
-      variables: {
-        id: component?.id,
-        sbomId: sbomId,
-        purl: purlString
-      }
-    })
-      .then(() => {
-        if (friendlyId) {
-          healthRecheck({
-            variables: {
-              checkId: friendlyId,
-              compId: component?.id,
-              sbomId: sbomId
-            }
-          }).then((res) => res?.data && refetch())
+    if (resolved) {
+      onClose()
+    } else {
+      updateComponent({
+        variables: {
+          id: component?.id,
+          sbomId: sbomId,
+          purl: purlString
         }
       })
-      .finally(() => onClose())
+        .then(() => {
+          if (friendlyId) {
+            healthRecheck({
+              variables: {
+                checkId: friendlyId,
+                compId: component?.id,
+                sbomId: sbomId
+              }
+            }).then((res) => res?.data && refetch())
+          }
+        })
+        .finally(() => onClose())
+    }
   }
 
   const isAutoComplete =

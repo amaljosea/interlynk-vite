@@ -96,28 +96,32 @@ const SupplierModal = ({
 
   const handleSave = () => {
     disableButtonTemporarily()
-    createSupplier({
-      variables: {
-        name: orgName,
-        url: orgUrl,
-        contactName: supName,
-        contactEmail: supEmail,
-        componentId: component?.id || id
-      }
-    })
-      .then((res) => {
-        res?.data && refetch()
-        if (friendlyId) {
-          healthRecheck({
-            variables: {
-              sbomId: sbomId,
-              checkId: friendlyId,
-              compId: component?.id
-            }
-          })
+    if (resolved) {
+      onClose()
+    } else {
+      createSupplier({
+        variables: {
+          name: orgName,
+          url: orgUrl,
+          contactName: supName,
+          contactEmail: supEmail,
+          componentId: component?.id || id
         }
       })
-      .finally(() => onClose())
+        .then((res) => {
+          res?.data && refetch()
+          if (friendlyId) {
+            healthRecheck({
+              variables: {
+                sbomId: sbomId,
+                checkId: friendlyId,
+                compId: component?.id
+              }
+            })
+          }
+        })
+        .finally(() => onClose())
+    }
   }
 
   const handleUpdate = () => {

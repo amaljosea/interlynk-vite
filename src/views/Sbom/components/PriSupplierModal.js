@@ -109,24 +109,28 @@ const PriSupplierModal = ({
 
   const handleSave = () => {
     disableButtonTemporarily()
-    createSupplier({
-      variables: {
-        name: orgName,
-        url: orgUrl,
-        contactName: supName,
-        contactEmail: supEmail,
-        sbomId: sbomId
-      }
-    })
-      .then((res) => {
-        res?.data && refetch()
-        if (friendlyId) {
-          healthRecheck({
-            variables: { sbomId: sbomId, checkId: friendlyId }
-          })
+    if (resolved) {
+      onClose()
+    } else {
+      createSupplier({
+        variables: {
+          name: orgName,
+          url: orgUrl,
+          contactName: supName,
+          contactEmail: supEmail,
+          sbomId: sbomId
         }
       })
-      .finally(() => onClose())
+        .then((res) => {
+          res?.data && refetch()
+          if (friendlyId) {
+            healthRecheck({
+              variables: { sbomId: sbomId, checkId: friendlyId }
+            })
+          }
+        })
+        .finally(() => onClose())
+    }
   }
 
   const handleUpdate = () => {

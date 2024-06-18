@@ -151,50 +151,50 @@ const GeneralDataDrawer = ({
     } else {
       setError('')
       disableButtonTemporarily()
+      if (!resolved) {
+        if (creationTools.length > 0) {
+          creationTools.map((item) => {
+            createTool({
+              variables: {
+                name: item.name,
+                version: item.version,
+                vendor: item.vendor,
+                sbomID: sbomId
+              }
+            }).then((res) => res?.data && refetch())
+          })
+        }
 
-      if (creationTools.length > 0) {
-        creationTools.map((item) => {
-          createTool({
-            variables: {
-              name: item.name,
-              version: item.version,
-              vendor: item.vendor,
-              sbomID: sbomId
-            }
-          }).then((res) => res?.data && refetch())
-        })
-      }
+        if (authorList.length > 0) {
+          authorList.map((item) => {
+            createAuthor({
+              variables: {
+                name: item.name,
+                email: item.email,
+                sbomId: sbomId
+              }
+            }).then((res) => res?.data && refetch())
+          })
+        }
 
-      if (authorList.length > 0) {
-        authorList.map((item) => {
-          createAuthor({
+        if (friendlyId && (creationTools.length > 0 || authorList.length > 0)) {
+          healthRecheck({
             variables: {
-              name: item.name,
-              email: item.email,
+              checkId: friendlyId,
               sbomId: sbomId
             }
           }).then((res) => res?.data && refetch())
-        })
-      }
+        }
 
-      if (friendlyId && (creationTools.length > 0 || authorList.length > 0)) {
-        healthRecheck({
-          variables: {
-            checkId: friendlyId,
-            sbomId: sbomId
-          }
-        }).then((res) => res?.data && refetch())
+        if (friendlyId && (creationTools.length > 0 || authorList.length > 0)) {
+          healthRecheck({
+            variables: {
+              checkId: friendlyId,
+              sbomId: sbomId
+            }
+          }).then((res) => res?.data && refetch())
+        }
       }
-
-      if (friendlyId && (creationTools.length > 0 || authorList.length > 0)) {
-        healthRecheck({
-          variables: {
-            checkId: friendlyId,
-            sbomId: sbomId
-          }
-        }).then((res) => res?.data && refetch())
-      }
-
       onClose()
     }
   }
@@ -229,18 +229,21 @@ const GeneralDataDrawer = ({
     }
   ]
 
-  const actionsAttributes = authorList?.length > 0 && [
-    {
-      subject: 'version',
-      field: 'version_author_name',
-      value: authorList[0].name
-    },
-    {
-      subject: 'version',
-      field: 'version_author_email',
-      value: authorList[0].email
-    }
-  ]
+  const actionsAttributes =
+    authorList?.length > 0
+      ? [
+          {
+            subject: 'version',
+            field: 'version_author_name',
+            value: authorList[0].name
+          },
+          {
+            subject: 'version',
+            field: 'version_author_email',
+            value: authorList[0].email
+          }
+        ]
+      : []
 
   const handleRuleCreate = async () => {
     if (ruleExists) {

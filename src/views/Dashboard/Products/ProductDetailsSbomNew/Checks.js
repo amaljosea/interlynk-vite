@@ -45,9 +45,9 @@ import {
   CpeAutoComplete,
   GetCheckFilterData,
   GetCheckResults,
+  GetExistingRules,
   GetProductData
 } from 'graphQL/Queries'
-import { GetExistingRules } from 'graphQL/Queries'
 
 import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'

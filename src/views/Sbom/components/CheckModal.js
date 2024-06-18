@@ -132,30 +132,34 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
 
   const handleComUpdate = () => {
     disableButtonTemporarily()
-    updateComponent({
-      variables: {
-        sbomId: sbomId,
-        id: isPrimary ? activeComp?.id : componentId,
-        primary: isPrimary ? true : undefined,
-        kind: isComponentType ? compType : undefined,
-        version: isComponentVersion ? compVersion : undefined,
-        licenses: {
-          licensesExp: isPrimary ? undefined : expLicense || undefined
-        }
-      }
-    })
-      .then((res) => {
-        if (res?.data) {
-          healthRecheck({
-            variables: {
-              sbomId: sbomId,
-              checkId: friendlyId,
-              compId: isPrimary ? activeComp?.id : componentId
-            }
-          }).then((res) => res?.data && refetch())
+    if (resolved) {
+      onClose()
+    } else {
+      updateComponent({
+        variables: {
+          sbomId: sbomId,
+          id: isPrimary ? activeComp?.id : componentId,
+          primary: isPrimary ? true : undefined,
+          kind: isComponentType ? compType : undefined,
+          version: isComponentVersion ? compVersion : undefined,
+          licenses: {
+            licensesExp: isPrimary ? undefined : expLicense || undefined
+          }
         }
       })
-      .finally(() => onClose())
+        .then((res) => {
+          if (res?.data) {
+            healthRecheck({
+              variables: {
+                sbomId: sbomId,
+                checkId: friendlyId,
+                compId: isPrimary ? activeComp?.id : componentId
+              }
+            }).then((res) => res?.data && refetch())
+          }
+        })
+        .finally(() => onClose())
+    }
   }
 
   const handleComponentChange = (e) => {
@@ -261,6 +265,8 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
           value: compVersion
         }
       ]
+    } else {
+      return []
     }
   }
 
