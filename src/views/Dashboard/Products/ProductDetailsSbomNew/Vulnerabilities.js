@@ -835,26 +835,43 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                 >
                   Edit Links
                 </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    if (jiraConfigWarning) {
-                      toast({
-                        title: 'Jira Configuration not set.',
-                        description:
-                          'Please configure Jira connections in the Organization Settings -> Connections.',
-                        status: 'error',
-                        duration: 5000,
-                        isClosable: true,
-                        position: 'top'
-                      })
-                    } else {
-                      setActiveRow(row)
-                      onJiraOpen()
-                    }
-                  }}
-                >
-                  Create Jira Ticket
-                </MenuItem>
+                {row?.externalUrls?.find(
+                  (externalUrl) => externalUrl.name === 'issue-tracker'
+                ) ? (
+                  <MenuItem
+                    onClick={() => {
+                      window.open(
+                        row.externalUrls.find(
+                          (externalUrl) => externalUrl.name === 'issue-tracker'
+                        ).url,
+                        '_blank'
+                      )
+                    }}
+                  >
+                    View Jira Ticket
+                  </MenuItem>
+                ) : (
+                  <MenuItem
+                    onClick={() => {
+                      if (jiraConfigWarning) {
+                        toast({
+                          title: 'Jira Configuration not set.',
+                          description:
+                            'Please configure Jira connections in the Organization Settings -> Connections.',
+                          status: 'error',
+                          duration: 5000,
+                          isClosable: true,
+                          position: 'top'
+                        })
+                      } else {
+                        setActiveRow(row)
+                        onJiraOpen()
+                      }
+                    }}
+                  >
+                    Create Jira Ticket
+                  </MenuItem>
+                )}
               </MenuList>
             </Portal>
           </Menu>
