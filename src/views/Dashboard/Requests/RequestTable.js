@@ -319,7 +319,11 @@ const RequestTable = ({
                 </MenuItem>
                 <MenuItem onClick={() => handleResend(row)}>Resend</MenuItem>
                 <MenuItem
-                  isDisabled={row.blob || row.status === 'Canceled'}
+                  isDisabled={
+                    row.blob ||
+                    row.status === 'Canceled' ||
+                    row.status === 'Declined'
+                  }
                   color='red'
                   onClick={() => {
                     onWarningOpen()

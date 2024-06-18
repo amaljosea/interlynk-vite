@@ -21,7 +21,7 @@ const WarningModal = ({
     <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Warning</ModalHeader>
+        <ModalHeader>Cancel Request</ModalHeader>
         <ModalCloseButton />
         <ModalBody>Are you sure you want to cancel this request?</ModalBody>
         <ModalFooter>
