@@ -18,6 +18,7 @@ import {
   FaWindowMaximize
 } from 'react-icons/fa'
 import { FaFileImport, FaToolbox } from 'react-icons/fa6'
+import { IoMdAnalytics } from 'react-icons/io'
 import { MdPolicy } from 'react-icons/md'
 
 export const dashRoutes = [
@@ -74,6 +75,13 @@ export const dashRoutes = [
   //   component: Feed,
   //   layout: '/vendor'
   // },
+  {
+    path: '/analytics',
+    name: 'Analytics',
+    icon: <IoMdAnalytics color='inherit' />,
+    component: () => 'Analytics',
+    layout: '/vendor'
+  },
   {
     path: '/tools',
     name: 'Tools',

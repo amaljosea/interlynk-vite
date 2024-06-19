@@ -10,6 +10,7 @@ import PubProducts from 'views/Customer/Products'
 import PubProductDetails from 'views/Customer/Products/ProductDetails'
 import PubProductList from 'views/Customer/Products/ProductList'
 import PubSbomDetails from 'views/Customer/Sbom/index.js'
+import Analytics from 'views/Dashboard/Analytics/index.js'
 import Dashboard from 'views/Dashboard/Dashboard'
 import Policies from 'views/Dashboard/Policies'
 import Products from 'views/Dashboard/Products'
@@ -93,6 +94,7 @@ export const MainRoutes = () => {
           {/* <Route path={`SAG`} element={<Sag />} /> */}
           <Route path={`vulnerabilities`} element={<Vulnerabilities />} />
           <Route path={`licenses`} element={<Licenses />} />
+          <Route path={`analytics`} element={<Analytics />} />
           <Route path={`tools`} element={<Tools />} />
           <Route path={`support`} element={<Support />} />
           <Route path={`policies`} element={<Policies />} />
