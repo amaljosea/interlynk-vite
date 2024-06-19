@@ -56,7 +56,6 @@ import Pagination from '../Pagination'
 const ProductTable = ({
   data,
   refetch,
-  reset,
   loading,
   filters,
   setFilters,
@@ -87,20 +86,11 @@ const ProductTable = ({
 
   const { prodDispatch } = dispatch
 
-  const handleRefetch = () => {
-    refetch()
-    reset()
-  }
-
   const [filterText, setFilterText] = useState(search || '')
   const [activeRow, setActiveRow] = useState(null)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isOpenProduct,
-    onOpen: onOpenProduct,
-    onClose: onCloseProduct
-  } = useDisclosure()
+
   const {
     isOpen: isOpenUpload,
     onOpen: onOpenUpload,
@@ -180,19 +170,13 @@ const ProductTable = ({
     }
   })
 
-  const [deleteProjectGroup] = useMutation(DeleteProjectGroup, {
-    onCompleted: () => refetch()
-  })
+  const [deleteProjectGroup] = useMutation(DeleteProjectGroup)
 
   const onProductDelete = useCallback(async () => {
     await deleteProjectGroup({ variables: { id: activeRow.id } }).then(
       (res) => res.data && onDeleteClose()
     )
   }, [deleteProjectGroup, activeRow, onDeleteClose])
-
-  const handleRefresh = useCallback(async () => {
-    refetch()
-  }, [refetch])
 
   const setSearchFilter = useCallback(
     (value) => {
@@ -283,13 +267,16 @@ const ProductTable = ({
               colorScheme='blue'
               variant='solid'
               hidden={signedUrlParams}
-              onClick={onOpenProduct}
+              onClick={() => {
+                setActiveRow(null)
+                onOpen()
+              }}
             />
           </Tooltip>
           {/* REFRESH */}
           <Tooltip label='Refresh'>
             <IconButton
-              onClick={handleRefresh}
+              onClick={refetch}
               colorScheme='blue'
               icon={<RepeatIcon />}
             />
@@ -305,8 +292,8 @@ const ProductTable = ({
     signedUrlParams,
     enabled,
     onFilterActive,
-    onOpenProduct,
-    handleRefresh
+    onOpen,
+    refetch
   ])
 
   // COLUMNS
@@ -591,30 +578,9 @@ const ProductTable = ({
         />
       )}
 
-      {/* CREATE PRODUCT */}
-      {isOpenProduct && (
-        <ProductModal
-          isOpen={isOpenProduct}
-          totalRows={totalRows}
-          onClose={onCloseProduct}
-          id={null}
-          product={null}
-          description={null}
-          allProjects={null}
-        />
-      )}
-
       {/* UPDATE PRODUCT */}
       {isOpen && data && (
-        <ProductModal
-          id={activeRow.id}
-          isOpen={isOpen}
-          onClose={onClose}
-          product={activeRow.name}
-          description={activeRow.description}
-          allProjects={data.nodes}
-          activeEnv={productId}
-        />
+        <ProductModal isOpen={isOpen} onClose={onClose} data={activeRow} />
       )}
 
       {/* DELETE */}
@@ -658,8 +624,6 @@ const ProductTable = ({
           isOpen={isWarningOpen}
           onClose={onWarningClose}
           group={activeRow}
-          grouId={null}
-          refetch={handleRefetch}
         />
       )}
 

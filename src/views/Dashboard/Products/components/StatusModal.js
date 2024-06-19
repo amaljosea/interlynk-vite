@@ -1,5 +1,4 @@
 import { useMutation } from '@apollo/client'
-import { useState } from 'react'
 
 import {
   Button,
@@ -18,54 +17,44 @@ import {
 
 import { UpdateProjectGroup } from 'graphQL/Mutation'
 
-const StatusModal = ({ isOpen, onClose, group, grouId, refetch }) => {
-  const [isLoading, setIsLoading] = useState(false)
-
+const StatusModal = ({ isOpen, onClose, group }) => {
   const { id, enabled } = group
 
-  const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
+  const [projectGroupUpdate, { loading }] = useMutation(UpdateProjectGroup)
 
   // TOGGLE STATUS
   const toggleStatus = async () => {
-    setIsLoading(true)
     await projectGroupUpdate({
       variables: {
         id: id,
         enabled: enabled === true ? false : true
       }
+    }).then((res) => {
+      const errors = res?.data?.projectGroupUpdate?.errors
+      if (errors?.length === 0) {
+        console.log(errors[0])
+      } else {
+        onClose()
+      }
     })
-      .then((res) => {
-        if (res?.data?.projectGroupUpdate?.errors?.length === 0) {
-          setIsLoading(false)
-          if (grouId) {
-            refetch({ id: id })
-          } else {
-            refetch()
-          }
-        }
-      })
-      .finally(() => onClose())
   }
+
+  const status = enabled ? 'Disable' : 'Enable'
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>{enabled ? 'Disable' : 'Enable'} Product</ModalHeader>
+        <ModalHeader>{status} Product</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text>{enabled ? 'Disable' : 'Enable'} this product will: </Text>
+          <Text>{status} this product will: </Text>
           <UnorderedList>
             <Flex flexDir={'column'} gap={1} mt={4}>
               {[
-                `${
-                  enabled ? 'Disable' : 'Enable'
-                } this product, its versions and SBOMs`,
-                `${
-                  enabled ? 'Disable' : 'Enable'
-                } access to the product for all users`,
-                `${
-                  enabled ? 'Disable' : 'Enable'
-                } uploads of SBOMs to this product`
+                `${status} this product, its versions and SBOMs`,
+                `${status} access to the product for all users`,
+                `${status} uploads of SBOMs to this product`
               ].map((item, index) => (
                 <ListItem key={index}>{item}</ListItem>
               ))}
@@ -78,10 +67,10 @@ const StatusModal = ({ isOpen, onClose, group, grouId, refetch }) => {
             No
           </Button>
           <Button
-            colorScheme={enabled ? 'red' : 'green'}
+            isLoading={loading}
             onClick={toggleStatus}
-            isLoading={isLoading}
             loadingText='Updating....'
+            colorScheme={enabled ? 'red' : 'green'}
           >
             Yes
           </Button>

@@ -159,7 +159,7 @@ const ProductDetailsMain = () => {
   })
 
   const { projectGroup } = data || ''
-  const { id, name, description, enabled } = projectGroup || ''
+  const { name, description, enabled } = projectGroup || ''
 
   const {
     data: settings,
@@ -248,9 +248,7 @@ const ProductDetailsMain = () => {
     }
   })
 
-  const [projectDelete] = useMutation(DeleteProjectGroup, {
-    onCompleted: () => refetch({ id: productId })
-  })
+  const [projectDelete] = useMutation(DeleteProjectGroup)
 
   const activeTab = Number(localStorage.getItem('activeProdTab'))
 
@@ -560,12 +558,9 @@ const ProductDetailsMain = () => {
       {/* CREATE PRODUCT */}
       {data && isOpenProduct && (
         <ProductModal
-          description={description}
-          product={name}
-          id={id}
           onClose={onCloseProduct}
           isOpen={isOpenProduct}
-          refetch={refetch}
+          data={projectGroup}
         />
       )}
 
