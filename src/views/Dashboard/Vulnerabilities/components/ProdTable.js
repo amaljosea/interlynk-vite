@@ -12,11 +12,9 @@ import {
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
-  Box,
   Button,
   Flex,
   IconButton,
-  Select,
   Stack,
   Tag,
   TagLabel,
@@ -30,26 +28,37 @@ import CustomLoader from 'components/CustomLoader'
 import ConnectedSbomDrawer from 'components/Drawer/ConnectedSbomDrawer'
 import ComponentCard from 'components/Misc/ComponentCard'
 import VersionCard from 'components/Misc/VersionCard'
+import Pagination from 'components/Pagination'
 
-import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetConnectedSbom } from 'graphQL/Queries'
+import { GetCompVulnData } from 'graphQL/Queries'
 
 import { FaFolderTree } from 'react-icons/fa6'
 
 import VexModal from './VexModal'
 import VulnFilters from './VulnsFilter'
 
-const VulnProdTable = ({ data, vuln, refetch }) => {
+const VulnProdTable = ({ vulnId, sbomVersions }) => {
   const params = useParams()
-  const id = params.vulnerabilityid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
-  const { totalRows, setTotalRows, compVulnState, dispatch } = useGlobalState()
-  const { pageIndex, searchInput, envs, statuses, versions } = compVulnState
-  const { compVulnDispatch } = dispatch
+  const [vulnState, setVulnState] = useState({
+    vexComplete: false
+  })
+
+  const { nodes, paginationProps, refetch, loading, reset } =
+    usePaginatatedQuery(GetCompVulnData, {
+      skip: vulnId ? false : true,
+      selector: 'componentVulns',
+      variables: {
+        ...vulnState,
+        id: vulnId
+      }
+    })
 
   const [getSboms, { data: connectedSboms }] = useLazyQuery(GetConnectedSbom)
 
@@ -76,9 +85,8 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
   const [selectedVulns, setSelectedVulns] = useState([])
   const [selectedGroup, setSelectedGroup] = useState('')
   const [filterInput, setFilterInput] = useState('')
+  const [checkEquals, setCheckEquals] = useState(false)
   const [toggleClear, setToggleClear] = useState(false)
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
 
   const handlePreview = async (row) => {
@@ -94,16 +102,6 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       console.log(res?.data)
       onSbomOpen()
     })
-  }
-
-  const setPaginationControl = (data) => {
-    setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data?.pageInfo?.hasNextPage)
-  }
-
-  const disablePaginationControl = () => {
-    setIsPrevActive(false)
-    setIsNextActive(false)
   }
 
   // COLUMNS
@@ -235,53 +233,40 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     }
   ]
 
+  const setSearchFilter = useCallback(
+    (value) => {
+      setVulnState((oldFilter) => ({
+        ...oldFilter,
+        search: value
+      }))
+      reset()
+    },
+    [reset]
+  )
+
   // SEARCH COMPONENT
   const handleSearch = useCallback(
     async (event) => {
-      const { value } = event.target
-      if (event.key === 'Enter' && filterInput !== '') {
-        refetch({
-          id,
-          first: totalRows,
-          last: undefined,
-          search: value,
-          projectNames: envs?.length === 0 ? undefined : envs,
-          versions: versions?.length === 0 ? undefined : versions,
-          statuses: statuses?.length === 0 ? undefined : statuses
-        }).then(
-          (res) =>
-            res.data &&
-            compVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-        )
+      const {
+        key,
+        target: { value }
+      } = event
+      if (key === 'Enter' && value !== '') {
+        setSearchFilter(value)
       }
     },
-    [
-      compVulnDispatch,
-      envs,
-      filterInput,
-      id,
-      refetch,
-      statuses,
-      totalRows,
-      versions
-    ]
+    [setSearchFilter]
   )
 
   // CLEAR SERACH
-  const handleClear = useCallback(async () => {
+  const handleClear = useCallback(() => {
     setFilterInput('')
-    await refetch({
-      id,
-      first: totalRows,
-      last: undefined,
-      search: undefined,
-      projectNames: envs?.length === 0 ? undefined : envs,
-      versions: versions?.length === 0 ? undefined : versions,
-      statuses: statuses?.length === 0 ? undefined : statuses
-    }).then(
-      (res) => res.data && compVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-    )
-  }, [compVulnDispatch, envs, id, refetch, statuses, totalRows, versions])
+    setVulnState((oldFilter) => ({
+      ...oldFilter,
+      search: undefined
+    }))
+    reset()
+  }, [reset])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -312,7 +297,13 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
             onClear={handleClear}
             onChange={onSearchInputChange}
           />
-          <VulnFilters data={vuln} refetch={refetch} />
+          <VulnFilters
+            sbomVersions={sbomVersions}
+            setFilter={(newFilters) => {
+              setVulnState(newFilters)
+              reset()
+            }}
+          />
         </Stack>
         {/* UPDATE STATUES */}
         {selectedVulns.length > 0 && (
@@ -334,14 +325,12 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     handleSearch,
     handleClear,
     onSearchInputChange,
-    vuln,
-    refetch,
+    sbomVersions,
     selectedVulns.length,
     onOpen,
-    signedUrlParams
+    signedUrlParams,
+    reset
   ])
-
-  const [checkEquals, setCheckEquals] = useState(false)
 
   const handleChange = (state) => {
     setSelectedVulns(state?.selectedRows)
@@ -362,157 +351,38 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     }
   }
 
-  // ON PREV PAGE
-  const handlePreviousPage = async () => {
-    disablePaginationControl()
-    await refetch({
-      id,
-      first: undefined,
-      last: totalRows,
-      after: undefined,
-      before: data?.pageInfo?.startCursor,
-      search: searchInput !== '' ? searchInput : undefined,
-      projectNames: envs?.length === 0 ? undefined : envs,
-      versions: versions?.length === 0 ? undefined : versions,
-      statuses: statuses?.length === 0 ? undefined : statuses
-    }).then((res) => {
-      if (res.data) {
-        const project = res?.data?.componentVulns
-        setPaginationControl(project)
-        compVulnDispatch({
-          type: 'DECREMENT_PAGE',
-          payload: project?.pageInfo.startCursor
-        })
-      }
-    })
-  }
-
-  // ON NEXT PAGE
-  const handleNextPage = async () => {
-    disablePaginationControl()
-    await refetch({
-      id,
-      first: totalRows,
-      last: undefined,
-      after: data?.pageInfo?.endCursor,
-      before: undefined,
-      search: searchInput !== '' ? searchInput : undefined,
-      projectNames: envs?.length === 0 ? undefined : envs,
-      versions: versions?.length === 0 ? undefined : versions,
-      statuses: statuses?.length === 0 ? undefined : statuses
-    }).then((res) => {
-      if (res.data) {
-        const project = res?.data?.componentVulns
-        setPaginationControl(project)
-        compVulnDispatch({
-          type: 'INCREMENT_PAGE',
-          payload: {
-            total: project?.totalCount,
-            after: project?.pageInfo.endCursor
-          }
-        })
-      }
-    })
-  }
-
-  // ON SET ROW
-  const handleSetRow = async (e) => {
-    const { value } = e.target
-    setTotalRows(Number(value))
-    await refetch({ id, first: Number(value), last: undefined }).then((res) => {
-      if (res.data) {
-        compVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      }
-    })
-  }
-
   useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
-    }
-  }, [data])
-
-  useEffect(() => {
-    if (data) {
+    if (nodes) {
       const sortedData =
-        data &&
-        [...data.nodes].sort((a, b) => {
+        nodes &&
+        [...nodes].sort((a, b) => {
           const dateA = new Date(a.updatedAt)
           const dateB = new Date(b.updatedAt)
           return dateB - dateA
         })
       setStatusResults(sortedData)
     }
-  }, [data])
+  }, [nodes])
 
   return (
     <>
       {/* TABLE */}
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
-          columns={columns}
-          data={statusResults || []}
-          customStyles={customStyles(headColor)}
-          progressPending={data ? false : true}
-          progressComponent={<CustomLoader />}
           subHeader
-          subHeaderComponent={subHeaderComponent}
           responsive
-          persistTableHead
           selectableRows
+          persistTableHead
+          columns={columns}
+          progressPending={loading}
+          data={statusResults || []}
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
+          progressComponent={<CustomLoader />}
+          customStyles={customStyles(headColor)}
+          subHeaderComponent={subHeaderComponent}
         />
-
-        {data && (
-          <Flex
-            width={'100%'}
-            flexDir={'row'}
-            gap={4}
-            alignItems={'center'}
-            mt={6}
-            justifyContent={'space-between'}
-            flexWrap={'wrap'}
-          >
-            <Stack alignItems={'center'} direction={'row'} spacing={4}>
-              <Button
-                colorScheme='blue'
-                onClick={handlePreviousPage}
-                isDisabled={!isPrevActive}
-              >
-                Prev
-              </Button>
-              <Button
-                colorScheme='blue'
-                onClick={handleNextPage}
-                isDisabled={!isNextActive}
-              >
-                Next
-              </Button>
-              <Box>
-                Page {pageIndex} of{' '}
-                {data.totalCount === 0
-                  ? 1
-                  : Math.ceil(data.totalCount / totalRows)}
-              </Box>
-            </Stack>
-            <Stack alignItems={'center'} direction={'row'} spacing={4}>
-              <Text>Show</Text>
-              <Select
-                width={20}
-                value={totalRows}
-                onChange={handleSetRow}
-                id='rowlimit'
-                name='rowlimit'
-              >
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </Select>
-            </Stack>
-          </Flex>
-        )}
+        <Pagination {...paginationProps} />
       </Flex>
 
       {isSbomOpen && connectedSboms && (

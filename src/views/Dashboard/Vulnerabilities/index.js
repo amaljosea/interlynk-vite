@@ -1,4 +1,3 @@
-import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 
@@ -10,7 +9,7 @@ import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
-import { GetGlobalVulnData, GetGlobalVulns } from 'graphQL/Queries'
+import { GetGlobalVulns } from 'graphQL/Queries'
 
 import OrgRegister from '../Profile/components/OrgRegister'
 import VulnInfo from './vulnInfo'
@@ -22,8 +21,7 @@ const Vulnerabilities = () => {
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
   const org = localStorage.getItem('organization')
 
-  const { totalRows, compVulnState, userPermissions } = useGlobalState()
-  const { vexComplete } = compVulnState
+  const { userPermissions } = useGlobalState()
 
   const [filters, setFilters] = useState({
     field: 'VULNS_VULN_ID',
@@ -53,26 +51,20 @@ const Vulnerabilities = () => {
     }
   )
 
-  const { data: vulnData, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
-    skip: vulnId ? false : true,
-    variables: {
-      id: vulnId,
-      componentVulnId: vulnId,
-      first: totalRows,
-      vexComplete
-    }
-  })
+  // const { data: vulnData, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
+  //   skip: vulnId ? false : true,
+  //   variables: {
+  //     id: vulnId,
+  //     componentVulnId: vulnId,
+  //     first: totalRows,
+  //     vexComplete
+  //   }
+  // })
 
   if (!org || org === 'undefined') return <OrgRegister />
 
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
-    return (
-      <VulnInfo
-        data={vulnData?.vuln}
-        componentVulns={vulnData?.componentVulns}
-        refetch={getVulnData}
-      />
-    )
+    return <VulnInfo vulnId={vulnId} />
   }
 
   if (productPermissions?.value === false)

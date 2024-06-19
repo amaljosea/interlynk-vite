@@ -675,20 +675,7 @@ export const GetGlobalVulns = gql`
 
 // GET SINGLE GLOBAL VULNERABILITIES
 export const GetGlobalVulnData = gql`
-  query GetGlobalVulnData(
-    $id: Uuid!
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-    $search: String
-    $vexComplete: Boolean
-    $projectIds: [Uuid!]
-    $projectGroupIds: [Uuid!]
-    $projectNames: [String!]
-    $versions: [String!]
-    $statuses: [String!]
-  ) {
+  query GetGlobalVulnData($id: Uuid!) {
     vuln(id: $id) {
       id
       desc
@@ -716,6 +703,25 @@ export const GetGlobalVulnData = gql`
       sbomVersions
       sbomVersionsCount
     }
+  }
+`
+
+// GET COMP VULN DATA
+export const GetCompVulnData = gql`
+  query GetCompVulnData(
+    $id: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $search: String
+    $vexComplete: Boolean
+    $projectIds: [Uuid!]
+    $projectGroupIds: [Uuid!]
+    $projectNames: [String!]
+    $versions: [String!]
+    $statuses: [String!]
+  ) {
     componentVulns(
       vulnId: $id
       after: $after
