@@ -53,6 +53,8 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
 
+  console.log('activeRow', activeRow)
+
   const compRef = useRef()
 
   // GET COMPONENT DATA

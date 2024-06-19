@@ -680,6 +680,7 @@ const Checks = () => {
         const { friendlyId } = row?.organizationRule?.rule || ''
         const fixedIDs = ['SB-HC-4', 'SB-HC-5', 'SB-HC-6', 'SB-HC-16']
         const fixedByDefault = fixedIDs.includes(friendlyId)
+        const isPrimary = friendlyId === 'SB-HC-10'
         return (
           <>
             {status === 'unresolved' && !fixedByDefault && (
@@ -718,10 +719,10 @@ const Checks = () => {
                 fontWeight='normal'
                 colorScheme='whatsapp'
                 leftIcon={<CheckIcon />}
-                onClick={() => onFixedOpen()}
+                onClick={() => (isPrimary ? null : onFixedOpen())}
                 disabled={customerView || !editChecks || !updateSboms}
               >
-                View
+                {isPrimary ? 'Fixed' : 'View'}
               </Button>
             )}
 
@@ -732,10 +733,10 @@ const Checks = () => {
                 variant='solid'
                 colorScheme='whatsapp'
                 leftIcon={<CheckIcon />}
-                onClick={() => onCheckOpen(row)}
+                onClick={() => (isPrimary ? null : onCheckOpen(row))}
                 isLoading={activeRow?.id === id && loadingRules}
               >
-                View
+                {isPrimary ? 'Fixed' : 'View'}
               </Button>
             )}
 
