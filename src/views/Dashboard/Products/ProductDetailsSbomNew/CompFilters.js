@@ -82,8 +82,8 @@ const CompFilters = ({ filters, reset }) => {
             {kinds.length !== 0 && <CheckMark />}
             <MenuHeading title={'Type'} />
             <CustomList
-              options={kinds}
-              value={filterKinds}
+              value={kinds}
+              options={filterKinds}
               onChange={onFilterKind}
             />
           </Menu>
