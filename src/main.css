@@ -238,3 +238,13 @@
   position: sticky;
   top: 10;
 }
+
+.apexcharts-legend-text {
+  margin-top: 0.2rem;
+  font-family: inherit !important;
+}
+
+.apexcharts-tooltip {
+  color: black !important; /* Change this to your desired hover font color */
+  font-family: inherit !important;
+}

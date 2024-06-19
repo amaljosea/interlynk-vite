@@ -1,6 +1,10 @@
 import { gql, useQuery } from '@apollo/client'
 import { round } from 'lodash'
 
+import { Center } from '@chakra-ui/react'
+
+import Card from 'components/Card/Card'
+
 import { SimpleBarChat } from './utils'
 
 const QUERY_QUALITY_SCORE = gql`
@@ -20,10 +24,10 @@ export const QualityScoreGraph = ({ sbomIds }) => {
     }
   })
 
-  console.log({ error })
+  // console.log({ error })
 
   if (error) {
-    return 'Error!'
+    return <Center as={Card}>Error!</Center>
   }
   const formattedScores =
     data?.complianceReports?.nodes.map((i) => ({

@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 
-import { SimpleGrid, Skeleton } from '@chakra-ui/react'
+import { Center, SimpleGrid, Skeleton } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -36,7 +36,7 @@ export const ProductGraphs = () => {
   const sbomIds = items?.map((i) => i.id)
 
   if (error) {
-    return 'Error'
+    return <Center as={Card}>Error</Center>
   }
 
   if (loading) {

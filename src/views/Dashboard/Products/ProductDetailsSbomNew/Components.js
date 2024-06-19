@@ -66,7 +66,9 @@ import {
   FaLightbulb,
   FaSitemap
 } from 'react-icons/fa'
+import { RiFundsBoxFill } from 'react-icons/ri'
 
+import HealthMap from '../components/HealthMap'
 import CompFilters from './CompFilters'
 
 const Components = ({ sbomData, sbomRefetch }) => {
@@ -194,6 +196,11 @@ const Components = ({ sbomData, sbomRefetch }) => {
     isOpen: isLinkOpen,
     onOpen: onLinkOpen,
     onClose: onLinkClose
+  } = useDisclosure()
+  const {
+    isOpen: isMapOpen,
+    onOpen: onMapOpen,
+    onClose: onMapClose
   } = useDisclosure()
   const {
     isOpen: isRelationOpen,
@@ -990,6 +997,8 @@ const Components = ({ sbomData, sbomRefetch }) => {
     [prodCompDispatch, reset]
   )
 
+  const restricted = lifecycle === 'signed' || !updateComponent || !updateSboms
+
   // HEADER SECTION
   const subHeader = useMemo(() => {
     return (
@@ -1024,6 +1033,15 @@ const Components = ({ sbomData, sbomRefetch }) => {
           spacing={2}
           justifyContent={'flex-end'}
         >
+          {/* SHOW HEATMAP */}
+          <Tooltip label='View Health Map'>
+            <IconButton
+              colorScheme='blue'
+              onClick={onMapOpen}
+              icon={<RiFundsBoxFill />}
+              isDisabled={restricted}
+            />
+          </Tooltip>
           {/* CREATE COMPONENT */}
           <Tooltip label='Add Component'>
             <IconButton
@@ -1035,9 +1053,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
               fontWeight='normal'
               fontSize={'sm'}
               hidden={signedUrlParams}
-              isDisabled={
-                lifecycle === 'signed' || !updateComponent || !updateSboms
-              }
+              isDisabled={restricted}
             />
           </Tooltip>
           <Tooltip label='Refresh'>
@@ -1056,11 +1072,10 @@ const Components = ({ sbomData, sbomRefetch }) => {
     handleClear,
     onSearchInputChange,
     compFilters?.sbom?.filters,
+    onMapOpen,
+    restricted,
     onCreateComponent,
     signedUrlParams,
-    lifecycle,
-    updateComponent,
-    updateSboms,
     reset,
     refetch
   ])
@@ -1211,6 +1226,8 @@ const Components = ({ sbomData, sbomRefetch }) => {
           onClose={onCpeClose}
         />
       )}
+
+      {isMapOpen && <HealthMap isOpen={isMapOpen} onClose={onMapClose} />}
     </>
   )
 }
