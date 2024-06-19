@@ -699,8 +699,10 @@ export const validPassword = (value) => {
 }
 
 export const validateEmail = (email) => {
-  const emailRegex = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-  return emailRegex.test(email)
+  const emailRegex = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  // Ensure the email doesn't have consecutive dots in the domain part
+  const hasConsecutiveDots = /\.\./.test(email)
+  return emailRegex.test(email) && !hasConsecutiveDots
 }
 
 export const toast_error_message_duration = 300
