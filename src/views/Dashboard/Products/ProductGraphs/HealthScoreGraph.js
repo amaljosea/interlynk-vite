@@ -1,5 +1,9 @@
 import { useParams } from 'react-router-dom'
 
+import { Center } from '@chakra-ui/react'
+
+import Card from 'components/Card/Card'
+
 import { useSingleHealthScore } from 'hooks/useSingleHealthScore'
 
 import { SimpleBarChat } from './utils'
@@ -52,11 +56,11 @@ export const HealthScoreGraph = ({ sbomIds }) => {
   })
 
   if (loading0 || loading1 || loading2 || loading3 || loading4) {
-    return 'Loading...'
+    return <Center as={Card}>Loading...</Center>
   }
 
   if (error0 || error1 || error2 || error3 || error4) {
-    return 'Error!'
+    return <Center as={Card}>Error!</Center>
   }
 
   const combinedData = [

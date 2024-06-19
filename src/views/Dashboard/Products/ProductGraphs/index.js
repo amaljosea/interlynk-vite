@@ -6,6 +6,8 @@ import { SimpleGrid, Skeleton } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
+
 import { ScoreGraphs } from './ScoreGraphs'
 import {
   SBOM_LIST_WITH_DATA_QUERY,
@@ -19,12 +21,15 @@ import {
 export const ProductGraphs = () => {
   const params = useParams()
   const productId = params.productid
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const { data, loading, error } = useQuery(SBOM_LIST_WITH_DATA_QUERY, {
     variables: {
       projectId: productId
     }
   })
+
+  const totlaColumns = shouldShowDemoFeatures ? 6 : 5
 
   const items = data?.project?.sbomVersions?.nodes
   const count = items?.length
@@ -37,7 +42,7 @@ export const ProductGraphs = () => {
   if (loading) {
     return (
       <SimpleGrid width={'100%'} columns={5} spacing='24px'>
-        {[1, 2, 3, 4, 5].map((item, index) => (
+        {[1, 2, 3, 4, 5].map((_, index) => (
           <Card key={index}>
             <CardBody>
               <Skeleton width={'100%'} height={8} />
@@ -55,7 +60,7 @@ export const ProductGraphs = () => {
   const graphData = formatDataForGraph(items)
 
   return (
-    <SimpleGrid width={'100%'} columns={5} spacing='24px'>
+    <SimpleGrid width={'100%'} columns={totlaColumns} spacing='24px'>
       <SimpleBarChat
         color='#3182ce'
         label={'Component'}
