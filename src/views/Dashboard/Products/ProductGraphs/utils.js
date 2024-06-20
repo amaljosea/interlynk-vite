@@ -37,7 +37,14 @@ export const SBOM_LIST_WITH_DATA_QUERY = gql`
 `
 
 const tooltipCustom = (
-  <Tooltip position={{ x: 0, y: 70 }} wrapperStyle={{ zIndex: 9999 }} />
+  <Tooltip
+    position={{ x: 0, y: 70 }}
+    labelStyle={{ color: '#4A5568', fontWeight: 600 }}
+    wrapperStyle={{
+      zIndex: 9999,
+      fontSize: '12px'
+    }}
+  />
 )
 
 export const SimpleBarChat = ({ label, dataKey, color, data }) => {
