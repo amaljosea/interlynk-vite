@@ -1,19 +1,23 @@
 import { useQuery } from '@apollo/client'
 import React from 'react'
-import ReactApexChart from 'react-apexcharts'
 import { useParams } from 'react-router-dom'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 
 import {
+  Center,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
   DrawerOverlay,
+  Grid,
   SimpleGrid,
+  Skeleton,
+  Stack,
+  Tag,
   Text,
-  useColorModeValue
+  Tooltip
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
@@ -22,12 +26,36 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { GetComponentData } from 'graphQL/Queries'
 
-const createRows = (components, rowSize) => {
-  const rows = []
-  for (let i = 0; i < components?.length; i += rowSize) {
-    rows.push(components?.slice(i, i + rowSize))
+const getBg = (score) => {
+  if (score >= 0 && score < 30) {
+    return 'red.300'
+  } else if (score >= 30 && score < 50) {
+    return 'yellow.300'
+  } else if (score >= 50 && score <= 100) {
+    return 'green.300'
   }
-  return rows
+}
+
+const TooltipData = ({ item }) => {
+  return (
+    <Stack direction={'column'} spacing={0} py={1}>
+      <Text fontSize={'xs'}>Name - {item?.name}</Text>
+      <Text fontSize={'xs'}>Version - {item?.version}</Text>
+      <Text fontSize={'xs'}>Score - {item?.score}</Text>
+    </Stack>
+  )
+}
+
+const HeatMap = ({ data }) => {
+  return (
+    <>
+      {data?.map((item, index) => (
+        <Tooltip key={index} label={<TooltipData item={item} />}>
+          <Center p={4} bg={getBg(item?.score)} />
+        </Tooltip>
+      ))}
+    </>
+  )
 }
 
 const HealthMap = ({ isOpen, onClose }) => {
@@ -37,7 +65,7 @@ const HealthMap = ({ isOpen, onClose }) => {
   const { prodCompState } = useGlobalState()
   const { totalComp } = prodCompState
 
-  const { data } = useQuery(GetComponentData, {
+  const { data, loading } = useQuery(GetComponentData, {
     skip: isOpen ? false : true,
     variables: {
       sbomId: sbomId,
@@ -46,11 +74,6 @@ const HealthMap = ({ isOpen, onClose }) => {
     }
   })
 
-  const legendColor = useColorModeValue('#171923', '#F7FAFC')
-  const lowColor = useColorModeValue('#F56565', '#C53030')
-  const mediumColor = useColorModeValue('#ECC94B', '#ECC94B')
-  const highColor = useColorModeValue('#48BB78', '#48BB78')
-
   const { nodes } = data?.sbom?.components || ''
   const isUnknown = nodes?.filter(
     (item) => item?.cpes?.length === 0 && !item?.purl
@@ -58,107 +81,26 @@ const HealthMap = ({ isOpen, onClose }) => {
   const isKnown = nodes?.filter(
     (item) => item?.cpes?.length === 0 && item?.purl
   )
-  const knownData = createRows(isKnown, 25)
-  const UnKnownData = createRows(isUnknown, 25)
 
-  var options = {
-    chart: {
-      height: 250,
-      type: 'heatmap',
-      toolbar: {
-        tools: {
-          zoomin: false, // Disable zoomIn button
-          zoomout: false, // Disable zoomOut button
-          zoom: false, // Disable zoom functionality if you don't need it at all
-          reset: false, // Disable reset zoom button
-          pan: false, // Disable pan button
-          download: false // Optionally disable download button if you don't need it
-        }
-      },
-      background: 'transparent' // Remove chart background border
-    },
-    grid: {
-      borderColor: 'transparent' // Remove grid border
-    },
-    tooltip: {
-      style: {
-        border: 'none' // Remove tooltip border
-      }
-    },
-    legend: {
-      labels: {
-        colors: legendColor, // Change this to your desired font color
-        fontSize: '14px' // Font size
-      }
-    },
-    xaxis: {
-      labels: {
-        style: {
-          colors: legendColor, // X-axis labels font color
-          fontFamily: 'inherit' // X-axis labels font family
-        }
-      }
-    },
-    yaxis: {
-      labels: {
-        style: {
-          colors: legendColor, // X-axis labels font color
-          fontFamily: 'inherit' // X-axis labels font family
-        }
-      }
-    },
-    plotOptions: {
-      heatmap: {
-        colorScale: {
-          ranges: [
-            {
-              from: -1,
-              to: 0,
-              color: lowColor,
-              name: 'Low'
-            },
-            {
-              from: 1,
-              to: 50,
-              color: mediumColor,
-              name: 'Medium'
-            },
-            {
-              from: 51,
-              to: 100,
-              color: highColor,
-              name: 'High'
-            }
-          ]
-        }
-      }
-    },
-    dataLabels: {
-      enabled: false
-    }
-  }
-
-  const getSeries = (data) => {
-    let newSeries = []
+  const getCategory = (data) => {
+    let results = []
     data?.map((item) => {
-      return newSeries.push({
-        name: item?.length,
-        data: item?.map((row) => {
-          const data = getComponentHealthScoreFromLocalData({
-            componentName: row?.name,
-            componentVersion: row?.version
-          }).healthScore
-          return data
-        })
+      return results.push({
+        name: item?.name,
+        version: item?.version,
+        score: getComponentHealthScoreFromLocalData({
+          componentName: item?.name,
+          componentVersion: item?.version
+        }).healthScore
       })
     })
-    return newSeries
+    return results
   }
 
-  const knownResults = getSeries(knownData)
-  const unknownResults = getSeries(UnKnownData)
-
-  console.log('knownResults', knownResults)
+  const seriesOne = getCategory(isKnown)
+  const seriesTwo = getCategory(isUnknown)
+  const knownData = seriesOne?.sort((a, b) => a?.score - b?.score)
+  const unknownData = seriesTwo?.sort((a, b) => a?.score - b?.score)
 
   return (
     <Drawer
@@ -171,30 +113,39 @@ const HealthMap = ({ isOpen, onClose }) => {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          Components
+        <DrawerHeader borderBottomWidth='1px'>
+          Component Health Heat Map
         </DrawerHeader>
         <DrawerBody>
-          <SimpleGrid width={'100%'} columns={1} spacing='24px'>
-            <Card width={'100%'}>
-              <ReactApexChart
-                options={options}
-                series={knownResults}
-                type='heatmap'
-                height='250'
-              />
-              <Text textAlign={'center'}>Known Components</Text>
-            </Card>
-            <Card width={'100%'}>
-              <ReactApexChart
-                options={options}
-                series={unknownResults}
-                type='heatmap'
-                height='250'
-              />
-              <Text textAlign={'center'}>Unknown Components</Text>
-            </Card>
-          </SimpleGrid>
+          {loading ? (
+            <Stack direction={'column'} p={5} spacing={6}>
+              <Skeleton width={'100%'} height={32} />
+              <Skeleton width={'100%'} height={32} />
+            </Stack>
+          ) : (
+            <SimpleGrid width={'100%'} columns={1} spacing='24px'>
+              <Card width={'100%'}>
+                <Tag colorScheme='blue' width={'fit-content'} mb={6}>
+                  Known Components
+                </Tag>
+                {knownData?.length > 0 && (
+                  <Grid templateColumns='repeat(20, 1fr)' gap={0.5}>
+                    <HeatMap data={knownData} />
+                  </Grid>
+                )}
+              </Card>
+              <Card width={'100%'}>
+                <Tag colorScheme='blue' width={'fit-content'} mb={6}>
+                  Unknown Components
+                </Tag>
+                {unknownData?.length > 0 && (
+                  <Grid templateColumns='repeat(20, 1fr)' gap={0.5}>
+                    <HeatMap data={unknownData} />
+                  </Grid>
+                )}
+              </Card>
+            </SimpleGrid>
+          )}
         </DrawerBody>
       </DrawerContent>
     </Drawer>
