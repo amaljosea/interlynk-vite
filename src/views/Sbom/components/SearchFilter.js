@@ -5,7 +5,6 @@ import { Box, Input } from '@chakra-ui/react'
 
 const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
   const searchInputRef = useRef()
-  const value = filterText?.replace(/\s+/g, '')
 
   const focusSearchInput = () => {
     if (searchInputRef?.current) {
@@ -35,11 +34,11 @@ const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
           type='text'
           placeholder='Search'
           ref={searchInputRef}
-          value={value}
+          value={filterText}
           onChange={onChange}
           onKeyDown={onFilter}
         />
-        {value !== '' && (
+        {filterText !== '' && (
           <CloseIcon
             w={'18px'}
             h={'18px'}
