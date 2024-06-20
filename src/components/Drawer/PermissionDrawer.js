@@ -85,6 +85,50 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, userRole }) => {
 
   const readOnly = activeRole?.name !== 'custom' && userRole !== 'admin'
 
+  const Permissions = ({ category }) => {
+    return (
+      <Box>
+        {activeRole?.permissionsMap
+          ?.filter(
+            (item) =>
+              item.category === category &&
+              item.hidden === null &&
+              item.supersededBy.length > 0
+          )
+          .map((item, index) => (
+            <Checkbox
+              key={index}
+              isChecked={item.value}
+              isReadOnly={readOnly}
+              onChange={(e) => onCheckParent(e, item.category)}
+            >
+              {item.name}
+            </Checkbox>
+          ))}
+        <Stack pl={6} mt={1} spacing={1}>
+          {activeRole?.permissionsMap
+            ?.filter(
+              (item) =>
+                item.category === category &&
+                item.hidden === null &&
+                item.supersededBy.length === 0
+            )
+            .map((item, index) => (
+              <Checkbox
+                key={index}
+                name={item.key}
+                isChecked={item?.value}
+                isReadOnly={readOnly}
+                onChange={(e) => onCheckChild(e, item.category)}
+              >
+                {item.name}
+              </Checkbox>
+            ))}
+        </Stack>
+      </Box>
+    )
+  }
+
   return (
     <Drawer isOpen={isOpen} placement='right' size='md' onClose={onClose}>
       <DrawerOverlay />
@@ -94,291 +138,28 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, userRole }) => {
         <DrawerBody>
           <Stack spacing={4} dir='column'>
             {/* ORGANIZATION MANAGEMENT */}
-            <Box>
-              {activeRole?.permissionsMap
-                ?.filter(
-                  (item) =>
-                    item.category === 'Organization Management' &&
-                    item.hidden === null &&
-                    item.supersededBy.length > 0
-                )
-                .map((item, index) => (
-                  <Checkbox
-                    key={index}
-                    isChecked={item.value}
-                    isReadOnly={readOnly}
-                    onChange={(e) => onCheckParent(e, item.category)}
-                  >
-                    {item.name}
-                  </Checkbox>
-                ))}
-              <Stack pl={6} mt={1} spacing={1}>
-                {activeRole?.permissionsMap
-                  ?.filter(
-                    (item) =>
-                      item.category === 'Organization Management' &&
-                      item.hidden === null &&
-                      item.supersededBy.length === 0
-                  )
-                  .map((item, index) => (
-                    <Checkbox
-                      key={index}
-                      name={item.key}
-                      isChecked={item?.value}
-                      isReadOnly={readOnly}
-                      onChange={(e) => onCheckChild(e, item.category)}
-                    >
-                      {item.name}
-                    </Checkbox>
-                  ))}
-              </Stack>
-            </Box>
+            <Permissions category={'Organization Management'} />
             <Divider />
             {/* PROJECT GROUP MANAGEMENT */}
-            <Box mt={6}>
-              {activeRole?.permissionsMap
-                ?.filter(
-                  (item) =>
-                    item.category === 'Product Management' &&
-                    item.hidden === null &&
-                    item.supersededBy.length > 0
-                )
-                .map((item, index) => (
-                  <Checkbox
-                    key={index}
-                    isChecked={item?.value}
-                    isReadOnly={readOnly}
-                    onChange={(e) => onCheckParent(e, item.category)}
-                  >
-                    {item.name}
-                  </Checkbox>
-                ))}
-              <Stack pl={6} mt={1} spacing={1}>
-                {activeRole?.permissionsMap
-                  ?.filter(
-                    (item) =>
-                      item.category === 'Product Management' &&
-                      item.hidden === null &&
-                      item.supersededBy.length === 0
-                  )
-                  .map((item, index) => (
-                    <Checkbox
-                      key={index}
-                      name={item.key}
-                      isChecked={item.value}
-                      isReadOnly={readOnly}
-                      onChange={(e) => onCheckChild(e, item.category)}
-                    >
-                      {item.name}
-                    </Checkbox>
-                  ))}
-              </Stack>
-            </Box>
+            <Permissions category={'Product Management'} />
             <Divider />
             {/* PROJECT MANAGEMENT */}
-            <Box mt={6}>
-              {activeRole?.permissionsMap
-                ?.filter(
-                  (item) =>
-                    item.category === 'Product Environment Management' &&
-                    item.hidden === null &&
-                    item.supersededBy.length > 0
-                )
-                .map((item, index) => (
-                  <Checkbox
-                    key={index}
-                    isChecked={item?.value}
-                    isReadOnly={readOnly}
-                    onChange={(e) => onCheckParent(e, item.category)}
-                  >
-                    {item.name}
-                  </Checkbox>
-                ))}
-              <Stack pl={6} mt={1} spacing={1}>
-                {activeRole?.permissionsMap
-                  ?.filter(
-                    (item) =>
-                      item.category === 'Product Environment Management' &&
-                      item.hidden === null &&
-                      item.supersededBy.length === 0
-                  )
-                  .map((item, index) => (
-                    <Checkbox
-                      key={index}
-                      name={item.key}
-                      isChecked={item.value}
-                      isReadOnly={readOnly}
-                      onChange={(e) => onCheckChild(e, item.category)}
-                    >
-                      {item.name}
-                    </Checkbox>
-                  ))}
-              </Stack>
-            </Box>
+            <Permissions category={'Product Environment Management'} />
             <Divider />
             {/* SBOM MANAGEMENT */}
-            <Box mt={6}>
-              {activeRole?.permissionsMap
-                ?.filter(
-                  (item) =>
-                    item.category === 'SBOM Management' &&
-                    item.hidden === null &&
-                    item.supersededBy.length > 0
-                )
-                .map((item, index) => (
-                  <Checkbox
-                    key={index}
-                    isChecked={item?.value}
-                    isReadOnly={readOnly}
-                    onChange={(e) => onCheckParent(e, item.category)}
-                  >
-                    {item.name}
-                  </Checkbox>
-                ))}
-              <Stack pl={6} mt={1} spacing={1}>
-                {activeRole?.permissionsMap
-                  ?.filter(
-                    (item) =>
-                      item.category === 'SBOM Management' &&
-                      item.hidden === null &&
-                      item.supersededBy.length === 0
-                  )
-                  .map((item, index) => (
-                    <Checkbox
-                      key={index}
-                      name={item.key}
-                      isChecked={item.value}
-                      isReadOnly={readOnly}
-                      onChange={(e) => onCheckChild(e, item.category)}
-                    >
-                      {item.name}
-                    </Checkbox>
-                  ))}
-              </Stack>
-            </Box>
+            <Permissions category={'SBOM Management'} />
             <Divider />
             {/* USER MANAGEMENT */}
-            <Box mt={6}>
-              {activeRole?.permissionsMap
-                ?.filter(
-                  (item) =>
-                    item.category === 'User Management' &&
-                    item.hidden === null &&
-                    item.supersededBy.length > 0
-                )
-                .map((item, index) => (
-                  <Checkbox
-                    key={index}
-                    isChecked={item?.value}
-                    isReadOnly={readOnly}
-                    onChange={(e) => onCheckParent(e, item.category)}
-                  >
-                    {item.name}
-                  </Checkbox>
-                ))}
-              <Stack pl={6} mt={1} spacing={1}>
-                {activeRole?.permissionsMap
-                  ?.filter(
-                    (item) =>
-                      item.category === 'User Management' &&
-                      item.hidden === null &&
-                      item.supersededBy.length === 0
-                  )
-                  .map((item, index) => (
-                    <Checkbox
-                      key={index}
-                      name={item.key}
-                      isChecked={item.value}
-                      isReadOnly={readOnly}
-                      onChange={(e) => onCheckChild(e, item.category)}
-                    >
-                      {item.name}
-                    </Checkbox>
-                  ))}
-              </Stack>
-            </Box>
+            <Permissions category={'User Management'} />
             <Divider />
             {/* VULN MANAGEMENT */}
-            <Box mt={6}>
-              {activeRole?.permissionsMap
-                ?.filter(
-                  (item) =>
-                    item.category === 'Vulnerability Management' &&
-                    item.hidden === null &&
-                    item.supersededBy.length > 0
-                )
-                .map((item, index) => (
-                  <Checkbox
-                    key={index}
-                    isChecked={item.value}
-                    isReadOnly={readOnly}
-                    onChange={(e) => onCheckParent(e, item.category)}
-                  >
-                    {item.name}
-                  </Checkbox>
-                ))}
-              <Stack pl={6} mt={1} spacing={1}>
-                {activeRole?.permissionsMap
-                  ?.filter(
-                    (item) =>
-                      item.category === 'Vulnerability Management' &&
-                      item.hidden === null &&
-                      item.supersededBy.length === 0
-                  )
-                  .map((item, index) => (
-                    <Checkbox
-                      key={index}
-                      name={item.key}
-                      isChecked={item.value}
-                      isReadOnly={readOnly}
-                      onChange={(e) => onCheckChild(e, item.category)}
-                    >
-                      {item.name}
-                    </Checkbox>
-                  ))}
-              </Stack>
-            </Box>
+            <Permissions category={'Vulnerability Management'} />
             <Divider />
             {/* LICENSE MANAGEMENT */}
-            <Box mt={6}>
-              {activeRole?.permissionsMap
-                ?.filter(
-                  (item) =>
-                    item.category === 'License Management' &&
-                    item.hidden === null &&
-                    item.supersededBy.length > 0
-                )
-                .map((item, index) => (
-                  <Checkbox
-                    key={index}
-                    isChecked={item.value}
-                    isReadOnly={readOnly}
-                    onChange={(e) => onCheckParent(e, item.category)}
-                  >
-                    {item.name}
-                  </Checkbox>
-                ))}
-              <Stack pl={6} mt={1} spacing={1}>
-                {activeRole?.permissionsMap
-                  ?.filter(
-                    (item) =>
-                      item.category === 'License Management' &&
-                      item.hidden === null &&
-                      item.supersededBy.length === 0
-                  )
-                  .map((item, index) => (
-                    <Checkbox
-                      key={index}
-                      name={item.key}
-                      isChecked={item.value}
-                      isReadOnly={readOnly}
-                      onChange={(e) => onCheckChild(e, item.category)}
-                    >
-                      {item.name}
-                    </Checkbox>
-                  ))}
-              </Stack>
-            </Box>
+            <Permissions category={'License Management'} />
+            <Divider />
+            {/* POLICY MANAGEMENT */}
+            <Permissions category={'Policy Management'} />
           </Stack>
         </DrawerBody>
 
