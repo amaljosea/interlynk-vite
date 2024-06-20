@@ -33,6 +33,8 @@ import {
   Text,
   Tooltip,
   useClipboard,
+  useColorMode,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -53,6 +55,12 @@ const ShareLynkDrawer = ({
 }) => {
   const BACKEND_URL = process.env.REACT_APP_SERVER
   const [createLynk] = useMutation(CreateShareLynk)
+  const { colorMode } = useColorMode()
+  const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const iconColor = useColorModeValue('gray', 'blue')
 
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
@@ -142,7 +150,7 @@ const ShareLynkDrawer = ({
         </Tooltip>
       </Flex>
     )
-  }, [svgLink, onShareLynkOpen])
+  }, [svgLink, onShareLynkOpen, data])
 
   // COLUMNS
   const columns = [
@@ -173,6 +181,7 @@ const ShareLynkDrawer = ({
           <Flex my={2} gap={2} alignItems={'center'}>
             <Input
               size='sm'
+              color={textColor}
               value={sbomLink.value}
               onChange={(e) => sbomLink.setValue(e.target.value)}
               width={'350px'}
@@ -184,8 +193,8 @@ const ShareLynkDrawer = ({
               isDisabled={!enabled}
               size='sm'
               onClick={() => sbomLink.onCopy()}
-              colorScheme={sbomLink.hasCopied ? 'whatsapp' : 'gray'}
-              icon={sbomLink.hasCopied ? <FaCheck /> : <FaRegCopy />}
+              colorScheme={sbomLink?.hasCopied ? 'whatsapp' : iconColor}
+              icon={sbomLink?.hasCopied ? <FaCheck /> : <FaRegCopy />}
             />
           </Flex>
         )
@@ -199,7 +208,9 @@ const ShareLynkDrawer = ({
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
-          <Text textAlign={'right'}>{timeSince(row?.updatedAt)}</Text>
+          <Text color={textColor} textAlign={'right'}>
+            {timeSince(row?.updatedAt)}
+          </Text>
         </Tooltip>
       ),
       sortable: true,
@@ -233,8 +244,8 @@ const ShareLynkDrawer = ({
                 persistTableHead
                 responsive={true}
                 columns={columns}
-                data={data && data.nodes}
-                customStyles={customStyles}
+                data={data?.nodes || []}
+                customStyles={customStyles(headColor)}
                 progressPending={data ? false : true}
                 progressComponent={<CustomLoader />}
                 subHeaderComponent={subHeader}
@@ -259,10 +270,14 @@ const ShareLynkDrawer = ({
                   <Datetime
                     value={selectedDate}
                     onChange={handleDateChange}
+                    className={react_datatime}
                     inputProps={{
                       placeholder: 'Select Date and Time',
                       onCopy: (e) => e.preventDefault(),
-                      onPaste: (e) => e.preventDefault()
+                      onPaste: (e) => e.preventDefault(),
+                      style: {
+                        background: 'none'
+                      }
                     }}
                   />
                   {!isValidDate && (

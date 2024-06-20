@@ -66,7 +66,7 @@ export default function HeaderLinks(props) {
   const bgColor = useColorModeValue('#EDF2F7', '#2D3748')
 
   const dashboardView = location.pathname === '/vendor/dashboard'
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = location.pathname.startsWith('/customer')
   const name = localStorage.getItem('username')
   const email = localStorage.getItem('email')
   const userEmail = localStorage.getItem('userEmail')
@@ -182,7 +182,8 @@ export default function HeaderLinks(props) {
           border='none'
           borderRadius={6}
           placeholder='Search..'
-          onClick={query.toggle}
+          onClick={query?.toggle}
+          display={signedUrlParams ? 'none' : 'block'}
         />
         <Box pos={'absolute'} top={'0.2rem'} right={1.5}>
           <Kbd>{os?.startsWith('Windows') ? 'Ctrl' : 'Cmd'}</Kbd> <Kbd>K</Kbd>
@@ -228,6 +229,7 @@ export default function HeaderLinks(props) {
         size='sm'
         onClick={toggleColorMode}
         icon={colorMode === 'light' ? <FaMoon /> : <FaSun />}
+        display={signedUrlParams ? 'none' : 'flex'}
       />
       {!signedUrlParams && (
         <Menu>
