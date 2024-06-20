@@ -2310,6 +2310,7 @@ export const GetCheckResults = gql`
             version
             licensesExp
             primary
+            internal
             group
             kind
             purl

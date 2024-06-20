@@ -16,9 +16,21 @@ import {
 
 import CustomTag from './CustomTag'
 
-const ComponentCard = ({ data, isOpen, onClose }) => {
+const ListItem = ({ label, value }) => {
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-  const { name, version, kind, purl } = data || ''
+  return (
+    <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+      <Text color={textColor} fontSize={'sm'}>
+        {label}
+      </Text>
+      <CustomTag>{value || '-'}</CustomTag>
+    </Grid>
+  )
+}
+
+const ComponentCard = ({ data, isOpen, onClose }) => {
+  const { name, version, kind, purl, licensesExp, primary, internal } =
+    data || ''
   const pkg = purl ? PackageURL.fromString(purl) : ''
 
   return (
@@ -29,33 +41,19 @@ const ComponentCard = ({ data, isOpen, onClose }) => {
         <ModalCloseButton />
         <ModalBody pb={6}>
           <Stack spacing={2} py={3}>
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text color={textColor} fontSize={'sm'}>
-                Ecosystem
-              </Text>
-              <CustomTag>{pkg?.type || '-'}</CustomTag>
-            </Grid>
+            <ListItem label={'Ecosystem'} value={pkg?.type} />
             <Divider />
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text color={textColor} fontSize={'sm'}>
-                Name
-              </Text>
-              <CustomTag>{name || '-'}</CustomTag>
-            </Grid>
+            <ListItem label={'Name'} value={name} />
             <Divider />
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text color={textColor} fontSize={'sm'}>
-                Version
-              </Text>
-              <CustomTag>{version || '-'}</CustomTag>
-            </Grid>
+            <ListItem label={'Version'} value={version} />
             <Divider />
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text color={textColor} fontSize={'sm'}>
-                Type
-              </Text>
-              <CustomTag>{kind || '-'}</CustomTag>
-            </Grid>
+            <ListItem label={'Type'} value={kind} />
+            <Divider />
+            <ListItem label={'License'} value={licensesExp} />
+            <Divider />
+            <ListItem label={'Primary'} value={primary ? 'Yes' : 'No'} />
+            <Divider />
+            <ListItem label={'Internal'} value={internal ? 'Yes' : 'No'} />
           </Stack>
         </ModalBody>
       </ModalContent>
