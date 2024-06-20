@@ -47,7 +47,7 @@ const PurlModal = ({
   ruleExists
 }) => {
   const { status, component } = activeRow || ''
-  const { name, version } = component || ''
+  const { name, version, purl } = component || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
 
@@ -421,21 +421,6 @@ const PurlModal = ({
     }
   }
 
-  useEffect(() => {
-    if (data) {
-      setPurlType(data.type === null ? '' : data.type)
-      setNamespace(data.namespace === null ? '' : data.namespace)
-      setPurlName(data.name === null ? '' : data.name)
-      setPurlVersion(data.version === null ? '' : data.version)
-      if (data.qualifiers) {
-        const queryString = Object.entries(data.qualifiers)
-          .map(([key, value]) => `${key}=${value}`)
-          .join('&')
-        setQualifiers(queryString)
-      }
-    }
-  }, [data])
-
   const handleTypeChange = (e) => {
     const { value } = e.target
     setPurlType(value)
@@ -622,8 +607,23 @@ const PurlModal = ({
   }
 
   useEffect(() => {
-    if (status === 'resolved') {
-      const pkg = PackageURL.fromString(component?.purl)
+    if (data) {
+      setPurlType(data.type === null ? '' : data.type)
+      setNamespace(data.namespace === null ? '' : data.namespace)
+      setPurlName(data.name === null ? '' : data.name)
+      setPurlVersion(data.version === null ? '' : data.version)
+      if (data.qualifiers) {
+        const queryString = Object.entries(data.qualifiers)
+          .map(([key, value]) => `${key}=${value}`)
+          .join('&')
+        setQualifiers(queryString)
+      }
+    }
+  }, [data])
+
+  useEffect(() => {
+    if (purl) {
+      const pkg = PackageURL.fromString(purl)
       setPurlName(pkg?.name)
       setNamespace(pkg?.namespace)
       setPurlType(pkg?.type)
@@ -631,7 +631,7 @@ const PurlModal = ({
       setQualifiers(pkg?.qualifiers)
       setPurlValue(pkg.toString())
     }
-  }, [component?.purl, setPurlValue, status])
+  }, [purl, setPurlValue])
 
   return (
     <>

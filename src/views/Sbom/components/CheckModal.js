@@ -49,11 +49,11 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const { status, component } = activeRow || ''
-  const { id: componentId, name, version } = component || ''
+  const { id: componentId, name, version, kind, licensesExp } = component || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
 
-  console.log('activeRow', activeRow)
+  // console.log('activeRow', activeRow)
 
   const compRef = useRef()
 
@@ -71,8 +71,8 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
   const timestamp = currentTime
   const currentTime = now.toISOString().slice(0, 16)
   const [comp, setComp] = useState('')
-  const [compType, setCompType] = useState(component?.kind || '')
-  const [compVersion, setCompVersion] = useState(component?.version || '')
+  const [compType, setCompType] = useState(kind || '')
+  const [compVersion, setCompVersion] = useState(version || '')
   const [componentList, setComponentList] = useState([])
   const [activeComp, setActiveComp] = useState(null)
   const [isDisabled, setIsDisabled] = useState(false)
@@ -451,7 +451,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
             <LicenseField
               sbomView={false}
               resolved={resolved}
-              license={resolved ? component?.licensesExp : ''}
+              license={licensesExp || ''}
             />
           )}
         </ModalBody>

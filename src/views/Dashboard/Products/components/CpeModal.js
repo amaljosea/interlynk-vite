@@ -48,7 +48,7 @@ const CpeModal = ({
   ruleExists
 }) => {
   const { status, component } = activeRow || ''
-  const { name: compName, version: compVersion } = component || ''
+  const { name: compName, version: compVersion, cpes } = component || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
   const params = useParams()
@@ -93,48 +93,6 @@ const CpeModal = ({
 
   const [healthRecheck] = useMutation(recheckHealth)
   const [updateComponent] = useMutation(UpdateComponent)
-
-  // UPDATE FIELDS DATA FROM API
-  useEffect(() => {
-    if (cpeValue !== '') {
-      const components = cpeValue.split(':')
-      const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
-      const isValid =
-        components[2] && allowedValues.includes(components[2].toLowerCase())
-      if (isValid) {
-        setType(components[2].toLowerCase())
-      } else {
-        setType('')
-      }
-      setVendor(components[3]?.replace(/\*/g, '') || '')
-      setProduct(components[4]?.replace(/\*/g, '') || '')
-      setVersion(components[5]?.replace(/\*/g, '') || '')
-      setUpdate(components[6]?.replace(/\*/g, '') || '')
-      setEdition(components[7]?.replace(/\*/g, '') || '')
-      setLanguage(components[8]?.replace(/\*/g, '') || '')
-      setSwEdition(components[9]?.replace(/\*/g, '') || '')
-      setTargetSoftware(components[10]?.replace(/\*/g, '') || '')
-      setHardware(components[11]?.replace(/\*/g, '') || '')
-      setOther(components[12]?.replace(/\*/g, '') || '')
-      prodCompDispatch({
-        type: 'SET_CPE_STRING',
-        payload: `cpe:2.3:${isValid ? components[2].toLowerCase() : '*'}:${
-          components[3] || '*'
-        }:${components[4] || '*'}:${components[5] || '*'}:${
-          components[6] || '*'
-        }:${components[7] || '*'}:${components[8] || '*'}:${
-          components[9] || '*'
-        }:${components[10] || '*'}:${components[11] || '*'}:${
-          components[12] || '*'
-        }`
-      })
-    } else {
-      prodCompDispatch({
-        type: 'SET_CPE_STRING',
-        payload: 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*'
-      })
-    }
-  }, [cpeValue, prodCompDispatch])
 
   // ON BLUR UPDATE
   const onBlurUpdate = () => {
@@ -420,10 +378,52 @@ const CpeModal = ({
   }
 
   useEffect(() => {
-    if (status === 'resolved') {
-      setCpeValue(component?.cpes[0] || '')
+    if (cpes?.length > 0) {
+      setCpeValue(cpes[0])
     }
-  }, [component?.cpes, prodCompDispatch, setCpeValue, status])
+  }, [cpes, setCpeValue])
+
+  // UPDATE FIELDS DATA FROM API
+  useEffect(() => {
+    if (cpeValue !== '') {
+      const components = cpeValue.split(':')
+      const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
+      const isValid =
+        components[2] && allowedValues.includes(components[2].toLowerCase())
+      if (isValid) {
+        setType(components[2].toLowerCase())
+      } else {
+        setType('')
+      }
+      setVendor(components[3]?.replace(/\*/g, '') || '')
+      setProduct(components[4]?.replace(/\*/g, '') || '')
+      setVersion(components[5]?.replace(/\*/g, '') || '')
+      setUpdate(components[6]?.replace(/\*/g, '') || '')
+      setEdition(components[7]?.replace(/\*/g, '') || '')
+      setLanguage(components[8]?.replace(/\*/g, '') || '')
+      setSwEdition(components[9]?.replace(/\*/g, '') || '')
+      setTargetSoftware(components[10]?.replace(/\*/g, '') || '')
+      setHardware(components[11]?.replace(/\*/g, '') || '')
+      setOther(components[12]?.replace(/\*/g, '') || '')
+      prodCompDispatch({
+        type: 'SET_CPE_STRING',
+        payload: `cpe:2.3:${isValid ? components[2].toLowerCase() : '*'}:${
+          components[3] || '*'
+        }:${components[4] || '*'}:${components[5] || '*'}:${
+          components[6] || '*'
+        }:${components[7] || '*'}:${components[8] || '*'}:${
+          components[9] || '*'
+        }:${components[10] || '*'}:${components[11] || '*'}:${
+          components[12] || '*'
+        }`
+      })
+    } else {
+      prodCompDispatch({
+        type: 'SET_CPE_STRING',
+        payload: 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*'
+      })
+    }
+  }, [cpeValue, prodCompDispatch])
 
   return (
     <>
