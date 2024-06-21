@@ -178,6 +178,7 @@ export default function HeaderLinks(props) {
           <SearchIcon color={'gray.400'} />
         </InputLeftElement>
         <Input
+          isReadOnly
           bg={bgColor}
           border='none'
           borderRadius={6}
