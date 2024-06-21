@@ -111,7 +111,7 @@ const ExpandedComponent = ({
   allVexJustify,
   allCdx
 }) => {
-  const { vuln } = data
+  const { vuln, fixedVersions, lastAffectedVersions } = data
   const CustomText = styled(Text)`
     font-size: 13px;
     font-weight: bold;
@@ -154,6 +154,28 @@ const ExpandedComponent = ({
             <Text color={textColor} mt={1} fontSize={14}>
               {getFullDateAndTime(vuln.lastModifiedAt)}
             </Text>
+          </Box>
+          {/* Fixed Versions */}
+          <Box>
+            <CustomText>Fixed Version:</CustomText>
+            <Flex mt={1} flexWrap={'wrap'} alignItems={'center'} gap={2}>
+              {fixedVersions?.map((item, index) => (
+                <Tag colorScheme='blue' size='sm' key={index} pt={1}>
+                  {item}
+                </Tag>
+              ))}
+            </Flex>
+          </Box>
+          {/* Last Affected Versions */}
+          <Box>
+            <CustomText>Last Affected Version:</CustomText>
+            <Flex mt={1} flexWrap={'wrap'} alignItems={'center'} gap={2}>
+              {lastAffectedVersions?.map((item, index) => (
+                <Tag colorScheme='blue' size='sm' key={index} pt={1}>
+                  {item}
+                </Tag>
+              ))}
+            </Flex>
           </Box>
           {/* CVSS Vector */}
           <Box>

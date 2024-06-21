@@ -2002,6 +2002,8 @@ export const GetVulnData = gql`
           impact
           isPart
           isComplete
+          fixedVersions
+          lastAffectedVersions
           isFirstDegreePart
           cdxResponseId
           impact
