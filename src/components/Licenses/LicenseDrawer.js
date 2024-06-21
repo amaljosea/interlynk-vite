@@ -21,7 +21,8 @@ import {
   Select,
   Stack,
   Text,
-  Textarea
+  Textarea,
+  useToast
 } from '@chakra-ui/react'
 
 import LynkSelect from 'components/LynkSelect'
@@ -29,6 +30,8 @@ import LynkSelect from 'components/LynkSelect'
 import { CreateLicense, UpdateLicense } from '../../graphQL/Mutation'
 
 const LicenseDrawer = ({ isOpen, onClose, data }) => {
+  const toast = useToast()
+
   const [name, setName] = useState('')
   const [text, setText] = useState('')
   const [url, setUrl] = useState('')
@@ -97,6 +100,14 @@ const LicenseDrawer = ({ isOpen, onClose, data }) => {
       }
     })
     refetchActiveQueries()
+    toast({
+      description:
+        'License properties and all product versions, including this license, are being updated. This could take some time.',
+      status: 'success',
+      duration: 7000,
+      isClosable: true,
+      position: 'top'
+    })
     onClose()
   }
 
