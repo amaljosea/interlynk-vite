@@ -15,6 +15,7 @@ import {
 
 import { UpdateNotificationPreference } from 'graphQL/Mutation'
 import {
+  GetConnections,
   GetUserNotificationChannels,
   GetUserNotificationPreferences
 } from 'graphQL/Queries'
@@ -34,6 +35,7 @@ const NotificationMenuBell = () => {
     }
   })
   const [getChannelsInfo] = useLazyQuery(GetUserNotificationChannels)
+  const [getConnections] = useLazyQuery(GetConnections)
 
   useEffect(() => {
     if (data) {
@@ -61,16 +63,28 @@ const NotificationMenuBell = () => {
       }
     }).then((res) => {
       setPreference(newPreference)
-      getChannelsInfo().then(({ data: { notificationChannels } }) => {
-        const enabledChannelCount = Object.values(notificationChannels).filter(
+      let enabledChannelCount = 0
+
+      Promise.all([getChannelsInfo(), getConnections()]).then((values) => {
+        const channelsData = values[0].data.notificationChannels
+        const connectionsData = values[1].data.organization.connections.nodes
+
+        enabledChannelCount = Object.values(channelsData).filter(
           (value) => value === true
         ).length
 
+        const connectionsCount = connectionsData.filter(
+          (node) => node.connection.__typename !== 'JiraConnection'
+        ).length
+        enabledChannelCount += connectionsCount
+
+        console.log(enabledChannelCount)
+
         if (enabledChannelCount === 0 && !newPreference.includes('none')) {
           toast({
-            title: 'No notification channel enabled',
+            title: 'No notification medium enabled',
             description:
-              'Please enable at least one channel under personal settings.',
+              'Please configure at least one notification medium under settings.',
             status: 'warning',
             duration: 5000,
             isClosable: true,

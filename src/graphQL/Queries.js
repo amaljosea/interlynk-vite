@@ -4363,6 +4363,12 @@ export const GetConnections = gql`
               apiToken
               url
             }
+            ... on SlackConnection {
+              url
+            }
+            ... on TeamsConnection {
+              url
+            }
           }
         }
       }

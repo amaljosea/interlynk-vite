@@ -2716,10 +2716,100 @@ export const CreateJiraIssue = gql`
   }
 `
 
-export const DeleteJiraIssue = gql`
-  mutation DeleteJiraIssue($componentVulnId: ID!) {
-    jiraIssueDelete(input: { componentVulnId: $componentVulnId }) {
+export const CreateSlackConnection = gql`
+  mutation CreateSlackConnection($url: String!) {
+    slackConnectionCreate(input: { url: $url }) {
+      organizationConnection {
+        id
+        enabled
+        connection {
+          ... on SlackConnection {
+            url
+          }
+        }
+      }
       errors
+    }
+  }
+`
+
+export const UpdateSlackConnection = gql`
+  mutation UpdateSlackConnection($id: ID!, $url: String, $enabled: Boolean) {
+    slackConnectionUpdate(
+      input: { url: $url, organizationConnectionId: $id, enabled: $enabled }
+    ) {
+      organizationConnection {
+        id
+        enabled
+        connection {
+          ... on SlackConnection {
+            url
+          }
+        }
+      }
+      errors
+    }
+  }
+`
+
+export const DeleteSlackConnection = gql`
+  mutation DeleteSlackConnection($organizationConnectionId: ID!) {
+    slackConnectionDelete(
+      input: { organizationConnectionId: $organizationConnectionId }
+    ) {
+      errors
+      organizationConnection {
+        id
+      }
+    }
+  }
+`
+
+export const CreateTeamsConnection = gql`
+  mutation CreateTeamsConnection($url: String!) {
+    teamsConnectionCreate(input: { url: $url }) {
+      organizationConnection {
+        id
+        enabled
+        connection {
+          ... on TeamsConnection {
+            url
+          }
+        }
+      }
+      errors
+    }
+  }
+`
+
+export const UpdateTeamsConnection = gql`
+  mutation UpdateTeamsConnection($id: ID!, $url: String, $enabled: Boolean) {
+    teamsConnectionUpdate(
+      input: { url: $url, organizationConnectionId: $id, enabled: $enabled }
+    ) {
+      organizationConnection {
+        id
+        enabled
+        connection {
+          ... on TeamsConnection {
+            url
+          }
+        }
+      }
+      errors
+    }
+  }
+`
+
+export const DeleteTeamsConnection = gql`
+  mutation DeleteTeamsConnection($organizationConnectionId: ID!) {
+    teamsConnectionDelete(
+      input: { organizationConnectionId: $organizationConnectionId }
+    ) {
+      errors
+      organizationConnection {
+        id
+      }
     }
   }
 `

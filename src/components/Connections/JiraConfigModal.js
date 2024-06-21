@@ -74,7 +74,7 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
       }
     }).then((res) => {
       if (res?.data?.jiraConnectionCreate?.errors?.length === 0) {
-        setGreenCheck(!isSaveDisabled)
+        setGreenCheck((prev) => ({ ...prev, jira: !isSaveDisabled }))
         resetChanges()
         refetch()
         onClose()
@@ -110,7 +110,7 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
       }
     }).then((res) => {
       if (res?.data?.jiraConnectionUpdate?.errors?.length === 0) {
-        setGreenCheck(!isSaveDisabled)
+        setGreenCheck((prev) => ({ ...prev, jira: !isSaveDisabled }))
         resetChanges()
         refetch()
         onClose()
@@ -172,7 +172,7 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
       }
     }).then((res) => {
       if (res?.data?.jiraConnectionDelete?.errors?.length === 0) {
-        setGreenCheck(false)
+        setGreenCheck((prev) => ({ ...prev, jira: false }))
         refetch()
         onClose()
         toast({

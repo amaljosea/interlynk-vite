@@ -2,32 +2,70 @@ import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
 import { CheckIcon } from '@chakra-ui/icons'
-import { Button, Flex, Text, useDisclosure } from '@chakra-ui/react'
+import { Button, Flex, Text, Wrap, useDisclosure } from '@chakra-ui/react'
 
 import { GetConnections } from 'graphQL/Queries'
 
-import { FaJira } from 'react-icons/fa'
+import { FaJira, FaMicrosoft, FaSlack } from 'react-icons/fa'
 
 import Card from '../Card/Card'
 import CardBody from '../Card/CardBody'
 import CardHeader from '../Card/CardHeader'
+import ConnectionCard from './ConnectionCard'
 import JiraConfigModal from './JiraConfigModal'
+import SlackConfigModal from './SlackConfigModal'
+import TeamsConfigModal from './TeamsConfigModal'
 
 const Connections = () => {
   const { data, refetch } = useQuery(GetConnections, {
     fetchPolicy: 'network-only'
   })
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isJiraOpen,
+    onOpen: onJiraOpen,
+    onClose: onJiraClose
+  } = useDisclosure()
 
-  const [greenCheck, setGreenCheck] = useState(false)
+  const {
+    isOpen: isSlackOpen,
+    onOpen: onSlackOpen,
+    onClose: onSlackClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isTeamsOpen,
+    onOpen: onTeamsOpen,
+    onClose: onTeamsClose
+  } = useDisclosure()
+
+  const [greenCheck, setGreenCheck] = useState({
+    jira: false,
+    slack: false,
+    teams: false
+  })
+
+  const [jiraData, setJiraData] = useState(null)
+  const [slackData, setSlackData] = useState(null)
+  const [teamsData, setTeamsData] = useState(null)
 
   useEffect(() => {
-    if (
-      data?.organization?.connections?.nodes[0]?.connection?.__typename ===
-      'JiraConnection'
-    ) {
-      setGreenCheck(true)
+    setJiraData(null)
+    setSlackData(null)
+    setTeamsData(null)
+    if (data?.organization?.connections?.nodes) {
+      data.organization.connections.nodes.forEach((connection) => {
+        if (connection.connection.__typename === 'JiraConnection') {
+          setGreenCheck((prev) => ({ ...prev, jira: true }))
+          setJiraData(connection)
+        } else if (connection.connection.__typename === 'SlackConnection') {
+          setGreenCheck((prev) => ({ ...prev, slack: true }))
+          setSlackData(connection)
+        } else if (connection.connection.__typename === 'TeamsConnection') {
+          setGreenCheck((prev) => ({ ...prev, teams: true }))
+          setTeamsData(connection)
+        }
+      })
     }
   }, [data])
 
@@ -40,54 +78,55 @@ const Connections = () => {
           </Text>
         </CardHeader>
         <CardBody px='5px'>
-          <Flex direction='column'>
-            <Card
-              height='200px'
-              width='200px'
-              borderWidth='1px'
-              borderRadius='lg'
-              overflow='hidden'
-              boxShadow='lg'
-            >
-              <Flex align='center' justify='center' direction='column'>
-                <FaJira size='25px' color='#0070f3' />
-                <Text
-                  noOfLines={1}
-                  fontSize='md'
-                  color='gray.500'
-                  fontWeight='400'
-                  pt='20px'
-                >
-                  Jira
-                </Text>
-                <Button colorScheme='blue' size='sm' mt='30px' onClick={onOpen}>
-                  Configure
-                </Button>
-                {greenCheck && (
-                  <CheckIcon
-                    w={8}
-                    h={8}
-                    bg={'green.500'}
-                    color={'white'}
-                    border={'1px solid #4299E1'}
-                    rounded={'full'}
-                    p={'4px'}
-                    position={'absolute'}
-                    right={1}
-                    top={1}
-                  />
-                )}
-              </Flex>
-            </Card>
-          </Flex>
+          <Wrap spacing='30px'>
+            <ConnectionCard
+              icon={FaJira}
+              name='Jira'
+              onConfigure={onJiraOpen}
+              isConnected={greenCheck.jira}
+              color='#0070f3'
+            />
+            <ConnectionCard
+              icon={FaSlack}
+              name='Slack'
+              onConfigure={onSlackOpen}
+              isConnected={greenCheck.slack}
+              color='#E01E5A'
+            />
+            <ConnectionCard
+              icon={FaMicrosoft}
+              name='Teams'
+              onConfigure={onTeamsOpen}
+              isConnected={greenCheck.teams}
+              color='#6264A7'
+            />
+          </Wrap>
         </CardBody>
       </Card>
 
-      {isOpen && (
+      {isJiraOpen && (
         <JiraConfigModal
-          isOpen={isOpen}
-          onClose={onClose}
-          data={data?.organization?.connections?.nodes[0]}
+          isOpen={isJiraOpen}
+          onClose={onJiraClose}
+          data={jiraData}
+          setGreenCheck={setGreenCheck}
+          refetch={refetch}
+        />
+      )}
+      {isSlackOpen && (
+        <SlackConfigModal
+          isOpen={isSlackOpen}
+          onClose={onSlackClose}
+          data={slackData}
+          setGreenCheck={setGreenCheck}
+          refetch={refetch}
+        />
+      )}
+      {isTeamsOpen && (
+        <TeamsConfigModal
+          isOpen={isTeamsOpen}
+          onClose={onTeamsClose}
+          data={teamsData}
           setGreenCheck={setGreenCheck}
           refetch={refetch}
         />
