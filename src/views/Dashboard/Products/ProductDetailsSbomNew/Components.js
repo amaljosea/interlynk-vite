@@ -1186,11 +1186,13 @@ const Components = ({ sbomData, sbomRefetch }) => {
 
           {isRelationOpen && comPath && (
             <RelationshipDrawer
+              data={activeRow}
+              activeRow={null}
+              ruleExists={false}
               isOpen={isRelationOpen}
               onClose={onRelationClose}
-              data={activeRow}
-              compPath={comPath.component.pathToPrimary}
               fetchCompData={fetchCompData}
+              compPath={comPath?.component?.pathToPrimary}
             />
           )}
         </>

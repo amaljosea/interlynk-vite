@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { ArrowDownIcon } from '@chakra-ui/icons'
 import {
@@ -40,8 +40,11 @@ import CardHeader from 'components/Card/CardHeader'
 import RelDeleteModal from 'components/RelDeleteModal'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
+import { AutomationRuleCreate } from 'graphQL/Mutation'
+import { recheckHealth } from 'graphQL/Mutation'
 import {
   GetAllComponents,
   GetCompDependency,
@@ -68,17 +71,27 @@ const RelationshipDrawer = ({
   isOpen,
   onClose,
   data,
+  activeRow,
   fetchCompData,
-  compPath
+  compPath,
+  ruleExists
 }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
   const location = useLocation()
+  const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
+  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
-  const { name, version, id } = data
+  const { name, version, id } = data || ''
+  const { status, component: comp } = activeRow || ''
+  const { id: compId, name: compName, version: compVersion } = comp || ''
+  const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
+  const resolved = status === 'resolved'
+
+  const isCompRelation = shortDesc === 'Component has relationship/s'
 
   const [dependencyOfList, setDependencyOfList] = useState([])
   const [dependsOnList, setDependsOnList] = useState([])
@@ -104,6 +117,9 @@ const RelationshipDrawer = ({
     }
   })
 
+  const [createRule] = useMutation(AutomationRuleCreate)
+  const [healthRecheck] = useMutation(recheckHealth)
+
   const { data: allComponents } = useQuery(GetAllComponents, {
     skip: compData ? false : true,
     variables: {
@@ -121,7 +137,7 @@ const RelationshipDrawer = ({
   const [addRelation] = useMutation(CreateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
   const { data: compDependency, refetch } = useQuery(GetCompDependency, {
-    variables: { compId: id, sbomId: sbomId }
+    variables: { compId: compId || id, sbomId: sbomId }
   })
 
   const shortestPath = findShortestPath(compPath)[0]
@@ -143,14 +159,23 @@ const RelationshipDrawer = ({
 
   const handleAdd = () => {
     addRelation({
-      variables: { from: id, to: component, relType: relation }
+      variables: { from: compId || id, to: component, relType: relation }
     }).then((res) => {
-      if (res.data) {
+      if (res?.data) {
         setIsAdded(true)
         setDependsOnList((prev) => [
           ...prev,
-          res.data.componentRelationCreate.compRelation
+          res?.data?.componentRelationCreate?.compRelation
         ])
+        if (shortDesc) {
+          healthRecheck({
+            variables: {
+              sbomId: sbomId,
+              checkId: friendlyId,
+              compId: compId
+            }
+          })
+        }
       }
     })
     setRelation('')
@@ -181,17 +206,81 @@ const RelationshipDrawer = ({
     onClose()
   }
 
+  const getConditionsAttributes = () => {
+    return [
+      {
+        subject: 'component',
+        operator: 'is',
+        field: 'component_name',
+        value: compName
+      },
+      {
+        subject: 'component',
+        operator: 'is',
+        field: 'component_version',
+        value: compVersion
+      },
+      {
+        subject: 'component',
+        operator: 'not_exists',
+        field: 'component_relationship',
+        value: undefined
+      }
+    ]
+  }
+
+  const getActionsAttributes = () => {
+    return [
+      {
+        subject: 'component',
+        field: 'component_relationship',
+        value: component
+      }
+    ]
+  }
+
+  const handleRuleCreate = () => {
+    if (ruleExists) {
+      localStorage.setItem('activeProdTab', 2)
+      navigate(generateProductDetailPageUrlFromCurrentUrl())
+    } else {
+      createRule({
+        variables: {
+          active: true,
+          name: shortDesc,
+          projectId: productId,
+          checkComponent: compName,
+          checkVersion: compVersion,
+          checkIdentifier: friendlyId,
+          automationConditionsAttributes: getConditionsAttributes(),
+          automationActionsAttributes: getActionsAttributes()
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleCreate?.errors
+        if (errors?.length > 0) {
+          console.log(errors[0])
+        } else {
+          if (isCompRelation) {
+            handleAdd()
+          } else {
+            onClose()
+          }
+        }
+      })
+    }
+  }
+
   return (
     <Drawer
       size='lg'
       isOpen={isOpen}
       placement='right'
       onClose={onClose}
-      closeOnOverlayClick={true}
+      closeOnOverlayClick={false}
     >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton />
+        <DrawerCloseButton onClick={handleAdd} />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
           Relationships
         </DrawerHeader>
@@ -206,8 +295,8 @@ const RelationshipDrawer = ({
                 wrap={'wrap'}
                 gap={2}
               >
-                <Text fontWeight={'medium'}>{name}</Text>
-                <Tag colorScheme='blue'>{version}</Tag>
+                <Text fontWeight={'medium'}>{name || compName}</Text>
+                <Tag colorScheme='blue'>{version || compVersion}</Tag>
               </Flex>
             </CardHeader>
             <CardBody>
@@ -219,11 +308,12 @@ const RelationshipDrawer = ({
               >
                 {/* CREATE RELATIONSHIP */}
                 <Stack
+                  mt={6}
+                  gap={2}
                   width={'100%'}
+                  hidden={resolved}
                   direction={'column'}
                   alignItems={'flex-start'}
-                  gap={2}
-                  mt={6}
                 >
                   <FormControl>
                     <FormLabel htmlFor='relation' color='gray.600'>
@@ -258,7 +348,11 @@ const RelationshipDrawer = ({
                       >
                         <option value=''>-- Select --</option>
                         {[...allComponents.sbom.components.nodes]
-                          .filter((com) => com?.name !== name)
+                          .filter((com) =>
+                            shortDesc
+                              ? com?.name !== compName
+                              : com?.name !== name
+                          )
                           .sort((a, b) => a?.name?.localeCompare(b?.name))
                           .map((item, idx) => (
                             <option key={idx} value={item.id}>
@@ -276,18 +370,32 @@ const RelationshipDrawer = ({
                     </FormControl>
                   )}
 
-                  <Button
-                    size='md'
-                    mt={2}
-                    width={'fit-content'}
-                    colorScheme='blue'
-                    onClick={handleAdd}
-                    isDisabled={
-                      relation === '' || component === '' || list.length > 0
-                    }
+                  <Flex
+                    width={'100%'}
+                    alignItems={'center'}
+                    justifyContent={'space-between'}
                   >
-                    Add
-                  </Button>
+                    <Button
+                      hidden
+                      mr={'auto'}
+                      fontSize={'sm'}
+                      onClick={handleRuleCreate}
+                      colorScheme={ruleExists ? 'green' : 'blue'}
+                    >
+                      {ruleExists ? 'View' : 'Save as'} Rule
+                    </Button>
+                    <Button
+                      size='md'
+                      width={'fit-content'}
+                      colorScheme='blue'
+                      onClick={handleAdd}
+                      isDisabled={
+                        relation === '' || component === '' || list.length > 0
+                      }
+                    >
+                      {shortDesc ? 'Save' : 'Add'}
+                    </Button>
+                  </Flex>
                 </Stack>
 
                 {/* COMONENT RELATIONSIP DATA */}
@@ -359,6 +467,7 @@ const RelationshipDrawer = ({
                                     {comp?.toComp?.version}
                                   </TagLabel>
                                   <TagCloseButton
+                                    hidden={resolved}
                                     onClick={() => {
                                       setActiveComp(comp)
                                       onDelOpen()
@@ -432,7 +541,7 @@ const RelationshipDrawer = ({
                     justifyContent={'center'}
                   >
                     <Tag size='sm' colorScheme='green'>
-                      {name} - {version}
+                      {name || compName} - {version || compVersion}
                     </Tag>
                   </Stack>
                 )}
@@ -441,7 +550,12 @@ const RelationshipDrawer = ({
           </Card>
         </DrawerBody>
         <DrawerFooter>
-          <Button variant='solid' colorScheme='blue' onClick={handleSave}>
+          <Button
+            variant='solid'
+            colorScheme='blue'
+            onClick={handleSave}
+            hidden={resolved}
+          >
             Done
           </Button>
         </DrawerFooter>

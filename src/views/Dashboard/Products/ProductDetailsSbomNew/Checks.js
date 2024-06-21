@@ -28,6 +28,7 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
+import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import LicenseModal from 'components/LicenseModal'
 import ComponentCard from 'components/Misc/ComponentCard'
 import Pagination from 'components/Pagination'
@@ -48,6 +49,7 @@ import {
   GetExistingRules,
   GetProductData
 } from 'graphQL/Queries'
+import { GetComponentPath } from 'graphQL/Queries'
 
 import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
@@ -76,6 +78,9 @@ const Checks = () => {
     skip: activeTab === 'checks' ? false : true,
     variables: { projectId: productId, sbomId }
   })
+
+  const [getComPath, { data: relation }] = useLazyQuery(GetComponentPath)
+  const { pathToPrimary } = relation?.component || ''
 
   const { sbom: sbomData } = prodData || ''
 
@@ -220,6 +225,12 @@ const Checks = () => {
     isOpen: isVersionOpen,
     onOpen: onVersionOpen,
     onClose: onVersionClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isRelOpen,
+    onOpen: onRelOpen,
+    onClose: onRelClose
   } = useDisclosure()
 
   const handleReCheck = useCallback(async () => {
@@ -464,6 +475,13 @@ const Checks = () => {
     // COMPONENT ADD SUPPLIER MODAL
     if (shortDesc === 'Component has a supplier') {
       return onSupplierOpen()
+    }
+
+    // COMPONENT HAS RELATIONSHIP
+    if (shortDesc === 'Component has relationship/s') {
+      getComPath({
+        variables: { compId: row?.component?.id, sbomId: sbomId }
+      }).then((res) => res?.data && onRelOpen())
     }
 
     // PURL MODAL
@@ -944,6 +962,19 @@ const Checks = () => {
               ruleExists={ruleExists}
               refetch={handleRefetch}
               onClose={onDocSupClose}
+            />
+          )}
+
+          {/* COMPONENT RELATIONSHIP DRAWER */}
+          {isRelOpen && (
+            <RelationshipDrawer
+              data={null}
+              isOpen={isRelOpen}
+              fetchCompData={refetch}
+              onClose={onRelClose}
+              activeRow={activeRow}
+              ruleExists={ruleExists}
+              compPath={pathToPrimary}
             />
           )}
         </>
