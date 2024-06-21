@@ -204,7 +204,7 @@ const RequestTable = ({
     }).then((res) => {
       if (res?.data?.requestCancel?.errors?.length === 0) {
         toast({
-          description: 'Request Cancelled',
+          description: 'Request Canceled',
           status: 'success',
           duration: 5000,
           isClosable: true,
