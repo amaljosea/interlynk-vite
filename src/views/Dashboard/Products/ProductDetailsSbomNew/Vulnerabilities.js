@@ -53,6 +53,7 @@ import {
 import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
 import CustomLoader from 'components/CustomLoader'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
+import { FixedIcon } from 'components/Icons/Icons'
 import ComponentCard from 'components/Misc/ComponentCard'
 import CvssCard from 'components/Misc/CvssCard'
 import Pagination from 'components/Pagination'
@@ -596,7 +597,9 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
       id: 'COMPONENTS_NAME',
       name: 'COMPONENT',
       selector: (row) => {
-        const { component } = row
+        const { component, fixedVersions } = row
+        const { name, version } = component || ''
+        const isExists = fixedVersions?.length > 0
         return (
           <Stack
             my={3}
@@ -610,8 +613,13 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
               onCardOpen()
             }}
           >
-            <Text color={textColor}>{component?.name || ''}</Text>
-            <Text color={textColor}>{component?.version || ''}</Text>
+            <Flex alignItems={'center'} gap={2}>
+              <Text color={textColor}>{name || ''}</Text>
+              <Tooltip label={fixedVersions?.join(', ')} placement='top'>
+                <Icon as={FixedIcon} display={isExists ? 'flex' : 'none'} />
+              </Tooltip>
+            </Flex>
+            <Text color={textColor}>{version || ''}</Text>
           </Stack>
         )
       },
