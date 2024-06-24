@@ -409,20 +409,15 @@ const Components = ({ sbomData, sbomRefetch }) => {
       id: 'COMPONENTS_HEALTH',
       name: 'HEALTH',
       omit: !shouldShowDemoFeatures,
-      selector: (row) => (
-        <ProgressBar
-          value={
-            getComponentHealthScoreFromLocalData({
-              componentName: row?.name,
-              componentVersion: row?.version
-            }).healthScore
-          }
-          text='Health Score'
-        />
-      ),
+      selector: (row) => {
+        const { name, version } = row
+        const score = getComponentHealthScoreFromLocalData({
+          componentName: name,
+          componentVersion: version
+        }).healthScore
+        return <ProgressBar value={score} width={100} />
+      },
       width: '12%',
-      wrap: true,
-      sortable: false,
       right: 'true'
     },
     // PURL

@@ -1,14 +1,14 @@
-import { Box, Text, useColorModeValue } from '@chakra-ui/react'
+import { Box, Stack, Text, useColorModeValue } from '@chakra-ui/react'
 
-export const ProgressBar = ({ value, loading, text }) => {
+export const ProgressBar = ({ value, loading, text, width }) => {
   const bgColor = useColorModeValue('gray.100', 'gray.600')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   return (
-    <Box>
+    <Stack dir='column' cursor={'pointer'} alignItems={'center'}>
       <Box
         height={6}
-        width='100%'
+        width={width || '100%'}
         overflow={'hidden'}
         position='relative'
         borderLeftRadius={'md'}
@@ -50,18 +50,9 @@ export const ProgressBar = ({ value, loading, text }) => {
           </Text>
         </Box>
       </Box>
-      {text && (
-        <Text
-          pos={'relative'}
-          top={0}
-          textAlign={'center'}
-          fontSize={'xs'}
-          color={textColor}
-          style={{ cursor: 'pointer' }}
-        >
-          {text}
-        </Text>
-      )}
-    </Box>
+      <Text fontSize={'xs'} color={textColor}>
+        {text}
+      </Text>
+    </Stack>
   )
 }
