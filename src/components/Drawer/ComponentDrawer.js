@@ -69,7 +69,7 @@ function ComponentDrawer(props) {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const customerView = location.pathname.startsWith('/customer')
 
-  const { isOpen, onClose, data, primaryComp, shortDesc } = props
+  const { isOpen, onClose, data, primaryComp, shortDesc, fetchCompData } = props
   const { prodCompState, dispatch } = useGlobalState()
   const { licenseType, purlString, expLicense, totalComp } = prodCompState
   const { prodCompDispatch } = dispatch
@@ -77,8 +77,12 @@ function ComponentDrawer(props) {
   const [addRelation] = useMutation(CreateCompRelation)
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
-  const [createComponent] = useMutation(CreateComponent)
-  const [updateComponent] = useMutation(UpdateComponent)
+  const [createComponent] = useMutation(CreateComponent, {
+    onCompleted: (data) => data && fetchCompData()
+  })
+  const [updateComponent] = useMutation(UpdateComponent, {
+    onCompleted: (data) => data && fetchCompData()
+  })
 
   const cpeRef = useRef()
 

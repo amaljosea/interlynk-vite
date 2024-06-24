@@ -3,8 +3,13 @@ import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
-import { GetIcon, customStyles, getFullDateAndTime, timeSince } from 'utils'
-import { isUnknown } from 'utils'
+import {
+  GetIcon,
+  customStyles,
+  getFullDateAndTime,
+  isUnknown,
+  timeSince
+} from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 import { openSsf } from 'variables/general'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -173,10 +178,9 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState(searchInput)
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-
   const [getComPath, { data: comPath }] = useLazyQuery(GetComponentPath)
 
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const {
     isOpen: isDelOpen,
     onOpen: onDelOpen,
@@ -208,12 +212,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
     onClose: onRelationClose
   } = useDisclosure()
   const {
-    isOpen: isCompOpen,
-    onOpen: onCompOpen,
-    onClose: onCompClose,
-    onToggle: onCompToggle
-  } = useDisclosure()
-  const {
     isOpen: isPurlOpen,
     onOpen: onPurlOpen,
     onClose: onPurlClose
@@ -226,40 +224,23 @@ const Components = ({ sbomData, sbomRefetch }) => {
 
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
-  const onLicenseOpen = (row) => {
+  const onCreateComponent = useCallback(() => {
+    setActiveRow(null)
+    prodCompDispatch({ type: 'CLEAR_LICENSES' })
+    onOpen()
+  }, [onOpen, prodCompDispatch])
+
+  const onEditOpen = (row) => {
     setActiveRow(row)
     prodCompDispatch({ type: 'SET_LICENSES', payload: row })
     onOpen()
   }
 
-  const onCreateComponent = useCallback(() => {
-    prodCompDispatch({ type: 'CLEAR_LICENSES' })
-    onCompOpen()
-  }, [onCompOpen, prodCompDispatch])
-
-  const handleOpen = (row) => {
+  const onRelOpen = (row) => {
     setActiveRow(row)
-    onRelationOpen()
     getComPath({ variables: { compId: row.id, sbomId: sbomId } })
+    onRelationOpen()
   }
-
-  // ADD KEYBOARD SHORTCUT FOR TOGGLE COMPONENT DRAWER
-  const handleCompDown = useCallback(
-    (event) => {
-      if (event.altKey && event.key === '1') {
-        onCompToggle()
-      }
-    },
-    [onCompToggle]
-  )
-
-  // KEYBOARD EVENT LISTNER FOR COMPONENT DRAWER
-  useEffect(() => {
-    window.addEventListener('keydown', handleCompDown)
-    return () => {
-      window.removeEventListener('keydown', handleCompDown)
-    }
-  }, [handleCompDown])
 
   // COLUMNS
   const columns = [
@@ -595,13 +576,13 @@ const Components = ({ sbomData, sbomRefetch }) => {
                 <Portal>
                   <MenuList size='sm'>
                     <MenuItem
-                      onClick={() => onLicenseOpen(row)}
+                      onClick={() => onEditOpen(row)}
                       isDisabled={status === 'signed' || !updateComponent}
                     >
                       Edit Component
                     </MenuItem>
                     <MenuItem
-                      onClick={() => handleOpen(row)}
+                      onClick={() => onRelOpen(row)}
                       isDisabled={!updateComponent}
                     >
                       Edit Relationships
@@ -1127,84 +1108,64 @@ const Components = ({ sbomData, sbomRefetch }) => {
         />
       )}
 
-      {/* ACTIONS */}
-      {activeRow !== null && (
-        <>
-          {isOpen && (
-            <ComponentDrawer
-              data={activeRow}
-              isOpen={isOpen}
-              onClose={onClose}
-              sbomRefetch={sbomRefetch}
-              fetchCompData={fetchCompData}
-              filterRefetch={getCompFilters}
-              shortDesc={null}
-              checkId={null}
-              primaryComp={primaryComponent}
-            />
-          )}
-
-          {isDelOpen && (
-            <ComponentModal
-              isOpen={isDelOpen}
-              onClose={onDelClose}
-              id={activeRow.id}
-              sbomRefetch={sbomRefetch}
-              fetchCompData={fetchCompData}
-            />
-          )}
-
-          {isSupOpen && (
-            <SupplierModal
-              id={activeRow.id}
-              refetch={fetchCompData}
-              filterRefetch={getCompFilters}
-              isOpen={isSupOpen}
-              onClose={onSupClose}
-              data={activeRow}
-              shortDesc={null}
-              checkId={null}
-            />
-          )}
-
-          {isLinkOpen && (
-            <LinksDrawer
-              component={activeRow}
-              btnRef={linkRef}
-              isOpen={isLinkOpen}
-              onClose={onLinkClose}
-              fetchCompData={fetchCompData}
-              productId={productId}
-              sbomId={sbomId}
-            />
-          )}
-
-          {isRelationOpen && comPath && (
-            <RelationshipDrawer
-              data={activeRow}
-              activeRow={null}
-              ruleExists={false}
-              isOpen={isRelationOpen}
-              onClose={onRelationClose}
-              fetchCompData={fetchCompData}
-              compPath={comPath?.component?.pathToPrimary}
-            />
-          )}
-        </>
-      )}
-
-      {/* COMPONENT DRAWER */}
-      {isCompOpen && (
+      {isOpen && (
         <ComponentDrawer
-          isOpen={isCompOpen}
-          onClose={onCompClose}
+          data={activeRow}
+          isOpen={isOpen}
+          onClose={onClose}
+          sbomRefetch={sbomRefetch}
           fetchCompData={fetchCompData}
           filterRefetch={getCompFilters}
-          sbomRefetch={sbomRefetch}
-          primaryComp={primaryComponent}
           shortDesc={null}
           checkId={null}
-          data={null}
+          primaryComp={primaryComponent}
+        />
+      )}
+
+      {isDelOpen && (
+        <ComponentModal
+          isOpen={isDelOpen}
+          onClose={onDelClose}
+          id={activeRow.id}
+          sbomRefetch={sbomRefetch}
+          fetchCompData={fetchCompData}
+        />
+      )}
+
+      {isSupOpen && (
+        <SupplierModal
+          id={activeRow.id}
+          refetch={fetchCompData}
+          filterRefetch={getCompFilters}
+          isOpen={isSupOpen}
+          onClose={onSupClose}
+          data={activeRow}
+          shortDesc={null}
+          checkId={null}
+        />
+      )}
+
+      {isLinkOpen && (
+        <LinksDrawer
+          component={activeRow}
+          btnRef={linkRef}
+          isOpen={isLinkOpen}
+          onClose={onLinkClose}
+          fetchCompData={fetchCompData}
+          productId={productId}
+          sbomId={sbomId}
+        />
+      )}
+
+      {isRelationOpen && comPath && (
+        <RelationshipDrawer
+          data={activeRow}
+          activeRow={null}
+          ruleExists={false}
+          isOpen={isRelationOpen}
+          onClose={onRelationClose}
+          fetchCompData={fetchCompData}
+          compPath={comPath?.component?.pathToPrimary}
         />
       )}
 

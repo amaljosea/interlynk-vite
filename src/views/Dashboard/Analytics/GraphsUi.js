@@ -17,7 +17,7 @@ export const GraphUi = ({ dataForGraph }) => {
         <CartesianGrid strokeDasharray='3 3' />
         <XAxis dataKey='date' />
         <YAxis />
-        <Tooltip />
+        <Tooltip labelStyle={{ color: '#4A5568' }} />
         <Legend />
         <Line
           type='monotone'
@@ -31,7 +31,7 @@ export const GraphUi = ({ dataForGraph }) => {
         <CartesianGrid strokeDasharray='3 3' />
         <XAxis dataKey='date' />
         <YAxis />
-        <Tooltip />
+        <Tooltip labelStyle={{ color: '#4A5568' }} />
         <Legend />
         <Line
           type='monotone'
@@ -45,7 +45,7 @@ export const GraphUi = ({ dataForGraph }) => {
         <CartesianGrid strokeDasharray='3 3' />
         <XAxis dataKey='date' />
         <YAxis />
-        <Tooltip />
+        <Tooltip labelStyle={{ color: '#4A5568' }} />
         <Legend />
         <Line
           type='monotone'
