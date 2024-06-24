@@ -105,36 +105,6 @@ const Licenses = () => {
           </Flex>
         )
       }
-    },
-    {
-      id: 'STATUS',
-      name: 'STATUS',
-      wrap: true,
-      sortable: true,
-      selector: ({ derivedState }) => {
-        derivedState = derivedState?.toLowerCase() || 'Not Available'
-        return (
-          <Tag
-            size='md'
-            variant='solid'
-            colorScheme={
-              derivedState === 'approved'
-                ? 'green'
-                : derivedState === 'rejected'
-                  ? 'red'
-                  : derivedState === 'unspecified'
-                    ? 'orange'
-                    : 'blue'
-            }
-            width={'110px'}
-          >
-            <TagLabel mx={'auto'} textTransform={'capitalize'}>
-              {derivedState}
-            </TagLabel>
-          </Tag>
-        )
-      },
-      right: 'true'
     }
   ]
 
