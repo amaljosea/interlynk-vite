@@ -187,9 +187,9 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
                 <Input
                   id='fileInput'
                   type='file'
-                  accept='application/json'
                   style={{ display: 'none' }}
                   onChange={handleFileChange}
+                  accept='.json,application/json,application/xml,text/xml'
                 />
                 <Flex
                   height={32}
