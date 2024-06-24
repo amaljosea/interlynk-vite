@@ -121,6 +121,7 @@ const SbomDetails = ({ sbomData, refetch }) => {
     automatedFixesEnabled
   } = projectSetting || ''
   const hasFinished = vulnRunStatus === 'FINISHED'
+  const reScanVuln = vulnScan === true && vulnRunStatus !== 'FINISHED'
 
   const handleRelationView = async () => {
     await getPrimaryComp({
@@ -205,13 +206,13 @@ const SbomDetails = ({ sbomData, refetch }) => {
       } else {
         clearInterval(refetchInterval)
       }
-    }, 5000)
+    }, 15000)
     return () => clearInterval(refetchInterval)
   }, [sbomId, isInitialized, refetch, policyRefetch])
 
   useEffect(() => {
     const refetchInterval = setInterval(() => {
-      if (vulnRunStatus === 'IN_PROGRESS') {
+      if (reScanVuln) {
         refetch()
       } else if (isInitialized) {
         policyRefetch()
@@ -219,9 +220,9 @@ const SbomDetails = ({ sbomData, refetch }) => {
       } else {
         clearInterval(refetchInterval)
       }
-    }, 5000)
+    }, 15000)
     return () => clearInterval(refetchInterval)
-  }, [refetch, vulnRunStatus, isInitialized, policyRefetch])
+  }, [refetch, reScanVuln, isInitialized, policyRefetch])
 
   return (
     <>
