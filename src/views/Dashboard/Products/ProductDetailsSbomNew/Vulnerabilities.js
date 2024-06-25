@@ -615,7 +615,10 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           >
             <Flex alignItems={'center'} gap={2}>
               <Text color={textColor}>{name || ''}</Text>
-              <Tooltip label={fixedVersions?.join(', ')} placement='top'>
+              <Tooltip
+                label={'Fixed In: ' + fixedVersions?.join(', ')}
+                placement='top'
+              >
                 <Icon as={FixedIcon} display={isExists ? 'flex' : 'none'} />
               </Tooltip>
             </Flex>
