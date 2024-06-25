@@ -49,31 +49,41 @@ const Connections = () => {
   const [slackData, setSlackData] = useState(null)
   const [teamsData, setTeamsData] = useState(null)
 
+  const handleConnectionData = (connections) => {
+    connections.forEach((connection) => {
+      switch (connection.connection.__typename) {
+        case 'JiraConnection':
+          setGreenCheck((prev) => ({ ...prev, jira: true }))
+          setJiraData(connection)
+          break
+        case 'SlackConnection':
+          setGreenCheck((prev) => ({ ...prev, slack: true }))
+          setSlackData(connection)
+          break
+        case 'TeamsConnection':
+          setGreenCheck((prev) => ({ ...prev, teams: true }))
+          setTeamsData(connection)
+          break
+        default:
+          break
+      }
+    })
+  }
+
   useEffect(() => {
     setJiraData(null)
     setSlackData(null)
     setTeamsData(null)
     if (data?.organization?.connections?.nodes) {
-      data.organization.connections.nodes.forEach((connection) => {
-        if (connection.connection.__typename === 'JiraConnection') {
-          setGreenCheck((prev) => ({ ...prev, jira: true }))
-          setJiraData(connection)
-        } else if (connection.connection.__typename === 'SlackConnection') {
-          setGreenCheck((prev) => ({ ...prev, slack: true }))
-          setSlackData(connection)
-        } else if (connection.connection.__typename === 'TeamsConnection') {
-          setGreenCheck((prev) => ({ ...prev, teams: true }))
-          setTeamsData(connection)
-        }
-      })
+      handleConnectionData(data.organization.connections.nodes)
     }
   }, [data])
 
   return (
     <>
-      <Card p={0}>
+      <Card p={4}>
         <CardHeader p='12px 0' mb='12px'>
-          <Text fontSize='lg' fontWeight='bold'>
+          <Text fontSize='xl' fontWeight='bold'>
             Connected Accounts
           </Text>
         </CardHeader>

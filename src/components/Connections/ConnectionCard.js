@@ -18,19 +18,21 @@ const ConnectionCard = ({
       borderRadius='lg'
       overflow='hidden'
       boxShadow='lg'
+      _hover={{ boxShadow: 'xl' }}
+      position='relative'
     >
-      <Flex align='center' justify='center' direction='column'>
-        <Icon size='25px' color={color} />
+      <Flex align='center' justify='center' direction='column' p={4}>
+        <Icon size='40px' color={color} />
         <Text
           noOfLines={1}
-          fontSize='md'
-          color='gray.500'
-          fontWeight='400'
+          fontSize='lg'
+          color='gray.600'
+          fontWeight='500'
           pt='20px'
         >
           {name}
         </Text>
-        <Button colorScheme='blue' size='sm' mt='30px' onClick={onConfigure}>
+        <Button colorScheme='blue' size='md' mt='20px' onClick={onConfigure}>
           Configure
         </Button>
         {isConnected && (
@@ -43,8 +45,8 @@ const ConnectionCard = ({
             rounded={'full'}
             p={'4px'}
             position={'absolute'}
-            right={1}
-            top={1}
+            right={2}
+            top={2}
           />
         )}
       </Flex>
