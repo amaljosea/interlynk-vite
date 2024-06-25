@@ -14,7 +14,7 @@ const getVersionOptions = (filters) => {
         return [
           ...acc,
           {
-            label: `${singleProduct.label} (${version.projectVersion})`,
+            label: version.projectVersion,
             value: version.id
           }
         ]

@@ -13,7 +13,12 @@ export const getDays = ({ startDate, endDate }) => {
 const defaultData = {
   licensesCount: 0,
   componentsCount: 0,
-  vulnerabilityCount: 0
+  vulnerabilityCount: 0,
+  vulnerabilityCriticalCount: 0,
+  vulnerabilityHighCount: 0,
+  vulnerabilityMediumCount: 0,
+  vulnerabilityLowCount: 0,
+  vulnerabilityUnknownSevCount: 0
 }
 
 export const formatForGraph = ({ nodes, dates }) => {

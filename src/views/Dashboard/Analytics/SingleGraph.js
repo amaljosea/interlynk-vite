@@ -29,7 +29,7 @@ class CustomizedAxisTick extends PureComponent {
   }
 }
 
-export const SingleGraph = ({ data, dataKey, name }) => {
+export const SingleGraph = ({ data, lines }) => {
   return (
     <LineChart width={500} height={300} data={data}>
       <CartesianGrid strokeDasharray='3 3' />
@@ -37,13 +37,17 @@ export const SingleGraph = ({ data, dataKey, name }) => {
       <YAxis tick={<CustomizedAxisTick />} />
       <Tooltip />
       <Legend />
-      <Line
-        type='monotone'
-        dataKey={dataKey}
-        name={name}
-        stroke='#3182CE'
-        activeDot={{ r: 8 }}
-      />
+      {lines.map((item) => {
+        return (
+          <Line
+            key={item.name}
+            type='monotone'
+            stroke='#3182CE'
+            activeDot={{ r: 8 }}
+            {...item}
+          />
+        )
+      })}
     </LineChart>
   )
 }

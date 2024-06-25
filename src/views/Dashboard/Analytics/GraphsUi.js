@@ -14,18 +14,55 @@ export const GraphUi = ({ dataForGraph }) => {
     >
       <SingleGraph
         data={dataForGraph}
-        dataKey='licensesCount'
-        name='License Count'
+        lines={[
+          {
+            dataKey: 'licensesCount',
+            name: 'License Count'
+          }
+        ]}
       />
       <SingleGraph
         data={dataForGraph}
-        dataKey='componentsCount'
-        name='Components Count'
+        lines={[
+          {
+            dataKey: 'licensesCount',
+            name: 'License Count'
+          }
+        ]}
       />
       <SingleGraph
         data={dataForGraph}
-        dataKey='vulnerabilityCount'
-        name='Vulnerability Count'
+        lines={[
+          {
+            dataKey: 'vulnerabilityCount',
+            name: 'Total'
+          },
+          {
+            dataKey: 'vulnerabilityCriticalCount',
+            name: 'Critical',
+            stroke: 'red'
+          },
+          {
+            dataKey: 'vulnerabilityHighCount',
+            name: 'High',
+            stroke: 'orange'
+          },
+          {
+            dataKey: 'vulnerabilityMediumCount',
+            name: 'Medium',
+            stroke: '#cbbb08'
+          },
+          {
+            dataKey: 'vulnerabilityLowCount',
+            name: 'Low',
+            stroke: 'green'
+          },
+          {
+            dataKey: 'vulnerabilityUnknownSevCount',
+            name: 'Unknown',
+            stroke: 'gray'
+          }
+        ]}
       />
     </Flex>
   )

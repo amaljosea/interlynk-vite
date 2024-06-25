@@ -25,6 +25,11 @@ const DAILY_METRICS_QUERY = gql`
       nodes {
         licensesCount
         componentsCount
+        vulnerabilityCriticalCount
+        vulnerabilityHighCount
+        vulnerabilityMediumCount
+        vulnerabilityLowCount
+        vulnerabilityUnknownSevCount
         vulnerabilityCount
         date
       }
@@ -34,7 +39,6 @@ const DAILY_METRICS_QUERY = gql`
 
 export const Graphs = ({ filters }) => {
   const { startDate, endDate } = filters?.duration || {}
-  const bgColor = useColorModeValue('gray.200', 'gray.800')
 
   const { data, loading, error } = useQuery(DAILY_METRICS_QUERY, {
     variables: {

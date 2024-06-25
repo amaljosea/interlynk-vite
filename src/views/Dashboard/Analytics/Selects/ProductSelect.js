@@ -37,12 +37,13 @@ export const ProductSelect = ({ value, onChange }) => {
   const options = data?.organization?.projectGroups?.nodes || []
   return (
     <CustomSelect
-      isMulti
       isLoading={loading}
       label='Product'
       options={options}
       value={value}
-      onChange={onChange}
+      onChange={(newValue) => {
+        onChange(newValue ? [newValue] : [])
+      }}
     />
   )
 }
