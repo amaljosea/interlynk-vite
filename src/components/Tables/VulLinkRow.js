@@ -13,8 +13,7 @@ const VulLinkRow = ({
   status,
   timestamp,
   note,
-  impact,
-  onSelect
+  impact
 }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   return (
@@ -39,7 +38,7 @@ const VulLinkRow = ({
           </Tooltip>
         )}
       </Td>
-      <Td fontSize={'xs'} pl={0}>
+      <Td fontSize={'xs'} pl={0} display={signedUrlParams ? 'none' : 'block'}>
         {note && (
           <Tooltip
             text={note?.length > 35 ? `${note.substring(0, 35)}...` : note}
