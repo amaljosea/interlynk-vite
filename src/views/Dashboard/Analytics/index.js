@@ -11,8 +11,8 @@ import { Graphs } from './Graphs'
 const Analytics = () => {
   const [filters, setFilters] = useState({
     env: null,
-    product: null,
-    version: null,
+    product: [],
+    version: [],
     duration: null
   })
 

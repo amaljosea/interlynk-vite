@@ -14,6 +14,12 @@ const PRODUCT_OPTION_QUERY = gql`
           projects {
             id
             name
+            sbomVersions {
+              nodes {
+                id
+                projectVersion
+              }
+            }
           }
         }
       }
@@ -31,6 +37,7 @@ export const ProductSelect = ({ value, onChange }) => {
   const options = data?.organization?.projectGroups?.nodes || []
   return (
     <CustomSelect
+      isMulti
       isLoading={loading}
       label='Product'
       options={options}

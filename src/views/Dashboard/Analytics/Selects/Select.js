@@ -4,7 +4,7 @@ import LynkSelect from 'components/LynkSelect'
 
 export const CustomSelect = ({ label, ...props }) => {
   return (
-    <FormControl>
+    <FormControl width='15%' marginRight={5}>
       <FormLabel>{label}</FormLabel>
       <LynkSelect
         {...props}

@@ -1,9 +1,10 @@
 import { gql, useQuery } from '@apollo/client'
 import React from 'react'
 
-import { Center, Grid, Skeleton, useColorModeValue } from '@chakra-ui/react'
+import { Center, Flex, useColorModeValue } from '@chakra-ui/react'
 
 import { GraphUi } from './GraphsUi'
+import Placeholder from './Placeholder.png'
 import { formatForGraph, getDays } from './utils'
 
 const DAILY_METRICS_QUERY = gql`
@@ -37,26 +38,38 @@ export const Graphs = ({ filters }) => {
 
   const { data, loading, error } = useQuery(DAILY_METRICS_QUERY, {
     variables: {
-      sbomIds: filters?.version?.value ? [filters?.version?.value] : [],
+      sbomIds: filters.version?.map((p) => p.value),
       projectNames: filters?.env?.value ? [filters?.env?.value] : [],
-      projectGroupIds: filters?.product?.value ? [filters?.product?.value] : [],
+      projectGroupIds: filters.product?.map((p) => p.value),
       startDate,
       endDate: endDate
     },
     skip: !filters.version || !startDate || !endDate
   })
 
-  if (!filters.version || !filters.duration) {
+  if (!filters.version.length || !filters.duration) {
     return (
-      <Grid width={'100%'} templateColumns={`repeat(3,1fr)`} gap={6}>
+      <Flex
+        mt={4}
+        gap={8}
+        width={'100%'}
+        flexWrap={'wrap'}
+        alignItems={'center'}
+        justifyContent='center'
+      >
         {['License Count', 'Components Count', 'Vulnerability Count'].map(
           (item, index) => (
-            <Center width={'100%'} height={48} bg={bgColor} key={index}>
-              {item}
-            </Center>
+            <Center
+              width={500}
+              height={300}
+              backgroundRepeat='no-repeat'
+              backgroundImage={Placeholder}
+              backgroundPosition='center'
+              key={index}
+            />
           )
         )}
-      </Grid>
+      </Flex>
     )
   }
 

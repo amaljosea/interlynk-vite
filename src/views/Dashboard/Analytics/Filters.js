@@ -7,27 +7,17 @@ import { EnvironmentSelect } from './Selects/EnvironmentSelect'
 import { ProductSelect } from './Selects/ProductSelect'
 import { VersionSelect } from './Selects/VersionSelect'
 
-const getProjectId = (filters) => {
-  const selectedEnv = filters.env?.value
-  const selectedProject = filters.product?.projects?.find(
-    (project) => project.name == selectedEnv
-  )
-  return selectedProject?.id || null
-}
-
 export const Filters = ({ filters, setFilters }) => {
   const changeFilter = (key, value) => {
     setFilters((filtersOld) => ({
       ...filtersOld,
-      version: key === 'product' || key === 'env' ? null : filtersOld.version,
+      version: key === 'product' || key === 'env' ? [] : filtersOld.version,
       [key]: value
     }))
   }
 
-  const projectId = getProjectId(filters)
-
   return (
-    <Flex alignItems={'center'} gap={4}>
+    <Flex width='100%'>
       <EnvironmentSelect
         value={filters.env}
         onChange={(value) => {
@@ -42,7 +32,7 @@ export const Filters = ({ filters, setFilters }) => {
         }}
       />
       <VersionSelect
-        projectId={projectId}
+        filters={filters}
         value={filters.version}
         onChange={(value) => {
           changeFilter('version', value)

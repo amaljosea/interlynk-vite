@@ -1,39 +1,40 @@
-import { gql, useQuery } from '@apollo/client'
 import React from 'react'
 
 import { CustomSelect } from './Select'
 
-const PRODUCT_VERSION_OPTION_QUERY = gql`
-  query ProjectVersionOptions($projectId: Uuid!) {
-    project(id: $projectId) {
-      id
-      sbomVersions {
-        nodes {
-          value: id
-          label: projectVersion
-        }
-      }
-    }
-  }
-`
+const getVersionOptions = (filters) => {
+  const selectedEnv = filters.env?.value
+  const optionsFinal = filters?.product?.reduce((options, singleProduct) => {
+    const selectedProject = singleProduct.projects?.find(
+      (project) => project.name == selectedEnv
+    )
 
-export const VersionSelect = ({ value, onChange, projectId }) => {
-  const { data, loading, error } = useQuery(PRODUCT_VERSION_OPTION_QUERY, {
-    variables: {
-      projectId
-    },
-    skip: !projectId
-  })
+    const optionsInternal = selectedProject.sbomVersions.nodes.reduce(
+      (acc, version) => {
+        return [
+          ...acc,
+          {
+            label: `${singleProduct.label} (${version.projectVersion})`,
+            value: version.id
+          }
+        ]
+      },
+      []
+    )
 
-  if (error) {
-    return 'Error'
-  }
+    return [...options, ...optionsInternal]
+  }, [])
 
-  const options = data?.project?.sbomVersions?.nodes || []
+  return optionsFinal
+}
+
+export const VersionSelect = ({ value, onChange, filters }) => {
+  const options = getVersionOptions(filters)
+
   return (
     <CustomSelect
-      isDisabled={!projectId}
-      isLoading={loading}
+      isMulti
+      isDisabled={!filters?.product?.length}
       label='Version'
       options={options}
       value={value}
