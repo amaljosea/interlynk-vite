@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client'
+import { gql, useQuery } from '@apollo/client'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
@@ -7,7 +7,6 @@ import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 import { WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Flex,
-  Grid,
   Tab,
   TabList,
   TabPanel,
@@ -25,26 +24,29 @@ import TeamTable from 'components/Tables/TeamTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import {
-  AllOrganizations,
-  GetOrg,
-  GetOrgManufacturers,
-  GetOrgSettings,
-  GetRoles,
-  MyOrganizations
-} from 'graphQL/Queries'
+import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
 
 import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 
 import Connections from '../../../components/Connections/Connections'
-import AdvisoryFeeds from './components/AdvisoryFeeds'
-import ApiFeed from './components/ApiFeed'
-import ExploitFeeds from './components/ExploitFeeds'
+import Checks from './components/Checks'
+import Feeds from './components/Feeds'
 import GeneralFeed from './components/GeneralFeed'
 import Header from './components/Header'
 import { InternalComponents } from './components/InternalComponents'
 import PersonalInfo from './components/PersonalInfo'
 import TokenInfo from './components/TokenInfo'
+
+const GetOrganization = gql`
+  query GetOrganization {
+    organization {
+      id
+      currentUser {
+        superAdmin
+      }
+    }
+  }
+`
 
 const orgTabs = [
   'general',
@@ -105,34 +107,26 @@ function Profile() {
       permission.key === 'manage_listing' && permission.value === true
   )
 
-  const {
-    data: orgInfo,
-    refetch,
-    error
-  } = useQuery(GetOrg, { skip: !org || org === 'undefined' ? true : false })
+  const { data, error } = useQuery(GetOrganization, {
+    skip: !org || org === 'undefined' ? true : false
+  })
 
-  const isAdmin = orgInfo && orgInfo?.organization?.currentUser?.superAdmin
+  const { organization } = data || ''
+  const { id, currentUser } = organization || ''
 
-  const { data: orgs, refetch: myOrgRefetch } = useQuery(MyOrganizations, {
+  const isAdmin = currentUser?.superAdmin
+
+  const { data: myOrgs, refetch: myOrgRefetch } = useQuery(MyOrganizations, {
     skip: org === 'undefined' ? true : isAdmin === true ? true : false,
     variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
   })
+  const { nodes: myOrgList } = myOrgs?.myOrganizations || ''
+
   const { data: allOrgs, refetch: allOrgRefetch } = useQuery(AllOrganizations, {
     skip: org === 'undefined' ? true : isAdmin === true ? false : true,
     variables: { first: totalRows, status: 'approved' }
   })
-  const { data: roles } = useQuery(GetRoles, {
-    skip: org === 'undefined' ? true : activetab === 'roles' ? false : true
-  })
-  const { data: mfc, refetch: mfcRefetch } = useQuery(GetOrgManufacturers, {
-    skip: org === 'undefined' ? true : activetab === 'legal' ? false : true
-  })
-  const { data: settingsData, refetch: settingsRefetch } = useQuery(
-    GetOrgSettings,
-    {
-      skip: !org || org === 'undefined' ? true : false
-    }
-  )
+  const { nodes: allOrgList } = allOrgs?.allOrganizations || ''
 
   const onOrgTabChange = (index) => {
     navigate(`/vendor/settings?tab=${orgTabs[index]}`)
@@ -140,6 +134,15 @@ function Profile() {
 
   const onPsTabChange = (index) => {
     navigate(`/vendor/settings?tab=${psTabs[index]}`)
+  }
+
+  const getDisplay = (item) => {
+    const conditions = {
+      Lists: !manageListing,
+      Feeds: !manageFeeds,
+      Users: !viewUsers?.value
+    }
+    return conditions[item] ? 'none' : 'block'
   }
 
   useEffect(() => {
@@ -175,34 +178,26 @@ function Profile() {
       {/*  HEADER */}
       <Header
         tabs={tabs}
-        refetch={refetch}
         selectedTab={selectedTab}
-        org={orgInfo?.organization}
         setSelectedTab={setSelectedTab}
-        user={orgInfo?.organization?.currentUser}
       />
+
       {/*  ORGANIZATION */}
       {selectedTab === 'ORGANIZATION' && (
         <Card>
           <Tabs
             w={'100%'}
-            variant='enclosed'
             index={orgIndex}
+            variant='enclosed'
             onChange={onOrgTabChange}
           >
             <TabList>
               {orgTabs.map((item, index) => (
                 <Tab
                   key={index}
+                  display={getDisplay(item)}
                   textTransform={'capitalize'}
                   _focus={{ outline: 'none' }}
-                  display={
-                    (item === 'Lists' && !manageListing) ||
-                    (item === 'Feeds' && !manageFeeds) ||
-                    (item === 'Users' && !viewUsers?.value)
-                      ? 'none'
-                      : 'block'
-                  }
                 >
                   {item}
                 </Tab>
@@ -211,49 +206,23 @@ function Profile() {
             <TabPanels>
               {/* GEENRAL */}
               <TabPanel>
-                <Grid
-                  width={'100%'}
-                  templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
-                  gap='22px'
-                >
-                  <GeneralFeed orgInfo={orgInfo} refetch={refetch} />
-                </Grid>
+                <GeneralFeed />
               </TabPanel>
               {/* TEAMS */}
-              <TabPanel>
-                {orgInfo && (
-                  <TeamTable currentUser={orgInfo?.organization?.currentUser} />
-                )}
+              <TabPanel display={data ? 'block' : 'none'}>
+                <TeamTable />
               </TabPanel>
               {/* ROLES */}
               <TabPanel>
-                <RoleTable
-                  data={roles?.organization?.organizationRoles}
-                  role={orgInfo?.organization?.currentUser?.role?.name}
-                />
+                <RoleTable />
               </TabPanel>
               {/* FEEDS */}
               <TabPanel display={manageFeeds ? 'block' : 'none'}>
-                {settingsData && (
-                  <Grid
-                    width={'100%'}
-                    templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
-                    gap='22px'
-                  >
-                    <AdvisoryFeeds
-                      data={settingsData}
-                      refetch={settingsRefetch}
-                    />
-                    <ExploitFeeds
-                      data={settingsData}
-                      refetch={settingsRefetch}
-                    />
-                  </Grid>
-                )}
+                <Feeds />
               </TabPanel>
               {/* RULES */}
               <TabPanel>
-                <ApiFeed />
+                <Checks />
               </TabPanel>
               {/* LISTS */}
               <TabPanel>
@@ -261,10 +230,7 @@ function Profile() {
               </TabPanel>
               {/* LEGAL */}
               <TabPanel>
-                <LegalTable
-                  data={mfc?.organizationManufacturers}
-                  refetch={mfcRefetch}
-                />
+                <LegalTable />
               </TabPanel>
               <TabPanel>
                 <Connections />
@@ -279,8 +245,8 @@ function Profile() {
         <Card>
           <Tabs
             w={'100%'}
-            variant='enclosed'
             index={psIndex}
+            variant='enclosed'
             onChange={onPsTabChange}
           >
             <TabList>
@@ -290,7 +256,7 @@ function Profile() {
                   textTransform={'capitalize'}
                   _focus={{ outline: 'none' }}
                   isDisabled={
-                    orgInfo?.organization === null &&
+                    organization === null &&
                     (item === 'Personal Details' || item === 'Security Tokens')
                   }
                 >
@@ -300,38 +266,22 @@ function Profile() {
             </TabList>
             <TabPanels>
               {/* PERSONA DETAILS */}
-              <TabPanel display={orgInfo?.organization ? 'block' : 'none'}>
-                <PersonalInfo
-                  user={orgInfo?.organization?.currentUser || null}
-                  refetch={refetch}
-                />
+              <TabPanel display={organization ? 'block' : 'none'}>
+                <PersonalInfo />
               </TabPanel>
               {/* ORG DETAILS */}
               <TabPanel>
-                {isAdmin === true ? (
-                  <OrgTable
-                    data={allOrgs?.allOrganizations?.nodes || []}
-                    refetch={allOrgRefetch}
-                    isAdmin={isAdmin}
-                    activeOrg={orgInfo?.organization?.id || null}
-                  />
-                ) : (
-                  <OrgTable
-                    data={orgs?.myOrganizations?.nodes || []}
-                    refetch={myOrgRefetch}
-                    isAdmin={isAdmin}
-                    activeOrg={orgInfo?.organization?.id || null}
-                  />
-                )}
-              </TabPanel>
-              {/* SECURITY TOKEN */}
-              <TabPanel display={orgInfo?.organization ? 'block' : 'none'}>
-                <TokenInfo
-                  data={orgInfo?.organization?.currentUser?.apiKeys || []}
-                  refetch={refetch}
+                <OrgTable
+                  isAdmin={isAdmin}
+                  activeOrg={id || null}
+                  data={isAdmin ? allOrgList : myOrgList}
+                  refetch={isAdmin ? allOrgRefetch : myOrgRefetch}
                 />
               </TabPanel>
-
+              {/* SECURITY TOKEN */}
+              <TabPanel display={organization ? 'block' : 'none'}>
+                <TokenInfo />
+              </TabPanel>
               {/* Notification Preferences */}
               <TabPanel>
                 <NotificationChannels />

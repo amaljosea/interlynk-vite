@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -18,12 +18,36 @@ import CardBody from 'components/Card/CardBody.js'
 
 import { UploadProfileImage } from 'graphQL/Mutation'
 
-const Header = ({ org, selectedTab, setSelectedTab, user, tabs, refetch }) => {
+const GetCurrentUser = gql`
+  query GetCurrentUser {
+    organization {
+      currentUser {
+        id
+        name
+        email
+        profileImage {
+          filename
+          url
+        }
+      }
+    }
+  }
+`
+
+const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const toast = useToast()
   const navigate = useNavigate()
+  const org = localStorage.getItem('organization')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const iconColor = useColorModeValue('#EDF2F7', '#2D3748')
   const emailColor = useColorModeValue('gray.500', 'gray.300')
+
+  const { data, refetch } = useQuery(GetCurrentUser, {
+    skip: org === 'undefined' ? true : false
+  })
+
+  const { organization } = data || ''
+  const { id, name, email, profileImage: dp } = organization?.currentUser || ''
 
   const handleClick = (name) => {
     setSelectedTab(name)
@@ -59,7 +83,7 @@ const Header = ({ org, selectedTab, setSelectedTab, user, tabs, refetch }) => {
     // setProfileImage(URL.createObjectURL(file))
     await uploadProfile({
       variables: {
-        userId: user.id,
+        userId: id,
         profileImage: file
       }
     })
@@ -104,113 +128,113 @@ const Header = ({ org, selectedTab, setSelectedTab, user, tabs, refetch }) => {
   }
 
   useEffect(() => {
-    if (user) {
-      if (user.profileImage?.url) {
-        setProfileImage(`${SERVER_URL}/${user.profileImage?.url}`)
+    if (dp) {
+      if (dp?.url) {
+        setProfileImage(`${SERVER_URL}/${dp?.url}`)
       } else {
         setProfileImage(null)
       }
     }
-  }, [user])
+  }, [SERVER_URL, dp])
 
   return (
     <Flex direction='column'>
       <Card mb='6'>
         <CardBody>
-          {/* user info */}
+          {/* USER INFO */}
           <Flex
+            gap={4}
             align='center'
+            w={{ sm: '100%' }}
             mb={{ sm: '10px', md: '0px' }}
             direction={{ sm: 'column', md: 'row' }}
-            w={{ sm: '100%' }}
             textAlign={{ sm: 'center', md: 'start' }}
-            gap={4}
           >
             {/* PROFILE IMAGE */}
             <Box
-              position='relative'
-              overflow='hidden'
-              borderRadius='full'
               width='80px'
               height='80px'
+              overflow='hidden'
+              position='relative'
+              borderRadius='full'
             >
               <Avatar
-                me={{ md: '22px' }}
-                src={profileImage && profileImage}
-                borderRadius='full'
                 width='80px'
                 height='80px'
                 objectFit='cover'
+                borderRadius='full'
+                me={{ md: '22px' }}
+                src={profileImage || ''}
               />
               <Input
-                type='file'
-                accept='.jpg,.jpeg,.png,.webp'
-                ref={inputRef}
-                onChange={handleFileChange}
-                opacity='0'
-                position='absolute'
                 top='0'
                 left='0'
+                type='file'
+                opacity='0'
+                zIndex={-1}
                 width='80px'
                 height='80px'
+                ref={inputRef}
                 cursor='pointer'
-                isDisabled={!org}
-                zIndex={-1}
+                position='absolute'
+                isDisabled={!organization}
+                onChange={handleFileChange}
+                accept='.jpg,.jpeg,.png,.webp'
               />
               <Box
-                position='absolute'
                 top='0'
                 left='0'
+                opacity='0'
                 width='80px'
                 height='80px'
-                bg='rgba(0,0,0,0.2)'
-                opacity='0'
-                transition='opacity 0.3s'
-                _hover={{ opacity: org ? 1 : 0 }}
-                onClick={onProfileClick}
-                borderRadius='full'
                 cursor='pointer'
+                position='absolute'
+                borderRadius='full'
+                bg='rgba(0,0,0,0.2)'
+                onClick={onProfileClick}
+                transition='opacity 0.3s'
+                _hover={{ opacity: organization ? 1 : 0 }}
               />
             </Box>
 
             <Flex direction='column' maxWidth='100%' my={{ sm: '14px' }}>
               <Text
-                fontSize={{ sm: 'lg', lg: 'xl' }}
-                color={textColor}
                 fontWeight='bold'
+                color={textColor}
                 ms={{ sm: '8px', md: '0px' }}
+                fontSize={{ sm: 'lg', lg: 'xl' }}
               >
-                {user ? user.name : userName}
+                {name || userName}
               </Text>
               <Text
-                fontSize={{ sm: 'sm', md: 'md' }}
                 color={emailColor}
                 fontWeight='medium'
+                fontSize={{ sm: 'sm', md: 'md' }}
               >
-                {user ? user.email : userEmail}
+                {email || userEmail}
               </Text>
             </Flex>
           </Flex>
           {/* tabs */}
           <Flex
-            direction={{ sm: 'column', lg: 'row' }}
-            w={{ sm: '100%', md: '50%', lg: 'auto' }}
             gap={2}
             alignItems={'center'}
+            direction={{ sm: 'column', lg: 'row' }}
+            w={{ sm: '100%', md: '50%', lg: 'auto' }}
           >
             {tabs.map((tab, index) => (
               <Button
                 key={index}
-                onClick={() => handleClick(tab.name)}
-                variant={`${selectedTab == tab.name ? 'solid' : 'outline'}`}
                 colorScheme='blue'
-                display={!org ? 'none' : 'block'}
+                onClick={() => handleClick(tab.name)}
+                display={!organization ? 'none' : 'block'}
+                variant={`${selectedTab == tab.name ? 'solid' : 'outline'}`}
               >
                 <Flex align='center' justifyContent='center'>
                   <tab.icon
-                    color={`${selectedTab == tab.name ? iconColor : '#3182CE'}`}
                     w='100%'
                     h='100%'
+                    color={`${selectedTab == tab.name ? iconColor : '#3182CE'}`}
                   />
                   <Text fontSize='xs' fontWeight='bold' ms='6px'>
                     {tab.name}

@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link } from 'react-router-dom'
@@ -34,13 +34,18 @@ import CustomLoader from 'components/CustomLoader'
 import InfoModal from 'components/InfoModal'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { OrganizationManufacturerDelete } from 'graphQL/Mutation'
+import { GetOrgManufacturers } from 'graphQL/Queries'
 
 import { FaEllipsisVertical, FaPlus } from 'react-icons/fa6'
 
-const LegalTable = ({ data, refetch }) => {
+const LegalTable = () => {
   const toast = useToast()
+  const activetab = useQueryParam('tab')
+  const org = localStorage.getItem('organization')
+
   const { totalRows } = useGlobalState()
   const [activeRow, setActiveRow] = useState(null)
   const [infoHeading, setInfoHeading] = useState('')
@@ -49,6 +54,12 @@ const LegalTable = ({ data, refetch }) => {
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const iconColor = useColorModeValue('#718096', '#F7FAFC')
+
+  const { data, loading, refetch } = useQuery(GetOrgManufacturers, {
+    skip: org === 'undefined' ? true : activetab === 'legal' ? false : true
+  })
+
+  const { nodes } = data?.organizationManufacturers || ''
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -284,15 +295,15 @@ const LegalTable = ({ data, refetch }) => {
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
-          columns={columns}
-          data={data?.nodes || []}
-          customStyles={customStyles(headColor)}
-          progressPending={data ? false : true}
-          progressComponent={<CustomLoader />}
           subHeader
-          subHeaderComponent={subHeader}
           persistTableHead
           responsive={true}
+          columns={columns}
+          data={nodes || []}
+          progressPending={loading}
+          subHeaderComponent={subHeader}
+          customStyles={customStyles(headColor)}
+          progressComponent={<CustomLoader />}
         />
       </Flex>
 

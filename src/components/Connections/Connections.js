@@ -1,8 +1,9 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { CheckIcon } from '@chakra-ui/icons'
-import { Button, Flex, Text, Wrap, useDisclosure } from '@chakra-ui/react'
+import { Text, Wrap, useDisclosure } from '@chakra-ui/react'
+
+import useQueryParam from 'hooks/useQueryParam'
 
 import { GetConnections } from 'graphQL/Queries'
 
@@ -17,8 +18,11 @@ import SlackConfigModal from './SlackConfigModal'
 import TeamsConfigModal from './TeamsConfigModal'
 
 const Connections = () => {
+  const activetab = useQueryParam('tab')
+  const org = localStorage.getItem('organization')
   const { data, refetch } = useQuery(GetConnections, {
-    fetchPolicy: 'network-only'
+    skip:
+      org === 'undefined' ? true : activetab === 'connections' ? false : true
   })
 
   const {

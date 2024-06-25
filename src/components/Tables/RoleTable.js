@@ -1,3 +1,4 @@
+import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
@@ -15,9 +16,23 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 
+import useQueryParam from 'hooks/useQueryParam'
+
+import { GetRoles } from 'graphQL/Queries'
+
 import { FaUserLock } from 'react-icons/fa6'
 
-const RoleTable = ({ data, role }) => {
+const RoleTable = () => {
+  const activetab = useQueryParam('tab')
+  const org = localStorage.getItem('organization')
+
+  const { data, loading } = useQuery(GetRoles, {
+    skip: org === 'undefined' ? true : activetab === 'roles' ? false : true
+  })
+
+  const { currentUser, organizationRoles } = data?.organization || ''
+  const { role } = currentUser || ''
+
   const [selectedRole, setSelectedRole] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
@@ -86,19 +101,19 @@ const RoleTable = ({ data, role }) => {
           subHeader
           responsive={true}
           columns={columns}
-          data={data || []}
+          progressPending={loading}
+          data={organizationRoles || []}
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
-          progressPending={data ? false : true}
           customStyles={customStyles(headColor)}
         />
       </Flex>
 
       {isOpen && (
         <PermissionDrawer
-          userRole={role}
           isOpen={isOpen}
           onClose={onClose}
+          userRole={role?.name}
           selectedRole={selectedRole}
         />
       )}

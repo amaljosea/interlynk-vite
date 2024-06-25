@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
@@ -38,6 +38,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
 import { GetUsers } from 'graphQL/Queries'
@@ -54,12 +55,41 @@ function userTimeStart(row) {
   return timeStart
 }
 
-const TeamTable = ({ currentUser }) => {
+const GetCurrentUser = gql`
+  query GetCurrentUser {
+    organization {
+      currentUser {
+        email
+      }
+    }
+  }
+`
+
+const TeamTable = () => {
+  const activetab = useQueryParam('tab')
   const org = localStorage.getItem('organization')
   const { userPermissions } = useGlobalState()
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+
+  const { data: orgData } = useQuery(GetCurrentUser, {
+    skip: org === 'undefined' ? true : activetab === 'users' ? false : true
+  })
+
+  const { currentUser } = orgData?.organization || ''
+  const { email } = currentUser || ''
+
+  const {
+    data: userData,
+    loading,
+    refetch
+  } = useQuery(GetUsers, {
+    skip: org === 'undefined' ? true : activetab === 'users' ? false : true,
+    variables: { search: filterText === '' ? undefined : filterText }
+  })
+
+  const { users } = userData?.organization || ''
 
   const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
   const inviteUser = viewUsers?.supersededBy?.some(
@@ -100,13 +130,6 @@ const TeamTable = ({ currentUser }) => {
     onCompleted: () => refetch()
   })
 
-  const { data, refetch } = useQuery(GetUsers, {
-    skip: !org || org === 'undefined' ? true : false,
-    variables: { search: filterText === '' ? undefined : filterText }
-  })
-
-  const { users } = data?.organization || ''
-
   // COLUMNS
   const columns = [
     // NAME
@@ -138,7 +161,7 @@ const TeamTable = ({ currentUser }) => {
               <Text color={textColor} width={'fit-content'} fontSize={'14px'}>
                 {name}
               </Text>
-              {row.email === currentUser?.email && (
+              {row.email === email && (
                 <Badge
                   variant='outline'
                   colorScheme='blue'
@@ -250,7 +273,7 @@ const TeamTable = ({ currentUser }) => {
             <Portal>
               <MenuList size='sm'>
                 <MenuItem
-                  isDisabled={row.email === currentUser?.email || !editUserRole}
+                  isDisabled={row.email === email || !editUserRole}
                   onClick={() => {
                     setActiveRow(row)
                     onRoleOpen()
@@ -259,7 +282,7 @@ const TeamTable = ({ currentUser }) => {
                   Change Role
                 </MenuItem>
                 <MenuItem
-                  isDisabled={row.email === currentUser?.email || !removeUser}
+                  isDisabled={row.email === email || !removeUser}
                   onClick={() => {
                     setActiveRow(row)
                     onOpen()
@@ -381,17 +404,13 @@ const TeamTable = ({ currentUser }) => {
   ])
 
   const handleRemove = async () => {
-    try {
-      await deleteUser({
-        variables: {
-          userId: activeRow.id
-        }
-      })
-        .then((res) => res.data && refetch())
-        .finally(() => onClose())
-    } catch (error) {
-      console.log(`Error`, error)
-    }
+    await deleteUser({
+      variables: {
+        userId: activeRow.id
+      }
+    })
+      .then((res) => res.data && refetch())
+      .finally(() => onClose())
   }
 
   const onResendInvite = async (row) => {
@@ -423,16 +442,16 @@ const TeamTable = ({ currentUser }) => {
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
+          subHeader
+          responsive={true}
           columns={columns}
           data={users || []}
           defaultSortAsc={false}
+          progressPending={loading}
           defaultSortFieldId={'joinedDate'}
-          subHeader
-          subHeaderComponent={subHeaderComponent}
-          customStyles={customStyles(headColor)}
-          progressPending={users ? false : true}
           progressComponent={<CustomLoader />}
-          responsive={true}
+          customStyles={customStyles(headColor)}
+          subHeaderComponent={subHeaderComponent}
         />
       </Flex>
 

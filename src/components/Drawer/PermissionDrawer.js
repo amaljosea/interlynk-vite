@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useLocation } from 'react-router-dom'
 
 import {
   Box,
@@ -16,20 +15,20 @@ import {
   Stack
 } from '@chakra-ui/react'
 
+import CustomLoader from 'components/CustomLoader'
+
+import useQueryParam from 'hooks/useQueryParam'
+
 import { UpdateOrganizationRole } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
 
 const PermissionDrawer = ({ isOpen, onClose, selectedRole, userRole }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const activetab = queryParams.get('tab')
+  const activetab = useQueryParam('tab')
 
-  const { data, refetch } = useQuery(GetAllPermissions, {
+  const { data, loading } = useQuery(GetAllPermissions, {
     skip: activetab === 'roles' ? false : true
   })
-  const [updateRole] = useMutation(UpdateOrganizationRole, {
-    onCompleted: () => refetch()
-  })
+  const [updateRole] = useMutation(UpdateOrganizationRole)
 
   const activeRole =
     data &&
@@ -37,20 +36,21 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, userRole }) => {
       (item) => item?.name === selectedRole
     )
 
-  const onCheckParent = async (e, category) => {
+  const onCheckParent = (e, category) => {
+    e.preventDefault()
     if (userRole !== 'custom') {
       const list = activeRole?.permissionsMap?.filter(
         (item) => item.category === category && item.hidden === null
       )
       const filterData = list
         .filter((item) => item?.supersededBy?.length === 0)
-        .map((_) => e.target.checked)
+        .map(() => e.target.checked)
       if (filterData) {
         const permissions = list.map((item) => ({
           permissionKey: item?.key,
           value: e.target.checked
         }))
-        await updateRole({
+        updateRole({
           variables: {
             organizationRoleId: activeRole?.id,
             permissions: permissions
@@ -61,13 +61,14 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, userRole }) => {
     return null
   }
 
-  const onCheckChild = async (e, category) => {
+  const onCheckChild = (e, category) => {
+    e.preventDefault()
     if (userRole !== 'custom') {
       const selector = activeRole?.permissionsMap?.filter(
         (item) => item.category === category
       )
       const filterItem = selector?.find((item) => item?.key === e.target.name)
-      await updateRole({
+      updateRole({
         variables: {
           organizationRoleId: activeRole?.id,
           permissions: [
@@ -136,31 +137,45 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, userRole }) => {
         <DrawerCloseButton />
         <DrawerHeader>Permissions for {activeRole?.name || ''}</DrawerHeader>
         <DrawerBody>
-          <Stack spacing={4} dir='column'>
-            {/* ORGANIZATION MANAGEMENT */}
-            <Permissions category={'Organization Management'} />
-            <Divider />
-            {/* PROJECT GROUP MANAGEMENT */}
-            <Permissions category={'Product Management'} />
-            <Divider />
-            {/* PROJECT MANAGEMENT */}
-            <Permissions category={'Product Environment Management'} />
-            <Divider />
-            {/* SBOM MANAGEMENT */}
-            <Permissions category={'SBOM Management'} />
-            <Divider />
-            {/* USER MANAGEMENT */}
-            <Permissions category={'User Management'} />
-            <Divider />
-            {/* VULN MANAGEMENT */}
-            <Permissions category={'Vulnerability Management'} />
-            <Divider />
-            {/* LICENSE MANAGEMENT */}
-            <Permissions category={'License Management'} />
-            <Divider />
-            {/* POLICY MANAGEMENT */}
-            <Permissions category={'Policy Management'} />
-          </Stack>
+          {loading ? (
+            <CustomLoader />
+          ) : (
+            <Stack spacing={4} dir='column'>
+              {/* ORGANIZATION MANAGEMENT */}
+              <Permissions category={'Organization Management'} />
+              <Divider />
+              {/* PROJECT GROUP MANAGEMENT */}
+              <Permissions category={'Product Management'} />
+              <Divider />
+              {/* PROJECT MANAGEMENT */}
+              <Permissions category={'Product Environment Management'} />
+              <Divider />
+              {/* SBOM MANAGEMENT */}
+              <Permissions category={'SBOM Management'} />
+              <Divider />
+              {/* USER MANAGEMENT */}
+              <Permissions category={'User Management'} />
+              <Divider />
+              {/* VULN MANAGEMENT */}
+              <Permissions category={'Vulnerability Management'} />
+              <Divider />
+              {/* LICENSE MANAGEMENT */}
+              <Permissions category={'License Management'} />
+              <Divider />
+              {/* POLICY MANAGEMENT */}
+              <Permissions category={'Policy Management'} />
+              <Divider />
+              {/* SUPPORT MANAGEMENT */}
+              <Permissions category={'Support Management'} />
+              <Divider />
+              {/* VENDOR MANAGEMENT */}
+              <Permissions category={'Vendor Management'} />
+              <Divider />
+              {/* CONNECTION MANAGEMENT */}
+              <Permissions category={'Connection Management'} />
+              <Divider />
+            </Stack>
+          )}
         </DrawerBody>
 
         <DrawerFooter>

@@ -21,15 +21,21 @@ import CardHeader from 'components/Card/CardHeader'
 import CustomLoader from 'components/CustomLoader'
 import { RegexHighlighter } from 'components/RegexHighlighter'
 
+import useQueryParam from 'hooks/useQueryParam'
+
 import { getInternalComponents } from 'graphQL/Queries'
 
 import { DeleteInternalComponent } from './DeleteInternalComponent'
 import { UpdateInternalComponent } from './MutateInternalComponent'
 
 export const InternalComponents = () => {
+  const activetab = useQueryParam('tab')
+  const org = localStorage.getItem('organization')
   const [isOpen, setIsOpen] = useState(false)
   const [editingRow, setEditingRow] = useState(null)
-  const { data, loading } = useQuery(getInternalComponents)
+  const { data, loading } = useQuery(getInternalComponents, {
+    skip: org === 'undefined' ? true : activetab === 'lists' ? false : true
+  })
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')

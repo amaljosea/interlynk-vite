@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { isValid } from 'date-fns'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -42,6 +42,8 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 
+import useQueryParam from 'hooks/useQueryParam'
+
 // CSS styling for the date-time picker
 import {
   createApiToken,
@@ -51,7 +53,31 @@ import {
 
 import { FaEllipsisV } from 'react-icons/fa'
 
-const TokenInfo = ({ data, refetch }) => {
+const GetApiKeys = gql`
+  query GetApiKeys {
+    organization {
+      currentUser {
+        apiKeys {
+          id
+          rawToken
+          tokenMask
+          revoked
+          expired
+          createdAt
+          updatedAt
+          revokedAt
+          expiresAt
+          notes
+        }
+      }
+    }
+  }
+`
+
+const TokenInfo = () => {
+  const activetab = useQueryParam('tab')
+  const org = localStorage.getItem('organization')
+
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const { colorMode } = useColorMode()
@@ -59,6 +85,17 @@ const TokenInfo = ({ data, refetch }) => {
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+
+  const { data, loading, refetch } = useQuery(GetApiKeys, {
+    skip:
+      org === 'undefined'
+        ? true
+        : activetab === 'security-tokens'
+          ? false
+          : true
+  })
+
+  const { apiKeys } = data?.organization?.currentUser || ''
 
   const tokenRef = useRef(null)
 
@@ -164,7 +201,7 @@ const TokenInfo = ({ data, refetch }) => {
           id: id,
           revoked: new Date().toISOString()
         }
-      }).then((res) => onClose())
+      }).then((res) => res?.data && onClose())
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -385,15 +422,15 @@ const TokenInfo = ({ data, refetch }) => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           subHeader
-          columns={columns}
-          data={data}
-          defaultSortAsc={false}
-          defaultSortFieldId={'updated'}
           persistTableHead
           responsive={true}
-          customStyles={customStyles(headColor)}
+          columns={columns}
+          data={apiKeys || []}
+          defaultSortAsc={false}
+          progressPending={loading}
+          defaultSortFieldId={'updated'}
           progressComponent={<CustomLoader />}
-          progressPending={data ? false : true}
+          customStyles={customStyles(headColor)}
           subHeaderComponent={subHeaderComponent}
         />
       </Flex>

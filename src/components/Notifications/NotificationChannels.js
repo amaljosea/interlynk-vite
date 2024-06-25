@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 
 import { Button, Flex, Input, Switch, Text } from '@chakra-ui/react'
 
+import useQueryParam from 'hooks/useQueryParam'
+
 import {
   UpdateNotificationChannel,
   UpdateNotificationConfig
@@ -16,6 +18,9 @@ import Card from '../Card/Card'
 import CardHeader from '../Card/CardHeader'
 
 const NotificationChannels = () => {
+  const activetab = useQueryParam('tab')
+  const org = localStorage.getItem('organization')
+
   const [slackWebhookUrl, setSlackWebhookUrl] = useState('')
   const [teamsWebhookUrl, setTeamsWebhookUrl] = useState('')
   const [isSlackChanged, setIsSlackChanged] = useState(false)
@@ -26,12 +31,15 @@ const NotificationChannels = () => {
   const [notificationChannels, setNotificationChannels] = useState({})
   const [notificationConfigs, setNotificationConfigs] = useState({})
 
+  const status =
+    org === 'undefined' ? true : activetab === 'notifications' ? false : true
+
   const { data: channels } = useQuery(GetUserNotificationChannels, {
-    fetchPolicy: 'network-only'
+    skip: status
   })
 
   const { data: configs } = useQuery(GetUserNotificationConfigs, {
-    fetchPolicy: 'network-only'
+    skip: status
   })
 
   useEffect(() => {

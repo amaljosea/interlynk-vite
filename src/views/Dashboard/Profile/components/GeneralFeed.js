@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
 import {
@@ -20,9 +20,17 @@ import CardHeader from 'components/Card/CardHeader'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { orgUpdate } from 'graphQL/Mutation'
+import { GetOrgName } from 'graphQL/Queries'
 
-const GeneralFeed = ({ orgInfo, refetch }) => {
+const GeneralFeed = () => {
+  const orginzation = localStorage.getItem('organization')
   const { userPermissions } = useGlobalState()
+
+  const { data, refetch } = useQuery(GetOrgName, {
+    skip: !orginzation || orginzation === 'undefined' ? true : false
+  })
+
+  const { name } = data?.organization || ''
 
   const org = userPermissions?.find((item) => item.key === 'view_organization')
   const updateOrgs = org?.supersededBy?.some(
@@ -37,41 +45,35 @@ const GeneralFeed = ({ orgInfo, refetch }) => {
 
   const [updateOrg] = useMutation(orgUpdate)
 
-  useEffect(() => {
-    if (orgInfo && orgInfo.organization) {
-      setOrgName(orgInfo.organization.name)
-    }
-  }, [orgInfo])
-
   const handleUpdate = async () => {
-    try {
-      await updateOrg({
-        variables: {
-          name: orgName
+    await updateOrg({
+      variables: {
+        name: orgName
+      }
+    })
+      .then((res) => {
+        if (res.data.organizationUpdate.errors.length === 0) {
+          localStorage.setItem('organization', orgName)
+          setMessage('Saving....')
+          setTimeout(() => {
+            setMessage('Update')
+            toast({
+              description: 'Organization name updated successfully',
+              status: 'success',
+              position: 'top',
+              duration: 2000
+            })
+          }, 2000)
         }
       })
-        .then((res) => {
-          if (res.data.organizationUpdate.errors.length === 0) {
-            localStorage.setItem('organization', orgName)
-            setMessage('Saving....')
-            setTimeout(() => {
-              setMessage('Update')
-              toast({
-                description: 'Organization name updated successfully',
-                status: 'success',
-                position: 'top',
-                duration: 2000
-              })
-            }, 2000)
-          }
-        })
-        .finally(() => {
-          refetch()
-        })
-    } catch (error) {
-      console.log(`Error`, error)
-    }
+      .finally(() => refetch())
   }
+
+  useEffect(() => {
+    if (name) {
+      setOrgName(name)
+    }
+  }, [name])
 
   return (
     <Card p={0}>
@@ -88,7 +90,7 @@ const GeneralFeed = ({ orgInfo, refetch }) => {
           gap={6}
         >
           {/* NAME */}
-          <FormControl isRequired>
+          <FormControl isRequired width={400}>
             <FormLabel>Name</FormLabel>
             <Input
               value={orgName}

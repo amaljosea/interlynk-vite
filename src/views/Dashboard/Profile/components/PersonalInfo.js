@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import Cookies from 'js-cookie'
 import React, { useEffect, useState } from 'react'
 import { validPassword, validateEmail } from 'utils'
@@ -27,12 +27,41 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { UpdateUserPassword, updateOrgUser } from 'graphQL/Mutation'
 
-const PersonalInfo = ({ user, refetch }) => {
-  const textColor = useColorModeValue('gray.700', 'white')
+const GetCurrentUser = gql`
+  query GetCurrentUser {
+    organization {
+      currentUser {
+        id
+        name
+        email
+        unconfirmedEmail
+      }
+    }
+  }
+`
+
+const PersonalInfo = () => {
   const toast = useToast()
+  const activetab = useQueryParam('tab')
+  const org = localStorage.getItem('organization')
+  const textColor = useColorModeValue('gray.700', 'white')
+
+  const { data, refetch } = useQuery(GetCurrentUser, {
+    skip:
+      org === 'undefined' ? true : activetab === 'person-details' ? false : true
+  })
+
+  const { currentUser } = data?.organization || ''
+  const {
+    id: userId,
+    name: userName,
+    email: userEmail,
+    unconfirmedEmail
+  } = currentUser || ''
 
   const { setUserName } = useGlobalState()
 
@@ -98,11 +127,11 @@ const PersonalInfo = ({ user, refetch }) => {
   }
 
   useEffect(() => {
-    if (user) {
-      setName(user.name)
-      setEmail(user.email)
+    if (currentUser) {
+      setName(userName)
+      setEmail(userEmail)
     }
-  }, [user])
+  }, [currentUser, userEmail, userName])
 
   const handleNameChange = (e) => {
     const { value } = e.target
@@ -117,29 +146,25 @@ const PersonalInfo = ({ user, refetch }) => {
   }
 
   const handleUpdate = async () => {
-    try {
-      await updateUser({ variables: { id: user.id, name: name, email: email } })
-        .then((res) => {
-          if (res.data.userUpdate.errors.length === 0) {
-            setMessage('Saving....')
-            setUserName(name)
-            localStorage.setItem('username', name)
-            localStorage.setItem('email', email)
-            setTimeout(() => {
-              setMessage('Update')
-              toast({
-                description: 'User details updated successfully',
-                status: 'success',
-                position: 'top',
-                duration: 2000
-              })
-            }, 2000)
-          }
-        })
-        .finally(() => refetch())
-    } catch (error) {
-      console.log(`Error`, error)
-    }
+    await updateUser({ variables: { id: userId, name: name, email: email } })
+      .then((res) => {
+        if (res.data.userUpdate.errors.length === 0) {
+          setMessage('Saving....')
+          setUserName(name)
+          localStorage.setItem('username', name)
+          localStorage.setItem('email', email)
+          setTimeout(() => {
+            setMessage('Update')
+            toast({
+              description: 'User details updated successfully',
+              status: 'success',
+              position: 'top',
+              duration: 2000
+            })
+          }, 2000)
+        }
+      })
+      .finally(() => refetch())
   }
 
   const handleUpdatePassword = () => {
@@ -201,9 +226,9 @@ const PersonalInfo = ({ user, refetch }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                {user?.unconfirmedEmail && (
+                {unconfirmedEmail && (
                   <FormHelperText>
-                    {JSON.stringify(user?.unconfirmedEmail)}
+                    {JSON.stringify(unconfirmedEmail)}
                   </FormHelperText>
                 )}
               </FormControl>
