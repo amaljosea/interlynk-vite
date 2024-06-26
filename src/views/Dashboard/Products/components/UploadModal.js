@@ -24,6 +24,7 @@ import {
   Stack,
   Tag,
   Text,
+  useColorModeValue,
   useToast
 } from '@chakra-ui/react'
 
@@ -32,6 +33,7 @@ import { UploadSbom } from 'graphQL/Mutation'
 const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
   const params = useParams()
   const toast = useToast()
+  const borderColor = useColorModeValue('gray.200', 'gray.600')
 
   const { projects, name } = data || ''
   const environment = localStorage.getItem('environment')
@@ -181,7 +183,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
                 borderStyle='dashed'
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
-                borderColor={isDragActive ? 'teal.500' : 'gray.200'}
+                borderColor={isDragActive ? 'blue.500' : borderColor}
                 onClick={() => document.getElementById('fileInput').click()}
               >
                 <Input
@@ -198,10 +200,10 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
                 >
                   <Text hidden={loading}>
                     {isDragActive
-                      ? 'Drop the files here ...'
+                      ? 'Drop the file here'
                       : 'Drop SBOM here, or click to select a file'}
                   </Text>
-                  <Text hidden={!loading}>Uploading ...</Text>
+                  <Text hidden={!loading}>Uploading...</Text>
                 </Flex>
               </Box>
               {loading && <Progress size='xs' isIndeterminate />}
