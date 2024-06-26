@@ -121,7 +121,7 @@ const Changelog = () => {
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          search: loggablePrefix,
+          search: searchInput[0],
           field: 'COMPONENT_VULNS_UPDATED_AT',
           direction: 'DESC'
         }
