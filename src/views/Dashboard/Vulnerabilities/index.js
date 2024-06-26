@@ -51,16 +51,6 @@ const Vulnerabilities = () => {
     }
   )
 
-  // const { data: vulnData, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
-  //   skip: vulnId ? false : true,
-  //   variables: {
-  //     id: vulnId,
-  //     componentVulnId: vulnId,
-  //     first: totalRows,
-  //     vexComplete
-  //   }
-  // })
-
   if (!org || org === 'undefined') return <OrgRegister />
 
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {

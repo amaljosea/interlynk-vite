@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-const GlobalVulnSearch = ({ setFilters }) => {
-  const [searchInput, setSearchInput] = useState('')
+const GlobalVulnSearch = ({ filters, setFilters }) => {
+  const { search } = filters || ''
+  const [searchInput, setSearchInput] = useState(search || '')
 
   const setSearchFilter = (value) => {
     setFilters((oldFilter) => ({

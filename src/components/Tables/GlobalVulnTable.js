@@ -336,8 +336,9 @@ const GlobalVulnTable = ({
   // HEADER
   const subHeaderComponent = (
     <SubHeader
-      handleRefresh={() => refetchActiveQueries()}
+      filters={filters}
       setFilters={setFilters}
+      handleRefresh={() => refetchActiveQueries()}
     />
   )
 

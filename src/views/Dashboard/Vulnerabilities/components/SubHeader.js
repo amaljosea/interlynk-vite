@@ -5,7 +5,7 @@ import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
 
 import Filters from './Filters'
 
-const SubHeader = ({ handleRefresh, setFilters }) => {
+const SubHeader = ({ handleRefresh, filters, setFilters }) => {
   return (
     <Flex width={'100%'} alignItems={'center'} gap={3}>
       <Stack
@@ -14,7 +14,7 @@ const SubHeader = ({ handleRefresh, setFilters }) => {
         spacing={4}
         alignItems={'flex-start'}
       >
-        <Filters setFilters={setFilters} />
+        <Filters filters={filters} setFilters={setFilters} />
       </Stack>
       <Stack
         width={'100%'}
