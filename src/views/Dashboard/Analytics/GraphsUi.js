@@ -64,6 +64,15 @@ export const GraphUi = ({ dataForGraph }) => {
           }
         ]}
       />
+      <SingleGraph
+        data={dataForGraph}
+        lines={[
+          {
+            dataKey: 'averageVulnerabilityDuration',
+            name: 'Patch Velociy'
+          }
+        ]}
+      />
     </Flex>
   )
 }

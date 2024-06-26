@@ -31,6 +31,7 @@ const DAILY_METRICS_QUERY = gql`
         vulnerabilityLowCount
         vulnerabilityUnknownSevCount
         vulnerabilityCount
+        averageVulnerabilityDuration
         date
       }
     }

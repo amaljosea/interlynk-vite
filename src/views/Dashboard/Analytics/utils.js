@@ -18,7 +18,8 @@ const defaultData = {
   vulnerabilityHighCount: 0,
   vulnerabilityMediumCount: 0,
   vulnerabilityLowCount: 0,
-  vulnerabilityUnknownSevCount: 0
+  vulnerabilityUnknownSevCount: 0,
+  averageVulnerabilityDuration: 0
 }
 
 export const formatForGraph = ({ nodes, dates }) => {
