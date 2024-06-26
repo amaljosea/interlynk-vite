@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import CreateRole from 'views/Dashboard/Profile/components/CreateRole'
 
 import { AddIcon } from '@chakra-ui/icons'
 import {
@@ -26,7 +27,7 @@ const RoleTable = () => {
   const activetab = useQueryParam('tab')
   const org = localStorage.getItem('organization')
 
-  const { data, loading } = useQuery(GetRoles, {
+  const { data, loading, refetch } = useQuery(GetRoles, {
     skip: org === 'undefined' ? true : activetab === 'roles' ? false : true
   })
 
@@ -35,6 +36,11 @@ const RoleTable = () => {
 
   const [selectedRole, setSelectedRole] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isRoleOpen,
+    onOpen: onRoleOpen,
+    onClose: onRoleClose
+  } = useDisclosure()
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
@@ -61,7 +67,13 @@ const RoleTable = () => {
           </Text>
         </Tooltip>
       ),
-      right: 'true'
+      right: 'true',
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.createdAt)
+        const dateB = new Date(b.createdAt)
+        return dateA - dateB // Sort in descending order
+      }
     },
     // PERMISSIONS
     {
@@ -88,11 +100,15 @@ const RoleTable = () => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         <Tooltip label='Add Role'>
-          <IconButton colorScheme='blue' icon={<AddIcon />} />
+          <IconButton
+            icon={<AddIcon />}
+            colorScheme='blue'
+            onClick={onRoleOpen}
+          />
         </Tooltip>
       </Flex>
     )
-  }, [])
+  }, [onRoleOpen])
 
   return (
     <>
@@ -101,7 +117,9 @@ const RoleTable = () => {
           subHeader
           responsive={true}
           columns={columns}
+          defaultSortAsc={false}
           progressPending={loading}
+          defaultSortFieldId={'createdAt'}
           data={organizationRoles || []}
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
@@ -115,6 +133,14 @@ const RoleTable = () => {
           onClose={onClose}
           userRole={role?.name}
           selectedRole={selectedRole}
+        />
+      )}
+
+      {isRoleOpen && (
+        <CreateRole
+          isOpen={isRoleOpen}
+          onClose={onRoleClose}
+          refetch={refetch}
         />
       )}
     </>

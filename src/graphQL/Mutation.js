@@ -2813,3 +2813,21 @@ export const DeleteTeamsConnection = gql`
     }
   }
 `
+
+// ORGANIZATION ROLE CREATE
+export const OrgRoleCreate = gql`
+  mutation OrgRoleCreate($permissions: [String!]!, $name: String!) {
+    organizationRoleCreate(input: { permissions: $permissions, name: $name }) {
+      errors
+      organizationRole {
+        createdAt
+        id
+        isAdmin
+        isSystem
+        name
+        permissions
+        updatedAt
+      }
+    }
+  }
+`

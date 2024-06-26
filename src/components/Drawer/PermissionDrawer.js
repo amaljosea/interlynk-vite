@@ -12,7 +12,8 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-  Stack
+  Stack,
+  Tag
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -84,7 +85,9 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, userRole }) => {
     return null
   }
 
-  const readOnly = activeRole?.name !== 'custom' && userRole !== 'admin'
+  const restrictedRoles = ['admin', 'viewer', 'operator']
+
+  const readOnly = restrictedRoles?.includes(activeRole?.name?.toLowerCase())
 
   const Permissions = ({ category }) => {
     return (
@@ -140,44 +143,50 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, userRole }) => {
           {loading ? (
             <CustomLoader />
           ) : (
-            <Stack spacing={4} dir='column'>
-              {/* ORGANIZATION MANAGEMENT */}
-              <Permissions category={'Organization Management'} />
-              <Divider />
-              {/* PROJECT GROUP MANAGEMENT */}
-              <Permissions category={'Product Management'} />
-              <Divider />
-              {/* PROJECT MANAGEMENT */}
-              <Permissions category={'Product Environment Management'} />
-              <Divider />
-              {/* SBOM MANAGEMENT */}
-              <Permissions category={'SBOM Management'} />
-              <Divider />
-              {/* USER MANAGEMENT */}
-              <Permissions category={'User Management'} />
-              <Divider />
-              {/* VULN MANAGEMENT */}
-              <Permissions category={'Vulnerability Management'} />
-              <Divider />
-              {/* LICENSE MANAGEMENT */}
-              <Permissions category={'License Management'} />
-              <Divider />
-              {/* POLICY MANAGEMENT */}
-              <Permissions category={'Policy Management'} />
-              <Divider />
-              {/* SUPPORT MANAGEMENT */}
-              <Permissions category={'Support Management'} />
-              <Divider />
-              {/* VENDOR MANAGEMENT */}
-              <Permissions category={'Vendor Management'} />
-              <Divider />
-              {/* CONNECTION MANAGEMENT */}
-              <Permissions category={'Connection Management'} />
-              <Divider />
+            <Stack spacing={6} dir='column'>
+              {readOnly && (
+                <Tag width={'fit-content'} colorScheme='red'>
+                  Update permissions not allowed
+                </Tag>
+              )}
+              <Stack spacing={4} dir='blue'>
+                {/* ORGANIZATION MANAGEMENT */}
+                <Permissions category={'Organization Management'} />
+                <Divider />
+                {/* PROJECT GROUP MANAGEMENT */}
+                <Permissions category={'Product Management'} />
+                <Divider />
+                {/* PROJECT MANAGEMENT */}
+                <Permissions category={'Product Environment Management'} />
+                <Divider />
+                {/* SBOM MANAGEMENT */}
+                <Permissions category={'SBOM Management'} />
+                <Divider />
+                {/* USER MANAGEMENT */}
+                <Permissions category={'User Management'} />
+                <Divider />
+                {/* VULN MANAGEMENT */}
+                <Permissions category={'Vulnerability Management'} />
+                <Divider />
+                {/* LICENSE MANAGEMENT */}
+                <Permissions category={'License Management'} />
+                <Divider />
+                {/* POLICY MANAGEMENT */}
+                <Permissions category={'Policy Management'} />
+                <Divider />
+                {/* SUPPORT MANAGEMENT */}
+                <Permissions category={'Support Management'} />
+                <Divider />
+                {/* VENDOR MANAGEMENT */}
+                <Permissions category={'Vendor Management'} />
+                <Divider />
+                {/* CONNECTION MANAGEMENT */}
+                <Permissions category={'Connection Management'} />
+                <Divider />
+              </Stack>
             </Stack>
           )}
         </DrawerBody>
-
         <DrawerFooter>
           <Button onClick={onClose}>Close</Button>
         </DrawerFooter>

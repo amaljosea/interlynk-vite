@@ -52,6 +52,14 @@ const LynkSelect = (props) => {
       '&:hover': {
         color: textColor
       }
+    }),
+    multiValueRemove: (provided) => ({
+      ...provided,
+      color: 'red',
+      ':hover': {
+        backgroundColor: 'red',
+        color: 'white'
+      }
     })
   }
 
