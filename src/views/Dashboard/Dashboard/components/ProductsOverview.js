@@ -34,9 +34,8 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const handleClick = (prod) => {
-    console.log('prod', prod)
     const { id, projectId } = prod
-    localStorage.setItem('activeProdTab', 0)
+
     prodDispatch({
       type: 'SET_CURRENT_PRODUCT',
       payload: { id: projectId, sbomId: id }

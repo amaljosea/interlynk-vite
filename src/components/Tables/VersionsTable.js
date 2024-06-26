@@ -1,9 +1,9 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getFullDateAndTime, timeSince } from 'utils'
-import { customStyles } from 'utils'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { ProductDetailsTabs } from 'utils/TabsObjects'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -67,7 +67,6 @@ const VersionsTable = ({ projectGroup }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const {
     userPermissions,
-    activeProdTab,
     clearSelect,
     setClearSelect,
     selectedSbom,
@@ -95,10 +94,15 @@ const VersionsTable = ({ projectGroup }) => {
     signedUrlParams ? GetShareSbomAlternatives : GetSbomAlternatives
   )
 
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const tab = queryParams.get('tab')
+
+  const { VERSIONS } = ProductDetailsTabs
   const { nodes, paginationProps, loading, refetch } = usePaginatatedQuery(
     signedUrlParams ? ShareVersionTable : GetVersionsTable,
     {
-      skip: activeProdTab === 0 && !isToolOpen ? false : true,
+      skip: (tab === VERSIONS || tab === null) && !isToolOpen ? false : true,
       selector: signedUrlParams
         ? 'shareLynkQuery.project.sbomVersions'
         : 'project.sbomVersions',

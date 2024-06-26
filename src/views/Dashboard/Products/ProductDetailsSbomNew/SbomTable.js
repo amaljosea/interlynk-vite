@@ -39,6 +39,7 @@ const SbomTable = ({ data, refetch, loading, error }) => {
         tab: tabs[value]
       }
     })
+
     navigate(link)
   }
 

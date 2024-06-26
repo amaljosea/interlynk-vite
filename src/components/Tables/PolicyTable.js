@@ -9,6 +9,7 @@ import {
   timeSince,
   updatedValue
 } from 'utils'
+import { ProductDetailsTabs } from 'utils/TabsObjects'
 import DeleteModal from 'views/Dashboard/Policies/DeleteModal'
 import PolicyModal from 'views/Dashboard/Policies/PolicyModal'
 import RuleModal from 'views/Dashboard/Policies/RuleModal'
@@ -58,7 +59,8 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const activeTab = Number(localStorage.getItem('activeProdTab'))
+  const queryParams = new URLSearchParams(location.search)
+  const tab = queryParams.get('tab')
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -66,9 +68,11 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [activeRule, setActiveRule] = useState(null)
 
+  const { POLICIES } = ProductDetailsTabs
+
   const { data: subOperators } = useQuery(PolicySubjectOperators, {
     skip:
-      activeTab === 4 || location?.pathname === '/vendor/policies'
+      tab === POLICIES || location?.pathname === '/vendor/policies'
         ? false
         : true
   })

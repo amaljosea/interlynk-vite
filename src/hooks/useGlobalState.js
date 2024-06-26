@@ -18,7 +18,7 @@ const GlobalStateProvider = ({ children }) => {
   const [userPermissions, setUserPermissions] = useState([])
   const [userName, setUserName] = useState('')
   const [totalRows, setTotalRows] = useState(25)
-  const [activeProdTab, setActiveProdTab] = useState(0)
+
   const [activeCsProdTab, setActiveCsProdTab] = useState(0)
   const [activeCsSbomTab, setActiveCsSbomTab] = useState(0)
   const [activeDockerHub, setActiveDockerHub] = useState(true)
@@ -149,8 +149,6 @@ const GlobalStateProvider = ({ children }) => {
       value={{
         totalRows,
         setTotalRows,
-        activeProdTab,
-        setActiveProdTab,
         activeCsProdTab,
         setActiveCsProdTab,
         activeCsSbomTab,

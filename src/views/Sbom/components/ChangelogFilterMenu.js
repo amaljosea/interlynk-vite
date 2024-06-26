@@ -1,5 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { ProductGeneralTabs } from 'utils/TabsObjects'
 
 import {
   Box,
@@ -14,20 +16,21 @@ import {
 import CheckMark from 'components/Misc/CheckMark'
 import MenuHeading from 'components/Misc/MenuHeading'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 import { GetLogFilters } from 'graphQL/Queries'
 
 const ChangelogFilterMenu = ({ id, setFilter }) => {
-  const { activeProdTab } = useGlobalState()
+  const queryParams = useSearchParams()
+  const tab = queryParams[0].get('tab')
 
   const [user, setUser] = useState([])
   const [type, setType] = useState([])
   const [object, setObject] = useState([])
 
+  const { CHANGELOG } = ProductGeneralTabs
+
   const { data, error, loading } = useQuery(GetLogFilters, {
     fetchPolicy: 'network-only',
-    skip: activeProdTab === 5 ? false : true,
+    skip: tab === CHANGELOG ? false : true,
     variables: { id: id }
   })
 

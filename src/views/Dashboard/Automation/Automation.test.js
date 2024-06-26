@@ -12,6 +12,11 @@ jest.mock('hooks/useGlobalState', () => ({
   })
 }))
 
+jest.mock('react-router-dom', () => ({
+  useLocation: () => '',
+  useParams: () => ''
+}))
+
 test('Automation page renders correctly', () => {
   render(
     <MockedProvider mocks={[]} addTypename={false}>

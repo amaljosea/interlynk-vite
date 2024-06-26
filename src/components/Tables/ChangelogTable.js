@@ -1,6 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
+import { useLocation } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { ProductDetailsTabs } from 'utils/TabsObjects'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -19,7 +21,6 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import UserCard from 'components/Misc/UserCard'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetProjectLogs } from 'graphQL/Queries'
@@ -49,8 +50,6 @@ const ChangelogTable = ({ activeEnv }) => {
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
-  const { activeProdTab } = useGlobalState()
-
   const [prodLogState, setProdLogState] = useState({
     field: 'ACTIVITY_LOGS_CREATED_AT',
     direction: 'DESC'
@@ -64,9 +63,15 @@ const ChangelogTable = ({ activeEnv }) => {
     onClose: onUserClose
   } = useDisclosure()
 
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const tab = queryParams.get('tab')
+
+  const { CHANGE_LOG } = ProductDetailsTabs
+
   const { nodes, paginationProps, refetch, loading, reset } =
     usePaginatatedQuery(GetProjectLogs, {
-      skip: activeProdTab === 5 ? false : true,
+      skip: tab === CHANGE_LOG ? false : true,
       selector: 'project.activityLogs',
       variables: {
         id: activeEnv,

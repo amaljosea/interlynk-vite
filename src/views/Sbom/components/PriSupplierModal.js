@@ -2,6 +2,7 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { validateEmail, validateUrl } from 'utils'
+import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import {
   Button,
@@ -203,10 +204,17 @@ const PriSupplierModal = ({
     (item) => item?.value !== undefined
   )
 
+  const { AUTOMATION_RULES } = ProductDetailsTabs
+
+  const link = generateProductDetailPageUrlFromCurrentUrl({
+    paramsObj: {
+      tab: AUTOMATION_RULES
+    }
+  })
+
   const handleRuleCreate = async () => {
     if (ruleExists) {
-      localStorage.setItem('activeProdTab', 2)
-      navigate(generateProductDetailPageUrlFromCurrentUrl())
+      navigate(link)
     } else {
       disableButtonTemporarily()
       await createRule({

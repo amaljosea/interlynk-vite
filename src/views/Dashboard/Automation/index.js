@@ -1,13 +1,14 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import {
   customStyles,
   getFullDateAndTime,
   timeSince,
   updatedValue
 } from 'utils'
+import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
@@ -54,7 +55,7 @@ const Automation = () => {
   const toast = useToast()
   const params = useParams()
   const productId = params.productid
-  const activeTab = Number(localStorage.getItem('activeProdTab'))
+
   const { userPermissions } = useGlobalState()
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
@@ -62,17 +63,23 @@ const Automation = () => {
 
   const [activeRow, setActiveRow] = useState(null)
 
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const tab = queryParams.get('tab')
+
+  const { AUTOMATION_RULES } = ProductDetailsTabs
+
   const { data: subOperators } = useQuery(
     AutomationConditionSubjectFieldMapping,
     {
-      skip: activeTab === 2 ? false : true
+      skip: tab === AUTOMATION_RULES ? false : true
     }
   )
 
   const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
     GetProjectCheck,
     {
-      skip: activeTab === 2 ? false : true,
+      skip: tab === AUTOMATION_RULES ? false : true,
       selector: 'project.automationRules',
       variables: {
         id: productId

@@ -340,7 +340,7 @@ const ProductTable = ({
             productgroupid: id,
             productid: env?.id || defaultProject?.id
           })
-          localStorage.setItem('activeProdTab', 0)
+
           navigate(link)
         }
         return (
@@ -380,7 +380,7 @@ const ProductTable = ({
         const handleClick = (value) => {
           const env = projects?.find((item) => item.name === value)
           localStorage.setItem('environment', env?.name)
-          localStorage.setItem('activeProdTab', 0)
+
           prodDispatch({
             type: 'SET_CURRENT_PRODUCT',
             payload: { id: env?.id }

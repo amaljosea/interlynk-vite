@@ -8,8 +8,8 @@ import {
   envOrderList,
   isDefaultEnv
 } from 'utils'
-import { isUnknown } from 'utils'
-import { GetIcon } from 'utils'
+import { GetIcon, isUnknown } from 'utils'
+import { ProductGeneralTabs } from 'utils/TabsObjects'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -81,17 +81,19 @@ const Parts = ({ sbomRefetch }) => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
+  const { totalRows, prodState, userPermissions, dispatch } = useGlobalState()
+
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
-  const { setActiveProdTab, totalRows, prodState, userPermissions, dispatch } =
-    useGlobalState()
   const { enabled, field, direction } = prodState
   const { prodVulnDispatch } = dispatch
 
+  const { PARTS } = ProductGeneralTabs
+
   // GET SBOM PARTS
   const { data, refetch, error } = useQuery(GetSbomParts, {
-    skip: activeTab === 'parts' ? false : true,
+    skip: activeTab === PARTS ? false : true,
     variables: { projectId: prodId, sbomId, first: totalRows }
   })
 
@@ -121,7 +123,7 @@ const Parts = ({ sbomRefetch }) => {
   const [envList, setEnvList] = useState([])
 
   const { data: allProjects } = useQuery(GetProjectGroups, {
-    skip: activeTab === 'parts' ? false : true,
+    skip: activeTab === PARTS ? false : true,
     variables: {
       first: totalRows,
       enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
@@ -267,7 +269,6 @@ const Parts = ({ sbomRefetch }) => {
 
   const onSelectPart = () => {
     partsContext.push()
-    setActiveProdTab(0)
   }
 
   const onFilterSev = (part, value) => {

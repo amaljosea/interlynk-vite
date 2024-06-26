@@ -2,6 +2,7 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { validateCpe } from 'utils'
+import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import {
   Button,
@@ -55,7 +56,6 @@ const CpeModal = ({
   const sbomId = params.sbomid
   const productId = params.productid
   const navigate = useNavigate()
-  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const [error, setError] = useState('')
   const [vendor, setVendor] = useState('')
@@ -76,6 +76,8 @@ const CpeModal = ({
   const [hardware, setHardware] = useState('')
   const [other, setOther] = useState('')
   const [isDisabled, setIsDisabled] = useState(false)
+
+  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const isInvalid =
     type === '' || vendor === '' || product === '' || version === ''
@@ -346,10 +348,17 @@ const CpeModal = ({
     }
   ]
 
+  const { AUTOMATION_RULES } = ProductDetailsTabs
+
+  const link = generateProductDetailPageUrlFromCurrentUrl({
+    paramsObj: {
+      tab: AUTOMATION_RULES
+    }
+  })
+
   const handleRuleCreate = async () => {
     if (ruleExists) {
-      localStorage.setItem('activeProdTab', 2)
-      navigate(generateProductDetailPageUrlFromCurrentUrl())
+      navigate(link)
     } else {
       disableButtonTemporarily()
       await createRule({

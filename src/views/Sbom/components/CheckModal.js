@@ -1,6 +1,7 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
@@ -272,10 +273,17 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
     }
   }
 
-  const handleRuleCreate = () => {
+  const { AUTOMATION_RULES } = ProductDetailsTabs
+
+  const link = generateProductDetailPageUrlFromCurrentUrl({
+    paramsObj: {
+      tab: AUTOMATION_RULES
+    }
+  })
+
+  const handleRuleCreate = async () => {
     if (ruleExists) {
-      localStorage.setItem('activeProdTab', 2)
-      navigate(generateProductDetailPageUrlFromCurrentUrl())
+      navigate(link)
     } else {
       disableButtonTemporarily()
       createRule({

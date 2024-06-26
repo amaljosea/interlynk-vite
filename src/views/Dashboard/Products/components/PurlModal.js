@@ -3,6 +3,7 @@ import { PackageURL } from 'packageurl-js'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { typeOptions } from 'utils'
+import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import {
   Button,
@@ -55,6 +56,7 @@ const PurlModal = ({
   const sbomId = params.sbomid
   const productId = params.productid
   const navigate = useNavigate()
+
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const { prodCompState, dispatch } = useGlobalState()
@@ -575,10 +577,17 @@ const PurlModal = ({
     }
   ]
 
+  const { AUTOMATION_RULES } = ProductDetailsTabs
+
+  const link = generateProductDetailPageUrlFromCurrentUrl({
+    paramsObj: {
+      tab: AUTOMATION_RULES
+    }
+  })
+
   const handleRuleCreate = async () => {
     if (ruleExists) {
-      localStorage.setItem('activeProdTab', 2)
-      navigate(generateProductDetailPageUrlFromCurrentUrl())
+      navigate(link)
     } else {
       disableButtonTemporarily()
       await createRule({

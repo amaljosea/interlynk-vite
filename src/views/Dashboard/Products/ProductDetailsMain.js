@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { Search2Icon } from '@chakra-ui/icons'
 import {
@@ -44,6 +45,7 @@ import VersionsTable from 'components/Tables/VersionsTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
@@ -103,14 +105,24 @@ const ProductDetailsMain = () => {
     'change log'
   ]
 
-  const {
-    totalRows,
-    activeProdTab,
-    setActiveProdTab,
-    prodVulnState,
-    dispatch,
-    userPermissions
-  } = useGlobalState()
+  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
+
+  const onTabChange = (value) => {
+    const link = generateProductDetailPageUrlFromCurrentUrl({
+      paramsObj: {
+        tab: tabs[value]
+      }
+    })
+
+    navigate(link)
+  }
+
+  const queryParams = useSearchParams()
+  const tab = queryParams[0].get('tab')
+  const activeTabNumber = Math.max(tabs.indexOf(tab), 0)
+
+  const { totalRows, prodVulnState, dispatch, userPermissions } =
+    useGlobalState()
 
   const {
     searchInput: vulnSearch,
@@ -182,14 +194,14 @@ const ProductDetailsMain = () => {
     field: 'VULNS_VULN_ID',
     direction: 'DESC'
   })
-
+  const { VERSIONS } = ProductDetailsTabs
   const {
     nodes,
     paginationProps,
     reset,
     loading: globalVulnloading
   } = usePaginatatedQuery(GetGlobalVulns, {
-    skip: activeProdTab === 1 ? false : true,
+    skip: tab === VERSIONS ? false : true,
     selector: 'organization.vulns',
     variables: {
       projectGroupIds: [productGroupId],
@@ -198,6 +210,7 @@ const ProductDetailsMain = () => {
     }
   })
 
+  const { POLICIES } = ProductDetailsTabs
   // GET POLICY DATA
   const {
     nodes: policyData,
@@ -205,15 +218,15 @@ const ProductDetailsMain = () => {
     refetch: policyRefetch,
     loading: policyloading
   } = usePaginatatedQuery(GetProjectPolicies, {
-    skip: activeProdTab === 4 ? false : true,
+    skip: tab === POLICIES ? false : true,
     selector: 'projectPolicies',
     variables: {
       projectId: activeEnv
     }
   })
-
+  const { SETTINGS } = ProductDetailsTabs
   const { data: mfc } = useQuery(GetOrgMfc, {
-    skip: activeProdTab === 3 ? false : true
+    skip: tab === SETTINGS ? false : true
   })
 
   const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
@@ -250,8 +263,6 @@ const ProductDetailsMain = () => {
 
   const [projectDelete] = useMutation(DeleteProjectGroup)
 
-  const activeTab = Number(localStorage.getItem('activeProdTab'))
-
   const {
     isOpen: isOpenProduct,
     onOpen: onOpenProduct,
@@ -274,11 +285,6 @@ const ProductDetailsMain = () => {
   } = useDisclosure()
   const { isOpen: isEnvOpen, onClose: onEnvClose } = useDisclosure()
 
-  const handleTabChange = (value) => {
-    localStorage.setItem('activeProdTab', value)
-    setActiveProdTab(value)
-  }
-
   // DELETE PRODUCT
   const onProductDelete = async () => {
     await projectDelete({
@@ -293,22 +299,6 @@ const ProductDetailsMain = () => {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
   }, [prodVulnDispatch, sbomId])
-
-  useEffect(() => {
-    if (activeTab === 0) {
-      setActiveProdTab(0)
-    } else if (activeTab === 1) {
-      setActiveProdTab(1)
-    } else if (activeTab === 2) {
-      setActiveProdTab(2)
-    } else if (activeTab === 3) {
-      setActiveProdTab(3)
-    } else if (activeTab === 4) {
-      setActiveProdTab(4)
-    } else if (activeTab === 5) {
-      setActiveProdTab(5)
-    }
-  }, [activeTab, setActiveProdTab])
 
   useEffect(() => {
     if (environment && data) {
@@ -467,9 +457,10 @@ const ProductDetailsMain = () => {
           <CardBody>
             <Tabs
               w={'100%'}
+              bg={'white'}
+              index={activeTabNumber}
+              onChange={onTabChange}
               variant='enclosed'
-              index={activeProdTab}
-              onChange={(value) => handleTabChange(value)}
             >
               <TabList>
                 {tabs.map((item, index) => (

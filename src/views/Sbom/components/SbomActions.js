@@ -275,7 +275,6 @@ const SbomActions = ({ sbom, refetch }) => {
           navigate(url)
         }
       })
-    // .finally(() => setActiveProdTab(2))
   }
 
   const handleDelete = async () => {
