@@ -47,7 +47,7 @@ const VulnCard = ({ data, isOpen, onClose }) => {
             <Divider />
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
               <Text fontSize={'sm'}>KEV</Text>
-              <CustomTag>{JSON.stringify(kev) || '-'}</CustomTag>
+              <CustomTag>{kev ? 'Yes' : 'No'}</CustomTag>
             </Grid>
           </Stack>
         </ModalBody>
