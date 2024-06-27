@@ -457,7 +457,6 @@ const ProductDetailsMain = () => {
           <CardBody>
             <Tabs
               w={'100%'}
-              bg={'white'}
               index={activeTabNumber}
               onChange={onTabChange}
               variant='enclosed'

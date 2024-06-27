@@ -503,7 +503,7 @@ const VersionsTable = ({ projectGroup }) => {
                 colorScheme='blue'
                 icon={<FaCodeCompare />}
                 isLoading={isToolOpen}
-              ></IconButton>
+              />
             </Tooltip>
           )}
           {/* BUILD SBOM */}
