@@ -71,6 +71,7 @@ const ChangelogTable = ({ activeEnv }) => {
 
   const { nodes, paginationProps, refetch, loading, reset } =
     usePaginatatedQuery(GetProjectLogs, {
+      fetchPolicy: 'network-only',
       skip: tab === CHANGE_LOG ? false : true,
       selector: 'project.activityLogs',
       variables: {

@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { ProductGeneralTabs } from 'utils/TabsObjects'
+import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import {
   Box,
@@ -26,11 +26,11 @@ const ChangelogFilterMenu = ({ id, setFilter }) => {
   const [type, setType] = useState([])
   const [object, setObject] = useState([])
 
-  const { CHANGELOG } = ProductGeneralTabs
+  const { CHANGE_LOG } = ProductDetailsTabs
 
   const { data, error, loading } = useQuery(GetLogFilters, {
     fetchPolicy: 'network-only',
-    skip: tab === CHANGELOG ? false : true,
+    skip: tab === CHANGE_LOG ? false : true,
     variables: { id: id }
   })
 
