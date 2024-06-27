@@ -4324,6 +4324,9 @@ export const getInternalComponents = gql`
         organizationId
         updatedAt
         createdAt
+        enabled
+        createdBy
+        lastUpdatedBy
       }
     }
   }

@@ -163,14 +163,19 @@ export const DeclineInvitation = gql`
 
 // CREATE INTERNAL COMPONENT
 export const createOrgComp = gql`
-  mutation createOrgComp($matchStr: String!, $ignoreCase: Boolean!) {
+  mutation createOrgComp(
+    $matchStr: String!
+    $ignoreCase: Boolean!
+    $enabled: Boolean!
+  ) {
     organizationComponentCreate(
-      input: { matchStr: $matchStr, ignoreCase: $ignoreCase }
+      input: { matchStr: $matchStr, ignoreCase: $ignoreCase, enabled: $enabled }
     ) {
       organizationComponent {
         matchStr
         updatedAt
         id
+        enabled
       }
       errors
     }
@@ -179,14 +184,25 @@ export const createOrgComp = gql`
 
 // UPDATE INTERNAL COMPONENT
 export const updateOrgComp = gql`
-  mutation updateOrgComp($id: ID!, $matchStr: String!, $ignoreCase: Boolean!) {
+  mutation updateOrgComp(
+    $id: Uuid!
+    $matchStr: String!
+    $ignoreCase: Boolean!
+    $enabled: Boolean!
+  ) {
     organizationComponentUpdate(
-      input: { id: $id, matchStr: $matchStr, ignoreCase: $ignoreCase }
+      input: {
+        id: $id
+        matchStr: $matchStr
+        ignoreCase: $ignoreCase
+        enabled: $enabled
+      }
     ) {
       organizationComponent {
         matchStr
         updatedAt
         id
+        enabled
       }
       errors
     }

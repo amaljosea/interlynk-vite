@@ -16,6 +16,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Switch,
   Text,
   UnorderedList,
   useToast
@@ -36,6 +37,7 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
   const [matchStr, setMatchStr] = useState(internalComponent?.matchStr || '')
   const [errorText, setErrorText] = useState(null)
   const [ignoreCase, setIgnoreCase] = useState(!!internalComponent?.ignoreCase)
+  const [enabled, setEnabled] = useState(!!internalComponent?.enabled)
   const toast = useToast()
   const mutateText = isEdit ? 'Update' : 'Tag'
 
@@ -75,7 +77,8 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
       variables: {
         id: internalComponent?.id,
         matchStr,
-        ignoreCase
+        ignoreCase,
+        enabled
       }
     })
   }
@@ -117,6 +120,16 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
                     }}
                   >
                     Case insensitive
+                  </Checkbox>
+                </FormControl>
+                <FormControl mt={3}>
+                  <Checkbox
+                    defaultChecked={enabled}
+                    onChange={() => {
+                      setEnabled(!enabled)
+                    }}
+                  >
+                    Enable
                   </Checkbox>
                 </FormControl>
                 <Box py={3}>

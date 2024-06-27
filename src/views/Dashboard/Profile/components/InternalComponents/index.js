@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils'
@@ -10,9 +10,11 @@ import {
   Flex,
   IconButton,
   Stack,
+  Switch,
   Text,
   Tooltip,
-  useColorModeValue
+  useColorModeValue,
+  useToast
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
@@ -23,6 +25,7 @@ import { RegexHighlighter } from 'components/RegexHighlighter'
 
 import useQueryParam from 'hooks/useQueryParam'
 
+import { updateOrgComp } from 'graphQL/Mutation'
 import { getInternalComponents } from 'graphQL/Queries'
 
 import { DeleteInternalComponent } from './DeleteInternalComponent'
@@ -36,6 +39,29 @@ export const InternalComponents = () => {
   const { data, loading } = useQuery(getInternalComponents, {
     skip: org === 'undefined' ? true : activetab === 'lists' ? false : true
   })
+  const toast = useToast()
+
+  const [mutate] = useMutation(updateOrgComp, {
+    onCompleted: () => {
+      toast({
+        description: `Internal component update successful!`,
+        status: 'success',
+        position: 'top',
+        duration: 3000
+      })
+    }
+  })
+
+  const handleToggleChange = async (id, matchStr, ignoreCase, enabled) => {
+    mutate({
+      variables: {
+        id,
+        matchStr,
+        ignoreCase,
+        enabled
+      }
+    })
+  }
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -44,7 +70,7 @@ export const InternalComponents = () => {
     {
       id: 'REGULAR_EXPRESSION',
       name: 'REGULAR EXPRESSION',
-      grow: 3,
+      grow: 2,
       selector: (row) => {
         return <RegexHighlighter>{row.matchStr}</RegexHighlighter>
       }
@@ -52,10 +78,22 @@ export const InternalComponents = () => {
     {
       id: 'CASE_INSENSITIVE',
       name: 'CASE INSENSITIVE',
+      grow: 1.5,
       selector: (row) => {
         return (
           <Text color={textColor} my={2}>
             {row.ignoreCase ? 'Yes' : 'No'}
+          </Text>
+        )
+      }
+    },
+    {
+      id: 'CREATED_BY',
+      name: 'CREATED BY',
+      selector: (row) => {
+        return (
+          <Text color={textColor} my={2}>
+            {row.createdBy}
           </Text>
         )
       }
@@ -79,6 +117,37 @@ export const InternalComponents = () => {
           <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
             <Text color={textColor}>{timeSince(row.updatedAt)}</Text>
           </Tooltip>
+        )
+      }
+    },
+    {
+      id: 'LAST_UPDATED_BY',
+      name: 'LAST UPDATED BY',
+      selector: (row) => {
+        return (
+          <Text color={textColor} my={2}>
+            {row.lastUpdatedBy}
+          </Text>
+        )
+      }
+    },
+    {
+      id: 'ENABLED',
+      name: 'ENABLED',
+      right: true,
+      selector: (row) => {
+        return (
+          <Switch
+            isChecked={row.enabled}
+            onChange={() =>
+              handleToggleChange(
+                row.id,
+                row.matchStr,
+                row.ignoreCase,
+                !row.enabled
+              )
+            }
+          />
         )
       }
     },
