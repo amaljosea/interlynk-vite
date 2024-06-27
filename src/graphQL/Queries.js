@@ -3969,6 +3969,23 @@ export const ComponentVulnLogs = gql`
   }
 `
 
+export const ShareCompVulnLogs = gql`
+  query ShareCompVulnLogs($vexLogableId: Uuid!) {
+    componentVulnLogs(vexLogableId: $vexLogableId) {
+      actionStmt
+      changedBy
+      detail
+      fixedIn
+      id
+      impact
+      justification
+      response
+      status
+      updatedAt
+    }
+  }
+`
+
 export const GetOrgMfc = gql`
   query GetOrgMfc($after: String, $before: String, $first: Int, $last: Int) {
     organizationManufacturers(
