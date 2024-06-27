@@ -194,14 +194,14 @@ const ProductDetailsMain = () => {
     field: 'VULNS_VULN_ID',
     direction: 'DESC'
   })
-  const { VERSIONS } = ProductDetailsTabs
+  const { VULNERABILITIES } = ProductDetailsTabs
   const {
     nodes,
     paginationProps,
     reset,
     loading: globalVulnloading
   } = usePaginatatedQuery(GetGlobalVulns, {
-    skip: tab === VERSIONS ? false : true,
+    skip: tab === VULNERABILITIES ? false : true,
     selector: 'organization.vulns',
     variables: {
       projectGroupIds: [productGroupId],
