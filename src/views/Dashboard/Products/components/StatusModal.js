@@ -30,8 +30,8 @@ const StatusModal = ({ isOpen, onClose, group }) => {
         enabled: enabled === true ? false : true
       }
     }).then((res) => {
-      const errors = res?.data?.projectGroupUpdate?.errors
-      if (errors?.length === 0) {
+      const { errors } = res?.data?.projectGroupUpdate || ''
+      if (errors?.length > 0) {
         console.log(errors[0])
       } else {
         onClose()
