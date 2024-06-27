@@ -1,6 +1,10 @@
 import { useMutation, useQuery } from '@apollo/client'
+import { useState } from 'react'
 
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
   Box,
   Button,
   Checkbox,
@@ -23,9 +27,15 @@ import useQueryParam from 'hooks/useQueryParam'
 import { UpdateOrganizationRole } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
 
-const PermissionDrawer = ({ isOpen, onClose, selectedRole, userRole }) => {
+const PermissionDrawer = ({
+  isOpen,
+  onClose,
+  selectedRole,
+  userRole,
+  refetch
+}) => {
   const activetab = useQueryParam('tab')
-
+  const [error, setError] = useState('')
   const { data, loading } = useQuery(GetAllPermissions, {
     skip: activetab === 'roles' ? false : true
   })
@@ -56,6 +66,13 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, userRole }) => {
             organizationRoleId: activeRole?.id,
             permissions: permissions
           }
+        }).then((res) => {
+          const { errors } = res?.data?.organizationRoleUpdate || ''
+          if (errors?.length > 0) {
+            setError(errors[0])
+          } else {
+            refetch()
+          }
         })
       }
     }
@@ -79,6 +96,13 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, userRole }) => {
             },
             { permissionKey: filterItem?.key, value: e.target.checked }
           ]
+        }
+      }).then((res) => {
+        const { errors } = res?.data?.organizationRoleUpdate || ''
+        if (errors?.length > 0) {
+          setError(errors[0])
+        } else {
+          refetch()
         }
       })
     }
@@ -148,6 +172,12 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, userRole }) => {
                 <Tag width={'fit-content'} colorScheme='red'>
                   Update permissions not allowed
                 </Tag>
+              )}
+              {error !== '' && (
+                <Alert status='error' borderRadius={4}>
+                  <AlertIcon />
+                  <AlertDescription fontSize={'sm'}>{error}</AlertDescription>
+                </Alert>
               )}
               <Stack spacing={4} dir='blue'>
                 {/* ORGANIZATION MANAGEMENT */}

@@ -40,7 +40,7 @@ const CreateRole = ({ isOpen, onClose, refetch }) => {
 
   const [createRole] = useMutation(OrgRoleCreate)
 
-  const psOptions = []
+  const psOptions = [{ value: 'all', label: 'All' }]
 
   const { data } = useQuery(GetPermissions, {
     skip: isOpen === true ? false : true
@@ -73,12 +73,18 @@ const CreateRole = ({ isOpen, onClose, refetch }) => {
 
   const onSave = () => {
     const selectedPs = permissions?.map((item) => item?.value)
+    const allPs = psOptions
+      ?.filter((item) => item?.value !== 'all')
+      ?.map((item) => item?.value)
     if (roleName?.length < 4) {
       setError('Input must be at least 4 characters')
     } else {
       disableButtonTemporarily()
       createRole({
-        variables: { name: roleName, permissions: selectedPs }
+        variables: {
+          name: roleName,
+          permissions: selectedPs?.includes('all') ? allPs : selectedPs
+        }
       }).then((res) => {
         const { errors } = res?.data?.organizationRoleCreate || ''
         if (errors?.length > 0) {
