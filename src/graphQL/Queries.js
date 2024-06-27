@@ -3445,14 +3445,9 @@ export const GetShareLicensesTable = gql`
           }
           nodes {
             licenseExpression
-            licenses {
-              __typename
-              state
-            }
             components {
               name
             }
-            derivedState
           }
         }
       }
