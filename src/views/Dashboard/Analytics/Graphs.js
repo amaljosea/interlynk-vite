@@ -1,10 +1,13 @@
 import { gql, useQuery } from '@apollo/client'
 import React from 'react'
 
-import { Center, Flex, useColorModeValue } from '@chakra-ui/react'
+import { Center, Icon, SimpleGrid, useColorModeValue } from '@chakra-ui/react'
+
+import CustomLoader from 'components/CustomLoader'
+
+import { TfiBarChart } from 'react-icons/tfi'
 
 import { GraphUi } from './GraphsUi'
-import Placeholder from './Placeholder.png'
 import { formatForGraph, getDays } from './utils'
 
 const DAILY_METRICS_QUERY = gql`
@@ -40,6 +43,7 @@ const DAILY_METRICS_QUERY = gql`
 
 export const Graphs = ({ filters }) => {
   const { startDate, endDate } = filters?.duration || {}
+  const bgColor = useColorModeValue('gray.300', 'gray.600')
 
   const { data, loading, error } = useQuery(DAILY_METRICS_QUERY, {
     variables: {
@@ -54,27 +58,13 @@ export const Graphs = ({ filters }) => {
 
   if (!filters.version.length || !filters.duration) {
     return (
-      <Flex
-        mt={4}
-        gap={8}
-        width={'100%'}
-        flexWrap={'wrap'}
-        alignItems={'center'}
-        justifyContent='center'
-      >
-        {['License Count', 'Components Count', 'Vulnerability Count'].map(
-          (item, index) => (
-            <Center
-              width={500}
-              height={300}
-              backgroundRepeat='no-repeat'
-              backgroundImage={Placeholder}
-              backgroundPosition='center'
-              key={index}
-            />
-          )
-        )}
-      </Flex>
+      <SimpleGrid width={'100%'} columns={2} spacing={24}>
+        {[1, 2, 3, 4].map((_, index) => (
+          <Center key={index}>
+            <Icon as={TfiBarChart} boxSize={44} color={bgColor} />
+          </Center>
+        ))}
+      </SimpleGrid>
     )
   }
 
@@ -91,7 +81,7 @@ export const Graphs = ({ filters }) => {
   })
 
   if (loading) {
-    return 'Loading...'
+    return <CustomLoader />
   }
 
   if (error) {

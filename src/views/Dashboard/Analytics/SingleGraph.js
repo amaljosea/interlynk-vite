@@ -4,6 +4,7 @@ import {
   Legend,
   Line,
   LineChart,
+  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis
@@ -31,23 +32,25 @@ class CustomizedAxisTick extends PureComponent {
 
 export const SingleGraph = ({ data, lines }) => {
   return (
-    <LineChart width={500} height={300} data={data}>
-      <CartesianGrid strokeDasharray='3 3' />
-      <XAxis dataKey='date' tick={<CustomizedAxisTick xOffset={50} />} />
-      <YAxis tick={<CustomizedAxisTick />} />
-      <Tooltip />
-      <Legend />
-      {lines.map((item) => {
-        return (
-          <Line
-            key={item.name}
-            type='monotone'
-            stroke='#3182CE'
-            activeDot={{ r: 8 }}
-            {...item}
-          />
-        )
-      })}
-    </LineChart>
+    <ResponsiveContainer aspect={2.5} debounce={300}>
+      <LineChart data={data}>
+        <CartesianGrid strokeDasharray='3 3' />
+        <XAxis dataKey='date' tick={<CustomizedAxisTick xOffset={50} />} />
+        <YAxis tick={<CustomizedAxisTick />} />
+        <Tooltip labelStyle={{ color: '#4A5568' }} />
+        <Legend wrapperStyle={{ fontSize: 14 }} />
+        {lines.map((item) => {
+          return (
+            <Line
+              key={item.name}
+              type='monotone'
+              stroke='#3182CE'
+              activeDot={{ r: 8 }}
+              {...item}
+            />
+          )
+        })}
+      </LineChart>
+    </ResponsiveContainer>
   )
 }

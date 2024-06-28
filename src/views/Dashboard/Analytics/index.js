@@ -24,7 +24,7 @@ const Analytics = () => {
         </CardBody>
       </Card>
       <Card>
-        <CardBody>
+        <CardBody py={6} pr={12}>
           <Graphs filters={filters} />
         </CardBody>
       </Card>

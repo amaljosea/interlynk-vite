@@ -1,23 +1,23 @@
-import { Flex } from '@chakra-ui/react'
+import { Grid } from '@chakra-ui/react'
 
 import { SingleGraph } from './SingleGraph'
 
 export const GraphUi = ({ dataForGraph }) => {
   return (
-    <Flex
+    <Grid
       mt={4}
-      gap={8}
+      gap={12}
       width={'100%'}
-      flexWrap={'wrap'}
       alignItems={'center'}
       justifyContent='center'
+      templateColumns={`repeat(2, 1fr)`}
     >
       <SingleGraph
         data={dataForGraph}
         lines={[
           {
-            dataKey: 'licensesCount',
-            name: 'License Count'
+            dataKey: 'componentsCount',
+            name: 'Components Count'
           }
         ]}
       />
@@ -69,10 +69,10 @@ export const GraphUi = ({ dataForGraph }) => {
         lines={[
           {
             dataKey: 'averageVulnerabilityDuration',
-            name: 'Patch Velociy'
+            name: 'Patch Velocity'
           }
         ]}
       />
-    </Flex>
+    </Grid>
   )
 }
