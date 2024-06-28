@@ -75,48 +75,12 @@ const NotificationChannels = () => {
     updateChannel({
       variables: {
         notificationChannels: {
-          ...selectedChannels,
-          slack: false,
-          teams: false
+          ...selectedChannels
         }
       }
     }).then((res) => {
       res?.data?.notificationChannelUpdate?.success &&
         setNotificationChannels(selectedChannels)
-    })
-  }
-
-  const handleSaveSlackWebhookUrl = (id) => {
-    updateConfig({
-      variables: {
-        notificationConfigs: {
-          slackWebhookUrl: slackWebhookUrl
-        }
-      }
-    }).then((res) => {
-      res?.data?.notificationConfigUpdate?.success &&
-        setNotificationConfigs({
-          ...notificationConfigs,
-          slackWebhookUrl
-        })
-      setIsSlackChanged(false)
-    })
-  }
-
-  const handleSaveTeamsWebhookUrl = (id) => {
-    updateConfig({
-      variables: {
-        notificationConfigs: {
-          teamsWebhookUrl: teamsWebhookUrl
-        }
-      }
-    }).then((res) => {
-      res?.data?.notificationConfigUpdate?.success &&
-        setNotificationConfigs({
-          ...notificationConfigs,
-          teamsWebhookUrl
-        })
-      setIsTeamsChanged(false)
     })
   }
 
@@ -127,70 +91,20 @@ const NotificationChannels = () => {
           Channels
         </Text>
       </CardHeader>
-      {Object.keys(notificationChannels)
-        .filter((key) => key === 'email')
-        .map((id, index) => (
-          <Flex align='center' mb='20px' key={index}>
-            <Switch
-              size='md'
-              colorScheme='blue'
-              isChecked={notificationChannels[id]}
-              me='20px'
-              onChange={() => handleSwitchChange(id)}
-            />
-            <Text
-              color='gray.500'
-              fontWeight='400'
-              textTransform={'capitalize'}
-            >
-              {id}
-            </Text>
-            {id === 'slack' && notificationChannels[id] && (
-              <>
-                <Input
-                  value={slackWebhookUrl}
-                  onChange={(e) => {
-                    setSlackWebhookUrl(e.target.value)
-                    setIsSlackChanged(true)
-                  }}
-                  placeholder='Paste Slack Webhook URL'
-                  color='gray.600'
-                  ml='23px'
-                />
-                <Button
-                  colorScheme='blue'
-                  ml='20px'
-                  onClick={handleSaveSlackWebhookUrl}
-                  disabled={!isSlackChanged}
-                >
-                  Save
-                </Button>
-              </>
-            )}
-            {id === 'teams' && notificationChannels[id] && (
-              <>
-                <Input
-                  value={teamsWebhookUrl}
-                  onChange={(e) => {
-                    setTeamsWebhookUrl(e.target.value)
-                    setIsTeamsChanged(true)
-                  }}
-                  placeholder='Paste Teams Webhook URL'
-                  color='gray.600'
-                  ml='15px'
-                />
-                <Button
-                  colorScheme='blue'
-                  ml='20px'
-                  onClick={handleSaveTeamsWebhookUrl}
-                  disabled={!isTeamsChanged}
-                >
-                  Save
-                </Button>
-              </>
-            )}
-          </Flex>
-        ))}
+      {Object.keys(notificationChannels).map((id, index) => (
+        <Flex align='center' mb='20px' key={index}>
+          <Switch
+            size='md'
+            colorScheme='blue'
+            isChecked={notificationChannels[id]}
+            me='20px'
+            onChange={() => handleSwitchChange(id)}
+          />
+          <Text color='gray.500' fontWeight='400' textTransform={'capitalize'}>
+            {id}
+          </Text>
+        </Flex>
+      ))}
     </Card>
   )
 }
