@@ -124,7 +124,9 @@ const VersionsTable = ({ projectGroup }) => {
       permission.key === 'archive_sbom' && permission.value === true
   )
 
-  const [deleteSbom] = useMutation(sbomDelete)
+  const [deleteSbom] = useMutation(sbomDelete, {
+    onCompleted: (data) => data && refetch({ id: productId })
+  })
 
   const {
     isOpen: isToolOpen,
@@ -402,14 +404,14 @@ const VersionsTable = ({ projectGroup }) => {
         id: activeRow.id
       }
     }).then((res) => {
-      if (res.data.sbomDelete?.errors?.length === 0) {
-        setTimeout(() => {
-          setIsLoading(false)
-          setClearSelect(true)
-          setSelectedSbom([])
-          refetch({ id: productId })
-          onDeleteClose()
-        }, 2000)
+      const { errors } = res?.data?.sbomDelete || ''
+      if (errors?.length > 0) {
+        console.log(errors[0])
+      } else {
+        setIsLoading(false)
+        setClearSelect(true)
+        setSelectedSbom([])
+        onDeleteClose()
       }
     })
   }

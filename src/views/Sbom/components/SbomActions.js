@@ -138,7 +138,7 @@ const SbomActions = ({ sbom, refetch }) => {
   } = useDisclosure()
 
   const {
-    isOpen: isDelete,
+    isOpen: isDeleteOpen,
     onOpen: setDeleteOpen,
     onClose: setDeleteClose
   } = useDisclosure()
@@ -284,12 +284,10 @@ const SbomActions = ({ sbom, refetch }) => {
         id: sbomId
       }
     }).then((res) => {
-      if (res.data) {
-        setTimeout(() => {
-          setIsLoading(false)
-          const url = generateProductDetailPageUrlFromCurrentUrl()
-          navigate(url)
-        }, 3000)
+      if (res?.data) {
+        setIsLoading(false)
+        const url = generateProductDetailPageUrlFromCurrentUrl()
+        navigate(url)
       }
     })
   }
@@ -447,7 +445,7 @@ const SbomActions = ({ sbom, refetch }) => {
       )}
 
       {/* DELETE SBOM */}
-      <Modal isOpen={isDelete} onClose={setDeleteClose}>
+      <Modal isOpen={isDeleteOpen} onClose={setDeleteClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Delete Version</ModalHeader>
