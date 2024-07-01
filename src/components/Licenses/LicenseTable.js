@@ -24,6 +24,8 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaScaleBalanced } from 'react-icons/fa6'
 
@@ -36,11 +38,19 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
+  const { userPermissions } = useGlobalState()
+  const viewLic = userPermissions?.find((item) => item?.key === 'view_license')
+  const updateLic = viewLic?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_license_attributes' && permission?.value === true
+  )
+
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const subHeaderComponent = (
     <SubHeaderComponent
       onOpen={onOpen}
+      createLic={updateLic}
       setActiveRow={setActiveRow}
       handleRefresh={() => refetchActiveQueries()}
       setFilters={setFilters}
@@ -226,7 +236,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
                     setActiveRow(row)
                     onOpen()
                   }}
-                  isDisabled={false}
+                  isDisabled={!updateLic}
                 >
                   Edit License
                 </MenuItem>

@@ -45,8 +45,14 @@ const LegalTable = () => {
   const toast = useToast()
   const activetab = useQueryParam('tab')
   const org = localStorage.getItem('organization')
+  const { userPermissions, totalRows } = useGlobalState()
 
-  const { totalRows } = useGlobalState()
+  const orgs = userPermissions?.find((item) => item.key === 'view_organization')
+  const updateOrg = orgs?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_organization' && permission?.value === true
+  )
+
   const [activeRow, setActiveRow] = useState(null)
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
@@ -124,6 +130,7 @@ const LegalTable = () => {
         <Tooltip label='Add Manufacturer'>
           <IconButton
             size='sm'
+            isDisabled={!updateOrg}
             colorScheme='blue'
             onClick={() => {
               setActiveRow(null)
@@ -134,7 +141,7 @@ const LegalTable = () => {
         </Tooltip>
       </Flex>
     )
-  }, [onCheckMfc, onOpen, textColor])
+  }, [updateOrg, onCheckMfc, onOpen, textColor])
 
   // COLUMNS
   const columns = [
@@ -268,6 +275,7 @@ const LegalTable = () => {
             <Portal>
               <MenuList fontSize={'sm'}>
                 <MenuItem
+                  isDisabled={!updateOrg}
                   onClick={() => {
                     setActiveRow(row)
                     onOpen()
@@ -276,6 +284,7 @@ const LegalTable = () => {
                   Update Manufacturer
                 </MenuItem>
                 <MenuItem
+                  isDisabled={!updateOrg}
                   color={'red.500'}
                   onClick={() => handleDelete(row?.id)}
                 >

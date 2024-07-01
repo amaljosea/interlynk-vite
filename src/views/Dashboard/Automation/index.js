@@ -93,6 +93,11 @@ const Automation = () => {
   })
 
   const product = userPermissions?.find((item) => item.key === 'view_product')
+  const updateProduct = product?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_product_group' && permission.value === true
+  )
+
   const editAutomations = product?.supersededBy?.some(
     (permission) =>
       permission.key === 'edit_product_automations' && permission.value === true
@@ -186,7 +191,7 @@ const Automation = () => {
       selector: (row) => {
         return (
           <div
-            draggable
+            draggable={updateProduct}
             style={{ padding: '1rem' }}
             onDrag={() => setActiveRow(row)}
             onDrop={(e) => moveRow(e, row)}
@@ -205,6 +210,7 @@ const Automation = () => {
         return (
           <Switch
             isChecked={row?.active}
+            isDisabled={!updateProduct}
             onChange={() => {
               setActiveRow(row)
               onActiveOpen()

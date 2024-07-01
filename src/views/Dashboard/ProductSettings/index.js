@@ -82,6 +82,11 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
     (permission) =>
       permission.key === 'update_product_settings' && permission.value === true
   )
+  const con = userPermissions?.find((item) => item.key === 'view_connections')
+  const updateCon = con?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'create_update_connection' && permission.value === true
+  )
 
   const [updateSettings] = useMutation(ProjectSettingUpdate)
 
@@ -367,6 +372,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
               <LynkSelect
                 options={projects}
                 placeholder='Project'
+                isDisabled={!updateCon}
                 onChange={(e) => onUpdate(e.value, 'jira')}
                 value={{ value: jiraProject || '', label: jiraProject || '' }}
               />

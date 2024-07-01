@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 
 import { Text, Wrap, useDisclosure } from '@chakra-ui/react'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { GetConnections } from 'graphQL/Queries'
@@ -20,10 +21,17 @@ import TeamsConfigModal from './TeamsConfigModal'
 const Connections = () => {
   const activetab = useQueryParam('tab')
   const org = localStorage.getItem('organization')
+  const { userPermissions } = useGlobalState()
   const { data, refetch } = useQuery(GetConnections, {
     skip:
       org === 'undefined' ? true : activetab === 'connections' ? false : true
   })
+
+  const con = userPermissions?.find((item) => item.key === 'view_connections')
+  const updateCon = con?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'create_update_connection' && permission.value === true
+  )
 
   const {
     isOpen: isJiraOpen,
@@ -98,6 +106,7 @@ const Connections = () => {
               name='Jira'
               onConfigure={onJiraOpen}
               isConnected={greenCheck.jira}
+              isDisabled={!updateCon}
               color='#0070f3'
             />
             <ConnectionCard
@@ -105,6 +114,7 @@ const Connections = () => {
               name='Slack'
               onConfigure={onSlackOpen}
               isConnected={greenCheck.slack}
+              isDisabled={!updateCon}
               color='#E01E5A'
             />
             <ConnectionCard
@@ -112,6 +122,7 @@ const Connections = () => {
               name='Teams'
               onConfigure={onTeamsOpen}
               isConnected={greenCheck.teams}
+              isDisabled={!updateCon}
               color='#6264A7'
             />
           </Wrap>

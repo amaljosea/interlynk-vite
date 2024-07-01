@@ -48,6 +48,8 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
 
@@ -61,6 +63,24 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
   const sbomId = params.sbomid
   const queryParams = new URLSearchParams(location.search)
   const tab = queryParams.get('tab')
+
+  const { userPermissions } = useGlobalState()
+  const product = userPermissions?.find(
+    (item) => item.key === 'view_product_group'
+  )
+  const updateProduct = product?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_product_group' && permission.value === true
+  )
+  const policy = userPermissions?.find((item) => item?.key === 'view_policy')
+  const updatePolicy = policy?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'create_update_policy' && permission?.value === true
+  )
+  const removePolicy = policy?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'remove_policy' && permission?.value === true
+  )
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -156,6 +176,7 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
             <IconButton
               hidden={productId}
               colorScheme='blue'
+              isDisabled={!updatePolicy}
               onClick={() => {
                 setActiveRow(null)
                 onOpen()
@@ -174,7 +195,7 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
         </Stack>
       </Flex>
     )
-  }, [handleRefresh, onOpen, productId, sbomId])
+  }, [handleRefresh, onOpen, productId, sbomId, updatePolicy])
 
   // COLUMNS
   const columns = [
@@ -186,6 +207,7 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
         return (
           <Switch
             size='md'
+            isDisabled={!updatePolicy}
             isChecked={isEnabled}
             onChange={() => {
               setActiveRow(row)
@@ -279,6 +301,7 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
               isExcluded ? handleDeleteExclusion(id) : handleCreateExclusion(id)
             }
             color={textColor}
+            isDisabled={!updateProduct}
             textTransform={'capitalize'}
           >
             {['yes', 'no'].map((itm, index) => (
@@ -312,6 +335,7 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
               <MenuList fontSize={'sm'}>
                 {/* EDIT POLICY */}
                 <MenuItem
+                  isDisabled={!updatePolicy}
                   hidden={productId}
                   onClick={() => {
                     setActiveRow(row)
@@ -334,6 +358,7 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
                 {/* DELETE POLICY  */}
                 <MenuItem
                   color='red'
+                  isDisabled={!removePolicy}
                   onClick={() => {
                     setActiveRow(row)
                     onDeleteOpen()
@@ -458,55 +483,6 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
               </Tbody>
             </Table>
           </TableContainer>
-          {/* <Grid templateColumns='repeat(3, 1fr)' gap={6} mb={4}>
-            <GridItem>
-              <CustomText>subject</CustomText>
-            </GridItem>
-            <GridItem>
-              <CustomText>operator</CustomText>
-            </GridItem>
-            <GridItem>
-              <CustomText>value</CustomText>
-            </GridItem>
-          </Grid>
-          {policyRules?.map((item, index) => (
-            <Grid
-              key={index}
-              templateColumns='repeat(3, 1fr)'
-              gap={6}
-              mb={1}
-              bg={'#EDF2F7'}
-              p={2}
-            >
-              <GridItem>
-                <Text fontSize={'sm'} textTransform={'capitalize'}>
-                  {formatSubject(item?.subject)}
-                </Text>
-              </GridItem>
-              <GridItem>
-                <Text fontSize={'sm'} textTransform={'lowercase'}>
-                  {updatedValue(item?.operator)}
-                </Text>
-              </GridItem>
-              <GridItem>
-                <Text
-                  fontSize={'sm'}
-                  wordBreak={'break-all'}
-                  hidden={
-                    item?.operator === 'EXISTS' ||
-                    item?.operator === 'NOT_EXISTS'
-                  }
-                >
-                  {item?.value}{' '}
-                  {item?.subject === 'VULNERABILITY_EPSS' &&
-                  (item?.operator === 'LESS_THAN' ||
-                    item?.operator === 'MORE_THAN')
-                    ? ' %'
-                    : ''}
-                </Text>
-              </GridItem>
-            </Grid>
-          ))} */}
         </Box>
       </Flex>
     )

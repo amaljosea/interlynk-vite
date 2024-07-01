@@ -22,6 +22,7 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { UpdateOrganizationRole } from 'graphQL/Mutation'
@@ -35,6 +36,13 @@ const PermissionDrawer = ({
   refetch
 }) => {
   const activetab = useQueryParam('tab')
+  const { userPermissions } = useGlobalState()
+  const orgs = userPermissions?.find((item) => item.key === 'view_organization')
+  const updateOrg = orgs?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_organization' && permission?.value === true
+  )
+
   const [error, setError] = useState('')
   const { data, loading } = useQuery(GetAllPermissions, {
     skip: activetab === 'roles' ? false : true
@@ -127,7 +135,7 @@ const PermissionDrawer = ({
             <Checkbox
               key={index}
               isChecked={item.value}
-              isDisabled={readOnly}
+              isDisabled={readOnly || !updateOrg}
               onChange={(e) => onCheckParent(e, item.category)}
             >
               {item.name}
@@ -146,7 +154,7 @@ const PermissionDrawer = ({
                 key={index}
                 name={item.key}
                 isChecked={item?.value}
-                isDisabled={readOnly}
+                isDisabled={readOnly || !updateOrg}
                 onChange={(e) => onCheckChild(e, item.category)}
               >
                 {item.name}

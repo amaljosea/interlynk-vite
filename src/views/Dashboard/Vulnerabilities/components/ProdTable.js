@@ -30,10 +30,10 @@ import ComponentCard from 'components/Misc/ComponentCard'
 import VersionCard from 'components/Misc/VersionCard'
 import Pagination from 'components/Pagination'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
-import { GetConnectedSbom } from 'graphQL/Queries'
-import { GetCompVulnData } from 'graphQL/Queries'
+import { GetCompVulnData, GetConnectedSbom } from 'graphQL/Queries'
 
 import { FaFolderTree } from 'react-icons/fa6'
 
@@ -45,6 +45,13 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+
+  const { userPermissions } = useGlobalState()
+  const viewFeeds = userPermissions?.find((item) => item?.key === 'view_feeds')
+  const manageFeeds = viewFeeds?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'manage_feeds' && permission?.value === true
+  )
 
   const [vulnState, setVulnState] = useState({
     vexComplete: false
@@ -313,7 +320,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
             fontWeight='normal'
             fontSize={'sm'}
             onClick={onOpen}
-            isDisabled={signedUrlParams}
+            isDisabled={signedUrlParams || !manageFeeds}
           >
             Set Status
           </Button>
@@ -321,6 +328,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
       </Flex>
     )
   }, [
+    manageFeeds,
     filterInput,
     handleSearch,
     handleClear,

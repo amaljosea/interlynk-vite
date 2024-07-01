@@ -117,6 +117,8 @@ const ProductTable = ({
     [userPermissions]
   )
 
+  console.log('productPermissions', productPermissions)
+
   const sbomPermissions = useMemo(
     () => userPermissions?.find((item) => item.key === 'view_sbom'),
     [userPermissions]
@@ -127,6 +129,15 @@ const ProductTable = ({
       productPermissions?.supersededBy?.some(
         (permission) =>
           permission.key === 'create_product_group' && permission.value
+      ),
+    [productPermissions]
+  )
+
+  const canEditProduct = useMemo(
+    () =>
+      productPermissions?.supersededBy?.some(
+        (permission) =>
+          permission.key === 'update_product_group' && permission.value
       ),
     [productPermissions]
   )
@@ -266,6 +277,7 @@ const ProductTable = ({
               icon={<AddIcon />}
               colorScheme='blue'
               variant='solid'
+              isDisabled={!canAddProduct}
               hidden={signedUrlParams}
               onClick={() => {
                 setActiveRow(null)
@@ -286,6 +298,7 @@ const ProductTable = ({
     )
   }, [
     filterText,
+    canAddProduct,
     onSearchInputChange,
     handleClear,
     handleSearch,
@@ -310,7 +323,7 @@ const ProductTable = ({
             id={name}
             size='md'
             isChecked={enabled}
-            isDisabled={signedUrlParams}
+            isDisabled={signedUrlParams || !canEditProduct}
             onChange={() => {
               setActiveRow(row)
               onWarningOpen()

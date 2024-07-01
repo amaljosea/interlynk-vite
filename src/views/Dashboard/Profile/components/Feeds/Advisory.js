@@ -15,10 +15,6 @@ const AdvisoryFeeds = ({ data, refetch }) => {
   const [organizationSettingCreate] = useMutation(OrgSettingCreate)
   const [organizationSettingUpdate] = useMutation(OrgSettingUpdate)
 
-  const filteredFeed = data?.organization?.organizationSettings?.filter(
-    (item) => item.setting.kind === `advisory_feed`
-  )
-
   const handleChange = async (e, id, feed) => {
     try {
       if (feed && feed.id !== undefined) {
@@ -49,42 +45,37 @@ const AdvisoryFeeds = ({ data, refetch }) => {
         </Text>
       </CardHeader>
       <CardBody px='5px'>
-        {data && data.organization && (
-          <Flex direction='column'>
-            {filteredFeed &&
-              filteredFeed
-                .sort((a, b) =>
-                  a.setting.friendlyName.localeCompare(b.setting.friendlyName)
+        <Flex direction='column'>
+          {data?.length > 0 &&
+            [...data]
+              .sort((a, b) =>
+                a?.setting?.friendlyName.localeCompare(b?.setting?.friendlyName)
+              )
+              .map((feed, index) => {
+                const activeFeed = data?.find((org) => org.id === feed.id)
+                return (
+                  <Flex align='center' mb='20px' key={index}>
+                    <Switch
+                      size='md'
+                      colorScheme='blue'
+                      me='10px'
+                      disabled={true}
+                      isChecked={activeFeed && activeFeed.value}
+                      onChange={(e) => handleChange(e, feed.id, activeFeed)}
+                      id={feed.id}
+                    />
+                    <Text
+                      noOfLines={1}
+                      color='gray.500'
+                      fontWeight='400'
+                      htmlFor={feed.friendlyName}
+                    >
+                      {feed.setting.friendlyName}
+                    </Text>
+                  </Flex>
                 )
-                .map((feed, index) => {
-                  const activeFeed =
-                    data.organization.organizationSettings.find(
-                      (org) => org.id === feed.id
-                    )
-                  return (
-                    <Flex align='center' mb='20px' key={index}>
-                      <Switch
-                        size='md'
-                        colorScheme='blue'
-                        me='10px'
-                        disabled={true}
-                        isChecked={activeFeed && activeFeed.value}
-                        onChange={(e) => handleChange(e, feed.id, activeFeed)}
-                        id={feed.id}
-                      />
-                      <Text
-                        noOfLines={1}
-                        color='gray.500'
-                        fontWeight='400'
-                        htmlFor={feed.friendlyName}
-                      >
-                        {feed.setting.friendlyName}
-                      </Text>
-                    </Flex>
-                  )
-                })}
-          </Flex>
-        )}
+              })}
+        </Flex>
       </CardBody>
     </Card>
   )

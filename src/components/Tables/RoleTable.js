@@ -17,6 +17,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { GetRoles } from 'graphQL/Queries'
@@ -26,6 +27,13 @@ import { FaUserLock } from 'react-icons/fa6'
 const RoleTable = () => {
   const activetab = useQueryParam('tab')
   const org = localStorage.getItem('organization')
+
+  const { userPermissions } = useGlobalState()
+  const orgs = userPermissions?.find((item) => item.key === 'view_organization')
+  const updateOrgs = orgs?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_organization' && permission.value === true
+  )
 
   const { data, loading, refetch } = useQuery(GetRoles, {
     skip: org === 'undefined' ? true : activetab === 'roles' ? false : true
@@ -104,11 +112,12 @@ const RoleTable = () => {
             icon={<AddIcon />}
             colorScheme='blue'
             onClick={onRoleOpen}
+            isDisabled={!updateOrgs}
           />
         </Tooltip>
       </Flex>
     )
-  }, [onRoleOpen])
+  }, [updateOrgs, onRoleOpen])
 
   return (
     <>

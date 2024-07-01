@@ -23,6 +23,7 @@ import CardHeader from 'components/Card/CardHeader'
 import CustomLoader from 'components/CustomLoader'
 import { RegexHighlighter } from 'components/RegexHighlighter'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { updateOrgComp } from 'graphQL/Mutation'
@@ -40,6 +41,13 @@ export const InternalComponents = () => {
     skip: org === 'undefined' ? true : activetab === 'lists' ? false : true
   })
   const toast = useToast()
+  const { userPermissions } = useGlobalState()
+
+  const orgs = userPermissions?.find((item) => item.key === 'view_organization')
+  const updateOrg = orgs?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_organization' && permission?.value === true
+  )
 
   const [mutate] = useMutation(updateOrgComp, {
     onCompleted: () => {
@@ -190,6 +198,7 @@ export const InternalComponents = () => {
               icon={<AddIcon />}
               colorScheme='blue'
               variant='solid'
+              isDisabled={!updateOrg}
               onClick={() => {
                 setIsOpen(true)
               }}

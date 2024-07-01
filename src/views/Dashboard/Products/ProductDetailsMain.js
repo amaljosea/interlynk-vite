@@ -432,7 +432,7 @@ const ProductDetailsMain = () => {
                     <IconButton
                       colorScheme={'blue'}
                       onClick={onWarningOpen}
-                      isDisabled={signedUrlParams}
+                      isDisabled={signedUrlParams || !updateProduct}
                       icon={enabled ? <FaToggleOff /> : <FaToggleOn />}
                     />
                   </Tooltip>

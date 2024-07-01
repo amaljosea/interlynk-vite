@@ -1025,6 +1025,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
               <IconButton
                 colorScheme='blue'
                 onClick={onOpen}
+                isDisabled={!editVulns}
                 hidden={signedUrlParams}
                 icon={<FaPen />}
               />

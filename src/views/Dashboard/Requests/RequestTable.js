@@ -25,6 +25,8 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import SearchFilter from 'components/Licenses/LicenseSearchFilter'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { RequestCancel, RequestResend } from 'graphQL/Mutation'
 
 import { FaEllipsisV } from 'react-icons/fa'
@@ -45,6 +47,13 @@ const RequestTable = ({
   paginationProps
 }) => {
   const toast = useToast()
+  const { userPermissions } = useGlobalState()
+  const viewReq = userPermissions?.find((item) => item?.key === 'view_requests')
+  const addReq = viewReq?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'add_request' && permission?.value === true
+  )
+
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
@@ -149,6 +158,7 @@ const RequestTable = ({
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
           <Tooltip label='Request SBOM'>
             <IconButton
+              isDisabled={!addReq}
               colorScheme='blue'
               onClick={() => {
                 setActiveRow(null)
@@ -169,6 +179,7 @@ const RequestTable = ({
     )
   }, [
     data,
+    addReq,
     filterText,
     handleClear,
     handleRefresh,

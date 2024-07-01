@@ -11,6 +11,7 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import CustomLoader from 'components/CustomLoader'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { orgRuleUpdate } from 'graphQL/Mutation'
@@ -19,9 +20,16 @@ import { GetOrgRules } from 'graphQL/Queries'
 const Checks = () => {
   const activetab = useQueryParam('tab')
   const org = localStorage.getItem('organization')
+  const { userPermissions } = useGlobalState()
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
+  const editChecks = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_checks' && permission.value === true
+  )
 
   const { data, refetch } = useQuery(GetOrgRules, {
     skip: org === 'undefined' ? true : activetab === 'checks' ? false : true,
@@ -106,6 +114,7 @@ const Checks = () => {
             width={'130px'}
             value={severity}
             color={textColor}
+            isDisabled={!editChecks}
             onChange={(e) => handleStatusChange(id, e.target.value)}
             bg={sevColor(severity.toLowerCase()) + '.300'}
           >

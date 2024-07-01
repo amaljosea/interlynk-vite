@@ -30,6 +30,8 @@ import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaPlus } from 'react-icons/fa6'
 
@@ -43,6 +45,17 @@ const SupportTable = ({
 }) => {
   const params = useParams()
   const sbomId = params.sbomid
+
+  const { userPermissions } = useGlobalState()
+  const viewSup = userPermissions?.find((item) => item?.key === 'view_support')
+  const editSup = viewSup?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_support' && permission?.value === true
+  )
+  const archiveSup = viewSup?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'archive_support' && permission?.value === true
+  )
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -148,6 +161,7 @@ const SupportTable = ({
             <Tooltip label='Create Support'>
               <IconButton
                 colorScheme='blue'
+                isDisabled={!editSup}
                 onClick={() => {
                   setActiveRow(null)
                   onOpen()
@@ -167,6 +181,7 @@ const SupportTable = ({
       </Flex>
     )
   }, [
+    editSup,
     filterText,
     onSearchInputChange,
     handleClear,
@@ -200,6 +215,7 @@ const SupportTable = ({
         return (
           <Switch
             size='md'
+            isDisabled={!editSup}
             isChecked={enabled}
             onChange={() => {
               setActiveRow(row)
@@ -333,6 +349,7 @@ const SupportTable = ({
               <MenuList fontSize={'sm'}>
                 {/* EDIT SUPPORT */}
                 <MenuItem
+                  isDisabled={!editSup}
                   onClick={() => {
                     setActiveRow(row)
                     onOpen()
@@ -343,6 +360,7 @@ const SupportTable = ({
                 {/* DELETE SUPPORT  */}
                 <MenuItem
                   color='red'
+                  isDisabled={!archiveSup}
                   onClick={() => {
                     setActiveRow(row)
                     onDeleteOpen()

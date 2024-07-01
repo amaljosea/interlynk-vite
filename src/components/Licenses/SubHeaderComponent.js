@@ -6,6 +6,7 @@ import Filter from './Filter'
 export const SubHeaderComponent = ({
   setFilters,
   onOpen,
+  createLic,
   setActiveRow,
   handleRefresh
 }) => {
@@ -18,6 +19,7 @@ export const SubHeaderComponent = ({
       {/* ADD LICNESE */}
       <Tooltip label='Add License'>
         <IconButton
+          isDisabled={!createLic}
           onClick={() => {
             setActiveRow(null)
             onOpen()

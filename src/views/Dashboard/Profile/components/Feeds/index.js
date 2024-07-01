@@ -19,6 +19,15 @@ const Feeds = () => {
     skip: org === 'undefined' ? true : activetab === 'feeds' ? false : true
   })
 
+  const { organizationSettings } = data?.organization || ''
+
+  const advisoryFeed = organizationSettings?.filter(
+    (item) => item?.setting?.kind === `advisory_feed`
+  )
+  const exploitFeed = organizationSettings?.filter(
+    (item) => item?.setting?.kind === `exploit_feed`
+  )
+
   if (loading) return <CustomLoader />
 
   return (
@@ -27,8 +36,8 @@ const Feeds = () => {
       width={'100%'}
       templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
     >
-      <AdvisoryFeeds data={data} refetch={refetch} />
-      <ExploitFeeds data={data} refetch={refetch} />
+      <AdvisoryFeeds data={advisoryFeed} refetch={refetch} />
+      <ExploitFeeds data={exploitFeed} refetch={refetch} />
     </Grid>
   )
 }

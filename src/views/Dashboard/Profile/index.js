@@ -217,7 +217,7 @@ function Profile() {
                 <RoleTable />
               </TabPanel>
               {/* FEEDS */}
-              <TabPanel display={manageFeeds ? 'block' : 'none'}>
+              <TabPanel>
                 <Feeds />
               </TabPanel>
               {/* RULES */}
