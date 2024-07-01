@@ -229,37 +229,26 @@ export default function HeaderLinks(props) {
       <IconButton
         size='sm'
         onClick={toggleColorMode}
-        icon={colorMode === 'light' ? <FaMoon /> : <FaSun />}
         display={signedUrlParams ? 'none' : 'flex'}
+        icon={colorMode === 'light' ? <FaMoon /> : <FaSun />}
       />
       {!signedUrlParams && (
         <Menu>
           <MenuButton
-            as={IconButton}
-            aria-label='Options'
             variant='none'
             color='gray.400'
-            ms='0px'
-            px='0px'
+            fontSize={'sm'}
+            fontWeight='semibold'
+            wordBreak='break-all'
+            maxWidth={'150px'}
             onClick={() => fetchOrg()}
-            rightIcon={
-              document.documentElement.dir ? (
-                ''
-              ) : (
-                <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
-              )
-            }
-            leftIcon={
-              document.documentElement.dir ? (
-                <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
-              ) : (
-                ''
-              )
-            }
           >
-            <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
-              {userName || name}
-            </Text>
+            <Stack direction={'row'} alignItems={'center'}>
+              <ProfileIcon color={navbarIcon} width='24px' />
+              <Text textAlign={'left'} lineHeight={1.2}>
+                {userName || name}
+              </Text>
+            </Stack>
           </MenuButton>
           <MenuList>
             <MenuGroup title=''>
