@@ -4461,3 +4461,54 @@ export const GetSbomQualityScores = gql`
     }
   }
 `
+
+// GET PROJECT VERSION AND ID
+export const GetProjectVersionAndId = gql`
+  query GetProjectVersionAndId($id: Uuid!) {
+    project(id: $id) {
+      sbomVersions {
+        nodes {
+          id
+          projectVersion
+        }
+      }
+    }
+  }
+`
+export const GetProjectGroupDetails = gql`
+  query GetProjectGroupDetails(
+    $search: String
+    $enabled: Boolean
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ProjectGroupOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    organization {
+      id
+      projectGroups(
+        search: $search
+        enabled: $enabled
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        nodes {
+          id
+          name
+          defaultProject {
+            id
+          }
+          projects {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`
