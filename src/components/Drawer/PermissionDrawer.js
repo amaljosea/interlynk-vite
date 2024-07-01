@@ -127,7 +127,7 @@ const PermissionDrawer = ({
             <Checkbox
               key={index}
               isChecked={item.value}
-              isReadOnly={readOnly}
+              isDisabled={readOnly}
               onChange={(e) => onCheckParent(e, item.category)}
             >
               {item.name}
@@ -146,7 +146,7 @@ const PermissionDrawer = ({
                 key={index}
                 name={item.key}
                 isChecked={item?.value}
-                isReadOnly={readOnly}
+                isDisabled={readOnly}
                 onChange={(e) => onCheckChild(e, item.category)}
               >
                 {item.name}
@@ -170,7 +170,7 @@ const PermissionDrawer = ({
             <Stack spacing={6} dir='column'>
               {readOnly && (
                 <Tag width={'fit-content'} colorScheme='red'>
-                  Update permissions not allowed
+                  {activeRole?.name} permissions not allowed
                 </Tag>
               )}
               {error !== '' && (
