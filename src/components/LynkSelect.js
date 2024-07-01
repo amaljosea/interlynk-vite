@@ -1,4 +1,5 @@
 import ReactSelect from 'react-select'
+import CreatableSelect from 'react-select/creatable'
 
 import { useColorModeValue } from '@chakra-ui/system'
 
@@ -63,7 +64,13 @@ const LynkSelect = (props) => {
     })
   }
 
-  return (
+  return props.isCreatable ? (
+    <CreatableSelect
+      styles={selectStyles}
+      className='react-select'
+      {...props}
+    />
+  ) : (
     <ReactSelect styles={selectStyles} className='react-select' {...props} />
   )
 }

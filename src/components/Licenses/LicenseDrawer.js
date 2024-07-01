@@ -229,6 +229,7 @@ const LicenseDrawer = ({ isOpen, onClose, data }) => {
                 <FormControl>
                   <FormLabel htmlFor='url'>Attribution Keys</FormLabel>
                   <LynkSelect
+                    isCreatable
                     isMulti
                     name='attributionKeys'
                     id='attributionKeys'
