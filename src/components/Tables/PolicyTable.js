@@ -70,16 +70,16 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
   )
   const updateProduct = product?.supersededBy?.some(
     (permission) =>
-      permission.key === 'update_product_group' && permission.value === true
+      permission?.key === 'update_product_group' && permission?.value === true
   )
   const policy = userPermissions?.find((item) => item?.key === 'view_policy')
   const updatePolicy = policy?.supersededBy?.some(
     (permission) =>
-      permission.key === 'create_update_policy' && permission?.value === true
+      permission?.key === 'create_update_policy' && permission?.value === true
   )
   const removePolicy = policy?.supersededBy?.some(
     (permission) =>
-      permission.key === 'remove_policy' && permission?.value === true
+      permission?.key === 'remove_policy' && permission?.value === true
   )
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
