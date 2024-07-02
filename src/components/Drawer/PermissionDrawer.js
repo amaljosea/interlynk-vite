@@ -178,7 +178,7 @@ const PermissionDrawer = ({
             <Stack spacing={6} dir='column'>
               {readOnly && (
                 <Tag width={'fit-content'} colorScheme='red'>
-                  {activeRole?.name} permissions not allowed
+                  {activeRole?.name} permissions cannot be modified
                 </Tag>
               )}
               {error !== '' && (
