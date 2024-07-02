@@ -81,8 +81,8 @@ const LicenseDrawer = ({ isOpen, onClose, data }) => {
     onClose()
   }
 
-  const handleUpdateLicense = async () => {
-    await updateLicense({
+  const handleUpdateLicense = () => {
+    updateLicense({
       variables: {
         id: data.id,
         state,
@@ -98,8 +98,9 @@ const LicenseDrawer = ({ isOpen, onClose, data }) => {
         fsfLibre,
         osiApproved
       }
+    }).then(() => {
+      refetchActiveQueries()
     })
-    refetchActiveQueries()
     toast({
       description:
         'License properties and all product versions, including this license, are being updated. This could take some time.',
