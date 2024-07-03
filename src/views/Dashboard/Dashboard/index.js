@@ -142,7 +142,7 @@ export default function Dashboard() {
         <GridItem colSpan={8} w='100%'>
           <ProductsOverview
             title={'Recent Imports'}
-            data={metrics?.organizationMetric?.latestVersions || []}
+            data={metrics?.organizationMetric?.latestVersions}
             prodPermissions={productPermissions}
           />
         </GridItem>
@@ -151,7 +151,7 @@ export default function Dashboard() {
           <ActivitiesOverview
             title={'Recent Activities'}
             amount={metrics?.organizationMetric?.latestActivity?.length}
-            data={metrics?.organizationMetric?.latestActivity || []}
+            data={metrics?.organizationMetric?.latestActivity}
             prodPermissions={productPermissions}
           />
         </GridItem>
