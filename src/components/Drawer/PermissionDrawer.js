@@ -126,9 +126,10 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, refetch }) => {
           )
           .map((item, index) => (
             <Checkbox
+              isDisabled
               key={index}
               isChecked={item.value}
-              isDisabled={readOnly || !updateOrg}
+              // isDisabled={readOnly || !updateOrg}
               onChange={(e) => onCheckParent(e, item.category)}
             >
               {item.name}
