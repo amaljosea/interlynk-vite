@@ -16,18 +16,24 @@ import { SearchIcon } from '@chakra-ui/icons'
 import { useColorModeValue } from '@chakra-ui/system'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useSettingActions from 'hooks/useSettingActions'
 import useThemeActions from 'hooks/useThemeAction'
 
-import { GetProductTable } from 'graphQL/Queries'
+import { GetProjectGroupAndVersionDetails } from 'graphQL/Queries'
 
 import { FaRegWindowMaximize } from 'react-icons/fa'
+import { FaScrewdriverWrench } from 'react-icons/fa6'
 
 const Kbar = () => {
   // hooks
   const { results, rootActionId } = useMatches()
   const userType = getUserType()
   const navigate = useNavigate()
+  const {
+    generateProductVersionDetailPageUrlFromCurrentUrl,
+    generateProductDetailPageUrlFromCurrentUrl
+  } = useProductUrlContext()
 
   const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
   const textHoverColor = useColorModeValue('#EDF2F7', '#2D3748')
@@ -38,7 +44,7 @@ const Kbar = () => {
     [userPermissions]
   )
 
-  const { data: productData } = useQuery(GetProductTable, {
+  const { data: productData } = useQuery(GetProjectGroupAndVersionDetails, {
     skip: productPermissions?.value === true ? false : true,
     fetchPolicy: 'network-only',
     variables: {
@@ -50,18 +56,41 @@ const Kbar = () => {
 
   let data = []
   if (productData?.organization?.projectGroups?.nodes?.length > 0) {
-    productData?.organization?.projectGroups?.nodes?.map((item) =>
-      data?.push({
+    productData.organization.projectGroups.nodes.forEach((item) => {
+      data.push({
         id: item?.name,
         name: item?.name,
         section: 'products',
         icon: <FaRegWindowMaximize color='#718096' />,
-        perform: () =>
-          navigate(
-            `/${userType}/products/${item?.id}/env/${item?.defaultProject?.id}`
-          )
+        perform: () => {
+          const link = generateProductDetailPageUrlFromCurrentUrl({
+            productgroupid: item?.id,
+            productid: item?.defaultProject?.id
+          })
+          navigate(link)
+        }
       })
-    )
+
+      if (item?.defaultProject?.sbomVersions?.nodes?.length > 0) {
+        item.defaultProject.sbomVersions.nodes.forEach((version) => {
+          data.push({
+            id: version?.id,
+            name: `${item?.name} - ${version?.projectVersion}`,
+            section: 'product versions',
+            icon: <FaScrewdriverWrench color='#718096' />,
+            perform: () => {
+              const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+                productgroupid: item?.id,
+                productid: item?.defaultProject?.id,
+                sbomid: version?.id,
+                paramsObj: { tab: 'general' }
+              })
+              navigate(link)
+            }
+          })
+        })
+      }
+    })
   }
 
   useThemeActions()

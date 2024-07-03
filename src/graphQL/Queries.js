@@ -4512,3 +4512,53 @@ export const GetProjectGroupDetails = gql`
     }
   }
 `
+
+export const GetProjectGroupAndVersionDetails = gql`
+  query GetProjectGroupAndVersionDetails(
+    $search: String
+    $enabled: Boolean
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ProjectGroupOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    organization {
+      id
+      projectGroups(
+        search: $search
+        enabled: $enabled
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        nodes {
+          id
+          name
+          defaultProject {
+            id
+            sbomVersions {
+              nodes {
+                id
+                projectVersion
+              }
+            }
+          }
+          projects {
+            id
+            name
+            sbomVersions {
+              nodes {
+                id
+                projectVersion
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
