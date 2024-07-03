@@ -49,7 +49,11 @@ const Filters = ({ setFilters, data }) => {
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* EMAILS */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box
+        width={'fit-content'}
+        position={'relative'}
+        hidden={emailList?.length === 0}
+      >
         <Menu closeOnSelect={false}>
           {email.length !== 0 && !email.includes('all') && <CheckMark />}
           <MenuHeading title={'Email'} />
@@ -69,7 +73,11 @@ const Filters = ({ setFilters, data }) => {
         </Menu>
       </Box>
       {/* PRODUCTS */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box
+        width={'fit-content'}
+        position={'relative'}
+        hidden={productList?.length === 0}
+      >
         <Menu closeOnSelect={false}>
           {product.length !== 0 && !product.includes('all') && <CheckMark />}
           <MenuHeading title={'Product'} />
@@ -89,7 +97,11 @@ const Filters = ({ setFilters, data }) => {
         </Menu>
       </Box>
       {/* STATUS */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box
+        width={'fit-content'}
+        position={'relative'}
+        hidden={statusList?.length === 0}
+      >
         <Menu closeOnSelect={false}>
           {status.length !== 0 && !status.includes('all') && <CheckMark />}
           <MenuHeading title={'Status'} />
