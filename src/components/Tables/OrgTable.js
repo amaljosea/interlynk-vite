@@ -135,18 +135,23 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
       variables: {
         organizationId: id
       }
+    }).then((res) => {
+      const { errors } = res?.data?.organizationUserInvitationAcceptById || ''
+      if (errors?.length > 0) {
+        toast({
+          description: errors[0],
+          position: 'top',
+          status: 'error'
+        })
+      } else {
+        toast({
+          description: `Invitation accepted`,
+          position: 'top',
+          status: 'success'
+        })
+        navigate('/vendor/dashboard')
+      }
     })
-      .then((res) => {
-        if (res.data) {
-          console.log('res', res.data)
-          toast({
-            description: `Invitation accepted`,
-            position: 'top',
-            status: 'success'
-          })
-        }
-      })
-      .finally(() => navigate('/vendor/dashboard'))
   }
 
   const onDecline = async (id) => {
@@ -154,41 +159,31 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
       variables: {
         organizationId: id
       }
+    }).then((res) => {
+      const { errors } = res?.data?.organizationUserInvitationDeclineById || ''
+      if (errors?.length > 0) {
+        toast({
+          description: errors[0],
+          position: 'top',
+          status: 'error'
+        })
+      } else {
+        refetch()
+      }
     })
-      .then((res) => {
-        if (res.data) {
-          console.log('res', res.data)
-          toast({
-            description: `Invitation declined`,
-            position: 'top',
-            status: 'success'
-          })
-        }
-      })
-      .finally(() => {
-        if (isAdmin) {
-          refetch({ first: totalRows, status: 'approved' })
-        } else {
-          refetch({
-            variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
-          })
-        }
-      })
   }
 
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
-        <Stack direction={'row'} spacing={2} alignItems={'center'}>
-          <Tooltip label='Register Organization'>
-            <IconButton
-              colorScheme='blue'
-              icon={<AddIcon />}
-              onClick={onOpen}
-              isDisabled={!updateOrg}
-            ></IconButton>
-          </Tooltip>
-        </Stack>
+        <Tooltip label='Register Organization'>
+          <IconButton
+            colorScheme='blue'
+            icon={<AddIcon />}
+            onClick={onOpen}
+            isDisabled={!updateOrg}
+          />
+        </Tooltip>
       </Flex>
     )
   }, [onOpen, updateOrg])
