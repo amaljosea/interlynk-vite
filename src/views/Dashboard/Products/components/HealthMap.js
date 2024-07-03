@@ -51,7 +51,12 @@ const HeatMap = ({ data }) => {
     <>
       {data?.map((item, index) => (
         <Tooltip key={index} label={<TooltipData item={item} />}>
-          <Center p={4} bg={getBg(item?.score)} />
+          <Center
+            width={4}
+            height={4}
+            cursor={'pointer'}
+            bg={getBg(item?.score)}
+          />
         </Tooltip>
       ))}
     </>
@@ -104,7 +109,7 @@ const HealthMap = ({ isOpen, onClose }) => {
 
   return (
     <Drawer
-      size='xl'
+      size='lg'
       isOpen={isOpen}
       onClose={onClose}
       placement='right'
@@ -116,7 +121,7 @@ const HealthMap = ({ isOpen, onClose }) => {
         <DrawerHeader borderBottomWidth='1px'>
           Component Health Heat Map
         </DrawerHeader>
-        <DrawerBody>
+        <DrawerBody p={1}>
           {loading ? (
             <Stack direction={'column'} p={5} spacing={6}>
               <Skeleton width={'100%'} height={32} />
@@ -129,7 +134,7 @@ const HealthMap = ({ isOpen, onClose }) => {
                   Known Components
                 </Tag>
                 {knownData?.length > 0 && (
-                  <Grid templateColumns='repeat(20, 1fr)' gap={0.5}>
+                  <Grid templateColumns='repeat(30, 1fr)' gap={1}>
                     <HeatMap data={knownData} />
                   </Grid>
                 )}
@@ -139,7 +144,7 @@ const HealthMap = ({ isOpen, onClose }) => {
                   Unknown Components
                 </Tag>
                 {unknownData?.length > 0 && (
-                  <Grid templateColumns='repeat(20, 1fr)' gap={0.5}>
+                  <Grid templateColumns='repeat(30, 1fr)' gap={1}>
                     <HeatMap data={unknownData} />
                   </Grid>
                 )}
