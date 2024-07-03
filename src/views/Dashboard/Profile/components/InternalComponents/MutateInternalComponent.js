@@ -122,15 +122,14 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
                     Case insensitive
                   </Checkbox>
                 </FormControl>
-                <FormControl mt={3}>
-                  <Checkbox
-                    defaultChecked={enabled}
+                <FormControl display='flex' alignItems='center' mt={3}>
+                  <FormLabel marginBlock={0}>Active</FormLabel>
+                  <Switch
+                    isChecked={enabled}
                     onChange={() => {
                       setEnabled(!enabled)
                     }}
-                  >
-                    Enable
-                  </Checkbox>
+                  />
                 </FormControl>
                 <Box py={3}>
                   <Text fontWeight='bold'>Tips:</Text>

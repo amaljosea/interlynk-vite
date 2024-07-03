@@ -2,16 +2,30 @@ import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 
 import { DeleteIcon } from '@chakra-ui/icons'
-import { Button, IconButton, Text, useToast } from '@chakra-ui/react'
+import {
+  Button,
+  Checkbox,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
+  Text,
+  useToast
+} from '@chakra-ui/react'
 
 import { ConfirmationModal } from 'components/Modal/ConfirmationModal'
 
 import { deleteOrgComp } from 'graphQL/Mutation'
 import { getInternalComponents } from 'graphQL/Queries'
 
+import { FaEllipsisV } from 'react-icons/fa'
+
 export const DeleteInternalComponent = ({ internalComponent }) => {
-  const { id } = internalComponent
+  const { id, matchStr } = internalComponent
   const [isConfirming, setIsConfirming] = useState(false)
+  const [untag, setUntag] = useState(false)
   const toast = useToast()
 
   const onCancel = () => setIsConfirming(false)
@@ -28,20 +42,24 @@ export const DeleteInternalComponent = ({ internalComponent }) => {
       onCancel()
     }
   })
+
+  const handleDelete = () => {
+    deleteComp({
+      variables: {
+        id,
+        untag
+      }
+    })
+  }
+
   return (
     <>
       {isConfirming && (
         <ConfirmationModal
           onClose={onCancel}
-          onConfirm={() => {
-            deleteComp({
-              variables: {
-                id
-              }
-            })
-          }}
+          onConfirm={handleDelete}
           confirmText='Delete'
-          header='UnTag internal component?'
+          header='Delete Regular Expression'
           footer={
             <>
               <Button mr={3} onClick={onCancel}>
@@ -50,40 +68,38 @@ export const DeleteInternalComponent = ({ internalComponent }) => {
               <Button
                 isLoading={deleting}
                 colorScheme={'red'}
-                onClick={() => {
-                  deleteComp({
-                    variables: {
-                      id
-                    }
-                  })
-                }}
+                onClick={handleDelete}
               >
-                UnTag
+                Delete
               </Button>
             </>
           }
         >
           <Text>
-            Components tagged <span style={{ fontWeight: 600 }}>internal</span>{' '}
-            with regular expression{' '}
-            <span style={{ fontWeight: 600 }}>
-              {internalComponent.matchStr}
-            </span>
-            , will be untagged. Do you want to proceed ?
+            Do you wish to delete regular expression:{' '}
+            <strong>{matchStr}</strong> that is being used to find{' '}
+            <strong>Internal Components</strong>?
           </Text>
+          <Checkbox mt={3} isChecked={untag} onChange={() => setUntag(!untag)}>
+            Also remove the internal flag from previously tagged components.
+          </Checkbox>
         </ConfirmationModal>
       )}
-      <IconButton
-        icon={<DeleteIcon />}
-        colorScheme='red'
-        size='sm'
-        isLoading={deleting}
-        onClick={() => {
-          setIsConfirming(true)
-        }}
-      >
-        UnTag
-      </IconButton>
+      <Menu>
+        <MenuButton
+          as={IconButton}
+          icon={<FaEllipsisV />}
+          variant='none'
+          color='gray.400'
+        />
+        <Portal>
+          <MenuList fontSize={'sm'}>
+            <MenuItem color='red' onClick={() => setIsConfirming(true)}>
+              Delete
+            </MenuItem>
+          </MenuList>
+        </Portal>
+      </Menu>
     </>
   )
 }

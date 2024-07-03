@@ -76,6 +76,25 @@ export const InternalComponents = () => {
 
   const columns = [
     {
+      id: 'ACTIVE',
+      name: 'ACTIVE',
+      selector: (row) => {
+        return (
+          <Switch
+            isChecked={row.enabled}
+            onChange={() =>
+              handleToggleChange(
+                row.id,
+                row.matchStr,
+                row.ignoreCase,
+                !row.enabled
+              )
+            }
+          />
+        )
+      }
+    },
+    {
       id: 'REGULAR_EXPRESSION',
       name: 'REGULAR EXPRESSION',
       grow: 2,
@@ -96,68 +115,28 @@ export const InternalComponents = () => {
       }
     },
     {
-      id: 'CREATED_BY',
-      name: 'CREATED BY',
-      selector: (row) => {
-        return (
-          <Text color={textColor} my={2}>
-            {row.createdBy}
-          </Text>
-        )
-      }
-    },
-    {
       id: 'CREATED',
       name: 'CREATED',
-      selector: (row) => {
-        return (
-          <Tooltip label={getFullDateAndTime(row.createdAt)} placement={'top'}>
+      selector: (row) => (
+        <Tooltip label={getFullDateAndTime(row.createdAt)} placement={'top'}>
+          <Text color={textColor} my={2}>
+            {row.createdBy} <br />
             {timeSince(row.createdAt)}
-          </Tooltip>
-        )
-      }
+          </Text>
+        </Tooltip>
+      )
     },
     {
       id: 'UPDATED',
-      name: 'UPDATED',
-      selector: (row) => {
-        return (
-          <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-            <Text color={textColor}>{timeSince(row.updatedAt)}</Text>
-          </Tooltip>
-        )
-      }
-    },
-    {
-      id: 'LAST_UPDATED_BY',
-      name: 'LAST UPDATED BY',
-      selector: (row) => {
-        return (
+      name: 'LAST UPDATED',
+      selector: (row) => (
+        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           <Text color={textColor} my={2}>
-            {row.lastUpdatedBy}
+            {row.lastUpdatedBy} <br />
+            {timeSince(row.updatedAt)}
           </Text>
-        )
-      }
-    },
-    {
-      id: 'ENABLED',
-      name: 'ENABLED',
-      right: true,
-      selector: (row) => {
-        return (
-          <Switch
-            isChecked={row.enabled}
-            onChange={() =>
-              handleToggleChange(
-                row.id,
-                row.matchStr,
-                row.ignoreCase,
-                !row.enabled
-              )
-            }
-          />
-        )
-      }
+        </Tooltip>
+      )
     },
     {
       id: 'ACTION',

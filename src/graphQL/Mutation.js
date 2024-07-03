@@ -211,9 +211,15 @@ export const updateOrgComp = gql`
 
 // DELETE INTERNAL COMPONENT
 export const deleteOrgComp = gql`
-  mutation deleteOrgComp($id: ID!) {
-    organizationComponentDelete(input: { id: $id }) {
+  mutation deleteOrgComp($untag: Boolean, $id: ID!) {
+    organizationComponentDelete(input: { untag: $untag, id: $id }) {
       organizationComponent {
+        createdAt
+        createdBy
+        enabled
+        ignoreCase
+        lastUpdatedBy
+        organizationId
         matchStr
         updatedAt
         id
