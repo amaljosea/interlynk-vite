@@ -41,9 +41,6 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-import { useHasPermission } from 'hooks/useHasPermission'
-
 import {
   AcceptOrgInvitation,
   DeclineOrgInvitation,
@@ -53,7 +50,7 @@ import {
 
 import { FaEllipsisVertical } from 'react-icons/fa6'
 
-const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
+const OrgTable = ({ data, refetch, activeOrg }) => {
   const navigate = useNavigate()
   const toast = useToast()
   const [leaveError, setLeaveError] = useState('')
@@ -61,18 +58,6 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-
-  const { totalRows, userPermissions } = useGlobalState()
-
-  const updateOrg = useHasPermission({
-    parentKey: 'view_organization',
-    childKey: 'update_organization'
-  })
-
-  const removeOrg = useHasPermission({
-    parentKey: 'view_organization',
-    childKey: 'remove_organization'
-  })
 
   const {
     isOpen: isWarningOpen,
@@ -123,7 +108,7 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
       if (res?.data?.organizationUserLeave?.errors?.length > 0) {
         setLeaveError(res?.data?.organizationUserLeave?.errors[0])
       } else {
-        navigate('/auth')
+        onLeaveClose()
       }
     } catch (error) {
       setLeaveError(error.message || 'An unexpected error occurred')
@@ -177,16 +162,11 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         <Tooltip label='Register Organization'>
-          <IconButton
-            colorScheme='blue'
-            icon={<AddIcon />}
-            onClick={onOpen}
-            isDisabled={!updateOrg}
-          />
+          <IconButton colorScheme='blue' icon={<AddIcon />} onClick={onOpen} />
         </Tooltip>
       </Flex>
     )
-  }, [onOpen, updateOrg])
+  }, [onOpen])
 
   const onSwitch = (row) => {
     setActiveRow(row)
@@ -320,8 +300,7 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
                     <MenuItem onClick={() => onSwitch(row)}>Switch To</MenuItem>
                   )}
                   <MenuItem
-                    isDisabled={superAdmin || !removeOrg}
-                    hidden={activeOrg !== id}
+                    isDisabled={superAdmin}
                     onClick={() => {
                       setActiveRow(row)
                       setLeaveError('')
@@ -350,6 +329,8 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
           persistTableHead
           responsive={true}
           columns={columns}
+          defaultSortAsc={true}
+          defaultSortFieldId={'UPDATED_AT'}
           customStyles={customStyles(headColor)}
           data={data || []}
           progressComponent={<CustomLoader />}

@@ -1,6 +1,5 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
@@ -25,14 +24,20 @@ import {
 import { RegisterOrganization } from 'graphQL/Mutation'
 
 const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
-  console.log('org', org)
-  const navigate = useNavigate()
   const [error, setError] = useState('')
   const [name, setName] = useState('')
   const [url, setUrl] = useState('')
   const [urlError, setUrlError] = useState('')
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
+  const [isDisabled, setIsDisabled] = useState(false)
+
+  const disableButtonTemporarily = () => {
+    setIsDisabled(true)
+    setTimeout(() => {
+      setIsDisabled(false)
+    }, 3000)
+  }
 
   const containsSpace = /\s/.test(url)
 
@@ -53,6 +58,7 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
   }
 
   const handleCreate = () => {
+    disableButtonTemporarily()
     registerOrg({
       variables: {
         name,
@@ -60,21 +66,22 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
         email
       }
     }).then((res) => {
-      if (org) {
-        onClose()
-        navigate('/vendor/settings?tab=organization')
+      const { errors } = res?.data?.RegisterOrganization || ''
+      if (errors?.length > 0) {
+        setError(errors[0])
       } else {
-        const orgId = res?.data?.organizationCreate?.organization?.id
-        onSwitch(orgId, name)
+        if (org) {
+          onClose()
+        } else {
+          const orgId = res?.data?.organizationCreate?.organization?.id
+          onSwitch(orgId, name)
+        }
       }
     })
-    setName('')
-    setEmail('')
-    setEmailError('')
-    setUrl('')
   }
 
   const isInvalid =
+    isDisabled ||
     name === '' ||
     (email !== '' && emailError !== '') ||
     (url !== '' && !validateUrl(url))

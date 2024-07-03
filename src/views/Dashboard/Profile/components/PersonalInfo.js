@@ -54,10 +54,11 @@ const PersonalInfo = () => {
   const { orgView } = useGlobalQueryContext()
 
   const { data, refetch } = useQuery(GetCurrentUser, {
-    skip: !orgView || activetab !== 'person-details'
+    skip: !orgView || activetab !== 'personal-details'
   })
 
   const { currentUser } = data?.organization || ''
+  console.log('currentUser', currentUser)
   const {
     id: userId,
     name: userName,
@@ -175,8 +176,7 @@ const PersonalInfo = () => {
         newPasswordConfirmation: confirmPassword
       }
     }).then((res) => {
-      console.log(res?.data)
-      const errors = res?.data?.userUpdatePassword?.errors
+      const { errors } = res?.data?.userUpdatePassword || ''
       if (errors?.length > 0) {
         toast({
           description: errors[0],
