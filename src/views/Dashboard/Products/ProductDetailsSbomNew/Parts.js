@@ -299,7 +299,7 @@ const Parts = ({ sbomRefetch }) => {
       name: 'NAME',
       selector: (row) => {
         const { part } = row
-        const { primaryComponent } = part || ''
+        const { primaryComponent, projectVersion } = part || ''
         const { purl, cpes } = primaryComponent || ''
         const unknown = isUnknown(cpes, purl)
 
@@ -334,35 +334,23 @@ const Parts = ({ sbomRefetch }) => {
               />
             </GridItem>
             <GridItem colSpan={6}>
-              <Link to={link} replace>
-                <Text
-                  fontSize={14}
-                  color={'blue.500'}
-                  onClick={() => onSelectPart(part)}
-                >
-                  {part?.project?.projectGroup?.name}
-                </Text>
-              </Link>
+              <Stack spacing={1} direction='column'>
+                <Link to={link} replace>
+                  <Text
+                    fontSize={14}
+                    color={'blue.500'}
+                    onClick={() => onSelectPart(part)}
+                  >
+                    {part?.project?.projectGroup?.name}
+                  </Text>
+                </Link>
+                <Text color={textColor}>{projectVersion}</Text>
+              </Stack>
             </GridItem>
           </Grid>
         )
       },
-      width: '10%',
-      wrap: true
-    },
-    {
-      id: 'VERSION',
-      name: 'VERSION',
-      selector: (row) => {
-        const { part } = row
-        return (
-          <Text color={textColor} fontSize={14} my={2} textAlign='right'>
-            {part?.projectVersion}
-          </Text>
-        )
-      },
-      width: '10%',
-      right: 'true',
+      width: '20%',
       wrap: true
     },
     {
