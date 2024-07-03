@@ -58,7 +58,6 @@ const PersonalInfo = () => {
   })
 
   const { currentUser } = data?.organization || ''
-  console.log('currentUser', currentUser)
   const {
     id: userId,
     name: userName,

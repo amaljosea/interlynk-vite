@@ -55,7 +55,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const handleClick = (name) => {
     setSelectedTab(name)
     if (name === 'PERSONAL') {
-      navigate('/vendor/settings?tab=person-details')
+      navigate('/vendor/settings?tab=personal-details')
     } else {
       navigate('/vendor/settings?tab=general')
     }

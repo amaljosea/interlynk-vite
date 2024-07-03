@@ -8,6 +8,7 @@ import { logoutUser } from 'utils/authUtils'
 
 import { ChevronDownIcon, SearchIcon } from '@chakra-ui/icons'
 import {
+  Avatar,
   Box,
   Button,
   Flex,
@@ -32,7 +33,7 @@ import {
 } from '@chakra-ui/react'
 
 // Custom Icons
-import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
+import { SettingsIcon } from 'components/Icons/Icons'
 // Custom Components
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
@@ -86,7 +87,7 @@ export default function HeaderLinks(props) {
   })
 
   const { projects } = props
-  const { secondary, ...rest } = props
+  const { ...rest } = props
 
   useEffect(() => {
     if (location.pathname.startsWith('/vendor')) {
@@ -101,13 +102,6 @@ export default function HeaderLinks(props) {
       logoutUser().then(() => navigate('/auth'))
     }
   }, [email, location, navigate])
-
-  // Chakra Color Mode
-  let navbarIcon = useColorModeValue('gray.500', 'gray.200')
-
-  if (secondary) {
-    navbarIcon = 'white'
-  }
 
   const handleLogout = async () => {
     await logoutUser()
@@ -156,11 +150,8 @@ export default function HeaderLinks(props) {
     if (/iPhone|iPad|iPod/.test(userAgent)) return 'iOS'
     return 'Unknown'
   }
-  const os = detectOS()
 
-  const filterText = (item) => {
-    return item?.length > 10 ? `${item?.substring(0, 10)}..` : item
-  }
+  const os = detectOS()
 
   return (
     <Flex gap={3} alignItems='center' flexDirection='row'>
@@ -239,21 +230,8 @@ export default function HeaderLinks(props) {
       />
       {!signedUrlParams && (
         <Menu>
-          <MenuButton
-            variant='none'
-            color='gray.400'
-            fontSize={'sm'}
-            fontWeight='semibold'
-            wordBreak='break-all'
-            maxWidth={'150px'}
-            onClick={() => (orgView ? fetchOrg() : null)}
-          >
-            <Stack direction={'row'} alignItems={'center'}>
-              <ProfileIcon color={navbarIcon} width='24px' />
-              <Text textAlign={'left'} lineHeight={1.2}>
-                {filterText(userName || name)}
-              </Text>
-            </Stack>
+          <MenuButton onClick={() => (orgView ? fetchOrg() : null)}>
+            <Avatar size='sm' name={userName || name} />
           </MenuButton>
           <MenuList>
             <MenuGroup title=''>
