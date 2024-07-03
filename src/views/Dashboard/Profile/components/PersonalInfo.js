@@ -26,6 +26,7 @@ import { useColorModeValue } from '@chakra-ui/system'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -47,12 +48,13 @@ const GetCurrentUser = gql`
 const PersonalInfo = () => {
   const toast = useToast()
   const activetab = useQueryParam('tab')
-  const org = localStorage.getItem('organization')
   const textColor = useColorModeValue('gray.700', 'white')
 
+  const { setUserName } = useGlobalState()
+  const { orgView } = useGlobalQueryContext()
+
   const { data, refetch } = useQuery(GetCurrentUser, {
-    skip:
-      org === 'undefined' ? true : activetab === 'person-details' ? false : true
+    skip: !orgView || activetab !== 'person-details'
   })
 
   const { currentUser } = data?.organization || ''
@@ -62,8 +64,6 @@ const PersonalInfo = () => {
     email: userEmail,
     unconfirmedEmail
   } = currentUser || ''
-
-  const { setUserName } = useGlobalState()
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')

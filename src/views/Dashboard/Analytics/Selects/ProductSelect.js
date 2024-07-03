@@ -1,6 +1,8 @@
 import { gql, useQuery } from '@apollo/client'
 import React from 'react'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+
 import { CustomSelect } from './Select'
 
 const PRODUCT_OPTION_QUERY = gql`
@@ -28,7 +30,10 @@ const PRODUCT_OPTION_QUERY = gql`
 `
 
 export const ProductSelect = ({ value, onChange }) => {
-  const { data, loading, error } = useQuery(PRODUCT_OPTION_QUERY)
+  const { orgView } = useGlobalQueryContext()
+  const { data, loading, error } = useQuery(PRODUCT_OPTION_QUERY, {
+    skip: !orgView
+  })
 
   if (error) {
     return 'Error'

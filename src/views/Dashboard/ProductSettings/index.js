@@ -35,6 +35,8 @@ import { ProjectSettingUpdate } from 'graphQL/Mutation'
 import { GetJiraProjects } from 'graphQL/Queries'
 
 const Settings = ({ enabled, data, refetch, mfc }) => {
+  const org = localStorage.getItem('organization')
+
   const {
     id,
     dataRetentionDays,
@@ -48,6 +50,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
   } = data || ''
 
   const { data: projectOptions } = useQuery(GetJiraProjects, {
+    skip: org ? false : true,
     fetchPolicy: 'network-only'
   })
 

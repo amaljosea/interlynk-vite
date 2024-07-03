@@ -36,7 +36,8 @@ import AdminNavbarLinks from './AdminNavbarLinks'
 export default function AdminNavbar(props) {
   const partsContext = usePartsContext()
   const navigate = useNavigate()
-  const { setUserPermissions } = useGlobalState()
+  const { setUserPermissions, userPermissions } = useGlobalState()
+  const { sbomHookData, orgView } = useGlobalQueryContext()
   const {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
@@ -54,7 +55,7 @@ export default function AdminNavbar(props) {
   const environment = localStorage.getItem('environment')
 
   useQuery(GetUserPermissions, {
-    skip: location?.pathname?.startsWith('/customer') ? true : false,
+    skip: path === 'customer' || !orgView,
     onCompleted: (data) => {
       if (data) {
         const result =
@@ -70,11 +71,13 @@ export default function AdminNavbar(props) {
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
 
-  const { sbomHookData } = useGlobalQueryContext()
-
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
   let secondaryText = useColorModeValue('gray.400', 'gray.200')
+
+  const viewProds = userPermissions?.find(
+    (item) => item.key === 'view_product_group'
+  )
 
   const {
     name: projectGroupName,
@@ -88,11 +91,12 @@ export default function AdminNavbar(props) {
     GetProjectVersionAndId,
     {
       variables: { id: prodID },
-      skip: !prodID
+      skip: !prodID || !orgView
     }
   )
 
   const { data: productsData } = useQuery(GetProjectGroupDetails, {
+    skip: !orgView || viewProds?.value === false,
     variables: {
       field: 'PROJECT_GROUPS_UPDATED_AT',
       direction: 'DESC',

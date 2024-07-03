@@ -17,7 +17,8 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Stack,
-  Tag
+  Tag,
+  useToast
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -28,13 +29,8 @@ import useQueryParam from 'hooks/useQueryParam'
 import { UpdateOrganizationRole } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
 
-const PermissionDrawer = ({
-  isOpen,
-  onClose,
-  selectedRole,
-  userRole,
-  refetch
-}) => {
+const PermissionDrawer = ({ isOpen, onClose, selectedRole, refetch }) => {
+  const toast = useToast()
   const activetab = useQueryParam('tab')
   const { userPermissions } = useGlobalState()
   const orgs = userPermissions?.find((item) => item.key === 'view_organization')
@@ -44,6 +40,7 @@ const PermissionDrawer = ({
   )
 
   const [error, setError] = useState('')
+  const [isEdited, setIsEdited] = useState(false)
   const { data, loading } = useQuery(GetAllPermissions, {
     skip: activetab === 'roles' ? false : true
   })
@@ -57,55 +54,24 @@ const PermissionDrawer = ({
 
   const onCheckParent = (e, category) => {
     e.preventDefault()
-    if (userRole !== 'custom') {
-      const list = activeRole?.permissionsMap?.filter(
-        (item) => item.category === category && item.hidden === null
-      )
-      const filterData = list
-        .filter((item) => item?.supersededBy?.length === 0)
-        .map(() => e.target.checked)
-      if (filterData) {
-        const permissions = list.map((item) => ({
-          permissionKey: item?.key,
-          value: e.target.checked
-        }))
-        updateRole({
-          variables: {
-            organizationRoleId: activeRole?.id,
-            permissions: permissions
-          }
-        }).then((res) => {
-          const { errors } = res?.data?.organizationRoleUpdate || ''
-          if (errors?.length > 0) {
-            setError(errors[0])
-          } else {
-            refetch()
-          }
-        })
-      }
-    }
-    return null
-  }
-
-  const onCheckChild = (e, category) => {
-    e.preventDefault()
-    if (userRole !== 'custom') {
-      const selector = activeRole?.permissionsMap?.filter(
-        (item) => item.category === category
-      )
-      const filterItem = selector?.find((item) => item?.key === e.target.name)
+    const list = activeRole?.permissionsMap?.filter(
+      (item) => item.category === category && item.hidden === null
+    )
+    const filterData = list
+      .filter((item) => item?.supersededBy?.length === 0)
+      .map(() => e.target.checked)
+    if (filterData) {
+      const permissions = list.map((item) => ({
+        permissionKey: item?.key,
+        value: e.target.checked
+      }))
       updateRole({
         variables: {
           organizationRoleId: activeRole?.id,
-          permissions: [
-            {
-              permissionKey: selector[0]?.key,
-              value: e.target.checked ? true : selector[0]?.value
-            },
-            { permissionKey: filterItem?.key, value: e.target.checked }
-          ]
+          permissions: permissions
         }
       }).then((res) => {
+        setIsEdited(true)
         const { errors } = res?.data?.organizationRoleUpdate || ''
         if (errors?.length > 0) {
           setError(errors[0])
@@ -114,7 +80,34 @@ const PermissionDrawer = ({
         }
       })
     }
-    return null
+  }
+
+  const onCheckChild = (e, category) => {
+    e.preventDefault()
+    const selector = activeRole?.permissionsMap?.filter(
+      (item) => item.category === category
+    )
+    const filterItem = selector?.find((item) => item?.key === e.target.name)
+    updateRole({
+      variables: {
+        organizationRoleId: activeRole?.id,
+        permissions: [
+          {
+            permissionKey: selector[0]?.key,
+            value: e.target.checked ? true : selector[0]?.value
+          },
+          { permissionKey: filterItem?.key, value: e.target.checked }
+        ]
+      }
+    }).then((res) => {
+      setIsEdited(true)
+      const { errors } = res?.data?.organizationRoleUpdate || ''
+      if (errors?.length > 0) {
+        setError(errors[0])
+      } else {
+        refetch()
+      }
+    })
   }
 
   const restrictedRoles = ['admin', 'viewer', 'operator']
@@ -165,8 +158,23 @@ const PermissionDrawer = ({
     )
   }
 
+  const onSave = () => {
+    toast({
+      description: 'Permission updated successfully',
+      position: 'top',
+      status: 'success'
+    })
+    onClose()
+  }
+
   return (
-    <Drawer isOpen={isOpen} placement='right' size='md' onClose={onClose}>
+    <Drawer
+      isOpen={isOpen}
+      placement='right'
+      size='md'
+      onClose={onClose}
+      closeOnOverlayClick={false}
+    >
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
@@ -226,7 +234,12 @@ const PermissionDrawer = ({
           )}
         </DrawerBody>
         <DrawerFooter>
-          <Button onClick={onClose}>Close</Button>
+          <Button mr={3} onClick={onClose}>
+            Close
+          </Button>
+          <Button colorScheme='blue' onClick={onSave} isDisabled={!isEdited}>
+            Save
+          </Button>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

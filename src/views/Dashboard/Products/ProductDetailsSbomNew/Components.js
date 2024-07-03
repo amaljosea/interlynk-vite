@@ -973,7 +973,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
     [prodCompDispatch, reset]
   )
 
-  const restricted = lifecycle === 'signed' || !updateComponent || !updateSboms
+  const restricted = lifecycle === 'signed' || !updateComponent
 
   // HEADER SECTION
   const subHeader = useMemo(() => {

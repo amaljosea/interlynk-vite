@@ -42,6 +42,7 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import useQueryParam from 'hooks/useQueryParam'
 
 // CSS styling for the date-time picker
@@ -76,7 +77,7 @@ const GetApiKeys = gql`
 
 const TokenInfo = () => {
   const activetab = useQueryParam('tab')
-  const org = localStorage.getItem('organization')
+  const { orgView } = useGlobalQueryContext()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -87,12 +88,7 @@ const TokenInfo = () => {
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { data, loading, refetch } = useQuery(GetApiKeys, {
-    skip:
-      org === 'undefined'
-        ? true
-        : activetab === 'security-tokens'
-          ? false
-          : true
+    skip: !orgView || activetab !== 'security-tokens'
   })
 
   const { apiKeys } = data?.organization?.currentUser || ''

@@ -432,6 +432,11 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     (permission) =>
       permission.key === 'edit_vulnerabilities' && permission.value === true
   )
+  const con = userPermissions?.find((item) => item.key === 'view_connections')
+  const updateCon = con?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'create_update_connection' && permission.value === true
+  )
 
   const handleChange = (state) => {
     setSelectedVulns(state?.selectedRows)
@@ -861,6 +866,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
             <Portal>
               <MenuList size='sm'>
                 <MenuItem
+                  isDisabled={!editVulns}
                   onClick={() => {
                     setActiveRow(row)
                     onLinkOpen()
@@ -872,6 +878,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                   (externalUrl) => externalUrl.name === 'issue-tracker'
                 ) ? (
                   <MenuItem
+                    isDisabled={!updateCon}
                     onClick={() => {
                       window.open(
                         row.externalUrls.find(
@@ -885,6 +892,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                   </MenuItem>
                 ) : (
                   <MenuItem
+                    isDisabled={!updateCon}
                     onClick={() => {
                       if (jiraConfigWarning) {
                         toast({

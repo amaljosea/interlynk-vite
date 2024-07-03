@@ -22,6 +22,7 @@ import OrgTable from 'components/Tables/OrgTable'
 import RoleTable from 'components/Tables/RoleTable'
 import TeamTable from 'components/Tables/TeamTable'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
@@ -73,6 +74,7 @@ function Profile() {
   const activetab = queryParams.get('tab')
   const org = localStorage.getItem('organization')
   const { totalRows, userPermissions } = useGlobalState()
+  const { orgView } = useGlobalQueryContext()
 
   const [orgIndex, setOrgIndex] = useState(0)
   const [psIndex, setPsIndex] = useState(0)
@@ -108,7 +110,7 @@ function Profile() {
   )
 
   const { data, error } = useQuery(GetOrganization, {
-    skip: !org || org === 'undefined' ? true : false
+    skip: !orgView
   })
 
   const { organization } = data || ''
@@ -117,13 +119,13 @@ function Profile() {
   const isAdmin = currentUser?.superAdmin
 
   const { data: myOrgs, refetch: myOrgRefetch } = useQuery(MyOrganizations, {
-    skip: org === 'undefined' ? true : isAdmin === true ? true : false,
+    skip: isAdmin === true ? true : false,
     variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
   })
   const { nodes: myOrgList } = myOrgs?.myOrganizations || ''
 
   const { data: allOrgs, refetch: allOrgRefetch } = useQuery(AllOrganizations, {
-    skip: org === 'undefined' ? true : isAdmin === true ? false : true,
+    skip: isAdmin === true ? false : true,
     variables: { first: totalRows, status: 'approved' }
   })
   const { nodes: allOrgList } = allOrgs?.allOrganizations || ''
@@ -166,11 +168,7 @@ function Profile() {
   }
 
   if (!org || org === 'undefined') {
-    return (
-      <Flex direction='column' pr={2} pl={5} pt={{ base: '120px', md: '75px' }}>
-        <OrgRegister />
-      </Flex>
-    )
+    return <OrgRegister />
   }
 
   return (
@@ -184,7 +182,7 @@ function Profile() {
 
       {/*  ORGANIZATION */}
       {selectedTab === 'ORGANIZATION' && (
-        <Card>
+        <Card display={orgView ? 'flex' : 'none'}>
           <Tabs
             w={'100%'}
             index={orgIndex}
@@ -242,7 +240,7 @@ function Profile() {
 
       {/* PERSONAL  */}
       {selectedTab === 'PERSONAL' && (
-        <Card>
+        <Card display={orgView ? 'flex' : 'none'}>
           <Tabs
             w={'100%'}
             index={psIndex}
@@ -266,7 +264,7 @@ function Profile() {
             </TabList>
             <TabPanels>
               {/* PERSONA DETAILS */}
-              <TabPanel display={organization ? 'block' : 'none'}>
+              <TabPanel>
                 <PersonalInfo />
               </TabPanel>
               {/* ORG DETAILS */}
@@ -279,7 +277,7 @@ function Profile() {
                 />
               </TabPanel>
               {/* SECURITY TOKEN */}
-              <TabPanel display={organization ? 'block' : 'none'}>
+              <TabPanel>
                 <TokenInfo />
               </TabPanel>
               {/* Notification Preferences */}

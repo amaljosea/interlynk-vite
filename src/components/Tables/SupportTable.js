@@ -28,6 +28,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
+import ViewAlert from 'components/Misc/ViewAlert'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -50,11 +51,11 @@ const SupportTable = ({
   const viewSup = userPermissions?.find((item) => item?.key === 'view_support')
   const editSup = viewSup?.supersededBy?.some(
     (permission) =>
-      permission.key === 'edit_support' && permission?.value === true
+      permission.key === 'create_update_support' && permission?.value === true
   )
   const archiveSup = viewSup?.supersededBy?.some(
     (permission) =>
-      permission.key === 'archive_support' && permission?.value === true
+      permission.key === 'remove_support' && permission?.value === true
   )
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
@@ -377,6 +378,10 @@ const SupportTable = ({
       omit: sbomId ? true : false
     }
   ]
+
+  if (viewSup?.value === false) {
+    return <ViewAlert category='supports' />
+  }
 
   return (
     <>

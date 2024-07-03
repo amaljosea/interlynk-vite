@@ -18,7 +18,6 @@ const GlobalStateProvider = ({ children }) => {
   const [userPermissions, setUserPermissions] = useState([])
   const [userName, setUserName] = useState('')
   const [totalRows, setTotalRows] = useState(25)
-
   const [activeCsProdTab, setActiveCsProdTab] = useState(0)
   const [activeCsSbomTab, setActiveCsSbomTab] = useState(0)
   const [activeDockerHub, setActiveDockerHub] = useState(true)

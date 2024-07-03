@@ -16,6 +16,8 @@ import {
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+
 import { UploadProfileImage } from 'graphQL/Mutation'
 
 const GetCurrentUser = gql`
@@ -37,13 +39,14 @@ const GetCurrentUser = gql`
 const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const toast = useToast()
   const navigate = useNavigate()
-  const org = localStorage.getItem('organization')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const iconColor = useColorModeValue('#EDF2F7', '#2D3748')
   const emailColor = useColorModeValue('gray.500', 'gray.300')
 
+  const { orgView } = useGlobalQueryContext()
+
   const { data, refetch } = useQuery(GetCurrentUser, {
-    skip: org === 'undefined' ? true : false
+    skip: !orgView
   })
 
   const { organization } = data || ''

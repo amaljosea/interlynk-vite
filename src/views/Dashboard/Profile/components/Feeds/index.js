@@ -1,9 +1,10 @@
 import { useQuery } from '@apollo/client'
 
-import { Grid } from '@chakra-ui/react'
+import { Alert, Grid } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { GetOrgSettings } from 'graphQL/Queries'
@@ -14,6 +15,8 @@ import ExploitFeeds from './Exploit'
 const Feeds = () => {
   const activetab = useQueryParam('tab')
   const org = localStorage.getItem('organization')
+  const { userPermissions } = useGlobalState()
+  const viewFeeds = userPermissions?.find((item) => item.key === 'view_feeds')
 
   const { data, refetch, loading } = useQuery(GetOrgSettings, {
     skip: org === 'undefined' ? true : activetab === 'feeds' ? false : true
@@ -29,6 +32,14 @@ const Feeds = () => {
   )
 
   if (loading) return <CustomLoader />
+
+  if (viewFeeds?.value === false) {
+    return (
+      <Alert status='error' borderRadius={5}>
+        You are not authorized to view feeds
+      </Alert>
+    )
+  }
 
   return (
     <Grid

@@ -24,7 +24,9 @@ import { CreateJiraIssue } from 'graphQL/Mutation'
 import { GetJiraOptions, GetJiraProjects } from 'graphQL/Queries'
 
 const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
+  const org = localStorage.getItem('organization')
   const { data: projectOptions } = useQuery(GetJiraProjects, {
+    skip: org ? false : true,
     fetchPolicy: 'network-only'
   })
 

@@ -64,7 +64,7 @@ export const refetchActiveQueries = async () => {
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (networkError?.statusCode === 401) {
     console.log('Unauthorized Access. Please log in.')
-    logoutUser().then(() => navigateCache('/auth'))
+    // logoutUser().then(() => navigateCache('/auth'))
   }
   if (graphQLErrors && env !== 'production') {
     graphQLErrors.forEach(({ message }) => {

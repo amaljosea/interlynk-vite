@@ -2,9 +2,7 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
-import { displayErrorMessage } from 'utils'
 
-import { WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Grid,
@@ -13,11 +11,12 @@ import {
   Skeleton,
   useColorModeValue
 } from '@chakra-ui/react'
-import { Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
+import ViewAlert from 'components/Misc/ViewAlert'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { GetOrg, GetOrgMetrics } from 'graphQL/Queries'
@@ -34,8 +33,8 @@ export default function Dashboard() {
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
   const { dispatch, envName, userPermissions } = useGlobalState()
+  const { orgView, orgLoading } = useGlobalQueryContext()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
-
   const iconBoxInside = useColorModeValue('white', 'white')
 
   const productPermissions = useMemo(
@@ -48,7 +47,7 @@ export default function Dashboard() {
     error: eOrg,
     loading
   } = useQuery(GetOrg, {
-    skip: data === undefined ? false : true,
+    skip: !orgView,
     fetchPolicy: 'network-only',
     onCompleted: (data) => {
       if (data) {
@@ -76,18 +75,11 @@ export default function Dashboard() {
     }
   }, [prodCompDispatch, prodVulnDispatch, product])
 
-  if (eOrg) {
-    return (
-      <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
-        <WarningTwoIcon color='blue.500' />
-        <Text textAlign={'center'} fontSize={14}>
-          {displayErrorMessage(eOrg.networkError?.statusCode, eOrg.message)}
-        </Text>
-      </Flex>
-    )
-  }
+  if (eOrg || eOrgMetric) return <OrgRegister />
 
-  if (eOrg && eOrgMetric) return <OrgRegister />
+  if (!orgView) {
+    return <ViewAlert loading={orgLoading} category='dashboar page' />
+  }
 
   if (loading) {
     return (
@@ -118,64 +110,52 @@ export default function Dashboard() {
   }
 
   return (
-    <Flex width={'100%'} flexDirection='column'>
-      {data.organization ? (
-        <Flex flexDirection='column' gap={6}>
-          {/* STATS */}
-          <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
-            <MiniStatistics
-              title={'Products'}
-              amount={metrics?.organizationMetric?.projectCount}
-              icon={
-                <FaWindowMaximize h={'24px'} w={'24px'} color={iconBoxInside} />
-              }
-            />
-            <MiniStatistics
-              title={'Versions'}
-              amount={metrics?.organizationMetric?.versionCount}
-              icon={
-                <FaLayerGroup h={'24px'} w={'24px'} color={iconBoxInside} />
-              }
-            />
-            <MiniStatistics
-              title={'Components'}
-              amount={metrics?.organizationMetric?.componentCount}
-              icon={<FaCube h={'24px'} w={'24px'} color={iconBoxInside} />}
-            />
-            <MiniStatistics
-              title={'Vulnerabilities'}
-              amount={metrics?.organizationMetric?.vulnsMetric}
-              icon={<FaBug h={'24px'} w={'24px'} color={iconBoxInside} />}
-            />
-          </SimpleGrid>
-          {/* LIST */}
-          <Grid
-            templateColumns='repeat(12, 1fr)'
-            gap={'24px'}
-            flexWrap={'wrap'}
-          >
-            {/* RECENT IMPORTS */}
-            <GridItem colSpan={8} w='100%'>
-              <ProductsOverview
-                title={'Recent Imports'}
-                data={metrics?.organizationMetric?.latestVersions}
-                prodPermissions={productPermissions}
-              />
-            </GridItem>
-            {/* LATEST ACTIVITIES */}
-            <GridItem colSpan={4} w='100%'>
-              <ActivitiesOverview
-                title={'Recent Activities'}
-                amount={metrics?.organizationMetric?.latestActivity?.length}
-                data={metrics?.organizationMetric?.latestActivity}
-                prodPermissions={productPermissions}
-              />
-            </GridItem>
-          </Grid>
-        </Flex>
-      ) : (
-        <OrgRegister />
-      )}
+    <Flex width={'100%'} flexDirection='column' gap={6}>
+      {/* STATS */}
+      <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
+        <MiniStatistics
+          title={'Products'}
+          amount={metrics?.organizationMetric?.projectCount}
+          icon={
+            <FaWindowMaximize h={'24px'} w={'24px'} color={iconBoxInside} />
+          }
+        />
+        <MiniStatistics
+          title={'Versions'}
+          amount={metrics?.organizationMetric?.versionCount}
+          icon={<FaLayerGroup h={'24px'} w={'24px'} color={iconBoxInside} />}
+        />
+        <MiniStatistics
+          title={'Components'}
+          amount={metrics?.organizationMetric?.componentCount}
+          icon={<FaCube h={'24px'} w={'24px'} color={iconBoxInside} />}
+        />
+        <MiniStatistics
+          title={'Vulnerabilities'}
+          amount={metrics?.organizationMetric?.vulnsMetric}
+          icon={<FaBug h={'24px'} w={'24px'} color={iconBoxInside} />}
+        />
+      </SimpleGrid>
+      {/* LIST */}
+      <Grid templateColumns='repeat(12, 1fr)' gap={'24px'} flexWrap={'wrap'}>
+        {/* RECENT IMPORTS */}
+        <GridItem colSpan={8} w='100%'>
+          <ProductsOverview
+            title={'Recent Imports'}
+            data={metrics?.organizationMetric?.latestVersions || []}
+            prodPermissions={productPermissions}
+          />
+        </GridItem>
+        {/* LATEST ACTIVITIES */}
+        <GridItem colSpan={4} w='100%'>
+          <ActivitiesOverview
+            title={'Recent Activities'}
+            amount={metrics?.organizationMetric?.latestActivity?.length}
+            data={metrics?.organizationMetric?.latestActivity || []}
+            prodPermissions={productPermissions}
+          />
+        </GridItem>
+      </Grid>
     </Flex>
   )
 }

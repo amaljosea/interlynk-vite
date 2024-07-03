@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { displayErrorMessage } from 'utils'
 
-import { WarningTwoIcon } from '@chakra-ui/icons'
-import { Flex, Text } from '@chakra-ui/react'
-
+import ViewAlert from 'components/Misc/ViewAlert'
 import ProductTable from 'components/Tables/ProductTable'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
@@ -22,6 +20,7 @@ function ProductList() {
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
   const org = localStorage.getItem('organization')
+  const { orgView, orgLoading } = useGlobalQueryContext()
 
   const productPermissions = useMemo(
     () => userPermissions?.find((item) => item.key === 'view_product_group'),
@@ -34,9 +33,9 @@ function ProductList() {
     enabled: true
   })
 
-  const { nodes, paginationProps, reset, refetch, loading, error } =
+  const { nodes, paginationProps, reset, refetch, loading } =
     usePaginatatedQuery(GetProductTable, {
-      skip: productPermissions?.value === true ? false : true,
+      skip: !orgView || productPermissions?.value === false,
       selector: 'organization.projectGroups',
       variables: {
         ...filters
@@ -68,23 +67,8 @@ function ProductList() {
     return <OrgRegister />
   }
 
-  if (error) {
-    return (
-      <Flex my={32} alignItems={'center'} justifyContent={'center'}>
-        <WarningTwoIcon color='blue.500' />
-        <Text textAlign={'center'} fontSize={14}>
-          {displayErrorMessage(error.networkError?.statusCode, error.message)}
-        </Text>
-      </Flex>
-    )
-  }
-
-  if (productPermissions?.value === false)
-    return (
-      <Text textAlign={'center'} mt={30}>
-        There are no records to display
-      </Text>
-    )
+  if (productPermissions?.value === false || !orgView)
+    return <ViewAlert loading={orgLoading} category='products page' />
 
   return (
     <ProductTable

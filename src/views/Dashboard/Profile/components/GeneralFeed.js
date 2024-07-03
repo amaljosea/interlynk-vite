@@ -17,17 +17,18 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { orgUpdate } from 'graphQL/Mutation'
 import { GetOrgName } from 'graphQL/Queries'
 
 const GeneralFeed = () => {
-  const orginzation = localStorage.getItem('organization')
   const { userPermissions } = useGlobalState()
+  const { orgView } = useGlobalQueryContext()
 
   const { data, refetch } = useQuery(GetOrgName, {
-    skip: !orginzation || orginzation === 'undefined' ? true : false
+    skip: !orgView
   })
 
   const { name } = data?.organization || ''

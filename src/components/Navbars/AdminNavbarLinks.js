@@ -36,6 +36,7 @@ import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
 // Custom Components
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -64,7 +65,6 @@ export default function HeaderLinks(props) {
 
   const { colorMode, toggleColorMode, setColorMode } = useColorMode()
   const bgColor = useColorModeValue('#EDF2F7', '#2D3748')
-
   const dashboardView = location.pathname === '/vendor/dashboard'
   const signedUrlParams = location.pathname.startsWith('/customer')
   const name = localStorage.getItem('username')
@@ -79,6 +79,7 @@ export default function HeaderLinks(props) {
     envName,
     setEnvName
   } = useGlobalState()
+  const { orgView } = useGlobalQueryContext()
 
   const [fetchOrg, { data }] = useLazyQuery(GetOrgName, {
     fetchPolicy: 'network-only'
@@ -157,6 +158,10 @@ export default function HeaderLinks(props) {
   }
   const os = detectOS()
 
+  const filterText = (item) => {
+    return item?.length > 10 ? `${item?.substring(0, 10)}..` : item
+  }
+
   return (
     <Flex gap={3} alignItems='center' flexDirection='row'>
       {/* JOIN WAITLIST */}
@@ -191,7 +196,7 @@ export default function HeaderLinks(props) {
         </Box>
       </InputGroup>
       {/* ENVIRONMENT */}
-      {(dashboardView || productId) && !vulnId && (
+      {(dashboardView || productId) && !vulnId && orgView && (
         <Menu closeOnSelect={true}>
           <MenuButton
             size='sm'
@@ -241,12 +246,12 @@ export default function HeaderLinks(props) {
             fontWeight='semibold'
             wordBreak='break-all'
             maxWidth={'150px'}
-            onClick={() => fetchOrg()}
+            onClick={() => (orgView ? fetchOrg() : null)}
           >
             <Stack direction={'row'} alignItems={'center'}>
               <ProfileIcon color={navbarIcon} width='24px' />
               <Text textAlign={'left'} lineHeight={1.2}>
-                {userName || name}
+                {filterText(userName || name)}
               </Text>
             </Stack>
           </MenuButton>

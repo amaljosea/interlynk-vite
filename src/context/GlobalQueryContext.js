@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
 
+import useOrg from 'hooks/useOrg'
 import { useSbom } from 'hooks/useSbom'
 
 const { createContext } = require('react')
@@ -16,10 +17,14 @@ export const GlobalQueryContextWrapper = ({ children }) => {
     skip: !params?.sbomid
   })
 
+  const { data, loading } = useOrg()
+
   return (
     <GlobalQueryContext.Provider
       value={{
-        sbomHookData
+        sbomHookData,
+        orgView: data?.organization ? true : false,
+        orgLoading: loading
       }}
     >
       {children}

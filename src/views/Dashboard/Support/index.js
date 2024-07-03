@@ -2,13 +2,16 @@ import { useState } from 'react'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import Card from 'components/Card/Card'
+import ViewAlert from 'components/Misc/ViewAlert'
 import SupportTable from 'components/Tables/SupportTable'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetSupportTab } from 'graphQL/Queries'
 
 const Support = () => {
+  const { orgView, orgLoading } = useGlobalQueryContext()
   const org = localStorage.getItem('organization')
 
   const [filters, setFilters] = useState({
@@ -18,12 +21,16 @@ const Support = () => {
 
   const { nodes, paginationProps, reset, loading, refetch } =
     usePaginatatedQuery(GetSupportTab, {
-      skip: org !== 'undefined' ? false : true,
+      skip: !orgView,
       selector: 'supports',
       variables: {
         ...filters
       }
     })
+
+  if (!orgView) {
+    return <ViewAlert loading={orgLoading} category='support page' />
+  }
 
   if (!org || org === 'undefined') return <OrgRegister />
 

@@ -124,10 +124,6 @@ const Checks = () => {
     (permission) =>
       permission.key === 'edit_checks' && permission.value === true
   )
-  const updateSboms = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom' && permission.value === true
-  )
 
   const [purlValue, setPurlValue] = useState('')
   const [cpeList, setCpeList] = useState([])
@@ -711,7 +707,7 @@ const Checks = () => {
                     fontWeight='normal'
                     icon={<BiSolidWrench size={18} />}
                     onClick={() => onCheckOpen(row)}
-                    disabled={customerView || !editChecks || !updateSboms}
+                    disabled={customerView || !editChecks}
                   />
                 </Tooltip>
 
@@ -723,7 +719,7 @@ const Checks = () => {
                     fontWeight='normal'
                     icon={<GoSkip size={18} />}
                     onClick={() => updateIssue(id)}
-                    disabled={customerView || !editChecks || !updateSboms}
+                    disabled={customerView || !editChecks}
                   />
                 </Tooltip>
               </Stack>
@@ -738,7 +734,7 @@ const Checks = () => {
                 colorScheme='whatsapp'
                 leftIcon={<CheckIcon />}
                 onClick={() => (isPrimary ? null : onFixedOpen())}
-                disabled={customerView || !editChecks || !updateSboms}
+                disabled={customerView || !editChecks}
               >
                 {isPrimary ? 'Fixed' : 'View'}
               </Button>

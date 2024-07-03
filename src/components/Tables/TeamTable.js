@@ -36,6 +36,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import ViewAlert from 'components/Misc/ViewAlert'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
@@ -92,6 +93,7 @@ const TeamTable = () => {
   const { users } = userData?.organization || ''
 
   const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
+  console.log('viewUsersd', viewUsers)
   const inviteUser = viewUsers?.supersededBy?.some(
     (permission) =>
       permission.key === 'invite_users' && permission.value === true
@@ -99,9 +101,6 @@ const TeamTable = () => {
   const editUserRole = viewUsers?.supersededBy?.some(
     (permission) =>
       permission.key === 'edit_user_role' && permission.value === true
-  )
-  const editTeam = viewUsers?.supersededBy?.some(
-    (permission) => permission.key === 'edit_team' && permission.value === true
   )
   const removeUser = viewUsers?.supersededBy?.some(
     (permission) =>
@@ -436,6 +435,10 @@ const TeamTable = () => {
         })
       }
     })
+  }
+
+  if (viewUsers?.value === false) {
+    return <ViewAlert category='user list' />
   }
 
   return (

@@ -46,6 +46,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import ViewAlert from 'components/Misc/ViewAlert'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -68,9 +69,9 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
   const product = userPermissions?.find(
     (item) => item.key === 'view_product_group'
   )
-  const updateProduct = product?.supersededBy?.some(
+  const editProdPolicies = product?.supersededBy?.some(
     (permission) =>
-      permission?.key === 'update_product_group' && permission?.value === true
+      permission?.key === 'edit_product_policies' && permission?.value === true
   )
   const policy = userPermissions?.find((item) => item?.key === 'view_policy')
   const updatePolicy = policy?.supersededBy?.some(
@@ -301,7 +302,7 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
               isExcluded ? handleDeleteExclusion(id) : handleCreateExclusion(id)
             }
             color={textColor}
-            isDisabled={!updateProduct}
+            isDisabled={!editProdPolicies}
             textTransform={'capitalize'}
           >
             {['yes', 'no'].map((itm, index) => (
@@ -486,6 +487,10 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
         </Box>
       </Flex>
     )
+  }
+
+  if (policy?.value === false) {
+    return <ViewAlert category='policies' />
   }
 
   return (

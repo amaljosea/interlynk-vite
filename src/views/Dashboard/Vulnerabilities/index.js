@@ -4,8 +4,10 @@ import { useLocation, useParams } from 'react-router-dom'
 import { Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import ViewAlert from 'components/Misc/ViewAlert'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
@@ -22,6 +24,7 @@ const Vulnerabilities = () => {
   const org = localStorage.getItem('organization')
 
   const { userPermissions } = useGlobalState()
+  const { orgView, orgLoading } = useGlobalQueryContext()
 
   const [filters, setFilters] = useState({
     field: 'VULNS_VULN_ID',
@@ -41,9 +44,9 @@ const Vulnerabilities = () => {
     GetGlobalVulns,
     {
       skip:
-        productPermissions?.value === true && vulnsPermissions?.value === true
-          ? false
-          : true,
+        !orgView ||
+        (productPermissions?.value === false &&
+          vulnsPermissions?.value === false),
       selector: 'organization.vulns',
       variables: {
         ...filters
@@ -57,12 +60,9 @@ const Vulnerabilities = () => {
     return <VulnInfo vulnId={vulnId} />
   }
 
-  if (productPermissions?.value === false)
-    return (
-      <Text textAlign={'center'} mt={32}>
-        There are no records to display
-      </Text>
-    )
+  if (productPermissions?.value === false || !orgView) {
+    return <ViewAlert loading={orgLoading} category='vulnerability page' />
+  }
 
   return (
     <Card>

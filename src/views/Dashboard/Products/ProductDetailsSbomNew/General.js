@@ -90,7 +90,7 @@ const General = ({ data, refetch, loading, error }) => {
     (permission) =>
       permission.key === 'update_sbom_components' && permission.value === true
   )
-  const updateSboms = sboms?.supersededBy?.some(
+  const editSboms = sboms?.supersededBy?.some(
     (permission) =>
       permission.key === 'update_sbom' && permission.value === true
   )
@@ -99,7 +99,7 @@ const General = ({ data, refetch, loading, error }) => {
   const status = 'created'
   const textColor = useColorModeValue('gray.700', 'white')
   const iconColor = useColorModeValue('blue.500', 'gray.100')
-  const customerView = location.pathname.startsWith('/customer')
+  const customerView = location?.pathname?.startsWith('/customer')
   const [selectedKey, setSelectedKey] = useState('')
   const [activeTool, setActiveTool] = useState(null)
   const [isValid, setIsValid] = useState(true)
@@ -186,8 +186,6 @@ const General = ({ data, refetch, loading, error }) => {
       .then((res) => res.data && sbomDispatch({ type: 'CLEAR_LICENSES' }))
       .finally(() => onSBMClose())
   }
-
-  const isInvalid = status === 'signed' || !updateComponent || customerView
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
   const handleSBMDown = useCallback(
@@ -319,7 +317,7 @@ const General = ({ data, refetch, loading, error }) => {
               <Td pl={0}>
                 <IconButton
                   size='sm'
-                  isDisabled={isInvalid}
+                  isDisabled={customerView || !editSboms}
                   icon={<EditIcon color={iconColor} />}
                   onClick={() => handleClick('tools')}
                 />
@@ -367,7 +365,7 @@ const General = ({ data, refetch, loading, error }) => {
               <Td pl={0}>
                 <IconButton
                   size='sm'
-                  isDisabled={isInvalid}
+                  isDisabled={customerView || !editSboms}
                   icon={<EditIcon color={iconColor} />}
                   onClick={() => handleClick('author')}
                 />
@@ -420,7 +418,7 @@ const General = ({ data, refetch, loading, error }) => {
               <Td pl={0}>
                 <IconButton
                   size='sm'
-                  isDisabled={isInvalid}
+                  isDisabled={customerView || !editSboms}
                   icon={<EditIcon color={iconColor} />}
                   onClick={onSupOpen}
                 />
@@ -467,7 +465,7 @@ const General = ({ data, refetch, loading, error }) => {
               <Td pl={0}>
                 <IconButton
                   size='sm'
-                  isDisabled={isInvalid}
+                  isDisabled={customerView || !editSboms}
                   icon={<EditIcon color={iconColor} />}
                   onClick={onLicenseOpen}
                 />

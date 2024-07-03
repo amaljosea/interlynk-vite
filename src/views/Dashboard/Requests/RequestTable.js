@@ -24,6 +24,7 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import SearchFilter from 'components/Licenses/LicenseSearchFilter'
+import ViewAlert from 'components/Misc/ViewAlert'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -51,7 +52,7 @@ const RequestTable = ({
   const viewReq = userPermissions?.find((item) => item?.key === 'view_requests')
   const addReq = viewReq?.supersededBy?.some(
     (permission) =>
-      permission.key === 'add_request' && permission?.value === true
+      permission.key === 'create_request' && permission?.value === true
   )
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
@@ -351,6 +352,10 @@ const RequestTable = ({
       right: 'true'
     }
   ]
+
+  if (viewReq?.value === false) {
+    return <ViewAlert category='requests' />
+  }
 
   return (
     <>

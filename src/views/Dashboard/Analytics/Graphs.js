@@ -5,6 +5,8 @@ import { Center, Icon, SimpleGrid, useColorModeValue } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+
 import { TfiBarChart } from 'react-icons/tfi'
 
 import { GraphUi } from './GraphsUi'
@@ -42,6 +44,7 @@ const DAILY_METRICS_QUERY = gql`
 `
 
 export const Graphs = ({ filters }) => {
+  const { orgView } = useGlobalQueryContext()
   const { startDate, endDate } = filters?.duration || {}
   const bgColor = useColorModeValue('gray.300', 'gray.600')
 
@@ -53,7 +56,7 @@ export const Graphs = ({ filters }) => {
       startDate,
       endDate: endDate
     },
-    skip: !filters.version || !startDate || !endDate
+    skip: !filters.version || !startDate || !endDate || !orgView
   })
 
   if (!filters.version.length || !filters.duration) {

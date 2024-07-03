@@ -43,10 +43,10 @@ export const InternalComponents = () => {
   const toast = useToast()
   const { userPermissions } = useGlobalState()
 
-  const orgs = userPermissions?.find((item) => item.key === 'view_organization')
-  const updateOrg = orgs?.supersededBy?.some(
+  const viewFeeds = userPermissions?.find((item) => item.key === 'view_feeds')
+  const manageListing = viewFeeds?.supersededBy?.some(
     (permission) =>
-      permission.key === 'update_organization' && permission?.value === true
+      permission?.key === 'manage_listing' && permission?.value === true
   )
 
   const [mutate] = useMutation(updateOrgComp, {
@@ -198,7 +198,7 @@ export const InternalComponents = () => {
               icon={<AddIcon />}
               colorScheme='blue'
               variant='solid'
-              isDisabled={!updateOrg}
+              isDisabled={!manageListing}
               onClick={() => {
                 setIsOpen(true)
               }}

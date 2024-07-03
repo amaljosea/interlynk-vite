@@ -60,6 +60,7 @@ const Checks = () => {
           <Switch
             name={rule.friendlyId}
             id={rule.friendlyId}
+            isDisabled={!editChecks}
             isChecked={enabled ? true : false}
             onChange={(e) => handleChange(e.target.checked, id)}
           />

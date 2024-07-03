@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 
 import { Text, Wrap, useDisclosure } from '@chakra-ui/react'
 
+import ViewAlert from 'components/Misc/ViewAlert'
+
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -90,6 +92,10 @@ const Connections = () => {
       handleConnectionData(data.organization.connections.nodes)
     }
   }, [data])
+
+  if (con?.value === false) {
+    return <ViewAlert category='connections' />
+  }
 
   return (
     <>
