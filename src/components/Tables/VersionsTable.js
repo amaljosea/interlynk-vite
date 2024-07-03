@@ -117,7 +117,7 @@ const VersionsTable = ({ projectGroup }) => {
   const sbom = userPermissions?.find((item) => item.key === 'view_sbom')
   const createSbom = sbom?.supersededBy?.some(
     (permission) =>
-      permission.key === 'create_sbom' && permission.value === true
+      permission.key === 'update_sbom' && permission.value === true
   )
   const archiveSbom = sbom?.supersededBy?.some(
     (permission) =>

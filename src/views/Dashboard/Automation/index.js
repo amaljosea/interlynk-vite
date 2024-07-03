@@ -92,7 +92,9 @@ const Automation = () => {
     fetchPolicy: 'network-only'
   })
 
-  const product = userPermissions?.find((item) => item.key === 'view_product')
+  const product = userPermissions?.find(
+    (item) => item.key === 'view_product_group'
+  )
   const updateProduct = product?.supersededBy?.some(
     (permission) =>
       permission.key === 'update_product_group' && permission.value === true

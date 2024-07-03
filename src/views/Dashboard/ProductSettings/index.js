@@ -80,7 +80,9 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
     onClose: onInfoClose
   } = useDisclosure()
 
-  const product = userPermissions?.find((item) => item.key === 'view_product')
+  const product = userPermissions?.find(
+    (item) => item.key === 'view_product_group'
+  )
   const editControls = product?.supersededBy?.some(
     (permission) =>
       permission.key === 'update_product_settings' && permission.value === true

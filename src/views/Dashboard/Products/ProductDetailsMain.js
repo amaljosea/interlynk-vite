@@ -161,7 +161,7 @@ const ProductDetailsMain = () => {
     () =>
       sbomPermission?.supersededBy?.some(
         (permission) =>
-          permission.key === 'create_sbom' && permission.value === true
+          permission.key === 'update_sbom' && permission.value === true
       ),
     [sbomPermission]
   )

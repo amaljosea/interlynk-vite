@@ -126,7 +126,7 @@ const ProductTable = ({
     () =>
       productPermissions?.supersededBy?.some(
         (permission) =>
-          permission.key === 'create_product_group' && permission.value
+          permission.key === 'update_product_group' && permission.value
       ),
     [productPermissions]
   )
@@ -143,7 +143,7 @@ const ProductTable = ({
   const canCreateSBOM = useMemo(
     () =>
       sbomPermissions?.supersededBy?.some(
-        (permission) => permission.key === 'create_sbom' && permission.value
+        (permission) => permission.key === 'update_sbom' && permission.value
       ),
     [sbomPermissions]
   )
