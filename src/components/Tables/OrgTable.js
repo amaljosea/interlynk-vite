@@ -42,6 +42,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import {
   AcceptOrgInvitation,
@@ -63,17 +64,15 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
 
   const { totalRows, userPermissions } = useGlobalState()
 
-  const viewOrg = userPermissions?.find(
-    (item) => item.key === 'view_organization'
-  )
-  const updateOrg = viewOrg?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_organization' && permission.value === true
-  )
-  const removeOrg = viewOrg?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'remove_organization' && permission.value === true
-  )
+  const updateOrg = useHasPermission({
+    parentKey: 'view_organization',
+    childKey: 'update_organization'
+  })
+
+  const removeOrg = useHasPermission({
+    parentKey: 'view_organization',
+    childKey: 'remove_organization'
+  })
 
   const {
     isOpen: isWarningOpen,
