@@ -20,11 +20,10 @@ import CustomTag from './CustomTag'
 const UserCard = ({ name, isOpen, onClose }) => {
   const isSystem = name === 'system'
   const { data } = useQuery(GetSelectedUser, {
-    variables: { search: name },
     skip: name === '' || isSystem ? true : false
   })
   const { users } = data?.organization || ''
-  const currentUser = users?.find((item) => item?.name === name)
+  const currentUser = users?.find((item) => item?.name?.includes(name))
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
