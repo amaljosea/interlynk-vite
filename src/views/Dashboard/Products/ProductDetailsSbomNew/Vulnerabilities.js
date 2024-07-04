@@ -57,6 +57,7 @@ import { FixedIcon } from 'components/Icons/Icons'
 import ComponentCard from 'components/Misc/ComponentCard'
 import CvssCard from 'components/Misc/CvssCard'
 import Pagination from 'components/Pagination'
+import RowComponent from 'components/RowComponent'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -618,8 +619,9 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
               onCardOpen()
             }}
           >
+            <RowComponent content={name || ''} />
             <Flex alignItems={'center'} gap={2}>
-              <Text color={textColor}>{name || ''}</Text>
+              <Text color={textColor}>{version || ''}</Text>
               <Tooltip
                 label={'Fixed In: ' + fixedVersions?.join(', ')}
                 placement='top'
@@ -627,7 +629,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                 <Icon as={FixedIcon} display={isExists ? 'flex' : 'none'} />
               </Tooltip>
             </Flex>
-            <Text color={textColor}>{version || ''}</Text>
           </Stack>
         )
       },

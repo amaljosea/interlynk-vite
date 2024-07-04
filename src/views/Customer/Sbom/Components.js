@@ -45,18 +45,16 @@ import CompFilters from './CompFilters'
 
 const Components = ({ sbomData, sbomRefetch }) => {
   const params = useParams()
-  const productId = params.productid
   const sbomId = params.sbomid
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const { totalRows, setTotalRows, prodCompState, dispatch } = useGlobalState()
+  const { prodCompState, dispatch } = useGlobalState()
   const {
     field,
     direction,
-    pageIndex,
     searchInput,
     ecosystems,
     kinds,
@@ -106,7 +104,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
     window.scrollTo({ top: 0 })
   }, [loading])
 
-  const { primaryComponent, lifecycle } = sbomData || ''
+  const { primaryComponent } = sbomData || ''
 
   // GET COMPONENT FILTER HEADS
   const { refetch: getCompFilters } = useQuery(ShareCompFilters, {
@@ -122,11 +120,11 @@ const Components = ({ sbomData, sbomRefetch }) => {
     }
   })
 
-  const fetchCompData = () => {
+  const fetchCompData = useCallback(() => {
     reset()
     refetch()
     getCompFilters()
-  }
+  }, [getCompFilters, refetch, reset])
 
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState('')

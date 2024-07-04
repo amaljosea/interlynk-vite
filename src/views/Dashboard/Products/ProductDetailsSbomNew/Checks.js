@@ -13,6 +13,7 @@ import SupplierModal from 'views/Sbom/components/SupplierModal'
 import { CheckIcon } from '@chakra-ui/icons'
 import {
   Badge,
+  Box,
   Button,
   Flex,
   IconButton,
@@ -32,6 +33,7 @@ import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import LicenseModal from 'components/LicenseModal'
 import ComponentCard from 'components/Misc/ComponentCard'
 import Pagination from 'components/Pagination'
+import RowComponent from 'components/RowComponent'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -640,20 +642,15 @@ const Checks = () => {
         return (
           <Stack spacing={2} my={3}>
             {component !== null && (
-              <Badge
-                fontSize={'sm'}
-                variant='subtle'
-                colorScheme='blue'
-                cursor={'pointer'}
+              <Box
                 width={'fit-content'}
-                fontWeight={'medium'}
                 onClick={() => {
                   setActiveRow(component)
                   onCardOpen()
                 }}
               >
-                {component.name}
-              </Badge>
+                <RowComponent content={component.name} />
+              </Box>
             )}
             <Text color={textColor}>
               {organizationRule.rule.longDesc !== null

@@ -17,6 +17,7 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
+import RowComponent from 'components/RowComponent'
 
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
@@ -46,9 +47,13 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       selector: (row) => {
         const { violation, component } = row
         return (
-          <Text color={textColor} my={2}>
-            {component?.name || violation?.primaryComponent?.name || ''}
-          </Text>
+          <Box my={2}>
+            <RowComponent
+              content={
+                component?.name || violation?.primaryComponent?.name || ''
+              }
+            />
+          </Box>
         )
       },
       wrap: true

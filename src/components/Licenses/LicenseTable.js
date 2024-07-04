@@ -22,9 +22,7 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
-import ViewAlert from 'components/Misc/ViewAlert'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
