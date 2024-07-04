@@ -6,7 +6,7 @@ import { GetOrgName } from 'graphQL/Queries'
 const useOrg = () => {
   const location = useLocation()
   const { data, loading } = useQuery(GetOrgName, {
-    skip: location?.pathname === '/auth'
+    skip: location?.pathname?.startsWith('/vendor') === false
   })
   return { data, loading }
 }
