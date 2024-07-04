@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 
 import {
@@ -22,37 +22,31 @@ import {
 import LynkSelect from 'components/LynkSelect'
 
 import { OrgRoleCreate } from 'graphQL/Mutation'
-
-const GetPermissions = gql`
-  query GetPermissions {
-    permissions {
-      key
-      name
-    }
-  }
-`
+import { GetAllPermissions } from 'graphQL/Queries'
 
 const CreateRole = ({ isOpen, onClose, refetch }) => {
   const [roleName, setRoleName] = useState('')
-  const [permissions, setPermissions] = useState([])
+  const [permissions, setPermissions] = useState('')
   const [disabled, setDisabled] = useState(false)
   const [error, setError] = useState('')
 
   const [createRole] = useMutation(OrgRoleCreate)
 
-  const psOptions = [{ value: 'all', label: 'All' }]
+  const psOptions = []
 
-  const { data } = useQuery(GetPermissions, {
+  const { data } = useQuery(GetAllPermissions, {
     skip: isOpen === true ? false : true
   })
 
-  const { permissions: psMaps } = data || ''
-  const filterPs = psMaps?.filter((item) => item?.name?.startsWith('View'))
+  const { organizationRoles } = data?.organization || ''
 
-  filterPs?.length &&
-    filterPs?.map((item) =>
-      psOptions?.push({ value: item?.key, label: item?.name })
-    )
+  organizationRoles?.length &&
+    organizationRoles?.map((item) => {
+      const allPs = item?.permissionsMap
+        ?.filter((ps) => ps?.value === true)
+        ?.map((item) => item?.key)
+      psOptions?.push({ value: allPs, label: item?.name })
+    })
 
   const disableButtonTemporarily = () => {
     setDisabled(true)
@@ -72,10 +66,6 @@ const CreateRole = ({ isOpen, onClose, refetch }) => {
   }
 
   const onSave = () => {
-    const selectedPs = permissions?.map((item) => item?.value)
-    const allPs = psOptions
-      ?.filter((item) => item?.value !== 'all')
-      ?.map((item) => item?.value)
     if (roleName?.length < 4) {
       setError('Input must be at least 4 characters')
     } else {
@@ -83,7 +73,7 @@ const CreateRole = ({ isOpen, onClose, refetch }) => {
       createRole({
         variables: {
           name: roleName,
-          permissions: selectedPs?.includes('all') ? allPs : selectedPs
+          permissions: permissions?.value
         }
       }).then((res) => {
         const { errors } = res?.data?.organizationRoleCreate || ''
@@ -126,10 +116,8 @@ const CreateRole = ({ isOpen, onClose, refetch }) => {
             </FormControl>
             {/* PERMISSIONS */}
             <FormControl isRequired>
-              <FormLabel>Permissions</FormLabel>
+              <FormLabel>Copy Permission From</FormLabel>
               <LynkSelect
-                isMulti
-                isClearable={true}
                 value={permissions}
                 options={psOptions}
                 placeholder='Select'

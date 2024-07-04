@@ -43,6 +43,7 @@ const LynkSelect = (props) => {
       ...provided,
       color: optionColor,
       backgroundColor: bgColor,
+      textTransform: 'capitalize',
       '&:hover': {
         backgroundColor: textHoverColor
       }
