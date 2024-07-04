@@ -299,7 +299,7 @@ const Parts = ({ sbomRefetch }) => {
       name: 'NAME',
       selector: (row) => {
         const { part } = row
-        const { primaryComponent, projectVersion } = part || ''
+        const { primaryComponent, projectVersion, suppliers } = part || ''
         const { purl, cpes } = primaryComponent || ''
         const unknown = isUnknown(cpes, purl)
 
@@ -345,6 +345,11 @@ const Parts = ({ sbomRefetch }) => {
                   </Text>
                 </Link>
                 <Text color={textColor}>{projectVersion}</Text>
+                {suppliers?.map((item, index) => (
+                  <Text key={index} color={textColor}>
+                    {item?.name}
+                  </Text>
+                ))}
               </Stack>
             </GridItem>
           </Grid>
@@ -352,39 +357,6 @@ const Parts = ({ sbomRefetch }) => {
       },
       width: '20%',
       wrap: true
-    },
-    {
-      id: 'SUPPLIER',
-      name: 'SUPPLIER',
-      selector: (row) => {
-        const { part } = row
-        const { suppliers } = part || ''
-        return (
-          <>
-            {suppliers?.map((item, index) => (
-              <Tooltip
-                key={index}
-                label={`${item?.name || item.contactName || ''} ${item.contactEmail && `- ${item.contactEmail}`}`}
-                placement='top'
-              >
-                <Tag
-                  size={'md'}
-                  key={index}
-                  fontSize={14}
-                  variant='subtle'
-                  colorScheme='orange'
-                >
-                  <TagLabel>
-                    {item?.name || item?.contactName || ''}
-                    {item?.contactEmail && ` - ${item?.contactEmail}`}
-                  </TagLabel>
-                </Tag>
-              </Tooltip>
-            ))}
-          </>
-        )
-      },
-      width: '15%'
     },
     {
       id: 'COMPONENTS',
