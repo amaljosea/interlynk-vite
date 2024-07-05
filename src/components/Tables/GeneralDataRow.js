@@ -38,6 +38,7 @@ import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import InfoModal from 'components/InfoModal'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import {
   authorDelete,
@@ -73,15 +74,15 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const { expLicense } = sbomState
   const { sbomDispatch } = dispatch
 
-  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const updateComponent = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom_components' && permission.value === true
-  )
-  const updateSboms = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom' && permission.value === true
-  )
+  const updateComponent = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom_components'
+  })
+
+  const updateSboms = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom'
+  })
 
   const btnRef = useRef(null)
   const licenseBtn = useRef(null)

@@ -6,6 +6,7 @@ import ViewAlert from 'components/Misc/ViewAlert'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetLicensesTable } from 'graphQL/Queries'
@@ -16,7 +17,9 @@ const Licenses = () => {
   const { userPermissions } = useGlobalState()
   const { orgView, orgLoading } = useGlobalQueryContext()
   const org = localStorage.getItem('organization')
-  const viewLic = userPermissions?.find((item) => item?.key === 'view_license')
+  const viewLic = useHasPermission({
+    parentKey: 'view_license'
+  })
 
   const [filters, setFilters] = useState({})
   const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
@@ -31,7 +34,7 @@ const Licenses = () => {
     }
   )
 
-  if (!orgView || viewLic?.value === false) {
+  if (!orgView || viewLic === false) {
     return <ViewAlert loading={orgLoading} category='license page' />
   }
 

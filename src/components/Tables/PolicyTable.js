@@ -50,6 +50,7 @@ import ViewAlert from 'components/Misc/ViewAlert'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
@@ -66,22 +67,24 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
   const tab = queryParams.get('tab')
 
   const { userPermissions } = useGlobalState()
-  const product = userPermissions?.find(
-    (item) => item.key === 'view_product_group'
-  )
-  const editProdPolicies = product?.supersededBy?.some(
-    (permission) =>
-      permission?.key === 'edit_product_policies' && permission?.value === true
-  )
-  const policy = userPermissions?.find((item) => item?.key === 'view_policy')
-  const updatePolicy = policy?.supersededBy?.some(
-    (permission) =>
-      permission?.key === 'create_update_policy' && permission?.value === true
-  )
-  const removePolicy = policy?.supersededBy?.some(
-    (permission) =>
-      permission?.key === 'remove_policy' && permission?.value === true
-  )
+  const editProdPolicies = useHasPermission({
+    parentKey: 'view_product_group',
+    childKey: 'edit_product_policies'
+  })
+
+  const policy = useHasPermission({
+    parentKey: 'view_policy'
+  })
+
+  const updatePolicy = useHasPermission({
+    parentKey: 'view_policy',
+    childKey: 'create_update_policy'
+  })
+
+  const removePolicy = useHasPermission({
+    parentKey: 'view_policy',
+    childKey: 'remove_policy'
+  })
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')

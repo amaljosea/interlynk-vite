@@ -34,6 +34,7 @@ import CustomLoader from 'components/CustomLoader'
 import InfoModal from 'components/InfoModal'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { OrganizationManufacturerDelete } from 'graphQL/Mutation'
@@ -47,11 +48,10 @@ const LegalTable = () => {
   const org = localStorage.getItem('organization')
   const { userPermissions, totalRows } = useGlobalState()
 
-  const orgs = userPermissions?.find((item) => item.key === 'view_organization')
-  const updateOrg = orgs?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_organization' && permission?.value === true
-  )
+  const updateOrg = useHasPermission({
+    parentKey: 'view_organization',
+    childKey: 'update_organization'
+  })
 
   const [activeRow, setActiveRow] = useState(null)
   const [infoHeading, setInfoHeading] = useState('')

@@ -21,6 +21,7 @@ import {
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
@@ -75,9 +76,9 @@ export default function AdminNavbar(props) {
   let mainText = useColorModeValue('gray.700', 'gray.200')
   let secondaryText = useColorModeValue('gray.400', 'gray.200')
 
-  const viewProds = userPermissions?.find(
-    (item) => item.key === 'view_product_group'
-  )
+  const viewProds = useHasPermission({
+    parentKey: 'view_product_group'
+  })
 
   const {
     name: projectGroupName,
@@ -96,7 +97,7 @@ export default function AdminNavbar(props) {
   )
 
   const { data: productsData } = useQuery(GetProjectGroupDetails, {
-    skip: !orgView || viewProds?.value === false,
+    skip: !orgView || viewProds === false,
     variables: {
       field: 'PROJECT_GROUPS_UPDATED_AT',
       direction: 'DESC',

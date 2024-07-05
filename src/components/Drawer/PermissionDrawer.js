@@ -24,6 +24,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { UpdateOrganizationRole } from 'graphQL/Mutation'
@@ -33,11 +34,10 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, refetch }) => {
   const toast = useToast()
   const activetab = useQueryParam('tab')
   const { userPermissions } = useGlobalState()
-  const orgs = userPermissions?.find((item) => item.key === 'view_organization')
-  const updateOrg = orgs?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_organization' && permission?.value === true
-  )
+  const updateOrg = useHasPermission({
+    parentKey: 'view_organization',
+    childKey: 'update_organization'
+  })
 
   const [error, setError] = useState('')
   const [isEdited, setIsEdited] = useState(false)

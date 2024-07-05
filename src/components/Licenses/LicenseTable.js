@@ -25,6 +25,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaScaleBalanced } from 'react-icons/fa6'
@@ -39,11 +40,11 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { userPermissions } = useGlobalState()
-  const viewLic = userPermissions?.find((item) => item?.key === 'view_license')
-  const updateLic = viewLic?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'edit_license_attributes' && permission?.value === true
-  )
+
+  const updateLic = useHasPermission({
+    parentKey: 'view_license',
+    childKey: 'edit_license_attributes'
+  })
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 

@@ -18,6 +18,7 @@ import CustomLoader from 'components/CustomLoader'
 import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { GetRoles } from 'graphQL/Queries'
@@ -29,11 +30,10 @@ const RoleTable = () => {
   const org = localStorage.getItem('organization')
 
   const { userPermissions } = useGlobalState()
-  const orgs = userPermissions?.find((item) => item.key === 'view_organization')
-  const updateOrgs = orgs?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_organization' && permission.value === true
-  )
+  const updateOrgs = useHasPermission({
+    parentKey: 'view_organization',
+    childKey: 'update_organization'
+  })
 
   const { data, loading, refetch } = useQuery(GetRoles, {
     skip: org === 'undefined' ? true : activetab === 'roles' ? false : true

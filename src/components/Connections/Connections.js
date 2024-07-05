@@ -6,6 +6,7 @@ import { Text, Wrap, useDisclosure } from '@chakra-ui/react'
 import ViewAlert from 'components/Misc/ViewAlert'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { GetConnections } from 'graphQL/Queries'
@@ -29,12 +30,13 @@ const Connections = () => {
       org === 'undefined' ? true : activetab === 'connections' ? false : true
   })
 
-  const con = userPermissions?.find((item) => item.key === 'view_connections')
-  const updateCon = con?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'create_update_connection' && permission.value === true
-  )
-
+  const con = useHasPermission({
+    parentKey: 'view_connections'
+  })
+  const updateCon = useHasPermission({
+    parentKey: 'view_connections',
+    childKey: 'create_update_connection'
+  })
   const {
     isOpen: isJiraOpen,
     onOpen: onJiraOpen,
@@ -93,7 +95,7 @@ const Connections = () => {
     }
   }, [data])
 
-  if (con?.value === false) {
+  if (con === false) {
     return <ViewAlert category='connections' />
   }
 
