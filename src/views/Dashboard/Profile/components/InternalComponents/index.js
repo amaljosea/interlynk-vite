@@ -128,7 +128,7 @@ export const InternalComponents = () => {
     },
     {
       id: 'UPDATED',
-      name: 'LAST UPDATED',
+      name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           <Text color={textColor} my={2}>

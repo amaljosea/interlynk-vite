@@ -15,7 +15,6 @@ import { getUserType } from 'utils/url'
 import { SearchIcon } from '@chakra-ui/icons'
 import { useColorModeValue } from '@chakra-ui/system'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useSettingActions from 'hooks/useSettingActions'
@@ -29,7 +28,6 @@ import { FaScrewdriverWrench } from 'react-icons/fa6'
 const Kbar = () => {
   // hooks
   const { results, rootActionId } = useMatches()
-  const userType = getUserType()
   const navigate = useNavigate()
   const {
     generateProductVersionDetailPageUrlFromCurrentUrl,
@@ -43,7 +41,7 @@ const Kbar = () => {
     parentKey: 'view_product_group'
   })
 
-  const { data: productData } = useQuery(GetProductTable, {
+  const { data: productData } = useQuery(GetProjectGroupAndVersionDetails, {
     skip: !productPermissions,
     fetchPolicy: 'network-only',
     variables: {
