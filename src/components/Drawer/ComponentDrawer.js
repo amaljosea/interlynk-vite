@@ -1,7 +1,7 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import React, { useEffect, useRef, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { validateCpe } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
@@ -48,6 +48,7 @@ import InfoModal from 'components/InfoModal'
 import LicenseField from 'components/Licenses/LicenseField'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import {
   CreateCompRelation,
@@ -59,6 +60,7 @@ import { CpeAutoComplete, GetAllComponents, GetAllSboms } from 'graphQL/Queries'
 import { FaExpandAlt } from 'react-icons/fa'
 
 function ComponentDrawer(props) {
+  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
@@ -68,6 +70,16 @@ function ComponentDrawer(props) {
   const sbomId = params.sbomid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const customerView = location.pathname.startsWith('/customer')
+
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
+
+  const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+    replaceParams: true,
+    paramsObj: {
+      tab: 'components'
+    }
+  })
 
   const { isOpen, onClose, data, primaryComp, shortDesc, fetchCompData } = props
   const { prodCompState, dispatch } = useGlobalState()
@@ -334,6 +346,7 @@ function ComponentDrawer(props) {
     }).then((res) => {
       if (res.data) {
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        navigate(link)
         onClose()
       }
     })
@@ -438,6 +451,11 @@ function ComponentDrawer(props) {
     onInfoOpen()
   }
 
+  const onDrawerClose = () => {
+    navigate(link)
+    onClose()
+  }
+
   const isInvalid =
     compKind === '' ||
     compName === '' ||
@@ -447,7 +465,13 @@ function ComponentDrawer(props) {
 
   return (
     <>
-      <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
+      <Drawer
+        size='md'
+        isOpen={isOpen}
+        placement='right'
+        onClose={onDrawerClose}
+        closeOnOverlayClick={false}
+      >
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
@@ -793,7 +817,7 @@ function ComponentDrawer(props) {
             </Stack>
           </DrawerBody>
           <DrawerFooter borderTopWidth='1px' hidden={signedUrlParams !== null}>
-            <Button mr={3} onClick={onClose}>
+            <Button mr={3} onClick={onDrawerClose}>
               Cancel
             </Button>
             <Button

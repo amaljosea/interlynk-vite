@@ -2,7 +2,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   GetIcon,
   customStyles,
@@ -54,6 +54,8 @@ import { ProgressBar } from 'components/ProgressBar'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
@@ -78,9 +80,11 @@ import CompFilters from './CompFilters'
 
 const Components = ({ sbomData, sbomRefetch }) => {
   const params = useParams()
+  const navigate = useNavigate()
   const productId = params.productid
   const sbomId = params.sbomid
   const location = useLocation()
+  const expandView = useQueryParam('expand')
   const customerView = location.pathname.startsWith('/customer')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
@@ -1065,6 +1069,15 @@ const Components = ({ sbomData, sbomRefetch }) => {
       }
     })
   }
+
+  useEffect(() => {
+    if (expandView === 'true') {
+      setActiveRow(nodes?.length > 0 ? nodes[0] : null)
+      setTimeout(() => {
+        onOpen()
+      }, 1000)
+    }
+  }, [nodes, expandView, onOpen])
 
   if (error) {
     return (

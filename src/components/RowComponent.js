@@ -22,7 +22,8 @@ const RowComponent = ({ content }) => {
 
   const link = generateProductVersionDetailPageUrlFromCurrentUrl({
     paramsObj: {
-      tab: 'components'
+      tab: 'components',
+      expand: true
     }
   })
 
