@@ -6,14 +6,12 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   Checkbox,
   Divider,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   Stack,
@@ -30,7 +28,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { UpdateOrganizationRole } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
 
-const PermissionDrawer = ({ isOpen, onClose, selectedRole, refetch }) => {
+const PermissionDrawer = ({ isOpen, onClose, selectedRole }) => {
   const toast = useToast()
   const activetab = useQueryParam('tab')
   const { userPermissions } = useGlobalState()
@@ -39,48 +37,17 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, refetch }) => {
     childKey: 'update_organization'
   })
 
-  const [error, setError] = useState('')
-  const [isEdited, setIsEdited] = useState(false)
-  const { data, loading } = useQuery(GetAllPermissions, {
-    skip: activetab === 'roles' ? false : true
-  })
   const [updateRole] = useMutation(UpdateOrganizationRole)
 
-  const activeRole =
-    data &&
-    data?.organization?.organizationRoles?.find(
-      (item) => item?.name === selectedRole
-    )
+  const [error, setError] = useState('')
+  const { data, loading, refetch } = useQuery(GetAllPermissions, {
+    skip: activetab === 'roles' ? false : true
+  })
+  const { organizationRoles } = data?.organization || ''
 
-  const onCheckParent = (e, category) => {
-    e.preventDefault()
-    const list = activeRole?.permissionsMap?.filter(
-      (item) => item.category === category && item.hidden === null
-    )
-    const filterData = list
-      .filter((item) => item?.supersededBy?.length === 0)
-      .map(() => e.target.checked)
-    if (filterData) {
-      const permissions = list.map((item) => ({
-        permissionKey: item?.key,
-        value: e.target.checked
-      }))
-      updateRole({
-        variables: {
-          organizationRoleId: activeRole?.id,
-          permissions: permissions
-        }
-      }).then((res) => {
-        setIsEdited(true)
-        const { errors } = res?.data?.organizationRoleUpdate || ''
-        if (errors?.length > 0) {
-          setError(errors[0])
-        } else {
-          refetch()
-        }
-      })
-    }
-  }
+  const activeRole = organizationRoles?.find(
+    (item) => item?.name === selectedRole
+  )
 
   const onCheckChild = (e, category) => {
     e.preventDefault()
@@ -92,20 +59,20 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, refetch }) => {
       variables: {
         organizationRoleId: activeRole?.id,
         permissions: [
-          {
-            permissionKey: selector[0]?.key,
-            value: e.target.checked ? true : selector[0]?.value
-          },
           { permissionKey: filterItem?.key, value: e.target.checked }
         ]
       }
     }).then((res) => {
-      setIsEdited(true)
       const { errors } = res?.data?.organizationRoleUpdate || ''
       if (errors?.length > 0) {
         setError(errors[0])
       } else {
         refetch()
+        toast({
+          description: `${filterItem?.name} Permission updated successfully`,
+          position: 'top',
+          status: 'success'
+        })
       }
     })
   }
@@ -125,13 +92,7 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, refetch }) => {
               item.supersededBy.length > 0
           )
           .map((item, index) => (
-            <Checkbox
-              isDisabled
-              key={index}
-              isChecked={item.value}
-              // isDisabled={readOnly || !updateOrg}
-              onChange={(e) => onCheckParent(e, item.category)}
-            >
+            <Checkbox isDisabled key={index} isChecked={item.value}>
               {item.name}
             </Checkbox>
           ))}
@@ -157,15 +118,6 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, refetch }) => {
         </Stack>
       </Box>
     )
-  }
-
-  const onSave = () => {
-    toast({
-      description: 'Permission updated successfully',
-      position: 'top',
-      status: 'success'
-    })
-    onClose()
   }
 
   return (
@@ -234,14 +186,6 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole, refetch }) => {
             </Stack>
           )}
         </DrawerBody>
-        <DrawerFooter>
-          <Button mr={3} onClick={onClose}>
-            Close
-          </Button>
-          <Button colorScheme='blue' onClick={onSave} isDisabled={!isEdited}>
-            Save
-          </Button>
-        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   )

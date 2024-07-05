@@ -140,8 +140,6 @@ const RoleTable = () => {
         <PermissionDrawer
           isOpen={isOpen}
           onClose={onClose}
-          refetch={refetch}
-          userRole={role?.name}
           selectedRole={selectedRole}
         />
       )}
