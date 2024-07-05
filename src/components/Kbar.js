@@ -15,6 +15,7 @@ import { getUserType } from 'utils/url'
 import { SearchIcon } from '@chakra-ui/icons'
 import { useColorModeValue } from '@chakra-ui/system'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useSettingActions from 'hooks/useSettingActions'
@@ -33,6 +34,7 @@ const Kbar = () => {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
   } = useProductUrlContext()
+  const { setEnvName } = useGlobalState()
 
   const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
   const textHoverColor = useColorModeValue('#EDF2F7', '#2D3748')
@@ -51,6 +53,15 @@ const Kbar = () => {
     }
   })
 
+  const handleVersionClick = (value) => {
+    const env = productData?.organization?.projectGroups?.nodes
+      .flatMap((group) => group.projects)
+      .find((item) => item.name === value)
+
+    localStorage.setItem('environment', env?.name)
+    setEnvName(env?.name)
+  }
+
   let data = []
   if (productData?.organization?.projectGroups?.nodes?.length > 0) {
     productData.organization.projectGroups.nodes.forEach((item) => {
@@ -68,25 +79,28 @@ const Kbar = () => {
         }
       })
 
-      if (item?.defaultProject?.sbomVersions?.nodes?.length > 0) {
-        item.defaultProject.sbomVersions.nodes.forEach((version) => {
-          data.push({
-            id: version?.id,
-            name: `${item?.name} - ${version?.projectVersion}`,
-            section: 'product versions',
-            icon: <FaScrewdriverWrench color='#718096' />,
-            perform: () => {
-              const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-                productgroupid: item?.id,
-                productid: item?.defaultProject?.id,
-                sbomid: version?.id,
-                paramsObj: { tab: 'general' }
-              })
-              navigate(link)
-            }
+      item?.projects?.forEach((project) => {
+        if (project?.sbomVersions?.nodes?.length > 0) {
+          project.sbomVersions.nodes.forEach((version) => {
+            data.push({
+              id: version?.id,
+              name: `${item?.name} - ${version?.projectVersion} (${project?.name})`,
+              section: 'product versions',
+              icon: <FaScrewdriverWrench color='#718096' />,
+              perform: () => {
+                const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+                  productgroupid: item?.id,
+                  productid: project?.id,
+                  sbomid: version?.id,
+                  paramsObj: { tab: 'general' }
+                })
+                handleVersionClick(project?.name)
+                navigate(link)
+              }
+            })
           })
-        })
-      }
+        }
+      })
     })
   }
 
