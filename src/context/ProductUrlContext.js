@@ -11,30 +11,33 @@ export const useProductUrls = () => {
   const generateProductDetailPageUrlFromCurrentUrl = ({
     productgroupid = params.productgroupid,
     productid = params.productid,
-    paramsObj
+    paramsObj,
+    replaceParams = false
   } = {}) => {
     const url = `/${userType}/products/${productgroupid}/env/${productid}`
-    return appendParams({ url, paramsObj })
+    return appendParams({ url, paramsObj, replaceParams })
   }
 
   const generateProductVersionDetailPageUrlFromCurrentUrl = ({
     productgroupid = params.productgroupid,
     productid = params.productid,
     sbomid = params.sbomid,
-    paramsObj
+    paramsObj,
+    replaceParams = false
   } = {}) => {
     const url = `/${userType}/products/${productgroupid}/env/${productid}/version/${sbomid}`
-    return appendParams({ url, paramsObj })
+    return appendParams({ url, paramsObj, replaceParams })
   }
 
   const generateProductVulnerabilityDetailPageUrlFromCurrentUrl = ({
     productgroupid = params.productgroupid,
     productid = params.productid,
     vulnerabilityid = params.vulnerabilityid,
-    paramsObj
+    paramsObj,
+    replaceParams = false
   } = {}) => {
     const url = `/${userType}/products/${productgroupid}/env/${productid}/vulnerability/${vulnerabilityid}`
-    return appendParams({ url, paramsObj })
+    return appendParams({ url, paramsObj, replaceParams })
   }
 
   return {

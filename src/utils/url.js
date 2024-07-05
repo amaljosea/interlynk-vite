@@ -11,9 +11,9 @@ const getOldSearchParams = () => {
 
   return oldSearchParamsObj
 }
-export const appendParams = ({ url, paramsObj = {} }) => {
+export const appendParams = ({ url, paramsObj = {}, replaceParams }) => {
   const paramsLength = Object.keys(paramsObj).length
-  const old = getOldSearchParams()
+  const old = replaceParams ? {} : getOldSearchParams()
 
   if (paramsLength) {
     const newSearchParams = new URLSearchParams({
