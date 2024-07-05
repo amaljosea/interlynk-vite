@@ -28,6 +28,7 @@ import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import LynkSelect from 'components/LynkSelect'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -59,8 +60,7 @@ const SbomActions = ({ sbom, refetch }) => {
     generateProductDetailPageUrlFromCurrentUrl
   } = useProductUrlContext()
 
-  const { totalRows, dispatch, prodCompState, userPermissions } =
-    useGlobalState()
+  const { totalRows, dispatch, prodCompState } = useGlobalState()
   const {
     field,
     direction,
@@ -73,19 +73,14 @@ const SbomActions = ({ sbom, refetch }) => {
   } = prodCompState
   const { prodCompDispatch, prodVulnDispatch, sbomDispatch } = dispatch
 
-  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const archiveSboms = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'archive_sbom' && permission.value === true
-  )
-  const updateSboms = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom' && permission.value === true
-  )
-
-  // const signSboms = sboms?.supersededBy?.some(
-  //   (permission) => permission.key === 'sign_sbom' && permission.value === true
-  // )
+  const archiveSboms = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'archive_sbom'
+  })
+  const updateSboms = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom_components'
+  })
 
   const navigate = useNavigate()
   const params = useParams()

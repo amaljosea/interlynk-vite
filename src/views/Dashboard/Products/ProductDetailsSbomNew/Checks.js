@@ -12,7 +12,6 @@ import SupplierModal from 'views/Sbom/components/SupplierModal'
 
 import { CheckIcon } from '@chakra-ui/icons'
 import {
-  Badge,
   Box,
   Button,
   Flex,
@@ -36,6 +35,7 @@ import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import {
@@ -73,7 +73,7 @@ const Checks = () => {
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
-  const { userPermissions, dispatch } = useGlobalState()
+  const { dispatch } = useGlobalState()
   const { prodCompDispatch, sbomDispatch } = dispatch
 
   const { data: prodData } = useQuery(GetProductData, {
@@ -121,11 +121,10 @@ const Checks = () => {
     filterRefetch()
   }, [filterRefetch, refetch, reset])
 
-  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const editChecks = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'edit_checks' && permission.value === true
-  )
+  const editChecks = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'edit_checks'
+  })
 
   const [purlValue, setPurlValue] = useState('')
   const [cpeList, setCpeList] = useState([])
@@ -334,11 +333,12 @@ const Checks = () => {
 
         <Tooltip label='Re-Check'>
           <IconButton
+            fontSize={'sm'}
             variant='solid'
             colorScheme='blue'
             fontWeight='normal'
-            fontSize={'sm'}
             onClick={handleReCheck}
+            isDisabled={!editChecks}
             icon={<FaCheckDouble size={16} />}
           />
         </Tooltip>
@@ -351,6 +351,7 @@ const Checks = () => {
     handleClear,
     filterHead,
     handleReCheck,
+    editChecks,
     reset
   ])
 

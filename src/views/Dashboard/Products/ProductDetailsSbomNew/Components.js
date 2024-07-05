@@ -166,10 +166,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
     (permission) =>
       permission.key === 'update_sbom_components' && permission.value === true
   )
-  const updateSboms = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom' && permission.value === true
-  )
 
   const fetchCompData = () => {
     reset()
@@ -1019,7 +1015,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
               colorScheme='blue'
               onClick={onMapOpen}
               icon={<RiFundsBoxFill />}
-              isDisabled={restricted}
             />
           </Tooltip>
           {/* CREATE COMPONENT */}

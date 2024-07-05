@@ -31,6 +31,7 @@ import CustomLoader from 'components/CustomLoader'
 import ViolationDrawer from 'components/Drawer/ViolationDrawer'
 import Pagination from 'components/Pagination'
 
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { SbomPolicyScan } from 'graphQL/Mutation'
@@ -49,6 +50,11 @@ const Policies = () => {
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+
+  const policyRun = useHasPermission({
+    parentKey: 'view_policy',
+    childKey: 'run_policy_scan'
+  })
 
   const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
     PolicyResults,
@@ -100,12 +106,13 @@ const Policies = () => {
           <IconButton
             colorScheme='blue'
             onClick={handleRefresh}
+            isDisabled={!policyRun}
             icon={<BiScan size={20} />}
           />
         </Tooltip>
       </Flex>
     )
-  }, [policyScan, refetch, sbomId, toast])
+  }, [policyRun, policyScan, refetch, sbomId, toast])
 
   const getColor = (result) => {
     switch (result) {

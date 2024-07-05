@@ -31,7 +31,7 @@ import { GetAllPermissions } from 'graphQL/Queries'
 const PermissionDrawer = ({ isOpen, onClose, selectedRole }) => {
   const toast = useToast()
   const activetab = useQueryParam('tab')
-  const { userPermissions } = useGlobalState()
+
   const updateOrg = useHasPermission({
     parentKey: 'view_organization',
     childKey: 'update_organization'
