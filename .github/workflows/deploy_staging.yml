@@ -1,4 +1,4 @@
-name: Staging CI/CD Pipeline
+name: Staging | Deploy
 
 on:
   workflow_dispatch
