@@ -47,6 +47,7 @@ import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import GraphDrawer from 'components/Drawer/GraphDrawer'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
+import LoadingOverlay from 'components/LoadingOverlay'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
@@ -178,7 +179,8 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState(searchInput)
 
-  const [getComPath, { data: comPath }] = useLazyQuery(GetComponentPath)
+  const [getComPath, { data: comPath, loading: comPathLoading }] =
+    useLazyQuery(GetComponentPath)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -1084,6 +1086,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
 
   return (
     <>
+      <LoadingOverlay isLoading={comPathLoading} />
       <Flex flexDir={'column'} width={'100%'} height={'auto'}>
         <DataTable
           columns={columns}
