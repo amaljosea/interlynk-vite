@@ -291,13 +291,18 @@ const SbomActions = ({ sbom, refetch }) => {
     <>
       <Flex
         direction={'row'}
-        gap={2}
+        gap={3}
         justifyContent='flex-end'
         ml={'auto'}
         flexWrap={'wrap'}
       >
         {/* SBOM VERSIONS */}
-        <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+        <Flex
+          gap={2}
+          flexDirection={'row'}
+          alignItems={'center'}
+          className='search-version'
+        >
           <FaLayerGroup size={21} color='#4299E1' />
           <LynkSelect
             components={{
@@ -354,6 +359,7 @@ const SbomActions = ({ sbom, refetch }) => {
         {/* DOWNLOAD SBOM */}
         <Tooltip label='Download'>
           <IconButton
+            className='download'
             icon={<FaFileDownload />}
             onClick={onOpen}
             size='md'

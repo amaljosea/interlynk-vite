@@ -1,4 +1,5 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
+import { useTour } from '@reactour/tour'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -98,6 +99,8 @@ const VersionsTable = ({ projectGroup }) => {
   const queryParams = new URLSearchParams(location.search)
   const tab = queryParams.get('tab')
 
+  const { setIsOpen } = useTour()
+
   const { VERSIONS } = ProductDetailsTabs
   const { nodes, paginationProps, loading, refetch } = usePaginatatedQuery(
     signedUrlParams ? ShareVersionTable : GetVersionsTable,
@@ -110,7 +113,16 @@ const VersionsTable = ({ projectGroup }) => {
         id: productId,
         ...filters
       },
-      onCompleted: () => setClearSelect(false)
+      onCompleted: () => {
+        setClearSelect(false)
+        const hasSeenTour = localStorage.getItem('hasSeenTour')
+        if (!hasSeenTour) {
+          setTimeout(() => {
+            setIsOpen(true)
+            localStorage.setItem('hasSeenTour', 'true')
+          }, 1000)
+        }
+      }
     }
   )
 
@@ -197,7 +209,7 @@ const VersionsTable = ({ projectGroup }) => {
     {
       id: 'SBOMS_PROJECT_VERSION',
       name: 'VERSION',
-      selector: (row) => {
+      selector: (row, index) => {
         const { projectVersion } = row
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           sbomid: row.id,
@@ -212,7 +224,13 @@ const VersionsTable = ({ projectGroup }) => {
               prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
             }}
           >
-            <Text color={'blue.500'} minWidth='100%' my={3} fontSize={14}>
+            <Text
+              className={index === 0 ? 'version' : ''}
+              color={'blue.500'}
+              minWidth='100%'
+              my={3}
+              fontSize={14}
+            >
               {projectVersion}
             </Text>
           </Link>

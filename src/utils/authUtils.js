@@ -3,6 +3,8 @@ import { client } from 'context/ApolloWrapper'
 import Cookies from 'js-cookie'
 
 export const logoutUser = async () => {
+  const hasSeenTour = localStorage.getItem('hasSeenTour')
+
   await logError() // Added for debugging random logouts
 
   const logoutURL = process.env.REACT_APP_VENDOR_LOGOUT_URL
@@ -20,6 +22,7 @@ export const logoutUser = async () => {
   } finally {
     // Clear client-side storage and cookies regardless of server response
     localStorage.clear()
+    localStorage.setItem('hasSeenTour', hasSeenTour)
     sessionStorage.clear()
     Cookies.remove('authToken')
     Cookies.remove('signedParamId')

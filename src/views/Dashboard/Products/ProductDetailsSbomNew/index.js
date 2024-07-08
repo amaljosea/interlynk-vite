@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client'
+import { TourProvider } from '@reactour/tour'
 import { useParams } from 'react-router-dom'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -25,8 +26,36 @@ const ProductDetailsSbomNew = () => {
     }
   })
 
+  const steps = [
+    {
+      selector: '.search-version',
+      content: 'Search SBOM Version'
+    },
+    {
+      selector: '.download',
+      content:
+        'By clicking this action, users can download a comprehensive inventory of all the components, dependencies, and libraries included in the software'
+    },
+    {
+      selector: '.general',
+      content: 'From this tab you can see all the SBOM related details'
+    },
+    {
+      selector: '.components',
+      content: 'SBOM Component Details'
+    },
+    {
+      selector: '.vulnerabilities',
+      content: 'SBOM Vulnerability Details'
+    },
+    {
+      selector: '.licenses',
+      content: 'SBOM License Details'
+    }
+  ]
+
   return (
-    <>
+    <TourProvider steps={steps}>
       <SbomInfo
         data={data?.sbom}
         error={error}
@@ -39,7 +68,7 @@ const ProductDetailsSbomNew = () => {
         loading={loading}
         refetch={refetch}
       />
-    </>
+    </TourProvider>
   )
 }
 

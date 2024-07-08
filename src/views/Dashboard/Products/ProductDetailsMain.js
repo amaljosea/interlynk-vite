@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
+import { TourProvider } from '@reactour/tour'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
@@ -294,6 +295,13 @@ const ProductDetailsMain = () => {
       .finally(() => navigate('/vendor/products'))
   }
 
+  const steps = [
+    {
+      selector: '.version',
+      content: 'SBOM Version Details'
+    }
+  ]
+
   useEffect(() => {
     if (sbomId === null) {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
@@ -330,7 +338,7 @@ const ProductDetailsMain = () => {
   }
 
   return (
-    <>
+    <TourProvider steps={steps}>
       <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
         {/* INFO SECTION */}
         <Card display={data ? 'block' : 'none'}>
@@ -621,7 +629,7 @@ const ProductDetailsMain = () => {
           setActiveEnv={setActiveEnv}
         />
       )}
-    </>
+    </TourProvider>
   )
 }
 

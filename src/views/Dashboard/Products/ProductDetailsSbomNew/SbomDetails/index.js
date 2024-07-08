@@ -1,4 +1,5 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
+import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
@@ -60,6 +61,8 @@ const SbomDetails = ({ sbomData, refetch }) => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
+  const { setIsOpen } = useTour()
+
   const setActiveTab = (value) => {
     const link = generateProductVersionDetailPageUrlFromCurrentUrl({
       paramsObj: {
@@ -105,7 +108,8 @@ const SbomDetails = ({ sbomData, refetch }) => {
     PolicyResultsType,
     {
       skip: sbomId ? false : true,
-      variables: { sbomId: sbomId, first: 100 }
+      variables: { sbomId: sbomId, first: 100 },
+      onCompleted: (data) => data && setIsOpen(true)
     }
   )
 
