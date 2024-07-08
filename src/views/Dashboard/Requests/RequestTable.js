@@ -27,6 +27,7 @@ import SearchFilter from 'components/Licenses/LicenseSearchFilter'
 import ViewAlert from 'components/Misc/ViewAlert'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import { RequestCancel, RequestResend } from 'graphQL/Mutation'
 
@@ -49,11 +50,15 @@ const RequestTable = ({
 }) => {
   const toast = useToast()
   const { userPermissions } = useGlobalState()
-  const viewReq = userPermissions?.find((item) => item?.key === 'view_requests')
-  const addReq = viewReq?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'create_request' && permission?.value === true
-  )
+
+  const viewReq = useHasPermission({
+    parentKey: 'view_requests'
+  })
+
+  const addReq = useHasPermission({
+    parentKey: 'view_requests',
+    childKey: 'create_request'
+  })
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -353,7 +358,7 @@ const RequestTable = ({
     }
   ]
 
-  if (viewReq?.value === false) {
+  if (viewReq === false) {
     return <ViewAlert category='requests' />
   }
 

@@ -29,6 +29,7 @@ import SbomInfo from 'components/SbomInfo'
 import DiffTable from 'components/Tables/DiffTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import {
   GetProductData,
@@ -48,10 +49,9 @@ const Compare = ({ selectedSboms }) => {
 
   const [isLoading, setIsLoading] = useState(false)
 
-  const productPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_product_group'),
-    [userPermissions]
-  )
+  const productPermissions = useHasPermission({
+    parentKey: 'view_product_group'
+  })
   const [getProduct] = useLazyQuery(GetProject, { fetchPolicy: 'network-only' })
   const [getSbomData] = useLazyQuery(GetProductData, {
     fetchPolicy: 'network-only'
@@ -60,7 +60,7 @@ const Compare = ({ selectedSboms }) => {
     fetchPolicy: 'network-only'
   })
   const { data } = useQuery(GetProductsForSbomDrift, {
-    skip: productPermissions?.value === true ? false : true,
+    skip: productPermissions === true ? false : true,
     fetchPolicy: 'network-only',
     variables: { enabled: true, field: field, direction: direction }
   })

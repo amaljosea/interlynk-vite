@@ -39,6 +39,7 @@ import CustomLoader from 'components/CustomLoader'
 import ViewAlert from 'components/Misc/ViewAlert'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
@@ -92,20 +93,24 @@ const TeamTable = () => {
 
   const { users } = userData?.organization || ''
 
-  const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
-  console.log('viewUsersd', viewUsers)
-  const inviteUser = viewUsers?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'invite_users' && permission.value === true
-  )
-  const editUserRole = viewUsers?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'edit_user_role' && permission.value === true
-  )
-  const removeUser = viewUsers?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'remove_user' && permission.value === true
-  )
+  const viewUsers = useHasPermission({
+    parentKey: 'view_users'
+  })
+
+  const inviteUser = useHasPermission({
+    parentKey: 'view_users',
+    childKey: 'invite_users'
+  })
+
+  const editUserRole = useHasPermission({
+    parentKey: 'view_users',
+    childKey: 'edit_user_role'
+  })
+
+  const removeUser = useHasPermission({
+    parentKey: 'view_users',
+    childKey: 'remove_user'
+  })
 
   const toast = useToast()
   const SERVER_URL = process.env.REACT_APP_SERVER
@@ -437,7 +442,7 @@ const TeamTable = () => {
     })
   }
 
-  if (viewUsers?.value === false) {
+  if (viewUsers === false) {
     return <ViewAlert category='user list' />
   }
 

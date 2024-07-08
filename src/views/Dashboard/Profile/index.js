@@ -24,6 +24,7 @@ import TeamTable from 'components/Tables/TeamTable'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
 
@@ -98,16 +99,17 @@ function Profile() {
 
   const [selectedTab, setSelectedTab] = useState('')
 
-  const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
-  const viewFeeds = userPermissions?.find((item) => item.key === 'view_feeds')
-  const manageFeeds = viewFeeds?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'manage_feeds' && permission.value === true
-  )
-  const manageListing = viewFeeds?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'manage_listing' && permission.value === true
-  )
+  const viewUsers = useHasPermission({ parentKey: 'view_users' })
+
+  const manageFeeds = useHasPermission({
+    parentKey: 'view_feeds',
+    childKey: 'manage_feeds'
+  })
+
+  const manageListing = useHasPermission({
+    parentKey: 'view_feeds',
+    childKey: 'manage_listing'
+  })
 
   const { data, error } = useQuery(GetOrganization, {
     skip: !orgView
@@ -142,7 +144,7 @@ function Profile() {
     const conditions = {
       Lists: !manageListing,
       Feeds: !manageFeeds,
-      Users: !viewUsers?.value
+      Users: !viewUsers
     }
     return conditions[item] ? 'none' : 'block'
   }

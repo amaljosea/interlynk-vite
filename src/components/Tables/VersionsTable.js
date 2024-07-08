@@ -44,6 +44,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -126,15 +127,15 @@ const VersionsTable = ({ projectGroup }) => {
     }
   )
 
-  const sbom = userPermissions?.find((item) => item.key === 'view_sbom')
-  const createSbom = sbom?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom' && permission.value === true
-  )
-  const archiveSbom = sbom?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'archive_sbom' && permission.value === true
-  )
+  const createSbom = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom'
+  })
+
+  const archiveSbom = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'archive_sbom'
+  })
 
   const [deleteSbom] = useMutation(sbomDelete, {
     onCompleted: (data) => data && refetch({ id: productId })

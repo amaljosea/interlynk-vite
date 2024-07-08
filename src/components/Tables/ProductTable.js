@@ -43,6 +43,7 @@ import CustomLoader from 'components/CustomLoader'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
@@ -112,58 +113,30 @@ const ProductTable = ({
     onClose: onLynkClose
   } = useDisclosure()
 
-  const productPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_product_group'),
-    [userPermissions]
-  )
+  const canAddProduct = useHasPermission({
+    parentKey: 'view_product_group',
+    childKey: 'update_product_group'
+  })
 
-  const sbomPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_sbom'),
-    [userPermissions]
-  )
+  const canEditProduct = useHasPermission({
+    parentKey: 'view_product_group',
+    childKey: 'update_product_group'
+  })
 
-  const canAddProduct = useMemo(
-    () =>
-      productPermissions?.supersededBy?.some(
-        (permission) =>
-          permission.key === 'update_product_group' && permission.value
-      ),
-    [productPermissions]
-  )
+  const canArchiveProduct = useHasPermission({
+    parentKey: 'view_product_group',
+    childKey: 'archive_product_group'
+  })
 
-  const canEditProduct = useMemo(
-    () =>
-      productPermissions?.supersededBy?.some(
-        (permission) =>
-          permission.key === 'update_product_group' && permission.value
-      ),
-    [productPermissions]
-  )
+  const canEditShareynk = useHasPermission({
+    parentKey: 'view_product_group',
+    childKey: 'edit_share_lynk'
+  })
 
-  const canCreateSBOM = useMemo(
-    () =>
-      sbomPermissions?.supersededBy?.some(
-        (permission) => permission.key === 'update_sbom' && permission.value
-      ),
-    [sbomPermissions]
-  )
-
-  const canArchiveProduct = useMemo(
-    () =>
-      productPermissions?.supersededBy?.some(
-        (permission) =>
-          permission.key === 'archive_product_group' && permission.value
-      ),
-    [productPermissions]
-  )
-
-  const canEditShareynk = useMemo(
-    () =>
-      productPermissions?.supersededBy?.some(
-        (permission) => permission.key === 'edit_share_lynk' && permission.value
-      ),
-    [productPermissions]
-  )
+  const canCreateSBOM = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom'
+  })
 
   const {
     data: lynks,

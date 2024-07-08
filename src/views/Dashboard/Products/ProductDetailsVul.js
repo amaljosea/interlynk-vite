@@ -7,6 +7,7 @@ import { Flex, Skeleton } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import { GetGlobalVulnData } from 'graphQL/Queries'
 
@@ -27,17 +28,16 @@ const ProductDetailsVul = () => {
     vexComplete: isCompleted
   } = compVulnState
 
-  const vulnsPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_feeds'),
-    [userPermissions]
-  )
+  const vulnsPermissions = useHasPermission({
+    parentKey: 'view_feeds'
+  })
 
   const {
     data: vulnInfo,
     refetch: getVulnData,
     loading
   } = useQuery(GetGlobalVulnData, {
-    skip: vulnId && vulnsPermissions?.value === true ? false : true,
+    skip: vulnId && vulnsPermissions === true ? false : true,
     fetchPolicy: 'cache-and-network',
     variables: {
       id: vulnId,

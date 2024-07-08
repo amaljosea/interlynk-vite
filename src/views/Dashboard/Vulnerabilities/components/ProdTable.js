@@ -31,6 +31,7 @@ import VersionCard from 'components/Misc/VersionCard'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetCompVulnData, GetConnectedSbom } from 'graphQL/Queries'
@@ -47,11 +48,11 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { userPermissions } = useGlobalState()
-  const viewFeeds = userPermissions?.find((item) => item?.key === 'view_feeds')
-  const manageFeeds = viewFeeds?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'manage_feeds' && permission?.value === true
-  )
+
+  const manageFeeds = useHasPermission({
+    parentKey: 'view_feeds',
+    childKey: 'manage_feeds'
+  })
 
   const [vulnState, setVulnState] = useState({
     vexComplete: false

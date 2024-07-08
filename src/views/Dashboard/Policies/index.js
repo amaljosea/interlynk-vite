@@ -6,6 +6,7 @@ import PolicyTable from 'components/Tables/PolicyTable'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetPolicies } from 'graphQL/Queries'
@@ -14,12 +15,14 @@ const Policies = () => {
   const { userPermissions } = useGlobalState()
   const org = localStorage.getItem('organization')
   const { orgView, orgLoading } = useGlobalQueryContext()
-  const policy = userPermissions?.find((item) => item?.key === 'view_policy')
+  const policy = useHasPermission({
+    parentKey: 'view_policy'
+  })
 
   const { nodes, paginationProps, loading, refetch } = usePaginatatedQuery(
     GetPolicies,
     {
-      skip: !orgView || policy?.value === false,
+      skip: !orgView || policy === false,
       selector: 'policies'
     }
   )

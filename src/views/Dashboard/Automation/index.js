@@ -36,6 +36,7 @@ import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { AutomationRuleDelete, AutomationRuleUpdate } from 'graphQL/Mutation'
@@ -92,19 +93,15 @@ const Automation = () => {
     fetchPolicy: 'network-only'
   })
 
-  const product = userPermissions?.find(
-    (item) => item.key === 'view_product_group'
-  )
-  const updateProduct = product?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_product_group' && permission.value === true
-  )
+  const updateProduct = useHasPermission({
+    parentKey: 'view_product_group',
+    childKey: 'update_product_group'
+  })
 
-  const editAutomations = product?.supersededBy?.some(
-    (permission) =>
-      permission?.key === 'edit_product_automations' &&
-      permission.value === true
-  )
+  const editAutomations = useHasPermission({
+    parentKey: 'view_product_group',
+    childKey: 'edit_product_automations'
+  })
 
   const {
     isOpen: isRuleOpen,

@@ -32,6 +32,7 @@ import ViewAlert from 'components/Misc/ViewAlert'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaPlus } from 'react-icons/fa6'
@@ -48,15 +49,18 @@ const SupportTable = ({
   const sbomId = params.sbomid
 
   const { userPermissions } = useGlobalState()
-  const viewSup = userPermissions?.find((item) => item?.key === 'view_support')
-  const editSup = viewSup?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'create_update_support' && permission?.value === true
-  )
-  const archiveSup = viewSup?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'remove_support' && permission?.value === true
-  )
+  const viewSup = useHasPermission({
+    parentKey: 'view_support'
+  })
+  const editSup = useHasPermission({
+    parentKey: 'view_support',
+    childKey: 'create_update_support'
+  })
+
+  const archiveSup = useHasPermission({
+    parentKey: 'view_support',
+    childKey: 'remove_support'
+  })
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -379,7 +383,7 @@ const SupportTable = ({
     }
   ]
 
-  if (viewSup?.value === false) {
+  if (viewSup === false) {
     return <ViewAlert category='supports' />
   }
 

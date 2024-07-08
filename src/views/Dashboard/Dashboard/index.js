@@ -18,6 +18,7 @@ import ViewAlert from 'components/Misc/ViewAlert'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import { GetOrg, GetOrgMetrics } from 'graphQL/Queries'
 
@@ -37,10 +38,9 @@ export default function Dashboard() {
   const { prodCompDispatch, prodVulnDispatch } = dispatch
   const iconBoxInside = useColorModeValue('white', 'white')
 
-  const productPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_product_group'),
-    [userPermissions]
-  )
+  const productPermissions = useHasPermission({
+    parentKey: 'view_product_group'
+  })
 
   const {
     data,
@@ -62,9 +62,7 @@ export default function Dashboard() {
 
   const { data: metrics, error: eOrgMetric } = useQuery(GetOrgMetrics, {
     skip:
-      data?.organization?.name && productPermissions?.value === true
-        ? false
-        : true,
+      data?.organization?.name && productPermissions === true ? false : true,
     variables: { env: envName }
   })
 

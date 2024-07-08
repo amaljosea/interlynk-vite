@@ -9,6 +9,7 @@ import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetGlobalVulns } from 'graphQL/Queries'
@@ -31,22 +32,17 @@ const Vulnerabilities = () => {
     direction: 'DESC'
   })
 
-  const productPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_product_group'),
-    [userPermissions]
-  )
-  const vulnsPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_feeds'),
-    [userPermissions]
-  )
+  const productPermissions = useHasPermission({
+    parentKey: 'view_product_group'
+  })
+  const vulnsPermissions = useHasPermission({ parentKey: 'view_feeds' })
 
   const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
     GetGlobalVulns,
     {
       skip:
         !orgView ||
-        (productPermissions?.value === false &&
-          vulnsPermissions?.value === false),
+        (productPermissions === false && vulnsPermissions === false),
       selector: 'organization.vulns',
       variables: {
         ...filters
@@ -60,13 +56,13 @@ const Vulnerabilities = () => {
     return <VulnInfo vulnId={vulnId} />
   }
 
-  if (productPermissions?.value === false || !orgView) {
+  if (productPermissions === false || !orgView) {
     return <ViewAlert loading={orgLoading} category='vulnerability page' />
   }
 
   return (
     <Card>
-      {vulnsPermissions?.value === false ? (
+      {vulnsPermissions === false ? (
         <Text>You are not allowed to access this data</Text>
       ) : (
         <GlobalVulnTable

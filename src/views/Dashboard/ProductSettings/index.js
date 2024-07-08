@@ -30,6 +30,7 @@ import InfoModal from 'components/InfoModal'
 import LynkSelect from 'components/LynkSelect'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
 import { GetJiraProjects } from 'graphQL/Queries'
@@ -80,18 +81,15 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
     onClose: onInfoClose
   } = useDisclosure()
 
-  const product = userPermissions?.find(
-    (item) => item.key === 'view_product_group'
-  )
-  const editControls = product?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_product_settings' && permission.value === true
-  )
-  const con = userPermissions?.find((item) => item.key === 'view_connections')
-  const updateCon = con?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'create_update_connection' && permission.value === true
-  )
+  const editControls = useHasPermission({
+    parentKey: 'view_product_group',
+    childKey: 'update_product_settings'
+  })
+
+  const updateCon = useHasPermission({
+    parentKey: 'view_connections',
+    childKey: 'create_update_connection'
+  })
 
   const [updateSettings] = useMutation(ProjectSettingUpdate)
 

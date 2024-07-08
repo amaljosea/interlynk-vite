@@ -24,6 +24,7 @@ import CustomLoader from 'components/CustomLoader'
 import { RegexHighlighter } from 'components/RegexHighlighter'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { updateOrgComp } from 'graphQL/Mutation'
@@ -43,11 +44,10 @@ export const InternalComponents = () => {
   const toast = useToast()
   const { userPermissions } = useGlobalState()
 
-  const viewFeeds = userPermissions?.find((item) => item.key === 'view_feeds')
-  const manageListing = viewFeeds?.supersededBy?.some(
-    (permission) =>
-      permission?.key === 'manage_listing' && permission?.value === true
-  )
+  const manageListing = useHasPermission({
+    parentKey: 'view_feeds',
+    childKey: 'manage_listing'
+  })
 
   const [mutate] = useMutation(updateOrgComp, {
     onCompleted: () => {

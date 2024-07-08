@@ -61,6 +61,7 @@ import RowComponent from 'components/RowComponent'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { ManualVulnScan } from 'graphQL/Mutation'
@@ -305,10 +306,9 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const vulnsPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_feeds'),
-    [userPermissions]
-  )
+  const vulnsPermissions = useHasPermission({
+    parentKey: 'view_feeds'
+  })
 
   useEffect(() => {
     if (configs) {
@@ -338,9 +338,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   const { nodes, paginationProps, refetch, loading, reset } =
     usePaginatatedQuery(GetVulnData, {
       skip:
-        sbomId &&
-        vulnsPermissions?.value === true &&
-        activeTab === 'vulnerabilities'
+        sbomId && vulnsPermissions === true && activeTab === 'vulnerabilities'
           ? false
           : true,
       selector: 'sbom.vulns',
@@ -428,16 +426,15 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
 
   const [onVulnScan] = useMutation(ManualVulnScan)
 
-  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const editVulns = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'edit_vulnerabilities' && permission.value === true
-  )
-  const con = userPermissions?.find((item) => item.key === 'view_connections')
-  const updateCon = con?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'create_update_connection' && permission.value === true
-  )
+  const editVulns = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'edit_vulnerabilities'
+  })
+
+  const updateCon = useHasPermission({
+    parentKey: 'view_connections',
+    childKey: 'create_update_connection'
+  })
 
   const handleChange = (state) => {
     setSelectedVulns(state?.selectedRows)
@@ -1108,7 +1105,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     [refetch]
   )
 
-  if (vulnsPermissions?.value === false) {
+  if (vulnsPermissions === false) {
     return (
       <Text mt={4} textAlign={'center'}>
         You do not have permission to access this data

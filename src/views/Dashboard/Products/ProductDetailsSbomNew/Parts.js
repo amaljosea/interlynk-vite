@@ -56,6 +56,7 @@ import CustomLoader from 'components/CustomLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -101,11 +102,10 @@ const Parts = ({ sbomRefetch }) => {
 
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const updateSboms = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom' && permission.value === true
-  )
+  const updateSboms = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom'
+  })
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {

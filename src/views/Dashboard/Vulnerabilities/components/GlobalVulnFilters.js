@@ -24,6 +24,7 @@ import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import { GetProductNames } from 'graphQL/Queries'
 
@@ -32,15 +33,14 @@ const GlobalVulnsFilters = ({ setFilters }) => {
 
   const { totalRows, prodState, userPermissions } = useGlobalState()
 
-  const productPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_product_group'),
-    [userPermissions]
-  )
+  const productPermissions = useHasPermission({
+    parentKey: 'view_product_group'
+  })
 
   const { data } = useQuery(GetProductNames, {
     skip:
       window.location.pathname.startsWith(`/vendor/products`) ||
-      productPermissions?.value === false
+      productPermissions === false
         ? true
         : false,
     variables: {

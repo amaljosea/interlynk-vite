@@ -45,6 +45,7 @@ import PolicyTable from 'components/Tables/PolicyTable'
 import VersionsTable from 'components/Tables/VersionsTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -140,32 +141,25 @@ const ProductDetailsMain = () => {
   const environment = localStorage.getItem('environment')
   const [activeEnv, setActiveEnv] = useState(productId || '')
 
-  const product = userPermissions?.find(
-    (item) => item.key === 'view_product_group'
-  )
-  const sbomPermission = userPermissions?.find(
-    (item) => item.key === 'view_sbom'
-  )
-  const vulnsPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_feeds'),
-    [userPermissions]
-  )
-  const updateProduct = product?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_product_group' && permission.value === true
-  )
-  const archiveProduct = product?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'archive_product_group' && permission.value === true
-  )
-  const canCreateSBOM = useMemo(
-    () =>
-      sbomPermission?.supersededBy?.some(
-        (permission) =>
-          permission.key === 'update_sbom' && permission.value === true
-      ),
-    [sbomPermission]
-  )
+  const vulnsPermissions = useHasPermission({
+    parentKey: 'view_feeds'
+  })
+
+  const updateProduct = useHasPermission({
+    parentKey: 'view_product_group',
+    childKey: 'update_product_group'
+  })
+
+  const archiveProduct = useHasPermission({
+    parentKey: 'view_product_group',
+    childKey: 'archive_product_group'
+  })
+
+  const canCreateSBOM = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom'
+  })
+
   // GET PROJECT DATA
   const { data, refetch, loading, error } = useQuery(GetProjectGroup, {
     variables: { id: productGroupId }
@@ -239,7 +233,7 @@ const ProductDetailsMain = () => {
 
   // GET VULN DATA
   const { refetch: vulnRefetch } = useQuery(GetVulnData, {
-    skip: sbomId && vulnsPermissions?.value === true ? false : true,
+    skip: sbomId && vulnsPermissions === true ? false : true,
     variables: {
       projectId: productId || activeEnv,
       sbomId: sbomId,

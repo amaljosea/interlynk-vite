@@ -42,6 +42,7 @@ import InfoModal from 'components/InfoModal'
 import LicenseField from 'components/Licenses/LicenseField'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import {
   authorDelete,
@@ -85,15 +86,15 @@ const General = ({ data, refetch, loading, error }) => {
   const { expLicense } = sbomState
   const { sbomDispatch } = dispatch
 
-  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const updateComponent = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom_components' && permission.value === true
-  )
-  const editSboms = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom' && permission.value === true
-  )
+  const updateComponent = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom_components'
+  })
+
+  const editSboms = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom'
+  })
 
   const btnRef = useRef(null)
   const status = 'created'

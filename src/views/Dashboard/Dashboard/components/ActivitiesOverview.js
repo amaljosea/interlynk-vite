@@ -22,7 +22,7 @@ const ActivitiesOverview = ({ title, prodPermissions, data }) => {
     onClose: onCpeClose
   } = useDisclosure()
 
-  if (prodPermissions?.value === false)
+  if (prodPermissions === false)
     return (
       <Card maxH='100%'>
         <Text mb={4} fontSize='lg' color={textColor} fontWeight='bold'>

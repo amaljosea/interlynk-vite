@@ -19,6 +19,7 @@ import CardHeader from 'components/Card/CardHeader'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import { orgUpdate } from 'graphQL/Mutation'
 import { GetOrgName } from 'graphQL/Queries'
@@ -33,11 +34,10 @@ const GeneralFeed = () => {
 
   const { name } = data?.organization || ''
 
-  const org = userPermissions?.find((item) => item.key === 'view_organization')
-  const updateOrgs = org?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_organization' && permission.value === true
-  )
+  const updateOrgs = useHasPermission({
+    parentKey: 'view_organization',
+    childKey: 'update_organization'
+  })
 
   const toast = useToast()
   const textColor = useColorModeValue('gray.700', 'white')

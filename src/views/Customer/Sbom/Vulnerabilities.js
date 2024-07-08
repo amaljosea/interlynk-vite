@@ -39,6 +39,7 @@ import Pagination from 'components/Pagination'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import {
@@ -214,10 +215,9 @@ const Vulnerabilities = ({ sbomData }) => {
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const vulnsPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_feeds'),
-    [userPermissions]
-  )
+  const vulnsPermissions = useHasPermission({
+    parentKey: 'view_feeds'
+  })
 
   const textColor = useColorModeValue('gray.700', 'white')
   const [activeRow, setActiveRow] = useState(null)
@@ -786,7 +786,7 @@ const Vulnerabilities = ({ sbomData }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  if (vulnsPermissions?.value === false) {
+  if (vulnsPermissions === false) {
     return (
       <Text mt={4} textAlign={'center'}>
         You do not have permission to access this data

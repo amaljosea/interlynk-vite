@@ -6,6 +6,7 @@ import ProductTable from 'components/Tables/ProductTable'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetProductTable } from 'graphQL/Queries'
@@ -22,10 +23,9 @@ function ProductList() {
   const org = localStorage.getItem('organization')
   const { orgView, orgLoading } = useGlobalQueryContext()
 
-  const productPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_product_group'),
-    [userPermissions]
-  )
+  const productPermissions = useHasPermission({
+    parentKey: 'view_product_group'
+  })
 
   const [filters, setFilters] = useState({
     field: 'PROJECT_GROUPS_UPDATED_AT',
@@ -35,7 +35,7 @@ function ProductList() {
 
   const { nodes, paginationProps, reset, refetch, loading } =
     usePaginatatedQuery(GetProductTable, {
-      skip: !orgView || productPermissions?.value === false,
+      skip: !orgView || productPermissions === false,
       selector: 'organization.projectGroups',
       variables: {
         ...filters
@@ -67,7 +67,7 @@ function ProductList() {
     return <OrgRegister />
   }
 
-  if (productPermissions?.value === false || !orgView)
+  if (productPermissions === false || !orgView)
     return <ViewAlert loading={orgLoading} category='products page' />
 
   return (

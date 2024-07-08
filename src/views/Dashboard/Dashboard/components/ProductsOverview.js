@@ -277,7 +277,7 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
     }
   ]
 
-  if (prodPermissions?.value === false)
+  if (prodPermissions === false)
     return (
       <Card maxH='100%'>
         <Text mb={4} fontSize='lg' color={textColor} fontWeight='bold'>
