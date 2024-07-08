@@ -1,4 +1,4 @@
-import { useLazyQuery } from '@apollo/client'
+import { gql, useLazyQuery, useQuery } from '@apollo/client'
 import { useKBar } from 'kbar'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react'
@@ -53,6 +53,20 @@ import {
   FaUser
 } from 'react-icons/fa6'
 
+// GET PROFILE PHOTO
+export const GetProfilePic = gql`
+  query GetProfilePic {
+    organization {
+      currentUser {
+        profileImage {
+          filename
+          url
+        }
+      }
+    }
+  }
+`
+
 export default function HeaderLinks(props) {
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const location = useLocation()
@@ -60,6 +74,8 @@ export default function HeaderLinks(props) {
   const queryParams = new URLSearchParams(location.search)
   const params = useParams()
   const { query } = useKBar()
+
+  const SERVER_URL = process.env.REACT_APP_SERVER
 
   const productId = params.productid
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
@@ -81,6 +97,12 @@ export default function HeaderLinks(props) {
     setEnvName
   } = useGlobalState()
   const { orgView } = useGlobalQueryContext()
+
+  const { data: org } = useQuery(GetProfilePic)
+  const { currentUser } = org?.organization || ''
+  const { profileImage } = currentUser || ''
+
+  console.log('profileImage', profileImage)
 
   const [fetchOrg, { data }] = useLazyQuery(GetOrgName, {
     fetchPolicy: 'network-only'
@@ -231,7 +253,11 @@ export default function HeaderLinks(props) {
       {!signedUrlParams && (
         <Menu>
           <MenuButton onClick={() => (orgView ? fetchOrg() : null)}>
-            <Avatar size='sm' name={userName || name} />
+            <Avatar
+              size='sm'
+              name={userName || name}
+              src={`${SERVER_URL}/${profileImage?.url}`}
+            />
           </MenuButton>
           <MenuList>
             <MenuGroup title=''>
