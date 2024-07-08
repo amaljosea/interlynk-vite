@@ -68,7 +68,6 @@ const GeneralDataDrawer = ({
   const [creationTools, setCreationTools] = useState([])
   const [existingAuthors, setExistingAuthors] = useState([])
   const [authorList, setAuthorList] = useState([])
-  const [authorError, setAuthorError] = useState('')
   const [isDisabled, setIsDisabled] = useState(false)
   const [error, setError] = useState('')
 
@@ -88,11 +87,6 @@ const GeneralDataDrawer = ({
   const onAuthorChange = (e) => {
     const { value } = e.target
     setAuthorName(value)
-    if (value.length < 4 || value.length > 256) {
-      setAuthorError('Input must be between 4 and 256 characters')
-    } else {
-      setAuthorError('')
-    }
   }
 
   const [createTool] = useMutation(toolCreate)
@@ -426,18 +420,13 @@ const GeneralDataDrawer = ({
             {selectedKey === 'author' && (
               <form onSubmit={handleAuthorAdd}>
                 <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                  <FormControl
-                    isRequired
-                    isInvalid={authorError}
-                    hidden={resolved}
-                  >
+                  <FormControl isRequired hidden={resolved}>
                     <Input
                       type='text'
                       placeholder='Author Name*'
                       value={authorName}
                       onChange={onAuthorChange}
                     />
-                    <FormErrorMessage>{authorError}</FormErrorMessage>
                   </FormControl>
                   <FormControl
                     hidden={resolved}
@@ -469,10 +458,7 @@ const GeneralDataDrawer = ({
                     type='submit'
                     hidden={resolved}
                     disabled={
-                      !authorName ||
-                      !authorEmail ||
-                      !validateEmail(authorEmail) ||
-                      authorError !== ''
+                      !authorName || !authorEmail || !validateEmail(authorEmail)
                     }
                   >
                     Add
