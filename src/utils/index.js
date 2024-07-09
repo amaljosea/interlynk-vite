@@ -920,3 +920,28 @@ export const isUnknown = (cpes, purl) => {
     return false
   }
 }
+
+export const tourStyles = {
+  popover: (base) => ({
+    ...base,
+    borderRadius: '5px',
+    fontSize: '14px'
+  }),
+  close: (base) => ({
+    ...base,
+    top: '12px',
+    right: '12px'
+  }),
+  badge: (base) => ({
+    ...base,
+    backgroundColor: '#3182CE',
+    color: '#fff'
+  }),
+  controls: (base) => ({
+    ...base,
+    button: {
+      ...base.button,
+      color: '#ff6347'
+    }
+  })
+}

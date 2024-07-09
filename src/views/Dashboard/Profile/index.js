@@ -74,7 +74,9 @@ function Profile() {
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
   const org = localStorage.getItem('organization')
-  const { totalRows, userPermissions } = useGlobalState()
+  const orgNotFound = !org || org === 'undefined'
+
+  const { totalRows } = useGlobalState()
   const { orgView } = useGlobalQueryContext()
 
   const [orgIndex, setOrgIndex] = useState(0)
@@ -169,9 +171,7 @@ function Profile() {
     )
   }
 
-  if (!org || org === 'undefined') {
-    return <OrgRegister />
-  }
+  if (orgNotFound) return <OrgRegister />
 
   return (
     <>

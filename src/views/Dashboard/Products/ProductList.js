@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import { displayErrorMessage } from 'utils'
 
-import ViewAlert from 'components/Misc/ViewAlert'
+import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/react'
+
 import ProductTable from 'components/Tables/ProductTable'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -14,14 +15,13 @@ import { GetProductTable } from 'graphQL/Queries'
 import OrgRegister from '../Profile/components/OrgRegister'
 
 function ProductList() {
-  const { userPermissions, dispatch } = useGlobalState()
+  const { dispatch } = useGlobalState()
   const { prodDispatch, prodCompDispatch, prodVulnDispatch } = dispatch
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
   const org = localStorage.getItem('organization')
-  const { orgView, orgLoading } = useGlobalQueryContext()
 
   const productPermissions = useHasPermission({
     parentKey: 'view_product_group'
@@ -33,9 +33,11 @@ function ProductList() {
     enabled: true
   })
 
-  const { nodes, paginationProps, reset, refetch, loading } =
+  const orgNotFound = !org || org === 'undefined'
+
+  const { nodes, paginationProps, reset, refetch, loading, error } =
     usePaginatatedQuery(GetProductTable, {
-      skip: !orgView || productPermissions === false,
+      skip: orgNotFound || productPermissions === false,
       selector: 'organization.projectGroups',
       variables: {
         ...filters
@@ -63,12 +65,18 @@ function ProductList() {
     }
   }, [prodCompDispatch, prodVulnDispatch, product])
 
-  if (!org || org === 'undefined') {
-    return <OrgRegister />
-  }
+  if (orgNotFound) return <OrgRegister />
 
-  if (productPermissions === false || !orgView)
-    return <ViewAlert loading={orgLoading} category='products page' />
+  if (error) {
+    return (
+      <Alert mt={32} status='error'>
+        <AlertIcon />
+        <AlertDescription>
+          {displayErrorMessage(error.networkError?.statusCode, error.message)}
+        </AlertDescription>
+      </Alert>
+    )
+  }
 
   return (
     <ProductTable

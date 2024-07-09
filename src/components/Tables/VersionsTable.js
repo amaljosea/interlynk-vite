@@ -68,7 +68,6 @@ const VersionsTable = ({ projectGroup }) => {
   const productId = params.productid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const {
-    userPermissions,
     clearSelect,
     setClearSelect,
     selectedSbom,
@@ -116,11 +115,11 @@ const VersionsTable = ({ projectGroup }) => {
       },
       onCompleted: () => {
         setClearSelect(false)
-        const hasSeenTour = localStorage.getItem('hasSeenTour')
+        const hasSeenTour = localStorage.getItem('hasSeenProd')
         if (!hasSeenTour) {
           setTimeout(() => {
             setIsOpen(true)
-            localStorage.setItem('hasSeenTour', 'true')
+            localStorage.setItem('hasSeenProd', 'true')
           }, 1000)
         }
       }

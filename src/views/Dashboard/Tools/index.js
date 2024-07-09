@@ -4,8 +4,9 @@ import Compare from './Compare'
 
 const Tools = () => {
   const org = localStorage.getItem('organization')
+  const orgNotFound = !org || org === 'undefined'
 
-  if (!org || org === 'undefined') return <OrgRegister />
+  if (orgNotFound) return <OrgRegister />
 
   return <Compare selectedSboms={null} />
 }

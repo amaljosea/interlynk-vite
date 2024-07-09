@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { TourProvider } from '@reactour/tour'
 import { useParams } from 'react-router-dom'
+import { tourStyles } from 'utils'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -55,7 +56,16 @@ const ProductDetailsSbomNew = () => {
   ]
 
   return (
-    <TourProvider steps={steps}>
+    <TourProvider
+      steps={steps}
+      styles={tourStyles}
+      onClickClose={(value) => {
+        value.setIsOpen(false)
+      }}
+      onClickMask={(value) => {
+        value.setIsOpen(false)
+      }}
+    >
       <SbomInfo
         data={data?.sbom}
         error={error}

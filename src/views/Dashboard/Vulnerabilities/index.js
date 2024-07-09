@@ -1,14 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 
 import { Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import ViewAlert from 'components/Misc/ViewAlert'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
@@ -23,9 +20,7 @@ const Vulnerabilities = () => {
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
   const org = localStorage.getItem('organization')
-
-  const { userPermissions } = useGlobalState()
-  const { orgView, orgLoading } = useGlobalQueryContext()
+  const orgNotFound = !org || org === 'undefined'
 
   const [filters, setFilters] = useState({
     field: 'VULNS_VULN_ID',
@@ -41,7 +36,7 @@ const Vulnerabilities = () => {
     GetGlobalVulns,
     {
       skip:
-        !orgView ||
+        orgNotFound ||
         (productPermissions === false && vulnsPermissions === false),
       selector: 'organization.vulns',
       variables: {
@@ -50,14 +45,10 @@ const Vulnerabilities = () => {
     }
   )
 
-  if (!org || org === 'undefined') return <OrgRegister />
+  if (orgNotFound) return <OrgRegister />
 
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
     return <VulnInfo vulnId={vulnId} />
-  }
-
-  if (productPermissions === false || !orgView) {
-    return <ViewAlert loading={orgLoading} category='vulnerability page' />
   }
 
   return (

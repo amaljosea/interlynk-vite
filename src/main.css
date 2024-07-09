@@ -248,8 +248,3 @@
   color: black !important; /* Change this to your desired hover font color */
   font-family: inherit !important;
 }
-
-.reactour__close-button {
-  top: 12px !important;
-  right: 12px !important;
-}

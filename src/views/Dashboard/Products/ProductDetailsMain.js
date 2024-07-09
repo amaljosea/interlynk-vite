@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { TourProvider } from '@reactour/tour'
-import { useEffect, useMemo, useState } from 'react'
+import { TourProvider, useTour } from '@reactour/tour'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { tourStyles } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { Search2Icon } from '@chakra-ui/icons'
@@ -123,8 +124,7 @@ const ProductDetailsMain = () => {
   const tab = queryParams[0].get('tab')
   const activeTabNumber = Math.max(tabs.indexOf(tab), 0)
 
-  const { totalRows, prodVulnState, dispatch, userPermissions } =
-    useGlobalState()
+  const { totalRows, prodVulnState, dispatch } = useGlobalState()
 
   const {
     searchInput: vulnSearch,
@@ -289,6 +289,8 @@ const ProductDetailsMain = () => {
       .finally(() => navigate('/vendor/products'))
   }
 
+  const { isOpen, setIsOpen } = useTour()
+
   const steps = [
     {
       selector: '.version',
@@ -332,7 +334,16 @@ const ProductDetailsMain = () => {
   }
 
   return (
-    <TourProvider steps={steps}>
+    <TourProvider
+      steps={steps}
+      styles={tourStyles}
+      onClickClose={(value) => {
+        value.setIsOpen(false)
+      }}
+      onClickMask={(value) => {
+        value.setIsOpen(false)
+      }}
+    >
       <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
         {/* INFO SECTION */}
         <Card display={data ? 'block' : 'none'}>

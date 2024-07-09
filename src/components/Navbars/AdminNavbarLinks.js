@@ -102,8 +102,6 @@ export default function HeaderLinks(props) {
   const { currentUser } = org?.organization || ''
   const { profileImage } = currentUser || ''
 
-  console.log('profileImage', profileImage)
-
   const [fetchOrg, { data }] = useLazyQuery(GetOrgName, {
     fetchPolicy: 'network-only'
   })

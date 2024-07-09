@@ -2,17 +2,15 @@ import { useState } from 'react'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import Card from 'components/Card/Card'
-import ViewAlert from 'components/Misc/ViewAlert'
 import SupportTable from 'components/Tables/SupportTable'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetSupportTab } from 'graphQL/Queries'
 
 const Support = () => {
-  const { orgView, orgLoading } = useGlobalQueryContext()
   const org = localStorage.getItem('organization')
+  const orgNotFound = !org || org === 'undefined'
 
   const [filters, setFilters] = useState({
     field: 'COMPONENT_SUPPORT_OVERRIDES_UPDATED_AT',
@@ -21,18 +19,14 @@ const Support = () => {
 
   const { nodes, paginationProps, reset, loading, refetch } =
     usePaginatatedQuery(GetSupportTab, {
-      skip: !orgView,
+      skip: orgNotFound,
       selector: 'supports',
       variables: {
         ...filters
       }
     })
 
-  if (!orgView) {
-    return <ViewAlert loading={orgLoading} category='support page' />
-  }
-
-  if (!org || org === 'undefined') return <OrgRegister />
+  if (orgNotFound) return <OrgRegister />
 
   return (
     <Card>

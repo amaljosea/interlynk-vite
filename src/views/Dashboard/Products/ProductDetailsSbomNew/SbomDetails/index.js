@@ -97,19 +97,29 @@ const SbomDetails = ({ sbomData, refetch }) => {
   // GET PRIMARY COMPONENT
   const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(
     signedUrlParams ? GetSharPrimartComp : GetPrimaryComponent,
-    { fetchPolicy: 'network-only' }
+    {
+      fetchPolicy: 'network-only'
+    }
   )
 
   const { data: settings } = useQuery(GetProjectSettings, {
-    variables: { id: projectId }
+    variables: { id: projectId },
+    onCompleted: () => {
+      const hasSeenTour = localStorage.getItem('hasSeenSbom')
+      if (!hasSeenTour) {
+        setTimeout(() => {
+          setIsOpen(true)
+          localStorage.setItem('hasSeenSbom', 'true')
+        }, 2000)
+      }
+    }
   })
 
   const { data: policies, refetch: policyRefetch } = useQuery(
     PolicyResultsType,
     {
       skip: sbomId ? false : true,
-      variables: { sbomId: sbomId, first: 100 },
-      onCompleted: (data) => data && setIsOpen(true)
+      variables: { sbomId: sbomId, first: 100 }
     }
   )
 
