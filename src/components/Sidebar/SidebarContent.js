@@ -76,7 +76,7 @@ const SidebarContent = ({ routes }) => {
   const links = createLinks(filterRoutes)
 
   return (
-    <Flex gap={4} py={6} flexDirection={'column'} alignItems={'center'}>
+    <Flex gap={4} py={3.5} flexDirection={'column'} alignItems={'center'}>
       <Link to={signedUrlParams ? `/customer/products` : `/vendor/dashboard`}>
         <Img src={InterlynkLogo} w='32px' h='32px' />
       </Link>
