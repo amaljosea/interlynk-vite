@@ -17,6 +17,8 @@ const RowComponent = ({ content }) => {
   const [isHovered, setIsHovered] = useState(false)
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
+  const { name, version } = content || ''
+
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
@@ -28,7 +30,7 @@ const RowComponent = ({ content }) => {
   })
 
   const onCheck = () => {
-    prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: content })
+    prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: version })
     navigate(link)
   }
 
@@ -41,9 +43,9 @@ const RowComponent = ({ content }) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <Text textColor={textColor}>
-        {isHovered && content?.length > 10
-          ? `${content?.substring(0, content?.length - 4)}...`
-          : content}
+        {isHovered && name?.length > 10
+          ? `${name?.substring(0, name?.length - 4)}...`
+          : name}
       </Text>
       {isHovered && (
         <MotionFlex

@@ -601,7 +601,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
       name: 'COMPONENT',
       selector: (row) => {
         const { component, fixedVersions } = row
-        const { name, version } = component || ''
+        const { version } = component || ''
         const isExists = fixedVersions?.length > 0
         return (
           <Stack
@@ -616,7 +616,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
               onCardOpen()
             }}
           >
-            <RowComponent content={name || ''} />
+            <RowComponent content={component} />
             <Flex alignItems={'center'} gap={2}>
               <Text color={textColor}>{version || ''}</Text>
               <Tooltip

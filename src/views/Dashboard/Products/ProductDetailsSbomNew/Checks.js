@@ -650,7 +650,7 @@ const Checks = () => {
                   onCardOpen()
                 }}
               >
-                <RowComponent content={component.name} />
+                <RowComponent content={component} />
               </Box>
             )}
             <Text color={textColor}>

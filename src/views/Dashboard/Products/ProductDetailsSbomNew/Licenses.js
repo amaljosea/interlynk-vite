@@ -167,7 +167,7 @@ const Licenses = () => {
       >
         <Flex direction='row' py={5} alignItems={'center'} wrap='wrap' gap={2}>
           {sortedComponents?.map((component, index) => (
-            <RowComponent key={index} content={component?.name} />
+            <RowComponent key={index} content={component} />
           ))}
         </Flex>
       </Box>

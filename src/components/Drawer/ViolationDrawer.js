@@ -45,14 +45,11 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       id: 'COMPONENT',
       name: 'COMPONENT',
       selector: (row) => {
-        const { violation, component } = row
+        const { violation, component } = row || ''
+        const { primaryComponent } = violation || ''
         return (
           <Box my={2}>
-            <RowComponent
-              content={
-                component?.name || violation?.primaryComponent?.name || ''
-              }
-            />
+            <RowComponent content={component || primaryComponent || ''} />
           </Box>
         )
       },
