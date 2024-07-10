@@ -7,12 +7,11 @@ import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
-import ViewAlert from 'components/Misc/ViewAlert'
 import ActivitiesOverviewRow from 'components/Tables/ActivitiesOverviewRow'
 
 import { FaEye } from 'react-icons/fa'
 
-const ActivitiesOverview = ({ title, prodPermissions, data }) => {
+const ActivitiesOverview = ({ title, data }) => {
   const textColor = useColorModeValue('gray.700', 'white')
   const [activeRow, setActiveRow] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -21,16 +20,6 @@ const ActivitiesOverview = ({ title, prodPermissions, data }) => {
     onOpen: onCpeOpen,
     onClose: onCpeClose
   } = useDisclosure()
-
-  if (prodPermissions === false)
-    return (
-      <Card maxH='100%'>
-        <Text mb={4} fontSize='lg' color={textColor} fontWeight='bold'>
-          {title}
-        </Text>
-        <ViewAlert category='recent activities' />
-      </Card>
-    )
 
   return (
     <>

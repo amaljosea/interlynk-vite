@@ -115,12 +115,14 @@ const VersionsTable = ({ projectGroup }) => {
       },
       onCompleted: () => {
         setClearSelect(false)
-        const hasSeenTour = localStorage.getItem('hasSeenProd')
-        if (!hasSeenTour) {
-          setTimeout(() => {
-            setIsOpen(true)
-            localStorage.setItem('hasSeenProd', 'true')
-          }, 1000)
+        if (nodes?.length > 0) {
+          const hasSeenTour = localStorage.getItem('hasSeenProd')
+          if (!hasSeenTour) {
+            setTimeout(() => {
+              setIsOpen(true)
+              localStorage.setItem('hasSeenProd', 'true')
+            }, 1000)
+          }
         }
       }
     }

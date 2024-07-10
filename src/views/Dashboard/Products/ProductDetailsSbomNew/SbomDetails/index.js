@@ -110,7 +110,7 @@ const SbomDetails = ({ sbomData, refetch }) => {
         setTimeout(() => {
           setIsOpen(true)
           localStorage.setItem('hasSeenSbom', 'true')
-        }, 2000)
+        }, 1000)
       }
     }
   })

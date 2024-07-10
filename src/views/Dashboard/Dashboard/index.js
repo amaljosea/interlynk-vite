@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import { useQuery } from '@apollo/client'
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
 import {
@@ -18,7 +18,6 @@ import ViewAlert from 'components/Misc/ViewAlert'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useHasPermission } from 'hooks/useHasPermission'
 
 import { GetOrg, GetOrgMetrics } from 'graphQL/Queries'
 
@@ -33,14 +32,10 @@ export default function Dashboard() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
-  const { dispatch, envName, userPermissions } = useGlobalState()
+  const { dispatch, envName } = useGlobalState()
   const { orgView, orgLoading } = useGlobalQueryContext()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
   const iconBoxInside = useColorModeValue('white', 'white')
-
-  const productPermissions = useHasPermission({
-    parentKey: 'view_product_group'
-  })
 
   const {
     data,
@@ -61,8 +56,7 @@ export default function Dashboard() {
   })
 
   const { data: metrics, error: eOrgMetric } = useQuery(GetOrgMetrics, {
-    skip:
-      data?.organization?.name && productPermissions === true ? false : true,
+    skip: data?.organization?.name ? false : true,
     variables: { env: envName }
   })
 
@@ -141,7 +135,6 @@ export default function Dashboard() {
           <ProductsOverview
             title={'Recent Imports'}
             data={metrics?.organizationMetric?.latestVersions}
-            prodPermissions={productPermissions}
           />
         </GridItem>
         {/* LATEST ACTIVITIES */}
@@ -150,7 +143,6 @@ export default function Dashboard() {
             title={'Recent Activities'}
             amount={metrics?.organizationMetric?.latestActivity?.length}
             data={metrics?.organizationMetric?.latestActivity}
-            prodPermissions={productPermissions}
           />
         </GridItem>
       </Grid>

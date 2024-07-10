@@ -1486,6 +1486,7 @@ export const GetComponentData = gql`
     $internal: Boolean
     $primary: Boolean
     $direct: Boolean
+    $includeParts: Boolean
     $orderBy: ComponentOrderByInput
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
@@ -1505,6 +1506,7 @@ export const GetComponentData = gql`
         primary: $primary
         direct: $direct
         orderBy: $orderBy
+        includeParts: $includeParts
       ) {
         totalCount
         pageInfo {

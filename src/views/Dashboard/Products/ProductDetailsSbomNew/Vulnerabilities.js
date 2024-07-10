@@ -290,8 +290,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   const activeTab = queryParams.get('tab')
   const customerView = location.pathname.startsWith('/customer')
 
-  const { userPermissions, totalRows, prodVulnState, dispatch } =
-    useGlobalState()
+  const { totalRows, prodVulnState, dispatch } = useGlobalState()
   const {
     field,
     searchInput,
@@ -319,10 +318,10 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   }, [configs])
 
   useEffect(() => {
-    if (sbomData?.sbom?.sbomParts?.length > 0) {
+    if (sbomData?.sbomParts?.length > 0) {
       prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
     }
-  }, [prodVulnDispatch, sbomData?.sbom?.sbomParts?.length])
+  }, [prodVulnDispatch, sbomData])
 
   const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
 

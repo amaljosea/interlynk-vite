@@ -2,7 +2,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import {
   GetIcon,
   customStyles,
@@ -55,7 +55,6 @@ import { ProgressBar } from 'components/ProgressBar'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
-import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
@@ -81,7 +80,6 @@ import CompFilters from './CompFilters'
 
 const Components = ({ sbomData, sbomRefetch }) => {
   const params = useParams()
-  const navigate = useNavigate()
   const productId = params.productid
   const sbomId = params.sbomid
   const location = useLocation()
@@ -132,8 +130,9 @@ const Components = ({ sbomData, sbomRefetch }) => {
         ...compData,
         sbomId: sbomId,
         projectId: productId,
+        orderBy: searchInput === '' ? orderBy : undefined,
         search: searchInput !== '' ? searchInput : undefined,
-        orderBy: searchInput === '' ? orderBy : undefined
+        includeParts: sbomData?.sbomParts?.length > 0 ? true : false
       },
       onCompleted: (data) => {
         prodCompDispatch({

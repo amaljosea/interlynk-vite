@@ -18,13 +18,12 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CustomLoader from 'components/CustomLoader'
-import ViewAlert from 'components/Misc/ViewAlert'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-const ProductsOverview = ({ title, data, prodPermissions }) => {
+const ProductsOverview = ({ title, data }) => {
   const { dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
@@ -276,16 +275,6 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       }
     }
   ]
-
-  if (prodPermissions === false)
-    return (
-      <Card maxH='100%'>
-        <Text mb={4} fontSize='lg' color={textColor} fontWeight='bold'>
-          {title}
-        </Text>
-        <ViewAlert category='recent imports' />
-      </Card>
-    )
 
   return (
     <Card maxH='100%'>
