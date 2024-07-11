@@ -29,7 +29,14 @@ import {
 } from 'graphQL/Mutation'
 import { VerifyJiraToken } from 'graphQL/Queries'
 
-const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
+const JiraConfigModal = ({
+  isOpen,
+  onClose,
+  setGreenCheck,
+  data,
+  refetch,
+  updateCon
+}) => {
   const toast = useToast()
 
   const [jiraApiToken, setJiraApiToken] = useState('')
@@ -52,10 +59,12 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
   const [updateJiraSecret] = useMutation(UpdateJiraConnection)
   const [createJiraSecret] = useMutation(CreateJiraConnection)
   const [deleteJiraSecret] = useMutation(DeleteJiraConnection)
-  const [verifyJiraToken, { data: verifyData, loading: verifyLoading }] =
-    useLazyQuery(VerifyJiraToken, {
+  const [verifyJiraToken, { loading: verifyLoading }] = useLazyQuery(
+    VerifyJiraToken,
+    {
       fetchPolicy: 'network-only'
-    })
+    }
+  )
 
   useEffect(() => {
     if (data) {
@@ -260,13 +269,13 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
                   setIsJiraApiTokenChanged(true)
                 }}
               />
-              <InputRightElement width='4.5rem'>
+              <InputRightElement width='4.5rem' hidden={data}>
                 <IconButton
+                  right='2'
                   size='sm'
                   h='1.75rem'
-                  onClick={handleToggleVisibility}
                   position='absolute'
-                  right='2'
+                  onClick={handleToggleVisibility}
                 >
                   {showApiToken ? <ViewOffIcon /> : <ViewIcon />}
                 </IconButton>
@@ -327,25 +336,30 @@ const JiraConfigModal = ({ isOpen, onClose, setGreenCheck, data, refetch }) => {
           )}
           {saveOrVerify ? (
             <Button
-              colorScheme='blue'
               ml={3}
+              colorScheme='blue'
               onClick={handleVerify}
+              isDisabled={!updateCon}
               isLoading={isLoading || verifyLoading}
             >
               Verify
             </Button>
           ) : (
             <Button
-              colorScheme={isSaveDisabled ? 'blue' : 'green'}
               ml={3}
+              isDisabled={isSaveDisabled || !updateCon}
               onClick={data ? handleUpdate : handleSave}
-              isDisabled={isSaveDisabled}
+              colorScheme={isSaveDisabled ? 'blue' : 'green'}
             >
               {data ? 'Update' : 'Save'}
             </Button>
           )}
           {data && (
-            <Button colorScheme='red' ml={3} onClick={handleDelete}>
+            <Button
+              colorScheme='red'
+              onClick={handleDelete}
+              isDisabled={!updateCon}
+            >
               Delete
             </Button>
           )}

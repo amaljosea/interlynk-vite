@@ -8,8 +8,7 @@ const ConnectionCard = ({
   name,
   onConfigure,
   isConnected,
-  color,
-  isDisabled
+  color
 }) => {
   return (
     <Card
@@ -33,13 +32,7 @@ const ConnectionCard = ({
         >
           {name}
         </Text>
-        <Button
-          colorScheme='blue'
-          size='md'
-          mt='20px'
-          onClick={onConfigure}
-          isDisabled={isDisabled}
-        >
+        <Button colorScheme='blue' size='md' mt='20px' onClick={onConfigure}>
           Configure
         </Button>
         {isConnected && (

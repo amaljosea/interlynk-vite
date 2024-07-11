@@ -24,7 +24,6 @@ import TeamsConfigModal from './TeamsConfigModal'
 const Connections = () => {
   const activetab = useQueryParam('tab')
   const org = localStorage.getItem('organization')
-  const { userPermissions } = useGlobalState()
   const { data, refetch } = useQuery(GetConnections, {
     skip:
       org === 'undefined' ? true : activetab === 'connections' ? false : true
@@ -114,7 +113,6 @@ const Connections = () => {
               name='Jira'
               onConfigure={onJiraOpen}
               isConnected={greenCheck.jira}
-              isDisabled={!updateCon}
               color='#0070f3'
             />
             <ConnectionCard
@@ -122,7 +120,6 @@ const Connections = () => {
               name='Slack'
               onConfigure={onSlackOpen}
               isConnected={greenCheck.slack}
-              isDisabled={!updateCon}
               color='#E01E5A'
             />
             <ConnectionCard
@@ -130,7 +127,6 @@ const Connections = () => {
               name='Teams'
               onConfigure={onTeamsOpen}
               isConnected={greenCheck.teams}
-              isDisabled={!updateCon}
               color='#6264A7'
             />
           </Wrap>
@@ -139,29 +135,32 @@ const Connections = () => {
 
       {isJiraOpen && (
         <JiraConfigModal
+          data={jiraData}
+          refetch={refetch}
           isOpen={isJiraOpen}
           onClose={onJiraClose}
-          data={jiraData}
+          updateCon={updateCon}
           setGreenCheck={setGreenCheck}
-          refetch={refetch}
         />
       )}
       {isSlackOpen && (
         <SlackConfigModal
-          isOpen={isSlackOpen}
-          onClose={onSlackClose}
           data={slackData}
-          setGreenCheck={setGreenCheck}
           refetch={refetch}
+          isOpen={isSlackOpen}
+          updateCon={updateCon}
+          onClose={onSlackClose}
+          setGreenCheck={setGreenCheck}
         />
       )}
       {isTeamsOpen && (
         <TeamsConfigModal
-          isOpen={isTeamsOpen}
-          onClose={onTeamsClose}
           data={teamsData}
-          setGreenCheck={setGreenCheck}
           refetch={refetch}
+          isOpen={isTeamsOpen}
+          updateCon={updateCon}
+          onClose={onTeamsClose}
+          setGreenCheck={setGreenCheck}
         />
       )}
     </>

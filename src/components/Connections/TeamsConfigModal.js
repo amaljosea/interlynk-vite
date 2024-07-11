@@ -1,16 +1,9 @@
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
-  Box,
   Button,
-  FormControl,
-  FormLabel,
-  IconButton,
   Input,
-  InputGroup,
-  InputRightElement,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -18,7 +11,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Text,
   useToast
 } from '@chakra-ui/react'
 
@@ -33,7 +25,8 @@ const TeamsConfigModal = ({
   onClose,
   data,
   setGreenCheck,
-  refetch
+  refetch,
+  updateCon
 }) => {
   const toast = useToast()
 
@@ -170,18 +163,17 @@ const TeamsConfigModal = ({
         </ModalBody>
         <ModalFooter>
           <Button
-            colorScheme='blue'
             mr={3}
+            colorScheme='blue'
             onClick={() => (data ? handleUpdate() : handleSave())}
-            isDisabled={!teamsWebhook || !isUrlChanged}
+            isDisabled={!teamsWebhook || !isUrlChanged || !updateCon}
           >
             Save
           </Button>
           <Button
             colorScheme='red'
-            mr={3}
             onClick={handleDelete}
-            isDisabled={!data}
+            isDisabled={!data || !updateCon}
           >
             Delete
           </Button>
