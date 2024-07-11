@@ -26,9 +26,8 @@ import {
 import { InviteUser } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
 
-const TeamModal = ({ isOpen, onClose, refetch, data }) => {
+const TeamModal = ({ isOpen, onClose, refetch, data, editUserRole }) => {
   const toast = useToast()
-  const [user, setUser] = useState('')
   const [email, setEmail] = useState('')
   const [role, setRole] = useState(data?.role?.id)
   const [error, setError] = useState('')
@@ -78,15 +77,6 @@ const TeamModal = ({ isOpen, onClose, refetch, data }) => {
                 <Text fontSize={'sm'}>{error}</Text>
               </Alert>
             )}
-            {/* NAME */}
-            <FormControl isRequired display={'none'}>
-              <FormLabel>Name</FormLabel>
-              <Input
-                type='text'
-                value={user}
-                onChange={(e) => setUser(e.target.value)}
-              />
-            </FormControl>
             {/* EMAIL */}
             <FormControl
               isRequired
@@ -108,7 +98,7 @@ const TeamModal = ({ isOpen, onClose, refetch, data }) => {
             </FormControl>
             {/* ROLES */}
             {roles && (
-              <FormControl>
+              <FormControl isDisabled={!editUserRole}>
                 <FormLabel>Role</FormLabel>
                 <Select
                   value={role}

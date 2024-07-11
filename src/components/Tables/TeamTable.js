@@ -36,9 +36,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
-import ViewAlert from 'components/Misc/ViewAlert'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -62,6 +60,9 @@ const GetCurrentUser = gql`
     organization {
       currentUser {
         email
+        role {
+          id
+        }
       }
     }
   }
@@ -70,7 +71,6 @@ const GetCurrentUser = gql`
 const TeamTable = () => {
   const activetab = useQueryParam('tab')
   const org = localStorage.getItem('organization')
-  const { userPermissions } = useGlobalState()
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -92,10 +92,6 @@ const TeamTable = () => {
   })
 
   const { users } = userData?.organization || ''
-
-  const viewUsers = useHasPermission({
-    parentKey: 'view_users'
-  })
 
   const inviteUser = useHasPermission({
     parentKey: 'view_users',
@@ -442,10 +438,6 @@ const TeamTable = () => {
     })
   }
 
-  if (viewUsers === false) {
-    return <ViewAlert category='user list' />
-  }
-
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
@@ -467,9 +459,10 @@ const TeamTable = () => {
       {isTeamOpen && (
         <TeamModal
           refetch={refetch}
+          data={currentUser}
           isOpen={isTeamOpen}
           onClose={onTeamClose}
-          data={currentUser}
+          changeRole={editUserRole}
         />
       )}
 
