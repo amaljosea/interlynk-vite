@@ -30,7 +30,8 @@ import {
   GetPrimaryComponent,
   GetProjectSettings,
   GetSharPrimartComp,
-  PolicyResultsType
+  PolicyResultsType,
+  UserSettings
 } from 'graphQL/Queries'
 
 import {
@@ -102,17 +103,21 @@ const SbomDetails = ({ sbomData, refetch }) => {
     }
   )
 
-  const { data: settings } = useQuery(GetProjectSettings, {
-    variables: { id: projectId },
-    onCompleted: () => {
-      const hasSeenTour = localStorage.getItem('hasSeenSbom')
+  useQuery(UserSettings, {
+    skip: !sbomId,
+    onCompleted: (data) => {
+      const { sbomDetailsOnboardingCompleted: hasSeenTour } =
+        data?.currentUserSettings || ''
       if (!hasSeenTour) {
         setTimeout(() => {
           setIsOpen(true)
-          localStorage.setItem('hasSeenSbom', 'true')
         }, 1000)
       }
     }
+  })
+
+  const { data: settings } = useQuery(GetProjectSettings, {
+    variables: { id: projectId }
   })
 
   const { data: policies, refetch: policyRefetch } = useQuery(

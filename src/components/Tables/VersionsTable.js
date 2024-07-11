@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -55,6 +55,7 @@ import {
   GetVersionsTable,
   ShareVersionTable
 } from 'graphQL/Queries'
+import { UserSettings } from 'graphQL/Queries'
 
 import {
   FaCodeCompare,
@@ -113,20 +114,22 @@ const VersionsTable = ({ projectGroup }) => {
         id: productId,
         ...filters
       },
-      onCompleted: () => {
-        setClearSelect(false)
-        if (nodes?.length > 0) {
-          const hasSeenTour = localStorage.getItem('hasSeenProd')
-          if (!hasSeenTour) {
-            setTimeout(() => {
-              setIsOpen(true)
-              localStorage.setItem('hasSeenProd', 'true')
-            }, 1000)
-          }
-        }
-      }
+      onCompleted: () => setClearSelect(false)
     }
   )
+
+  useQuery(UserSettings, {
+    skip: tab !== VERSIONS,
+    onCompleted: (data) => {
+      const { productDetailsOnboardingCompleted: hasSeenTour } =
+        data?.currentUserSettings || ''
+      if (!hasSeenTour) {
+        setTimeout(() => {
+          setIsOpen(true)
+        }, 1000)
+      }
+    }
+  })
 
   const createSbom = useHasPermission({
     parentKey: 'view_sbom',

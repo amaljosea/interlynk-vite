@@ -77,13 +77,8 @@ const ProductTable = ({
 
   const environment = localStorage.getItem('environment')
 
-  const {
-    userPermissions,
-    setEnvName,
-    setClearSelect,
-    setSelectedSbom,
-    dispatch
-  } = useGlobalState()
+  const { setEnvName, setClearSelect, setSelectedSbom, dispatch } =
+    useGlobalState()
 
   const { prodDispatch } = dispatch
 
@@ -321,7 +316,10 @@ const ProductTable = ({
           })
           const link = generateProductDetailPageUrlFromCurrentUrl({
             productgroupid: id,
-            productid: env?.id || defaultProject?.id
+            productid: env?.id || defaultProject?.id,
+            paramsObj: {
+              tab: 'versions'
+            }
           })
 
           navigate(link)

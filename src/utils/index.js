@@ -925,12 +925,14 @@ export const tourStyles = {
   popover: (base) => ({
     ...base,
     borderRadius: '5px',
-    fontSize: '14px'
+    fontSize: '14px',
+    color: '#2D3748'
   }),
   close: (base) => ({
     ...base,
     top: '12px',
-    right: '12px'
+    right: '12px',
+    color: '#2D3748'
   }),
   badge: (base) => ({
     ...base,

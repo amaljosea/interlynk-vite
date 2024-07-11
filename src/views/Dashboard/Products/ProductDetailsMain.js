@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { TourProvider, useTour } from '@reactour/tour'
+import { TourProvider } from '@reactour/tour'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { tourStyles } from 'utils'
@@ -51,6 +51,7 @@ import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
+import { CurrentUserFlagSet } from 'graphQL/Mutation'
 import {
   GetGlobalVulns,
   GetOrgMfc,
@@ -98,6 +99,8 @@ const ProductDetailsMain = () => {
   const productGroupId = params.productgroupid
   const sbomId = params.sbomid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+
+  const [updateTour] = useMutation(CurrentUserFlagSet)
 
   const tabs = [
     'versions',
@@ -289,14 +292,18 @@ const ProductDetailsMain = () => {
       .finally(() => navigate('/vendor/products'))
   }
 
-  const { isOpen, setIsOpen } = useTour()
-
   const steps = [
     {
       selector: '.version',
       content: 'SBOM Version Details'
     }
   ]
+
+  const onTourUpdate = (value) => {
+    updateTour({
+      variables: { flags: ['productDetailsOnboardingCompleted'] }
+    }).then((res) => res?.data && value.setIsOpen(false))
+  }
 
   useEffect(() => {
     if (sbomId === null) {
@@ -337,12 +344,8 @@ const ProductDetailsMain = () => {
     <TourProvider
       steps={steps}
       styles={tourStyles}
-      onClickClose={(value) => {
-        value.setIsOpen(false)
-      }}
-      onClickMask={(value) => {
-        value.setIsOpen(false)
-      }}
+      onClickClose={(value) => onTourUpdate(value)}
+      onClickMask={(value) => onTourUpdate(value)}
     >
       <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
         {/* INFO SECTION */}

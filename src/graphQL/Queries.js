@@ -9,6 +9,15 @@ export const GetOrgName = gql`
   }
 `
 
+export const UserSettings = gql`
+  query UserSettings {
+    currentUserSettings {
+      productDetailsOnboardingCompleted
+      sbomDetailsOnboardingCompleted
+    }
+  }
+`
+
 // GET USERS
 export const GetUsers = gql`
   query GetUsers($search: String) {

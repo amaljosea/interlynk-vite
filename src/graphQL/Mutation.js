@@ -2853,3 +2853,16 @@ export const OrgRoleCreate = gql`
     }
   }
 `
+
+// UPDATE USER TOUR SETTINGS
+export const CurrentUserFlagSet = gql`
+  mutation CurrentUserFlagSet($flags: [CurrentUserSupportedFlagsEnum!]!) {
+    currentUserFlagSet(input: { flags: $flags }) {
+      errors
+      currentUserSetting {
+        productDetailsOnboardingCompleted
+        sbomDetailsOnboardingCompleted
+      }
+    }
+  }
+`

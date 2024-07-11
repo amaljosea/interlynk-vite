@@ -1,10 +1,11 @@
-import { useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { TourProvider } from '@reactour/tour'
 import { useParams } from 'react-router-dom'
 import { tourStyles } from 'utils'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
+import { CurrentUserFlagSet } from 'graphQL/Mutation'
 import { GetProductData } from 'graphQL/Queries'
 
 import SbomInfo from './SbomInfo'
@@ -17,6 +18,8 @@ const ProductDetailsSbomNew = () => {
 
   const { dispatch } = useGlobalState()
   const { prodVulnDispatch } = dispatch
+
+  const [updateTour] = useMutation(CurrentUserFlagSet)
 
   const { data, loading, error, refetch } = useQuery(GetProductData, {
     variables: { projectId: productId, sbomId: sbomId },
@@ -55,16 +58,18 @@ const ProductDetailsSbomNew = () => {
     }
   ]
 
+  const onTourUpdate = (value) => {
+    updateTour({
+      variables: { flags: ['sbomDetailsOnboardingCompleted'] }
+    }).then((res) => res?.data && value.setIsOpen(false))
+  }
+
   return (
     <TourProvider
       steps={steps}
       styles={tourStyles}
-      onClickClose={(value) => {
-        value.setIsOpen(false)
-      }}
-      onClickMask={(value) => {
-        value.setIsOpen(false)
-      }}
+      onClickClose={(value) => onTourUpdate(value)}
+      onClickMask={(value) => onTourUpdate(value)}
     >
       <SbomInfo
         data={data?.sbom}
