@@ -5,19 +5,13 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Select from 'react-select'
 import { permissionList } from 'utils'
 
-import { ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons'
+import { ChevronRightIcon } from '@chakra-ui/icons'
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
-  Button,
   Grid,
   GridItem,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Text,
   useColorModeValue
 } from '@chakra-ui/react'
 
@@ -36,23 +30,6 @@ import {
 } from 'graphQL/Queries'
 
 import AdminNavbarLinks from './AdminNavbarLinks'
-
-const selectStyles = {
-  control: (provided) => ({
-    ...provided,
-    minHeight: '30px',
-    height: '30px',
-    width: '100px',
-    background: '#edf2f7',
-    border: 'none',
-    '&:hover': { background: '#e2e8f0' },
-    '&:focus-within': { background: '#cbd5e0', borderColor: 'transparent' }
-  }),
-  menu: (provided) => ({ ...provided, width: '100px' }),
-  input: (provided) => ({ ...provided, margin: '0px' }),
-  indicatorSeparator: () => ({ display: 'none' }),
-  indicatorsContainer: (provided) => ({ ...provided, height: '30px' })
-}
 
 export default function AdminNavbar(props) {
   const partsContext = usePartsContext()
@@ -81,6 +58,64 @@ export default function AdminNavbar(props) {
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const environment = localStorage.getItem('environment')
+
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
+  const optionColor = useColorModeValue('#718096', '#A0AEC0')
+  const textHoverColor = useColorModeValue('#EDF2F7', '#4A5568')
+  const borderColor = useColorModeValue('#CBD5E0', '#4A5568')
+
+  const selectStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      color: textColor,
+      border: 'none',
+      height: '30px',
+      padding: 0,
+      width: 'fit-content',
+      cursor: 'pointer',
+      backgroundColor: 'transparent',
+      fontSize: '14px',
+      '&:hover': {
+        borderColor: borderColor,
+        backgroundColor: 'transparent'
+      },
+      boxShadow: state.isFocused ? 'none' : provided.boxShadow,
+      borderColor: state.isFocused ? 'transparent' : provided.borderColor
+    }),
+    menu: (provided) => ({
+      ...provided,
+      backgroundColor: bgColor,
+      width: '150px'
+    }),
+    menuList: (provided) => ({
+      ...provided,
+      backgroundColor: bgColor,
+      '&:hover': {
+        backgroundColor: 'transparent'
+      }
+    }),
+    input: (provided) => ({
+      ...provided,
+      color: textColor,
+      backgroundColor: 'transparent'
+    }),
+    option: (provided) => ({
+      ...provided,
+      color: optionColor,
+      backgroundColor: bgColor,
+      '&:hover': {
+        backgroundColor: textHoverColor
+      }
+    }),
+    singleValue: (provided) => ({
+      ...provided,
+      color: textColor,
+      '&:hover': {
+        color: textColor
+      }
+    })
+  }
 
   useQuery(GetUserPermissions, {
     skip: path === 'customer' || !orgView,
@@ -115,20 +150,19 @@ export default function AdminNavbar(props) {
     projectGroupId: params.productgroupid
   })
 
-  const {
-    data: versionData,
-    loading: loadingVersions,
-    refetch: refetchVersions
-  } = useQuery(GetProjectVersionAndId, {
-    variables: {
-      id: prodID,
-      search: debouncedVersionSearchInput,
-      first: 10,
-      field: 'SBOMS_CREATED_AT',
-      direction: 'DESC'
-    },
-    skip: !prodID || !orgView
-  })
+  const { data: versionData, refetch: refetchVersions } = useQuery(
+    GetProjectVersionAndId,
+    {
+      variables: {
+        id: prodID,
+        search: debouncedVersionSearchInput,
+        first: 10,
+        field: 'SBOMS_CREATED_AT',
+        direction: 'DESC'
+      },
+      skip: !prodID || !orgView
+    }
+  )
 
   const { data: productsData, refetch } = useQuery(GetProjectGroupDetails, {
     skip: !orgView || viewProds === false,
@@ -195,7 +229,12 @@ export default function AdminNavbar(props) {
       })
       navigate(link)
     },
-    [products, navigate, environment]
+    [
+      products,
+      generateProductDetailPageUrlFromCurrentUrl,
+      navigate,
+      environment
+    ]
   )
 
   const renderVersionBreadcrumb = () => {
@@ -218,6 +257,10 @@ export default function AdminNavbar(props) {
                 (version) => version.projectVersion === sbomHookData.versionName
               ) || null
             }
+            components={{
+              DropdownIndicator: () => null,
+              IndicatorSeparator: () => null
+            }}
             hideSelectedOptions
           />
         </BreadcrumbItem>
@@ -253,10 +296,10 @@ export default function AdminNavbar(props) {
           isCurrentPage={!sbomId && !partsContext.isParts}
         >
           <Select
+            options={products}
             styles={selectStyles}
             inputValue={searchInput}
             onInputChange={setSearchInput}
-            options={products}
             getOptionLabel={(product) => product.name}
             getOptionValue={(product) => product.id}
             onChange={(product) => handleProductClick(product)}
@@ -264,6 +307,10 @@ export default function AdminNavbar(props) {
               products.find((product) => product.name === projectGroupName) ||
               null
             }
+            components={{
+              DropdownIndicator: () => null,
+              IndicatorSeparator: () => null
+            }}
             hideSelectedOptions
           />
         </BreadcrumbItem>
