@@ -54,7 +54,6 @@ import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
 import CustomLoader from 'components/CustomLoader'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import { FixedIcon } from 'components/Icons/Icons'
-import ComponentCard from 'components/Misc/ComponentCard'
 import CvssCard from 'components/Misc/CvssCard'
 import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
@@ -401,12 +400,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     onClose: onJiraClose
   } = useDisclosure()
 
-  const {
-    isOpen: isCardOpen,
-    onOpen: onCardOpen,
-    onClose: onCardClose
-  } = useDisclosure()
-
   // GET VULN FILTER HEADS
   useQuery(signedUrlParams ? ShareVulnFilters : GetVulnFilterData, {
     variables: {
@@ -609,11 +602,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
             direction='column'
             cursor={'pointer'}
             alignItems={'flex-start'}
-            onClick={() => {
-              // e.currentTarget.parentElement.click()
-              setActiveRow(row)
-              onCardOpen()
-            }}
           >
             <RowComponent content={component} />
             <Flex alignItems={'center'} gap={2}>
@@ -629,7 +617,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
         )
       },
       wrap: true,
-      width: '10.99%',
+      width: '12%',
       sortable: true
     },
     // SEVERITY
@@ -1218,14 +1206,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           isOpen={isCvssOpen}
           onClose={onCvssClose}
           value={activeRow?.vuln?.cvssVector}
-        />
-      )}
-
-      {isCardOpen && (
-        <ComponentCard
-          isOpen={isCardOpen}
-          onClose={onCardClose}
-          data={activeRow?.component}
         />
       )}
     </>

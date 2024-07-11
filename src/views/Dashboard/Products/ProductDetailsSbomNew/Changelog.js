@@ -20,12 +20,12 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
-import ComponentCard from 'components/Misc/ComponentCard'
 import PurlCard from 'components/Misc/PurlCard'
 import UserCard from 'components/Misc/UserCard'
 import VersionCard from 'components/Misc/VersionCard'
 import VulnCard from 'components/Misc/VulnCard'
 import Pagination from 'components/Pagination'
+import RowComponent from 'components/RowComponent'
 
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
@@ -75,11 +75,7 @@ const Changelog = () => {
     onOpen: onUserOpen,
     onClose: onUserClose
   } = useDisclosure()
-  const {
-    isOpen: isCardOpen,
-    onOpen: onCardOpen,
-    onClose: onCardClose
-  } = useDisclosure()
+
   const {
     isOpen: isVCardOpen,
     onOpen: onVCardOpen,
@@ -109,7 +105,6 @@ const Changelog = () => {
       }
     })
 
-  const [getComponent] = useLazyQuery(GetComponentData)
   const [getSbom] = useLazyQuery(GetProductData)
   const [getVuln] = useLazyQuery(GetVulnData)
 
@@ -142,21 +137,6 @@ const Changelog = () => {
       })
         .then((res) => res?.data && setActiveRow(res?.data))
         .finally(() => onVCardOpen())
-    } else {
-      getComponent({
-        variables: {
-          sbomId: sbomId,
-          projectId: productId,
-          search: searchInput[0]
-        }
-      })
-        .then((res) => {
-          if (res?.data) {
-            const components = res?.data?.sbom?.components?.nodes
-            components?.length > 0 && setActiveRow(components[0])
-          }
-        })
-        .finally(() => onCardOpen())
     }
   }
 
@@ -203,21 +183,30 @@ const Changelog = () => {
       name: 'CHANGED',
       selector: (row) => {
         const { event, loggablePrefix, loggableType } = row
+        const isComponent = loggableType === 'Component'
         return (
-          <Stack direction={'column'} spacing={0} my={2}>
-            <Tag
-              fontSize={'sm'}
-              overflow={'auto'}
-              colorScheme='blue'
-              cursor={'pointer'}
-              fontWeight={'medium'}
-              width={'fit-content'}
-              onClick={() => onSelect(row)}
-            >
-              <TagLabel>
-                {loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}
-              </TagLabel>
-            </Tag>
+          <Stack
+            my={2}
+            spacing={0}
+            direction={'column'}
+            onClick={() => onSelect(row)}
+          >
+            {isComponent ? (
+              <RowComponent content={loggablePrefix} />
+            ) : (
+              <Tag
+                fontSize={'sm'}
+                overflow={'auto'}
+                cursor={'pointer'}
+                fontWeight={'medium'}
+                width={'fit-content'}
+              >
+                <TagLabel>
+                  {loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}
+                </TagLabel>
+              </Tag>
+            )}
+
             <Text color={textColor}>{event}</Text>
           </Stack>
         )
@@ -611,14 +600,6 @@ const Changelog = () => {
           name={activeRow?.changedBy}
           isOpen={isUserOpen}
           onClose={onUserClose}
-        />
-      )}
-
-      {isCardOpen && (
-        <ComponentCard
-          isOpen={isCardOpen}
-          onClose={onCardClose}
-          data={activeRow}
         />
       )}
 

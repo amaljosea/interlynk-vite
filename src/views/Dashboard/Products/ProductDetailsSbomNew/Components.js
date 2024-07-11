@@ -1062,14 +1062,11 @@ const Components = ({ sbomData, sbomRefetch }) => {
     })
   }
 
-  useEffect(() => {
+  const isRowExpandable = (row) => {
     if (expandView === 'true') {
-      setActiveRow(nodes?.length > 0 ? nodes[0] : null)
-      setTimeout(() => {
-        onOpen()
-      }, 1000)
+      return row?.name === compSearch
     }
-  }, [nodes, expandView, onOpen])
+  }
 
   if (error) {
     return (
@@ -1098,6 +1095,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
           expandOnRowClicked
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
+          expandableRowExpanded={(row) => isRowExpandable(row)}
           responsive={true}
         />
       </Flex>
