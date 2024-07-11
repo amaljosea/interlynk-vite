@@ -82,22 +82,25 @@ const Kbar = () => {
       item?.projects?.forEach((project) => {
         if (project?.sbomVersions?.nodes?.length > 0) {
           project.sbomVersions.nodes.forEach((version) => {
-            data.push({
-              id: version?.id,
-              name: `${item?.name} - ${version?.projectVersion} (${project?.name})`,
-              section: 'product versions',
-              icon: <FaScrewdriverWrench color='#718096' />,
-              perform: () => {
-                const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-                  productgroupid: item?.id,
-                  productid: project?.id,
-                  sbomid: version?.id,
-                  paramsObj: { tab: 'general' }
-                })
-                handleVersionClick(project?.name)
-                navigate(link)
-              }
-            })
+            if (version?.projectVersion) {
+              data.push({
+                id: version?.id,
+                name: `${item?.name} - ${version.projectVersion} (${project?.name})`,
+                section: 'product versions',
+                icon: <FaScrewdriverWrench color='#718096' />,
+                perform: () => {
+                  const link =
+                    generateProductVersionDetailPageUrlFromCurrentUrl({
+                      productgroupid: item?.id,
+                      productid: project?.id,
+                      sbomid: version?.id,
+                      paramsObj: { tab: 'general' }
+                    })
+                  handleVersionClick(project?.name)
+                  navigate(link)
+                }
+              })
+            }
           })
         }
       })
