@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 
-import { Text } from '@chakra-ui/react'
-
 import Card from 'components/Card/Card'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 
@@ -27,17 +25,12 @@ const Vulnerabilities = () => {
     direction: 'DESC'
   })
 
-  const productPermissions = useHasPermission({
-    parentKey: 'view_product_group'
-  })
   const vulnsPermissions = useHasPermission({ parentKey: 'view_feeds' })
 
   const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
     GetGlobalVulns,
     {
-      skip:
-        orgNotFound ||
-        (productPermissions === false && vulnsPermissions === false),
+      skip: orgNotFound || !vulnsPermissions,
       selector: 'organization.vulns',
       variables: {
         ...filters
@@ -53,20 +46,16 @@ const Vulnerabilities = () => {
 
   return (
     <Card>
-      {vulnsPermissions === false ? (
-        <Text>You are not allowed to access this data</Text>
-      ) : (
-        <GlobalVulnTable
-          loading={loading}
-          vulns={nodes}
-          paginationProps={paginationProps}
-          filters={filters}
-          setFilters={(newFilters) => {
-            setFilters(newFilters)
-            reset()
-          }}
-        />
-      )}
+      <GlobalVulnTable
+        loading={loading}
+        vulns={nodes}
+        paginationProps={paginationProps}
+        filters={filters}
+        setFilters={(newFilters) => {
+          setFilters(newFilters)
+          reset()
+        }}
+      />
     </Card>
   )
 }
