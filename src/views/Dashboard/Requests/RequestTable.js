@@ -26,7 +26,6 @@ import CustomLoader from 'components/CustomLoader'
 import SearchFilter from 'components/Licenses/LicenseSearchFilter'
 import ViewAlert from 'components/Misc/ViewAlert'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 
 import { RequestCancel, RequestResend } from 'graphQL/Mutation'
@@ -49,7 +48,6 @@ const RequestTable = ({
   paginationProps
 }) => {
   const toast = useToast()
-  const { userPermissions } = useGlobalState()
 
   const viewReq = useHasPermission({
     parentKey: 'view_requests'
@@ -329,14 +327,20 @@ const RequestTable = ({
             <Portal>
               <MenuList fontSize={'sm'}>
                 <MenuItem
-                  isDisabled={!row.blob}
+                  isDisabled={!row.blob || !addReq}
                   onClick={() => handleAccept(row)}
                 >
                   Accept
                 </MenuItem>
-                <MenuItem onClick={() => handleResend(row)}>Resend</MenuItem>
+                <MenuItem
+                  isDisabled={!addReq}
+                  onClick={() => handleResend(row)}
+                >
+                  Resend
+                </MenuItem>
                 <MenuItem
                   isDisabled={
+                    !addReq ||
                     row.blob ||
                     row.status === 'Canceled' ||
                     row.status === 'Declined'
