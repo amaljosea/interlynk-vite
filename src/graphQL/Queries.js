@@ -4466,9 +4466,30 @@ export const GetSbomQualityScores = gql`
 
 // GET PROJECT VERSION AND ID
 export const GetProjectVersionAndId = gql`
-  query GetProjectVersionAndId($id: Uuid!) {
+  query GetProjectVersionAndId(
+    $id: Uuid!
+    $search: String
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: SbomOrderByFields!
+    $direction: OrderByDirection!
+  ) {
     project(id: $id) {
-      sbomVersions {
+      id
+      allSbomVersions: sbomVersions {
+        totalCount
+      }
+      sbomVersions(
+        search: $search
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
         nodes {
           id
           projectVersion
@@ -4499,6 +4520,7 @@ export const GetProjectGroupDetails = gql`
         before: $before
         orderBy: { field: $field, direction: $direction }
       ) {
+        totalCount
         nodes {
           id
           name
@@ -4510,6 +4532,12 @@ export const GetProjectGroupDetails = gql`
             name
           }
         }
+      }
+      allProjectGroups: projectGroups(
+        enabled: $enabled
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
       }
     }
   }

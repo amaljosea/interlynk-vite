@@ -1,6 +1,8 @@
 import { useQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import Select from 'react-select'
 import { permissionList } from 'utils'
 
 import { ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons'
@@ -19,6 +21,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
+import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -34,15 +37,39 @@ import {
 
 import AdminNavbarLinks from './AdminNavbarLinks'
 
+const selectStyles = {
+  control: (provided) => ({
+    ...provided,
+    minHeight: '30px',
+    height: '30px',
+    width: '100px',
+    background: '#edf2f7',
+    border: 'none',
+    '&:hover': { background: '#e2e8f0' },
+    '&:focus-within': { background: '#cbd5e0', borderColor: 'transparent' }
+  }),
+  menu: (provided) => ({ ...provided, width: '100px' }),
+  input: (provided) => ({ ...provided, margin: '0px' }),
+  indicatorSeparator: () => ({ display: 'none' }),
+  indicatorsContainer: (provided) => ({ ...provided, height: '30px' })
+}
+
 export default function AdminNavbar(props) {
   const partsContext = usePartsContext()
   const navigate = useNavigate()
-  const { setUserPermissions, userPermissions } = useGlobalState()
+  const { setUserPermissions } = useGlobalState()
   const { sbomHookData, orgView } = useGlobalQueryContext()
   const {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
   } = useProductUrlContext()
+  const [searchInput, setSearchInput] = useState('')
+  const [versionSearchInput, setVersionSearchInput] = useState('')
+  const [versions, setVersions] = useState([])
+  const [totalCount, setTotalCount] = useState(null)
+
+  const debouncedSearchInput = useDebounce(searchInput, 300)
+  const debouncedVersionSearchInput = useDebounce(versionSearchInput, 300)
 
   const location = useLocation()
   const params = useParams()
@@ -88,24 +115,62 @@ export default function AdminNavbar(props) {
     projectGroupId: params.productgroupid
   })
 
-  const { data: versionData, loading: loadingVersions } = useQuery(
-    GetProjectVersionAndId,
-    {
-      variables: { id: prodID },
-      skip: !prodID || !orgView
-    }
-  )
+  const {
+    data: versionData,
+    loading: loadingVersions,
+    refetch: refetchVersions
+  } = useQuery(GetProjectVersionAndId, {
+    variables: {
+      id: prodID,
+      search: debouncedVersionSearchInput,
+      first: 10,
+      field: 'SBOMS_CREATED_AT',
+      direction: 'DESC'
+    },
+    skip: !prodID || !orgView
+  })
 
-  const { data: productsData } = useQuery(GetProjectGroupDetails, {
+  const { data: productsData, refetch } = useQuery(GetProjectGroupDetails, {
     skip: !orgView || viewProds === false,
     variables: {
       field: 'PROJECT_GROUPS_UPDATED_AT',
       direction: 'DESC',
-      enabled: true
+      enabled: true,
+      first: 10,
+      search: ''
     }
   })
 
   const products = productsData?.organization?.projectGroups?.nodes
+  useEffect(() => {
+    if (versionData) {
+      setVersions(versionData.project.sbomVersions.nodes)
+      setTotalCount(versionData.project.allSbomVersions.totalCount)
+    }
+  }, [versionData])
+
+  useEffect(() => {
+    if (debouncedSearchInput !== '' || searchInput === '') {
+      refetch({
+        search: debouncedSearchInput,
+        enabled: true,
+        first: 10,
+        field: 'PROJECT_GROUPS_UPDATED_AT',
+        direction: 'DESC'
+      })
+    }
+  }, [debouncedSearchInput, searchInput, refetch])
+
+  useEffect(() => {
+    if (debouncedVersionSearchInput !== '') {
+      refetchVersions({
+        variables: {
+          id: prodID,
+          search: debouncedVersionSearchInput
+        }
+      })
+    }
+  }, [debouncedVersionSearchInput, refetchVersions, prodID])
 
   const filterText = (item) => {
     return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
@@ -121,56 +186,43 @@ export default function AdminNavbar(props) {
     navigate(link)
   }
 
-  const handleProductClick = (product) => {
-    const env = products?.find((item) => item.name === environment)
-    const link = generateProductDetailPageUrlFromCurrentUrl({
-      productgroupid: product?.id,
-      productid: env?.id || product?.defaultProject?.id
-    })
-    navigate(link)
-  }
+  const handleProductClick = useCallback(
+    (product) => {
+      const env = products?.find((item) => item.name === environment)
+      const link = generateProductDetailPageUrlFromCurrentUrl({
+        productgroupid: product?.id,
+        productid: env?.id || product?.defaultProject?.id
+      })
+      navigate(link)
+    },
+    [products, navigate, environment]
+  )
 
   const renderVersionBreadcrumb = () => {
-    if (
-      loadingVersions ||
-      partsContext.isParts ||
-      !sbomId ||
-      !sbomHookData.versionName ||
-      !versionData?.project?.sbomVersions?.nodes
-    ) {
+    if (partsContext.isParts || !sbomId || !sbomHookData.versionName) {
       return null
     }
-
-    const versions = versionData.project.sbomVersions.nodes
-
-    if (versions.length > 1) {
+    if (totalCount > 1) {
       return (
         <BreadcrumbItem color={mainText} isCurrentPage={!parts}>
-          <Menu>
-            <MenuButton
-              as={Button}
-              rightIcon={<ChevronDownIcon />}
-              fontSize={14}
-              fontWeight={400}
-            >
-              {filterText(sbomHookData.versionName)}
-            </MenuButton>
-            <MenuList>
-              {versions.map((version) => (
-                <MenuItem
-                  key={version.id}
-                  onClick={() => handleVersionClick(version)}
-                >
-                  <Text color={'blue.500'} fontSize={14}>
-                    {version.projectVersion}
-                  </Text>
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
+          <Select
+            styles={selectStyles}
+            inputValue={versionSearchInput}
+            onInputChange={setVersionSearchInput}
+            options={versions}
+            getOptionLabel={(version) => version.projectVersion}
+            getOptionValue={(version) => version.id}
+            onChange={(version) => handleVersionClick(version)}
+            defaultValue={
+              versions.find(
+                (version) => version.projectVersion === sbomHookData.versionName
+              ) || null
+            }
+            hideSelectedOptions
+          />
         </BreadcrumbItem>
       )
-    } else if (versions.length === 1) {
+    } else if (totalCount === 1) {
       return (
         <BreadcrumbItem color={mainText} isCurrentPage={!parts}>
           <BreadcrumbLink
@@ -188,41 +240,35 @@ export default function AdminNavbar(props) {
   }
 
   const renderProjectGroupBreadcrumb = () => {
-    if (!projectGroupName || !products || loadingVersions || !prodID) {
+    const totalCount = productsData?.organization?.allProjectGroups?.totalCount
+
+    if (!projectGroupName || !products || !prodID || partsContext.isParts) {
       return null
     }
 
-    if (products.length > 1) {
+    if (totalCount > 1) {
       return (
         <BreadcrumbItem
           color={mainText}
           isCurrentPage={!sbomId && !partsContext.isParts}
         >
-          <Menu>
-            <MenuButton
-              as={Button}
-              rightIcon={<ChevronDownIcon />}
-              fontSize={14}
-              fontWeight={400}
-            >
-              {filterText(projectGroupName)}
-            </MenuButton>
-            <MenuList>
-              {products.map((product) => (
-                <MenuItem
-                  key={product.id}
-                  onClick={() => handleProductClick(product)}
-                >
-                  <Text color={'blue.500'} fontSize={14}>
-                    {product.name}
-                  </Text>
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
+          <Select
+            styles={selectStyles}
+            inputValue={searchInput}
+            onInputChange={setSearchInput}
+            options={products}
+            getOptionLabel={(product) => product.name}
+            getOptionValue={(product) => product.id}
+            onChange={(product) => handleProductClick(product)}
+            defaultValue={
+              products.find((product) => product.name === projectGroupName) ||
+              null
+            }
+            hideSelectedOptions
+          />
         </BreadcrumbItem>
       )
-    } else if (products.length === 1) {
+    } else if (totalCount === 1) {
       return (
         <BreadcrumbItem
           color={mainText}
