@@ -47,6 +47,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { sbomDelete } from 'graphQL/Mutation'
 import {
@@ -60,6 +61,7 @@ import { UserSettings } from 'graphQL/Queries'
 import {
   FaCodeCompare,
   FaEllipsisVertical,
+  FaFileImport,
   FaScrewdriverWrench
 } from 'react-icons/fa6'
 
@@ -80,6 +82,7 @@ const VersionsTable = ({ projectGroup }) => {
   const { prodVulnDispatch, prodCompDispatch } = dispatch
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const [filterText, setFilterText] = useState(searchInput)
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
@@ -208,6 +211,22 @@ const VersionsTable = ({ projectGroup }) => {
     return () => clearInterval(refetchInterval)
   }, [nodes, refetch])
 
+  const getFormat = (creationAt) => {
+    if (creationAt === null) {
+      return 'Manual Build'
+    } else {
+      return 'External'
+    }
+  }
+
+  const getType = (creationAt) => {
+    if (creationAt === null) {
+      return <FaFileImport />
+    } else {
+      return <FaScrewdriverWrench />
+    }
+  }
+
   // COLUMNS
   const columns = [
     // VERSION
@@ -215,7 +234,7 @@ const VersionsTable = ({ projectGroup }) => {
       id: 'SBOMS_PROJECT_VERSION',
       name: 'VERSION',
       selector: (row, index) => {
-        const { projectVersion } = row
+        const { projectVersion, creationAt } = row
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           sbomid: row.id,
           paramsObj: {
@@ -223,25 +242,35 @@ const VersionsTable = ({ projectGroup }) => {
           }
         })
         return (
-          <Link
-            to={link}
-            onClick={() => {
-              prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
-            }}
-          >
-            <Text
-              className={index === 0 ? 'version' : ''}
-              color={'blue.500'}
-              minWidth='100%'
-              my={3}
-              fontSize={14}
+          <Flex alignItems={'flex-center'} my={3}>
+            <Tooltip label={getFormat(creationAt)} placement='top'>
+              <Link to={creationAt ? '#' : '/vendor/requests'}>
+                <IconButton
+                  mr={2}
+                  size='xs'
+                  colorScheme='blue'
+                  icon={getType(creationAt)}
+                  hidden={!shouldShowDemoFeatures}
+                />
+              </Link>
+            </Tooltip>
+            <Link
+              to={link}
+              onClick={() => prodCompDispatch({ type: 'CLEAR_PROD_COMP' })}
             >
-              {projectVersion}
-            </Text>
-          </Link>
+              <Text
+                className={index === 0 ? 'version' : ''}
+                color={'blue.500'}
+                minWidth='100%'
+                fontSize={14}
+              >
+                {projectVersion}
+              </Text>
+            </Link>
+          </Flex>
         )
       },
-      width: '12%',
+      width: '13%',
       wrap: true,
       sortable: true
     },

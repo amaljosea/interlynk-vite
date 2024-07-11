@@ -45,12 +45,18 @@ import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import { GetSharelynks } from 'graphQL/Queries'
 
 import { FaEllipsisV } from 'react-icons/fa'
-import { FaCode, FaInbox, FaSquareArrowUpRight } from 'react-icons/fa6'
+import {
+  FaCode,
+  FaInbox,
+  FaScrewdriverWrench,
+  FaSquareArrowUpRight
+} from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
 
@@ -63,6 +69,7 @@ const ProductTable = ({
   paginationProps
 }) => {
   const navigate = useNavigate()
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
@@ -325,28 +332,34 @@ const ProductTable = ({
           navigate(link)
         }
         return (
-          <Stack
-            direction='column'
-            alignItems={'flex-start'}
-            spacing={1}
-            my={3}
-          >
-            <Text
-              fontSize={14}
-              color={'blue.500'}
-              minWidth='100%'
-              fontWeight={'medium'}
-              onClick={handleClick}
-              cursor={'pointer'}
-            >
-              {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
-            </Text>
-            <Text color={textColor}>
-              {description?.length > 50
-                ? description.substring(0, 50) + '....'
-                : description}
-            </Text>
-          </Stack>
+          <Flex alignItems={'flex-start'} my={3}>
+            <Tooltip label={'Manual Build'} placement='top'>
+              <IconButton
+                mr={2}
+                size='xs'
+                colorScheme='blue'
+                icon={<FaScrewdriverWrench />}
+                hidden={!shouldShowDemoFeatures}
+              />
+            </Tooltip>
+            <Stack direction='column' alignItems={'flex-start'} spacing={1}>
+              <Text
+                fontSize={14}
+                color={'blue.500'}
+                minWidth='100%'
+                fontWeight={'medium'}
+                onClick={handleClick}
+                cursor={'pointer'}
+              >
+                {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
+              </Text>
+              <Text color={textColor}>
+                {description?.length > 50
+                  ? description.substring(0, 50) + '....'
+                  : description}
+              </Text>
+            </Stack>
+          </Flex>
         )
       },
       wrap: true,
