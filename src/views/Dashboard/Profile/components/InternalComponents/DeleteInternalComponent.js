@@ -22,7 +22,10 @@ import { getInternalComponents } from 'graphQL/Queries'
 
 import { FaEllipsisV } from 'react-icons/fa'
 
-export const DeleteInternalComponent = ({ internalComponent }) => {
+export const DeleteInternalComponent = ({
+  internalComponent,
+  manageListing
+}) => {
   const { id, matchStr } = internalComponent
   const [isConfirming, setIsConfirming] = useState(false)
   const [untag, setUntag] = useState(false)
@@ -94,7 +97,11 @@ export const DeleteInternalComponent = ({ internalComponent }) => {
         />
         <Portal>
           <MenuList fontSize={'sm'}>
-            <MenuItem color='red' onClick={() => setIsConfirming(true)}>
+            <MenuItem
+              color='red'
+              isDisabled={!manageListing}
+              onClick={() => setIsConfirming(true)}
+            >
               Delete
             </MenuItem>
           </MenuList>

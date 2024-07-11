@@ -23,7 +23,6 @@ import CardHeader from 'components/Card/CardHeader'
 import CustomLoader from 'components/CustomLoader'
 import { RegexHighlighter } from 'components/RegexHighlighter'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -42,7 +41,6 @@ export const InternalComponents = () => {
     skip: org === 'undefined' ? true : activetab === 'lists' ? false : true
   })
   const toast = useToast()
-  const { userPermissions } = useGlobalState()
 
   const manageListing = useHasPermission({
     parentKey: 'view_feeds',
@@ -81,6 +79,7 @@ export const InternalComponents = () => {
       selector: (row) => {
         return (
           <Switch
+            isDisabled={!manageListing}
             isChecked={row.enabled}
             onChange={() =>
               handleToggleChange(
@@ -143,7 +142,12 @@ export const InternalComponents = () => {
       name: 'ACTION',
       right: true,
       selector: (row) => {
-        return <DeleteInternalComponent internalComponent={row} />
+        return (
+          <DeleteInternalComponent
+            internalComponent={row}
+            manageListing={manageListing}
+          />
+        )
       }
     }
   ]
