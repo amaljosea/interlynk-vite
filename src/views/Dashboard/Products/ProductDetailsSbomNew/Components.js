@@ -142,10 +142,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
       }
     })
 
-  useEffect(() => {
-    window.scrollTo({ top: 0 })
-  }, [loading])
-
   const { lifecycle, primaryComponent } = sbomData || ''
 
   // GET COMPONENT FILTER HEADS

@@ -15,9 +15,6 @@ const Pagination = ({
   paginationHidden = false,
   loading
 }) => {
-  if (loading) {
-    return null
-  }
   if (paginationHidden) {
     return null
   }
@@ -37,14 +34,14 @@ const Pagination = ({
         <Button
           colorScheme='blue'
           onClick={onPreviousPage}
-          isDisabled={!hasPreviousPage}
+          isDisabled={!hasPreviousPage || loading}
         >
           Prev
         </Button>
         <Button
           colorScheme='blue'
           onClick={onNextPage}
-          isDisabled={!hasNextPage}
+          isDisabled={!hasNextPage || loading}
         >
           Next
         </Button>
@@ -59,6 +56,7 @@ const Pagination = ({
           width='auto'
           value={totalRows}
           onChange={onSetRow}
+          disabled={loading}
           id='rowlimit'
           name='rowlimit'
         >

@@ -100,10 +100,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
     }
   })
 
-  useEffect(() => {
-    window.scrollTo({ top: 0 })
-  }, [loading])
-
   const { primaryComponent } = sbomData || ''
 
   // GET COMPONENT FILTER HEADS
@@ -820,7 +816,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
           customStyles={customStyles}
           defaultSortAsc={false}
           defaultSortFieldId={field}
-          progressPending={components ? false : true}
+          progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
