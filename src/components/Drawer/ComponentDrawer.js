@@ -344,7 +344,10 @@ function ComponentDrawer(props) {
         internal: isInternal
       }
     }).then((res) => {
-      if (res.data) {
+      const { errors } = res?.data?.componentUpdate || ''
+      if (errors?.length > 0) {
+        toast({ description: errors[0], status: 'error', position: 'top' })
+      } else {
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
         navigate(link)
         onClose()
