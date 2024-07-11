@@ -24,7 +24,6 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 
 import { FaEllipsisV } from 'react-icons/fa'
@@ -38,8 +37,6 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
   const [activeRow, setActiveRow] = useState(null)
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-
-  const { userPermissions } = useGlobalState()
 
   const updateLic = useHasPermission({
     parentKey: 'view_license',
@@ -237,9 +234,8 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
                     setActiveRow(row)
                     onOpen()
                   }}
-                  isDisabled={!updateLic}
                 >
-                  Edit License
+                  {!updateLic ? 'View' : 'Edit'} License
                 </MenuItem>
               </MenuList>
             </Portal>
@@ -276,7 +272,12 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
       {/* PAGINATION */}
       <Pagination {...paginationProps} />
       {isOpen && (
-        <LicenseDrawer isOpen={isOpen} onClose={onClose} data={activeRow} />
+        <LicenseDrawer
+          isOpen={isOpen}
+          data={activeRow}
+          onClose={onClose}
+          updateLic={updateLic}
+        />
       )}
     </>
   )

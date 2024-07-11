@@ -29,7 +29,7 @@ import LynkSelect from 'components/LynkSelect'
 
 import { CreateLicense, UpdateLicense } from '../../graphQL/Mutation'
 
-const LicenseDrawer = ({ isOpen, onClose, data }) => {
+const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
   const toast = useToast()
 
   const [name, setName] = useState('')
@@ -154,7 +154,9 @@ const LicenseDrawer = ({ isOpen, onClose, data }) => {
       <DrawerContent>
         <DrawerCloseButton />
         {drawerSize === 'md' ? (
-          <DrawerHeader>{data ? 'Edit' : 'Add'} License</DrawerHeader>
+          <DrawerHeader>
+            {!updateLic ? 'View' : data ? 'Edit' : 'Add'} License
+          </DrawerHeader>
         ) : (
           <DrawerHeader>License</DrawerHeader>
         )}
@@ -394,7 +396,7 @@ const LicenseDrawer = ({ isOpen, onClose, data }) => {
         </DrawerBody>
 
         <DrawerFooter>
-          <Button mr={3} onClick={onClose}>
+          <Button mr={3} onClick={onClose} hidden={!updateLic}>
             Cancel
           </Button>
           {drawerSize === 'md' ? (
@@ -403,6 +405,7 @@ const LicenseDrawer = ({ isOpen, onClose, data }) => {
                 colorScheme='blue'
                 onClick={handleCreateLicense}
                 disabled={name === ''}
+                hidden={!updateLic}
               >
                 Save
               </Button>
@@ -411,6 +414,7 @@ const LicenseDrawer = ({ isOpen, onClose, data }) => {
                 colorScheme='blue'
                 onClick={handleUpdateLicense}
                 disabled={name === ''}
+                hidden={!updateLic}
               >
                 Update
               </Button>
