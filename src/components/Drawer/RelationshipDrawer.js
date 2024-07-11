@@ -37,6 +37,7 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
+import LoadingSpinner from 'components/LoadingSpinner'
 import RelDeleteModal from 'components/RelDeleteModal'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -74,7 +75,8 @@ const RelationshipDrawer = ({
   activeRow,
   fetchCompData,
   compPath,
-  ruleExists
+  ruleExists,
+  comPathLoading
 }) => {
   const params = useParams()
   const productId = params.productid
@@ -133,6 +135,8 @@ const RelationshipDrawer = ({
       }
     }
   })
+
+  const isLoading = comPathLoading || !allComponents
 
   const [addRelation] = useMutation(CreateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
@@ -284,281 +288,298 @@ const RelationshipDrawer = ({
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
           Relationships
         </DrawerHeader>
-        <DrawerBody>
-          <Card px={0} mx={0}>
-            <CardHeader>
-              <Flex
-                width='100%'
-                direction={'row'}
-                alignItems={'center'}
-                justifyContent={'flex-start'}
-                wrap={'wrap'}
-                gap={2}
-              >
-                <Text fontWeight={'medium'}>{name || compName}</Text>
-                <Tag colorScheme='blue'>{version || compVersion}</Tag>
-              </Flex>
-            </CardHeader>
-            <CardBody>
-              <Flex
-                flexDir={'column'}
-                alignItems={'flex-start'}
-                width={'100%'}
-                gap={4}
-              >
-                {/* CREATE RELATIONSHIP */}
-                <Stack
-                  mt={6}
-                  gap={2}
-                  width={'100%'}
-                  hidden={resolved}
-                  direction={'column'}
-                  alignItems={'flex-start'}
-                >
-                  <FormControl>
-                    <FormLabel htmlFor='relation' color='gray.600'>
-                      Type
-                    </FormLabel>
-                    <Select
-                      id='relation'
-                      size='sm'
-                      value={relation}
-                      onChange={(e) => setRelation(e.target.value)}
-                    >
-                      <option value=''>-- Select --</option>
-                      {[{ value: 'depends_on', label: 'Depends On' }].map(
-                        (item, idx) => (
-                          <option key={idx} value={item.value}>
-                            {item.label}
-                          </option>
-                        )
-                      )}
-                    </Select>
-                  </FormControl>
-                  {allComponents && (
-                    <FormControl isInvalid={list.length > 0}>
-                      <FormLabel htmlFor='component' color='gray.600'>
-                        Component
-                      </FormLabel>
-                      <Select
-                        id='component'
-                        size='sm'
-                        value={component}
-                        onChange={(e) => setComponent(e.target.value)}
-                      >
-                        <option value=''>-- Select --</option>
-                        {[...allComponents.sbom.components.nodes]
-                          .filter((com) =>
-                            shortDesc
-                              ? com?.name !== compName
-                              : com?.name !== name
-                          )
-                          .sort((a, b) => a?.name?.localeCompare(b?.name))
-                          .map((item, idx) => (
-                            <option key={idx} value={item.id}>
-                              {item.name}-{item.version}
-                              {item.primary ? ` [Primary Component]` : ''}
-                            </option>
-                          ))}
-                      </Select>
-                      {list.length !== 0 && (
-                        <FormErrorMessage>
-                          <FormErrorIcon />
-                          Component dependency already exists
-                        </FormErrorMessage>
-                      )}
-                    </FormControl>
-                  )}
-
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            <DrawerBody>
+              <Card px={0} mx={0}>
+                <CardHeader>
                   <Flex
-                    width={'100%'}
+                    width='100%'
+                    direction={'row'}
                     alignItems={'center'}
-                    justifyContent={'space-between'}
+                    justifyContent={'flex-start'}
+                    wrap={'wrap'}
+                    gap={2}
                   >
-                    <Button
-                      hidden
-                      mr={'auto'}
-                      fontSize={'sm'}
-                      onClick={handleRuleCreate}
-                      colorScheme={ruleExists ? 'green' : 'blue'}
-                    >
-                      {ruleExists ? 'View' : 'Save as'} Rule
-                    </Button>
-                    <Button
-                      size='md'
-                      width={'fit-content'}
-                      colorScheme='blue'
-                      onClick={handleAdd}
-                      isDisabled={
-                        relation === '' || component === '' || list.length > 0
-                      }
-                    >
-                      {shortDesc ? 'Save' : 'Add'}
-                    </Button>
+                    <Text fontWeight={'medium'}>{name || compName}</Text>
+                    <Tag colorScheme='blue'>{version || compVersion}</Tag>
                   </Flex>
-                </Stack>
-
-                {/* COMONENT RELATIONSIP DATA */}
-                <Table mt={6} width={'100%'}>
-                  <Thead>
-                    <Tr>
-                      {['Type', 'Component'].map((item, index) => (
-                        <Th key={index} pl={0} width={'100px'}>
-                          <Box>{item}</Box>
-                        </Th>
-                      ))}
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {/* Dependency Of */}
-                    <Tr>
-                      <Td pl={0} width={'120px'}>
-                        <Text fontSize='xs' fontWeight={'medium'}>
-                          Dependency Of
-                        </Text>
-                      </Td>
-                      <Td pl={0} width={'300px'}>
-                        <Flex flexDirection={'row'} flexWrap={'wrap'} gap={2}>
-                          {dependencyOfList.map((comp, index) => (
-                            <Tag
-                              size={'sm'}
-                              key={index}
-                              variant='subtle'
-                              colorScheme={'blue'}
-                              width={'fit-content'}
-                            >
-                              <TagLabel>
-                                {comp.fromComp.name}-{comp.fromComp.version}
-                              </TagLabel>
-                            </Tag>
-                          ))}
-                        </Flex>
-                      </Td>
-                    </Tr>
-                    <Tr>
-                      <Td pl={0} width={'120px'}>
-                        <Text fontSize='xs' fontWeight={'medium'}>
-                          Depends On
-                        </Text>
-                      </Td>
-                      <Td pl={0} width={'300px'}>
-                        <Flex flexDirection={'row'} flexWrap={'wrap'} gap={2}>
-                          {[...dependsOnList]
-                            .sort(
-                              (a, b) =>
-                                new Date(b?.updatedAt) - new Date(a?.updatedAt)
+                </CardHeader>
+                <CardBody>
+                  <Flex
+                    flexDir={'column'}
+                    alignItems={'flex-start'}
+                    width={'100%'}
+                    gap={4}
+                  >
+                    {/* CREATE RELATIONSHIP */}
+                    <Stack
+                      mt={6}
+                      gap={2}
+                      width={'100%'}
+                      hidden={resolved}
+                      direction={'column'}
+                      alignItems={'flex-start'}
+                    >
+                      <FormControl>
+                        <FormLabel htmlFor='relation' color='gray.600'>
+                          Type
+                        </FormLabel>
+                        <Select
+                          id='relation'
+                          size='sm'
+                          value={relation}
+                          onChange={(e) => setRelation(e.target.value)}
+                        >
+                          <option value=''>-- Select --</option>
+                          {[{ value: 'depends_on', label: 'Depends On' }].map(
+                            (item, idx) => (
+                              <option key={idx} value={item.value}>
+                                {item.label}
+                              </option>
                             )
-                            .map((comp, index) => (
-                              <Tooltip
-                                key={index}
-                                label={comp?.toComp?.name}
-                                placement='top'
-                              >
+                          )}
+                        </Select>
+                      </FormControl>
+                      {allComponents && (
+                        <FormControl isInvalid={list.length > 0}>
+                          <FormLabel htmlFor='component' color='gray.600'>
+                            Component
+                          </FormLabel>
+                          <Select
+                            id='component'
+                            size='sm'
+                            value={component}
+                            onChange={(e) => setComponent(e.target.value)}
+                          >
+                            <option value=''>-- Select --</option>
+                            {[...allComponents.sbom.components.nodes]
+                              .filter((com) =>
+                                shortDesc
+                                  ? com?.name !== compName
+                                  : com?.name !== name
+                              )
+                              .sort((a, b) => a?.name?.localeCompare(b?.name))
+                              .map((item, idx) => (
+                                <option key={idx} value={item.id}>
+                                  {item.name}-{item.version}
+                                  {item.primary ? ` [Primary Component]` : ''}
+                                </option>
+                              ))}
+                          </Select>
+                          {list.length !== 0 && (
+                            <FormErrorMessage>
+                              <FormErrorIcon />
+                              Component dependency already exists
+                            </FormErrorMessage>
+                          )}
+                        </FormControl>
+                      )}
+
+                      <Flex
+                        width={'100%'}
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Button
+                          hidden
+                          mr={'auto'}
+                          fontSize={'sm'}
+                          onClick={handleRuleCreate}
+                          colorScheme={ruleExists ? 'green' : 'blue'}
+                        >
+                          {ruleExists ? 'View' : 'Save as'} Rule
+                        </Button>
+                        <Button
+                          size='md'
+                          width={'fit-content'}
+                          colorScheme='blue'
+                          onClick={handleAdd}
+                          isDisabled={
+                            relation === '' ||
+                            component === '' ||
+                            list.length > 0
+                          }
+                        >
+                          {shortDesc ? 'Save' : 'Add'}
+                        </Button>
+                      </Flex>
+                    </Stack>
+
+                    {/* COMONENT RELATIONSIP DATA */}
+                    <Table mt={6} width={'100%'}>
+                      <Thead>
+                        <Tr>
+                          {['Type', 'Component'].map((item, index) => (
+                            <Th key={index} pl={0} width={'100px'}>
+                              <Box>{item}</Box>
+                            </Th>
+                          ))}
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {/* Dependency Of */}
+                        <Tr>
+                          <Td pl={0} width={'120px'}>
+                            <Text fontSize='xs' fontWeight={'medium'}>
+                              Dependency Of
+                            </Text>
+                          </Td>
+                          <Td pl={0} width={'300px'}>
+                            <Flex
+                              flexDirection={'row'}
+                              flexWrap={'wrap'}
+                              gap={2}
+                            >
+                              {dependencyOfList.map((comp, index) => (
                                 <Tag
                                   size={'sm'}
+                                  key={index}
                                   variant='subtle'
-                                  colorScheme={
-                                    index == 0 && isAdded ? 'green' : 'blue'
-                                  }
+                                  colorScheme={'blue'}
                                   width={'fit-content'}
                                 >
                                   <TagLabel>
-                                    {comp?.toComp?.name?.substring(0, 50)}-
-                                    {comp?.toComp?.version}
+                                    {comp.fromComp.name}-{comp.fromComp.version}
                                   </TagLabel>
-                                  <TagCloseButton
-                                    hidden={resolved}
-                                    onClick={() => {
-                                      setActiveComp(comp)
-                                      onDelOpen()
-                                    }}
-                                  />
                                 </Tag>
-                              </Tooltip>
-                            ))}
-                        </Flex>
-                      </Td>
-                    </Tr>
-                  </Tbody>
-                </Table>
+                              ))}
+                            </Flex>
+                          </Td>
+                        </Tr>
+                        <Tr>
+                          <Td pl={0} width={'120px'}>
+                            <Text fontSize='xs' fontWeight={'medium'}>
+                              Depends On
+                            </Text>
+                          </Td>
+                          <Td pl={0} width={'300px'}>
+                            <Flex
+                              flexDirection={'row'}
+                              flexWrap={'wrap'}
+                              gap={2}
+                            >
+                              {[...dependsOnList]
+                                .sort(
+                                  (a, b) =>
+                                    new Date(b?.updatedAt) -
+                                    new Date(a?.updatedAt)
+                                )
+                                .map((comp, index) => (
+                                  <Tooltip
+                                    key={index}
+                                    label={comp?.toComp?.name}
+                                    placement='top'
+                                  >
+                                    <Tag
+                                      size={'sm'}
+                                      variant='subtle'
+                                      colorScheme={
+                                        index == 0 && isAdded ? 'green' : 'blue'
+                                      }
+                                      width={'fit-content'}
+                                    >
+                                      <TagLabel>
+                                        {comp?.toComp?.name?.substring(0, 50)}-
+                                        {comp?.toComp?.version}
+                                      </TagLabel>
+                                      <TagCloseButton
+                                        hidden={resolved}
+                                        onClick={() => {
+                                          setActiveComp(comp)
+                                          onDelOpen()
+                                        }}
+                                      />
+                                    </Tag>
+                                  </Tooltip>
+                                ))}
+                            </Flex>
+                          </Td>
+                        </Tr>
+                      </Tbody>
+                    </Table>
 
-                {isDelOpen && activeComp && (
-                  <RelDeleteModal
-                    isOpen={isOpen}
-                    onClose={onClose}
-                    handleRemove={handleRemove}
-                    activeComp={activeComp}
-                  />
-                )}
-
-                {/* PATHS */}
-                <Text fontSize={'lg'} fontWeight={'medium'} mt={6}>
-                  Tree View
-                </Text>
-                {compPath?.length > 0 ? (
-                  <Stack
-                    width={'100%'}
-                    mt={10}
-                    dir='column'
-                    spacing={2}
-                    alignItems={'center'}
-                    justifyContent={'center'}
-                  >
-                    {shortestPath.path?.length > 0 ? (
-                      shortestPath.path.map((item, index) => (
-                        <>
-                          <Tag
-                            key={item.id}
-                            size='sm'
-                            colorScheme={
-                              index === 0 ||
-                              index === shortestPath.path.length - 1
-                                ? 'blue'
-                                : 'green'
-                            }
-                          >
-                            {item.name} - {item.version}
-                          </Tag>
-                          {index !== shortestPath.path.length - 1 && (
-                            <ArrowDownIcon
-                              width={4}
-                              height={4}
-                              color={'blue.500'}
-                            />
-                          )}
-                        </>
-                      ))
-                    ) : (
-                      <Text fontSize={'sm'}>
-                        Component is not connected to Primary component
-                      </Text>
+                    {isDelOpen && activeComp && (
+                      <RelDeleteModal
+                        isOpen={isOpen}
+                        onClose={onClose}
+                        handleRemove={handleRemove}
+                        activeComp={activeComp}
+                      />
                     )}
-                  </Stack>
-                ) : (
-                  <Stack
-                    width={'100%'}
-                    alignItems={'center'}
-                    justifyContent={'center'}
-                  >
-                    <Tag size='sm' colorScheme='green'>
-                      {name || compName} - {version || compVersion}
-                    </Tag>
-                  </Stack>
-                )}
-              </Flex>
-            </CardBody>
-          </Card>
-        </DrawerBody>
-        <DrawerFooter>
-          <Button
-            variant='solid'
-            colorScheme='blue'
-            onClick={handleSave}
-            hidden={resolved}
-          >
-            Done
-          </Button>
-        </DrawerFooter>
+
+                    {/* PATHS */}
+                    <Text fontSize={'lg'} fontWeight={'medium'} mt={6}>
+                      Tree View
+                    </Text>
+                    {compPath?.length > 0 ? (
+                      <Stack
+                        width={'100%'}
+                        mt={10}
+                        dir='column'
+                        spacing={2}
+                        alignItems={'center'}
+                        justifyContent={'center'}
+                      >
+                        {shortestPath.path?.length > 0 ? (
+                          shortestPath.path.map((item, index) => (
+                            <>
+                              <Tag
+                                key={item.id}
+                                size='sm'
+                                colorScheme={
+                                  index === 0 ||
+                                  index === shortestPath.path.length - 1
+                                    ? 'blue'
+                                    : 'green'
+                                }
+                              >
+                                {item.name} - {item.version}
+                              </Tag>
+                              {index !== shortestPath.path.length - 1 && (
+                                <ArrowDownIcon
+                                  width={4}
+                                  height={4}
+                                  color={'blue.500'}
+                                />
+                              )}
+                            </>
+                          ))
+                        ) : (
+                          <Text fontSize={'sm'}>
+                            Component is not connected to Primary component
+                          </Text>
+                        )}
+                      </Stack>
+                    ) : (
+                      <Stack
+                        width={'100%'}
+                        alignItems={'center'}
+                        justifyContent={'center'}
+                      >
+                        <Tag size='sm' colorScheme='green'>
+                          {name || compName} - {version || compVersion}
+                        </Tag>
+                      </Stack>
+                    )}
+                  </Flex>
+                </CardBody>
+              </Card>
+            </DrawerBody>
+            <DrawerFooter>
+              <Button
+                variant='solid'
+                colorScheme='blue'
+                onClick={handleSave}
+                hidden={resolved}
+              >
+                Done
+              </Button>
+            </DrawerFooter>
+          </>
+        )}
       </DrawerContent>
     </Drawer>
   )
