@@ -30,7 +30,6 @@ import CustomLoader from 'components/CustomLoader'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import LicenseModal from 'components/LicenseModal'
-import ComponentCard from 'components/Misc/ComponentCard'
 import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
 
@@ -204,12 +203,6 @@ const Checks = () => {
     isOpen: isCpeOpen,
     onOpen: onCpeOpen,
     onClose: onCpeClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isCardOpen,
-    onOpen: onCardOpen,
-    onClose: onCardClose
   } = useDisclosure()
 
   const {
@@ -645,10 +638,7 @@ const Checks = () => {
             {component !== null && (
               <Box
                 width={'fit-content'}
-                onClick={() => {
-                  setActiveRow(component)
-                  onCardOpen()
-                }}
+                onClick={() => setActiveRow(component)}
               >
                 <RowComponent content={component} />
               </Box>
@@ -972,14 +962,6 @@ const Checks = () => {
             />
           )}
         </>
-      )}
-
-      {isCardOpen && (
-        <ComponentCard
-          isOpen={isCardOpen}
-          onClose={onCardClose}
-          data={activeRow}
-        />
       )}
 
       {isFixedOpen && (

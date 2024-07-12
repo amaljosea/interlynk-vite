@@ -149,8 +149,11 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
             licensesExp: isPrimary ? undefined : expLicense || undefined
           }
         }
-      })
-        .then((res) => {
+      }).then((res) => {
+        const { errors } = res?.data?.componentUpdate || ''
+        if (errors?.length) {
+          setError(errors[0])
+        } else {
           if (res?.data) {
             healthRecheck({
               variables: {
@@ -158,10 +161,12 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
                 checkId: friendlyId,
                 compId: isPrimary ? activeComp?.id : componentId
               }
-            }).then((res) => res?.data && refetch())
+            })
+              .then((res) => res?.data && refetch())
+              .finally(() => onClose())
           }
-        })
-        .finally(() => onClose())
+        }
+      })
     }
   }
 
@@ -453,9 +458,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
             </FormControl>
           )}
 
-          {(shortDesc === 'Component has license/s specified' ||
-            shortDesc === 'Componet has deprecated license/s' ||
-            shortDesc === 'Component has restrictive licenses specified') && (
+          {isComponentLicense && (
             <LicenseField
               sbomView={false}
               resolved={resolved}
