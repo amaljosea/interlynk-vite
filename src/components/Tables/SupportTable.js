@@ -28,10 +28,8 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
-import ViewAlert from 'components/Misc/ViewAlert'
 import Pagination from 'components/Pagination'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 
 import { FaEllipsisV } from 'react-icons/fa'
@@ -48,10 +46,6 @@ const SupportTable = ({
   const params = useParams()
   const sbomId = params.sbomid
 
-  const { userPermissions } = useGlobalState()
-  const viewSup = useHasPermission({
-    parentKey: 'view_support'
-  })
   const editSup = useHasPermission({
     parentKey: 'view_support',
     childKey: 'create_update_support'
@@ -382,10 +376,6 @@ const SupportTable = ({
       omit: sbomId ? true : false
     }
   ]
-
-  if (viewSup === false) {
-    return <ViewAlert category='supports' />
-  }
 
   return (
     <>

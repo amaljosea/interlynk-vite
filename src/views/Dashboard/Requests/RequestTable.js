@@ -24,7 +24,6 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import SearchFilter from 'components/Licenses/LicenseSearchFilter'
-import ViewAlert from 'components/Misc/ViewAlert'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 
@@ -48,10 +47,6 @@ const RequestTable = ({
   paginationProps
 }) => {
   const toast = useToast()
-
-  const viewReq = useHasPermission({
-    parentKey: 'view_requests'
-  })
 
   const addReq = useHasPermission({
     parentKey: 'view_requests',
@@ -361,10 +356,6 @@ const RequestTable = ({
       right: 'true'
     }
   ]
-
-  if (viewReq === false) {
-    return <ViewAlert category='requests' />
-  }
 
   return (
     <>

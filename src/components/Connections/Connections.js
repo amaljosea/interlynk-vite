@@ -3,9 +3,6 @@ import { useEffect, useState } from 'react'
 
 import { Text, Wrap, useDisclosure } from '@chakra-ui/react'
 
-import ViewAlert from 'components/Misc/ViewAlert'
-
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -29,9 +26,6 @@ const Connections = () => {
       org === 'undefined' ? true : activetab === 'connections' ? false : true
   })
 
-  const con = useHasPermission({
-    parentKey: 'view_connections'
-  })
   const updateCon = useHasPermission({
     parentKey: 'view_connections',
     childKey: 'create_update_connection'
@@ -93,10 +87,6 @@ const Connections = () => {
       handleConnectionData(data.organization.connections.nodes)
     }
   }, [data])
-
-  if (con === false) {
-    return <ViewAlert category='connections' />
-  }
 
   return (
     <>

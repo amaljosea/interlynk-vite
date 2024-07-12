@@ -14,7 +14,6 @@ import {
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
-import ViewAlert from 'components/Misc/ViewAlert'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -33,7 +32,7 @@ export default function Dashboard() {
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
   const { dispatch, envName } = useGlobalState()
-  const { orgView, orgLoading } = useGlobalQueryContext()
+  const { orgView } = useGlobalQueryContext()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
   const iconBoxInside = useColorModeValue('white', 'white')
 
@@ -68,10 +67,6 @@ export default function Dashboard() {
   }, [prodCompDispatch, prodVulnDispatch, product])
 
   if (eOrg || eOrgMetric) return <OrgRegister />
-
-  if (!orgView) {
-    return <ViewAlert loading={orgLoading} category='dashboar page' />
-  }
 
   if (loading) {
     return (

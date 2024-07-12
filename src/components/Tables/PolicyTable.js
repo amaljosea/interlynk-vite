@@ -46,10 +46,8 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
-import ViewAlert from 'components/Misc/ViewAlert'
 import Pagination from 'components/Pagination'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
@@ -66,14 +64,9 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
   const queryParams = new URLSearchParams(location.search)
   const tab = queryParams.get('tab')
 
-  const { userPermissions } = useGlobalState()
   const editProdPolicies = useHasPermission({
     parentKey: 'view_product_group',
     childKey: 'edit_product_policies'
-  })
-
-  const policy = useHasPermission({
-    parentKey: 'view_policy'
   })
 
   const updatePolicy = useHasPermission({
@@ -490,10 +483,6 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
         </Box>
       </Flex>
     )
-  }
-
-  if (policy?.value === false) {
-    return <ViewAlert category='policies' />
   }
 
   return (
