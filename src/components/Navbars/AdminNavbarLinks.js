@@ -98,11 +98,12 @@ export default function HeaderLinks(props) {
   } = useGlobalState()
   const { orgView } = useGlobalQueryContext()
 
-  const { data: org } = useQuery(GetProfilePic)
+  const { data: org } = useQuery(GetProfilePic, { skip: signedUrlParams })
   const { currentUser } = org?.organization || ''
   const { profileImage } = currentUser || ''
 
   const [fetchOrg, { data }] = useLazyQuery(GetOrgName, {
+    skip: signedUrlParams,
     fetchPolicy: 'network-only'
   })
 

@@ -18,7 +18,6 @@ import {
 import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useHasPermission } from 'hooks/useHasPermission'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
@@ -138,10 +137,6 @@ export default function AdminNavbar(props) {
   let mainText = useColorModeValue('gray.700', 'gray.200')
   let secondaryText = useColorModeValue('gray.400', 'gray.200')
 
-  const viewProds = useHasPermission({
-    parentKey: 'view_product_group'
-  })
-
   const {
     name: projectGroupName,
     projects,
@@ -165,7 +160,7 @@ export default function AdminNavbar(props) {
   )
 
   const { data: productsData, refetch } = useQuery(GetProjectGroupDetails, {
-    skip: !orgView || viewProds === false,
+    skip: !orgView || path === 'customer',
     variables: {
       field: 'PROJECT_GROUPS_UPDATED_AT',
       direction: 'DESC',
@@ -184,7 +179,10 @@ export default function AdminNavbar(props) {
   }, [versionData])
 
   useEffect(() => {
-    if (debouncedSearchInput !== '' || searchInput === '') {
+    if (
+      path === 'vendor' &&
+      (debouncedSearchInput !== '' || searchInput === '')
+    ) {
       refetch({
         search: debouncedSearchInput,
         enabled: true,
@@ -193,7 +191,7 @@ export default function AdminNavbar(props) {
         direction: 'DESC'
       })
     }
-  }, [debouncedSearchInput, searchInput, refetch])
+  }, [debouncedSearchInput, searchInput, refetch, path])
 
   useEffect(() => {
     if (debouncedVersionSearchInput !== '') {

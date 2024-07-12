@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 import {
   Button,
@@ -18,18 +19,18 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 
 import { orgUpdate } from 'graphQL/Mutation'
 import { GetOrgName } from 'graphQL/Queries'
 
 const GeneralFeed = () => {
-  const { userPermissions } = useGlobalState()
+  const location = useLocation()
+  const customerView = location.pathname.startsWith('/customer')
   const { orgView } = useGlobalQueryContext()
 
   const { data, refetch } = useQuery(GetOrgName, {
-    skip: !orgView
+    skip: !orgView || customerView
   })
 
   const { name } = data?.organization || ''
