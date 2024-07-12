@@ -3,17 +3,20 @@ import { useEffect, useState } from 'react'
 
 import { Text, Wrap, useDisclosure } from '@chakra-ui/react'
 
+import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetConnections } from 'graphQL/Queries'
 
-import { FaJira, FaMicrosoft, FaSlack } from 'react-icons/fa'
+import { FaGithub, FaJira, FaMicrosoft, FaSlack } from 'react-icons/fa'
 
 import Card from '../Card/Card'
 import CardBody from '../Card/CardBody'
 import CardHeader from '../Card/CardHeader'
 import ConnectionCard from './ConnectionCard'
+import GithubConfigModal from './GithubConfigModal'
 import JiraConfigModal from './JiraConfigModal'
 import SlackConfigModal from './SlackConfigModal'
 import TeamsConfigModal from './TeamsConfigModal'
@@ -25,6 +28,7 @@ const Connections = () => {
     skip:
       org === 'undefined' ? true : activetab === 'connections' ? false : true
   })
+  const isGithubConfigSaved = useGithubConfigSaved()
 
   const updateCon = useHasPermission({
     parentKey: 'view_connections',
@@ -48,15 +52,25 @@ const Connections = () => {
     onClose: onTeamsClose
   } = useDisclosure()
 
+  const {
+    isOpen: isGithubOpen,
+    onOpen: onGithubOpen,
+    onClose: onGithubClose
+  } = useDisclosure()
+
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
+
   const [greenCheck, setGreenCheck] = useState({
     jira: false,
     slack: false,
-    teams: false
+    teams: false,
+    github: false
   })
 
   const [jiraData, setJiraData] = useState(null)
   const [slackData, setSlackData] = useState(null)
   const [teamsData, setTeamsData] = useState(null)
+  const [githubData, setGithubData] = useState(null)
 
   const handleConnectionData = (connections) => {
     connections.forEach((connection) => {
@@ -73,6 +87,10 @@ const Connections = () => {
           setGreenCheck((prev) => ({ ...prev, teams: true }))
           setTeamsData(connection)
           break
+        case 'GithubConnection':
+          setGreenCheck((prev) => ({ ...prev, github: true }))
+          setGithubData(connection)
+          break
         default:
           break
       }
@@ -83,10 +101,17 @@ const Connections = () => {
     setJiraData(null)
     setSlackData(null)
     setTeamsData(null)
+    setGithubData(null)
     if (data?.organization?.connections?.nodes) {
       handleConnectionData(data.organization.connections.nodes)
     }
   }, [data])
+
+  useEffect(() => {
+    if (isGithubConfigSaved) {
+      setGreenCheck((prev) => ({ ...prev, github: true }))
+    }
+  }, [isGithubConfigSaved])
 
   return (
     <>
@@ -119,6 +144,16 @@ const Connections = () => {
               isConnected={greenCheck.teams}
               color='#6264A7'
             />
+            {shouldShowDemoFeatures && (
+              <ConnectionCard
+                icon={FaGithub}
+                name='Github'
+                onConfigure={onGithubOpen}
+                isConnected={greenCheck.github}
+                isDisabled={!updateCon}
+                color='#24292f'
+              />
+            )}
           </Wrap>
         </CardBody>
       </Card>
@@ -151,6 +186,15 @@ const Connections = () => {
           updateCon={updateCon}
           onClose={onTeamsClose}
           setGreenCheck={setGreenCheck}
+        />
+      )}
+      {isGithubOpen && (
+        <GithubConfigModal
+          isOpen={isGithubOpen}
+          onClose={onGithubClose}
+          data={githubData}
+          setGreenCheck={setGreenCheck}
+          refetch={refetch}
         />
       )}
     </>

@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
 import { customStyles } from 'utils'
+import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import StatusModal from 'views/Dashboard/Products/components/StatusModal'
@@ -42,6 +43,7 @@ import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 
+import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
@@ -50,7 +52,7 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import { GetSharelynks } from 'graphQL/Queries'
 
-import { FaEllipsisV } from 'react-icons/fa'
+import { FaEllipsisV, FaGithub } from 'react-icons/fa'
 import {
   FaCode,
   FaInbox,
@@ -91,6 +93,7 @@ const ProductTable = ({
 
   const [filterText, setFilterText] = useState(search || '')
   const [activeRow, setActiveRow] = useState(null)
+  const isGithubConfigSaved = useGithubConfigSaved()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -113,6 +116,11 @@ const ProductTable = ({
     isOpen: isLynkOpen,
     onOpen: onLynkOpen,
     onClose: onLynkClose
+  } = useDisclosure()
+  const {
+    isOpen: isGithubOpen,
+    onOpen: onGithubOpen,
+    onClose: onGithubClose
   } = useDisclosure()
 
   const canAddProduct = useHasPermission({
@@ -243,6 +251,16 @@ const ProductTable = ({
           )}
         </Stack>
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          {/* ADD GITHUB PROJECT */}
+          {shouldShowDemoFeatures && isGithubConfigSaved && (
+            <Tooltip label='Add GitHub Project'>
+              <IconButton
+                icon={<FaGithub />}
+                colorScheme='blue'
+                onClick={onGithubOpen}
+              />
+            </Tooltip>
+          )}
           {/* ADD PRODUCT */}
           <Tooltip label='Add Product'>
             <IconButton
@@ -278,7 +296,8 @@ const ProductTable = ({
     enabled,
     onFilterActive,
     onOpen,
-    refetch
+    refetch,
+    isGithubConfigSaved
   ])
 
   // COLUMNS
@@ -575,6 +594,11 @@ const ProductTable = ({
       {/* UPDATE PRODUCT */}
       {isOpen && data && (
         <ProductModal isOpen={isOpen} onClose={onClose} data={activeRow} />
+      )}
+
+      {/* GITHUB ADD PROJECT */}
+      {isGithubOpen && (
+        <GithubAddModal isOpen={isGithubOpen} onClose={onGithubClose} />
       )}
 
       {/* DELETE */}
