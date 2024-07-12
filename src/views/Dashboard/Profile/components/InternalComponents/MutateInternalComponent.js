@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -72,7 +73,8 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
     setErrorText(null)
   }, [matchStr])
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault()
     mutate({
       variables: {
         id: internalComponent?.id,
@@ -84,86 +86,74 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
   }
 
   return (
-    <Modal isOpen={true} onClose={onClose} size='6xl'>
+    <Modal isOpen={true} onClose={onClose} size='xl'>
       <ModalOverlay />
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          handleSubmit()
-        }}
-      >
+      <form onSubmit={handleSubmit}>
         <ModalContent>
           <ModalHeader>{mutateText} Internal Component</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
-            <div>
-              <div>
-                <FormControl isInvalid={!!errorText} isRequired>
-                  <FormLabel>Regular Expression</FormLabel>
-                  <Input
-                    autoFocus
-                    placeholder='orgname'
-                    required
-                    value={matchStr}
-                    onChange={(e) => setMatchStr(e.target.value)}
-                    bg={'white'}
-                  />
-                  {!!errorText && (
-                    <FormErrorMessage>{errorText}</FormErrorMessage>
-                  )}
-                </FormControl>
-                <FormControl mt={3}>
-                  <Checkbox
-                    defaultChecked={ignoreCase}
-                    onChange={() => {
-                      setIgnoreCase(!ignoreCase)
-                    }}
-                  >
-                    Case insensitive
-                  </Checkbox>
-                </FormControl>
-                <FormControl display='flex' alignItems='center' mt={3}>
-                  <FormLabel marginBlock={0}>Active</FormLabel>
-                  <Switch
-                    isChecked={enabled}
-                    onChange={() => {
-                      setEnabled(!enabled)
-                    }}
-                  />
-                </FormControl>
-                <Box py={3}>
-                  <Text fontWeight='bold'>Tips:</Text>
-                  <UnorderedList mx={10}>
-                    <li>{'// are not required'}</li>
-                    <li>
-                      <strong>^myname</strong> matches components whose name{' '}
-                      <strong>start with myname</strong>
-                    </li>
-                    <li>
-                      <strong>myname$</strong> matches components whose name{' '}
-                      <strong>ends with myname</strong>
-                    </li>
-                    <li>
-                      <strong>myname </strong> matches components whose name
-                      <strong> includes myname</strong>
-                    </li>
-                  </UnorderedList>
-                  <Text fontWeight='bold'>Note:</Text>
-                  <UnorderedList mx={10}>
-                    <li>All existing and future components will be tagged</li>
-                  </UnorderedList>
-                </Box>
-              </div>
-              <TextRegex regex={matchStr} ignoreCase={ignoreCase} />
-            </div>
+          <ModalBody as={Flex} flexDir='column'>
+            <FormControl isInvalid={!!errorText} isRequired>
+              <FormLabel>Regular Expression</FormLabel>
+              <Input
+                required
+                autoFocus
+                value={matchStr}
+                placeholder='orgname'
+                onChange={(e) => setMatchStr(e.target.value)}
+              />
+              {!!errorText && <FormErrorMessage>{errorText}</FormErrorMessage>}
+            </FormControl>
+            <FormControl mt={3}>
+              <Checkbox
+                defaultChecked={ignoreCase}
+                onChange={() => {
+                  setIgnoreCase(!ignoreCase)
+                }}
+              >
+                Case insensitive
+              </Checkbox>
+            </FormControl>
+            <FormControl display='flex' alignItems='center' mt={3}>
+              <FormLabel marginBlock={0}>Active</FormLabel>
+              <Switch
+                isChecked={enabled}
+                onChange={() => {
+                  setEnabled(!enabled)
+                }}
+              />
+            </FormControl>
+            <Box py={3}>
+              <Text fontWeight='bold'>Tips:</Text>
+              <UnorderedList mx={10}>
+                <li>{'// are not required'}</li>
+                <li>
+                  <strong>^myname</strong> matches components whose name{' '}
+                  <strong>start with myname</strong>
+                </li>
+                <li>
+                  <strong>myname$</strong> matches components whose name{' '}
+                  <strong>ends with myname</strong>
+                </li>
+                <li>
+                  <strong>myname </strong> matches components whose name
+                  <strong> includes myname</strong>
+                </li>
+              </UnorderedList>
+              <Text fontWeight='bold'>Note:</Text>
+              <UnorderedList mx={10}>
+                <li>All existing and future components will be tagged</li>
+              </UnorderedList>
+            </Box>
+            <TextRegex regex={matchStr} ignoreCase={ignoreCase} />
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='gray' mr={3} onClick={onClose}>
+            <Button mr={3} onClick={onClose}>
               Cancel
             </Button>
             <Button
-              isLoading={loading}
               type='submit'
+              isLoading={loading}
               fontWeight={'medium'}
               colorScheme='blue'
             >
