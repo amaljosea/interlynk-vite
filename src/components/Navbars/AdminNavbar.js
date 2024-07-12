@@ -220,19 +220,16 @@ export default function AdminNavbar(props) {
 
   const handleProductClick = useCallback(
     (product) => {
-      const env = products?.find((item) => item.name === environment)
+      const envProject = product?.projects?.find(
+        (proj) => proj.name === environment
+      )
       const link = generateProductDetailPageUrlFromCurrentUrl({
         productgroupid: product?.id,
-        productid: env?.id || product?.defaultProject?.id
+        productid: envProject?.id || product?.defaultProject?.id
       })
       navigate(link)
     },
-    [
-      products,
-      generateProductDetailPageUrlFromCurrentUrl,
-      navigate,
-      environment
-    ]
+    [generateProductDetailPageUrlFromCurrentUrl, navigate, environment]
   )
 
   const renderVersionBreadcrumb = () => {
