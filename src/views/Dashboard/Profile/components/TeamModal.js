@@ -26,7 +26,7 @@ import {
 import { InviteUser } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
 
-const TeamModal = ({ isOpen, onClose, refetch, data, editUserRole }) => {
+const TeamModal = ({ isOpen, onClose, refetch, data, changeRole }) => {
   const toast = useToast()
   const [email, setEmail] = useState('')
   const [role, setRole] = useState(data?.role?.id)
@@ -98,7 +98,7 @@ const TeamModal = ({ isOpen, onClose, refetch, data, editUserRole }) => {
             </FormControl>
             {/* ROLES */}
             {roles && (
-              <FormControl isDisabled={!editUserRole}>
+              <FormControl isDisabled={!changeRole}>
                 <FormLabel>Role</FormLabel>
                 <Select
                   value={role}

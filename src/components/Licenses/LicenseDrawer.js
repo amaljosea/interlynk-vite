@@ -162,7 +162,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
         )}
         <DrawerBody>
           <Stack direction={'column'} spacing={4} alignItems={'flex-start'}>
-            <FormControl isRequired>
+            <FormControl isRequired isDisabled={!updateLic}>
               <FormLabel htmlFor='name'>Name</FormLabel>
               <Input
                 name='name'
@@ -175,7 +175,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
               />
             </FormControl>
 
-            <FormControl>
+            <FormControl isDisabled={!updateLic}>
               <FormLabel htmlFor='text'>
                 License Text
                 <Link
@@ -197,13 +197,13 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                 value={text}
                 placeholder='Add text'
                 onChange={(e) => setText(e.target.value)}
-                disabled={data}
+                disabled={data || !updateLic}
                 resize={'none'}
               />
             </FormControl>
             {drawerSize === 'md' && (
               <>
-                <FormControl>
+                <FormControl isDisabled={!updateLic}>
                   <FormLabel htmlFor='url'>URL</FormLabel>
                   <Input
                     name='url'
@@ -216,7 +216,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                   />
                 </FormControl>
 
-                <FormControl>
+                <FormControl isDisabled={!updateLic}>
                   <FormLabel htmlFor='comment'>Comment</FormLabel>
                   <Input
                     name='comment'
@@ -245,10 +245,11 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                     onChange={(values) =>
                       setAttributionKeys(values?.map((v) => v.value))
                     }
+                    isDisabled={!updateLic}
                   />
                 </FormControl>
 
-                <FormControl>
+                <FormControl isDisabled={!updateLic}>
                   <FormLabel htmlFor='url'>Warranty</FormLabel>
                   <Input
                     name='warranty'
@@ -260,7 +261,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                   />
                 </FormControl>
 
-                <FormControl>
+                <FormControl isDisabled={!updateLic}>
                   <FormLabel htmlFor='url'>Governing Laws</FormLabel>
                   <Input
                     name='governingLaws'
@@ -273,7 +274,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                 </FormControl>
 
                 {/* Attribution */}
-                <FormControl>
+                <FormControl isDisabled={!updateLic}>
                   <FormLabel htmlFor='attribution'>Attribution</FormLabel>
                   <Select
                     onChange={(e) => setAttribution(e.target.value)}
@@ -287,7 +288,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                 </FormControl>
 
                 {/* CopyLeft */}
-                <FormControl>
+                <FormControl isDisabled={!updateLic}>
                   <FormLabel htmlFor='CopyLeft'>CopyLeft</FormLabel>
                   <Select
                     onChange={(e) => setCopyLeft(e.target.value)}
@@ -302,7 +303,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                 </FormControl>
 
                 {/* Radios */}
-                <FormControl>
+                <FormControl isDisabled={!updateLic}>
                   <FormLabel htmlFor='requiresSourceCode'>
                     Requires Source Code
                   </FormLabel>
@@ -321,7 +322,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                     </Radio>
                   </RadioGroup>
                 </FormControl>
-                <FormControl>
+                <FormControl isDisabled={!updateLic}>
                   <FormLabel htmlFor='permitsModifications'>
                     Permits Modifications
                   </FormLabel>
@@ -342,6 +343,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                 </FormControl>
 
                 <Checkbox
+                  isDisabled={!updateLic}
                   isChecked={deprecated}
                   size='sm'
                   colorScheme='blue'
@@ -351,6 +353,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                 </Checkbox>
 
                 <Checkbox
+                  isDisabled={!updateLic}
                   isChecked={restrictive}
                   size='sm'
                   colorScheme='blue'
@@ -360,6 +363,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                 </Checkbox>
 
                 <Checkbox
+                  isDisabled={!updateLic}
                   isChecked={fsfLibre}
                   size='sm'
                   colorScheme='blue'
@@ -369,6 +373,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                 </Checkbox>
 
                 <Checkbox
+                  isDisabled={!updateLic}
                   isChecked={osiApproved}
                   size='sm'
                   colorScheme='blue'
@@ -377,7 +382,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                   OSI Approved?
                 </Checkbox>
 
-                <FormControl>
+                <FormControl isDisabled={!updateLic}>
                   <FormLabel htmlFor='state'>Status</FormLabel>
                   <Select
                     fontSize={'sm'}

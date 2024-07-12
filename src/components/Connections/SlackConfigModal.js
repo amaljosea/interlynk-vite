@@ -152,6 +152,7 @@ const SlackConfigModal = ({
         <ModalCloseButton />
         <ModalBody>
           <Input
+            isDisabled={!updateCon}
             placeholder='Paste Slack Webhook URL'
             color='gray.600'
             value={slackWebhook}
@@ -163,7 +164,6 @@ const SlackConfigModal = ({
         </ModalBody>
         <ModalFooter>
           <Button
-            mr={3}
             colorScheme='blue'
             onClick={() => (data ? handleUpdate() : handleSave())}
             isDisabled={!slackWebhook || !isUrlChanged || !updateCon}
@@ -171,9 +171,11 @@ const SlackConfigModal = ({
             Save
           </Button>
           <Button
+            ml={3}
             colorScheme='red'
             onClick={handleDelete}
-            isDisabled={!data || !updateCon}
+            isDisabled={!updateCon}
+            display={data ? 'flex' : 'none'}
           >
             Delete
           </Button>

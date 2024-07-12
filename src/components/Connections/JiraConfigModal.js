@@ -234,7 +234,7 @@ const JiraConfigModal = ({
         <ModalHeader>Configure JIRA Connection </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <FormControl isRequired mt={4}>
+          <FormControl isRequired mt={4} isDisabled={!updateCon}>
             <FormLabel>JIRA Host URL</FormLabel>
             <Input
               value={jiraHost}
@@ -245,7 +245,7 @@ const JiraConfigModal = ({
               }}
             />
           </FormControl>
-          <FormControl isRequired mt={4}>
+          <FormControl isRequired mt={4} isDisabled={!updateCon}>
             <FormLabel>User Name</FormLabel>
             <Input
               value={jiraUsername}
@@ -256,7 +256,7 @@ const JiraConfigModal = ({
               placeholder='Enter User Name'
             />
           </FormControl>
-          <FormControl isRequired mt={4}>
+          <FormControl isRequired mt={4} isDisabled={!updateCon}>
             <FormLabel>API Token</FormLabel>
             <InputGroup size='md'>
               <Input
@@ -275,6 +275,7 @@ const JiraConfigModal = ({
                   size='sm'
                   h='1.75rem'
                   position='absolute'
+                  isDisabled={!updateCon}
                   onClick={handleToggleVisibility}
                 >
                   {showApiToken ? <ViewOffIcon /> : <ViewIcon />}
@@ -356,6 +357,7 @@ const JiraConfigModal = ({
           )}
           {data && (
             <Button
+              ml={3}
               colorScheme='red'
               onClick={handleDelete}
               isDisabled={!updateCon}

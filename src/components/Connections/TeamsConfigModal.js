@@ -152,6 +152,7 @@ const TeamsConfigModal = ({
         <ModalCloseButton />
         <ModalBody>
           <Input
+            isDisabled={!updateCon}
             placeholder='Paste Teams Webhook URL'
             color='gray.600'
             value={teamsWebhook}
@@ -163,7 +164,6 @@ const TeamsConfigModal = ({
         </ModalBody>
         <ModalFooter>
           <Button
-            mr={3}
             colorScheme='blue'
             onClick={() => (data ? handleUpdate() : handleSave())}
             isDisabled={!teamsWebhook || !isUrlChanged || !updateCon}
@@ -171,9 +171,11 @@ const TeamsConfigModal = ({
             Save
           </Button>
           <Button
+            ml={3}
             colorScheme='red'
             onClick={handleDelete}
-            isDisabled={!data || !updateCon}
+            isDisabled={!updateCon}
+            display={data ? 'flex' : 'none'}
           >
             Delete
           </Button>
