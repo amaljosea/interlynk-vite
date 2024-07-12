@@ -1,4 +1,5 @@
 import { PackageURL } from 'packageurl-js'
+import { useEffect, useState } from 'react'
 
 import {
   Divider,
@@ -31,7 +32,19 @@ const ListItem = ({ label, value }) => {
 const ComponentCard = ({ data, isOpen, onClose }) => {
   const { name, version, kind, purl, licensesExp, primary, internal } =
     data || ''
-  const pkg = purl ? PackageURL.fromString(purl) : ''
+
+  const [pkg, setPkg] = useState(null)
+
+  useEffect(() => {
+    if (purl) {
+      try {
+        PackageURL.fromString(purl)
+        setPkg(true)
+      } catch (ex) {
+        console.error('ex', ex)
+      }
+    }
+  }, [purl])
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
