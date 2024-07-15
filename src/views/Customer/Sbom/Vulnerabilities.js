@@ -3,9 +3,13 @@ import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
-import { getFullDateAndTime, sevColor, timeSince } from 'utils'
-import { customStyles } from 'utils'
-import { linkURl } from 'utils'
+import {
+  customStyles,
+  getFullDateAndTime,
+  linkURl,
+  sevColor,
+  timeSince
+} from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
@@ -39,7 +43,6 @@ import Pagination from 'components/Pagination'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import {
@@ -198,7 +201,7 @@ const Vulnerabilities = ({ sbomData }) => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { userPermissions, prodVulnState, dispatch } = useGlobalState()
+  const { prodVulnState, dispatch } = useGlobalState()
   const {
     field,
     direction,
@@ -214,10 +217,6 @@ const Vulnerabilities = ({ sbomData }) => {
     vexComplete
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
-
-  const vulnsPermissions = useHasPermission({
-    parentKey: 'view_feeds'
-  })
 
   const textColor = useColorModeValue('gray.700', 'white')
   const [activeRow, setActiveRow] = useState(null)
@@ -784,14 +783,6 @@ const Vulnerabilities = ({ sbomData }) => {
       }
     })
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  if (vulnsPermissions === false) {
-    return (
-      <Text mt={4} textAlign={'center'}>
-        You do not have permission to access this data
-      </Text>
-    )
   }
 
   return (

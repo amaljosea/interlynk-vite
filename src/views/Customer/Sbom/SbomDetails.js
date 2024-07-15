@@ -35,7 +35,6 @@ import {
   FaCubes
 } from 'react-icons/fa'
 import { FaCircleCheck } from 'react-icons/fa6'
-import { MdPolicy } from 'react-icons/md'
 
 const SbomDetails = ({ sbomData, refetch }) => {
   const partsContext = usePartsContext()
@@ -57,7 +56,6 @@ const SbomDetails = ({ sbomData, refetch }) => {
 
   const {
     project,
-    policyResultMetrics,
     projectVersion,
     primaryComponent,
     vulnRunStatus,
@@ -369,40 +367,6 @@ const SbomDetails = ({ sbomData, refetch }) => {
                   onClick={onSelectVulns}
                 >
                   Vulnerabilities
-                </Text>
-              </Flex>
-            </Stack>
-            {/* POLICY RESULTS */}
-            <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
-              <Icon mt={1} h={5} w={5} color='#777' as={MdPolicy} />
-              <Flex flexDir={'column'} alignItems={'center'}>
-                <Stack fontWeight={'medium'} direction={'row'}>
-                  <VulnBadge color='red' label='Fail'>
-                    {policyResultMetrics?.failedCount || 0}
-                  </VulnBadge>
-                  <VulnBadge color='yellow' label='Warn'>
-                    {policyResultMetrics?.warnCount || 0}
-                  </VulnBadge>
-                  <VulnBadge color='blue' label='Inform'>
-                    {policyResultMetrics?.informCount || 0}
-                  </VulnBadge>
-                  <VulnBadge color='green' label='Pass'>
-                    {policyResultMetrics?.passedCount || 0}
-                  </VulnBadge>
-                  <VulnBadge color='orange' label='Skipped'>
-                    {policyResultMetrics?.skippedCount || 0}
-                  </VulnBadge>
-                  <VulnBadge color='gray' label='Error'>
-                    {policyResultMetrics?.errorCount || 0}
-                  </VulnBadge>
-                </Stack>
-                <Text
-                  mt={1}
-                  fontSize={'xs'}
-                  style={{ cursor: 'pointer' }}
-                  _hover={{ textDecoration: 'underline' }}
-                >
-                  Policy Results
                 </Text>
               </Flex>
             </Stack>

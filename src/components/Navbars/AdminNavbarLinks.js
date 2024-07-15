@@ -178,7 +178,7 @@ export default function HeaderLinks(props) {
     <Flex gap={3} alignItems='center' flexDirection='row'>
       {/* JOIN WAITLIST */}
       {signedUrlParams && (
-        <Link href='https://www.interlynk.io/sign-up' isExternal>
+        <Link to='https://www.interlynk.io/sign-up' target='_blank'>
           <Button colorScheme='blue' size='sm'>
             Sign up
           </Button>
