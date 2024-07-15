@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { Text, Wrap, useDisclosure } from '@chakra-ui/react'
+import { Text, Wrap, useColorModeValue, useDisclosure } from '@chakra-ui/react'
 
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -29,6 +29,8 @@ const Connections = () => {
       org === 'undefined' ? true : activetab === 'connections' ? false : true
   })
   const isGithubConfigSaved = useGithubConfigSaved()
+
+  const iconColor = useColorModeValue('#24292f', '#f1f1f1')
 
   const updateCon = useHasPermission({
     parentKey: 'view_connections',
@@ -151,7 +153,7 @@ const Connections = () => {
                 onConfigure={onGithubOpen}
                 isConnected={greenCheck.github}
                 isDisabled={!updateCon}
-                color='#24292f'
+                color={iconColor}
               />
             )}
           </Wrap>
