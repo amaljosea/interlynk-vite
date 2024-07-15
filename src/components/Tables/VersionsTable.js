@@ -1,5 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
+import { differenceInDays, parseISO } from 'date-fns'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -9,8 +10,9 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { RepeatIcon } from '@chakra-ui/icons'
+import { RepeatIcon, WarningIcon } from '@chakra-ui/icons'
 import {
+  Badge,
   Button,
   Flex,
   Grid,
@@ -58,9 +60,9 @@ import {
   GetSbomAlternatives,
   GetShareSbomAlternatives,
   GetVersionsTable,
-  ShareVersionTable
+  ShareVersionTable,
+  UserSettings
 } from 'graphQL/Queries'
-import { UserSettings } from 'graphQL/Queries'
 
 import {
   FaCodeCompare,
@@ -68,7 +70,7 @@ import {
   FaScrewdriverWrench
 } from 'react-icons/fa6'
 
-const VersionsTable = ({ projectGroup }) => {
+const VersionsTable = ({ projectGroup, retentionTime }) => {
   const navigate = useNavigate()
   const params = useParams()
   const productId = params.productid
@@ -90,6 +92,8 @@ const VersionsTable = ({ projectGroup }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
 
+  const currentDate = new Date()
+
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
@@ -106,7 +110,7 @@ const VersionsTable = ({ projectGroup }) => {
   const queryParams = new URLSearchParams(location.search)
   const tab = queryParams.get('tab')
 
-  const { setIsOpen, setCurrentStep } = useTour()
+  const { setIsOpen } = useTour()
 
   const { VERSIONS } = ProductDetailsTabs
   const { nodes, paginationProps, loading, refetch } = usePaginatatedQuery(
@@ -236,6 +240,8 @@ const VersionsTable = ({ projectGroup }) => {
     }
   }
 
+  const retention = retentionTime && Math.floor(retentionTime) // Convert to integer
+
   // COLUMNS
   const columns = [
     // VERSION
@@ -243,7 +249,11 @@ const VersionsTable = ({ projectGroup }) => {
       id: 'SBOMS_PROJECT_VERSION',
       name: 'VERSION',
       selector: (row, index) => {
-        const { projectVersion } = row
+        const { projectVersion, creationAt } = row
+        const parsedCreationDate = creationAt && parseISO(creationAt)
+        const difference = differenceInDays(currentDate, parsedCreationDate)
+        const showWarning = difference > retention
+        const expired = retention !== 0 && showWarning === true
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           sbomid: row.id,
           paramsObj: {
@@ -257,7 +267,7 @@ const VersionsTable = ({ projectGroup }) => {
             justifyContent={'center'}
             templateColumns='repeat(12, 1fr)'
           >
-            <GridItem colSpan={2}>
+            <GridItem colSpan={2} hidden={!shouldShowDemoFeatures}>
               <Tooltip label={getFormat(index)} placement='top'>
                 <Link
                   to={
@@ -266,22 +276,14 @@ const VersionsTable = ({ projectGroup }) => {
                       : 'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
                   }
                 >
-                  <Img
-                    mr={2}
-                    width={5}
-                    hidden={!shouldShowDemoFeatures}
-                    src={getType(index)}
-                  />
+                  <Img mr={2} width={5} src={getType(index)} />
                 </Link>
               </Tooltip>
             </GridItem>
             <GridItem colSpan={10}>
-              <Link
-                to={link}
-                onClick={() => prodCompDispatch({ type: 'CLEAR_PROD_COMP' })}
-              >
+              <Link to={link} onClick={onStartTour}>
                 <Text
-                  className={index === 0 ? 'version' : ''}
+                  className={index === 0 ? 'versions' : ''}
                   color={'blue.500'}
                   minWidth='100%'
                   fontSize={14}
@@ -289,6 +291,11 @@ const VersionsTable = ({ projectGroup }) => {
                   {projectVersion}
                 </Text>
               </Link>
+              {expired && !signedUrlParams && (
+                <Badge mt={1.5} colorScheme='red' cursor={'pointer'}>
+                  Expired
+                </Badge>
+              )}
             </GridItem>
           </Grid>
         )

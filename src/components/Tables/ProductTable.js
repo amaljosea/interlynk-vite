@@ -372,7 +372,7 @@ const ProductTable = ({
             justifyContent={'center'}
             templateColumns='repeat(12, 1fr)'
           >
-            <GridItem colSpan={2}>
+            <GridItem colSpan={2} hidden={!shouldShowDemoFeatures}>
               <Tooltip
                 label={index === 0 ? 'Github' : 'Manual Build'}
                 placement='top'
@@ -383,12 +383,7 @@ const ProductTable = ({
                     'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
                   }
                 >
-                  <Img
-                    mr={2}
-                    width={5}
-                    hidden={!shouldShowDemoFeatures}
-                    src={getType(index)}
-                  />
+                  <Img mr={2} width={5} src={getType(index)} />
                 </Link>
               </Tooltip>
             </GridItem>

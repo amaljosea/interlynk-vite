@@ -29,7 +29,6 @@ import CardBody from 'components/Card/CardBody'
 import InfoModal from 'components/InfoModal'
 import LynkSelect from 'components/LynkSelect'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
@@ -67,7 +66,6 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
   }, [projectOptions])
 
   const toast = useToast()
-  const { userPermissions } = useGlobalState()
   const [checks, setChecks] = useState(false)
   const [internalComp, setInternalComp] = useState(false)
   const [infoHeading, setInfoHeading] = useState('')
@@ -332,8 +330,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
               >
                 {[1, 30, 90, 365, 0].map((item, index) => (
                   <option key={index} value={item}>
-                    {item !== 0 && item}{' '}
-                    {item === 365 ? 'Year' : item === 0 ? 'Forever' : 'Days'}
+                    {item !== 0 && item} {item === 0 ? 'Forever' : 'Days'}
                   </option>
                 ))}
               </Select>

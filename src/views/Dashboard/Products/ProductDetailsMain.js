@@ -57,8 +57,7 @@ import {
   GetOrgMfc,
   GetProjectGroup,
   GetProjectPolicies,
-  GetProjectSettings,
-  GetVulnData
+  GetProjectSettings
 } from 'graphQL/Queries'
 
 import { FaBug, FaRobot, FaTag } from 'react-icons/fa'
@@ -127,7 +126,7 @@ const ProductDetailsMain = () => {
   const tab = queryParams[0].get('tab')
   const activeTabNumber = Math.max(tabs.indexOf(tab), 0)
 
-  const { totalRows, prodVulnState, dispatch } = useGlobalState()
+  const { prodVulnState, dispatch } = useGlobalState()
 
   const {
     searchInput: vulnSearch,
@@ -143,10 +142,6 @@ const ProductDetailsMain = () => {
   const { prodVulnDispatch } = dispatch
   const environment = localStorage.getItem('environment')
   const [activeEnv, setActiveEnv] = useState(productId || '')
-
-  const vulnsPermissions = useHasPermission({
-    parentKey: 'view_feeds'
-  })
 
   const updateProduct = useHasPermission({
     parentKey: 'view_product_group',
@@ -182,6 +177,7 @@ const ProductDetailsMain = () => {
   const { projectSetting } = settings?.project || ''
   const {
     checksEnabled,
+    dataRetentionDays,
     vulnScanningEnabled,
     internalCompMatchingEnabled,
     automatedFixesEnabled
@@ -225,38 +221,6 @@ const ProductDetailsMain = () => {
   const { SETTINGS } = ProductDetailsTabs
   const { data: mfc } = useQuery(GetOrgMfc, {
     skip: tab === SETTINGS ? false : true
-  })
-
-  const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
-
-  const range = {
-    min: parseFloat(vulnEpss[0]) / 100,
-    max: parseFloat(vulnEpss[1]) / 100
-  }
-
-  // GET VULN DATA
-  const { refetch: vulnRefetch } = useQuery(GetVulnData, {
-    skip: sbomId && vulnsPermissions === true ? false : true,
-    variables: {
-      projectId: productId || activeEnv,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      search: vulnSearch !== '' ? vulnSearch : undefined,
-      severity: severities.length > 0 ? severities : undefined,
-      source: source === true ? undefined : 'COMPONENT',
-      componentName: components.length > 0 ? components : undefined,
-      status: statues.length > 0 ? statues : undefined,
-      kev:
-        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
-      epss: epss !== '' && epss !== 'all' ? range : undefined,
-      direct: direct === 'direct only' ? true : undefined,
-      vexComplete: vexComplete === 'all' ? undefined : false,
-      field: prodVulnState.field,
-      direction: prodVulnState.direction
-    }
   })
 
   const [projectDelete] = useMutation(DeleteProjectGroup)
@@ -492,9 +456,8 @@ const ProductDetailsMain = () => {
                 {/* VERSIONS */}
                 <TabPanel px={0}>
                   <VersionsTable
-                    productId={activeEnv}
                     projectGroup={projectGroup}
-                    getVulnData={vulnRefetch}
+                    retentionTime={dataRetentionDays}
                   />
                 </TabPanel>
                 {/* VULNERABILITIES */}

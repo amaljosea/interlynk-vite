@@ -18,11 +18,11 @@ const ProductDetailsSbomNew = () => {
     variables: { projectId: productId, sbomId: sbomId },
     onCompleted: (data) => {
       const tour = localStorage.getItem('tourCompleted')
-      if (data && !tour) {
+      if (data && tour === 'false') {
         setTimeout(() => {
           setCurrentStep(3)
           setIsOpen(true)
-        }, 2000)
+        }, 1000)
       }
     }
   })

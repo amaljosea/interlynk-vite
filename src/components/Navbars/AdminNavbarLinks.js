@@ -179,6 +179,7 @@ export default function HeaderLinks(props) {
   const { setIsOpen, setCurrentStep } = useTour()
 
   const onStartTour = () => {
+    localStorage.setItem('tourCompleted', false)
     if (sbomId) {
       setCurrentStep(3)
     } else {

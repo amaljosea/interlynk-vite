@@ -1,10 +1,11 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
+import { differenceInDays, parseISO } from 'date-fns'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
 
-import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
+import { DownloadIcon, InfoIcon, Search2Icon } from '@chakra-ui/icons'
 import {
   Flex,
   HStack,
@@ -82,7 +83,8 @@ const SbomDetails = ({ sbomData, refetch }) => {
     updatedAt,
     lifecycle,
     stats,
-    sbomParts
+    sbomParts,
+    creationAt
   } = sbomData || ''
   const { compCount, compLicenseCount, vulnStats } = stats || ''
   const { critical, high, medium, low, unknown } = vulnStats || ''
@@ -135,12 +137,19 @@ const SbomDetails = ({ sbomData, refetch }) => {
   const { projectSetting } = settings?.project || ''
   const {
     checksEnabled,
+    dataRetentionDays,
     vulnScanningEnabled: vulnScan,
     internalCompMatchingEnabled: internalComp,
     automatedFixesEnabled
   } = projectSetting || ''
   const hasFinished = vulnRunStatus === 'FINISHED'
   const reScanVuln = vulnScan === true && vulnRunStatus !== 'FINISHED'
+
+  const currentDate = new Date()
+  const parsedCreationDate = creationAt && parseISO(creationAt)
+  const difference = differenceInDays(currentDate, parsedCreationDate)
+  const showWarning = difference > dataRetentionDays
+  const expired = dataRetentionDays !== 0 && showWarning === true
 
   const handleRelationView = async () => {
     await getPrimaryComp({
@@ -340,6 +349,13 @@ const SbomDetails = ({ sbomData, refetch }) => {
               color={hasFinished ? 'blue' : scanColor}
               icon={<FaCircleCheck />}
             />
+            {expired && (
+              <SettingsTag
+                color={'red'}
+                label={'This SBOM has expired, please remove it'}
+                icon={<InfoIcon />}
+              />
+            )}
           </Flex>
           {/* UPDATED AT */}
           <Tooltip placement='top' label={getFullDateAndTime(updatedAt)}>

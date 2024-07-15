@@ -9,7 +9,6 @@ import {
   GridItem,
   Icon,
   Skeleton,
-  Stack,
   Tab,
   TabList,
   TabPanel,
@@ -231,9 +230,8 @@ const ProductDetails = () => {
               {/* VERSIONS */}
               <TabPanel px={0}>
                 <VersionsTable
-                  productId={activeEnv}
+                  retentionTime={null}
                   projectGroup={projectGroup}
-                  getVulnData={vulnRefetch}
                 />
               </TabPanel>
             </TabPanels>
