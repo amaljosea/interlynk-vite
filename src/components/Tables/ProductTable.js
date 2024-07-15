@@ -1,4 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
+import Github from 'assets/img/github.png'
+import Build from 'assets/img/manual-build.png'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -16,7 +18,10 @@ import {
   Button,
   Divider,
   Flex,
+  Grid,
+  GridItem,
   IconButton,
+  Img,
   ListItem,
   Menu,
   MenuButton,
@@ -288,17 +293,27 @@ const ProductTable = ({
     )
   }, [
     filterText,
-    canAddProduct,
     onSearchInputChange,
     handleClear,
     handleSearch,
     signedUrlParams,
     enabled,
     onFilterActive,
-    onOpen,
+    shouldShowDemoFeatures,
+    isGithubConfigSaved,
+    onGithubOpen,
+    canAddProduct,
     refetch,
-    isGithubConfigSaved
+    onOpen
   ])
+
+  const getType = (index) => {
+    if (index === 0) {
+      return Github
+    } else {
+      return Build
+    }
+  }
 
   // COLUMNS
   const columns = [
@@ -329,7 +344,7 @@ const ProductTable = ({
     {
       id: 'PROJECT_GROUPS_NAME',
       name: 'PRODUCT',
-      selector: (row) => {
+      selector: (row, index) => {
         const { id, name, projects, defaultProject, description } = row
         const handleClick = () => {
           setClearSelect(true)
@@ -351,34 +366,52 @@ const ProductTable = ({
           navigate(link)
         }
         return (
-          <Flex alignItems={'flex-start'} my={3}>
-            <Tooltip label={'Manual Build'} placement='top'>
-              <IconButton
-                mr={2}
-                size='xs'
-                colorScheme='blue'
-                icon={<FaScrewdriverWrench />}
-                hidden={!shouldShowDemoFeatures}
-              />
-            </Tooltip>
-            <Stack direction='column' alignItems={'flex-start'} spacing={1}>
-              <Text
-                fontSize={14}
-                color={'blue.500'}
-                minWidth='100%'
-                fontWeight={'medium'}
-                onClick={handleClick}
-                cursor={'pointer'}
+          <Grid
+            my={3}
+            alignItems={'center'}
+            justifyContent={'center'}
+            templateColumns='repeat(12, 1fr)'
+          >
+            <GridItem colSpan={2}>
+              <Tooltip
+                label={index === 0 ? 'Github' : 'Manual Build'}
+                placement='top'
               >
-                {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
-              </Text>
-              <Text color={textColor}>
-                {description?.length > 50
-                  ? description.substring(0, 50) + '....'
-                  : description}
-              </Text>
-            </Stack>
-          </Flex>
+                <Link
+                  target='_blank'
+                  to={
+                    'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
+                  }
+                >
+                  <Img
+                    mr={2}
+                    width={5}
+                    hidden={!shouldShowDemoFeatures}
+                    src={getType(index)}
+                  />
+                </Link>
+              </Tooltip>
+            </GridItem>
+            <GridItem colSpan={10}>
+              <Stack direction='column' alignItems={'flex-start'} spacing={1}>
+                <Text
+                  fontSize={14}
+                  color={'blue.500'}
+                  minWidth='100%'
+                  fontWeight={'medium'}
+                  onClick={handleClick}
+                  cursor={'pointer'}
+                >
+                  {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
+                </Text>
+                <Text color={textColor}>
+                  {description?.length > 50
+                    ? description.substring(0, 50) + '....'
+                    : description}
+                </Text>
+              </Stack>
+            </GridItem>
+          </Grid>
         )
       },
       wrap: true,

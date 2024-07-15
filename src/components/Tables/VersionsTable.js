@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { getType } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -12,7 +13,10 @@ import { RepeatIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
+  Grid,
+  GridItem,
   IconButton,
+  Img,
   ListItem,
   Menu,
   MenuButton,
@@ -61,7 +65,6 @@ import { UserSettings } from 'graphQL/Queries'
 import {
   FaCodeCompare,
   FaEllipsisVertical,
-  FaFileImport,
   FaScrewdriverWrench
 } from 'react-icons/fa6'
 
@@ -211,19 +214,17 @@ const VersionsTable = ({ projectGroup }) => {
     return () => clearInterval(refetchInterval)
   }, [nodes, refetch])
 
-  const getFormat = (creationAt) => {
-    if (creationAt === null) {
-      return 'Manual Build'
-    } else {
+  const getFormat = (index) => {
+    if (index === 0) {
+      return 'Github'
+    } else if (index === 1) {
       return 'External'
-    }
-  }
-
-  const getType = (creationAt) => {
-    if (creationAt === null) {
-      return <FaFileImport />
+    } else if (index === 2) {
+      return 'Github Actions'
+    } else if (index === 3) {
+      return 'Jenkins'
     } else {
-      return <FaScrewdriverWrench />
+      return 'Manual Build'
     }
   }
 
@@ -234,7 +235,7 @@ const VersionsTable = ({ projectGroup }) => {
       id: 'SBOMS_PROJECT_VERSION',
       name: 'VERSION',
       selector: (row, index) => {
-        const { projectVersion, creationAt } = row
+        const { projectVersion } = row
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           sbomid: row.id,
           paramsObj: {
@@ -242,32 +243,46 @@ const VersionsTable = ({ projectGroup }) => {
           }
         })
         return (
-          <Flex alignItems={'flex-center'} my={3}>
-            <Tooltip label={getFormat(creationAt)} placement='top'>
-              <Link to={creationAt ? '#' : '/vendor/requests'}>
-                <IconButton
-                  mr={2}
-                  size='xs'
-                  colorScheme='blue'
-                  icon={getType(creationAt)}
-                  hidden={!shouldShowDemoFeatures}
-                />
-              </Link>
-            </Tooltip>
-            <Link
-              to={link}
-              onClick={() => prodCompDispatch({ type: 'CLEAR_PROD_COMP' })}
-            >
-              <Text
-                className={index === 0 ? 'version' : ''}
-                color={'blue.500'}
-                minWidth='100%'
-                fontSize={14}
+          <Grid
+            my={3}
+            alignItems={'center'}
+            justifyContent={'center'}
+            templateColumns='repeat(12, 1fr)'
+          >
+            <GridItem colSpan={2}>
+              <Tooltip label={getFormat(index)} placement='top'>
+                <Link
+                  to={
+                    index === 1
+                      ? '/vendor/requests'
+                      : 'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
+                  }
+                >
+                  <Img
+                    mr={2}
+                    width={5}
+                    hidden={!shouldShowDemoFeatures}
+                    src={getType(index)}
+                  />
+                </Link>
+              </Tooltip>
+            </GridItem>
+            <GridItem colSpan={10}>
+              <Link
+                to={link}
+                onClick={() => prodCompDispatch({ type: 'CLEAR_PROD_COMP' })}
               >
-                {projectVersion}
-              </Text>
-            </Link>
-          </Flex>
+                <Text
+                  className={index === 0 ? 'version' : ''}
+                  color={'blue.500'}
+                  minWidth='100%'
+                  fontSize={14}
+                >
+                  {projectVersion}
+                </Text>
+              </Link>
+            </GridItem>
+          </Grid>
         )
       },
       width: '13%',

@@ -1,7 +1,12 @@
 // USER IMAGES
 import userOne from 'assets/img/abhi.png'
 import custom from 'assets/img/custom.png'
+import Action from 'assets/img/github-actions.png'
+import GitHub from 'assets/img/github.png'
 import grype from 'assets/img/grype.png'
+import Import from 'assets/img/import.png'
+import Jenkins from 'assets/img/jenkins.png'
+import Build from 'assets/img/manual-build.png'
 import userThree from 'assets/img/rcn.jpg'
 import scout from 'assets/img/scout.png'
 import snyk from 'assets/img/snyk.png'
@@ -51,6 +56,20 @@ import { LetterLIcon } from 'components/Icons/Icons'
 import { FaBalanceScale, FaBox, FaBug, FaCube, FaCubes } from 'react-icons/fa'
 
 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+export const getType = (index) => {
+  if (index === 0) {
+    return GitHub
+  } else if (index === 1) {
+    return Import
+  } else if (index === 2) {
+    return Action
+  } else if (index === 3) {
+    return Jenkins
+  } else {
+    return Build
+  }
+}
 
 export const getConImg = (name) => {
   switch (name) {
