@@ -57,6 +57,7 @@ const SbomTable = ({ data, refetch, loading, error }) => {
             {tabs.map((item, index) => (
               <Tab
                 key={index}
+                className={item}
                 textTransform={'capitalize'}
                 _focus={{ outline: 'none' }}
                 isDisabled={

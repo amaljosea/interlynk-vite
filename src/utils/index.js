@@ -955,8 +955,11 @@ export const tourStyles = {
   }),
   badge: (base) => ({
     ...base,
+    width: 'fit-content',
     backgroundColor: '#3182CE',
-    color: '#fff'
+    color: '#fff',
+    top: '20px',
+    left: '-15px'
   }),
   controls: (base) => ({
     ...base,

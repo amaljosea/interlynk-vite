@@ -106,7 +106,7 @@ const VersionsTable = ({ projectGroup }) => {
   const queryParams = new URLSearchParams(location.search)
   const tab = queryParams.get('tab')
 
-  const { setIsOpen } = useTour()
+  const { setIsOpen, setCurrentStep } = useTour()
 
   const { VERSIONS } = ProductDetailsTabs
   const { nodes, paginationProps, loading, refetch } = usePaginatatedQuery(
@@ -125,7 +125,7 @@ const VersionsTable = ({ projectGroup }) => {
   )
 
   useQuery(UserSettings, {
-    skip: tab !== VERSIONS,
+    skip: tab !== VERSIONS || signedUrlParams,
     onCompleted: (data) => {
       const { productDetailsOnboardingCompleted: hasSeenTour } =
         data?.currentUserSettings || ''
@@ -225,6 +225,14 @@ const VersionsTable = ({ projectGroup }) => {
       return 'Jenkins'
     } else {
       return 'Manual Build'
+    }
+  }
+
+  const onStartTour = () => {
+    if (signedUrlParams) {
+      setIsOpen(false)
+    } else {
+      prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
     }
   }
 

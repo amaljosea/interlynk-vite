@@ -1,4 +1,5 @@
 import { gql, useLazyQuery, useQuery } from '@apollo/client'
+import { useTour } from '@reactour/tour'
 import { useKBar } from 'kbar'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react'
@@ -73,6 +74,7 @@ export default function HeaderLinks(props) {
   const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const params = useParams()
+  const sbomId = params.sbomid
   const { query } = useKBar()
 
   const SERVER_URL = process.env.REACT_APP_SERVER
@@ -174,15 +176,31 @@ export default function HeaderLinks(props) {
 
   const os = detectOS()
 
+  const { setIsOpen, setCurrentStep } = useTour()
+
+  const onStartTour = () => {
+    if (sbomId) {
+      setCurrentStep(3)
+    } else {
+      setCurrentStep(0)
+    }
+    setIsOpen(true)
+  }
+
   return (
     <Flex gap={3} alignItems='center' flexDirection='row'>
       {/* JOIN WAITLIST */}
       {signedUrlParams && (
-        <Link to='https://www.interlynk.io/sign-up' target='_blank'>
-          <Button colorScheme='blue' size='sm'>
-            Sign up
+        <Flex alignItems={'center'} gap={2}>
+          <Button size='sm' onClick={onStartTour}>
+            Start Tour
           </Button>
-        </Link>
+          <Link to='https://www.interlynk.io/sign-up' target='_blank'>
+            <Button className='signup' colorScheme='blue' size='sm'>
+              Sign up
+            </Button>
+          </Link>
+        </Flex>
       )}
       {/* SEARCH */}
       <InputGroup

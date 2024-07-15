@@ -294,7 +294,7 @@ const ProductDetailsMain = () => {
 
   const steps = [
     {
-      selector: '.version',
+      selector: '.versions',
       content: 'SBOM Version Details'
     }
   ]

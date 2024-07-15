@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client'
+import { useTour } from '@reactour/tour'
 import { useParams } from 'react-router-dom'
 
 import { ShareProductData } from 'graphQL/Queries'
@@ -11,8 +12,19 @@ const ProductDetailsSbomNew = () => {
   const productId = params.productid
   const sbomId = params.sbomid
 
+  const { setIsOpen, setCurrentStep } = useTour()
+
   const { data, loading, error, refetch } = useQuery(ShareProductData, {
-    variables: { projectId: productId, sbomId: sbomId }
+    variables: { projectId: productId, sbomId: sbomId },
+    onCompleted: (data) => {
+      const tour = localStorage.getItem('tourCompleted')
+      if (data && !tour) {
+        setTimeout(() => {
+          setCurrentStep(3)
+          setIsOpen(true)
+        }, 2000)
+      }
+    }
   })
 
   return (

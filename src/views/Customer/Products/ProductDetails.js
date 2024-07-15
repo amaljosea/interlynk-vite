@@ -159,88 +159,88 @@ const ProductDetails = () => {
   }
 
   return (
-    <>
-      <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
-        {/* INFO SECTION */}
-        <Card display={data ? 'block' : 'none'}>
-          <CardBody>
-            <Grid
-              width={'100%'}
-              templateColumns='repeat(12, 1fr)'
-              alignItems={'top'}
-              gap={10}
-            >
-              {/* PRODUCT INFORMATIONS */}
-              <GridItem colSpan={10}>
+    <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
+      {/* INFO SECTION */}
+      <Card display={data ? 'block' : 'none'}>
+        <CardBody>
+          <Grid
+            width={'100%'}
+            templateColumns='repeat(12, 1fr)'
+            alignItems={'top'}
+            gap={10}
+          >
+            {/* PRODUCT INFORMATIONS */}
+            <GridItem colSpan={10}>
+              <Flex
+                gap={5}
+                width={'100%'}
+                direction={'row'}
+                alignItems={'flex-start'}
+              >
+                <Icon
+                  h={'64px'}
+                  w={'64px'}
+                  color='blue.300'
+                  as={FaWindowMaximize}
+                />
                 <Flex
-                  direction={'row'}
-                  alignItems={'flex-start'}
-                  gap={5}
-                  width={'100%'}
+                  gap={0.5}
+                  direction={'column'}
+                  className='product_details'
                 >
-                  <Icon
-                    as={FaWindowMaximize}
-                    h={'64px'}
-                    w={'64px'}
-                    color='blue.300'
-                  />
-                  <Flex direction={'column'} gap={0.5}>
-                    {/* PRODUCT TITLE */}
-                    <Stack direction={'column'} spacing={1} alignItems={'left'}>
-                      <Text fontWeight={'semibold'} fontSize={25}>
-                        {name || ''}
-                      </Text>
-                    </Stack>
-                    {/* PRODUCT DESCRIPTION */}
-                    <Text fontSize={'sm'}>{description || ''}</Text>
-                  </Flex>
+                  {/* PRODUCT TITLE */}
+                  <Text fontWeight={'semibold'} fontSize={25}>
+                    {name || ''}
+                  </Text>
+                  {/* PRODUCT DESCRIPTION */}
+                  <Text fontSize={'sm'}>{description || ''}</Text>
                 </Flex>
-              </GridItem>
-              {/* PRODUCT ACTIONS */}
-              <GridItem colSpan={2}></GridItem>
-            </Grid>
-          </CardBody>
-        </Card>
-        {/* TAB SECTION */}
-        <Card display={data ? 'block' : 'none'}>
-          <CardBody>
-            <Tabs
-              variant='enclosed'
-              w={'100%'}
-              bg={'white'}
-              index={activeCsProdTab}
-              onChange={(value) => handleTabChange(value)}
-            >
-              <TabList>
-                {tabs.map((item, index) => (
-                  <Tab
-                    key={index}
-                    _focus={{ outline: 'none' }}
-                    textTransform={'capitalize'}
-                    isDisabled={item === 'versions' ? false : true}
-                  >
-                    {item !== 'versions' && (
-                      <FaLock color='darkgray' style={{ marginRight: '6px' }} />
-                    )}
-                    {item}
-                  </Tab>
-                ))}
-              </TabList>
-              <TabPanels>
-                {/* VERSIONS */}
-                <TabPanel px={0}>
-                  <VersionsTable
-                    productId={activeEnv}
-                    projectGroup={projectGroup}
-                    getVulnData={vulnRefetch}
-                  />
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
-          </CardBody>
-        </Card>
-      </Flex>
-    </>
+              </Flex>
+            </GridItem>
+            {/* PRODUCT ACTIONS */}
+            <GridItem colSpan={2}></GridItem>
+          </Grid>
+        </CardBody>
+      </Card>
+      {/* TAB SECTION */}
+      <Card display={data ? 'block' : 'none'}>
+        <CardBody>
+          <Tabs
+            variant='enclosed'
+            w={'100%'}
+            bg={'white'}
+            index={activeCsProdTab}
+            onChange={(value) => handleTabChange(value)}
+          >
+            <TabList>
+              {tabs.map((item, index) => (
+                <Tab
+                  key={index}
+                  _focus={{ outline: 'none' }}
+                  textTransform={'capitalize'}
+                  isDisabled={item === 'versions' ? false : true}
+                >
+                  {item !== 'versions' && (
+                    <FaLock color='darkgray' style={{ marginRight: '6px' }} />
+                  )}
+                  {item}
+                </Tab>
+              ))}
+            </TabList>
+            <TabPanels>
+              {/* VERSIONS */}
+              <TabPanel px={0}>
+                <VersionsTable
+                  productId={activeEnv}
+                  projectGroup={projectGroup}
+                  getVulnData={vulnRefetch}
+                />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </CardBody>
+      </Card>
+    </Flex>
   )
 }
 

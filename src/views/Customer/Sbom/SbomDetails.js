@@ -153,14 +153,15 @@ const SbomDetails = ({ sbomData, refetch }) => {
           onClick={handleRelationView}
           cursor={'pointer'}
         />
-        <Flex direction={'column'} gap={0.5}>
+        <Flex direction={'column'} gap={0.5} className='version'>
           {/* PRODUCT TITLE */}
-          <Stack direction={'column'} spacing={1} alignItems={'left'}>
+          <Stack spacing={1} direction={'column'} alignItems={'left'}>
             {projectId && partsContext.latestPart && (
               <Link to={partsContext.latestPart.url} onClick={handlePart}>
                 <HStack>
                   <FaAngleLeft size={18} color='#3182CE' />
                   <Text
+                    width={'fit-content'}
                     fontWeight={'semibold'}
                     fontSize={18}
                     color={'blue.500'}
@@ -177,7 +178,7 @@ const SbomDetails = ({ sbomData, refetch }) => {
               flexWrap={'wrap'}
               gap={2}
             >
-              <Text fontWeight={'semibold'} fontSize={25}>
+              <Text fontWeight={'semibold'} fontSize={25} width={'fit-content'}>
                 {project?.projectGroup?.name}
               </Text>
             </Flex>

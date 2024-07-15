@@ -21,9 +21,6 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import InfoModal from 'components/InfoModal'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-import { useHasPermission } from 'hooks/useHasPermission'
-
 const InfoLabel = ({ title, onClick }) => {
   return (
     <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
@@ -41,13 +38,6 @@ const InfoLabel = ({ title, onClick }) => {
 const General = ({ data, loading, error }) => {
   const { suppliers, licensesExp, licenses, authors, creationAt, tools } =
     data || ''
-
-  const { userPermissions } = useGlobalState()
-
-  const updateComponent = useHasPermission({
-    parentKey: 'view_sbom',
-    childKey: 'update_sbom_components'
-  })
 
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
