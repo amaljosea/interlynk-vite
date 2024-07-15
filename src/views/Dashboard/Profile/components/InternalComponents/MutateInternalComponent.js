@@ -23,8 +23,7 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import { updateOrgComp } from 'graphQL/Mutation'
-import { createOrgComp } from 'graphQL/Mutation'
+import { createOrgComp, updateOrgComp } from 'graphQL/Mutation'
 import { getInternalComponents } from 'graphQL/Queries'
 
 import { TextRegex } from './TestRegex'
@@ -38,7 +37,9 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
   const [matchStr, setMatchStr] = useState(internalComponent?.matchStr || '')
   const [errorText, setErrorText] = useState(null)
   const [ignoreCase, setIgnoreCase] = useState(!!internalComponent?.ignoreCase)
-  const [enabled, setEnabled] = useState(!!internalComponent?.enabled)
+  const [enabled, setEnabled] = useState(
+    isEdit ? !!internalComponent?.enabled : true
+  )
   const toast = useToast()
   const mutateText = isEdit ? 'Update' : 'Tag'
 

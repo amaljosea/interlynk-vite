@@ -119,7 +119,6 @@ export const InternalComponents = () => {
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.createdAt)} placement={'top'}>
           <Text color={textColor} my={2}>
-            {row.createdBy} <br />
             {timeSince(row.createdAt)}
           </Text>
         </Tooltip>
@@ -131,7 +130,6 @@ export const InternalComponents = () => {
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           <Text color={textColor} my={2}>
-            {row.lastUpdatedBy} <br />
             {timeSince(row.updatedAt)}
           </Text>
         </Tooltip>
