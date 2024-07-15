@@ -111,9 +111,10 @@ const SbomDetails = ({ sbomData, refetch }) => {
       const { sbomDetailsOnboardingCompleted: hasSeenTour } =
         data?.currentUserSettings || ''
       if (!hasSeenTour) {
-        setTimeout(() => {
-          setIsOpen(true)
-        }, 1000)
+        // Disable for production release
+        // setTimeout(() => {
+        //  setIsOpen(true)
+        //}, 1000)
       }
     }
   })
