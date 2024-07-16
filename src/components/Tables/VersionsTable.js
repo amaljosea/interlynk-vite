@@ -134,9 +134,9 @@ const VersionsTable = ({ projectGroup, retentionTime }) => {
       const { productDetailsOnboardingCompleted: hasSeenTour } =
         data?.currentUserSettings || ''
       if (!hasSeenTour) {
-        setTimeout(() => {
-          setIsOpen(true)
-        }, 1000)
+        // setTimeout(() => {
+        //  setIsOpen(true)
+        // }, 1000)
       }
     }
   })
