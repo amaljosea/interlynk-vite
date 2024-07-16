@@ -53,7 +53,7 @@ export default function AdminNavbar(props) {
       color: textColor,
       border: 'none',
       height: '20px',
-      maxWidth: '130px',
+      maxWidth: '200px',
       padding: 0,
       cursor: 'pointer',
       backgroundColor: btnBgColor,
@@ -97,7 +97,21 @@ export default function AdminNavbar(props) {
       '&:hover': {
         color: textColor
       }
-    })
+    }),
+    dropdownIndicator: (provided) => {
+      return {
+        ...provided,
+        paddingLeft: '0px',
+        paddingRight: '4px'
+      }
+    },
+    valueContainer: (provided) => {
+      return {
+        ...provided,
+        paddingRight: '0px',
+        paddingLeft: '4px'
+      }
+    }
   }
 
   useQuery(GetUserPermissions, {

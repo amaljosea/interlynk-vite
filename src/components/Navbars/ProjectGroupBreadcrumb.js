@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Select from 'react-select'
 
 import { useDebounce } from 'hooks/useDebounce'
@@ -12,9 +12,12 @@ import { GetProjectGroupDetails } from 'graphQL/Queries'
 
 const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
   const navigate = useNavigate()
+  const location = useLocation()
 
   const { orgView } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
+
   const [searchInput, setSearchInput] = useState('')
   const [products, setProducts] = useState([])
   const [totalCount, setTotalCount] = useState(null)
@@ -62,7 +65,13 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
     return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
   }
 
-  if (products && totalCount > 1) {
+  if (path === 'customer' && projectGroupName) {
+    return (
+      <Link to={generateProductDetailPageUrlFromCurrentUrl()}>
+        {filterText(projectGroupName)}
+      </Link>
+    )
+  } else if (products && totalCount > 1) {
     return (
       <Select
         options={products}

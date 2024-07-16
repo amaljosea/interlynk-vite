@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Select from 'react-select'
 
 import { useDebounce } from 'hooks/useDebounce'
@@ -13,6 +13,9 @@ const VersionBreadcrumb = ({ selectStyles }) => {
   const navigate = useNavigate()
   const { sbomHookData, orgView } = useGlobalQueryContext()
   const params = useParams()
+  const location = useLocation()
+
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
@@ -56,7 +59,13 @@ const VersionBreadcrumb = ({ selectStyles }) => {
     })
     navigate(link)
   }
-
+  if (path === 'customer' && sbomHookData.versionName) {
+    return (
+      <Link to={generateProductVersionDetailPageUrlFromCurrentUrl()}>
+        {filterText(sbomHookData.versionName)}
+      </Link>
+    )
+  }
   if (versions && totalCount > 1) {
     return (
       <Select
