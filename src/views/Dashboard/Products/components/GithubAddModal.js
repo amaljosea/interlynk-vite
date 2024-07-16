@@ -78,6 +78,7 @@ const GithubAddModal = ({ isOpen, onClose }) => {
   const [projectLoading, setProjectLoading] = useState({})
   const [buttonLoading, setButtonLoading] = useState(false)
   const [selectedProjects, setSelectedProjects] = useState({})
+  const [selectAll, setSelectAll] = useState(false)
   const [importOptions, setImportOptions] = useState({})
   const [projectGroupCreate] = useMutation(CreateProjectGroup)
 
@@ -99,17 +100,39 @@ const GithubAddModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen])
 
+  useEffect(() => {
+    if (selectAll) {
+      const allSelected = {}
+      projects.forEach((project) => {
+        allSelected[project.name] = true
+      })
+      setSelectedProjects(allSelected)
+    } else {
+      setSelectedProjects({})
+      setImportOptions({})
+    }
+  }, [selectAll])
+
   const handleProjectCheckboxChange = (projectName) => {
-    setSelectedProjects((prev) => ({
-      ...prev,
-      [projectName]: !prev[projectName]
-    }))
+    setSelectedProjects((prev) => {
+      const newSelectedProjects = { ...prev, [projectName]: !prev[projectName] }
+      if (!newSelectedProjects[projectName]) {
+        const newImportOptions = { ...importOptions }
+        delete newImportOptions[projectName]
+        setImportOptions(newImportOptions)
+      }
+      return newSelectedProjects
+    })
   }
 
   const handleImportCheckboxChange = (projectName) => {
     setImportOptions((prev) => ({
       ...prev,
       [projectName]: !prev[projectName]
+    }))
+    setSelectedProjects((prev) => ({
+      ...prev,
+      [projectName]: true
     }))
   }
 
@@ -155,58 +178,69 @@ const GithubAddModal = ({ isOpen, onClose }) => {
           {initialLoading ? (
             <LoadingSkeleton />
           ) : (
-            projects.map((project) => (
-              <Box
-                key={project.name}
-                mb={2}
-                p={4}
-                border='1px'
-                borderColor='gray.200'
-                borderRadius='md'
-                _hover={{ backgroundColor: 'gray.50' }}
-                backgroundColor={
-                  selectedProjects[project.name] ? 'gray.100' : 'white'
-                }
+            <>
+              <Checkbox
+                isChecked={selectAll}
+                onChange={() => setSelectAll(!selectAll)}
+                mb={4}
               >
-                <Flex justify='space-between' align='center'>
-                  <Flex align='center' flex={1}>
-                    <Checkbox
-                      mr={2}
-                      isChecked={selectedProjects[project.name] || false}
-                      onChange={() => handleProjectCheckboxChange(project.name)}
-                    >
-                      <Flex align='center'>
-                        <FaCodeBranch style={{ marginRight: '8px' }} />
-                        <Text fontWeight='semibold'>{project.name}</Text>
-                      </Flex>
-                    </Checkbox>
+                Select All
+              </Checkbox>
+              {projects.map((project) => (
+                <Box
+                  key={project.name}
+                  mb={2}
+                  p={4}
+                  border='1px'
+                  borderColor='gray.200'
+                  borderRadius='md'
+                  _hover={{ backgroundColor: 'gray.50' }}
+                  backgroundColor={
+                    selectedProjects[project.name] ? 'gray.100' : 'white'
+                  }
+                >
+                  <Flex justify='space-between' align='end'>
+                    <Flex align='center' flex={1}>
+                      <Checkbox
+                        mr={2}
+                        isChecked={selectedProjects[project.name] || false}
+                        onChange={() =>
+                          handleProjectCheckboxChange(project.name)
+                        }
+                      >
+                        <Flex align='center'>
+                          <FaCodeBranch style={{ marginRight: '8px' }} />
+                          <Text fontWeight='semibold'>{project.name}</Text>
+                        </Flex>
+                      </Checkbox>
+                    </Flex>
+                    <Flex flex={1} justify='center'>
+                      {!projectLoading[project.name] && (
+                        <Text fontSize={14}>{project.label}</Text>
+                      )}
+                    </Flex>
+                    <Flex flex={1} justify='flex-end' align='center'>
+                      {projectLoading[project.name] ? (
+                        <Spinner size='sm' />
+                      ) : (
+                        project.checkboxLabel && (
+                          <Checkbox
+                            mt={2}
+                            isChecked={importOptions[project.name] || false}
+                            onChange={() =>
+                              handleImportCheckboxChange(project.name)
+                            }
+                            size='sm'
+                          >
+                            <Text fontSize={14}>{project.checkboxLabel}</Text>
+                          </Checkbox>
+                        )
+                      )}
+                    </Flex>
                   </Flex>
-                  <Flex flex={1} justify='center'>
-                    {!projectLoading[project.name] && (
-                      <Text fontSize={14}>{project.label}</Text>
-                    )}
-                  </Flex>
-                  <Flex flex={1} justify='flex-end' align='center'>
-                    {projectLoading[project.name] ? (
-                      <Spinner size='sm' />
-                    ) : (
-                      project.checkboxLabel && (
-                        <Checkbox
-                          mt={2}
-                          isChecked={importOptions[project.name] || false}
-                          onChange={() =>
-                            handleImportCheckboxChange(project.name)
-                          }
-                          size='sm'
-                        >
-                          <Text fontSize={14}>{project.checkboxLabel}</Text>
-                        </Checkbox>
-                      )
-                    )}
-                  </Flex>
-                </Flex>
-              </Box>
-            ))
+                </Box>
+              ))}
+            </>
           )}
         </ModalBody>
         <ModalFooter>
