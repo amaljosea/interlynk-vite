@@ -1,24 +1,28 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { differenceInDays, parseISO } from 'date-fns'
+import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
-import { getType } from 'utils'
+import {
+  customStyles,
+  getFormat,
+  getFullDateAndTime,
+  getType,
+  timeSince
+} from 'utils'
+import { getLink } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { RepeatIcon, WarningIcon } from '@chakra-ui/icons'
+import { RepeatIcon } from '@chakra-ui/icons'
 import {
-  Badge,
   Button,
   Flex,
   Grid,
   GridItem,
   IconButton,
-  Img,
   ListItem,
   Menu,
   MenuButton,
@@ -70,7 +74,13 @@ import {
   FaScrewdriverWrench
 } from 'react-icons/fa6'
 
-const VersionsTable = ({ projectGroup, retentionTime }) => {
+const VersionsTable = ({
+  handleSort,
+  projectGroup,
+  retentionTime,
+  filters,
+  setFilters
+}) => {
   const navigate = useNavigate()
   const params = useParams()
   const productId = params.productid
@@ -96,11 +106,6 @@ const VersionsTable = ({ projectGroup, retentionTime }) => {
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-
-  const [filters, setFilters] = useState({
-    field: 'SBOMS_CREATED_AT',
-    direction: 'DESC'
-  })
 
   const [getAlternatives, { data: sbomAlts }] = useLazyQuery(
     signedUrlParams ? GetShareSbomAlternatives : GetSbomAlternatives
@@ -218,20 +223,6 @@ const VersionsTable = ({ projectGroup, retentionTime }) => {
     return () => clearInterval(refetchInterval)
   }, [nodes, refetch])
 
-  const getFormat = (index) => {
-    if (index === 0) {
-      return 'Github'
-    } else if (index === 1) {
-      return 'External'
-    } else if (index === 2) {
-      return 'Github Actions'
-    } else if (index === 3) {
-      return 'Jenkins'
-    } else {
-      return 'Manual Build'
-    }
-  }
-
   const onStartTour = () => {
     if (signedUrlParams) {
       setIsOpen(false)
@@ -240,7 +231,7 @@ const VersionsTable = ({ projectGroup, retentionTime }) => {
     }
   }
 
-  const retention = retentionTime && Math.floor(retentionTime) // Convert to integer
+  const retention = retentionTime && Math.floor(retentionTime)
 
   // COLUMNS
   const columns = [
@@ -251,6 +242,7 @@ const VersionsTable = ({ projectGroup, retentionTime }) => {
       selector: (row, index) => {
         const { projectVersion, creationAt } = row
         const parsedCreationDate = creationAt && parseISO(creationAt)
+        const endDate = addDays(parsedCreationDate, retention)
         const difference = differenceInDays(currentDate, parsedCreationDate)
         const showWarning = difference > retention
         const expired = retention !== 0 && showWarning === true
@@ -263,24 +255,34 @@ const VersionsTable = ({ projectGroup, retentionTime }) => {
         return (
           <Grid
             my={3}
+            gap={1}
             alignItems={'center'}
             justifyContent={'center'}
-            templateColumns='repeat(12, 1fr)'
+            templateColumns='repeat(7, 1fr)'
           >
-            <GridItem colSpan={2} hidden={!shouldShowDemoFeatures}>
-              <Tooltip label={getFormat(index)} placement='top'>
-                <Link
-                  to={
-                    index === 1
-                      ? '/vendor/requests'
-                      : 'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
-                  }
-                >
-                  <Img mr={2} width={5} src={getType(index)} />
+            <GridItem
+              colSpan={1}
+              width={'40px'}
+              hidden={!shouldShowDemoFeatures}
+            >
+              <Tooltip label={getFormat(projectVersion)} placement='top'>
+                <Link target='_blank' to={getLink(projectVersion)}>
+                  <IconButton
+                    size='sm'
+                    isRound={true}
+                    variant='solid'
+                    colorScheme='blue'
+                    icon={getType(projectVersion)}
+                  />
                 </Link>
               </Tooltip>
             </GridItem>
-            <GridItem colSpan={10}>
+            <GridItem
+              colSpan={6}
+              display={'flex'}
+              flexWrap={'wrap'}
+              flexDirection={'column'}
+            >
               <Link to={link} onClick={onStartTour}>
                 <Text
                   className={index === 0 ? 'versions' : ''}
@@ -292,15 +294,16 @@ const VersionsTable = ({ projectGroup, retentionTime }) => {
                 </Text>
               </Link>
               {expired && !signedUrlParams && (
-                <Badge mt={1.5} colorScheme='red' cursor={'pointer'}>
-                  Expired
-                </Badge>
+                <Text fontSize='xs' mt={1} color='#F56565' cursor={'pointer'}>
+                  Marked for deletion on{' '}
+                  {endDate ? new Date(endDate).toLocaleDateString() : ''}
+                </Text>
               )}
             </GridItem>
           </Grid>
         )
       },
-      width: '13%',
+      width: '15%',
       wrap: true,
       sortable: true
     },
@@ -512,12 +515,15 @@ const VersionsTable = ({ projectGroup, retentionTime }) => {
     setSelectedSbom(state?.selectedRows)
   }
 
-  const setSearchFilter = (value) => {
-    setFilters((oldFilter) => ({
-      ...oldFilter,
-      search: value
-    }))
-  }
+  const setSearchFilter = useCallback(
+    (value) => {
+      setFilters((oldFilter) => ({
+        ...oldFilter,
+        search: value
+      }))
+    },
+    [setFilters]
+  )
 
   // CLEAR SERACH
   const handleClear = useCallback(async () => {
@@ -526,7 +532,7 @@ const VersionsTable = ({ projectGroup, retentionTime }) => {
       ...oldFilter,
       search: undefined
     }))
-  }, [])
+  }, [setFilters])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -542,15 +548,18 @@ const VersionsTable = ({ projectGroup, retentionTime }) => {
   )
 
   // SEARCH COMPONENT
-  const handleSearch = useCallback((event) => {
-    const {
-      key,
-      target: { value }
-    } = event
-    if (key === 'Enter' && value !== '') {
-      setSearchFilter(value)
-    }
-  }, [])
+  const handleSearch = useCallback(
+    (event) => {
+      const {
+        key,
+        target: { value }
+      } = event
+      if (key === 'Enter' && value !== '') {
+        setSearchFilter(value)
+      }
+    },
+    [setSearchFilter]
+  )
 
   const subHeaderComponent = useMemo(() => {
     return (
@@ -626,14 +635,6 @@ const VersionsTable = ({ projectGroup, retentionTime }) => {
     handleRefresh
   ])
 
-  const handleSort = (column, sortDirection) => {
-    setFilters((oldFilters) => ({
-      ...oldFilters,
-      field: column?.id,
-      direction: sortDirection.toUpperCase()
-    }))
-  }
-
   const disableRowCheckBox = (row) => {
     if (selectedSbom.length >= 2) {
       return !selectedSbom.some((selectedRow) => selectedRow.id === row.id)
@@ -646,8 +647,8 @@ const VersionsTable = ({ projectGroup, retentionTime }) => {
     data: nodes || [],
     customStyles: customStyles(headColor),
     onSort: handleSort,
-    defaultSortFieldId: versionState?.field,
-    defaultSortAsc: false,
+    defaultSortFieldId: filters?.field,
+    defaultSortAsc: filters?.direction === 'ASC',
     subHeader: true,
     subHeaderComponent: subHeaderComponent,
     progressPending: loading,

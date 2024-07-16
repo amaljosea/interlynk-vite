@@ -47,6 +47,7 @@ import RpmIcon from 'assets/svg/rpm.png'
 import SwidIcon from 'assets/svg/swid.png'
 import SwiftIcon from 'assets/svg/swift.png'
 import { PackageURL } from 'packageurl-js'
+import { sbomOrigin } from 'variables/general'
 
 import { LetterCIcon } from 'components/Icons/Icons'
 import { LetterHIcon } from 'components/Icons/Icons'
@@ -54,20 +55,51 @@ import { LetterMIcon } from 'components/Icons/Icons'
 import { LetterLIcon } from 'components/Icons/Icons'
 
 import { FaBalanceScale, FaBox, FaBug, FaCube, FaCubes } from 'react-icons/fa'
+import {
+  FaA,
+  FaFileImport,
+  FaGithub,
+  FaScrewdriverWrench,
+  FaUserAstronaut
+} from 'react-icons/fa6'
 
 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
-export const getType = (index) => {
-  if (index === 0) {
-    return GitHub
-  } else if (index === 1) {
-    return Import
-  } else if (index === 2) {
-    return Action
-  } else if (index === 3) {
-    return Jenkins
+export const getLink = (name) => {
+  const result = sbomOrigin?.find((item) => item.value === name)
+  const { link } = result || ''
+  return link || ''
+}
+
+export const getType = (name) => {
+  const result = sbomOrigin?.find((item) => item.value === name)
+  const { origin } = result || ''
+  if (origin === 'github') {
+    return <FaGithub />
+  } else if (origin === 'external') {
+    return <FaFileImport />
+  } else if (origin === 'actions') {
+    return <FaA />
+  } else if (origin === 'jenkins') {
+    return <FaUserAstronaut />
   } else {
-    return Build
+    return <FaScrewdriverWrench />
+  }
+}
+
+export const getFormat = (name) => {
+  const result = sbomOrigin?.find((item) => item.value === name)
+  const { origin } = result || ''
+  if (origin === 'github') {
+    return 'Github'
+  } else if (origin === 'external') {
+    return 'External'
+  } else if (origin === 'actions') {
+    return 'Github Actions'
+  } else if (origin === 'jenkins') {
+    return 'Jenkins'
+  } else if (origin === 'manual') {
+    return 'Manual Build'
   }
 }
 
@@ -943,23 +975,28 @@ export const isUnknown = (cpes, purl) => {
 export const tourStyles = {
   popover: (base) => ({
     ...base,
-    borderRadius: '5px',
+    background: '#2B6CB0',
     fontSize: '14px',
-    color: '#2D3748'
+    color: 'white'
   }),
   close: (base) => ({
     ...base,
     top: '12px',
     right: '12px',
-    color: '#2D3748'
+    color: 'white'
   }),
   badge: (base) => ({
     ...base,
+    fontWeight: 'bold',
     width: 'fit-content',
-    backgroundColor: '#3182CE',
-    color: '#fff',
+    backgroundColor: 'white',
+    color: '#3182CE',
     top: '20px',
     left: '-15px'
+  }),
+  dot: (base, state) => ({
+    ...base,
+    backgroundColor: state.current ? '#EBF8FF' : 'none'
   }),
   controls: (base) => ({
     ...base,

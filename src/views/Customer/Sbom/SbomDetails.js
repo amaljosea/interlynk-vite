@@ -153,7 +153,7 @@ const SbomDetails = ({ sbomData, refetch }) => {
           onClick={handleRelationView}
           cursor={'pointer'}
         />
-        <Flex direction={'column'} gap={0.5} className='version'>
+        <Flex direction={'column'} gap={0.5}>
           {/* PRODUCT TITLE */}
           <Stack spacing={1} direction={'column'} alignItems={'left'}>
             {projectId && partsContext.latestPart && (

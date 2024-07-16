@@ -75,11 +75,11 @@ export default function HeaderLinks(props) {
   const queryParams = new URLSearchParams(location.search)
   const params = useParams()
   const sbomId = params.sbomid
+  const productId = params.productid
   const { query } = useKBar()
 
   const SERVER_URL = process.env.REACT_APP_SERVER
 
-  const productId = params.productid
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
 
   const { colorMode, toggleColorMode, setColorMode } = useColorMode()
@@ -180,6 +180,7 @@ export default function HeaderLinks(props) {
 
   const onStartTour = () => {
     localStorage.setItem('tourCompleted', false)
+    document.body.classList.add('no-scroll')
     if (sbomId) {
       setCurrentStep(3)
     } else {
@@ -192,11 +193,11 @@ export default function HeaderLinks(props) {
     <Flex gap={3} alignItems='center' flexDirection='row'>
       {/* JOIN WAITLIST */}
       {signedUrlParams && (
-        <Flex alignItems={'center'} gap={2}>
-          <Button size='sm' onClick={onStartTour}>
+        <Flex alignItems={'center'} gap={3}>
+          <Button size='sm' onClick={onStartTour} hidden={!productId}>
             Start Tour
           </Button>
-          <Link to='https://www.interlynk.io/sign-up' target='_blank'>
+          <Link to='https://app.interlynk.io/register' target='_blank'>
             <Button className='signup' colorScheme='blue' size='sm'>
               Sign up
             </Button>

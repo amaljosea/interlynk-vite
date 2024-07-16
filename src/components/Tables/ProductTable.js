@@ -1,11 +1,9 @@
 import { useMutation, useQuery } from '@apollo/client'
-import Github from 'assets/img/github.png'
-import Build from 'assets/img/manual-build.png'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
-import { customStyles } from 'utils'
+import { customStyles, getFormat, getLink, getType } from 'utils'
 import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
@@ -21,7 +19,6 @@ import {
   Grid,
   GridItem,
   IconButton,
-  Img,
   ListItem,
   Menu,
   MenuButton,
@@ -58,12 +55,7 @@ import { DeleteProjectGroup } from 'graphQL/Mutation'
 import { GetSharelynks } from 'graphQL/Queries'
 
 import { FaEllipsisV, FaGithub } from 'react-icons/fa'
-import {
-  FaCode,
-  FaInbox,
-  FaScrewdriverWrench,
-  FaSquareArrowUpRight
-} from 'react-icons/fa6'
+import { FaCode, FaInbox, FaSquareArrowUpRight } from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
 
@@ -307,14 +299,6 @@ const ProductTable = ({
     onOpen
   ])
 
-  const getType = (index) => {
-    if (index === 0) {
-      return Github
-    } else {
-      return Build
-    }
-  }
-
   // COLUMNS
   const columns = [
     // ACTIVE
@@ -344,7 +328,7 @@ const ProductTable = ({
     {
       id: 'PROJECT_GROUPS_NAME',
       name: 'PRODUCT',
-      selector: (row, index) => {
+      selector: (row) => {
         const { id, name, projects, defaultProject, description } = row
         const handleClick = () => {
           setClearSelect(true)
@@ -368,47 +352,48 @@ const ProductTable = ({
         return (
           <Grid
             my={3}
+            gap={1}
             alignItems={'center'}
             justifyContent={'center'}
-            templateColumns='repeat(12, 1fr)'
+            templateColumns='repeat(7, 1fr)'
           >
-            <GridItem colSpan={2} hidden={!shouldShowDemoFeatures}>
-              <Tooltip
-                label={index === 0 ? 'Github' : 'Manual Build'}
-                placement='top'
-              >
-                <Link
-                  target='_blank'
-                  to={
-                    'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
-                  }
-                >
-                  <Img mr={2} width={5} src={getType(index)} />
+            <GridItem
+              colSpan={1}
+              width={'40px'}
+              hidden={!shouldShowDemoFeatures}
+            >
+              <Tooltip label={getFormat(name)} placement='top'>
+                <Link target='_blank' to={getLink(name)}>
+                  <IconButton
+                    size='sm'
+                    isRound={true}
+                    variant='solid'
+                    colorScheme='blue'
+                    icon={getType(name)}
+                  />
                 </Link>
               </Tooltip>
             </GridItem>
-            <GridItem colSpan={10}>
-              <Stack direction='column' alignItems={'flex-start'} spacing={1}>
-                <Text
-                  fontSize={14}
-                  color={'blue.500'}
-                  minWidth='100%'
-                  fontWeight={'medium'}
-                  onClick={handleClick}
-                  cursor={'pointer'}
-                >
-                  {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
-                </Text>
-                <Text color={textColor}>
-                  {description?.length > 50
-                    ? description.substring(0, 50) + '....'
-                    : description}
-                </Text>
-              </Stack>
+            <GridItem gap={1} colSpan={6}>
+              <Text
+                fontSize={14}
+                color={'blue.500'}
+                fontWeight={'medium'}
+                onClick={handleClick}
+                cursor={'pointer'}
+              >
+                {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
+              </Text>
+              <Text color={textColor}>
+                {description?.length > 50
+                  ? description.substring(0, 50) + '....'
+                  : description}
+              </Text>
             </GridItem>
           </Grid>
         )
       },
+      width: '20%',
       wrap: true,
       sortable: true
     },

@@ -743,13 +743,7 @@ const Checks = () => {
             )}
 
             {status === 'ignored' && (
-              <Button
-                size='sm'
-                width={'74px'}
-                fontSize={'xs'}
-                variant='solid'
-                colorScheme='blackAlpha'
-              >
+              <Button size='sm' width={'74px'} fontSize={'xs'} variant='solid'>
                 Ignored
               </Button>
             )}

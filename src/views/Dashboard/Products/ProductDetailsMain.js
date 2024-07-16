@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { TourProvider } from '@reactour/tour'
+import { differenceInDays, parseISO } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { tourStyles } from 'utils'
@@ -59,10 +60,12 @@ import {
   GetProjectPolicies,
   GetProjectSettings
 } from 'graphQL/Queries'
+import { GetVersionsDate } from 'graphQL/Queries'
 
 import { FaBug, FaRobot, FaTag } from 'react-icons/fa'
 import {
   FaBoxArchive,
+  FaExclamation,
   FaPenToSquare,
   FaToggleOff,
   FaToggleOn,
@@ -110,6 +113,9 @@ const ProductDetailsMain = () => {
     'change log'
   ]
 
+  const [warning, setWarning] = useState(false)
+  const [exceedingCount, setExceedingCount] = useState(0)
+
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const onTabChange = (value) => {
@@ -126,19 +132,8 @@ const ProductDetailsMain = () => {
   const tab = queryParams[0].get('tab')
   const activeTabNumber = Math.max(tabs.indexOf(tab), 0)
 
-  const { prodVulnState, dispatch } = useGlobalState()
+  const { dispatch } = useGlobalState()
 
-  const {
-    searchInput: vulnSearch,
-    severities,
-    components,
-    statues,
-    source,
-    kev,
-    epss,
-    direct,
-    vexComplete
-  } = prodVulnState
   const { prodVulnDispatch } = dispatch
   const environment = localStorage.getItem('environment')
   const [activeEnv, setActiveEnv] = useState(productId || '')
@@ -182,6 +177,39 @@ const ProductDetailsMain = () => {
     internalCompMatchingEnabled,
     automatedFixesEnabled
   } = projectSetting || ''
+
+  const [versionFilters, setVersionFilters] = useState({
+    field: 'SBOMS_CREATED_AT',
+    direction: 'DESC'
+  })
+
+  const { data: versions } = useQuery(GetVersionsDate, {
+    skip: signedUrlParams,
+    fetchPolicy: 'network-only',
+    variables: {
+      first: 25,
+      id: productId,
+      ...versionFilters
+    }
+  })
+
+  const { nodes: versionDates } = versions?.project?.sbomVersions || ''
+
+  useEffect(() => {
+    if (versionDates && dataRetentionDays) {
+      const currentDate = new Date()
+      const retentionTimeInt = Math.floor(dataRetentionDays)
+      const exceedingItems = versionDates?.filter((item) => {
+        const creationDate = parseISO(item?.creationAt)
+        const difference = differenceInDays(currentDate, creationDate)
+        return difference > retentionTimeInt
+      })
+      setExceedingCount(exceedingItems?.length)
+      setWarning(exceedingItems?.length > 0)
+    } else {
+      setWarning(false)
+    }
+  }, [dataRetentionDays, versionDates])
 
   // GET VULN DATA
   const [filters, setFilters] = useState({
@@ -285,6 +313,14 @@ const ProductDetailsMain = () => {
     }
   }, [data, environment])
 
+  const handleSort = (column, sortDirection) => {
+    setVersionFilters((oldFilters) => ({
+      ...oldFilters,
+      field: column?.id,
+      direction: sortDirection.toUpperCase()
+    }))
+  }
+
   if (loading) {
     return (
       <Card>
@@ -372,6 +408,20 @@ const ProductDetailsMain = () => {
                         label={'Automation'}
                         settings={automatedFixesEnabled}
                       />
+                      {warning && (
+                        <Tooltip
+                          label={`${exceedingCount} SBOMs are marked from deletion in the next 7 days`}
+                        >
+                          <IconButton
+                            size='xs'
+                            colorScheme={'red'}
+                            icon={<FaExclamation />}
+                            onClick={() =>
+                              handleSort({ id: 'SBOMS_CREATED_AT' }, 'desc')
+                            }
+                          />
+                        </Tooltip>
+                      )}
                     </Stack>
                   </Flex>
                 </Flex>
@@ -456,7 +506,10 @@ const ProductDetailsMain = () => {
                 {/* VERSIONS */}
                 <TabPanel px={0}>
                   <VersionsTable
+                    handleSort={handleSort}
+                    filters={versionFilters}
                     projectGroup={projectGroup}
+                    setFilters={setVersionFilters}
                     retentionTime={dataRetentionDays}
                   />
                 </TabPanel>

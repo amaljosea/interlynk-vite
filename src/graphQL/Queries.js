@@ -1104,6 +1104,28 @@ export const GetVersionsTable = gql`
   }
 `
 
+// GET VERSION CREATE DATE
+export const GetVersionsDate = gql`
+  query GetVersionsDate(
+    $id: Uuid!
+    $first: Int
+    $field: SbomOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    project(id: $id) {
+      id
+      sbomVersions(
+        first: $first
+        orderBy: { direction: $direction, field: $field }
+      ) {
+        nodes {
+          creationAt
+        }
+      }
+    }
+  }
+`
+
 // GET ALL PRIMARY VERSIONS
 export const GetAllSboms = gql`
   query GetAllSboms($id: Uuid!) {

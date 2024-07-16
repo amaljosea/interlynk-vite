@@ -113,6 +113,11 @@ const ProductDetails = () => {
     }
   })
 
+  const [versionFilters, setVersionFilters] = useState({
+    field: 'SBOMS_CREATED_AT',
+    direction: 'DESC'
+  })
+
   useEffect(() => {
     if (sbomId === null) {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
@@ -160,7 +165,7 @@ const ProductDetails = () => {
   return (
     <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
       {/* INFO SECTION */}
-      <Card display={data ? 'block' : 'none'}>
+      <Card display={data ? 'block' : 'none'} className='product_details'>
         <CardBody>
           <Grid
             width={'100%'}
@@ -182,11 +187,7 @@ const ProductDetails = () => {
                   color='blue.300'
                   as={FaWindowMaximize}
                 />
-                <Flex
-                  gap={0.5}
-                  direction={'column'}
-                  className='product_details'
-                >
+                <Flex gap={0.5} direction={'column'}>
                   {/* PRODUCT TITLE */}
                   <Text fontWeight={'semibold'} fontSize={25}>
                     {name || ''}
@@ -231,7 +232,9 @@ const ProductDetails = () => {
               <TabPanel px={0}>
                 <VersionsTable
                   retentionTime={null}
+                  filters={versionFilters}
                   projectGroup={projectGroup}
+                  setFilters={setVersionFilters}
                 />
               </TabPanel>
             </TabPanels>

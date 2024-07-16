@@ -11,6 +11,51 @@ import {
   FaTools
 } from 'react-icons/fa'
 
+export const sbomOrigin = [
+  {
+    value: 'demo-upload',
+    type: 'product',
+    origin: 'manual',
+    link: 'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
+  },
+  {
+    value: 'sbom-zen',
+    type: 'product',
+    origin: 'github',
+    link: 'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
+  },
+  {
+    value: '2.0.31',
+    type: 'sbom',
+    origin: 'github',
+    link: 'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
+  },
+  {
+    value: '2.0.32',
+    type: 'sbom',
+    origin: 'external',
+    link: '/vendor/requests'
+  },
+  {
+    value: '2.0.33',
+    type: 'sbom',
+    origin: 'actions',
+    link: 'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
+  },
+  {
+    value: '2.0.34',
+    type: 'sbom',
+    origin: 'jenkins',
+    link: 'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
+  },
+  {
+    value: '2.0.35',
+    type: 'sbom',
+    origin: 'manual',
+    link: 'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
+  }
+]
+
 export const settingsData = {
   introduction: {
     name: 'Introduction',

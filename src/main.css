@@ -248,3 +248,7 @@
   color: black !important; /* Change this to your desired hover font color */
   font-family: inherit !important;
 }
+
+.no-scroll {
+  overflow: hidden;
+}

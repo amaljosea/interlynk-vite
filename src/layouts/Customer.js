@@ -1,6 +1,6 @@
-import { TourProvider, useTour } from '@reactour/tour'
+import { TourProvider } from '@reactour/tour'
 import React, { useEffect } from 'react'
-import { Outlet, useLocation, useParams } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { customerRoutes } from 'routes'
 
 import { Box, Flex, Stack, Text } from '@chakra-ui/react'
@@ -9,12 +9,15 @@ import { Box, Flex, Stack, Text } from '@chakra-ui/react'
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
+
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 
 // Custom components
 import { getActiveNavbar, getActiveRoute, tourStyles } from '../utils'
 
 export default function Customer() {
+  const navigate = useNavigate()
   const location = useLocation()
   const params = useParams()
   const sbomId = params.sbomid
@@ -22,10 +25,14 @@ export default function Customer() {
   const signedUrlParams = queryParams.get('signed_url_params')
   const tabRes = window.matchMedia('(max-width: 1199px)')
 
+  const { generateProductVersionDetailPageUrlFromCurrentUrl: genUrl } =
+    useProductUrlContext()
+
   document.documentElement.dir = 'ltr'
 
   const onTourUpdate = (value) => {
     localStorage.setItem('tourCompleted', true)
+    document?.body?.classList.remove('no-scroll')
     value.setIsOpen(false)
   }
 
@@ -215,19 +222,39 @@ export default function Customer() {
     }
   ]
 
-  const { currentStep } = useTour()
+  const onNavigate = (step) => {
+    if (step === 4) {
+      const link = genUrl({ paramsObj: { tab: 'general' } })
+      navigate(link)
+    } else if (step === 5) {
+      const link = genUrl({ paramsObj: { tab: 'components' } })
+      navigate(link)
+    } else if (step === 6) {
+      const link = genUrl({ paramsObj: { tab: 'vulnerabilities' } })
+      navigate(link)
+    } else if (step === 7) {
+      const link = genUrl({ paramsObj: { tab: 'licenses' } })
+      navigate(link)
+    } else if (step === 10) {
+      localStorage.setItem('tourCompleted', true)
+    }
+  }
 
   const onClickPrev = (props) => {
     const { currentStep, setCurrentStep } = props
     setCurrentStep(currentStep - 1)
+    onNavigate(currentStep - 1)
   }
 
   const onClickNext = (props) => {
     const { currentStep, setCurrentStep } = props
     setCurrentStep(currentStep + 1)
-    if (currentStep === 10) {
-      localStorage.setItem('tourCompleted', true)
-    }
+    onNavigate(currentStep + 1)
+  }
+
+  const onClickDone = (props) => {
+    document?.body?.classList.remove('no-scroll')
+    onClickNext(props)
   }
 
   useEffect(() => {
@@ -240,18 +267,18 @@ export default function Customer() {
     <TourProvider
       steps={steps}
       styles={tourStyles}
-      nextButton={(prop) =>
-        prop?.currentStep === 2 ? null : prop?.currentStep === 10 ? (
-          <Text onClick={() => onClickNext(prop)} cursor={'pointer'}>
+      nextButton={(props) =>
+        props?.currentStep === 2 ? null : props?.currentStep === 10 ? (
+          <Text cursor={'pointer'} onClick={() => onClickDone(props)}>
             Done
           </Text>
         ) : (
-          <FaArrowRight cursor={'pointer'} onClick={() => onClickNext(prop)} />
+          <FaArrowRight cursor={'pointer'} onClick={() => onClickNext(props)} />
         )
       }
-      prevButton={(prop) =>
-        sbomId && prop?.currentStep === 3 ? null : (
-          <FaArrowLeft cursor={'pointer'} onClick={() => onClickPrev(prop)} />
+      prevButton={(props) =>
+        sbomId && props?.currentStep === 3 ? null : (
+          <FaArrowLeft cursor={'pointer'} onClick={() => onClickPrev(props)} />
         )
       }
       onClickClose={(value) => onTourUpdate(value)}
