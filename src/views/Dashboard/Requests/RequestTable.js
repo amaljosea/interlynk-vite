@@ -279,20 +279,19 @@ const RequestTable = ({
     {
       id: 'RESPONDED',
       name: 'RESPONDED',
-      selector: (row) => (
-        <>
-          {row?.uploadedAt ? (
-            <Tooltip
-              label={getFullDateAndTime(row?.uploadedAt)}
-              placement={'top'}
-            >
-              {timeSince(row?.uploadedAt)}
-            </Tooltip>
-          ) : (
-            <Text color={textColor}>...</Text>
-          )}
-        </>
-      ),
+      selector: (row) => {
+        const { uploadedAt } = row
+        return (
+          <Tooltip
+            placement={'top'}
+            label={getFullDateAndTime(row?.uploadedAt)}
+          >
+            <Text color={textColor}>
+              {uploadedAt ? timeSince(row?.uploadedAt) : ''}
+            </Text>
+          </Tooltip>
+        )
+      },
       wrap: true
     },
     {
