@@ -64,8 +64,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
               'The validated SBOM data will be available in the product shortly. Please refresh to update the product.',
             duration: 6500,
             isClosable: true,
-            position: 'top',
-            variant: 'left-accent'
+            position: 'top'
           })
         }
       })
