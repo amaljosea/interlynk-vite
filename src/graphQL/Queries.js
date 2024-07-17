@@ -1250,6 +1250,7 @@ export const ShareVersionTable = gql`
           nodes {
             id
             creationAt
+            createdAt
             updatedAt
             lifecycle
             projectVersion
