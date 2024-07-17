@@ -3,11 +3,13 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Select from 'react-select'
 
+import { Spinner, useColorModeValue } from '@chakra-ui/react'
+
 import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { GetProjectVersionAndId } from 'graphQL/Queries'
+import { GetProjectVersionAndId, GetVersionName } from 'graphQL/Queries'
 
 const VersionBreadcrumb = ({ selectStyles }) => {
   const navigate = useNavigate()
@@ -25,8 +27,11 @@ const VersionBreadcrumb = ({ selectStyles }) => {
   const [totalCount, setTotalCount] = useState(null)
 
   const debouncedVersionSearchInput = useDebounce(versionSearchInput, 300)
+  const loaderColor = useColorModeValue('#e2e8f0', '#4A5568')
 
   const prodID = params.productid
+  const sbomId = params.sbomid
+  const productid = params.productid
 
   const { data: versionData, loading } = useQuery(GetProjectVersionAndId, {
     variables: {
@@ -37,6 +42,14 @@ const VersionBreadcrumb = ({ selectStyles }) => {
       direction: 'DESC'
     },
     skip: !prodID || !orgView
+  })
+
+  const { data: versionNameData } = useQuery(GetVersionName, {
+    skip: !productid || !sbomId || path === 'customer',
+    variables: {
+      projectId: productid,
+      sbomId: sbomId
+    }
   })
 
   useEffect(() => {
@@ -76,9 +89,7 @@ const VersionBreadcrumb = ({ selectStyles }) => {
         getOptionLabel={(version) => version.projectVersion}
         getOptionValue={(version) => version.id}
         onChange={(version) => handleVersionClick(version)}
-        defaultValue={versions.find(
-          (version) => version.projectVersion === sbomHookData.versionName
-        )}
+        defaultValue={versionNameData?.sbom}
         components={{
           IndicatorSeparator: () => null
         }}
@@ -94,7 +105,7 @@ const VersionBreadcrumb = ({ selectStyles }) => {
     )
   }
 
-  return null
+  return <Spinner size='xs' color={loaderColor} />
 }
 
 export default VersionBreadcrumb

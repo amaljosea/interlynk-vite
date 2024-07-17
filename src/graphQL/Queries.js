@@ -4625,3 +4625,27 @@ export const GetProjectGroupAndVersionDetails = gql`
     }
   }
 `
+export const GetProjectName = gql`
+  query GetProjectGroup($id: Uuid!) {
+    projectGroup(id: $id) {
+      id
+      name
+      defaultProject {
+        id
+      }
+      projects {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const GetVersionName = gql`
+  query GetSbomName($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      projectVersion
+    }
+  }
+`

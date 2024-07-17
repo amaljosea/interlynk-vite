@@ -1,17 +1,22 @@
 import { useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Select from 'react-select'
+
+import { Spinner, useColorModeValue } from '@chakra-ui/react'
 
 import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { GetProjectGroupDetails } from 'graphQL/Queries'
+import { GetProjectGroupDetails, GetProjectName } from 'graphQL/Queries'
 
 const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
   const navigate = useNavigate()
+  const params = useParams()
+
+  const productGroupId = params.productgroupid
   const location = useLocation()
 
   const { orgView } = useGlobalQueryContext()
@@ -25,6 +30,8 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
   const debouncedSearchInput = useDebounce(searchInput, 300)
   const environment = localStorage.getItem('environment')
 
+  const loaderColor = useColorModeValue('#e2e8f0', '#4A5568')
+
   const viewProds = useHasPermission({
     parentKey: 'view_product_group'
   })
@@ -37,6 +44,13 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
       enabled: true,
       first: 10,
       search: debouncedSearchInput
+    }
+  })
+
+  const { data: projectNameData } = useQuery(GetProjectName, {
+    skip: !productGroupId || path === 'customer',
+    variables: {
+      id: productGroupId
     }
   })
 
@@ -81,9 +95,7 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
         getOptionLabel={(product) => product.name}
         getOptionValue={(product) => product.id}
         onChange={(product) => handleProductClick(product)}
-        defaultValue={products.find(
-          (product) => product.name === projectGroupName
-        )}
+        defaultValue={projectNameData?.projectGroup}
         components={{
           IndicatorSeparator: () => null
         }}
@@ -99,7 +111,7 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
     )
   }
 
-  return null
+  return <Spinner size='xs' color={loaderColor} />
 }
 
 export default ProjectGroupBreadcrumb
