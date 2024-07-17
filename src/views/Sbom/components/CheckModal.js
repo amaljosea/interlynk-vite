@@ -27,7 +27,8 @@ import {
   Select,
   Tag,
   Text,
-  Tooltip
+  Tooltip,
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
@@ -48,6 +49,9 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
   const sbomId = params.sbomid
   const navigate = useNavigate()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
+
+  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
+  const hoverColor = useColorModeValue('#EDF2F7', '#2D3748')
 
   const { status, component } = activeRow || ''
   const { id: componentId, name, version, kind, licensesExp } = component || ''
@@ -368,8 +372,8 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
                   width='100%'
                   top={10}
                   mt='8'
-                  bg='white'
-                  border='1px solid #ccc'
+                  bg={bgColor}
+                  border={`1px solid ${hoverColor}`}
                   minH={'auto'}
                   maxH={'300px'}
                   overflowY={'scroll'}
@@ -388,7 +392,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
                           setComponentList([])
                         }}
                         p='2'
-                        _hover={{ background: 'gray.100' }}
+                        _hover={{ background: hoverColor }}
                       >
                         <Text>{item.name}</Text>
                       </ListItem>
