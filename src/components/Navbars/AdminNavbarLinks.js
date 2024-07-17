@@ -266,7 +266,6 @@ export default function HeaderLinks(props) {
       <IconButton
         size='sm'
         onClick={toggleColorMode}
-        display={signedUrlParams ? 'none' : 'flex'}
         icon={colorMode === 'light' ? <FaMoon /> : <FaSun />}
       />
       {!signedUrlParams && (

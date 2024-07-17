@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { customerRoutes } from 'routes'
 
-import { Box, Flex, Stack, Text } from '@chakra-ui/react'
+import { Box, Flex, Stack, Text, useColorMode } from '@chakra-ui/react'
 
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
@@ -25,6 +25,7 @@ export default function Customer() {
   const signedUrlParams = queryParams.get('signed_url_params')
   const tabRes = window.matchMedia('(max-width: 1199px)')
 
+  const { colorMode } = useColorMode()
   const { generateProductVersionDetailPageUrlFromCurrentUrl: genUrl } =
     useProductUrlContext()
 
@@ -297,10 +298,10 @@ export default function Customer() {
         <Flex width={'100%'} flexDir={'column'}>
           <Box
             top={0}
-            bg={'white'}
             zIndex={111}
             pos={'sticky'}
-            borderBottom={'1px solid #E2E8F0'}
+            bg={colorMode === 'light' ? 'white' : 'gray.900'}
+            borderBottom={`1px solid ${colorMode === 'light' ? '#E2E8F0' : '#1A202C'}`}
           >
             <AdminNavbar
               tabRes={tabRes}

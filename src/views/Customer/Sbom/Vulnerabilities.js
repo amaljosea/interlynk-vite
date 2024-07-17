@@ -96,21 +96,21 @@ const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
           {/* Description */}
           <Box>
             <CustomText>Description :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text mt={1} fontSize={14} color={textColor}>
               {vuln.desc}
             </Text>
           </Box>
           {/* Published At  */}
           <Box>
             <CustomText>Published:</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text mt={1} fontSize={14} color={textColor}>
               {getFullDateAndTime(vuln.publishedAt)}
             </Text>
           </Box>
           {/* Last Modified At */}
           <Box>
             <CustomText>Last Modified:</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text mt={1} fontSize={14} color={textColor}>
               {getFullDateAndTime(vuln.lastModifiedAt)}
             </Text>
           </Box>
@@ -177,7 +177,7 @@ const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
           {/* EPSS Percentile */}
           <Box>
             <CustomText>EPSS Percentile :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text mt={1} fontSize={14} color={textColor}>
               {vuln?.vulnInfo?.epssPercentile
                 ? (vuln?.vulnInfo?.epssPercentile * 100).toFixed()
                 : 0}{' '}
@@ -218,7 +218,8 @@ const Vulnerabilities = ({ sbomData }) => {
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const textColor = useColorModeValue('gray.700', 'white')
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const [activeRow, setActiveRow] = useState(null)
   const [vulnSearch, setVulnSearch] = useState(searchInput)
 
@@ -372,7 +373,7 @@ const Vulnerabilities = ({ sbomData }) => {
                       variant='solid'
                       isDisabled={!website}
                       colorScheme='gray'
-                      icon={<FaGlobe fontSize={16} />}
+                      icon={<FaGlobe color={textColor} fontSize={16} />}
                     />
                   </Link>
                 </Tooltip>
@@ -385,7 +386,7 @@ const Vulnerabilities = ({ sbomData }) => {
                       variant='solid'
                       colorScheme='gray'
                       isDisabled={!vcs}
-                      icon={<FaSitemap fontSize={16} />}
+                      icon={<FaSitemap color={textColor} fontSize={16} />}
                     />
                   </Link>
                 </Tooltip>
@@ -398,7 +399,7 @@ const Vulnerabilities = ({ sbomData }) => {
                       variant='solid'
                       colorScheme='gray'
                       isDisabled={!issueTracker}
-                      icon={<FaHouseUser fontSize={16} />}
+                      icon={<FaHouseUser color={textColor} fontSize={16} />}
                     />
                   </Link>
                 </Tooltip>
@@ -411,7 +412,7 @@ const Vulnerabilities = ({ sbomData }) => {
                       variant='solid'
                       isDisabled={!distribution}
                       colorScheme='gray'
-                      icon={<FaLightbulb fontSize={16} />}
+                      icon={<FaLightbulb color={textColor} fontSize={16} />}
                     />
                   </Link>
                 </Tooltip>
@@ -444,8 +445,8 @@ const Vulnerabilities = ({ sbomData }) => {
               e.currentTarget.parentElement.click()
             }}
           >
-            <Text>{component?.name || ''}</Text>
-            <Text>{component?.version || ''}</Text>
+            <Text color={textColor}>{component?.name || ''}</Text>
+            <Text color={textColor}>{component?.version || ''}</Text>
           </Stack>
         )
       },
@@ -603,29 +604,6 @@ const Vulnerabilities = ({ sbomData }) => {
       sortable: true,
       wrap: true
     },
-    // VERSION
-    {
-      id: 'COMPONENTS_VERSION',
-      name: 'VERSION',
-      selector: (row) => (
-        <Tooltip label={row.component.version} placement='top'>
-          <Text
-            onClick={(e) => {
-              e.currentTarget.parentElement.click()
-            }}
-            textAlign='right'
-            my={2}
-          >
-            {row.component.version}
-          </Text>
-        </Tooltip>
-      ),
-      wrap: true,
-      width: '12%',
-      sortable: true,
-      right: 'true',
-      omit: true
-    },
     // STATUS
     {
       id: 'VEX_STATUSES_NAME',
@@ -662,12 +640,7 @@ const Vulnerabilities = ({ sbomData }) => {
           label={getFullDateAndTime(row.vuln.updatedAt)}
           placement={'top'}
         >
-          <Text
-            onClick={(e) => {
-              e.currentTarget.parentElement.click()
-            }}
-            textAlign={'right'}
-          >
+          <Text color={textColor} textAlign={'right'}>
             {timeSince(row.vuln.updatedAt)}
           </Text>
         </Tooltip>
@@ -793,7 +766,7 @@ const Vulnerabilities = ({ sbomData }) => {
           className='data-table-container'
           columns={columns}
           data={nodes}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={field}

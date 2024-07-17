@@ -14,6 +14,7 @@ import {
   Tag,
   TagLabel,
   Text,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -38,6 +39,8 @@ const InfoLabel = ({ title, onClick }) => {
 const General = ({ data, loading, error }) => {
   const { suppliers, licensesExp, licenses, authors, creationAt, tools } =
     data || ''
+  const textColor = useColorModeValue('#E2E8F0', '#1A202C')
+  const border = `1px solid ${textColor}`
 
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
@@ -108,10 +111,10 @@ const General = ({ data, loading, error }) => {
       <CardBody>
         <Grid mt={2} width={'100%'} templateColumns='repeat(2, 1fr)'>
           {/* CREATION TOOLS */}
-          <GridItem py={3} borderY={'1px solid #E2E8F0'} w='100%'>
+          <GridItem py={3} borderY={border} w='100%'>
             <InfoLabel title={`Creation Tool`} onClick={onCheckTool} />
           </GridItem>
-          <GridItem py={3} borderY={'1px solid #E2E8F0'} w='100%'>
+          <GridItem py={3} borderY={border} w='100%'>
             <Flex
               flexDirection={'row'}
               alignItems={'flex-start'}
@@ -135,17 +138,17 @@ const General = ({ data, loading, error }) => {
             </Flex>
           </GridItem>
           {/* CREATED AT */}
-          <GridItem py={3} borderBottom={'1px solid #E2E8F0'} w='100%'>
+          <GridItem py={3} borderBottom={border} w='100%'>
             <Text fontSize={'sm'}>Created At</Text>
           </GridItem>
-          <GridItem py={3} borderBottom={'1px solid #E2E8F0'} w='100%'>
+          <GridItem py={3} borderBottom={border} w='100%'>
             <Text fontSize={'sm'}>{getFullDateAndTime(creationAt)}</Text>
           </GridItem>
           {/* AUTHORS */}
-          <GridItem py={3} borderBottom={'1px solid #E2E8F0'} w='100%'>
+          <GridItem py={3} borderBottom={border} w='100%'>
             <InfoLabel title={`Authors`} onClick={onCheckAuthor} />
           </GridItem>
-          <GridItem py={3} borderBottom={'1px solid #E2E8F0'} w='100%'>
+          <GridItem py={3} borderBottom={border} w='100%'>
             <Stack spacing={2} direction={'column'}>
               {authors &&
                 authors.length > 0 &&
@@ -165,10 +168,10 @@ const General = ({ data, loading, error }) => {
             </Stack>
           </GridItem>
           {/* SUPPLIERS */}
-          <GridItem py={3} borderBottom={'1px solid #E2E8F0'} w='100%'>
+          <GridItem py={3} borderBottom={border} w='100%'>
             <InfoLabel title={`Supplier`} onClick={onCheckSupplier} />
           </GridItem>
-          <GridItem py={3} borderBottom={'1px solid #E2E8F0'} w='100%'>
+          <GridItem py={3} borderBottom={border} w='100%'>
             <HStack spacing={4}>
               {suppliers?.length > 0 &&
                 suppliers.map((item, index) => (
@@ -202,10 +205,10 @@ const General = ({ data, loading, error }) => {
             </HStack>
           </GridItem>
           {/* DATA LICENSES */}
-          <GridItem py={3} borderBottom={'1px solid #E2E8F0'} w='100%'>
+          <GridItem py={3} borderBottom={border} w='100%'>
             <InfoLabel title={`Data License`} onClick={onCheckLicense} />
           </GridItem>
-          <GridItem py={3} borderBottom={'1px solid #E2E8F0'} w='100%'>
+          <GridItem py={3} borderBottom={border} w='100%'>
             <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
               {/* SPDX */}
               {licenses?.length > 0 &&

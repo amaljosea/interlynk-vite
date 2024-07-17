@@ -11,7 +11,8 @@ import {
   Tag,
   TagLabel,
   Text,
-  Tooltip
+  Tooltip,
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
@@ -28,6 +29,9 @@ const Licenses = () => {
   const sbomId = params.sbomid
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
+
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { nodes, loading, error, refetch, paginationProps } =
     usePaginatatedQuery(GetShareLicensesTable, {
@@ -67,7 +71,7 @@ const Licenses = () => {
       wrap: true,
       selector: ({ licenseExpression }) => (
         <Flex direction='row' alignItems={'center'} gap={2}>
-          <Text my={3} fontWeight={'medium'}>
+          <Text my={3} fontWeight={'medium'} color={textColor}>
             {licenseExpression || 'Not Available'}
           </Text>
         </Flex>
@@ -97,7 +101,7 @@ const Licenses = () => {
                 {sortedComponents[0].name}
               </TagLabel>
             </Tag>
-            <Text>
+            <Text color={textColor}>
               {sortedComponents.length > 1
                 ? `+${sortedComponents.length - 1} more`
                 : ''}
@@ -133,7 +137,7 @@ const Licenses = () => {
   if (error) {
     return (
       <Card>
-        <Text>Something went wrong</Text>
+        <Text color={textColor}>Something went wrong</Text>
       </Card>
     )
   }
@@ -144,7 +148,7 @@ const Licenses = () => {
         <DataTable
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles}
+          customStyles={customStyles(headColor)}
           defaultSortAsc={false}
           defaultSortFieldId={'UPDATED_AT'}
           progressPending={loading}

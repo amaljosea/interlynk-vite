@@ -208,7 +208,6 @@ const ProductDetails = () => {
           <Tabs
             variant='enclosed'
             w={'100%'}
-            bg={'white'}
             index={activeCsProdTab}
             onChange={(value) => handleTabChange(value)}
           >
