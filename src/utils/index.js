@@ -98,7 +98,7 @@ export const getFormat = (name) => {
     return 'Github Actions'
   } else if (origin === 'jenkins') {
     return 'Jenkins'
-  } else if (origin === 'manual') {
+  } else {
     return 'Manual Build'
   }
 }
@@ -689,6 +689,13 @@ export const customStyles = (headColor) => {
     expanderRow: {
       style: {
         backgroundColor: 'transparent' // expandable row background color
+      }
+    },
+    expanderCell: {
+      style: {
+        '& svg': {
+          color: 'darkgray'
+        }
       }
     }
   }

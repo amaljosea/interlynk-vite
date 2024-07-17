@@ -31,6 +31,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Link as Olink,
   Portal,
   Stack,
   Switch,
@@ -363,15 +364,17 @@ const ProductTable = ({
               hidden={!shouldShowDemoFeatures}
             >
               <Tooltip label={getFormat(name)} placement='top'>
-                <Link target='_blank' to={getLink(name)}>
+                <Olink
+                  href={getLink(name)}
+                  isExternal={getLink(name) === '#' ? false : true}
+                >
                   <IconButton
-                    size='sm'
+                    size='xs'
                     isRound={true}
-                    variant='solid'
-                    colorScheme='blue'
+                    color={textColor}
                     icon={getType(name)}
                   />
-                </Link>
+                </Olink>
               </Tooltip>
             </GridItem>
             <GridItem gap={1} colSpan={6}>

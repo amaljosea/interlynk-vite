@@ -1,6 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import {
@@ -256,19 +256,14 @@ const Components = ({ sbomData, sbomRefetch }) => {
         )
         const vcs = externalUrls?.find((item) => item.name === 'vcs')
         const icon = unknown ? (
-          <BsFillPatchQuestionFill color={textColor} fontSize={24} />
+          <BsFillPatchQuestionFill fontSize={24} />
         ) : (
           GetIcon(purl.split('/')[0])
         )
         return (
           <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
             <GridItem colSpan={1} width={'50px'}>
-              <IconButton
-                isRound={true}
-                variant='solid'
-                colorScheme='gray'
-                icon={icon}
-              />
+              <IconButton icon={icon} isRound={true} variant='solid' />
             </GridItem>
             <GridItem
               colSpan={6}

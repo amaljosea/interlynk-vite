@@ -16,7 +16,7 @@ export const sbomOrigin = [
     value: 'demo-upload',
     type: 'product',
     origin: 'manual',
-    link: 'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
+    link: '#'
   },
   {
     value: 'sbom-zen',
@@ -52,7 +52,7 @@ export const sbomOrigin = [
     value: '2.0.35',
     type: 'sbom',
     origin: 'manual',
-    link: 'https://github.com/interlynk-io/lynk-dash-app/actions/runs/9925589195'
+    link: '#'
   }
 ]
 

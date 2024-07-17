@@ -1089,6 +1089,7 @@ export const GetVersionsTable = gql`
         nodes {
           id
           creationAt
+          createdAt
           updatedAt
           lifecycle
           projectVersion
@@ -1119,7 +1120,7 @@ export const GetVersionsDate = gql`
         orderBy: { direction: $direction, field: $field }
       ) {
         nodes {
-          creationAt
+          createdAt
         }
       }
     }

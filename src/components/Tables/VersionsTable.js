@@ -35,6 +35,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Link as Olink,
   Portal,
   Spinner,
   Stack,
@@ -240,10 +241,10 @@ const VersionsTable = ({
       id: 'SBOMS_PROJECT_VERSION',
       name: 'VERSION',
       selector: (row, index) => {
-        const { projectVersion, creationAt } = row
-        const parsedCreationDate = creationAt && parseISO(creationAt)
-        const endDate = addDays(parsedCreationDate, retention)
-        const difference = differenceInDays(currentDate, parsedCreationDate)
+        const { projectVersion, createdAt } = row
+        const parsedCreatedDate = parseISO(createdAt)
+        const endDate = addDays(parsedCreatedDate, retention)
+        const difference = differenceInDays(currentDate, parsedCreatedDate)
         const showWarning = difference > retention
         const expired = retention !== 0 && showWarning === true
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
@@ -266,15 +267,17 @@ const VersionsTable = ({
               hidden={!shouldShowDemoFeatures}
             >
               <Tooltip label={getFormat(projectVersion)} placement='top'>
-                <Link target='_blank' to={getLink(projectVersion)}>
+                <Olink
+                  href={getLink(projectVersion)}
+                  isExternal={getLink(projectVersion) === '#' ? false : true}
+                >
                   <IconButton
-                    size='sm'
+                    size='xs'
                     isRound={true}
-                    variant='solid'
-                    colorScheme='blue'
+                    color={textColor}
                     icon={getType(projectVersion)}
                   />
-                </Link>
+                </Olink>
               </Tooltip>
             </GridItem>
             <GridItem
@@ -413,13 +416,13 @@ const VersionsTable = ({
     // CREATED AT
     {
       id: 'SBOMS_CREATED_AT',
-      name: 'CREATED',
+      name: 'IMPORTED',
       selector: (row) => {
-        const { creationAt } = row
+        const { createdAt } = row
         return (
-          <Tooltip label={getFullDateAndTime(creationAt)} placement='top'>
+          <Tooltip label={getFullDateAndTime(createdAt)} placement='top'>
             <Text color={textColor} textAlign={'right'}>
-              {timeSince(creationAt)}
+              {timeSince(createdAt)}
             </Text>
           </Tooltip>
         )

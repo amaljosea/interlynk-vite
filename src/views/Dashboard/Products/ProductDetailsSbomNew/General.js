@@ -82,7 +82,7 @@ const General = ({ data, refetch, loading, error }) => {
     tools
   } = data || ''
 
-  const { userPermissions, sbomState, dispatch } = useGlobalState()
+  const { sbomState, dispatch } = useGlobalState()
   const { expLicense } = sbomState
   const { sbomDispatch } = dispatch
 
@@ -97,7 +97,6 @@ const General = ({ data, refetch, loading, error }) => {
   })
 
   const btnRef = useRef(null)
-  const status = 'created'
   const textColor = useColorModeValue('gray.700', 'white')
   const iconColor = useColorModeValue('blue.500', 'gray.100')
   const customerView = location?.pathname?.startsWith('/customer')
@@ -278,6 +277,18 @@ const General = ({ data, refetch, loading, error }) => {
             </Tr>
           </Thead>
           <Tbody>
+            {/* CREATED AT */}
+            <Tr>
+              <Td pl={0} fontWeight={'medium'}>
+                Created At
+              </Td>
+              <Td pl={0}>
+                <Text my={2}>
+                  {creationAt ? getFullDateAndTime(creationAt) : ''}
+                </Text>
+              </Td>
+              <Td pl={0}></Td>
+            </Tr>
             {/* CREATION TOOLS */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
@@ -323,16 +334,6 @@ const General = ({ data, refetch, loading, error }) => {
                   onClick={() => handleClick('tools')}
                 />
               </Td>
-            </Tr>
-            {/* CREATED AT */}
-            <Tr>
-              <Td pl={0} fontWeight={'medium'}>
-                Created At
-              </Td>
-              <Td pl={0}>
-                <Text my={2}>{getFullDateAndTime(creationAt)}</Text>
-              </Td>
-              <Td pl={0}></Td>
             </Tr>
             {/* AUTHORS */}
             <Tr>
