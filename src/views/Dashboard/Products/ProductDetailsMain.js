@@ -200,7 +200,12 @@ const ProductDetailsMain = () => {
       const currentDate = new Date()
       const retentionTimeInt = Math.floor(dataRetentionDays)
       const exceedingItems = versionDates?.filter((item) => {
-        const creationDate = parseISO(item?.creationAt)
+        let creationDate
+        if (item && item.creationAt) {
+          creationDate = parseISO(item.creationAt)
+        } else {
+          creationDate = currentDate
+        }
         const difference = differenceInDays(currentDate, creationDate)
         return difference > retentionTimeInt
       })
