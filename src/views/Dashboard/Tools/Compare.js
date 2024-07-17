@@ -1,5 +1,5 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { envOrderList, sortByUpdatedAt } from 'utils'
 
 import {
@@ -29,7 +29,6 @@ import SbomInfo from 'components/SbomInfo'
 import DiffTable from 'components/Tables/DiffTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useHasPermission } from 'hooks/useHasPermission'
 
 import {
   GetProductData,
@@ -41,7 +40,7 @@ import {
 import { FaCodeCompare, FaScaleUnbalanced, FaX } from 'react-icons/fa6'
 
 const Compare = ({ selectedSboms }) => {
-  const { prodState, userPermissions, dispatch } = useGlobalState()
+  const { prodState, dispatch } = useGlobalState()
   const { field, direction } = prodState
   const { toolsDispatch } = dispatch
 
@@ -49,9 +48,6 @@ const Compare = ({ selectedSboms }) => {
 
   const [isLoading, setIsLoading] = useState(false)
 
-  const productPermissions = useHasPermission({
-    parentKey: 'view_product_group'
-  })
   const [getProduct] = useLazyQuery(GetProject, { fetchPolicy: 'network-only' })
   const [getSbomData] = useLazyQuery(GetProductData, {
     fetchPolicy: 'network-only'
@@ -60,9 +56,8 @@ const Compare = ({ selectedSboms }) => {
     fetchPolicy: 'network-only'
   })
   const { data } = useQuery(GetProductsForSbomDrift, {
-    skip: productPermissions === true ? false : true,
     fetchPolicy: 'network-only',
-    variables: { enabled: true, field: field, direction: direction }
+    variables: { first: 200, enabled: true, field: field, direction: direction }
   })
 
   // -------------- SBOM 1 --------------
