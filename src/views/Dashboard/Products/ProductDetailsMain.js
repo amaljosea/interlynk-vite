@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { TourProvider } from '@reactour/tour'
-import { differenceInDays, parseISO } from 'date-fns'
+import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { tourStyles } from 'utils'
@@ -201,8 +201,13 @@ const ProductDetailsMain = () => {
       const retentionTimeInt = Math.floor(dataRetentionDays)
       const exceedingItems = versionDates?.filter((item) => {
         const createdDate = parseISO(item?.createdAt)
-        const difference = differenceInDays(currentDate, createdDate)
-        return difference > retentionTimeInt
+        const expirationDate = addDays(createdDate, retentionTimeInt)
+        const daysUntilDeletion = differenceInDays(expirationDate, currentDate)
+        return (
+          daysUntilDeletion <= 7 &&
+          daysUntilDeletion >= 0 &&
+          retentionTimeInt !== 0
+        )
       })
       setExceedingCount(exceedingItems?.length)
       setWarning(exceedingItems?.length > 0)

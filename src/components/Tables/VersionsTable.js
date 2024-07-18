@@ -1,6 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { addDays, differenceInDays, parseISO } from 'date-fns'
+import { addDays, differenceInDays, isAfter, parseISO } from 'date-fns'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -244,9 +244,9 @@ const VersionsTable = ({
         const { projectVersion, createdAt } = row
         const parsedCreatedDate = parseISO(createdAt)
         const endDate = addDays(parsedCreatedDate, retention)
-        const difference = differenceInDays(currentDate, parsedCreatedDate)
-        const showWarning = difference > retention
-        const expired = retention !== 0 && showWarning === true
+        const diff = differenceInDays(endDate, currentDate)
+        const daysUntilDeletion = diff <= 7 && diff >= 0 && retention !== 0
+        // const exceedingItems = endDate > currentDate
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           sbomid: row.id,
           paramsObj: {
@@ -296,7 +296,7 @@ const VersionsTable = ({
                   {projectVersion}
                 </Text>
               </Link>
-              {expired && !signedUrlParams && (
+              {daysUntilDeletion && !signedUrlParams && (
                 <Text fontSize='xs' mt={1} color='#F56565' cursor={'pointer'}>
                   Marked for deletion on{' '}
                   {endDate ? new Date(endDate).toLocaleDateString() : ''}
