@@ -2,7 +2,6 @@ import { gql, useQuery } from '@apollo/client'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
-import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import { WarningTwoIcon } from '@chakra-ui/icons'
 import {
@@ -73,11 +72,9 @@ function Profile() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
-  const org = localStorage.getItem('organization')
-  const orgNotFound = !org || org === 'undefined'
+  const { orgView } = useGlobalQueryContext()
 
   const { totalRows } = useGlobalState()
-  const { orgView } = useGlobalQueryContext()
 
   const [orgIndex, setOrgIndex] = useState(0)
   const [psIndex, setPsIndex] = useState(0)
@@ -170,8 +167,6 @@ function Profile() {
       </Flex>
     )
   }
-
-  if (orgNotFound) return <OrgRegister />
 
   return (
     <>

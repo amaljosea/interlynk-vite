@@ -9,16 +9,13 @@ import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetGlobalVulns } from 'graphQL/Queries'
 
-import OrgRegister from '../Profile/components/OrgRegister'
 import VulnInfo from './vulnInfo'
 
 const Vulnerabilities = () => {
-  const location = useLocation()
   const params = useParams()
+  const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
-  const org = localStorage.getItem('organization')
-  const orgNotFound = !org || org === 'undefined'
 
   const [filters, setFilters] = useState({
     field: 'VULNS_VULN_ID',
@@ -30,15 +27,13 @@ const Vulnerabilities = () => {
   const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
     GetGlobalVulns,
     {
-      skip: orgNotFound || !vulnsPermissions,
+      skip: !vulnsPermissions,
       selector: 'organization.vulns',
       variables: {
         ...filters
       }
     }
   )
-
-  if (orgNotFound) return <OrgRegister />
 
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
     return <VulnInfo vulnId={vulnId} />

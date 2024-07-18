@@ -10,6 +10,7 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import CustomLoader from 'components/CustomLoader'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -18,7 +19,7 @@ import { GetOrgRules } from 'graphQL/Queries'
 
 const Checks = () => {
   const activetab = useQueryParam('tab')
-  const org = localStorage.getItem('organization')
+  const { orgView } = useGlobalQueryContext()
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -29,7 +30,7 @@ const Checks = () => {
   })
 
   const { data, refetch } = useQuery(GetOrgRules, {
-    skip: org === 'undefined' ? true : activetab === 'checks' ? false : true,
+    skip: !orgView ? true : activetab === 'checks' ? false : true,
     variables: {
       field: 'RULES_FRIENDLY_ID',
       direction: 'ASC'

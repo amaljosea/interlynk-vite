@@ -17,7 +17,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 
-import { useGlobalState } from 'hooks/useGlobalState'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -27,20 +27,18 @@ import { FaUserLock } from 'react-icons/fa6'
 
 const RoleTable = () => {
   const activetab = useQueryParam('tab')
-  const org = localStorage.getItem('organization')
+  const { orgView } = useGlobalQueryContext()
 
-  const { userPermissions } = useGlobalState()
   const updateOrgs = useHasPermission({
     parentKey: 'view_organization',
     childKey: 'update_organization'
   })
 
   const { data, loading, refetch } = useQuery(GetRoles, {
-    skip: org === 'undefined' ? true : activetab === 'roles' ? false : true
+    skip: !orgView ? true : activetab === 'roles' ? false : true
   })
 
-  const { currentUser, organizationRoles } = data?.organization || ''
-  const { role } = currentUser || ''
+  const { organizationRoles } = data?.organization || ''
 
   const [selectedRole, setSelectedRole] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()

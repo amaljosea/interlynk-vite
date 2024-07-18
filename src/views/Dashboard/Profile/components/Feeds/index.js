@@ -4,7 +4,7 @@ import { Alert, Grid } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
-import { useGlobalState } from 'hooks/useGlobalState'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -15,15 +15,14 @@ import ExploitFeeds from './Exploit'
 
 const Feeds = () => {
   const activetab = useQueryParam('tab')
-  const org = localStorage.getItem('organization')
-  const { userPermissions } = useGlobalState()
+  const { orgView } = useGlobalQueryContext()
 
   const viewFeeds = useHasPermission({
     parentKey: 'view_feeds'
   })
 
   const { data, refetch, loading } = useQuery(GetOrgSettings, {
-    skip: org === 'undefined' ? true : activetab === 'feeds' ? false : true
+    skip: !orgView ? true : activetab === 'feeds' ? false : true
   })
 
   const { organizationSettings } = data?.organization || ''

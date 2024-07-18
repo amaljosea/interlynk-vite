@@ -23,7 +23,6 @@ import { GetOrg, GetOrgMetrics } from 'graphQL/Queries'
 
 import { FaBug, FaCube, FaLayerGroup, FaWindowMaximize } from 'react-icons/fa'
 
-import OrgRegister from '../Profile/components/OrgRegister'
 import ActivitiesOverview from './components/ActivitiesOverview'
 import MiniStatistics from './components/MiniStatistics'
 import ProductsOverview from './components/ProductsOverview'
@@ -56,7 +55,7 @@ export default function Dashboard() {
     }
   })
 
-  const { data: metrics, error: eOrgMetric } = useQuery(GetOrgMetrics, {
+  const { data: metrics } = useQuery(GetOrgMetrics, {
     skip: data?.organization?.name ? false : true,
     variables: { env: envName }
   })
@@ -68,8 +67,6 @@ export default function Dashboard() {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
   }, [prodCompDispatch, prodVulnDispatch, product, setIsOpen])
-
-  if (eOrg || eOrgMetric) return <OrgRegister />
 
   if (loading) {
     return (

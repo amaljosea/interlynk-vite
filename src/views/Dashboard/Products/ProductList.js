@@ -14,8 +14,6 @@ import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetProductTable } from 'graphQL/Queries'
 
-import OrgRegister from '../Profile/components/OrgRegister'
-
 function ProductList() {
   const { dispatch } = useGlobalState()
   const prodTour = localStorage.getItem('productTour')
@@ -25,7 +23,6 @@ function ProductList() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
-  const org = localStorage.getItem('organization')
 
   const productPermissions = useHasPermission({
     parentKey: 'view_product_group'
@@ -37,11 +34,9 @@ function ProductList() {
     enabled: true
   })
 
-  const orgNotFound = !org || org === 'undefined'
-
   const { nodes, paginationProps, reset, refetch, loading, error } =
     usePaginatatedQuery(GetProductTable, {
-      skip: orgNotFound || productPermissions === false,
+      skip: productPermissions === false,
       selector: 'organization.projectGroups',
       variables: {
         ...filters
@@ -80,8 +75,6 @@ function ProductList() {
       }
     }
   }, [location, nodes?.length, prodTour, setCurrentStep, setIsOpen, setSteps])
-
-  if (orgNotFound) return <OrgRegister />
 
   if (error) {
     return (

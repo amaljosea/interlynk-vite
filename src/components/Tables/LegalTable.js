@@ -33,6 +33,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import InfoModal from 'components/InfoModal'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
@@ -45,8 +46,8 @@ import { FaEllipsisVertical, FaPlus } from 'react-icons/fa6'
 const LegalTable = () => {
   const toast = useToast()
   const activetab = useQueryParam('tab')
-  const org = localStorage.getItem('organization')
-  const { userPermissions, totalRows } = useGlobalState()
+  const { orgView } = useGlobalQueryContext()
+  const { totalRows } = useGlobalState()
 
   const updateOrg = useHasPermission({
     parentKey: 'view_organization',
@@ -62,7 +63,7 @@ const LegalTable = () => {
   const iconColor = useColorModeValue('#718096', '#F7FAFC')
 
   const { data, loading, refetch } = useQuery(GetOrgManufacturers, {
-    skip: org === 'undefined' ? true : activetab === 'legal' ? false : true
+    skip: !orgView ? true : activetab === 'legal' ? false : true
   })
 
   const { nodes } = data?.organizationManufacturers || ''

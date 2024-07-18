@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Text, Wrap, useColorModeValue, useDisclosure } from '@chakra-ui/react'
 
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
@@ -23,10 +24,9 @@ import TeamsConfigModal from './TeamsConfigModal'
 
 const Connections = () => {
   const activetab = useQueryParam('tab')
-  const org = localStorage.getItem('organization')
+  const { orgView } = useGlobalQueryContext()
   const { data, refetch } = useQuery(GetConnections, {
-    skip:
-      org === 'undefined' ? true : activetab === 'connections' ? false : true
+    skip: !orgView ? true : activetab === 'connections' ? false : true
   })
   const isGithubConfigSaved = useGithubConfigSaved()
 

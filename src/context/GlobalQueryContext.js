@@ -23,8 +23,8 @@ export const GlobalQueryContextWrapper = ({ children }) => {
     <GlobalQueryContext.Provider
       value={{
         sbomHookData,
-        orgView: data?.organization ? true : false,
-        orgLoading: loading
+        orgLoading: loading,
+        orgView: data?.organization?.name ? true : false
       }}
     >
       {children}

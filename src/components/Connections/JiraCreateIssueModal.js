@@ -20,13 +20,15 @@ import {
   useToast
 } from '@chakra-ui/react'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+
 import { CreateJiraIssue } from 'graphQL/Mutation'
 import { GetJiraOptions, GetJiraProjects } from 'graphQL/Queries'
 
 const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
-  const org = localStorage.getItem('organization')
+  const { orgView } = useGlobalQueryContext()
   const { data: projectOptions } = useQuery(GetJiraProjects, {
-    skip: org ? false : true,
+    skip: !orgView,
     fetchPolicy: 'network-only'
   })
 

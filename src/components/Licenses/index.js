@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import Card from 'components/Card/Card'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { GetLicensesTable } from 'graphQL/Queries'
@@ -10,14 +10,13 @@ import { GetLicensesTable } from 'graphQL/Queries'
 import LicenseTable from './LicenseTable'
 
 const Licenses = () => {
-  const org = localStorage.getItem('organization')
-  const orgNotFound = !org || org === 'undefined'
+  const { orgView } = useGlobalQueryContext()
 
   const [filters, setFilters] = useState({})
   const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
     GetLicensesTable,
     {
-      skip: orgNotFound,
+      skip: !orgView,
       selector: 'organization.licenses',
       variables: {
         direction: 'ASC',
@@ -25,8 +24,6 @@ const Licenses = () => {
       }
     }
   )
-
-  if (orgNotFound) return <OrgRegister />
 
   return (
     <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>

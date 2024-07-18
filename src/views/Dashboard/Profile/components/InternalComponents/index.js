@@ -23,6 +23,7 @@ import CardHeader from 'components/Card/CardHeader'
 import CustomLoader from 'components/CustomLoader'
 import { RegexHighlighter } from 'components/RegexHighlighter'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -34,11 +35,11 @@ import { UpdateInternalComponent } from './MutateInternalComponent'
 
 export const InternalComponents = () => {
   const activetab = useQueryParam('tab')
-  const org = localStorage.getItem('organization')
+  const { orgView } = useGlobalQueryContext()
   const [isOpen, setIsOpen] = useState(false)
   const [editingRow, setEditingRow] = useState(null)
   const { data, loading } = useQuery(getInternalComponents, {
-    skip: org === 'undefined' ? true : activetab === 'lists' ? false : true
+    skip: !orgView ? true : activetab === 'lists' ? false : true
   })
   const toast = useToast()
 

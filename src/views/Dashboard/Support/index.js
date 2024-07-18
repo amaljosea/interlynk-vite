@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import Card from 'components/Card/Card'
 import SupportTable from 'components/Tables/SupportTable'
@@ -9,9 +8,6 @@ import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { GetSupportTab } from 'graphQL/Queries'
 
 const Support = () => {
-  const org = localStorage.getItem('organization')
-  const orgNotFound = !org || org === 'undefined'
-
   const [filters, setFilters] = useState({
     field: 'COMPONENT_SUPPORT_OVERRIDES_UPDATED_AT',
     direction: 'DESC'
@@ -19,14 +15,11 @@ const Support = () => {
 
   const { nodes, paginationProps, reset, loading, refetch } =
     usePaginatatedQuery(GetSupportTab, {
-      skip: orgNotFound,
       selector: 'supports',
       variables: {
         ...filters
       }
     })
-
-  if (orgNotFound) return <OrgRegister />
 
   return (
     <Card>

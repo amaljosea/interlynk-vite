@@ -5,6 +5,7 @@ import { KBarProvider } from 'kbar'
 import React, { useEffect } from 'react'
 import { Outlet, redirect, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
+import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import { Box, Flex, Stack, useColorMode } from '@chakra-ui/react'
 
@@ -13,6 +14,7 @@ import Kbar from 'components/Kbar'
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { FaArrowLeft, FaArrowRight, FaRegFile } from 'react-icons/fa6'
@@ -22,13 +24,15 @@ import { logoutUser } from '../utils/authUtils'
 
 export default function Admin() {
   const params = useParams()
+  const { steps } = useTour()
+  const navigate = useNavigate()
+  const { colorMode } = useColorMode()
+  const { orgView, orgLoading } = useGlobalQueryContext()
+
   const productId = params.productid
   const sbomId = params.sbomid
   const authToken = Cookies.get('authToken')
   const tabRes = window.matchMedia('(max-width: 1199px)')
-  const navigate = useNavigate()
-  const { colorMode } = useColorMode()
-  const { steps } = useTour()
 
   const productView = location.pathname === '/vendor/products'
   const dashboardView = location.pathname === '/vendor/dashboard'
@@ -243,7 +247,7 @@ export default function Admin() {
               />
             </Box>
             <Box my={6} px={10}>
-              <Outlet />
+              {orgView ? <Outlet /> : <OrgRegister loading={orgLoading} />}
             </Box>
           </Flex>
         </TourProvider>

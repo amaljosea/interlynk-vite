@@ -1,7 +1,6 @@
 import { useMutation } from '@apollo/client'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
@@ -21,6 +20,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Skeleton,
   Text,
   useDisclosure,
   useToast
@@ -30,8 +30,7 @@ import Card from 'components/Card/Card'
 
 import { RegisterOrganization, SwitchOrganization } from 'graphQL/Mutation'
 
-const OrgRegister = () => {
-  const navigate = useNavigate()
+const OrgRegister = ({ loading }) => {
   const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [error, setError] = useState('')
@@ -100,6 +99,13 @@ const OrgRegister = () => {
     name === '' ||
     (email !== '' && emailError !== '') ||
     (url !== '' && !validateUrl(url))
+
+  if (loading)
+    return (
+      <Card>
+        <Skeleton width={'100%'} height={6} />
+      </Card>
+    )
 
   return (
     <>

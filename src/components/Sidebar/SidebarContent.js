@@ -13,11 +13,12 @@ import IconBox from 'components/Icons/IconBox'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 
 import useAnalyticsEventTracker from 'hooks/useAnalyticsEventTracker'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 
 const SidebarContent = ({ routes }) => {
   const location = useLocation()
   const activeUser = localStorage.getItem('email')
-  const org = localStorage.getItem('organization')
+  const { orgView } = useGlobalQueryContext()
   const isSuperAdmin = localStorage.getItem('isSuperAdmin')
   const dashboardView = location.pathname === '/vendor/dashboard'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
@@ -56,7 +57,7 @@ const SidebarContent = ({ routes }) => {
             className={dashboardView ? prop.name.toLowerCase() : ''}
             to={
               prop.path === '/settings'
-                ? `${prop.layout}${prop.path}?tab=${org === 'undefined' ? 'organization' : 'general'}`
+                ? `${prop.layout}${prop.path}?tab=${!orgView ? 'organization' : 'general'}`
                 : prop.layout + prop.path
             }
             onClick={() => gaEventTracker(prop.name)}

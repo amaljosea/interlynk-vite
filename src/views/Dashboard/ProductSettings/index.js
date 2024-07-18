@@ -29,13 +29,14 @@ import CardBody from 'components/Card/CardBody'
 import InfoModal from 'components/InfoModal'
 import LynkSelect from 'components/LynkSelect'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
 import { GetJiraProjects } from 'graphQL/Queries'
 
 const Settings = ({ enabled, data, refetch, mfc }) => {
-  const org = localStorage.getItem('organization')
+  const { orgView } = useGlobalQueryContext()
 
   const {
     id,
@@ -50,7 +51,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
   } = data || ''
 
   const { data: projectOptions } = useQuery(GetJiraProjects, {
-    skip: org ? false : true,
+    skip: !orgView,
     fetchPolicy: 'network-only'
   })
 

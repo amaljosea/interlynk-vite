@@ -37,6 +37,7 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -70,13 +71,13 @@ const GetCurrentUser = gql`
 
 const TeamTable = () => {
   const activetab = useQueryParam('tab')
-  const org = localStorage.getItem('organization')
+  const { orgView } = useGlobalQueryContext()
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { data: orgData } = useQuery(GetCurrentUser, {
-    skip: org === 'undefined' ? true : activetab === 'users' ? false : true
+    skip: !orgView ? true : activetab === 'users' ? false : true
   })
 
   const { currentUser } = orgData?.organization || ''
@@ -87,7 +88,7 @@ const TeamTable = () => {
     loading,
     refetch
   } = useQuery(GetUsers, {
-    skip: org === 'undefined' ? true : activetab === 'users' ? false : true,
+    skip: !orgView ? true : activetab === 'users' ? false : true,
     variables: { search: filterText === '' ? undefined : filterText }
   })
 
