@@ -4,6 +4,7 @@ import SidebarContent from './SidebarContent'
 
 const Sidebar = ({ routes }) => {
   const { colorMode } = useColorMode()
+
   return (
     <Box
       px={3.5}

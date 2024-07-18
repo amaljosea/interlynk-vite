@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
+import { useTour } from '@reactour/tour'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -69,6 +70,7 @@ const ProductTable = ({
   paginationProps
 }) => {
   const navigate = useNavigate()
+  const { setIsOpen } = useTour()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
@@ -329,9 +331,10 @@ const ProductTable = ({
     {
       id: 'PROJECT_GROUPS_NAME',
       name: 'PRODUCT',
-      selector: (row) => {
+      selector: (row, index) => {
         const { id, name, projects, defaultProject, description } = row
         const handleClick = () => {
+          setIsOpen(false)
           setClearSelect(true)
           setSelectedSbom([])
           const env = projects?.find((item) => item.name === environment)
@@ -379,6 +382,7 @@ const ProductTable = ({
             </GridItem>
             <GridItem gap={1} colSpan={6}>
               <Text
+                className={index === 0 ? 'product' : ''}
                 fontSize={14}
                 color={'blue.500'}
                 fontWeight={'medium'}

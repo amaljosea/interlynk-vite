@@ -1,10 +1,10 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { TourProvider } from '@reactour/tour'
+import { useTour } from '@reactour/tour'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { tourStyles } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
+import { productDetailSteps } from 'utils/tourUtils'
 
 import { Search2Icon } from '@chakra-ui/icons'
 import {
@@ -52,15 +52,14 @@ import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
-import { CurrentUserFlagSet } from 'graphQL/Mutation'
 import {
   GetGlobalVulns,
   GetOrgMfc,
   GetProjectGroup,
   GetProjectPolicies,
-  GetProjectSettings
+  GetProjectSettings,
+  GetVersionsDate
 } from 'graphQL/Queries'
-import { GetVersionsDate } from 'graphQL/Queries'
 
 import { FaBug, FaRobot, FaTag } from 'react-icons/fa'
 import {
@@ -100,9 +99,9 @@ const ProductDetailsMain = () => {
   const productId = params.productid
   const productGroupId = params.productgroupid
   const sbomId = params.sbomid
+  const { setIsOpen, setSteps, setCurrentStep } = useTour()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-
-  const [updateTour] = useMutation(CurrentUserFlagSet)
+  const prodTour = localStorage.getItem('productTour')
 
   const tabs = [
     'versions',
@@ -289,19 +288,6 @@ const ProductDetailsMain = () => {
       .finally(() => navigate('/vendor/products'))
   }
 
-  const steps = [
-    {
-      selector: '.versions',
-      content: 'SBOM Version Details'
-    }
-  ]
-
-  const onTourUpdate = (value) => {
-    updateTour({
-      variables: { flags: ['productDetailsOnboardingCompleted'] }
-    }).then((res) => res?.data && value.setIsOpen(false))
-  }
-
   useEffect(() => {
     if (sbomId === null) {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
@@ -317,6 +303,17 @@ const ProductDetailsMain = () => {
       setActiveEnv(env?.id)
     }
   }, [data, environment])
+
+  useEffect(() => {
+    if (productId && prodTour === 'false') {
+      setSteps(productDetailSteps)
+      document?.body?.classList.remove('no-scroll')
+      setCurrentStep(0)
+      setTimeout(() => {
+        setIsOpen(true)
+      }, 2000)
+    }
+  }, [prodTour, productId, setCurrentStep, setIsOpen, setSteps])
 
   const handleSort = (column, sortDirection) => {
     setVersionFilters((oldFilters) => ({
@@ -346,15 +343,10 @@ const ProductDetailsMain = () => {
   }
 
   return (
-    <TourProvider
-      steps={steps}
-      styles={tourStyles}
-      onClickClose={(value) => onTourUpdate(value)}
-      onClickMask={(value) => onTourUpdate(value)}
-    >
+    <>
       <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
         {/* INFO SECTION */}
-        <Card display={data ? 'block' : 'none'}>
+        <Card display={data ? 'block' : 'none'} className='product-details'>
           <CardBody>
             <Grid
               width={'100%'}
@@ -502,6 +494,13 @@ const ProductDetailsMain = () => {
                     key={index}
                     _focus={{ outline: 'none' }}
                     textTransform={'capitalize'}
+                    className={
+                      item === 'automation rules'
+                        ? 'automation-rules'
+                        : item === 'versions'
+                          ? ''
+                          : item
+                    }
                   >
                     {item}
                   </Tab>
@@ -658,7 +657,7 @@ const ProductDetailsMain = () => {
           setActiveEnv={setActiveEnv}
         />
       )}
-    </TourProvider>
+    </>
   )
 }
 

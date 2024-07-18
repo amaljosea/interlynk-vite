@@ -1,7 +1,9 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
+import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
+import { versionDetailSteps } from 'utils/tourUtils'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
 import {
@@ -83,9 +85,11 @@ const SbomDetails = ({ sbomData, refetch }) => {
   } = sbomData || ''
   const { compCount, compLicenseCount, vulnStats } = stats || ''
   const { critical, high, medium, low, unknown } = vulnStats || ''
+  const { setIsOpen, setSteps, setCurrentStep } = useTour()
   const { prodCompState, setActiveCsSbomTab, dispatch } = useGlobalState()
   const { field, direction } = prodCompState
   const { prodCompDispatch, prodVulnDispatch } = dispatch
+  const prodTour = localStorage.getItem('productTour')
 
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const scanColor = useColorModeValue('blackAlpha', 'whiteAlpha')
@@ -214,6 +218,17 @@ const SbomDetails = ({ sbomData, refetch }) => {
       handlePart()
     }
   })
+
+  useEffect(() => {
+    if (sbomId && prodTour === 'false') {
+      setSteps(versionDetailSteps)
+      document?.body?.classList.remove('no-scroll')
+      setCurrentStep(0)
+      setTimeout(() => {
+        setIsOpen(true)
+      }, 2000)
+    }
+  }, [sbomId, prodTour, setCurrentStep, setIsOpen, setSteps])
 
   useEffect(() => {
     const refetchInterval = setInterval(() => {

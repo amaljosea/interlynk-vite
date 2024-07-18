@@ -1,6 +1,8 @@
+import { useTour } from '@reactour/tour'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
+import { productSteps } from 'utils/tourUtils'
 
 import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/react'
 
@@ -16,6 +18,8 @@ import OrgRegister from '../Profile/components/OrgRegister'
 
 function ProductList() {
   const { dispatch } = useGlobalState()
+  const prodTour = localStorage.getItem('productTour')
+  const { setIsOpen, setSteps, setCurrentStep } = useTour()
   const { prodDispatch, prodCompDispatch, prodVulnDispatch } = dispatch
 
   const location = useLocation()
@@ -60,10 +64,22 @@ function ProductList() {
 
   useEffect(() => {
     if (product === null) {
+      !prodTour && localStorage.setItem('productTour', false)
       prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
-  }, [prodCompDispatch, prodVulnDispatch, product])
+  }, [prodCompDispatch, prodTour, prodVulnDispatch, product])
+
+  useEffect(() => {
+    if (location.pathname === '/vendor/products' && prodTour === 'false') {
+      document?.body?.classList.remove('no-scroll')
+      if (nodes?.length > 0) {
+        setSteps(productSteps)
+        setCurrentStep(0)
+        setIsOpen(true)
+      }
+    }
+  }, [location, nodes?.length, prodTour, setCurrentStep, setIsOpen, setSteps])
 
   if (orgNotFound) return <OrgRegister />
 

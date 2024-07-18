@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import { logoutUser } from 'utils/authUtils'
+import { homeSteps } from 'utils/tourUtils'
 
 import { ChevronDownIcon, SearchIcon } from '@chakra-ui/icons'
 import {
@@ -48,6 +49,7 @@ import { FaExchangeAlt, FaSignOutAlt } from 'react-icons/fa'
 import {
   FaCode,
   FaInbox,
+  FaLocationArrow,
   FaMoon,
   FaSquareArrowUpRight,
   FaSun,
@@ -176,7 +178,7 @@ export default function HeaderLinks(props) {
 
   const os = detectOS()
 
-  const { setIsOpen, setCurrentStep } = useTour()
+  const { setIsOpen, setCurrentStep, setSteps } = useTour()
 
   const onStartTour = () => {
     localStorage.setItem('tourCompleted', false)
@@ -186,6 +188,14 @@ export default function HeaderLinks(props) {
     } else {
       setCurrentStep(0)
     }
+    setIsOpen(true)
+  }
+
+  const onStartDashTour = () => {
+    setSteps(homeSteps)
+    localStorage.setItem('dashboardTour', false)
+    document?.body?.classList.remove('no-scroll')
+    setCurrentStep(0)
     setIsOpen(true)
   }
 
@@ -236,9 +246,9 @@ export default function HeaderLinks(props) {
             fontSize='sm'
             colorScheme='blue'
             fontWeight='medium'
-            leftIcon={envIcon(envName)}
-            rightIcon={<ChevronDownIcon />}
             textTransform='capitalize'
+            leftIcon={envIcon(envName)}
+            className='environments'
           >
             {envName || 'Default'}
           </MenuButton>
@@ -302,6 +312,13 @@ export default function HeaderLinks(props) {
                   Settings
                 </MenuItem>
               </Link>
+              <MenuItem
+                hidden={!dashboardView}
+                onClick={onStartDashTour}
+                icon={<FaLocationArrow />}
+              >
+                Start Tour
+              </MenuItem>
               <Link to='/vendor/settings?tab=organizations'>
                 <MenuItem
                   icon={<FaExchangeAlt />}

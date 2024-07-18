@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import { useQuery } from '@apollo/client'
+import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -31,6 +32,7 @@ export default function Dashboard() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
+  const { setIsOpen } = useTour()
   const { dispatch, envName } = useGlobalState()
   const { orgView } = useGlobalQueryContext()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
@@ -61,10 +63,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (product === null) {
+      setIsOpen(false)
       prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
-  }, [prodCompDispatch, prodVulnDispatch, product])
+  }, [prodCompDispatch, prodVulnDispatch, product, setIsOpen])
 
   if (eOrg || eOrgMetric) return <OrgRegister />
 

@@ -28,7 +28,7 @@ const SbomInfo = ({ data, error, loading, refetch }) => {
   }
 
   return (
-    <Card mb='6'>
+    <Card mb='6' className='version'>
       <CardBody>
         <Grid
           width={'100%'}

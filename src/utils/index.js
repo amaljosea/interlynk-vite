@@ -1009,7 +1009,7 @@ export const tourStyles = {
     ...base,
     button: {
       ...base.button,
-      color: '#ff6347'
+      color: 'white'
     }
   })
 }

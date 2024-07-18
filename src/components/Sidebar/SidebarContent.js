@@ -19,6 +19,7 @@ const SidebarContent = ({ routes }) => {
   const activeUser = localStorage.getItem('email')
   const org = localStorage.getItem('organization')
   const isSuperAdmin = localStorage.getItem('isSuperAdmin')
+  const dashboardView = location.pathname === '/vendor/dashboard'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
@@ -52,6 +53,7 @@ const SidebarContent = ({ routes }) => {
       return (
         <Tooltip key={prop.name} label={prop.name} placement='right'>
           <Link
+            className={dashboardView ? prop.name.toLowerCase() : ''}
             to={
               prop.path === '/settings'
                 ? `${prop.layout}${prop.path}?tab=${org === 'undefined' ? 'organization' : 'general'}`
