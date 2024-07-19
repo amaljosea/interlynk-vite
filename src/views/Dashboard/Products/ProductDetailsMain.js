@@ -64,13 +64,13 @@ import {
 import { FaBug, FaRobot, FaTag } from 'react-icons/fa'
 import {
   FaBoxArchive,
-  FaExclamation,
   FaPenToSquare,
   FaToggleOff,
   FaToggleOn,
   FaUpload,
   FaWindowMaximize
 } from 'react-icons/fa6'
+import { IoMdWarning } from 'react-icons/io'
 
 import Automation from '../Automation'
 import Settings from '../ProductSettings'
@@ -102,6 +102,8 @@ const ProductDetailsMain = () => {
   const { setIsOpen, setSteps, setCurrentStep } = useTour()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const prodTour = localStorage.getItem('productTour')
+
+  const warningColor = useColorModeValue('#E53E3E', '#F56565')
 
   const tabs = [
     'versions',
@@ -407,12 +409,12 @@ const ProductDetailsMain = () => {
                       />
                       {warning && (
                         <Tooltip
-                          label={`${exceedingCount} SBOMs are marked from deletion in the next 7 days`}
+                          label={`${exceedingCount} SBOM${exceedingCount > 1 ? 's' : ''} are marked from deletion in the next 7 days`}
                         >
                           <IconButton
                             size='xs'
-                            colorScheme={'red'}
-                            icon={<FaExclamation />}
+                            color={warningColor}
+                            icon={<IoMdWarning size={16} />}
                             onClick={() =>
                               handleSort({ id: 'SBOMS_CREATED_AT' }, 'desc')
                             }

@@ -1,6 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { addDays, differenceInDays, isAfter, parseISO } from 'date-fns'
+import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -74,6 +74,7 @@ import {
   FaEllipsisVertical,
   FaScrewdriverWrench
 } from 'react-icons/fa6'
+import { IoMdWarning } from 'react-icons/io'
 
 const VersionsTable = ({
   handleSort,
@@ -107,6 +108,7 @@ const VersionsTable = ({
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const warningColor = useColorModeValue('#E53E3E', '#F56565')
 
   const [getAlternatives, { data: sbomAlts }] = useLazyQuery(
     signedUrlParams ? GetShareSbomAlternatives : GetSbomAlternatives
@@ -281,10 +283,11 @@ const VersionsTable = ({
               </Tooltip>
             </GridItem>
             <GridItem
+              gap={2}
               colSpan={6}
               display={'flex'}
-              flexWrap={'wrap'}
-              flexDirection={'column'}
+              flexDirection={'row'}
+              alignItems={'center'}
             >
               <Link to={link} onClick={onStartTour}>
                 <Text
@@ -297,10 +300,15 @@ const VersionsTable = ({
                 </Text>
               </Link>
               {daysUntilDeletion && !signedUrlParams && (
-                <Text fontSize='xs' mt={1} color='#F56565' cursor={'pointer'}>
-                  Marked for deletion on{' '}
-                  {endDate ? new Date(endDate).toLocaleDateString() : ''}
-                </Text>
+                <Tooltip
+                  label={`Marked for deletion on ${endDate ? new Date(endDate).toLocaleDateString() : ''}`}
+                >
+                  <IconButton
+                    size='xs'
+                    color={warningColor}
+                    icon={<IoMdWarning size={16} />}
+                  />
+                </Tooltip>
               )}
             </GridItem>
           </Grid>
