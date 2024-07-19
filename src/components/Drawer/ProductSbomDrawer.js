@@ -71,6 +71,8 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const [isPURLInputValid, setPURLInputValid] = useState(true)
   const [isValid, setIsValid] = useState(true)
   const [disabled, setDisabled] = useState(false)
+  const [isPrimary, setIsPrimary] = useState(false)
+  const [isInternal, setIsInternal] = useState(false)
 
   const handleRefetch = () => {
     refetch({
@@ -199,16 +201,16 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
     await createComponent({
       variables: {
         sbomId: id,
-        kind: compType,
         name: sbomName,
+        kind: compType,
+        purl: purlValue,
         version: version,
         group: groupInfo,
         scope: compScope,
-        licenses: { licensesExp: expLicense || '' },
+        primary: isPrimary,
+        internal: isInternal,
         cpes: cpeValue !== '' ? [cpeValue] : [],
-        purl: purlValue,
-        primary: true,
-        internal: false
+        licenses: { licensesExp: expLicense || '' }
       }
     }).then(
       (res) =>
@@ -445,16 +447,30 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                 </Select>
               </FormControl>
               {/* PRIMARY COMPONENT */}
-              <FormControl htmlFor={'isPrimary'} isReadOnly={true}>
+              <FormControl htmlFor={'isPrimary'}>
                 <Checkbox
+                  mt={4}
                   size='sm'
                   id='isPrimary'
                   name='isPrimary'
                   colorScheme='blue'
-                  defaultChecked={true}
-                  mt={4}
+                  isChecked={isPrimary}
+                  onChange={() => setIsPrimary(!isPrimary)}
                 >
                   Primary component
+                </Checkbox>
+              </FormControl>
+              {/* INTERNAL COMPONENT */}
+              <FormControl htmlFor={'isInternal'}>
+                <Checkbox
+                  size='sm'
+                  id='isInternal'
+                  name='isInternal'
+                  colorScheme='blue'
+                  isChecked={isInternal}
+                  onChange={() => setIsInternal(!isInternal)}
+                >
+                  Internal component
                 </Checkbox>
               </FormControl>
             </Stack>
