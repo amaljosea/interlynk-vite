@@ -154,7 +154,6 @@ const SlackConfigModal = ({
           <Input
             isDisabled={!updateCon}
             placeholder='Paste Slack Webhook URL'
-            color='gray.600'
             value={slackWebhook}
             onChange={(e) => {
               setSlackWebhook(e.target.value)

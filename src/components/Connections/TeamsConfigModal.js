@@ -154,7 +154,6 @@ const TeamsConfigModal = ({
           <Input
             isDisabled={!updateCon}
             placeholder='Paste Teams Webhook URL'
-            color='gray.600'
             value={teamsWebhook}
             onChange={(e) => {
               setTeamsWebhook(e.target.value)
