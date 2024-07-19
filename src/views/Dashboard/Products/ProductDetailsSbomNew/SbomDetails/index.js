@@ -26,6 +26,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import {
   GetPrimaryComponent,
@@ -86,6 +87,7 @@ const SbomDetails = ({ sbomData, refetch }) => {
   const { compCount, compLicenseCount, vulnStats } = stats || ''
   const { critical, high, medium, low, unknown } = vulnStats || ''
   const { setIsOpen, setSteps, setCurrentStep } = useTour()
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const { prodCompState, setActiveCsSbomTab, dispatch } = useGlobalState()
   const { field, direction } = prodCompState
   const { prodCompDispatch, prodVulnDispatch } = dispatch
@@ -220,15 +222,23 @@ const SbomDetails = ({ sbomData, refetch }) => {
   })
 
   useEffect(() => {
-    if (sbomId && prodTour === 'false') {
-      setSteps(versionDetailSteps)
+    if (sbomId && prodTour === 'false' && shouldShowDemoFeatures) {
       document?.body?.classList.remove('no-scroll')
-      setCurrentStep(0)
-      setTimeout(() => {
+      if (sbomData) {
+        setSteps(versionDetailSteps)
+        setCurrentStep(0)
         setIsOpen(true)
-      }, 2000)
+      }
     }
-  }, [sbomId, prodTour, setCurrentStep, setIsOpen, setSteps])
+  }, [
+    sbomId,
+    prodTour,
+    setCurrentStep,
+    setIsOpen,
+    setSteps,
+    shouldShowDemoFeatures,
+    sbomData
+  ])
 
   useEffect(() => {
     const refetchInterval = setInterval(() => {

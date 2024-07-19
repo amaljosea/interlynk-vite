@@ -11,6 +11,7 @@ import ProductTable from 'components/Tables/ProductTable'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetProductTable } from 'graphQL/Queries'
 
@@ -23,6 +24,8 @@ function ProductList() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
+
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const productPermissions = useHasPermission({
     parentKey: 'view_product_group'
@@ -66,7 +69,11 @@ function ProductList() {
   }, [prodCompDispatch, prodTour, prodVulnDispatch, product])
 
   useEffect(() => {
-    if (location.pathname === '/vendor/products' && prodTour === 'false') {
+    if (
+      location.pathname === '/vendor/products' &&
+      prodTour === 'false' &&
+      shouldShowDemoFeatures
+    ) {
       document?.body?.classList.remove('no-scroll')
       if (nodes?.length > 0) {
         setSteps(productSteps)
@@ -74,7 +81,15 @@ function ProductList() {
         setIsOpen(true)
       }
     }
-  }, [location, nodes?.length, prodTour, setCurrentStep, setIsOpen, setSteps])
+  }, [
+    location,
+    nodes?.length,
+    prodTour,
+    setCurrentStep,
+    setIsOpen,
+    setSteps,
+    shouldShowDemoFeatures
+  ])
 
   if (error) {
     return (

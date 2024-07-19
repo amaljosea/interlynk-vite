@@ -50,6 +50,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
@@ -117,6 +118,7 @@ const ProductDetailsMain = () => {
   const [warning, setWarning] = useState(false)
   const [exceedingCount, setExceedingCount] = useState(0)
 
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const onTabChange = (value) => {
@@ -307,15 +309,23 @@ const ProductDetailsMain = () => {
   }, [data, environment])
 
   useEffect(() => {
-    if (productId && prodTour === 'false') {
-      setSteps(productDetailSteps)
+    if (productId && prodTour === 'false' && shouldShowDemoFeatures) {
       document?.body?.classList.remove('no-scroll')
-      setCurrentStep(0)
-      setTimeout(() => {
+      if (data) {
+        setSteps(productDetailSteps)
+        setCurrentStep(0)
         setIsOpen(true)
-      }, 2000)
+      }
     }
-  }, [prodTour, productId, setCurrentStep, setIsOpen, setSteps])
+  }, [
+    data,
+    prodTour,
+    productId,
+    setCurrentStep,
+    setIsOpen,
+    setSteps,
+    shouldShowDemoFeatures
+  ])
 
   const handleSort = (column, sortDirection) => {
     setVersionFilters((oldFilters) => ({

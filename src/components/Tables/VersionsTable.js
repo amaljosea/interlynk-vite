@@ -227,11 +227,8 @@ const VersionsTable = ({
   }, [nodes, refetch])
 
   const onStartTour = () => {
-    if (signedUrlParams) {
-      setIsOpen(false)
-    } else {
-      prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
-    }
+    setIsOpen(false)
+    prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
   }
 
   const retention = retentionTime && Math.floor(retentionTime)

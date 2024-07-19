@@ -8,7 +8,7 @@ import { dashRoutes } from 'routes.js'
 import { logoutUser } from 'utils/authUtils'
 import { homeSteps } from 'utils/tourUtils'
 
-import { ChevronDownIcon, SearchIcon } from '@chakra-ui/icons'
+import { SearchIcon } from '@chakra-ui/icons'
 import {
   Avatar,
   Box,
@@ -42,6 +42,7 @@ import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetOrgName } from 'graphQL/Queries'
 
@@ -71,6 +72,7 @@ export const GetProfilePic = gql`
 `
 
 export default function HeaderLinks(props) {
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const location = useLocation()
   const navigate = useNavigate()
@@ -313,9 +315,9 @@ export default function HeaderLinks(props) {
                 </MenuItem>
               </Link>
               <MenuItem
-                hidden={!dashboardView}
                 onClick={onStartDashTour}
                 icon={<FaLocationArrow />}
+                hidden={!shouldShowDemoFeatures || !dashboardView}
               >
                 Start Tour
               </MenuItem>
