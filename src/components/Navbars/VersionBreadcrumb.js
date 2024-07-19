@@ -1,15 +1,15 @@
 import { useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Select from 'react-select'
 
 import { Spinner, useColorModeValue } from '@chakra-ui/react'
 
-import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { GetProjectVersionAndId, GetVersionName } from 'graphQL/Queries'
+
+import { customFilter } from './customFilter'
 
 const VersionBreadcrumb = ({ selectStyles }) => {
   const navigate = useNavigate()
@@ -22,11 +22,6 @@ const VersionBreadcrumb = ({ selectStyles }) => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const [versionSearchInput, setVersionSearchInput] = useState('')
-  const [versions, setVersions] = useState([])
-  const [totalCount, setTotalCount] = useState(null)
-
-  const debouncedVersionSearchInput = useDebounce(versionSearchInput, 300)
   const loaderColor = useColorModeValue('#e2e8f0', '#4A5568')
 
   const prodID = params.productid
@@ -36,10 +31,8 @@ const VersionBreadcrumb = ({ selectStyles }) => {
   const { data: versionData, loading } = useQuery(GetProjectVersionAndId, {
     variables: {
       id: prodID,
-      search: debouncedVersionSearchInput,
-      first: 10,
-      field: 'SBOMS_CREATED_AT',
-      direction: 'DESC'
+      field: 'SBOMS_PROJECT_VERSION',
+      direction: 'ASC'
     },
     skip: !prodID || !orgView
   })
@@ -52,12 +45,8 @@ const VersionBreadcrumb = ({ selectStyles }) => {
     }
   })
 
-  useEffect(() => {
-    if (versionData) {
-      setVersions(versionData.project.sbomVersions.nodes)
-      setTotalCount(versionData.project.allSbomVersions.totalCount)
-    }
-  }, [versionData])
+  const versions = versionData?.project?.sbomVersions?.nodes
+  const totalCount = versionData?.project?.allSbomVersions?.totalCount
 
   const filterText = (item) => {
     return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
@@ -83,8 +72,7 @@ const VersionBreadcrumb = ({ selectStyles }) => {
     return (
       <Select
         styles={selectStyles}
-        inputValue={versionSearchInput}
-        onInputChange={setVersionSearchInput}
+        isSearchable
         options={versions}
         getOptionLabel={(version) => version.projectVersion}
         getOptionValue={(version) => version.id}
@@ -95,6 +83,7 @@ const VersionBreadcrumb = ({ selectStyles }) => {
         }}
         hideSelectedOptions
         isLoading={loading}
+        filterOption={customFilter}
       />
     )
   } else if (versions && totalCount === 1) {

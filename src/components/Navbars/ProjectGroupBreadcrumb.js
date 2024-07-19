@@ -1,16 +1,17 @@
 import { useQuery } from '@apollo/client'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Select from 'react-select'
 
 import { Spinner, useColorModeValue } from '@chakra-ui/react'
 
-import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { GetProjectGroupDetails, GetProjectName } from 'graphQL/Queries'
+
+import { customFilter } from './customFilter'
 
 const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
   const navigate = useNavigate()
@@ -23,11 +24,6 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
-  const [searchInput, setSearchInput] = useState('')
-  const [products, setProducts] = useState([])
-  const [totalCount, setTotalCount] = useState(null)
-
-  const debouncedSearchInput = useDebounce(searchInput, 300)
   const environment = localStorage.getItem('environment')
 
   const loaderColor = useColorModeValue('#e2e8f0', '#4A5568')
@@ -39,11 +35,8 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
   const { data: productsData, loading } = useQuery(GetProjectGroupDetails, {
     skip: !orgView || viewProds === false,
     variables: {
-      field: 'PROJECT_GROUPS_UPDATED_AT',
-      direction: 'DESC',
-      enabled: true,
-      first: 10,
-      search: debouncedSearchInput
+      field: 'PROJECT_GROUPS_NAME',
+      direction: 'ASC'
     }
   })
 
@@ -54,12 +47,8 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
     }
   })
 
-  useEffect(() => {
-    if (productsData) {
-      setProducts(productsData?.organization?.projectGroups?.nodes)
-      setTotalCount(productsData?.organization?.allProjectGroups?.totalCount)
-    }
-  }, [productsData])
+  const products = productsData?.organization?.projectGroups?.nodes
+  const totalCount = productsData?.organization?.allProjectGroups?.totalCount
 
   const handleProductClick = useCallback(
     (product) => {
@@ -85,13 +74,12 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
         {filterText(projectGroupName)}
       </Link>
     )
-  } else if (products && totalCount > 1) {
+  } else if (products && totalCount) {
     return (
       <Select
         options={products}
         styles={selectStyles}
-        inputValue={searchInput}
-        onInputChange={setSearchInput}
+        isSearchable
         getOptionLabel={(product) => product.name}
         getOptionValue={(product) => product.id}
         onChange={(product) => handleProductClick(product)}
@@ -100,6 +88,7 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
           IndicatorSeparator: () => null
         }}
         hideSelectedOptions
+        filterOption={customFilter}
         isLoading={loading}
       />
     )
