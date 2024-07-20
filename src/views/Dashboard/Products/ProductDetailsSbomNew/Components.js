@@ -245,7 +245,19 @@ const Components = ({ sbomData, sbomRefetch }) => {
       id: 'COMPONENTS_NAME',
       name: 'NAME',
       selector: (row) => {
-        const { purl, cpes, name, primary, internal, externalUrls } = row
+        const {
+          purl,
+          cpes,
+          name,
+          primary,
+          internal,
+          externalUrls,
+          sbomId: bomId,
+          sbom
+        } = row
+        const { projectVersion, project } = sbom || ''
+        const { projectGroup } = project || ''
+        const isPart = sbomId !== bomId
         const unknown = isUnknown(cpes, purl)
         const website = externalUrls?.find((item) => item.name === 'website')
         const distribution = externalUrls?.find(
@@ -276,6 +288,16 @@ const Components = ({ sbomData, sbomRefetch }) => {
               <Text color={textColor} data-tag='allowRowEvents'>
                 {name}
               </Text>
+              {isPart && (
+                <Text
+                  fontSize={'xs'}
+                  color={textColor}
+                  fontWeight={'medium'}
+                  width={'fit-content'}
+                >
+                  {projectGroup?.name || ''} : {projectVersion || ''}
+                </Text>
+              )}
               {/* EXTERNAL REFERENCE */}
               <Stack direction={'row'} alignItems={'center'}>
                 {/* WEBSITE */}

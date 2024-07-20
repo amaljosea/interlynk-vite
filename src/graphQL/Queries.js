@@ -1550,6 +1550,15 @@ export const GetComponentData = gql`
         }
         nodes {
           id
+          sbomId
+          sbom {
+            projectVersion
+            project {
+              projectGroup {
+                name
+              }
+            }
+          }
           name
           version
           primary
