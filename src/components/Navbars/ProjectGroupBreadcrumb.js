@@ -1,9 +1,9 @@
 import { useQuery } from '@apollo/client'
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import Select from 'react-select'
+import Select, { components } from 'react-select'
 
-import { Spinner, useColorModeValue } from '@chakra-ui/react'
+import { Divider, Spinner, useColorModeValue } from '@chakra-ui/react'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -49,6 +49,9 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
 
   const products = productsData?.organization?.projectGroups?.nodes
   const totalCount = productsData?.organization?.allProjectGroups?.totalCount
+  const selectedProduct = products?.find(
+    (product) => product.id === productGroupId
+  )
 
   const handleProductClick = useCallback(
     (product) => {
@@ -68,29 +71,59 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
     return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
   }
 
+  const options = selectedProduct
+    ? [selectedProduct, ...products.filter((p) => p.id !== selectedProduct.id)]
+    : products
+
+  const selectRef = useRef()
+
+  const CustomMenuList = (props) => {
+    return (
+      <components.MenuList {...props}>
+        {props.children.map((child, index) => (
+          <>
+            {index === 1 && <Divider />}
+            {child}
+          </>
+        ))}
+      </components.MenuList>
+    )
+  }
+
   if (path === 'customer' && projectGroupName) {
     return (
       <Link to={generateProductDetailPageUrlFromCurrentUrl()}>
         {filterText(projectGroupName)}
       </Link>
     )
-  } else if (products && totalCount) {
+  } else if (products && totalCount > 1) {
     return (
-      <Select
-        options={products}
-        styles={selectStyles}
-        isSearchable
-        getOptionLabel={(product) => product.name}
-        getOptionValue={(product) => product.id}
-        onChange={(product) => handleProductClick(product)}
-        defaultValue={projectNameData?.projectGroup}
-        components={{
-          IndicatorSeparator: () => null
+      <div
+        onMouseOver={() => {
+          if (selectRef.current) {
+            selectRef.current.focus()
+          }
         }}
-        hideSelectedOptions
-        filterOption={customFilter}
-        isLoading={loading}
-      />
+      >
+        <Select
+          ref={selectRef}
+          options={options}
+          styles={selectStyles}
+          isSearchable
+          getOptionLabel={(product) => product.name}
+          getOptionValue={(product) => product.id}
+          onChange={(product) => handleProductClick(product)}
+          defaultValue={projectNameData?.projectGroup}
+          components={{
+            IndicatorSeparator: () => null,
+            MenuList: CustomMenuList
+          }}
+          filterOption={customFilter}
+          isLoading={loading}
+          openMenuOnFocus
+          blurInputOnSelect
+        />
+      </div>
     )
   } else if (products && totalCount === 1) {
     return (
