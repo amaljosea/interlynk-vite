@@ -77,7 +77,7 @@ function ComponentDrawer(props) {
   const link = generateProductVersionDetailPageUrlFromCurrentUrl({
     replaceParams: true,
     paramsObj: {
-      tab: 'components'
+      tab: activeTab
     }
   })
 

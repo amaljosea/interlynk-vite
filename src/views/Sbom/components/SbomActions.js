@@ -1,7 +1,7 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
@@ -86,6 +86,9 @@ const SbomActions = ({ sbom, refetch }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const activeTab = queryParams.get('tab')
 
   const [status, setStatus] = useState('created')
   const [signedData, setSignedData] = useState(null)
@@ -189,7 +192,10 @@ const SbomActions = ({ sbom, refetch }) => {
     }).then((res) => {
       if (res.data) {
         const url = generateProductVersionDetailPageUrlFromCurrentUrl({
-          sbomid: id
+          sbomid: id,
+          paramsObj: {
+            tab: activeTab
+          }
         })
         navigate(url)
       }
@@ -266,7 +272,11 @@ const SbomActions = ({ sbom, refetch }) => {
       })
       .then((res) => {
         if (res.data) {
-          const url = generateProductVersionDetailPageUrlFromCurrentUrl()
+          const url = generateProductVersionDetailPageUrlFromCurrentUrl({
+            paramsObj: {
+              tab: activeTab
+            }
+          })
           navigate(url)
         }
       })
