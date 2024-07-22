@@ -58,8 +58,6 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
 
-  // console.log('activeRow', activeRow)
-
   const compRef = useRef()
 
   // GET COMPONENT DATA
@@ -120,22 +118,6 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
       document.removeEventListener('click', handleClickOutside)
     }
   }, [])
-
-  useEffect(() => {
-    if (isOpen) {
-      getCompData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: 100,
-          field: field,
-          direction: direction
-        }
-      }).then(
-        (res) => res.data && setComponentList(res.data.sbom.components.nodes)
-      )
-    }
-  }, [direction, field, getCompData, isOpen, productId, sbomId])
 
   const handleComUpdate = () => {
     disableButtonTemporarily()
@@ -323,6 +305,22 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
       })
     }
   }
+
+  useEffect(() => {
+    if (isPrimary) {
+      getCompData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: 100,
+          field: field,
+          direction: direction
+        }
+      }).then(
+        (res) => res.data && setComponentList(res.data.sbom.components.nodes)
+      )
+    }
+  }, [direction, field, getCompData, isPrimary, productId, sbomId])
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInBottom'>

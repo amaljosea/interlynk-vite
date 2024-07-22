@@ -27,6 +27,7 @@ import {
   Stack,
   Tag,
   Text,
+  useColorModeValue,
   useToast
 } from '@chakra-ui/react'
 
@@ -54,6 +55,8 @@ const DownloadModal = ({
   const [getData] = useLazyQuery(
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
   )
+
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { data: ntia, loading: ntiaLoading } = useQuery(GetSbomQualityScores, {
     skip: isOpen && !signedUrlParams ? false : true,
@@ -162,6 +165,7 @@ const DownloadModal = ({
                 size='xs'
                 width={'80px'}
                 isLoading={loading}
+                color={'#000'}
                 bg={getBgColor(item?.score)}
                 _hover={{ background: getBgColor(item?.score) }}
               >
@@ -283,6 +287,7 @@ const DownloadModal = ({
                       _focus={{ outline: 'none' }}
                       _expanded={{
                         bg: 'blue.100',
+                        color: '#111',
                         boxShadow: 'none',
                         outline: 'none'
                       }}

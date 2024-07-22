@@ -33,9 +33,8 @@ import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { sbomDelete } from 'graphQL/Mutation'
+import { recheckHealth } from 'graphQL/Mutation'
 import {
-  AllShareComponents,
-  GetAllComponents,
   GetCheckResults,
   GetCompFilterData,
   GetComponentData,
@@ -91,6 +90,7 @@ const SbomActions = ({ sbom, refetch }) => {
   const activeTab = queryParams.get('tab')
 
   const [status, setStatus] = useState('created')
+  const [checks, setChecks] = useState(false)
   const [signedData, setSignedData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [selectedVersion, setSelectedVersion] = useState(null)
@@ -105,14 +105,12 @@ const SbomActions = ({ sbom, refetch }) => {
     }
   })
 
-  const [getAllComps, { data: allComponents }] = useLazyQuery(
-    signedUrlParams ? AllShareComponents : GetAllComponents
-  )
   const [getCompFilters] = useLazyQuery(
     signedUrlParams ? ShareCompFilters : GetCompFilterData
   )
 
   const [deleteSbom] = useMutation(sbomDelete)
+  const [healthRecheck] = useMutation(recheckHealth)
 
   // DISCLOUSERS
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -210,7 +208,8 @@ const SbomActions = ({ sbom, refetch }) => {
   }
 
   const { nodes } = usePaginatatedQuery(GetCheckResults, {
-    skip: isPrimaryOpen ? false : true,
+    skip: !checks,
+    fetchPolicy: 'network-only',
     selector: 'sbom.checkResults',
     variables: {
       sbomId: sbomId,
@@ -228,17 +227,15 @@ const SbomActions = ({ sbom, refetch }) => {
       sbomDispatch({ type: 'SET_LICENSES', payload: sbom?.primaryComponent })
       setSBMOpen()
     } else {
-      getAllComps({
-        variables: {
-          projectId: signedUrlParams ? undefined : productId,
-          field: signedUrlParams ? undefined : 'COMPONENTS_UPDATED_AT',
-          direction: signedUrlParams ? undefined : 'DESC',
-          sbomId: sbomId,
-          first: 100
-        }
-      }).then(() => {
-        onPrimaryOpen()
-      })
+      healthRecheck({ variables: { sbomId } })
+        .then((res) => {
+          if (res?.data) {
+            setChecks(true)
+          } else {
+            setChecks(true)
+          }
+        })
+        .finally(() => onPrimaryOpen())
     }
   }
 
@@ -371,7 +368,11 @@ const SbomActions = ({ sbom, refetch }) => {
           <IconButton
             className='download'
             icon={<FaFileDownload />}
-            onClick={onOpen}
+            onClick={() =>
+              healthRecheck({ variables: { sbomId } }).then(
+                (res) => res?.data && onOpen()
+              )
+            }
             size='md'
             colorScheme='blue'
           />
@@ -404,7 +405,7 @@ const SbomActions = ({ sbom, refetch }) => {
       )}
 
       {/*  SET PRIMARY COMPONENT */}
-      {isPrimaryOpen && allComponents && (
+      {isPrimaryOpen && (
         <CheckModal
           ruleExists={null}
           refetch={refetch}
