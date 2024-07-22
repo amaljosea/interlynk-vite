@@ -693,7 +693,6 @@ const PurlModal = ({
                   value={purlString}
                   fontSize='16px'
                   fontStyle={'bold'}
-                  color='black'
                   isInvalid
                   errorBorderColor='blue.600'
                   onChange={(e) => console.log(e.target.value)}

@@ -12,7 +12,8 @@ import {
   InputRightElement,
   List,
   ListItem,
-  VStack
+  VStack,
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -30,6 +31,9 @@ const CpeInput = ({
 }) => {
   const [focusedIndex, setFocusedIndex] = useState(null)
   const listItemsRef = useRef([])
+
+  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
+  const hoverColor = useColorModeValue('#EDF2F7', '#2D3748')
 
   const { prodCompState, dispatch } = useGlobalState()
   const { cpeString, purlString, isCpeValid } = prodCompState
@@ -201,13 +205,13 @@ const CpeInput = ({
           width={'100%'}
           left={0}
           right={0}
-          bg={'white'}
           zIndex={111}
           top={name === 'cpe' ? 8 : 14}
           borderRadius={'md'}
-          border={'1px solid #CBD5E0'}
           maxH={'260px'}
           overflowY={'scroll'}
+          bg={bgColor}
+          border={`1px solid ${hoverColor}`}
         >
           <List>
             {cpeList.map((item, index) => (
@@ -215,10 +219,8 @@ const CpeInput = ({
                 key={index}
                 ref={(el) => (listItemsRef.current[index] = el)}
                 tabIndex='0'
-                bg={index === focusedIndex ? '#E2E8F0' : 'transparent'}
-                _hover={{
-                  bg: focusedIndex === null ? '#E2E8F0' : 'transparent'
-                }}
+                bg={index === focusedIndex ? hoverColor : 'transparent'}
+                _hover={{ background: hoverColor }}
                 onMouseEnter={() => setFocusedIndex(null)}
                 outline='none'
                 p={2}
