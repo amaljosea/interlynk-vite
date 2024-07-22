@@ -27,7 +27,6 @@ import {
   Stack,
   Tag,
   Text,
-  useColorModeValue,
   useToast
 } from '@chakra-ui/react'
 
@@ -55,8 +54,6 @@ const DownloadModal = ({
   const [getData] = useLazyQuery(
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
   )
-
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { data: ntia, loading: ntiaLoading } = useQuery(GetSbomQualityScores, {
     skip: isOpen && !signedUrlParams ? false : true,

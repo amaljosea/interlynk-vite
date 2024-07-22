@@ -200,6 +200,16 @@ const SbomActions = ({ sbom, refetch }) => {
     })
   }
 
+  const onDownload = () => {
+    if (signedUrlParams) {
+      onOpen()
+    } else {
+      healthRecheck({ variables: { sbomId } }).then(
+        (res) => res?.data && onOpen()
+      )
+    }
+  }
+
   const handleSBOMChange = (select) => {
     prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
@@ -366,26 +376,22 @@ const SbomActions = ({ sbom, refetch }) => {
         {/* DOWNLOAD SBOM */}
         <Tooltip label='Download'>
           <IconButton
-            className='download'
-            icon={<FaFileDownload />}
-            onClick={() =>
-              healthRecheck({ variables: { sbomId } }).then(
-                (res) => res?.data && onOpen()
-              )
-            }
             size='md'
             colorScheme='blue'
+            className='download'
+            onClick={onDownload}
+            icon={<FaFileDownload />}
           />
         </Tooltip>
 
         {/* DELETE SBOM */}
         <Tooltip label='Delete'>
           <IconButton
-            display={signedUrlParams ? 'none' : 'flex'}
             colorScheme='red'
             icon={<DeleteIcon />}
             onClick={setDeleteOpen}
             isDisabled={!archiveSboms}
+            display={signedUrlParams ? 'none' : 'flex'}
           ></IconButton>
         </Tooltip>
       </Flex>
