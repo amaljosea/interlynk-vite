@@ -388,18 +388,6 @@ const Automation = ({ projects }) => {
                 >
                   {isSystem ? 'View' : 'Edit'} Rule
                 </MenuItem>
-                {/* DELETE POLICY  */}
-                <MenuItem
-                  color='red'
-                  onClick={() => {
-                    setActiveRow(row)
-                    onDeleteOpen()
-                  }}
-                  isDisabled={!editAutomations}
-                  hidden={isSystem}
-                >
-                  Archive Rule
-                </MenuItem>
                 {/* COPY ACTIONS */}
                 {filterProjects?.map((item) => (
                   <MenuItem
@@ -415,6 +403,18 @@ const Automation = ({ projects }) => {
                     Copy to {capitalizeFirstLetter(item?.name)}
                   </MenuItem>
                 ))}
+                {/* DELETE POLICY  */}
+                <MenuItem
+                  color='red'
+                  onClick={() => {
+                    setActiveRow(row)
+                    onDeleteOpen()
+                  }}
+                  isDisabled={!editAutomations}
+                  hidden={isSystem}
+                >
+                  Archive Rule
+                </MenuItem>
               </MenuList>
             </Portal>
           </Menu>
