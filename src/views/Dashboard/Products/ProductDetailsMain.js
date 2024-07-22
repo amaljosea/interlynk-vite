@@ -135,10 +135,10 @@ const ProductDetailsMain = () => {
   const tab = queryParams[0].get('tab')
   const activeTabNumber = Math.max(tabs.indexOf(tab), 0)
 
-  const { dispatch } = useGlobalState()
+  const { dispatch, envName } = useGlobalState()
 
   const { prodVulnDispatch } = dispatch
-  const environment = localStorage.getItem('environment')
+  const environment = envName
   const [activeEnv, setActiveEnv] = useState(productId || '')
 
   const updateProduct = useHasPermission({

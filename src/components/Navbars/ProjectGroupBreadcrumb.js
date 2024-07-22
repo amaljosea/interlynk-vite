@@ -7,6 +7,7 @@ import Select, { components } from 'react-select'
 import { Divider, Spinner, useColorModeValue } from '@chakra-ui/react'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -21,12 +22,13 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
 
   const productGroupId = params.productgroupid
   const location = useLocation()
+  const { envName } = useGlobalState()
 
   const { orgView } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
-  const environment = localStorage.getItem('environment')
+  const environment = envName
 
   const loaderColor = useColorModeValue('#e2e8f0', '#4A5568')
 

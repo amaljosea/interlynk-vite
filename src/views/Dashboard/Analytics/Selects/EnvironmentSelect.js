@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { CustomSelect } from './Select'
 
 const options = [
@@ -9,8 +11,10 @@ const options = [
 ]
 
 export const EnvironmentSelect = ({ value, onChange }) => {
+  const { envName } = useGlobalState()
+
   useEffect(() => {
-    const defaultValue = localStorage.getItem('environment') || 'default'
+    const defaultValue = envName || 'default'
     const defaultOption = options.find((i) => i.value === defaultValue)
     onChange(defaultOption)
   }, [])

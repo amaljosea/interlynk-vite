@@ -33,7 +33,6 @@ const ProductDetails = () => {
   const productGroupId = params.productgroupid
   const sbomId = params.sbomid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const environment = localStorage.getItem('environment')
   const [activeEnv, setActiveEnv] = useState(productId || '')
 
   const tabs = [
@@ -50,8 +49,12 @@ const ProductDetails = () => {
     activeCsProdTab,
     setActiveCsProdTab,
     prodVulnState,
-    dispatch
+    dispatch,
+    envName
   } = useGlobalState()
+
+  const environment = envName
+
   const {
     field,
     direction,

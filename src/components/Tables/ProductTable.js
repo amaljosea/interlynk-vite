@@ -84,10 +84,10 @@ const ProductTable = ({
   const params = useParams()
   const productId = params.productid
 
-  const environment = localStorage.getItem('environment')
-
-  const { setEnvName, setClearSelect, setSelectedSbom, dispatch } =
+  const { setEnvName, setClearSelect, setSelectedSbom, dispatch, envName } =
     useGlobalState()
+
+  const environment = envName
 
   const { prodDispatch } = dispatch
 

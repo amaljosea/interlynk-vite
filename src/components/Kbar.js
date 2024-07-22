@@ -34,7 +34,7 @@ const Kbar = () => {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
   } = useProductUrlContext()
-  const { setEnvName } = useGlobalState()
+  const { setEnvName, envName } = useGlobalState()
 
   const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
   const textHoverColor = useColorModeValue('#EDF2F7', '#2D3748')
@@ -65,6 +65,8 @@ const Kbar = () => {
   let data = []
   if (productData?.organization?.projectGroups?.nodes?.length > 0) {
     productData.organization.projectGroups.nodes.forEach((item) => {
+      const envProject = item?.projects?.find((proj) => proj.name === envName)
+
       data.push({
         id: item?.name,
         name: item?.name,
@@ -73,7 +75,7 @@ const Kbar = () => {
         perform: () => {
           const link = generateProductDetailPageUrlFromCurrentUrl({
             productgroupid: item?.id,
-            productid: item?.defaultProject?.id
+            productid: envProject?.id
           })
           navigate(link)
         }
@@ -109,7 +111,7 @@ const Kbar = () => {
 
   useThemeActions()
   useSettingActions()
-  useRegisterActions(data, [productData])
+  useRegisterActions(data, [productData, envName])
 
   const ResultItem = ({ item, active, currentRootActionId }) => {
     const ancestors = useMemo(() => {

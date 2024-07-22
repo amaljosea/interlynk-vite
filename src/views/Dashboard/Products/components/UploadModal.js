@@ -28,15 +28,18 @@ import {
   useToast
 } from '@chakra-ui/react'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { UploadSbom } from 'graphQL/Mutation'
 
 const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
   const params = useParams()
   const toast = useToast()
   const borderColor = useColorModeValue('gray.200', 'gray.600')
+  const { envName } = useGlobalState()
 
   const { projects, name } = data || ''
-  const environment = localStorage.getItem('environment')
+  const environment = envName
   const defaultENV = data?.projects?.find((item) =>
     environment ? item?.name === environment : item?.name === 'default'
   )
