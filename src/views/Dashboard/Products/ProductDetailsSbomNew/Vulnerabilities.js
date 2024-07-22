@@ -333,6 +333,11 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   const { data: allVexJustify } = useQuery(getVexJustifications)
   const { data: allCdx } = useQuery(GetCdxResponses)
 
+  const orderBy = {
+    field: prodVulnState?.field,
+    direction: prodVulnState?.direction
+  }
+
   const { nodes, paginationProps, refetch, loading, reset } =
     usePaginatatedQuery(GetVulnData, {
       skip:
@@ -359,8 +364,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
         direct: direct === 'direct only' ? true : undefined,
         includeRetracted: include.includes('retracted') ? true : false,
         vexComplete: vexComplete === 'all' ? undefined : false,
-        field: prodVulnState.field,
-        direction: prodVulnState.direction
+        orderBy: searchInput === '' ? orderBy : undefined
       }
     })
 
