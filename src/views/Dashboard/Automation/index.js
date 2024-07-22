@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import {
+  capitalizeFirstLetter,
   customStyles,
   getFullDateAndTime,
   timeSince,
@@ -35,7 +36,6 @@ import CardBody from 'components/Card/CardBody'
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
@@ -48,21 +48,23 @@ import {
 import { FaEllipsisV } from 'react-icons/fa'
 import { MdDragIndicator } from 'react-icons/md'
 
+import CopyRule from './components/CopyRule'
 import CreateRule from './components/CreateRule'
 import DeleteWarning from './components/DeleteWarning'
 import StatusWarning from './components/StatusWarning'
 
-const Automation = () => {
+const Automation = ({ projects }) => {
   const toast = useToast()
   const params = useParams()
   const productId = params.productid
 
-  const { userPermissions } = useGlobalState()
+  const filterProjects = projects?.filter((item) => item?.id !== productId)
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const [activeRow, setActiveRow] = useState(null)
+  const [activeEnv, setActiveEnv] = useState(null)
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -93,11 +95,6 @@ const Automation = () => {
     fetchPolicy: 'network-only'
   })
 
-  const updateProduct = useHasPermission({
-    parentKey: 'view_product_group',
-    childKey: 'update_product_group'
-  })
-
   const editAutomations = useHasPermission({
     parentKey: 'view_product_group',
     childKey: 'edit_product_automations'
@@ -107,6 +104,11 @@ const Automation = () => {
     isOpen: isRuleOpen,
     onOpen: onRuleOpen,
     onClose: onRuleClose
+  } = useDisclosure()
+  const {
+    isOpen: isCopyOpen,
+    onOpen: onCopyOpen,
+    onClose: onCopyClose
   } = useDisclosure()
   const {
     isOpen: isActiveOpen,
@@ -398,6 +400,21 @@ const Automation = () => {
                 >
                   Archive Rule
                 </MenuItem>
+                {/* COPY ACTIONS */}
+                {filterProjects?.map((item) => (
+                  <MenuItem
+                    key={item?.id}
+                    isDisabled={!editAutomations}
+                    hidden={isSystem}
+                    onClick={() => {
+                      setActiveRow(row)
+                      setActiveEnv(item)
+                      onCopyOpen()
+                    }}
+                  >
+                    Copy to {capitalizeFirstLetter(item?.name)}
+                  </MenuItem>
+                ))}
               </MenuList>
             </Portal>
           </Menu>
@@ -482,6 +499,15 @@ const Automation = () => {
           onClose={onActiveClose}
           onToggle={toggleStatus}
           data={activeRow}
+        />
+      )}
+
+      {isCopyOpen && (
+        <CopyRule
+          env={activeEnv}
+          data={activeRow}
+          isOpen={isCopyOpen}
+          onClose={onCopyClose}
         />
       )}
     </>

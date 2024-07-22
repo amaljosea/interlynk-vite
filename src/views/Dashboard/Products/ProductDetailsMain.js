@@ -162,7 +162,9 @@ const ProductDetailsMain = () => {
   })
 
   const { projectGroup } = data || ''
-  const { name, description, enabled } = projectGroup || ''
+  const { name, description, enabled, projects } = projectGroup || ''
+
+  console.log('data', data)
 
   const {
     data: settings,
@@ -564,7 +566,7 @@ const ProductDetailsMain = () => {
                   >
                     Automation is disabled under Product Settings
                   </Tag>
-                  <Automation />
+                  <Automation projects={projects} />
                 </TabPanel>
                 {/* SETTINGS */}
                 <TabPanel px={0}>
