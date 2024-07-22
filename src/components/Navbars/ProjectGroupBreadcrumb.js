@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client'
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Select, { components } from 'react-select'
 
@@ -9,13 +10,14 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { GetProjectGroupDetails, GetProjectName } from 'graphQL/Queries'
+import { GetProjectGroupDetails } from 'graphQL/Queries'
 
 import { customFilter } from './customFilter'
 
 const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
   const navigate = useNavigate()
   const params = useParams()
+  const [value, setValue] = useState(null)
 
   const productGroupId = params.productgroupid
   const location = useLocation()
@@ -40,12 +42,12 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
     }
   })
 
-  const { data: projectNameData } = useQuery(GetProjectName, {
-    skip: !productGroupId || path === 'customer',
-    variables: {
-      id: productGroupId
-    }
-  })
+  useEffect(() => {
+    const product = productsData?.organization?.projectGroups?.nodes?.find(
+      (i) => i.id === productGroupId
+    )
+    setValue(product)
+  }, [productGroupId, setValue, productsData])
 
   const products = productsData?.organization?.projectGroups?.nodes
   const totalCount = productsData?.organization?.allProjectGroups?.totalCount
@@ -55,6 +57,7 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
 
   const handleProductClick = useCallback(
     (product) => {
+      setValue(product)
       const envProject = product?.projects?.find(
         (proj) => proj.name === environment
       )
@@ -114,7 +117,7 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
           getOptionLabel={(product) => product.name}
           getOptionValue={(product) => product.id}
           onChange={(product) => handleProductClick(product)}
-          defaultValue={projectNameData?.projectGroup}
+          value={value}
           components={{
             IndicatorSeparator: () => null,
             MenuList: CustomMenuList

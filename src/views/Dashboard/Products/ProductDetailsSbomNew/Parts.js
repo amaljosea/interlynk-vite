@@ -417,6 +417,7 @@ const Parts = ({ sbomRefetch }) => {
       selector: (row) => {
         const { part, vulnRunStatus } = row
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+          productgroupid: part.project.projectGroup.id,
           productid: part.project.id,
           sbomid: part.id,
           paramsObj: {

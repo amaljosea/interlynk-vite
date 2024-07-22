@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Select from 'react-select'
 
@@ -7,7 +8,7 @@ import { Spinner, useColorModeValue } from '@chakra-ui/react'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { GetProjectVersionAndId, GetVersionName } from 'graphQL/Queries'
+import { GetProjectVersionAndId } from 'graphQL/Queries'
 
 import { customFilter } from './customFilter'
 
@@ -16,6 +17,7 @@ const VersionBreadcrumb = ({ selectStyles }) => {
   const { sbomHookData, orgView } = useGlobalQueryContext()
   const params = useParams()
   const location = useLocation()
+  const [value, setValue] = useState(null)
 
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
@@ -26,7 +28,6 @@ const VersionBreadcrumb = ({ selectStyles }) => {
 
   const prodID = params.productid
   const sbomId = params.sbomid
-  const productid = params.productid
 
   const { data: versionData, loading } = useQuery(GetProjectVersionAndId, {
     variables: {
@@ -37,13 +38,12 @@ const VersionBreadcrumb = ({ selectStyles }) => {
     skip: !prodID || !orgView
   })
 
-  const { data: versionNameData } = useQuery(GetVersionName, {
-    skip: !productid || !sbomId || path === 'customer',
-    variables: {
-      projectId: productid,
-      sbomId: sbomId
-    }
-  })
+  useEffect(() => {
+    const sbom = versionData?.project?.sbomVersions?.nodes?.find(
+      (i) => i.id === sbomId
+    )
+    setValue(sbom)
+  }, [sbomId, setValue, versionData])
 
   const versions = versionData?.project?.sbomVersions?.nodes
   const totalCount = versionData?.project?.allSbomVersions?.totalCount
@@ -53,6 +53,7 @@ const VersionBreadcrumb = ({ selectStyles }) => {
   }
 
   const handleVersionClick = (version) => {
+    setValue(version)
     const link = generateProductVersionDetailPageUrlFromCurrentUrl({
       sbomid: version.id,
       paramsObj: {
@@ -73,11 +74,11 @@ const VersionBreadcrumb = ({ selectStyles }) => {
       <Select
         styles={selectStyles}
         isSearchable
+        value={value}
         options={versions}
         getOptionLabel={(version) => version.projectVersion}
         getOptionValue={(version) => version.id}
         onChange={(version) => handleVersionClick(version)}
-        defaultValue={versionNameData?.sbom}
         components={{
           IndicatorSeparator: () => null
         }}
