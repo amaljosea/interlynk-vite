@@ -93,7 +93,7 @@ const SbomUpload = () => {
         } else {
           toast({
             title: 'SBOM uploaded successfully',
-            description: 'This SBOM will be sent to the requster shortly.',
+            description: 'This SBOM will be sent to the requester shortly.',
             duration: 6500,
             isClosable: true,
             position: 'top',
