@@ -419,7 +419,7 @@ const ProductDetailsMain = () => {
                       />
                       {warning && (
                         <Tooltip
-                          label={`${exceedingCount} SBOM${exceedingCount > 1 ? 's' : ''} are marked from deletion in the next 7 days`}
+                          label={`${exceedingCount} SBOM${exceedingCount > 1 ? 's are' : ' is'} marked for deletion in the next 7 days. This is based on the data retention under Settings tab.`}
                         >
                           <IconButton
                             size='xs'
@@ -428,6 +428,7 @@ const ProductDetailsMain = () => {
                             onClick={() =>
                               handleSort({ id: 'SBOMS_CREATED_AT' }, 'desc')
                             }
+                            bg='transparent'
                           />
                         </Tooltip>
                       )}

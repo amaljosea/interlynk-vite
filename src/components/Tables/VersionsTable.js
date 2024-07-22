@@ -304,6 +304,7 @@ const VersionsTable = ({
                     size='xs'
                     color={warningColor}
                     icon={<IoMdWarning size={16} />}
+                    bg='transparent'
                   />
                 </Tooltip>
               )}
