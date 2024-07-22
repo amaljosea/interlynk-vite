@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { useCallback, useRef } from 'react'
+import React, { useCallback, useRef } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Select, { components } from 'react-select'
 
@@ -76,15 +76,16 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
     : products
 
   const selectRef = useRef()
-
   const CustomMenuList = (props) => {
+    const childrenArray = React.Children.toArray(props.children)
+
     return (
       <components.MenuList {...props}>
-        {props.children.map((child, index) => (
-          <>
+        {childrenArray.map((child, index) => (
+          <React.Fragment key={index}>
             {index === 1 && <Divider />}
             {child}
-          </>
+          </React.Fragment>
         ))}
       </components.MenuList>
     )
@@ -99,9 +100,9 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
   } else if (products && totalCount > 1) {
     return (
       <div
-        onMouseOver={() => {
+        onMouseEnter={() => {
           if (selectRef.current) {
-            selectRef.current.focus()
+            // selectRef.current.focus()
           }
         }}
       >
