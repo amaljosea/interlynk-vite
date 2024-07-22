@@ -3,11 +3,17 @@ import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import CreateRole from 'views/Dashboard/Profile/components/CreateRole'
+import DeleteRole from 'views/Dashboard/Profile/components/DeleteRole'
 
 import { AddIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
   Text,
   Tooltip,
   useColorModeValue,
@@ -23,7 +29,7 @@ import useQueryParam from 'hooks/useQueryParam'
 
 import { GetRoles } from 'graphQL/Queries'
 
-import { FaUserLock } from 'react-icons/fa6'
+import { FaEllipsisV } from 'react-icons/fa'
 
 const RoleTable = () => {
   const activetab = useQueryParam('tab')
@@ -34,6 +40,11 @@ const RoleTable = () => {
     childKey: 'update_organization'
   })
 
+  const editUserRole = useHasPermission({
+    parentKey: 'view_users',
+    childKey: 'edit_user_role'
+  })
+
   const { data, loading, refetch } = useQuery(GetRoles, {
     skip: !orgView ? true : activetab === 'roles' ? false : true
   })
@@ -42,6 +53,11 @@ const RoleTable = () => {
 
   const [selectedRole, setSelectedRole] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isDelOpen,
+    onOpen: onDelOpen,
+    onClose: onDelClose
+  } = useDisclosure()
   const {
     isOpen: isRoleOpen,
     onOpen: onRoleOpen,
@@ -85,18 +101,42 @@ const RoleTable = () => {
     {
       id: 'action',
       name: 'ACTION',
-      selector: (row) => (
-        <IconButton
-          size='sm'
-          variant='solid'
-          colorScheme='blue'
-          icon={<FaUserLock />}
-          onClick={() => {
-            setSelectedRole(row?.name)
-            onOpen()
-          }}
-        />
-      ),
+      selector: (row) => {
+        const { name } = row
+        return (
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              <MenuList size='sm'>
+                <MenuItem
+                  onClick={() => {
+                    setSelectedRole(name)
+                    onOpen()
+                  }}
+                >
+                  View Permissions
+                </MenuItem>
+                <MenuItem
+                  color={'red.500'}
+                  isDisabled={!editUserRole}
+                  onClick={() => {
+                    setSelectedRole(row)
+                    onDelOpen()
+                  }}
+                >
+                  Delete Role
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        )
+      },
+      width: '10%',
       right: 'true'
     }
   ]
@@ -147,6 +187,15 @@ const RoleTable = () => {
           refetch={refetch}
           isOpen={isRoleOpen}
           onClose={onRoleClose}
+        />
+      )}
+
+      {isDelOpen && (
+        <DeleteRole
+          refetch={refetch}
+          isOpen={isDelOpen}
+          onClose={onDelClose}
+          activeRole={selectedRole}
         />
       )}
     </>

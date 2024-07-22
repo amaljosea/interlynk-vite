@@ -2866,3 +2866,33 @@ export const CurrentUserFlagSet = gql`
     }
   }
 `
+
+// DELETE ROLE
+export const OrganizationRoleDelete = gql`
+  mutation OrganizationRoleDelete($id: Uuid!) {
+    organizationRoleDelete(input: { id: $id }) {
+      organizationRole {
+        id
+      }
+      errors
+    }
+  }
+`
+
+// BULK ROLE UPDATE
+export const OrganizationRoleBulkApply = gql`
+  mutation OrganizationRoleBulkApply(
+    $userIds: [Uuid!]!
+    $organizationRoleId: Uuid!
+  ) {
+    organizationRoleBulkApply(
+      input: { organizationRoleId: $organizationRoleId, userIds: $userIds }
+    ) {
+      errors
+      organizationRole {
+        id
+        name
+      }
+    }
+  }
+`
