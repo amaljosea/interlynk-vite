@@ -85,6 +85,7 @@ export default function HeaderLinks(props) {
   const SERVER_URL = process.env.REACT_APP_SERVER
 
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
+  const activeTab = queryParams.get('tab')
 
   const { colorMode, toggleColorMode, setColorMode } = useColorMode()
   const bgColor = useColorModeValue('#EDF2F7', '#2D3748')
@@ -143,7 +144,10 @@ export default function HeaderLinks(props) {
       const project = projects.find((p) => p.name === value)
       navigate(
         generateProductDetailPageUrlFromCurrentUrl({
-          productid: project.id
+          productid: project.id,
+          paramsObj: {
+            tab: activeTab
+          }
         })
       )
     }
