@@ -34,6 +34,7 @@ import {
   Select,
   Stack,
   Text,
+  Textarea,
   Tooltip,
   useDisclosure,
   useToast
@@ -58,6 +59,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const { prodCompDispatch } = dispatch
 
   const [sbomName, setSbomName] = useState('')
+  const [compDesc, setCompDesc] = useState('')
   const [version, setVersion] = useState('')
   const [compType, setCompType] = useState('')
   const [groupInfo, setGroupInfo] = useState('')
@@ -209,6 +211,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         scope: compScope,
         primary: isPrimary,
         internal: isInternal,
+        description: compDesc,
         cpes: cpeValue !== '' ? [cpeValue] : [],
         licenses: { licensesExp: expLicense || '' }
       }
@@ -271,7 +274,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
             Build Version
           </DrawerHeader>
           <DrawerBody>
-            <Stack direction={'column'} spacing={4}>
+            <Stack direction={'column'} spacing={4} mt={2}>
               {/* NAME */}
               <FormControl isRequired>
                 <FormLabel htmlFor='sbomName' fontSize={'sm'}>
@@ -285,6 +288,19 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                   value={sbomName}
                   onChange={(e) => setSbomName(e.target.value)}
                   placeholder='Enter name'
+                />
+              </FormControl>
+              {/* Description */}
+              <FormControl>
+                <FormLabel htmlFor='compDescription' fontSize={'sm'}>
+                  Description
+                </FormLabel>
+                <Textarea
+                  size='md'
+                  fontSize={'sm'}
+                  placeholder='Add description'
+                  value={compDesc}
+                  onChange={(e) => setCompDesc(e.target.value)}
                 />
               </FormControl>
               {/* VERSION */}
