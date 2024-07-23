@@ -164,7 +164,6 @@ export default function AdminNavbar(props) {
         >
           <BreadcrumbItem color={mainText}>
             <Link
-              className='welcome'
               to={
                 !location.pathname.startsWith('/customer')
                   ? '/vendor/dashboard'

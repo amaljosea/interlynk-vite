@@ -7,6 +7,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import { logoutUser } from 'utils/authUtils'
 import { homeSteps } from 'utils/tourUtils'
+import { productSteps } from 'utils/tourUtils'
 
 import { SearchIcon } from '@chakra-ui/icons'
 import {
@@ -90,6 +91,7 @@ export default function HeaderLinks(props) {
   const { colorMode, toggleColorMode, setColorMode } = useColorMode()
   const bgColor = useColorModeValue('#EDF2F7', '#2D3748')
   const dashboardView = location.pathname === '/vendor/dashboard'
+  const productView = location.pathname === '/vendor/products'
   const signedUrlParams = location.pathname.startsWith('/customer')
   const name = localStorage.getItem('username')
   const email = localStorage.getItem('email')
@@ -200,9 +202,17 @@ export default function HeaderLinks(props) {
   }
 
   const onStartDashTour = () => {
-    setSteps(homeSteps)
-    localStorage.setItem('dashboardTour', false)
-    document?.body?.classList.remove('no-scroll')
+    document?.body?.classList.add('no-scroll')
+    if (dashboardView) {
+      setSteps(homeSteps)
+      localStorage.setItem('activeTour', 'dashboard')
+    }
+
+    if (productView) {
+      setSteps(productSteps)
+      localStorage.setItem('activeTour', 'products')
+    }
+
     setCurrentStep(0)
     setIsOpen(true)
   }
@@ -320,13 +330,15 @@ export default function HeaderLinks(props) {
                   Settings
                 </MenuItem>
               </Link>
-              <MenuItem
-                onClick={onStartDashTour}
-                icon={<FaLocationArrow />}
-                hidden={!shouldShowDemoFeatures || !dashboardView}
-              >
-                Start Tour
-              </MenuItem>
+              {(dashboardView || productView) && (
+                <MenuItem
+                  onClick={onStartDashTour}
+                  icon={<FaLocationArrow />}
+                  hidden={!shouldShowDemoFeatures || productId}
+                >
+                  Start {productView ? 'Product' : ''} Tour
+                </MenuItem>
+              )}
               <Link to='/vendor/settings?tab=organizations'>
                 <MenuItem
                   icon={<FaExchangeAlt />}

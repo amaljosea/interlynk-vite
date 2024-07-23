@@ -356,10 +356,11 @@ const ProductTable = ({
         return (
           <Grid
             my={3}
-            gap={1}
+            gap={2}
             alignItems={'center'}
             justifyContent={'center'}
             templateColumns='repeat(7, 1fr)'
+            className={index === 0 ? 'product' : ''}
           >
             <GridItem
               colSpan={1}
@@ -389,7 +390,6 @@ const ProductTable = ({
                 onClick={handleClick}
                 cursor={'pointer'}
                 width={'fit-content'}
-                className={index === 0 ? 'product' : ''}
               >
                 {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
               </Text>

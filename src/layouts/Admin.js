@@ -7,7 +7,7 @@ import { Outlet, redirect, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
-import { Box, Flex, Stack, useColorMode } from '@chakra-ui/react'
+import { Box, Flex, Stack, Text, useColorMode } from '@chakra-ui/react'
 
 import Kbar from 'components/Kbar'
 // Layout components
@@ -35,7 +35,6 @@ export default function Admin() {
   const tabRes = window.matchMedia('(max-width: 1199px)')
 
   const productView = location.pathname === '/vendor/products'
-  const dashboardView = location.pathname === '/vendor/dashboard'
 
   const {
     generateProductDetailPageUrlFromCurrentUrl: genProdUrl,
@@ -93,56 +92,49 @@ export default function Admin() {
   ]
 
   const onTourUpdate = (value) => {
-    if (dashboardView) {
-      localStorage.setItem('dashboardTour', true)
-    }
-    if (productId || sbomId || productView) {
-      localStorage.setItem('productTour', true)
-    }
     document?.body?.classList.remove('no-scroll')
     value.setIsOpen(false)
   }
 
   const onProdNavigate = (step) => {
-    if (step === 2) {
+    if (step === 3) {
       const link = genProdUrl({ paramsObj: { tab: 'versions' } })
       navigate(link)
-    } else if (step === 3) {
+    } else if (step === 4) {
       const link = genProdUrl({ paramsObj: { tab: 'vulnerabilities' } })
       navigate(link)
-    } else if (step === 4) {
+    } else if (step === 5) {
       const link = genProdUrl({ paramsObj: { tab: 'automation rules' } })
       navigate(link)
-    } else if (step === 5) {
+    } else if (step === 6) {
       const link = genProdUrl({ paramsObj: { tab: 'policies' } })
       navigate(link)
     }
   }
 
   const onSbomNavigate = (step) => {
-    if (step === 1) {
+    if (step === 8) {
       const link = getSbomUrl({ paramsObj: { tab: 'general' } })
       navigate(link)
-    } else if (step === 2) {
+    } else if (step === 9) {
       const link = getSbomUrl({ paramsObj: { tab: 'parts' } })
       navigate(link)
-    } else if (step === 3) {
+    } else if (step === 10) {
       const link = getSbomUrl({ paramsObj: { tab: 'components' } })
       navigate(link)
-    } else if (step === 4) {
+    } else if (step === 11) {
       const link = getSbomUrl({ paramsObj: { tab: 'vulnerabilities' } })
       navigate(link)
-    } else if (step === 5) {
+    } else if (step === 12) {
       const link = getSbomUrl({ paramsObj: { tab: 'licenses' } })
       navigate(link)
-    } else if (step === 6) {
+    } else if (step === 13) {
       const link = getSbomUrl({ paramsObj: { tab: 'checks' } })
       navigate(link)
     }
   }
 
   const onClickPrev = (props) => {
-    console.log(props)
     const { currentStep, setCurrentStep } = props
     if (productId && !sbomId) {
       onProdNavigate(currentStep - 1)
@@ -164,6 +156,12 @@ export default function Admin() {
       onSbomNavigate(currentStep + 1)
     }
     setCurrentStep(currentStep + 1)
+  }
+
+  const onComplete = (props) => {
+    localStorage.removeItem('activeTour')
+    document?.body?.classList.remove('no-scroll')
+    props?.setIsOpen(false)
   }
 
   useEffect(() => {
@@ -212,9 +210,15 @@ export default function Admin() {
               <FaArrowRight
                 cursor={'pointer'}
                 onClick={() => onClickNext(props)}
+                style={{
+                  display:
+                    productId && props?.currentStep === 6 ? 'none' : 'flex'
+                }}
               />
             ) : (
-              ''
+              <Text cursor={'pointer'} onClick={() => onComplete(props)}>
+                Finish
+              </Text>
             )
           }
           prevButton={(props) =>
@@ -223,11 +227,22 @@ export default function Admin() {
               <FaArrowLeft
                 cursor={'pointer'}
                 onClick={() => onClickPrev(props)}
+                style={{
+                  display:
+                    (productId && props?.currentStep === 1) ||
+                    (productId && sbomId && props?.currentStep === 7)
+                      ? 'none'
+                      : 'flex'
+                }}
               />
             )
           }
+          showPrevNextButtons={!productView}
           onClickClose={(value) => onTourUpdate(value)}
           onClickMask={(value) => onTourUpdate(value)}
+          badgeContent={(props) =>
+            `${props?.currentStep + 1}/${props?.totalSteps}`
+          }
         >
           <Box pos={'sticky'} top={0}>
             <Sidebar routes={dashRoutes} />

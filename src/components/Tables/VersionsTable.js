@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -8,10 +8,10 @@ import {
   customStyles,
   getFormat,
   getFullDateAndTime,
+  getLink,
   getType,
   timeSince
 } from 'utils'
-import { getLink } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -65,8 +65,7 @@ import {
   GetSbomAlternatives,
   GetShareSbomAlternatives,
   GetVersionsTable,
-  ShareVersionTable,
-  UserSettings
+  ShareVersionTable
 } from 'graphQL/Queries'
 
 import {
@@ -135,19 +134,6 @@ const VersionsTable = ({
       onCompleted: () => setClearSelect(false)
     }
   )
-
-  useQuery(UserSettings, {
-    skip: tab !== VERSIONS || signedUrlParams,
-    onCompleted: (data) => {
-      const { productDetailsOnboardingCompleted: hasSeenTour } =
-        data?.currentUserSettings || ''
-      if (!hasSeenTour) {
-        // setTimeout(() => {
-        //  setIsOpen(true)
-        // }, 1000)
-      }
-    }
-  })
 
   const createSbom = useHasPermission({
     parentKey: 'view_sbom',
@@ -255,10 +241,11 @@ const VersionsTable = ({
         return (
           <Grid
             my={3}
-            gap={1}
+            gap={2}
             alignItems={'center'}
             justifyContent={'center'}
             templateColumns='repeat(7, 1fr)'
+            className={index === 0 ? 'versions' : ''}
           >
             <GridItem
               colSpan={1}
@@ -288,12 +275,7 @@ const VersionsTable = ({
               alignItems={'center'}
             >
               <Link to={link} onClick={onStartTour}>
-                <Text
-                  className={index === 0 ? 'versions' : ''}
-                  color={'blue.500'}
-                  minWidth='100%'
-                  fontSize={14}
-                >
+                <Text color={'blue.500'} minWidth='100%' fontSize={14}>
                   {projectVersion}
                 </Text>
               </Link>

@@ -14,6 +14,12 @@ export const UserSettings = gql`
     currentUserSettings {
       productDetailsOnboardingCompleted
       sbomDetailsOnboardingCompleted
+      licensesOnboardingCompleted
+      navOptionOnboardingCompleted
+      policiesOnboardingCompleted
+      requestsOnboardingCompleted
+      supportOnboardingCompleted
+      vulnerabilitiesOnboardingCompleted
     }
   }
 `

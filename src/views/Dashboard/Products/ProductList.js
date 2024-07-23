@@ -2,7 +2,6 @@ import { useTour } from '@reactour/tour'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
-import { productSteps } from 'utils/tourUtils'
 
 import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/react'
 
@@ -11,21 +10,17 @@ import ProductTable from 'components/Tables/ProductTable'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
-import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetProductTable } from 'graphQL/Queries'
 
 function ProductList() {
+  const { setIsOpen } = useTour()
   const { dispatch } = useGlobalState()
-  const prodTour = localStorage.getItem('productTour')
-  const { setIsOpen, setSteps, setCurrentStep } = useTour()
   const { prodDispatch, prodCompDispatch, prodVulnDispatch } = dispatch
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
-
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const productPermissions = useHasPermission({
     parentKey: 'view_product_group'
@@ -62,34 +57,11 @@ function ProductList() {
 
   useEffect(() => {
     if (product === null) {
-      !prodTour && localStorage.setItem('productTour', false)
+      setIsOpen(false)
       prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
-  }, [prodCompDispatch, prodTour, prodVulnDispatch, product])
-
-  useEffect(() => {
-    if (
-      location.pathname === '/vendor/products' &&
-      prodTour === 'false' &&
-      shouldShowDemoFeatures
-    ) {
-      document?.body?.classList.remove('no-scroll')
-      if (nodes?.length > 0) {
-        setSteps(productSteps)
-        setCurrentStep(0)
-        setIsOpen(true)
-      }
-    }
-  }, [
-    location,
-    nodes?.length,
-    prodTour,
-    setCurrentStep,
-    setIsOpen,
-    setSteps,
-    shouldShowDemoFeatures
-  ])
+  }, [prodCompDispatch, prodVulnDispatch, product, setIsOpen])
 
   if (error) {
     return (

@@ -11,11 +11,11 @@ export const homeSteps = [
         <Text>
           Interlynk’s SBOM Management Platform is the ultimate solution for
           managing a product’s software composition using SBOM and vulnerability
-          exploitability using VEX
+          exploitability using VEX.
         </Text>
         <Text>
-          Let’s guide you through the essential features that will help you
-          utilize this Share Lynk effectively
+          Let’s guide you through the essential features to help you utilize the
+          Dashboard effectively.
         </Text>
       </Flex>
     )
@@ -178,10 +178,7 @@ export const productSteps = [
         <Text>Click on any product to continue.</Text>
       </Flex>
     )
-  }
-]
-
-export const productDetailSteps = [
+  },
   {
     selector: '.environments',
     content: (
@@ -279,10 +276,7 @@ export const productDetailSteps = [
         </Text>
       </Flex>
     )
-  }
-]
-
-export const versionDetailSteps = [
+  },
   {
     selector: '.version',
     content: (

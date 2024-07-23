@@ -982,24 +982,28 @@ export const isUnknown = (cpes, purl) => {
 export const tourStyles = {
   popover: (base) => ({
     ...base,
+    width: '480px',
+    maxWidth: '100%',
     background: '#2B6CB0',
     fontSize: '14px',
-    color: 'white'
+    color: 'white',
+    paddingTop: '56px'
   }),
   close: (base) => ({
     ...base,
-    top: '12px',
-    right: '12px',
+    top: '26px',
+    right: '25px',
     color: 'white'
   }),
   badge: (base) => ({
     ...base,
     fontWeight: 'bold',
     width: 'fit-content',
-    backgroundColor: 'white',
-    color: '#3182CE',
-    top: '20px',
-    left: '-15px'
+    backgroundColor: 'transparent',
+    boxShadow: 'none',
+    color: 'white',
+    top: '16px',
+    left: '20px'
   }),
   dot: (base, state) => ({
     ...base,

@@ -4,7 +4,6 @@ import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
-import { productDetailSteps } from 'utils/tourUtils'
 
 import { Search2Icon } from '@chakra-ui/icons'
 import {
@@ -100,9 +99,9 @@ const ProductDetailsMain = () => {
   const productId = params.productid
   const productGroupId = params.productgroupid
   const sbomId = params.sbomid
-  const { setIsOpen, setSteps, setCurrentStep } = useTour()
+  const { setIsOpen, setCurrentStep } = useTour()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const prodTour = localStorage.getItem('productTour')
+  const activeTour = localStorage.getItem('activeTour')
 
   const warningColor = useColorModeValue('#E53E3E', '#F56565')
 
@@ -163,8 +162,6 @@ const ProductDetailsMain = () => {
 
   const { projectGroup } = data || ''
   const { name, description, enabled, projects } = projectGroup || ''
-
-  console.log('data', data)
 
   const {
     data: settings,
@@ -302,7 +299,6 @@ const ProductDetailsMain = () => {
 
   useEffect(() => {
     if (environment && data) {
-      console.log('Environment changed')
       const env = data?.projectGroup?.projects.find(
         (item) => item.name === environment
       )
@@ -311,23 +307,19 @@ const ProductDetailsMain = () => {
   }, [data, environment])
 
   useEffect(() => {
-    if (productId && prodTour === 'false' && shouldShowDemoFeatures) {
-      document?.body?.classList.remove('no-scroll')
-      if (data) {
-        setSteps(productDetailSteps)
-        setCurrentStep(0)
-        setIsOpen(true)
+    if (shouldShowDemoFeatures) {
+      if (activeTour === 'products') {
+        document?.body?.classList.add('no-scroll')
+        if (data) {
+          setCurrentStep(1)
+          setIsOpen(true)
+        }
+      } else {
+        document?.body?.classList.remove('no-scroll')
+        setIsOpen(false)
       }
     }
-  }, [
-    data,
-    prodTour,
-    productId,
-    setCurrentStep,
-    setIsOpen,
-    setSteps,
-    shouldShowDemoFeatures
-  ])
+  }, [data, activeTour, setCurrentStep, setIsOpen, shouldShowDemoFeatures])
 
   const handleSort = (column, sortDirection) => {
     setVersionFilters((oldFilters) => ({

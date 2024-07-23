@@ -1,9 +1,7 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
-import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
-import { versionDetailSteps } from 'utils/tourUtils'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
 import {
@@ -26,14 +24,12 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import {
   GetPrimaryComponent,
   GetProjectSettings,
   GetSharPrimartComp,
-  PolicyResultsType,
-  UserSettings
+  PolicyResultsType
 } from 'graphQL/Queries'
 
 import {
@@ -86,12 +82,10 @@ const SbomDetails = ({ sbomData, refetch }) => {
   } = sbomData || ''
   const { compCount, compLicenseCount, vulnStats } = stats || ''
   const { critical, high, medium, low, unknown } = vulnStats || ''
-  const { setIsOpen, setSteps, setCurrentStep } = useTour()
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
+
   const { prodCompState, setActiveCsSbomTab, dispatch } = useGlobalState()
   const { field, direction } = prodCompState
   const { prodCompDispatch, prodVulnDispatch } = dispatch
-  const prodTour = localStorage.getItem('productTour')
 
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const scanColor = useColorModeValue('blackAlpha', 'whiteAlpha')
@@ -105,20 +99,6 @@ const SbomDetails = ({ sbomData, refetch }) => {
       fetchPolicy: 'network-only'
     }
   )
-
-  useQuery(UserSettings, {
-    skip: !sbomId,
-    onCompleted: (data) => {
-      const { sbomDetailsOnboardingCompleted: hasSeenTour } =
-        data?.currentUserSettings || ''
-      if (!hasSeenTour) {
-        // Disable for production release
-        // setTimeout(() => {
-        //  setIsOpen(true)
-        //}, 1000)
-      }
-    }
-  })
 
   const { data: settings } = useQuery(GetProjectSettings, {
     variables: { id: projectId }
@@ -220,25 +200,6 @@ const SbomDetails = ({ sbomData, refetch }) => {
       handlePart()
     }
   })
-
-  useEffect(() => {
-    if (sbomId && prodTour === 'false' && shouldShowDemoFeatures) {
-      document?.body?.classList.remove('no-scroll')
-      if (sbomData) {
-        setSteps(versionDetailSteps)
-        setCurrentStep(0)
-        setIsOpen(true)
-      }
-    }
-  }, [
-    sbomId,
-    prodTour,
-    setCurrentStep,
-    setIsOpen,
-    setSteps,
-    shouldShowDemoFeatures,
-    sbomData
-  ])
 
   useEffect(() => {
     const refetchInterval = setInterval(() => {

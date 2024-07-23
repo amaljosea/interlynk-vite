@@ -2862,6 +2862,12 @@ export const CurrentUserFlagSet = gql`
       currentUserSetting {
         productDetailsOnboardingCompleted
         sbomDetailsOnboardingCompleted
+        licensesOnboardingCompleted
+        navOptionOnboardingCompleted
+        policiesOnboardingCompleted
+        requestsOnboardingCompleted
+        supportOnboardingCompleted
+        vulnerabilitiesOnboardingCompleted
       }
     }
   }
