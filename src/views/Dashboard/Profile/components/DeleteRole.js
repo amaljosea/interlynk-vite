@@ -92,6 +92,8 @@ const DeleteRole = ({ isOpen, onClose, activeRole, refetch }) => {
     })
   }
 
+  const isDisabled = role === '' || error !== ''
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -130,7 +132,7 @@ const DeleteRole = ({ isOpen, onClose, activeRole, refetch }) => {
           <Button colorScheme='gray' mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button colorScheme='red' onClick={onDelete}>
+          <Button colorScheme='red' onClick={onDelete} isDisabled={isDisabled}>
             Reassign Users and Delete
           </Button>
         </ModalFooter>
