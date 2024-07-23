@@ -9,7 +9,7 @@
     "@chakra-ui/react": "1.8.9",
     "@chakra-ui/system": "^1.12.1",
     "@chakra-ui/theme-tools": "^2.1.2",
-    "@emotion/cache": "^11.7.1",
+    "@emotion/cache": "^11.13.0",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.8.1",
     "@reactour/tour": "^3.7.0",
