@@ -262,7 +262,7 @@ const VersionsTable = ({
           >
             <GridItem
               colSpan={1}
-              width={'40px'}
+              width={'20px'}
               hidden={!shouldShowDemoFeatures}
             >
               <Tooltip label={getFormat(projectVersion)} placement='top'>
@@ -275,6 +275,7 @@ const VersionsTable = ({
                     isRound={true}
                     color={textColor}
                     icon={getType(projectVersion)}
+                    background='transparent'
                   />
                 </Olink>
               </Tooltip>

@@ -363,7 +363,7 @@ const ProductTable = ({
           >
             <GridItem
               colSpan={1}
-              width={'40px'}
+              width={'20px'}
               hidden={!shouldShowDemoFeatures}
             >
               <Tooltip label={getFormat(name)} placement='top'>
@@ -376,6 +376,7 @@ const ProductTable = ({
                     isRound={true}
                     color={textColor}
                     icon={getType(name)}
+                    background='transparent'
                   />
                 </Olink>
               </Tooltip>
