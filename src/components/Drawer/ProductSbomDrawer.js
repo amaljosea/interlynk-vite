@@ -73,7 +73,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const [isPURLInputValid, setPURLInputValid] = useState(true)
   const [isValid, setIsValid] = useState(true)
   const [disabled, setDisabled] = useState(false)
-  const [isPrimary, setIsPrimary] = useState(false)
+  const [isPrimary, setIsPrimary] = useState(true)
   const [isInternal, setIsInternal] = useState(false)
 
   const handleRefetch = () => {
