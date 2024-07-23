@@ -145,9 +145,11 @@ export default function HeaderLinks(props) {
       navigate(
         generateProductDetailPageUrlFromCurrentUrl({
           productid: project.id,
-          paramsObj: {
-            tab: activeTab
-          }
+          paramsObj: activeTab
+            ? {
+                tab: activeTab
+              }
+            : {}
         })
       )
     }
