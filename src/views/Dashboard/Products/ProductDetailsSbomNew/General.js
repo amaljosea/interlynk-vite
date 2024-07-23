@@ -200,7 +200,7 @@ const General = ({ data, refetch, loading, error }) => {
   const onCheckTool = () => {
     setInfoHeading(`Creation Tool`)
     setInfoText(
-      `Creator Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools`
+      `Creation Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -209,7 +209,7 @@ const General = ({ data, refetch, loading, error }) => {
   const onCheckAuthor = () => {
     setInfoHeading(`Author`)
     setInfoText(
-      `In case of non-automated SBOM generation, Author(s) identifies the name and email of persons involved in building the SBOM.`
+      `In case of non-automated SBOM generation, Author(s) identify the name and email of person(s) involved in building the SBOM.`
     )
     setInfoUrl(``)
     onInfoOpen()

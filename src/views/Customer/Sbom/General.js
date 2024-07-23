@@ -55,7 +55,7 @@ const General = ({ data, loading, error }) => {
   const onCheckTool = () => {
     setInfoHeading(`Creation Tool`)
     setInfoText(
-      `Creator Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools`
+      `Creation Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -64,7 +64,7 @@ const General = ({ data, loading, error }) => {
   const onCheckAuthor = () => {
     setInfoHeading(`Author`)
     setInfoText(
-      `In case of non-automated SBOM generation, Author(s) identifies the name and email of persons involved in building the SBOM.`
+      `In case of non-automated SBOM generation, Author(s) identify the name and email of person(s) involved in building the SBOM.`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -73,7 +73,7 @@ const General = ({ data, loading, error }) => {
   const onCheckSupplier = () => {
     setInfoHeading(`Supplier`)
     setInfoText(
-      `Supplier identify the name and email of the organization that built, distributed or package the application. For Open-source components, it can refer to the name of the project or entity distributing the project.`
+      `Supplier identifies the name and email of the organization that built, distributed or packaged the application. For open-source components, supplier can refer to the name of the project or entity distributing the project.`
     )
     setInfoUrl(``)
     onInfoOpen()

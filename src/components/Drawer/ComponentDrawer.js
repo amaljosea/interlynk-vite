@@ -421,7 +421,7 @@ function ComponentDrawer(props) {
   const onCheckDesc = () => {
     setInfoHeading(`Description`)
     setInfoText(
-      `A component description refers to the specific description or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software product.`
+      `A component description refers to the specific description or release of a software component that is included in the SBOM.`
     )
     setInfoUrl(``)
     onInfoOpen()
