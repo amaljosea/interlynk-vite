@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { capitalizeFirstLetter } from 'utils'
 
@@ -21,6 +21,7 @@ import {
 } from '@chakra-ui/react'
 
 import { AutomationRuleCreate } from 'graphQL/Mutation'
+import { GetAutomationNames } from 'graphQL/Queries'
 
 const CopyRule = ({ isOpen, onClose, env, data }) => {
   const toast = useToast()
@@ -28,6 +29,15 @@ const CopyRule = ({ isOpen, onClose, env, data }) => {
   const { name: projectName, id: projectId } = env || ''
 
   const [createRule] = useMutation(AutomationRuleCreate)
+
+  const { data: rule } = useQuery(GetAutomationNames, {
+    skip: !env,
+    variables: {
+      id: env?.id
+    }
+  })
+
+  const { nodes } = rule?.project?.automationRules || ''
 
   const [error, setError] = useState('')
   const [isDisabled, setIsDisabled] = useState(false)
@@ -59,28 +69,33 @@ const CopyRule = ({ isOpen, onClose, env, data }) => {
 
   const onSubmit = () => {
     disableButtonTemporarily()
-    createRule({
-      variables: {
-        active: true,
-        name: ruleName,
-        projectId: projectId,
-        automationConditionsAttributes: conditionsAttributes,
-        automationActionsAttributes: actionsAttributes
-      }
-    }).then((res) => {
-      const errors = res?.data?.automationRuleCreate?.errors
-      if (errors?.length > 0) {
-        setError(errors[0])
-      } else {
-        toast({
-          description: 'Copy rule completed',
-          position: 'top',
-          duration: 2000,
-          status: 'success'
-        })
-        onClose()
-      }
-    })
+    const existingRules = nodes?.filter((item) => item?.name === ruleName)
+    if (existingRules?.length > 0) {
+      setError('Automation rule already exists')
+    } else {
+      createRule({
+        variables: {
+          active: true,
+          name: ruleName,
+          projectId: projectId,
+          automationConditionsAttributes: conditionsAttributes,
+          automationActionsAttributes: actionsAttributes
+        }
+      }).then((res) => {
+        const errors = res?.data?.automationRuleCreate?.errors
+        if (errors?.length > 0) {
+          setError(errors[0])
+        } else {
+          toast({
+            description: 'Copy rule completed',
+            position: 'top',
+            duration: 2000,
+            status: 'success'
+          })
+          onClose()
+        }
+      })
+    }
   }
 
   return (
@@ -115,7 +130,11 @@ const CopyRule = ({ isOpen, onClose, env, data }) => {
           <Button mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button colorScheme='blue' onClick={onSubmit} isDisabled={isDisabled}>
+          <Button
+            colorScheme='blue'
+            onClick={onSubmit}
+            isDisabled={isDisabled || error !== ''}
+          >
             Copy
           </Button>
         </ModalFooter>

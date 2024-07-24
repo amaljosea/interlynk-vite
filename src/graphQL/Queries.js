@@ -2571,6 +2571,30 @@ export const GetProjectCheck = gql`
   }
 `
 
+// GET PROJECT AUTOMATION NAMES
+export const GetAutomationNames = gql`
+  query GetAutomationNames(
+    $id: Uuid!
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+  ) {
+    project(id: $id) {
+      automationRules(
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+      ) {
+        nodes {
+          name
+        }
+      }
+    }
+  }
+`
+
 // GET AUTOMATION MAPPING
 export const AutomationConditionSubjectFieldMapping = gql`
   query AutomationConditionSubjectFieldMapping {
