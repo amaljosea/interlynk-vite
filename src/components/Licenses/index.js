@@ -12,14 +12,17 @@ import LicenseTable from './LicenseTable'
 const Licenses = () => {
   const { orgView } = useGlobalQueryContext()
 
-  const [filters, setFilters] = useState({})
+  const [filters, setFilters] = useState({
+    search: '',
+    orderBy: { field: 'ORGANIZATION_LICENSES_STATE', direction: 'ASC' }
+  })
+
   const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
     GetLicensesTable,
     {
       skip: !orgView,
       selector: 'organization.licenses',
       variables: {
-        direction: 'ASC',
         ...filters
       }
     }

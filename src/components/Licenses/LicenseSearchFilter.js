@@ -7,7 +7,8 @@ export const LicenseSearchFilter = ({ setFilters }) => {
   const setSearchFilter = (value) => {
     setFilters((oldFilter) => ({
       ...oldFilter,
-      search: value
+      search: value,
+      orderBy: undefined
     }))
   }
 
@@ -16,7 +17,8 @@ export const LicenseSearchFilter = ({ setFilters }) => {
     setSearchInput('')
     setFilters((oldFilter) => ({
       ...oldFilter,
-      search: undefined
+      search: undefined,
+      orderBy: undefined
     }))
   }, [setFilters])
 

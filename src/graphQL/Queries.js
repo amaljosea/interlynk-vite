@@ -3381,7 +3381,6 @@ export const GetSharelynks = gql`
 
 export const GetLicensesTable = gql`
   query GetLicensesTable(
-    $direction: OrderByDirection!
     $first: Int
     $after: String
     $last: Int
@@ -3389,6 +3388,7 @@ export const GetLicensesTable = gql`
     $status: [String!]
     $search: String
     $licenseType: [String!]
+    $orderBy: OrganizationLicenseOrderByInput
   ) {
     organization {
       licenses(
@@ -3399,7 +3399,7 @@ export const GetLicensesTable = gql`
         status: $status
         search: $search
         licenseType: $licenseType
-        orderBy: { direction: $direction, field: ORGANIZATION_LICENSES_STATE }
+        orderBy: $orderBy
       ) {
         totalCount
         pageInfo {

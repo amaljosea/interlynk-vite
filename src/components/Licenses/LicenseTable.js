@@ -261,7 +261,10 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           onSort={(column, sortDirection) => {
             setFilters((oldFilters) => ({
               ...oldFilters,
-              direction: sortDirection.toUpperCase()
+              orderBy: {
+                field: column?.id,
+                direction: sortDirection?.toUpperCase()
+              }
             }))
           }}
           subHeader
