@@ -304,7 +304,9 @@ const RelationshipDrawer = ({
                     gap={2}
                   >
                     <Text fontWeight={'medium'}>{name || compName}</Text>
-                    <Tag colorScheme='blue'>{version || compVersion}</Tag>
+                    {(version || compVersion) && (
+                      <Tag colorScheme='blue'>{version || compVersion}</Tag>
+                    )}
                   </Flex>
                 </CardHeader>
                 <CardBody>
