@@ -15,7 +15,8 @@ import {
   ModalOverlay,
   Skeleton,
   Spinner,
-  Text
+  Text,
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import { CreateProjectGroup } from 'graphQL/Mutation'
@@ -81,6 +82,9 @@ const GithubAddModal = ({ isOpen, onClose }) => {
   const [selectAll, setSelectAll] = useState(false)
   const [importOptions, setImportOptions] = useState({})
   const [projectGroupCreate] = useMutation(CreateProjectGroup)
+
+  const headingColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const labelColor = useColorModeValue('#718096', '#A0AEC0')
 
   useEffect(() => {
     if (isOpen) {
@@ -167,7 +171,7 @@ const GithubAddModal = ({ isOpen, onClose }) => {
     <Modal isOpen={isOpen} onClose={onClose} size='2xl'>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>
+        <ModalHeader border='1px' borderColor='gray.200'>
           <Flex align='center'>
             <FaGithub style={{ marginRight: '8px' }} />
             Add GitHub Project
@@ -183,6 +187,12 @@ const GithubAddModal = ({ isOpen, onClose }) => {
                 isChecked={selectAll}
                 onChange={() => setSelectAll(!selectAll)}
                 mb={4}
+                _checked={{
+                  '& .chakra-checkbox__control': {
+                    background: 'black',
+                    border: 'black'
+                  }
+                }}
               >
                 Select All
               </Checkbox>
@@ -199,51 +209,71 @@ const GithubAddModal = ({ isOpen, onClose }) => {
                     selectedProjects[project.name] ? 'gray.100' : 'white'
                   }
                 >
-                  <Flex justify='space-between' align='end'>
-                    <Flex align='center' flex={1}>
+                  <Flex justify='space-between' align='center'>
+                    <Flex direction='column' flex={1}>
                       <Checkbox
                         mr={2}
                         isChecked={selectedProjects[project.name] || false}
                         onChange={() =>
                           handleProjectCheckboxChange(project.name)
                         }
+                        _checked={{
+                          '& .chakra-checkbox__control': {
+                            background: 'black',
+                            border: 'black'
+                          }
+                        }}
                       >
                         <Flex align='center'>
-                          <FaCodeBranch style={{ marginRight: '8px' }} />
-                          <Text fontWeight='semibold'>{project.name}</Text>
+                          <FaCodeBranch
+                            style={{ marginRight: '8px' }}
+                            color={headingColor}
+                          />
+                          <Text fontWeight='semibold' color={headingColor}>
+                            {project.name}
+                          </Text>
                         </Flex>
                       </Checkbox>
                     </Flex>
-                    <Flex flex={1} justify='center'>
-                      {!projectLoading[project.name] && (
-                        <Text fontSize={14}>{project.label}</Text>
-                      )}
-                    </Flex>
-                    <Flex flex={1} justify='flex-end' align='center'>
+                    <Flex flex={1} justify='flex-end'>
                       {projectLoading[project.name] ? (
                         <Spinner size='sm' />
                       ) : (
-                        project.checkboxLabel && (
-                          <Checkbox
-                            mt={2}
-                            isChecked={importOptions[project.name] || false}
-                            onChange={() =>
-                              handleImportCheckboxChange(project.name)
-                            }
-                            size='sm'
-                          >
-                            <Text fontSize={14}>{project.checkboxLabel}</Text>
-                          </Checkbox>
-                        )
+                        <Text fontSize={14} color={labelColor}>
+                          {project.label}
+                        </Text>
                       )}
                     </Flex>
                   </Flex>
+                  {project.checkboxLabel &&
+                    !projectLoading[project.name] &&
+                    selectedProjects[project.name] && (
+                      <Checkbox
+                        mt={2}
+                        ml={6}
+                        isChecked={importOptions[project.name] || false}
+                        onChange={() =>
+                          handleImportCheckboxChange(project.name)
+                        }
+                        size='sm'
+                        _checked={{
+                          '& .chakra-checkbox__control': {
+                            background: 'black',
+                            border: 'black'
+                          }
+                        }}
+                      >
+                        <Text fontSize={14} color={labelColor}>
+                          {project.checkboxLabel}
+                        </Text>
+                      </Checkbox>
+                    )}
                 </Box>
               ))}
             </>
           )}
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter borderTop='1px' borderColor='gray.200'>
           <Button colorScheme='gray' mr={3} onClick={onClose}>
             Cancel
           </Button>
