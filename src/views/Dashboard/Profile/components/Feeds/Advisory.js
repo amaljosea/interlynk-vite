@@ -10,7 +10,7 @@ import CardHeader from 'components/Card/CardHeader'
 
 import { OrgSettingCreate, OrgSettingUpdate } from 'graphQL/Mutation'
 
-const AdvisoryFeeds = ({ data, refetch }) => {
+const AdvisoryFeeds = ({ data, refetch, manageFeeds }) => {
   const textColor = useColorModeValue('gray.700', 'white')
   const [organizationSettingCreate] = useMutation(OrgSettingCreate)
   const [organizationSettingUpdate] = useMutation(OrgSettingUpdate)
@@ -57,12 +57,12 @@ const AdvisoryFeeds = ({ data, refetch }) => {
                   <Flex align='center' mb='20px' key={index}>
                     <Switch
                       size='md'
-                      colorScheme='blue'
                       me='10px'
-                      disabled={true}
+                      id={feed.id}
+                      colorScheme='blue'
+                      disabled={!manageFeeds}
                       isChecked={activeFeed && activeFeed.value}
                       onChange={(e) => handleChange(e, feed.id, activeFeed)}
-                      id={feed.id}
                     />
                     <Text
                       noOfLines={1}

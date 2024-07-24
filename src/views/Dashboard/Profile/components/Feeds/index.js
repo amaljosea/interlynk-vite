@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 
-import { Alert, Grid } from '@chakra-ui/react'
+import { Grid } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
@@ -17,8 +17,9 @@ const Feeds = () => {
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
 
-  const viewFeeds = useHasPermission({
-    parentKey: 'view_feeds'
+  const manageFeeds = useHasPermission({
+    parentKey: 'view_feeds',
+    childKey: 'manage_feeds'
   })
 
   const { data, refetch, loading } = useQuery(GetOrgSettings, {
@@ -36,22 +37,22 @@ const Feeds = () => {
 
   if (loading) return <CustomLoader />
 
-  if (viewFeeds === false) {
-    return (
-      <Alert status='error' borderRadius={5}>
-        You are not authorized to view feeds
-      </Alert>
-    )
-  }
-
   return (
     <Grid
       gap='22px'
       width={'100%'}
       templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
     >
-      <AdvisoryFeeds data={advisoryFeed} refetch={refetch} />
-      <ExploitFeeds data={exploitFeed} refetch={refetch} />
+      <AdvisoryFeeds
+        refetch={refetch}
+        data={advisoryFeed}
+        manageFeeds={manageFeeds}
+      />
+      <ExploitFeeds
+        refetch={refetch}
+        data={exploitFeed}
+        manageFeeds={manageFeeds}
+      />
     </Grid>
   )
 }
