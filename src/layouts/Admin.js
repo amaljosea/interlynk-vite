@@ -221,6 +221,7 @@ export default function Admin() {
               </Text>
             )
           }
+          disableKeyboardNavigation={true}
           prevButton={(props) =>
             props?.stepsLength !== 1 &&
             props?.currentStep !== 0 && (
