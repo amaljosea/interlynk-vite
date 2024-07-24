@@ -11,6 +11,45 @@ import {
   FaTools
 } from 'react-icons/fa'
 
+export const labels = [
+  {
+    id: 1,
+    name: 'bug',
+    description: 'Something is not working',
+    color: '#E53E3E',
+    issues: 15
+  },
+  { id: 2, name: 'demo', description: '', color: '#DD6B20', issues: 0 },
+  {
+    id: 3,
+    name: 'dependencies',
+    description: 'Pull requests that update a dependency file',
+    color: '#D69E2E',
+    issues: 2
+  },
+  {
+    id: 43,
+    name: 'documentation',
+    description: 'Improvements or additions to documentation',
+    color: '#38A169',
+    issues: 2
+  },
+  {
+    id: 5,
+    name: 'enhancement',
+    description: 'New feature or request',
+    color: '#319795',
+    issues: 30
+  },
+  {
+    id: 6,
+    name: 'FDA',
+    description: '',
+    color: '#3182CE',
+    issues: 0
+  }
+]
+
 export const sbomOrigin = [
   {
     value: 'demo-upload',

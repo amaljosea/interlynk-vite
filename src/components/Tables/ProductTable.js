@@ -45,6 +45,7 @@ import {
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
+import LabelDrawer from 'components/Drawer/LabelDrawer'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
@@ -57,7 +58,7 @@ import { DeleteProjectGroup } from 'graphQL/Mutation'
 import { GetSharelynks } from 'graphQL/Queries'
 
 import { FaEllipsisV, FaGithub } from 'react-icons/fa'
-import { FaCode, FaInbox, FaSquareArrowUpRight } from 'react-icons/fa6'
+import { FaCode, FaInbox, FaSquareArrowUpRight, FaTag } from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
 
@@ -101,6 +102,11 @@ const ProductTable = ({
     isOpen: isOpenUpload,
     onOpen: onOpenUpload,
     onClose: onCloseUpload
+  } = useDisclosure()
+  const {
+    isOpen: isOpenLabel,
+    onOpen: onOpenLabel,
+    onClose: onCloseLabel
   } = useDisclosure()
   const {
     isOpen: isDeleteOpen,
@@ -261,6 +267,19 @@ const ProductTable = ({
               />
             </Tooltip>
           )}
+          {/* EDIT LABEL */}
+          {shouldShowDemoFeatures && (
+            <Tooltip label='Edit Label'>
+              <IconButton
+                icon={<FaTag />}
+                colorScheme='blue'
+                variant='solid'
+                isDisabled={!canAddProduct}
+                hidden={signedUrlParams}
+                onClick={onOpenLabel}
+              />
+            </Tooltip>
+          )}
           {/* ADD PRODUCT */}
           <Tooltip label='Add Product'>
             <IconButton
@@ -299,7 +318,8 @@ const ProductTable = ({
     onGithubOpen,
     canAddProduct,
     refetch,
-    onOpen
+    onOpen,
+    onOpenLabel
   ])
 
   // COLUMNS
@@ -677,6 +697,11 @@ const ProductTable = ({
           isOpen={isLynkOpen}
           onClose={onLynkClose}
         />
+      )}
+
+      {/* Labels */}
+      {isOpenLabel && (
+        <LabelDrawer isOpen={isOpenLabel} onClose={onCloseLabel} />
       )}
     </>
   )

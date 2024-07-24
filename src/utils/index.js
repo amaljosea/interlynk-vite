@@ -979,6 +979,30 @@ export const isUnknown = (cpes, purl) => {
   }
 }
 
+export const getRandomColor = () => {
+  const getLightValue = () => Math.floor(Math.random() * 128) + 128;
+  const r = getLightValue().toString(16).padStart(2, '0');
+  const g = getLightValue().toString(16).padStart(2, '0');
+  const b = getLightValue().toString(16).padStart(2, '0');
+  return `#${r}${g}${b}`;
+}
+
+export const hexToRGBA = (hex, opacity) => {
+  let r = 0,
+    g = 0,
+    b = 0
+  if (hex.length === 4) {
+    r = parseInt(hex[1] + hex[1], 16)
+    g = parseInt(hex[2] + hex[2], 16)
+    b = parseInt(hex[3] + hex[3], 16)
+  } else if (hex.length === 7) {
+    r = parseInt(hex[1] + hex[2], 16)
+    g = parseInt(hex[3] + hex[4], 16)
+    b = parseInt(hex[5] + hex[6], 16)
+  }
+  return `rgba(${r},${g},${b},${opacity})`
+}
+
 export const tourStyles = {
   popover: (base) => ({
     ...base,
