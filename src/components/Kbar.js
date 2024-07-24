@@ -10,7 +10,6 @@ import {
 } from 'kbar'
 import { Fragment, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getUserType } from 'utils/url'
 
 import { SearchIcon } from '@chakra-ui/icons'
 import { useColorModeValue } from '@chakra-ui/system'
@@ -34,7 +33,7 @@ const Kbar = () => {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
   } = useProductUrlContext()
-  const { setEnvName, envName } = useGlobalState()
+  const { setEnvName, envName, onChangeEnv } = useGlobalState()
 
   const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
   const textHoverColor = useColorModeValue('#EDF2F7', '#2D3748')
@@ -57,9 +56,7 @@ const Kbar = () => {
     const env = productData?.organization?.projectGroups?.nodes
       .flatMap((group) => group.projects)
       .find((item) => item.name === value)
-
-    localStorage.setItem('environment', env?.name)
-    setEnvName(env?.name)
+    onChangeEnv(env?.name)
   }
 
   let data = []

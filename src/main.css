@@ -225,6 +225,15 @@
   background: #2d3748 !important;
 }
 
+.rdtPicker thead tr:first-of-type th:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+td.rdtMonth:hover,
+td.rdtYear:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
 .rdtPicker td.rdtDay:hover,
 .rdtPicker td.rdtHour:hover,
 .rdtPicker td.rdtMinute:hover,

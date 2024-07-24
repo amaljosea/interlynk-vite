@@ -170,6 +170,7 @@ const ShareLynkDrawer = ({
       selector: (row) => {
         const { enabled, contents } = row
         const projectGroup = contents[0]
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         const sbomLink = useClipboard(
           getShareLinklUrl({
             signedUrlParams: row?.signedUrlParams,

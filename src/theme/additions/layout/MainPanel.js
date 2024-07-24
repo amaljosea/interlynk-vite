@@ -11,20 +11,12 @@ const MainPanel = {
     transitionTimingFunction: 'linear, linear, ease'
   },
   variants: {
-    main: (props) => ({
-      float: 'right'
-    }),
-    rtl: (props) => ({
-      float: 'left'
-    })
+    main: () => ({ float: 'right' }),
+    rtl: () => ({ float: 'left' })
   },
-  defaultProps: {
-    variant: 'main'
-  }
+  defaultProps: { variant: 'main' }
 }
 
 export const MainPanelComponent = {
-  components: {
-    MainPanel
-  }
+  components: { MainPanel }
 }

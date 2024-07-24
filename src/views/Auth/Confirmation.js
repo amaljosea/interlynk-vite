@@ -45,7 +45,7 @@ const Confirmation = () => {
         })
       }
     })
-  }, [])
+  }, [emailConfirmation, toast, token])
 
   if (error?.length > 0) {
     return (

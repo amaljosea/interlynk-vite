@@ -28,7 +28,7 @@ export default function Reset() {
     if (authToken) {
       navigate('/vendor/dashboard')
     }
-  }, [])
+  }, [authToken, navigate])
 
   return (
     <Box ref={navRef} w='100%' height={'100vh'} position={'relative'}>

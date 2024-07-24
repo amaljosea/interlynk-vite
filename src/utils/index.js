@@ -1,12 +1,7 @@
 // USER IMAGES
 import userOne from 'assets/img/abhi.png'
 import custom from 'assets/img/custom.png'
-import Action from 'assets/img/github-actions.png'
-import GitHub from 'assets/img/github.png'
 import grype from 'assets/img/grype.png'
-import Import from 'assets/img/import.png'
-import Jenkins from 'assets/img/jenkins.png'
-import Build from 'assets/img/manual-build.png'
 import userThree from 'assets/img/rcn.jpg'
 import scout from 'assets/img/scout.png'
 import snyk from 'assets/img/snyk.png'
@@ -980,11 +975,11 @@ export const isUnknown = (cpes, purl) => {
 }
 
 export const getRandomColor = () => {
-  const getLightValue = () => Math.floor(Math.random() * 128) + 128;
-  const r = getLightValue().toString(16).padStart(2, '0');
-  const g = getLightValue().toString(16).padStart(2, '0');
-  const b = getLightValue().toString(16).padStart(2, '0');
-  return `#${r}${g}${b}`;
+  const getLightValue = () => Math.floor(Math.random() * 128) + 128
+  const r = getLightValue().toString(16).padStart(2, '0')
+  const g = getLightValue().toString(16).padStart(2, '0')
+  const b = getLightValue().toString(16).padStart(2, '0')
+  return `#${r}${g}${b}`
 }
 
 export const hexToRGBA = (hex, opacity) => {

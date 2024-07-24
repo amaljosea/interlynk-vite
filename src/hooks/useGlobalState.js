@@ -143,6 +143,11 @@ const GlobalStateProvider = ({ children }) => {
     filters: null
   })
 
+  const onChangeEnv = (env) => {
+    localStorage.setItem('environment', env)
+    setEnvName(env)
+  }
+
   return (
     <GlobalStateContext.Provider
       value={{
@@ -178,6 +183,7 @@ const GlobalStateProvider = ({ children }) => {
         sbomState,
         versionState,
         toolsState,
+        onChangeEnv,
         dispatch: {
           compVulnDispatch,
           prodDispatch,

@@ -91,8 +91,8 @@ const GraphView = ({ data, activeComp }) => {
 
   const [treeView, setTreeView] = useState(null)
   const [zoom, setZoom] = useState(Number(1))
-  const [position, setPosition] = useState({ x: 100, y: 250 })
-  const [dimensions, translate, containerRef] = useCenteredTree()
+  const position = { x: 100, y: 250 }
+  const [containerRef] = useCenteredTree()
 
   const nodeSize = { x: 1000, y: 500 }
   const foreignObjectProps = {
@@ -101,7 +101,6 @@ const GraphView = ({ data, activeComp }) => {
     x: -10,
     y: 12
   }
-  const separation = { siblings: 1.5, nonSiblings: 2 }
 
   const { data: compDependency } = useQuery(
     signedUrlParams ? GetShareCompDependency : GetCompDependency,
@@ -120,7 +119,6 @@ const GraphView = ({ data, activeComp }) => {
 
   useEffect(() => {
     if (compDependency) {
-      // console.log('compDependency', compDependency)
       if (signedUrlParams) {
         const dependsOnNodes =
           compDependency?.shareLynkQuery?.component?.dependsOn?.map(
@@ -154,7 +152,7 @@ const GraphView = ({ data, activeComp }) => {
         setTreeView(data)
       }
     }
-  }, [compDependency])
+  }, [compDependency, signedUrlParams])
 
   return (
     <Card overflow='hidden'>

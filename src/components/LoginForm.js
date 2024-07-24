@@ -3,7 +3,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
 // core components
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 import {
   Alert,
@@ -25,7 +25,6 @@ import { UserResendConfirmationEmail } from 'graphQL/Mutation'
 
 const LoginForm = () => {
   const toast = useToast()
-  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const emailId = queryParams.get('id')
@@ -36,9 +35,7 @@ const LoginForm = () => {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  const [resendInvitation, { loading }] = useMutation(
-    UserResendConfirmationEmail
-  )
+  const [resendInvitation] = useMutation(UserResendConfirmationEmail)
 
   const handleSubmit = (e) => {
     e.preventDefault()

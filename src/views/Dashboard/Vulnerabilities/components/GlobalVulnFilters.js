@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { useMemo, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import {
@@ -31,7 +31,7 @@ import { GetProductNames } from 'graphQL/Queries'
 const GlobalVulnsFilters = ({ setFilters }) => {
   const params = useParams()
 
-  const { totalRows, prodState, userPermissions } = useGlobalState()
+  const { totalRows, prodState } = useGlobalState()
 
   const productPermissions = useHasPermission({
     parentKey: 'view_product_group'

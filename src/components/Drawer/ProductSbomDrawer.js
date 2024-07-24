@@ -93,11 +93,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
     onCompleted: () => handleRefetch()
   })
 
-  const {
-    isOpen: isWarningOpen,
-    onOpen: onWarningOpen,
-    onClose: onWarningClose
-  } = useDisclosure()
+  const { isOpen: isWarningOpen, onClose: onWarningClose } = useDisclosure()
   const {
     isOpen: isPurlOpen,
     onOpen: onPurlOpen,

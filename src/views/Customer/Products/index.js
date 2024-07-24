@@ -28,7 +28,12 @@ function Index() {
         }
       })
     }
-  }, [])
+  }, [
+    generateProductDetailPageUrlFromCurrentUrl,
+    getProjectGroup,
+    navigate,
+    productGroupId
+  ])
 
   return <Outlet />
 }

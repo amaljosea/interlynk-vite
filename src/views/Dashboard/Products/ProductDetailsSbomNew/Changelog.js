@@ -31,7 +31,6 @@ import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import {
   GetChangeLogs,
-  GetComponentData,
   GetProductData,
   GetSbomLogFilters,
   GetVulnData

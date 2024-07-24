@@ -103,7 +103,7 @@ export default function HeaderLinks(props) {
     setSelectedSbom,
     setUserName,
     envName,
-    setEnvName
+    onChangeEnv
   } = useGlobalState()
   const { orgView } = useGlobalQueryContext()
 
@@ -155,8 +155,7 @@ export default function HeaderLinks(props) {
         })
       )
     }
-    localStorage.setItem('environment', value)
-    setEnvName(value)
+    onChangeEnv(value)
     setClearSelect(true)
     setSelectedSbom([])
   }
@@ -201,18 +200,19 @@ export default function HeaderLinks(props) {
     setIsOpen(true)
   }
 
+  const updateTour = (steps, name) => {
+    localStorage.setItem('activeTour', name)
+    setSteps(steps)
+  }
+
   const onStartDashTour = () => {
     document?.body?.classList.add('no-scroll')
     if (dashboardView) {
-      setSteps(homeSteps)
-      localStorage.setItem('activeTour', 'dashboard')
+      updateTour(homeSteps, 'dashboard')
     }
-
     if (productView) {
-      setSteps(productSteps)
-      localStorage.setItem('activeTour', 'products')
+      updateTour(productSteps, 'products')
     }
-
     setCurrentStep(0)
     setIsOpen(true)
   }

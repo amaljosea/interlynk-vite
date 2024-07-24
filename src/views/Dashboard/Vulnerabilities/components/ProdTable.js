@@ -30,7 +30,6 @@ import ComponentCard from 'components/Misc/ComponentCard'
 import VersionCard from 'components/Misc/VersionCard'
 import Pagination from 'components/Pagination'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
@@ -46,8 +45,6 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-
-  const { userPermissions } = useGlobalState()
 
   const manageFeeds = useHasPermission({
     parentKey: 'view_feeds',

@@ -37,11 +37,7 @@ export default function Dashboard() {
   const { prodCompDispatch, prodVulnDispatch } = dispatch
   const iconBoxInside = useColorModeValue('white', 'white')
 
-  const {
-    data,
-    error: eOrg,
-    loading
-  } = useQuery(GetOrg, {
+  const { data, loading } = useQuery(GetOrg, {
     skip: !orgView,
     fetchPolicy: 'network-only',
     onCompleted: (data) => {

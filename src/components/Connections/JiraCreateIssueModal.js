@@ -1,7 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import ReactSelect from 'react-select'
-import CreatableSelect from 'react-select/creatable'
 
 import {
   Button,
@@ -54,15 +53,13 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
   const [reporters, setReporters] = useState([])
   const [reporter, setReporter] = useState('')
 
-  const [labels, setLabels] = useState([])
-  const [label, setLabel] = useState([])
+  const label = []
 
-  const [priorities, setPriorities] = useState([
+  const priority = [
     { value: 'Medium', label: 'Medium' },
     { value: 'High', label: 'High' },
     { value: 'Low', label: 'Low' }
-  ])
-  const [priority, setPriority] = useState('')
+  ]
 
   const [description, setDescription] = useState('')
   const [isCreateDisabled, setIsCreateDisabled] = useState(true)
@@ -110,7 +107,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
     if (defaultProject) {
       getOptions({ variables: { pKey: defaultProject } })
     }
-  }, [])
+  }, [defaultProject, getOptions, row])
 
   useEffect(() => {
     if (summary && project && issueType && reporter && assignee) {
@@ -138,18 +135,6 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
         options.jira?.users?.map((reporter) => ({
           value: reporter.accountId,
           label: reporter.name
-        }))
-      )
-      setLabels(
-        options.jira?.labels?.map((label) => ({
-          value: label,
-          label: label
-        }))
-      )
-      setPriorities(
-        options.jira?.priorities?.map((priority) => ({
-          value: priority,
-          label: priority
         }))
       )
     }

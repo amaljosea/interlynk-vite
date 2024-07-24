@@ -1,5 +1,4 @@
 import { useQuery } from '@apollo/client'
-import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { Flex, Skeleton } from '@chakra-ui/react'
@@ -19,7 +18,7 @@ const ProductDetailsVul = () => {
   const productGroupId = params.productgroupid
   const vulnId = params.vulnerabilityid
 
-  const { totalRows, compVulnState, userPermissions } = useGlobalState()
+  const { totalRows, compVulnState } = useGlobalState()
   const {
     searchInput: compVulnSearch,
     envs,

@@ -27,6 +27,7 @@ export const DurationSelect = ({ value, onChange }) => {
     const defaultValue = 14
     const defaultOption = options.find((i) => i.value === defaultValue)
     onChange(defaultOption)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

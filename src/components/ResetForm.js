@@ -162,11 +162,11 @@ const ResetForm = () => {
         </Text>
         <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
           Thanks! If <strong>{email}</strong> matches an email we have on file,
-          then we've sent you an email containing further instructions for
+          then we have sent you an email containing further instructions for
           resetting your password.
         </Text>
         <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
-          If you haven't received an email in 5 minutes, check your{' '}
+          If you have not received an email in 5 minutes, check your{' '}
           <strong>spam</strong> or try a <strong>different email</strong>.
         </Text>
       </Flex>
@@ -279,7 +279,7 @@ const ResetForm = () => {
         Reset your password
       </Text>
       <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
-        Enter the email address associated with your account and we'll send you
+        Enter the email address associated with your account and we will send you
         a link to reset your password.
       </Text>
       {error !== '' && (

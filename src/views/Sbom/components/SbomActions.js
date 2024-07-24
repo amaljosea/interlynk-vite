@@ -139,11 +139,7 @@ const SbomActions = ({ sbom, refetch }) => {
     onClose: setDeleteClose
   } = useDisclosure()
 
-  const {
-    isOpen: isCopied,
-    onOpen: onCopiedOpen,
-    onClose: onCopiedClose
-  } = useDisclosure()
+  const { isOpen: isCopied, onClose: onCopiedClose } = useDisclosure()
 
   const filterVersion = data
     ? data?.project?.sboms.find((item) => item.id === sbomId)

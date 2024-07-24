@@ -85,8 +85,14 @@ const ProductTable = ({
   const params = useParams()
   const productId = params.productid
 
-  const { setEnvName, setClearSelect, setSelectedSbom, dispatch, envName } =
-    useGlobalState()
+  const {
+    setEnvName,
+    setClearSelect,
+    setSelectedSbom,
+    dispatch,
+    envName,
+    onChangeEnv
+  } = useGlobalState()
 
   const environment = envName
 
@@ -434,13 +440,11 @@ const ProductTable = ({
         const { projects } = row
         const handleClick = (value) => {
           const env = projects?.find((item) => item.name === value)
-          localStorage.setItem('environment', env?.name)
-
+          onChangeEnv(env?.name)
           prodDispatch({
             type: 'SET_CURRENT_PRODUCT',
             payload: { id: env?.id }
           })
-          setEnvName(env?.name)
         }
         return (
           <Stack direction={'row'} spacing={2} alignItems={'center'}>

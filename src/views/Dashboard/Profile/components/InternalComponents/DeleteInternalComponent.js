@@ -1,7 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 
-import { DeleteIcon } from '@chakra-ui/icons'
 import {
   Button,
   Checkbox,

@@ -95,9 +95,6 @@ const TokenInfo = () => {
 
   const tokenRef = useRef(null)
 
-  const defaultDate = new Date()
-  defaultDate.setDate(defaultDate.getDate() + 90)
-
   const [token, setToken] = useState('')
   const [keyName, setKeyName] = useState('')
   const [error, setError] = useState('')
@@ -122,6 +119,8 @@ const TokenInfo = () => {
   }
 
   const handleExpireChange = (e) => {
+    const defaultDate = new Date()
+    defaultDate.setDate(defaultDate.getDate() + 90)
     const { checked } = e.target
     setNoExpire(checked)
     setIsValidDate(true)
@@ -221,9 +220,11 @@ const TokenInfo = () => {
 
   // HEADER SECTION
   const subHeaderComponent = useMemo(() => {
+    const defaultDate = new Date()
+    defaultDate.setDate(defaultDate.getDate() + 90)
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
-        {/* CREATE COMPONENT */}
+        {/* NER TOKEN */}
         <Tooltip label='New Token'>
           <IconButton
             ref={tokenRef}
@@ -245,7 +246,7 @@ const TokenInfo = () => {
         </Tooltip>
       </Flex>
     )
-  }, [])
+  }, [onOpen])
 
   useEffect(() => {
     if (activeRow) {

@@ -10,11 +10,9 @@ import { createUploadLink } from 'apollo-upload-client'
 import Cookies from 'js-cookie'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { logoutUser } from 'utils/authUtils'
 
 import { useToast } from '@chakra-ui/react'
 
-let navigateCache
 let toastCache
 
 const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
@@ -104,7 +102,6 @@ export const ApolloWrapper = ({ children }) => {
   const toast = useToast()
 
   useEffect(() => {
-    navigateCache = navigate
     toastCache = toast
   }, [navigate, toast])
 

@@ -95,7 +95,7 @@ const Invitation = () => {
               >
                 <Icon color={'red.400'} boxSize={20} as={WarningIcon} />
                 <Text my={6}>
-                  That didn't work because of the following error:
+                  That did not work because of the following error:
                   <br />
                   {error[0]}.
                   <br />

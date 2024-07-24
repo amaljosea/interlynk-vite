@@ -82,7 +82,7 @@ const Parts = ({ sbomRefetch }) => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const { totalRows, prodState, userPermissions, dispatch } = useGlobalState()
+  const { totalRows, prodState, dispatch } = useGlobalState()
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')

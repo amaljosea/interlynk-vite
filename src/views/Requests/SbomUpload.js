@@ -1,6 +1,6 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 
 import {
   Box,
@@ -26,7 +26,6 @@ import { FaUpload } from 'react-icons/fa'
 
 const SbomUpload = () => {
   const toast = useToast()
-  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const token = queryParams.get('token')
@@ -39,12 +38,7 @@ const SbomUpload = () => {
   const [isUploadVisible, setIsUploadVisible] = useState(true)
 
   useEffect(() => {
-    validateRequest({
-      variables: {
-        id: id,
-        token: token
-      }
-    }).then((res) => {
+    validateRequest({ variables: { id, token } }).then((res) => {
       if (res.data?.requestValidate?.errors?.length > 0) {
         setIsUploadVisible(false)
         toast({
@@ -56,7 +50,7 @@ const SbomUpload = () => {
         })
       }
     })
-  }, [id, token])
+  }, [id, toast, token, validateRequest])
 
   const onDecline = () => {
     declineRequest({

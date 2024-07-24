@@ -61,7 +61,7 @@ const NotificationMenuBell = () => {
         notificationPreferences: newPreference,
         envId: productId
       }
-    }).then((res) => {
+    }).then(() => {
       setPreference(newPreference)
       let enabledChannelCount = 0
 

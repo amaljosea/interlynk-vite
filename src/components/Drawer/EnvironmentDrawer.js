@@ -109,7 +109,7 @@ const EnvironmentDrawer = ({
         </Stack>
       </Flex>
     )
-  }, [])
+  }, [data?.projectGroup?.enabled, onProdOpen])
 
   // COLUMNS
   const columns = [
@@ -153,7 +153,7 @@ const EnvironmentDrawer = ({
       id: 'ACTIONS',
       name: 'ACTIONS',
       selector: (row) => {
-        const { name, id } = row
+        const { name } = row
         return (
           <IconButton
             size='xs'

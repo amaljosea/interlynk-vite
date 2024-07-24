@@ -30,6 +30,7 @@ const CpeText = ({ children }) => (
 )
 
 const CpeCard = ({ value, isOpen, onClose }) => {
+  // eslint-disable-next-line no-useless-escape
   const filterString = value?.replace(/[\[\]"]/g, '') || ''
   const cpeString = filterString.split(':')
 

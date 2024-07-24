@@ -304,10 +304,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const vulnsPermissions = useHasPermission({
-    parentKey: 'view_feeds'
-  })
-
   useEffect(() => {
     if (configs) {
       if (!configs?.organization?.connections?.nodes[0]?.connection) {
@@ -340,10 +336,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
 
   const { nodes, paginationProps, refetch, loading, reset } =
     usePaginatatedQuery(GetVulnData, {
-      skip:
-        sbomId && vulnsPermissions === true && activeTab === 'vulnerabilities'
-          ? false
-          : true,
+      skip: sbomId && activeTab === 'vulnerabilities' ? false : true,
       selector: 'sbom.vulns',
       variables: {
         projectId: productId,
@@ -1095,14 +1088,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     (row, bool) => !bool && refetch(),
     [refetch]
   )
-
-  if (vulnsPermissions === false) {
-    return (
-      <Text mt={4} textAlign={'center'}>
-        You do not have permission to access this data
-      </Text>
-    )
-  }
 
   return (
     <>

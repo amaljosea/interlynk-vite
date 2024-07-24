@@ -99,13 +99,11 @@ const CpeField = ({
         setCpeList([])
       }
     }
-
     document.addEventListener('click', handleClickOutside)
-
     return () => {
       document.removeEventListener('click', handleClickOutside)
     }
-  }, [])
+  }, [inputRef, setCpeList])
 
   return (
     <VStack

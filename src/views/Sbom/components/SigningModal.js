@@ -23,9 +23,6 @@ import {
 const SigningModal = ({
   isOpen,
   onClose,
-  sbomId,
-  projectId,
-  refetch,
   sbomData,
   status,
   setStatus,
@@ -45,7 +42,7 @@ const SigningModal = ({
       setSpdxSign(signedData.spdxSign)
       setCycloneDxSign(signedData.cycloneDxSign)
     }
-  }, [])
+  }, [signedData])
 
   // const [sbomSign] = useMutation(signSbom)
 

@@ -1,15 +1,12 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 
-import { Button, Flex, Input, Switch, Text } from '@chakra-ui/react'
+import { Flex, Switch, Text } from '@chakra-ui/react'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import useQueryParam from 'hooks/useQueryParam'
 
-import {
-  UpdateNotificationChannel,
-  UpdateNotificationConfig
-} from 'graphQL/Mutation'
+import { UpdateNotificationChannel } from 'graphQL/Mutation'
 import {
   GetUserNotificationChannels,
   GetUserNotificationConfigs
@@ -22,15 +19,8 @@ const NotificationChannels = () => {
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
 
-  const [slackWebhookUrl, setSlackWebhookUrl] = useState('')
-  const [teamsWebhookUrl, setTeamsWebhookUrl] = useState('')
-  const [isSlackChanged, setIsSlackChanged] = useState(false)
-  const [isTeamsChanged, setIsTeamsChanged] = useState(false)
-
   const [updateChannel] = useMutation(UpdateNotificationChannel)
-  const [updateConfig] = useMutation(UpdateNotificationConfig)
   const [notificationChannels, setNotificationChannels] = useState({})
-  const [notificationConfigs, setNotificationConfigs] = useState({})
 
   const status = !orgView ? true : activetab === 'notifications' ? false : true
 
@@ -58,11 +48,6 @@ const NotificationChannels = () => {
       if ('__typename' in notificationConfigs) {
         delete notificationConfigs.__typename
       }
-      setNotificationConfigs(notificationConfigs)
-      setSlackWebhookUrl(notificationConfigs.slackWebhookUrl)
-      setTeamsWebhookUrl(notificationConfigs.teamsWebhookUrl)
-      setIsSlackChanged(false)
-      setIsTeamsChanged(false)
     }
   }, [configs])
 

@@ -7,7 +7,6 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 
 const {
-  ChakraProvider,
   Button,
   Text,
   FormControl,

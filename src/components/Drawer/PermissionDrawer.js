@@ -21,7 +21,6 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
