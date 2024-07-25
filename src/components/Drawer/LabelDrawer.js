@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'react'
 import { getRandomColor, hexToRGBA } from 'utils'
 import { labels } from 'variables/general'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
+import { DeleteIcon, EditIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
   Button,
   Divider,
@@ -15,23 +16,15 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Grid,
+  GridItem,
   IconButton,
   Input,
   SimpleGrid,
-  Table,
-  TableContainer,
   Tag,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tooltip,
-  Tr,
   useColorModeValue
 } from '@chakra-ui/react'
-
-import SearchFilter from 'components/Licenses/LicenseSearchFilter'
 
 import { VscIssues } from 'react-icons/vsc'
 
@@ -45,6 +38,7 @@ const LabelDrawer = ({ isOpen, onClose }) => {
   const [activeRow, setActiveRow] = useState(null)
 
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const borderColor = useColorModeValue('#E2E8F0', '#2D3748')
   const randomColor = getRandomColor()
 
   const handleRefresh = () => {
@@ -127,7 +121,7 @@ const LabelDrawer = ({ isOpen, onClose }) => {
   return (
     <>
       <Drawer
-        size='xl'
+        size='lg'
         isOpen={isOpen}
         placement='right'
         onClose={onClose}
@@ -140,7 +134,7 @@ const LabelDrawer = ({ isOpen, onClose }) => {
           <DrawerBody mt={3} as={Flex} flexDirection={'column'} gap={4}>
             {/* ACTIONS AND EDIT FIELDS */}
             {edit ? (
-              <Flex gap={4} flexDir={'column'}>
+              <Flex gap={4} mb={2} flexDir={'column'}>
                 <Tag
                   width={'fit-content'}
                   borderColor={labelColor}
@@ -148,7 +142,7 @@ const LabelDrawer = ({ isOpen, onClose }) => {
                 >
                   {labelName !== '' ? labelName : 'Label preview'}
                 </Tag>
-                <SimpleGrid columns={3} spacing={10}>
+                <SimpleGrid columns={1} spacing={4}>
                   <FormControl>
                     <FormLabel>Label name</FormLabel>
                     <Input
@@ -165,34 +159,36 @@ const LabelDrawer = ({ isOpen, onClose }) => {
                       onChange={(e) => setLabelDesc(e.target.value)}
                     />
                   </FormControl>
-                  <FormControl>
-                    <FormLabel>Color</FormLabel>
-                    <Flex gap={2} alignItems={'center'}>
-                      <IconButton
-                        icon={<RepeatIcon />}
-                        onClick={handleRefresh}
-                      />
-                      <Input
-                        width='fit-cotent'
-                        value={labelColor}
-                        onChange={(e) => setLabelColor(e.target.value)}
-                      />
-                    </Flex>
-                  </FormControl>
-                </SimpleGrid>
-                <Flex gap={3} alignItems='center'>
-                  <Button size='sm' onClick={() => setEdit(false)}>
-                    Cancel
-                  </Button>
-                  <Button
-                    size='sm'
-                    colorScheme='blue'
-                    onClick={onSubmit}
-                    isDisabled={labelName === '' || labelColor === ''}
+                  <Flex
+                    alignItems={'flex-end'}
+                    justifyContent={'space-between'}
                   >
-                    {activeRow ? 'Update' : 'Create'} Label
-                  </Button>
-                </Flex>
+                    <FormControl>
+                      <FormLabel>Color</FormLabel>
+                      <Flex gap={2} alignItems={'center'}>
+                        <IconButton
+                          icon={<RepeatIcon />}
+                          onClick={handleRefresh}
+                        />
+                        <Input
+                          width='fit-content'
+                          value={labelColor}
+                          onChange={(e) => setLabelColor(e.target.value)}
+                        />
+                      </Flex>
+                    </FormControl>
+                    <Flex gap={3} alignItems='center'>
+                      <Button onClick={() => setEdit(false)}>Cancel</Button>
+                      <Button
+                        colorScheme='blue'
+                        onClick={onSubmit}
+                        isDisabled={labelName === '' || labelColor === ''}
+                      >
+                        {activeRow ? 'Update' : 'Create'} Label
+                      </Button>
+                    </Flex>
+                  </Flex>
+                </SimpleGrid>
               </Flex>
             ) : (
               <Flex
@@ -209,108 +205,88 @@ const LabelDrawer = ({ isOpen, onClose }) => {
                   onFilter={handleSearch}
                 />
                 {/* ADD PRODUCT */}
-                <Tooltip label='New Label' placement='left'>
-                  <IconButton
-                    icon={<AddIcon />}
-                    colorScheme='blue'
-                    variant='solid'
-                    onClick={() => {
-                      setLabelColor(randomColor)
-                      setActiveRow(null)
-                      setEdit(true)
-                    }}
-                  />
-                </Tooltip>
+                <Button
+                  colorScheme='blue'
+                  onClick={() => {
+                    setLabelColor(randomColor)
+                    setActiveRow(null)
+                    setEdit(true)
+                  }}
+                >
+                  New Label
+                </Button>
               </Flex>
             )}
             <Divider />
-            {/* TABLE */}
-            <TableContainer overflowY={'scroll'}>
-              <Table variant='simple'>
-                <Thead>
-                  <Tr>
-                    <Th px={0}>
-                      <Text
-                        fontSize={'sm'}
-                        textAlign={'left'}
-                        color={textColor}
-                        textTransform={'capitalize'}
-                      >
-                        {data?.length} Labels
-                      </Text>
-                    </Th>
-                    <Th></Th>
-                    <Th></Th>
-                    <Th px={0}>
-                      {/* <Text
-                        fontSize={'sm'}
-                        textAlign={'right'}
-                        color={textColor}
-                        textTransform={'capitalize'}
-                      >
-                        Sort
-                      </Text> */}
-                    </Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {data?.map((row) => (
-                    <Tr key={row?.id}>
-                      <Td pl={0}>
-                        <Tag
-                          size='sm'
-                          width={'fit-content'}
-                          borderColor={row?.color}
-                          bg={hexToRGBA(row?.color, 0.5)}
-                        >
-                          {row?.name}
-                        </Tag>
-                      </Td>
-                      <Td>
-                        <Text fontSize={'xs'} color={textColor}>
-                          {row?.description}
-                        </Text>
-                      </Td>
-                      <Td>
-                        <Flex
-                          gap={1}
-                          width={'100px'}
-                          alignItems={'center'}
-                          hidden={row?.issues === 0}
-                        >
-                          <VscIssues color={textColor} size={20} />
-                          <Text fontSize='xs' color={textColor}>
-                            {row?.issues}
-                          </Text>
-                        </Flex>
-                      </Td>
-                      <Td pr={2}>
-                        <Flex
-                          gap={1}
-                          alignItems={'center'}
-                          justifyContent={'flex-end'}
-                        >
-                          <Button
-                            size='xs'
-                            color={textColor}
-                            onClick={() => onEdit(row)}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            size='xs'
-                            color='red.500'
-                            onClick={() => onDelete(row)}
-                          >
-                            Delete
-                          </Button>
-                        </Flex>
-                      </Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
+            {/* HEADER */}
+            <Flex alignItems={'center'} justifyContent={'flex-start'}>
+              <Text
+                fontSize={'sm'}
+                color={textColor}
+                textAlign={'left'}
+                fontWeight={'semibold'}
+                textTransform={'capitalize'}
+              >
+                {data?.length} Labels
+              </Text>
+            </Flex>
+            {/* LABEL LIST */}
+            {data?.map((row) => (
+              <Grid
+                pb={3}
+                gap={4}
+                key={row?.id}
+                templateColumns='repeat(6, 1fr)'
+                borderBottom={`1px solid ${borderColor}`}
+              >
+                <GridItem colSpan={2}>
+                  <Tag
+                    size='sm'
+                    width={'fit-content'}
+                    borderColor={row?.color}
+                    bg={hexToRGBA(row?.color, 0.5)}
+                  >
+                    {row?.name}
+                  </Tag>
+                </GridItem>
+                <GridItem colSpan={2}>
+                  <Text fontSize={'xs'} color={textColor}>
+                    {row?.description}
+                  </Text>
+                </GridItem>
+                <GridItem colSpan={1}>
+                  <Flex
+                    gap={1}
+                    width={'100px'}
+                    alignItems={'center'}
+                    hidden={row?.issues === 0}
+                  >
+                    <VscIssues color={textColor} size={20} />
+                    <Text fontSize='xs' color={textColor}>
+                      {row?.issues}
+                    </Text>
+                  </Flex>
+                </GridItem>
+                <GridItem colSpan={1}>
+                  <Flex
+                    gap={2}
+                    alignItems={'center'}
+                    justifyContent={'flex-end'}
+                  >
+                    <IconButton
+                      size='sm'
+                      icon={<EditIcon />}
+                      onClick={() => onEdit(row)}
+                    />
+                    <IconButton
+                      size='sm'
+                      icon={<DeleteIcon color={'red.500'} />}
+                      onClick={() => onDelete(row)}
+                    />
+                  </Flex>
+                </GridItem>
+              </Grid>
+            ))}
           </DrawerBody>
         </DrawerContent>
       </Drawer>
