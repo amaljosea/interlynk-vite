@@ -285,9 +285,7 @@ const RelationshipDrawer = ({
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton onClick={handleAdd} />
-        <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          Relationships
-        </DrawerHeader>
+        <DrawerHeader borderBottomWidth='1px'>Relationships</DrawerHeader>
         {isLoading ? (
           <LoadingSpinner />
         ) : (

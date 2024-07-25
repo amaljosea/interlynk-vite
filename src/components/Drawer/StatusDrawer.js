@@ -211,9 +211,7 @@ const StatusDrawer = ({
         <DrawerCloseButton
           onClick={() => vulnRefetch !== null && vulnRefetch()}
         />
-        <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          {cve} Status
-        </DrawerHeader>
+        <DrawerHeader borderBottomWidth='1px'>{cve} Status</DrawerHeader>
         <DrawerBody>
           <Stack spacing='24px'>
             <Box>

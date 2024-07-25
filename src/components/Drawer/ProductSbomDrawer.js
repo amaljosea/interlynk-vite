@@ -266,9 +266,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-            Build Version
-          </DrawerHeader>
+          <DrawerHeader borderBottomWidth='1px'>Build Version</DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4} mt={2}>
               {/* NAME */}

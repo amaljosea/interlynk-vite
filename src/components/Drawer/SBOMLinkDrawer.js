@@ -29,7 +29,6 @@ function SBOMLinkDrawer(props) {
     id,
     isOpen,
     onClose,
-    btnRef,
     imageDataRefetch,
     shareScanner,
     scanResults,
@@ -42,8 +41,6 @@ function SBOMLinkDrawer(props) {
   const sortScanResult = [...scanResults].sort((a, b) =>
     a.company.localeCompare(b.company)
   )
-
-  const sbomqsVersions = ['v0.0.1', 'v0.0.2', 'v0.0.3']
 
   const [shareLynkUpdate] = useMutation(UpdateShareLynk, {
     onCompleted: imageDataRefetch
@@ -127,7 +124,7 @@ function SBOMLinkDrawer(props) {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader borderBottomWidth='1px' color='gray.600'>
+        <DrawerHeader borderBottomWidth='1px'>
           Share Lynk
         </DrawerHeader>
         <DrawerBody>

@@ -29,9 +29,7 @@ import {
   Text
 } from '@chakra-ui/react'
 
-function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
-  const [product, setProduct] = useState('dashboard-app')
-  const [version, setVersion] = useState('')
+function ImagesDrawer({ isOpen, onClose, activeImageId }) {
   const [hasEmail, setHasEmail] = useState(true)
   const [hasTerms, setHasTerms] = useState(true)
   const [hasRedactions, setHasRedactions] = useState(true)
@@ -43,7 +41,6 @@ function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
   const [hasCyclonDx, setHasCyclonDx] = useState(true)
   const [hasSpdx, setHasSpdx] = useState(true)
   const [isPublic, setIsPublic] = useState(false)
-  const [selectedVersion, setSelectedVersion] = useState([])
 
   const [email, setEmail] = useState('')
   const [emailList, setEmailList] = useState([])
@@ -53,10 +50,6 @@ function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
       setEmailList((prev) => [email, ...prev])
       setEmail('')
     }
-  }
-
-  const handleProductChange = (e) => {
-    setProduct(e.target.value)
   }
 
   const handleRemove = (item) => {
@@ -73,10 +66,7 @@ function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          Share Lynk
-        </DrawerHeader>
-
+        <DrawerHeader borderBottomWidth='1px'>Share Lynk</DrawerHeader>
         <DrawerBody>
           <Stack spacing='20px'>
             <Box>

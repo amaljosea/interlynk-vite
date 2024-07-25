@@ -99,9 +99,7 @@ const MultiStatusDrawer = ({
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton onClick={onClose} />
-        <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          Status
-        </DrawerHeader>
+        <DrawerHeader borderBottomWidth='1px'>Status</DrawerHeader>
         <DrawerBody>
           <Box mb={6}>
             <Flex gap={2} alignItems={'center'} fontSize={'sm'}>

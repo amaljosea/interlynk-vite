@@ -183,9 +183,7 @@ function SBOMDrawer(props) {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          Share Lynk
-        </DrawerHeader>
+        <DrawerHeader borderBottomWidth='1px'>Share Lynk</DrawerHeader>
         <DrawerBody>
           <FormControl fontSize={'sm'}>
             <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>

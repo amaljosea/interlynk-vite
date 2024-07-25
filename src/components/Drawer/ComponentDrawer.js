@@ -478,7 +478,7 @@ function ComponentDrawer(props) {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader borderBottomWidth='1px' color='gray.600'>
+          <DrawerHeader borderBottomWidth='1px'>
             {signedUrlParams
               ? 'Component'
               : data

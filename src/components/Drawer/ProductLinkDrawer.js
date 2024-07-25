@@ -73,9 +73,7 @@ function ProductLinkDrawer(props) {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          Share Link
-        </DrawerHeader>
+        <DrawerHeader borderBottomWidth='1px'>Share Link</DrawerHeader>
         <DrawerBody>
           <Stack spacing='24px'>
             <Box>

@@ -116,9 +116,7 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-            Edit Links
-          </DrawerHeader>
+          <DrawerHeader borderBottomWidth='1px'>Edit Links</DrawerHeader>
           <DrawerBody>
             {component && (
               <Flex

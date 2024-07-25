@@ -91,9 +91,7 @@ function ProductAssembleDrawer(props) {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          Assemble Product
-        </DrawerHeader>
+        <DrawerHeader borderBottomWidth='1px'>Assemble Product</DrawerHeader>
         <DrawerBody>
           <Stack spacing='24px'>
             <Box>

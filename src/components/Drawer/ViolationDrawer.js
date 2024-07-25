@@ -7,7 +7,6 @@ import {
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
-  DrawerHeader,
   DrawerOverlay,
   Flex,
   Stack,
@@ -103,11 +102,6 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>
-          {/* <Text width={'90%'} mr={'auto'} wordBreak={'break-all'}>
-            {policy?.length > 25 ? `${policy?.substring(0, 25)}...` : policy}
-          </Text> */}
-        </DrawerHeader>
         <DrawerBody>
           <Flex
             height={'100%'}

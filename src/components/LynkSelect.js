@@ -8,7 +8,7 @@ const LynkSelect = (props) => {
   const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
   const optionColor = useColorModeValue('#718096', '#A0AEC0')
   const textHoverColor = useColorModeValue('#EDF2F7', '#4A5568')
-  const borderColor = useColorModeValue('#CBD5E0', '#4A5568')
+  const borderColor = useColorModeValue('#E2E8F0', '#4A5568')
 
   const selectStyles = {
     control: (baseStyles) => ({
