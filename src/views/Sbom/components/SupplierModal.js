@@ -27,7 +27,6 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import {
   AutomationRuleCreate,
   addComSupplier,
-  recheckHealth,
   updateComSupplier
 } from 'graphQL/Mutation'
 
@@ -41,7 +40,6 @@ const SupplierModal = ({
   ruleExists
 }) => {
   const params = useParams()
-  const sbomId = params.sbomid
   const productId = params.productid
   const navigate = useNavigate()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
@@ -79,9 +77,12 @@ const SupplierModal = ({
     }
   }
 
-  const [createSupplier] = useMutation(addComSupplier)
-  const [updateSupplier] = useMutation(updateComSupplier)
-  const [healthRecheck] = useMutation(recheckHealth)
+  const [createSupplier] = useMutation(addComSupplier, {
+    onCompleted: (data) => data && refetch()
+  })
+  const [updateSupplier] = useMutation(updateComSupplier, {
+    onCompleted: (data) => data && refetch()
+  })
 
   const { suppliers } = data || ''
 
@@ -108,20 +109,7 @@ const SupplierModal = ({
           contactEmail: supEmail,
           componentId: component?.id || id
         }
-      })
-        .then((res) => {
-          res?.data && refetch()
-          if (friendlyId) {
-            healthRecheck({
-              variables: {
-                sbomId: sbomId,
-                checkId: friendlyId,
-                compId: component?.id
-              }
-            })
-          }
-        })
-        .finally(() => onClose())
+      }).then((res) => res?.data && onClose())
     }
   }
 
@@ -135,9 +123,7 @@ const SupplierModal = ({
         contactEmail: supEmail,
         id: data && data.suppliers && data.suppliers[0].id
       }
-    })
-      .then((res) => res.data && refetch())
-      .finally(() => onClose())
+    }).then((res) => res.data && onClose())
   }
 
   const handleCheckEmail = () => {

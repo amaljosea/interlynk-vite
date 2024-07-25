@@ -1,5 +1,4 @@
 import { useMutation } from '@apollo/client'
-import { useParams } from 'react-router-dom'
 
 import {
   Button,
@@ -15,46 +14,32 @@ import {
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { recheckHealth, sbomUpdate } from 'graphQL/Mutation'
+import { sbomUpdate } from 'graphQL/Mutation'
 
 import LicenseField from './Licenses/LicenseField'
 
 const LicenseModal = ({ data, isOpen, onClose, activeRow, refetch }) => {
-  const params = useParams()
-  const sbomId = params.sbomid
-
   const { status, sbom } = activeRow || ''
-  const { friendlyId } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
   const { sbomState } = useGlobalState()
   const { expLicense } = sbomState
 
   const isInvalidLicense = expLicense === ''
 
-  const [healthRecheck] = useMutation(recheckHealth)
-  const [updateSbom] = useMutation(sbomUpdate)
+  const [updateSbom] = useMutation(sbomUpdate, {
+    onCompleted: (data) => data && refetch()
+  })
 
   const handleUpdateSBOM = () => {
     updateSbom({
       variables: {
-        id: data.id,
-        spec: data.spec,
+        id: data?.id,
+        spec: data?.spec,
         licenses: {
           licensesExp: expLicense || ''
         }
       }
-    })
-      .then(() => {
-        if (friendlyId) {
-          healthRecheck({
-            variables: {
-              checkId: friendlyId,
-              sbomId: sbomId
-            }
-          }).then((res) => res?.data && refetch())
-        }
-      })
-      .finally(() => onClose())
+    }).then((res) => res?.data && onClose())
   }
 
   return (

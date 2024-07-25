@@ -45,7 +45,6 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
 import { AutomationRuleCreate } from 'graphQL/Mutation'
-import { recheckHealth } from 'graphQL/Mutation'
 import {
   GetAllComponents,
   GetCompDependency,
@@ -120,7 +119,6 @@ const RelationshipDrawer = ({
   })
 
   const [createRule] = useMutation(AutomationRuleCreate)
-  const [healthRecheck] = useMutation(recheckHealth)
 
   const { data: allComponents } = useQuery(GetAllComponents, {
     skip: compData ? false : true,
@@ -171,15 +169,6 @@ const RelationshipDrawer = ({
           ...prev,
           res?.data?.componentRelationCreate?.compRelation
         ])
-        if (shortDesc) {
-          healthRecheck({
-            variables: {
-              sbomId: sbomId,
-              checkId: friendlyId,
-              compId: compId
-            }
-          })
-        }
       }
     })
     setRelation('')

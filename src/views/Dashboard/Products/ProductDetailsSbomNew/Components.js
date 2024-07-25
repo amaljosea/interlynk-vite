@@ -53,6 +53,7 @@ import Pagination from 'components/Pagination'
 import { ProgressBar } from 'components/ProgressBar'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
@@ -89,7 +90,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
-  const { userPermissions, prodCompState, dispatch } = useGlobalState()
+  const { prodCompState, dispatch } = useGlobalState()
   const {
     field,
     direction,
@@ -156,11 +157,10 @@ const Components = ({ sbomData, sbomRefetch }) => {
 
   const [activeComp, setActiveComp] = useState(null)
 
-  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const updateComponent = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom_components' && permission.value === true
-  )
+  const updateComponent = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom_components'
+  })
 
   const fetchCompData = () => {
     reset()

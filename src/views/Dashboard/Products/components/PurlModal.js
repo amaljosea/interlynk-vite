@@ -29,11 +29,7 @@ import CpeInput from 'components/CpeInput'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import {
-  AutomationRuleCreate,
-  UpdateComponent,
-  recheckHealth
-} from 'graphQL/Mutation'
+import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 
 const PurlModal = ({
   data,
@@ -123,8 +119,9 @@ const PurlModal = ({
     pypi: []
   }
 
-  const [healthRecheck] = useMutation(recheckHealth)
-  const [updateComponent] = useMutation(UpdateComponent)
+  const [updateComponent] = useMutation(UpdateComponent, {
+    onCompleted: (data) => data && refetch()
+  })
 
   const handleComUpdate = () => {
     disableButtonTemporarily()
@@ -137,19 +134,7 @@ const PurlModal = ({
           sbomId: sbomId,
           purl: purlString
         }
-      })
-        .then(() => {
-          if (friendlyId) {
-            healthRecheck({
-              variables: {
-                checkId: friendlyId,
-                compId: component?.id,
-                sbomId: sbomId
-              }
-            }).then((res) => res?.data && refetch())
-          }
-        })
-        .finally(() => onClose())
+      }).then((res) => res?.data && onClose())
     }
   }
 

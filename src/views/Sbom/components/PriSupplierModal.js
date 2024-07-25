@@ -22,7 +22,7 @@ import {
 
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { recheckHealth, supplierCreate, supplierUpdate } from 'graphQL/Mutation'
+import { supplierCreate, supplierUpdate } from 'graphQL/Mutation'
 import { AutomationRuleCreate } from 'graphQL/Mutation'
 
 const PriSupplierModal = ({
@@ -95,9 +95,12 @@ const PriSupplierModal = ({
     (supEmail !== '' && !validateEmail(supEmail)) ||
     (orgUrl !== '' && !validateUrl(orgUrl))
 
-  const [createSupplier] = useMutation(supplierCreate)
-  const [updateSupplier] = useMutation(supplierUpdate)
-  const [healthRecheck] = useMutation(recheckHealth)
+  const [createSupplier] = useMutation(supplierCreate, {
+    onCompleted: (data) => data && refetch()
+  })
+  const [updateSupplier] = useMutation(supplierUpdate, {
+    onCompleted: (data) => data && refetch()
+  })
 
   useEffect(() => {
     if (suppliers && suppliers.length > 0) {
@@ -121,16 +124,7 @@ const PriSupplierModal = ({
           contactEmail: supEmail,
           sbomId: sbomId
         }
-      })
-        .then((res) => {
-          res?.data && refetch()
-          if (friendlyId) {
-            healthRecheck({
-              variables: { sbomId: sbomId, checkId: friendlyId }
-            })
-          }
-        })
-        .finally(() => onClose())
+      }).then((res) => res?.data && onClose())
     }
   }
 
@@ -143,9 +137,7 @@ const PriSupplierModal = ({
         contactEmail: supEmail,
         id: suppliers[0].id
       }
-    })
-      .then((res) => res?.data && refetch())
-      .finally(() => onClose())
+    }).then((res) => res?.data && onClose())
   }
 
   const [createRule] = useMutation(AutomationRuleCreate)

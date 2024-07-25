@@ -125,6 +125,11 @@ const Checks = () => {
     childKey: 'edit_checks'
   })
 
+  const updateComp = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom_components'
+  })
+
   const [purlValue, setPurlValue] = useState('')
   const [cpeList, setCpeList] = useState([])
   const [cpeValue, setCpeValue] = useState('')
@@ -678,11 +683,13 @@ const Checks = () => {
       id: 'RESOLUTION',
       name: 'RESOLUTION',
       selector: (row) => {
-        const { status, id } = row
+        const { status, id, componentId } = row
+        console.log(row)
         const { friendlyId } = row?.organizationRule?.rule || ''
         const fixedIDs = ['SB-HC-4', 'SB-HC-5', 'SB-HC-6', 'SB-HC-16']
         const fixedByDefault = fixedIDs.includes(friendlyId)
         const isPrimary = friendlyId === 'SB-HC-10'
+        const isEditable = componentId ? updateComp : editChecks
         return (
           <>
             {status === 'unresolved' && !fixedByDefault && (
@@ -695,7 +702,7 @@ const Checks = () => {
                     fontWeight='normal'
                     icon={<BiSolidWrench size={18} />}
                     onClick={() => onCheckOpen(row)}
-                    disabled={customerView || !editChecks}
+                    disabled={customerView || !isEditable}
                   />
                 </Tooltip>
 

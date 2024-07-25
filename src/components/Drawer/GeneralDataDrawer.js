@@ -36,7 +36,6 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import {
   AutomationRuleCreate,
   authorCreate,
-  recheckHealth,
   toolCreate
 } from 'graphQL/Mutation'
 
@@ -89,9 +88,12 @@ const GeneralDataDrawer = ({
     setAuthorName(value)
   }
 
-  const [createTool] = useMutation(toolCreate)
-  const [createAuthor] = useMutation(authorCreate)
-  const [healthRecheck] = useMutation(recheckHealth)
+  const [createTool] = useMutation(toolCreate, {
+    onCompleted: (data) => data && refetch()
+  })
+  const [createAuthor] = useMutation(authorCreate, {
+    onCompleted: (data) => data && refetch()
+  })
   const [createRule] = useMutation(AutomationRuleCreate)
 
   useEffect(() => {
@@ -156,7 +158,7 @@ const GeneralDataDrawer = ({
                 vendor: item.vendor,
                 sbomID: sbomId
               }
-            }).then((res) => res?.data && refetch())
+            })
           })
         }
 
@@ -168,26 +170,8 @@ const GeneralDataDrawer = ({
                 email: item.email,
                 sbomId: sbomId
               }
-            }).then((res) => res?.data && refetch())
+            })
           })
-        }
-
-        if (friendlyId && (creationTools.length > 0 || authorList.length > 0)) {
-          healthRecheck({
-            variables: {
-              checkId: friendlyId,
-              sbomId: sbomId
-            }
-          }).then((res) => res?.data && refetch())
-        }
-
-        if (friendlyId && (creationTools.length > 0 || authorList.length > 0)) {
-          healthRecheck({
-            variables: {
-              checkId: friendlyId,
-              sbomId: sbomId
-            }
-          }).then((res) => res?.data && refetch())
         }
       }
       onClose()

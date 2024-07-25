@@ -36,11 +36,7 @@ import LicenseField from 'components/Licenses/LicenseField'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import {
-  AutomationRuleCreate,
-  UpdateComponent,
-  recheckHealth
-} from 'graphQL/Mutation'
+import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 import { GetComponentData } from 'graphQL/Queries'
 
 const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
@@ -102,22 +98,9 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
 
   const isEmptyVersion = isComponentVersion && compVersion === ''
 
-  const [healthRecheck] = useMutation(recheckHealth)
-  const [updateComponent] = useMutation(UpdateComponent)
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (compRef.current && !compRef.current.contains(event.target)) {
-        setComponentList([])
-      }
-    }
-
-    document.addEventListener('click', handleClickOutside)
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [])
+  const [updateComponent] = useMutation(UpdateComponent, {
+    onCompleted: (data) => data && refetch()
+  })
 
   const handleComUpdate = () => {
     disableButtonTemporarily()
@@ -140,17 +123,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
         if (errors?.length) {
           setError(errors[0])
         } else {
-          if (res?.data) {
-            healthRecheck({
-              variables: {
-                sbomId: sbomId,
-                checkId: friendlyId,
-                compId: isPrimary ? activeComp?.id : componentId
-              }
-            })
-              .then((res) => res?.data && refetch())
-              .finally(() => onClose())
-          }
+          onClose()
         }
       })
     }
@@ -305,6 +278,18 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
       })
     }
   }
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (compRef.current && !compRef.current.contains(event.target)) {
+        setComponentList([])
+      }
+    }
+    document.addEventListener('click', handleClickOutside)
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [])
 
   useEffect(() => {
     if (isPrimary) {
