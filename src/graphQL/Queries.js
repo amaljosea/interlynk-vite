@@ -4687,3 +4687,15 @@ export const GetVersionName = gql`
     }
   }
 `
+
+// GET INVITATION INFO
+export const OrgUserInvitationInfo = gql`
+  query OrgUserInvitationInfo($token: String!, $nonce: String!) {
+    organizationUserInvitationInfo(
+      invitationToken: $token
+      invitationNonce: $nonce
+    ) {
+      organizationName
+    }
+  }
+`

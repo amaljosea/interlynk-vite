@@ -1,6 +1,6 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
 import {
@@ -17,22 +17,29 @@ import {
   useToast
 } from '@chakra-ui/react'
 
-import { AcceptInvitation } from 'graphQL/Mutation'
-import { DeclineInvitation } from 'graphQL/Mutation'
+import useQueryParam from 'hooks/useQueryParam'
+
+import { AcceptInvitation, DeclineInvitation } from 'graphQL/Mutation'
+import { OrgUserInvitationInfo } from 'graphQL/Queries'
 
 const Invitation = () => {
   const toast = useToast()
   const navigate = useNavigate()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const token = queryParams.get('token')
-  const nonce = queryParams.get('nonce')
+  const token = useQueryParam('token')
+  const nonce = useQueryParam('nonce')
 
   const [error, setError] = useState([])
   const [isRejected, setIsRejected] = useState(false)
 
   const [acceptInvitation] = useMutation(AcceptInvitation)
   const [rejectInvitation] = useMutation(DeclineInvitation)
+
+  const { data, loading } = useQuery(OrgUserInvitationInfo, {
+    skip: !token,
+    variables: { token, nonce }
+  })
+
+  const { organizationName } = data?.organizationUserInvitationInfo || ''
 
   const onAccept = async () => {
     await acceptInvitation({
@@ -113,7 +120,7 @@ const Invitation = () => {
   }
 
   return (
-    <Modal isCentered size={'3xl'} isOpen={true}>
+    <Modal isCentered size={'3xl'} isOpen={loading ? false : true}>
       <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(4px)' />
       <ModalContent>
         <ModalBody py={12}>
@@ -132,7 +139,7 @@ const Invitation = () => {
             <Text my={6} fontSize={20}>
               {isRejected
                 ? 'Invitation Rejected'
-                : 'This is an invitation to join Interlynk'}
+                : `This is an invitation to join ${organizationName || ''}`}
             </Text>
             {!isRejected && (
               <HStack spacing={2}>
