@@ -197,6 +197,15 @@ const General = ({ data, refetch, loading, error }) => {
     [onSBMToggle]
   )
 
+  const onCheckTime = () => {
+    setInfoHeading(`Creation At`)
+    setInfoText(
+      `Creatat At is the date and time that the SBOM describing this version was produced. This can be different than when the SBOM was imported into the Interlynk system.`
+    )
+    setInfoUrl(``)
+    onInfoOpen()
+  }
+
   const onCheckTool = () => {
     setInfoHeading(`Creation Tool`)
     setInfoText(
@@ -209,7 +218,7 @@ const General = ({ data, refetch, loading, error }) => {
   const onCheckAuthor = () => {
     setInfoHeading(`Author`)
     setInfoText(
-      `In case of non-automated SBOM generation, Author(s) identify the name and email of person(s) involved in building the SBOM.`
+      `The Author Name is the name of the entity that created the SBOM data.`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -218,18 +227,9 @@ const General = ({ data, refetch, loading, error }) => {
   const onCheckSupplier = () => {
     setInfoHeading(`Supplier`)
     setInfoText(
-      `Supplier identify the name and email of the organization that built, distributed or package the application. For Open-source components, it can refer to the name of the project or entity distributing the project.`
+      `Supplier identifies the name and email of the organization that built, distributed or packaged the application. For open-source components, Supplier can refer to the name of the project or entity distributing the project.`
     )
     setInfoUrl(``)
-    onInfoOpen()
-  }
-
-  const onCheckLicense = () => {
-    setInfoHeading(`Data License`)
-    setInfoText(
-      `Data licence is a legal arrangement between the creator of the data and the end-user, or the place the data will be deposited, specifying what users can do with the data`
-    )
-    setInfoUrl(`https://spdx.dev/about/overview`)
     onInfoOpen()
   }
 
@@ -280,7 +280,7 @@ const General = ({ data, refetch, loading, error }) => {
             {/* CREATED AT */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
-                Created At
+                <InfoLabel title={`Created At`} onClick={onCheckTime} />
               </Td>
               <Td pl={0}>
                 <Text my={2}>
@@ -429,7 +429,7 @@ const General = ({ data, refetch, loading, error }) => {
             {/* LICENSES */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
-                <InfoLabel title={`Data License`} onClick={onCheckLicense} />
+                Data License
               </Td>
               <Td pl={0}>
                 <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>

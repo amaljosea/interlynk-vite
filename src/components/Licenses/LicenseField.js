@@ -1,23 +1,20 @@
 import { useLazyQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
 import { components } from 'react-select'
 
-import { InfoIcon } from '@chakra-ui/icons'
 import {
   Flex,
   FormControl,
   FormLabel,
-  Icon,
   Tag,
   TagLabel,
   Text,
-  Tooltip,
   VStack,
   useDisclosure
 } from '@chakra-ui/react'
 
 import LynkSelect from 'components/LynkSelect'
+import Info from 'components/Misc/Info'
 
 import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -27,23 +24,6 @@ import { LicenseAutoComplete } from 'graphQL/Queries'
 import InfoModal from '../InfoModal'
 
 const LicenseField = ({ resolved, sbomView, license }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const tab = queryParams.get('tab')
-
-  useEffect(() => {
-    if (license) {
-      const payload = {
-        value: license,
-        label: license
-      }
-      dispatcher({ type: 'SET_LICENSE_FIELD', payload: [payload] })
-    }
-    return () => {
-      dispatcher({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field while unmounting
-    }
-  }, [dispatcher, license])
-
   const { prodCompState, dispatch, sbomState } = useGlobalState()
 
   const { prodCompDispatch, sbomDispatch } = dispatch
@@ -138,6 +118,19 @@ const LicenseField = ({ resolved, sbomView, license }) => {
     'Custom License': 'orange'
   }
 
+  useEffect(() => {
+    if (license) {
+      const payload = {
+        value: license,
+        label: license
+      }
+      dispatcher({ type: 'SET_LICENSE_FIELD', payload: [payload] })
+    }
+    return () => {
+      dispatcher({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field while unmounting
+    }
+  }, [dispatcher, license])
+
   const Option = (props) => {
     return (
       <components.Option {...props}>
@@ -176,18 +169,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
           <FormLabel htmlFor={licenseType}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>Licenses</Text>
-              {tab === 'licenses' ? (
-                <Tooltip label={licenseInfo}>
-                  <Icon as={InfoIcon} color={'blue.500'} />
-                </Tooltip>
-              ) : (
-                <Icon
-                  as={InfoIcon}
-                  color={'blue.500'}
-                  cursor={'pointer'}
-                  onClick={onCheckLicense}
-                />
-              )}
+              <Info onClick={onCheckLicense} />
             </Flex>
           </FormLabel>
           {/* LICENSE */}

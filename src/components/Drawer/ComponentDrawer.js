@@ -6,7 +6,7 @@ import { validateCpe } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 
-import { CheckIcon, InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
+import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Button,
   Checkbox,
@@ -21,7 +21,6 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Icon,
   IconButton,
   Input,
   InputGroup,
@@ -46,6 +45,7 @@ import {
 import CpeField from 'components/CpeField'
 import InfoModal from 'components/InfoModal'
 import LicenseField from 'components/Licenses/LicenseField'
+import Info from 'components/Misc/Info'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
@@ -409,50 +409,66 @@ function ComponentDrawer(props) {
     })
   }
 
-  const onCheckName = () => {
-    setInfoHeading(`Name`)
-    setInfoText(
+  const onCheck = (heading, text) => {
+    setInfoHeading(heading)
+    setInfoText(text)
+    setInfoUrl('')
+    onInfoOpen()
+  }
+
+  const onCheckName = () =>
+    onCheck(
+      `Name`,
       `The component name within an SBOM serves as a unique identifier for a particular software component, helping to distinguish it from others and providing clarity when referring to or discussing components within the software supply chain.`
     )
-    setInfoUrl(``)
-    onInfoOpen()
-  }
 
-  const onCheckDesc = () => {
-    setInfoHeading(`Description`)
-    setInfoText(
+  const onCheckDesc = () =>
+    onCheck(
+      `Description`,
       `A component description refers to the specific description or release of a software component that is included in the SBOM.`
     )
-    setInfoUrl(``)
-    onInfoOpen()
-  }
 
-  const onCheckVersion = () => {
-    setInfoHeading(`Version`)
-    setInfoText(
+  const onCheckVersion = () =>
+    onCheck(
+      `Version`,
       `A component version refers to the specific version or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software product.`
     )
-    setInfoUrl(``)
-    onInfoOpen()
-  }
 
-  const onCheckGroup = () => {
-    setInfoHeading(`Group`)
-    setInfoText(
-      `Component group refers to a categorization or grouping of related software components within the SBOM document. Component groups are typically used to organize components based on their function, purpose, or other relevant criteria.`
+  const onCheckGroup = () =>
+    onCheck(
+      `Group`,
+      `A component group refers to a categorization or grouping of related software components. This will often be a shortened, single name of the company or project that produced the component, or the source package or domain name. Whitespace and special characters should be avoided. Examples include: apache, org.apache.commons, and apache.org.`
     )
-    setInfoUrl(``)
-    onInfoOpen()
-  }
 
-  const onCheckIdentifiers = () => {
-    setInfoHeading(`Identifiers`)
-    setInfoText(
+  const onCheckType = () =>
+    onCheck(
+      `Type`,
+      `A component type provides information about the primary purpose of the identified component. The type is intrinsic to how the component is being used rather than the content of the component.`
+    )
+
+  const onCheckIdentifiers = () =>
+    onCheck(
+      `Identifiers`,
       `Component identifiers refer to unique identifiers assigned to each software component listed in the SBOM document. These identifiers serve to uniquely identify and distinguish one component from another within the software inventory.`
     )
-    setInfoUrl(``)
-    onInfoOpen()
-  }
+
+  const onCheckScope = () =>
+    onCheck(
+      `Scope`,
+      `Component scope specifies the scope of the component to help separate rqeuired components from optional components. If the scope is not specified, 'required' is assumed.`
+    )
+
+  const onCheckPrimary = () =>
+    onCheck(
+      `Primary`,
+      `A component is marked primary when the component itself is the subject of the SBOM.`
+    )
+
+  const onCheckInternal = () =>
+    onCheck(
+      `Internal`,
+      `A component is marked internal when the component is represents internally developed components.`
+    )
 
   const onDrawerClose = () => {
     navigate(link)
@@ -486,7 +502,7 @@ function ComponentDrawer(props) {
                 : 'Add Component'}
           </DrawerHeader>
           <DrawerBody>
-            <Stack direction={'column'} spacing={4}>
+            <Stack direction={'column'} spacing={4} my={3}>
               {/* Name */}
               <FormControl isReadOnly={signedUrlParams}>
                 <FormLabel htmlFor='compName' fontSize={'sm'}>
@@ -497,12 +513,7 @@ function ComponentDrawer(props) {
                         *
                       </chakra.span>
                     </Text>
-                    <Icon
-                      as={InfoIcon}
-                      color={'blue.500'}
-                      cursor={'pointer'}
-                      onClick={onCheckName}
-                    />
+                    <Info onClick={onCheckName} />
                   </Flex>
                 </FormLabel>
                 <Input
@@ -518,12 +529,7 @@ function ComponentDrawer(props) {
                 <FormLabel htmlFor='compDescription' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Description</Text>
-                    <Icon
-                      as={InfoIcon}
-                      color={'blue.500'}
-                      cursor={'pointer'}
-                      onClick={onCheckDesc}
-                    />
+                    <Info onClick={onCheckDesc} />
                   </Flex>
                 </FormLabel>
                 <Textarea
@@ -547,12 +553,7 @@ function ComponentDrawer(props) {
                         *
                       </chakra.span>
                     </Text>
-                    <Icon
-                      as={InfoIcon}
-                      color={'blue.500'}
-                      cursor={'pointer'}
-                      onClick={onCheckVersion}
-                    />
+                    <Info onClick={onCheckVersion} />
                   </Flex>
                 </FormLabel>
                 <Input
@@ -572,12 +573,7 @@ function ComponentDrawer(props) {
                 <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Group</Text>
-                    <Icon
-                      as={InfoIcon}
-                      color={'blue.500'}
-                      cursor={'pointer'}
-                      onClick={onCheckGroup}
-                    />
+                    <Info onClick={onCheckGroup} />
                   </Flex>
                 </FormLabel>
                 <Input
@@ -589,8 +585,18 @@ function ComponentDrawer(props) {
                 />
               </FormControl>
               {/* KIND */}
-              <FormControl isRequired>
-                <FormLabel htmlFor='componentType'>Type</FormLabel>
+              <FormControl>
+                <FormLabel htmlFor='componentType' fontSize={'sm'}>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                    <Text>
+                      Type{' '}
+                      <chakra.span color={'red.500'} ml={1}>
+                        *
+                      </chakra.span>
+                    </Text>
+                    <Info onClick={onCheckType} />
+                  </Flex>
+                </FormLabel>
                 <Select
                   id='componentType'
                   name='componentType'
@@ -646,12 +652,7 @@ function ComponentDrawer(props) {
                         <WarningTwoIcon w={4} h={4} color='red.500' />
                       )}
                     <Text>Identifiers</Text>
-                    <Icon
-                      as={InfoIcon}
-                      color={'blue.500'}
-                      cursor={'pointer'}
-                      onClick={onCheckIdentifiers}
-                    />
+                    <Info onClick={onCheckIdentifiers} />
                   </Flex>
                 </FormLabel>
                 <Stack direction={'row'} spacing={2}>
@@ -721,7 +722,12 @@ function ComponentDrawer(props) {
               </FormControl>
               {/* SCOPE */}
               <FormControl>
-                <FormLabel htmlFor='compScope'>Scope</FormLabel>
+                <FormLabel htmlFor='compScope'>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                    <Text>Scope</Text>
+                    <Info onClick={onCheckScope} />
+                  </Flex>
+                </FormLabel>
                 <Select
                   id='compScope'
                   name='compScope'
@@ -741,7 +747,7 @@ function ComponentDrawer(props) {
               </FormControl>
               {/* PRIMARY COMPONENT */}
               <FormControl isReadOnly={signedUrlParams}>
-                <Flex alignItems={'center'} gap={2} mt={4}>
+                <Flex alignItems={'center'} gap={2}>
                   {shortDesc === 'Primary Component' && !isPrimary && (
                     <WarningTwoIcon w={4} h={4} color='red.500' />
                   )}
@@ -753,18 +759,22 @@ function ComponentDrawer(props) {
                   >
                     Primary component
                   </Checkbox>
+                  <Info onClick={onCheckPrimary} />
                 </Flex>
               </FormControl>
               {/* INTERNAL COMPONENT */}
               <FormControl isReadOnly={signedUrlParams}>
-                <Checkbox
-                  size='sm'
-                  colorScheme='blue'
-                  isChecked={isInternal}
-                  onChange={() => setIsInternal(!isInternal)}
-                >
-                  Internal component
-                </Checkbox>
+                <Flex alignItems={'center'} gap={2}>
+                  <Checkbox
+                    size='sm'
+                    colorScheme='blue'
+                    isChecked={isInternal}
+                    onChange={() => setIsInternal(!isInternal)}
+                  >
+                    Internal component
+                  </Checkbox>
+                  <Info onClick={onCheckInternal} />
+                </Flex>
               </FormControl>
               {/* ADD RELATION */}
               {signedUrlParams === null && (
