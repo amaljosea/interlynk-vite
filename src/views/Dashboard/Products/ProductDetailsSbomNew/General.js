@@ -200,7 +200,7 @@ const General = ({ data, refetch, loading, error }) => {
   const onCheckTime = () => {
     setInfoHeading(`Creation At`)
     setInfoText(
-      `Creatat At is the date and time that the SBOM describing this version was produced. This can be different than when the SBOM was imported into the Interlynk system.`
+      `Created At is the date and time when the SBOM describing this version was generated. This can be different from the import time of the SBOM.`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -209,7 +209,7 @@ const General = ({ data, refetch, loading, error }) => {
   const onCheckTool = () => {
     setInfoHeading(`Creation Tool`)
     setInfoText(
-      `Creation Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools`
+      `Creation Tool(s) identify all the software tools and their versions used in building the SBOM describing this version. Interlynk's SbomZen is automatically added as one of the tools to represents edits done on the platform.`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -218,7 +218,7 @@ const General = ({ data, refetch, loading, error }) => {
   const onCheckAuthor = () => {
     setInfoHeading(`Author`)
     setInfoText(
-      `The Author Name is the name of the entity that created the SBOM data.`
+      `Author(s) is the name of the entity that created the SBOM data.`
     )
     setInfoUrl(``)
     onInfoOpen()
@@ -227,7 +227,7 @@ const General = ({ data, refetch, loading, error }) => {
   const onCheckSupplier = () => {
     setInfoHeading(`Supplier`)
     setInfoText(
-      `Supplier identifies the name and email of the organization that built, distributed or packaged the application. For open-source components, Supplier can refer to the name of the project or entity distributing the project.`
+      `Supplier identifies the name and email of the organization that built, distributed or packaged this version of the application. For open-source components, Supplier can refer to the name of the project or entity distributing the project.`
     )
     setInfoUrl(``)
     onInfoOpen()

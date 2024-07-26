@@ -105,7 +105,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   const licenseInfo = `Component license refers to the licensing terms and conditions associated with a specific software component listed in the SBOM document.`
 
   const onCheckLicense = () => {
-    setInfoHeading(`License`)
+    setInfoHeading(`Component License`)
     setInfoText(licenseInfo)
     setInfoUrl(``)
     onInfoOpen()
@@ -168,7 +168,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
         <FormControl>
           <FormLabel htmlFor={licenseType}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-              <Text>Licenses</Text>
+              <Text>License</Text>
               <Info onClick={onCheckLicense} />
             </Flex>
           </FormLabel>

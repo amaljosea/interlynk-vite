@@ -418,56 +418,56 @@ function ComponentDrawer(props) {
 
   const onCheckName = () =>
     onCheck(
-      `Name`,
-      `The component name within an SBOM serves as a unique identifier for a particular software component, helping to distinguish it from others and providing clarity when referring to or discussing components within the software supply chain.`
+      `Component Name`,
+      `Component name within an SBOM serves as a unique identifier for a particular software component, helping to distinguish it from others and providing clarity when referring to or discussing components within the software supply chain.`
     )
 
   const onCheckDesc = () =>
     onCheck(
-      `Description`,
-      `A component description refers to the specific description or release of a software component that is included in the SBOM.`
+      `Component Description`,
+      `Component description refers to the specific description or release of a software component that is included in the SBOM.`
     )
 
   const onCheckVersion = () =>
     onCheck(
-      `Version`,
-      `A component version refers to the specific version or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software product.`
+      `Component Version`,
+      `Component version refers to the specific version or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software product.`
     )
 
   const onCheckGroup = () =>
     onCheck(
-      `Group`,
-      `A component group refers to a categorization or grouping of related software components. This will often be a shortened, single name of the company or project that produced the component, or the source package or domain name. Whitespace and special characters should be avoided. Examples include: apache, org.apache.commons, and apache.org.`
+      `Component Group`,
+      `Component group refers to a categorization or grouping of related software components. This will often be a shortened, single name of the company or project that produced the component, or the source package or domain name. Whitespace and special characters should be avoided. Examples include: apache, org.apache.commons, and apache.org.`
     )
 
   const onCheckType = () =>
     onCheck(
-      `Type`,
-      `A component type provides information about the primary purpose of the identified component. The type is intrinsic to how the component is being used rather than the content of the component.`
+      `Component Type`,
+      `Component type provides information about the primary purpose of this component. The type is intrinsic to how the component is being used rather than the content of the component.`
     )
 
   const onCheckIdentifiers = () =>
     onCheck(
-      `Identifiers`,
+      `Component Identifiers`,
       `Component identifiers refer to unique identifiers assigned to each software component listed in the SBOM document. These identifiers serve to uniquely identify and distinguish one component from another within the software inventory.`
     )
 
   const onCheckScope = () =>
     onCheck(
-      `Scope`,
+      `Component Scope`,
       `Component scope specifies the scope of the component to help separate rqeuired components from optional components. If the scope is not specified, 'required' is assumed.`
     )
 
   const onCheckPrimary = () =>
     onCheck(
-      `Primary`,
+      `Primary Component`,
       `A component is marked primary when the component itself is the subject of the SBOM.`
     )
 
   const onCheckInternal = () =>
     onCheck(
-      `Internal`,
-      `A component is marked internal when the component is represents internally developed components.`
+      `Internal Component`,
+      `A component is marked internal when the component is developed by the organization.`
     )
 
   const onDrawerClose = () => {
