@@ -71,7 +71,9 @@ const CopyRule = ({ isOpen, onClose, env, data }) => {
     disableButtonTemporarily()
     const existingRules = nodes?.filter((item) => item?.name === ruleName)
     if (existingRules?.length > 0) {
-      setError('Automation rule already exists')
+      setError(
+        'An automation rule with the same name already exists in that environment.'
+      )
     } else {
       createRule({
         variables: {
