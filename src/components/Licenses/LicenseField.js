@@ -1,6 +1,7 @@
 import { useLazyQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
 import { components } from 'react-select'
+import { infoData } from 'variables/general'
 
 import {
   Flex,
@@ -102,11 +103,10 @@ const LicenseField = ({ resolved, sbomView, license }) => {
     handleInputChange(debouncedSearchTerm)
   }, [debouncedSearchTerm, handleInputChange])
 
-  const licenseInfo = `Component license refers to the licensing terms and conditions associated with a specific software component listed in the SBOM document.`
-
   const onCheckLicense = () => {
-    setInfoHeading(`Component License`)
-    setInfoText(licenseInfo)
+    const result = infoData.find((item) => item?.title === `Component License`)
+    setInfoHeading(result?.title)
+    setInfoText(result?.desc)
     setInfoUrl(``)
     onInfoOpen()
   }
@@ -169,7 +169,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
           <FormLabel htmlFor={licenseType}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>License</Text>
-              <Info onClick={onCheckLicense} />
+              {!sbomView && <Info onClick={onCheckLicense} />}
             </Flex>
           </FormLabel>
           {/* LICENSE */}

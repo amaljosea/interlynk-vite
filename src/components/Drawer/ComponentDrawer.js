@@ -3,6 +3,7 @@ import { PackageURL } from 'packageurl-js'
 import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { validateCpe } from 'utils'
+import { infoData } from 'variables/general'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 
@@ -409,66 +410,23 @@ function ComponentDrawer(props) {
     })
   }
 
-  const onCheck = (heading, text) => {
-    setInfoHeading(heading)
-    setInfoText(text)
+  const onCheck = (title) => {
+    const result = infoData.find((item) => item?.title === title)
+    setInfoHeading(result?.title)
+    setInfoText(result?.desc)
     setInfoUrl('')
     onInfoOpen()
   }
 
-  const onCheckName = () =>
-    onCheck(
-      `Component Name`,
-      `Component name within an SBOM serves as a unique identifier for a particular software component, helping to distinguish it from others and providing clarity when referring to or discussing components within the software supply chain.`
-    )
-
-  const onCheckDesc = () =>
-    onCheck(
-      `Component Description`,
-      `Component description refers to the specific description or release of a software component that is included in the SBOM.`
-    )
-
-  const onCheckVersion = () =>
-    onCheck(
-      `Component Version`,
-      `Component version refers to the specific version or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software product.`
-    )
-
-  const onCheckGroup = () =>
-    onCheck(
-      `Component Group`,
-      `Component group refers to a categorization or grouping of related software components. This will often be a shortened, single name of the company or project that produced the component, or the source package or domain name. Whitespace and special characters should be avoided. Examples include: apache, org.apache.commons, and apache.org.`
-    )
-
-  const onCheckType = () =>
-    onCheck(
-      `Component Type`,
-      `Component type provides information about the primary purpose of this component. The type is intrinsic to how the component is being used rather than the content of the component.`
-    )
-
-  const onCheckIdentifiers = () =>
-    onCheck(
-      `Component Identifiers`,
-      `Component identifiers refer to unique identifiers assigned to each software component listed in the SBOM document. These identifiers serve to uniquely identify and distinguish one component from another within the software inventory.`
-    )
-
-  const onCheckScope = () =>
-    onCheck(
-      `Component Scope`,
-      `Component scope specifies the scope of the component to help separate rqeuired components from optional components. If the scope is not specified, 'required' is assumed.`
-    )
-
-  const onCheckPrimary = () =>
-    onCheck(
-      `Primary Component`,
-      `A component is marked primary when the component itself is the subject of the SBOM.`
-    )
-
-  const onCheckInternal = () =>
-    onCheck(
-      `Internal Component`,
-      `A component is marked internal when the component is developed by the organization.`
-    )
+  const onCheckName = () => onCheck(`Component Name`)
+  const onCheckDesc = () => onCheck(`Component Description`)
+  const onCheckVersion = () => onCheck(`Component Version`)
+  const onCheckGroup = () => onCheck(`Component Group`)
+  const onCheckType = () => onCheck(`Component Type`)
+  const onCheckIdentifiers = () => onCheck(`Component Identifiers`)
+  const onCheckScope = () => onCheck(`Component Scope`)
+  const onCheckPrimary = () => onCheck(`Primary Component`)
+  const onCheckInternal = () => onCheck(`Internal Component`)
 
   const onDrawerClose = () => {
     navigate(link)

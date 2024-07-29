@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { capitalizeFirstLetter } from 'utils'
+import { infoData } from 'variables/general'
 
-import { InfoIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
@@ -28,6 +28,7 @@ import {
 import CardBody from 'components/Card/CardBody'
 import InfoModal from 'components/InfoModal'
 import LynkSelect from 'components/LynkSelect'
+import Info from 'components/Misc/Info'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -85,11 +86,6 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
     childKey: 'update_product_settings'
   })
 
-  const updateCon = useHasPermission({
-    parentKey: 'view_connections',
-    childKey: 'create_update_connection'
-  })
-
   const [updateSettings] = useMutation(ProjectSettingUpdate)
 
   const { isOpen: isChecksOpen, onClose: onChecksClose } = useDisclosure()
@@ -122,77 +118,22 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
       })
   }
 
-  const onCheckVulnScan = useCallback(() => {
-    setInfoHeading(`Vulnerability Scan`)
-    setInfoText(
-      `This setting lets you turn on or off vulnerability scanning for your system. It's best to keep this turned on.`
-    )
-    setInfoUrl(``)
+  const onCheck = (title) => {
+    const result = infoData.find((item) => item?.title === title)
+    setInfoHeading(result?.title)
+    setInfoText(result?.desc)
+    setInfoUrl('')
     onInfoOpen()
-  }, [onInfoOpen])
+  }
 
-  const onCheckVulnStatus = useCallback(() => {
-    setInfoHeading(`Retain Vulnerability Status`)
-    setInfoText(
-      `This settings lets you turn on or off copying of vulnerability status, when an sbom is imported, whose version matches an existing one.`
-    )
-    setInfoUrl(``)
-    onInfoOpen()
-  }, [onInfoOpen])
-
-  const onCheckHealth = useCallback(() => {
-    setInfoHeading(`Checks`)
-    setInfoText(
-      `This setting lets you decide whether to turn on or off SBOM checks when importing. These checks help you find any issues with the SBOMs you're bringing in.`
-    )
-    setInfoUrl(``)
-    onInfoOpen()
-  }, [onInfoOpen])
-
-  const onCheckAutomation = useCallback(() => {
-    setInfoHeading(`Automation`)
-    setInfoText(
-      `This setting decides whether the automation rules set up for the environment should run when importing SBOMs.`
-    )
-    setInfoUrl(``)
-    onInfoOpen()
-  }, [onInfoOpen])
-
-  const onCheckComponent = useCallback(() => {
-    setInfoHeading(`Internal Component Labeling`)
-    setInfoText(
-      `This setting lets you choose whether components are marked as internal when you import an SBOM.`
-    )
-    setInfoUrl(``)
-    onInfoOpen()
-  }, [onInfoOpen])
-
-  const onCheckRetaintion = useCallback(() => {
-    setInfoHeading(`Data Retaintion`)
-    setInfoText(
-      `This setting lets you choose how long the SBOM data is kept before it's deleted. Once it's gone, you can't get it back.`
-    )
-    setInfoUrl(``)
-    onInfoOpen()
-  }, [onInfoOpen])
-
-  const onCheckMfc = useCallback(() => {
-    setInfoHeading(`Manufacturer`)
-    setInfoText(
-      `This setting allows you to select a manufacturer as the default for the environment. When sboms are exported, this is used to set the manufacturer.`
-    )
-    setInfoUrl(``)
-    onInfoOpen()
-  }, [onInfoOpen])
-
-  const onCheckJira = useCallback(() => {
-    setInfoHeading(`Jira Default Project`)
-    setInfoText(
-      `This setting allows you to select a default Jira project. Please configure Jira in the Organizarion settings.`
-    )
-    setInfoUrl(``)
-    onInfoOpen()
-  }, [onInfoOpen])
+  const onCheckVulnScan = () => onCheck(`Vulnerability Scan`)
+  const onCheckVulnStatus = () => onCheck(`Retain Vulnerability Status`)
+  const onCheckHealth = () => onCheck(`Checks`)
+  const onCheckAutomation = () => onCheck(`Automation`)
+  const onCheckComponent = () => onCheck(`Internal Component Labeling`)
+  const onCheckRetaintion = () => onCheck(`Data Retaintion`)
+  const onCheckMfc = () => onCheck(`Manufacturer`)
+  const onCheckJira = () => onCheck(`Jira Default Project`)
 
   return (
     <>
@@ -214,12 +155,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Vulnerability Scan
-                  <InfoIcon
-                    ml={2}
-                    color={'blue.500'}
-                    cursor={'pointer'}
-                    onClick={onCheckVulnScan}
-                  />
+                  <Info ml={2} onClick={onCheckVulnScan} />
                 </Text>
               </Flex>
               {/* COPY VEX FROM PREVIOUS */}
@@ -237,12 +173,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Retain Vulnerability Status
-                  <InfoIcon
-                    ml={2}
-                    color={'blue.500'}
-                    cursor={'pointer'}
-                    onClick={onCheckVulnStatus}
-                  />
+                  <Info ml={2} onClick={onCheckVulnStatus} />
                 </Text>
               </Flex>
               {/* APPLY CHECK */}
@@ -258,12 +189,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Checks
-                  <InfoIcon
-                    ml={2}
-                    color={'blue.500'}
-                    cursor={'pointer'}
-                    onClick={onCheckHealth}
-                  />
+                  <Info ml={2} onClick={onCheckHealth} />
                 </Text>
               </Flex>
               {/* APPLY AUTOMATION */}
@@ -279,12 +205,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Automation
-                  <InfoIcon
-                    ml={2}
-                    color={'blue.500'}
-                    cursor={'pointer'}
-                    onClick={onCheckAutomation}
-                  />
+                  <Info ml={2} onClick={onCheckAutomation} />
                 </Text>
               </Flex>
               {/* APPLY INTERNAL COMPONENTS */}
@@ -300,12 +221,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Internal Component Labeling
-                  <InfoIcon
-                    ml={2}
-                    color={'blue.500'}
-                    cursor={'pointer'}
-                    onClick={onCheckComponent}
-                  />
+                  <Info ml={2} onClick={onCheckComponent} />
                 </Text>
               </Flex>
             </VStack>
@@ -315,12 +231,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
             <FormControl>
               <FormLabel>
                 Retain Data For
-                <InfoIcon
-                  ml={2}
-                  color={'blue.500'}
-                  cursor={'pointer'}
-                  onClick={onCheckRetaintion}
-                />
+                <Info ml={2} onClick={onCheckRetaintion} />
               </FormLabel>
               <Select
                 width={'400px'}
@@ -339,12 +250,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
             <FormControl mt={4}>
               <FormLabel>
                 Manufacturer
-                <InfoIcon
-                  ml={2}
-                  color={'blue.500'}
-                  cursor={'pointer'}
-                  onClick={onCheckMfc}
-                />
+                <Info ml={2} onClick={onCheckMfc} />
               </FormLabel>
               <Select
                 width={'400px'}
@@ -363,17 +269,12 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
             <FormControl mt={4} width={'400px'}>
               <FormLabel>
                 Jira Default Project
-                <InfoIcon
-                  ml={2}
-                  color={'blue.500'}
-                  cursor={'pointer'}
-                  onClick={onCheckJira}
-                />
+                <Info ml={2} onClick={onCheckJira} />
               </FormLabel>
               <LynkSelect
                 options={projects}
                 placeholder='Project'
-                isDisabled={!updateCon}
+                isDisabled={!editControls}
                 onChange={(e) => onUpdate(e.value, 'jira')}
                 value={{ value: jiraProject || '', label: jiraProject || '' }}
               />
