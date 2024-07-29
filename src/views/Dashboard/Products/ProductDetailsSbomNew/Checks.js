@@ -10,7 +10,7 @@ import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 
-import { CheckIcon } from '@chakra-ui/icons'
+import { CheckIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -115,10 +115,18 @@ const Checks = () => {
   )
 
   const handleRefetch = useCallback(() => {
+    toast({
+      description:
+        'Checks rescan is in progress. Please refresh the page to see the updated results.',
+      status: 'info',
+      isClosable: true,
+      duration: 6500,
+      position: 'top'
+    })
     reset()
     refetch()
     filterRefetch()
-  }, [filterRefetch, refetch, reset])
+  }, [filterRefetch, refetch, reset, toast])
 
   const editChecks = useHasPermission({
     parentKey: 'view_sbom',
@@ -329,17 +337,26 @@ const Checks = () => {
           )}
         </Stack>
 
-        <Tooltip label='Re-Check'>
-          <IconButton
-            fontSize={'sm'}
-            variant='solid'
-            colorScheme='blue'
-            fontWeight='normal'
-            onClick={handleReCheck}
-            isDisabled={!editChecks}
-            icon={<FaCheckDouble size={16} />}
-          />
-        </Tooltip>
+        <Stack spacing={3} direction={'row'}>
+          <Tooltip label='Re-Check'>
+            <IconButton
+              fontSize={'sm'}
+              variant='solid'
+              colorScheme='blue'
+              fontWeight='normal'
+              onClick={handleReCheck}
+              isDisabled={!editChecks}
+              icon={<FaCheckDouble size={16} />}
+            />
+          </Tooltip>
+          <Tooltip label='Refresh'>
+            <IconButton
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+              onClick={() => refetch()}
+            />
+          </Tooltip>
+        </Stack>
       </Flex>
     )
   }, [
@@ -350,7 +367,8 @@ const Checks = () => {
     filterHead,
     handleReCheck,
     editChecks,
-    reset
+    reset,
+    refetch
   ])
 
   const handleOpenLicense = () => {
