@@ -1028,6 +1028,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
               colorScheme='blue'
               onClick={onMapOpen}
               icon={<RiFundsBoxFill />}
+              hidden={!shouldShowDemoFeatures}
             />
           </Tooltip>
           {/* CREATE COMPONENT */}
@@ -1060,10 +1061,11 @@ const Components = ({ sbomData, sbomRefetch }) => {
     handleClear,
     onSearchInputChange,
     compFilters?.sbom?.filters,
+    shouldShowDemoFeatures,
     onMapOpen,
-    restricted,
     onCreateComponent,
     signedUrlParams,
+    restricted,
     reset,
     refetch
   ])
