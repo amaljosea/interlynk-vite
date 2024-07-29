@@ -1,8 +1,31 @@
+import { useNavigate } from 'react-router-dom'
+
 import { Box, Stack, Text, Tooltip, useColorModeValue } from '@chakra-ui/react'
 
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
+
 export const ProgressBar = ({ value, loading, text, width }) => {
+  const navigate = useNavigate()
   const bgColor = useColorModeValue('gray.100', 'gray.600')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
+  const setActiveTab = (value) => {
+    const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+      paramsObj: {
+        tab: value
+      }
+    })
+    navigate(link)
+  }
+
+  const onSelectCheck = () => {
+    if (text === 'SBOM Quality Score') {
+      setActiveTab('checks')
+    }
+    return null
+  }
 
   return (
     <Stack dir='column' cursor={'pointer'} alignItems={'center'}>
@@ -56,7 +79,12 @@ export const ProgressBar = ({ value, loading, text, width }) => {
           </Box>
         </Box>
       </Tooltip>
-      <Text fontSize={'xs'} color={textColor}>
+      <Text
+        fontSize={'xs'}
+        color={textColor}
+        onClick={onSelectCheck}
+        _hover={{ textDecoration: 'underline' }}
+      >
         {text}
       </Text>
     </Stack>
