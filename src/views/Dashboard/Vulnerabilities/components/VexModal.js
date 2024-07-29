@@ -178,7 +178,7 @@ const VexModal = ({
           <SimpleGrid row={5} spacing={4}>
             {/* STATUS */}
             <FormControl>
-              <FormLabel htmlFor='vexType' fontSize='sm' color={'gray.600'}>
+              <FormLabel htmlFor='vexType' fontSize='sm'>
                 Status
               </FormLabel>
               <Select
@@ -376,11 +376,7 @@ const VexModal = ({
             {/* ACTION STATEMENT */}
             {statusName === 'Affected' && (
               <FormControl>
-                <FormLabel
-                  htmlFor='actionStatement'
-                  fontSize='sm'
-                  color={'gray.600'}
-                >
+                <FormLabel htmlFor='actionStatement' fontSize='sm'>
                   Action Statement
                 </FormLabel>
                 <Textarea
@@ -397,7 +393,7 @@ const VexModal = ({
             {/* DETAILS */}
             {statusName === 'In Triage' && (
               <FormControl>
-                <FormLabel htmlFor='details' fontSize='sm' color={'gray.600'}>
+                <FormLabel htmlFor='details' fontSize='sm'>
                   Details
                 </FormLabel>
                 <Textarea
@@ -413,11 +409,7 @@ const VexModal = ({
             )}
             {/* INTERNAL NOTES */}
             <FormControl>
-              <FormLabel
-                htmlFor='internalNotes'
-                fontSize='sm'
-                color={'gray.600'}
-              >
+              <FormLabel htmlFor='internalNotes' fontSize='sm'>
                 Internal Notes
               </FormLabel>
               <Textarea
@@ -435,6 +427,7 @@ const VexModal = ({
               <Checkbox
                 size='sm'
                 isChecked={upstream}
+                isDisabled={statusTitle === ''}
                 onChange={(e) => setUpstream(e.target.checked)}
               >
                 Also update upstream products
