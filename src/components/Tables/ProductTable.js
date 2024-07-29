@@ -137,7 +137,7 @@ const ProductTable = ({
 
   const canAddProduct = useHasPermission({
     parentKey: 'view_product_group',
-    childKey: 'update_product_group'
+    childKey: 'create_product_group'
   })
 
   const canEditProduct = useHasPermission({
