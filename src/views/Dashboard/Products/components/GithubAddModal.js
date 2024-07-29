@@ -187,12 +187,6 @@ const GithubAddModal = ({ isOpen, onClose }) => {
                 isChecked={selectAll}
                 onChange={() => setSelectAll(!selectAll)}
                 mb={4}
-                _checked={{
-                  '& .chakra-checkbox__control': {
-                    background: 'black',
-                    border: 'black'
-                  }
-                }}
               >
                 Select All
               </Checkbox>
@@ -217,12 +211,6 @@ const GithubAddModal = ({ isOpen, onClose }) => {
                         onChange={() =>
                           handleProjectCheckboxChange(project.name)
                         }
-                        _checked={{
-                          '& .chakra-checkbox__control': {
-                            background: 'black',
-                            border: 'black'
-                          }
-                        }}
                       >
                         <Flex align='center'>
                           <FaCodeBranch
@@ -256,12 +244,6 @@ const GithubAddModal = ({ isOpen, onClose }) => {
                           handleImportCheckboxChange(project.name)
                         }
                         size='sm'
-                        _checked={{
-                          '& .chakra-checkbox__control': {
-                            background: 'black',
-                            border: 'black'
-                          }
-                        }}
                       >
                         <Text fontSize={14} color={labelColor}>
                           {project.checkboxLabel}
