@@ -25,12 +25,7 @@ const MiniStatistics = ({ title, amount, icon }) => {
       <CardBody>
         <Flex flexDirection='row' align='center' justify='center' w='100%'>
           <Stat me='auto'>
-            <StatLabel
-              fontSize='md'
-              color='gray.600'
-              fontWeight='semibold'
-              pb='.1rem'
-            >
+            <StatLabel fontSize='md' pb='.1rem'>
               {title}
             </StatLabel>
             <Box height={5}>

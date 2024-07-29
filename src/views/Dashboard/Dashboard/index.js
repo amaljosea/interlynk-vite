@@ -1,17 +1,9 @@
-/* eslint-disable no-undef */
 import { useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
-import {
-  Flex,
-  Grid,
-  GridItem,
-  SimpleGrid,
-  Skeleton,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Flex, Grid, GridItem, SimpleGrid, Skeleton } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
@@ -35,7 +27,6 @@ export default function Dashboard() {
   const { dispatch, envName } = useGlobalState()
   const { orgView } = useGlobalQueryContext()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
-  const iconBoxInside = useColorModeValue('white', 'white')
 
   const { data, loading } = useQuery(GetOrg, {
     skip: !orgView,
@@ -55,6 +46,9 @@ export default function Dashboard() {
     skip: data?.organization?.name ? false : true,
     variables: { env: envName }
   })
+
+  const { projectCount, versionCount, componentCount, vulnsMetric } =
+    metrics?.organizationMetric || ''
 
   useEffect(() => {
     if (product === null) {
@@ -98,25 +92,23 @@ export default function Dashboard() {
       <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
         <MiniStatistics
           title={'Products'}
-          amount={metrics?.organizationMetric?.projectCount}
-          icon={
-            <FaWindowMaximize h={'24px'} w={'24px'} color={iconBoxInside} />
-          }
+          amount={projectCount}
+          icon={<FaWindowMaximize />}
         />
         <MiniStatistics
           title={'Versions'}
-          amount={metrics?.organizationMetric?.versionCount}
-          icon={<FaLayerGroup h={'24px'} w={'24px'} color={iconBoxInside} />}
+          amount={versionCount}
+          icon={<FaLayerGroup />}
         />
         <MiniStatistics
           title={'Components'}
-          amount={metrics?.organizationMetric?.componentCount}
-          icon={<FaCube h={'24px'} w={'24px'} color={iconBoxInside} />}
+          amount={componentCount}
+          icon={<FaCube />}
         />
         <MiniStatistics
           title={'Vulnerabilities'}
-          amount={metrics?.organizationMetric?.vulnsMetric}
-          icon={<FaBug h={'24px'} w={'24px'} color={iconBoxInside} />}
+          amount={vulnsMetric}
+          icon={<FaBug />}
         />
       </SimpleGrid>
       {/* LIST */}
