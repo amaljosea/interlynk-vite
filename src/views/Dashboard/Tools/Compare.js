@@ -45,6 +45,8 @@ const Compare = ({ selectedSboms }) => {
   const { toolsDispatch } = dispatch
 
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const sbomOneBg = useColorModeValue('#38A169', '#1C4532')
+  const sbomTwoBg = useColorModeValue('#E53E3E', '#63171B')
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -284,7 +286,7 @@ const Compare = ({ selectedSboms }) => {
       <Grid templateColumns='repeat(2, 1fr)' gap={6} color={textColor}>
         {/* SBOM ONE */}
         <GridItem w='100%'>
-          <Card border={'2px solid green'} p={8} h='450px' overflowY='scroll'>
+          <Card border={`2px solid ${sbomOneBg}`} p={8} h='450px' overflowY='scroll'>
             <Flex
               alignItems={'flex-start'}
               flexWrap={'wrap'}
@@ -423,7 +425,7 @@ const Compare = ({ selectedSboms }) => {
         </GridItem>
         {/* SBOM TWO */}
         <GridItem w='100%'>
-          <Card border={'2px solid red'} p={8} h='450px' overflowY='scroll'>
+          <Card border={`2px solid ${sbomTwoBg}`} p={8} h='450px' overflowY='scroll'>
             <Flex alignItems={'flex-start'} justifyContent={'space-between'}>
               {secondSbomInfo ? (
                 <Stack>

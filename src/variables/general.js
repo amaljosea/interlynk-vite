@@ -1,16 +1,3 @@
-import { AiOutlineExclamation } from 'react-icons/ai'
-import {
-  FaArrowDown,
-  FaArrowUp,
-  FaBug,
-  FaEye,
-  FaFilePdf,
-  FaGithub,
-  FaShare,
-  FaThumbsUp,
-  FaTools
-} from 'react-icons/fa'
-
 export const tagColors = [
   '#ff6900',
   '#fcb900',
