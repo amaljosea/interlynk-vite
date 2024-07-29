@@ -28,12 +28,8 @@ function Index() {
         }
       })
     }
-  }, [
-    generateProductDetailPageUrlFromCurrentUrl,
-    getProjectGroup,
-    navigate,
-    productGroupId
-  ])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return <Outlet />
 }
