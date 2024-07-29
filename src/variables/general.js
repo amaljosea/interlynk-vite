@@ -1,3 +1,33 @@
+import { AiOutlineExclamation } from 'react-icons/ai'
+import {
+  FaArrowDown,
+  FaArrowUp,
+  FaBug,
+  FaEye,
+  FaFilePdf,
+  FaGithub,
+  FaShare,
+  FaThumbsUp,
+  FaTools
+} from 'react-icons/fa'
+
+export const tagColors = [
+  '#ff6900',
+  '#fcb900',
+  '#7bdcb5',
+  '#00d084',
+  '#8ed1fc',
+  '#0693e3',
+  '#abb8c3',
+  '#eb144c',
+  '#f78da7',
+  '#9900ef',
+  '#795548',
+  '#00bcd4',
+  '#3f51b5',
+  '#009688'
+]
+
 export const labels = [
   {
     id: 1,

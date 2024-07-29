@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react'
 import { getRandomColor, hexToRGBA } from 'utils'
-import { labels } from 'variables/general'
+import { labels, tagColors } from 'variables/general'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { DeleteIcon, EditIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
+  Box,
   Button,
   Divider,
   Drawer,
@@ -20,6 +21,10 @@ import {
   GridItem,
   IconButton,
   Input,
+  Popover,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
   SimpleGrid,
   Tag,
   Text,
@@ -47,6 +52,7 @@ const LabelDrawer = ({ isOpen, onClose }) => {
 
   const handleClear = useCallback(async () => {
     setFilterText('')
+    setData(labels)
   }, [])
 
   const onSearchInputChange = useCallback(
@@ -61,15 +67,21 @@ const LabelDrawer = ({ isOpen, onClose }) => {
     [handleClear]
   )
 
-  const handleSearch = useCallback((event) => {
-    const {
-      key,
-      target: { value }
-    } = event
-    if (key === 'Enter' && value !== '') {
-      console.log(value)
-    }
-  }, [])
+  const handleSearch = useCallback(
+    (event) => {
+      const {
+        key,
+        target: { value }
+      } = event
+      if (key === 'Enter' && value !== '') {
+        const result = data?.filter((item) =>
+          item?.name?.toLowerCase().startsWith(value?.toLowerCase())
+        )
+        setData(result)
+      }
+    },
+    [data]
+  )
 
   const onSubmit = () => {
     if (activeRow?.id) {
@@ -103,8 +115,6 @@ const LabelDrawer = ({ isOpen, onClose }) => {
     setEdit(false)
   }
 
-  console.log('data', data)
-
   const onDelete = (row) => {
     const filterLabels = data?.filter((item) => item?.id !== row?.id)
     setData(filterLabels)
@@ -115,6 +125,14 @@ const LabelDrawer = ({ isOpen, onClose }) => {
     setLabelName(row?.name)
     setLabelDesc(row?.description)
     setLabelColor(row?.color)
+    setEdit(true)
+  }
+
+  const onAdd = () => {
+    setLabelColor(randomColor)
+    setActiveRow(null)
+    setLabelName('')
+    setLabelDesc('')
     setEdit(true)
   }
 
@@ -129,12 +147,12 @@ const LabelDrawer = ({ isOpen, onClose }) => {
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerCloseButton />
+          <DrawerCloseButton mt={2} />
           <DrawerHeader borderBottomWidth='1px'>Edit Label</DrawerHeader>
-          <DrawerBody mt={3} as={Flex} flexDirection={'column'} gap={4}>
+          <DrawerBody mt={3} px={0} as={Flex} flexDirection={'column'} gap={4}>
             {/* ACTIONS AND EDIT FIELDS */}
             {edit ? (
-              <Flex gap={4} mb={2} flexDir={'column'}>
+              <Flex px={6} gap={4} mb={2} flexDir={'column'}>
                 <Tag
                   width={'fit-content'}
                   borderColor={labelColor}
@@ -170,12 +188,35 @@ const LabelDrawer = ({ isOpen, onClose }) => {
                           icon={<RepeatIcon />}
                           onClick={handleRefresh}
                         />
-                        <Input
-                          width='fit-content'
-                          value={labelColor}
-                          onChange={(e) => setLabelColor(e.target.value)}
-                        />
+                        <Popover>
+                          <PopoverTrigger>
+                            <Input
+                              width='fit-content'
+                              value={labelColor}
+                              onChange={(e) => setLabelColor(e.target.value)}
+                            />
+                          </PopoverTrigger>
+                          <PopoverContent w={'fit-content'}>
+                            <PopoverBody
+                              columns={6}
+                              spacing={2}
+                              as={SimpleGrid}
+                            >
+                              {tagColors?.map((item, index) => (
+                                <Box
+                                  p={3}
+                                  bg={item}
+                                  key={index}
+                                  borderRadius={3}
+                                  cursor='pointer'
+                                  onClick={() => setLabelColor(item)}
+                                />
+                              ))}
+                            </PopoverBody>
+                          </PopoverContent>
+                        </Popover>
                       </Flex>
+                      <Box position='absolute' top='100%' zIndex='1'></Box>
                     </FormControl>
                     <Flex gap={3} alignItems='center'>
                       <Button onClick={() => setEdit(false)}>Cancel</Button>
@@ -192,6 +233,7 @@ const LabelDrawer = ({ isOpen, onClose }) => {
               </Flex>
             ) : (
               <Flex
+                px={6}
                 width={'100%'}
                 alignItems={'center'}
                 justifyContent={'space-between'}
@@ -205,21 +247,14 @@ const LabelDrawer = ({ isOpen, onClose }) => {
                   onFilter={handleSearch}
                 />
                 {/* ADD PRODUCT */}
-                <Button
-                  colorScheme='blue'
-                  onClick={() => {
-                    setLabelColor(randomColor)
-                    setActiveRow(null)
-                    setEdit(true)
-                  }}
-                >
+                <Button colorScheme='blue' onClick={onAdd}>
                   New Label
                 </Button>
               </Flex>
             )}
             <Divider />
             {/* HEADER */}
-            <Flex alignItems={'center'} justifyContent={'flex-start'}>
+            <Flex px={6} alignItems={'center'} justifyContent={'flex-start'}>
               <Text
                 fontSize={'sm'}
                 color={textColor}
@@ -233,6 +268,7 @@ const LabelDrawer = ({ isOpen, onClose }) => {
             {/* LABEL LIST */}
             {data?.map((row) => (
               <Grid
+                mx={6}
                 pb={3}
                 gap={4}
                 key={row?.id}

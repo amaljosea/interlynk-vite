@@ -1,6 +1,16 @@
 import { useState } from 'react'
+import { hexToRGBA } from 'utils'
+import { labels as tags } from 'variables/general'
 
-import { Box, Menu, Stack } from '@chakra-ui/react'
+import {
+  Box,
+  Menu,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
+  Stack,
+  Tag
+} from '@chakra-ui/react'
 
 import CheckMark from 'components/Misc/CheckMark'
 import CustomList from 'components/Misc/CustomList'
@@ -10,9 +20,10 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 const ProdFilterMenu = ({ enabled, onFilter }) => {
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
+  const prodLabels = [{ name: 'All', color: '#CBD5E0' }, ...tags]
   const [labels, setLabels] = useState([])
   const onFilterLabel = (value) => {
-    setLabels(value?.includes('all') ? [] : value)
+    setLabels(value?.includes('All') ? [] : value)
   }
 
   return (
@@ -39,19 +50,31 @@ const ProdFilterMenu = ({ enabled, onFilter }) => {
         <Menu closeOnSelect={false}>
           {labels?.length !== 0 && <CheckMark />}
           <MenuHeading title={'Labels'} />
-          <CustomList
-            type='checkbox'
-            options={[
-              'bug',
-              'demo',
-              'dependencies',
-              'documentation',
-              'enhancement',
-              'FDA'
-            ]}
-            value={labels}
-            onChange={onFilterLabel}
-          />
+          <MenuList minH='auto' maxH={'350px'} overflowY={'scroll'}>
+            <MenuOptionGroup
+              type={'checkbox'}
+              value={labels}
+              onChange={onFilterLabel}
+            >
+              {prodLabels?.map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  maxW={'300px'}
+                  fontSize={'sm'}
+                  value={item?.name}
+                  wordBreak={'break-all'}
+                >
+                  <Tag
+                    width={'fit-content'}
+                    borderColor={item?.color}
+                    bg={hexToRGBA(item?.color, 0.5)}
+                  >
+                    {item?.name}
+                  </Tag>
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
         </Menu>
       </Box>
     </Stack>
