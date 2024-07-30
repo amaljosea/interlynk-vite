@@ -459,7 +459,7 @@ function ComponentDrawer(props) {
                 ? 'Edit Component'
                 : 'Add Component'}
           </DrawerHeader>
-          <DrawerBody>
+          <DrawerBody overflowX={'hidden'}>
             <Stack direction={'column'} spacing={4} my={3}>
               {/* Name */}
               <FormControl isReadOnly={signedUrlParams}>

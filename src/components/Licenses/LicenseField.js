@@ -1,8 +1,10 @@
 import { useLazyQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
 import { components } from 'react-select'
+import { Tooltip } from 'recharts'
 import { infoData } from 'variables/general'
 
+import { InfoIcon } from '@chakra-ui/icons'
 import {
   Flex,
   FormControl,
@@ -10,19 +12,15 @@ import {
   Tag,
   TagLabel,
   Text,
-  VStack,
-  useDisclosure
+  VStack
 } from '@chakra-ui/react'
 
 import LynkSelect from 'components/LynkSelect'
-import Info from 'components/Misc/Info'
 
 import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { LicenseAutoComplete } from 'graphQL/Queries'
-
-import InfoModal from '../InfoModal'
 
 const LicenseField = ({ resolved, sbomView, license }) => {
   const { prodCompState, dispatch, sbomState } = useGlobalState()
@@ -38,22 +36,12 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   const [licenseList, setLicenseList] = useState([])
   const [licenseType, setLicenseType] = useState('')
 
-  const [infoHeading, setInfoHeading] = useState('')
-  const [infoText, setInfoText] = useState('')
-  const [infoUrl, setInfoUrl] = useState('')
-
   const [getLicense, { loading }] = useLazyQuery(LicenseAutoComplete, {
     fetchPolicy: 'network-only'
   })
 
   const [searchText, setSearchText] = useState('')
   const debouncedSearchTerm = useDebounce(searchText, 300)
-
-  const {
-    isOpen: isInfoOpen,
-    onOpen: onInfoOpen,
-    onClose: onInfoClose
-  } = useDisclosure()
 
   const onLicenseChange = (selected) => {
     selected = [selected]
@@ -103,12 +91,9 @@ const LicenseField = ({ resolved, sbomView, license }) => {
     handleInputChange(debouncedSearchTerm)
   }, [debouncedSearchTerm, handleInputChange])
 
-  const onCheckLicense = () => {
-    const result = infoData.find((item) => item?.title === `Component License`)
-    setInfoHeading(result?.title)
-    setInfoText(result?.desc)
-    setInfoUrl(``)
-    onInfoOpen()
+  const onCheck = (title) => {
+    const result = infoData.find((item) => item?.title === title)
+    return result?.desc
   }
 
   const colorScheme = {
@@ -169,7 +154,11 @@ const LicenseField = ({ resolved, sbomView, license }) => {
           <FormLabel htmlFor={licenseType}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>License</Text>
-              {!sbomView && <Info onClick={onCheckLicense} />}
+              {!sbomView && (
+                <Tooltip label={onCheck(`Component License`)}>
+                  <InfoIcon color={'blue.500'} />
+                </Tooltip>
+              )}
             </Flex>
           </FormLabel>
           {/* LICENSE */}
@@ -206,17 +195,6 @@ const LicenseField = ({ resolved, sbomView, license }) => {
           )}
         </FormControl>
       </VStack>
-
-      {/* INFO MODAL */}
-      {isInfoOpen && (
-        <InfoModal
-          isOpen={isInfoOpen}
-          onClose={onInfoClose}
-          heading={infoHeading}
-          body={infoText}
-          url={infoUrl}
-        />
-      )}
     </>
   )
 }

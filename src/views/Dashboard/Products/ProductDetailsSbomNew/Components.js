@@ -75,6 +75,7 @@ import {
 } from 'react-icons/fa'
 import { RiFundsBoxFill } from 'react-icons/ri'
 
+import CompDrawer from '../components/CompDrawer'
 import HealthMap from '../components/HealthMap'
 import CompFilters from './CompFilters'
 
@@ -217,6 +218,11 @@ const Components = ({ sbomData, sbomRefetch }) => {
     onOpen: onCpeOpen,
     onClose: onCpeClose
   } = useDisclosure()
+  const {
+    isOpen: isCompOpen,
+    onOpen: onCompOpen,
+    onClose: onCompClose
+  } = useDisclosure()
 
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
@@ -229,7 +235,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
   const onEditOpen = (row) => {
     setActiveRow(row)
     prodCompDispatch({ type: 'SET_LICENSES', payload: row })
-    onOpen()
+    onCompOpen()
   }
 
   const onRelOpen = (row) => {
@@ -1208,6 +1214,15 @@ const Components = ({ sbomData, sbomRefetch }) => {
       )}
 
       {isMapOpen && <HealthMap isOpen={isMapOpen} onClose={onMapClose} />}
+
+      {isCompOpen && (
+        <CompDrawer
+          data={activeRow}
+          isOpen={isCompOpen}
+          onClose={onCompClose}
+          refetch={fetchCompData}
+        />
+      )}
     </>
   )
 }

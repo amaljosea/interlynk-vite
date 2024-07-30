@@ -10,7 +10,8 @@ import {
   InputRightElement,
   List,
   ListItem,
-  VStack
+  VStack,
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -30,6 +31,9 @@ const CpeField = ({
 
   const [focusedIndex, setFocusedIndex] = useState(null)
   const listItemsRef = useRef([])
+
+  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
+  const hoverColor = useColorModeValue('#EDF2F7', '#2D3748')
 
   const handleValidate = (value) => {
     const matches = validateCpe(value)
@@ -145,7 +149,7 @@ const CpeField = ({
           width={'100%'}
           left={0}
           right={0}
-          bg={'white'}
+          bg={bgColor}
           zIndex={111}
           top={8}
           borderRadius={'md'}
@@ -159,9 +163,9 @@ const CpeField = ({
                 key={index}
                 ref={(el) => (listItemsRef.current[index] = el)}
                 tabIndex='0'
-                bg={index === focusedIndex ? '#E2E8F0' : 'transparent'}
+                bg={index === focusedIndex ? hoverColor : 'transparent'}
                 _hover={{
-                  bg: focusedIndex === null ? '#E2E8F0' : 'transparent'
+                  bg: focusedIndex === null ? hoverColor : 'transparent'
                 }}
                 onMouseEnter={() => setFocusedIndex(null)}
                 outline='none'
