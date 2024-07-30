@@ -11,7 +11,7 @@
     "@chakra-ui/theme-tools": "^2.1.2",
     "@emotion/cache": "^11.13.0",
     "@emotion/react": "^11.11.3",
-    "@emotion/styled": "^11.8.1",
+    "@emotion/styled": "^11.13.0",
     "@reactour/tour": "^3.7.0",
     "@sentry/cli": "^2.32.2",
     "@sentry/react": "^7.113.0",
