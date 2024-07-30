@@ -44,7 +44,7 @@
     "react-select": "^5.8.0",
     "react-syntax-highlighter": "^15.5.0",
     "recharts": "^2.12.7",
-    "semver": "^7.6.2",
+    "semver": "^7.6.3",
     "spdx-expression-validate": "^2.0.0",
     "styled-components": "^4.4.1",
     "use-persisted-state": "^0.3.3",
