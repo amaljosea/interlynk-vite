@@ -88,8 +88,8 @@ const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
           </Badge>
         )
       },
-      wrap: true,
-      width: '200px'
+      width: '10%',
+      wrap: true
     },
     {
       id: 'NAME',
@@ -99,7 +99,6 @@ const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
           {row?.subjectComponent?.name || row?.targetComponent?.name || '-'}
         </Text>
       ),
-      width: '250px',
       wrap: true
     },
     {
@@ -134,7 +133,6 @@ const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
           )
         }
       },
-      width: '200px',
       wrap: true
     },
     {
@@ -171,7 +169,6 @@ const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
           )
         }
       },
-      width: '250px',
       wrap: true
     },
     {
@@ -206,7 +203,6 @@ const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
           )
         }
       },
-      width: '360px',
       wrap: true
     },
     {
@@ -262,7 +258,6 @@ const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
           )
         }
       },
-      width: '400px',
       wrap: true
     }
   ]
