@@ -196,7 +196,12 @@ const CompIdentifiers = (props) => {
   }, [data, prodCompDispatch])
 
   return (
-    <Stack direction={'column'} height={cpeOpen ? '100%' : '80vh'} spacing={4}>
+    <Stack
+      pb={20}
+      spacing={4}
+      direction={'column'}
+      height={cpeOpen ? '100%' : '80vh'}
+    >
       {/* PURL INPUI */}
       {purlOpen && (
         <PurlInputs

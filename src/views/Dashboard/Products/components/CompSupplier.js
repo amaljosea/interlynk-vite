@@ -117,7 +117,7 @@ const CompSupplier = ({ data, onClose, refetch }) => {
   }, [data])
 
   return (
-    <Flex width={'100%'} direction={'column'} gap={4}>
+    <Flex width={'100%'} direction={'column'} gap={4} pb={20}>
       {/* ORG NAME */}
       <FormControl isRequired>
         <FormLabel fontSize={'sm'}>Organization Name</FormLabel>

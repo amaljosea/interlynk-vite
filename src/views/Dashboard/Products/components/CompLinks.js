@@ -110,7 +110,7 @@ const CompLinks = ({ onClose, component, refetch }) => {
 
   return (
     <form onSubmit={handleLinkAdd}>
-      <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
+      <Flex direction={'column'} alignItems={'flex-start'} gap={3} pb={20}>
         {/* NAME */}
         <FormControl isRequired isInvalid={error}>
           <FormLabel>Type</FormLabel>

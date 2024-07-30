@@ -5,7 +5,6 @@ import { infoData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
-  Box,
   Button,
   Checkbox,
   Flex,
@@ -180,7 +179,7 @@ const CompDetails = (props) => {
     compKind === '' || compName === '' || compVersion === '' || disabled
 
   return (
-    <Stack direction={'column'} spacing={4}>
+    <Stack direction={'column'} spacing={4} pb={20}>
       {/* Name */}
       <FormControl isReadOnly={customerView}>
         <FormLabel htmlFor='compName' fontSize={'sm'}>
