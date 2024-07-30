@@ -413,6 +413,7 @@ export const GetProductTable = gql`
           projects {
             id
             name
+            sbomsCount
           }
           description
           updatedAt

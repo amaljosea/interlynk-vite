@@ -47,6 +47,7 @@ import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import LabelDrawer from 'components/Drawer/LabelDrawer'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
+import IconBox from 'components/Icons/IconBox'
 
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -58,7 +59,7 @@ import { DeleteProjectGroup } from 'graphQL/Mutation'
 import { GetSharelynks } from 'graphQL/Queries'
 
 import { FaEllipsisV, FaGithub } from 'react-icons/fa'
-import { FaCode, FaInbox, FaSquareArrowUpRight, FaTag } from 'react-icons/fa6'
+import { FaCode, FaDesktop, FaInbox, FaTag } from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
 
@@ -76,8 +77,12 @@ const ProductTable = ({
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const headColor = useColorModeValue('#00000066', '#CBD5E0')
+  const textColor = useColorModeValue('#000000', '#FFFFFF')
+  const bgColor = useColorModeValue('#EDF2F7', '#4D698166')
+  const grayColor = useColorModeValue('#616161BF', '#FFFFFF66')
+  const timeColor = useColorModeValue('#00000099', '#FFFFFF99')
+  const borderColor = useColorModeValue('#3182CE66', '#3182CE99')
 
   const { search, enabled, field } = filters
   const { totalRows } = paginationProps
@@ -356,7 +361,7 @@ const ProductTable = ({
     // PRODUCT
     {
       id: 'PROJECT_GROUPS_NAME',
-      name: 'PRODUCT',
+      name: 'PRODUCT NAME',
       selector: (row, index) => {
         const { id, name, projects, defaultProject, description } = row
         const handleClick = () => {
@@ -382,7 +387,7 @@ const ProductTable = ({
         return (
           <Grid
             my={3}
-            gap={2}
+            gap={3}
             alignItems={'center'}
             justifyContent={'center'}
             templateColumns='repeat(7, 1fr)'
@@ -390,7 +395,7 @@ const ProductTable = ({
           >
             <GridItem
               colSpan={1}
-              width={'20px'}
+              width={'32px'}
               hidden={!shouldShowDemoFeatures}
             >
               <Tooltip label={getFormat(name)} placement='top'>
@@ -398,28 +403,28 @@ const ProductTable = ({
                   href={getLink(name)}
                   isExternal={getLink(name) === '#' ? false : true}
                 >
-                  <IconButton
-                    size='xs'
-                    isRound={true}
-                    color={textColor}
-                    icon={getType(name)}
-                    background='transparent'
-                  />
+                  <IconBox
+                    h={'32px'}
+                    w={'32px'}
+                    color={'blue.500'}
+                    bg={bgColor}
+                  >
+                    {getType(name)}
+                  </IconBox>
                 </Olink>
               </Tooltip>
             </GridItem>
             <GridItem gap={1} colSpan={6}>
               <Text
                 fontSize={14}
-                color={'blue.500'}
-                fontWeight={'medium'}
+                color={textColor}
                 onClick={handleClick}
                 cursor={'pointer'}
                 width={'fit-content'}
               >
                 {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
               </Text>
-              <Text color={textColor}>
+              <Text color={grayColor}>
                 {description?.length > 50
                   ? description.substring(0, 50) + '....'
                   : description}
@@ -428,9 +433,29 @@ const ProductTable = ({
           </Grid>
         )
       },
-      width: '20%',
+      width: '50%',
       wrap: true,
       sortable: true
+    },
+    // UPDATEDAT
+    {
+      id: 'PROJECT_GROUPS_UPDATED_AT',
+      name: 'UPDATED',
+      selector: (row) => {
+        const { updatedAt } = row
+        return (
+          <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
+            <Text color={timeColor}>{timeSince(updatedAt)}</Text>
+          </Tooltip>
+        )
+      },
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB
+      },
+      wrap: true
     },
     // ENVIRONMENT
     {
@@ -446,6 +471,12 @@ const ProductTable = ({
             payload: { id: env?.id }
           })
         }
+
+        const getProjectSbomsCount = (name) => {
+          const project = projects?.find((item) => item.name === name)
+          return project ? project.sbomsCount : 0
+        }
+
         return (
           <Stack direction={'row'} spacing={2} alignItems={'center'}>
             <Tooltip label='Default'>
@@ -456,7 +487,16 @@ const ProductTable = ({
                 })}
                 onClick={() => handleClick('default')}
               >
-                <IconButton size='sm' colorScheme='blue' icon={<FaInbox />} />
+                <Button
+                  size='sm'
+                  leftIcon={<FaInbox color='#3182CE' />}
+                  variant='outline'
+                  borderColor={borderColor}
+                  color={textColor}
+                  fontWeight={400}
+                >
+                  {getProjectSbomsCount('default')}
+                </Button>
               </Link>
             </Tooltip>
             <Tooltip label='Development'>
@@ -469,7 +509,16 @@ const ProductTable = ({
                 })}
                 onClick={() => handleClick('development')}
               >
-                <IconButton size='sm' colorScheme='blue' icon={<FaCode />} />
+                <Button
+                  size='sm'
+                  leftIcon={<FaCode color='#3182CE' />}
+                  variant='outline'
+                  borderColor={borderColor}
+                  color={textColor}
+                  fontWeight={400}
+                >
+                  {getProjectSbomsCount('development')}
+                </Button>
               </Link>
             </Tooltip>
             <Tooltip label='Production'>
@@ -482,56 +531,28 @@ const ProductTable = ({
                 })}
                 onClick={() => handleClick('production')}
               >
-                <IconButton
+                <Button
                   size='sm'
-                  colorScheme='blue'
-                  icon={<FaSquareArrowUpRight />}
-                />
+                  leftIcon={<FaDesktop color='#3182CE' />}
+                  variant='outline'
+                  borderColor={borderColor}
+                  color={textColor}
+                  fontWeight={400}
+                >
+                  {getProjectSbomsCount('production')}
+                </Button>
               </Link>
             </Tooltip>
           </Stack>
         )
       },
-      width: '12%',
+      width: '20%',
       wrap: true
-    },
-    // VERSION
-    {
-      id: 'VERSIONS',
-      name: 'VERSIONS',
-      selector: (row) => {
-        const { sbomsCount } = row
-
-        return <Text color={textColor}>{sbomsCount || 0}</Text>
-      },
-      wrap: true,
-      right: 'true'
-    },
-    // UPDATEDAT
-    {
-      id: 'PROJECT_GROUPS_UPDATED_AT',
-      name: 'UPDATED',
-      selector: (row) => {
-        const { updatedAt } = row
-        return (
-          <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
-            <Text color={textColor}>{timeSince(updatedAt)}</Text>
-          </Tooltip>
-        )
-      },
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
-        return dateA - dateB
-      },
-      wrap: true,
-      right: 'true'
     },
     // ACTIONS
     {
       id: 'ACTIONS',
-      name: 'ACTIONS',
+      name: '',
       selector: (row) => {
         const { enabled } = row
         return (
@@ -589,7 +610,7 @@ const ProductTable = ({
           </Menu>
         )
       },
-      width: '10%',
+      width: '5%',
       right: 'true',
       omit: signedUrlParams
     }
