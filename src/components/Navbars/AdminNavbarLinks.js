@@ -252,7 +252,7 @@ export default function HeaderLinks(props) {
           display={signedUrlParams ? 'none' : 'block'}
         />
         <Box pos={'absolute'} top={'0.2rem'} right={1.5}>
-          <Kbd>{os?.startsWith('Windows') ? 'Ctrl' : 'Cmd'}</Kbd> <Kbd>K</Kbd>
+          <Kbd>{os?.startsWith('Windows') ? 'Ctrl' : 'Cmd'} + K</Kbd>
         </Box>
       </InputGroup>
       {/* ENVIRONMENT */}

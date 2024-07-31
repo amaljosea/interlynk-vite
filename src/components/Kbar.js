@@ -10,6 +10,7 @@ import {
 } from 'kbar'
 import { Fragment, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { settingActions } from 'variables/general'
 
 import { SearchIcon } from '@chakra-ui/icons'
 import { useColorModeValue } from '@chakra-ui/system'
@@ -17,13 +18,12 @@ import { useColorModeValue } from '@chakra-ui/system'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import useSettingActions from 'hooks/useSettingActions'
 import useThemeActions from 'hooks/useThemeAction'
 
 import { GetProjectGroupAndVersionDetails } from 'graphQL/Queries'
 
 import { FaRegWindowMaximize } from 'react-icons/fa'
-import { FaScrewdriverWrench } from 'react-icons/fa6'
+import { FaRegFile, FaScrewdriverWrench } from 'react-icons/fa6'
 
 const Kbar = () => {
   // hooks
@@ -33,7 +33,7 @@ const Kbar = () => {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
   } = useProductUrlContext()
-  const { setEnvName, envName, onChangeEnv } = useGlobalState()
+  const { envName, onChangeEnv } = useGlobalState()
 
   const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
   const textHoverColor = useColorModeValue('#EDF2F7', '#2D3748')
@@ -103,11 +103,20 @@ const Kbar = () => {
           })
         }
       })
+
+      settingActions?.map((item) =>
+        data?.push({
+          id: item?.name,
+          name: item?.name,
+          section: item?.section,
+          icon: <FaRegFile color='#718096' />,
+          perform: () => navigate(item?.path)
+        })
+      )
     })
   }
 
   useThemeActions()
-  useSettingActions()
   useRegisterActions(data, [productData, envName])
 
   const ResultItem = ({ item, active, currentRootActionId }) => {

@@ -1,3 +1,78 @@
+export const settingActions = [
+  {
+    id: 'general',
+    name: 'General',
+    section: 'Organization',
+    path: '/vendor/settings?tab=general'
+  },
+  {
+    id: 'users',
+    name: 'Users',
+    section: 'Organization',
+    path: '/vendor/settings?tab=users'
+  },
+  {
+    id: 'roles',
+    name: 'Roles',
+    section: 'Organization',
+    path: '/vendor/settings?tab=roles'
+  },
+  {
+    id: 'feeds',
+    name: 'Feeds',
+    section: 'Organization',
+    path: '/vendor/settings?tab=feeds'
+  },
+  {
+    id: 'checks',
+    name: 'Checks',
+    section: 'Organization',
+    path: '/vendor/settings?tab=checks'
+  },
+  {
+    id: 'lists',
+    name: 'Lists',
+    section: 'Organization',
+    path: '/vendor/settings?tab=lists'
+  },
+  {
+    id: 'legal',
+    name: 'Legal',
+    section: 'Organization',
+    path: '/vendor/settings?tab=legal'
+  },
+  {
+    id: 'connections',
+    name: 'Connections',
+    section: 'Organization',
+    path: '/vendor/settings?tab=connections'
+  },
+  {
+    id: 'personal-details',
+    name: 'Personal Details',
+    section: 'Personal',
+    path: '/vendor/settings?tab=personal-details'
+  },
+  {
+    id: 'organizations',
+    name: 'Organizations',
+    section: 'Personal',
+    path: '/vendor/settings?tab=organizations'
+  },
+  {
+    id: 'security-tokens',
+    name: 'Security Tokens',
+    section: 'Personal',
+    path: '/vendor/settings?tab=security-tokens'
+  },
+  {
+    id: 'notifications',
+    name: 'Notifications',
+    section: 'Personal',
+    path: '/vendor/settings?tab=notifications'
+  }
+]
+
 export const tagColors = [
   '#ff6900',
   '#fcb900',
@@ -601,7 +676,7 @@ export const infoData = [
   },
   {
     title: `Component Name`,
-    desc: `Component name within an SBOM serves as a unique identifier for a particular software component, helping to distinguish it from others and providing clarity when referring to or discussing components within the software supply chain.`
+    desc: `The component name within an SBOM serves as a unique identifier for a particular software component, helping to distinguish it from others and providing clarity when referring to or discussing components within the software supply chain.`
   },
   {
     title: `Component Description`,
@@ -609,15 +684,15 @@ export const infoData = [
   },
   {
     title: `Component Version`,
-    desc: `Component version refers to the specific version or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software product.`
+    desc: `A component version refers to the specific version or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software product.`
   },
   {
     title: `Component Group`,
-    desc: `Component group refers to a categorization or grouping of related software components. This will often be a shortened, single name of the company or project that produced the component, or the source package or domain name. Whitespace and special characters should be avoided. Examples include: apache, org.apache.commons, and apache.org.`
+    desc: `A component group refers to a categorization or grouping of related software components. This will often be a shortened, single name of the company or project that produced the component, or the source package or domain name. Whitespace and special characters should be avoided. Examples include: apache, org.apache.commons, and apache.org.`
   },
   {
     title: `Component Type`,
-    desc: `Component type provides information about the primary purpose of this component. The type is intrinsic to how the component is being used rather than the content of the component.`
+    desc: `A component type provides information about the primary purpose of the identified component. The type is intrinsic to how the component is being used rather than the content of the component`
   },
   {
     title: `Component License`,
@@ -637,6 +712,6 @@ export const infoData = [
   },
   {
     title: `Internal Component`,
-    desc: `A component is marked internal when the component is developed by the organization.`
+    desc: `A component is marked internal when the component is represents internally developed components.`
   }
 ]

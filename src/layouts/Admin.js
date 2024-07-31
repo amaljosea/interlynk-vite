@@ -83,11 +83,46 @@ export default function Admin() {
       perform: () => navigate('/vendor/vulnerabilities')
     },
     {
+      id: 'licenses',
+      name: 'Licenses',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/licenses')
+    },
+    {
+      id: 'analytics',
+      name: 'Analytics',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/analytics')
+    },
+    {
+      id: 'tools',
+      name: 'Tools',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/tools')
+    },
+    {
+      id: 'support',
+      name: 'Support',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/support')
+    },
+    {
       id: 'policies',
       name: 'Policies',
       section: 'navigation',
       icon: <FaRegFile color='#718096' />,
       perform: () => navigate('/vendor/policies')
+    },
+    {
+      id: 'settings',
+      name: 'Settings',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/settings?tab=general')
     }
   ]
 
