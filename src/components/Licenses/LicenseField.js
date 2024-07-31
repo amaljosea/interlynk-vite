@@ -1,7 +1,6 @@
 import { useLazyQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
 import { components } from 'react-select'
-import { Tooltip } from 'recharts'
 import { infoData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -12,6 +11,7 @@ import {
   Tag,
   TagLabel,
   Text,
+  Tooltip,
   VStack
 } from '@chakra-ui/react'
 
