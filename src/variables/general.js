@@ -643,6 +643,22 @@ export const openSsf = [
 // SBOM TOOLTIPS
 export const infoData = [
   {
+    title: `Created At`,
+    desc: `Creatat At is the date and time that the SBOM describing this version was produced. This can be different than when the SBOM was imported into the Interlynk system.`
+  },
+  {
+    title: `Creation Tool`,
+    desc: `Creation Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools.`
+  },
+  {
+    title: `Authors`,
+    desc: `The Author Name is the name of the entity that created the SBOM data.`
+  },
+  {
+    title: `Supplier`,
+    desc: `Supplier identifies the name and email of the organization that built, distributed or packaged the application. For open-source components, Supplier can refer to the name of the project or entity distributing the project.`
+  },
+  {
     title: `Vulnerability Scan`,
     desc: `This setting lets you turn on or off vulnerability scanning for your system. It's best to keep this turned on.`
   },

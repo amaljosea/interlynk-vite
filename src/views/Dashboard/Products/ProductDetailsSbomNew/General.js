@@ -50,6 +50,7 @@ import {
   supplierDelete,
   toolDelete
 } from 'graphQL/Mutation'
+import { infoData } from 'variables/general'
 
 const InfoLabel = ({ title, onClick }) => {
   return (
@@ -197,41 +198,18 @@ const General = ({ data, refetch, loading, error }) => {
     [onSBMToggle]
   )
 
-  const onCheckTime = () => {
-    setInfoHeading(`Creation At`)
-    setInfoText(
-      `Creatat At is the date and time that the SBOM describing this version was produced. This can be different than when the SBOM was imported into the Interlynk system.`
-    )
-    setInfoUrl(``)
+  const onCheck = (title) => {
+    const result = infoData.find((item) => item?.title === title)
+    setInfoHeading(result?.title)
+    setInfoText(result?.desc)
+    setInfoUrl('')
     onInfoOpen()
   }
 
-  const onCheckTool = () => {
-    setInfoHeading(`Creation Tool`)
-    setInfoText(
-      `Creation Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools.`
-    )
-    setInfoUrl(``)
-    onInfoOpen()
-  }
-
-  const onCheckAuthor = () => {
-    setInfoHeading(`Author`)
-    setInfoText(
-      `The Author Name is the name of the entity that created the SBOM data.`
-    )
-    setInfoUrl(``)
-    onInfoOpen()
-  }
-
-  const onCheckSupplier = () => {
-    setInfoHeading(`Supplier`)
-    setInfoText(
-      `Supplier identifies the name and email of the organization that built, distributed or packaged the application. For open-source components, Supplier can refer to the name of the project or entity distributing the project.`
-    )
-    setInfoUrl(``)
-    onInfoOpen()
-  }
+  const onCheckTime = () => onCheck(`Created At`)
+  const onCheckTool = () => onCheck(`Creation Tool`)
+  const onCheckAuthor = () => onCheck(`Authors`)
+  const onCheckSupplier = () => onCheck(`Supplier`)
 
   // KEYBOARD EVENT LISTNER FOR SBOM DRAWER
   useEffect(() => {

@@ -11,7 +11,6 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Icon,
   IconButton,
   Input,
   Select,
@@ -19,8 +18,6 @@ import {
   Tbody,
   Td,
   Text,
-  Th,
-  Thead,
   Tooltip,
   Tr
 } from '@chakra-ui/react'
@@ -203,7 +200,9 @@ const CompLinks = ({ onClose, component, refetch }) => {
                           </Tooltip>
                         ) : null}
                       </Text>
-                      <Text mt={2} color={'gray.500'}>{item.name}</Text>
+                      <Text mt={2} color={'gray.500'}>
+                        {item.name}
+                      </Text>
                     </Td>
                     <Td pl={0} isNumeric>
                       <IconButton

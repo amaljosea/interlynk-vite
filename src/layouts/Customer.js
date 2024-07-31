@@ -309,7 +309,7 @@ export default function Customer() {
               secondary={getActiveNavbar(customerRoutes)}
             />
           </Box>
-          <Box my={6} px={10}>
+          <Box my={6} px={6}>
             <Outlet />
           </Box>
         </Flex>

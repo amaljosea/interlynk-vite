@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { getFullDateAndTime } from 'utils'
+import { infoData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
@@ -52,41 +53,18 @@ const General = ({ data, loading, error }) => {
     onClose: onInfoClose
   } = useDisclosure()
 
-  const onCheckTool = () => {
-    setInfoHeading(`Creation Tool`)
-    setInfoText(
-      `Creation Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools`
-    )
-    setInfoUrl(``)
+  const onCheck = (title) => {
+    const result = infoData.find((item) => item?.title === title)
+    setInfoHeading(result?.title)
+    setInfoText(result?.desc)
+    setInfoUrl('')
     onInfoOpen()
   }
 
-  const onCheckAuthor = () => {
-    setInfoHeading(`Author`)
-    setInfoText(
-      `In case of non-automated SBOM generation, Author(s) identify the name and email of person(s) involved in building the SBOM.`
-    )
-    setInfoUrl(``)
-    onInfoOpen()
-  }
-
-  const onCheckSupplier = () => {
-    setInfoHeading(`Supplier`)
-    setInfoText(
-      `Supplier identifies the name and email of the organization that built, distributed or packaged the application. For open-source components, supplier can refer to the name of the project or entity distributing the project.`
-    )
-    setInfoUrl(``)
-    onInfoOpen()
-  }
-
-  const onCheckLicense = () => {
-    setInfoHeading(`Data License`)
-    setInfoText(
-      `Data licence is a legal arrangement between the creator of the data and the end-user, or the place the data will be deposited, specifying what users can do with the data`
-    )
-    setInfoUrl(`https://spdx.dev/about/overview`)
-    onInfoOpen()
-  }
+  const onCheckDate = () => onCheck(`Created At`)
+  const onCheckTool = () => onCheck(`Creation Tool`)
+  const onCheckAuthor = () => onCheck(`Authors`)
+  const onCheckSupplier = () => onCheck(`Supplier`)
 
   if (loading) {
     return (
@@ -110,6 +88,13 @@ const General = ({ data, loading, error }) => {
     <>
       <CardBody>
         <Grid mt={2} width={'100%'} templateColumns='repeat(2, 1fr)'>
+          {/* CREATED AT */}
+          <GridItem py={3} borderTop={border} w='100%'>
+            <InfoLabel title={`Created At`} onClick={onCheckDate} />
+          </GridItem>
+          <GridItem py={3} borderTop={border} w='100%'>
+            <Text fontSize={'sm'}>{getFullDateAndTime(creationAt)}</Text>
+          </GridItem>
           {/* CREATION TOOLS */}
           <GridItem py={3} borderY={border} w='100%'>
             <InfoLabel title={`Creation Tool`} onClick={onCheckTool} />
@@ -136,13 +121,6 @@ const General = ({ data, loading, error }) => {
                   </Tag>
                 ))}
             </Flex>
-          </GridItem>
-          {/* CREATED AT */}
-          <GridItem py={3} borderBottom={border} w='100%'>
-            <Text fontSize={'sm'}>Created At</Text>
-          </GridItem>
-          <GridItem py={3} borderBottom={border} w='100%'>
-            <Text fontSize={'sm'}>{getFullDateAndTime(creationAt)}</Text>
           </GridItem>
           {/* AUTHORS */}
           <GridItem py={3} borderBottom={border} w='100%'>

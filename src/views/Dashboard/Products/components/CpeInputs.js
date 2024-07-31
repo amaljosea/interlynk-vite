@@ -4,7 +4,6 @@ import {
   Button,
   Flex,
   FormControl,
-  FormErrorMessage,
   FormLabel,
   Grid,
   Input,
@@ -21,7 +20,6 @@ const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
   const { component } = activeRow || ''
   const { cpes } = component || ''
 
-  const [error, setError] = useState('')
   const [vendor, setVendor] = useState('')
   const [vendorList, setVendorList] = useState([])
   const vendorRef = useRef()
@@ -297,7 +295,6 @@ const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
           onChange={(e) => console.log(e.target.value)}
           disabled
         />
-        {error !== '' && <FormErrorMessage>{error}</FormErrorMessage>}
       </FormControl>
       <Grid templateColumns='repeat(1, 1fr)' gap={6}>
         {/* PART */}
@@ -457,7 +454,9 @@ const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
         </FormControl>
       </Grid>
       <Flex alignItems={'center'} justifyContent={'flex-end'} gap={2}>
-        <Button onClick={onClose} variant='ghost'>Close</Button>
+        <Button onClick={onClose} variant='ghost'>
+          Close
+        </Button>
         <Button
           variant='outline'
           colorScheme='blue'
