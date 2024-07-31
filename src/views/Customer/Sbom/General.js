@@ -206,7 +206,7 @@ const General = ({ data, loading, error }) => {
           </GridItem>
           {/* DATA LICENSES */}
           <GridItem py={3} borderBottom={border} w='100%'>
-            <InfoLabel title={`Data License`} onClick={onCheckLicense} />
+            <Text fontSize={'sm'}>Data License</Text>
           </GridItem>
           <GridItem py={3} borderBottom={border} w='100%'>
             <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
