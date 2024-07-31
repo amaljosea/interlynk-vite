@@ -417,10 +417,10 @@ const ProductTable = ({
             <GridItem gap={1} colSpan={6}>
               <Text
                 fontSize={14}
-                color={textColor}
-                onClick={handleClick}
+                color={'blue.500'}
                 cursor={'pointer'}
                 width={'fit-content'}
+                onClick={handleClick}
               >
                 {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
               </Text>
