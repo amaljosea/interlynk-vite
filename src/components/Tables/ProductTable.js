@@ -10,6 +10,7 @@ import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import StatusModal from 'views/Dashboard/Products/components/StatusModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
+import ProductSearchFilter from 'views/Sbom/components/ProductSearchFilter'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -59,7 +60,13 @@ import { DeleteProjectGroup } from 'graphQL/Mutation'
 import { GetSharelynks } from 'graphQL/Queries'
 
 import { FaEllipsisV, FaGithub } from 'react-icons/fa'
-import { FaCode, FaDesktop, FaInbox, FaTag } from 'react-icons/fa6'
+import {
+  FaCode,
+  FaDesktop,
+  FaInbox,
+  FaRotateRight,
+  FaTag
+} from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
 
@@ -248,73 +255,84 @@ const ProductTable = ({
   // HEADER
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Stack direction={'row'} spacing={2} alignItems={'center'}>
-          {/* SEARCH PRODUCTS */}
-          <SearchFilter
-            id='product'
-            filterText={filterText}
-            onChange={onSearchInputChange}
-            onClear={handleClear}
-            onFilter={handleSearch}
-          />
-          {/* FILTER PRODUCTS */}
-          {!signedUrlParams && (
-            <ProdFilterMenu enabled={enabled} onFilter={onFilterActive} />
-          )}
-        </Stack>
-        <Stack direction={'row'} spacing={2} alignItems={'center'}>
-          {/* ADD GITHUB PROJECT */}
-          {shouldShowDemoFeatures && isGithubConfigSaved && (
-            <Tooltip label='Add GitHub Project'>
-              <IconButton
-                icon={<FaGithub />}
-                colorScheme='blue'
-                onClick={onGithubOpen}
-              />
-            </Tooltip>
-          )}
-          {/* EDIT LABEL */}
-          {shouldShowDemoFeatures && (
-            <Tooltip label='Edit Label'>
-              <IconButton
-                icon={<FaTag />}
-                colorScheme='blue'
-                variant='solid'
-                isDisabled={!canAddProduct}
-                hidden={signedUrlParams}
-                onClick={onOpenLabel}
-              />
-            </Tooltip>
-          )}
+      <>
+        <Flex
+          width={'100%'}
+          alignItems={'center'}
+          justifyContent={'space-between'}
+          marginBottom={4}
+        >
+          <Text fontSize={'24px'} fontWeight={600}>
+            Products
+          </Text>
           {/* ADD PRODUCT */}
-          <Tooltip label='Add Product'>
-            <IconButton
-              icon={<AddIcon />}
-              colorScheme='blue'
-              variant='solid'
-              isDisabled={!canAddProduct}
-              hidden={signedUrlParams}
-              onClick={() => {
-                setActiveRow(null)
-                onOpen()
-              }}
+          <Button
+            leftIcon={<AddIcon />}
+            colorScheme='blue'
+            variant='solid'
+            isDisabled={!canAddProduct}
+            hidden={signedUrlParams}
+            onClick={() => {
+              setActiveRow(null)
+              onOpen()
+            }}
+          >
+            Add product
+          </Button>
+        </Flex>
+        <Flex
+          width={'100%'}
+          alignItems={'center'}
+          justifyContent={'space-between'}
+        >
+          <Stack direction={'row'} spacing={2} alignItems={'center'}>
+            {/* SEARCH PRODUCTS */}
+            <ProductSearchFilter
+              id='product'
+              filterText={filterText}
+              onChange={onSearchInputChange}
+              onClear={handleClear}
+              onFilter={handleSearch}
             />
-          </Tooltip>
-          {/* REFRESH */}
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={refetch}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            />
-          </Tooltip>
-        </Stack>
-      </Flex>
+            {/* FILTER PRODUCTS */}
+            {!signedUrlParams && (
+              <ProdFilterMenu enabled={enabled} onFilter={onFilterActive} />
+            )}
+          </Stack>
+          <Stack direction={'row'} spacing={2} alignItems={'center'}>
+            {/* ADD GITHUB PROJECT */}
+            {shouldShowDemoFeatures && isGithubConfigSaved && (
+              <Tooltip label='Add GitHub Project'>
+                <IconButton
+                  icon={<FaGithub />}
+                  variant='outline'
+                  onClick={onGithubOpen}
+                />
+              </Tooltip>
+            )}
+            {/* EDIT LABEL */}
+            {shouldShowDemoFeatures && (
+              <Tooltip label='Edit Label'>
+                <IconButton
+                  icon={<FaTag />}
+                  variant='outline'
+                  isDisabled={!canAddProduct}
+                  hidden={signedUrlParams}
+                  onClick={onOpenLabel}
+                />
+              </Tooltip>
+            )}
+            {/* REFRESH */}
+            <Tooltip label='Refresh'>
+              <IconButton
+                onClick={refetch}
+                variant='outline'
+                icon={<FaRotateRight />}
+              />
+            </Tooltip>
+          </Stack>
+        </Flex>
+      </>
     )
   }, [
     filterText,

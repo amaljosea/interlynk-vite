@@ -4,19 +4,23 @@ import { labels as tags } from 'variables/general'
 
 import {
   Box,
+  Button,
   Menu,
+  MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
   Stack,
-  Tag
+  Tag,
+  useColorModeValue
 } from '@chakra-ui/react'
 
-import CheckMark from 'components/Misc/CheckMark'
 import CustomList from 'components/Misc/CustomList'
-import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
+
+import { FaFilter } from 'react-icons/fa'
+import { FaTags } from 'react-icons/fa6'
 
 const ProdFilterMenu = ({ enabled, onFilter }) => {
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
@@ -31,8 +35,11 @@ const ProdFilterMenu = ({ enabled, onFilter }) => {
       {/* ACTIVE */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
-          {enabled !== undefined && <CheckMark />}
-          <MenuHeading title={'Active'} />
+          <MenuHeading
+            title={'Active'}
+            icon={FaFilter}
+            active={enabled !== undefined}
+          />
           <CustomList
             type='radio'
             options={['yes', 'no']}
@@ -48,8 +55,11 @@ const ProdFilterMenu = ({ enabled, onFilter }) => {
         display={shouldShowDemoFeatures ? 'flex' : 'none'}
       >
         <Menu closeOnSelect={false}>
-          {labels?.length !== 0 && <CheckMark />}
-          <MenuHeading title={'Labels'} />
+          <MenuHeading
+            title={'Labels'}
+            icon={FaTags}
+            active={labels?.length !== 0}
+          />
           <MenuList minH='auto' maxH={'350px'} overflowY={'scroll'}>
             <MenuOptionGroup
               type={'checkbox'}
@@ -82,3 +92,26 @@ const ProdFilterMenu = ({ enabled, onFilter }) => {
 }
 
 export default ProdFilterMenu
+
+const MenuHeading = ({ title, icon: Icon, onClick, active }) => {
+  const grayBorder = useColorModeValue('#1A202C29', '#ffffff29')
+  const grayText = useColorModeValue('#03030399', '#60686f')
+  const bgActive = useColorModeValue('#EDF2F7', '')
+  const iconColor = '#3182CE'
+
+  return (
+    <MenuButton
+      as={Button}
+      fontWeight='normal'
+      fontSize='sm'
+      leftIcon={<Icon size={14} color={active ? iconColor : grayText} />}
+      onClick={onClick}
+      variant='outline'
+      borderColor={active ? iconColor : grayBorder}
+      color={active ? iconColor : grayText}
+      backgroundColor={active ? bgActive : 'transparent'}
+    >
+      {title}
+    </MenuButton>
+  )
+}
