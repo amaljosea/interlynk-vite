@@ -267,7 +267,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px'>Build Version</DrawerHeader>
-          <DrawerBody>
+          <DrawerBody overflowX={'hidden'}>
             <Stack direction={'column'} spacing={4} mt={2}>
               {/* NAME */}
               <FormControl isRequired>
