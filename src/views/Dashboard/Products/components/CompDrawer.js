@@ -26,7 +26,7 @@ const CompInfo = ({ data }) => {
 
   return (
     <Flex width={'90%'} columnGap={2} flexWrap={'wrap'} alignContent={'center'}>
-      <Text fontSize='sm' fontWeight={'medium'} wordBreak={'break-all'}>
+      <Text fontSize='sm' fontWeight={'normal'} wordBreak={'break-all'}>
         {name}
       </Text>
       <Tag size='sm' colorScheme='blue'>
@@ -46,44 +46,45 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
       <DrawerContent>
         <DrawerCloseButton mt={3} />
         <DrawerHeader borderBottomWidth='1px'>
-          {data ? 'Edit' : 'Add'} Component
+          <Text mb={1} fontWeight={'normal'}>{data ? 'Edit' : 'Add'} Component</Text>
           {data && <CompInfo data={data} />}
         </DrawerHeader>
-        <DrawerBody>
+        <DrawerBody p={0}>
           <Tabs>
             <TabList
               position={'fixed'}
-              top={'84px'}
+              top={'88px'}
               bg={bgColor}
-              zIndex={111}
-              left={5}
-              right={5}
+              zIndex={1}
+              pl={6}
+              left={0}
+              right={0}
             >
               {tabs.map((item, index) => (
                 <Tab
                   key={index}
                   textTransform={'capitalize'}
-                  _focus={{ outline: 'none' }}
+                  _focus={{ outline: 'none', bg:'none' }}
                 >
                   {item}
                 </Tab>
               ))}
             </TabList>
-            <TabPanels pos={'relative'} top={8} overflowX={'hidden'}>
+            <TabPanels pos={'relative'} top={10} overflowX={'hidden'}>
               <TabPanel px={0}>
                 <CompDetails data={data} onClose={onClose} refetch={refetch} />
               </TabPanel>
-              <TabPanel>
+              <TabPanel px={0}>
                 <CompIdentifiers
                   data={data}
                   onClose={onClose}
                   refetch={refetch}
                 />
               </TabPanel>
-              <TabPanel>
+              <TabPanel px={0}>
                 <CompSupplier data={data} onClose={onClose} refetch={refetch} />
               </TabPanel>
-              <TabPanel>
+              <TabPanel px={0}>
                 <CompLinks
                   component={data}
                   onClose={onClose}

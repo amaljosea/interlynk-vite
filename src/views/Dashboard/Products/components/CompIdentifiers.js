@@ -197,6 +197,7 @@ const CompIdentifiers = (props) => {
 
   return (
     <Stack
+      px={6}
       pb={20}
       spacing={4}
       direction={'column'}
@@ -303,7 +304,7 @@ const CompIdentifiers = (props) => {
         </Stack>
       </FormControl>
       {/* ACTIONS */}
-      <ActionWrapper>
+      <ActionWrapper hidden={cpeOpen || purlOpen}>
         <Button onClick={onClose}>Cancel</Button>
         <Button
           colorScheme='blue'
@@ -312,7 +313,7 @@ const CompIdentifiers = (props) => {
           onClick={data ? handleUpdateCom : handleCreateCom}
           isDisabled={disabled || (cpeValue === '' && purlValue === '')}
         >
-          {data ? 'Update' : 'Save'}
+          Save
         </Button>
       </ActionWrapper>
     </Stack>

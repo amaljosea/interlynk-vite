@@ -25,10 +25,12 @@ const LynkSelect = (props) => {
     }),
     menu: (provided) => ({
       ...provided,
+      zIndex:1111,
       backgroundColor: bgColor
     }),
     menuList: (provided) => ({
       ...provided,
+      zIndex:1111,
       backgroundColor: bgColor,
       '&:hover': {
         backgroundColor: 'transparent'

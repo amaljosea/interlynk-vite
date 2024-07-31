@@ -3,14 +3,16 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { validateUrl } from 'utils'
 
-import { DeleteIcon } from '@chakra-ui/icons'
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
   Button,
+  Divider,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Icon,
+  IconButton,
   Input,
   Select,
   Table,
@@ -110,7 +112,17 @@ const CompLinks = ({ onClose, component, refetch }) => {
 
   return (
     <form onSubmit={handleLinkAdd}>
-      <Flex direction={'column'} alignItems={'flex-start'} gap={3} pb={20}>
+      <Flex
+        direction={'column'}
+        alignItems={'flex-start'}
+        gap={3}
+        px={6}
+        pb={20}
+      >
+        {/* HEADING */}
+        <Text color={'gray.500'} fontWeight={'medium'}>
+          ADD LINK
+        </Text>
         {/* NAME */}
         <FormControl isRequired isInvalid={error}>
           <FormLabel>Type</FormLabel>
@@ -159,55 +171,46 @@ const CompLinks = ({ onClose, component, refetch }) => {
         </FormControl>
         {/* ACTIONS */}
         <Button
-          colorScheme='blue'
+          mt={1}
           type='submit'
+          variant='outline'
+          colorScheme='blue'
+          leftIcon={<AddIcon />}
           isDisabled={
             !validateUrl(link.trim()) || error !== '' || linkError !== ''
           }
         >
-          Add
+          Add Link
         </Button>
+        <Divider my={2} pos={'relative'} left={0} right={0} />
         {/* TABLE */}
         <Flex width={'100%'} flexDir={'column'}>
-          <Text size='md' my={2}>
+          <Text size='md' color={'gray.500'}>
             Existing Links
           </Text>
           {linksData.length > 0 ? (
             <Table variant='simple' size='sm' mt={4}>
-              <Thead>
-                <Tr my='.8rem'>
-                  <Th pl={0} width={'260px'}>
-                    Link
-                  </Th>
-                  <Th pl={0}>Type</Th>
-                  <Th pl={0}></Th>
-                </Tr>
-              </Thead>
               <Tbody>
                 {linksData.map((item, index) => (
                   <Tr key={index}>
-                    <Td
-                      pl={0}
-                      fontSize={'xs'}
-                      width={'260px'}
-                      wordBreak={'break-all'}
-                    >
-                      {item.url ? (
-                        <Tooltip label={item.url}>
-                          {item.url.length > 35
-                            ? `${item.url.substring(0, 35)}...`
-                            : item.url}
-                        </Tooltip>
-                      ) : null}
+                    <Td pl={0} wordBreak={'break-all'}>
+                      <Text>
+                        {item.url ? (
+                          <Tooltip label={item.url}>
+                            {item.url.length > 35
+                              ? `${item.url.substring(0, 35)}...`
+                              : item.url}
+                          </Tooltip>
+                        ) : null}
+                      </Text>
+                      <Text mt={2} color={'gray.500'}>{item.name}</Text>
                     </Td>
-                    <Td pl={0} fontSize={'xs'}>
-                      {item.name}
-                    </Td>
-                    <Td pl={0}>
-                      <Icon
-                        as={DeleteIcon}
+                    <Td pl={0} isNumeric>
+                      <IconButton
                         color={'red'}
+                        variant='outline'
                         cursor={'pointer'}
+                        icon={<DeleteIcon />}
                         onClick={() => handleLinkRemove(index)}
                       />
                     </Td>

@@ -179,7 +179,7 @@ const CompDetails = (props) => {
     compKind === '' || compName === '' || compVersion === '' || disabled
 
   return (
-    <Stack direction={'column'} spacing={4} pb={20}>
+    <Stack direction={'column'} spacing={4} px={6} pb={20}>
       {/* Name */}
       <FormControl isReadOnly={customerView}>
         <FormLabel htmlFor='compName' fontSize={'sm'}>
@@ -394,7 +394,7 @@ const CompDetails = (props) => {
           isDisabled={isInvalid}
           onClick={data ? handleUpdateCom : handleCreateCom}
         >
-          {data ? 'Update' : 'Save'}
+          Save
         </Button>
       </ActionWrapper>
     </Stack>

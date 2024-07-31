@@ -117,7 +117,7 @@ const CompSupplier = ({ data, onClose, refetch }) => {
   }, [data])
 
   return (
-    <Flex width={'100%'} direction={'column'} gap={4} pb={20}>
+    <Flex width={'100%'} direction={'column'} gap={4} px={6} pb={20}>
       {/* ORG NAME */}
       <FormControl isRequired>
         <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
@@ -173,7 +173,7 @@ const CompSupplier = ({ data, onClose, refetch }) => {
           isDisabled={isInvalid}
           onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
         >
-          {data ? 'Update' : 'Save'}
+          Save
         </Button>
       </ActionWrapper>
     </Flex>

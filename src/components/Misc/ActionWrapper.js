@@ -6,7 +6,8 @@ const ActionWrapper = (props) => {
 
   return (
     <Flex
-      p={4}
+      py={4}
+      px={7}
       gap={3}
       left={0}
       right={0}

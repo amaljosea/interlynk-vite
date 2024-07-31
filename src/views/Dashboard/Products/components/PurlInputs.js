@@ -654,10 +654,17 @@ const PurlInputs = ({
           placeholder='Enter qualifiers'
         />
       </FormControl>
-      <Flex alignItems={'center'} gap={2}>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button colorScheme='blue' isDisabled={isInvalid} onClick={handleSave}>
-          Save
+      <Flex alignItems={'center'} justifyContent={'flex-end'} gap={2}>
+        <Button onClick={onClose} variant='ghost'>
+          Close
+        </Button>
+        <Button
+          variant='outline'
+          colorScheme='blue'
+          onClick={handleSave}
+          isDisabled={isInvalid}
+        >
+          Save PURL
         </Button>
       </Flex>
     </Flex>
