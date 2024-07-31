@@ -320,7 +320,7 @@ const VersionsTable = ({
           </Link>
         )
       },
-      width: '11%'
+      width: '10.3%'
     },
     // LICENSES
     {
@@ -341,7 +341,7 @@ const VersionsTable = ({
           </Tag>
         )
       },
-      width: '8%'
+      width: '7.7%'
     },
     // VULNERABILITIES
     {
@@ -356,7 +356,7 @@ const VersionsTable = ({
           }
         })
         return (
-          <Flex my={2} gap={1} alignItems={'center'} fontWeight={'medium'} flexWrap={'wrap'}>
+          <Flex my={2} gap={1} alignItems={'center'} fontWeight={'medium'}>
             <Link to={link} onClick={() => onFilterSev(['critical'])}>
               <VulnBadge color='red' label='Critical' status={vulnRunStatus}>
                 {stats?.vulnStats?.critical || 0}
@@ -385,7 +385,7 @@ const VersionsTable = ({
           </Flex>
         )
       },
-      width: '23%'
+      width: '26.8%'
     },
     // STATUS
     {
@@ -400,7 +400,7 @@ const VersionsTable = ({
           </Tag>
         )
       },
-      width: '10%'
+      width: '9%'
     },
     // CREATED AT
     {
