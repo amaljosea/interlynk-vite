@@ -276,7 +276,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
         const icon = unknown ? (
           <BsFillPatchQuestionFill fontSize={24} />
         ) : (
-          GetIcon(purl.split('/')[0])
+          GetIcon(purl?.split('/')[0])
         )
         return (
           <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
