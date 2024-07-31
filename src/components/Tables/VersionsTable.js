@@ -356,7 +356,7 @@ const VersionsTable = ({
           }
         })
         return (
-          <Stack fontWeight={'medium'} direction={'row'}>
+          <Flex my={2} gap={1} alignItems={'center'} fontWeight={'medium'} flexWrap={'wrap'}>
             <Link to={link} onClick={() => onFilterSev(['critical'])}>
               <VulnBadge color='red' label='Critical' status={vulnRunStatus}>
                 {stats?.vulnStats?.critical || 0}
@@ -382,10 +382,10 @@ const VersionsTable = ({
                 {stats?.vulnStats?.unknown || 0}
               </VulnBadge>
             </Link>
-          </Stack>
+          </Flex>
         )
       },
-      width: '26%'
+      width: '23%'
     },
     // STATUS
     {
