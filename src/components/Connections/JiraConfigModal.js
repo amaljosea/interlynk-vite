@@ -34,7 +34,6 @@ const JiraConfigModal = ({
   onClose,
   setGreenCheck,
   data,
-  refetch,
   updateCon
 }) => {
   const toast = useToast()
@@ -85,7 +84,6 @@ const JiraConfigModal = ({
       if (res?.data?.jiraConnectionCreate?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, jira: !isSaveDisabled }))
         resetChanges()
-        refetch()
         onClose()
         toast({
           title: 'Configuration saved.',
@@ -121,7 +119,6 @@ const JiraConfigModal = ({
       if (res?.data?.jiraConnectionUpdate?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, jira: !isSaveDisabled }))
         resetChanges()
-        refetch()
         onClose()
         toast({
           title: 'Configuration saved.',
@@ -182,7 +179,6 @@ const JiraConfigModal = ({
     }).then((res) => {
       if (res?.data?.jiraConnectionDelete?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, jira: false }))
-        refetch()
         onClose()
         toast({
           title: 'Configuration deleted.',

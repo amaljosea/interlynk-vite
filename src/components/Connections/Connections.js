@@ -163,7 +163,6 @@ const Connections = () => {
       {isJiraOpen && (
         <JiraConfigModal
           data={jiraData}
-          refetch={refetch}
           isOpen={isJiraOpen}
           onClose={onJiraClose}
           updateCon={updateCon}
