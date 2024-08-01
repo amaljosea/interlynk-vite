@@ -511,6 +511,7 @@ const ProductTable = ({
                   borderColor={borderColor}
                   color={textColor}
                   fontWeight={400}
+                  width={'60px'}
                 >
                   {getProjectSbomsCount('default')}
                 </Button>
@@ -533,6 +534,7 @@ const ProductTable = ({
                   borderColor={borderColor}
                   color={textColor}
                   fontWeight={400}
+                  width={'60px'}
                 >
                   {getProjectSbomsCount('development')}
                 </Button>
@@ -555,6 +557,7 @@ const ProductTable = ({
                   borderColor={borderColor}
                   color={textColor}
                   fontWeight={400}
+                  width={'60px'}
                 >
                   {getProjectSbomsCount('production')}
                 </Button>
