@@ -64,6 +64,8 @@ import {
 import { FaBug, FaRobot, FaTag } from 'react-icons/fa'
 import {
   FaBoxArchive,
+  FaDiagramProject,
+  FaExclamation,
   FaPenToSquare,
   FaToggleOff,
   FaToggleOn,
@@ -75,6 +77,7 @@ import { IoMdWarning } from 'react-icons/io'
 import Automation from '../Automation'
 import Settings from '../ProductSettings'
 import { ProductGraphs } from './ProductGraphs'
+import ProductProgressModal from './ProductGraphs/ProductProgressModal'
 import ProductModal from './components/ProductModal'
 import StatusModal from './components/StatusModal'
 import UploadModal from './components/UploadModal'
@@ -281,6 +284,11 @@ const ProductDetailsMain = () => {
     onClose: onDeleteClose
   } = useDisclosure()
   const { isOpen: isEnvOpen, onClose: onEnvClose } = useDisclosure()
+  const {
+    isOpen: isOpenProductProgress,
+    onOpen: onOpenProductProgress,
+    onClose: onCloseProductProgress
+  } = useDisclosure()
 
   // DELETE PRODUCT
   const onProductDelete = async () => {
@@ -439,6 +447,16 @@ const ProductDetailsMain = () => {
                   ml={'auto'}
                   flexWrap={'wrap'}
                 >
+                  {/* VIEW PRODUCT PROGRESS */}
+                  {shouldShowDemoFeatures && (
+                    <Tooltip label='View Product Progress'>
+                      <IconButton
+                        icon={<FaDiagramProject />}
+                        colorScheme='blue'
+                        onClick={onOpenProductProgress}
+                      />
+                    </Tooltip>
+                  )}
                   {/* Notifications */}
                   <NotificationMenuBell />
                   {/* EDIT PRODUCT */}
@@ -594,6 +612,14 @@ const ProductDetailsMain = () => {
           onClose={onCloseProduct}
           isOpen={isOpenProduct}
           data={projectGroup}
+        />
+      )}
+
+      {/* VIEW PRODUCT PROGRESS */}
+      {isOpenProductProgress && (
+        <ProductProgressModal
+          onClose={onCloseProductProgress}
+          isOpen={isOpenProductProgress}
         />
       )}
 
