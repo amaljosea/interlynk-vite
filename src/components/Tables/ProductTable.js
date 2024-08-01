@@ -11,9 +11,8 @@ import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import StatusModal from 'views/Dashboard/Products/components/StatusModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import ProductSearchFilter from 'views/Sbom/components/ProductSearchFilter'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Button,
   Divider,

@@ -2902,3 +2902,53 @@ export const OrganizationRoleBulkApply = gql`
     }
   }
 `
+
+// LABEL
+
+export const LabelCreate = gql`
+  mutation LabelCreate($name: String!, $color: String!) {
+    labelCreate(input: { color: $color, name: $name }) {
+      errors
+      label {
+        color
+        createdAt
+        id
+        name
+        organizationId
+        updatedAt
+      }
+    }
+  }
+`
+
+export const LabelUpdate = gql`
+  mutation LabelUpdate($name: String, $id: Uuid!, $color: String) {
+    labelUpdate(input: { id: $id, name: $name, color: $color }) {
+      errors
+      label {
+        color
+        createdAt
+        id
+        name
+        organizationId
+        updatedAt
+      }
+    }
+  }
+`
+
+export const LabelDelete = gql`
+  mutation LabelDelete($id: Uuid!) {
+    labelDelete(input: { id: $id }) {
+      errors
+      label {
+        color
+        createdAt
+        id
+        name
+        organizationId
+        updatedAt
+      }
+    }
+  }
+`

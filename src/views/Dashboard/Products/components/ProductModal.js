@@ -1,10 +1,13 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
+import { components } from 'react-select'
 import { errorMapping } from 'utils/errorUtils'
+import { labels } from 'variables/general'
 
 import {
   Alert,
   AlertIcon,
+  Box,
   Button,
   Flex,
   FormControl,
@@ -21,6 +24,8 @@ import {
   Textarea
 } from '@chakra-ui/react'
 
+import LynkSelect from 'components/LynkSelect'
+
 import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
 
 const ProductModal = ({ isOpen, onClose, data }) => {
@@ -30,6 +35,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
 
   const [productName, setProductName] = useState(name || '')
   const [productDesc, setProductDesc] = useState(description || '')
+  const [productLabels, setProductLabels] = useState([])
   const [error, setError] = useState('')
 
   const updateProduct = async (e) => {
@@ -69,6 +75,26 @@ const ProductModal = ({ isOpen, onClose, data }) => {
     setError('')
   }
 
+  const options = []
+  labels?.map((item) =>
+    options.push({
+      label: item?.name,
+      value: item?.id
+    })
+  )
+
+  const Option = (props) => {
+    const result = labels?.find((item) => item?.name === props.data.label)
+    return (
+      <components.Option {...props}>
+        <Flex alignItems={'center'} gap={2}>
+          <Box borderRadius={'full'} p={1.5} bg={result?.color}></Box>
+          <Text cursor={'pointer'}>{props.data.label}</Text>
+        </Flex>
+      </components.Option>
+    )
+  }
+
   const isInvalid = productName === '' || error !== ''
 
   return (
@@ -94,6 +120,21 @@ const ProductModal = ({ isOpen, onClose, data }) => {
                     value={productName}
                     onChange={onNameChange}
                     placeholder={`Add product name`}
+                  />
+                </FormControl>
+                <FormControl display={'none'}>
+                  <FormLabel>Labels</FormLabel>
+                  <LynkSelect
+                    isMulti
+                    components={{
+                      DropdownIndicator: () => null,
+                      IndicatorSeparator: () => null,
+                      Option
+                    }}
+                    options={options}
+                    placeholder='Select'
+                    value={productLabels}
+                    onChange={(value) => setProductLabels(value)}
                   />
                 </FormControl>
                 <FormControl>

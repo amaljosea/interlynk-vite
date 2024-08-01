@@ -4700,3 +4700,21 @@ export const OrgUserInvitationInfo = gql`
     }
   }
 `
+
+// LABEL
+
+export const GetLabels = gql`
+  query GetLabels {
+    labels {
+      totalCount
+      nodes {
+        color
+        createdAt
+        id
+        name
+        organizationId
+        updatedAt
+      }
+    }
+  }
+`
