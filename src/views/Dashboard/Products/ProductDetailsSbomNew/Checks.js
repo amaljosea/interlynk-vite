@@ -753,7 +753,7 @@ const Checks = () => {
               </Button>
             )}
 
-            {status === 'resolved' && (
+            {!fixedByDefault && status === 'resolved' && (
               <Button
                 size='sm'
                 fontSize={'xs'}
