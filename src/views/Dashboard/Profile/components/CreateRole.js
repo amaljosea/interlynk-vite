@@ -24,7 +24,7 @@ import LynkSelect from 'components/LynkSelect'
 import { OrgRoleCreate } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
 
-const CreateRole = ({ isOpen, onClose, refetch }) => {
+const CreateRole = ({ isOpen, onClose }) => {
   const [roleName, setRoleName] = useState('')
   const [permissions, setPermissions] = useState('')
   const [disabled, setDisabled] = useState(false)
@@ -80,7 +80,6 @@ const CreateRole = ({ isOpen, onClose, refetch }) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
-          refetch()
           onClose()
         }
       })

@@ -45,14 +45,7 @@ import { CreateShareLynk } from 'graphQL/Mutation'
 import { FaCheck, FaPlus, FaRegCopy } from 'react-icons/fa6'
 import { PiFileSvgDuotone } from 'react-icons/pi'
 
-const ShareLynkDrawer = ({
-  error,
-  isOpen,
-  onClose,
-  data,
-  groupId,
-  refetch
-}) => {
+const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
   const BACKEND_URL = process.env.REACT_APP_SERVER
   const [createLynk] = useMutation(CreateShareLynk)
   const { colorMode } = useColorMode()
@@ -109,7 +102,6 @@ const ShareLynkDrawer = ({
       }
     }).then((res) => {
       if (res?.data) {
-        refetch()
         onShareLynkClose()
       }
     })

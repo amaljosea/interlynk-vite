@@ -18,7 +18,7 @@ import { sbomUpdate } from 'graphQL/Mutation'
 
 import LicenseField from './Licenses/LicenseField'
 
-const LicenseModal = ({ data, isOpen, onClose, activeRow, refetch }) => {
+const LicenseModal = ({ data, isOpen, onClose, activeRow }) => {
   const { status, sbom } = activeRow || ''
   const resolved = status === 'resolved'
   const { sbomState } = useGlobalState()
@@ -26,9 +26,7 @@ const LicenseModal = ({ data, isOpen, onClose, activeRow, refetch }) => {
 
   const isInvalidLicense = expLicense === ''
 
-  const [updateSbom] = useMutation(sbomUpdate, {
-    onCompleted: (data) => data && refetch()
-  })
+  const [updateSbom] = useMutation(sbomUpdate)
 
   const handleUpdateSBOM = () => {
     updateSbom({

@@ -2,6 +2,7 @@ import { useMutation } from '@apollo/client'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
+import { infoData } from 'variables/general'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 
 import { EditIcon, InfoIcon } from '@chakra-ui/icons'
@@ -50,7 +51,6 @@ import {
   supplierDelete,
   toolDelete
 } from 'graphQL/Mutation'
-import { infoData } from 'variables/general'
 
 const InfoLabel = ({ title, onClick }) => {
   return (
@@ -134,9 +134,7 @@ const General = ({ data, refetch, loading, error }) => {
   const [deleteSupplier] = useMutation(supplierDelete)
   const [deleteTool] = useMutation(toolDelete)
   const [deleteAuthor] = useMutation(authorDelete)
-  const [updateSbom] = useMutation(sbomUpdate, {
-    onCompleted: () => refetch()
-  })
+  const [updateSbom] = useMutation(sbomUpdate)
 
   const handleToolRemove = async (id) => {
     try {
@@ -454,7 +452,6 @@ const General = ({ data, refetch, loading, error }) => {
           </Tbody>
         </Table>
       </CardBody>
-
       {/* GENERAL DRAWER */}
       {data && isOpen && (
         <GeneralDataDrawer
@@ -467,7 +464,6 @@ const General = ({ data, refetch, loading, error }) => {
           checkId={null}
         />
       )}
-
       {/* SBOM LICENSE DRAWER */}
       {isSBMOpen && data && (
         <Modal isOpen={isSBMOpen} onClose={onSBMClose}>
@@ -501,7 +497,6 @@ const General = ({ data, refetch, loading, error }) => {
           </ModalContent>
         </Modal>
       )}
-
       {/* SUPPLIER MODAL */}
       {isSupOpen && (
         <PriSupplierModal
@@ -512,7 +507,6 @@ const General = ({ data, refetch, loading, error }) => {
           activeRow={null}
         />
       )}
-
       {/* TOOL DELETE MODAL */}
       {isDelOpen && activeTool && (
         <Modal isOpen={isDelOpen} onClose={onDelClose}>
@@ -542,7 +536,6 @@ const General = ({ data, refetch, loading, error }) => {
           </ModalContent>
         </Modal>
       )}
-
       {/* INFO MODAL */}
       {isInfoOpen && (
         <InfoModal

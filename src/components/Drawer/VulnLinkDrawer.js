@@ -145,7 +145,6 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
           setError(errors[0])
         } else {
           setError('')
-          refetch()
           onClose()
         }
       })
@@ -165,7 +164,6 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
         setError(errors[0])
       } else {
         setError('')
-        refetch()
         onClose()
       }
     })

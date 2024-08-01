@@ -45,7 +45,7 @@ const RoleTable = () => {
     childKey: 'edit_user_role'
   })
 
-  const { data, loading, refetch } = useQuery(GetRoles, {
+  const { data, loading } = useQuery(GetRoles, {
     skip: !orgView ? true : activetab === 'roles' ? false : true
   })
 
@@ -182,17 +182,10 @@ const RoleTable = () => {
         />
       )}
 
-      {isRoleOpen && (
-        <CreateRole
-          refetch={refetch}
-          isOpen={isRoleOpen}
-          onClose={onRoleClose}
-        />
-      )}
+      {isRoleOpen && <CreateRole isOpen={isRoleOpen} onClose={onRoleClose} />}
 
       {isDelOpen && (
         <DeleteRole
-          refetch={refetch}
           isOpen={isDelOpen}
           onClose={onDelClose}
           activeRole={selectedRole}

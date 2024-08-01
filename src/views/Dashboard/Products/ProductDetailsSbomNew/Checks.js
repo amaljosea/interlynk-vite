@@ -818,7 +818,6 @@ const Checks = () => {
             <LicenseModal
               data={sbomData}
               activeRow={activeRow}
-              refetch={handleRefetch}
               isOpen={isDataLicenseOpen}
               onClose={onDataLicenseClose}
             />
@@ -874,7 +873,6 @@ const Checks = () => {
               id={null}
               data={null}
               activeRow={activeRow}
-              refetch={handleRefetch}
               isOpen={isSupplierOpen}
               ruleExists={ruleExists}
               onClose={onSupplierClose}

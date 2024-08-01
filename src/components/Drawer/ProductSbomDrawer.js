@@ -89,9 +89,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [createSbom] = useMutation(sbomCreate)
-  const [createComponent] = useMutation(CreateComponent, {
-    onCompleted: () => handleRefetch()
-  })
+  const [createComponent] = useMutation(CreateComponent)
 
   const { isOpen: isWarningOpen, onClose: onWarningClose } = useDisclosure()
   const {

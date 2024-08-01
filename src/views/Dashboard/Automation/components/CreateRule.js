@@ -47,7 +47,7 @@ const SubjectIcon = ({ subject, isSystem = { isSystem } }) => {
   )
 }
 
-const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
+const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
   const params = useParams()
   const projectId = params?.productid
 
@@ -113,12 +113,8 @@ const CreateRule = ({ data, refetch, isOpen, onClose, subOperators }) => {
   const isComponent = conditions?.some((item) => item?.category === 'component')
   // const isVersion = conditions?.some((item) => item?.category === 'version')
 
-  const [createRule] = useMutation(AutomationRuleCreate, {
-    onCompleted: (data) => data && refetch()
-  })
-  const [updateRule] = useMutation(AutomationRuleUpdate, {
-    onCompleted: (data) => data && refetch()
-  })
+  const [createRule] = useMutation(AutomationRuleCreate)
+  const [updateRule] = useMutation(AutomationRuleUpdate)
 
   const checkActionValidity = (data) => {
     for (let i = 0; i < data.length; i++) {

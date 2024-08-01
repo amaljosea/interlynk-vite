@@ -39,7 +39,7 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole }) => {
   const [updateRole] = useMutation(UpdateOrganizationRole)
 
   const [error, setError] = useState('')
-  const { data, loading, refetch } = useQuery(GetAllPermissions, {
+  const { data, loading } = useQuery(GetAllPermissions, {
     skip: activetab === 'roles' ? false : true
   })
   const { organizationRoles } = data?.organization || ''
@@ -66,7 +66,6 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole }) => {
       if (errors?.length > 0) {
         setError(errors[0])
       } else {
-        refetch()
         toast({
           description: `${filterItem?.name} Permission updated successfully`,
           position: 'top',

@@ -25,7 +25,6 @@ const SlackConfigModal = ({
   onClose,
   data,
   setGreenCheck,
-  refetch,
   updateCon
 }) => {
   const toast = useToast()
@@ -52,7 +51,6 @@ const SlackConfigModal = ({
     }).then((res) => {
       if (res?.data?.slackConnectionCreate?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, slack: true }))
-        refetch()
         onClose()
         toast({
           title: 'Configuration saved.',
@@ -85,7 +83,6 @@ const SlackConfigModal = ({
     }).then((res) => {
       if (res?.data?.slackConnectionUpdate?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, slack: true }))
-        refetch()
         onClose()
         toast({
           title: 'Configuration saved.',
@@ -118,7 +115,6 @@ const SlackConfigModal = ({
     }).then((res) => {
       if (res?.data?.slackConnectionDelete?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, slack: false }))
-        refetch()
         onClose()
         toast({
           title: 'Configuration deleted.',

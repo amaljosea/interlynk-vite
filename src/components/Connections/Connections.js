@@ -172,7 +172,6 @@ const Connections = () => {
       {isSlackOpen && (
         <SlackConfigModal
           data={slackData}
-          refetch={refetch}
           isOpen={isSlackOpen}
           updateCon={updateCon}
           onClose={onSlackClose}
@@ -182,7 +181,6 @@ const Connections = () => {
       {isTeamsOpen && (
         <TeamsConfigModal
           data={teamsData}
-          refetch={refetch}
           isOpen={isTeamsOpen}
           updateCon={updateCon}
           onClose={onTeamsClose}

@@ -127,9 +127,7 @@ const TeamTable = () => {
   const [filterText, setFilterText] = useState('')
   const [deleteUser] = useMutation(deleteOrgUser)
 
-  const [inviteUsers] = useMutation(InviteUser, {
-    onCompleted: () => refetch()
-  })
+  const [inviteUsers] = useMutation(InviteUser)
 
   // COLUMNS
   const columns = [
@@ -459,7 +457,6 @@ const TeamTable = () => {
       {/* ADD / UPDATE User */}
       {isTeamOpen && (
         <TeamModal
-          refetch={refetch}
           data={currentUser}
           isOpen={isTeamOpen}
           onClose={onTeamClose}

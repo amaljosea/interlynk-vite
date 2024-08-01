@@ -44,7 +44,6 @@ const GeneralDataDrawer = ({
   onClose,
   data,
   selectedKey,
-  refetch,
   activeRow,
   ruleExists
 }) => {
@@ -88,12 +87,8 @@ const GeneralDataDrawer = ({
     setAuthorName(value)
   }
 
-  const [createTool] = useMutation(toolCreate, {
-    onCompleted: (data) => data && refetch()
-  })
-  const [createAuthor] = useMutation(authorCreate, {
-    onCompleted: (data) => data && refetch()
-  })
+  const [createTool] = useMutation(toolCreate)
+  const [createAuthor] = useMutation(authorCreate)
   const [createRule] = useMutation(AutomationRuleCreate)
 
   useEffect(() => {

@@ -35,7 +35,6 @@ const SupplierModal = ({
   data,
   isOpen,
   onClose,
-  refetch,
   activeRow,
   ruleExists
 }) => {
@@ -77,12 +76,8 @@ const SupplierModal = ({
     }
   }
 
-  const [createSupplier] = useMutation(addComSupplier, {
-    onCompleted: (data) => data && refetch()
-  })
-  const [updateSupplier] = useMutation(updateComSupplier, {
-    onCompleted: (data) => data && refetch()
-  })
+  const [createSupplier] = useMutation(addComSupplier)
+  const [updateSupplier] = useMutation(updateComSupplier)
 
   const { suppliers } = data || ''
 

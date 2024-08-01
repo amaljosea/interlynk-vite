@@ -738,7 +738,6 @@ const ProductTable = ({
           error={error}
           groupId={activeRow?.id}
           data={lynks?.shareLynks}
-          refetch={lynkRefetch}
           isOpen={isLynkOpen}
           onClose={onLynkClose}
         />

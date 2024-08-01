@@ -124,9 +124,7 @@ function SBOMLinkDrawer(props) {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader borderBottomWidth='1px'>
-          Share Lynk
-        </DrawerHeader>
+        <DrawerHeader borderBottomWidth='1px'>Share Lynk</DrawerHeader>
         <DrawerBody>
           <Stack spacing='24px'>
             <Box>

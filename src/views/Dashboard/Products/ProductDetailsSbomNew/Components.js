@@ -1162,7 +1162,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
       {isSupOpen && (
         <SupplierModal
           id={activeRow.id}
-          refetch={fetchCompData}
           filterRefetch={getCompFilters}
           isOpen={isSupOpen}
           onClose={onSupClose}

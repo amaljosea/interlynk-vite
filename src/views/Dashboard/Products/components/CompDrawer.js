@@ -46,7 +46,9 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
       <DrawerContent>
         <DrawerCloseButton mt={3} />
         <DrawerHeader borderBottomWidth='1px'>
-          <Text mb={1} fontWeight={'normal'}>{data ? 'Edit' : 'Add'} Component</Text>
+          <Text mb={1} fontWeight={'normal'}>
+            {data ? 'Edit' : 'Add'} Component
+          </Text>
           {data && <CompInfo data={data} />}
         </DrawerHeader>
         <DrawerBody p={0}>
@@ -64,7 +66,7 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
                 <Tab
                   key={index}
                   textTransform={'capitalize'}
-                  _focus={{ outline: 'none', bg:'none' }}
+                  _focus={{ outline: 'none', bg: 'none' }}
                 >
                   {item}
                 </Tab>

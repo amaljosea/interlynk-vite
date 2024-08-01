@@ -28,7 +28,7 @@ import {
 } from 'graphQL/Mutation'
 import { GetRoles, GetUsers } from 'graphQL/Queries'
 
-const DeleteRole = ({ isOpen, onClose, activeRole, refetch }) => {
+const DeleteRole = ({ isOpen, onClose, activeRole }) => {
   const toast = useToast()
   const { orgView } = useGlobalQueryContext()
   const { name, id } = activeRole || ''
@@ -42,9 +42,7 @@ const DeleteRole = ({ isOpen, onClose, activeRole, refetch }) => {
   console.log('filterUsers', filterUsers)
 
   const [updateUserRole] = useMutation(OrganizationRoleBulkApply)
-  const [deleteRole] = useMutation(OrganizationRoleDelete, {
-    onCompleted: (data) => data && refetch()
-  })
+  const [deleteRole] = useMutation(OrganizationRoleDelete)
 
   const { data } = useQuery(GetRoles)
   const { organizationRoles } = data?.organization || ''

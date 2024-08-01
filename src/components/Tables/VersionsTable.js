@@ -145,9 +145,7 @@ const VersionsTable = ({
     childKey: 'archive_sbom'
   })
 
-  const [deleteSbom] = useMutation(sbomDelete, {
-    onCompleted: (data) => data && refetch({ id: productId })
-  })
+  const [deleteSbom] = useMutation(sbomDelete)
 
   const {
     isOpen: isToolOpen,

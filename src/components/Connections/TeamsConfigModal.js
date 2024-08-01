@@ -25,7 +25,6 @@ const TeamsConfigModal = ({
   onClose,
   data,
   setGreenCheck,
-  refetch,
   updateCon
 }) => {
   const toast = useToast()
@@ -52,7 +51,6 @@ const TeamsConfigModal = ({
     }).then((res) => {
       if (res?.data?.teamsConnectionCreate?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, teams: true }))
-        refetch()
         onClose()
         toast({
           title: 'Configuration saved.',
@@ -85,7 +83,6 @@ const TeamsConfigModal = ({
     }).then((res) => {
       if (res?.data?.teamsConnectionUpdate?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, teams: true }))
-        refetch()
         onClose()
         toast({
           title: 'Configuration saved.',
@@ -118,7 +115,6 @@ const TeamsConfigModal = ({
     }).then((res) => {
       if (res?.data?.teamsConnectionDelete?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, teams: false }))
-        refetch()
         onClose()
         toast({
           title: 'Configuration deleted.',

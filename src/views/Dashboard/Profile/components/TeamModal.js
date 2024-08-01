@@ -26,7 +26,7 @@ import {
 import { InviteUser } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
 
-const TeamModal = ({ isOpen, onClose, refetch, data, changeRole }) => {
+const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
   const toast = useToast()
   const [email, setEmail] = useState('')
   const [role, setRole] = useState(data?.role?.id)
@@ -34,9 +34,7 @@ const TeamModal = ({ isOpen, onClose, refetch, data, changeRole }) => {
 
   const { data: roles } = useQuery(GetRoles)
 
-  const [inviteUsers] = useMutation(InviteUser, {
-    onCompleted: () => refetch()
-  })
+  const [inviteUsers] = useMutation(InviteUser)
 
   const handleAdd = async () => {
     try {

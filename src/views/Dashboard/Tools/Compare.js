@@ -286,7 +286,12 @@ const Compare = ({ selectedSboms }) => {
       <Grid templateColumns='repeat(2, 1fr)' gap={6} color={textColor}>
         {/* SBOM ONE */}
         <GridItem w='100%'>
-          <Card border={`2px solid ${sbomOneBg}`} p={8} h='450px' overflowY='scroll'>
+          <Card
+            border={`2px solid ${sbomOneBg}`}
+            p={8}
+            h='450px'
+            overflowY='scroll'
+          >
             <Flex
               alignItems={'flex-start'}
               flexWrap={'wrap'}
@@ -425,7 +430,12 @@ const Compare = ({ selectedSboms }) => {
         </GridItem>
         {/* SBOM TWO */}
         <GridItem w='100%'>
-          <Card border={`2px solid ${sbomTwoBg}`} p={8} h='450px' overflowY='scroll'>
+          <Card
+            border={`2px solid ${sbomTwoBg}`}
+            p={8}
+            h='450px'
+            overflowY='scroll'
+          >
             <Flex alignItems={'flex-start'} justifyContent={'space-between'}>
               {secondSbomInfo ? (
                 <Stack>
