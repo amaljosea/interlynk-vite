@@ -27,6 +27,8 @@ import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 import Licenses from 'components/Licenses'
 import { SentryTest } from 'components/SentryTest.js'
 
+import usePageTracking from 'hooks/usePageTracking.js'
+
 import AdminLayout from './layouts/Admin.js'
 import AuthLayout from './layouts/Auth.js'
 import CustomerLayout from './layouts/Customer.js'
@@ -46,6 +48,8 @@ const MainWrapper = () => (
 )
 
 export const MainRoutes = () => {
+  usePageTracking()
+
   return (
     <Routes>
       <Route path={`/`} element={<MainWrapper />}>

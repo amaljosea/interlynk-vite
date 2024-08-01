@@ -20,8 +20,10 @@ import './main.css'
 const { hostname } = window.location
 
 const TRACKING_ID = '411749268'
+const isProduction = hostname === 'app.interlynk.io'
 const tagManagerArgs = { gtmId: 'G-VDPMCV382D' }
-hostname === 'app.interlynk.io' && ReactGA.initialize(TRACKING_ID)
+isProduction && ReactGA.initialize(TRACKING_ID)
+isProduction && ReactGA.pageview(location.pathname + location.search)
 hostname === 'app.interlynk.io' && TagManager.initialize(tagManagerArgs)
 
 Sentry.init({
