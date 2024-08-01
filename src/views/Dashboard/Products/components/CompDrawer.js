@@ -50,13 +50,13 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
           {data && <CompInfo data={data} />}
         </DrawerHeader>
         <DrawerBody p={0}>
-          <Tabs>
+          <Tabs isFitted>
             <TabList
               position={'fixed'}
               top={'88px'}
               bg={bgColor}
               zIndex={1}
-              pl={6}
+              px={6}
               left={0}
               right={0}
             >

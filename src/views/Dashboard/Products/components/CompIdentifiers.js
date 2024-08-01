@@ -311,7 +311,7 @@ const CompIdentifiers = (props) => {
           width={'fit-content'}
           hidden={purlOpen || cpeOpen}
           onClick={data ? handleUpdateCom : handleCreateCom}
-          isDisabled={disabled || (cpeValue === '' && purlValue === '')}
+          isDisabled={disabled}
         >
           Save
         </Button>
