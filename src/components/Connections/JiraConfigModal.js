@@ -19,6 +19,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  useColorModeValue,
   useToast
 } from '@chakra-ui/react'
 
@@ -217,6 +218,7 @@ const JiraConfigModal = ({
     isValuesChanged && jiraHost && jiraUsername && jiraApiToken
 
   const handleToggleVisibility = () => setShowApiToken(!showApiToken)
+  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
 
   return (
     <Modal
@@ -287,7 +289,7 @@ const JiraConfigModal = ({
               borderColor='gray.200'
               borderRadius='md'
               boxShadow='md'
-              bg='gray.50'
+              bg={bgColor}
             >
               <Text fontWeight='bold' mb={2}>
                 Verification Details:

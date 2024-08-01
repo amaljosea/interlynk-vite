@@ -18,6 +18,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  useColorModeValue,
   useToast
 } from '@chakra-ui/react'
 
@@ -87,6 +88,8 @@ const GithubConfigModal = ({
       })
     }, 3000)
   }
+
+  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
 
   const handleDelete = () => {}
 
@@ -159,7 +162,7 @@ const GithubConfigModal = ({
               borderColor='gray.200'
               borderRadius='md'
               boxShadow='md'
-              bg='gray.50'
+              bg={bgColor}
             >
               <Text fontWeight='bold' mb={2}>
                 Verification Details:
