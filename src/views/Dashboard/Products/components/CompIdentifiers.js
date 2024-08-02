@@ -198,7 +198,7 @@ const CompIdentifiers = (props) => {
   return (
     <Stack
       px={6}
-      pb={20}
+      pb={10}
       spacing={4}
       direction={'column'}
       height={cpeOpen ? '100%' : '80vh'}
@@ -215,8 +215,8 @@ const CompIdentifiers = (props) => {
         />
       )}
       <FormControl
+        hidden={purlOpen}
         isReadOnly={customerView}
-        hidden={purlOpen || cpeOpen}
         isInvalid={purlValue !== '' && !isPURLInputValid}
       >
         <FormLabel htmlFor='purl' fontSize={'sm'}>
@@ -266,7 +266,7 @@ const CompIdentifiers = (props) => {
           )}
         </Stack>
       </FormControl>
-      <Divider hidden={purlOpen || cpeOpen} />
+      <Divider />
       {/* CPE INPUT */}
       {cpeOpen && (
         <CpeInputs
@@ -278,7 +278,7 @@ const CompIdentifiers = (props) => {
           onClose={() => setCpeOpen(false)}
         />
       )}
-      <FormControl hidden={purlOpen || cpeOpen}>
+      <FormControl hidden={cpeOpen}>
         <Stack direction={'row'} width={'100%'} spacing={2}>
           <CpeField
             inputRef={cpeRef}
@@ -303,6 +303,7 @@ const CompIdentifiers = (props) => {
           )}
         </Stack>
       </FormControl>
+      <br />
       {/* ACTIONS */}
       <ActionWrapper hidden={cpeOpen || purlOpen}>
         <Button onClick={onClose}>Cancel</Button>

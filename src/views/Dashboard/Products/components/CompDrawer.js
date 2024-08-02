@@ -46,7 +46,7 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
       <DrawerContent>
         <DrawerCloseButton mt={3} />
         <DrawerHeader borderBottomWidth='1px'>
-          <Text mb={1} fontWeight={'normal'}>
+          <Text mb={1} fontWeight={'medium'}>
             {data ? 'Edit' : 'Add'} Component
           </Text>
           {data && <CompInfo data={data} />}
@@ -58,13 +58,13 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
               top={'88px'}
               bg={bgColor}
               zIndex={1}
-              px={6}
               left={0}
               right={0}
             >
               {tabs.map((item, index) => (
                 <Tab
                   key={index}
+                  fontSize={'sm'}
                   textTransform={'capitalize'}
                   _focus={{ outline: 'none', bg: 'none' }}
                 >

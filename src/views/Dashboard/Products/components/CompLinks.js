@@ -194,8 +194,8 @@ const CompLinks = ({ onClose, component, refetch }) => {
                       <Text>
                         {item.url ? (
                           <Tooltip label={item.url}>
-                            {item.url.length > 35
-                              ? `${item.url.substring(0, 35)}...`
+                            {item.url.length > 50
+                              ? `${item.url.substring(0, 50)}...`
                               : item.url}
                           </Tooltip>
                         ) : null}
@@ -204,7 +204,7 @@ const CompLinks = ({ onClose, component, refetch }) => {
                         {item.name}
                       </Text>
                     </Td>
-                    <Td pl={0} isNumeric>
+                    <Td px={0} isNumeric>
                       <IconButton
                         color={'red'}
                         variant='outline'
