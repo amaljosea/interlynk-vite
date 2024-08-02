@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -18,40 +18,32 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { RepeatIcon } from '@chakra-ui/icons'
 import {
-  Button,
   Flex,
   Grid,
   GridItem,
   IconButton,
-  ListItem,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Link as Olink,
   Portal,
-  Spinner,
   Stack,
   Tag,
   TagLabel,
   Text,
   Tooltip,
-  UnorderedList,
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import ArchivedVersions from 'components/Drawer/ArchivedVersions'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ToolsDrawer from 'components/Drawer/ToolsDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
+import ArchiveSbom from 'components/Modal/ArchiveSbom'
+import DeleteSbom from 'components/Modal/DeleteSbom'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -60,7 +52,6 @@ import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
-import { sbomDelete } from 'graphQL/Mutation'
 import {
   GetSbomAlternatives,
   GetShareSbomAlternatives,
@@ -69,6 +60,7 @@ import {
 } from 'graphQL/Queries'
 
 import {
+  FaBoxArchive,
   FaCodeCompare,
   FaEllipsisVertical,
   FaScrewdriverWrench
@@ -100,7 +92,6 @@ const VersionsTable = ({
     useProductUrlContext()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const [filterText, setFilterText] = useState(searchInput)
-  const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
 
   const currentDate = new Date()
@@ -135,6 +126,8 @@ const VersionsTable = ({
     }
   )
 
+  const activeNodes = nodes?.filter((item) => item?.lifecycle !== 'archived')
+
   const createSbom = useHasPermission({
     parentKey: 'view_sbom',
     childKey: 'update_sbom'
@@ -144,8 +137,6 @@ const VersionsTable = ({
     parentKey: 'view_sbom',
     childKey: 'archive_sbom'
   })
-
-  const [deleteSbom] = useMutation(sbomDelete)
 
   const {
     isOpen: isToolOpen,
@@ -158,6 +149,11 @@ const VersionsTable = ({
     onClose: onDeleteClose
   } = useDisclosure()
   const {
+    isOpen: isArchiveOpen,
+    onOpen: onArchiveOpen,
+    onClose: onArchiveClose
+  } = useDisclosure()
+  const {
     isOpen: isListOpen,
     onOpen: onListOpen,
     onClose: onListClose
@@ -166,6 +162,11 @@ const VersionsTable = ({
     isOpen: isSbomOpen,
     onOpen: onSbomOpen,
     onClose: onSbomClose
+  } = useDisclosure()
+  const {
+    isOpen: isArcOpen,
+    onOpen: onArcOpen,
+    onClose: onArcClose
   } = useDisclosure()
 
   const onFilterSev = async (value) => {
@@ -451,8 +452,14 @@ const VersionsTable = ({
             />
             <Portal>
               <MenuList fontSize={16}>
-                <MenuItem onClick={() => handleListSbom(row)}>
-                  List SBOM
+                <MenuItem
+                  isDisabled={!archiveSbom || signedUrlParams}
+                  onClick={() => {
+                    setActiveRow(row)
+                    onArchiveOpen()
+                  }}
+                >
+                  Archive
                 </MenuItem>
                 <MenuItem
                   onClick={() => {
@@ -463,6 +470,9 @@ const VersionsTable = ({
                 >
                   Delete
                 </MenuItem>
+                <MenuItem onClick={() => handleListSbom(row)}>
+                  List SBOM
+                </MenuItem>
               </MenuList>
             </Portal>
           </Menu>
@@ -471,25 +481,6 @@ const VersionsTable = ({
       right: 'true'
     }
   ]
-
-  const handleDelete = () => {
-    setIsLoading(true)
-    deleteSbom({
-      variables: {
-        id: activeRow.id
-      }
-    }).then((res) => {
-      const { errors } = res?.data?.sbomDelete || ''
-      if (errors?.length > 0) {
-        console.log(errors[0])
-      } else {
-        setIsLoading(false)
-        setClearSelect(true)
-        setSelectedSbom([])
-        onDeleteClose()
-      }
-    })
-  }
 
   // REFRESH PRODUCTS
   const handleRefresh = useCallback(async () => {
@@ -589,6 +580,16 @@ const VersionsTable = ({
               />
             </Tooltip>
           )}
+          {/* SHOW ARCHIVED VERSION */}
+          <Tooltip label='Show Archived Versions'>
+            <IconButton
+              isDisabled={!projectGroup?.enabled}
+              hidden={signedUrlParams}
+              colorScheme='blue'
+              onClick={onArcOpen}
+              icon={<FaBoxArchive />}
+            />
+          </Tooltip>
           {/* BUILD SBOM */}
           <Tooltip label='Build Version'>
             <IconButton
@@ -619,8 +620,9 @@ const VersionsTable = ({
     onToolOpen,
     isToolOpen,
     projectGroup?.enabled,
-    createSbom,
     signedUrlParams,
+    onArcOpen,
+    createSbom,
     onBuildSbom,
     handleRefresh
   ])
@@ -634,7 +636,7 @@ const VersionsTable = ({
 
   const dataTableProps = {
     columns: columns,
-    data: nodes || [],
+    data: activeNodes || [],
     customStyles: customStyles(headColor),
     onSort: handleSort,
     defaultSortFieldId: filters?.field,
@@ -660,51 +662,32 @@ const VersionsTable = ({
 
       {/* DELETE VERSION */}
       {isDeleteOpen && (
-        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Delete Version</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Tag py={1} colorScheme='blue' mb={3} wordBreak={'break-all'}>
-                {activeRow?.projectVersion}
-              </Tag>
-              <Text>Deleting this version will: </Text>
-              <UnorderedList>
-                <Flex flexDir={'column'} gap={1} mt={4}>
-                  {[
-                    'remove this versions and its SBOM',
-                    'remove access to this version for all users'
-                  ].map((item, index) => (
-                    <ListItem key={index}>{item}</ListItem>
-                  ))}
-                </Flex>
-              </UnorderedList>
-              <br />
-              <Text mt={10}>Are you sure you wish to continue?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Flex
-                width={'100%'}
-                alignItems={'center'}
-                justifyContent={'space-between'}
-                gap={4}
-              >
-                <Stack>{isLoading && <Spinner color='red.500' />}</Stack>
-                <Stack direction='row' alignItems='center' gap={1}>
-                  <Button onClick={onDeleteClose}>No</Button>
-                  <Button
-                    colorScheme='red'
-                    onClick={handleDelete}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Deleting...' : 'Yes'}
-                  </Button>
-                </Stack>
-              </Flex>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <DeleteSbom
+          data={activeRow}
+          refetch={refetch}
+          isOpen={isDeleteOpen}
+          onClose={onDeleteClose}
+        />
+      )}
+
+      {/* ARCHIVE VERSION */}
+      {isArchiveOpen && (
+        <ArchiveSbom
+          data={activeRow}
+          refetch={refetch}
+          isOpen={isArchiveOpen}
+          onClose={onArchiveClose}
+        />
+      )}
+
+      {/* ARCHIVE VERSION LIST */}
+      {isArcOpen && (
+        <ArchivedVersions
+          data={nodes}
+          refetch={refetch}
+          isOpen={isArcOpen}
+          onClose={onArcClose}
+        />
       )}
 
       {/* SBOM LIST */}

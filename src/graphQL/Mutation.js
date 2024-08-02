@@ -1234,6 +1234,7 @@ export const sbomUpdate = gql`
     $specVersion: String
     $format: String
     $licenses: LicenseInput
+    $archived: Boolean
     $generateUniqueId: Boolean
   ) {
     sbomUpdate(
@@ -1243,29 +1244,13 @@ export const sbomUpdate = gql`
         specVersion: $specVersion
         format: $format
         licenses: $licenses
+        archived: $archived
         generateUniqueId: $generateUniqueId
       }
     ) {
       errors
       sbom {
         id
-        authors {
-          name
-          email
-        }
-        creationAt
-        licensesExp
-        lifecycle
-        project {
-          name
-        }
-        spec
-        specVersion
-        tools {
-          name
-          version
-        }
-        updatedAt
       }
     }
   }

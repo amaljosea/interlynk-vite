@@ -1095,6 +1095,7 @@ export const GetVersionsTable = gql`
         }
         nodes {
           id
+          spec
           creationAt
           createdAt
           updatedAt

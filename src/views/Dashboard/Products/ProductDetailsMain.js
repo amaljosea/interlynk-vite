@@ -369,7 +369,7 @@ const ProductDetailsMain = () => {
               gap={10}
             >
               {/* PRODUCT INFORMATIONS */}
-              <GridItem colSpan={10}>
+              <GridItem colSpan={8}>
                 <Flex
                   direction={'row'}
                   alignItems={'flex-start'}
@@ -439,7 +439,7 @@ const ProductDetailsMain = () => {
                 </Flex>
               </GridItem>
               {/* PRODUCT ACTIONS */}
-              <GridItem colSpan={2}>
+              <GridItem colSpan={4}>
                 <Flex
                   direction={'row'}
                   gap={2}
