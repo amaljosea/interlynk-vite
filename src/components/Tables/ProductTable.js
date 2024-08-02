@@ -87,6 +87,7 @@ const ProductTable = ({
   const textColor = useColorModeValue('#000000', '#FFFFFF')
   const bgColor = useColorModeValue('#EDF2F7', '#4D698166')
   const grayColor = useColorModeValue('#616161BF', '#FFFFFF66')
+  const iconColor = useColorModeValue('blue.500', 'gray.50')
   const timeColor = useColorModeValue('#00000099', '#FFFFFF99')
   const borderColor = useColorModeValue('#3182CE66', '#3182CE99')
 
@@ -406,32 +407,23 @@ const ProductTable = ({
             my={3}
             gap={3}
             alignItems={'center'}
-            justifyContent={'center'}
-            templateColumns='repeat(7, 1fr)'
+            justifyContent={'flex-start'}
+            templateColumns='repeat(12, 1fr)'
             className={index === 0 ? 'product' : ''}
           >
-            <GridItem
-              colSpan={1}
-              width={'32px'}
-              hidden={!shouldShowDemoFeatures}
-            >
+            <GridItem colSpan={1} hidden={!shouldShowDemoFeatures}>
               <Tooltip label={getFormat(name)} placement='top'>
                 <Olink
                   href={getLink(name)}
                   isExternal={getLink(name) === '#' ? false : true}
                 >
-                  <IconBox
-                    h={'32px'}
-                    w={'32px'}
-                    color={'blue.500'}
-                    bg={bgColor}
-                  >
+                  <IconBox h={'32px'} w={'32px'} color={iconColor} bg={bgColor}>
                     {getType(name)}
                   </IconBox>
                 </Olink>
               </Tooltip>
             </GridItem>
-            <GridItem gap={1} colSpan={6}>
+            <GridItem gap={1} colSpan={11}>
               <Text
                 fontSize={14}
                 color={'blue.500'}
