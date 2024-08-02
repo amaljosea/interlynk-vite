@@ -33,20 +33,23 @@ import { developmentData } from './ProductProgressData'
 import { productionData } from './ProductProgressData'
 import Tree from './Tree'
 
-const LegendItem = ({ color, label }) => (
-  <Flex gap={2} alignItems={'center'}>
-    <Box height={'1.75px'} width={'40px'} backgroundColor={color} />
-    <Text fontSize={12} fontWeight={400} color={'#03030399'}>
-      {label}
-    </Text>
-  </Flex>
-)
+const LegendItem = ({ color, label }) => {
+  const textColor = useColorModeValue('#030303', '#FFFFFFCC')
+  return (
+    <Flex gap={2} alignItems={'center'}>
+      <Box height={'1.75px'} width={'40px'} backgroundColor={color} />
+      <Text fontSize={12} fontWeight={400} color={textColor}>
+        {label}
+      </Text>
+    </Flex>
+  )
+}
 
 const MenuHeading = ({ title, icon: Icon, onClick, active }) => {
   const grayBorder = useColorModeValue('#1A202C29', '#ffffff29')
   const grayText = useColorModeValue('#1A202C', '#60686f')
   const bgActive = useColorModeValue('#EDF2F7', '')
-  const iconColor = '#3182CE'
+  const iconColor = useColorModeValue('#3182CE', '#90cdf4')
 
   return (
     <MenuButton
@@ -82,12 +85,16 @@ const FilterMenu = ({ title, icon, value, onChange, options }) => {
   )
 }
 
-const ProductProgressModal = ({ isOpen, onClose }) => {
+const ProductProgressModal = ({ isOpen, onClose, name }) => {
   const [targetComponent, setTargetComponent] = useState('')
   const [targetVulnerability, setTargetVulnerability] = useState('')
-  const [env, setEnv] = useState('all')
+  const [env, setEnv] = useState([])
 
   const bgColor = useColorModeValue('#EDF2F7', '#4D698166')
+  const componentColor = useColorModeValue('#E53E3E', '#ff3c3c')
+  const vulnerabilityColor = useColorModeValue('#0D0CEE', '#009bff')
+  const strokeColor = useColorModeValue('#A0AEC0', '#A0AEC066')
+
   const allComponents = [
     ...new Set([
       ...getComponentNames(defaultData),
@@ -104,6 +111,21 @@ const ProductProgressModal = ({ isOpen, onClose }) => {
     ])
   ]
 
+  const onFilterEnv = (value) => {
+    if (value.includes('all')) {
+      setEnv([])
+      return
+    }
+    const allEnvs = ['default', 'development', 'production']
+    const selectedEnvs = new Set(value)
+
+    if (allEnvs.every((env) => selectedEnvs.has(env))) {
+      setEnv([])
+    } else {
+      setEnv([...selectedEnvs])
+    }
+  }
+
   const envIcon = (env) => {
     switch (env) {
       case 'default':
@@ -116,9 +138,21 @@ const ProductProgressModal = ({ isOpen, onClose }) => {
   }
 
   const renderTree = (data, envName) => {
-    if (env === 'all' || env === envName.toLowerCase()) {
+    const envColor = useColorModeValue('#1A202CCC', '#FFFFFF99')
+    const grayBorder = useColorModeValue('#1A202C29', '#ffffff12')
+
+    if (
+      env.length === 0 ||
+      env.includes('all') ||
+      env.includes(envName.toLowerCase())
+    ) {
       return (
-        <GridItem border={'0.6px solid #1A202C29'} borderRadius={4} padding={3}>
+        <Box
+          border={'0.6px solid'}
+          borderColor={grayBorder}
+          borderRadius={4}
+          padding={3}
+        >
           <Flex gap={2} alignItems={'center'}>
             <Flex
               h={'24px'}
@@ -131,7 +165,7 @@ const ProductProgressModal = ({ isOpen, onClose }) => {
             >
               {envIcon(envName)}
             </Flex>
-            <Text textTransform={'capitalize'} fontSize={14}>
+            <Text textTransform={'capitalize'} fontSize={14} color={envColor}>
               {envName}
             </Text>
           </Flex>
@@ -142,7 +176,7 @@ const ProductProgressModal = ({ isOpen, onClose }) => {
               targetVulnerability={targetVulnerability}
             />
           </Box>
-        </GridItem>
+        </Box>
       )
     }
     return null
@@ -155,9 +189,9 @@ const ProductProgressModal = ({ isOpen, onClose }) => {
         <ModalHeader>
           <Flex align='center' gap={2}>
             <Text fontSize={20} fontWeight={500}>
-              Product Progress
+              Product TrailLynk
             </Text>
-            <Tag>Product A</Tag>
+            <Tag>{`Product ${name}`}</Tag>
           </Flex>
         </ModalHeader>
         <Divider />
@@ -179,9 +213,6 @@ const ProductProgressModal = ({ isOpen, onClose }) => {
               options={allVulnerabilities}
             />
           </Flex>
-          <Menu>
-            <MenuHeading title='Last 30 days' icon={FaCalendar} />
-          </Menu>
         </Flex>
         <Divider />
         <ModalBody borderRadius={10} p={0}>
@@ -189,14 +220,15 @@ const ProductProgressModal = ({ isOpen, onClose }) => {
             <Menu>
               <MenuButton textTransform={'capitalize'}>
                 <Flex gap={2} alignItems={'center'}>
-                  {`Environment: ${env}`} <FaChevronDown />
+                  {`Environment: ${env.length === 0 ? 'All' : env.join(', ')}`}
+                  <FaChevronDown />
                 </Flex>
               </MenuButton>
               <MenuList>
                 <MenuOptionGroup
                   value={env}
-                  onChange={(value) => setEnv(value)}
-                  type='radio'
+                  onChange={onFilterEnv}
+                  type='checkbox'
                 >
                   {['all', 'default', 'development', 'production'].map(
                     (item, index) => (
@@ -214,26 +246,25 @@ const ProductProgressModal = ({ isOpen, onClose }) => {
               </MenuList>
             </Menu>
           </Flex>
-          <Grid
-            templateColumns='repeat(3, 1fr)'
+          <Flex
             gap={4}
             marginTop={10}
             minHeight={600}
-            p={5}
+            justifyContent={'space-evenly'}
           >
             {renderTree(defaultData, 'default')}
             {renderTree(developmentData, 'development')}
             {renderTree(productionData, 'production')}
-          </Grid>
+          </Flex>
         </ModalBody>
         <ModalFooter justifyContent={'flex-start'}>
           <Flex gap={12}>
-            <LegendItem color={'#A0AEC0'} label={'Path'} />
+            <LegendItem color={strokeColor} label={'Path'} />
             {targetComponent && (
-              <LegendItem color={'#E53E3E'} label={'Components'} />
+              <LegendItem color={componentColor} label={'Components'} />
             )}
             {targetVulnerability && (
-              <LegendItem color={'#0D0CEE'} label={'Vulnerability'} />
+              <LegendItem color={vulnerabilityColor} label={'Vulnerability'} />
             )}
           </Flex>
         </ModalFooter>

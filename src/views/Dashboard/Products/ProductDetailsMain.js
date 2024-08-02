@@ -620,6 +620,7 @@ const ProductDetailsMain = () => {
         <ProductProgressModal
           onClose={onCloseProductProgress}
           isOpen={isOpenProductProgress}
+          name={name}
         />
       )}
 

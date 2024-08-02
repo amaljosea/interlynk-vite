@@ -1,8 +1,16 @@
 import * as d3 from 'd3'
 import { useEffect, useRef } from 'react'
 
+import { useColorModeValue } from '@chakra-ui/system'
+
 const Tree = ({ data, targetComponent, targetVulnerability }) => {
   const svgRef = useRef()
+  const textColor = useColorModeValue('#030303', '#FFFFFFCC')
+  const vulnerabilityColor = useColorModeValue('#0D0CEE', '#009bff')
+  const componentColor = useColorModeValue('#E53E3E', '#ff3c3c')
+  const strokeColor = useColorModeValue('#A0AEC0', '#A0AEC066')
+  const nodeColor = useColorModeValue('#3182ce', '#009bff')
+  const whiteNodeColor = useColorModeValue('#FFFFFF', '#121212')
 
   useEffect(() => {
     function collapsibleIndent(
@@ -26,15 +34,15 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
       } = options
 
       let plus = {
-        shapeFill: '#3182CE',
-        shapeStroke: '#3182CE',
-        textFill: '#FFFFFF',
+        shapeFill: nodeColor,
+        shapeStroke: nodeColor,
+        textFill: whiteNodeColor,
         text: '+'
       }
       let minus = {
-        shapeFill: '#FFFFFF',
-        shapeStroke: '#3182CE',
-        textFill: '#3182CE',
+        shapeFill: whiteNodeColor,
+        shapeStroke: nodeColor,
+        textFill: nodeColor,
         text: '−'
       }
 
@@ -186,7 +194,7 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
                 : plus.shapeFill
               : 'none'
           )
-          .attr('stroke', (d) => (d._children ? '#3182CE' : 'none'))
+          .attr('stroke', (d) => (d._children ? nodeColor : 'none'))
           .attr('stroke-width', 0.9)
           .attr('rx', 1)
           .attr('ry', 1)
@@ -208,9 +216,9 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
           .attr('dy', '0.32em')
           .attr('font-size', '12px')
           .attr('fill', (d) => {
-            if (d.data.name === targetComponent) return '#E53E3E'
-            if (d.data.name === targetVulnerability) return '#0D0CEE'
-            return '#030303'
+            if (d.data.name === targetComponent) return componentColor
+            if (d.data.name === targetVulnerability) return vulnerabilityColor
+            return textColor
           })
           .attr('font-weight', (d) => {
             if (d.depth === 0) return '500'
@@ -265,9 +273,9 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
             pathsToTargets.some((path) => path.includes(d.target)) ||
             pathsToVulnerabilities.some((path) => path.includes(d.target))
               ? pathsToTargets.some((path) => path.includes(d.target))
-                ? '#E53E3E'
-                : '#0D0CEE'
-              : '#A0AEC0'
+                ? componentColor
+                : vulnerabilityColor
+              : strokeColor
           ) // stroke color for paths to targets and vulnerabilities
           .attr('stroke-width', (d) =>
             pathsToTargets.some((path) => path.includes(d.target)) ||
@@ -320,8 +328,8 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
           .attr('stroke-opacity', 1)
           .attr('stroke', (d) =>
             pathsToTargets.some((path) => path.includes(d.target))
-              ? '#E53E3E'
-              : '#0D0CEE'
+              ? componentColor
+              : vulnerabilityColor
           )
           .attr('stroke-width', '1.2px')
           .attr(
