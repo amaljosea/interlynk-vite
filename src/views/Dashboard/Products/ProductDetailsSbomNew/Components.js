@@ -601,12 +601,14 @@ const Components = ({ sbomData, sbomRefetch }) => {
                       Edit Component
                     </MenuItem>
                     <MenuItem
+                      hidden
                       onClick={() => onRelOpen(row)}
                       isDisabled={!updateComponent}
                     >
                       Edit Relationships
                     </MenuItem>
                     <MenuItem
+                      hidden
                       onClick={() => {
                         setActiveRow(row)
                         onSupOpen()
@@ -616,6 +618,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
                       {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
                     </MenuItem>
                     <MenuItem
+                      hidden
                       onClick={() => {
                         setActiveRow(row)
                         onLinkOpen()

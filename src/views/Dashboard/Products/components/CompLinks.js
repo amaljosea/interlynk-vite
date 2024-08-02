@@ -118,7 +118,7 @@ const CompLinks = ({ onClose, component, refetch }) => {
       >
         {/* HEADING */}
         <Text color={'gray.500'} fontWeight={'medium'}>
-          ADD LINK
+          Add Link
         </Text>
         {/* NAME */}
         <FormControl isRequired isInvalid={error}>
@@ -182,7 +182,7 @@ const CompLinks = ({ onClose, component, refetch }) => {
         <Divider my={2} pos={'relative'} left={0} right={0} />
         {/* TABLE */}
         <Flex width={'100%'} flexDir={'column'}>
-          <Text size='md' color={'gray.500'}>
+          <Text fontWeight={'medium'} color={'gray.500'}>
             Existing Links
           </Text>
           {linksData.length > 0 ? (
@@ -206,6 +206,7 @@ const CompLinks = ({ onClose, component, refetch }) => {
                     </Td>
                     <Td px={0} isNumeric>
                       <IconButton
+                        size='sm'
                         color={'red'}
                         variant='outline'
                         cursor={'pointer'}
