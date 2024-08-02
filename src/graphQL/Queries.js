@@ -4442,8 +4442,8 @@ export const GetSelectedUser = gql`
   }
 `
 
-export const GetConnections = gql`
-  query GetConnections {
+export const GetOrgConnections = gql`
+  query GetOrgConnections {
     organization {
       id
       name
@@ -4458,10 +4458,66 @@ export const GetConnections = gql`
               url
             }
             ... on SlackConnection {
-              url
+              configs {
+                address
+                notificationType
+                frequency
+              }
             }
             ... on TeamsConnection {
+              configs {
+                address
+                notificationType
+                frequency
+              }
+            }
+            ... on EmailConnection {
+              configs {
+                address
+                notificationType
+                frequency
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GetPersonalConnections = gql`
+  query GetPersonalConnections {
+    organizationUser {
+      id
+      connections {
+        nodes {
+          id
+          connection {
+            ... on JiraConnection {
+              userName
+              apiToken
               url
+            }
+            ... on SlackConnection {
+              configs {
+                address
+                notificationType
+                frequency
+              }
+            }
+            ... on TeamsConnection {
+              configs {
+                address
+                notificationType
+                frequency
+              }
+            }
+            ... on EmailConnection {
+              configs {
+                address
+                notificationType
+                frequency
+              }
             }
           }
         }

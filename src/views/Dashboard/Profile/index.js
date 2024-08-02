@@ -57,14 +57,14 @@ const orgTabs = [
   'checks',
   'lists',
   'legal',
-  'connections'
+  'connections-org'
 ]
 
 const psTabs = [
   'personal-details',
   'organizations',
   'security-tokens',
-  'notifications'
+  'connections'
 ]
 
 function Profile() {
@@ -194,7 +194,7 @@ function Profile() {
                   textTransform={'capitalize'}
                   _focus={{ outline: 'none' }}
                 >
-                  {item}
+                  {item.replace(/-org/g, '')}
                 </Tab>
               ))}
             </TabList>
@@ -228,7 +228,7 @@ function Profile() {
                 <LegalTable />
               </TabPanel>
               <TabPanel>
-                <Connections />
+                <Connections org={true}/>
               </TabPanel>
             </TabPanels>
           </Tabs>
@@ -277,9 +277,8 @@ function Profile() {
               <TabPanel>
                 <TokenInfo />
               </TabPanel>
-              {/* Notification Preferences */}
               <TabPanel>
-                <NotificationChannels />
+                <Connections/>
               </TabPanel>
             </TabPanels>
           </Tabs>

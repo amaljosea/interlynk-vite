@@ -67,7 +67,7 @@ import { ManualVulnScan } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
   GetCdxResponses,
-  GetConnections,
+  GetOrgConnections,
   GetDefaultJiraProduct,
   GetVulnData,
   GetVulnFilterData,
@@ -272,7 +272,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
-  const { data: configs } = useQuery(GetConnections, {
+  const { data: configs } = useQuery(GetOrgConnections, {
     fetchPolicy: 'network-only'
   })
 

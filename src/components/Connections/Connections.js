@@ -9,9 +9,9 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
-import { GetConnections } from 'graphQL/Queries'
+import { GetOrgConnections, GetPersonalConnections } from 'graphQL/Queries'
 
-import { FaGithub, FaJira, FaMicrosoft, FaSlack } from 'react-icons/fa'
+import { FaGithub, FaJira, FaMicrosoft, FaSlack, FaEnvelope } from 'react-icons/fa'
 
 import Card from '../Card/Card'
 import CardBody from '../Card/CardBody'
@@ -21,12 +21,13 @@ import GithubConfigModal from './GithubConfigModal'
 import JiraConfigModal from './JiraConfigModal'
 import SlackConfigModal from './SlackConfigModal'
 import TeamsConfigModal from './TeamsConfigModal'
+import EmailConfigModal from "./EmailConfigModal";
 
-const Connections = () => {
+const Connections = ({org}) => {
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
-  const { data, refetch } = useQuery(GetConnections, {
-    skip: !orgView ? true : activetab === 'connections' ? false : true
+  const { data, refetch } = useQuery(org ? GetOrgConnections : GetPersonalConnections, {
+    skip: !orgView ? true : (activetab === 'connections' || activetab === 'connections-org') ? false : true
   })
   const isGithubConfigSaved = useGithubConfigSaved()
 
@@ -55,6 +56,12 @@ const Connections = () => {
   } = useDisclosure()
 
   const {
+    isOpen: isEmailOpen,
+    onOpen: onEmailOpen,
+    onClose: onEmailClose
+  } = useDisclosure()
+
+  const {
     isOpen: isGithubOpen,
     onOpen: onGithubOpen,
     onClose: onGithubClose
@@ -69,9 +76,12 @@ const Connections = () => {
     github: false
   })
 
+  const [hostId, setHostId] = useState(null)
+
   const [jiraData, setJiraData] = useState(null)
-  const [slackData, setSlackData] = useState(null)
-  const [teamsData, setTeamsData] = useState(null)
+  const [slackData, setSlackData] = useState([])
+  const [teamsData, setTeamsData] = useState([])
+  const [emailData, setEmailData] = useState([])
   const [githubData, setGithubData] = useState(null)
 
   const handleConnectionData = (connections) => {
@@ -83,11 +93,15 @@ const Connections = () => {
           break
         case 'SlackConnection':
           setGreenCheck((prev) => ({ ...prev, slack: true }))
-          setSlackData(connection)
+          setSlackData((prev) => [...(prev || []), connection])
           break
         case 'TeamsConnection':
           setGreenCheck((prev) => ({ ...prev, teams: true }))
-          setTeamsData(connection)
+          setTeamsData((prev) => [...(prev || []), connection])
+          break
+        case 'EmailConnection':
+          setGreenCheck((prev) => ({ ...prev, email: true }))
+          setEmailData((prev) => [...(prev || []), connection])
           break
         case 'GithubConnection':
           setGreenCheck((prev) => ({ ...prev, github: true }))
@@ -103,9 +117,16 @@ const Connections = () => {
     setJiraData(null)
     setSlackData(null)
     setTeamsData(null)
+    setEmailData(null)
     setGithubData(null)
-    if (data?.organization?.connections?.nodes) {
-      handleConnectionData(data.organization.connections.nodes)
+
+    const hostId = org ? data?.organization?.id : data?.organizationUser?.id
+    setHostId(hostId)
+
+    const nodes = org ? data?.organization?.connections?.nodes : data?.organizationUser?.connections?.nodes
+
+    if (nodes) {
+      handleConnectionData(nodes)
     }
   }, [data])
 
@@ -120,18 +141,18 @@ const Connections = () => {
       <Card p={4}>
         <CardHeader p='12px 0' mb='12px'>
           <Text fontSize='xl' fontWeight='bold'>
-            Connected Accounts
+            Connected Accounts {org && '(Organization Level)'}
           </Text>
         </CardHeader>
         <CardBody px='5px'>
           <Wrap spacing='30px'>
-            <ConnectionCard
+            {org &&(<ConnectionCard
               icon={FaJira}
               name='Jira'
               onConfigure={onJiraOpen}
               isConnected={greenCheck.jira}
               color='#0070f3'
-            />
+            />)}
             <ConnectionCard
               icon={FaSlack}
               name='Slack'
@@ -146,7 +167,14 @@ const Connections = () => {
               isConnected={greenCheck.teams}
               color='#6264A7'
             />
-            {shouldShowDemoFeatures && (
+            <ConnectionCard
+              icon={FaEnvelope}
+              name='Email'
+              onConfigure={onEmailOpen}
+              isConnected={greenCheck.email}
+              color='#FF4500'
+            />
+            {org && shouldShowDemoFeatures && (
               <ConnectionCard
                 icon={FaGithub}
                 name='Github'
@@ -162,6 +190,7 @@ const Connections = () => {
 
       {isJiraOpen && (
         <JiraConfigModal
+          org={org}
           data={jiraData}
           isOpen={isJiraOpen}
           onClose={onJiraClose}
@@ -171,24 +200,41 @@ const Connections = () => {
       )}
       {isSlackOpen && (
         <SlackConfigModal
+          org={org}
           data={slackData}
           isOpen={isSlackOpen}
           updateCon={updateCon}
           onClose={onSlackClose}
           setGreenCheck={setGreenCheck}
+          hostId={hostId}
         />
       )}
       {isTeamsOpen && (
         <TeamsConfigModal
+          org={org}
           data={teamsData}
           isOpen={isTeamsOpen}
           updateCon={updateCon}
           onClose={onTeamsClose}
           setGreenCheck={setGreenCheck}
+          hostId={hostId}
+        />
+      )}
+      {isEmailOpen && (
+        <EmailConfigModal
+          org={org}
+          data={emailData}
+          refetch={refetch}
+          isOpen={isEmailOpen}
+          updateCon={updateCon}
+          onClose={onEmailClose}
+          setGreenCheck={setGreenCheck}
+          hostId={hostId}
         />
       )}
       {isGithubOpen && (
         <GithubConfigModal
+          org={org}
           isOpen={isGithubOpen}
           onClose={onGithubClose}
           data={githubData}

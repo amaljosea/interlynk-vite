@@ -15,7 +15,7 @@ import {
 
 import { UpdateNotificationPreference } from 'graphQL/Mutation'
 import {
-  GetConnections,
+  GetOrgConnections,
   GetUserNotificationChannels,
   GetUserNotificationPreferences
 } from 'graphQL/Queries'
@@ -35,7 +35,7 @@ const NotificationMenuBell = () => {
     }
   })
   const [getChannelsInfo] = useLazyQuery(GetUserNotificationChannels)
-  const [getConnections] = useLazyQuery(GetConnections)
+  const [getOrgConnections] = useLazyQuery(GetOrgConnections)
 
   useEffect(() => {
     if (data) {
@@ -65,7 +65,7 @@ const NotificationMenuBell = () => {
       setPreference(newPreference)
       let enabledChannelCount = 0
 
-      Promise.all([getChannelsInfo(), getConnections()]).then((values) => {
+      Promise.all([getChannelsInfo(), getOrgConnections()]).then((values) => {
         const channelsData = values[0].data.notificationChannels
         const connectionsData = values[1].data.organization.connections.nodes
 

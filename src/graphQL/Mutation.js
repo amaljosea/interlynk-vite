@@ -2739,99 +2739,85 @@ export const CreateJiraIssue = gql`
 `
 
 export const CreateSlackConnection = gql`
-  mutation CreateSlackConnection($url: String!) {
-    slackConnectionCreate(input: { url: $url }) {
-      organizationConnection {
-        id
-        enabled
-        connection {
-          ... on SlackConnection {
-            url
-          }
-        }
-      }
+  mutation CreateSlackConnection($configs: [ConnectionConfigInput!]!, $org: Boolean!) {
+    slackConnectionCreate(input: { configs: $configs, org: $org }) {
       errors
     }
   }
 `
 
 export const UpdateSlackConnection = gql`
-  mutation UpdateSlackConnection($id: ID!, $url: String, $enabled: Boolean) {
+  mutation UpdateSlackConnection($id: ID!, $configs: [ConnectionConfigInput!]!, $org: Boolean!) {
     slackConnectionUpdate(
-      input: { url: $url, organizationConnectionId: $id, enabled: $enabled }
+      input: { configs: $configs, org: $org, hostId: $id}
     ) {
-      organizationConnection {
-        id
-        enabled
-        connection {
-          ... on SlackConnection {
-            url
-          }
-        }
-      }
       errors
     }
   }
 `
 
 export const DeleteSlackConnection = gql`
-  mutation DeleteSlackConnection($organizationConnectionId: ID!) {
+  mutation DeleteSlackConnection($id: ID!, $org: Boolean!) {
     slackConnectionDelete(
-      input: { organizationConnectionId: $organizationConnectionId }
+      input: { hostId: $id, org: $org }
     ) {
       errors
-      organizationConnection {
-        id
-      }
     }
   }
 `
 
 export const CreateTeamsConnection = gql`
-  mutation CreateTeamsConnection($url: String!) {
-    teamsConnectionCreate(input: { url: $url }) {
-      organizationConnection {
-        id
-        enabled
-        connection {
-          ... on TeamsConnection {
-            url
-          }
-        }
-      }
+  mutation CreateTeamsConnection($configs: [ConnectionConfigInput!]!, $org: Boolean!) {
+    teamsConnectionCreate(input: { configs: $configs, org: $org }) {
       errors
     }
   }
 `
 
 export const UpdateTeamsConnection = gql`
-  mutation UpdateTeamsConnection($id: ID!, $url: String, $enabled: Boolean) {
+  mutation UpdateTeamsConnection($id: ID!, $configs: [ConnectionConfigInput!]!, $org: Boolean!) {
     teamsConnectionUpdate(
-      input: { url: $url, organizationConnectionId: $id, enabled: $enabled }
+      input: { configs: $configs, org: $org, hostId: $id}
     ) {
-      organizationConnection {
-        id
-        enabled
-        connection {
-          ... on TeamsConnection {
-            url
-          }
-        }
-      }
       errors
     }
   }
 `
 
 export const DeleteTeamsConnection = gql`
-  mutation DeleteTeamsConnection($organizationConnectionId: ID!) {
+  mutation DeleteTeamsConnection($id: ID!, $org: Boolean!) {
     teamsConnectionDelete(
-      input: { organizationConnectionId: $organizationConnectionId }
+      input: { hostId: $id, org: $org }
     ) {
       errors
-      organizationConnection {
-        id
-      }
+    }
+  }
+`
+
+export const CreateEmailConnection = gql`
+  mutation CreateEmailConnection($configs: [ConnectionConfigInput!]!, $org: Boolean!) {
+    emailConnectionCreate(input: { configs: $configs, org: $org }) {
+      errors
+    }
+  }
+`
+
+export const UpdateEmailConnection = gql`
+  mutation UpdateEmailConnection($id: ID!, $configs: [ConnectionConfigInput!]!, $org: Boolean!) {
+    emailConnectionUpdate(
+      input: { configs: $configs, org: $org, hostId: $id}
+    ) {
+      errors
+    }
+  }
+`
+
+export const DeleteEmailConnection = gql`
+  mutation DeleteEmailConnection($id: ID!, $org: Boolean!) {
+    emailConnectionDelete(
+      input: { hostId: $id, org: $org }
+    ) {
+      errors
     }
   }
 `
