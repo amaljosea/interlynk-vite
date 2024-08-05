@@ -5,11 +5,13 @@ import {
   KBarPositioner,
   KBarResults,
   KBarSearch,
+  useKBar,
   useMatches,
   useRegisterActions
 } from 'kbar'
 import { Fragment, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { settingActions } from 'variables/general'
 
 import { SearchIcon } from '@chakra-ui/icons'
@@ -26,9 +28,17 @@ import { FaRegWindowMaximize } from 'react-icons/fa'
 import { FaRegFile, FaScrewdriverWrench } from 'react-icons/fa6'
 
 const Kbar = () => {
+  const [searchQuery, setSearchQuery] = useState('')
+
   // hooks
+  const { query } = useKBar((state) => ({
+    query: state.query,
+    disabled: state.disabled
+  }))
   const { results, rootActionId } = useMatches()
   const navigate = useNavigate()
+  const location = useLocation()
+  const params = useParams()
   const {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
@@ -59,6 +69,65 @@ const Kbar = () => {
     onChangeEnv(env?.name)
   }
 
+  // Function to disabled KBAR
+  const kBarDisabledTrue = () => {
+    query.disable(true)
+  }
+
+  // Function to enable KBAR
+  const kBarDisabledFalse = () => {
+    query.disable(false)
+  }
+
+  //Function to clean up after executing the '..' shortcut
+  const executeNavigationCleanup = () => {
+    setSearchQuery('')
+    kBarDisabledTrue()
+    setTimeout(() => {
+      kBarDisabledFalse()
+    }, 100)
+  }
+
+  //Effect to run code when the search input is ".."
+  //The function strictly takes user back a level for the products details and product version page. For all other pages, it navigates back to the previous URL
+  useEffect(() => {
+    if (searchQuery.trim() === '..') {
+      const isProductVersionPage = location.pathname.includes('version')
+
+      const isProductDetailsPage =
+        location.pathname.includes('products') &&
+        location.pathname.includes('env')
+
+      const isProductsPage = location.pathname === '/vendor/products'
+
+      if (isProductVersionPage) {
+        const link = generateProductDetailPageUrlFromCurrentUrl({
+          productgroupid: params.productgroupid,
+          productid: params.productid
+        })
+        navigate(link)
+        executeNavigationCleanup()
+      } else if (isProductDetailsPage) {
+        const link = '/vendor/products'
+        navigate(link)
+        executeNavigationCleanup()
+      } else if (isProductsPage) {
+        const link = '/vendor/dashboard'
+        navigate(link)
+        executeNavigationCleanup()
+      } else {
+        navigate(-1)
+        executeNavigationCleanup()
+      }
+    }
+  }, [searchQuery])
+
+  //Input capture to check if the input is '..'
+  const handleInputChange = (event) => {
+    const { value } = event.target
+    setSearchQuery(value)
+  }
+
   let data = []
   if (productData?.organization?.projectGroups?.nodes?.length > 0) {
     productData.organization.projectGroups.nodes.forEach((item) => {
@@ -74,6 +143,7 @@ const Kbar = () => {
             productgroupid: item?.id,
             productid: envProject?.id
           })
+
           navigate(link)
         }
       })
@@ -189,10 +259,15 @@ const Kbar = () => {
             {/* search icon */}
             <SearchIcon color={'gray.500'} />
             {/* search input */}
-            <KBarSearch className='kbar_search' />
+            <KBarSearch
+              onChange={handleInputChange}
+              value={searchQuery}
+              className='kbar_search'
+            />
           </div>
           <div className='kbar_result_container'>
             {/* search results */}
+
             {results && results?.length !== 0 && (
               <div className='kbar_result_body'>
                 <KBarResults
