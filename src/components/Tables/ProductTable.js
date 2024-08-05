@@ -5,6 +5,7 @@ import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
 import { customStyles, getFormat, getLink, getType } from 'utils'
+import { hexToRGBA } from 'utils'
 import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
@@ -36,6 +37,7 @@ import {
   Portal,
   Stack,
   Switch,
+  Tag,
   Text,
   Tooltip,
   UnorderedList,
@@ -403,27 +405,23 @@ const ProductTable = ({
           navigate(link)
         }
         return (
-          <Grid
+          <Flex
             my={3}
             gap={3}
             alignItems={'center'}
-            justifyContent={'flex-start'}
-            templateColumns='repeat(12, 1fr)'
             className={index === 0 ? 'product' : ''}
           >
-            <GridItem colSpan={1} hidden={!shouldShowDemoFeatures}>
-              <Tooltip label={getFormat(name)} placement='top'>
-                <Olink
-                  href={getLink(name)}
-                  isExternal={getLink(name) === '#' ? false : true}
-                >
-                  <IconBox h={'32px'} w={'32px'} color={iconColor} bg={bgColor}>
-                    {getType(name)}
-                  </IconBox>
-                </Olink>
-              </Tooltip>
-            </GridItem>
-            <GridItem gap={1} colSpan={11}>
+            <Tooltip label={getFormat(name)} placement='top'>
+              <Olink
+                href={getLink(name)}
+                isExternal={getLink(name) === '#' ? false : true}
+              >
+                <IconBox h={'32px'} w={'32px'} color={iconColor} bg={bgColor}>
+                  {getType(name)}
+                </IconBox>
+              </Olink>
+            </Tooltip>
+            <Flex flexWrap={'wrap'} flexDirection={'column'}>
               <Text
                 fontSize={14}
                 color={'blue.500'}
@@ -431,20 +429,41 @@ const ProductTable = ({
                 width={'fit-content'}
                 onClick={handleClick}
               >
-                {name?.length > 20 ? `${name?.substring(0, 20)}...` : name}
+                {name}
               </Text>
-              <Text color={grayColor}>
-                {description?.length > 50
-                  ? description.substring(0, 50) + '....'
-                  : description}
-              </Text>
-            </GridItem>
-          </Grid>
+              <Text color={grayColor}>{description}</Text>
+            </Flex>
+          </Flex>
         )
       },
-      width: '50%',
+      width: '30%',
       wrap: true,
       sortable: true
+    },
+    // LABELS
+    {
+      id: 'PROJECT_GROUPS_LABELS',
+      name: 'TAG',
+      selector: (row) => {
+        const { labels } = row
+        return (
+          <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
+            {labels?.map((item) => (
+              <Tag
+                my={3}
+                py={1}
+                size='sm'
+                key={item?.id}
+                width={'fit-content'}
+                borderColor={item?.color}
+                bg={hexToRGBA(item?.color, 0.5)}
+              >
+                {item?.name}
+              </Tag>
+            ))}
+          </Flex>
+        )
+      }
     },
     // UPDATEDAT
     {

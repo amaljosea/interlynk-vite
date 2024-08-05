@@ -405,6 +405,11 @@ export const GetProductTable = gql`
         nodes {
           id
           name
+          labels {
+            id
+            name
+            color
+          }
           enabled
           sbomsCount
           defaultProject {
@@ -4761,15 +4766,20 @@ export const OrgUserInvitationInfo = gql`
 // LABEL
 
 export const GetLabels = gql`
-  query GetLabels {
-    labels {
+  query GetLabels($first: Int, $last: Int, $after: String, $before: String) {
+    labels(first: $first, last: $last, after: $after, before: $before) {
       totalCount
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
       nodes {
         color
         createdAt
         id
         name
-        organizationId
         updatedAt
       }
     }

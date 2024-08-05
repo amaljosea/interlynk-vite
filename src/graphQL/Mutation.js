@@ -298,9 +298,15 @@ export const CreateProjectGroup = gql`
     $name: String!
     $desc: String
     $enabled: Boolean
+    $labelsAttributes: [AddOrRemoveInput!]
   ) {
     projectGroupCreate(
-      input: { name: $name, description: $desc, enabled: $enabled }
+      input: {
+        name: $name
+        description: $desc
+        enabled: $enabled
+        labelsAttributes: $labelsAttributes
+      }
     ) {
       projectGroup {
         id
@@ -324,9 +330,16 @@ export const UpdateProjectGroup = gql`
     $name: String
     $desc: String
     $enabled: Boolean
+    $labelsAttributes: [AddOrRemoveInput!]
   ) {
     projectGroupUpdate(
-      input: { id: $id, name: $name, description: $desc, enabled: $enabled }
+      input: {
+        id: $id
+        name: $name
+        description: $desc
+        enabled: $enabled
+        labelsAttributes: $labelsAttributes
+      }
     ) {
       projectGroup {
         id
@@ -2724,7 +2737,10 @@ export const CreateJiraIssue = gql`
 `
 
 export const CreateSlackConnection = gql`
-  mutation CreateSlackConnection($configs: [ConnectionConfigInput!]!, $org: Boolean!) {
+  mutation CreateSlackConnection(
+    $configs: [ConnectionConfigInput!]!
+    $org: Boolean!
+  ) {
     slackConnectionCreate(input: { configs: $configs, org: $org }) {
       errors
     }
@@ -2732,9 +2748,13 @@ export const CreateSlackConnection = gql`
 `
 
 export const UpdateSlackConnection = gql`
-  mutation UpdateSlackConnection($id: ID!, $configs: [ConnectionConfigInput!]!, $org: Boolean!) {
+  mutation UpdateSlackConnection(
+    $id: ID!
+    $configs: [ConnectionConfigInput!]!
+    $org: Boolean!
+  ) {
     slackConnectionUpdate(
-      input: { configs: $configs, org: $org, hostId: $id}
+      input: { configs: $configs, org: $org, hostId: $id }
     ) {
       errors
     }
@@ -2743,16 +2763,17 @@ export const UpdateSlackConnection = gql`
 
 export const DeleteSlackConnection = gql`
   mutation DeleteSlackConnection($id: ID!, $org: Boolean!) {
-    slackConnectionDelete(
-      input: { hostId: $id, org: $org }
-    ) {
+    slackConnectionDelete(input: { hostId: $id, org: $org }) {
       errors
     }
   }
 `
 
 export const CreateTeamsConnection = gql`
-  mutation CreateTeamsConnection($configs: [ConnectionConfigInput!]!, $org: Boolean!) {
+  mutation CreateTeamsConnection(
+    $configs: [ConnectionConfigInput!]!
+    $org: Boolean!
+  ) {
     teamsConnectionCreate(input: { configs: $configs, org: $org }) {
       errors
     }
@@ -2760,9 +2781,13 @@ export const CreateTeamsConnection = gql`
 `
 
 export const UpdateTeamsConnection = gql`
-  mutation UpdateTeamsConnection($id: ID!, $configs: [ConnectionConfigInput!]!, $org: Boolean!) {
+  mutation UpdateTeamsConnection(
+    $id: ID!
+    $configs: [ConnectionConfigInput!]!
+    $org: Boolean!
+  ) {
     teamsConnectionUpdate(
-      input: { configs: $configs, org: $org, hostId: $id}
+      input: { configs: $configs, org: $org, hostId: $id }
     ) {
       errors
     }
@@ -2771,16 +2796,17 @@ export const UpdateTeamsConnection = gql`
 
 export const DeleteTeamsConnection = gql`
   mutation DeleteTeamsConnection($id: ID!, $org: Boolean!) {
-    teamsConnectionDelete(
-      input: { hostId: $id, org: $org }
-    ) {
+    teamsConnectionDelete(input: { hostId: $id, org: $org }) {
       errors
     }
   }
 `
 
 export const CreateEmailConnection = gql`
-  mutation CreateEmailConnection($configs: [ConnectionConfigInput!]!, $org: Boolean!) {
+  mutation CreateEmailConnection(
+    $configs: [ConnectionConfigInput!]!
+    $org: Boolean!
+  ) {
     emailConnectionCreate(input: { configs: $configs, org: $org }) {
       errors
     }
@@ -2788,9 +2814,13 @@ export const CreateEmailConnection = gql`
 `
 
 export const UpdateEmailConnection = gql`
-  mutation UpdateEmailConnection($id: ID!, $configs: [ConnectionConfigInput!]!, $org: Boolean!) {
+  mutation UpdateEmailConnection(
+    $id: ID!
+    $configs: [ConnectionConfigInput!]!
+    $org: Boolean!
+  ) {
     emailConnectionUpdate(
-      input: { configs: $configs, org: $org, hostId: $id}
+      input: { configs: $configs, org: $org, hostId: $id }
     ) {
       errors
     }
@@ -2799,9 +2829,7 @@ export const UpdateEmailConnection = gql`
 
 export const DeleteEmailConnection = gql`
   mutation DeleteEmailConnection($id: ID!, $org: Boolean!) {
-    emailConnectionDelete(
-      input: { hostId: $id, org: $org }
-    ) {
+    emailConnectionDelete(input: { hostId: $id, org: $org }) {
       errors
     }
   }

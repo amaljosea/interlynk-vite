@@ -1,8 +1,7 @@
-import { useMutation } from '@apollo/client'
-import { useState } from 'react'
+import { useMutation, useQuery } from '@apollo/client'
+import { useEffect, useState } from 'react'
 import { components } from 'react-select'
 import { errorMapping } from 'utils/errorUtils'
-import { labels } from 'variables/general'
 
 import {
   Alert,
@@ -27,21 +26,45 @@ import {
 import LynkSelect from 'components/LynkSelect'
 
 import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
+import { GetLabels } from 'graphQL/Queries'
 
 const ProductModal = ({ isOpen, onClose, data }) => {
-  const { id, name, description } = data || ''
+  const { id, name, description, labels: activeLabels } = data || ''
   const [projectGroupCreate] = useMutation(CreateProjectGroup)
   const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
+
+  const { data: prodLabels } = useQuery(GetLabels, {
+    skip: isOpen ? false : true
+  })
+  const { labels } = prodLabels || ''
+
+  const options = []
+  labels?.nodes?.map((item) =>
+    options.push({
+      label: item?.name,
+      value: item?.id
+    })
+  )
 
   const [productName, setProductName] = useState(name || '')
   const [productDesc, setProductDesc] = useState(description || '')
   const [productLabels, setProductLabels] = useState([])
   const [error, setError] = useState('')
 
+  const labelsAttributes = []
+  if (productLabels?.length > 0) {
+    productLabels?.map((item) => labelsAttributes?.push({ id: item?.value }))
+  }
+
   const updateProduct = async (e) => {
     e.preventDefault()
     await projectGroupUpdate({
-      variables: { id: id, name: productName, desc: productDesc }
+      variables: {
+        id: id,
+        name: productName,
+        desc: productDesc,
+        labelsAttributes
+      }
     }).then((res) => {
       const error = res?.data?.projectGroupUpdate?.errors
       if (error?.length > 0) {
@@ -55,7 +78,12 @@ const ProductModal = ({ isOpen, onClose, data }) => {
   const handleSave = async (e) => {
     e.preventDefault()
     await projectGroupCreate({
-      variables: { name: productName, desc: productDesc, enabled: true }
+      variables: {
+        name: productName,
+        desc: productDesc,
+        labelsAttributes,
+        enabled: true
+      }
     }).then((res) => {
       const error = res?.data?.projectGroupCreate?.errors
       if (error?.length > 0) {
@@ -75,16 +103,10 @@ const ProductModal = ({ isOpen, onClose, data }) => {
     setError('')
   }
 
-  const options = []
-  labels?.map((item) =>
-    options.push({
-      label: item?.name,
-      value: item?.id
-    })
-  )
-
   const Option = (props) => {
-    const result = labels?.find((item) => item?.name === props.data.label)
+    const result = labels?.nodes?.find(
+      (item) => item?.name === props.data.label
+    )
     return (
       <components.Option {...props}>
         <Flex alignItems={'center'} gap={2}>
@@ -96,6 +118,16 @@ const ProductModal = ({ isOpen, onClose, data }) => {
   }
 
   const isInvalid = productName === '' || error !== ''
+
+  useEffect(() => {
+    if (activeLabels?.length > 0) {
+      const result = []
+      activeLabels?.map((item) =>
+        result?.push({ label: item?.name, value: item?.id })
+      )
+      setProductLabels(result)
+    }
+  }, [activeLabels])
 
   return (
     <>
@@ -122,7 +154,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
                     placeholder={`Add product name`}
                   />
                 </FormControl>
-                <FormControl display={'none'}>
+                <FormControl>
                   <FormLabel>Labels</FormLabel>
                   <LynkSelect
                     isMulti
