@@ -18,6 +18,7 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { RepeatIcon } from '@chakra-ui/icons'
 import {
+  Divider,
   Flex,
   Grid,
   GridItem,
@@ -132,7 +133,6 @@ const VersionsTable = ({
     parentKey: 'view_sbom',
     childKey: 'update_sbom'
   })
-
   const archiveSbom = useHasPermission({
     parentKey: 'view_sbom',
     childKey: 'archive_sbom'
@@ -452,6 +452,10 @@ const VersionsTable = ({
             />
             <Portal>
               <MenuList fontSize={16}>
+                <MenuItem onClick={() => handleListSbom(row)}>
+                  List SBOM
+                </MenuItem>
+                <Divider />
                 <MenuItem
                   isDisabled={!archiveSbom || signedUrlParams}
                   onClick={() => {
@@ -462,6 +466,7 @@ const VersionsTable = ({
                   Archive
                 </MenuItem>
                 <MenuItem
+                  color={'red.500'}
                   onClick={() => {
                     setActiveRow(row)
                     onDeleteOpen()
@@ -469,9 +474,6 @@ const VersionsTable = ({
                   isDisabled={!archiveSbom || signedUrlParams}
                 >
                   Delete
-                </MenuItem>
-                <MenuItem onClick={() => handleListSbom(row)}>
-                  List SBOM
                 </MenuItem>
               </MenuList>
             </Portal>

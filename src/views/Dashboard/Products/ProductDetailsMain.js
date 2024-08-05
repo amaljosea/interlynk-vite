@@ -65,10 +65,10 @@ import { FaBug, FaRobot, FaTag } from 'react-icons/fa'
 import {
   FaBoxArchive,
   FaDiagramProject,
-  FaExclamation,
   FaPenToSquare,
   FaToggleOff,
   FaToggleOn,
+  FaTrash,
   FaUpload,
   FaWindowMaximize
 } from 'react-icons/fa6'
@@ -493,7 +493,7 @@ const ProductDetailsMain = () => {
                     <IconButton
                       colorScheme='red'
                       onClick={onDeleteOpen}
-                      icon={<FaBoxArchive />}
+                      icon={<FaTrash />}
                       isDisabled={!archiveProduct || signedUrlParams}
                     />
                   </Tooltip>
