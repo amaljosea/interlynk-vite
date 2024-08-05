@@ -3,8 +3,7 @@ import { MainRoutes } from 'MainRoutes.js'
 import { ApolloWrapper } from 'context/ApolloWrapper.js'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ReactGA from 'react-ga'
-import TagManager from 'react-gtm-module'
+import ReactGA from 'react-ga4'
 import { BrowserRouter } from 'react-router-dom'
 import theme from 'theme/theme.js'
 
@@ -20,11 +19,7 @@ import './main.css'
 const { hostname } = window.location
 
 const TRACKING_ID = '411749268'
-const isProduction = hostname === 'app.interlynk.io'
-const tagManagerArgs = { gtmId: 'G-VDPMCV382D' }
-isProduction && ReactGA.initialize(TRACKING_ID)
-isProduction && ReactGA.pageview(location.pathname + location.search)
-hostname === 'app.interlynk.io' && TagManager.initialize(tagManagerArgs)
+hostname === 'app.interlynk.io' && ReactGA.initialize(TRACKING_ID)
 
 Sentry.init({
   environment: window.location.hostname,

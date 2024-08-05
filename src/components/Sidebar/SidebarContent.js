@@ -1,4 +1,5 @@
 import InterlynkLogo from 'assets/img/logo.png'
+import ReactGA from 'react-ga4'
 import { Link, useLocation } from 'react-router-dom'
 
 import {
@@ -12,7 +13,6 @@ import {
 import IconBox from 'components/Icons/IconBox'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 
-import useAnalyticsEventTracker from 'hooks/useAnalyticsEventTracker'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 
 const SidebarContent = ({ routes }) => {
@@ -25,7 +25,9 @@ const SidebarContent = ({ routes }) => {
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
 
-  const gaEventTracker = useAnalyticsEventTracker('Interlynk Dashboard')
+  const handleClick = (prop) => {
+    ReactGA.send({ hitType: 'pageview', page: prop.path, title: prop.name })
+  }
 
   const filterRoutes =
     activeUser === 'sp@interlynk.io' ||
@@ -49,18 +51,18 @@ const SidebarContent = ({ routes }) => {
 
   const createLinks = (routes) => {
     return routes.map((prop) => {
-      const isActive = activeRoute(prop.layout + prop.path) === 'active'
-
+      const { name, path, layout, icon } = prop || ''
+      const isActive = activeRoute(layout + path) === 'active'
       return (
-        <Tooltip key={prop.name} label={prop.name} placement='right'>
+        <Tooltip key={name} label={name} placement='right'>
           <Link
-            className={dashboardView ? prop.name.toLowerCase() : ''}
+            className={dashboardView ? name.toLowerCase() : ''}
             to={
-              prop.path === '/settings'
-                ? `${prop.layout}${prop.path}?tab=${!orgView ? 'organization' : 'general'}`
-                : prop.layout + prop.path
+              path === '/settings'
+                ? `${layout}${path}?tab=${!orgView ? 'organization' : 'general'}`
+                : layout + path
             }
-            onClick={() => gaEventTracker(prop.name)}
+            onClick={() => handleClick(prop)}
           >
             <IconBox
               h={'40px'}
@@ -68,7 +70,7 @@ const SidebarContent = ({ routes }) => {
               color={isActive ? 'white' : 'blue.500'}
               bg={isActive ? activeBg : inActiveBg}
             >
-              {prop.icon}
+              {icon}
             </IconBox>
           </Link>
         </Tooltip>
