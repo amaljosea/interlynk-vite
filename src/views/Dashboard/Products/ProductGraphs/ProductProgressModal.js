@@ -4,25 +4,29 @@ import {
   Box,
   Button,
   Divider,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   Flex,
   Grid,
   GridItem,
+  IconButton,
   Menu,
   MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Tag,
   Text,
   useColorModeValue
 } from '@chakra-ui/react'
+
+import { ZoomInIcon } from 'components/Icons/Icons'
+import { ZoomOutIcon } from 'components/Icons/Icons'
 
 import { FaCalendar, FaFilter } from 'react-icons/fa'
 import { FaChevronDown } from 'react-icons/fa6'
@@ -69,13 +73,23 @@ const MenuHeading = ({ title, icon: Icon, onClick, active }) => {
 }
 
 const FilterMenu = ({ title, icon, value, onChange, options }) => {
+  const handleChange = (selected) => {
+    onChange(value === selected ? '' : selected)
+  }
+
   return (
     <Menu>
       <MenuHeading title={title} icon={icon} active={!!value} />
       <MenuList>
-        <MenuOptionGroup value={value} onChange={onChange} type='radio'>
+        <MenuOptionGroup value={value} onChange={handleChange} type='radio'>
           {options.map((item, index) => (
-            <MenuItemOption key={index} value={item} fontSize='sm'>
+            <MenuItemOption
+              key={index}
+              value={item}
+              fontSize='sm'
+              isChecked={value === item}
+              onClick={() => handleChange(item)}
+            >
               {item}
             </MenuItemOption>
           ))}
@@ -83,6 +97,12 @@ const FilterMenu = ({ title, icon, value, onChange, options }) => {
       </MenuList>
     </Menu>
   )
+}
+
+const customDrawerStyle = {
+  width: '960px',
+  maxWidth: '960px',
+  margin: 'auto'
 }
 
 const ProductProgressModal = ({ isOpen, onClose, name }) => {
@@ -183,19 +203,19 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size='6xl'>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>
+    <Drawer isOpen={isOpen} onClose={onClose} size='xl'>
+      <DrawerOverlay />
+      <DrawerContent style={customDrawerStyle}>
+        <DrawerHeader>
           <Flex align='center' gap={2}>
             <Text fontSize={20} fontWeight={500}>
               Product TrailLynk
             </Text>
             <Tag>{`Product ${name}`}</Tag>
           </Flex>
-        </ModalHeader>
+        </DrawerHeader>
         <Divider />
-        <ModalCloseButton />
+        <DrawerCloseButton />
         <Flex m={5} justifyContent={'space-between'} alignItems={'center'}>
           <Flex gap={4}>
             <FilterMenu
@@ -215,61 +235,79 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
           </Flex>
         </Flex>
         <Divider />
-        <ModalBody borderRadius={10} p={0}>
-          <Flex m={5} justifyContent={'space-between'} alignItems={'center'}>
-            <Menu>
-              <MenuButton textTransform={'capitalize'}>
-                <Flex gap={2} alignItems={'center'}>
-                  {`Environment: ${env.length === 0 ? 'All' : env.join(', ')}`}
-                  <FaChevronDown />
-                </Flex>
-              </MenuButton>
-              <MenuList>
-                <MenuOptionGroup
-                  value={env}
-                  onChange={onFilterEnv}
-                  type='checkbox'
-                >
-                  {['all', 'default', 'development', 'production'].map(
-                    (item, index) => (
-                      <MenuItemOption
-                        key={index}
-                        value={item}
-                        fontSize='sm'
-                        textTransform={'capitalize'}
-                      >
-                        {item}
-                      </MenuItemOption>
-                    )
-                  )}
-                </MenuOptionGroup>
-              </MenuList>
-            </Menu>
+        <Flex m={5} justifyContent={'space-between'} alignItems={'center'}>
+          <Menu>
+            <MenuButton textTransform={'capitalize'}>
+              <Flex gap={2} alignItems={'center'}>
+                {`Environment: ${env}`} <FaChevronDown />
+              </Flex>
+            </MenuButton>
+            <MenuList>
+              <MenuOptionGroup
+                value={env}
+                onChange={(value) => setEnv(value)}
+                type='radio'
+              >
+                {['all', 'default', 'development', 'production'].map(
+                  (item, index) => (
+                    <MenuItemOption
+                      key={index}
+                      value={item}
+                      fontSize='sm'
+                      textTransform={'capitalize'}
+                    >
+                      {item}
+                    </MenuItemOption>
+                  )
+                )}
+              </MenuOptionGroup>
+            </MenuList>
+          </Menu>
+          <Flex gap={3}>
+            <IconButton
+              icon={<ZoomOutIcon color={'#60686F'} />}
+              onClick={() => {}}
+              size='md'
+              colorScheme='gray'
+              variant='outline'
+              fontSize='24px'
+            />
+            <IconButton
+              icon={<ZoomInIcon color={'#60686F'} />}
+              onClick={() => {}}
+              size='md'
+              colorScheme='gray'
+              variant='outline'
+              fontSize='24px'
+            />
           </Flex>
-          <Flex
+        </Flex>
+        <DrawerBody borderRadius={10} p={0}>
+          <Grid
+            templateColumns='repeat(3, 1fr)'
             gap={4}
             marginTop={10}
             minHeight={600}
-            justifyContent={'space-evenly'}
+            p={5}
           >
             {renderTree(defaultData, 'default')}
             {renderTree(developmentData, 'development')}
             {renderTree(productionData, 'production')}
-          </Flex>
-        </ModalBody>
-        <ModalFooter justifyContent={'flex-start'}>
+          </Grid>
+        </DrawerBody>
+        <DrawerFooter justifyContent={'flex-start'}>
           <Flex gap={12}>
-            <LegendItem color={strokeColor} label={'Path'} />
+            <LegendItem color={'#A0AEC0'} label={'Path'} />
             {targetComponent && (
-              <LegendItem color={componentColor} label={'Components'} />
+              <LegendItem color={'#E53E3E'} label={'Components'} />
             )}
             {targetVulnerability && (
-              <LegendItem color={vulnerabilityColor} label={'Vulnerability'} />
+              <LegendItem color={'#0D0CEE'} label={'Vulnerability'} />
             )}
           </Flex>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   )
 }
 
