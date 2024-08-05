@@ -401,7 +401,6 @@ const ProductTable = ({
               tab: 'versions'
             }
           })
-
           navigate(link)
         }
         return (
