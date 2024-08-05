@@ -3,22 +3,20 @@ import { PackageURL } from 'packageurl-js'
 import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { validateCpe } from 'utils'
-import { infoData } from 'variables/general'
 
-import { CheckIcon, InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
+import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Button,
   Divider,
   Flex,
   FormControl,
   FormLabel,
-  IconButton,
+  Icon,
   Input,
   InputGroup,
   InputRightElement,
   Stack,
   Text,
-  Tooltip,
   useToast
 } from '@chakra-ui/react'
 
@@ -31,7 +29,7 @@ import { CreateComponent } from 'graphQL/Mutation'
 import { UpdateComponent } from 'graphQL/Mutation'
 import { CpeAutoComplete } from 'graphQL/Queries'
 
-import { FaExpandAlt } from 'react-icons/fa'
+import { FaChevronDown, FaChevronRight } from 'react-icons/fa6'
 
 import CpeInputs from './CpeInputs'
 import PurlInputs from './PurlInputs'
@@ -77,10 +75,10 @@ const CompIdentifiers = (props) => {
     }, 3000)
   }
 
-  const onCheck = (title) => {
-    const result = infoData.find((item) => item?.title === title)
-    return result?.desc
-  }
+  // const onCheck = (title) => {
+  //   const result = infoData.find((item) => item?.title === title)
+  //   return result?.desc
+  // }
 
   const handlePURLInputChange = (e) => {
     const { value } = e.target
@@ -220,51 +218,39 @@ const CompIdentifiers = (props) => {
         isInvalid={purlValue !== '' && !isPURLInputValid}
       >
         <FormLabel htmlFor='purl' fontSize={'sm'}>
-          <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-            <Text>Identifiers</Text>
-            <Tooltip label={onCheck(`Component Identifiers`)}>
-              <InfoIcon color={'blue.500'} />
-            </Tooltip>
+          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+            <Icon
+              cursor={'pointer'}
+              onClick={handlePurlModal}
+              display={customerView ? 'none' : 'flex'}
+              as={purlOpen ? FaChevronDown : FaChevronRight}
+            />
+            <Text>Package URL {`(PURL)`}</Text>
           </Flex>
         </FormLabel>
-        <Stack direction={'row'} spacing={2}>
-          <InputGroup>
-            <Input
-              type='text'
-              size='md'
-              id='purl'
-              name='purl'
-              fontSize={'sm'}
-              placeholder='PURL'
-              value={purlValue}
-              autoComplete='off'
-              onChange={handlePURLInputChange}
-              onBlur={purlInputBlur}
-            />
-            <InputRightElement align='center' zIndex={-1}>
-              {purlValue != null && purlValue !== '' ? (
-                isPURLInputValid ? (
-                  <CheckIcon color='green' />
-                ) : (
-                  <WarningTwoIcon color='red' />
-                )
-              ) : null}
-            </InputRightElement>
-          </InputGroup>
-          {!customerView && (
-            <IconButton
-              icon={<FaExpandAlt />}
-              size='md'
-              fontWeight={'normal'}
-              variant='solid'
-              colorScheme='blue'
-              width={'fit-content'}
-              onClick={handlePurlModal}
-            >
-              Details
-            </IconButton>
-          )}
-        </Stack>
+        <InputGroup>
+          <Input
+            type='text'
+            size='md'
+            id='purl'
+            name='purl'
+            fontSize={'sm'}
+            placeholder='PURL'
+            value={purlValue}
+            autoComplete='off'
+            onChange={handlePURLInputChange}
+            onBlur={purlInputBlur}
+          />
+          <InputRightElement align='center' zIndex={-1}>
+            {purlValue != null && purlValue !== '' ? (
+              isPURLInputValid ? (
+                <CheckIcon color='green' />
+              ) : (
+                <WarningTwoIcon color='red' />
+              )
+            ) : null}
+          </InputRightElement>
+        </InputGroup>
       </FormControl>
       <Divider />
       {/* CPE INPUT */}
@@ -279,29 +265,25 @@ const CompIdentifiers = (props) => {
         />
       )}
       <FormControl hidden={cpeOpen}>
-        <Stack direction={'row'} width={'100%'} spacing={2}>
-          <CpeField
-            inputRef={cpeRef}
-            inputValue={cpeValue}
-            setInputValue={setCpeValue}
-            cpeList={cpeData}
-            setCpeList={setCpeData}
-            onChange={handleCpeChange}
-          />
-          {!customerView && (
-            <IconButton
-              icon={<FaExpandAlt />}
-              size='md'
-              fontWeight={'normal'}
-              variant='solid'
-              colorScheme='blue'
-              width={'fit-content'}
+        <FormLabel htmlFor='cpe' fontSize={'sm'}>
+          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+            <Icon
+              cursor={'pointer'}
               onClick={() => setCpeOpen(true)}
-            >
-              Details
-            </IconButton>
-          )}
-        </Stack>
+              display={customerView ? 'none' : 'flex'}
+              as={purlOpen ? FaChevronDown : FaChevronRight}
+            />
+            <Text>CPE</Text>
+          </Flex>
+        </FormLabel>
+        <CpeField
+          inputRef={cpeRef}
+          inputValue={cpeValue}
+          setInputValue={setCpeValue}
+          cpeList={cpeData}
+          setCpeList={setCpeData}
+          onChange={handleCpeChange}
+        />
       </FormControl>
       <br />
       {/* ACTIONS */}

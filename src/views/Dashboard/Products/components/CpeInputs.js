@@ -6,15 +6,19 @@ import {
   FormControl,
   FormLabel,
   Grid,
+  Icon,
   Input,
   Select,
   Stack,
+  Text,
   Textarea
 } from '@chakra-ui/react'
 
 import CpeInput from 'components/CpeInput'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+
+import { FaChevronDown } from 'react-icons/fa6'
 
 const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
   const { component } = activeRow || ''
@@ -279,21 +283,22 @@ const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
   }, [cpeValue, prodCompDispatch])
 
   return (
-    <Flex width={'100%'} direction={'column'} gap={4}>
+    <Flex width={'100%'} direction={'column'} gap={3}>
       {/* CPE STRING */}
       <FormControl>
-        <FormLabel htmlFor='cpeString'>CPE String</FormLabel>
+        <FormLabel htmlFor='cpe'>
+          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+            <Icon cursor={'pointer'} onClick={onClose} as={FaChevronDown} />
+            <Text>CPE</Text>
+          </Flex>
+        </FormLabel>
         <Textarea
           type='text'
-          variant='outline'
-          name='cpeString'
-          id='cpeString'
-          mt={1.5}
-          value={cpeString}
+          isReadOnly
+          variant='filled'
           fontSize='16px'
           fontStyle={'bold'}
-          onChange={(e) => console.log(e.target.value)}
-          disabled
+          defaultValue={cpeString}
         />
       </FormControl>
       <Grid templateColumns='repeat(1, 1fr)' gap={6}>

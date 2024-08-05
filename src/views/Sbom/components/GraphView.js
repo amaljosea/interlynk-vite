@@ -22,7 +22,7 @@ import { GetShareCompDependency } from 'graphQL/Queries'
 
 import { BiZoomIn, BiZoomOut } from 'react-icons/bi'
 
-const containerStyles = { width: '100vw', height: '60vh' }
+const containerStyles = { width: '100vw', height: '80vh' }
 
 export const useCenteredTree = (defaultTranslate = { x: 0, y: 0 }) => {
   const [translate, setTranslate] = useState(defaultTranslate)
@@ -90,8 +90,8 @@ const GraphView = ({ data, activeComp }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const [treeView, setTreeView] = useState(null)
-  const [zoom, setZoom] = useState(Number(1))
-  const position = { x: 100, y: 250 }
+  const [zoom, setZoom] = useState(Number(0.6))
+  const position = { x: 20, y: 250 }
   const [containerRef] = useCenteredTree()
 
   const nodeSize = { x: 1000, y: 500 }
@@ -155,29 +155,32 @@ const GraphView = ({ data, activeComp }) => {
   }, [compDependency, signedUrlParams])
 
   return (
-    <Card overflow='hidden'>
-      <CardHeader mb={6}>
-        <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
-          <Flex alignItems={'center'} gap={2}>
-            <Tooltip label='Zoom In'>
-              <IconButton
-                colorScheme='blue'
-                onClick={handleZoomIn}
-                isDisabled={zoom > 0.8}
-                icon={<BiZoomIn size={20} />}
-              />
-            </Tooltip>
-            <Tooltip label='Zoom Out'>
-              <IconButton
-                colorScheme='blue'
-                onClick={handleZoomOut}
-                isDisabled={zoom < 0.2}
-                icon={<BiZoomOut size={20} />}
-              />
-            </Tooltip>
-          </Flex>
-        </Flex>
-      </CardHeader>
+    <Flex flexDir={'column'} gap={6} overflow='hidden'>
+      <Flex
+        gap={2}
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'flex-end'}
+      >
+        <Tooltip label='Zoom In'>
+          <IconButton
+            size='sm'
+            variant='outline'
+            onClick={handleZoomIn}
+            isDisabled={zoom > 0.8}
+            icon={<BiZoomIn size={20} />}
+          />
+        </Tooltip>
+        <Tooltip label='Zoom Out'>
+          <IconButton
+            size='sm'
+            variant='outline'
+            onClick={handleZoomOut}
+            isDisabled={zoom < 0.2}
+            icon={<BiZoomOut size={20} />}
+          />
+        </Tooltip>
+      </Flex>
       {data?.nodes?.length === 0 && !compDependency ? (
         <Alert>No relationship found</Alert>
       ) : (
@@ -203,7 +206,7 @@ const GraphView = ({ data, activeComp }) => {
           )}
         </Box>
       )}
-    </Card>
+    </Flex>
   )
 }
 

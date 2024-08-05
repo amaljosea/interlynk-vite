@@ -7,14 +7,18 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Icon,
   Input,
   Select,
+  Text,
   Textarea
 } from '@chakra-ui/react'
 
 import CpeInput from 'components/CpeInput'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+
+import { FaChevronDown } from 'react-icons/fa6'
 
 const PurlInputs = ({
   data,
@@ -500,21 +504,22 @@ const PurlInputs = ({
   }, [purl, setPurlValue])
 
   return (
-    <Flex width={'100%'} direction={'column'} gap={4}>
+    <Flex width={'100%'} direction={'column'} gap={3}>
       {/* Package URL */}
       <FormControl>
-        <FormLabel>Package URL</FormLabel>
+        <FormLabel>
+          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+            <Icon cursor={'pointer'} onClick={onClose} as={FaChevronDown} />
+            <Text>Package URL {`(PURL)`}</Text>
+          </Flex>
+        </FormLabel>
         <Textarea
           type='text'
+          isReadOnly
           variant='filled'
-          mt={1.5}
-          value={purlString}
           fontSize='16px'
           fontStyle={'bold'}
-          isInvalid
-          errorBorderColor='blue.600'
-          onChange={(e) => console.log(e.target.value)}
-          disabled
+          defaultValue={purlString}
         />
       </FormControl>
       {/* Type */}

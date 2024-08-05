@@ -9,16 +9,16 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerOverlay,
-  Flex,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
-  Tag,
   Text,
   useColorModeValue
 } from '@chakra-ui/react'
+
+import CompInfo from 'components/Misc/CompInfo'
 
 import { GetComponentPath } from 'graphQL/Queries'
 
@@ -27,21 +27,6 @@ import CompIdentifiers from './CompIdentifiers'
 import CompLinks from './CompLinks'
 import CompRelations from './CompRelations'
 import CompSupplier from './CompSupplier'
-
-const CompInfo = ({ data }) => {
-  const { name, version } = data || ''
-
-  return (
-    <Flex width={'90%'} columnGap={2} flexWrap={'wrap'} alignContent={'center'}>
-      <Text fontSize='sm' fontWeight={'normal'} wordBreak={'break-all'}>
-        {name}
-      </Text>
-      <Tag size='sm' colorScheme='blue'>
-        {version}
-      </Tag>
-    </Flex>
-  )
-}
 
 const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
   const params = useParams()
