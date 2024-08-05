@@ -11,24 +11,37 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetOrgConnections, GetPersonalConnections } from 'graphQL/Queries'
 
-import { FaGithub, FaJira, FaMicrosoft, FaSlack, FaEnvelope } from 'react-icons/fa'
+import {
+  FaEnvelope,
+  FaGithub,
+  FaJira,
+  FaMicrosoft,
+  FaSlack
+} from 'react-icons/fa'
 
 import Card from '../Card/Card'
 import CardBody from '../Card/CardBody'
 import CardHeader from '../Card/CardHeader'
 import ConnectionCard from './ConnectionCard'
+import EmailConfigModal from './EmailConfigModal'
 import GithubConfigModal from './GithubConfigModal'
 import JiraConfigModal from './JiraConfigModal'
 import SlackConfigModal from './SlackConfigModal'
 import TeamsConfigModal from './TeamsConfigModal'
-import EmailConfigModal from "./EmailConfigModal";
 
-const Connections = ({org}) => {
+const Connections = ({ org }) => {
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
-  const { data, refetch } = useQuery(org ? GetOrgConnections : GetPersonalConnections, {
-    skip: !orgView ? true : (activetab === 'connections' || activetab === 'connections-org') ? false : true
-  })
+  const { data, refetch } = useQuery(
+    org ? GetOrgConnections : GetPersonalConnections,
+    {
+      skip: !orgView
+        ? true
+        : activetab === 'connections' || activetab === 'connections-org'
+          ? false
+          : true
+    }
+  )
   const isGithubConfigSaved = useGithubConfigSaved()
 
   const iconColor = useColorModeValue('#24292f', '#f1f1f1')
@@ -123,7 +136,9 @@ const Connections = ({org}) => {
     const hostId = org ? data?.organization?.id : data?.organizationUser?.id
     setHostId(hostId)
 
-    const nodes = org ? data?.organization?.connections?.nodes : data?.organizationUser?.connections?.nodes
+    const nodes = org
+      ? data?.organization?.connections?.nodes
+      : data?.organizationUser?.connections?.nodes
 
     if (nodes) {
       handleConnectionData(nodes)
@@ -138,21 +153,23 @@ const Connections = ({org}) => {
 
   return (
     <>
-      <Card p={4}>
+      <Card p={0}>
         <CardHeader p='12px 0' mb='12px'>
-          <Text fontSize='xl' fontWeight='bold'>
+          <Text fontSize='lg' fontWeight='bold'>
             Connected Accounts {org && '(Organization Level)'}
           </Text>
         </CardHeader>
         <CardBody px='5px'>
-          <Wrap spacing='30px'>
-            {org &&(<ConnectionCard
-              icon={FaJira}
-              name='Jira'
-              onConfigure={onJiraOpen}
-              isConnected={greenCheck.jira}
-              color='#0070f3'
-            />)}
+          <Wrap spacing={4}>
+            {org && (
+              <ConnectionCard
+                icon={FaJira}
+                name='Jira'
+                onConfigure={onJiraOpen}
+                isConnected={greenCheck.jira}
+                color='#0070f3'
+              />
+            )}
             <ConnectionCard
               icon={FaSlack}
               name='Slack'
@@ -198,6 +215,7 @@ const Connections = ({org}) => {
           setGreenCheck={setGreenCheck}
         />
       )}
+
       {isSlackOpen && (
         <SlackConfigModal
           org={org}
@@ -209,6 +227,7 @@ const Connections = ({org}) => {
           hostId={hostId}
         />
       )}
+
       {isTeamsOpen && (
         <TeamsConfigModal
           org={org}
@@ -220,6 +239,7 @@ const Connections = ({org}) => {
           hostId={hostId}
         />
       )}
+
       {isEmailOpen && (
         <EmailConfigModal
           org={org}
@@ -232,6 +252,7 @@ const Connections = ({org}) => {
           hostId={hostId}
         />
       )}
+      
       {isGithubOpen && (
         <GithubConfigModal
           org={org}

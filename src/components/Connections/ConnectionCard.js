@@ -1,5 +1,5 @@
 import { CheckIcon } from '@chakra-ui/icons'
-import { Button, Flex, Text } from '@chakra-ui/react'
+import { Button, Flex, Text, useColorModeValue } from '@chakra-ui/react'
 
 import Card from '../Card/Card'
 
@@ -10,6 +10,7 @@ const ConnectionCard = ({
   isConnected,
   color
 }) => {
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   return (
     <Card
       height='200px'
@@ -17,18 +18,16 @@ const ConnectionCard = ({
       borderWidth='1px'
       borderRadius='lg'
       overflow='hidden'
-      boxShadow='lg'
-      _hover={{ boxShadow: 'xl' }}
       position='relative'
     >
       <Flex align='center' justify='center' direction='column' p={4}>
         <Icon size='40px' color={color} />
         <Text
+          pt='20px'
           noOfLines={1}
           fontSize='lg'
-          color='gray.600'
           fontWeight='500'
-          pt='20px'
+          color={textColor}
         >
           {name}
         </Text>
