@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Flex } from '@chakra-ui/react'
+import { SimpleGrid } from '@chakra-ui/react'
 
 import { DurationSelect } from './Selects/DurationSelect'
 import { EnvironmentSelect } from './Selects/EnvironmentSelect'
@@ -17,14 +15,13 @@ export const Filters = ({ filters, setFilters }) => {
   }
 
   return (
-    <Flex width='100%'>
+    <SimpleGrid width='100%' columns={4} gap={5} alignItems='center'>
       <EnvironmentSelect
         value={filters.env}
         onChange={(value) => {
           changeFilter('env', value)
         }}
       />
-
       <ProductSelect
         value={filters.product}
         onChange={(value) => {
@@ -44,6 +41,6 @@ export const Filters = ({ filters, setFilters }) => {
           changeFilter('duration', value)
         }}
       />
-    </Flex>
+    </SimpleGrid>
   )
 }
