@@ -63,7 +63,6 @@ import {
 
 import { FaBug, FaRobot, FaTag } from 'react-icons/fa'
 import {
-  FaBoxArchive,
   FaDiagramProject,
   FaPenToSquare,
   FaToggleOff,

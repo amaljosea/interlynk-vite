@@ -16,22 +16,36 @@ import {
   Text,
   Tooltip,
   useColorModeValue,
-  useDisclosure
+  useDisclosure,
+  useToast
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 
-import { GetArchivedVersions } from 'graphQL/Queries'
+import { GetArchivedVersions, GetVersions } from 'graphQL/Queries'
 
 import { MdOutlineUnarchive } from 'react-icons/md'
 
 const ArchivedVersions = ({ isOpen, onClose }) => {
+  const toast = useToast()
   const params = useParams()
   const productId = params?.productid
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const [activeRow, setActiveRow] = useState(null)
+
+  const { data: versions } = useQuery(GetVersions, {
+    skip: isOpen ? false : true,
+    variables: {
+      id: productId,
+      first: 100,
+      direction: 'DESC',
+      field: 'SBOMS_CREATED_AT'
+    }
+  })
+
+  const { nodes } = versions?.project?.sbomVersions || ''
 
   const { data, loading } = useQuery(GetArchivedVersions, {
     skip: isOpen ? false : true,
@@ -47,8 +61,21 @@ const ArchivedVersions = ({ isOpen, onClose }) => {
   } = useDisclosure()
 
   const onRestore = (row) => {
-    setActiveRow(row)
-    onWarnOpen()
+    const isExists = nodes?.some(
+      (item) => item?.projectVersion === row?.projectVersion
+    )
+    if (isExists) {
+      toast({
+        position: 'top',
+        status: 'info',
+        title: 'Restore Version',
+        description:
+          'An existing version with same value found. Please delete previous version to restore this one.'
+      })
+    } else {
+      setActiveRow(row)
+      onWarnOpen()
+    }
   }
 
   const columns = [

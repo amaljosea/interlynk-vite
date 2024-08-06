@@ -1118,6 +1118,28 @@ export const GetVersionsTable = gql`
   }
 `
 
+// GET SBOM VERSION NAME
+export const GetVersions = gql`
+  query GetVersions(
+    $id: Uuid!
+    $first: Int
+    $field: SbomOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    project(id: $id) {
+      id
+      sbomVersions(
+        first: $first
+        orderBy: { direction: $direction, field: $field }
+      ) {
+        nodes {
+          projectVersion
+        }
+      }
+    }
+  }
+`
+
 // GET ARCHIVED VERSIONS
 export const GetArchivedVersions = gql`
   query GetArchivedVersions($id: Uuid!) {
