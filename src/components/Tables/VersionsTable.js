@@ -353,7 +353,13 @@ const VersionsTable = ({
           }
         })
         return (
-          <Flex my={2} gap={1} alignItems={'center'} fontWeight={'medium'}>
+          <Flex
+            my={2}
+            gap={1}
+            flexWrap={'wrap'}
+            alignItems={'center'}
+            fontWeight={'medium'}
+          >
             <Link to={link} onClick={() => onFilterSev(['critical'])}>
               <VulnBadge color='red' label='Critical' status={vulnRunStatus}>
                 {stats?.vulnStats?.critical || 0}
