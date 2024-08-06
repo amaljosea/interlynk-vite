@@ -20,6 +20,8 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { FaChevronDown } from 'react-icons/fa6'
 
+import IdentifierLabel from './IdentifierLabel'
+
 const PurlInputs = ({
   data,
   onClose,
@@ -504,22 +506,17 @@ const PurlInputs = ({
   }, [purl, setPurlValue])
 
   return (
-    <Flex width={'100%'} direction={'column'} gap={3}>
+    <Flex width={'100%'} direction={'column'} gap={4}>
       {/* Package URL */}
       <FormControl>
-        <FormLabel>
-          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-            <Icon cursor={'pointer'} onClick={onClose} as={FaChevronDown} />
-            <Text>Package URL {`(PURL)`}</Text>
-          </Flex>
-        </FormLabel>
+        <IdentifierLabel title={`Package URL (PURL)`} onClose={onClose} />
         <Textarea
           type='text'
           isReadOnly
+          fontSize='sm'
           variant='filled'
-          fontSize='16px'
-          fontStyle={'bold'}
-          defaultValue={purlString}
+          value={purlString}
+          onChange={(e) => console.log(e.target.value)}
         />
       </FormControl>
       {/* Type */}
@@ -660,10 +657,11 @@ const PurlInputs = ({
         />
       </FormControl>
       <Flex alignItems={'center'} justifyContent={'flex-end'} gap={2}>
-        <Button onClick={onClose} variant='ghost'>
+        <Button fontSize={'sm'} onClick={onClose} variant='ghost'>
           Close
         </Button>
         <Button
+          fontSize={'sm'}
           variant='outline'
           colorScheme='blue'
           onClick={handleSave}

@@ -20,6 +20,8 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { FaChevronDown } from 'react-icons/fa6'
 
+import IdentifierLabel from './IdentifierLabel'
+
 const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
   const { component } = activeRow || ''
   const { cpes } = component || ''
@@ -283,25 +285,20 @@ const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
   }, [cpeValue, prodCompDispatch])
 
   return (
-    <Flex width={'100%'} direction={'column'} gap={3}>
+    <Flex width={'100%'} direction={'column'} gap={4}>
       {/* CPE STRING */}
       <FormControl>
-        <FormLabel htmlFor='cpe'>
-          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-            <Icon cursor={'pointer'} onClick={onClose} as={FaChevronDown} />
-            <Text>CPE</Text>
-          </Flex>
-        </FormLabel>
+        <IdentifierLabel title={`CPE`} onClose={onClose} />
         <Textarea
           type='text'
           isReadOnly
+          fontSize='sm'
           variant='filled'
-          fontSize='16px'
-          fontStyle={'bold'}
-          defaultValue={cpeString}
+          value={cpeString}
+          onChange={(e) => console.log(e.target.value)}
         />
       </FormControl>
-      <Grid templateColumns='repeat(1, 1fr)' gap={6}>
+      <Grid templateColumns='repeat(1, 1fr)' gap={4}>
         {/* PART */}
         <FormControl>
           <FormLabel htmlFor='type'>Part</FormLabel>
@@ -459,10 +456,11 @@ const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
         </FormControl>
       </Grid>
       <Flex alignItems={'center'} justifyContent={'flex-end'} gap={2}>
-        <Button onClick={onClose} variant='ghost'>
+        <Button fontSize={'sm'} onClick={onClose} variant='ghost'>
           Close
         </Button>
         <Button
+          fontSize={'sm'}
           variant='outline'
           colorScheme='blue'
           onClick={handleSave}

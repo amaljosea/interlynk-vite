@@ -122,8 +122,9 @@ const CompSupplier = ({ data, onClose, refetch }) => {
       <FormControl isRequired>
         <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
         <Input
-          placeholder='Enter organization name'
+          fontSize={'sm'}
           value={orgName}
+          placeholder='Enter organization name'
           onChange={(e) => setOrgName(e.target.value)}
         />
       </FormControl>
@@ -133,8 +134,9 @@ const CompSupplier = ({ data, onClose, refetch }) => {
       >
         <FormLabel fontSize={'sm'}>URL</FormLabel>
         <Input
-          placeholder='Enter URL'
           value={orgUrl}
+          fontSize={'sm'}
+          placeholder='Enter URL'
           onBlur={handleCheckUrl}
           onChange={onUrlChange}
         />
@@ -144,6 +146,7 @@ const CompSupplier = ({ data, onClose, refetch }) => {
       <FormControl isInvalid={supName !== '' && nameError !== ''}>
         <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
         <Input
+          fontSize={'sm'}
           placeholder='Enter supplier name'
           value={supName}
           onChange={onSupplierChange}
@@ -154,9 +157,10 @@ const CompSupplier = ({ data, onClose, refetch }) => {
       <FormControl isInvalid={supEmail !== '' && !validateEmail(supEmail)}>
         <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
         <Input
-          placeholder='Enter supplier email'
+          fontSize={'sm'}
           value={supEmail}
           onBlur={handleCheckEmail}
+          placeholder='Enter supplier email'
           onChange={(e) => {
             setSupEmail(e.target.value)
             setEmailError('')

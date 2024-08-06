@@ -32,7 +32,7 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
   const params = useParams()
   const sbomId = params.sbomid
   const bgColor = useColorModeValue('white', 'gray.700')
-  const tabs = ['details', 'identifiers', 'suppliers', 'links', 'relations']
+  const tabs = ['details', 'identifiers', 'suppliers', 'links', 'relationships']
   const [tab, setTab] = useState(0)
 
   const [getComPath, { data: comPath, loading: comPathLoading }] =
@@ -73,6 +73,7 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
             >
               {tabs.map((item, index) => (
                 <Tab
+                  py={3.5}
                   key={index}
                   fontSize={'sm'}
                   textTransform={'capitalize'}
@@ -82,7 +83,7 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
                 </Tab>
               ))}
             </TabList>
-            <TabPanels pos={'relative'} top={10} overflowX={'hidden'}>
+            <TabPanels pos={'relative'} top={12} overflowX={'hidden'}>
               <TabPanel px={0}>
                 <CompDetails data={data} onClose={onClose} refetch={refetch} />
               </TabPanel>

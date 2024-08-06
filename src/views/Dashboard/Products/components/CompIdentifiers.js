@@ -220,6 +220,8 @@ const CompIdentifiers = (props) => {
         <FormLabel htmlFor='purl' fontSize={'sm'}>
           <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
             <Icon
+              fontSize={12}
+              color={'#718096'}
               cursor={'pointer'}
               onClick={handlePurlModal}
               display={customerView ? 'none' : 'flex'}
@@ -268,6 +270,8 @@ const CompIdentifiers = (props) => {
         <FormLabel htmlFor='cpe' fontSize={'sm'}>
           <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
             <Icon
+              fontSize={12}
+              color={'#718096'}
               cursor={'pointer'}
               onClick={() => setCpeOpen(true)}
               display={customerView ? 'none' : 'flex'}

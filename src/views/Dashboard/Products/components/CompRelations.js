@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 
-import { ArrowDownIcon } from '@chakra-ui/icons'
+import { AddIcon, ArrowDownIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -180,7 +180,7 @@ const CompRelations = ({ data, onClose, compPath, comPathLoading }) => {
           </FormLabel>
           <Select
             id='relation'
-            size='sm'
+            fontSize='sm'
             value={relation}
             onChange={(e) => setRelation(e.target.value)}
           >
@@ -199,7 +199,7 @@ const CompRelations = ({ data, onClose, compPath, comPathLoading }) => {
             </FormLabel>
             <Select
               id='component'
-              size='sm'
+              fontSize='sm'
               value={component}
               onChange={(e) => setComponent(e.target.value)}
             >
@@ -224,13 +224,15 @@ const CompRelations = ({ data, onClose, compPath, comPathLoading }) => {
         )}
 
         <Button
-          size='md'
+          fontSize='sm'
+          variant='outline'
           width={'fit-content'}
           colorScheme='blue'
           onClick={handleAdd}
+          leftIcon={<AddIcon />}
           isDisabled={relation === '' || component === '' || list.length > 0}
         >
-          {'Add'}
+          Add
         </Button>
       </Stack>
 

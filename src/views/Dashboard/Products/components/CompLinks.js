@@ -123,7 +123,7 @@ const CompLinks = ({ onClose, component, refetch }) => {
         {/* NAME */}
         <FormControl isRequired isInvalid={error}>
           <FormLabel>Type</FormLabel>
-          <Select value={type} onChange={handleTypeChange}>
+          <Select fontSize={'sm'} value={type} onChange={handleTypeChange}>
             <option value=''>-- Select --</option>
             {[
               'vcs',
@@ -159,8 +159,9 @@ const CompLinks = ({ onClose, component, refetch }) => {
         >
           <FormLabel>Link</FormLabel>
           <Input
-            placeholder='Add URL'
+            fontSize={'sm'}
             value={link}
+            placeholder='Add URL'
             onBlur={handleCheckUrl}
             onChange={handleLinkChange}
           />
@@ -170,6 +171,7 @@ const CompLinks = ({ onClose, component, refetch }) => {
         <Button
           mt={1}
           type='submit'
+          fontSize={'sm'}
           variant='outline'
           colorScheme='blue'
           leftIcon={<AddIcon />}
