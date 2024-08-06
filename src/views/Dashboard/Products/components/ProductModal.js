@@ -25,11 +25,14 @@ import {
 
 import LynkSelect from 'components/LynkSelect'
 
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
+
 import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
 import { GetLabels } from 'graphQL/Queries'
 
 const ProductModal = ({ isOpen, onClose, data }) => {
   const { id, name, description, labels: activeLabels } = data || ''
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const [projectGroupCreate] = useMutation(CreateProjectGroup)
   const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
 
@@ -154,7 +157,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
                     placeholder={`Add product name`}
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl hidden={!shouldShowDemoFeatures}>
                   <FormLabel>Labels</FormLabel>
                   <LynkSelect
                     isMulti

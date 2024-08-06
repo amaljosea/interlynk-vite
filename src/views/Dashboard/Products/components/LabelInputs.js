@@ -23,7 +23,7 @@ import {
 
 import { LabelCreate, LabelUpdate } from 'graphQL/Mutation'
 
-const LabelInputs = ({ activeRow, setEdit, refetch }) => {
+const LabelInputs = ({ activeRow, setEdit }) => {
   const toast = useToast()
   const randomColor = getRandomColor()
   const [labelData, setLabelData] = useState({
@@ -32,12 +32,8 @@ const LabelInputs = ({ activeRow, setEdit, refetch }) => {
     color: randomColor
   })
 
-  const [createLabel] = useMutation(LabelCreate, {
-    onCompleted: (data) => data && refetch()
-  })
-  const [updateLabel] = useMutation(LabelUpdate, {
-    onCompleted: (data) => data && refetch()
-  })
+  const [createLabel] = useMutation(LabelCreate)
+  const [updateLabel] = useMutation(LabelUpdate)
 
   const handleRefresh = () => {
     setLabelData((prev) => ({ ...prev, color: randomColor }))

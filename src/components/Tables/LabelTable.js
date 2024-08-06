@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, hexToRGBA, timeSince } from 'utils'
 import LabelInputs from 'views/Dashboard/Products/components/LabelInputs'
@@ -36,16 +36,11 @@ const LabelTable = () => {
   const [activeRow, setActiveRow] = useState(null)
   const [filterText, setFilterText] = useState('')
 
-  const { nodes, paginationProps, loading, refetch } = usePaginatatedQuery(
-    GetLabels,
-    {
-      selector: 'labels'
-    }
-  )
-
-  const [deleteLabel] = useMutation(LabelDelete, {
-    onCompleted: (data) => data && refetch()
+  const { nodes, paginationProps, loading } = usePaginatatedQuery(GetLabels, {
+    selector: 'labels'
   })
+
+  const [deleteLabel] = useMutation(LabelDelete)
 
   const handleClear = useCallback(async () => {
     setFilterText('')
@@ -89,13 +84,7 @@ const LabelTable = () => {
 
   const Header = () => {
     if (edit) {
-      return (
-        <LabelInputs
-          setEdit={setEdit}
-          refetch={refetch}
-          activeRow={activeRow}
-        />
-      )
+      return <LabelInputs setEdit={setEdit} activeRow={activeRow} />
     }
 
     return (

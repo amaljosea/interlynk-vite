@@ -3,9 +3,8 @@ import { useTour } from '@reactour/tour'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getFullDateAndTime, timeSince } from 'utils'
+import { getFullDateAndTime, hexToRGBA, timeSince } from 'utils'
 import { customStyles, getFormat, getLink, getType } from 'utils'
-import { hexToRGBA } from 'utils'
 import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
@@ -18,8 +17,6 @@ import {
   Button,
   Divider,
   Flex,
-  Grid,
-  GridItem,
   IconButton,
   ListItem,
   Menu,
@@ -174,11 +171,7 @@ const ProductTable = ({
     childKey: 'update_sbom'
   })
 
-  const {
-    data: lynks,
-    refetch: lynkRefetch,
-    error
-  } = useQuery(GetSharelynks, {
+  const { data: lynks, error } = useQuery(GetSharelynks, {
     skip: activeRow && isLynkOpen ? false : true,
     fetchPolicy: 'network-only',
     variables: {
@@ -257,21 +250,20 @@ const ProductTable = ({
   // HEADER
   const subHeaderComponent = useMemo(() => {
     return (
-      <>
+      <Flex width={'100%'} flexDir={'column'} gap={4}>
         <Flex
           width={'100%'}
           alignItems={'center'}
           justifyContent={'space-between'}
-          marginBottom={4}
         >
-          <Text fontSize={'24px'} fontWeight={600}>
+          <Text fontSize={'xl'} fontWeight={600}>
             Products
           </Text>
           {/* ADD PRODUCT */}
           <Button
+            fontSize={'sm'}
             leftIcon={<AddIcon />}
             colorScheme='blue'
-            variant='solid'
             isDisabled={!canAddProduct}
             hidden={signedUrlParams}
             onClick={() => {
@@ -334,7 +326,7 @@ const ProductTable = ({
             </Tooltip>
           </Stack>
         </Flex>
-      </>
+      </Flex>
     )
   }, [
     filterText,
@@ -406,8 +398,8 @@ const ProductTable = ({
         return (
           <Flex
             my={3}
-            gap={3}
             alignItems={'center'}
+            gap={shouldShowDemoFeatures ? 3 : 0}
             className={index === 0 ? 'product' : ''}
           >
             <Tooltip label={getFormat(name)} placement='top'>
@@ -415,7 +407,13 @@ const ProductTable = ({
                 href={getLink(name)}
                 isExternal={getLink(name) === '#' ? false : true}
               >
-                <IconBox h={'32px'} w={'32px'} color={iconColor} bg={bgColor}>
+                <IconBox
+                  h={'32px'}
+                  w={'32px'}
+                  bg={bgColor}
+                  color={iconColor}
+                  hidden={!shouldShowDemoFeatures}
+                >
                   {getType(name)}
                 </IconBox>
               </Olink>
@@ -462,7 +460,8 @@ const ProductTable = ({
             ))}
           </Flex>
         )
-      }
+      },
+      omit: !shouldShowDemoFeatures
     },
     // UPDATEDAT
     {
