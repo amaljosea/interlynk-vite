@@ -88,7 +88,8 @@ const ProductTable = ({
   const grayColor = useColorModeValue('#616161BF', '#FFFFFF66')
   const iconColor = useColorModeValue('blue.500', 'gray.50')
   const timeColor = useColorModeValue('#00000099', '#FFFFFF99')
-  const borderColor = useColorModeValue('#3182CE66', '#3182CE99')
+  const borderColor = useColorModeValue('#3182CE66', '#90cdf499')
+  const envIconColor = useColorModeValue('#3182CE', '#90cdf4')
 
   const { search, enabled, field } = filters
   const { totalRows } = paginationProps
@@ -260,19 +261,18 @@ const ProductTable = ({
             Products
           </Text>
           {/* ADD PRODUCT */}
-          <Button
-            fontSize={'sm'}
-            leftIcon={<AddIcon />}
-            colorScheme='blue'
-            isDisabled={!canAddProduct}
-            hidden={signedUrlParams}
-            onClick={() => {
-              setActiveRow(null)
-              onOpen()
-            }}
-          >
-            Add product
-          </Button>
+          <Tooltip label='Add product'>
+            <IconButton
+              icon={<AddIcon />}
+              colorScheme='blue'
+              isDisabled={!canAddProduct}
+              hidden={signedUrlParams}
+              onClick={() => {
+                setActiveRow(null)
+                onOpen()
+              }}
+            />
+          </Tooltip>
         </Flex>
         <Flex
           width={'100%'}
@@ -420,15 +420,17 @@ const ProductTable = ({
             </Tooltip>
             <Flex flexWrap={'wrap'} flexDirection={'column'}>
               <Text
-                fontSize={14}
-                color={'blue.500'}
+                fontSize={16}
+                color={envIconColor}
                 cursor={'pointer'}
                 width={'fit-content'}
                 onClick={handleClick}
               >
                 {name}
               </Text>
-              <Text color={grayColor}>{description}</Text>
+              <Text fontSize={14} color={grayColor}>
+                {description}
+              </Text>
             </Flex>
           </Flex>
         )
@@ -515,7 +517,7 @@ const ProductTable = ({
               >
                 <Button
                   size='sm'
-                  leftIcon={<FaInbox color='#3182CE' />}
+                  leftIcon={<FaInbox color={envIconColor} />}
                   variant='outline'
                   borderColor={borderColor}
                   color={textColor}
@@ -538,7 +540,7 @@ const ProductTable = ({
               >
                 <Button
                   size='sm'
-                  leftIcon={<FaCode color='#3182CE' />}
+                  leftIcon={<FaCode color={envIconColor} />}
                   variant='outline'
                   borderColor={borderColor}
                   color={textColor}
@@ -561,7 +563,7 @@ const ProductTable = ({
               >
                 <Button
                   size='sm'
-                  leftIcon={<FaDesktop color='#3182CE' />}
+                  leftIcon={<FaDesktop color={envIconColor} />}
                   variant='outline'
                   borderColor={borderColor}
                   color={textColor}
