@@ -42,7 +42,6 @@ const VexModal = ({
   setToggleClear
 }) => {
   const toast = useToast()
-
   const params = useParams()
   const sbomId = params.sbomid
 
@@ -59,6 +58,14 @@ const VexModal = ({
   const [notes, setNotes] = useState('')
   const [impactData, setImpactData] = useState('')
   const [upstream, setUpstream] = useState(false)
+  const [disabled, setDisabled] = useState(false)
+
+  const disableButtonTemporarily = () => {
+    setDisabled(true)
+    setTimeout(() => {
+      setDisabled(false)
+    }, 3000)
+  }
 
   const [getProject, { data }] = useLazyQuery(GetProject)
   const { data: allVexStatus } = useQuery(getVexStatuses)
@@ -117,6 +124,7 @@ const VexModal = ({
 
   const handleSave = () => {
     setToggleClear(false)
+    disableButtonTemporarily()
     const vulnIds = selectedVulns?.map((item) => item?.id)
     compVexCreate({
       variables: {
@@ -145,18 +153,20 @@ const VexModal = ({
         onClose()
       }
     })
-    setStatusTitle('')
-    setStatusName('')
-    setJustification('')
-    setJustifyName('')
-    setSelectedTag('')
-    setActionStatement('')
-    setResponse('')
-    setResponseTitle('')
-    setDetails('')
-    setNotes('')
-    setImpactData('')
   }
+
+  const isInvalid =
+    disabled ||
+    statusTitle === '' ||
+    (statusName === 'Not Affected' && justification === '') ||
+    (statusName === 'Not Affected' &&
+      justifyName === 'Other (impact statment required)' &&
+      impactData === '') ||
+    (statusName === 'Affected' &&
+      responseTitle === '' &&
+      actionStatement === '') ||
+    (responseTitle !== '' && actionStatement === '') ||
+    (responseTitle === 'update' && selectedTag === '')
 
   useEffect(() => {
     if (statusName === 'Not Affected') {
@@ -201,20 +211,15 @@ const VexModal = ({
             {/* JUSTIFICATION */}
             {statusName === 'Not Affected' && (
               <FormControl>
-                <FormLabel
-                  htmlFor='justification'
-                  fontSize='sm'
-                  color='gray.600'
-                >
+                <FormLabel htmlFor='justification' fontSize='sm'>
                   Justification
                 </FormLabel>
                 <Select
+                  fontSize='sm'
                   id='justification'
                   name='justification'
                   value={justification}
                   onChange={handleJustifyChange}
-                  fontSize='sm'
-                  color='gray.600'
                 >
                   <option value=''>-- Select --</option>
                   {allVexJustify ? (
@@ -232,17 +237,16 @@ const VexModal = ({
             {/* RESPONSE */}
             {statusName === 'Affected' && (
               <FormControl>
-                <FormLabel htmlFor='response' fontSize='sm' color='gray.600'>
+                <FormLabel htmlFor='response' fontSize='sm'>
                   Response
                 </FormLabel>
                 {allCdx && (
                   <Select
+                    fontSize='sm'
                     id='response'
                     name='response'
                     value={response}
                     onChange={handleResponseChange}
-                    fontSize='sm'
-                    color='gray.600'
                   >
                     <option value=''>-- Select --</option>
                     {allCdx?.cdxResponses.length > 0 &&
@@ -260,27 +264,22 @@ const VexModal = ({
               responseTitle === 'Update' &&
               groups && (
                 <Stack
+                  spacing={4}
                   width={'100%'}
                   direction={'column'}
-                  spacing={4}
                   alignItems={'flex-start'}
                 >
                   <FormControl width={'100%'}>
-                    <FormLabel
-                      htmlFor='fixedVersion'
-                      fontSize='sm'
-                      color='gray.600'
-                    >
+                    <FormLabel htmlFor='fixedVersion' fontSize='sm'>
                       Project Environment
                     </FormLabel>
                     <Select
                       id='env'
                       name='env'
+                      fontSize='sm'
                       value={selectEnv}
                       onChange={handleEnvChange}
                       textTransform={'capitalize'}
-                      fontSize='sm'
-                      color='gray.600'
                     >
                       <option value=''>-- Select --</option>
                       {groups?.projectGroup?.projects.length > 0 ? (
@@ -301,21 +300,16 @@ const VexModal = ({
                     </Select>
                   </FormControl>
                   <FormControl width={'100%'}>
-                    <FormLabel
-                      htmlFor='fixedVersion'
-                      fontSize='sm'
-                      color='gray.600'
-                    >
+                    <FormLabel htmlFor='fixedVersion' fontSize='sm'>
                       Fixed Version
                     </FormLabel>
                     <Select
+                      fontSize='sm'
                       id='fixedVersion'
                       name='fixedVersion'
                       value={selectedTag}
                       onChange={(e) => setSelectedTag(e.target.value)}
                       textTransform={'capitalize'}
-                      fontSize='sm'
-                      color='gray.600'
                     >
                       <option value=''>-- Select --</option>
                       {data?.project?.sboms?.length > 0 ? (
@@ -352,11 +346,7 @@ const VexModal = ({
             {/* IMPACT STATEMENT */}
             {statusName === 'Not Affected' && (
               <FormControl>
-                <FormLabel
-                  htmlFor='impactStatement'
-                  fontSize='sm'
-                  color='gray.600'
-                >
+                <FormLabel htmlFor='impactStatement' fontSize='sm'>
                   Impact Statement
                 </FormLabel>
                 <Textarea
@@ -442,18 +432,7 @@ const VexModal = ({
             variant='solid'
             colorScheme='blue'
             onClick={handleSave}
-            disabled={
-              statusTitle === '' ||
-              (statusName === 'Not Affected' && justification === '') ||
-              (statusName === 'Not Affected' &&
-                justifyName === 'Other (impact statment required)' &&
-                impactData === '') ||
-              (statusName === 'Affected' &&
-                responseTitle === '' &&
-                actionStatement === '') ||
-              (responseTitle !== '' && actionStatement === '') ||
-              (responseTitle === 'update' && selectedTag === '')
-            }
+            disabled={isInvalid}
           >
             Save
           </Button>
