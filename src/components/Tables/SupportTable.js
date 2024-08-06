@@ -405,7 +405,6 @@ const SupportTable = ({
           data={activeRow}
           isOpen={isOpen}
           onClose={onClose}
-          refetch={refetch}
         />
       )}
 
@@ -414,7 +413,6 @@ const SupportTable = ({
           data={activeRow}
           isOpen={isDeleteOpen}
           onClose={onDeleteClose}
-          refetch={refetch}
         />
       )}
 
@@ -423,7 +421,6 @@ const SupportTable = ({
           data={activeRow}
           isOpen={isActiveOpen}
           onClose={onActiveClose}
-          refetch={refetch}
         />
       )}
 

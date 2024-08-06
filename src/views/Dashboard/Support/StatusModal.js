@@ -18,7 +18,7 @@ import {
 
 import { UpdateCompSupportOverride } from 'graphQL/Mutation'
 
-const StatusModal = ({ isOpen, onClose, data, refetch }) => {
+const StatusModal = ({ isOpen, onClose, data }) => {
   const toast = useToast()
   const { id, enabled } = data
   const [updateSupport] = useMutation(UpdateCompSupportOverride)
@@ -36,7 +36,6 @@ const StatusModal = ({ isOpen, onClose, data, refetch }) => {
           position: 'top'
         })
       } else {
-        refetch()
         onClose()
       }
     })

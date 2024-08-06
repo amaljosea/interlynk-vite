@@ -36,7 +36,7 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
 import { GetJiraProjects } from 'graphQL/Queries'
 
-const Settings = ({ enabled, data, refetch, mfc }) => {
+const Settings = ({ enabled, data, mfc }) => {
   const { orgView } = useGlobalQueryContext()
 
   const {
@@ -107,7 +107,7 @@ const Settings = ({ enabled, data, refetch, mfc }) => {
         jiraProject: field === 'jira' ? value : undefined
       }
     })
-      .then((res) => res.data && refetch())
+      .then((res) => res.data)
       .finally(() => {
         toast({
           description: `${capitalizeFirstLetter(field)} updated successfully`,

@@ -36,7 +36,7 @@ import {
 import { ComponentVulnUpdate } from 'graphQL/Mutation'
 import { DispositionByParentUpdate } from 'graphQL/Mutation'
 
-const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId, refetch }) => {
+const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   const { id, externalUrls, currentExternalUrls, vuln, isPart } = data || ''
   const [type, setType] = useState('')
   const [link, setLink] = useState('')

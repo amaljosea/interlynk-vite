@@ -67,8 +67,8 @@ import { ManualVulnScan } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
   GetCdxResponses,
-  GetOrgConnections,
   GetDefaultJiraProduct,
+  GetOrgConnections,
   GetVulnData,
   GetVulnFilterData,
   ShareVulnFilters,
@@ -1181,7 +1181,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
           isOpen={isOpen}
           onClose={onClose}
           checkEquals={true}
-          refetch={refetch}
           selectedGroup={selectedGroup}
           selectedVulns={selectedVulns}
           setSelectedVulns={setSelectedVulns}

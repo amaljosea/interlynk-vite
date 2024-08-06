@@ -37,7 +37,7 @@ import {
 
 import { FaPlus, FaTrash } from 'react-icons/fa'
 
-const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
+const SupportModal = ({ supports, data, isOpen, onClose }) => {
   const [idUri, setIdUri] = useState('')
   const [productName, setProductName] = useState('')
   const [productVersion, setProductVersion] = useState('')
@@ -198,7 +198,6 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
               if (errors?.length > 0) {
                 setError(errors[0])
               } else {
-                refetch()
                 onClose()
               }
             })
@@ -235,7 +234,6 @@ const SupportModal = ({ supports, data, isOpen, onClose, refetch }) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
-          refetch()
           setIdUri('')
           setProductName('')
           setProductVersion('')

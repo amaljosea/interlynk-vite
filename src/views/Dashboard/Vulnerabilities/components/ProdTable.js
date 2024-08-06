@@ -403,7 +403,6 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
         <VexModal
           isOpen={isOpen}
           onClose={onClose}
-          refetch={refetch}
           checkEquals={checkEquals}
           selectedGroup={selectedGroup}
           selectedVulns={selectedVulns}

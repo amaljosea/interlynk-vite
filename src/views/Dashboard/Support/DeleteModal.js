@@ -18,7 +18,7 @@ import {
 
 import { DeleteCompSupportOverride } from 'graphQL/Mutation'
 
-const DeleteModal = ({ isOpen, onClose, data, refetch }) => {
+const DeleteModal = ({ isOpen, onClose, data }) => {
   const { id } = data
   const toast = useToast()
   const [deleteSupport] = useMutation(DeleteCompSupportOverride)
@@ -34,7 +34,6 @@ const DeleteModal = ({ isOpen, onClose, data, refetch }) => {
           duration: 3000
         })
       } else {
-        refetch()
         onClose()
       }
     })

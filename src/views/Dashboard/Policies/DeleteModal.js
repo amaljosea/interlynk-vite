@@ -18,7 +18,7 @@ import {
 
 import { PolicyDelete } from 'graphQL/Mutation'
 
-const DeleteModal = ({ isOpen, onClose, data, refetch }) => {
+const DeleteModal = ({ isOpen, onClose, data }) => {
   const toast = useToast()
   const { id } = data
   const [deletePolicy] = useMutation(PolicyDelete)
@@ -34,7 +34,6 @@ const DeleteModal = ({ isOpen, onClose, data, refetch }) => {
           duration: 2000
         })
       } else {
-        refetch()
         onClose()
       }
     })

@@ -37,7 +37,6 @@ const VexModal = ({
   checkEquals,
   isOpen,
   onClose,
-  refetch,
   selectedVulns,
   setSelectedVulns,
   setToggleClear
@@ -69,7 +68,6 @@ const VexModal = ({
   const [compVexCreate] = useMutation(updateBulkCompVex, {
     onCompleted: (data) => {
       if (data) {
-        refetch()
         setSelectedVulns([])
         setToggleClear(true)
       }

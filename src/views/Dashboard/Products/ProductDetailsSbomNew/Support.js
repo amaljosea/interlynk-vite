@@ -393,7 +393,6 @@ const Support = () => {
           data={activeRow}
           isOpen={isOpen}
           onClose={onClose}
-          refetch={handleRefresh}
         />
       )}
 
@@ -402,7 +401,6 @@ const Support = () => {
           data={activeRow}
           isOpen={isDeleteOpen}
           onClose={onDeleteClose}
-          refetch={handleRefresh}
         />
       )}
 
@@ -411,7 +409,6 @@ const Support = () => {
           data={activeRow}
           isOpen={isActiveOpen}
           onClose={onActiveClose}
-          refetch={handleRefresh}
         />
       )}
 

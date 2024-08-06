@@ -45,7 +45,6 @@ const EnvironmentDrawer = ({
   data,
   isOpen,
   onClose,
-  refetch,
   activeEnv,
   setActiveEnv
 }) => {
@@ -78,9 +77,7 @@ const EnvironmentDrawer = ({
           activeEnv = data?.projectGroup?.defaultProject?.id
           setActiveEnv(activeEnv)
         }
-        refetch({
-          id: data?.projectGroup?.id
-        })
+
         setTimeout(() => {
           setLoading(false)
           onWarningClose()
@@ -216,7 +213,6 @@ const EnvironmentDrawer = ({
           isOpen={isProdOpen}
           onClose={onProdClose}
           groupId={data?.projectGroup?.id}
-          refetch={refetch}
         />
       )}
 

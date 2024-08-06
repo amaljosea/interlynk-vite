@@ -513,7 +513,6 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
           data={activeRow}
           isOpen={isOpen}
           onClose={onClose}
-          refetch={refetch}
           plSubjects={subOperators?.policySubjectOperatorMapping || []}
         />
       )}
@@ -541,7 +540,6 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
           isOpen={isDeleteOpen}
           onClose={onDeleteClose}
           data={activeRow}
-          refetch={refetch}
         />
       )}
     </>

@@ -23,7 +23,7 @@ import {
 
 import { EnvCreate } from 'graphQL/Mutation'
 
-const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
+const EnvModal = ({ groupId, isOpen, onClose }) => {
   const toast = useToast()
   const [projectCreate] = useMutation(EnvCreate)
   const [productName, setProductName] = useState('')
@@ -42,7 +42,6 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
       if (errors?.length > 0) {
         setError(errorMapping[errors[0]] || errors[0])
       } else {
-        refetch({ id: groupId })
         toast({
           description: 'Environment added successfully',
           status: 'success',

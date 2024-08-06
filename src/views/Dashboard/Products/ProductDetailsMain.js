@@ -166,13 +166,12 @@ const ProductDetailsMain = () => {
   const { projectGroup } = data || ''
   const { name, description, enabled, projects } = projectGroup || ''
 
-  const {
-    data: settings,
-    loading: settingsLoading,
-    refetch: refetchSettings
-  } = useQuery(GetProjectSettings, {
-    variables: { id: activeEnv }
-  })
+  const { data: settings, loading: settingsLoading } = useQuery(
+    GetProjectSettings,
+    {
+      variables: { id: activeEnv }
+    }
+  )
 
   const { projectSetting } = settings?.project || ''
   const {
@@ -584,7 +583,6 @@ const ProductDetailsMain = () => {
                     data={projectSetting}
                     enabled={projectGroup?.enabled}
                     mfc={mfc?.organizationManufacturers}
-                    refetch={refetchSettings}
                   />
                 </TabPanel>
                 {/* POLICIES */}
@@ -686,7 +684,6 @@ const ProductDetailsMain = () => {
           isOpen={isEnvOpen}
           onClose={onEnvClose}
           data={data}
-          refetch={refetch}
           activeEnv={activeEnv}
           setActiveEnv={setActiveEnv}
         />

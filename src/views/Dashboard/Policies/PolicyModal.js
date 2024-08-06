@@ -39,7 +39,7 @@ import { PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
 
 import { FaPlus, FaTrash } from 'react-icons/fa'
 
-const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
+const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
   const [name, setName] = useState('')
   const [desc, setDesc] = useState('')
   const [operator, setOperator] = useState('')
@@ -97,10 +97,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
     acc[category] = options
     return acc
   }, {})
-
-  const handleRefetch = () => {
-    refetch()
-  }
 
   const onNameChange = (e) => {
     setName(e.target.value)
@@ -283,7 +279,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
       if (errors?.length > 0) {
         setError(errors[0])
       } else {
-        handleRefetch()
         setError('')
         clearState()
         onClose()
@@ -354,7 +349,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
-          handleRefetch()
           clearState()
           onClose()
         }
@@ -376,7 +370,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
-          handleRefetch()
           clearState()
           onClose()
         }
@@ -398,7 +391,6 @@ const PolicyModal = ({ data, isOpen, onClose, refetch, plSubjects }) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
-          handleRefetch()
           clearState()
           onClose()
         }
