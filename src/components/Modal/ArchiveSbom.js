@@ -24,7 +24,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { sbomUpdate } from 'graphQL/Mutation'
 
-const ArchiveSbom = ({ isOpen, onClose, data, refetch }) => {
+const ArchiveSbom = ({ isOpen, onClose, data }) => {
   const toast = useToast()
   const { id, spec, lifecycle, projectVersion } = data || ''
   const { setClearSelect, setSelectedSbom } = useGlobalState()
@@ -56,7 +56,6 @@ const ArchiveSbom = ({ isOpen, onClose, data, refetch }) => {
         setIsLoading(false)
         setClearSelect(true)
         setSelectedSbom([])
-        refetch()
         onClose()
       }
     })

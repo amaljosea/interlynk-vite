@@ -1,5 +1,7 @@
+import { useQuery } from '@apollo/client'
 import { useState } from 'react'
 import DataTable from 'react-data-table-component'
+import { useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 
 import {
@@ -17,16 +19,26 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
+import CustomLoader from 'components/CustomLoader'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
+
+import { GetArchivedVersions } from 'graphQL/Queries'
 
 import { MdOutlineUnarchive } from 'react-icons/md'
 
-const ArchivedVersions = ({ data, isOpen, onClose, refetch }) => {
+const ArchivedVersions = ({ isOpen, onClose }) => {
+  const params = useParams()
+  const productId = params?.productid
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const [activeRow, setActiveRow] = useState(null)
 
-  const nodes = data?.filter((item) => item?.lifecycle === 'archived')
+  const { data, loading } = useQuery(GetArchivedVersions, {
+    skip: isOpen ? false : true,
+    variables: { id: productId }
+  })
+
+  const { sbomArchived } = data?.project || ''
 
   const {
     isOpen: isWarnOpen,
@@ -106,10 +118,12 @@ const ArchivedVersions = ({ data, isOpen, onClose, refetch }) => {
             <Box height={'85%'} overflowY={'scroll'}>
               <DataTable
                 responsive
-                columns={columns}
-                data={nodes || []}
-                customStyles={customStyles(headColor)}
                 persistTableHead
+                columns={columns}
+                data={sbomArchived || []}
+                progressPending={loading}
+                progressComponent={<CustomLoader />}
+                customStyles={customStyles(headColor)}
               />
             </Box>
           </DrawerBody>
@@ -120,7 +134,6 @@ const ArchivedVersions = ({ data, isOpen, onClose, refetch }) => {
       {isWarnOpen && (
         <ArchiveSbom
           data={activeRow}
-          refetch={refetch}
           isOpen={isWarnOpen}
           onClose={onWarnClose}
         />

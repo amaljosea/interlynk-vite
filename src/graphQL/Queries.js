@@ -1118,6 +1118,21 @@ export const GetVersionsTable = gql`
   }
 `
 
+// GET ARCHIVED VERSIONS
+export const GetArchivedVersions = gql`
+  query GetArchivedVersions($id: Uuid!) {
+    project(id: $id) {
+      sbomArchived {
+        id
+        spec
+        createdAt
+        lifecycle
+        projectVersion
+      }
+    }
+  }
+`
+
 // GET VERSION CREATE DATE
 export const GetVersionsDate = gql`
   query GetVersionsDate(

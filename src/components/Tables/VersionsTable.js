@@ -127,8 +127,6 @@ const VersionsTable = ({
     }
   )
 
-  const activeNodes = nodes?.filter((item) => item?.lifecycle !== 'archived')
-
   const createSbom = useHasPermission({
     parentKey: 'view_sbom',
     childKey: 'update_sbom'
@@ -638,7 +636,7 @@ const VersionsTable = ({
 
   const dataTableProps = {
     columns: columns,
-    data: activeNodes || [],
+    data: nodes || [],
     customStyles: customStyles(headColor),
     onSort: handleSort,
     defaultSortFieldId: filters?.field,
@@ -666,7 +664,6 @@ const VersionsTable = ({
       {isDeleteOpen && (
         <DeleteSbom
           data={activeRow}
-          refetch={refetch}
           isOpen={isDeleteOpen}
           onClose={onDeleteClose}
         />
@@ -676,7 +673,6 @@ const VersionsTable = ({
       {isArchiveOpen && (
         <ArchiveSbom
           data={activeRow}
-          refetch={refetch}
           isOpen={isArchiveOpen}
           onClose={onArchiveClose}
         />
@@ -684,12 +680,7 @@ const VersionsTable = ({
 
       {/* ARCHIVE VERSION LIST */}
       {isArcOpen && (
-        <ArchivedVersions
-          data={nodes}
-          refetch={refetch}
-          isOpen={isArcOpen}
-          onClose={onArcClose}
-        />
+        <ArchivedVersions isOpen={isArcOpen} onClose={onArcClose} />
       )}
 
       {/* SBOM LIST */}
@@ -710,7 +701,6 @@ const VersionsTable = ({
           isOpen={isSbomOpen}
           onClose={onSbomClose}
           data={projectGroup}
-          refetch={refetch}
           productId={productId}
         />
       )}

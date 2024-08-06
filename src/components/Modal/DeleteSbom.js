@@ -24,7 +24,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { sbomDelete } from 'graphQL/Mutation'
 
-const DeleteSbom = ({ isOpen, onClose, data, refetch }) => {
+const DeleteSbom = ({ isOpen, onClose, data }) => {
   const toast = useToast()
   const { id, projectVersion } = data || ''
   const { setClearSelect, setSelectedSbom } = useGlobalState()
@@ -52,7 +52,6 @@ const DeleteSbom = ({ isOpen, onClose, data, refetch }) => {
         setIsLoading(false)
         setClearSelect(true)
         setSelectedSbom([])
-        refetch()
         onClose()
       }
     })

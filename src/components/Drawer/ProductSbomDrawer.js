@@ -50,11 +50,11 @@ import { CpeAutoComplete } from 'graphQL/Queries'
 
 import { FaExpandAlt } from 'react-icons/fa'
 
-function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
+function ProductSbomDrawer({ isOpen, onClose, data }) {
   const toast = useToast()
   const params = useParams()
   const productId = params.productid
-  const { totalRows, prodCompState, versionState, dispatch } = useGlobalState()
+  const { prodCompState, dispatch } = useGlobalState()
   const { expLicense } = prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -75,17 +75,6 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const [disabled, setDisabled] = useState(false)
   const [isPrimary, setIsPrimary] = useState(true)
   const [isInternal, setIsInternal] = useState(false)
-
-  const handleRefetch = () => {
-    refetch({
-      id: productId,
-      first: totalRows,
-      after: undefined,
-      before: undefined,
-      field: versionState?.field,
-      direction: versionState?.direction
-    })
-  }
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [createSbom] = useMutation(sbomCreate)
