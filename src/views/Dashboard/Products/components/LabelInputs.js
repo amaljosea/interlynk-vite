@@ -55,6 +55,11 @@ const LabelInputs = ({ activeRow, setEdit }) => {
       if (errors?.length > 0) {
         toast({ description: errors[0], status: 'error', position: 'top' })
       } else {
+        toast({
+          description: 'Label added successfully',
+          status: 'success',
+          position: 'top'
+        })
         setLabelData((prev) => ({ ...prev, color: randomColor }))
         setEdit(false)
       }
@@ -70,6 +75,11 @@ const LabelInputs = ({ activeRow, setEdit }) => {
       if (errors?.length > 0) {
         toast({ description: errors[0], status: 'error', position: 'top' })
       } else {
+        toast({
+          description: 'Label updated successfully',
+          status: 'success',
+          position: 'top'
+        })
         setLabelData((prev) => ({ ...prev, color: randomColor }))
         setEdit(false)
       }
@@ -134,8 +144,11 @@ const LabelInputs = ({ activeRow, setEdit }) => {
         </FormControl>
       </SimpleGrid>
       <Flex gap={3} alignItems='center'>
-        <Button onClick={() => setEdit(false)}>Cancel</Button>
+        <Button fontSize={'sm'} onClick={() => setEdit(false)}>
+          Cancel
+        </Button>
         <Button
+          fontSize={'sm'}
           colorScheme='blue'
           onClick={activeRow ? handleUpdate : handleCreate}
           isDisabled={labelData?.name === '' || labelData.color === ''}

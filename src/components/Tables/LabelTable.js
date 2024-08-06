@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, hexToRGBA, timeSince } from 'utils'
 import LabelInputs from 'views/Dashboard/Products/components/LabelInputs'
@@ -36,6 +36,13 @@ const LabelTable = () => {
   const [activeRow, setActiveRow] = useState(null)
   const [filterText, setFilterText] = useState('')
 
+  const divRef = useRef(null)
+  const scrollToDiv = () => {
+    if (divRef?.current) {
+      divRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   const { nodes, paginationProps, loading } = usePaginatatedQuery(GetLabels, {
     selector: 'labels'
   })
@@ -69,6 +76,7 @@ const LabelTable = () => {
   }, [])
 
   const onEdit = (row) => {
+    scrollToDiv()
     setActiveRow(row)
     setEdit(true)
   }
@@ -80,6 +88,11 @@ const LabelTable = () => {
         toast({ description: errors[0], status: 'error', position: 'top' })
       }
     })
+  }
+
+  const onCreate = () => {
+    setActiveRow(null)
+    setEdit(true)
   }
 
   const Header = () => {
@@ -96,7 +109,7 @@ const LabelTable = () => {
           onClear={handleClear}
           onFilter={handleSearch}
         />
-        <Button colorScheme='blue' onClick={() => setEdit(true)}>
+        <Button fontSize={'sm'} colorScheme='blue' onClick={onCreate}>
           New Label
         </Button>
       </Flex>
@@ -119,6 +132,7 @@ const LabelTable = () => {
           {row?.name}
         </Tag>
       ),
+      width: '40%',
       wrap: true
     },
     {
@@ -158,7 +172,7 @@ const LabelTable = () => {
   ]
 
   return (
-    <Stack width={'100%'} px={6} py={0} spacing={2}>
+    <Stack width={'100%'} px={6} py={0} spacing={2} ref={divRef}>
       <Header />
       <DataTable
         responsive

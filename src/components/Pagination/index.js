@@ -32,6 +32,7 @@ const Pagination = ({
     >
       <Stack alignItems={'center'} direction={'row'} spacing={4}>
         <Button
+          fontSize={'sm'}
           colorScheme='blue'
           onClick={onPreviousPage}
           isDisabled={!hasPreviousPage || loading}
@@ -39,6 +40,7 @@ const Pagination = ({
           Prev
         </Button>
         <Button
+          fontSize={'sm'}
           colorScheme='blue'
           onClick={onNextPage}
           isDisabled={!hasNextPage || loading}
