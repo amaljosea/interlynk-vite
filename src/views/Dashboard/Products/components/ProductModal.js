@@ -37,7 +37,8 @@ const ProductModal = ({ isOpen, onClose, data }) => {
   const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
 
   const { data: prodLabels } = useQuery(GetLabels, {
-    skip: isOpen ? false : true
+    skip: isOpen ? false : true,
+    variables: { first: 100 }
   })
   const { labels } = prodLabels || ''
 
@@ -54,9 +55,9 @@ const ProductModal = ({ isOpen, onClose, data }) => {
   const [productLabels, setProductLabels] = useState([])
   const [error, setError] = useState('')
 
-  const labelsAttributes = []
+  const labelIds = []
   if (productLabels?.length > 0) {
-    productLabels?.map((item) => labelsAttributes?.push({ id: item?.value }))
+    productLabels?.map((item) => labelIds?.push(item?.value))
   }
 
   const updateProduct = async (e) => {
@@ -66,7 +67,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
         id: id,
         name: productName,
         desc: productDesc,
-        labelsAttributes
+        labelIds
       }
     }).then((res) => {
       const error = res?.data?.projectGroupUpdate?.errors
@@ -84,8 +85,8 @@ const ProductModal = ({ isOpen, onClose, data }) => {
       variables: {
         name: productName,
         desc: productDesc,
-        labelsAttributes,
-        enabled: true
+        enabled: true,
+        labelIds
       }
     }).then((res) => {
       const error = res?.data?.projectGroupCreate?.errors

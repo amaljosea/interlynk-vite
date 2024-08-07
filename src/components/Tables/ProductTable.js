@@ -375,7 +375,7 @@ const ProductTable = ({
       id: 'PROJECT_GROUPS_NAME',
       name: 'PRODUCT NAME',
       selector: (row, index) => {
-        const { id, name, projects, defaultProject, description } = row
+        const { id, name, projects, defaultProject, description, labels } = row
         const handleClick = () => {
           setIsOpen(false)
           setClearSelect(true)
@@ -418,52 +418,39 @@ const ProductTable = ({
                 </IconBox>
               </Olink>
             </Tooltip>
-            <Flex flexWrap={'wrap'} flexDirection={'column'}>
-              <Text
-                fontSize={16}
-                color={envIconColor}
-                cursor={'pointer'}
-                width={'fit-content'}
-                onClick={handleClick}
-              >
-                {name}
-              </Text>
-              <Text fontSize={14} color={grayColor}>
-                {description}
-              </Text>
+            <Flex gap={1} flexWrap={'wrap'} flexDirection={'column'}>
+              <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
+                <Text
+                  fontSize={16}
+                  color={envIconColor}
+                  cursor={'pointer'}
+                  width={'fit-content'}
+                  onClick={handleClick}
+                >
+                  {name}
+                </Text>
+                {shouldShowDemoFeatures &&
+                  labels?.map((item) => (
+                    <Tag
+                      py={1}
+                      size='sm'
+                      key={item?.id}
+                      width={'fit-content'}
+                      borderColor={item?.color}
+                      bg={hexToRGBA(item?.color, 0.5)}
+                    >
+                      {item?.name}
+                    </Tag>
+                  ))}
+              </Flex>
+              <Text color={grayColor}>{description}</Text>
             </Flex>
           </Flex>
         )
       },
-      width: '30%',
+      width: '50%',
       wrap: true,
       sortable: true
-    },
-    // LABELS
-    {
-      id: 'PROJECT_GROUPS_LABELS',
-      name: 'TAG',
-      selector: (row) => {
-        const { labels } = row
-        return (
-          <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
-            {labels?.map((item) => (
-              <Tag
-                my={3}
-                py={1}
-                size='sm'
-                key={item?.id}
-                width={'fit-content'}
-                borderColor={item?.color}
-                bg={hexToRGBA(item?.color, 0.5)}
-              >
-                {item?.name}
-              </Tag>
-            ))}
-          </Flex>
-        )
-      },
-      omit: !shouldShowDemoFeatures
     },
     // UPDATEDAT
     {
@@ -483,6 +470,7 @@ const ProductTable = ({
         const dateB = new Date(b.updatedAt)
         return dateA - dateB
       },
+      right: 'true',
       wrap: true
     },
     // ENVIRONMENT

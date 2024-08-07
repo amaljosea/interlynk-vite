@@ -25,7 +25,7 @@ const LabelDrawer = ({ isOpen, onClose }) => {
           <DrawerCloseButton mt={2} />
           <DrawerHeader borderBottomWidth='1px'>Edit Label</DrawerHeader>
           <DrawerBody mt={2} px={0} as={Flex} flexDirection={'column'} gap={4}>
-            <LabelTable />
+            <LabelTable isOpen={isOpen} />
           </DrawerBody>
         </DrawerContent>
       </Drawer>

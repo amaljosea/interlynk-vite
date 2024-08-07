@@ -298,14 +298,14 @@ export const CreateProjectGroup = gql`
     $name: String!
     $desc: String
     $enabled: Boolean
-    $labelsAttributes: [AddOrRemoveInput!]
+    $labelIds: [Uuid!]
   ) {
     projectGroupCreate(
       input: {
         name: $name
         description: $desc
         enabled: $enabled
-        labelsAttributes: $labelsAttributes
+        labelIds: $labelIds
       }
     ) {
       projectGroup {
@@ -330,7 +330,7 @@ export const UpdateProjectGroup = gql`
     $name: String
     $desc: String
     $enabled: Boolean
-    $labelsAttributes: [AddOrRemoveInput!]
+    $labelIds: [Uuid!]
   ) {
     projectGroupUpdate(
       input: {
@@ -338,12 +338,16 @@ export const UpdateProjectGroup = gql`
         name: $name
         description: $desc
         enabled: $enabled
-        labelsAttributes: $labelsAttributes
+        labelIds: $labelIds
       }
     ) {
       projectGroup {
         id
         name
+        labels {
+          id
+          name
+        }
       }
       errors
     }

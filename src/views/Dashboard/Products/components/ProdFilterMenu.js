@@ -1,6 +1,6 @@
+import { useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { hexToRGBA } from 'utils'
-import { labels as tags } from 'variables/general'
 
 import {
   Box,
@@ -19,14 +19,27 @@ import CustomList from 'components/Misc/CustomList'
 
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
+import { GetLabels } from 'graphQL/Queries'
+
 import { FaFilter } from 'react-icons/fa'
 
 const ProdFilterMenu = ({ enabled, onFilter }) => {
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
-  const prodLabels = [{ name: 'All', color: '#CBD5E0' }, ...tags]
   const [labels, setLabels] = useState([])
   const onFilterLabel = (value) => {
     setLabels(value?.includes('All') ? [] : value)
+  }
+
+  const { data } = useQuery(GetLabels, {
+    variables: { first: 100 }
+  })
+  const { nodes } = data?.labels || ''
+
+  const prodLabels = [{ name: 'All', color: '#CBD5E0' }]
+  if (nodes?.length > 0) {
+    nodes?.map((item) =>
+      prodLabels?.push({ name: item?.name, color: item?.color })
+    )
   }
 
   return (
@@ -51,7 +64,7 @@ const ProdFilterMenu = ({ enabled, onFilter }) => {
       >
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Labels'} active={labels?.length !== 0} />
-          <MenuList minH='auto' maxH={'350px'} overflowY={'scroll'}>
+          <MenuList minH='auto' maxH={'320px'} overflowY={'scroll'}>
             <MenuOptionGroup
               type={'checkbox'}
               value={labels}

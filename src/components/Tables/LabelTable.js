@@ -27,7 +27,7 @@ import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 import { LabelDelete } from 'graphQL/Mutation'
 import { GetLabels } from 'graphQL/Queries'
 
-const LabelTable = () => {
+const LabelTable = ({ isOpen }) => {
   const toast = useToast()
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -44,6 +44,7 @@ const LabelTable = () => {
   }
 
   const { nodes, paginationProps, loading } = usePaginatatedQuery(GetLabels, {
+    skip: isOpen ? false : true,
     selector: 'labels'
   })
 
