@@ -1,22 +1,10 @@
 import { useMutation } from '@apollo/client'
 
-import {
-  Button,
-  Flex,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  UnorderedList,
-  useToast
-} from '@chakra-ui/react'
+import { useToast } from '@chakra-ui/react'
 
 import { UpdateCompSupportOverride } from 'graphQL/Mutation'
+
+import ConfirmationModal from '../Products/components/ConfirmationModal'
 
 const StatusModal = ({ isOpen, onClose, data }) => {
   const toast = useToast()
@@ -41,35 +29,17 @@ const StatusModal = ({ isOpen, onClose, data }) => {
     })
   }
 
+  const status = enabled ? 'Disable' : 'Enable'
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Disable Support</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Text>Disabling this entry will: </Text>
-          <UnorderedList>
-            <Flex flexDir={'column'} gap={1} mt={4}>
-              {[`Remove this support detail from existing products`].map(
-                (item, index) => (
-                  <ListItem key={index}>{item}</ListItem>
-                )
-              )}
-            </Flex>
-          </UnorderedList>
-          <Text mt={10}>Are you sure you wish to continue ?</Text>
-        </ModalBody>
-        <ModalFooter>
-          <Button mr={3} onClick={onClose}>
-            No
-          </Button>
-          <Button colorScheme={'blue'} onClick={onChangeStatus}>
-            Yes
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+    <ConfirmationModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onConfirm={onChangeStatus}
+      title={`${status} Support`}
+      description={`${enabled ? 'Disabling' : 'Enabling'} this entry will:`}
+      items={[`${status} this support detail from existing products`]}
+    />
   )
 }
 

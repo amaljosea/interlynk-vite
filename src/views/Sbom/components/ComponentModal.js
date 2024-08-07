@@ -1,31 +1,20 @@
 import { useMutation } from '@apollo/client'
 import { useParams } from 'react-router-dom'
-
-import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Stack,
-  Text
-} from '@chakra-ui/react'
+import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
 import { DeleteComponent } from 'graphQL/Mutation'
 
 const ComponentModal = ({
   isOpen,
   onClose,
-  id,
+  activeRow,
   fetchCompData,
   sbomRefetch
 }) => {
   const params = useParams()
   const prodId = params.productid
   const sbomId = params.sbomid
+  const { id, name } = activeRow
 
   const [deleteComponent] = useMutation(DeleteComponent, {
     onCompleted: () => fetchCompData()
@@ -47,30 +36,15 @@ const ComponentModal = ({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Delete</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stack direction={'column'} spacing={4}>
-              <Text>
-                Removing this component will remove it from the list and
-                associated SBOM
-              </Text>
-              <Text>Are you sure you want to remove it ?</Text>
-            </Stack>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='gray' mr={3} onClick={onClose}>
-              No
-            </Button>
-            <Button colorScheme='red' onClick={handleDelete}>
-              Yes
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <ConfirmationModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={handleDelete}
+        name={name}
+        title='Delete Component'
+        description='Deleting this component will:'
+        items={['Remove it from the list and associated SBOM']}
+      />
     </>
   )
 }

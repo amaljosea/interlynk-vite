@@ -1,24 +1,11 @@
 import { useMutation } from '@apollo/client'
 
-import {
-  Button,
-  Flex,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  UnorderedList
-} from '@chakra-ui/react'
-
 import { UpdateProjectGroup } from 'graphQL/Mutation'
 
+import ConfirmationModal from './ConfirmationModal'
+
 const StatusModal = ({ isOpen, onClose, group }) => {
-  const { id, enabled } = group
+  const { id, enabled, name } = group
 
   const [projectGroupUpdate, { loading }] = useMutation(UpdateProjectGroup)
 
@@ -41,43 +28,22 @@ const StatusModal = ({ isOpen, onClose, group }) => {
 
   const status = enabled ? 'Disable' : 'Enable'
 
-  return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>{status} Product</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Text>{status} this product will: </Text>
-          <UnorderedList>
-            <Flex flexDir={'column'} gap={1} mt={4}>
-              {[
-                `${status} this product, its versions and SBOMs`,
-                `${status} access to the product for all users`,
-                `${status} uploads of SBOMs to this product`
-              ].map((item, index) => (
-                <ListItem key={index}>{item}</ListItem>
-              ))}
-            </Flex>
-          </UnorderedList>
-          <Text mt={10}>Are you sure you wish to continue?</Text>
-        </ModalBody>
-        <ModalFooter>
-          <Button mr={3} onClick={onClose}>
-            No
-          </Button>
-          <Button
-            isLoading={loading}
-            onClick={toggleStatus}
-            loadingText='Updating....'
-            colorScheme={enabled ? 'red' : 'green'}
-          >
-            Yes
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
-  )
+  const modalProps = {
+    isOpen,
+    onClose,
+    onConfirm: toggleStatus,
+    name,
+    title: `${status} Product`,
+    description: `${enabled ? 'Disabling' : 'Enabling'} this product will:`,
+    items: [
+      `${status} this product, its versions and SBOMs`,
+      `${status} access to the product for all users`,
+      `${status} uploads of SBOMs to this product`
+    ],
+    isLoading: loading
+  }
+
+  return <ConfirmationModal {...modalProps} />
 }
 
 export default StatusModal

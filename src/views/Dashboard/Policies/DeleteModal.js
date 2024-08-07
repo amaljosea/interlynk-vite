@@ -1,26 +1,14 @@
 import { useMutation } from '@apollo/client'
 
-import {
-  Button,
-  Flex,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  UnorderedList,
-  useToast
-} from '@chakra-ui/react'
+import { useToast } from '@chakra-ui/react'
 
 import { PolicyDelete } from 'graphQL/Mutation'
 
+import ConfirmationModal from '../Products/components/ConfirmationModal'
+
 const DeleteModal = ({ isOpen, onClose, data }) => {
   const toast = useToast()
-  const { id } = data
+  const { id, name } = data
   const [deletePolicy] = useMutation(PolicyDelete)
 
   const onDeletePolicy = async () => {
@@ -40,36 +28,19 @@ const DeleteModal = ({ isOpen, onClose, data }) => {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Archive Policy</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Text>Archiving this policy will : </Text>
-          <UnorderedList>
-            <Flex flexDir={'column'} gap={1} mt={4}>
-              {[
-                `Disable the execution of this policy on products`,
-                `Remove results of this policy's execution from existing products`,
-                `Remove this policy from the list of available policies`
-              ].map((item, index) => (
-                <ListItem key={index}>{item}</ListItem>
-              ))}
-            </Flex>
-          </UnorderedList>
-          <Text mt={10}>Are you sure you wish to continue ?</Text>
-        </ModalBody>
-        <ModalFooter>
-          <Button mr={3} onClick={onClose}>
-            No
-          </Button>
-          <Button colorScheme={'red'} onClick={onDeletePolicy}>
-            Yes
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+    <ConfirmationModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onConfirm={onDeletePolicy}
+      name={name}
+      title='Archive Policy'
+      description='Archiving this policy will:'
+      items={[
+        `Disable the execution of this policy on products`,
+        `Remove results of this policy's execution from existing products`,
+        `Remove this policy from the list of available policies`
+      ]}
+    />
   )
 }
 

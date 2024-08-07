@@ -7,20 +7,11 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { Search2Icon } from '@chakra-ui/icons'
 import {
-  Button,
   Flex,
   Grid,
   GridItem,
   Icon,
   IconButton,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Skeleton,
   Stack,
   Tab,
@@ -31,7 +22,6 @@ import {
   Tag,
   Text,
   Tooltip,
-  UnorderedList,
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
@@ -77,6 +67,7 @@ import Automation from '../Automation'
 import Settings from '../ProductSettings'
 import { ProductGraphs } from './ProductGraphs'
 import ProductProgressModal from './ProductGraphs/ProductProgressModal'
+import ConfirmationModal from './components/ConfirmationModal'
 import ProductModal from './components/ProductModal'
 import StatusModal from './components/StatusModal'
 import UploadModal from './components/UploadModal'
@@ -644,37 +635,19 @@ const ProductDetailsMain = () => {
 
       {/* DELETE */}
       {isDeleteOpen && (
-        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Archive Product</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>Archiving this product will: </Text>
-              <UnorderedList>
-                <Flex flexDir={'column'} gap={1} mt={4}>
-                  {[
-                    'remove this product, its versions and SBOMs',
-                    'remove access to the product for all users',
-                    'disable uploads of SBOMs to this product'
-                  ].map((item, index) => (
-                    <ListItem key={index}>{item}</ListItem>
-                  ))}
-                </Flex>
-              </UnorderedList>
-              <br />
-              <Text mt={10}>Are you sure you wish to continue?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onDeleteClose}>
-                No
-              </Button>
-              <Button colorScheme='red' onClick={onProductDelete}>
-                Yes
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <ConfirmationModal
+          isOpen={isDeleteOpen}
+          onClose={onDeleteClose}
+          onConfirm={onProductDelete}
+          name={name}
+          title='Archive Product'
+          description='Archiving this product will:'
+          items={[
+            'Remove this product, its versions and SBOMs',
+            'Remove access to the product for all users',
+            'Disable uploads of SBOMs to this product'
+          ]}
+        />
       )}
 
       {/* ENV LIST */}

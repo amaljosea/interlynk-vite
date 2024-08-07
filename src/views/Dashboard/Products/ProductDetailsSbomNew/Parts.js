@@ -25,7 +25,6 @@ import {
   GridItem,
   HStack,
   IconButton,
-  ListItem,
   Menu,
   MenuButton,
   MenuItem,
@@ -46,7 +45,6 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  UnorderedList,
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
@@ -70,6 +68,8 @@ import {
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
+
+import ConfirmationModal from '../components/ConfirmationModal'
 
 const Parts = ({ sbomRefetch }) => {
   const location = useLocation()
@@ -754,35 +754,18 @@ const Parts = ({ sbomRefetch }) => {
 
       {/* DISABLED */}
       {isDeleteOpen && (
-        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Delete Part</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>Deleting this version will: </Text>
-              <UnorderedList>
-                <Flex flexDir={'column'} gap={1} mt={4}>
-                  {[
-                    'remove this versions and its SBOM',
-                    'remove access to this version for all users'
-                  ].map((item, index) => (
-                    <ListItem key={index}>{item}</ListItem>
-                  ))}
-                </Flex>
-              </UnorderedList>
-              <Text mt={6}>Are you sure you wish to continue ?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onDeleteClose}>
-                No
-              </Button>
-              <Button onClick={handleRemove} colorScheme='red'>
-                Yes
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <ConfirmationModal
+          isOpen={isDeleteOpen}
+          onClose={onDeleteClose}
+          onConfirm={handleRemove}
+          name={`${activeRow?.part?.project?.projectGroup?.name} - ${activeRow?.part?.projectVersion}`}
+          title='Delete Part'
+          description='Deleting this version will:'
+          items={[
+            'Remove this versions and its SBOM',
+            'Remove access to this version for all users'
+          ]}
+        />
       )}
     </>
   )

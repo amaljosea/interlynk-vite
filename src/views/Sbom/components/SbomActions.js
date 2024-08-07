@@ -2,27 +2,10 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
-import {
-  Button,
-  Flex,
-  IconButton,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Spinner,
-  Stack,
-  Text,
-  Tooltip,
-  UnorderedList,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import LynkSelect from 'components/LynkSelect'
@@ -459,48 +442,21 @@ const SbomActions = ({ sbom, refetch }) => {
       )}
 
       {/* DELETE SBOM */}
-      <Modal isOpen={isDeleteOpen} onClose={setDeleteClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Delete Version</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text>Deleting this version will: </Text>
-            <UnorderedList>
-              <Flex flexDir={'column'} gap={1} mt={4}>
-                {[
-                  'remove this versions and its SBOM',
-                  'remove access to this version for all users'
-                ].map((item, index) => (
-                  <ListItem key={index}>{item}</ListItem>
-                ))}
-              </Flex>
-            </UnorderedList>
-            <br />
-            <Text mt={10}>Are you sure you wish to continue?</Text>
-          </ModalBody>
-          <ModalFooter>
-            <Flex
-              width={'100%'}
-              alignItems={'center'}
-              justifyContent={'space-between'}
-              gap={4}
-            >
-              <Stack>{isLoading && <Spinner color='red.500' />}</Stack>
-              <Stack direction='row' alignItems='center' gap={1}>
-                <Button onClick={setDeleteClose}>No</Button>
-                <Button
-                  colorScheme='red'
-                  onClick={handleDelete}
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Deleting...' : 'Yes'}
-                </Button>
-              </Stack>
-            </Flex>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      {isDeleteOpen && (
+        <ConfirmationModal
+          isOpen={isDeleteOpen}
+          onClose={setDeleteClose}
+          onConfirm={handleDelete}
+          name={sbom?.projectVersion}
+          title='Delete Version'
+          description='Deleting this version will:'
+          items={[
+            'Remove this versions and its SBOM',
+            'Remove access to this version for all users'
+          ]}
+          isLoading={isLoading}
+        />
+      )}
     </>
   )
 }

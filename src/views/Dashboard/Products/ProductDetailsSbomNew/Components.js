@@ -1156,7 +1156,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
         <ComponentModal
           isOpen={isDelOpen}
           onClose={onDelClose}
-          id={activeRow.id}
+          activeRow={activeRow}
           sbomRefetch={sbomRefetch}
           fetchCompData={fetchCompData}
         />
