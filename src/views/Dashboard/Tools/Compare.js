@@ -20,7 +20,8 @@ import {
   Stack,
   Tag,
   Text,
-  useColorModeValue
+  useColorModeValue,
+  useToast
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
@@ -40,6 +41,7 @@ import {
 import { FaCodeCompare, FaScaleUnbalanced, FaX } from 'react-icons/fa6'
 
 const Compare = ({ selectedSboms }) => {
+  const toast = useToast()
   const { prodState, dispatch } = useGlobalState()
   const { field, direction } = prodState
   const { toolsDispatch } = dispatch
@@ -69,6 +71,7 @@ const Compare = ({ selectedSboms }) => {
   const [uniqVersionsOne, setUniqVersionsOne] = useState([])
   const [productListOne, setProductListOne] = useState([])
   const [firstSbomInfo, setFirstSbomInfo] = useState(null)
+  const [disabled, setDisabled] = useState(false)
 
   const onSelectGroupOne = (e) => {
     setSelectedGroupOne(e.target.value)
@@ -125,13 +128,9 @@ const Compare = ({ selectedSboms }) => {
           const data = sortByUpdatedAt(res?.data?.project?.sboms)
           if (data?.length > 0) {
             const versions = []
-            data
-              ?.filter(
-                (item) => item?.projectVersion !== selectedVersionTwo?.label
-              )
-              ?.map((sbom) => {
-                versions.push({ label: sbom?.projectVersion, value: sbom?.id })
-              })
+            data?.map((sbom) => {
+              versions.push({ label: sbom?.projectVersion, value: sbom?.id })
+            })
             setUniqVersionsOne(versions)
             setSelectedVersionOne(null)
           } else {
@@ -181,6 +180,36 @@ const Compare = ({ selectedSboms }) => {
     toolsDispatch({ type: 'SET_DATA', payload: [] })
   }
 
+  const onVersionOneChange = (item) => {
+    if (selectedVersionTwo?.value === item?.value) {
+      setDisabled(true)
+      setSelectedVersionOne(null)
+      toast({
+        description: 'Same version comparison not allowed',
+        status: 'error',
+        position: 'top'
+      })
+    } else {
+      setDisabled(false)
+      setSelectedVersionOne(item)
+    }
+  }
+
+  const onVersionTwoChange = (item) => {
+    if (selectedVersionOne?.value === item?.value) {
+      setDisabled(true)
+      setSelectedVersionTwo(null)
+      toast({
+        description: 'Same version comparison not allowed',
+        status: 'error',
+        position: 'top'
+      })
+    } else {
+      setDisabled(false)
+      setSelectedVersionTwo(item)
+    }
+  }
+
   useEffect(() => {
     if (selectedGroupTwo) {
       const activeGroup = data?.organization?.projectGroups?.nodes.find(
@@ -201,13 +230,9 @@ const Compare = ({ selectedSboms }) => {
           const data = sortByUpdatedAt(res?.data?.project?.sboms)
           if (data?.length > 0) {
             const versions = []
-            data
-              ?.filter(
-                (item) => item?.projectVersion !== selectedVersionOne?.label
-              )
-              ?.map((sbom) => {
-                versions.push({ label: sbom?.projectVersion, value: sbom?.id })
-              })
+            data?.map((sbom) => {
+              versions.push({ label: sbom?.projectVersion, value: sbom?.id })
+            })
             setUniqVersionsTwo(versions)
             setSelectedVersionTwo(null)
           } else {
@@ -404,11 +429,7 @@ const Compare = ({ selectedSboms }) => {
                         IndicatorSeparator: () => null
                       }}
                       value={selectedVersionOne}
-                      onChange={(value) => {
-                        setSelectedVersionOne(value)
-                        setSelectedProdTwo('')
-                        setSelectedVersionTwo(null)
-                      }}
+                      onChange={(value) => onVersionOneChange(value)}
                       isSearchable
                       type='text'
                       placeholder='Select versions'
@@ -544,7 +565,7 @@ const Compare = ({ selectedSboms }) => {
                         IndicatorSeparator: () => null
                       }}
                       value={selectedVersionTwo}
-                      onChange={(value) => setSelectedVersionTwo(value)}
+                      onChange={(value) => onVersionTwoChange(value)}
                       isSearchable
                       type='text'
                       placeholder='Select versions'
@@ -566,11 +587,13 @@ const Compare = ({ selectedSboms }) => {
             {(!firstSbomInfo || !secondSbomInfo) && (
               <Flex justifyContent={'flex-end'} mt={6}>
                 <Button
-                  width={'fit-content'}
                   colorScheme='blue'
+                  width={'fit-content'}
                   leftIcon={<FaCodeCompare />}
                   onClick={handleCompare}
-                  isDisabled={!selectedVersionOne || !selectedVersionTwo}
+                  isDisabled={
+                    !selectedVersionOne || !selectedVersionTwo || disabled
+                  }
                 >
                   Compare
                 </Button>
