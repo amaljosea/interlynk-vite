@@ -17,7 +17,6 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
-import RowComponent from 'components/RowComponent'
 
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
@@ -167,7 +166,7 @@ const Licenses = () => {
       >
         <Flex direction='row' py={5} alignItems={'center'} wrap='wrap' gap={2}>
           {sortedComponents?.map((component, index) => (
-            <RowComponent key={index} content={component} />
+            <Tag key={index}>{component?.name}</Tag>
           ))}
         </Flex>
       </Box>
