@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { getRandomColor, hexToRGBA } from 'utils'
 import { tagColors } from 'variables/general'
 
-import { RepeatIcon } from '@chakra-ui/icons'
+import { AddIcon, EditIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -18,12 +18,13 @@ import {
   PopoverTrigger,
   SimpleGrid,
   Tag,
+  Text,
   useToast
 } from '@chakra-ui/react'
 
 import { LabelCreate, LabelUpdate } from 'graphQL/Mutation'
 
-const LabelInputs = ({ activeRow, setEdit }) => {
+const LabelInputs = ({ activeRow, setActiveRow }) => {
   const toast = useToast()
   const randomColor = getRandomColor()
   const [labelData, setLabelData] = useState({
@@ -60,8 +61,8 @@ const LabelInputs = ({ activeRow, setEdit }) => {
           status: 'success',
           position: 'top'
         })
-        setLabelData((prev) => ({ ...prev, color: randomColor }))
-        setEdit(false)
+        setLabelData({ id: 0, name: '', color: randomColor })
+        setActiveRow(null)
       }
     })
   }
@@ -80,8 +81,8 @@ const LabelInputs = ({ activeRow, setEdit }) => {
           status: 'success',
           position: 'top'
         })
-        setLabelData((prev) => ({ ...prev, color: randomColor }))
-        setEdit(false)
+        setLabelData({ id: 0, name: '', color: randomColor })
+        setActiveRow(null)
       }
     })
   }
@@ -95,6 +96,7 @@ const LabelInputs = ({ activeRow, setEdit }) => {
 
   return (
     <Flex width='100%' gap={4} flexDir={'column'}>
+      <Text color={'gray.500'}>Add Label</Text>
       <Tag
         width={'fit-content'}
         borderColor={labelData?.color}
@@ -143,19 +145,17 @@ const LabelInputs = ({ activeRow, setEdit }) => {
           <Box position='absolute' top='100%' zIndex='1'></Box>
         </FormControl>
       </SimpleGrid>
-      <Flex gap={3} alignItems='center'>
-        <Button fontSize={'sm'} onClick={() => setEdit(false)}>
-          Cancel
-        </Button>
-        <Button
-          fontSize={'sm'}
-          colorScheme='blue'
-          onClick={activeRow ? handleUpdate : handleCreate}
-          isDisabled={labelData?.name === '' || labelData.color === ''}
-        >
-          {activeRow ? 'Update' : 'Create'} Label
-        </Button>
-      </Flex>
+      <Button
+        fontSize={'sm'}
+        variant='outline'
+        colorScheme='blue'
+        width={'fit-content'}
+        leftIcon={activeRow ? <EditIcon /> : <AddIcon />}
+        onClick={activeRow ? handleUpdate : handleCreate}
+        isDisabled={labelData?.name === '' || labelData.color === ''}
+      >
+        {activeRow ? 'Update' : 'Add'} Label
+      </Button>
     </Flex>
   )
 }

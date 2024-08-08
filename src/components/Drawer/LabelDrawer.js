@@ -23,7 +23,7 @@ const LabelDrawer = ({ isOpen, onClose }) => {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton mt={2} />
-          <DrawerHeader borderBottomWidth='1px'>Edit Label</DrawerHeader>
+          <DrawerHeader borderBottomWidth='1px'>Manage Labels</DrawerHeader>
           <DrawerBody mt={2} px={0} as={Flex} flexDirection={'column'} gap={4}>
             <LabelTable isOpen={isOpen} />
           </DrawerBody>
