@@ -60,7 +60,7 @@ export const ProductGraphs = () => {
   const graphData = formatDataForGraph(items)
 
   return (
-    <SimpleGrid width={'100%'} columns={totlaColumns} spacing='24px'>
+    <SimpleGrid spacing={5} width={'100%'} columns={totlaColumns}>
       <SimpleBarChat
         color='#3182ce'
         label={'Component'}

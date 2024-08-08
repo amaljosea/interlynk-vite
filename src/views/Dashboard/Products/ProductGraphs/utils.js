@@ -52,7 +52,12 @@ export const SimpleBarChat = ({ label, dataKey, color, data }) => {
     <Card>
       <CardBody>
         <Flex width={'100%'} flexDir={'column'} alignItems={'center'}>
-          <BarChart width={200} height={40} data={data}>
+          <BarChart
+            width={200}
+            height={40}
+            data={data}
+            style={{ transform: 'scale(0.8)' }}
+          >
             <Bar name={`${label} Count`} dataKey={dataKey} fill={color} />
             <XAxis dataKey='name' hide />
             {tooltipCustom}
@@ -71,7 +76,12 @@ export const SimpleLineChat = ({ label, config, data }) => {
     <Card>
       <CardBody>
         <Flex width={'100%'} flexDir={'column'} alignItems={'center'}>
-          <LineChart width={200} height={40} data={data}>
+          <LineChart
+            width={200}
+            height={40}
+            data={data}
+            style={{ transform: 'scale(0.8)' }}
+          >
             {config?.map((item) => (
               <Line
                 key={item.id}
