@@ -28,7 +28,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
 
-import { CreateComponent, UpdateComponent } from 'graphQL/Mutation'
+import { UpdateComponent } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
 
 const CompDetails = (props) => {
@@ -61,9 +61,6 @@ const CompDetails = (props) => {
     onClose()
   }
 
-  const [createComponent] = useMutation(CreateComponent, {
-    onCompleted: (data) => data && onRefetch()
-  })
   const [updateComponent] = useMutation(UpdateComponent, {
     onCompleted: (data) => data && onRefetch()
   })
@@ -116,36 +113,6 @@ const CompDetails = (props) => {
   const onCheck = (title) => {
     const result = infoData.find((item) => item?.title === title)
     return result?.desc
-  }
-
-  const handleCreateCom = () => {
-    disableButtonTemporarily()
-    createComponent({
-      variables: {
-        sbomId: sbomId,
-        kind: compKind,
-        name: compName,
-        description: compDesc,
-        version: compVersion,
-        group: groupInfo,
-        scope: compScope,
-        licenses: { licensesExp: expLicense || '' },
-        primary: isPrimary,
-        internal: isInternal
-      }
-    })
-      .then(
-        (res) => res?.data && prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      )
-      .finally(() => {
-        toast({
-          description: `Data added successfully`,
-          status: 'success',
-          position: 'top',
-          isClosable: true,
-          duration: 2000
-        })
-      })
   }
 
   const handleUpdateCom = () => {
@@ -392,7 +359,7 @@ const CompDetails = (props) => {
           colorScheme='blue'
           width={'fit-content'}
           isDisabled={isInvalid}
-          onClick={data ? handleUpdateCom : handleCreateCom}
+          onClick={handleUpdateCom}
         >
           Save
         </Button>

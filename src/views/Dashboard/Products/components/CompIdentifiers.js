@@ -25,7 +25,6 @@ import ActionWrapper from 'components/Misc/ActionWrapper'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { CreateComponent } from 'graphQL/Mutation'
 import { UpdateComponent } from 'graphQL/Mutation'
 import { CpeAutoComplete } from 'graphQL/Queries'
 
@@ -51,9 +50,6 @@ const CompIdentifiers = (props) => {
     onClose()
   }
 
-  const [createComponent] = useMutation(CreateComponent, {
-    onCompleted: (data) => data && onRefetch()
-  })
   const [updateComponent] = useMutation(UpdateComponent, {
     onCompleted: (data) => data && onRefetch()
   })
@@ -127,25 +123,6 @@ const CompIdentifiers = (props) => {
     })
   }
 
-  const handleCreateCom = () => {
-    disableButtonTemporarily()
-    createComponent({
-      variables: {
-        sbomId: sbomId,
-        cpes: cpeValue !== '' ? [cpeValue] : [],
-        purl: purlValue
-      }
-    })
-      .then((res) => {
-        if (res.data) {
-          prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        }
-      })
-      .finally(() => {
-        onClose()
-      })
-  }
-
   const handleUpdateCom = () => {
     disableButtonTemporarily()
     updateComponent({
@@ -196,10 +173,9 @@ const CompIdentifiers = (props) => {
   return (
     <Stack
       px={6}
-      pb={10}
       spacing={4}
       direction={'column'}
-      height={cpeOpen ? '100%' : '80vh'}
+      height={cpeOpen || purlOpen ? '100%' : '70vh'}
     >
       {/* PURL INPUI */}
       {purlOpen && (
@@ -275,7 +251,7 @@ const CompIdentifiers = (props) => {
               cursor={'pointer'}
               onClick={() => setCpeOpen(true)}
               display={customerView ? 'none' : 'flex'}
-              as={purlOpen ? FaChevronDown : FaChevronRight}
+              as={cpeOpen ? FaChevronDown : FaChevronRight}
             />
             <Text>CPE</Text>
           </Flex>
@@ -297,7 +273,7 @@ const CompIdentifiers = (props) => {
           colorScheme='blue'
           width={'fit-content'}
           hidden={purlOpen || cpeOpen}
-          onClick={data ? handleUpdateCom : handleCreateCom}
+          onClick={handleUpdateCom}
           isDisabled={disabled}
         >
           Save

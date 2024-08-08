@@ -27,7 +27,6 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import LoadingSpinner from 'components/LoadingSpinner'
 import ActionWrapper from 'components/Misc/ActionWrapper'
 import RelDeleteModal from 'components/RelDeleteModal'
 
@@ -56,7 +55,7 @@ const findShortestPath = (pathArray, currentShortestPath = []) => {
   ])
 }
 
-const CompRelations = ({ data, onClose, compPath, comPathLoading }) => {
+const CompRelations = ({ data, onClose, compPath }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
@@ -103,8 +102,6 @@ const CompRelations = ({ data, onClose, compPath, comPathLoading }) => {
       }
     }
   })
-
-  const isLoading = comPathLoading || !allComponents
 
   const [addRelation] = useMutation(CreateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
@@ -162,8 +159,6 @@ const CompRelations = ({ data, onClose, compPath, comPathLoading }) => {
         onDelClose()
       })
   }
-
-  if (isLoading) return <LoadingSpinner />
 
   return (
     <Flex flexDir={'column'} alignItems={'flex-start'} gap={4} px={6} pb={20}>
@@ -370,7 +365,6 @@ const CompRelations = ({ data, onClose, compPath, comPathLoading }) => {
           </Tag>
         </Stack>
       )}
-
       {/* ACTIONS */}
       <ActionWrapper>
         <Button onClick={onClose}>Cancel</Button>

@@ -1,4 +1,4 @@
-import { useLazyQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -35,15 +35,12 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
   const tabs = ['details', 'identifiers', 'suppliers', 'links', 'relationships']
   const [tab, setTab] = useState(0)
 
-  const [getComPath, { data: comPath, loading: comPathLoading }] =
-    useLazyQuery(GetComponentPath)
+  const { data: comPath } = useQuery(GetComponentPath, {
+    skip: isOpen ? false : true,
+    variables: { compId: data?.id, sbomId: sbomId }
+  })
 
-  const onTabChange = (value) => {
-    setTab(value)
-    if (value === 4) {
-      getComPath({ variables: { compId: data?.id, sbomId: sbomId } })
-    }
-  }
+  const onTabChange = (value) => setTab(value)
 
   return (
     <Drawer
@@ -109,7 +106,6 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
                   data={data}
                   onClose={onClose}
                   compPath={comPath?.component?.pathToPrimary}
-                  comPathLoading={comPathLoading}
                 />
               </TabPanel>
             </TabPanels>

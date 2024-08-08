@@ -231,9 +231,8 @@ const CompLinks = ({ onClose, component, refetch }) => {
           <Button onClick={onClose}>Cancel</Button>
           <Button
             colorScheme='blue'
-            width={'fit-content'}
             onClick={handleSave}
-            hidden={linksData?.length === 0}
+            isDisabled={linksData?.length === 0}
           >
             Save
           </Button>
