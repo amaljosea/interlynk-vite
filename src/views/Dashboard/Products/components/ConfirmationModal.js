@@ -48,7 +48,7 @@ const ConfirmationModal = ({
   const loadingText = title.includes('Delete') ? 'Deleting...' : 'Updating...'
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size='lg'>
+    <Modal isCentered isOpen={isOpen} onClose={onClose} size='lg'>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>
@@ -93,7 +93,6 @@ const ConfirmationModal = ({
             <Stack>{isLoading && <Spinner color={colorScheme} />}</Stack>
             <Stack direction='row' alignItems='center' gap={1}>
               <Button
-                mr={3}
                 onClick={onClose}
                 fontWeight={400}
                 color={'#60686F'}
