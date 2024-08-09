@@ -1,6 +1,5 @@
 import { Box, Flex, Menu, Stack, Switch, Text } from '@chakra-ui/react'
 
-import CheckMark from 'components/Misc/CheckMark'
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
@@ -65,10 +64,12 @@ const CompFilters = ({ filters, reset }) => {
     return (
       <Stack direction={'row'} alignItems={'center'} gap={1}>
         {/* ECOSYSTEM */}
-        <Box width={'fit-content'} position={'relative'}>
+        <Box width={'fit-content'}>
           <Menu closeOnSelect={false}>
-            {ecosystems.length !== 0 && <CheckMark />}
-            <MenuHeading title={'Ecosystem'} />
+            <MenuHeading
+              title={'Ecosystem'}
+              active={ecosystems?.length !== 0}
+            />
             <CustomList
               options={filterEcosystem}
               value={ecosystems}
@@ -77,10 +78,9 @@ const CompFilters = ({ filters, reset }) => {
           </Menu>
         </Box>
         {/* KIND */}
-        <Box width={'fit-content'} position={'relative'}>
+        <Box width={'fit-content'}>
           <Menu closeOnSelect={false}>
-            {kinds.length !== 0 && <CheckMark />}
-            <MenuHeading title={'Type'} />
+            <MenuHeading title={'Type'} active={kinds?.length !== 0} />
             <CustomList
               value={kinds}
               options={filterKinds}
@@ -89,10 +89,9 @@ const CompFilters = ({ filters, reset }) => {
           </Menu>
         </Box>
         {/* LICENSES */}
-        <Box width={'fit-content'} position={'relative'}>
+        <Box width={'fit-content'}>
           <Menu closeOnSelect={false}>
-            {licenses.length !== 0 && <CheckMark />}
-            <MenuHeading title={'Licenses'} />
+            <MenuHeading title={'Licenses'} active={licenses?.length !== 0} />
             <CustomList
               options={filterLicenses}
               value={licenses}
@@ -101,10 +100,9 @@ const CompFilters = ({ filters, reset }) => {
           </Menu>
         </Box>
         {/* SUPPLIER */}
-        <Box width={'fit-content'} position={'relative'}>
+        <Box width={'fit-content'}>
           <Menu closeOnSelect={false}>
-            {suppliers.length !== 0 && <CheckMark />}
-            <MenuHeading title={'Suppliers'} />
+            <MenuHeading title={'Suppliers'} active={suppliers?.length !== 0} />
             <CustomList
               options={filterSuppliers}
               value={suppliers}
@@ -113,10 +111,12 @@ const CompFilters = ({ filters, reset }) => {
           </Menu>
         </Box>
         {/* TYPE */}
-        <Box width={'fit-content'} position={'relative'}>
+        <Box width={'fit-content'}>
           <Menu closeOnSelect={false}>
-            {scope !== '' && scope !== 'all' && <CheckMark />}
-            <MenuHeading title={'Visibility'} />
+            <MenuHeading
+              title={'Visibility'}
+              active={scope !== '' && scope !== 'all'}
+            />
             <CustomList
               type='radio'
               options={['primary', 'internal']}

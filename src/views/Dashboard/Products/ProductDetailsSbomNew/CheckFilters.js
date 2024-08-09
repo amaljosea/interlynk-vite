@@ -11,7 +11,6 @@ import {
   Stack
 } from '@chakra-ui/react'
 
-import CheckMark from 'components/Misc/CheckMark'
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
@@ -77,10 +76,9 @@ const CheckFilters = ({ filters, setCheckState }) => {
       <Stack direction={'row'} alignItems={'center'} gap={1}>
         {/* CHECK ID */}
         {data && (
-          <Box width={'fit-content'} position={'relative'}>
+          <Box width={'fit-content'}>
             <Menu closeOnSelect={false}>
-              {rules.length !== 0 && <CheckMark />}
-              <MenuHeading title={'Check ID'} />
+              <MenuHeading title={'Check ID'} active={rules.length !== 0} />
               <MenuList
                 minHeight={'auto'}
                 maxHeight={'300px'}
@@ -123,10 +121,9 @@ const CheckFilters = ({ filters, setCheckState }) => {
           </Box>
         )}
         {/* CATEGORY */}
-        <Box width={'fit-content'} position={'relative'}>
+        <Box width={'fit-content'}>
           <Menu closeOnSelect={false}>
-            {categories.length !== 0 && <CheckMark />}
-            <MenuHeading title={'Category'} />
+            <MenuHeading title={'Category'} active={categories.length !== 0} />
             <CustomList
               options={checkCategories}
               value={categories}
@@ -135,10 +132,9 @@ const CheckFilters = ({ filters, setCheckState }) => {
           </Menu>
         </Box>
         {/* SEVERITY */}
-        <Box width={'fit-content'} position={'relative'}>
+        <Box width={'fit-content'}>
           <Menu closeOnSelect={false}>
-            {severities.length !== 0 && <CheckMark />}
-            <MenuHeading title={'Severity'} />
+            <MenuHeading title={'Severity'} active={severities.length !== 0} />
             <CustomList
               options={['critical', 'high', 'medium', 'low']}
               value={severities}
@@ -147,10 +143,9 @@ const CheckFilters = ({ filters, setCheckState }) => {
           </Menu>
         </Box>
         {/* STATUS */}
-        <Box width={'fit-content'} position={'relative'}>
+        <Box width={'fit-content'}>
           <Menu closeOnSelect={false}>
-            {statues.length !== 0 && <CheckMark />}
-            <MenuHeading title={'Resolution'} />
+            <MenuHeading title={'Resolution'} active={statues.length !== 0} />
             <CustomList
               options={checkStatuses}
               value={statues}

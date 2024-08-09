@@ -4,24 +4,20 @@ import { hexToRGBA } from 'utils'
 
 import {
   Box,
-  Button,
   Menu,
-  MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
   Stack,
-  Tag,
-  useColorModeValue
+  Tag
 } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
+import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetLabels } from 'graphQL/Queries'
-
-import { FaFilter } from 'react-icons/fa'
 
 const ProdFilterMenu = ({ enabled, onFilter }) => {
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
@@ -50,9 +46,9 @@ const ProdFilterMenu = ({ enabled, onFilter }) => {
           <MenuHeading title={'Active'} active={enabled !== undefined} />
           <CustomList
             type='radio'
+            onChange={onFilter}
             options={['yes', 'no']}
             value={enabled === true ? 'yes' : enabled === false ? 'no' : 'all'}
-            onChange={onFilter}
           />
         </Menu>
       </Box>
@@ -96,27 +92,3 @@ const ProdFilterMenu = ({ enabled, onFilter }) => {
 }
 
 export default ProdFilterMenu
-
-const MenuHeading = ({ title, onClick, active }) => {
-  const grayBorder = useColorModeValue('#1A202C29', '#ffffff29')
-  const grayText = useColorModeValue('#03030399', '#60686f')
-  const bgActive = useColorModeValue('#EDF2F7', '')
-  const iconColor = useColorModeValue('#3182CE', '#90cdf4')
-  const activeBorderColor = useColorModeValue('#3182CE', '#90cdf499')
-
-  return (
-    <MenuButton
-      as={Button}
-      fontWeight='normal'
-      fontSize='sm'
-      leftIcon={<FaFilter size={14} color={active ? iconColor : grayText} />}
-      onClick={onClick}
-      variant='outline'
-      borderColor={active ? activeBorderColor : grayBorder}
-      color={active ? iconColor : grayText}
-      backgroundColor={active ? bgActive : 'transparent'}
-    >
-      {title}
-    </MenuButton>
-  )
-}

@@ -20,7 +20,7 @@ const CustomList = ({ type, options, value, onChange }) => {
             wordBreak={'break-all'}
             textTransform={'capitalize'}
           >
-            {item}
+            {item?.replace(/_/g, ' ')}
           </MenuItemOption>
         ))}
       </MenuOptionGroup>

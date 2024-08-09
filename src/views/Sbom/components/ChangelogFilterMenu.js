@@ -3,17 +3,9 @@ import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
-import {
-  Box,
-  Flex,
-  Menu,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
-  Text
-} from '@chakra-ui/react'
+import { Box, Flex, Menu, Text } from '@chakra-ui/react'
 
-import CheckMark from 'components/Misc/CheckMark'
+import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { GetLogFilters } from 'graphQL/Queries'
@@ -33,6 +25,8 @@ const ChangelogFilterMenu = ({ id, setFilter }) => {
     skip: tab === CHANGE_LOG ? false : true,
     variables: { id: id }
   })
+  const { logChangeTypes, logChangeBys, logChangeObjects } =
+    data?.project?.activityLogFilters || ''
 
   const onFilterType = (value) => {
     const filterValue = value?.includes('all') ? undefined : value
@@ -61,99 +55,53 @@ const ChangelogFilterMenu = ({ id, setFilter }) => {
     }))
   }
 
+  const typeOptions = logChangeTypes?.map((item) => item)
+  const userOptions = logChangeBys?.map((item) => item)
+  const objectOptions = logChangeObjects?.map((item) => item)
+
   if (loading) return <Text pt={2}>Loading...</Text>
 
   if (error) return <Text pt={2}>Something went wrong...</Text>
 
   return (
-    <Flex alignItems={'center'} gap={4}>
+    <Flex alignItems={'center'} gap={3}>
       {/* TYPE FILTER */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'}>
         <Menu closeOnSelect={true}>
-          {type.length !== 0 && <CheckMark />}
-          <MenuHeading title={'Type'} />
-          <MenuList minWidth='240px'>
-            <MenuOptionGroup
-              type='checkbox'
+          <MenuHeading title={'Type'} active={type.length !== 0} />
+          {logChangeTypes?.length > 0 && (
+            <CustomList
               value={type}
+              options={typeOptions}
               onChange={onFilterType}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {data?.project?.activityLogFilters?.logChangeTypes?.length > 0 &&
-                data?.project?.activityLogFilters?.logChangeTypes?.map(
-                  (p, index) => (
-                    <MenuItemOption
-                      value={p}
-                      key={index}
-                      fontSize={'sm'}
-                      textTransform={'capitalize'}
-                    >
-                      {p}
-                    </MenuItemOption>
-                  )
-                )}
-            </MenuOptionGroup>
-          </MenuList>
+            />
+          )}
         </Menu>
       </Box>
       {/* USER FILTER */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'}>
         <Menu closeOnSelect={true}>
-          {user.length !== 0 && <CheckMark />}
-          <MenuHeading title={'User'} />
-          <MenuList minWidth='240px'>
-            <MenuOptionGroup
-              type='checkbox'
+          <MenuHeading title={'User'} active={user.length !== 0} />
+          {logChangeBys?.length > 0 && (
+            <CustomList
               value={user}
+              options={userOptions}
               onChange={onFilterUser}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {data?.project?.activityLogFilters?.logChangeBys?.length > 0 &&
-                data?.project?.activityLogFilters?.logChangeBys?.map(
-                  (p, index) => (
-                    <MenuItemOption value={p} key={index} fontSize={'sm'}>
-                      {p}
-                    </MenuItemOption>
-                  )
-                )}
-            </MenuOptionGroup>
-          </MenuList>
+            />
+          )}
         </Menu>
       </Box>
       {/* OBJECTS FILTER */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'}>
         <Menu closeOnSelect={true}>
-          {object.length !== 0 && <CheckMark />}
-          <MenuHeading title={'Object'} />
-          <MenuList minWidth='240px'>
-            <MenuOptionGroup
-              type='checkbox'
+          <MenuHeading title={'Object'} active={object.length !== 0} />
+          {logChangeObjects?.length > 0 && (
+            <CustomList
               value={object}
+              options={objectOptions}
               onChange={onFilterObject}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {data?.project?.activityLogFilters?.logChangeObjects?.length >
-                0 &&
-                data?.project?.activityLogFilters?.logChangeObjects?.map(
-                  (p, index) => (
-                    <MenuItemOption
-                      value={p}
-                      key={index}
-                      fontSize={'sm'}
-                      textTransform={'capitalize'}
-                    >
-                      {p?.replace(/_/g, ' ')}
-                    </MenuItemOption>
-                  )
-                )}
-            </MenuOptionGroup>
-          </MenuList>
+            />
+          )}
         </Menu>
       </Box>
     </Flex>

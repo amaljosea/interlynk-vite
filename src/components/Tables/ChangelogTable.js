@@ -258,9 +258,9 @@ const ChangelogTable = ({ activeEnv }) => {
         mb={4}
       >
         <Stack
+          spacing={3}
           width={'100%'}
           direction={'row'}
-          spacing={4}
           alignItems={'flex-start'}
         >
           <SearchFilter

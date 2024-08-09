@@ -2,7 +2,6 @@ import { useState } from 'react'
 
 import { Box, Menu, Stack } from '@chakra-ui/react'
 
-import CheckMark from 'components/Misc/CheckMark'
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
@@ -43,10 +42,9 @@ const LogFilters = ({ filters, setLogState }) => {
     return (
       <Stack direction={'row'} alignItems={'center'} gap={1}>
         {/* USER */}
-        <Box width={'fit-content'} position={'relative'}>
+        <Box width={'fit-content'}>
           <Menu closeOnBlur={true}>
-            {users?.length !== 0 && <CheckMark />}
-            <MenuHeading title={'User'} />
+            <MenuHeading title={'User'} active={users?.length !== 0} />
             <CustomList
               options={logChangeBys}
               value={users}
@@ -55,10 +53,9 @@ const LogFilters = ({ filters, setLogState }) => {
           </Menu>
         </Box>
         {/* OBJECT */}
-        <Box width={'fit-content'} position={'relative'}>
+        <Box width={'fit-content'}>
           <Menu closeOnSelect={true}>
-            {objects?.length !== 0 && <CheckMark />}
-            <MenuHeading title={'Object'} />
+            <MenuHeading title={'Object'} active={objects?.length !== 0} />
             <CustomList
               options={logChangeObjects}
               value={objects}
@@ -67,10 +64,9 @@ const LogFilters = ({ filters, setLogState }) => {
           </Menu>
         </Box>
         {/* TYPE */}
-        <Box width={'fit-content'} position={'relative'}>
+        <Box width={'fit-content'}>
           <Menu closeOnSelect={true}>
-            {types?.length !== 0 && <CheckMark />}
-            <MenuHeading title={'Type'} />
+            <MenuHeading title={'Type'} active={types?.length !== 0} />
             <CustomList
               options={logChangeTypes}
               value={types}

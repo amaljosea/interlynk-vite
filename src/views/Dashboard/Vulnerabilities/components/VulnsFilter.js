@@ -1,34 +1,11 @@
-import { useQuery } from '@apollo/client'
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { filterEnvList } from 'utils'
 
-import {
-  Box,
-  Flex,
-  Menu,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
-  Stack,
-  Switch,
-  Text
-} from '@chakra-ui/react'
+import { Box, Flex, Menu, Stack, Switch, Text } from '@chakra-ui/react'
 
-import CheckMark from 'components/Misc/CheckMark'
+import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
-import { GetProjectGroup } from 'graphQL/Queries'
-
 const VulnFilters = ({ setFilter, sbomVersions }) => {
-  const params = useParams()
-  const groupId = params.productgroupid
-
-  const { data: project } = useQuery(GetProjectGroup, {
-    skip: params?.name ? false : true,
-    variables: { id: groupId }
-  })
-
   const [versions, setVersions] = useState([])
   const onFilterVesion = async (value) => {
     const filterValue = value?.includes('all') ? undefined : value
@@ -65,124 +42,62 @@ const VulnFilters = ({ setFilter, sbomVersions }) => {
     }))
   }
 
-  const envList = project && filterEnvList(project?.projectGroup?.projects)
+  const versionOptions = sbomVersions?.map((item) => item)
+  const envOptions = ['default', 'development', 'production', 'others']
+  const statusOptions = [
+    'Unspecified',
+    'In Triage',
+    'Not Affected',
+    'Affected',
+    'Fixed'
+  ]
+
+  const getStatus = (category) => {
+    switch (category) {
+      case 'versions':
+        return versions.length !== 0 && !versions.includes('all')
+      case 'envs':
+        return envs.length !== 0 && !envs.includes('all')
+      case 'statuses':
+        return statuses.length !== 0 && !statuses.includes('all')
+    }
+  }
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={2}>
       {/* VERSIONS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
-          {versions.length !== 0 && !versions.includes('all') && <CheckMark />}
-          <MenuHeading title={'Versions'} />
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
+          <MenuHeading title={'Versions'} active={getStatus('versions')} />
+          {sbomVersions?.length > 0 && (
+            <CustomList
               value={versions}
+              options={versionOptions}
               onChange={onFilterVesion}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {sbomVersions?.length > 0 &&
-                sbomVersions.map((item, index) => (
-                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item || 'Unversioned'}
-                  </MenuItemOption>
-                ))}
-            </MenuOptionGroup>
-          </MenuList>
+            />
+          )}
         </Menu>
       </Box>
       {/* ENVIRONMENT */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
-          {envs.length !== 0 && !envs.includes('all') && <CheckMark />}
-          <MenuHeading title={'Environment'} />
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
-              value={envs}
-              onChange={onFilterEnv}
-            >
-              <MenuItemOption
-                value={'all'}
-                fontSize={'sm'}
-                textTransform={'capitalize'}
-              >
-                all
-              </MenuItemOption>
-              {params?.name
-                ? envList.map((item, index) => (
-                    <MenuItemOption
-                      key={index}
-                      value={item.name}
-                      fontSize={'sm'}
-                      textTransform={'capitalize'}
-                    >
-                      {item.name}
-                    </MenuItemOption>
-                  ))
-                : ['default', 'development', 'production', 'others'].map(
-                    (item, index) => (
-                      <MenuItemOption
-                        key={index}
-                        value={item}
-                        fontSize={'sm'}
-                        textTransform={'capitalize'}
-                      >
-                        {item}
-                      </MenuItemOption>
-                    )
-                  )}
-            </MenuOptionGroup>
-          </MenuList>
+          <MenuHeading title={'Environment'} active={getStatus('envs')} />
+          <CustomList
+            value={envs}
+            onChange={onFilterEnv}
+            options={envOptions}
+          />
         </Menu>
       </Box>
       {/* STATUSES */}
       <Box width={'fit-content'} position={'relative'} hidden>
         <Menu closeOnSelect={false}>
-          {statuses.length !== 0 && !statuses.includes('all') && <CheckMark />}
-          <MenuHeading title={'Status'} />
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
-              value={statuses}
-              onChange={onFilterStatus}
-            >
-              {[
-                'all',
-                'Unspecified',
-                'In Triage',
-                'Not Affected',
-                'Affected',
-                'Fixed'
-              ].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
+          <MenuHeading title={'Status'} active={getStatus('statuses')} />
+          <CustomList
+            value={statuses}
+            onChange={onFilterStatus}
+            options={statusOptions}
+          />
         </Menu>
       </Box>
       {/* INCOMPLETE STATUS */}

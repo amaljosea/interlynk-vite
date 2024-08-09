@@ -142,6 +142,7 @@ const GlobalVulnsFilters = ({ setFilters }) => {
   const [minEpss, setMinEpss] = useState(0)
   const [maxEpss, setMaxEpss] = useState(0)
   const handleSubmit = () => {
+    setEpss('')
     const value = `${minEpss}-${maxEpss}`
     const epssRange = value !== 'all' && value !== '' && value?.split('-')
     const range = {
@@ -156,17 +157,32 @@ const GlobalVulnsFilters = ({ setFilters }) => {
     onClose()
   }
 
+  const getStatus = (category) => {
+    switch (category) {
+      case 'products':
+        return products?.length !== 0 && !products.includes('all')
+      case 'envs':
+        return envs.length !== 0 && !envs.includes('all')
+      case 'severities':
+        return severities?.length !== 0 && !severities.includes('all')
+      case 'statues':
+        return statues.length !== 0 && !statues.includes('all')
+      case 'kev':
+        return kev !== 'all' && kev !== ''
+      case 'epss':
+        return (epss !== '' && epss !== 'all') || minEpss !== 0 || maxEpss !== 0
+    }
+  }
+
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* PRODUCTS */}
       <Box
         width={'fit-content'}
-        position={'relative'}
         display={params?.productgroupid ? 'none' : 'block'}
       >
         <Menu closeOnSelect={false}>
-          {products?.length !== 0 && !products.includes('all') && <CheckMark />}
-          <MenuHeading title={'Product'} />
+          <MenuHeading title={'Product'} active={getStatus('products')} />
           <MenuList minH={'auto'} maxH={'300px'} overflowY={'scroll'}>
             <MenuOptionGroup
               type='checkbox'
@@ -188,12 +204,10 @@ const GlobalVulnsFilters = ({ setFilters }) => {
       {/* ENVIRONMENT */}
       <Box
         width={'fit-content'}
-        position={'relative'}
         display={params?.productgroupid ? 'none' : 'block'}
       >
         <Menu closeOnSelect={false}>
-          {envs.length !== 0 && !envs.includes('all') && <CheckMark />}
-          <MenuHeading title={'Environment'} />
+          <MenuHeading title={'Environment'} active={getStatus('envs')} />
           <CustomList
             options={['default', 'development', 'production']}
             value={envs}
@@ -202,12 +216,9 @@ const GlobalVulnsFilters = ({ setFilters }) => {
         </Menu>
       </Box>
       {/* SEVERITY */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'}>
         <Menu closeOnSelect={false}>
-          {severities?.length !== 0 && !severities.includes('all') && (
-            <CheckMark />
-          )}
-          <MenuHeading title={'Severity'} />
+          <MenuHeading title={'Severity'} active={getStatus('severities')} />
           <CustomList
             options={['critical', 'high', 'medium', 'low', 'unknown']}
             value={severities}
@@ -216,10 +227,9 @@ const GlobalVulnsFilters = ({ setFilters }) => {
         </Menu>
       </Box>
       {/* STATUSES */}
-      <Box width={'fit-content'} position={'relative'} hidden>
+      <Box width={'fit-content'} hidden>
         <Menu closeOnSelect={false}>
-          {statues.length !== 0 && !statues.includes('all') && <CheckMark />}
-          <MenuHeading title={'Status'} />
+          <MenuHeading title={'Status'} active={getStatus('statues')} />
           <CustomList
             options={['Affected', 'Fixed', 'In Triage', 'Not Affected']}
             value={statues}
@@ -228,10 +238,9 @@ const GlobalVulnsFilters = ({ setFilters }) => {
         </Menu>
       </Box>
       {/* KEV */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'}>
         <Menu closeOnSelect={false}>
-          {kev !== 'all' && kev !== '' && <CheckMark />}
-          <MenuHeading title={'KEV'} />
+          <MenuHeading title={'KEV'} active={getStatus('kev')} />
           <CustomList
             type='radio'
             options={['yes', 'no']}
@@ -241,10 +250,13 @@ const GlobalVulnsFilters = ({ setFilters }) => {
         </Menu>
       </Box>
       {/* EPSS */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'}>
         <Menu closeOnSelect={false} isOpen={isOpen} onClose={onClose}>
-          {epss !== '' && epss !== 'all' && <CheckMark />}
-          <MenuHeading title={'EPSS'} onClick={onOpen} />
+          <MenuHeading
+            title={'EPSS'}
+            onClick={onOpen}
+            active={getStatus('epss')}
+          />
           <MenuList>
             <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
               <MenuItemOption value={'all'} fontSize={'sm'}>

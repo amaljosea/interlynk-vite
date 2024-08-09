@@ -2,18 +2,14 @@ import { useState } from 'react'
 
 import {
   Box,
-  Button,
   Menu,
-  MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
 
-import CheckMark from 'components/Misc/CheckMark'
-
-import { FaFilter } from 'react-icons/fa'
+import MenuHeading from 'components/Misc/MenuHeading'
 
 const LicenseFilter = ({ onFilter }) => {
   const [status, setStatus] = useState([undefined])
@@ -57,16 +53,7 @@ const LicenseFilter = ({ onFilter }) => {
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {status[0] && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Status
-          </MenuButton>
+          <MenuHeading title={'Status'} active={status[0]} />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
@@ -80,16 +67,7 @@ const LicenseFilter = ({ onFilter }) => {
       </Box>
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {spdx[0] && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            License Type
-          </MenuButton>
+          <MenuHeading title={'License Type'} active={spdx[0]} />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'

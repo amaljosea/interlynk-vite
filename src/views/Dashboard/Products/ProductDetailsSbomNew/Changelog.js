@@ -522,7 +522,7 @@ const Changelog = () => {
         <Stack
           width={'100%'}
           direction={'row'}
-          spacing={4}
+          spacing={3}
           alignItems={'flex-start'}
         >
           <SearchFilter

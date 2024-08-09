@@ -271,7 +271,7 @@ const ProductTable = ({
           alignItems={'center'}
           justifyContent={'space-between'}
         >
-          <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          <Stack direction={'row'} spacing={3} alignItems={'center'}>
             {/* SEARCH PRODUCTS */}
             <ProductSearchFilter
               id='product'

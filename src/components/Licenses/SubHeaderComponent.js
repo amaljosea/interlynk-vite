@@ -12,7 +12,7 @@ export const SubHeaderComponent = ({
 }) => {
   return (
     <Flex width={'100%'} alignItems={'center'} gap={3}>
-      <Stack width={'100%'} direction={'row'} spacing={4} alignItems={'center'}>
+      <Stack width={'100%'} direction={'row'} spacing={3} alignItems={'center'}>
         <Filter setFilters={setFilters} />
       </Stack>
 

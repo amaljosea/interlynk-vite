@@ -17,7 +17,6 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import CheckMark from 'components/Misc/CheckMark'
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
@@ -110,10 +109,12 @@ const VulnFilters = ({ reset }) => {
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* COMPONENT */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'}>
         <Menu closeOnSelect={false}>
-          {(direct !== 'all' || components?.length > 0) && <CheckMark />}
-          <MenuHeading title={'Component'} />
+          <MenuHeading
+            title={'Component'}
+            active={direct !== 'all' || components?.length > 0}
+          />
           <MenuList
             minH={'auto'}
             maxH={'300px'}
@@ -162,10 +163,12 @@ const VulnFilters = ({ reset }) => {
         </Menu>
       </Box>
       {/* STATUS */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'}>
         <Menu closeOnSelect={false}>
-          {(vexComplete !== 'all' || statues?.length > 0) && <CheckMark />}
-          <MenuHeading title={'Status'} />
+          <MenuHeading
+            title={'Status'}
+            active={vexComplete !== 'all' || statues?.length > 0}
+          />
           <MenuList
             minH={'auto'}
             maxH={'300px'}
@@ -220,10 +223,9 @@ const VulnFilters = ({ reset }) => {
         </Menu>
       </Box>
       {/* SEVERITY */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'}>
         <Menu closeOnSelect={false}>
-          {severities.length !== 0 && <CheckMark />}
-          <MenuHeading title={'Severity'} />
+          <MenuHeading title={'Severity'} active={severities.length !== 0} />
           <CustomList
             options={['critical', 'high', 'medium', 'low', 'unknown']}
             value={severities}
@@ -232,10 +234,9 @@ const VulnFilters = ({ reset }) => {
         </Menu>
       </Box>
       {/* KEV */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'}>
         <Menu closeOnSelect={false}>
-          {kev !== 'all' && kev !== '' && <CheckMark />}
-          <MenuHeading title={'KEV'} />
+          <MenuHeading title={'KEV'} active={kev !== 'all' && kev !== ''} />
           <CustomList
             type='radio'
             options={['yes', 'no']}
@@ -245,10 +246,13 @@ const VulnFilters = ({ reset }) => {
         </Menu>
       </Box>
       {/* EPSS */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'}>
         <Menu closeOnSelect={false} isOpen={isOpen} onClose={onClose}>
-          {epss !== '' && epss !== 'all' && <CheckMark />}
-          <MenuHeading title={'EPSS'} onClick={onOpen} />
+          <MenuHeading
+            title={'EPSS'}
+            onClick={onOpen}
+            active={epss !== '' && epss !== 'all'}
+          />
           <MenuList>
             <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -318,10 +322,9 @@ const VulnFilters = ({ reset }) => {
         </Menu>
       </Box>
       {/* INCLUDE */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'}>
         <Menu closeOnSelect={false}>
-          {include.length !== 0 && <CheckMark />}
-          <MenuHeading title={'Include'} />
+          <MenuHeading title={'Include'} active={include.length !== 0} />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
