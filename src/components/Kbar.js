@@ -5,12 +5,10 @@ import {
   KBarPositioner,
   KBarResults,
   KBarSearch,
-  useKBar,
   useMatches,
   useRegisterActions
 } from 'kbar'
 import { Fragment, useMemo } from 'react'
-import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { settingActions } from 'variables/general'
 
@@ -28,17 +26,11 @@ import { FaRegWindowMaximize } from 'react-icons/fa'
 import { FaRegFile, FaScrewdriverWrench } from 'react-icons/fa6'
 
 const Kbar = () => {
-  const [searchQuery, setSearchQuery] = useState('')
-
-  // hooks
-  const { query } = useKBar((state) => ({
-    query: state.query,
-    disabled: state.disabled
-  }))
   const { results, rootActionId } = useMatches()
   const navigate = useNavigate()
-  const location = useLocation()
   const params = useParams()
+  const location = useLocation()
+
   const {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
@@ -67,65 +59,6 @@ const Kbar = () => {
       .flatMap((group) => group.projects)
       .find((item) => item.name === value)
     onChangeEnv(env?.name)
-  }
-
-  // Function to disabled KBAR
-  const kBarDisabledTrue = () => {
-    query.disable(true)
-  }
-
-  // Function to enable KBAR
-  const kBarDisabledFalse = () => {
-    query.disable(false)
-  }
-
-  //Function to clean up after executing the '..' shortcut
-  const executeNavigationCleanup = () => {
-    setSearchQuery('')
-    kBarDisabledTrue()
-    setTimeout(() => {
-      kBarDisabledFalse()
-    }, 100)
-  }
-
-  //Effect to run code when the search input is ".."
-  //The function strictly takes user back a level for the products details and product version page. For all other pages, it navigates back to the previous URL
-  useEffect(() => {
-    if (searchQuery.trim() === '..') {
-      const isProductVersionPage = location.pathname.includes('version')
-
-      const isProductDetailsPage =
-        location.pathname.includes('products') &&
-        location.pathname.includes('env')
-
-      const isProductsPage = location.pathname === '/vendor/products'
-
-      if (isProductVersionPage) {
-        const link = generateProductDetailPageUrlFromCurrentUrl({
-          productgroupid: params.productgroupid,
-          productid: params.productid
-        })
-        navigate(link)
-        executeNavigationCleanup()
-      } else if (isProductDetailsPage) {
-        const link = '/vendor/products'
-        navigate(link)
-        executeNavigationCleanup()
-      } else if (isProductsPage) {
-        const link = '/vendor/dashboard'
-        navigate(link)
-        executeNavigationCleanup()
-      } else {
-        navigate(-1)
-        executeNavigationCleanup()
-      }
-    }
-  }, [searchQuery])
-
-  //Input capture to check if the input is '..'
-  const handleInputChange = (event) => {
-    const { value } = event.target
-    setSearchQuery(value)
   }
 
   let data = []
@@ -186,8 +119,78 @@ const Kbar = () => {
     })
   }
 
+  //Shortcuts
+  //.. shortcut
+  data.push({
+    id: '..',
+    name: '..  Go back a level',
+    section: 'shortcuts',
+    icon: <FaRegFile color='#718096' />,
+    perform: () => {
+      const isVulnerabilityDetailsPage =
+        location.pathname.includes('products') &&
+        location.pathname.includes('env') &&
+        location.pathname.includes('vulnerability')
+
+      const isProductVersionPage = location.pathname.includes('version')
+
+      const isProductDetailsPage =
+        location.pathname.includes('products') &&
+        location.pathname.includes('env')
+
+      const isProductsPage = location.pathname === '/vendor/products'
+
+      if (isVulnerabilityDetailsPage) {
+        const link = generateProductDetailPageUrlFromCurrentUrl({
+          productgroupid: params.productgroupid,
+          productid: params.productid,
+          paramsObj: { tab: 'vulnerabilities' }
+        })
+        navigate(link)
+      } else if (isProductVersionPage) {
+        const link = generateProductDetailPageUrlFromCurrentUrl({
+          productgroupid: params.productgroupid,
+          productid: params.productid
+        })
+        navigate(link)
+      } else if (isProductDetailsPage) {
+        const link = '/vendor/products'
+        navigate(link)
+      } else if (isProductsPage) {
+        const link = '/vendor/dashboard'
+        navigate(link)
+      } else {
+        return
+      }
+    }
+  })
+
+  // '/' shortcut
+  data.push({
+    id: '/',
+    name: '/  Go Back to first level',
+    section: 'shortcuts',
+    icon: <FaRegFile color='#718096' />,
+    perform: () => {
+      const isVulnerabilityRelatedPage =
+        location.pathname.includes('vulnerabilities')
+
+      const isProductsRelatedPage = location.pathname.includes('products')
+
+      if (isVulnerabilityRelatedPage) {
+        const link = '/vendor/vulnerabilities'
+        navigate(link)
+      } else if (isProductsRelatedPage) {
+        const link = '/vendor/products'
+        navigate(link)
+      } else {
+        return
+      }
+    }
+  })
+
   useThemeActions()
-  useRegisterActions(data, [productData, envName])
+  useRegisterActions(data, [productData, envName, params])
 
   const ResultItem = ({ item, active, currentRootActionId }) => {
     const ancestors = useMemo(() => {
@@ -259,11 +262,7 @@ const Kbar = () => {
             {/* search icon */}
             <SearchIcon color={'gray.500'} />
             {/* search input */}
-            <KBarSearch
-              onChange={handleInputChange}
-              value={searchQuery}
-              className='kbar_search'
-            />
+            <KBarSearch className='kbar_search' />
           </div>
           <div className='kbar_result_container'>
             {/* search results */}

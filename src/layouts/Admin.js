@@ -24,6 +24,7 @@ import { logoutUser } from '../utils/authUtils'
 
 export default function Admin() {
   const params = useParams()
+
   const { steps } = useTour()
   const navigate = useNavigate()
   const { colorMode } = useColorMode()
