@@ -559,6 +559,11 @@ export const GetProjectGroup = gql`
       name
       organizationId
       updatedAt
+      labels {
+        id
+        name
+        color
+      }
       defaultProject {
         description
         enabled
