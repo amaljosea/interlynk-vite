@@ -144,7 +144,7 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
       mergedArray.push(...existingData)
     }
     if (url !== '' && !validateUrl(url)) {
-      setIsValidUrl('Please enter a valid URL including http:// or https://')
+      setIsValidUrl('Please enter a valid URL')
     } else {
       updateMfc({
         variables: {

@@ -15,7 +15,6 @@ import {
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import NotificationChannels from 'components/Notifications/NotificationChannels'
 import LegalTable from 'components/Tables/LegalTable'
 import OrgTable from 'components/Tables/OrgTable'
 import RoleTable from 'components/Tables/RoleTable'
