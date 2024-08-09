@@ -3,6 +3,7 @@ import { useTour } from '@reactour/tour'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { truncatedValue } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { Search2Icon } from '@chakra-ui/icons'
@@ -378,7 +379,7 @@ const ProductDetailsMain = () => {
                       fontSize={25}
                       lineHeight={1.2}
                     >
-                      {name || ''}
+                      {truncatedValue(name)}
                     </Text>
                     {/* PRODUCT DESCRIPTION */}
                     <Text fontSize={'sm'}>{description || ''}</Text>

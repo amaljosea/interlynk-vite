@@ -59,6 +59,7 @@ import {
 } from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
+import { truncatedValue } from 'utils'
 
 const ProductTable = ({
   data,
@@ -419,7 +420,7 @@ const ProductTable = ({
                   width={'fit-content'}
                   onClick={handleClick}
                 >
-                  {name}
+                  {truncatedValue(name)}
                 </Text>
                 {shouldShowDemoFeatures &&
                   labels?.map((item) => (
