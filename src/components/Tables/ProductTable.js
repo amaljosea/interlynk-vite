@@ -83,6 +83,7 @@ const ProductTable = ({
   const timeColor = useColorModeValue('#00000099', '#FFFFFF99')
   const borderColor = useColorModeValue('#3182CE66', '#90cdf499')
   const envIconColor = useColorModeValue('#3182CE', '#90cdf4')
+  const dividerColor = useColorModeValue('#0000001f', '#ffffff1A')
 
   const { search, enabled, field } = filters
   const { totalRows } = paginationProps
@@ -357,6 +358,11 @@ const ProductTable = ({
               setActiveRow(row)
               onWarningOpen()
             }}
+            sx={{
+              '.chakra-switch__track[data-checked]:not([data-theme])': {
+                backgroundColor: '#3182ce'
+              }
+            }}
           />
         )
       },
@@ -411,7 +417,7 @@ const ProductTable = ({
                 </IconBox>
               </Olink>
             </Tooltip>
-            <Flex gap={1} flexWrap={'wrap'} flexDirection={'column'}>
+            <Flex gap={2} flexWrap={'wrap'} flexDirection={'column'}>
               <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
                 <Text
                   fontSize={16}
@@ -463,7 +469,6 @@ const ProductTable = ({
         const dateB = new Date(b.updatedAt)
         return dateA - dateB
       },
-      right: 'true',
       wrap: true
     },
     // ENVIRONMENT
@@ -640,7 +645,7 @@ const ProductTable = ({
     columns: columns,
     data: data || [],
     onSort: handleSort,
-    customStyles: customStyles(headColor),
+    customStyles: customStyles(headColor, dividerColor),
     defaultSortFieldId: field,
     defaultSortAsc: false,
     subHeader: true,

@@ -636,7 +636,7 @@ export function generateRandomId(length = 12) {
   return randomId
 }
 
-export const customStyles = (headColor) => {
+export const customStyles = (headColor, dividerColor) => {
   return {
     headCells: {
       style: {
@@ -646,6 +646,13 @@ export const customStyles = (headColor) => {
         color: headColor // change this to the desired text color
       }
     },
+    headRow: {
+      style: {
+        borderBottomStyle: 'solid',
+        borderBottomWidth: '1px',
+        borderBottomColor: dividerColor
+      }
+    },
     cells: {
       style: {
         backgroundColor: 'transparent' // cell background color
@@ -653,7 +660,12 @@ export const customStyles = (headColor) => {
     },
     rows: {
       style: {
-        backgroundColor: 'transparent' // row background color
+        backgroundColor: 'transparent', // row background color
+        '&:not(:last-of-type)': {
+          borderBottomStyle: 'solid',
+          borderBottomWidth: '1px',
+          borderBottomColor: dividerColor
+        }
       },
       stripedStyle: {
         backgroundColor: 'transparent' // striped row background color
