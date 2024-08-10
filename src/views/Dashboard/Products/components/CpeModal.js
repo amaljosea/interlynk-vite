@@ -39,7 +39,6 @@ const CpeModal = ({
   setCpeValue,
   cpeValue,
   activeComp,
-  refetch,
   getCpe,
   activeRow,
   ruleExists
@@ -89,9 +88,7 @@ const CpeModal = ({
   const { cpeString } = prodCompState
   const { prodCompDispatch } = dispatch
 
-  const [updateComponent] = useMutation(UpdateComponent, {
-    onCompleted: (data) => data && refetch()
-  })
+  const [updateComponent] = useMutation(UpdateComponent)
 
   // ON BLUR UPDATE
   const onBlurUpdate = () => {

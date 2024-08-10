@@ -38,7 +38,7 @@ import { GetImages } from 'graphQL/Queries'
 function SBOMDrawer(props) {
   const { showToast } = useCustomToast()
 
-  const { isOpen, onClose, refetch, id, shareUsers, contents } = props
+  const { isOpen, onClose, id, shareUsers, contents } = props
 
   const { data: allImages } = useQuery(GetImages, {
     variables: {
@@ -128,7 +128,7 @@ function SBOMDrawer(props) {
           }
         }).then((res) => {
           console.log(`Res`, res)
-          refetch()
+
           setEmailList([])
           setSelectedProd([])
           onClose()
@@ -155,7 +155,6 @@ function SBOMDrawer(props) {
           }
         }).then((res) => {
           console.log(`Res`, res)
-          refetch()
           setEmailList([])
           setSelectedProd([])
           onClose()

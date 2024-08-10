@@ -472,7 +472,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
           btnRef={btnRef}
           data={data}
           selectedKey={selectedKey}
-          refetch={refetch}
           checkId={null}
         />
       )}
@@ -513,7 +512,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
       {/* SUPPLIER MODAL */}
       {isSupOpen && data && (
         <PriSupplierModal
-          refetch={refetch}
           isOpen={isSupOpen}
           onClose={onSupClose}
           suppliers={data.suppliers}

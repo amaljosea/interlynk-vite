@@ -102,17 +102,14 @@ const Checks = () => {
     })
 
   // GET HEALTH CHECK FILTER HEADS
-  const { data: filterHead, refetch: filterRefetch } = useQuery(
-    GetCheckFilterData,
-    {
-      fetchPolicy: 'network-only',
-      skip: activeTab === 'checks' ? false : true,
-      variables: {
-        projectId: productId,
-        sbomId
-      }
+  const { data: filterHead } = useQuery(GetCheckFilterData, {
+    fetchPolicy: 'network-only',
+    skip: activeTab === 'checks' ? false : true,
+    variables: {
+      projectId: productId,
+      sbomId
     }
-  )
+  })
 
   const handleRefetch = useCallback(() => {
     showToast({
@@ -122,8 +119,7 @@ const Checks = () => {
     })
     reset()
     refetch()
-    filterRefetch()
-  }, [filterRefetch, refetch, reset, showToast])
+  }, [refetch, reset, showToast])
 
   const editChecks = useHasPermission({
     parentKey: 'view_sbom',
@@ -240,14 +236,13 @@ const Checks = () => {
       }
     }).then((res) => {
       if (res.data) {
-        handleRefetch()
         showToast({
           description: 'Health re-check successfully',
           status: 'success'
         })
       }
     })
-  }, [handleRefetch, healthRecheck, sbomId, showToast])
+  }, [healthRecheck, sbomId, showToast])
 
   const setSearchFilter = useCallback(
     (value) => {
@@ -410,7 +405,6 @@ const Checks = () => {
     })
       .then((res) => {
         if (res.data) {
-          handleRefetch()
           healthRecheck({
             variables: {
               checkId: row.organizationRule.rule.friendlyId,
@@ -815,7 +809,6 @@ const Checks = () => {
             <CheckModal
               activeRow={activeRow}
               isOpen={isPrimaryOpen}
-              refetch={handleRefetch}
               ruleExists={ruleExists}
               onClose={onPrimaryClose}
             />
@@ -827,7 +820,6 @@ const Checks = () => {
               activeRow={activeRow}
               isOpen={isVersionOpen}
               ruleExists={ruleExists}
-              refetch={handleRefetch}
               onClose={onVersionClose}
             />
           )}
@@ -838,7 +830,6 @@ const Checks = () => {
               activeRow={activeRow}
               isOpen={isLicenseOpen}
               ruleExists={ruleExists}
-              refetch={handleRefetch}
               onClose={onLicenseClose}
             />
           )}
@@ -849,7 +840,6 @@ const Checks = () => {
               isOpen={isTypeOpen}
               onClose={onTypeClose}
               activeRow={activeRow}
-              refetch={handleRefetch}
               ruleExists={ruleExists}
             />
           )}
@@ -872,7 +862,6 @@ const Checks = () => {
               onClose={onClose}
               activeRow={activeRow}
               ruleExists={ruleExists}
-              refetch={handleRefetch}
             />
           )}
 
@@ -885,7 +874,6 @@ const Checks = () => {
               purlValue={purlValue}
               activeRow={activeRow}
               onClose={onPurlClose}
-              refetch={handleRefetch}
               ruleExists={ruleExists}
               setPurlValue={setPurlValue}
             />
@@ -902,7 +890,6 @@ const Checks = () => {
               onClose={onCpeClose}
               activeRow={activeRow}
               ruleExists={ruleExists}
-              refetch={handleRefetch}
               selectedCpe={selectedCpe}
               setCpeValue={setCpeValue}
               onCreateCpe={handleCreateCpe}
@@ -916,7 +903,6 @@ const Checks = () => {
               data={null}
               selectedKey={'tools'}
               activeRow={activeRow}
-              refetch={handleRefetch}
               isOpen={isCreationOpen}
               ruleExists={ruleExists}
               btnRef={creationToolBtn}
@@ -935,8 +921,6 @@ const Checks = () => {
               selectedKey={'author'}
               onClose={onAuthorClose}
               ruleExists={ruleExists}
-              refetch={handleRefetch}
-              filterRefetch={filterRefetch}
             />
           )}
 
@@ -948,7 +932,6 @@ const Checks = () => {
               activeRow={activeRow}
               isOpen={isDocSupOpen}
               ruleExists={ruleExists}
-              refetch={handleRefetch}
               onClose={onDocSupClose}
             />
           )}

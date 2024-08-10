@@ -91,7 +91,6 @@ const Policies = () => {
             description: 'Policy re-scan started',
             status: 'success'
           })
-          refetch()
         }
       })
     }

@@ -51,7 +51,7 @@ import {
 
 import { FaEllipsisVertical } from 'react-icons/fa6'
 
-const OrgTable = ({ data, refetch, activeOrg }) => {
+const OrgTable = ({ data, activeOrg }) => {
   const navigate = useNavigate()
   const { showToast } = useCustomToast()
   const [leaveError, setLeaveError] = useState('')
@@ -149,8 +149,6 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
           description: errors[0],
           status: 'error'
         })
-      } else {
-        refetch()
       }
     })
   }
@@ -340,7 +338,6 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
         <OrgModal
           isOpen={isOpen}
           onClose={onClose}
-          refetch={refetch}
           org={activeOrg}
           onSwitch={onSwitchOrg}
         />

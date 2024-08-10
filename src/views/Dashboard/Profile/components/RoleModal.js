@@ -23,15 +23,13 @@ import {
 import { UpdateOrganizationUserRole } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
 
-const RoleModal = ({ isOpen, onClose, refetch, data }) => {
+const RoleModal = ({ isOpen, onClose, data }) => {
   const [role, setRole] = useState(data?.role?.id)
   const [error, setError] = useState('')
 
   const { data: roles } = useQuery(GetRoles)
 
-  const [updateOrgRules] = useMutation(UpdateOrganizationUserRole, {
-    onCompleted: () => refetch()
-  })
+  const [updateOrgRules] = useMutation(UpdateOrganizationUserRole)
 
   const updateRole = async () => {
     await updateOrgRules({

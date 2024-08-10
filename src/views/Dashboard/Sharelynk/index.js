@@ -65,7 +65,6 @@ const Sharelynk = () => {
           isOpen={isOpen}
           onClose={onClose}
           btnRef={btnRef}
-          refetch={refetch}
           shareUsers={[]}
           contents={[]}
         />

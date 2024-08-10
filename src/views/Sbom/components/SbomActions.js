@@ -393,7 +393,6 @@ const SbomActions = ({ sbom, refetch }) => {
       {isPrimaryOpen && (
         <CheckModal
           ruleExists={null}
-          refetch={refetch}
           isOpen={isPrimaryOpen}
           onClose={onPrimaryClose}
           activeRow={activeRow}
@@ -424,7 +423,6 @@ const SbomActions = ({ sbom, refetch }) => {
           setStatus={setStatus}
           signedData={signedData}
           setSignedData={setSignedData}
-          refetch={refetch}
           isOpen={isVerifyOpen}
           onClose={setVerifyClose}
           sbomData={sbom}

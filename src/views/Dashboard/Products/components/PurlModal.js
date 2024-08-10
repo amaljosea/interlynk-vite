@@ -36,7 +36,6 @@ const PurlModal = ({
   isOpen,
   onClose,
   setPurlValue,
-  refetch,
   getCpe,
   activeRow,
   setIsValid,
@@ -119,9 +118,7 @@ const PurlModal = ({
     pypi: []
   }
 
-  const [updateComponent] = useMutation(UpdateComponent, {
-    onCompleted: (data) => data && refetch()
-  })
+  const [updateComponent] = useMutation(UpdateComponent)
 
   const handleComUpdate = () => {
     disableButtonTemporarily()

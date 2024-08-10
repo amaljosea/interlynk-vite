@@ -31,7 +31,6 @@ const SlackConfigModal = ({
   onClose,
   data,
   setGreenCheck,
-  refetch,
   updateCon,
   org,
   hostId

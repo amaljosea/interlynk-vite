@@ -43,16 +43,8 @@ const Feeds = () => {
       width={'100%'}
       templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
     >
-      <AdvisoryFeeds
-        refetch={refetch}
-        data={advisoryFeed}
-        manageFeeds={manageFeeds}
-      />
-      <ExploitFeeds
-        refetch={refetch}
-        data={exploitFeed}
-        manageFeeds={manageFeeds}
-      />
+      <AdvisoryFeeds data={advisoryFeed} manageFeeds={manageFeeds} />
+      <ExploitFeeds data={exploitFeed} manageFeeds={manageFeeds} />
     </Grid>
   )
 }

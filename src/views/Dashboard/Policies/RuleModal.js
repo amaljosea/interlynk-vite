@@ -29,7 +29,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { CreatePolicyRule, UpdatePolicyRule } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
 
-const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
+const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
 
   const [operator, setOperator] = useState('')
@@ -51,10 +51,6 @@ const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
 
   const [onCreateRule] = useMutation(CreatePolicyRule)
   const [onUpdateRule] = useMutation(UpdatePolicyRule)
-
-  const handleRefetch = () => {
-    refetch()
-  }
 
   const isInvalid =
     operator === '' || subject === '' || value === '' || error !== ''
@@ -94,7 +90,6 @@ const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
           status: 'success'
         })
         setError('')
-        handleRefetch()
         setValue('')
         setOperator('')
         setSubject('')
@@ -128,7 +123,6 @@ const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
           status: 'success'
         })
         setError('')
-        handleRefetch()
         setValue('')
         setOperator('')
         setSubject('')

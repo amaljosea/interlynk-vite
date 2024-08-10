@@ -186,7 +186,6 @@ function SBOMLinkRow(props) {
             onClose={onClose}
             btnRef={btnRef}
             shareUsers={emailList}
-            refetch={refetch}
             contents={contents}
           />
         )}

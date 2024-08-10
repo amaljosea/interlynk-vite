@@ -227,7 +227,7 @@ function Profile() {
                 <LegalTable />
               </TabPanel>
               <TabPanel>
-                <Connections org={true}/>
+                <Connections org={true} />
               </TabPanel>
             </TabPanels>
           </Tabs>
@@ -269,7 +269,6 @@ function Profile() {
                   isAdmin={isAdmin}
                   activeOrg={id || null}
                   data={isAdmin ? allOrgList : myOrgList}
-                  refetch={isAdmin ? allOrgRefetch : myOrgRefetch}
                 />
               </TabPanel>
               {/* SECURITY TOKEN */}
@@ -277,7 +276,7 @@ function Profile() {
                 <TokenInfo />
               </TabPanel>
               <TabPanel>
-                <Connections/>
+                <Connections />
               </TabPanel>
             </TabPanels>
           </Tabs>

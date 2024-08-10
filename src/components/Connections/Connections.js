@@ -32,16 +32,13 @@ import TeamsConfigModal from './TeamsConfigModal'
 const Connections = ({ org }) => {
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
-  const { data, refetch } = useQuery(
-    org ? GetOrgConnections : GetPersonalConnections,
-    {
-      skip: !orgView
-        ? true
-        : activetab === 'connections' || activetab === 'connections-org'
-          ? false
-          : true
-    }
-  )
+  const { data } = useQuery(org ? GetOrgConnections : GetPersonalConnections, {
+    skip: !orgView
+      ? true
+      : activetab === 'connections' || activetab === 'connections-org'
+        ? false
+        : true
+  })
   const isGithubConfigSaved = useGithubConfigSaved()
 
   const iconColor = useColorModeValue('#24292f', '#f1f1f1')
@@ -244,7 +241,6 @@ const Connections = ({ org }) => {
         <EmailConfigModal
           org={org}
           data={emailData}
-          refetch={refetch}
           isOpen={isEmailOpen}
           updateCon={updateCon}
           onClose={onEmailClose}
@@ -252,7 +248,7 @@ const Connections = ({ org }) => {
           hostId={hostId}
         />
       )}
-      
+
       {isGithubOpen && (
         <GithubConfigModal
           org={org}
@@ -260,7 +256,6 @@ const Connections = ({ org }) => {
           onClose={onGithubClose}
           data={githubData}
           setGreenCheck={setGreenCheck}
-          refetch={refetch}
         />
       )}
     </>

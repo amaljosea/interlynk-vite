@@ -161,7 +161,6 @@ const Parts = ({ sbomRefetch }) => {
     })
       .then((res) => {
         if (res.data) {
-          sbomRefetch({ projectId: prodId, sbomId: sbomId })
           prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
           prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
         }
@@ -179,9 +178,7 @@ const Parts = ({ sbomRefetch }) => {
       variables: { id: activeRow.id }
     })
       .then((res) => {
-        if (res.data) {
-          sbomRefetch({ projectId: prodId, sbomId: sbomId })
-        }
+        console.log(res)
       })
       .finally(() => onDeleteClose())
   }

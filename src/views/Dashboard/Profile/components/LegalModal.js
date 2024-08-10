@@ -41,7 +41,7 @@ const validateUrl = (url) => {
   return urlRegex.test(url)
 }
 
-const LegalModal = ({ data, isOpen, onClose, refetch }) => {
+const LegalModal = ({ data, isOpen, onClose }) => {
   const { totalRows } = useGlobalState()
   const [orgName, setOrgName] = useState('')
   const [url, setUrl] = useState('')
@@ -113,7 +113,6 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
-          refetch({ first: totalRows })
           onClose()
         }
       })
@@ -158,7 +157,6 @@ const LegalModal = ({ data, isOpen, onClose, refetch }) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
-          refetch({ first: totalRows })
           onClose()
         }
       })

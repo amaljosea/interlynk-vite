@@ -23,13 +23,7 @@ import {
 
 import useCustomToast from 'hooks/useCustomToast'
 
-const GithubConfigModal = ({
-  isOpen,
-  onClose,
-  setGreenCheck,
-  data,
-  refetch
-}) => {
+const GithubConfigModal = ({ isOpen, onClose, setGreenCheck, data }) => {
   const { showToast } = useCustomToast()
 
   const [githubApiToken, setGithubApiToken] = useState('')
@@ -56,7 +50,6 @@ const GithubConfigModal = ({
   const handleSave = () => {
     setGreenCheck((prev) => ({ ...prev, github: !isSaveDisabled }))
     resetChanges()
-    refetch()
     onClose()
     localStorage.setItem('githubConfigSaved', 'true')
     showToast({

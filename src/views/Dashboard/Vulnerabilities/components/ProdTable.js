@@ -55,15 +55,17 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
     vexComplete: false
   })
 
-  const { nodes, paginationProps, refetch, loading, reset } =
-    usePaginatatedQuery(GetCompVulnData, {
+  const { nodes, paginationProps, loading, reset } = usePaginatatedQuery(
+    GetCompVulnData,
+    {
       skip: vulnId ? false : true,
       selector: 'componentVulns',
       variables: {
         ...vulnState,
         id: vulnId
       }
-    })
+    }
+  )
 
   const [getSboms, { data: connectedSboms }] = useLazyQuery(GetConnectedSbom)
 

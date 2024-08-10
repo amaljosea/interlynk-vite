@@ -31,7 +31,6 @@ const EmailConfigModal = ({
   onClose,
   data,
   setGreenCheck,
-  refetch,
   updateCon,
   org,
   hostId
@@ -67,7 +66,6 @@ const EmailConfigModal = ({
     }).then((res) => {
       if (res?.data?.emailConnectionCreate?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, email: true }))
-        refetch()
         onClose()
         showToast({
           title: 'Configuration saved.',
@@ -95,7 +93,6 @@ const EmailConfigModal = ({
     }).then((res) => {
       if (res?.data?.emailConnectionUpdate?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, email: true }))
-        refetch()
         onClose()
         showToast({
           title: 'Configuration saved.',
@@ -123,7 +120,6 @@ const EmailConfigModal = ({
     }).then((res) => {
       if (res?.data?.emailConnectionDelete?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, email: false }))
-        refetch()
         onClose()
         showToast({
           title: 'Configuration deleted.',

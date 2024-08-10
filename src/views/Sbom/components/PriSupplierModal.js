@@ -28,7 +28,6 @@ import { AutomationRuleCreate } from 'graphQL/Mutation'
 const PriSupplierModal = ({
   isOpen,
   onClose,
-  refetch,
   suppliers,
   activeRow,
   ruleExists
@@ -95,12 +94,8 @@ const PriSupplierModal = ({
     (supEmail !== '' && !validateEmail(supEmail)) ||
     (orgUrl !== '' && !validateUrl(orgUrl))
 
-  const [createSupplier] = useMutation(supplierCreate, {
-    onCompleted: (data) => data && refetch()
-  })
-  const [updateSupplier] = useMutation(supplierUpdate, {
-    onCompleted: (data) => data && refetch()
-  })
+  const [createSupplier] = useMutation(supplierCreate)
+  const [updateSupplier] = useMutation(supplierUpdate)
 
   useEffect(() => {
     if (suppliers && suppliers.length > 0) {

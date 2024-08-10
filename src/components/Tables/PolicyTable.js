@@ -519,7 +519,6 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
           data={activeRule}
           isOpen={isRuleOpen}
           onClose={onRuleClose}
-          refetch={refetch}
         />
       )}
 
@@ -528,7 +527,6 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
           isOpen={isWarningOpen}
           onClose={onWarningClose}
           data={activeRow}
-          refetch={refetch}
         />
       )}
       {isDeleteOpen && (

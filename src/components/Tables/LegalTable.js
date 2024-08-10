@@ -62,7 +62,7 @@ const LegalTable = () => {
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const iconColor = useColorModeValue('#718096', '#F7FAFC')
 
-  const { data, loading, refetch } = useQuery(GetOrgManufacturers, {
+  const { data, loading } = useQuery(GetOrgManufacturers, {
     skip: !orgView ? true : activetab === 'legal' ? false : true
   })
 
@@ -102,8 +102,6 @@ const LegalTable = () => {
           description: errors[0],
           status: 'error'
         })
-      } else {
-        refetch({ first: totalRows })
       }
     })
   }
@@ -320,7 +318,6 @@ const LegalTable = () => {
           data={activeRow}
           isOpen={isOpen}
           onClose={onClose}
-          refetch={refetch}
           orgs={existingData}
         />
       )}

@@ -6,7 +6,7 @@ import { PolicyUpdate } from 'graphQL/Mutation'
 
 import ConfirmationModal from '../Products/components/ConfirmationModal'
 
-const WarnModal = ({ isOpen, onClose, data, refetch }) => {
+const WarnModal = ({ isOpen, onClose, data }) => {
   const { showToast } = useCustomToast()
   const { id, isEnabled, name } = data
   const [updatePolicy] = useMutation(PolicyUpdate)
@@ -22,7 +22,6 @@ const WarnModal = ({ isOpen, onClose, data, refetch }) => {
           status: 'error'
         })
       } else {
-        refetch()
         onClose()
       }
     })

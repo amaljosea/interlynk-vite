@@ -39,7 +39,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 import { GetComponentData } from 'graphQL/Queries'
 
-const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
+const CheckModal = ({ isOpen, onClose, activeRow, ruleExists }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
@@ -98,9 +98,7 @@ const CheckModal = ({ isOpen, onClose, refetch, activeRow, ruleExists }) => {
 
   const isEmptyVersion = isComponentVersion && compVersion === ''
 
-  const [updateComponent] = useMutation(UpdateComponent, {
-    onCompleted: (data) => data && refetch()
-  })
+  const [updateComponent] = useMutation(UpdateComponent)
 
   const handleComUpdate = () => {
     disableButtonTemporarily()

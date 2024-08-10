@@ -23,7 +23,7 @@ import {
 
 import { RegisterOrganization } from 'graphQL/Mutation'
 
-const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
+const OrgModal = ({ isOpen, onClose, org, onSwitch }) => {
   const [error, setError] = useState('')
   const [name, setName] = useState('')
   const [url, setUrl] = useState('')
@@ -41,9 +41,7 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
 
   const containsSpace = /\s/.test(url)
 
-  const [registerOrg] = useMutation(RegisterOrganization, {
-    onCompleted: () => refetch()
-  })
+  const [registerOrg] = useMutation(RegisterOrganization)
 
   const handleCheckEmail = () => {
     if (!validateEmail(email)) {

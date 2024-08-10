@@ -71,12 +71,7 @@ const SbomTable = ({ data, refetch, loading, error }) => {
           </TabList>
           <TabPanels>
             <TabPanel px={1}>
-              <General
-                data={data}
-                error={error}
-                loading={loading}
-                refetch={refetch}
-              />
+              <General data={data} error={error} loading={loading} />
             </TabPanel>
             <TabPanel px={0}>
               <Parts sbomRefetch={refetch} />

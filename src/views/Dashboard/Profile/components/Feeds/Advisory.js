@@ -10,7 +10,7 @@ import CardHeader from 'components/Card/CardHeader'
 
 import { OrgSettingCreate, OrgSettingUpdate } from 'graphQL/Mutation'
 
-const AdvisoryFeeds = ({ data, refetch, manageFeeds }) => {
+const AdvisoryFeeds = ({ data, manageFeeds }) => {
   const textColor = useColorModeValue('gray.700', 'white')
   const [organizationSettingCreate] = useMutation(OrgSettingCreate)
   const [organizationSettingUpdate] = useMutation(OrgSettingUpdate)
@@ -23,14 +23,14 @@ const AdvisoryFeeds = ({ data, refetch, manageFeeds }) => {
             id: feed.id,
             value: e.target.checked ? true : false
           }
-        }).then(() => refetch())
+        })
       } else {
         await organizationSettingCreate({
           variables: {
             settingId: id,
             value: e.target.checked ? true : false
           }
-        }).then(() => refetch())
+        })
       }
     } catch (error) {
       console.log(error)

@@ -29,7 +29,7 @@ const GeneralFeed = () => {
   const customerView = location.pathname.startsWith('/customer')
   const { orgView } = useGlobalQueryContext()
 
-  const { data, refetch } = useQuery(GetOrgName, {
+  const { data } = useQuery(GetOrgName, {
     skip: !orgView || customerView
   })
 
@@ -61,12 +61,26 @@ const GeneralFeed = () => {
             setMessage('Update')
             showToast({
               description: 'Organization name updated successfully',
+              status: 'success',
+              position: 'top',
+              duration: 2000
+            })
+          }, 2000)
+        }
+      })
+      .then((res) => {
+        if (res.data.organizationUpdate.errors.length === 0) {
+          localStorage.setItem('organization', orgName)
+          setMessage('Saving....')
+          setTimeout(() => {
+            setMessage('Update')
+            showToast({
+              description: 'Organization name updated successfully',
               status: 'success'
             })
           }, 2000)
         }
       })
-      .finally(() => refetch())
   }
 
   useEffect(() => {

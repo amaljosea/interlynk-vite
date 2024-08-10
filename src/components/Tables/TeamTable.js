@@ -408,7 +408,7 @@ const TeamTable = () => {
         userId: activeRow.id
       }
     })
-      .then((res) => res.data && refetch())
+      .then((res) => res.data)
       .finally(() => onClose())
   }
 
@@ -462,12 +462,7 @@ const TeamTable = () => {
 
       {/* UPDATE User ROLE */}
       {isRoleOpen && (
-        <RoleModal
-          data={activeRow}
-          refetch={refetch}
-          isOpen={isRoleOpen}
-          onClose={onRoleClose}
-        />
+        <RoleModal data={activeRow} isOpen={isRoleOpen} onClose={onRoleClose} />
       )}
 
       {/* REMOVE User */}
