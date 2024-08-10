@@ -14,14 +14,15 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Textarea,
-  useToast
+  Textarea
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { RequestCreate } from 'graphQL/Mutation'
 
 const RequestModal = ({ isOpen, onClose }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const [email, setEmail] = useState('')
   const [productName, setProductName] = useState('')
@@ -52,12 +53,9 @@ const RequestModal = ({ isOpen, onClose }) => {
       }
     }).then((res) => {
       if (res?.data?.requestCreate?.errors?.length === 0) {
-        toast({
+        showToast({
           description: 'SBOM request is being sent to the email',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
         onClose()
       } else {

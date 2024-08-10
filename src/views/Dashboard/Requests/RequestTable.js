@@ -18,13 +18,13 @@ import {
   Text,
   Tooltip,
   useColorModeValue,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import SearchFilter from 'components/Licenses/LicenseSearchFilter'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
 
 import { RequestCancel, RequestResend } from 'graphQL/Mutation'
@@ -46,7 +46,7 @@ const RequestTable = ({
   refetch,
   paginationProps
 }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const addReq = useHasPermission({
     parentKey: 'view_requests',
@@ -195,12 +195,9 @@ const RequestTable = ({
       }
     }).then((res) => {
       if (res?.data?.requestResend?.errors?.length === 0) {
-        toast({
+        showToast({
           description: 'Request Resent',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
       }
     })
@@ -213,12 +210,9 @@ const RequestTable = ({
       }
     }).then((res) => {
       if (res?.data?.requestCancel?.errors?.length === 0) {
-        toast({
+        showToast({
           description: 'Request Canceled',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
       }
     })

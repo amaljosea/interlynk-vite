@@ -24,17 +24,17 @@ import {
   Stack,
   Tag,
   Text,
-  useColorModeValue,
-  useToast
+  useColorModeValue
 } from '@chakra-ui/react'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { UploadSbom } from 'graphQL/Mutation'
 
 const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
   const params = useParams()
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const borderColor = useColorModeValue('gray.200', 'gray.600')
   const { envName } = useGlobalState()
 
@@ -53,22 +53,15 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
     await sbomUpload({ variables: { doc: file, projectId: selectedEnv } })
       .then((res) => {
         if (res?.data?.sbomUpload.errors?.length > 0) {
-          toast({
+          showToast({
             description: 'Upload failed !',
-            status: 'error',
-            duration: 4000,
-            isClosable: true,
-            position: 'top'
+            status: 'error'
           })
         } else {
-          toast({
+          showToast({
             title: 'SBOM uploaded successfully and is now processing',
             description:
-              'The validated SBOM data will be available in the product shortly. Please refresh to update the product.',
-            duration: 6500,
-            isClosable: true,
-            position: 'top',
-            variant: 'left-accent'
+              'The validated SBOM data will be available in the product shortly. Please refresh to update the product.'
           })
         }
       })

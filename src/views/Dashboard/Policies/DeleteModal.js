@@ -1,13 +1,13 @@
 import { useMutation } from '@apollo/client'
 
-import { useToast } from '@chakra-ui/react'
+import useCustomToast from 'hooks/useCustomToast'
 
 import { PolicyDelete } from 'graphQL/Mutation'
 
 import ConfirmationModal from '../Products/components/ConfirmationModal'
 
 const DeleteModal = ({ isOpen, onClose, data }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const { id, name } = data
   const [deletePolicy] = useMutation(PolicyDelete)
 
@@ -15,11 +15,9 @@ const DeleteModal = ({ isOpen, onClose, data }) => {
     await deletePolicy({ variables: { id } }).then((res) => {
       const errors = res?.data?.policyDelete?.errors
       if (errors?.length > 0) {
-        toast({
+        showToast({
           description: errors[0],
-          status: 'error',
-          position: 'top',
-          duration: 2000
+          status: 'error'
         })
       } else {
         onClose()

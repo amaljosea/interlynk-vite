@@ -20,8 +20,7 @@ import {
   Stack,
   Tag,
   Text,
-  useColorModeValue,
-  useToast
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
@@ -29,6 +28,7 @@ import LynkSelect from 'components/LynkSelect'
 import SbomInfo from 'components/SbomInfo'
 import DiffTable from 'components/Tables/DiffTable'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import {
@@ -41,7 +41,7 @@ import {
 import { FaCodeCompare, FaScaleUnbalanced, FaX } from 'react-icons/fa6'
 
 const Compare = ({ selectedSboms }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const { prodState, dispatch } = useGlobalState()
   const { field, direction } = prodState
   const { toolsDispatch } = dispatch
@@ -184,10 +184,9 @@ const Compare = ({ selectedSboms }) => {
     if (selectedVersionTwo?.value === item?.value) {
       setDisabled(true)
       setSelectedVersionOne(null)
-      toast({
+      showToast({
         description: 'Same version comparison not allowed',
-        status: 'error',
-        position: 'top'
+        status: 'error'
       })
     } else {
       setDisabled(false)
@@ -199,10 +198,9 @@ const Compare = ({ selectedSboms }) => {
     if (selectedVersionOne?.value === item?.value) {
       setDisabled(true)
       setSelectedVersionTwo(null)
-      toast({
+      showToast({
         description: 'Same version comparison not allowed',
-        status: 'error',
-        position: 'top'
+        status: 'error'
       })
     } else {
       setDisabled(false)

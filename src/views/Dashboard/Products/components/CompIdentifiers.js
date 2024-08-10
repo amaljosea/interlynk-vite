@@ -16,13 +16,13 @@ import {
   InputGroup,
   InputRightElement,
   Stack,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
 
 import CpeField from 'components/CpeField'
 import ActionWrapper from 'components/Misc/ActionWrapper'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { UpdateComponent } from 'graphQL/Mutation'
@@ -35,7 +35,7 @@ import PurlInputs from './PurlInputs'
 
 const CompIdentifiers = (props) => {
   const { onClose, data, refetch } = props
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const params = useParams()
   const sbomId = params.sbomid
   const customerView = location.pathname.startsWith('/customer')
@@ -135,7 +135,7 @@ const CompIdentifiers = (props) => {
     }).then((res) => {
       const { errors } = res?.data?.componentUpdate || ''
       if (errors?.length > 0) {
-        toast({ description: errors[0], status: 'error', position: 'top' })
+        showToast({ description: errors[0], status: 'error' })
       } else {
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
         onClose()

@@ -39,8 +39,7 @@ import {
   Text,
   Textarea,
   chakra,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import CpeField from 'components/CpeField'
@@ -48,6 +47,7 @@ import InfoModal from 'components/InfoModal'
 import LicenseField from 'components/Licenses/LicenseField'
 import Info from 'components/Misc/Info'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -65,7 +65,7 @@ function ComponentDrawer(props) {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
@@ -308,12 +308,9 @@ function ComponentDrawer(props) {
         }
       })
       .finally(() => {
-        toast({
+        showToast({
           description: `Data added successfully`,
-          status: 'success',
-          position: 'top',
-          isClosable: true,
-          duration: 2000
+          status: 'success'
         })
         onClose()
       })
@@ -347,7 +344,7 @@ function ComponentDrawer(props) {
     }).then((res) => {
       const { errors } = res?.data?.componentUpdate || ''
       if (errors?.length > 0) {
-        toast({ description: errors[0], status: 'error', position: 'top' })
+        showToast({ description: errors[0], status: 'error' })
       } else {
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
         navigate(link)
@@ -359,11 +356,9 @@ function ComponentDrawer(props) {
   const handleCreateCpe = (string) => {
     const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
-      toast({
+      showToast({
         description: 'CPE already exists',
-        status: 'error',
-        position: 'top',
-        duration: 3000
+        status: 'error'
       })
     } else {
       setCpeList([...cpeList, string])
@@ -376,11 +371,9 @@ function ComponentDrawer(props) {
   const handleUpdateCpe = (string, id) => {
     const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
-      toast({
+      showToast({
         description: 'CPE already exists',
-        status: 'error',
-        position: 'top',
-        duration: 3000
+        status: 'error'
       })
     } else if (cpeList?.find((item, index) => index === id)) {
       const updatedData = cpeList?.map((item, index) => {

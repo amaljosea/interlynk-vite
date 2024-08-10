@@ -16,15 +16,16 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  chakra,
-  useToast
+  chakra
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { AutomationRuleCreate } from 'graphQL/Mutation'
 import { GetAutomationNames } from 'graphQL/Queries'
 
 const CopyRule = ({ isOpen, onClose, env, data }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const { name: ruleName, automationActions, automationConditions } = data || ''
   const { name: projectName, id: projectId } = env || ''
 
@@ -88,10 +89,8 @@ const CopyRule = ({ isOpen, onClose, env, data }) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
-          toast({
+          showToast({
             description: 'Copy rule completed',
-            position: 'top',
-            duration: 2000,
             status: 'success'
           })
           onClose()

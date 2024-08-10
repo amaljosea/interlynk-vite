@@ -23,14 +23,14 @@ import {
   Tooltip,
   Tr,
   useColorModeValue,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import ViolationDrawer from 'components/Drawer/ViolationDrawer'
 import Pagination from 'components/Pagination'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
@@ -41,7 +41,7 @@ import { BiScan } from 'react-icons/bi'
 import { FaEye } from 'react-icons/fa6'
 
 const Policies = () => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const params = useParams()
   const sbomId = params.sbomid
   const location = useLocation()
@@ -82,18 +82,14 @@ const Policies = () => {
       await policyScan({ variables: { sbomId } }).then((res) => {
         const errors = res?.data?.sbomPolicyScan?.errors
         if (errors?.length > 0) {
-          toast({
+          showToast({
             description: errors[0],
-            status: 'error',
-            position: 'top',
-            duration: 2000
+            status: 'error'
           })
         } else {
-          toast({
+          showToast({
             description: 'Policy re-scan started',
-            status: 'success',
-            position: 'top',
-            duration: 2000
+            status: 'success'
           })
           refetch()
         }
@@ -112,7 +108,7 @@ const Policies = () => {
         </Tooltip>
       </Flex>
     )
-  }, [policyRun, policyScan, refetch, sbomId, toast])
+  }, [policyRun, policyScan, refetch, sbomId, showToast])
 
   const getColor = (result) => {
     switch (result) {

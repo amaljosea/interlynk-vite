@@ -16,10 +16,10 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 
 import {
@@ -29,7 +29,7 @@ import {
 import { GetRoles, GetUsers } from 'graphQL/Queries'
 
 const DeleteRole = ({ isOpen, onClose, activeRole }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const { orgView } = useGlobalQueryContext()
   const { name, id } = activeRole || ''
 
@@ -50,10 +50,8 @@ const DeleteRole = ({ isOpen, onClose, activeRole }) => {
   const filterRoles = organizationRoles?.filter((item) => item?.name !== name)
 
   const onSuccess = () => {
-    toast({
+    showToast({
       description: 'Role deleted successfully',
-      position: 'top',
-      duration: 2000,
       status: 'success'
     })
     onClose()

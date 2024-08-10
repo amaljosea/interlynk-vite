@@ -19,15 +19,16 @@ import {
   ModalOverlay,
   Select,
   Stack,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { InviteUser } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
 
 const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const [email, setEmail] = useState('')
   const [role, setRole] = useState(data?.role?.id)
   const [error, setError] = useState('')
@@ -47,11 +48,9 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
         if (res.data.organizationUserInvite.errors.length > 0) {
           setError(res.data.organizationUserInvite.errors[0])
         } else {
-          toast({
+          showToast({
             description: 'Invitation sent successfully',
-            status: 'success',
-            position: 'top',
-            duration: 2000
+            status: 'success'
           })
           onClose()
         }

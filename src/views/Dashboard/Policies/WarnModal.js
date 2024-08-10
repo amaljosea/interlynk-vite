@@ -1,13 +1,13 @@
 import { useMutation } from '@apollo/client'
 
-import { useToast } from '@chakra-ui/react'
+import useCustomToast from 'hooks/useCustomToast'
 
 import { PolicyUpdate } from 'graphQL/Mutation'
 
 import ConfirmationModal from '../Products/components/ConfirmationModal'
 
 const WarnModal = ({ isOpen, onClose, data, refetch }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const { id, isEnabled, name } = data
   const [updatePolicy] = useMutation(PolicyUpdate)
 
@@ -17,11 +17,9 @@ const WarnModal = ({ isOpen, onClose, data, refetch }) => {
     }).then((res) => {
       const errors = res?.data?.policyUpdate?.errors
       if (errors?.length > 0) {
-        toast({
+        showToast({
           description: errors[0],
-          status: 'error',
-          position: 'top',
-          duration: 2000
+          status: 'error'
         })
       } else {
         refetch()

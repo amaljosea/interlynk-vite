@@ -15,10 +15,10 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Textarea,
-  useToast
+  Textarea
 } from '@chakra-ui/react'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 
 import { CreateJiraIssue } from 'graphQL/Mutation'
@@ -37,7 +37,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
 
   const [createJiraIssue] = useMutation(CreateJiraIssue)
 
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const [summary, setSummary] = useState('')
 
@@ -167,24 +167,18 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
       }
     }).then((res) => {
       if (res?.data?.jiraIssueCreate?.errors?.length === 0) {
-        toast({
+        showToast({
           title: 'Jira Issue created.',
           description: 'Your Jira Issue has been successfully created.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
         onClose()
       } else {
         setIsCreateDisabled(false)
-        toast({
+        showToast({
           title: 'Jira Issue creation failed.',
           description: 'An error occurred while creating your Jira Issue.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       }
     })

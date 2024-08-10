@@ -2,14 +2,13 @@ import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
-import { useToast } from '@chakra-ui/react'
-
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { sbomDelete } from 'graphQL/Mutation'
 
 const DeleteSbom = ({ isOpen, onClose, data }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const { id, projectVersion } = data || ''
   const { setClearSelect, setSelectedSbom } = useGlobalState()
 
@@ -26,11 +25,9 @@ const DeleteSbom = ({ isOpen, onClose, data }) => {
     }).then((res) => {
       const { errors } = res?.data?.sbomDelete || ''
       if (errors?.length > 0) {
-        toast({
+        showToast({
           description: errors[0],
-          position: 'top',
-          status: 'error',
-          duration: 3000
+          status: 'error'
         })
       } else {
         setIsLoading(false)

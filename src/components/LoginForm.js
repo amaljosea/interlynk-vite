@@ -17,14 +17,15 @@ import {
   FormLabel,
   Input,
   Stack,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { UserResendConfirmationEmail } from 'graphQL/Mutation'
 
 const LoginForm = () => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const emailId = queryParams.get('id')
@@ -76,11 +77,9 @@ const LoginForm = () => {
         setEmail('')
         setPassword('')
         setError('')
-        toast({
+        showToast({
           description: 'Invitation sent successfully',
-          status: 'success',
-          position: 'top',
-          duration: 3000
+          status: 'success'
         })
       }
     })

@@ -19,9 +19,10 @@ import {
   ModalOverlay,
   Switch,
   Text,
-  UnorderedList,
-  useToast
+  UnorderedList
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { createOrgComp, updateOrgComp } from 'graphQL/Mutation'
 import { getInternalComponents } from 'graphQL/Queries'
@@ -40,7 +41,7 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
   const [enabled, setEnabled] = useState(
     isEdit ? !!internalComponent?.enabled : true
   )
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const mutateText = isEdit ? 'Update' : 'Tag'
 
   const [mutate, { loading }] = useMutation(
@@ -59,11 +60,9 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
           setErrorText('Regular expression already present')
         } else {
           onClose()
-          toast({
+          showToast({
             description: `Internal component ${mutateText.toLowerCase()} successful!`,
-            status: 'success',
-            position: 'top',
-            duration: 3000
+            status: 'success'
           })
         }
       }

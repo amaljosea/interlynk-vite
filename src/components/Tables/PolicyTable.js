@@ -41,13 +41,13 @@ import {
   Tooltip,
   Tr,
   useColorModeValue,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
 
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
@@ -56,7 +56,7 @@ import { PolicySubjectOperators } from 'graphQL/Queries'
 import { FaEllipsisV, FaPlus } from 'react-icons/fa'
 
 const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const location = useLocation()
   const params = useParams()
   const productId = params.productid
@@ -133,11 +133,9 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
     }).then((res) => {
       const errors = res?.data?.policyExclusionCreate?.errors
       if (errors?.length > 0) {
-        toast({
+        showToast({
           description: errors[0],
-          status: 'error',
-          position: 'top',
-          duration: 2000
+          status: 'error'
         })
       } else {
         handleRefresh()
@@ -151,11 +149,9 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
     }).then((res) => {
       const errors = res?.data?.policyExclusionDelete?.errors
       if (errors?.length > 0) {
-        toast({
+        showToast({
           description: errors[0],
-          status: 'error',
-          position: 'top',
-          duration: 2000
+          status: 'error'
         })
       } else {
         handleRefresh()

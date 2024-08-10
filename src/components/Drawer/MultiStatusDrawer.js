@@ -18,9 +18,10 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  Textarea,
-  useToast
+  Textarea
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { VexVulnCreate } from 'graphQL/Mutation'
 import { getVexStatuses } from 'graphQL/Queries'
@@ -35,7 +36,7 @@ const MultiStatusDrawer = ({
   setCheckedRows,
   vulnRefetch
 }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
@@ -78,12 +79,10 @@ const MultiStatusDrawer = ({
         })
     } catch (error) {
       console.error('Status update error: ', error)
-      toast({
+      showToast({
         description:
           'An error occured while setting vulnerability status. Please retry in few minutes.',
-        status: 'error',
-        duration: 2000,
-        position: 'top'
+        status: 'error'
       })
     }
   }

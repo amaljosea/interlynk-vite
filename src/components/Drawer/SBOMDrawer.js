@@ -26,16 +26,17 @@ import {
   Tag,
   TagCloseButton,
   TagLabel,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { CreateShareLynk } from 'graphQL/Mutation'
 import { UpdateShareLynk } from 'graphQL/Mutation'
 import { GetImages } from 'graphQL/Queries'
 
 function SBOMDrawer(props) {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const { isOpen, onClose, refetch, id, shareUsers, contents } = props
 
@@ -86,11 +87,9 @@ function SBOMDrawer(props) {
         setEmailList((prev) => [email, ...prev])
         setEmail('')
       } else {
-        toast({
+        showToast({
           description: 'Invalid email !',
-          status: 'error',
-          position: 'top-right',
-          duration: 2000
+          status: 'error'
         })
       }
     }
@@ -116,12 +115,9 @@ function SBOMDrawer(props) {
   const handleSave = async () => {
     try {
       if (productIds.length === 0) {
-        toast({
+        showToast({
           description: 'Missing required products',
-          status: 'error',
-          duration: 2000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       } else {
         await shareLynkCreate({
@@ -146,12 +142,9 @@ function SBOMDrawer(props) {
   const handleUpdate = async () => {
     try {
       if (productIds.length === 0) {
-        toast({
+        showToast({
           description: 'Missing required products and images',
-          status: 'error',
-          duration: 2000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       } else {
         await shareLynkUpdate({

@@ -1,13 +1,13 @@
 import { useMutation } from '@apollo/client'
 
-import { useToast } from '@chakra-ui/react'
+import useCustomToast from 'hooks/useCustomToast'
 
 import { UpdateCompSupportOverride } from 'graphQL/Mutation'
 
 import ConfirmationModal from '../Products/components/ConfirmationModal'
 
 const StatusModal = ({ isOpen, onClose, data }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const { id, enabled } = data
   const [updateSupport] = useMutation(UpdateCompSupportOverride)
 
@@ -17,11 +17,9 @@ const StatusModal = ({ isOpen, onClose, data }) => {
     }).then((res) => {
       const errors = res?.data?.componentSupportOverrideUpdate?.errors
       if (errors?.length > 0) {
-        toast({
+        showToast({
           description: errors[0],
-          status: 'error',
-          duration: 2000,
-          position: 'top'
+          status: 'error'
         })
       } else {
         onClose()

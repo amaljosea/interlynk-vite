@@ -24,11 +24,12 @@ import {
   Textarea,
   Th,
   Thead,
-  Tr,
-  useToast
+  Tr
 } from '@chakra-ui/react'
 
 import VulLinkRow from 'components/Tables/VulLinkRow'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { VexVulnCreate } from 'graphQL/Mutation'
 import {
@@ -52,7 +53,7 @@ const StatusDrawer = ({
   vulnRefetch,
   setVulData
 }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
@@ -125,12 +126,10 @@ const StatusDrawer = ({
       setNotes('')
     } catch (error) {
       console.error('Status update error: ', error)
-      toast({
+      showToast({
         description:
           'An error occured while setting vulnerability status. Please retry in few minutes.',
-        status: 'error',
-        duration: 2000,
-        position: 'top'
+        status: 'error'
       })
     }
   }

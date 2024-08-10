@@ -13,15 +13,16 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
-  useToast
+  Select
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { RequestAccept } from 'graphQL/Mutation'
 import { GetProductNamesForRequest } from 'graphQL/Queries'
 
 const RequestAcceptModal = ({ data, isOpen, onClose }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const [acceptRequest] = useMutation(RequestAccept)
 
@@ -42,22 +43,16 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
     })
 
     if (!res?.data?.requestAccept?.errors?.length > 0) {
-      toast({
+      showToast({
         description: `SBOM copied into Product ${productName}`,
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-        position: 'top'
+        status: 'success'
       })
       onClose()
     } else {
-      toast({
+      showToast({
         title: 'Error',
         description: "Couldn't accept request",
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-        position: 'top'
+        status: 'error'
       })
     }
   }

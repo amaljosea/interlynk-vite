@@ -46,8 +46,7 @@ import {
   Text,
   Tooltip,
   useColorModeValue,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
@@ -59,6 +58,7 @@ import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -282,7 +282,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
 
   const [jiraConfigWarning, setJiraConfigWarning] = useState(false)
 
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const sbomId = params.sbomid
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -877,14 +877,11 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
                     isDisabled={!updateCon}
                     onClick={() => {
                       if (jiraConfigWarning) {
-                        toast({
+                        showToast({
                           title: 'Jira Configuration not set.',
                           description:
                             'Please configure Jira connections in the Organization Settings -> Connections.',
-                          status: 'error',
-                          duration: 5000,
-                          isClosable: true,
-                          position: 'top'
+                          status: 'error'
                         })
                       } else {
                         setActiveRow(row)
@@ -945,19 +942,15 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
       variables: { id: sbomId }
     }).then((res) => {
       if (sbomData?.vulnRunStatus === 'IN_PROGRESS') {
-        toast({
+        showToast({
           description: 'A scan is in-progress',
-          position: 'top',
-          status: 'info',
-          duration: 5000
+          status: 'info'
         })
       } else {
         if (res.data) {
-          toast({
+          showToast({
             description: 'Vulnerability re-scan started',
-            position: 'top',
-            status: 'success',
-            duration: 5000
+            status: 'success'
           })
           sbomRefetch({ projectId: productId, sbomId: sbomId }).then(
             (res) => res?.data && console.log(res?.data)
@@ -975,7 +968,7 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     sbomData?.vulnRunStatus,
     sbomId,
     sbomRefetch,
-    toast
+    showToast
   ])
 
   const handleRefresh = useCallback(() => {

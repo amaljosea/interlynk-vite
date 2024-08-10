@@ -26,9 +26,10 @@ import {
   RadioGroup,
   Stack,
   Tag,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import {
   DownloadSBOM,
@@ -48,7 +49,7 @@ const DownloadModal = ({
   version,
   sbomId
 }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const activeUser = localStorage.getItem('email')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const [getData] = useLazyQuery(
@@ -128,10 +129,8 @@ const DownloadModal = ({
         .finally(() => onClose())
     } catch (error) {
       console.log(`Error`, error)
-      toast({
+      showToast({
         description: `Internal error during SBOM download. Please try again in a few minutes.`,
-        duration: 3000,
-        position: 'top',
         status: 'error'
       })
     }

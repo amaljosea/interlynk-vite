@@ -9,8 +9,7 @@ import {
   FormLabel,
   Input,
   Text,
-  useColorModeValue,
-  useToast
+  useColorModeValue
 } from '@chakra-ui/react'
 
 // Custom components
@@ -18,6 +17,7 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 
@@ -40,7 +40,7 @@ const GeneralFeed = () => {
     childKey: 'update_organization'
   })
 
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const textColor = useColorModeValue('gray.700', 'white')
   const [orgName, setOrgName] = useState('')
   const [message, setMessage] = useState('Update')
@@ -59,11 +59,9 @@ const GeneralFeed = () => {
           setMessage('Saving....')
           setTimeout(() => {
             setMessage('Update')
-            toast({
+            showToast({
               description: 'Organization name updated successfully',
-              status: 'success',
-              position: 'top',
-              duration: 2000
+              status: 'success'
             })
           }, 2000)
         }

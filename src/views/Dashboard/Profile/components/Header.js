@@ -9,13 +9,13 @@ import {
   Flex,
   Input,
   Text,
-  useColorModeValue,
-  useToast
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 
 import { UploadProfileImage } from 'graphQL/Mutation'
@@ -37,7 +37,7 @@ const GetCurrentUser = gql`
 `
 
 const Header = ({ selectedTab, setSelectedTab, tabs }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const navigate = useNavigate()
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const iconColor = useColorModeValue('#EDF2F7', '#2D3748')
@@ -99,11 +99,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
         }
       })
       .finally(() => {
-        toast({
+        showToast({
           description: 'Profile updated successfully',
-          status: 'success',
-          duration: 3000,
-          position: 'top'
+          status: 'success'
         })
       })
   }
@@ -118,13 +116,10 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
       if (isValidFileType(file) && isValidFileSize(file)) {
         onImageChange(file)
       } else {
-        toast({
+        showToast({
           title: 'Someting went wrong 😕',
-          variant: 'left-accent',
           description: 'The file is too large. Allowed maximum size is 5MB',
-          status: 'error',
-          duration: 5000,
-          position: 'top'
+          status: 'error'
         })
       }
     }

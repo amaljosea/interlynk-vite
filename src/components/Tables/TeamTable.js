@@ -31,12 +31,12 @@ import {
   Text,
   Tooltip,
   useColorModeValue,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
@@ -109,7 +109,7 @@ const TeamTable = () => {
     childKey: 'remove_user'
   })
 
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const SERVER_URL = process.env.REACT_APP_SERVER
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -420,18 +420,14 @@ const TeamTable = () => {
       }
     }).then((res) => {
       if (res.data.organizationUserInvite.errors.length > 0) {
-        toast({
+        showToast({
           description: res.data.organizationUserInvite.errors[0],
-          status: 'error',
-          position: 'top',
-          duration: 2000
+          status: 'error'
         })
       } else {
-        toast({
+        showToast({
           description: 'Invitation sent successfully',
-          status: 'success',
-          position: 'top',
-          duration: 2000
+          status: 'success'
         })
       }
     })

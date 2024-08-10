@@ -12,9 +12,10 @@ import {
   ModalBody,
   ModalContent,
   ModalOverlay,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import {
   RequestDecline,
@@ -25,7 +26,7 @@ import {
 import { FaUpload } from 'react-icons/fa'
 
 const SbomUpload = () => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const token = queryParams.get('token')
@@ -41,16 +42,13 @@ const SbomUpload = () => {
     validateRequest({ variables: { id, token } }).then((res) => {
       if (res.data?.requestValidate?.errors?.length > 0) {
         setIsUploadVisible(false)
-        toast({
+        showToast({
           description: res.data?.requestValidate.errors[0],
-          status: 'error',
-          duration: 4000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       }
     })
-  }, [id, toast, token, validateRequest])
+  }, [id, showToast, token, validateRequest])
 
   const onDecline = () => {
     declineRequest({
@@ -60,12 +58,9 @@ const SbomUpload = () => {
       }
     }).then((res) => {
       if (res.data?.requestDecline) {
-        toast({
+        showToast({
           title: 'Request Declined',
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
 
         setIsUploadVisible(false)
@@ -77,20 +72,14 @@ const SbomUpload = () => {
     await uploadSbom({ variables: { file: file, id: id, token: token } })
       .then((res) => {
         if (res?.data?.requestUploadSbom.errors?.length > 0) {
-          toast({
+          showToast({
             description: res?.data?.requestUploadSbom.errors[0],
-            status: 'error',
-            duration: 4000,
-            isClosable: true,
-            position: 'top'
+            status: 'error'
           })
         } else {
-          toast({
+          showToast({
             title: 'SBOM uploaded successfully',
             description: 'This SBOM will be sent to the requester shortly.',
-            duration: 6500,
-            isClosable: true,
-            position: 'top',
             status: 'success'
           })
         }
@@ -106,13 +95,10 @@ const SbomUpload = () => {
       if (validExtensions.includes(fileExtension)) {
         await handleUploadRequestSbom(selectedFile)
       } else {
-        toast({
+        showToast({
           description:
             'Invalid file type, only .xml and .json files are allowed.',
-          status: 'error',
-          duration: 4000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       }
     }

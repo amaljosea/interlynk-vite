@@ -18,14 +18,15 @@ import {
   PopoverTrigger,
   SimpleGrid,
   Tag,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { LabelCreate, LabelUpdate } from 'graphQL/Mutation'
 
 const LabelInputs = ({ activeRow, setActiveRow }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const randomColor = getRandomColor()
   const [labelData, setLabelData] = useState({
     id: 0,
@@ -54,12 +55,11 @@ const LabelInputs = ({ activeRow, setActiveRow }) => {
     createLabel({ variables: { name, color } }).then((res) => {
       const { errors } = res?.data?.labelCreate || ''
       if (errors?.length > 0) {
-        toast({ description: errors[0], status: 'error', position: 'top' })
+        showToast({ description: errors[0], status: 'error' })
       } else {
-        toast({
+        showToast({
           description: 'Label added successfully',
-          status: 'success',
-          position: 'top'
+          status: 'success'
         })
         setLabelData({ id: 0, name: '', color: randomColor })
         setActiveRow(null)
@@ -74,12 +74,11 @@ const LabelInputs = ({ activeRow, setActiveRow }) => {
     }).then((res) => {
       const { errors } = res?.data?.labelUpdate || ''
       if (errors?.length > 0) {
-        toast({ description: errors[0], status: 'error', position: 'top' })
+        showToast({ description: errors[0], status: 'error' })
       } else {
-        toast({
+        showToast({
           description: 'Label updated successfully',
-          status: 'success',
-          position: 'top'
+          status: 'success'
         })
         setLabelData({ id: 0, name: '', color: randomColor })
         setActiveRow(null)

@@ -19,9 +19,10 @@ import {
   Select,
   SimpleGrid,
   Stack,
-  Textarea,
-  useToast
+  Textarea
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { updateBulkCompVex } from 'graphQL/Mutation'
 import {
@@ -41,7 +42,7 @@ const VexModal = ({
   setSelectedVulns,
   setToggleClear
 }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const params = useParams()
   const sbomId = params.sbomid
 
@@ -143,11 +144,9 @@ const VexModal = ({
     }).then((res) => {
       const errors = res?.data?.componentVexBulkUpdate?.errors
       if (errors?.length > 0) {
-        toast({
+        showToast({
           description: errors[0],
-          status: 'error',
-          duration: 2000,
-          position: 'top'
+          status: 'error'
         })
       } else {
         onClose()

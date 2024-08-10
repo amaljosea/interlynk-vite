@@ -16,7 +16,8 @@ import {
   Select,
   Text
 } from '@chakra-ui/react'
-import { useToast } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 function ProductAssembleDrawer(props) {
   const {
@@ -39,7 +40,7 @@ function ProductAssembleDrawer(props) {
   const [selectProduct, setSelectProduct] = useState('')
   const [selectVersion, setSelectVersion] = useState('')
 
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const handleSave = () => {
     if (productName !== '' && productVersion !== '') {
@@ -65,11 +66,9 @@ function ProductAssembleDrawer(props) {
       setProductVersion('')
       onClose()
     } else {
-      toast({
+      showToast({
         title: `Input fields required`,
-        status: 'error',
-        position: 'top-right',
-        isClosable: true
+        status: 'error'
       })
     }
   }

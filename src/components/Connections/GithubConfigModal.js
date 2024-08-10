@@ -18,9 +18,10 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  useColorModeValue,
-  useToast
+  useColorModeValue
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 const GithubConfigModal = ({
   isOpen,
@@ -29,7 +30,7 @@ const GithubConfigModal = ({
   data,
   refetch
 }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const [githubApiToken, setGithubApiToken] = useState('')
   const [githubUsername, setGithubUsername] = useState('')
@@ -58,13 +59,10 @@ const GithubConfigModal = ({
     refetch()
     onClose()
     localStorage.setItem('githubConfigSaved', 'true')
-    toast({
+    showToast({
       title: 'Configuration saved.',
       description: 'Your GITHUB configuration has been successfully saved.',
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-      position: 'top'
+      status: 'success'
     })
   }
 

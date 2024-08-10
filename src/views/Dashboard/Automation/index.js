@@ -28,14 +28,14 @@ import {
   Text,
   Tooltip,
   useColorModeValue,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import CardBody from 'components/Card/CardBody'
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
@@ -54,7 +54,7 @@ import DeleteWarning from './components/DeleteWarning'
 import StatusWarning from './components/StatusWarning'
 
 const Automation = ({ projects }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const params = useParams()
   const productId = params.productid
 
@@ -125,11 +125,9 @@ const Automation = ({ projects }) => {
     await deleteRule({ variables: { id: activeRow?.id } }).then((res) => {
       const errors = res?.data?.automationRuleDelete?.errors
       if (errors?.length > 0) {
-        toast({
+        showToast({
           description: errors[0],
-          status: 'error',
-          position: 'top',
-          duration: 2000
+          status: 'error'
         })
       } else {
         refetch()
@@ -147,11 +145,9 @@ const Automation = ({ projects }) => {
     }).then((res) => {
       const errors = res?.data?.automationRuleUpdate?.errors
       if (errors?.length > 0) {
-        toast({
+        showToast({
           description: errors[0],
-          status: 'error',
-          position: 'top',
-          duration: 2000
+          status: 'error'
         })
       } else {
         refetch()
@@ -171,11 +167,9 @@ const Automation = ({ projects }) => {
       }).then((res) => {
         const errors = res?.data?.automationRuleUpdate?.errors
         if (errors?.length > 0) {
-          toast({
+          showToast({
             description: errors[0],
-            status: 'error',
-            position: 'top',
-            duration: 2000
+            status: 'error'
           })
         } else {
           refetch()

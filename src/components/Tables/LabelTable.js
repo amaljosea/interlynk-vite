@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useCallback, useRef, useState } from 'react'
+import { hexToRGBA } from 'utils'
 import LabelInputs from 'views/Dashboard/Products/components/LabelInputs'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -15,19 +16,23 @@ import {
   Tbody,
   Td,
   Text,
+  Tooltip,
   Tr,
-  useColorModeValue,
-  useToast
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import Pagination from 'components/Pagination'
+
+import useCustomToast from 'hooks/useCustomToast'
+import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { LabelDelete } from 'graphQL/Mutation'
 import { GetLabels } from 'graphQL/Queries'
-import { hexToRGBA } from 'utils'
 
 const LabelTable = ({ isOpen }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
+  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const borderColor = useColorModeValue('gray.800', 'gray.200')
   const [activeRow, setActiveRow] = useState(null)
@@ -84,7 +89,7 @@ const LabelTable = ({ isOpen }) => {
     deleteLabel({ variables: { id: row?.id } }).then((res) => {
       const { errors } = res?.data?.labelDelete || ''
       if (errors?.length > 0) {
-        toast({ description: errors[0], status: 'error', position: 'top' })
+        showToast({ description: errors[0], status: 'error' })
       }
     })
   }

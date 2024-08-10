@@ -16,19 +16,20 @@ import {
   Text,
   Tooltip,
   useColorModeValue,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { GetArchivedVersions, GetVersions } from 'graphQL/Queries'
 
 import { MdOutlineUnarchive } from 'react-icons/md'
 
 const ArchivedVersions = ({ isOpen, onClose }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const params = useParams()
   const productId = params?.productid
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
@@ -65,12 +66,11 @@ const ArchivedVersions = ({ isOpen, onClose }) => {
       (item) => item?.projectVersion === row?.projectVersion
     )
     if (isExists) {
-      toast({
-        position: 'top',
-        status: 'info',
+      showToast({
         title: 'Restore Version',
         description:
-          'An existing version with same value found. Please delete previous version to restore this one.'
+          'An existing version with same value found. Please delete previous version to restore this one.',
+        status: 'info'
       })
     } else {
       setActiveRow(row)

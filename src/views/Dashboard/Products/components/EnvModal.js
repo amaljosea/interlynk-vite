@@ -17,14 +17,15 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  ModalOverlay,
-  useToast
+  ModalOverlay
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { EnvCreate } from 'graphQL/Mutation'
 
 const EnvModal = ({ groupId, isOpen, onClose }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const [projectCreate] = useMutation(EnvCreate)
   const [productName, setProductName] = useState('')
   const [error, setError] = useState('')
@@ -42,11 +43,9 @@ const EnvModal = ({ groupId, isOpen, onClose }) => {
       if (errors?.length > 0) {
         setError(errorMapping[errors[0]] || errors[0])
       } else {
-        toast({
+        showToast({
           description: 'Environment added successfully',
-          status: 'success',
-          position: 'top',
-          duration: 3000
+          status: 'success'
         })
         onClose()
       }

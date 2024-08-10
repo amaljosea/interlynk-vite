@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/client'
 import React, { useState } from 'react'
 import { useEffect } from 'react'
 
-import { Button, Flex, Input, Spacer, Stack, useToast } from '@chakra-ui/react'
+import { Button, Flex, Input, Spacer, Stack } from '@chakra-ui/react'
 import {
   Box,
   Checkbox,
@@ -22,6 +22,8 @@ import {
   Text
 } from '@chakra-ui/react'
 
+import useCustomToast from 'hooks/useCustomToast'
+
 import { UpdateShareLynk } from 'graphQL/Mutation'
 
 function SBOMLinkDrawer(props) {
@@ -36,7 +38,7 @@ function SBOMLinkDrawer(props) {
     setEmailList,
     imageInfo
   } = props
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const sortScanResult = [...scanResults].sort((a, b) =>
     a.company.localeCompare(b.company)
@@ -81,12 +83,10 @@ function SBOMLinkDrawer(props) {
       onClose()
     } catch (error) {
       console.error('ShareLynk update error: ', error)
-      toast({
+      showToast({
         description:
           'An error occured while updating ShareLynk. Please retry in few minutes.',
-        status: 'error',
-        duration: 2000,
-        position: 'top'
+        status: 'error'
       })
     }
   }

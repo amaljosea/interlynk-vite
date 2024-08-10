@@ -18,14 +18,14 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/system'
 
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
@@ -46,7 +46,7 @@ const GetCurrentUser = gql`
 `
 
 const PersonalInfo = () => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -155,11 +155,9 @@ const PersonalInfo = () => {
           localStorage.setItem('email', email)
           setTimeout(() => {
             setMessage('Update')
-            toast({
+            showToast({
               description: 'User details updated successfully',
-              status: 'success',
-              position: 'top',
-              duration: 2000
+              status: 'success'
             })
           }, 2000)
         }
@@ -177,19 +175,15 @@ const PersonalInfo = () => {
     }).then((res) => {
       const { errors } = res?.data?.userUpdatePassword || ''
       if (errors?.length > 0) {
-        toast({
+        showToast({
           description: errors[0],
-          status: 'error',
-          position: 'top',
-          duration: 2000
+          status: 'error'
         })
       } else {
         Cookies.set('authToken', res?.data?.userUpdatePassword?.updatedToken)
-        toast({
+        showToast({
           description: 'Password updated successfully',
-          status: 'success',
-          position: 'top',
-          duration: 3000
+          status: 'success'
         })
         window.location.href = `/vendor/dashboard`
       }

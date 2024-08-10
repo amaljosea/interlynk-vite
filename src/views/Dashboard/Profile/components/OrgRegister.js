@@ -22,16 +22,17 @@ import {
   ModalOverlay,
   Skeleton,
   Text,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 
+import useCustomToast from 'hooks/useCustomToast'
+
 import { RegisterOrganization, SwitchOrganization } from 'graphQL/Mutation'
 
 const OrgRegister = ({ loading }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [error, setError] = useState('')
   const [name, setName] = useState('')
@@ -66,9 +67,8 @@ const OrgRegister = ({ loading }) => {
       .then((res) => {
         if (res.data) {
           Cookies.set('authToken', res.data.organizationSwitch.token)
-          toast({
+          showToast({
             description: `Logged into ${name} successfully`,
-            position: 'top',
             status: 'success'
           })
         }

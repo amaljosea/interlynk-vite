@@ -26,13 +26,13 @@ import {
   Text,
   Tooltip,
   useColorModeValue,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import InfoModal from 'components/InfoModal'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -44,7 +44,7 @@ import { GetOrgManufacturers } from 'graphQL/Queries'
 import { FaEllipsisVertical, FaPlus } from 'react-icons/fa6'
 
 const LegalTable = () => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
   const { totalRows } = useGlobalState()
@@ -98,11 +98,9 @@ const LegalTable = () => {
     }).then((res) => {
       const errors = res?.data?.organizationManufacturerDelete?.errors
       if (errors?.length > 0) {
-        toast({
+        showToast({
           description: errors[0],
-          status: 'error',
-          duration: 2000,
-          position: 'top'
+          status: 'error'
         })
       } else {
         refetch({ first: totalRows })

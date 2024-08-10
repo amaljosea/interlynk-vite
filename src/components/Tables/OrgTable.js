@@ -35,11 +35,12 @@ import {
   Text,
   Tooltip,
   useColorModeValue,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import {
   AcceptOrgInvitation,
@@ -52,7 +53,7 @@ import { FaEllipsisVertical } from 'react-icons/fa6'
 
 const OrgTable = ({ data, refetch, activeOrg }) => {
   const navigate = useNavigate()
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const [leaveError, setLeaveError] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -87,9 +88,8 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       .then((res) => {
         if (res.data) {
           Cookies.set('authToken', res.data.organizationSwitch.token)
-          toast({
+          showToast({
             description: `Logged into ${name} successfully`,
-            position: 'top',
             status: 'success'
           })
         }
@@ -123,15 +123,13 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
     }).then((res) => {
       const { errors } = res?.data?.organizationUserInvitationAcceptById || ''
       if (errors?.length > 0) {
-        toast({
+        showToast({
           description: errors[0],
-          position: 'top',
           status: 'error'
         })
       } else {
-        toast({
+        showToast({
           description: `Invitation accepted`,
-          position: 'top',
           status: 'success'
         })
         navigate('/vendor/dashboard')
@@ -147,9 +145,8 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
     }).then((res) => {
       const { errors } = res?.data?.organizationUserInvitationDeclineById || ''
       if (errors?.length > 0) {
-        toast({
+        showToast({
           description: errors[0],
-          position: 'top',
           status: 'error'
         })
       } else {

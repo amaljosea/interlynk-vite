@@ -10,11 +10,12 @@ import {
   MenuItem,
   MenuList,
   Portal,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
 
 import { ConfirmationModal } from 'components/Modal/ConfirmationModal'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { deleteOrgComp } from 'graphQL/Mutation'
 import { getInternalComponents } from 'graphQL/Queries'
@@ -28,18 +29,16 @@ export const DeleteInternalComponent = ({
   const { id, matchStr } = internalComponent
   const [isConfirming, setIsConfirming] = useState(false)
   const [untag, setUntag] = useState(false)
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const onCancel = () => setIsConfirming(false)
 
   const [deleteComp, { loading: deleting }] = useMutation(deleteOrgComp, {
     refetchQueries: [getInternalComponents],
     onCompleted: () => {
-      toast({
+      showToast({
         description: `Internal component delete successful!`,
-        status: 'success',
-        position: 'top',
-        duration: 3000
+        status: 'success'
       })
       onCancel()
     }

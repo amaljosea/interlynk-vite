@@ -13,17 +13,17 @@ import {
   ModalBody,
   ModalContent,
   ModalOverlay,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
 
+import useCustomToast from 'hooks/useCustomToast'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { AcceptInvitation, DeclineInvitation } from 'graphQL/Mutation'
 import { OrgUserInvitationInfo } from 'graphQL/Queries'
 
 const Invitation = () => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const navigate = useNavigate()
   const token = useQueryParam('token')
   const nonce = useQueryParam('nonce')
@@ -59,11 +59,9 @@ const Invitation = () => {
         } else if (
           res.data.organizationUserInvitationAccept.userType === 'existing_user'
         ) {
-          toast({
+          showToast({
             description: 'Registration Successful 👍',
-            status: 'success',
-            position: 'top',
-            duration: 4000
+            status: 'success'
           })
           navigate(
             `/auth?id=${res.data.organizationUserInvitationAccept.user.email}`

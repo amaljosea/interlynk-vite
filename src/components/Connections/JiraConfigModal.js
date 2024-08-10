@@ -19,9 +19,10 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  useColorModeValue,
-  useToast
+  useColorModeValue
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import {
   CreateJiraConnection,
@@ -37,7 +38,7 @@ const JiraConfigModal = ({
   data,
   updateCon
 }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const [jiraApiToken, setJiraApiToken] = useState('')
   const [jiraHost, setJiraHost] = useState('')
@@ -86,23 +87,17 @@ const JiraConfigModal = ({
         setGreenCheck((prev) => ({ ...prev, jira: !isSaveDisabled }))
         resetChanges()
         onClose()
-        toast({
+        showToast({
           title: 'Configuration saved.',
           description: 'Your JIRA configuration has been successfully saved.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
       } else {
-        toast({
+        showToast({
           title: 'Saving failed.',
           description:
             'An error occurred while saving your JIRA configuration.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       }
     })
@@ -121,23 +116,17 @@ const JiraConfigModal = ({
         setGreenCheck((prev) => ({ ...prev, jira: !isSaveDisabled }))
         resetChanges()
         onClose()
-        toast({
+        showToast({
           title: 'Configuration saved.',
           description: 'Your JIRA configuration has been successfully updated.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
       } else {
-        toast({
+        showToast({
           title: 'Saving failed.',
           description:
             'An error occurred while updating your JIRA configuration.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       }
     })
@@ -181,24 +170,18 @@ const JiraConfigModal = ({
       if (res?.data?.jiraConnectionDelete?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, jira: false }))
         onClose()
-        toast({
+        showToast({
           title: 'Configuration deleted.',
           description: 'Your JIRA configuration has been successfully deleted.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
       } else {
         // handle failure
-        toast({
+        showToast({
           title: 'Deletion failed.',
           description:
             'An error occurred while deleting your JIRA configuration.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       }
     })

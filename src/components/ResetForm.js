@@ -20,12 +20,13 @@ import {
   InputGroup,
   InputRightElement,
   Stack,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
 
+import useCustomToast from 'hooks/useCustomToast'
+
 const ResetForm = () => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -92,11 +93,9 @@ const ResetForm = () => {
         if (status === 201) {
           setIsLoading(false)
           setSuccess(true)
-          toast({
+          showToast({
             description: 'Email sent successfully 👍',
-            status: 'success',
-            position: 'top',
-            duration: 3000
+            status: 'success'
           })
           setError('')
         }
@@ -133,11 +132,9 @@ const ResetForm = () => {
         const { status } = response
         if (status === 204) {
           setIsLoading(false)
-          toast({
+          showToast({
             description: 'Password changed successfully 👍',
-            status: 'success',
-            position: 'top',
-            duration: 3000
+            status: 'success'
           })
           navigate('/auth')
         }
@@ -279,8 +276,8 @@ const ResetForm = () => {
         Reset your password
       </Text>
       <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
-        Enter the email address associated with your account and we will send you
-        a link to reset your password.
+        Enter the email address associated with your account and we will send
+        you a link to reset your password.
       </Text>
       {error !== '' && (
         <Box mt={4} width={'100%'}>

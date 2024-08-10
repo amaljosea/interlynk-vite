@@ -21,8 +21,7 @@ import {
   Switch,
   Text,
   VStack,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import CardBody from 'components/Card/CardBody'
@@ -30,6 +29,7 @@ import InfoModal from 'components/InfoModal'
 import LynkSelect from 'components/LynkSelect'
 import Info from 'components/Misc/Info'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 
@@ -67,7 +67,7 @@ const Settings = ({ enabled, data, mfc }) => {
     }
   }, [projectOptions])
 
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const [checks, setChecks] = useState(false)
   const [internalComp, setInternalComp] = useState(false)
   const [infoHeading, setInfoHeading] = useState('')
@@ -109,11 +109,9 @@ const Settings = ({ enabled, data, mfc }) => {
     })
       .then((res) => res.data)
       .finally(() => {
-        toast({
+        showToast({
           description: `${capitalizeFirstLetter(field)} updated successfully`,
-          position: 'top',
-          status: 'success',
-          duration: 3000
+          status: 'success'
         })
       })
   }

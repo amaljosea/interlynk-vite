@@ -13,8 +13,7 @@ import {
   Switch,
   Text,
   Tooltip,
-  useColorModeValue,
-  useToast
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
@@ -23,6 +22,7 @@ import CardHeader from 'components/Card/CardHeader'
 import CustomLoader from 'components/CustomLoader'
 import { RegexHighlighter } from 'components/RegexHighlighter'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
@@ -41,7 +41,7 @@ export const InternalComponents = () => {
   const { data, loading } = useQuery(getInternalComponents, {
     skip: !orgView ? true : activetab === 'lists' ? false : true
   })
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const manageListing = useHasPermission({
     parentKey: 'view_feeds',
@@ -50,11 +50,9 @@ export const InternalComponents = () => {
 
   const [mutate] = useMutation(updateOrgComp, {
     onCompleted: () => {
-      toast({
+      showToast({
         description: `Internal component update successful!`,
-        status: 'success',
-        position: 'top',
-        duration: 3000
+        status: 'success'
       })
     }
   })

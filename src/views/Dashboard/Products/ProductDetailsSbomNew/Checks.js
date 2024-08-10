@@ -22,8 +22,7 @@ import {
   Text,
   Tooltip,
   useColorModeValue,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -33,6 +32,7 @@ import LicenseModal from 'components/LicenseModal'
 import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -60,7 +60,7 @@ import FixedModal from '../components/FixedModal'
 import CheckFilters from './CheckFilters'
 
 const Checks = () => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
@@ -115,18 +115,15 @@ const Checks = () => {
   )
 
   const handleRefetch = useCallback(() => {
-    toast({
+    showToast({
       description:
         'Checks rescan is in progress. Please refresh the page to see the updated results.',
-      status: 'info',
-      isClosable: true,
-      duration: 6500,
-      position: 'top'
+      status: 'info'
     })
     reset()
     refetch()
     filterRefetch()
-  }, [filterRefetch, refetch, reset, toast])
+  }, [filterRefetch, refetch, reset, showToast])
 
   const editChecks = useHasPermission({
     parentKey: 'view_sbom',
@@ -244,15 +241,13 @@ const Checks = () => {
     }).then((res) => {
       if (res.data) {
         handleRefetch()
-        toast({
+        showToast({
           description: 'Health re-check successfully',
-          status: 'success',
-          duration: 3000,
-          position: 'top'
+          status: 'success'
         })
       }
     })
-  }, [handleRefetch, healthRecheck, sbomId, toast])
+  }, [handleRefetch, healthRecheck, sbomId, showToast])
 
   const setSearchFilter = useCallback(
     (value) => {
@@ -397,11 +392,9 @@ const Checks = () => {
       })
       .finally(() => {
         setTimeout(() => {
-          toast({
+          showToast({
             description: 'A unique identifier has been added to the component',
-            status: 'success',
-            duration: 3000,
-            position: 'top'
+            status: 'success'
           })
         }, 1000)
       })
@@ -428,11 +421,9 @@ const Checks = () => {
       })
       .finally(() => {
         setTimeout(() => {
-          toast({
+          showToast({
             description: 'A unique identifier has been added to the component',
-            status: 'success',
-            duration: 3000,
-            position: 'top'
+            status: 'success'
           })
         }, 1000)
       })
@@ -536,11 +527,9 @@ const Checks = () => {
   const handleCreateCpe = (string) => {
     const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
-      toast({
+      showToast({
         description: 'CPE already exists',
-        status: 'error',
-        position: 'top',
-        duration: 3000
+        status: 'error'
       })
     } else {
       setCpeList([...cpeList, string])
@@ -553,11 +542,9 @@ const Checks = () => {
   const handleUpdateCpe = (string, id) => {
     const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
-      toast({
+      showToast({
         description: 'CPE already exists',
-        status: 'error',
-        position: 'top',
-        duration: 3000
+        status: 'error'
       })
     } else if (cpeList?.find((item, index) => index === id)) {
       const updatedData = cpeList?.map((item, index) => {

@@ -36,13 +36,13 @@ import {
   Text,
   Textarea,
   Tooltip,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react'
 
 import CpeInput from 'components/CpeInput'
 import LicenseField from 'components/Licenses/LicenseField'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { CreateComponent, sbomCreate } from 'graphQL/Mutation'
@@ -51,7 +51,7 @@ import { CpeAutoComplete } from 'graphQL/Queries'
 import { FaExpandAlt } from 'react-icons/fa'
 
 function ProductSbomDrawer({ isOpen, onClose, data }) {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const params = useParams()
   const productId = params.productid
   const { prodCompState, dispatch } = useGlobalState()
@@ -131,11 +131,9 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
   const handleCreateCpe = (string) => {
     const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
-      toast({
+      showToast({
         description: 'CPE already exists',
-        status: 'error',
-        position: 'top',
-        duration: 3000
+        status: 'error'
       })
     } else {
       setCpeList([...cpeList, string])
@@ -148,11 +146,9 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
   const handleUpdateCpe = (string, id) => {
     const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
-      toast({
+      showToast({
         description: 'CPE already exists',
-        status: 'error',
-        position: 'top',
-        duration: 3000
+        status: 'error'
       })
     } else if (cpeList?.find((item, index) => index === id)) {
       const updatedData = cpeList?.map((item, index) => {
@@ -201,11 +197,9 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
     }).then(
       (res) =>
         res.data &&
-        toast({
+        showToast({
           description: 'SBOM added successfully',
-          status: 'success',
-          position: 'top',
-          duration: 3000
+          status: 'success'
         })
     )
   }
@@ -225,11 +219,9 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
           setDisabled(false)
           handleCreateComp(res.data.sbomCreate.sbom.id)
         } else {
-          toast({
+          showToast({
             description: res.data.sbomCreate.errors,
-            status: 'error',
-            position: 'top',
-            duration: 4000
+            status: 'error'
           })
         }
       })

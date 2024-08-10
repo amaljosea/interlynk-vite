@@ -11,14 +11,15 @@ import {
   ModalBody,
   ModalContent,
   ModalOverlay,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { UserEmailConfirmation } from 'graphQL/Mutation'
 
 const Confirmation = () => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const token = queryParams.get('confirmation_token')
@@ -37,15 +38,13 @@ const Confirmation = () => {
         setError(res?.data?.userEmailConfirmation?.errors[0])
       } else {
         setError([])
-        toast({
+        showToast({
           description: 'Registration Successful 👍',
-          status: 'success',
-          position: 'top',
-          duration: 4000
+          status: 'success'
         })
       }
     })
-  }, [emailConfirmation, toast, token])
+  }, [emailConfirmation, showToast, token])
 
   if (error?.length > 0) {
     return (

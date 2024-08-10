@@ -1,7 +1,10 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
+
+import { AddIcon, MinusIcon } from '@chakra-ui/icons'
 import {
   Button,
+  HStack,
   IconButton,
   Input,
   Modal,
@@ -11,12 +14,11 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useToast,
-  VStack,
-  HStack,
   Select,
+  VStack
 } from '@chakra-ui/react'
-import { AddIcon, MinusIcon } from '@chakra-ui/icons'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import {
   CreateSlackConnection,
@@ -24,22 +26,35 @@ import {
   UpdateSlackConnection
 } from '../../graphQL/Mutation'
 
-const SlackConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updateCon, org, hostId }) => {
-  const toast = useToast()
+const SlackConfigModal = ({
+  isOpen,
+  onClose,
+  data,
+  setGreenCheck,
+  refetch,
+  updateCon,
+  org,
+  hostId
+}) => {
+  const { showToast } = useCustomToast()
 
   const [updateSlackConnection] = useMutation(UpdateSlackConnection)
   const [createSlackConnection] = useMutation(CreateSlackConnection)
   const [deleteSlackConnection] = useMutation(DeleteSlackConnection)
 
-  const [configs, setConfigs] = useState([{ address: '', notificationType: 'All', frequency: 'Instant' }])
+  const [configs, setConfigs] = useState([
+    { address: '', notificationType: 'All', frequency: 'Instant' }
+  ])
 
   useEffect(() => {
     if (data) {
-      setConfigs(data.map(item => ({
-        address: item.connection?.configs[0]?.address,
-        notificationType: item.connection?.configs[0]?.notificationType,
-        frequency: item.connection?.configs[0]?.frequency
-      })))
+      setConfigs(
+        data.map((item) => ({
+          address: item.connection?.configs[0]?.address,
+          notificationType: item.connection?.configs[0]?.notificationType,
+          frequency: item.connection?.configs[0]?.frequency
+        }))
+      )
     }
   }, [data])
 
@@ -53,23 +68,17 @@ const SlackConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updat
       if (res?.data?.slackConnectionCreate?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, slack: true }))
         onClose()
-        toast({
+        showToast({
           title: 'Configuration saved.',
           description: 'Your Slack configuration has been successfully saved.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
       } else {
-        toast({
+        showToast({
           title: 'Saving failed.',
           description:
             'An error occurred while saving your Slack configuration.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       }
     })
@@ -86,24 +95,18 @@ const SlackConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updat
       if (res?.data?.slackConnectionUpdate?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, slack: true }))
         onClose()
-        toast({
+        showToast({
           title: 'Configuration saved.',
           description:
             'Your Slack configuration has been successfully updated.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
       } else {
-        toast({
+        showToast({
           title: 'Saving failed.',
           description:
             'An error occurred while updating your Slack configuration.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       }
     })
@@ -119,24 +122,18 @@ const SlackConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updat
       if (res?.data?.slackConnectionDelete?.errors?.length === 0) {
         setGreenCheck((prev) => ({ ...prev, slack: false }))
         onClose()
-        toast({
+        showToast({
           title: 'Configuration deleted.',
           description:
             'Your Slack configuration has been successfully deleted.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
       } else {
-        toast({
+        showToast({
           title: 'Deletion failed.',
           description:
             'An error occurred while deleting your Slack configuration.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       }
     })
@@ -149,7 +146,10 @@ const SlackConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updat
   }
 
   const handleAddConfig = () => {
-    setConfigs([...configs, { address: '', notificationType: 'All', frequency: 'Instant' }])
+    setConfigs([
+      ...configs,
+      { address: '', notificationType: 'All', frequency: 'Instant' }
+    ])
   }
 
   const handleRemoveConfig = (index) => {
@@ -160,22 +160,26 @@ const SlackConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updat
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent maxW="800px">
+      <ModalContent maxW='800px'>
         <ModalHeader>Slack Configuration</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <VStack spacing={4}>
             {configs.map((config, index) => (
-              <HStack key={index} width="100%">
+              <HStack key={index} width='100%'>
                 <Input
                   placeholder='Paste Slack Webhook URL'
                   value={config.address}
-                  onChange={(e) => handleChange(index, 'address', e.target.value)}
+                  onChange={(e) =>
+                    handleChange(index, 'address', e.target.value)
+                  }
                   isDisabled={!updateCon}
                 />
                 <Select
                   value={config.notificationType}
-                  onChange={(e) => handleChange(index, 'notificationType', e.target.value)}
+                  onChange={(e) =>
+                    handleChange(index, 'notificationType', e.target.value)
+                  }
                   isDisabled={!updateCon}
                 >
                   <option value='All'>All</option>
@@ -185,7 +189,9 @@ const SlackConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updat
                 </Select>
                 <Select
                   value={config.frequency}
-                  onChange={(e) => handleChange(index, 'frequency', e.target.value)}
+                  onChange={(e) =>
+                    handleChange(index, 'frequency', e.target.value)
+                  }
                   isDisabled={!updateCon}
                 >
                   <option value='Instant'>Instant</option>

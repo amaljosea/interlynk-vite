@@ -17,13 +17,13 @@ import {
   Text,
   Textarea,
   Tooltip,
-  chakra,
-  useToast
+  chakra
 } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
 import ActionWrapper from 'components/Misc/ActionWrapper'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
@@ -33,7 +33,7 @@ import { GetAllSboms } from 'graphQL/Queries'
 
 const CompDetails = (props) => {
   const { onClose, data, refetch } = props
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const params = useParams()
   const navigate = useNavigate()
   const location = useLocation()
@@ -134,7 +134,7 @@ const CompDetails = (props) => {
     }).then((res) => {
       const { errors } = res?.data?.componentUpdate || ''
       if (errors?.length > 0) {
-        toast({ description: errors[0], status: 'error', position: 'top' })
+        showToast({ description: errors[0], status: 'error' })
       } else {
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
         navigate(link)

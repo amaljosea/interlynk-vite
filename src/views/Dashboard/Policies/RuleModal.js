@@ -21,15 +21,16 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
-  Tag,
-  useToast
+  Tag
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { CreatePolicyRule, UpdatePolicyRule } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
 
 const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const [operator, setOperator] = useState('')
   const [subject, setSubject] = useState('')
@@ -88,11 +89,9 @@ const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
         console.log(errors[0])
         setError(errors[0])
       } else {
-        toast({
+        showToast({
           description: 'Rule added successfully',
-          status: 'success',
-          position: 'top',
-          duration: 2000
+          status: 'success'
         })
         setError('')
         handleRefetch()
@@ -124,11 +123,9 @@ const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
       if (errors?.length > 0) {
         setError(errors[0])
       } else {
-        toast({
+        showToast({
           description: 'Rule updated successfully',
-          status: 'success',
-          position: 'top',
-          duration: 2000
+          status: 'success'
         })
         setError('')
         handleRefetch()

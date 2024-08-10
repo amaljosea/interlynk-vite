@@ -9,9 +9,10 @@ import {
   MenuButton,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup,
-  useToast
+  MenuOptionGroup
 } from '@chakra-ui/react'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import { UpdateNotificationPreference } from 'graphQL/Mutation'
 import {
@@ -25,7 +26,7 @@ import { FaBell } from 'react-icons/fa'
 import CheckMark from '../Misc/CheckMark'
 
 const NotificationMenuBell = () => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const params = useParams()
   const productId = params.productid
   const [updatePreference] = useMutation(UpdateNotificationPreference)
@@ -81,14 +82,11 @@ const NotificationMenuBell = () => {
         console.log(enabledChannelCount)
 
         if (enabledChannelCount === 0 && !newPreference.includes('none')) {
-          toast({
+          showToast({
             title: 'No notification medium enabled',
             description:
               'Please configure at least one notification medium under settings.',
-            status: 'warning',
-            duration: 5000,
-            isClosable: true,
-            position: 'top'
+            status: 'warning'
           })
         }
       })

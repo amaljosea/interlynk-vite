@@ -15,12 +15,12 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Stack,
-  Tag,
-  useToast
+  Tag
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -28,7 +28,7 @@ import { UpdateOrganizationRole } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
 
 const PermissionDrawer = ({ isOpen, onClose, selectedRole }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
 
   const updateOrg = useHasPermission({
@@ -66,9 +66,8 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole }) => {
       if (errors?.length > 0) {
         setError(errors[0])
       } else {
-        toast({
+        showToast({
           description: `${filterItem?.name} Permission updated successfully`,
-          position: 'top',
           status: 'success'
         })
       }

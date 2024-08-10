@@ -1,7 +1,10 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
+
+import { AddIcon, MinusIcon } from '@chakra-ui/icons'
 import {
   Button,
+  HStack,
   IconButton,
   Input,
   Modal,
@@ -11,12 +14,11 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useToast,
-  VStack,
-  HStack,
   Select,
+  VStack
 } from '@chakra-ui/react'
-import { AddIcon, MinusIcon } from '@chakra-ui/icons'
+
+import useCustomToast from 'hooks/useCustomToast'
 
 import {
   CreateEmailConnection,
@@ -24,22 +26,35 @@ import {
   UpdateEmailConnection
 } from '../../graphQL/Mutation'
 
-const EmailConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updateCon, org, hostId }) => {
-  const toast = useToast()
+const EmailConfigModal = ({
+  isOpen,
+  onClose,
+  data,
+  setGreenCheck,
+  refetch,
+  updateCon,
+  org,
+  hostId
+}) => {
+  const { showToast } = useCustomToast()
 
   const [updateEmailConnection] = useMutation(UpdateEmailConnection)
   const [createEmailConnection] = useMutation(CreateEmailConnection)
   const [deleteEmailConnection] = useMutation(DeleteEmailConnection)
 
-  const [configs, setConfigs] = useState([{ address: '', notificationType: 'All', frequency: 'Instant' }])
+  const [configs, setConfigs] = useState([
+    { address: '', notificationType: 'All', frequency: 'Instant' }
+  ])
 
   useEffect(() => {
     if (data) {
-      setConfigs(data.map(item => ({
-        address: item.connection?.configs[0]?.address,
-        notificationType: item.connection?.configs[0]?.notificationType,
-        frequency: item.connection?.configs[0]?.frequency
-      })))
+      setConfigs(
+        data.map((item) => ({
+          address: item.connection?.configs[0]?.address,
+          notificationType: item.connection?.configs[0]?.notificationType,
+          frequency: item.connection?.configs[0]?.frequency
+        }))
+      )
     }
   }, [data])
 
@@ -54,23 +69,17 @@ const EmailConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updat
         setGreenCheck((prev) => ({ ...prev, email: true }))
         refetch()
         onClose()
-        toast({
+        showToast({
           title: 'Configuration saved.',
           description: 'Your Email configuration has been successfully saved.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
       } else {
-        toast({
+        showToast({
           title: 'Saving failed.',
           description:
             'An error occurred while saving your Email configuration.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       }
     })
@@ -88,24 +97,18 @@ const EmailConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updat
         setGreenCheck((prev) => ({ ...prev, email: true }))
         refetch()
         onClose()
-        toast({
+        showToast({
           title: 'Configuration saved.',
           description:
             'Your Email configuration has been successfully updated.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
       } else {
-        toast({
+        showToast({
           title: 'Saving failed.',
           description:
             'An error occurred while updating your Email configuration.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       }
     })
@@ -122,24 +125,18 @@ const EmailConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updat
         setGreenCheck((prev) => ({ ...prev, email: false }))
         refetch()
         onClose()
-        toast({
+        showToast({
           title: 'Configuration deleted.',
           description:
             'Your Email configuration has been successfully deleted.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         })
       } else {
-        toast({
+        showToast({
           title: 'Deletion failed.',
           description:
             'An error occurred while deleting your Email configuration.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
+          status: 'error'
         })
       }
     })
@@ -152,7 +149,10 @@ const EmailConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updat
   }
 
   const handleAddConfig = () => {
-    setConfigs([...configs, { address: '', notificationType: 'All', frequency: 'Instant' }])
+    setConfigs([
+      ...configs,
+      { address: '', notificationType: 'All', frequency: 'Instant' }
+    ])
   }
 
   const handleRemoveConfig = (index) => {
@@ -163,22 +163,26 @@ const EmailConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updat
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent maxW="800px">
+      <ModalContent maxW='800px'>
         <ModalHeader>Email Configuration</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <VStack spacing={4}>
             {configs.map((config, index) => (
-              <HStack key={index} width="100%">
+              <HStack key={index} width='100%'>
                 <Input
                   placeholder='Paste Email Webhook URL'
                   value={config.address}
-                  onChange={(e) => handleChange(index, 'address', e.target.value)}
+                  onChange={(e) =>
+                    handleChange(index, 'address', e.target.value)
+                  }
                   isDisabled={!updateCon}
                 />
                 <Select
                   value={config.notificationType}
-                  onChange={(e) => handleChange(index, 'notificationType', e.target.value)}
+                  onChange={(e) =>
+                    handleChange(index, 'notificationType', e.target.value)
+                  }
                   isDisabled={!updateCon}
                 >
                   <option value='All'>All</option>
@@ -188,7 +192,9 @@ const EmailConfigModal = ({ isOpen, onClose, data, setGreenCheck, refetch, updat
                 </Select>
                 <Select
                   value={config.frequency}
-                  onChange={(e) => handleChange(index, 'frequency', e.target.value)}
+                  onChange={(e) =>
+                    handleChange(index, 'frequency', e.target.value)
+                  }
                   isDisabled={!updateCon}
                 >
                   <option value='Instant'>Instant</option>

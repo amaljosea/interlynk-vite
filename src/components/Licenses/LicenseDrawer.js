@@ -21,16 +21,17 @@ import {
   Select,
   Stack,
   Text,
-  Textarea,
-  useToast
+  Textarea
 } from '@chakra-ui/react'
 
 import LynkSelect from 'components/LynkSelect'
 
+import useCustomToast from 'hooks/useCustomToast'
+
 import { CreateLicense, UpdateLicense } from '../../graphQL/Mutation'
 
 const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const [name, setName] = useState('')
   const [text, setText] = useState('')
@@ -101,13 +102,10 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
     }).then(() => {
       refetchActiveQueries()
     })
-    toast({
+    showToast({
       description:
         'License properties and all product versions, including this license, are being updated. This could take some time.',
-      status: 'success',
-      duration: 7000,
-      isClosable: true,
-      position: 'top'
+      status: 'success'
     })
     onClose()
   }
