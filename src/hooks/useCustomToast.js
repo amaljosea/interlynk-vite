@@ -68,7 +68,7 @@ const useCustomToast = () => {
               marginLeft='12px'
               display='flex'
               flexDirection='column'
-              gap={1}
+              gap={title ? 1 : 0}
             >
               <Text fontWeight='500' fontSize='16px' color='#1A202C'>
                 {title}

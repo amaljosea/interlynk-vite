@@ -47,7 +47,7 @@ const CompLinks = ({ component }) => {
   const { data } = useQuery(GetCompUrls, {
     variables: { id, sbomId }
   })
-  const { externalUrls } = data?.component || ''
+  const { externalUrls, refetch } = data?.component || ''
   const filterUrls = externalUrls?.map((item) => ({
     name: item?.name,
     url: item?.url
@@ -106,11 +106,12 @@ const CompLinks = ({ component }) => {
 
   const handleLinkAdd = () => {
     disableButtonTemporarily()
+    const result = { url: link, name: type }
     updateLinks({
       variables: {
         id,
         sbomId,
-        urls: [{ url: link, name: type }, ...filterUrls]
+        urls: filterUrls?.length > 0 ? [result, ...filterUrls] : [result]
       }
     }).then((res) => {
       if (res?.data) {
