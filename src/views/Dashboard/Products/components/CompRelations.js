@@ -27,9 +27,9 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import ActionWrapper from 'components/Misc/ActionWrapper'
 import RelDeleteModal from 'components/RelDeleteModal'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
@@ -55,8 +55,9 @@ const findShortestPath = (pathArray, currentShortestPath = []) => {
   ])
 }
 
-const CompRelations = ({ data, onClose, compPath }) => {
+const CompRelations = ({ data, compPath }) => {
   const params = useParams()
+  const { showToast } = useCustomToast()
   const productId = params.productid
   const sbomId = params.sbomid
   const location = useLocation()
@@ -136,6 +137,10 @@ const CompRelations = ({ data, onClose, compPath }) => {
           ...prev,
           res?.data?.componentRelationCreate?.compRelation
         ])
+        showToast({
+          description: 'Relations updated successfully',
+          status: 'success'
+        })
       }
     })
     setRelation('')
@@ -365,13 +370,6 @@ const CompRelations = ({ data, onClose, compPath }) => {
           </Tag>
         </Stack>
       )}
-      {/* ACTIONS */}
-      <ActionWrapper>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button colorScheme='blue' width={'fit-content'} onClick={onClose}>
-          Save
-        </Button>
-      </ActionWrapper>
     </Flex>
   )
 }

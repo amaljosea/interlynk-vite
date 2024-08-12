@@ -52,7 +52,7 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
     >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton mt={3} />
+        <DrawerCloseButton mt={3} onClick={refetch} />
         <DrawerHeader borderBottomWidth='1px'>
           <Text mb={1} fontWeight={'medium'}>
             {data ? 'Edit' : 'Add'} Component
@@ -82,29 +82,20 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
             </TabList>
             <TabPanels pos={'relative'} top={12} overflowX={'hidden'}>
               <TabPanel px={0}>
-                <CompDetails data={data} onClose={onClose} refetch={refetch} />
+                <CompDetails data={data} />
               </TabPanel>
               <TabPanel px={0}>
-                <CompIdentifiers
-                  data={data}
-                  onClose={onClose}
-                  refetch={refetch}
-                />
+                <CompIdentifiers data={data} />
               </TabPanel>
               <TabPanel px={0}>
-                <CompSupplier data={data} onClose={onClose} refetch={refetch} />
+                <CompSupplier data={data} />
               </TabPanel>
               <TabPanel px={0}>
-                <CompLinks
-                  component={data}
-                  onClose={onClose}
-                  refetch={refetch}
-                />
+                <CompLinks component={data} />
               </TabPanel>
               <TabPanel px={0}>
                 <CompRelations
                   data={data}
-                  onClose={onClose}
                   compPath={comPath?.component?.pathToPrimary}
                 />
               </TabPanel>

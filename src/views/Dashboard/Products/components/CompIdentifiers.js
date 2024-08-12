@@ -20,7 +20,6 @@ import {
 } from '@chakra-ui/react'
 
 import CpeField from 'components/CpeField'
-import ActionWrapper from 'components/Misc/ActionWrapper'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -33,8 +32,7 @@ import { FaChevronDown, FaChevronRight } from 'react-icons/fa6'
 import CpeInputs from './CpeInputs'
 import PurlInputs from './PurlInputs'
 
-const CompIdentifiers = (props) => {
-  const { onClose, data, refetch } = props
+const CompIdentifiers = ({ data }) => {
   const { showToast } = useCustomToast()
   const params = useParams()
   const sbomId = params.sbomid
@@ -45,14 +43,7 @@ const CompIdentifiers = (props) => {
   const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
 
-  const onRefetch = () => {
-    refetch()
-    onClose()
-  }
-
-  const [updateComponent] = useMutation(UpdateComponent, {
-    onCompleted: (data) => data && onRefetch()
-  })
+  const [updateComponent] = useMutation(UpdateComponent)
 
   const cpeRef = useRef()
   const [cpeValue, setCpeValue] = useState('')
@@ -137,8 +128,11 @@ const CompIdentifiers = (props) => {
       if (errors?.length > 0) {
         showToast({ description: errors[0], status: 'error' })
       } else {
+        showToast({
+          description: 'Identifiers updated successfully',
+          status: 'success'
+        })
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        onClose()
       }
     })
   }
@@ -265,20 +259,17 @@ const CompIdentifiers = (props) => {
           onChange={handleCpeChange}
         />
       </FormControl>
-      <br />
       {/* ACTIONS */}
-      <ActionWrapper hidden={cpeOpen || purlOpen}>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button
-          colorScheme='blue'
-          width={'fit-content'}
-          hidden={purlOpen || cpeOpen}
-          onClick={handleUpdateCom}
-          isDisabled={disabled}
-        >
-          Save
-        </Button>
-      </ActionWrapper>
+      <Button
+        colorScheme='blue'
+        variant='outline'
+        width={'fit-content'}
+        hidden={purlOpen || cpeOpen}
+        onClick={handleUpdateCom}
+        isDisabled={disabled}
+      >
+        Save
+      </Button>
     </Stack>
   )
 }

@@ -1,11 +1,12 @@
-import { useMutation } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { gql, useMutation, useQuery } from '@apollo/client'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { validateUrl } from 'utils'
 
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
   Button,
+  ButtonGroup,
   Divider,
   Flex,
   FormControl,
@@ -22,40 +23,60 @@ import {
   Tr
 } from '@chakra-ui/react'
 
-import ActionWrapper from 'components/Misc/ActionWrapper'
+import useCustomToast from 'hooks/useCustomToast'
 
 import { UpdateCompLinks } from 'graphQL/Mutation'
 
-const CompLinks = ({ onClose, component, refetch }) => {
+const GetCompUrls = gql`
+  query GetCompUrls($id: Uuid!, $sbomId: Uuid!) {
+    component(id: $id, sbomId: $sbomId) {
+      externalUrls {
+        name
+        url
+      }
+    }
+  }
+`
+
+const CompLinks = ({ component }) => {
   const params = useParams()
   const sbomId = params.sbomid
+  const { showToast } = useCustomToast()
+  const { id } = component
+
+  const { data } = useQuery(GetCompUrls, {
+    variables: { id, sbomId }
+  })
+  const { externalUrls } = data?.component || ''
+  const filterUrls = externalUrls?.map((item) => ({
+    name: item?.name,
+    url: item?.url
+  }))
 
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
-  const [linksData, setLinksData] = useState([])
   const [error, setError] = useState('')
-  const { id, externalUrls } = component
+  const [disabled, setDisabled] = useState(false)
+  const [activeLink, setActiveLink] = useState(null)
   const [linkError, setLinkError] = useState('')
+
   const [updateLinks] = useMutation(UpdateCompLinks)
 
-  const containsSpace = /\s/.test(link)
+  const disableButtonTemporarily = () => {
+    setDisabled(true)
+    setTimeout(() => {
+      setDisabled(false)
+    }, 3000)
+  }
 
-  useEffect(() => {
-    const urls = []
-    externalUrls?.map((item) => {
-      urls.push({
-        name: item.name,
-        url: item.url
-      })
-    })
-    setLinksData(urls)
-  }, [externalUrls])
+  const containsSpace = /\s/.test(link)
 
   const handleTypeChange = (e) => {
     const { value } = e.target
     setType(value)
     const isExists =
-      linksData.length > 0 && linksData.find((item) => item.name === value)
+      externalUrls?.length > 0 &&
+      externalUrls?.find((item) => item.name === value)
     if (isExists) {
       setError('Link type already exists!')
     } else {
@@ -83,39 +104,51 @@ const CompLinks = ({ onClose, component, refetch }) => {
     }
   }
 
-  const handleLinkAdd = async (e) => {
-    e.preventDefault()
-    setLinksData((prev) => [{ url: link, name: type }, ...prev])
-    setType('')
-    setLink('')
-  }
-
-  const handleLinkRemove = (id) => {
-    const updatedList = linksData.filter((_, index) => index !== id)
-    setLinksData(updatedList)
-  }
-
-  const handleSave = async () => {
-    await updateLinks({
+  const handleLinkAdd = () => {
+    disableButtonTemporarily()
+    updateLinks({
       variables: {
-        id: id,
-        sbomId: sbomId,
-        urls: linksData
+        id,
+        sbomId,
+        urls: [{ url: link, name: type }, ...filterUrls]
+      }
+    }).then((res) => {
+      if (res?.data) {
+        showToast({
+          description: 'Links updated successfully',
+          status: 'success'
+        })
       }
     })
-      .then((res) => res.data && refetch())
-      .finally(() => onClose())
+    setType('')
+    setLink('')
+    setActiveLink(null)
   }
 
+  const onDelete = (data) => {
+    setActiveLink(data)
+  }
+
+  const handleLinkRemove = () => {
+    const updatedList = filterUrls?.filter(
+      (url) => url?.name !== activeLink?.name
+    )
+    disableButtonTemporarily()
+    updateLinks({
+      variables: {
+        id,
+        sbomId,
+        urls: updatedList
+      }
+    })
+  }
+
+  const isInvalid =
+    !validateUrl(link.trim()) || error !== '' || linkError !== '' || disabled
+
   return (
-    <form onSubmit={handleLinkAdd}>
-      <Flex
-        direction={'column'}
-        alignItems={'flex-start'}
-        gap={3}
-        px={6}
-        pb={20}
-      >
+    <>
+      <Flex px={6} gap={4} direction={'column'} alignItems={'flex-start'}>
         {/* HEADING */}
         <Text color={'gray.500'} fontWeight={'medium'}>
           Add Link
@@ -169,32 +202,29 @@ const CompLinks = ({ onClose, component, refetch }) => {
         </FormControl>
         {/* ACTIONS */}
         <Button
-          mt={1}
-          type='submit'
           fontSize={'sm'}
           variant='outline'
           colorScheme='blue'
           leftIcon={<AddIcon />}
-          isDisabled={
-            !validateUrl(link.trim()) || error !== '' || linkError !== ''
-          }
+          onClick={handleLinkAdd}
+          isDisabled={isInvalid}
         >
           Add Link
         </Button>
         <Divider my={2} pos={'relative'} left={0} right={0} />
         {/* TABLE */}
-        <Flex width={'100%'} flexDir={'column'}>
+        <Flex mb={4} width={'100%'} flexDir={'column'}>
           <Text fontWeight={'medium'} color={'gray.500'}>
             Existing Links
           </Text>
-          {linksData.length > 0 ? (
+          {externalUrls?.length > 0 ? (
             <Table variant='simple' size='sm' mt={4}>
               <Tbody>
-                {linksData.map((item, index) => (
+                {externalUrls?.map((item, index) => (
                   <Tr key={index}>
                     <Td pl={0} wordBreak={'break-all'}>
                       <Text>
-                        {item.url ? (
+                        {item?.url ? (
                           <Tooltip label={item.url}>
                             {item.url.length > 50
                               ? `${item.url.substring(0, 50)}...`
@@ -203,18 +233,41 @@ const CompLinks = ({ onClose, component, refetch }) => {
                         ) : null}
                       </Text>
                       <Text mt={2} color={'gray.500'}>
-                        {item.name}
+                        {item?.name}
                       </Text>
                     </Td>
                     <Td px={0} isNumeric>
-                      <IconButton
-                        size='sm'
-                        color={'red'}
-                        variant='outline'
-                        cursor={'pointer'}
-                        icon={<DeleteIcon />}
-                        onClick={() => handleLinkRemove(index)}
-                      />
+                      {activeLink?.name === item?.name ? (
+                        <ButtonGroup>
+                          <Button
+                            size='sm'
+                            fontSize={'sm'}
+                            variant='outline'
+                            onClick={() => setActiveLink(null)}
+                          >
+                            No
+                          </Button>
+                          <Button
+                            size='sm'
+                            fontSize={'sm'}
+                            variant='outline'
+                            colorScheme='red'
+                            isDisabled={disabled}
+                            onClick={handleLinkRemove}
+                          >
+                            Yes
+                          </Button>
+                        </ButtonGroup>
+                      ) : (
+                        <IconButton
+                          size='sm'
+                          color={'red'}
+                          variant='outline'
+                          cursor={'pointer'}
+                          icon={<DeleteIcon />}
+                          onClick={() => onDelete(item)}
+                        />
+                      )}
                     </Td>
                   </Tr>
                 ))}
@@ -226,19 +279,8 @@ const CompLinks = ({ onClose, component, refetch }) => {
             </Text>
           )}
         </Flex>
-        {/* ACTIONS */}
-        <ActionWrapper>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button
-            colorScheme='blue'
-            onClick={handleSave}
-            isDisabled={linksData?.length === 0}
-          >
-            Save
-          </Button>
-        </ActionWrapper>
       </Flex>
-    </form>
+    </>
   )
 }
 

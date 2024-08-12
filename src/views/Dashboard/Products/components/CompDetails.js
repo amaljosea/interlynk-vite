@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { infoData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -21,49 +21,26 @@ import {
 } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
-import ActionWrapper from 'components/Misc/ActionWrapper'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import useQueryParam from 'hooks/useQueryParam'
 
 import { UpdateComponent } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
 
-const CompDetails = (props) => {
-  const { onClose, data, refetch } = props
+const CompDetails = ({ data }) => {
   const { showToast } = useCustomToast()
   const params = useParams()
-  const navigate = useNavigate()
   const location = useLocation()
   const productId = params.productid
   const sbomId = params.sbomid
   const customerView = location.pathname.startsWith('/customer')
 
-  const activeTab = useQueryParam('tab')
   const { prodCompState, dispatch } = useGlobalState()
   const { expLicense } = prodCompState
   const { prodCompDispatch } = dispatch
 
-  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
-    useProductUrlContext()
-
-  const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-    replaceParams: true,
-    paramsObj: {
-      tab: activeTab
-    }
-  })
-
-  const onRefetch = () => {
-    refetch()
-    onClose()
-  }
-
-  const [updateComponent] = useMutation(UpdateComponent, {
-    onCompleted: (data) => data && onRefetch()
-  })
+  const [updateComponent] = useMutation(UpdateComponent)
 
   const [groupInfo, setGroupInfo] = useState('')
   const [compName, setCompName] = useState('')
@@ -136,8 +113,11 @@ const CompDetails = (props) => {
       if (errors?.length > 0) {
         showToast({ description: errors[0], status: 'error' })
       } else {
+        showToast({
+          description: 'Details updated successfully',
+          status: 'success'
+        })
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        navigate(link)
       }
     })
   }
@@ -146,7 +126,7 @@ const CompDetails = (props) => {
     compKind === '' || compName === '' || compVersion === '' || disabled
 
   return (
-    <Stack direction={'column'} spacing={4} px={6} pb={20}>
+    <Stack direction={'column'} spacing={4} px={6}>
       {/* Name */}
       <FormControl isReadOnly={customerView}>
         <FormLabel htmlFor='compName' fontSize={'sm'}>
@@ -353,17 +333,15 @@ const CompDetails = (props) => {
           </Tooltip>
         </Flex>
       </FormControl>
-      <ActionWrapper>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button
-          colorScheme='blue'
-          width={'fit-content'}
-          isDisabled={isInvalid}
-          onClick={handleUpdateCom}
-        >
-          Save
-        </Button>
-      </ActionWrapper>
+      <Button
+        colorScheme='blue'
+        variant={'outline'}
+        width={'fit-content'}
+        isDisabled={isInvalid}
+        onClick={handleUpdateCom}
+      >
+        Save
+      </Button>
     </Stack>
   )
 }

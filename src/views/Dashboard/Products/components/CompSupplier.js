@@ -1,5 +1,6 @@
-import { useMutation } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
@@ -11,12 +12,35 @@ import {
   Input
 } from '@chakra-ui/react'
 
-import ActionWrapper from 'components/Misc/ActionWrapper'
+import useCustomToast from 'hooks/useCustomToast'
 
 import { addComSupplier, updateComSupplier } from 'graphQL/Mutation'
 
-const CompSupplier = ({ data, onClose, refetch }) => {
-  const { id, suppliers } = data || ''
+const GetSupplier = gql`
+  query GetCompUrls($id: Uuid!, $sbomId: Uuid!) {
+    component(id: $id, sbomId: $sbomId) {
+      suppliers {
+        id
+        name
+        url
+        contactEmail
+        contactName
+      }
+    }
+  }
+`
+
+const CompSupplier = ({ data }) => {
+  const { showToast } = useCustomToast()
+  const params = useParams()
+  const sbomId = params.sbomid
+
+  const { id } = data || ''
+
+  const { data: result } = useQuery(GetSupplier, {
+    variables: { id, sbomId }
+  })
+  const { suppliers } = result?.component || ''
 
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')
@@ -46,12 +70,8 @@ const CompSupplier = ({ data, onClose, refetch }) => {
     }
   }
 
-  const [createSupplier] = useMutation(addComSupplier, {
-    onCompleted: (data) => data && refetch()
-  })
-  const [updateSupplier] = useMutation(updateComSupplier, {
-    onCompleted: (data) => data && refetch()
-  })
+  const [createSupplier] = useMutation(addComSupplier)
+  const [updateSupplier] = useMutation(updateComSupplier)
 
   const handleSave = () => {
     disableButtonTemporarily()
@@ -63,7 +83,14 @@ const CompSupplier = ({ data, onClose, refetch }) => {
         contactEmail: supEmail,
         componentId: id
       }
-    }).then((res) => res?.data && onClose())
+    }).then(
+      (res) =>
+        res?.data &&
+        showToast({
+          description: 'Supplier added successfully',
+          status: 'success'
+        })
+    )
   }
 
   const handleUpdate = () => {
@@ -77,7 +104,14 @@ const CompSupplier = ({ data, onClose, refetch }) => {
           contactEmail: supEmail,
           id: suppliers[0].id
         }
-      }).then((res) => res.data && onClose())
+      }).then(
+        (res) =>
+          res.data &&
+          showToast({
+            description: 'Supplier updated successfully',
+            status: 'success'
+          })
+      )
     }
   }
 
@@ -169,17 +203,15 @@ const CompSupplier = ({ data, onClose, refetch }) => {
         <FormErrorMessage>{emailError}</FormErrorMessage>
       </FormControl>
       {/* ACTIONS */}
-      <ActionWrapper>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button
-          colorScheme='blue'
-          width={'fit-content'}
-          isDisabled={isInvalid}
-          onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
-        >
-          Save
-        </Button>
-      </ActionWrapper>
+      <Button
+        variant='outline'
+        colorScheme='blue'
+        width={'fit-content'}
+        isDisabled={isInvalid}
+        onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
+      >
+        Save
+      </Button>
     </Flex>
   )
 }
