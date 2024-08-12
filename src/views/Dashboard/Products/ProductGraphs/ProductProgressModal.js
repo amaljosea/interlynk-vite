@@ -12,8 +12,6 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
-  Grid,
-  GridItem,
   IconButton,
   Menu,
   MenuButton,
@@ -28,7 +26,7 @@ import {
 import { ZoomInIcon } from 'components/Icons/Icons'
 import { ZoomOutIcon } from 'components/Icons/Icons'
 
-import { FaCalendar, FaFilter } from 'react-icons/fa'
+import { FaFilter } from 'react-icons/fa'
 import { FaChevronDown } from 'react-icons/fa6'
 import { FaCode, FaDesktop, FaInbox } from 'react-icons/fa6'
 
@@ -239,14 +237,15 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
           <Menu>
             <MenuButton textTransform={'capitalize'}>
               <Flex gap={2} alignItems={'center'}>
-                {`Environment: ${env}`} <FaChevronDown />
+                {`Environment: ${env.length === 0 ? 'All' : env.join(', ')}`}
+                <FaChevronDown />
               </Flex>
             </MenuButton>
             <MenuList>
               <MenuOptionGroup
                 value={env}
-                onChange={(value) => setEnv(value)}
-                type='radio'
+                onChange={onFilterEnv}
+                type='checkbox'
               >
                 {['all', 'default', 'development', 'production'].map(
                   (item, index) => (
@@ -263,46 +262,28 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
               </MenuOptionGroup>
             </MenuList>
           </Menu>
-          <Flex gap={3}>
-            <IconButton
-              icon={<ZoomOutIcon color={'#60686F'} />}
-              onClick={() => {}}
-              size='md'
-              colorScheme='gray'
-              variant='outline'
-              fontSize='24px'
-            />
-            <IconButton
-              icon={<ZoomInIcon color={'#60686F'} />}
-              onClick={() => {}}
-              size='md'
-              colorScheme='gray'
-              variant='outline'
-              fontSize='24px'
-            />
-          </Flex>
         </Flex>
         <DrawerBody borderRadius={10} p={0}>
-          <Grid
-            templateColumns='repeat(3, 1fr)'
+          <Flex
             gap={4}
             marginTop={10}
             minHeight={600}
             p={5}
+            justifyContent={'space-evenly'}
           >
             {renderTree(defaultData, 'default')}
             {renderTree(developmentData, 'development')}
             {renderTree(productionData, 'production')}
-          </Grid>
+          </Flex>
         </DrawerBody>
         <DrawerFooter justifyContent={'flex-start'}>
           <Flex gap={12}>
-            <LegendItem color={'#A0AEC0'} label={'Path'} />
+            <LegendItem color={strokeColor} label={'Path'} />
             {targetComponent && (
-              <LegendItem color={'#E53E3E'} label={'Components'} />
+              <LegendItem color={componentColor} label={'Components'} />
             )}
             {targetVulnerability && (
-              <LegendItem color={'#0D0CEE'} label={'Vulnerability'} />
+              <LegendItem color={vulnerabilityColor} label={'Vulnerability'} />
             )}
           </Flex>
         </DrawerFooter>
