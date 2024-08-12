@@ -261,3 +261,7 @@ td.rdtYear:hover {
 .no-scroll {
   overflow: hidden;
 }
+
+.rd3t-link {
+  stroke: darkgray !important;
+}

@@ -11,11 +11,9 @@ import {
   Stack,
   Tag,
   Text,
-  Tooltip
+  Tooltip,
+  useColorModeValue
 } from '@chakra-ui/react'
-
-import Card from 'components/Card/Card'
-import CardHeader from 'components/Card/CardHeader'
 
 import { GetCompDependency } from 'graphQL/Queries'
 import { GetShareCompDependency } from 'graphQL/Queries'
@@ -41,18 +39,34 @@ const renderForeignObjectNode = ({
   nodeDatum,
   toggleNode,
   foreignObjectProps,
-  activeComp
+  activeComp,
+  bgColor,
+  textColor
 }) => {
-  // console.log('nodeDatum', nodeDatum)
+  console.log('nodeDatum', nodeDatum)
   return (
-    <g>
-      <circle fill={'dodgerblue'} r='20' onClick={toggleNode} />
-      <foreignObject {...foreignObjectProps} y={-20}>
+    <g transform="translate(-56,-50)">
+      <svg xmlns='http://www.w3.org/2000/svg'>
+        <circle cx='50' cy='50' r='25' fill='dodgerBlue' stroke='transparent' />
+        <text
+          x='50'
+          y='52'
+          stroke='white'
+          fontSize={20}
+          strokeWidth={0.9}
+          textAnchor='middle'
+          fontFamily='inherit'
+          dominantBaseline='middle'
+        >
+          {nodeDatum?.children?.length || 0}
+        </text>
+      </svg>
+      <foreignObject {...foreignObjectProps} x={40} y={24}>
         <Flex width={'100%'} flexDirection={'column'} alignItems={'flex-start'}>
           <Box
             p={3}
             left={12}
-            bg={'blue.500'}
+            bg={bgColor}
             minW={'fit-content'}
             maxW={'300px'}
             position={'relative'}
@@ -60,10 +74,15 @@ const renderForeignObjectNode = ({
             colorScheme='blue'
             wordBreak={'break-all'}
             borderRadius={5}
-            color={'white'}
+            color={textColor}
           >
             <Stack direction={'column'}>
-              <Text wordBreak={'break-all'} lineHeight={1.3}>
+              <Text
+                fontSize={20}
+                fontWeight={'semibold'}
+                wordBreak={'break-all'}
+                lineHeight={1.3}
+              >
                 {nodeDatum?.name}
               </Text>
               {activeComp === null && !nodeDatum?.attributes?.version && (
@@ -73,7 +92,7 @@ const renderForeignObjectNode = ({
               )}
             </Stack>
             {nodeDatum.attributes?.version && (
-              <Text opacity={0.8} mt={1} fontSize='sm' colorScheme='blue'>
+              <Text opacity={0.8} mt={1} fontSize={16} colorScheme='blue'>
                 {nodeDatum.attributes?.version}
               </Text>
             )}
@@ -88,6 +107,9 @@ const GraphView = ({ data, activeComp }) => {
   const params = useParams()
   const sbomId = params.sbomid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+
+  const bgColor = useColorModeValue('gray.100', 'gray.800')
+  const textColor = useColorModeValue('blue.500', 'gray.100')
 
   const [treeView, setTreeView] = useState(null)
   const [zoom, setZoom] = useState(Number(0.6))
@@ -192,14 +214,16 @@ const GraphView = ({ data, activeComp }) => {
               zoom={Number(zoom)}
               initialDepth='2'
               separation={{ nonSiblings: 1, siblings: 1 }}
-              depthFactor='600'
+              depthFactor='650'
               enableLegacyTransitions={true}
               pathFunc={'step'}
               renderCustomNodeElement={(rd3tProps) =>
                 renderForeignObjectNode({
                   ...rd3tProps,
                   foreignObjectProps,
-                  activeComp
+                  activeComp,
+                  bgColor,
+                  textColor
                 })
               }
             />
