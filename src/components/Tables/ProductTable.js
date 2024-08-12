@@ -5,6 +5,7 @@ import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, hexToRGBA, timeSince } from 'utils'
 import { customStyles, getFormat, getLink, getType } from 'utils'
+import { truncatedValue } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
@@ -59,7 +60,6 @@ import {
 } from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
-import { truncatedValue } from 'utils'
 
 const ProductTable = ({
   data,
@@ -84,6 +84,7 @@ const ProductTable = ({
   const borderColor = useColorModeValue('#3182CE66', '#90cdf499')
   const envIconColor = useColorModeValue('#3182CE', '#90cdf4')
   const dividerColor = useColorModeValue('#0000001f', '#ffffff1A')
+  const switchColor = useColorModeValue('#ffffff', '#1f2733')
 
   const { search, enabled, field } = filters
   const { totalRows } = paginationProps
@@ -359,14 +360,14 @@ const ProductTable = ({
               onWarningOpen()
             }}
             sx={{
-              '.chakra-switch__track[data-checked]:not([data-theme])': {
-                backgroundColor: '#3182ce'
+              '.chakra-switch__thumb[data-checked]': {
+                backgroundColor: switchColor
               }
             }}
           />
         )
       },
-      width: '8%',
+      width: '10%',
       sortable: true
     },
     // PRODUCT
@@ -407,8 +408,8 @@ const ProductTable = ({
                 isExternal={getLink(name) === '#' ? false : true}
               >
                 <IconBox
-                  h={'32px'}
-                  w={'32px'}
+                  h={'40px'}
+                  w={'40px'}
                   bg={bgColor}
                   color={iconColor}
                   hidden={!shouldShowDemoFeatures}
