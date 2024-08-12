@@ -4,7 +4,7 @@ import {
   InfoIcon,
   WarningTwoIcon
 } from '@chakra-ui/icons'
-import { Box, Button, Icon, Text, useToast } from '@chakra-ui/react'
+import { Box, Button, Flex, Icon, Text, useToast } from '@chakra-ui/react'
 
 import { FaCircleXmark } from 'react-icons/fa6'
 
@@ -62,15 +62,22 @@ const useCustomToast = () => {
           borderRadius='8px'
           boxShadow='md'
         >
-          <Box>{Icon}</Box>
-          <Box marginLeft='12px' display='flex' flexDirection='column' gap={1}>
-            <Text fontWeight='500' fontSize='16px' color='#1A202C'>
-              {title}
-            </Text>
-            <Text fontWeight='300' fontSize='14px' color='#1A202C'>
-              {description}
-            </Text>
-          </Box>
+          <Flex>
+            <Box>{Icon}</Box>
+            <Box
+              marginLeft='12px'
+              display='flex'
+              flexDirection='column'
+              gap={1}
+            >
+              <Text fontWeight='500' fontSize='16px' color='#1A202C'>
+                {title}
+              </Text>
+              <Text fontWeight='300' fontSize='14px' color='#1A202C'>
+                {description}
+              </Text>
+            </Box>
+          </Flex>
           <Button
             variant='link'
             color={borderLeftColor}

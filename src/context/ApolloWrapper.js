@@ -11,7 +11,7 @@ import Cookies from 'js-cookie'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { useToast } from '@chakra-ui/react'
+import useCustomToast from 'hooks/useCustomToast'
 
 let toastCache
 
@@ -99,11 +99,11 @@ export const client = new ApolloClient({
 
 export const ApolloWrapper = ({ children }) => {
   const navigate = useNavigate()
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   useEffect(() => {
-    toastCache = toast
-  }, [navigate, toast])
+    toastCache = showToast
+  }, [navigate, showToast])
 
   return <ApolloProvider client={client}>{children}</ApolloProvider>
 }
