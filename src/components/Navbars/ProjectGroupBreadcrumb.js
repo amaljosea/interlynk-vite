@@ -14,6 +14,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { GetProjectGroupDetails } from 'graphQL/Queries'
 
 import { customFilter } from './customFilter'
+import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
 const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
   const navigate = useNavigate()
@@ -122,7 +123,8 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
           value={value}
           components={{
             IndicatorSeparator: () => null,
-            MenuList: CustomMenuList
+            MenuList: CustomMenuList,
+            DropdownIndicator: CustomDropdownIndicator
           }}
           filterOption={customFilter}
           isLoading={loading}

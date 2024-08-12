@@ -11,6 +11,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { GetProjectVersionAndId } from 'graphQL/Queries'
 
 import { customFilter } from './customFilter'
+import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
 const VersionBreadcrumb = ({ selectStyles }) => {
   const navigate = useNavigate()
@@ -80,7 +81,8 @@ const VersionBreadcrumb = ({ selectStyles }) => {
         getOptionValue={(version) => version.id}
         onChange={(version) => handleVersionClick(version)}
         components={{
-          IndicatorSeparator: () => null
+          IndicatorSeparator: () => null,
+          DropdownIndicator: CustomDropdownIndicator
         }}
         hideSelectedOptions
         isLoading={loading}

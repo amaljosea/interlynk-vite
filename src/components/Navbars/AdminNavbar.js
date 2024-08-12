@@ -17,6 +17,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
+import { useSelect } from 'hooks/useSelect'
 
 import { GetUserPermissions } from 'graphQL/Queries'
 
@@ -39,80 +40,7 @@ export default function AdminNavbar(props) {
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
-  const optionColor = useColorModeValue('#718096', '#A0AEC0')
-  const textHoverColor = useColorModeValue('#EDF2F7', '#4A5568')
-  const btnBgColor = useColorModeValue('#EDF2F7', '#ffffff14')
-  const bgHoverColor = useColorModeValue('#e2e8f0', '#4A5568')
-  const borderColor = useColorModeValue('#CBD5E0', '#4A5568')
-
-  const selectStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      color: textColor,
-      border: 'none',
-      height: '20px',
-      maxWidth: '200px',
-      padding: 0,
-      cursor: 'pointer',
-      backgroundColor: btnBgColor,
-      fontSize: '14px',
-      '&:hover': {
-        borderColor: borderColor,
-        backgroundColor: bgHoverColor
-      },
-      boxShadow: state.isFocused ? 'none' : provided.boxShadow,
-      borderColor: state.isFocused ? 'transparent' : provided.borderColor
-    }),
-    menu: (provided) => ({
-      ...provided,
-      backgroundColor: bgColor,
-      width: '130px'
-    }),
-    menuList: (provided) => ({
-      ...provided,
-      backgroundColor: bgColor,
-      '&:hover': {
-        backgroundColor: 'transparent'
-      }
-    }),
-    input: (provided) => ({
-      ...provided,
-      color: textColor,
-      backgroundColor: 'transparent',
-      margin: '0px'
-    }),
-    option: (provided) => ({
-      ...provided,
-      color: optionColor,
-      backgroundColor: bgColor,
-      '&:hover': {
-        backgroundColor: textHoverColor
-      }
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: textColor,
-      '&:hover': {
-        color: textColor
-      }
-    }),
-    dropdownIndicator: (provided) => {
-      return {
-        ...provided,
-        paddingLeft: '0px',
-        paddingRight: '4px'
-      }
-    },
-    valueContainer: (provided) => {
-      return {
-        ...provided,
-        paddingRight: '0px',
-        paddingLeft: '4px'
-      }
-    }
-  }
+  const { style } = useSelect('breadcrumb')
 
   useQuery(GetUserPermissions, {
     skip: path === 'customer' || !orgView,
@@ -214,13 +142,13 @@ export default function AdminNavbar(props) {
             >
               <ProjectGroupBreadcrumb
                 projectGroupName={projectGroupName}
-                selectStyles={selectStyles}
+                selectStyles={style}
               />
             </BreadcrumbItem>
           )}
           {!partsContext.isParts && sbomId && sbomHookData.versionName && (
             <BreadcrumbItem color={mainText} isCurrentPage={!parts}>
-              <VersionBreadcrumb selectStyles={selectStyles} />
+              <VersionBreadcrumb selectStyles={style} />
             </BreadcrumbItem>
           )}
           {!partsContext.isParts &&
