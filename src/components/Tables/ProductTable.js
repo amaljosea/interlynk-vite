@@ -86,7 +86,7 @@ const ProductTable = ({
   const dividerColor = useColorModeValue('#0000001f', '#ffffff1A')
   const switchColor = useColorModeValue('#ffffff', '#1f2733')
 
-  const { search, enabled, field } = filters
+  const { search, field } = filters
   const { totalRows } = paginationProps
 
   const params = useParams()
@@ -227,17 +227,6 @@ const ProductTable = ({
     [setSearchFilter]
   )
 
-  const onFilterActive = useCallback(
-    (value) => {
-      console.log(value)
-      setFilters((oldFilter) => ({
-        ...oldFilter,
-        enabled: value === 'yes' ? true : value === 'no' ? false : undefined
-      }))
-    },
-    [setFilters]
-  )
-
   const onSharelynkOpen = (row) => {
     setActiveRow(row)
     onLynkOpen()
@@ -262,7 +251,7 @@ const ProductTable = ({
           />
           {/* FILTER PRODUCTS */}
           {!signedUrlParams && (
-            <ProdFilterMenu enabled={enabled} onFilter={onFilterActive} />
+            <ProdFilterMenu filters={filters} setFilters={setFilters} />
           )}
         </Stack>
         <Stack direction={'row'} spacing={3} alignItems={'center'}>
@@ -318,15 +307,15 @@ const ProductTable = ({
     handleClear,
     handleSearch,
     signedUrlParams,
-    enabled,
-    onFilterActive,
+    filters,
+    setFilters,
     shouldShowDemoFeatures,
     isGithubConfigSaved,
     onGithubOpen,
     canAddProduct,
+    onOpenLabel,
     refetch,
-    onOpen,
-    onOpenLabel
+    onOpen
   ])
 
   // COLUMNS

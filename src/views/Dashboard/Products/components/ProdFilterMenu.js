@@ -1,5 +1,4 @@
 import { useQuery } from '@apollo/client'
-import { useState } from 'react'
 import { hexToRGBA } from 'utils'
 
 import {
@@ -19,11 +18,22 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetLabels } from 'graphQL/Queries'
 
-const ProdFilterMenu = ({ enabled, onFilter }) => {
+const ProdFilterMenu = ({ filters, setFilters }) => {
+  const { enabled, labelIds } = filters || ''
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
-  const [labels, setLabels] = useState([])
+
+  const onFilterActive = (value) => {
+    setFilters((oldFilter) => ({
+      ...oldFilter,
+      enabled: value === 'yes' ? true : value === 'no' ? false : undefined
+    }))
+  }
+
   const onFilterLabel = (value) => {
-    setLabels(value?.includes('All') ? [] : value)
+    setFilters((oldFilter) => ({
+      ...oldFilter,
+      labelIds: value?.includes('all') ? [] : value
+    }))
   }
 
   const { data } = useQuery(GetLabels, {
@@ -31,10 +41,10 @@ const ProdFilterMenu = ({ enabled, onFilter }) => {
   })
   const { nodes } = data?.labels || ''
 
-  const prodLabels = [{ name: 'All', color: '#CBD5E0' }]
+  const prodLabels = [{ id: 'all', name: 'All', color: '#CBD5E0' }]
   if (nodes?.length > 0) {
     nodes?.map((item) =>
-      prodLabels?.push({ name: item?.name, color: item?.color })
+      prodLabels?.push({ id: item?.id, name: item?.name, color: item?.color })
     )
   }
 
@@ -46,7 +56,7 @@ const ProdFilterMenu = ({ enabled, onFilter }) => {
           <MenuHeading title={'Active'} active={enabled !== undefined} />
           <CustomList
             type='radio'
-            onChange={onFilter}
+            onChange={onFilterActive}
             options={['yes', 'no']}
             value={enabled === true ? 'yes' : enabled === false ? 'no' : 'all'}
           />
@@ -59,11 +69,11 @@ const ProdFilterMenu = ({ enabled, onFilter }) => {
         display={shouldShowDemoFeatures ? 'flex' : 'none'}
       >
         <Menu closeOnSelect={false}>
-          <MenuHeading title={'Labels'} active={labels?.length !== 0} />
+          <MenuHeading title={'Labels'} active={labelIds?.length !== 0} />
           <MenuList minH='auto' maxH={'320px'} overflowY={'scroll'}>
             <MenuOptionGroup
               type={'checkbox'}
-              value={labels}
+              value={labelIds}
               onChange={onFilterLabel}
             >
               {prodLabels?.map((item, index) => (
@@ -71,7 +81,7 @@ const ProdFilterMenu = ({ enabled, onFilter }) => {
                   key={index}
                   maxW={'300px'}
                   fontSize={'sm'}
-                  value={item?.name}
+                  value={item?.id}
                   wordBreak={'break-all'}
                 >
                   <Tag

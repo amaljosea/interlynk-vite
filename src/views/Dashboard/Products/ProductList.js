@@ -29,7 +29,8 @@ function ProductList() {
   const [filters, setFilters] = useState({
     field: 'PROJECT_GROUPS_UPDATED_AT',
     direction: 'DESC',
-    enabled: true
+    enabled: true,
+    labelIds: []
   })
 
   const { nodes, paginationProps, reset, refetch, loading, error } =

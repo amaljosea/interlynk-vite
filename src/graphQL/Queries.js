@@ -377,6 +377,7 @@ export const GetProductTable = gql`
   query GetProjectTable(
     $search: String
     $enabled: Boolean
+    $labelIds: [Uuid!]
     $first: Int
     $last: Int
     $after: String
@@ -389,6 +390,7 @@ export const GetProductTable = gql`
       projectGroups(
         search: $search
         enabled: $enabled
+        labelIds: $labelIds
         first: $first
         last: $last
         after: $after
