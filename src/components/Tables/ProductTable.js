@@ -427,7 +427,7 @@ const ProductTable = ({
                   width={'fit-content'}
                   onClick={handleClick}
                 >
-                  {truncatedValue(name)}
+                  {truncatedValue(name, 20)}
                 </Text>
                 {shouldShowDemoFeatures &&
                   labels?.map((item) => (

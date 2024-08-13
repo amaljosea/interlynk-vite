@@ -9,6 +9,7 @@ import {
   isDefaultEnv
 } from 'utils'
 import { GetIcon, isUnknown } from 'utils'
+import { truncatedValue } from 'utils'
 import { ProductGeneralTabs } from 'utils/TabsObjects'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -653,7 +654,7 @@ const Parts = ({ sbomRefetch }) => {
                     {allProjects?.organization?.projectGroups?.nodes.map(
                       (item, index) => (
                         <option key={index} value={item.id}>
-                          {item.name}
+                          {truncatedValue(item.name, 30)}
                         </option>
                       )
                     )}
@@ -709,9 +710,7 @@ const Parts = ({ sbomRefetch }) => {
                       <option value={''}>-- Select --</option>
                       {sbomVersions.map((item, index) => (
                         <option key={index} value={item.value}>
-                          {item?.label?.length > 40
-                            ? `${item?.label?.substring(0, 40)}...`
-                            : item?.label}
+                          {truncatedValue(item?.label, 30)}
                         </option>
                       ))}
                     </Select>

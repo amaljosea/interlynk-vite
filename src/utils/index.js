@@ -892,9 +892,9 @@ export const sortByUpdatedAt = (data) => {
   return sortedData
 }
 
-export const truncatedValue = (name) => {
+export const truncatedValue = (name, length) => {
   if (name !== '') {
-    return name?.length > 20 ? `${name?.substring(0, 20)}...` : name
+    return name?.length > length ? `${name?.substring(0, length)}...` : name
   } else {
     return name
   }
