@@ -7,10 +7,8 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  Icon,
   Input,
   Select,
-  Text,
   Textarea
 } from '@chakra-ui/react'
 
@@ -18,7 +16,6 @@ import CpeInput from 'components/CpeInput'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { FaChevronDown } from 'react-icons/fa6'
 
 import IdentifierLabel from './IdentifierLabel'
 

@@ -40,7 +40,8 @@ const CompIdentifiers = ({ data }) => {
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
 
-  const { dispatch } = useGlobalState()
+  const { dispatch, prodCompState } = useGlobalState()
+  const { isCpeValid } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const [updateComponent] = useMutation(UpdateComponent)
@@ -86,11 +87,12 @@ const CompIdentifiers = ({ data }) => {
   }
 
   const handlePurlModal = () => {
-    if (purlValue && purlValue !== '' && isPURLInputValid) {
+    if (purlValue !== '' && isPURLInputValid) {
       const pkg = PackageURL.fromString(purlValue)
       setPurlData(pkg)
       prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
     } else {
+      setPurlData(null)
       prodCompDispatch({
         type: 'SET_PURL_STRING',
         payload: 'pkg:type/name@version?key=value'
@@ -113,6 +115,11 @@ const CompIdentifiers = ({ data }) => {
       }
     })
   }
+
+  const isInvalid =
+    (purlValue === '' && cpeValue === '') ||
+    (purlValue !== '' && !isPURLInputValid) ||
+    (cpeValue !== '' && !isCpeValid)
 
   const handleUpdateCom = () => {
     disableButtonTemporarily()
@@ -140,7 +147,7 @@ const CompIdentifiers = ({ data }) => {
   useEffect(() => {
     if (data) {
       const { cpes, purl } = data || ''
-      if (purl !== null) {
+      if (purl) {
         setPurlValue(purl)
         try {
           PackageURL.fromString(purl)
@@ -266,7 +273,7 @@ const CompIdentifiers = ({ data }) => {
         width={'fit-content'}
         hidden={purlOpen || cpeOpen}
         onClick={handleUpdateCom}
-        isDisabled={disabled}
+        isDisabled={disabled || isInvalid}
       >
         Save
       </Button>
