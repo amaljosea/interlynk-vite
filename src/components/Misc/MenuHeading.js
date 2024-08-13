@@ -3,8 +3,8 @@ import { Button, MenuButton, useColorModeValue } from '@chakra-ui/react'
 import { FaFilter } from 'react-icons/fa'
 
 const MenuHeading = ({ title, onClick, active }) => {
-  const grayBorder = useColorModeValue('#1A202C29', '#ffffff29')
-  const grayText = useColorModeValue('#1A202C', '#f1f1f1')
+  const grayBorder = useColorModeValue('#E2E8F0', '#ffffff29')
+  const grayText = useColorModeValue('#1A202C', '#E2E8F0')
   const bgActive = useColorModeValue('#EDF2F7', '')
   const iconColor = useColorModeValue('#3182CE', '#90cdf4')
   const activeBorderColor = useColorModeValue('#3182CE', '#90cdf499')
