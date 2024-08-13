@@ -1,8 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { hexToRGBA } from 'utils'
 import LabelInputs from 'views/Dashboard/Products/components/LabelInputs'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
@@ -16,27 +15,21 @@ import {
   Tbody,
   Td,
   Text,
-  Tooltip,
   Tr,
   useColorModeValue
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
-import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { LabelDelete } from 'graphQL/Mutation'
 import { GetLabels } from 'graphQL/Queries'
 
 const LabelTable = ({ isOpen }) => {
   const { showToast } = useCustomToast()
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const borderColor = useColorModeValue('gray.800', 'gray.200')
   const [activeRow, setActiveRow] = useState(null)
-  const [filterText, setFilterText] = useState('')
 
   const divRef = useRef(null)
   const scrollToDiv = () => {
@@ -53,32 +46,6 @@ const LabelTable = ({ isOpen }) => {
   const { nodes, totalCount } = data?.labels || ''
 
   const [deleteLabel] = useMutation(LabelDelete)
-
-  const handleClear = useCallback(async () => {
-    setFilterText('')
-  }, [])
-
-  const onSearchInputChange = useCallback(
-    (event) => {
-      const { value } = event.target
-      if (value === '') {
-        handleClear()
-      } else {
-        setFilterText(value)
-      }
-    },
-    [handleClear]
-  )
-
-  const handleSearch = useCallback((event) => {
-    const {
-      key,
-      target: { value }
-    } = event
-    if (key === 'Enter' && value !== '') {
-      console.log(value)
-    }
-  }, [])
 
   const onEdit = (row) => {
     scrollToDiv()
@@ -114,18 +81,9 @@ const LabelTable = ({ isOpen }) => {
       <Header />
       <Divider />
       <TableContainer>
-        <Flex alignItems={'center'} justifyContent={'space-between'}>
-          <Text fontSize={'sm'} color={'gray.500'}>
-            {totalCount} Labels
-          </Text>
-          {/* <SearchFilter
-            id='label'
-            filterText={filterText}
-            onChange={onSearchInputChange}
-            onClear={handleClear}
-            onFilter={handleSearch}
-          /> */}
-        </Flex>
+        <Text fontSize={'sm'} color={'gray.500'}>
+          {totalCount} Labels
+        </Text>
         <Table mt={2} size='sm' variant='simple'>
           <Tbody>
             {nodes?.map((row, index) => (
@@ -149,11 +107,13 @@ const LabelTable = ({ isOpen }) => {
                   >
                     <IconButton
                       size='sm'
+                      variant='outline'
                       icon={<EditIcon color={borderColor} />}
                       onClick={() => onEdit(row)}
                     />
                     <IconButton
                       size='sm'
+                      variant='outline'
                       icon={<DeleteIcon color={'red.500'} />}
                       onClick={() => onDelete(row)}
                     />

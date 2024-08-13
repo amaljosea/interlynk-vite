@@ -96,6 +96,13 @@ const LabelInputs = ({ activeRow, setActiveRow }) => {
 
   return (
     <Flex width='100%' gap={4} flexDir={'column'}>
+      <Tag
+        width={'fit-content'}
+        borderColor={labelData?.color}
+        bg={hexToRGBA(labelData?.color, 0.5)}
+      >
+        {labelData?.name !== '' ? labelData?.name : 'Label preview'}
+      </Tag>
       <SimpleGrid columns={2} spacing={4}>
         <FormControl>
           <FormLabel htmlFor='name'>Label name</FormLabel>
@@ -105,15 +112,6 @@ const LabelInputs = ({ activeRow, setActiveRow }) => {
             value={labelData?.name}
             onChange={handleChange}
           />
-          <FormHelperText>
-            <Tag
-              width={'fit-content'}
-              borderColor={labelData?.color}
-              bg={hexToRGBA(labelData?.color, 0.5)}
-            >
-              {labelData?.name !== '' ? labelData?.name : 'Label preview'}
-            </Tag>
-          </FormHelperText>
         </FormControl>
         <FormControl>
           <FormLabel htmlFor='color'>Color</FormLabel>
