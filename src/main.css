@@ -265,3 +265,9 @@ td.rdtYear:hover {
 .rd3t-link {
   stroke: darkgray !important;
 }
+
+.small {
+  font-size: 20px;
+  fill: white;
+  stroke: none;
+}

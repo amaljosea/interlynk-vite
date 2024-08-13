@@ -20,6 +20,8 @@ import { GetShareCompDependency } from 'graphQL/Queries'
 
 import { BiZoomIn, BiZoomOut } from 'react-icons/bi'
 
+import SearchFilter from './SearchFilter'
+
 const containerStyles = { width: '100vw', height: '80vh' }
 
 export const useCenteredTree = (defaultTranslate = { x: 0, y: 0 }) => {
@@ -41,19 +43,18 @@ const renderForeignObjectNode = ({
   foreignObjectProps,
   activeComp,
   bgColor,
-  textColor
+  textColor,
+  component
 }) => {
-  console.log('nodeDatum', nodeDatum)
+  const result = component !== '' && nodeDatum?.name?.includes(component)
   return (
-    <g transform="translate(-56,-50)">
-      <svg xmlns='http://www.w3.org/2000/svg'>
+    <g transform='translate(-56,-50)'>
+      <svg xmlns='http://www.w3.org/2000/svg' onClick={toggleNode}>
         <circle cx='50' cy='50' r='25' fill='dodgerBlue' stroke='transparent' />
         <text
           x='50'
           y='52'
-          stroke='white'
-          fontSize={20}
-          strokeWidth={0.9}
+          className='small'
           textAnchor='middle'
           fontFamily='inherit'
           dominantBaseline='middle'
@@ -62,19 +63,22 @@ const renderForeignObjectNode = ({
         </text>
       </svg>
       <foreignObject {...foreignObjectProps} x={40} y={24}>
-        <Flex width={'100%'} flexDirection={'column'} alignItems={'flex-start'}>
+        <Flex
+          flexDirection={'column'}
+          alignItems={'flex-start'}
+          maxW={nodeDatum?.children?.length > 0 ? '250px' : 'auto'}
+        >
           <Box
             p={3}
             left={12}
-            bg={bgColor}
+            borderRadius={5}
+            colorScheme='blue'
             minW={'fit-content'}
-            maxW={'300px'}
             position={'relative'}
             fontWeight={'medium'}
-            colorScheme='blue'
             wordBreak={'break-all'}
-            borderRadius={5}
-            color={textColor}
+            bg={result ? 'blue.500' : bgColor}
+            color={result ? 'gray.50' : textColor}
           >
             <Stack direction={'column'}>
               <Text
@@ -112,6 +116,8 @@ const GraphView = ({ data, activeComp }) => {
   const textColor = useColorModeValue('blue.500', 'gray.100')
 
   const [treeView, setTreeView] = useState(null)
+  const [filterText, setFilterText] = useState('')
+  const [component, setComponent] = useState('')
   const [zoom, setZoom] = useState(Number(0.6))
   const position = { x: 20, y: 250 }
   const [containerRef] = useCenteredTree()
@@ -138,6 +144,11 @@ const GraphView = ({ data, activeComp }) => {
 
   const handleZoomIn = () => setZoom(zoom + Number(0.1))
   const handleZoomOut = () => setZoom(zoom - Number(0.1))
+
+  const transformNode = (node, currentDepth) => {
+    const nodeDepthFactor = currentDepth === 0 ? 200 : 100
+    return { ...node, depthFactor: nodeDepthFactor }
+  }
 
   useEffect(() => {
     if (compDependency) {
@@ -176,32 +187,63 @@ const GraphView = ({ data, activeComp }) => {
     }
   }, [compDependency, signedUrlParams])
 
+  // CLEAR SERACH
+  const handleClear = () => {
+    setFilterText('')
+    setComponent('')
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      setFilterText(value)
+    }
+  }
+
+  // SEARCH COMPONENT
+  const handleSearch = (event) => {
+    const { value } = event.target
+    if (event.key === 'Enter' && value !== '') {
+      setComponent(value)
+    }
+  }
+
   return (
-    <Flex flexDir={'column'} gap={6} overflow='hidden'>
+    <Flex flexDir={'column'} p={1} gap={6} overflow={'hidden'}>
       <Flex
         gap={2}
         width={'100%'}
         alignItems={'center'}
-        justifyContent={'flex-end'}
+        justifyContent={'space-between'}
       >
-        <Tooltip label='Zoom In'>
-          <IconButton
-            size='sm'
-            variant='outline'
-            onClick={handleZoomIn}
-            isDisabled={zoom > 0.8}
-            icon={<BiZoomIn size={20} />}
-          />
-        </Tooltip>
-        <Tooltip label='Zoom Out'>
-          <IconButton
-            size='sm'
-            variant='outline'
-            onClick={handleZoomOut}
-            isDisabled={zoom < 0.2}
-            icon={<BiZoomOut size={20} />}
-          />
-        </Tooltip>
+        <SearchFilter
+          id='relationship'
+          filterText={filterText}
+          onFilter={handleSearch}
+          onClear={handleClear}
+          onChange={onSearchInputChange}
+        />
+        <Flex gap={2}>
+          <Tooltip label='Zoom In'>
+            <IconButton
+              variant='outline'
+              onClick={handleZoomIn}
+              isDisabled={zoom > 0.8}
+              icon={<BiZoomIn size={20} />}
+            />
+          </Tooltip>
+          <Tooltip label='Zoom Out'>
+            <IconButton
+              variant='outline'
+              onClick={handleZoomOut}
+              isDisabled={zoom < 0.2}
+              icon={<BiZoomOut size={20} />}
+            />
+          </Tooltip>
+        </Flex>
       </Flex>
       {data?.nodes?.length === 0 && !compDependency ? (
         <Alert>No relationship found</Alert>
@@ -213,17 +255,22 @@ const GraphView = ({ data, activeComp }) => {
               translate={position}
               zoom={Number(zoom)}
               initialDepth='2'
-              separation={{ nonSiblings: 1, siblings: 1 }}
-              depthFactor='650'
+              separation={{ nonSiblings: 1, siblings: 1.2 }}
+              depthFactor={350}
               enableLegacyTransitions={true}
               pathFunc={'step'}
               renderCustomNodeElement={(rd3tProps) =>
                 renderForeignObjectNode({
                   ...rd3tProps,
+                  nodeDatum: transformNode(
+                    rd3tProps.nodeDatum,
+                    rd3tProps.depth
+                  ),
                   foreignObjectProps,
                   activeComp,
                   bgColor,
-                  textColor
+                  textColor,
+                  component
                 })
               }
             />
