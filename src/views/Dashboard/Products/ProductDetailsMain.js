@@ -30,6 +30,7 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
+import EnvFilter from 'components/Misc/EnvFilter'
 import NotificationMenuBell from 'components/Notifications/NotificationMenuBell'
 import ChangelogTable from 'components/Tables/ChangelogTable'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
@@ -430,63 +431,70 @@ const ProductDetailsMain = () => {
               </GridItem>
               {/* PRODUCT ACTIONS */}
               <GridItem colSpan={4}>
-                <Flex
-                  direction={'row'}
-                  gap={2}
-                  justifyContent='flex-end'
-                  ml={'auto'}
-                  flexWrap={'wrap'}
-                >
-                  {/* VIEW PRODUCT PROGRESS */}
-                  {shouldShowDemoFeatures && (
-                    <Tooltip label='View Product Progress'>
+                <Flex alignItems={'flex-end'} flexDir={'column'} gap={3}>
+                  <EnvFilter />
+                  <Flex
+                    direction={'row'}
+                    gap={2}
+                    justifyContent='flex-end'
+                    ml={'auto'}
+                    flexWrap={'wrap'}
+                  >
+                    {/* VIEW PRODUCT PROGRESS */}
+                    {shouldShowDemoFeatures && (
+                      <Tooltip label='View Product Progress'>
+                        <IconButton
+                          icon={<FaDiagramProject />}
+                          colorScheme='blue'
+                          onClick={onOpenProductProgress}
+                        />
+                      </Tooltip>
+                    )}
+                    {/* Notifications */}
+                    <NotificationMenuBell />
+                    {/* EDIT PRODUCT */}
+                    <Tooltip label='Edit Product'>
                       <IconButton
-                        icon={<FaDiagramProject />}
+                        isDisabled={
+                          !enabled || !updateProduct || signedUrlParams
+                        }
                         colorScheme='blue'
-                        onClick={onOpenProductProgress}
+                        onClick={onOpenProduct}
+                        icon={<FaPenToSquare />}
                       />
                     </Tooltip>
-                  )}
-                  {/* Notifications */}
-                  <NotificationMenuBell />
-                  {/* EDIT PRODUCT */}
-                  <Tooltip label='Edit Product'>
-                    <IconButton
-                      isDisabled={!enabled || !updateProduct || signedUrlParams}
-                      colorScheme='blue'
-                      onClick={onOpenProduct}
-                      icon={<FaPenToSquare />}
-                    />
-                  </Tooltip>
-                  {/* UPLOAD SBOM */}
-                  <Tooltip label='Upload SBOM'>
-                    <IconButton
-                      isDisabled={!enabled || signedUrlParams || !canCreateSBOM}
-                      colorScheme='blue'
-                      onClick={onOpenUpload}
-                      icon={<FaUpload />}
-                    />
-                  </Tooltip>
-                  {/* UPDATE PRODUCT STATUS */}
-                  <Tooltip
-                    label={enabled ? 'Disable Product' : 'Enable Product'}
-                  >
-                    <IconButton
-                      colorScheme={'blue'}
-                      onClick={onWarningOpen}
-                      isDisabled={signedUrlParams || !updateProduct}
-                      icon={enabled ? <FaToggleOff /> : <FaToggleOn />}
-                    />
-                  </Tooltip>
-                  {/* ARCHIVE PRODUCT */}
-                  <Tooltip label='Archive Product'>
-                    <IconButton
-                      colorScheme='red'
-                      onClick={onDeleteOpen}
-                      icon={<FaTrash />}
-                      isDisabled={!archiveProduct || signedUrlParams}
-                    />
-                  </Tooltip>
+                    {/* UPLOAD SBOM */}
+                    <Tooltip label='Upload SBOM'>
+                      <IconButton
+                        isDisabled={
+                          !enabled || signedUrlParams || !canCreateSBOM
+                        }
+                        colorScheme='blue'
+                        onClick={onOpenUpload}
+                        icon={<FaUpload />}
+                      />
+                    </Tooltip>
+                    {/* UPDATE PRODUCT STATUS */}
+                    <Tooltip
+                      label={enabled ? 'Disable Product' : 'Enable Product'}
+                    >
+                      <IconButton
+                        colorScheme={'blue'}
+                        onClick={onWarningOpen}
+                        isDisabled={signedUrlParams || !updateProduct}
+                        icon={enabled ? <FaToggleOff /> : <FaToggleOn />}
+                      />
+                    </Tooltip>
+                    {/* ARCHIVE PRODUCT */}
+                    <Tooltip label='Archive Product'>
+                      <IconButton
+                        colorScheme='red'
+                        onClick={onDeleteOpen}
+                        icon={<FaTrash />}
+                        isDisabled={!archiveProduct || signedUrlParams}
+                      />
+                    </Tooltip>
+                  </Flex>
                 </Flex>
               </GridItem>
             </Grid>

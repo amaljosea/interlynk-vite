@@ -1,15 +1,23 @@
 import { useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
 
-import { Flex, Grid, GridItem, SimpleGrid, Skeleton } from '@chakra-ui/react'
+import {
+  Flex,
+  Grid,
+  GridItem,
+  SimpleGrid,
+  Skeleton,
+  Text
+} from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
+import EnvFilter from 'components/Misc/EnvFilter'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { GetOrg, GetOrgMetrics } from 'graphQL/Queries'
 
@@ -20,9 +28,7 @@ import MiniStatistics from './components/MiniStatistics'
 import ProductsOverview from './components/ProductsOverview'
 
 export default function Dashboard() {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const product = queryParams.get('id')
+  const product = useQueryParam('id')
   const { setIsOpen } = useTour()
   const { dispatch, envName } = useGlobalState()
   const { orgView } = useGlobalQueryContext()
@@ -87,9 +93,15 @@ export default function Dashboard() {
   }
 
   return (
-    <Flex width={'100%'} flexDirection='column' gap={6}>
+    <Flex width={'100%'} flexDirection='column' gap={5}>
       {/* STATS */}
-      <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
+      <Flex width='100%' alignItems={'center'} justifyContent={'space-between'}>
+        <Text fontWeight='semibold' fontSize={20}>
+          Dashboard
+        </Text>
+        {orgView && <EnvFilter />}
+      </Flex>
+      <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing={5}>
         <MiniStatistics
           title={'Products'}
           amount={projectCount}
@@ -112,7 +124,7 @@ export default function Dashboard() {
         />
       </SimpleGrid>
       {/* LIST */}
-      <Grid templateColumns='repeat(12, 1fr)' gap={'24px'} flexWrap={'wrap'}>
+      <Grid templateColumns='repeat(12, 1fr)' gap={5} flexWrap={'wrap'}>
         {/* RECENT IMPORTS */}
         <GridItem colSpan={8} w='100%'>
           <ProductsOverview

@@ -26,9 +26,7 @@ import {
   MenuDivider,
   MenuGroup,
   MenuItem,
-  MenuItemOption,
   MenuList,
-  MenuOptionGroup,
   Stack,
   Text,
   useColorMode,
@@ -42,21 +40,12 @@ import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetOrgName } from 'graphQL/Queries'
 
 import { FaExchangeAlt, FaSignOutAlt } from 'react-icons/fa'
-import {
-  FaCode,
-  FaInbox,
-  FaLocationArrow,
-  FaMoon,
-  FaSquareArrowUpRight,
-  FaSun,
-  FaUser
-} from 'react-icons/fa6'
+import { FaLocationArrow, FaMoon, FaSun, FaUser } from 'react-icons/fa6'
 
 // GET PROFILE PHOTO
 export const GetProfilePic = gql`
@@ -74,19 +63,14 @@ export const GetProfilePic = gql`
 
 export default function HeaderLinks(props) {
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
-  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const location = useLocation()
   const navigate = useNavigate()
-  const queryParams = new URLSearchParams(location.search)
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
   const { query } = useKBar()
 
   const SERVER_URL = process.env.REACT_APP_SERVER
-
-  const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
-  const activeTab = queryParams.get('tab')
 
   const { colorMode, toggleColorMode, setColorMode } = useColorMode()
   const bgColor = useColorModeValue('#EDF2F7', '#2D3748')
@@ -97,14 +81,7 @@ export default function HeaderLinks(props) {
   const email = localStorage.getItem('email')
   const userEmail = localStorage.getItem('userEmail')
 
-  const {
-    userName,
-    setClearSelect,
-    setSelectedSbom,
-    setUserName,
-    envName,
-    onChangeEnv
-  } = useGlobalState()
+  const { userName, setUserName } = useGlobalState()
   const { orgView } = useGlobalQueryContext()
 
   const { data: org } = useQuery(GetProfilePic, { skip: signedUrlParams })
@@ -116,7 +93,6 @@ export default function HeaderLinks(props) {
     fetchPolicy: 'network-only'
   })
 
-  const { projects } = props
   const { ...rest } = props
 
   useEffect(() => {
@@ -140,36 +116,6 @@ export default function HeaderLinks(props) {
   }
 
   // const shortcuts = [{ key: 'Ctrl + /', title: 'Search' }]
-
-  const handleEnvChange = (value) => {
-    if (params.productgroupid) {
-      const project = projects.find((p) => p.name === value)
-      navigate(
-        generateProductDetailPageUrlFromCurrentUrl({
-          productid: project.id,
-          paramsObj: activeTab
-            ? {
-                tab: activeTab
-              }
-            : {}
-        })
-      )
-    }
-    onChangeEnv(value)
-    setClearSelect(true)
-    setSelectedSbom([])
-  }
-
-  const envIcon = (env) => {
-    switch (env) {
-      case 'default':
-        return <FaInbox />
-      case 'development':
-        return <FaCode />
-      case 'production':
-        return <FaSquareArrowUpRight />
-    }
-  }
 
   const detectOS = () => {
     const { userAgent } = window.navigator
@@ -255,41 +201,6 @@ export default function HeaderLinks(props) {
           <Kbd>{os?.startsWith('Windows') ? 'Ctrl' : 'Cmd'} + K</Kbd>
         </Box>
       </InputGroup>
-      {/* ENVIRONMENT */}
-      {(dashboardView || productId) && !vulnId && orgView && (
-        <Menu closeOnSelect={true}>
-          <MenuButton
-            size='sm'
-            as={Button}
-            fontSize='sm'
-            colorScheme='blue'
-            fontWeight='medium'
-            textTransform='capitalize'
-            leftIcon={envIcon(envName)}
-            className='environments'
-          >
-            {envName || 'Default'}
-          </MenuButton>
-          <MenuList>
-            <MenuOptionGroup
-              value={envName}
-              onChange={(value) => handleEnvChange(value)}
-              type='radio'
-            >
-              {['default', 'development', 'production'].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize='sm'
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      )}
       {/* DARK MODE */}
       <IconButton
         size='sm'
