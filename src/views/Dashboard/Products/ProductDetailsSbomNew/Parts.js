@@ -367,7 +367,6 @@ const Parts = ({ sbomRefetch }) => {
             parts: true
           }
         })
-
         return (
           <Link to={link} onClick={() => onSelectPart(part)}>
             <Tag
@@ -476,7 +475,7 @@ const Parts = ({ sbomRefetch }) => {
           </Stack>
         )
       },
-      width: '26%'
+      width: '30%'
     },
     {
       id: 'STATUS',
@@ -518,7 +517,6 @@ const Parts = ({ sbomRefetch }) => {
           </Menu>
         )
       },
-      width: '10%',
       right: 'true'
     }
   ]
