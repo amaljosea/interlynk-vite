@@ -53,7 +53,7 @@ const useCustomToast = () => {
         <Box
           boxSizing='border-box'
           display='flex'
-          alignItems='baseline'
+          alignItems={title && description ? 'baseline' : 'center'}
           justifyContent='space-between'
           padding='10px 12px'
           minWidth='500px'
@@ -62,25 +62,33 @@ const useCustomToast = () => {
           borderRadius='8px'
           boxShadow='md'
         >
-          <Flex>
+          <Flex alignItems={title && description ? '' : 'center'}>
             <Box>{Icon}</Box>
             <Box
               marginLeft='12px'
               display='flex'
               flexDirection='column'
-              gap={title ? 1 : 0}
+              gap={1}
             >
-              <Text fontWeight='500' fontSize='16px' color='#1A202C'>
-                {title}
-              </Text>
-              <Text fontWeight='300' fontSize='14px' color='#1A202C'>
-                {description}
-              </Text>
+              {title && (
+                <Text fontWeight='600' fontSize='16px' color='#1A202C'>
+                  {title}
+                </Text>
+              )}
+              {description && (
+                <Text
+                  fontWeight={title ? 300 : 600}
+                  fontSize={title ? '14px' : '16px'}
+                  color='#1A202C'
+                >
+                  {description}
+                </Text>
+              )}
             </Box>
           </Flex>
           <Button
             variant='link'
-            color={borderLeftColor}
+            color={'#1A202C99'}
             onClick={() => toast.closeAll()}
           >
             <CloseIcon fontSize='11px' />
