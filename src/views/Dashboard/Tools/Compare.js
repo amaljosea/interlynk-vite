@@ -1,6 +1,7 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 import { envOrderList, sortByUpdatedAt } from 'utils'
+import { truncatedValue } from 'utils'
 
 import {
   Alert,
@@ -327,13 +328,11 @@ const Compare = ({ selectedSboms }) => {
                     fontFamily={'inherit'}
                     size='md'
                   >
-                    {firstSbomInfo?.project?.projectGroup?.name?.length > 20
-                      ? `${firstSbomInfo?.project?.projectGroup?.name?.substring(0, 20)}...`
-                      : firstSbomInfo?.project?.projectGroup?.name}{' '}
-                    :{' '}
-                    {firstSbomInfo?.projectVersion?.length > 20
-                      ? `${firstSbomInfo?.projectVersion?.substring(0, 20)}...`
-                      : firstSbomInfo?.projectVersion}
+                    {truncatedValue(
+                      firstSbomInfo?.project?.projectGroup?.name,
+                      20
+                    )}{' '}
+                    : {truncatedValue(firstSbomInfo?.projectVersion, 20)}
                   </Heading>
                   <Tag
                     variant='solid'
@@ -463,13 +462,11 @@ const Compare = ({ selectedSboms }) => {
                     fontFamily={'inherit'}
                     size='md'
                   >
-                    {secondSbomInfo?.project?.projectGroup?.name?.length > 20
-                      ? `${secondSbomInfo?.project?.projectGroup?.name?.substring(0, 20)}...`
-                      : secondSbomInfo?.project?.projectGroup?.name}{' '}
-                    :{' '}
-                    {secondSbomInfo?.projectVersion?.length > 20
-                      ? `${secondSbomInfo?.projectVersion?.substring(0, 20)}...`
-                      : secondSbomInfo?.projectVersion}
+                    {truncatedValue(
+                      secondSbomInfo?.project?.projectGroup?.name,
+                      20
+                    )}{' '}
+                    : {truncatedValue(secondSbomInfo?.projectVersion, 20)}
                   </Heading>
                   <Tag
                     variant='solid'

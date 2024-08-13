@@ -1,4 +1,5 @@
 import { getFullDateAndTime } from 'utils'
+import { truncatedValue } from 'utils'
 
 import {
   Flex,
@@ -41,7 +42,7 @@ const SbomInfo = ({ data }) => {
                 {data?.tools &&
                   data?.tools.map((item, index) => (
                     <Text key={index}>
-                      {item.name} - {item.version}
+                      {item.name} - {truncatedValue(item.version, 15)}
                     </Text>
                   ))}
               </Flex>
