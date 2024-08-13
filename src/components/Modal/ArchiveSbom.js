@@ -51,8 +51,8 @@ const ArchiveSbom = ({ isOpen, onClose, data }) => {
     description: `${isArchived ? 'Restoring' : 'Archiving'} this version will:`,
     items: [
       `${isArchived ? 'Add this version to' : 'Remove this version from'} the list`,
-      `${isArchived ? 'Enable' : 'Disable'} access to this version`,
-      `${isArchived ? 'Enable' : 'Disable'} monitoring and notifications for this version`
+      `${isArchived ? 'Enable' : 'Disable'} access to the version for all users`,
+      `${isArchived ? 'Enable' : 'Disable'} checks, monitoring and notifications for this version`
     ]
   }
 
