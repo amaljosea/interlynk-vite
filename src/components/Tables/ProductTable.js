@@ -246,15 +246,56 @@ const ProductTable = ({
   // HEADER
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex width={'100%'} flexDir={'column'} gap={4}>
-        <Flex
-          width={'100%'}
-          alignItems={'center'}
-          justifyContent={'space-between'}
-        >
-          <Text fontSize={'xl'} fontWeight={600}>
-            Products
-          </Text>
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
+        <Stack direction={'row'} spacing={3} alignItems={'center'}>
+          {/* SEARCH PRODUCTS */}
+          <ProductSearchFilter
+            id='product'
+            filterText={filterText}
+            onChange={onSearchInputChange}
+            onClear={handleClear}
+            onFilter={handleSearch}
+          />
+          {/* FILTER PRODUCTS */}
+          {!signedUrlParams && (
+            <ProdFilterMenu enabled={enabled} onFilter={onFilterActive} />
+          )}
+        </Stack>
+        <Stack direction={'row'} spacing={3} alignItems={'center'}>
+          {/* ADD GITHUB PROJECT */}
+          {shouldShowDemoFeatures && isGithubConfigSaved && (
+            <Tooltip label='Add GitHub Project'>
+              <IconButton
+                icon={<FaGithub />}
+                variant='outline'
+                onClick={onGithubOpen}
+              />
+            </Tooltip>
+          )}
+          {/* EDIT LABEL */}
+          {shouldShowDemoFeatures && (
+            <Tooltip label='Edit Label'>
+              <IconButton
+                icon={<FaTag />}
+                variant='outline'
+                isDisabled={!canAddProduct}
+                hidden={signedUrlParams}
+                onClick={onOpenLabel}
+              />
+            </Tooltip>
+          )}
+          {/* REFRESH */}
+          <Tooltip label='Refresh'>
+            <IconButton
+              onClick={refetch}
+              variant='outline'
+              icon={<FaRotateRight />}
+            />
+          </Tooltip>
           {/* ADD PRODUCT */}
           <Tooltip label='Add product'>
             <IconButton
@@ -268,59 +309,7 @@ const ProductTable = ({
               }}
             />
           </Tooltip>
-        </Flex>
-        <Flex
-          width={'100%'}
-          alignItems={'center'}
-          justifyContent={'space-between'}
-        >
-          <Stack direction={'row'} spacing={3} alignItems={'center'}>
-            {/* SEARCH PRODUCTS */}
-            <ProductSearchFilter
-              id='product'
-              filterText={filterText}
-              onChange={onSearchInputChange}
-              onClear={handleClear}
-              onFilter={handleSearch}
-            />
-            {/* FILTER PRODUCTS */}
-            {!signedUrlParams && (
-              <ProdFilterMenu enabled={enabled} onFilter={onFilterActive} />
-            )}
-          </Stack>
-          <Stack direction={'row'} spacing={2} alignItems={'center'}>
-            {/* ADD GITHUB PROJECT */}
-            {shouldShowDemoFeatures && isGithubConfigSaved && (
-              <Tooltip label='Add GitHub Project'>
-                <IconButton
-                  icon={<FaGithub />}
-                  variant='outline'
-                  onClick={onGithubOpen}
-                />
-              </Tooltip>
-            )}
-            {/* EDIT LABEL */}
-            {shouldShowDemoFeatures && (
-              <Tooltip label='Edit Label'>
-                <IconButton
-                  icon={<FaTag />}
-                  variant='outline'
-                  isDisabled={!canAddProduct}
-                  hidden={signedUrlParams}
-                  onClick={onOpenLabel}
-                />
-              </Tooltip>
-            )}
-            {/* REFRESH */}
-            <Tooltip label='Refresh'>
-              <IconButton
-                onClick={refetch}
-                variant='outline'
-                icon={<FaRotateRight />}
-              />
-            </Tooltip>
-          </Stack>
-        </Flex>
+        </Stack>
       </Flex>
     )
   }, [
