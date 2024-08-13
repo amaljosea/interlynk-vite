@@ -54,10 +54,10 @@ const ConfirmationModal = ({
         <ModalHeader>
           <Flex alignItems='center' gap={3}>
             {Icon && <Icon color='#60686F' />}
-            {title && <Text fontWeight={500}>{title}</Text>}
+            {title && <Text fontWeight={600}>{title}</Text>}
           </Flex>
         </ModalHeader>
-        <ModalCloseButton />
+        <ModalCloseButton marginTop={1.5} />
         <Divider />
         <ModalBody mb={2}>
           {name && (
@@ -80,7 +80,7 @@ const ConfirmationModal = ({
             </UnorderedList>
           )}
           <br />
-          <Text>Are you sure you want to proceed?</Text>
+          <Text fontWeight={500}>Are you sure you want to proceed?</Text>
         </ModalBody>
         <Divider />
         <ModalFooter>
