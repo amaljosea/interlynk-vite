@@ -381,7 +381,7 @@ const Compare = ({ selectedSboms }) => {
                       {data?.organization?.projectGroups?.nodes?.map(
                         (item, index) => (
                           <option key={index} value={item.id}>
-                            {item.name}
+                            {truncatedValue(item.name, 20)}
                           </option>
                         )
                       )}
@@ -515,7 +515,7 @@ const Compare = ({ selectedSboms }) => {
                       {data?.organization?.projectGroups?.nodes?.map(
                         (item, index) => (
                           <option key={index} value={item.id}>
-                            {item.name}
+                            {truncatedValue(item.name, 20)}
                           </option>
                         )
                       )}
