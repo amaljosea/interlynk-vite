@@ -169,7 +169,6 @@ const LicenseField = ({ resolved, sbomView, license }) => {
             noOptionsMessage={() => `Please search...`}
             components={{
               DropdownIndicator: () => null,
-              IndicatorSeparator: () => null,
               Menu,
               MenuList,
               Option

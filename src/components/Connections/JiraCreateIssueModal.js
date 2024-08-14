@@ -1,6 +1,5 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import ReactSelect from 'react-select'
 
 import {
   Button,
@@ -17,6 +16,8 @@ import {
   ModalOverlay,
   Textarea
 } from '@chakra-ui/react'
+
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -208,7 +209,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
           <Grid pt='15px' pb='15px' templateColumns='repeat(2, 1fr)' gap={6}>
             <FormControl isRequired>
               <FormLabel>Project (Default Selected)</FormLabel>
-              <ReactSelect
+              <LynkSelect
                 value={project}
                 placeholder='Project'
                 options={projects}
@@ -221,7 +222,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
 
             <FormControl isRequired>
               <FormLabel>Issue Type</FormLabel>
-              <ReactSelect
+              <LynkSelect
                 value={issueType}
                 placeholder='Issue Type'
                 options={issueTypes}
@@ -231,7 +232,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
 
             <FormControl isRequired>
               <FormLabel>Reporter</FormLabel>
-              <ReactSelect
+              <LynkSelect
                 value={reporter}
                 placeholder='Reporter'
                 options={reporters}
@@ -241,7 +242,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
 
             <FormControl isRequired>
               <FormLabel>Assignee</FormLabel>
-              <ReactSelect
+              <LynkSelect
                 value={assignee}
                 placeholder='Assignee'
                 options={assignees}

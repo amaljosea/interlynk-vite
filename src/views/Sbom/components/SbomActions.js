@@ -302,8 +302,7 @@ const SbomActions = ({ sbom, refetch }) => {
           <FaLayerGroup size={21} color='#4299E1' />
           <LynkSelect
             components={{
-              DropdownIndicator: () => null,
-              IndicatorSeparator: () => null
+              DropdownIndicator: () => null
             }}
             value={selectedVersion}
             onChange={handleSBOMChange}

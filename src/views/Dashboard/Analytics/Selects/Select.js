@@ -11,8 +11,7 @@ export const CustomSelect = ({ label, ...props }) => {
         placeholder='Select'
         isClearable={true}
         components={{
-          DropdownIndicator: () => null,
-          IndicatorSeparator: () => null
+          DropdownIndicator: () => null
         }}
       />
     </FormControl>

@@ -122,8 +122,8 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
           onChange={(product) => handleProductClick(product)}
           value={value}
           components={{
-            IndicatorSeparator: () => null,
             MenuList: CustomMenuList,
+            IndicatorSeparator: () => null,
             DropdownIndicator: CustomDropdownIndicator
           }}
           filterOption={customFilter}

@@ -164,7 +164,6 @@ const ProductModal = ({ isOpen, onClose, data }) => {
                     isMulti
                     components={{
                       DropdownIndicator: () => null,
-                      IndicatorSeparator: () => null,
                       Option
                     }}
                     options={options}

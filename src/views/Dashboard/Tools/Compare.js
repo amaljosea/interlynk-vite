@@ -422,8 +422,7 @@ const Compare = ({ selectedSboms }) => {
                   {uniqVersionsOne.length > 0 ? (
                     <LynkSelect
                       components={{
-                        DropdownIndicator: () => null,
-                        IndicatorSeparator: () => null
+                        DropdownIndicator: () => null
                       }}
                       value={selectedVersionOne}
                       onChange={(value) => onVersionOneChange(value)}
@@ -556,8 +555,7 @@ const Compare = ({ selectedSboms }) => {
                   {uniqVersionsTwo?.length > 0 ? (
                     <LynkSelect
                       components={{
-                        DropdownIndicator: () => null,
-                        IndicatorSeparator: () => null
+                        DropdownIndicator: () => null
                       }}
                       value={selectedVersionTwo}
                       onChange={(value) => onVersionTwoChange(value)}

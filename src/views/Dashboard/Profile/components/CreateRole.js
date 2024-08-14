@@ -122,8 +122,7 @@ const CreateRole = ({ isOpen, onClose }) => {
                 placeholder='Select'
                 onChange={onPermissionChange}
                 components={{
-                  DropdownIndicator: () => null,
-                  IndicatorSeparator: () => null
+                  DropdownIndicator: () => null
                 }}
               />
             </FormControl>
