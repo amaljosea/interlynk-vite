@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { truncatedValue } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { RepeatIcon } from '@chakra-ui/icons'
@@ -291,7 +292,7 @@ const Changelog = () => {
                         width={'fit-content'}
                       >
                         <TagLabel pt={1}>
-                          {item.name} - {item.url}
+                          {item.name} - {truncatedValue(item.url, 15)}
                         </TagLabel>
                       </Tag>
                     </Flex>
@@ -386,7 +387,7 @@ const Changelog = () => {
                         width={'fit-content'}
                       >
                         <TagLabel pt={1}>
-                          {item.name} - {item.url}
+                          {item.name} - {truncatedValue(item.url, 15)}
                         </TagLabel>
                       </Tag>
                     </Flex>
@@ -450,7 +451,7 @@ const Changelog = () => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      width: '10%',
+      width: '12%',
       right: 'true',
       wrap: true
     }
