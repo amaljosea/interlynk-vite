@@ -17,7 +17,6 @@ import {
   MenuList,
   Portal,
   Stack,
-  Switch,
   Tag,
   Text,
   Tooltip,
@@ -27,6 +26,7 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import CpeCard from 'components/Misc/CpeCard'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
@@ -204,7 +204,7 @@ const Support = () => {
       selector: (row) => {
         const { enabled } = row
         return (
-          <Switch
+          <LynkSwitch
             size='md'
             isChecked={enabled}
             onChange={() => {

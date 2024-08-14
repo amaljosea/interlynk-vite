@@ -13,7 +13,6 @@ import {
   MenuItem,
   MenuList,
   Portal,
-  Switch,
   Tag,
   TagLabel,
   Td,
@@ -29,6 +28,7 @@ import { UpdateShareLynk } from 'graphQL/Mutation'
 import { DeleteShareLynk } from 'graphQL/Mutation'
 
 import { FaEllipsisV } from 'react-icons/fa'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
 function SBOMLinkRow(props) {
   const {
@@ -102,7 +102,7 @@ function SBOMLinkRow(props) {
   return (
     <Tr>
       <Td>
-        <Switch isChecked={enabled} readOnly size='md' />
+        <LynkSwitch isChecked={enabled} readOnly size='md' />
       </Td>
       <Td width={'200px'}>
         <Flex flexDirection={'row'} flexWrap={'wrap'} spacing={2} gap={2}>

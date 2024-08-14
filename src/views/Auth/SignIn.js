@@ -11,10 +11,11 @@ import {
   Heading,
   Input,
   Link,
-  Switch,
   Text,
   useColorModeValue
 } from '@chakra-ui/react'
+
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
 function SignIn() {
   // Chakra color mode
@@ -80,7 +81,7 @@ function SignIn() {
                 size='lg'
               />
               <FormControl display='flex' alignItems='center'>
-                <Switch id='remember-login' colorScheme='teal' me='10px' />
+                <LynkSwitch id='remember-login' colorScheme='teal' me='10px' />
                 <FormLabel
                   htmlFor='remember-login'
                   mb='0'
@@ -113,7 +114,7 @@ function SignIn() {
               mt='0px'
             >
               <Text color={textColor} fontWeight='medium'>
-                Don't have an account?
+                Do not have an account?
                 <Link color={titleColor} as='span' ms='5px' fontWeight='bold'>
                   Sign Up
                 </Link>

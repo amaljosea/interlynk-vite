@@ -29,7 +29,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Switch,
   Text,
   Tooltip,
   useClipboard,
@@ -39,6 +38,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import { CreateShareLynk } from 'graphQL/Mutation'
 
@@ -150,9 +150,9 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
     {
       id: 'ENABLED',
       name: 'ACTIVE',
-      selector: (row) => {
-        return <Switch size='md' isChecked={row?.enabled} isReadOnly />
-      },
+      selector: (row) => (
+        <LynkSwitch size='md' isChecked={row?.enabled} isReadOnly />
+      ),
       width: '90px'
     },
     // URL

@@ -18,7 +18,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
-  Switch,
   Text,
   VStack,
   useDisclosure
@@ -28,6 +27,7 @@ import CardBody from 'components/Card/CardBody'
 import InfoModal from 'components/InfoModal'
 import LynkSelect from 'components/LynkSelect'
 import Info from 'components/Misc/Info'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -142,7 +142,7 @@ const Settings = ({ enabled, data, mfc }) => {
             <VStack spacing={4} alignItems={'flex-start'}>
               {/* VULN SCAN */}
               <Flex align='center'>
-                <Switch
+                <LynkSwitch
                   size='md'
                   colorScheme='blue'
                   me='10px'
@@ -158,7 +158,7 @@ const Settings = ({ enabled, data, mfc }) => {
               </Flex>
               {/* COPY VEX FROM PREVIOUS */}
               <Flex align='center'>
-                <Switch
+                <LynkSwitch
                   size='md'
                   colorScheme='blue'
                   me='10px'
@@ -176,7 +176,7 @@ const Settings = ({ enabled, data, mfc }) => {
               </Flex>
               {/* APPLY CHECK */}
               <Flex align='center'>
-                <Switch
+                <LynkSwitch
                   size='md'
                   colorScheme='blue'
                   me='10px'
@@ -192,7 +192,7 @@ const Settings = ({ enabled, data, mfc }) => {
               </Flex>
               {/* APPLY AUTOMATION */}
               <Flex align='center'>
-                <Switch
+                <LynkSwitch
                   size='md'
                   colorScheme='blue'
                   me='10px'
@@ -208,7 +208,7 @@ const Settings = ({ enabled, data, mfc }) => {
               </Flex>
               {/* APPLY INTERNAL COMPONENTS */}
               <Flex align='center'>
-                <Switch
+                <LynkSwitch
                   size='md'
                   colorScheme='blue'
                   me='10px'

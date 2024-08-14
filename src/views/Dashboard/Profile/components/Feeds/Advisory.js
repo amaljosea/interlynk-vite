@@ -1,12 +1,11 @@
 import { useMutation } from '@apollo/client'
-import React from 'react'
-
-import { Flex, Switch, Text, useColorModeValue } from '@chakra-ui/react'
+import { Flex, Text, useColorModeValue } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import { OrgSettingCreate, OrgSettingUpdate } from 'graphQL/Mutation'
 
@@ -55,7 +54,7 @@ const AdvisoryFeeds = ({ data, manageFeeds }) => {
                 const activeFeed = data?.find((org) => org.id === feed.id)
                 return (
                   <Flex align='center' mb='20px' key={index}>
-                    <Switch
+                    <LynkSwitch
                       size='md'
                       me='10px'
                       id={feed.id}

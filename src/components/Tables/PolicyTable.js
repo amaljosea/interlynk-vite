@@ -28,7 +28,6 @@ import {
   Portal,
   Select,
   Stack,
-  Switch,
   Table,
   TableContainer,
   Tag,
@@ -54,6 +53,7 @@ import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
 
 import { FaEllipsisV, FaPlus } from 'react-icons/fa'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
 const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
   const { showToast } = useCustomToast()
@@ -198,7 +198,7 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
       selector: (row) => {
         const { isEnabled } = row
         return (
-          <Switch
+          <LynkSwitch
             size='md'
             isDisabled={!updatePolicy}
             isChecked={isEnabled}

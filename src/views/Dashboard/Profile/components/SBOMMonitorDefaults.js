@@ -1,11 +1,12 @@
 import React from 'react'
 
-import { Flex, Switch, Text, useColorModeValue } from '@chakra-ui/react'
+import { Flex, Text, useColorModeValue } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
 const SBOMMonitorDefaults = () => {
   // Chakra color mode
@@ -23,13 +24,18 @@ const SBOMMonitorDefaults = () => {
             Compliance
           </Text>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' isChecked />
+            <LynkSwitch colorScheme='blue' me='10px' isChecked />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
               License Validation
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' isChecked id='lic_conflict' />
+            <LynkSwitch
+              colorScheme='blue'
+              me='10px'
+              isChecked
+              id='lic_conflict'
+            />
             <Text
               noOfLines={1}
               fontSize='md'
@@ -41,7 +47,7 @@ const SBOMMonitorDefaults = () => {
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch
+            <LynkSwitch
               colorScheme='blue'
               me='10px'
               isChecked
@@ -66,19 +72,19 @@ const SBOMMonitorDefaults = () => {
             Security
           </Text>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' isChecked />
+            <LynkSwitch colorScheme='blue' me='10px' isChecked />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
               Exploited Vulnerabilities
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' isChecked />
+            <LynkSwitch colorScheme='blue' me='10px' isChecked />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
               Unmaintained Component
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' isChecked />
+            <LynkSwitch colorScheme='blue' me='10px' isChecked />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
               Reputation Scoring
             </Text>

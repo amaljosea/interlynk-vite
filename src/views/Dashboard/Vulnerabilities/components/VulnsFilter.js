@@ -1,8 +1,9 @@
 import { useState } from 'react'
 
-import { Box, Flex, Menu, Stack, Switch, Text } from '@chakra-ui/react'
+import { Box, Flex, Menu, Stack, Text } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 const VulnFilters = ({ setFilter, sbomVersions }) => {
@@ -102,7 +103,7 @@ const VulnFilters = ({ setFilter, sbomVersions }) => {
       </Box>
       {/* INCOMPLETE STATUS */}
       <Flex align='center' gap={2}>
-        <Switch
+        <LynkSwitch
           id='incompleteStatus'
           isChecked={isComplete}
           onChange={onFilterComplete}

@@ -6,11 +6,11 @@ import {
   MenuList,
   MenuOptionGroup,
   Stack,
-  Switch,
   Text
 } from '@chakra-ui/react'
 
 import CheckMark from 'components/Misc/CheckMark'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -191,7 +191,11 @@ const CompFilters = () => {
       </Box>
       {/* DIRECT */}
       <Flex align='center' gap={2}>
-        <Switch id='isDirect' isChecked={direct} onChange={onFilterDirect} />
+        <LynkSwitch
+          id='isDirect'
+          isChecked={direct}
+          onChange={onFilterDirect}
+        />
         <Text>Direct</Text>
       </Flex>
     </Stack>

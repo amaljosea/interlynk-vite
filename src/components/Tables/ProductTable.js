@@ -27,7 +27,6 @@ import {
   Link as Olink,
   Portal,
   Stack,
-  Switch,
   Tag,
   Text,
   Tooltip,
@@ -40,6 +39,7 @@ import CustomLoader from 'components/CustomLoader'
 import LabelDrawer from 'components/Drawer/LabelDrawer'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 import IconBox from 'components/Icons/IconBox'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -84,7 +84,6 @@ const ProductTable = ({
   const borderColor = useColorModeValue('#3182CE66', '#90cdf499')
   const envIconColor = useColorModeValue('#3182CE', '#90cdf4')
   const dividerColor = useColorModeValue('#0000001f', '#ffffff1A')
-  const switchColor = useColorModeValue('#ffffff', '#1f2733')
 
   const { search, field } = filters
   const { totalRows } = paginationProps
@@ -327,7 +326,7 @@ const ProductTable = ({
       selector: (row) => {
         const { enabled, name } = row
         return (
-          <Switch
+          <LynkSwitch
             name={name}
             id={name}
             size='md'
@@ -336,11 +335,6 @@ const ProductTable = ({
             onChange={() => {
               setActiveRow(row)
               onWarningOpen()
-            }}
-            sx={{
-              '.chakra-switch__thumb[data-checked]': {
-                backgroundColor: switchColor
-              }
             }}
           />
         )

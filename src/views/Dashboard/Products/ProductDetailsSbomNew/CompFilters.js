@@ -1,6 +1,7 @@
-import { Box, Flex, Menu, Stack, Switch, Text } from '@chakra-ui/react'
+import { Box, Flex, Menu, Stack, Text } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -127,7 +128,7 @@ const CompFilters = ({ filters, reset }) => {
         </Box>
         {/* DIRECT */}
         <Flex align='center' gap={2}>
-          <Switch id='isDirect' isChecked={direct} onChange={onFilterDirect} />
+          <LynkSwitch id='isDirect' isChecked={direct} onChange={onFilterDirect} />
           <Text>Direct</Text>
         </Flex>
       </Stack>

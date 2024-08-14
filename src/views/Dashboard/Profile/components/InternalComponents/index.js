@@ -10,7 +10,6 @@ import {
   Flex,
   IconButton,
   Stack,
-  Switch,
   Text,
   Tooltip,
   useColorModeValue
@@ -32,6 +31,7 @@ import { getInternalComponents } from 'graphQL/Queries'
 
 import { DeleteInternalComponent } from './DeleteInternalComponent'
 import { UpdateInternalComponent } from './MutateInternalComponent'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
 export const InternalComponents = () => {
   const activetab = useQueryParam('tab')
@@ -77,7 +77,7 @@ export const InternalComponents = () => {
       name: 'ACTIVE',
       selector: (row) => {
         return (
-          <Switch
+          <LynkSwitch
             isDisabled={!manageListing}
             isChecked={row.enabled}
             onChange={() =>

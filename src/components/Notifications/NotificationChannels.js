@@ -1,7 +1,9 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 
-import { Flex, Switch, Text } from '@chakra-ui/react'
+import { Flex, Text } from '@chakra-ui/react'
+
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import useQueryParam from 'hooks/useQueryParam'
@@ -78,7 +80,7 @@ const NotificationChannels = () => {
       </CardHeader>
       {Object.keys(notificationChannels).map((id, index) => (
         <Flex align='center' mb='20px' key={index}>
-          <Switch
+          <LynkSwitch
             size='md'
             colorScheme='blue'
             isChecked={notificationChannels[id]}

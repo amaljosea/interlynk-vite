@@ -2,13 +2,14 @@ import { useMutation, useQuery } from '@apollo/client'
 import DataTable from 'react-data-table-component'
 import { customStyles, sevColor } from 'utils'
 
-import { Flex, Select, Switch, Text, useColorModeValue } from '@chakra-ui/react'
+import { Flex, Select, Text, useColorModeValue } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import CustomLoader from 'components/CustomLoader'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -55,7 +56,7 @@ const Checks = () => {
       selector: (row) => {
         const { id, rule, enabled } = row
         return (
-          <Switch
+          <LynkSwitch
             name={rule.friendlyId}
             id={rule.friendlyId}
             isDisabled={!updateOrg}

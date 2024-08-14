@@ -23,7 +23,6 @@ import {
   MenuList,
   Portal,
   Stack,
-  Switch,
   Tag,
   Text,
   Tooltip,
@@ -52,6 +51,7 @@ import CopyRule from './components/CopyRule'
 import CreateRule from './components/CreateRule'
 import DeleteWarning from './components/DeleteWarning'
 import StatusWarning from './components/StatusWarning'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
 const Automation = ({ projects }) => {
   const { showToast } = useCustomToast()
@@ -204,7 +204,7 @@ const Automation = ({ projects }) => {
       name: 'ACTIVE',
       selector: (row) => {
         return (
-          <Switch
+          <LynkSwitch
             isChecked={row?.active}
             isDisabled={!editAutomations}
             onChange={() => {

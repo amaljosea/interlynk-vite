@@ -1,13 +1,14 @@
 import React from 'react'
 
-import { Flex, Switch, Text, useColorModeValue } from '@chakra-ui/react'
+import { Flex, Text, useColorModeValue } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
-const SBOMLinkDefaults = ({ title }) => {
+const SBOMLinkDefaults = () => {
   // Chakra color mode
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -24,19 +25,19 @@ const SBOMLinkDefaults = ({ title }) => {
             SBOM Content
           </Text>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' isChecked />
+            <LynkSwitch colorScheme='blue' me='10px' isChecked />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
               Components
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' isChecked />
+            <LynkSwitch colorScheme='blue' me='10px' isChecked />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
               Licenses
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' />
+            <LynkSwitch colorScheme='blue' me='10px' />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
               Vulnerabilities
             </Text>
@@ -50,19 +51,19 @@ const SBOMLinkDefaults = ({ title }) => {
             SBOM Access
           </Text>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' isChecked />
+            <LynkSwitch colorScheme='blue' me='10px' isChecked />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
               Requires email validation
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' isChecked />
+            <LynkSwitch colorScheme='blue' me='10px' isChecked />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
               Requires terms acceptance
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' isChecked />
+            <LynkSwitch colorScheme='blue' me='10px' isChecked />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
               Apply component redaction
             </Text>

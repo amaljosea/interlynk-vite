@@ -17,7 +17,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Switch,
   Text,
   UnorderedList
 } from '@chakra-ui/react'
@@ -28,6 +27,7 @@ import { createOrgComp, updateOrgComp } from 'graphQL/Mutation'
 import { getInternalComponents } from 'graphQL/Queries'
 
 import { TextRegex } from './TestRegex'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 
 const checkIfRegexError = (text) => text.includes('not a valid regex')
 const checkIfDuplicateError = (text) =>
@@ -116,7 +116,7 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
             </FormControl>
             <FormControl display='flex' alignItems='center' mt={3}>
               <FormLabel marginBlock={0}>Active</FormLabel>
-              <Switch
+              <LynkSwitch
                 isChecked={enabled}
                 onChange={() => {
                   setEnabled(!enabled)
