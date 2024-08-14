@@ -48,7 +48,8 @@ const SbomUpload = () => {
         })
       }
     })
-  }, [id, showToast, token, validateRequest])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, token])
 
   const onDecline = () => {
     declineRequest({
