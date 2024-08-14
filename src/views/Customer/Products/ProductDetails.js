@@ -19,6 +19,7 @@ import {
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
+import EnvFilter from 'components/Misc/EnvFilter'
 import VersionsTable from 'components/Tables/VersionsTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -201,7 +202,9 @@ const ProductDetails = () => {
               </Flex>
             </GridItem>
             {/* PRODUCT ACTIONS */}
-            <GridItem colSpan={2}></GridItem>
+            <GridItem colSpan={2} ml={'auto'}>
+              <EnvFilter />
+            </GridItem>
           </Grid>
         </CardBody>
       </Card>
