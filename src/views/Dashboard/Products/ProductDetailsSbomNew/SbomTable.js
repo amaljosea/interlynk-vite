@@ -80,7 +80,7 @@ const SbomTable = ({ data, refetch, loading, error }) => {
               <Components sbomData={data} sbomRefetch={refetch} />
             </TabPanel>
             <TabPanel px={0}>
-              <Vulnerabilities sbomData={data} sbomRefetch={refetch} />
+              <Vulnerabilities sbomData={data} />
             </TabPanel>
             <TabPanel px={0}>
               <Licenses />

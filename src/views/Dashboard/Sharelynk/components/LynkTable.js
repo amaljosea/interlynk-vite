@@ -27,7 +27,6 @@ const LynkTable = ({ captions, data, refetch }) => {
               updatedAt={item.updatedAt}
               shareUsers={item.shareUsers}
               signedUrlParams={item.signedUrlParams}
-              refetch={refetch}
             />
           ))}
       </Tbody>

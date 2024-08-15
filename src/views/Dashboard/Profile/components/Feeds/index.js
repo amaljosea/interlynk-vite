@@ -22,7 +22,7 @@ const Feeds = () => {
     childKey: 'manage_feeds'
   })
 
-  const { data, refetch, loading } = useQuery(GetOrgSettings, {
+  const { data, loading } = useQuery(GetOrgSettings, {
     skip: !orgView ? true : activetab === 'feeds' ? false : true
   })
 

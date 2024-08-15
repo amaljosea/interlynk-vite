@@ -111,16 +111,6 @@ const Checks = () => {
     }
   })
 
-  const handleRefetch = useCallback(() => {
-    showToast({
-      description:
-        'Checks rescan is in progress. Please refresh the page to see the updated results.',
-      status: 'info'
-    })
-    reset()
-    refetch()
-  }, [refetch, reset, showToast])
-
   const editChecks = useHasPermission({
     parentKey: 'view_sbom',
     childKey: 'edit_checks'
@@ -228,6 +218,16 @@ const Checks = () => {
     onOpen: onRelOpen,
     onClose: onRelClose
   } = useDisclosure()
+
+  /*   const handleRefetch = useCallback(() => {
+    showToast({
+      description:
+        'Checks rescan is in progress. Please refresh the page to see the updated results.',
+      status: 'info'
+    })
+    reset()
+    refetch()
+  }, [refetch, reset, showToast]) */
 
   const handleReCheck = useCallback(async () => {
     await healthRecheck({
@@ -589,10 +589,6 @@ const Checks = () => {
       variables: {
         id: id,
         status: 'ignored'
-      }
-    }).then((res) => {
-      if (res?.data) {
-        handleRefetch()
       }
     })
   }

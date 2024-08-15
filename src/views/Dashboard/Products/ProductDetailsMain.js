@@ -151,7 +151,7 @@ const ProductDetailsMain = () => {
   })
 
   // GET PROJECT DATA
-  const { data, refetch, loading, error } = useQuery(GetProjectGroup, {
+  const { data, loading, error } = useQuery(GetProjectGroup, {
     variables: { id: productGroupId }
   })
 
@@ -638,7 +638,6 @@ const ProductDetailsMain = () => {
           onClose={onWarningClose}
           group={projectGroup}
           grouId={productId}
-          refetch={refetch}
         />
       )}
 

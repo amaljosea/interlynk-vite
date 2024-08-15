@@ -33,13 +33,11 @@ const ProductDetailsSbomNew = () => {
         data={data?.shareLynkQuery?.sbom}
         error={error}
         loading={loading}
-        refetch={refetch}
       />
       <SbomTable
         data={data?.shareLynkQuery?.sbom}
         error={error}
         loading={loading}
-        refetch={refetch}
       />
     </>
   )

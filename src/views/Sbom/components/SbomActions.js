@@ -404,9 +404,7 @@ const SbomActions = ({ sbom, refetch }) => {
           isOpen={isSBMOpen}
           onClose={setSBMClose}
           btnRef={btnRef}
-          sbomRefetch={refetch}
           data={sbom?.primaryComponent}
-          fetchCompData={fetchCompData}
           filterRefetch={getCompFilters}
           shortDesc={null}
           totalRows={null}

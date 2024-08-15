@@ -130,7 +130,6 @@ const Automation = ({ projects }) => {
           status: 'error'
         })
       } else {
-        refetch()
         onDeleteClose()
       }
     })
@@ -150,7 +149,6 @@ const Automation = ({ projects }) => {
           status: 'error'
         })
       } else {
-        refetch()
         onActiveClose()
       }
     })
@@ -171,8 +169,6 @@ const Automation = ({ projects }) => {
             description: errors[0],
             status: 'error'
           })
-        } else {
-          refetch()
         }
       })
     }
@@ -472,7 +468,6 @@ const Automation = ({ projects }) => {
       {isRuleOpen && (
         <CreateRule
           data={activeRow}
-          refetch={refetch}
           isOpen={isRuleOpen}
           onClose={onRuleClose}
           subOperators={subOperators}

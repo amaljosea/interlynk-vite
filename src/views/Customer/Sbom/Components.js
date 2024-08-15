@@ -44,7 +44,7 @@ import { FaGlobe, FaHouseUser, FaLightbulb, FaSitemap } from 'react-icons/fa'
 
 import CompFilters from './CompFilters'
 
-const Components = ({ sbomData, sbomRefetch }) => {
+const Components = ({ sbomData }) => {
   const params = useParams()
   const sbomId = params.sbomid
   const location = useLocation()
@@ -874,8 +874,6 @@ const Components = ({ sbomData, sbomRefetch }) => {
           data={activeRow}
           isOpen={isOpen}
           onClose={onClose}
-          sbomRefetch={sbomRefetch}
-          fetchCompData={fetchCompData}
           filterRefetch={getCompFilters}
           shortDesc={null}
           checkId={null}

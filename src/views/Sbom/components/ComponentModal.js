@@ -4,21 +4,13 @@ import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationM
 
 import { DeleteComponent } from 'graphQL/Mutation'
 
-const ComponentModal = ({
-  isOpen,
-  onClose,
-  activeRow,
-  fetchCompData,
-  sbomRefetch
-}) => {
+const ComponentModal = ({ isOpen, onClose, activeRow }) => {
   const params = useParams()
   const prodId = params.productid
   const sbomId = params.sbomid
   const { id, name } = activeRow
 
-  const [deleteComponent] = useMutation(DeleteComponent, {
-    onCompleted: () => fetchCompData()
-  })
+  const [deleteComponent] = useMutation(DeleteComponent)
 
   const handleDelete = async () => {
     await deleteComponent({
@@ -28,7 +20,6 @@ const ComponentModal = ({
       }
     }).then((res) => {
       if (res?.data) {
-        sbomRefetch({ projectId: prodId, sbomId: sbomId })
         onClose()
       }
     })

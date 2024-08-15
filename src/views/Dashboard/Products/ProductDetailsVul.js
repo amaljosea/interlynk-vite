@@ -31,11 +31,7 @@ const ProductDetailsVul = () => {
     parentKey: 'view_feeds'
   })
 
-  const {
-    data: vulnInfo,
-    refetch: getVulnData,
-    loading
-  } = useQuery(GetGlobalVulnData, {
+  const { data: vulnInfo, loading } = useQuery(GetGlobalVulnData, {
     skip: vulnId && vulnsPermissions === true ? false : true,
     fetchPolicy: 'cache-and-network',
     variables: {
@@ -67,7 +63,6 @@ const ProductDetailsVul = () => {
       <VulnInfo
         data={vulnInfo?.vuln}
         componentVulns={vulnInfo?.componentVulns}
-        refetch={getVulnData}
       />
     )
   }

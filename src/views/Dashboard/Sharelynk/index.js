@@ -17,7 +17,7 @@ const Sharelynk = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = useRef()
 
-  const { data, refetch } = useQuery(GetAllShareLynks)
+  const { data } = useQuery(GetAllShareLynks)
 
   return (
     <>
@@ -52,7 +52,6 @@ const Sharelynk = () => {
                 'Actions'
               ]}
               data={data}
-              refetch={refetch}
             />
           )}
         </CardBody>

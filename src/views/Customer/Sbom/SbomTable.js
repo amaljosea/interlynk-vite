@@ -25,7 +25,7 @@ const tabs = [
   'changelog'
 ]
 
-const SbomTable = ({ data, refetch, loading, error }) => {
+const SbomTable = ({ data, loading, error }) => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
   const navigate = useNavigate()
@@ -86,7 +86,7 @@ const SbomTable = ({ data, refetch, loading, error }) => {
             </TabPanel>
             <TabPanel px={0}></TabPanel>
             <TabPanel px={0}>
-              <Components sbomData={data} sbomRefetch={refetch} />
+              <Components sbomData={data} />
             </TabPanel>
             <TabPanel px={0}>
               <Vulnerabilities sbomData={data} />

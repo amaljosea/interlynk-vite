@@ -118,13 +118,13 @@ function Profile() {
 
   const isAdmin = currentUser?.superAdmin
 
-  const { data: myOrgs, refetch: myOrgRefetch } = useQuery(MyOrganizations, {
+  const { data: myOrgs } = useQuery(MyOrganizations, {
     skip: isAdmin === true ? true : false,
     variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
   })
   const { nodes: myOrgList } = myOrgs?.myOrganizations || ''
 
-  const { data: allOrgs, refetch: allOrgRefetch } = useQuery(AllOrganizations, {
+  const { data: allOrgs } = useQuery(AllOrganizations, {
     skip: isAdmin === true ? false : true,
     variables: { first: totalRows, status: 'approved' }
   })

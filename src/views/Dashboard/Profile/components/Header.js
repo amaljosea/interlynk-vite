@@ -45,7 +45,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
   const { orgView } = useGlobalQueryContext()
 
-  const { data, refetch } = useQuery(GetCurrentUser, {
+  const { data } = useQuery(GetCurrentUser, {
     skip: !orgView
   })
 
@@ -95,7 +95,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           setProfileImage(
             `${SERVER_URL}/${res.data.userUploadProfileImage.user.profileImage.url}`
           )
-          refetch()
         }
       })
       .finally(() => {

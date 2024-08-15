@@ -47,7 +47,7 @@ const CompLinks = ({ component }) => {
   const { data } = useQuery(GetCompUrls, {
     variables: { id, sbomId }
   })
-  const { externalUrls, refetch } = data?.component || ''
+  const { externalUrls } = data?.component || ''
   const filterUrls = externalUrls?.map((item) => ({
     name: item?.name,
     url: item?.url

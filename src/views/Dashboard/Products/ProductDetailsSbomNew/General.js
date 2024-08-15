@@ -66,7 +66,7 @@ const InfoLabel = ({ title, onClick }) => {
   )
 }
 
-const General = ({ data, refetch, loading, error }) => {
+const General = ({ data, loading, error }) => {
   const location = useLocation()
   const params = useParams()
   const productId = params.productid
@@ -139,7 +139,7 @@ const General = ({ data, refetch, loading, error }) => {
   const handleToolRemove = async (id) => {
     try {
       await deleteTool({ variables: { toolID: id, sbomID: sbomId } })
-        .then((res) => res?.data && refetch())
+        .then((res) => res?.data)
         .finally(() => onDelClose())
     } catch (error) {
       console.log(`Mutation error`, error)
@@ -149,7 +149,7 @@ const General = ({ data, refetch, loading, error }) => {
   const handleAuthorRemove = async (id) => {
     try {
       await deleteAuthor({ variables: { authorId: id, sbomId } }).then(
-        (res) => res?.data && refetch({ productId: productId, sbomId })
+        (res) => res?.data
       )
     } catch (error) {
       console.log(`Mutation error`, error)
@@ -162,9 +162,7 @@ const General = ({ data, refetch, loading, error }) => {
   }
 
   const handleSupRemove = async (id) => {
-    await deleteSupplier({ variables: { id: id } }).then(
-      (res) => res.data && refetch({ productId: productId, sbomId })
-    )
+    await deleteSupplier({ variables: { id: id } }).then((res) => res.data)
   }
 
   // const onRemoveLicense = async () => console.log('License');
@@ -460,7 +458,6 @@ const General = ({ data, refetch, loading, error }) => {
           btnRef={btnRef}
           data={data}
           selectedKey={selectedKey}
-          refetch={refetch}
           checkId={null}
         />
       )}
@@ -500,7 +497,6 @@ const General = ({ data, refetch, loading, error }) => {
       {/* SUPPLIER MODAL */}
       {isSupOpen && (
         <PriSupplierModal
-          refetch={refetch}
           isOpen={isSupOpen}
           onClose={onSupClose}
           suppliers={suppliers}

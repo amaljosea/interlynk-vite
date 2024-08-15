@@ -53,7 +53,7 @@ const PersonalInfo = () => {
   const { setUserName } = useGlobalState()
   const { orgView } = useGlobalQueryContext()
 
-  const { data, refetch } = useQuery(GetCurrentUser, {
+  const { data } = useQuery(GetCurrentUser, {
     skip: !orgView || activetab !== 'personal-details'
   })
 
@@ -146,23 +146,23 @@ const PersonalInfo = () => {
   }
 
   const handleUpdate = async () => {
-    await updateUser({ variables: { id: userId, name: name, email: email } })
-      .then((res) => {
-        if (res.data.userUpdate.errors.length === 0) {
-          setMessage('Saving....')
-          setUserName(name)
-          localStorage.setItem('username', name)
-          localStorage.setItem('email', email)
-          setTimeout(() => {
-            setMessage('Update')
-            showToast({
-              description: 'User details updated successfully',
-              status: 'success'
-            })
-          }, 2000)
-        }
-      })
-      .finally(() => refetch())
+    await updateUser({
+      variables: { id: userId, name: name, email: email }
+    }).then((res) => {
+      if (res.data.userUpdate.errors.length === 0) {
+        setMessage('Saving....')
+        setUserName(name)
+        localStorage.setItem('username', name)
+        localStorage.setItem('email', email)
+        setTimeout(() => {
+          setMessage('Update')
+          showToast({
+            description: 'User details updated successfully',
+            status: 'success'
+          })
+        }, 2000)
+      }
+    })
   }
 
   const handleUpdatePassword = () => {

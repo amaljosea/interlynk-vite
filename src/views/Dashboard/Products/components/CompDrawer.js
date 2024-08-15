@@ -28,7 +28,7 @@ import CompLinks from './CompLinks'
 import CompRelations from './CompRelations'
 import CompSupplier from './CompSupplier'
 
-const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
+const CompDrawer = ({ isOpen, onClose, data }) => {
   const params = useParams()
   const sbomId = params.sbomid
   const bgColor = useColorModeValue('white', 'gray.700')
@@ -52,7 +52,7 @@ const CompDrawer = ({ isOpen, onClose, data, refetch }) => {
     >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton mt={3} onClick={refetch} />
+        <DrawerCloseButton mt={3} />
         <DrawerHeader borderBottomWidth='1px'>
           <Text mb={1} fontWeight={'medium'}>
             {data ? 'Edit' : 'Add'} Component

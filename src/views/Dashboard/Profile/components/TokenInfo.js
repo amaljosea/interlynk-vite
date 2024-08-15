@@ -87,7 +87,7 @@ const TokenInfo = () => {
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
-  const { data, loading, refetch } = useQuery(GetApiKeys, {
+  const { data, loading } = useQuery(GetApiKeys, {
     skip: !orgView || activetab !== 'security-tokens'
   })
 
@@ -134,12 +134,8 @@ const TokenInfo = () => {
   const key = useClipboard(token)
 
   const [generateToken] = useMutation(createApiToken)
-  const [deleteToken] = useMutation(deleteApiToken, {
-    onCompleted: () => refetch()
-  })
-  const [updateToken] = useMutation(updateApiToken, {
-    onCompleted: () => refetch()
-  })
+  const [deleteToken] = useMutation(deleteApiToken)
+  const [updateToken] = useMutation(updateApiToken)
 
   const handleCreate = async () => {
     setIsLoading(true)
@@ -203,7 +199,6 @@ const TokenInfo = () => {
   }
 
   const handleSubmit = () => {
-    refetch()
     onClose()
   }
 

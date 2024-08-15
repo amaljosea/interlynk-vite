@@ -266,7 +266,7 @@ const ExpandedComponent = ({
   )
 }
 
-const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
+const Vulnerabilities = ({ sbomData }) => {
   const params = useParams()
   const productId = params.productid
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
@@ -952,9 +952,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
             description: 'Vulnerability re-scan started',
             status: 'success'
           })
-          sbomRefetch({ projectId: productId, sbomId: sbomId }).then(
-            (res) => res?.data && console.log(res?.data)
-          )
           prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
           reset()
         }
@@ -967,7 +964,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
     reset,
     sbomData?.vulnRunStatus,
     sbomId,
-    sbomRefetch,
     showToast
   ])
 
@@ -1123,7 +1119,6 @@ const Vulnerabilities = ({ sbomData, sbomRefetch }) => {
       {isLinkOpen && (
         <VulnLinkDrawer
           data={activeRow}
-          refetch={refetch}
           isOpen={isLinkOpen}
           onClose={onLinkClose}
           sbomId={sbomId}

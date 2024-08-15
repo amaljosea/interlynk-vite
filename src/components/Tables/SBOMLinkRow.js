@@ -31,15 +31,8 @@ import { FaEllipsisV } from 'react-icons/fa'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 function SBOMLinkRow(props) {
-  const {
-    id,
-    signedUrlParams,
-    updatedAt,
-    contents,
-    shareUsers,
-    enabled,
-    refetch
-  } = props
+  const { id, signedUrlParams, updatedAt, contents, shareUsers, enabled } =
+    props
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -64,7 +57,7 @@ function SBOMLinkRow(props) {
           shareLynkId: id,
           enabled: enabled ? false : true
         }
-      }).then(() => refetch())
+      })
     } catch (error) {
       console.log(error)
     }
@@ -76,7 +69,7 @@ function SBOMLinkRow(props) {
         variables: {
           id: id
         }
-      }).then(() => refetch())
+      })
     } catch (error) {
       console.log(error)
     }

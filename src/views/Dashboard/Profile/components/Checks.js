@@ -145,7 +145,7 @@ const Checks = () => {
           id: id,
           enabled: value === true ? true : false
         }
-      }).then(() => refetch())
+      })
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -158,7 +158,7 @@ const Checks = () => {
           id: id,
           severity: value
         }
-      }).then(() => refetch())
+      })
     } catch (error) {
       console.log(error)
     }
