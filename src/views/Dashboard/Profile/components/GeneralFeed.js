@@ -61,9 +61,7 @@ const GeneralFeed = () => {
             setMessage('Update')
             showToast({
               description: 'Organization name updated successfully',
-              status: 'success',
-              position: 'top',
-              duration: 2000
+              status: 'success'
             })
           }, 2000)
         }

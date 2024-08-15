@@ -22,6 +22,13 @@ const BACKGROUND_COLORS = {
   info: '#E7F5FF'
 }
 
+const TITLE = {
+  success: 'Successfull!',
+  error: 'Failed!',
+  warning: 'Warning!',
+  info: 'Information!'
+}
+
 const ICON_COMPONENTS = {
   success: <CheckCircleIcon color={ICON_COLORS.success} fontSize='20px' />,
   error: (
@@ -35,16 +42,24 @@ const ICON_COMPONENTS = {
 
 const getToastStyles = (status) => ({
   backgroundColor: BACKGROUND_COLORS[status] || BACKGROUND_COLORS.info,
-  borderLeftColor: ICON_COLORS[status] || ICON_COLORS.info
+  borderLeftColor: ICON_COLORS[status] || ICON_COLORS.info,
+  headerName: TITLE[status] || TITLE.info
 })
 
 const useCustomToast = () => {
   const toast = useToast()
 
   const showToast = ({ title, description, status }) => {
-    const { backgroundColor, borderLeftColor } = getToastStyles(status)
+    const { backgroundColor, borderLeftColor, headerName } =
+      getToastStyles(status)
     const Icon = ICON_COMPONENTS[status] || ICON_COMPONENTS.info
 
+    if (title && !description) {
+      description = title
+      title = headerName
+    } else if (!title && description) {
+      title = headerName
+    }
     toast({
       duration: 8000,
       isClosable: true,
@@ -76,11 +91,7 @@ const useCustomToast = () => {
                 </Text>
               )}
               {description && (
-                <Text
-                  fontWeight={title ? 300 : 600}
-                  fontSize={title ? '14px' : '16px'}
-                  color='#1A202C'
-                >
+                <Text fontWeight='300' fontSize='14px' color='#1A202C'>
                   {description}
                 </Text>
               )}
