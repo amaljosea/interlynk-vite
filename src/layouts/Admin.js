@@ -180,7 +180,7 @@ export default function Admin() {
     }
     setTimeout(() => {
       setCurrentStep(currentStep - 1)
-    }, 500)
+    }, 600)
   }
 
   const onClickNext = (props) => {
