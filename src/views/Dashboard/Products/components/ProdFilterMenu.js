@@ -13,14 +13,10 @@ import {
 
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
-
-import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
-
 import { GetLabels } from 'graphQL/Queries'
 
 const ProdFilterMenu = ({ filters, setFilters }) => {
   const { enabled, labelIds } = filters || ''
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const onFilterActive = (value) => {
     setFilters((oldFilter) => ({
@@ -66,7 +62,7 @@ const ProdFilterMenu = ({ filters, setFilters }) => {
       <Box
         width={'fit-content'}
         position={'relative'}
-        display={shouldShowDemoFeatures ? 'flex' : 'none'}
+        display={'flex'}
       >
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Labels'} active={labelIds?.length !== 0} />

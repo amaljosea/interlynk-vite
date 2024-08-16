@@ -23,7 +23,7 @@ const BACKGROUND_COLORS = {
 }
 
 const TITLE = {
-  success: 'Successfull!',
+  success: 'Successful!',
   error: 'Failed!',
   warning: 'Warning!',
   info: 'Information!'

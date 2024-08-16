@@ -265,17 +265,15 @@ const ProductTable = ({
             </Tooltip>
           )}
           {/* EDIT LABEL */}
-          {shouldShowDemoFeatures && (
-            <Tooltip label='Edit Label'>
-              <IconButton
-                icon={<FaTag />}
-                variant='outline'
-                isDisabled={!canAddProduct}
-                hidden={signedUrlParams}
-                onClick={onOpenLabel}
-              />
-            </Tooltip>
-          )}
+          <Tooltip label='Edit Label'>
+            <IconButton
+              icon={<FaTag />}
+              variant='outline'
+              isDisabled={!canAddProduct}
+              hidden={signedUrlParams}
+              onClick={onOpenLabel}
+            />
+          </Tooltip>
           {/* REFRESH */}
           <Tooltip label='Refresh'>
             <IconButton
@@ -371,7 +369,7 @@ const ProductTable = ({
           <Flex
             my={3}
             alignItems={'center'}
-            gap={shouldShowDemoFeatures ? 3 : 0}
+            gap={3}
             className={index === 0 ? 'product' : ''}
           >
             <Tooltip label={getFormat(name)} placement='top'>
@@ -401,8 +399,7 @@ const ProductTable = ({
                 >
                   {truncatedValue(name, 20)}
                 </Text>
-                {shouldShowDemoFeatures &&
-                  labels?.map((item) => (
+                {labels?.map((item) => (
                     <Tag
                       py={1}
                       size='sm'
