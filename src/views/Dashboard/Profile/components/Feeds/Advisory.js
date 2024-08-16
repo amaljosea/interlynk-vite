@@ -1,5 +1,6 @@
 import { useMutation } from '@apollo/client'
-import { Flex, Text, useColorModeValue } from '@chakra-ui/react'
+
+import { Flex, Tag, Text, useColorModeValue } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card'
@@ -58,12 +59,14 @@ const AdvisoryFeeds = ({ data, manageFeeds }) => {
                       size='md'
                       me='10px'
                       id={feed.id}
+                      isReadOnly
                       colorScheme='blue'
                       disabled={!manageFeeds}
-                      isChecked={activeFeed && activeFeed.value}
+                      isChecked={activeFeed?.value}
                       onChange={(e) => handleChange(e, feed.id, activeFeed)}
                     />
                     <Text
+                      mr={2}
                       noOfLines={1}
                       color='gray.500'
                       fontWeight='400'
@@ -71,6 +74,9 @@ const AdvisoryFeeds = ({ data, manageFeeds }) => {
                     >
                       {feed.setting.friendlyName}
                     </Text>
+                    <Tag hidden={activeFeed?.value} size='sm'>
+                      Coming soon
+                    </Tag>
                   </Flex>
                 )
               })}
