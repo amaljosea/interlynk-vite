@@ -9,7 +9,6 @@ import {
   Button,
   Flex,
   FormControl,
-  FormHelperText,
   FormLabel,
   IconButton,
   Input,
@@ -18,8 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   SimpleGrid,
-  Tag,
-  Text
+  Tag
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'

@@ -1,13 +1,13 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, hexToRGBA, timeSince } from 'utils'
 import { customStyles, getFormat, getLink, getType } from 'utils'
-import { truncatedValue } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
+import LabelInput from 'views/Dashboard/Products/components/LabelInput'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import StatusModal from 'views/Dashboard/Products/components/StatusModal'
@@ -16,8 +16,10 @@ import ProductSearchFilter from 'views/Sbom/components/ProductSearchFilter'
 
 import { AddIcon } from '@chakra-ui/icons'
 import {
+  Box,
   Button,
   Divider,
+  Fade,
   Flex,
   IconButton,
   Menu,
@@ -84,6 +86,8 @@ const ProductTable = ({
   const borderColor = useColorModeValue('#3182CE66', '#90cdf499')
   const envIconColor = useColorModeValue('#3182CE', '#90cdf4')
   const dividerColor = useColorModeValue('#0000001f', '#ffffff1A')
+  const labelBgColor = useColorModeValue('#fff', '#1f2733')
+  const labelBorderColor = useColorModeValue('#E2E8F0', '#ffffff29')
 
   const { search, field } = filters
   const { totalRows } = paginationProps
@@ -106,6 +110,7 @@ const ProductTable = ({
 
   const [filterText, setFilterText] = useState(search || '')
   const [activeRow, setActiveRow] = useState(null)
+  const [openTagMenu, setOpenTagMenu] = useState(false)
   const isGithubConfigSaved = useGithubConfigSaved()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -397,20 +402,20 @@ const ProductTable = ({
                   width={'fit-content'}
                   onClick={handleClick}
                 >
-                  {truncatedValue(name, 20)}
+                  {name}
                 </Text>
                 {labels?.map((item) => (
-                    <Tag
-                      py={1}
-                      size='sm'
-                      key={item?.id}
-                      width={'fit-content'}
-                      borderColor={item?.color}
-                      bg={hexToRGBA(item?.color, 0.5)}
-                    >
-                      {item?.name}
-                    </Tag>
-                  ))}
+                  <Tag
+                    py={1}
+                    size='sm'
+                    key={item?.id}
+                    width={'fit-content'}
+                    borderColor={item?.color}
+                    bg={hexToRGBA(item?.color, 0.5)}
+                  >
+                    {item?.name}
+                  </Tag>
+                ))}
               </Flex>
               <Text color={grayColor}>{description}</Text>
             </Flex>
@@ -541,14 +546,15 @@ const ProductTable = ({
       id: 'ACTIONS',
       name: '',
       selector: (row) => {
-        const { enabled } = row
+        const { enabled, labels } = row
         return (
           <Menu>
             <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
               variant='none'
+              as={IconButton}
               color='gray.400'
+              icon={<FaEllipsisV />}
+              onClick={() => setOpenTagMenu(false)}
             />
             <Portal>
               <MenuList fontSize={'sm'}>
@@ -562,7 +568,14 @@ const ProductTable = ({
                 >
                   Edit Product
                 </MenuItem>
-                <Divider />
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    setOpenTagMenu(true)
+                  }}
+                >
+                  {labels?.length > 0 ? 'Update' : 'Add'} Label
+                </MenuItem>
                 {/* UPLOAD SBOM */}
                 <MenuItem
                   onClick={() => {
@@ -626,13 +639,40 @@ const ProductTable = ({
     persistTableHead: true
   }
 
+  useEffect(() => {
+    if (openTagMenu) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'auto'
+    }
+  }, [openTagMenu])
+
   return (
     <>
-      <Card>
+      <Card pos={'relative'}>
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable {...dataTableProps} />
           <Pagination {...paginationProps} />
         </Flex>
+        {openTagMenu && (
+          <Fade initialScale={0.9} in={openTagMenu}>
+            <Box
+              top={'50%'}
+              right='52px'
+              width='300px'
+              bottom={'50%'}
+              position='fixed'
+              height={'432px'}
+              boxShadow={'lg'}
+              borderRadius='md'
+              bg={labelBgColor}
+              transform={`translate(-20%, -50%)`}
+              border={`1px solid ${labelBorderColor}`}
+            >
+              <LabelInput data={activeRow} setOpen={setOpenTagMenu} />
+            </Box>
+          </Fade>
+        )}
       </Card>
 
       {/* UPLOAD SBOM */}

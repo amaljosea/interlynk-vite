@@ -64,7 +64,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
         id: id,
         name: productName,
         desc: productDesc,
-        labelIds
+        labelIds: activeLabels?.map((item) => item?.id)
       }
     }).then((res) => {
       const error = res?.data?.projectGroupUpdate?.errors
@@ -80,10 +80,9 @@ const ProductModal = ({ isOpen, onClose, data }) => {
     e.preventDefault()
     await projectGroupCreate({
       variables: {
-        name: productName,
-        desc: productDesc,
         enabled: true,
-        labelIds
+        name: productName,
+        desc: productDesc
       }
     }).then((res) => {
       const error = res?.data?.projectGroupCreate?.errors
@@ -155,7 +154,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
                     placeholder={`Add product name`}
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl hidden>
                   <FormLabel>Labels</FormLabel>
                   <LynkSelect
                     isMulti
