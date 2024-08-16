@@ -18,8 +18,8 @@ import './main.css'
 
 const { hostname } = window.location
 
-const TRACKING_ID = '411749268'
-hostname === 'app.interlynk.io' && ReactGA.initialize(TRACKING_ID)
+// const TRACKING_ID = '411749268'
+hostname === 'app.interlynk.io' && ReactGA.initialize('G-VDPMCV382D')
 
 Sentry.init({
   environment: window.location.hostname,
