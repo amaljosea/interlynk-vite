@@ -24,16 +24,14 @@ const Vulnerabilities = () => {
 
   const vulnsPermissions = useHasPermission({ parentKey: 'view_feeds' })
 
-  const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
-    GetGlobalVulns,
-    {
+  const { nodes, paginationProps, reset, loading, refetch } =
+    usePaginatatedQuery(GetGlobalVulns, {
       skip: !vulnsPermissions,
       selector: 'organization.vulns',
       variables: {
         ...filters
       }
-    }
-  )
+    })
 
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
     return <VulnInfo vulnId={vulnId} />

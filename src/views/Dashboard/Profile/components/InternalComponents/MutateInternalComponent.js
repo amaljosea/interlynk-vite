@@ -21,13 +21,14 @@ import {
   UnorderedList
 } from '@chakra-ui/react'
 
+import LynkSwitch from 'components/Misc/LynkSwitch'
+
 import useCustomToast from 'hooks/useCustomToast'
 
 import { createOrgComp, updateOrgComp } from 'graphQL/Mutation'
 import { getInternalComponents } from 'graphQL/Queries'
 
 import { TextRegex } from './TestRegex'
-import LynkSwitch from 'components/Misc/LynkSwitch'
 
 const checkIfRegexError = (text) => text.includes('not a valid regex')
 const checkIfDuplicateError = (text) =>
@@ -47,7 +48,6 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
   const [mutate, { loading }] = useMutation(
     isEdit ? updateOrgComp : createOrgComp,
     {
-      refetchQueries: [getInternalComponents],
       onCompleted: (res) => {
         const isRegexError =
           res?.organizationComponentCreate?.errors?.some(checkIfRegexError)

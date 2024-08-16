@@ -138,7 +138,7 @@ const RelationshipDrawer = ({
 
   const [addRelation] = useMutation(CreateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
-  const { data: compDependency, refetch } = useQuery(GetCompDependency, {
+  const { data: compDependency } = useQuery(GetCompDependency, {
     variables: { compId: compId || id, sbomId: sbomId }
   })
 
@@ -195,7 +195,6 @@ const RelationshipDrawer = ({
 
   const handleSave = () => {
     fetchCompData()
-    refetch()
     onClose()
   }
 

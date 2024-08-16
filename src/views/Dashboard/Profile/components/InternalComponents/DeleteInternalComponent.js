@@ -34,7 +34,6 @@ export const DeleteInternalComponent = ({
   const onCancel = () => setIsConfirming(false)
 
   const [deleteComp, { loading: deleting }] = useMutation(deleteOrgComp, {
-    refetchQueries: [getInternalComponents],
     onCompleted: () => {
       showToast({
         description: `Internal component delete successful!`,

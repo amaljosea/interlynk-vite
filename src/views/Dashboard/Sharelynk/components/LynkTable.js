@@ -2,7 +2,7 @@ import { Box, Table, Tbody, Th, Thead, Tr } from '@chakra-ui/react'
 
 import SBOMLinkRow from 'components/Tables/SBOMLinkRow'
 
-const LynkTable = ({ captions, data, refetch }) => {
+const LynkTable = ({ captions, data }) => {
   return (
     <Table variant='simple' size='sm'>
       <Thead>

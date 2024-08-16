@@ -380,7 +380,7 @@ const ProductDetailsMain = () => {
                       fontSize={25}
                       lineHeight={1.2}
                     >
-                      {truncatedValue(name,20)}
+                      {truncatedValue(name, 20)}
                     </Text>
                     {/* PRODUCT DESCRIPTION */}
                     <Text fontSize={'sm'}>{description || ''}</Text>
