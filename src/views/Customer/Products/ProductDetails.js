@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { truncatedValue } from 'utils'
 import SBOM from 'views/Customer/Sbom'
 
 import {
@@ -193,11 +194,17 @@ const ProductDetails = () => {
                 />
                 <Flex gap={0.5} direction={'column'}>
                   {/* PRODUCT TITLE */}
-                  <Text fontWeight={'semibold'} fontSize={25}>
-                    {name || ''}
+                  <Text
+                    fontWeight={'semibold'}
+                    wordBreak={'break-all'}
+                    fontSize={25}
+                  >
+                    {truncatedValue(name, 30) || ''}
                   </Text>
                   {/* PRODUCT DESCRIPTION */}
-                  <Text fontSize={'sm'}>{description || ''}</Text>
+                  <Text fontSize={'sm'} wordBreak={'break-all'}>
+                    {description || ''}
+                  </Text>
                 </Flex>
               </Flex>
             </GridItem>
