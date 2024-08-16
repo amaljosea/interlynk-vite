@@ -79,7 +79,7 @@ import CompDrawer from '../components/CompDrawer'
 import HealthMap from '../components/HealthMap'
 import CompFilters from './CompFilters'
 
-const Components = ({ sbomData, sbomRefetch }) => {
+const Components = ({ sbomData }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
@@ -1218,6 +1218,7 @@ const Components = ({ sbomData, sbomRefetch }) => {
           isOpen={isCompOpen}
           onClose={onCompClose}
           refetch={fetchCompData}
+          primaryComp={primaryComponent}
         />
       )}
     </>

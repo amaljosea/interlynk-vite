@@ -17,10 +17,12 @@ import {
   Text,
   Textarea,
   Tooltip,
-  chakra
+  chakra,
+  useDisclosure
 } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
+import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -28,13 +30,15 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { UpdateComponent } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
 
-const CompDetails = ({ data }) => {
+const CompDetails = ({ data, primaryComp }) => {
   const { showToast } = useCustomToast()
   const params = useParams()
   const location = useLocation()
-  const productId = params.productid
   const sbomId = params.sbomid
+  const productId = params.productid
   const customerView = location.pathname.startsWith('/customer')
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const { prodCompState, dispatch } = useGlobalState()
   const { expLicense } = prodCompState
@@ -126,223 +130,236 @@ const CompDetails = ({ data }) => {
     compKind === '' || compName === '' || compVersion === '' || disabled
 
   return (
-    <Stack direction={'column'} spacing={4} px={6}>
-      {/* Name */}
-      <FormControl isReadOnly={customerView}>
-        <FormLabel htmlFor='compName' fontSize={'sm'}>
-          <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-            <Text>
-              Name
-              <chakra.span color={'red.500'} ml={1}>
-                *
-              </chakra.span>
-            </Text>
-            <Tooltip label={onCheck(`Component Name`)}>
-              <InfoIcon color={'blue.500'} />
-            </Tooltip>
-          </Flex>
-        </FormLabel>
-        <Input
-          size='md'
-          fontSize={'sm'}
-          placeholder='Enter name'
-          value={compName}
-          onChange={(e) => setCompName(e.target.value)}
-        />
-      </FormControl>
-      {/* Description */}
-      <FormControl isReadOnly={customerView}>
-        <FormLabel htmlFor='compDescription' fontSize={'sm'}>
-          <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-            <Text>Description</Text>
-            <Tooltip label={onCheck(`Component Description`)}>
-              <InfoIcon color={'blue.500'} />
-            </Tooltip>
-          </Flex>
-        </FormLabel>
-        <Textarea
-          size='md'
-          fontSize={'sm'}
-          placeholder='Add description'
-          value={compDesc}
-          onChange={(e) => setCompDesc(e.target.value)}
-        />
-      </FormControl>
-      {/* Version */}
-      <FormControl
-        isReadOnly={customerView}
-        isInvalid={data?.version !== compVersion && isExists}
-      >
-        <FormLabel htmlFor='compVersion' fontSize={'sm'}>
-          <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-            <Text>
-              Version{' '}
-              <chakra.span color={'red.500'} ml={1}>
-                *
-              </chakra.span>
-            </Text>
-            <Tooltip label={onCheck(`Component Version`)}>
-              <InfoIcon color={'blue.500'} />
-            </Tooltip>
-          </Flex>
-        </FormLabel>
-        <Input
-          size='md'
-          fontSize={'sm'}
-          placeholder='Enter version'
-          value={compVersion}
-          onChange={(e) => setCompVersion(e.target.value)}
-        />
-        <FormErrorMessage>
-          This version of the product already exists. Continuing will override
-          one of these versions.
-        </FormErrorMessage>
-      </FormControl>
-      {/* GROUP */}
-      <FormControl isReadOnly={customerView}>
-        <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
-          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-            <Text>Group</Text>
-            <Tooltip label={onCheck(`Component Group`)}>
-              <InfoIcon color={'blue.500'} />
-            </Tooltip>
-          </Flex>
-        </FormLabel>
-        <Input
-          size='md'
-          fontSize={'sm'}
-          placeholder='Add group'
-          value={groupInfo}
-          onChange={(e) => setGroupInfo(e.target.value)}
-        />
-      </FormControl>
-      {/* KIND */}
-      <FormControl>
-        <FormLabel htmlFor='componentType' fontSize={'sm'}>
-          <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-            <Text>
-              Type{' '}
-              <chakra.span color={'red.500'} ml={1}>
-                *
-              </chakra.span>
-            </Text>
-            <Tooltip label={onCheck(`Component Type`)}>
-              <InfoIcon color={'blue.500'} />
-            </Tooltip>
-          </Flex>
-        </FormLabel>
-        <Select
-          id='componentType'
-          name='componentType'
-          size='md'
-          fontSize={'sm'}
-          value={compKind}
-          isDisabled={customerView}
-          onChange={(e) => setCompKind(e.target.value)}
-          textTransform={'capitalize'}
+    <>
+      <Stack direction={'column'} spacing={4} px={6}>
+        {/* Name */}
+        <FormControl isReadOnly={customerView}>
+          <FormLabel htmlFor='compName' fontSize={'sm'}>
+            <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+              <Text>
+                Name
+                <chakra.span color={'red.500'} ml={1}>
+                  *
+                </chakra.span>
+              </Text>
+              <Tooltip label={onCheck(`Component Name`)}>
+                <InfoIcon color={'blue.500'} />
+              </Tooltip>
+            </Flex>
+          </FormLabel>
+          <Input
+            size='md'
+            fontSize={'sm'}
+            placeholder='Enter name'
+            value={compName}
+            onChange={(e) => setCompName(e.target.value)}
+          />
+        </FormControl>
+        {/* Description */}
+        <FormControl isReadOnly={customerView}>
+          <FormLabel htmlFor='compDescription' fontSize={'sm'}>
+            <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+              <Text>Description</Text>
+              <Tooltip label={onCheck(`Component Description`)}>
+                <InfoIcon color={'blue.500'} />
+              </Tooltip>
+            </Flex>
+          </FormLabel>
+          <Textarea
+            size='md'
+            fontSize={'sm'}
+            placeholder='Add description'
+            value={compDesc}
+            onChange={(e) => setCompDesc(e.target.value)}
+          />
+        </FormControl>
+        {/* Version */}
+        <FormControl
+          isReadOnly={customerView}
+          isInvalid={data?.version !== compVersion && isExists}
         >
-          <option value='' style={{ background: 'lightgray' }}>
-            -- Select --
-          </option>
-          {[
-            'application',
-            'framework',
-            'library',
-            'container',
-            'platform',
-            'operating-system',
-            'device',
-            'device-driver',
-            'firmware',
-            'file',
-            'machine-learning-model',
-            'data'
-          ].map((item, index) => (
-            <option
-              key={index}
-              value={item}
-              style={{ textTransform: 'capitalize' }}
-            >
-              {item}
+          <FormLabel htmlFor='compVersion' fontSize={'sm'}>
+            <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+              <Text>
+                Version{' '}
+                <chakra.span color={'red.500'} ml={1}>
+                  *
+                </chakra.span>
+              </Text>
+              <Tooltip label={onCheck(`Component Version`)}>
+                <InfoIcon color={'blue.500'} />
+              </Tooltip>
+            </Flex>
+          </FormLabel>
+          <Input
+            size='md'
+            fontSize={'sm'}
+            placeholder='Enter version'
+            value={compVersion}
+            onChange={(e) => setCompVersion(e.target.value)}
+          />
+          <FormErrorMessage>
+            This version of the product already exists. Continuing will override
+            one of these versions.
+          </FormErrorMessage>
+        </FormControl>
+        {/* GROUP */}
+        <FormControl isReadOnly={customerView}>
+          <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
+            <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+              <Text>Group</Text>
+              <Tooltip label={onCheck(`Component Group`)}>
+                <InfoIcon color={'blue.500'} />
+              </Tooltip>
+            </Flex>
+          </FormLabel>
+          <Input
+            size='md'
+            fontSize={'sm'}
+            placeholder='Add group'
+            value={groupInfo}
+            onChange={(e) => setGroupInfo(e.target.value)}
+          />
+        </FormControl>
+        {/* KIND */}
+        <FormControl>
+          <FormLabel htmlFor='componentType' fontSize={'sm'}>
+            <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+              <Text>
+                Type{' '}
+                <chakra.span color={'red.500'} ml={1}>
+                  *
+                </chakra.span>
+              </Text>
+              <Tooltip label={onCheck(`Component Type`)}>
+                <InfoIcon color={'blue.500'} />
+              </Tooltip>
+            </Flex>
+          </FormLabel>
+          <Select
+            id='componentType'
+            name='componentType'
+            size='md'
+            fontSize={'sm'}
+            value={compKind}
+            isDisabled={customerView}
+            onChange={(e) => setCompKind(e.target.value)}
+            textTransform={'capitalize'}
+          >
+            <option value='' style={{ background: 'lightgray' }}>
+              -- Select --
             </option>
-          ))}
-        </Select>
-      </FormControl>
-      {/* LICENSES */}
-      <LicenseField
-        sbomView={false}
-        isDisabled={customerView}
-        license={data?.licensesExp}
-      />
-      {/* SCOPE */}
-      <FormControl>
-        <FormLabel htmlFor='compScope'>
-          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-            <Text>Scope</Text>
-            <Tooltip label={onCheck(`Component Scope`)}>
+            {[
+              'application',
+              'framework',
+              'library',
+              'container',
+              'platform',
+              'operating-system',
+              'device',
+              'device-driver',
+              'firmware',
+              'file',
+              'machine-learning-model',
+              'data'
+            ].map((item, index) => (
+              <option
+                key={index}
+                value={item}
+                style={{ textTransform: 'capitalize' }}
+              >
+                {item}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+        {/* LICENSES */}
+        <LicenseField
+          sbomView={false}
+          isDisabled={customerView}
+          license={data?.licensesExp}
+        />
+        {/* SCOPE */}
+        <FormControl>
+          <FormLabel htmlFor='compScope'>
+            <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+              <Text>Scope</Text>
+              <Tooltip label={onCheck(`Component Scope`)}>
+                <InfoIcon color={'blue.500'} />
+              </Tooltip>
+            </Flex>
+          </FormLabel>
+          <Select
+            id='compScope'
+            name='compScope'
+            size='md'
+            fontSize={'sm'}
+            value={compScope}
+            isDisabled={customerView}
+            onChange={(e) => setCompScope(e.target.value)}
+          >
+            <option value='' style={{ background: 'lightgray' }}>
+              -- Select --
+            </option>
+            <option value='excluded'>Excluded</option>
+            <option value='optional'>Optional</option>
+            <option value='required'>Required</option>
+          </Select>
+        </FormControl>
+        {/* PRIMARY COMPONENT */}
+        <FormControl isReadOnly={customerView}>
+          <Flex alignItems={'center'} gap={2}>
+            <Checkbox
+              size='sm'
+              onChange={onOpen}
+              colorScheme='blue'
+              isChecked={isPrimary}
+            >
+              Primary component
+            </Checkbox>
+            <Tooltip label={onCheck(`Primary Component`)}>
               <InfoIcon color={'blue.500'} />
             </Tooltip>
           </Flex>
-        </FormLabel>
-        <Select
-          id='compScope'
-          name='compScope'
-          size='md'
-          fontSize={'sm'}
-          value={compScope}
-          isDisabled={customerView}
-          onChange={(e) => setCompScope(e.target.value)}
+        </FormControl>
+        {/* INTERNAL COMPONENT */}
+        <FormControl isReadOnly={customerView}>
+          <Flex alignItems={'center'} gap={2}>
+            <Checkbox
+              size='sm'
+              colorScheme='blue'
+              isChecked={isInternal}
+              onChange={() => setIsInternal(!isInternal)}
+            >
+              Internal component
+            </Checkbox>
+            <Tooltip label={onCheck(`Internal Component`)}>
+              <InfoIcon color={'blue.500'} />
+            </Tooltip>
+          </Flex>
+        </FormControl>
+        <Button
+          colorScheme='blue'
+          variant={'outline'}
+          width={'fit-content'}
+          isDisabled={isInvalid}
+          onClick={handleUpdateCom}
         >
-          <option value='' style={{ background: 'lightgray' }}>
-            -- Select --
-          </option>
-          <option value='excluded'>Excluded</option>
-          <option value='optional'>Optional</option>
-          <option value='required'>Required</option>
-        </Select>
-      </FormControl>
-      {/* PRIMARY COMPONENT */}
-      <FormControl isReadOnly={customerView}>
-        <Flex alignItems={'center'} gap={2}>
-          <Checkbox
-            size='sm'
-            colorScheme='blue'
-            isChecked={isPrimary}
-            onChange={() => setIsPrimary(!isPrimary)}
-          >
-            Primary component
-          </Checkbox>
-          <Tooltip label={onCheck(`Primary Component`)}>
-            <InfoIcon color={'blue.500'} />
-          </Tooltip>
-        </Flex>
-      </FormControl>
-      {/* INTERNAL COMPONENT */}
-      <FormControl isReadOnly={customerView}>
-        <Flex alignItems={'center'} gap={2}>
-          <Checkbox
-            size='sm'
-            colorScheme='blue'
-            isChecked={isInternal}
-            onChange={() => setIsInternal(!isInternal)}
-          >
-            Internal component
-          </Checkbox>
-          <Tooltip label={onCheck(`Internal Component`)}>
-            <InfoIcon color={'blue.500'} />
-          </Tooltip>
-        </Flex>
-      </FormControl>
-      <Button
-        colorScheme='blue'
-        variant={'outline'}
-        width={'fit-content'}
-        isDisabled={isInvalid}
-        onClick={handleUpdateCom}
-      >
-        Save
-      </Button>
-    </Stack>
+          Save
+        </Button>
+      </Stack>
+
+      {isOpen && (
+        <PrimaryWarning
+          isOpen={isOpen}
+          name={compName}
+          onClose={onClose}
+          version={compVersion}
+          setData={setIsPrimary}
+          primaryComp={primaryComp}
+        />
+      )}
+    </>
   )
 }
 

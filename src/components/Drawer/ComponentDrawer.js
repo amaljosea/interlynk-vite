@@ -26,16 +26,8 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Stack,
-  Tag,
   Text,
   Textarea,
   chakra,
@@ -46,6 +38,7 @@ import CpeField from 'components/CpeField'
 import InfoModal from 'components/InfoModal'
 import LicenseField from 'components/Licenses/LicenseField'
 import Info from 'components/Misc/Info'
+import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -821,62 +814,16 @@ function ComponentDrawer(props) {
         />
       )}
 
-      {/* DISABLE */}
+      {/* PRIMARY COMPONENT WARNING */}
       {isWarningOpen && (
-        <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Primary Component Change</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>
-                You are about to change primary component
-                <br />
-                <br />
-                From:
-                <br />
-                <Tag py={1} wordBreak={'break-all'}>
-                  {primaryComp?.name ? primaryComp?.name : 'None'}
-                  {primaryComp?.version ? `- ${primaryComp?.version}` : ''}
-                </Tag>
-                <br />
-                <br />
-                To:
-                <br />
-                <Tag py={1} wordBreak={'break-all'}>
-                  {primaryComp?.name === compName ? 'None' : compName}
-                  {primaryComp?.name === compName ? '' : `- ${compVersion}`}
-                </Tag>
-              </Text>
-              <br />
-              <Tag
-                py={1}
-                variant='subtle'
-                colorScheme='red'
-                hidden={!isExists}
-                wordBreak={'break-all'}
-              >
-                This version of the product already exists. Continuing will
-                override one of these versions.
-              </Tag>
-              <Text mt={6}>Are you sure you wish to continue ?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onWarningClose}>
-                No
-              </Button>
-              <Button
-                colorScheme={'red'}
-                onClick={() => {
-                  setIsPrimary(!isPrimary)
-                  onWarningClose()
-                }}
-              >
-                Yes
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <PrimaryWarning
+          name={compName}
+          version={compVersion}
+          isOpen={isWarningOpen}
+          setData={setIsPrimary}
+          onClose={onWarningClose}
+          primaryComp={primaryComp}
+        />
       )}
 
       {/* INFO MODAL */}

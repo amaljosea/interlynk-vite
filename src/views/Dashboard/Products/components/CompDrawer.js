@@ -28,7 +28,7 @@ import CompLinks from './CompLinks'
 import CompRelations from './CompRelations'
 import CompSupplier from './CompSupplier'
 
-const CompDrawer = ({ isOpen, onClose, data }) => {
+const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   const params = useParams()
   const sbomId = params.sbomid
   const bgColor = useColorModeValue('white', 'gray.700')
@@ -82,7 +82,7 @@ const CompDrawer = ({ isOpen, onClose, data }) => {
             </TabList>
             <TabPanels pos={'relative'} top={12} overflowX={'hidden'}>
               <TabPanel px={0}>
-                <CompDetails data={data} />
+                <CompDetails data={data} primaryComp={primaryComp} />
               </TabPanel>
               <TabPanel px={0}>
                 <CompIdentifiers data={data} />
