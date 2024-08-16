@@ -212,7 +212,7 @@ const JiraConfigModal = ({
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Configure JIRA Connection </ModalHeader>
+        <ModalHeader>JIRA Configuration</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <FormControl isRequired mt={4} isDisabled={!updateCon}>
