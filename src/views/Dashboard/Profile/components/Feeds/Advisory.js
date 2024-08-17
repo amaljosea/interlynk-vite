@@ -74,7 +74,7 @@ const AdvisoryFeeds = ({ data, manageFeeds }) => {
                     >
                       {feed.setting.friendlyName}
                     </Text>
-                    <Tag hidden={activeFeed?.value} size='sm'>
+                    <Tag hidden={activeFeed?.value} size='sm' fontSize='10'>
                       Coming soon
                     </Tag>
                   </Flex>
