@@ -14,7 +14,7 @@ const ProductDetailsSbomNew = () => {
 
   const { setIsOpen, setCurrentStep } = useTour()
 
-  const { data, loading, error, refetch } = useQuery(ShareProductData, {
+  const { data, loading, error } = useQuery(ShareProductData, {
     variables: { projectId: productId, sbomId: sbomId },
     onCompleted: (data) => {
       const tour = localStorage.getItem('tourCompleted')
