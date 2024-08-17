@@ -7,7 +7,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { sbomUpdate } from 'graphQL/Mutation'
 
-const ArchiveSbom = ({ isOpen, onClose, data }) => {
+const ArchiveSbom = ({ isOpen, onClose, data, projectGroup }) => {
   const { showToast } = useCustomToast()
   const { id, spec, lifecycle, projectVersion } = data || ''
   const { setClearSelect, setSelectedSbom } = useGlobalState()
@@ -46,7 +46,7 @@ const ArchiveSbom = ({ isOpen, onClose, data }) => {
     isOpen,
     onClose,
     onConfirm: onArchive,
-    name: projectVersion,
+    name: `${projectGroup?.name} - ${projectVersion}`,
     title: `${isArchived ? 'Restore' : 'Archive'} Version`,
     description: `${isArchived ? 'Restoring' : 'Archiving'} this version will:`,
     items: [

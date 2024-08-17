@@ -7,7 +7,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { sbomDelete } from 'graphQL/Mutation'
 
-const DeleteSbom = ({ isOpen, onClose, data }) => {
+const DeleteSbom = ({ isOpen, onClose, data, projectGroup }) => {
   const { showToast } = useCustomToast()
   const { id, projectVersion } = data || ''
   const { setClearSelect, setSelectedSbom } = useGlobalState()
@@ -42,7 +42,7 @@ const DeleteSbom = ({ isOpen, onClose, data }) => {
     isOpen,
     onClose,
     onConfirm: onDelete,
-    name: projectVersion,
+    name: `${projectGroup?.name} - ${projectVersion}`,
     title: 'Delete Version',
     description: 'Deleting this version will:',
     items: [

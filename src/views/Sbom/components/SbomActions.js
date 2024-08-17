@@ -442,7 +442,7 @@ const SbomActions = ({ sbom, refetch }) => {
           isOpen={isDeleteOpen}
           onClose={setDeleteClose}
           onConfirm={handleDelete}
-          name={sbom?.projectVersion}
+          name={`${sbom?.project?.projectGroup?.name} - ${sbom?.projectVersion}`}
           title='Delete Version'
           description='Deleting this version will:'
           items={[

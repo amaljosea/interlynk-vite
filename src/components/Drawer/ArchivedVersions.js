@@ -28,7 +28,7 @@ import { GetArchivedVersions, GetVersions } from 'graphQL/Queries'
 
 import { MdOutlineUnarchive } from 'react-icons/md'
 
-const ArchivedVersions = ({ isOpen, onClose }) => {
+const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
   const { showToast } = useCustomToast()
   const params = useParams()
   const productId = params?.productid
@@ -163,6 +163,7 @@ const ArchivedVersions = ({ isOpen, onClose }) => {
           data={activeRow}
           isOpen={isWarnOpen}
           onClose={onWarnClose}
+          projectGroup={projectGroup}
         />
       )}
     </>

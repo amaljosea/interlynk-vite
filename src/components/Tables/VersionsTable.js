@@ -670,6 +670,7 @@ const VersionsTable = ({
       {isDeleteOpen && (
         <DeleteSbom
           data={activeRow}
+          projectGroup={projectGroup}
           isOpen={isDeleteOpen}
           onClose={onDeleteClose}
         />
@@ -679,6 +680,7 @@ const VersionsTable = ({
       {isArchiveOpen && (
         <ArchiveSbom
           data={activeRow}
+          projectGroup={projectGroup}
           isOpen={isArchiveOpen}
           onClose={onArchiveClose}
         />
@@ -686,7 +688,11 @@ const VersionsTable = ({
 
       {/* ARCHIVE VERSION LIST */}
       {isArcOpen && (
-        <ArchivedVersions isOpen={isArcOpen} onClose={onArcClose} />
+        <ArchivedVersions
+          isOpen={isArcOpen}
+          onClose={onArcClose}
+          projectGroup={projectGroup}
+        />
       )}
 
       {/* SBOM LIST */}
