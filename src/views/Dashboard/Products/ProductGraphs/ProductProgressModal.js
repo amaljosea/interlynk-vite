@@ -205,12 +205,10 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
       <DrawerOverlay />
       <DrawerContent style={customDrawerStyle}>
         <DrawerHeader>
-          <Flex align='center' gap={2}>
-            <Text fontSize={20} fontWeight={500}>
-              Product TrailLynk
-            </Text>
-            <Tag>{`Product ${name}`}</Tag>
-          </Flex>
+          <Text fontSize={20} fontWeight={500}>
+            Product TrailLynk
+          </Text>
+          <Tag colorScheme='blue'>{name}</Tag>
         </DrawerHeader>
         <Divider />
         <DrawerCloseButton />

@@ -442,7 +442,7 @@ const ProductDetailsMain = () => {
                   >
                     {/* VIEW PRODUCT PROGRESS */}
                     {shouldShowDemoFeatures && (
-                      <Tooltip label='View Product Progress'>
+                      <Tooltip label='View Product TrailLynk'>
                         <IconButton
                           icon={<FaDiagramProject />}
                           colorScheme='blue'

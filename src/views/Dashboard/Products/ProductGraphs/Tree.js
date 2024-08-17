@@ -1,4 +1,5 @@
 import * as d3 from 'd3'
+import bugIcon from 'assets/svg/bug.svg'
 import { useEffect, useRef } from 'react'
 
 import { useColorModeValue } from '@chakra-ui/system'
@@ -20,8 +21,8 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
       options = {}
     ) {
       const {
-        indentSpacing = 20,
-        lineSpacing = 30,
+        indentSpacing = 22,
+        lineSpacing = 32,
         duration = 300,
         radius = 6,
         minHeight = 20,
@@ -214,7 +215,7 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
           .attr('x', 5 + boxSize / 2)
           .attr('text-anchor', 'start')
           .attr('dy', '0.32em')
-          .attr('font-size', '12px')
+          .attr('font-size', '14px')
           .attr('fill', (d) => {
             if (d.data.name === targetComponent) return componentColor
             if (d.data.name === targetVulnerability) return vulnerabilityColor
@@ -229,9 +230,22 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
               return '400'
             return '300'
           })
-          .text((d) => {
-            return d.data.name
-          })
+          .text((d) => d.data.name)
+
+        const iconSize = 20
+        const iconMarginLeft = 18
+
+        nodeEnter
+          .filter((d) => d.data.name === targetVulnerability)
+          .append('image')
+          .attr(
+            'x',
+            (d) => label.node().getComputedTextLength() + iconMarginLeft
+          )
+          .attr('y', -iconSize / 2)
+          .attr('width', iconSize)
+          .attr('height', iconSize)
+          .attr('href', bugIcon)
 
         const nodeUpdate = node
           .merge(nodeEnter)
@@ -364,7 +378,7 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
     collapsibleIndent(data, targetComponent, targetVulnerability)
   }, [data, targetComponent, targetVulnerability])
 
-  return <svg ref={svgRef} width='100%' height='100%'></svg>
+  return <svg ref={svgRef} width='100%' height='100%' />
 }
 
 export default Tree
