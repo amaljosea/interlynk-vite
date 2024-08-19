@@ -86,7 +86,8 @@ const LabelInput = ({ data, setOpen, onOpenLabel }) => {
         py={5}
         gap={4}
         ref={inputRef}
-        height={'250px'}
+        minH={'auto'}
+        maxH={'250px'}
         flexDir={'column'}
         overflow={'hidden'}
         overflowY={'scroll'}
@@ -122,19 +123,20 @@ const LabelInput = ({ data, setOpen, onOpenLabel }) => {
       alignItems={'center'}
     >
       <Text py={5} color={'gray.500'}>
-        No labels present
+        No Labels Present
       </Text>
       <Divider />
       <Button
         my={1}
         w={'100%'}
+        color={'blue.500'}
         variant='unstyled'
         onClick={() => {
           setOpen(false)
           onOpenLabel()
         }}
       >
-        Create label
+        Create Label
       </Button>
     </Flex>
   )
