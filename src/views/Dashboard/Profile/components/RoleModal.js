@@ -4,21 +4,16 @@ import { useEffect, useState } from 'react'
 import {
   Alert,
   AlertIcon,
-  Button,
   FormControl,
   FormLabel,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Stack,
   Text
 } from '@chakra-ui/react'
+
+import { ChangeRoleIcon } from 'components/Icons/Icons'
+import LynkModal from 'components/LynkModal'
 
 import { UpdateOrganizationUserRole } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
@@ -53,60 +48,47 @@ const RoleModal = ({ isOpen, onClose, data }) => {
   }, [data])
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Change Role</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
-            {error !== '' && (
-              <Alert status='error' borderRadius={4}>
-                <AlertIcon />
-                <Text fontSize={'sm'}>{error}</Text>
-              </Alert>
-            )}
-            {/* NAME */}
-            <FormControl>
-              <FormLabel>Name</FormLabel>
-              <Input type='text' defaultValue={data?.name || ''} isReadOnly />
-            </FormControl>
-            {/* ROLES */}
-            {roles && (
-              <FormControl>
-                <FormLabel>Role</FormLabel>
-                <Select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  textTransform={'capitalize'}
-                >
-                  <option value=''>-- Select --</option>
-                  {roles?.organization?.organizationRoles.map((item, index) => (
-                    <option key={index} value={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-          </Stack>
-        </ModalBody>
-
-        <ModalFooter>
-          <Button mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            variant='solid'
-            colorScheme='blue'
-            onClick={updateRole}
-            disabled={role === ''}
-          >
-            Update
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={updateRole}
+      title={'Change Role'}
+      Icon={ChangeRoleIcon}
+      disabled={role === ''}
+      buttonText='Update'
+    >
+      <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
+        {error !== '' && (
+          <Alert status='error' borderRadius={4}>
+            <AlertIcon />
+            <Text fontSize={'sm'}>{error}</Text>
+          </Alert>
+        )}
+        {/* NAME */}
+        <FormControl>
+          <FormLabel fontSize={12}>Name</FormLabel>
+          <Input type='text' defaultValue={data?.name || ''} isReadOnly />
+        </FormControl>
+        {/* ROLES */}
+        {roles && (
+          <FormControl>
+            <FormLabel fontSize={12}>Role</FormLabel>
+            <Select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              textTransform={'capitalize'}
+            >
+              <option value=''>-- Select --</option>
+              {roles?.organization?.organizationRoles.map((item, index) => (
+                <option key={index} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+      </Stack>
+    </LynkModal>
   )
 }
 
