@@ -3,13 +3,8 @@ import styled from '@emotion/styled'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
-import {
-  GetIcon,
-  customStyles,
-  getFullDateAndTime,
-  isUnknown,
-  timeSince
-} from 'utils'
+import { GetIcon, customStyles, timeSince } from 'utils'
+import { getFullDateAndTime, isUnknown } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 import { openSsf } from 'variables/general'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -37,6 +32,7 @@ import {
   Text,
   Tooltip,
   VStack,
+  useColorMode,
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
@@ -87,9 +83,11 @@ const Components = ({ sbomData }) => {
   const expandView = useQueryParam('expand')
   const customerView = location.pathname.startsWith('/customer')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const { colorMode } = useColorMode()
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const iconColor = useColorModeValue('#2D3748', '#EDF2F7')
 
   const { prodCompState, dispatch } = useGlobalState()
   const {
@@ -273,11 +271,12 @@ const Components = ({ sbomData }) => {
           (item) => item.name === 'issue-tracker'
         )
         const vcs = externalUrls?.find((item) => item.name === 'vcs')
-        const icon = unknown ? (
-          <BsFillPatchQuestionFill fontSize={24} />
-        ) : (
-          GetIcon(purl?.split('/')[0])
-        )
+        const icon =
+          unknown || !purl ? (
+            <BsFillPatchQuestionFill fontSize={24} color={iconColor} />
+          ) : (
+            GetIcon(purl?.split('/')[0], colorMode)
+          )
         return (
           <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
             <GridItem colSpan={1} width={'50px'}>

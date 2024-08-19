@@ -111,12 +111,17 @@ export const getConImg = (name) => {
   }
 }
 
-export const GetIcon = (name) => {
+export const GetIcon = (name, colorMode) => {
+  const light = { filter: 'none' }
+  const dark = { filter: 'brightness(0) invert(1)' }
+  const iconStyle = colorMode === 'light' ? light : dark
   switch (name) {
     case 'pkg:golang':
       return <img width={'36px'} src={GolangIcon} alt='golang' />
     case 'pkg:maven':
-      return <img width={'24px'} src={MavenIcon} alt='maven' />
+      return (
+        <img width={'24px'} style={iconStyle} src={MavenIcon} alt='maven' />
+      )
     case 'pkg:apache':
       return <img width={'24px'} src={MavenIcon} alt='apache' />
     case 'pkg:bitbucket':
@@ -160,7 +165,9 @@ export const GetIcon = (name) => {
     case 'pkg:npm':
       return <img src={NpmIcon} width={'26px'} alt='npm' />
     case 'pkg:nuget':
-      return <img src={NugetIcon} width={'28px'} alt='nuget' />
+      return (
+        <img src={NugetIcon} style={iconStyle} width={'28px'} alt='nuget' />
+      )
     case 'pkg:qpkg':
       return <img src={QpkgIcon} width={'28px'} alt='qpkg' />
     case 'pkg:oci':
