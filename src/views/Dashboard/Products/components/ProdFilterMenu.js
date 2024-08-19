@@ -13,6 +13,7 @@ import {
 
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
+
 import { GetLabels } from 'graphQL/Queries'
 
 const ProdFilterMenu = ({ filters, setFilters }) => {
@@ -62,7 +63,7 @@ const ProdFilterMenu = ({ filters, setFilters }) => {
       <Box
         width={'fit-content'}
         position={'relative'}
-        display={'flex'}
+        display={nodes?.length > 0 ? 'flex' : 'none'}
       >
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Labels'} active={labelIds?.length !== 0} />

@@ -33,8 +33,6 @@ const GeneralFeed = () => {
     skip: !orgView || customerView
   })
 
-  const { name } = data?.organization || ''
-
   const updateOrgs = useHasPermission({
     parentKey: 'view_organization',
     childKey: 'update_organization'
@@ -52,40 +50,26 @@ const GeneralFeed = () => {
       variables: {
         name: orgName
       }
+    }).then((res) => {
+      if (res.data.organizationUpdate.errors.length === 0) {
+        localStorage.setItem('organization', orgName)
+        setMessage('Saving....')
+        setTimeout(() => {
+          setMessage('Update')
+          showToast({
+            description: 'Organization name updated successfully',
+            status: 'success'
+          })
+        }, 2000)
+      }
     })
-      .then((res) => {
-        if (res.data.organizationUpdate.errors.length === 0) {
-          localStorage.setItem('organization', orgName)
-          setMessage('Saving....')
-          setTimeout(() => {
-            setMessage('Update')
-            showToast({
-              description: 'Organization name updated successfully',
-              status: 'success'
-            })
-          }, 2000)
-        }
-      })
-      .then((res) => {
-        if (res.data.organizationUpdate.errors.length === 0) {
-          localStorage.setItem('organization', orgName)
-          setMessage('Saving....')
-          setTimeout(() => {
-            setMessage('Update')
-            showToast({
-              description: 'Organization name updated successfully',
-              status: 'success'
-            })
-          }, 2000)
-        }
-      })
   }
 
   useEffect(() => {
-    if (name) {
-      setOrgName(name)
+    if (data?.organization) {
+      setOrgName(data?.organization?.name)
     }
-  }, [name])
+  }, [data])
 
   return (
     <Card p={0}>

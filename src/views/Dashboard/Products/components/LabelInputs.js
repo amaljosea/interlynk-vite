@@ -107,6 +107,7 @@ const LabelInputs = ({ activeRow, setActiveRow }) => {
           <Input
             name='name'
             fontSize='sm'
+            maxLength={'15'}
             value={labelData?.name}
             onChange={handleChange}
           />

@@ -5,6 +5,7 @@ import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, hexToRGBA, timeSince } from 'utils'
 import { customStyles, getFormat, getLink, getType } from 'utils'
+import { truncatedValue } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
 import LabelInput from 'views/Dashboard/Products/components/LabelInput'
@@ -270,7 +271,7 @@ const ProductTable = ({
             </Tooltip>
           )}
           {/* EDIT LABEL */}
-          <Tooltip label='Edit Label'>
+          <Tooltip label='Manage Labels'>
             <IconButton
               icon={<FaTag />}
               variant='outline'
@@ -342,7 +343,7 @@ const ProductTable = ({
           />
         )
       },
-      width: '10%',
+      width: '100px',
       sortable: true
     },
     // PRODUCT
@@ -374,7 +375,7 @@ const ProductTable = ({
           <Flex
             my={3}
             alignItems={'center'}
-            gap={3}
+            gap={shouldShowDemoFeatures ? 3 : 0}
             className={index === 0 ? 'product' : ''}
           >
             <Tooltip label={getFormat(name)} placement='top'>
@@ -402,7 +403,7 @@ const ProductTable = ({
                   width={'fit-content'}
                   onClick={handleClick}
                 >
-                  {name}
+                  {truncatedValue(name, 54)}
                 </Text>
                 {labels?.map((item) => (
                   <Tag
@@ -655,21 +656,24 @@ const ProductTable = ({
           <Pagination {...paginationProps} />
         </Flex>
         {openTagMenu && (
-          <Fade initialScale={0.9} in={openTagMenu}>
+          <Fade initialScale={0.9} in={openTagMenu} delay={0.2}>
             <Box
-              top={'50%'}
               right='52px'
-              width='300px'
+              width='220px'
               bottom={'50%'}
               position='fixed'
-              height={'432px'}
+              height={'auto'}
               boxShadow={'lg'}
               borderRadius='md'
               bg={labelBgColor}
-              transform={`translate(-20%, -50%)`}
+              transform={`translate(-20%, 60%)`}
               border={`1px solid ${labelBorderColor}`}
             >
-              <LabelInput data={activeRow} setOpen={setOpenTagMenu} />
+              <LabelInput
+                data={activeRow}
+                setOpen={setOpenTagMenu}
+                onOpenLabel={onOpenLabel}
+              />
             </Box>
           </Fade>
         )}

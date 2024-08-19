@@ -1,37 +1,22 @@
 import { useMutation, useQuery } from '@apollo/client'
-import React, { useEffect, useState } from 'react'
-import { hexToRGBA, truncatedValue } from 'utils'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { hexToRGBA } from 'utils'
 
-import {
-  Button,
-  ButtonGroup,
-  Checkbox,
-  Divider,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Tag,
-  Text
-} from '@chakra-ui/react'
-
-import CustomLoader from 'components/CustomLoader'
-
-import useCustomToast from 'hooks/useCustomToast'
+import { Button, Checkbox, Divider, Flex, Tag, Text } from '@chakra-ui/react'
 
 import { UpdateProjectGroup } from 'graphQL/Mutation'
 import { GetLabels } from 'graphQL/Queries'
 
-const LabelInput = ({ data, setOpen }) => {
+const LabelInput = ({ data, setOpen, onOpenLabel }) => {
   const { id, name, desc, labels } = data || ''
-  const { showToast } = useCustomToast()
   const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
 
-  const { data: prodLabels, loading } = useQuery(GetLabels, {
+  const { data: prodLabels } = useQuery(GetLabels, {
     variables: { first: 100 }
   })
   const { nodes } = prodLabels?.labels || ''
 
+  const inputRef = useRef()
   const [selectedLabels, setSelectedLabels] = useState([])
 
   const addLabels = (id) => {
@@ -43,7 +28,7 @@ const LabelInput = ({ data, setOpen }) => {
     }
   }
 
-  const updateProduct = () => {
+  const updateProduct = useCallback(() => {
     projectGroupUpdate({
       variables: {
         id,
@@ -57,10 +42,33 @@ const LabelInput = ({ data, setOpen }) => {
         console.log(res.data.projectGroupUpdate.errors[0])
       } else {
         setOpen(false)
-        showToast({ description: 'Label added successfully' })
       }
     })
-  }
+  }, [desc, id, name, projectGroupUpdate, selectedLabels, setOpen])
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (inputRef.current && !inputRef.current.contains(event.target)) {
+        updateProduct()
+      }
+    }
+    document.addEventListener('click', handleClickOutside)
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [inputRef, labels?.length, selectedLabels?.length, setOpen, updateProduct])
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        updateProduct()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [updateProduct])
 
   useEffect(() => {
     if (labels?.length > 0) {
@@ -71,66 +79,63 @@ const LabelInput = ({ data, setOpen }) => {
     }
   }, [labels])
 
-  return (
-    <Flex
-      p={3}
-      flexDir={'column'}
-      alignItems={'flex-start'}
-      gap={4}
-      overflow={'hidden'}
-    >
-      <FormControl>
-        <FormLabel>{truncatedValue(name, 30)}</FormLabel>
-        <FormHelperText>Apply Labels</FormHelperText>
-      </FormControl>
-      <Divider />
+  if (nodes?.length > 0) {
+    return (
       <Flex
+        px={3}
+        py={5}
         gap={4}
-        w={'100%'}
-        minH={'auto'}
-        maxH={'250px'}
+        ref={inputRef}
+        height={'250px'}
         flexDir={'column'}
+        overflow={'hidden'}
         overflowY={'scroll'}
         alignItems={'flex-start'}
       >
-        {loading && <CustomLoader />}
-        {nodes?.length === 0 ? (
-          <Text>Labels not exists</Text>
-        ) : (
-          nodes?.map((row, index) => (
-            <Flex alignItems={'center'} gap={2} key={index}>
-              <Checkbox
-                ml={1}
-                isChecked={selectedLabels?.includes(row?.id)}
-                onChange={() => addLabels(row?.id)}
-              />
-              <Tag
-                py={1}
-                size='sm'
-                width={'fit-content'}
-                borderColor={row?.color}
-                bg={hexToRGBA(row?.color, 0.5)}
-              >
-                {row?.name}
-              </Tag>
-            </Flex>
-          ))
-        )}
+        {nodes?.map((row, index) => (
+          <Flex alignItems={'center'} gap={2} key={index}>
+            <Checkbox
+              ml={1}
+              isChecked={selectedLabels?.includes(row?.id)}
+              onChange={() => addLabels(row?.id)}
+            />
+            <Tag
+              py={1}
+              size='sm'
+              width={'fit-content'}
+              borderColor={row?.color}
+              bg={hexToRGBA(row?.color, 0.5)}
+            >
+              {row?.name}
+            </Tag>
+          </Flex>
+        ))}
       </Flex>
-      <Divider hidden={nodes?.length === 0} />
-      <ButtonGroup ml={'auto'} hidden={nodes?.length === 0}>
-        <Button variant='ghost' fontSize={'sm'} onClick={() => setOpen(false)}>
-          Cancel
-        </Button>
-        <Button
-          fontSize='sm'
-          variant='outline'
-          colorScheme='blue'
-          onClick={updateProduct}
-        >
-          Save
-        </Button>
-      </ButtonGroup>
+    )
+  }
+
+  return (
+    <Flex
+      width={'100%'}
+      ref={inputRef}
+      flexDir={'column'}
+      alignItems={'center'}
+    >
+      <Text py={5} color={'gray.500'}>
+        No labels present
+      </Text>
+      <Divider />
+      <Button
+        my={1}
+        w={'100%'}
+        variant='unstyled'
+        onClick={() => {
+          setOpen(false)
+          onOpenLabel()
+        }}
+      >
+        Create label
+      </Button>
     </Flex>
   )
 }
