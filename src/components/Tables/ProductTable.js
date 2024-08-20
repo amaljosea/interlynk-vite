@@ -577,6 +577,7 @@ const ProductTable = ({
                   position={'relative'}
                   onMouseEnter={() => setOpenTagMenu(true)}
                   onMouseLeave={() => setOpenTagMenu(false)}
+                  isDisabled={!enabled || !canEditProduct}
                 >
                   {labels?.length > 0 ? 'Update' : 'Add'} Label
                 </MenuItem>
