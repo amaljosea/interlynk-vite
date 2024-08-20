@@ -115,6 +115,10 @@
   bottom: 44px;
 }
 
+.endOfSupport > input:focus {
+  outline-color: #3182ce;
+}
+
 .demo-node > circle {
   fill: #2d3748;
   stroke: #2d3748;

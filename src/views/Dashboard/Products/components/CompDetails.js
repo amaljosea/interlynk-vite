@@ -332,7 +332,7 @@ const CompDetails = ({ data, primaryComp }) => {
           <FormLabel htmlFor='compScope'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>Support Level</Text>
-              <Tooltip label={onCheck(`Component Scope`)}>
+              <Tooltip label={onCheck(`Component Support`)}>
                 <InfoIcon color={'blue.500'} />
               </Tooltip>
             </Flex>
@@ -356,9 +356,18 @@ const CompDetails = ({ data, primaryComp }) => {
           </Select>
         </FormControl>
         {/* END-OF-SUPPORT DATE */}
-        <FormControl mb={5} isInvalid={!isValidDate}>
+        <FormControl
+          mb={5}
+          isInvalid={!isValidDate}
+          isDisabled={compSupport === ''}
+        >
           <FormLabel mb={1} htmlFor='endOfSupport'>
-            End-Of-Support Date
+            <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+              <Text>End-Of-Support Date</Text>
+              <Tooltip label={onCheck(`Component Support Date`)}>
+                <InfoIcon color={'blue.500'} />
+              </Tooltip>
+            </Flex>
           </FormLabel>
           <Datetime
             value={selectedDate}
@@ -366,8 +375,7 @@ const CompDetails = ({ data, primaryComp }) => {
             className={`${react_datatime} endOfSupport`}
             onChange={handleDateChange}
             inputProps={{
-              placeholder: 'Select Date and Time',
-              disabled: compSupport !== '',
+              disabled: compSupport === '',
               onCopy: (e) => e.preventDefault(),
               onPaste: (e) => e.preventDefault(),
               style: {
@@ -391,7 +399,7 @@ const CompDetails = ({ data, primaryComp }) => {
               Primary component
             </Checkbox>
             <Tooltip label={onCheck(`Primary Component`)}>
-              <InfoIcon color={'blue.500'} />
+              <InfoIcon fontSize={14} color={'blue.500'} />
             </Tooltip>
           </Flex>
         </FormControl>
@@ -407,7 +415,7 @@ const CompDetails = ({ data, primaryComp }) => {
               Internal component
             </Checkbox>
             <Tooltip label={onCheck(`Internal Component`)}>
-              <InfoIcon color={'blue.500'} />
+              <InfoIcon fontSize={14} color={'blue.500'} />
             </Tooltip>
           </Flex>
         </FormControl>
