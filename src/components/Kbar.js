@@ -10,6 +10,7 @@ import {
 } from 'kbar'
 import { Fragment, useMemo } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { truncatedValue } from 'utils'
 import { settingActions } from 'variables/general'
 
 import { SearchIcon } from '@chakra-ui/icons'
@@ -68,7 +69,7 @@ const Kbar = () => {
 
       data.push({
         id: item?.name,
-        name: item?.name,
+        name: truncatedValue(item?.name, 30),
         section: 'products',
         icon: <FaRegWindowMaximize color='#718096' />,
         perform: () => {
@@ -87,7 +88,7 @@ const Kbar = () => {
             if (version?.projectVersion) {
               data.push({
                 id: version?.id,
-                name: `${item?.name} - ${version.projectVersion} (${project?.name})`,
+                name: `${truncatedValue(item?.name, 20)} - ${version.projectVersion} (${project?.name})`,
                 section: 'product versions',
                 icon: <FaScrewdriverWrench color='#718096' />,
                 perform: () => {
