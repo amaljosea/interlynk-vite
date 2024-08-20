@@ -2164,11 +2164,14 @@ export const GetVulnData = gql`
             version
             group
             kind
+            purl
+            cpes
             sbom {
               id
               createdAt
               projectVersion
               project {
+                name
                 projectGroup {
                   id
                   name
