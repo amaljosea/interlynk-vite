@@ -1,5 +1,6 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useState } from 'react'
+import { truncatedValue } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
 import {
@@ -159,7 +160,7 @@ const DownloadModal = ({
     }
   ]
 
-  const fileName = `${productName}-${version}.${type}.xml`
+  const fileName = `${truncatedValue(productName, 14)}-${version}.${type}.xml`
 
   return (
     <>
@@ -181,7 +182,6 @@ const DownloadModal = ({
           <ModalBody pb={6} mt={2.5}>
             <Flex flexDirection={'column'} gap={4}>
               <Tag
-                p={2}
                 fontSize={'xs'}
                 w={'fit-content'}
                 colorScheme='blue'

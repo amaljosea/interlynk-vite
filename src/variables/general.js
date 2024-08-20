@@ -692,3 +692,46 @@ export const infoData = [
     desc: `A component is marked internal when the component is represents internally developed components.`
   }
 ]
+
+export const complianceData = [
+  {
+    title: `Timestamp`,
+    desc: `The Timestamp is the date and time that the SBOM was produced. Interlynk automatically resolves missing Timestamp.`
+  },
+  {
+    title: `Supplier Name`,
+    desc: `Supplier identifies the name and email of the organization that built, distributed or packaged the application. For open-source components, Supplier can refer to the name of the project or entity distributing the project. To resolve this, add Supplier details under General Tab.`
+  },
+  {
+    title: `Unique ID`,
+    desc: `Unique identifiers provide additional information to help uniquely define a component. A unique identifier can be generated relative to some globally unique hierarchy or namespace or reference an existing global coordinate system. Interlynk automatically resolves missing unique identifiers.`
+  },
+  {
+    title: `Author`,
+    desc: `The Author Name is intended to be the name of the entity that created the SBOM data. As a minimum expectation, the Author Name attribute should name as many participants as are involved in authoring the SBOM data as possible. To resolve this, add Author details under General Tab.`
+  },
+  {
+    title: `Component Name`,
+    desc: `Component Name is defined as the public name for a component defined by the original supplier. Interlynk ignores any component that is missing a name in imported SBOM.`
+  },
+  {
+    title: `Component Version`,
+    desc: `Component Version is a supplier-defined identifier that specifies an update change in software from a previously identified version. To find all components that are missing versions, go to Checks Tab and filter for "SB-HC-12: Component has a version". To resolve this, add version for each component using Component Tab > Edit Component > Details.`
+  },
+  {
+    title: `Component Supplier Name`,
+    desc: `Component Supplier Name is the entity that creates, defines, and identifies a component.  It should be identified carefully as it is a significant contributor to achieving component identification at scale. To find all components that are missing suppliers, go to Checks Tab and filter for "SB-HC-15: Component has a supplier". To resolve this, add supplier for each component using Component Tab > Edit Component > Supplier.`
+  },
+  {
+    title: `Component Other unique identifiers`,
+    desc: `Component Unique identifiers provide additional information to help uniquely define a component. A unique identifier can be generated relative to some globally unique hierarchy or namespace or reference an existing global coordinate system. To find all components that are missing versions, go to Checks Tab and filter for "SB-HC-17: Component has a purl" and "SB-HC-19: Component has a CPE". To resolve this, add either CPE or PURL for each component using Component Tab > Edit Component > Identifiers.`
+  },
+  {
+    title: `Component Relationships`,
+    desc: `Component Relationship attribute describes the association of a component listed within the SBOM to other components. To find all components that are missing versions, go to Checks Tab and filter for "SB-HC-24: Component has relationship's". To resolve this, add a relationship for each component using Component Tab > Edit Components > Relationships.`
+  },
+  {
+    title: `Component Support Level`,
+    desc: `The Author Name is intended to be the name of the entity that created the SBOM data. As a minimum expectation, the Author Name attribute should name as many participants as are involved in authoring the SBOM data as possible. To resolve this, add Author details under General Tab`
+  }
+]

@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { complianceData } from 'variables/general'
 
+import { InfoIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -11,6 +13,7 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
+  Stack,
   Tab,
   TabList,
   TabPanel,
@@ -18,6 +21,7 @@ import {
   Tabs,
   Tag,
   Text,
+  Tooltip,
   useColorModeValue
 } from '@chakra-ui/react'
 
@@ -49,6 +53,11 @@ const ComplianceChecks = ({
     }
   }
 
+  const onCheck = (title) => {
+    const result = complianceData.find((item) => item?.title === title)
+    return result?.desc
+  }
+
   const ComplianceReport = ({ key, item, loading }) => {
     return (
       <Flex
@@ -58,9 +67,15 @@ const ComplianceChecks = ({
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Text fontSize={'xs'} textTransform={'capitalize'}>
-          {item?.category?.replace('Component ', '')}
-        </Text>
+        <Stack direction={'row'}>
+          <Text fontSize={'xs'} textTransform={'capitalize'}>
+            {item?.category?.replace('Component ', '')}
+          </Text>
+          <Tooltip label={onCheck(item?.category)}>
+            <InfoIcon fontSize={'sm'} color={'blue.500'} />
+          </Tooltip>
+        </Stack>
+
         <Box fontSize={'xs'} ml={'auto'}>
           {sbomCategory?.includes(item?.category) ? (
             <>
@@ -131,9 +146,10 @@ const ComplianceChecks = ({
       <DrawerContent>
         <DrawerCloseButton mt={2} />
         <DrawerHeader pl={4}>
-          <Text mb={1}>Compliance Checks</Text>
+          <Text mb={1} fontWeight={'medium'}>
+            Compliance Checks
+          </Text>
           <Tag
-            p={2}
             fontSize={'xs'}
             w={'fit-content'}
             colorScheme='blue'
@@ -174,7 +190,9 @@ const ComplianceChecks = ({
               </TabPanel>
               <TabPanel>
                 <Flex alignItems={'center'} justifyContent={'center'}>
-                  <Text py={24} color={'gray.500'}>Coming Soon...</Text>
+                  <Text py={24} color={'gray.500'}>
+                    Coming Soon...
+                  </Text>
                 </Flex>
               </TabPanel>
             </TabPanels>
