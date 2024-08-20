@@ -1,5 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
+import Datetime from 'react-datetime'
+import 'react-datetime/css/react-datetime.css'
 import { useLocation, useParams } from 'react-router-dom'
 import { infoData } from 'variables/general'
 
@@ -18,6 +20,7 @@ import {
   Textarea,
   Tooltip,
   chakra,
+  useColorMode,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -52,9 +55,27 @@ const CompDetails = ({ data, primaryComp }) => {
   const [compVersion, setCompVersion] = useState('')
   const [compKind, setCompKind] = useState('')
   const [compScope, setCompScope] = useState('')
+  const [compSupport, setCompSupport] = useState('')
   const [isPrimary, setIsPrimary] = useState(false)
   const [isInternal, setIsInternal] = useState(false)
   const [disabled, setDisabled] = useState(false)
+
+  const [selectedDate, setSelectedDate] = useState('')
+  const [isValidDate, setIsValidDate] = useState(true)
+
+  const { colorMode } = useColorMode()
+  const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
+
+  const handleDateChange = (newDate) => {
+    console.log('newDate', newDate)
+    const isValidDate = newDate && !isNaN(newDate)
+    setSelectedDate(newDate._d)
+    if (isValidDate) {
+      setIsValidDate(true)
+    } else {
+      setIsValidDate(false)
+    }
+  }
 
   const disableButtonTemporarily = () => {
     setDisabled(true)
@@ -305,6 +326,58 @@ const CompDetails = ({ data, primaryComp }) => {
             <option value='optional'>Optional</option>
             <option value='required'>Required</option>
           </Select>
+        </FormControl>
+        {/* SUPPRT LEVEL */}
+        <FormControl>
+          <FormLabel htmlFor='compScope'>
+            <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+              <Text>Support Level</Text>
+              <Tooltip label={onCheck(`Component Scope`)}>
+                <InfoIcon color={'blue.500'} />
+              </Tooltip>
+            </Flex>
+          </FormLabel>
+          <Select
+            id='compSupport'
+            name='compSupport'
+            size='md'
+            fontSize={'sm'}
+            value={compSupport}
+            isDisabled={customerView}
+            onChange={(e) => setCompSupport(e.target.value)}
+          >
+            <option value='' style={{ background: 'lightgray' }}>
+              -- Select --
+            </option>
+            <option value='unspecified'>Unspecified</option>
+            <option value='actively_maintained'>Actively Maintained</option>
+            <option value='no_longer_maintained'>No Longer Maintained</option>
+            <option value='abandoned'>Abandoned</option>
+          </Select>
+        </FormControl>
+        {/* END-OF-SUPPORT DATE */}
+        <FormControl mb={5} isInvalid={!isValidDate}>
+          <FormLabel mb={1} htmlFor='endOfSupport'>
+            End-Of-Support Date
+          </FormLabel>
+          <Datetime
+            value={selectedDate}
+            closeOnSelect={true}
+            className={`${react_datatime} endOfSupport`}
+            onChange={handleDateChange}
+            inputProps={{
+              placeholder: 'Select Date and Time',
+              disabled: compSupport !== '',
+              onCopy: (e) => e.preventDefault(),
+              onPaste: (e) => e.preventDefault(),
+              style: {
+                background: 'none'
+              }
+            }}
+          />
+          {!isValidDate && (
+            <FormErrorMessage>Please enter a valid datetime</FormErrorMessage>
+          )}
         </FormControl>
         {/* PRIMARY COMPONENT */}
         <FormControl isReadOnly={customerView}>

@@ -111,6 +111,10 @@
   border-radius: 5px;
 }
 
+.endOfSupport > .rdtPicker {
+  bottom: 44px;
+}
+
 .demo-node > circle {
   fill: #2d3748;
   stroke: #2d3748;
