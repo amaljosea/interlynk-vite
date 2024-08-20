@@ -33,6 +33,7 @@ import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -60,6 +61,7 @@ import FixedModal from '../components/FixedModal'
 import CheckFilters from './CheckFilters'
 
 const Checks = () => {
+  const { isFreeTier } = useGlobalQueryContext()
   const { showToast } = useCustomToast()
   const params = useParams()
   const productId = params.productid
@@ -807,6 +809,7 @@ const Checks = () => {
               isOpen={isPrimaryOpen}
               ruleExists={ruleExists}
               onClose={onPrimaryClose}
+              isFreeTier={isFreeTier}
             />
           )}
 
@@ -817,6 +820,7 @@ const Checks = () => {
               isOpen={isVersionOpen}
               ruleExists={ruleExists}
               onClose={onVersionClose}
+              isFreeTier={isFreeTier}
             />
           )}
 
@@ -827,6 +831,7 @@ const Checks = () => {
               isOpen={isLicenseOpen}
               ruleExists={ruleExists}
               onClose={onLicenseClose}
+              isFreeTier={isFreeTier}
             />
           )}
 
@@ -837,6 +842,7 @@ const Checks = () => {
               onClose={onTypeClose}
               activeRow={activeRow}
               ruleExists={ruleExists}
+              isFreeTier={isFreeTier}
             />
           )}
 
@@ -849,6 +855,7 @@ const Checks = () => {
               isOpen={isSupplierOpen}
               ruleExists={ruleExists}
               onClose={onSupplierClose}
+              isFreeTier={isFreeTier}
             />
           )}
 
@@ -858,6 +865,7 @@ const Checks = () => {
               onClose={onClose}
               activeRow={activeRow}
               ruleExists={ruleExists}
+              isFreeTier={isFreeTier}
             />
           )}
 
@@ -872,6 +880,7 @@ const Checks = () => {
               onClose={onPurlClose}
               ruleExists={ruleExists}
               setPurlValue={setPurlValue}
+              isFreeTier={isFreeTier}
             />
           )}
 
@@ -890,6 +899,7 @@ const Checks = () => {
               setCpeValue={setCpeValue}
               onCreateCpe={handleCreateCpe}
               onUpdateCpe={handleUpdateCpe}
+              isFreeTier={isFreeTier}
             />
           )}
 
@@ -903,6 +913,7 @@ const Checks = () => {
               ruleExists={ruleExists}
               btnRef={creationToolBtn}
               onClose={onCreationClose}
+              isFreeTier={isFreeTier}
             />
           )}
 
@@ -917,6 +928,7 @@ const Checks = () => {
               selectedKey={'author'}
               onClose={onAuthorClose}
               ruleExists={ruleExists}
+              isFreeTier={isFreeTier}
             />
           )}
 
@@ -929,6 +941,7 @@ const Checks = () => {
               isOpen={isDocSupOpen}
               ruleExists={ruleExists}
               onClose={onDocSupClose}
+              isFreeTier={isFreeTier}
             />
           )}
 
@@ -942,6 +955,7 @@ const Checks = () => {
               activeRow={activeRow}
               ruleExists={ruleExists}
               compPath={pathToPrimary}
+              isFreeTier={isFreeTier}
             />
           )}
         </>

@@ -5,6 +5,7 @@ export const GetOrgName = gql`
   query GetOrgName {
     organization {
       name
+      tier
     }
   }
 `

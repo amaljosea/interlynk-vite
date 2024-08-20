@@ -75,7 +75,8 @@ const RelationshipDrawer = ({
   fetchCompData,
   compPath,
   ruleExists,
-  comPathLoading
+  comPathLoading,
+  isFreeTier
 }) => {
   const params = useParams()
   const productId = params.productid
@@ -371,15 +372,18 @@ const RelationshipDrawer = ({
                         alignItems={'center'}
                         justifyContent={'space-between'}
                       >
-                        <Button
-                          hidden
-                          mr={'auto'}
-                          fontSize={'sm'}
-                          onClick={handleRuleCreate}
-                          colorScheme={ruleExists ? 'green' : 'blue'}
-                        >
-                          {ruleExists ? 'View' : 'Save as'} Rule
-                        </Button>
+                        {!isFreeTier && (
+                          <Button
+                            hidden
+                            mr={'auto'}
+                            fontSize={'sm'}
+                            onClick={handleRuleCreate}
+                            colorScheme={ruleExists ? 'green' : 'blue'}
+                          >
+                            {ruleExists ? 'View' : 'Save as'} Rule
+                          </Button>
+                        )}
+
                         <Button
                           size='md'
                           width={'fit-content'}

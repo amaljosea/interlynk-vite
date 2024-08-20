@@ -10,6 +10,7 @@ import { Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import LynkSelect from 'components/LynkSelect'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -41,6 +42,8 @@ const SbomActions = ({ sbom, refetch }) => {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
   } = useProductUrlContext()
+
+  const { isFreeTier, orgQueryLoading } = useGlobalQueryContext()
 
   const { totalRows, dispatch, prodCompState } = useGlobalState()
   const {
@@ -395,6 +398,7 @@ const SbomActions = ({ sbom, refetch }) => {
           isOpen={isPrimaryOpen}
           onClose={onPrimaryClose}
           activeRow={activeRow}
+          isFreeTier={isFreeTier}
         />
       )}
 

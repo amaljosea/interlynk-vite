@@ -17,6 +17,7 @@ import {
 import Card from 'components/Card/Card'
 import LegalTable from 'components/Tables/LegalTable'
 import OrgTable from 'components/Tables/OrgTable'
+import PlanTable from 'components/Tables/PlanTable'
 import RoleTable from 'components/Tables/RoleTable'
 import TeamTable from 'components/Tables/TeamTable'
 
@@ -48,30 +49,32 @@ const GetOrganization = gql`
   }
 `
 
-const orgTabs = [
-  'general',
-  'users',
-  'roles',
-  'feeds',
-  'checks',
-  'lists',
-  'legal',
-  'connections-org'
-]
-
-const psTabs = [
-  'personal-details',
-  'organizations',
-  'security-tokens',
-  'connections'
-]
-
 function Profile() {
+  const { orgView, isFreeTier } = useGlobalQueryContext()
+
+  const orgTabs = [
+    'general',
+    'users',
+    'roles',
+    'feeds',
+    'checks',
+    'lists',
+    'legal',
+    'connections-org',
+    'plan'
+  ]
+
+  const psTabs = [
+    'personal-details',
+    'organizations',
+    'security tokens',
+    'connections'
+  ]
+
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
-  const { orgView } = useGlobalQueryContext()
 
   const { totalRows } = useGlobalState()
 
@@ -142,7 +145,9 @@ function Profile() {
     const conditions = {
       Lists: !manageListing,
       Feeds: !manageFeeds,
-      Users: !viewUsers
+      Users: !viewUsers,
+      roles: isFreeTier,
+      'security tokens': isFreeTier
     }
     return conditions[item] ? 'none' : 'block'
   }
@@ -207,9 +212,7 @@ function Profile() {
                 <TeamTable />
               </TabPanel>
               {/* ROLES */}
-              <TabPanel>
-                <RoleTable />
-              </TabPanel>
+              <TabPanel>{<RoleTable />}</TabPanel>
               {/* FEEDS */}
               <TabPanel>
                 <Feeds />
@@ -229,6 +232,9 @@ function Profile() {
               <TabPanel>
                 <Connections org={true} />
               </TabPanel>
+              <TabPanel>
+                <PlanTable />
+              </TabPanel>
             </TabPanels>
           </Tabs>
         </Card>
@@ -247,6 +253,7 @@ function Profile() {
               {psTabs.map((item, index) => (
                 <Tab
                   key={index}
+                  display={getDisplay(item)}
                   textTransform={'capitalize'}
                   _focus={{ outline: 'none' }}
                   isDisabled={
@@ -272,9 +279,7 @@ function Profile() {
                 />
               </TabPanel>
               {/* SECURITY TOKEN */}
-              <TabPanel>
-                <TokenInfo />
-              </TabPanel>
+              <TabPanel>{<TokenInfo />}</TabPanel>
               <TabPanel>
                 <Connections />
               </TabPanel>

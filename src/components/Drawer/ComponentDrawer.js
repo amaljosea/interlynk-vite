@@ -41,6 +41,7 @@ import Info from 'components/Misc/Info'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -54,6 +55,7 @@ import { CpeAutoComplete, GetAllComponents, GetAllSboms } from 'graphQL/Queries'
 import { FaExpandAlt } from 'react-icons/fa'
 
 function ComponentDrawer(props) {
+  const { isFreeTier } = useGlobalQueryContext()
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -795,6 +797,7 @@ function ComponentDrawer(props) {
           purlValue={purlValue}
           getCpe={getCpe}
           activeComp={data}
+          isFreeTier={isFreeTier}
         />
       )}
 
@@ -811,6 +814,7 @@ function ComponentDrawer(props) {
           selectedCpe={selectedCpe}
           getCpe={getCpe}
           activeComp={data}
+          isFreeTier={isFreeTier}
         />
       )}
 

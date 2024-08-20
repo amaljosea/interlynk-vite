@@ -13,6 +13,7 @@ import {
   DrawerOverlay,
   Flex,
   Link,
+  Spinner,
   Stack,
   Text,
   useColorModeValue,
@@ -24,7 +25,10 @@ import { InterlynkLogo } from 'components/Icons/Icons'
 import { Separator } from 'components/Separator/Separator'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+
 function SidebarResponsive(props) {
+  const { isFreeTier, orgQueryLoading } = useGlobalQueryContext()
   // to check for active links and opened collapses
   let location = useLocation()
   // this is for the rest of the collapses
@@ -34,6 +38,16 @@ function SidebarResponsive(props) {
   const activeRoute = (routeName) => {
     return location.pathname === routeName ? 'active' : ''
   }
+
+  const routesActual = isFreeTier
+    ? props.routes.filter(
+        (route) =>
+          route.name !== 'Requests' &&
+          route.name !== 'Licenses' &&
+          route.name !== 'Analytics' &&
+          route.name !== 'Support'
+      )
+    : props.routes
 
   const createLinks = (routes) => {
     // Chakra Color Mode
@@ -70,6 +84,14 @@ function SidebarResponsive(props) {
             </Text>
             {createLinks(prop.views)}
           </div>
+        )
+      }
+
+      if (orgQueryLoading) {
+        return (
+          <Flex align='center' justify='center' h='100vh'>
+            <Spinner />
+          </Flex>
         )
       }
       return (
@@ -182,7 +204,7 @@ function SidebarResponsive(props) {
 
   const { logoText, routes, ...rest } = props
 
-  var links = <>{createLinks(routes)}</>
+  var links = <>{createLinks(routesActual)}</>
   //  BRAND
   //  Chakra Color Mode
   let hamburgerColor = useColorModeValue('gray.500', 'gray.200')

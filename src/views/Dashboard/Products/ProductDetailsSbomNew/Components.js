@@ -48,6 +48,7 @@ import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 import { ProgressBar } from 'components/ProgressBar'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -76,6 +77,7 @@ import HealthMap from '../components/HealthMap'
 import CompFilters from './CompFilters'
 
 const Components = ({ sbomData }) => {
+  const { isFreeTier } = useGlobalQueryContext()
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
@@ -1165,6 +1167,7 @@ const Components = ({ sbomData }) => {
           data={activeRow}
           shortDesc={null}
           checkId={null}
+          isFreeTier={isFreeTier}
         />
       )}
 
@@ -1190,6 +1193,7 @@ const Components = ({ sbomData }) => {
           fetchCompData={fetchCompData}
           compPath={comPath?.component?.pathToPrimary}
           comPathLoading={comPathLoading}
+          isFreeTier={isFreeTier}
         />
       )}
 

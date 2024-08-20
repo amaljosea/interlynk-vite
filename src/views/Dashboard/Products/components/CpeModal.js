@@ -32,6 +32,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
+import { GetOrgName } from 'graphQL/Queries'
 
 const CpeModal = ({
   isOpen,
@@ -41,7 +42,8 @@ const CpeModal = ({
   activeComp,
   getCpe,
   activeRow,
-  ruleExists
+  ruleExists,
+  isFreeTier
 }) => {
   const { status, component } = activeRow || ''
   const { name: compName, version: compVersion, cpes } = component || ''
@@ -657,16 +659,19 @@ const CpeModal = ({
               alignItems={'center'}
               justifyContent={'flex-end'}
             >
-              <Button
-                mr={'auto'}
-                fontSize={'sm'}
-                onClick={handleRuleCreate}
-                hidden={friendlyId ? false : true}
-                isDisabled={isDisabled || isInvalid}
-                colorScheme={ruleExists ? 'green' : 'blue'}
-              >
-                {ruleExists ? 'View' : 'Save as'} Rule
-              </Button>
+              {!isFreeTier && (
+                <Button
+                  mr={'auto'}
+                  fontSize={'sm'}
+                  onClick={handleRuleCreate}
+                  hidden={friendlyId ? false : true}
+                  isDisabled={isDisabled || isInvalid}
+                  colorScheme={ruleExists ? 'green' : 'blue'}
+                >
+                  {ruleExists ? 'View' : 'Save as'} Rule
+                </Button>
+              )}
+
               <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
                 Cancel
               </Button>

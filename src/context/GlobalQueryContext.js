@@ -1,12 +1,16 @@
+import { useQuery } from '@apollo/client'
+import { createContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import useOrg from 'hooks/useOrg'
 import { useSbom } from 'hooks/useSbom'
 
-const { createContext } = require('react')
+import { GetOrgName } from 'graphQL/Queries'
 
 export const GlobalQueryContext = createContext({
-  sbomHookData: null
+  sbomHookData: null,
+  orgLoading: false,
+  tier: null
 })
 
 export const GlobalQueryContextWrapper = ({ children }) => {
@@ -18,13 +22,30 @@ export const GlobalQueryContextWrapper = ({ children }) => {
   })
 
   const { data, loading } = useOrg()
+  const [isFreeTier, setIsFreeTier] = useState(false)
+
+  const { data: orgData, loading: orgQueryLoading } = useQuery(GetOrgName, {
+    fetchPolicy: 'network-only'
+  })
+
+  useEffect(() => {
+    if (!orgQueryLoading && orgData) {
+      setIsFreeTier(orgData.organization?.tier === 'free')
+    }
+  }, [orgQueryLoading, orgData])
+
+  if (orgQueryLoading) {
+    return null
+  }
 
   return (
     <GlobalQueryContext.Provider
       value={{
         sbomHookData,
         orgLoading: loading,
-        orgView: data?.organization?.name ? true : false
+        orgView: data?.organization?.name ? true : false,
+        isFreeTier,
+        orgQueryLoading
       }}
     >
       {children}

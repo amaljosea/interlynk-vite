@@ -30,7 +30,8 @@ const PriSupplierModal = ({
   onClose,
   suppliers,
   activeRow,
-  ruleExists
+  ruleExists,
+  isFreeTier
 }) => {
   const params = useParams()
   const sbomId = params.sbomid
@@ -304,16 +305,19 @@ const PriSupplierModal = ({
               justifyContent={'flex-end'}
               alignItems={'center'}
             >
-              <Button
-                mr={'auto'}
-                fontSize={'sm'}
-                isDisabled={isInvalid || isDisabled}
-                onClick={handleRuleCreate}
-                hidden={friendlyId ? false : true}
-                colorScheme={ruleExists ? 'green' : 'blue'}
-              >
-                {ruleExists ? 'View' : 'Save as'} Rule
-              </Button>
+              {!isFreeTier && (
+                <Button
+                  mr={'auto'}
+                  fontSize={'sm'}
+                  isDisabled={isInvalid || isDisabled}
+                  onClick={handleRuleCreate}
+                  hidden={friendlyId ? false : true}
+                  colorScheme={ruleExists ? 'green' : 'blue'}
+                >
+                  {ruleExists ? 'View' : 'Save as'} Rule
+                </Button>
+              )}
+
               <Button colorScheme='gray' mr={3} onClick={onClose}>
                 Cancel
               </Button>

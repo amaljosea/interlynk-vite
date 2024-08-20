@@ -24,6 +24,7 @@ import Support from 'views/Dashboard/Support'
 import Tools from 'views/Dashboard/Tools'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 
+import ConditionalRoute from 'components/ConditionalRoute.js'
 import Licenses from 'components/Licenses'
 import { SentryTest } from 'components/SentryTest.js'
 
@@ -93,12 +94,25 @@ export const MainRoutes = () => {
           </Route>
           {/* <Route path={`SAG`} element={<Sag />} /> */}
           <Route path={`vulnerabilities`} element={<Vulnerabilities />} />
-          <Route path={`licenses`} element={<Licenses />} />
-          <Route path={`analytics`} element={<Analytics />} />
+
+          <Route
+            path='licenses'
+            element={<ConditionalRoute element={Licenses} />}
+          />
+          <Route
+            path='analytics'
+            element={<ConditionalRoute element={Analytics} />}
+          />
           <Route path={`tools`} element={<Tools />} />
-          <Route path={`support`} element={<Support />} />
+          <Route
+            path='support'
+            element={<ConditionalRoute element={Support} />}
+          />
           <Route path={`policies`} element={<Policies />} />
-          <Route path={`requests`} element={<Requests />} />
+          <Route
+            path='requests'
+            element={<ConditionalRoute element={Requests} />}
+          />
           <Route path={`settings`} element={<Profile />} />
         </Route>
         <Route path={`login`} element={<LoginLayout />} />

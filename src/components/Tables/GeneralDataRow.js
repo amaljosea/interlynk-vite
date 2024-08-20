@@ -1,8 +1,7 @@
 import { useMutation } from '@apollo/client'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
-import { infoData } from 'variables/general'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 
 import { EditIcon, InfoIcon } from '@chakra-ui/icons'
@@ -11,7 +10,6 @@ import {
   Flex,
   HStack,
   Icon,
-  IconButton,
   Link,
   Modal,
   ModalBody,
@@ -20,7 +18,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Skeleton,
   Stack,
   Table,
   Tag,
@@ -36,13 +33,10 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import InfoModal from 'components/InfoModal'
-import LicenseField from 'components/Licenses/LicenseField'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 
@@ -52,6 +46,8 @@ import {
   supplierDelete,
   toolDelete
 } from 'graphQL/Mutation'
+
+import LicenseField from '../Licenses/LicenseField'
 
 const InfoLabel = ({ title, onClick }) => {
   return (
@@ -67,25 +63,14 @@ const InfoLabel = ({ title, onClick }) => {
   )
 }
 
-const General = ({ data, loading, error }) => {
-  const { isFreeTier } = useGlobalQueryContext()
+const GeneralDataRow = ({ status, data, refetch }) => {
   const location = useLocation()
   const params = useParams()
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const productId = params.productid
   const sbomId = params.sbomid
 
-  const {
-    id,
-    spec,
-    suppliers,
-    licensesExp,
-    licenses,
-    authors,
-    creationAt,
-    tools
-  } = data || ''
-
-  const { sbomState, dispatch } = useGlobalState()
+  const { userPermissions, sbomState, dispatch } = useGlobalState()
   const { expLicense } = sbomState
   const { sbomDispatch } = dispatch
 
@@ -94,15 +79,15 @@ const General = ({ data, loading, error }) => {
     childKey: 'update_sbom_components'
   })
 
-  const editSboms = useHasPermission({
+  const updateSboms = useHasPermission({
     parentKey: 'view_sbom',
     childKey: 'update_sbom'
   })
 
   const btnRef = useRef(null)
+  const licenseBtn = useRef(null)
   const textColor = useColorModeValue('gray.700', 'white')
-  const iconColor = useColorModeValue('blue.500', 'gray.100')
-  const customerView = location?.pathname?.startsWith('/customer')
+  const customerView = location.pathname.startsWith('/customer')
   const [selectedKey, setSelectedKey] = useState('')
   const [activeTool, setActiveTool] = useState(null)
   const [isValid, setIsValid] = useState(true)
@@ -133,15 +118,22 @@ const General = ({ data, loading, error }) => {
     onClose: onInfoClose
   } = useDisclosure()
 
+  const handleRefetch = () => refetch({ projectId: productId, sbomId: sbomId })
+
   const [deleteSupplier] = useMutation(supplierDelete)
   const [deleteTool] = useMutation(toolDelete)
   const [deleteAuthor] = useMutation(authorDelete)
-  const [updateSbom] = useMutation(sbomUpdate)
+  const [updateSbom] = useMutation(sbomUpdate, {
+    onCompleted: () => handleRefetch()
+  })
 
   const handleToolRemove = async (id) => {
     try {
       await deleteTool({ variables: { toolID: id, sbomID: sbomId } })
-        .then((res) => res?.data)
+        .then(
+          (res) =>
+            res?.data && refetch({ productId: productId, sbomId: sbomId })
+        )
         .finally(() => onDelClose())
     } catch (error) {
       console.log(`Mutation error`, error)
@@ -150,8 +142,8 @@ const General = ({ data, loading, error }) => {
 
   const handleAuthorRemove = async (id) => {
     try {
-      await deleteAuthor({ variables: { authorId: id, sbomId } }).then(
-        (res) => res?.data
+      await deleteAuthor({ variables: { authorId: id, sbomId: sbomId } }).then(
+        (res) => res?.data && refetch({ productId: productId, sbomId: sbomId })
       )
     } catch (error) {
       console.log(`Mutation error`, error)
@@ -164,21 +156,21 @@ const General = ({ data, loading, error }) => {
   }
 
   const handleSupRemove = async (id) => {
-    await deleteSupplier({ variables: { id: id } }).then((res) => res.data)
+    await deleteSupplier({ variables: { id: id } }).then(
+      (res) => res.data && refetch({ productId: productId, sbomId: sbomId })
+    )
   }
 
-  // const onRemoveLicense = async () => console.log('License');
-
   const onLicenseOpen = () => {
-    sbomDispatch({ type: 'SET_LICENSES', payload: licensesExp })
+    sbomDispatch({ type: 'SET_LICENSES', payload: data })
     onSBMOpen()
   }
 
   const onUpdateLicense = async () => {
     await updateSbom({
       variables: {
-        id: id,
-        spec: spec,
+        id: data.id,
+        spec: data.spec,
         licenses: { licensesExp: expLicense || '' }
       }
     })
@@ -187,27 +179,47 @@ const General = ({ data, loading, error }) => {
   }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
-  const handleSBMDown = useCallback(
-    (event) => {
-      if (event.altKey && event.key === '2') {
-        onSBMToggle()
-      }
-    },
-    [onSBMToggle]
-  )
+  const handleSBMDown = (event) => {
+    if (event.altKey && event.key === '2') {
+      onSBMToggle()
+    }
+  }
 
-  const onCheck = (title) => {
-    const result = infoData.find((item) => item?.title === title)
-    setInfoHeading(result?.title)
-    setInfoText(result?.desc)
-    setInfoUrl('')
+  const onCheckTool = () => {
+    setInfoHeading(`Creation Tool`)
+    setInfoText(
+      `Creation Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools`
+    )
+    setInfoUrl(``)
     onInfoOpen()
   }
 
-  const onCheckTime = () => onCheck(`Created At`)
-  const onCheckTool = () => onCheck(`Creation Tool`)
-  const onCheckAuthor = () => onCheck(`Authors`)
-  const onCheckSupplier = () => onCheck(`Supplier`)
+  const onCheckAuthor = () => {
+    setInfoHeading(`Author`)
+    setInfoText(
+      `In case of non-automated SBOM generation, Author(s) identify the name and email of person(s) involved in building the SBOM.`
+    )
+    setInfoUrl(``)
+    onInfoOpen()
+  }
+
+  const onCheckSupplier = () => {
+    setInfoHeading(`Supplier`)
+    setInfoText(
+      `Supplier identify the name and email of the organization that built, distributed or package the application. For Open-source components, it can refer to the name of the project or entity distributing the project.`
+    )
+    setInfoUrl(``)
+    onInfoOpen()
+  }
+
+  const onCheckLicense = () => {
+    setInfoHeading(`Data License`)
+    setInfoText(
+      `Data licence is a legal arrangement between the creator of the data and the end-user, or the place the data will be deposited, specifying what users can do with the data`
+    )
+    setInfoUrl(`https://spdx.dev/about/overview`)
+    onInfoOpen()
+  }
 
   // KEYBOARD EVENT LISTNER FOR SBOM DRAWER
   useEffect(() => {
@@ -215,25 +227,7 @@ const General = ({ data, loading, error }) => {
     return () => {
       window.removeEventListener('keydown', handleSBMDown)
     }
-  }, [handleSBMDown])
-
-  if (loading) {
-    return (
-      <Flex mt={4} width={'100%'} flexDir={'column'} gap={4}>
-        {[1, 2].map((_, index) => (
-          <Skeleton key={index} width={'100%'} height='20px' />
-        ))}
-      </Flex>
-    )
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <Text>Something went wrong</Text>
-      </Card>
-    )
-  }
+  }, [])
 
   return (
     <>
@@ -253,18 +247,6 @@ const General = ({ data, loading, error }) => {
             </Tr>
           </Thead>
           <Tbody>
-            {/* CREATED AT */}
-            <Tr>
-              <Td pl={0} fontWeight={'medium'}>
-                <InfoLabel title={`Created At`} onClick={onCheckTime} />
-              </Td>
-              <Td pl={0}>
-                <Text my={2}>
-                  {creationAt ? getFullDateAndTime(creationAt) : ''}
-                </Text>
-              </Td>
-              <Td pl={0}></Td>
-            </Tr>
             {/* CREATION TOOLS */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
@@ -278,8 +260,8 @@ const General = ({ data, loading, error }) => {
                   flexWrap={'wrap'}
                   gap={2.5}
                 >
-                  {tools &&
-                    tools.map((item, index) => (
+                  {data.tools &&
+                    data.tools.map((item, index) => (
                       <Tag
                         size={'md'}
                         key={index}
@@ -303,13 +285,28 @@ const General = ({ data, loading, error }) => {
                 </Flex>
               </Td>
               <Td pl={0}>
-                <IconButton
-                  size='sm'
-                  isDisabled={customerView || !editSboms}
-                  icon={<EditIcon color={iconColor} />}
-                  onClick={() => handleClick('tools')}
-                />
+                {!customerView && (
+                  <Button
+                    size='sm'
+                    isDisabled={
+                      status === 'signed' || !updateComponent || signedUrlParams
+                    }
+                    onClick={() => handleClick('tools')}
+                  >
+                    <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+                  </Button>
+                )}
               </Td>
+            </Tr>
+            {/* CREATED AT */}
+            <Tr>
+              <Td pl={0} fontWeight={'medium'}>
+                Created At
+              </Td>
+              <Td pl={0}>
+                <Text my={2}>{getFullDateAndTime(data?.creationAt)}</Text>
+              </Td>
+              <Td pl={0}></Td>
             </Tr>
             {/* AUTHORS */}
             <Tr>
@@ -317,11 +314,12 @@ const General = ({ data, loading, error }) => {
                 <InfoLabel title={`Authors`} onClick={onCheckAuthor} />
               </Td>
               <Td pl={0}>
-                <Stack spacing={2} direction={'column'} my={2}>
-                  {authors &&
-                    authors.length > 0 &&
-                    authors.map((item, index) => (
+                <Stack spacing={2} direction={'column'}>
+                  {data.authors &&
+                    data.authors.length > 0 &&
+                    data.authors.map((item, index) => (
                       <Tag
+                        my={2}
                         size={'md'}
                         key={index}
                         variant='subtle'
@@ -341,12 +339,17 @@ const General = ({ data, loading, error }) => {
                 </Stack>
               </Td>
               <Td pl={0}>
-                <IconButton
-                  size='sm'
-                  isDisabled={customerView || !editSboms}
-                  icon={<EditIcon color={iconColor} />}
-                  onClick={() => handleClick('author')}
-                />
+                {!customerView && (
+                  <Button
+                    size='sm'
+                    isDisabled={
+                      status === 'signed' || !updateComponent || signedUrlParams
+                    }
+                    onClick={() => handleClick('author')}
+                  >
+                    <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+                  </Button>
+                )}
               </Td>
             </Tr>
             {/* SUPPLIERS */}
@@ -356,8 +359,8 @@ const General = ({ data, loading, error }) => {
               </Td>
               <Td pl={0}>
                 <HStack spacing={4}>
-                  {suppliers?.length > 0 &&
-                    suppliers.map((item, index) => (
+                  {data?.suppliers?.length > 0 &&
+                    data?.suppliers.map((item, index) => (
                       <Tag
                         my={2}
                         size={'md'}
@@ -394,24 +397,29 @@ const General = ({ data, loading, error }) => {
                 </HStack>
               </Td>
               <Td pl={0}>
-                <IconButton
-                  size='sm'
-                  isDisabled={customerView || !editSboms}
-                  icon={<EditIcon color={iconColor} />}
-                  onClick={onSupOpen}
-                />
+                {!customerView && (
+                  <Button
+                    size='sm'
+                    isDisabled={
+                      status === 'signed' || !updateComponent || signedUrlParams
+                    }
+                    onClick={onSupOpen}
+                  >
+                    <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+                  </Button>
+                )}
               </Td>
             </Tr>
             {/* LICENSES */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
-                Data License
+                <InfoLabel title={`Data License`} onClick={onCheckLicense} />
               </Td>
               <Td pl={0}>
                 <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
                   {/* SPDX */}
-                  {licenses?.length > 0 &&
-                    licenses?.map((item, index) => (
+                  {data.licenses?.length > 0 &&
+                    data.licenses?.map((item, index) => (
                       <Tag
                         my={2}
                         size={'md'}
@@ -424,7 +432,7 @@ const General = ({ data, loading, error }) => {
                       </Tag>
                     ))}
                   {/* EXPRESSION */}
-                  {licensesExp && licensesExp !== '' && (
+                  {data.licensesExp && data.licensesExp !== '' && (
                     <Tag
                       my={2}
                       size={'md'}
@@ -432,26 +440,30 @@ const General = ({ data, loading, error }) => {
                       colorScheme='green'
                       width={'fit-content'}
                     >
-                      <TagLabel>{licensesExp}</TagLabel>
-                      {updateComponent && (
-                        <TagCloseButton onClick={onUpdateLicense} />
-                      )}
+                      <TagLabel>{data.licensesExp}</TagLabel>
                     </Tag>
                   )}
                 </Flex>
               </Td>
               <Td pl={0}>
-                <IconButton
-                  size='sm'
-                  isDisabled={customerView || !editSboms}
-                  icon={<EditIcon color={iconColor} />}
-                  onClick={onLicenseOpen}
-                />
+                {!customerView && (
+                  <Button
+                    size='sm'
+                    ref={licenseBtn}
+                    isDisabled={
+                      status === 'signed' || !updateComponent || signedUrlParams
+                    }
+                    onClick={onLicenseOpen}
+                  >
+                    <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+                  </Button>
+                )}
               </Td>
             </Tr>
           </Tbody>
         </Table>
       </CardBody>
+
       {/* GENERAL DRAWER */}
       {data && isOpen && (
         <GeneralDataDrawer
@@ -461,16 +473,16 @@ const General = ({ data, loading, error }) => {
           data={data}
           selectedKey={selectedKey}
           checkId={null}
-          isFreeTier={isFreeTier}
         />
       )}
+
       {/* SBOM LICENSE DRAWER */}
-      {isSBMOpen && data && (
+      {isSBMOpen && data && !customerView && (
         <Modal isOpen={isSBMOpen} onClose={onSBMClose}>
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>
-              {licensesExp?.length > 0 ? 'Update' : 'Add'} License
+              {data?.licenses?.length > 0 ? 'Update' : 'Add'} License
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
@@ -478,7 +490,6 @@ const General = ({ data, loading, error }) => {
                 sbomView={true}
                 isValid={isValid}
                 setIsValid={setIsValid}
-                license={licensesExp}
               />
             </ModalBody>
             <ModalFooter>
@@ -491,22 +502,24 @@ const General = ({ data, loading, error }) => {
                 onClick={onUpdateLicense}
                 isDisabled={!isValid}
               >
-                {licensesExp?.length > 0 ? 'Update' : 'Save'}
+                {data?.licensesExp?.length > 0 ? 'Update' : 'Save'}
               </Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
       )}
+
       {/* SUPPLIER MODAL */}
-      {isSupOpen && (
+      {isSupOpen && data && (
         <PriSupplierModal
           isOpen={isSupOpen}
           onClose={onSupClose}
-          suppliers={suppliers}
-          activeRow={null}
-          isFreeTier={isFreeTier}
+          suppliers={data.suppliers}
+          checkId={null}
+          shortDesc={null}
         />
       )}
+
       {/* TOOL DELETE MODAL */}
       {isDelOpen && activeTool && (
         <Modal isOpen={isDelOpen} onClose={onDelClose}>
@@ -536,6 +549,7 @@ const General = ({ data, loading, error }) => {
           </ModalContent>
         </Modal>
       )}
+
       {/* INFO MODAL */}
       {isInfoOpen && (
         <InfoModal
@@ -550,4 +564,4 @@ const General = ({ data, loading, error }) => {
   )
 }
 
-export default General
+export default GeneralDataRow

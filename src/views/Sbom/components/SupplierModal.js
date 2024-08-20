@@ -36,7 +36,8 @@ const SupplierModal = ({
   isOpen,
   onClose,
   activeRow,
-  ruleExists
+  ruleExists,
+  isFreeTier
 }) => {
   const params = useParams()
   const productId = params.productid
@@ -363,16 +364,19 @@ const SupplierModal = ({
               justifyContent={'flex-end'}
               alignItems={'center'}
             >
-              <Button
-                fontSize={'sm'}
-                mr={'auto'}
-                isDisabled={isInvalid}
-                onClick={handleRuleCreate}
-                hidden={friendlyId ? false : true}
-                colorScheme={ruleExists ? 'green' : 'blue'}
-              >
-                {ruleExists ? 'View' : 'Save as'} Rule
-              </Button>
+              {!isFreeTier && (
+                <Button
+                  fontSize={'sm'}
+                  mr={'auto'}
+                  isDisabled={isInvalid}
+                  onClick={handleRuleCreate}
+                  hidden={friendlyId ? false : true}
+                  colorScheme={ruleExists ? 'green' : 'blue'}
+                >
+                  {ruleExists ? 'View' : 'Save as'} Rule
+                </Button>
+              )}
+
               <Button colorScheme='gray' onClick={onClose}>
                 Cancel
               </Button>

@@ -40,7 +40,8 @@ const PurlModal = ({
   activeRow,
   setIsValid,
   activeComp,
-  ruleExists
+  ruleExists,
+  isFreeTier
 }) => {
   const { status, component } = activeRow || ''
   const { name, version, purl } = component || ''
@@ -836,16 +837,19 @@ const PurlModal = ({
               justifyContent={'flex-end'}
               alignItems={'center'}
             >
-              <Button
-                mr={'auto'}
-                fontSize={'sm'}
-                isDisabled={isDisabled || isInvalid}
-                onClick={handleRuleCreate}
-                hidden={friendlyId ? false : true}
-                colorScheme={ruleExists ? 'green' : 'blue'}
-              >
-                {ruleExists ? 'View' : 'Save as'} Rule
-              </Button>
+              {!isFreeTier && (
+                <Button
+                  mr={'auto'}
+                  fontSize={'sm'}
+                  isDisabled={isDisabled || isInvalid}
+                  onClick={handleRuleCreate}
+                  hidden={friendlyId ? false : true}
+                  colorScheme={ruleExists ? 'green' : 'blue'}
+                >
+                  {ruleExists ? 'View' : 'Save as'} Rule
+                </Button>
+              )}
+
               <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
                 Cancel
               </Button>

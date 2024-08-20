@@ -39,7 +39,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 import { GetComponentData } from 'graphQL/Queries'
 
-const CheckModal = ({ isOpen, onClose, activeRow, ruleExists }) => {
+const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
@@ -459,16 +459,19 @@ const CheckModal = ({ isOpen, onClose, activeRow, ruleExists }) => {
             alignItems={'center'}
             justifyContent={'flex-end'}
           >
-            <Button
-              mr={'auto'}
-              fontSize={'sm'}
-              onClick={handleRuleCreate}
-              hidden={!isComponentLicense && !isComponentVersion}
-              isDisabled={isInvalidLicense || isEmptyVersion || isDisabled}
-              colorScheme={ruleExists ? 'green' : 'blue'}
-            >
-              {ruleExists ? 'View' : 'Save as'} Rule
-            </Button>
+            {!isFreeTier && (
+              <Button
+                mr={'auto'}
+                fontSize={'sm'}
+                onClick={handleRuleCreate}
+                hidden={!isComponentLicense && !isComponentVersion}
+                isDisabled={isInvalidLicense || isEmptyVersion || isDisabled}
+                colorScheme={ruleExists ? 'green' : 'blue'}
+              >
+                {ruleExists ? 'View' : 'Save as'} Rule
+              </Button>
+            )}
+
             <Button fontSize={'sm'} onClick={onClose}>
               Close
             </Button>

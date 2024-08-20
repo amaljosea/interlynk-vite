@@ -31,7 +31,7 @@ import TeamsConfigModal from './TeamsConfigModal'
 
 const Connections = ({ org }) => {
   const activetab = useQueryParam('tab')
-  const { orgView } = useGlobalQueryContext()
+  const { orgView, isFreeTier } = useGlobalQueryContext()
   const { data } = useQuery(org ? GetOrgConnections : GetPersonalConnections, {
     skip: !orgView
       ? true
@@ -158,7 +158,7 @@ const Connections = ({ org }) => {
         </CardHeader>
         <CardBody px='5px'>
           <Wrap spacing={4}>
-            {org && (
+            {org && !isFreeTier && (
               <ConnectionCard
                 icon={FaJira}
                 name='Jira'
@@ -167,20 +167,26 @@ const Connections = ({ org }) => {
                 color='#0070f3'
               />
             )}
-            <ConnectionCard
-              icon={FaSlack}
-              name='Slack'
-              onConfigure={onSlackOpen}
-              isConnected={greenCheck.slack}
-              color='#E01E5A'
-            />
-            <ConnectionCard
-              icon={FaMicrosoft}
-              name='Teams'
-              onConfigure={onTeamsOpen}
-              isConnected={greenCheck.teams}
-              color='#6264A7'
-            />
+            {!isFreeTier && (
+              <ConnectionCard
+                icon={FaSlack}
+                name='Slack'
+                onConfigure={onSlackOpen}
+                isConnected={greenCheck.slack}
+                color='#E01E5A'
+              />
+            )}
+
+            {!isFreeTier && (
+              <ConnectionCard
+                icon={FaMicrosoft}
+                name='Teams'
+                onConfigure={onTeamsOpen}
+                isConnected={greenCheck.teams}
+                color='#6264A7'
+              />
+            )}
+
             <ConnectionCard
               icon={FaEnvelope}
               name='Email'

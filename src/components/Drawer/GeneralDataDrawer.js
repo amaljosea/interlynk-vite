@@ -45,7 +45,8 @@ const GeneralDataDrawer = ({
   data,
   selectedKey,
   activeRow,
-  ruleExists
+  ruleExists,
+  isFreeTier
 }) => {
   const params = useParams()
   const sbomId = params.sbomid
@@ -511,16 +512,19 @@ const GeneralDataDrawer = ({
               alignItems={'center'}
               justifyContent={'flex-end'}
             >
-              <Button
-                mr={'auto'}
-                fontSize={'sm'}
-                isDisabled={isDisabled}
-                onClick={handleRuleCreate}
-                hidden={friendlyId ? false : true}
-                colorScheme={ruleExists ? 'green' : 'blue'}
-              >
-                {ruleExists ? 'View' : 'Save as'} Rule
-              </Button>
+              {!isFreeTier && (
+                <Button
+                  mr={'auto'}
+                  fontSize={'sm'}
+                  isDisabled={isDisabled}
+                  onClick={handleRuleCreate}
+                  hidden={friendlyId ? false : true}
+                  colorScheme={ruleExists ? 'green' : 'blue'}
+                >
+                  {ruleExists ? 'View' : 'Save as'} Rule
+                </Button>
+              )}
+
               <Button onClick={onClose}>Cancel</Button>
               <Button
                 colorScheme='blue'

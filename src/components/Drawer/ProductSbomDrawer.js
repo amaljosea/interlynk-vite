@@ -43,6 +43,7 @@ import CpeInput from 'components/CpeInput'
 import LicenseField from 'components/Licenses/LicenseField'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { CreateComponent, sbomCreate } from 'graphQL/Mutation'
@@ -51,6 +52,7 @@ import { CpeAutoComplete } from 'graphQL/Queries'
 import { FaExpandAlt } from 'react-icons/fa'
 
 function ProductSbomDrawer({ isOpen, onClose, data }) {
+  const { isFreeTier } = useGlobalQueryContext()
   const { showToast } = useCustomToast()
   const params = useParams()
   const productId = params.productid
@@ -518,6 +520,7 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
           purlValue={purlValue}
           getCpe={getCpe}
           activeComp={data?.defaultProject}
+          isFreeTier={isFreeTier}
         />
       )}
 
@@ -534,6 +537,7 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
           getCpe={getCpe}
           activeComp={data?.defaultProject}
           activeRow={null}
+          isFreeTier={isFreeTier}
         />
       )}
     </>

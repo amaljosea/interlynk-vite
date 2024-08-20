@@ -4,6 +4,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { FaLock } from 'react-icons/fa6'
@@ -26,6 +27,7 @@ const tabs = [
 ]
 
 const SbomTable = ({ data, loading, error }) => {
+  const { isFreeTier, orgQueryLoading } = useGlobalQueryContext()
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
   const navigate = useNavigate()
@@ -37,6 +39,14 @@ const SbomTable = ({ data, loading, error }) => {
       }
     })
     navigate(link)
+  }
+
+  const getDisplay = (item) => {
+    const conditions = {
+      parts: isFreeTier,
+      support: isFreeTier
+    }
+    return conditions[item] ? 'none' : 'block'
   }
 
   const location = useLocation()
@@ -58,6 +68,7 @@ const SbomTable = ({ data, loading, error }) => {
               <Tab
                 key={index}
                 className={item}
+                display={getDisplay(item)}
                 textTransform={'capitalize'}
                 _focus={{ outline: 'none' }}
                 isDisabled={

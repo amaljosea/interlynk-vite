@@ -37,6 +37,7 @@ import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import PolicyTable from 'components/Tables/PolicyTable'
 import VersionsTable from 'components/Tables/VersionsTable'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -52,6 +53,7 @@ import {
   GetProjectSettings,
   GetVersionsDate
 } from 'graphQL/Queries'
+import { GetOrgName } from 'graphQL/Queries'
 
 import { FaBug, FaRobot, FaTag } from 'react-icons/fa'
 import {
@@ -89,6 +91,7 @@ const SettingsTag = ({ icon, label, settings }) => {
 }
 
 const ProductDetailsMain = () => {
+  const { isFreeTier, orgQueryLoading } = useGlobalQueryContext()
   const navigate = useNavigate()
   const params = useParams()
   const productId = params.productid
@@ -99,15 +102,6 @@ const ProductDetailsMain = () => {
   const activeTour = localStorage.getItem('activeTour')
 
   const warningColor = useColorModeValue('#E53E3E', '#F56565')
-
-  const tabs = [
-    'versions',
-    'vulnerabilities',
-    'automation rules',
-    'settings',
-    'policies',
-    'change log'
-  ]
 
   const [warning, setWarning] = useState(false)
   const [exceedingCount, setExceedingCount] = useState(0)
@@ -123,6 +117,22 @@ const ProductDetailsMain = () => {
     })
 
     navigate(link)
+  }
+
+  const tabs = [
+    'versions',
+    'vulnerabilities',
+    'automation rules',
+    'settings',
+    'policies',
+    'change log'
+  ]
+
+  const getDisplay = (item) => {
+    const conditions = {
+      'automation rules': isFreeTier
+    }
+    return conditions[item] ? 'none' : 'block'
   }
 
   const queryParams = useSearchParams()
@@ -328,7 +338,7 @@ const ProductDetailsMain = () => {
     }))
   }
 
-  if (loading) {
+  if (loading || orgQueryLoading) {
     return (
       <Card>
         <Flex width={'100%'} gap={4} direction={'row'}>
@@ -523,6 +533,7 @@ const ProductDetailsMain = () => {
                 {tabs.map((item, index) => (
                   <Tab
                     key={index}
+                    display={getDisplay(item)}
                     _focus={{ outline: 'none' }}
                     textTransform={'capitalize'}
                     className={
@@ -582,7 +593,7 @@ const ProductDetailsMain = () => {
                   >
                     Automation is disabled under Product Settings
                   </Tag>
-                  <Automation projects={projects} />
+                  {<Automation projects={projects} />}
                 </TabPanel>
                 {/* SETTINGS */}
                 <TabPanel px={0}>
