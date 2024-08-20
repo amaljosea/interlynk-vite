@@ -1,10 +1,8 @@
-import React from 'react'
-
 import { Flex, ListItem, Tag, Text, UnorderedList } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
-import { FaToggleOff, FaToggleOn } from 'react-icons/fa6'
+import { FaArrowRotateRight, FaToggleOff, FaToggleOn } from 'react-icons/fa6'
 import { MdDelete, MdOutlineArchive, MdOutlineUnarchive } from 'react-icons/md'
 
 const getIcon = (title) => {
@@ -13,6 +11,7 @@ const getIcon = (title) => {
   if (title.includes('Disable')) return FaToggleOff
   if (title.includes('Enable')) return FaToggleOn
   if (title.includes('Delete')) return MdDelete
+  if (title.includes('Reprocess')) return FaArrowRotateRight
   return null
 }
 

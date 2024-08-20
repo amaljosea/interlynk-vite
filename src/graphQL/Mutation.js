@@ -2955,3 +2955,11 @@ export const LabelDelete = gql`
     }
   }
 `
+
+export const SbomReprocess = gql`
+  mutation SbomReprocess($sbomId: Uuid!) {
+    sbomReprocess(input: { sbomId: $sbomId }) {
+      errors
+    }
+  }
+`

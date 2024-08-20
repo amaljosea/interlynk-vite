@@ -18,10 +18,12 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { RepeatIcon } from '@chakra-ui/icons'
 import {
+  Box,
   Divider,
   Flex,
   Grid,
   GridItem,
+  Icon,
   IconButton,
   Menu,
   MenuButton,
@@ -45,6 +47,7 @@ import ToolsDrawer from 'components/Drawer/ToolsDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 import DeleteSbom from 'components/Modal/DeleteSbom'
+import ReprocessSbom from 'components/Modal/ReprocessSbom'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -66,6 +69,7 @@ import {
   FaEllipsisVertical,
   FaScrewdriverWrench
 } from 'react-icons/fa6'
+import { HiOutlineDuplicate } from 'react-icons/hi'
 import { IoMdWarning } from 'react-icons/io'
 
 const VersionsTable = ({
@@ -166,6 +170,11 @@ const VersionsTable = ({
     onOpen: onArcOpen,
     onClose: onArcClose
   } = useDisclosure()
+  const {
+    isOpen: isRepOpen,
+    onOpen: onRepOpen,
+    onClose: onRepClose
+  } = useDisclosure()
 
   const onFilterSev = async (value) => {
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
@@ -181,6 +190,11 @@ const VersionsTable = ({
     })
     setActiveRow(row)
     onListOpen()
+  }
+
+  const handleRepSbom = (row) => {
+    setActiveRow(row)
+    onRepOpen()
   }
 
   const onSelectLicenses = (row) => {
@@ -216,6 +230,8 @@ const VersionsTable = ({
 
   const retention = retentionTime && Math.floor(retentionTime)
 
+  const ignoreMsg = `An SBOM with the same version was recently imported. However, the system found no difference between the two versions, so the newer import has been ignored. On the right, you can still see its record under Action ... > List SBOM`
+
   // COLUMNS
   const columns = [
     // VERSION
@@ -223,7 +239,7 @@ const VersionsTable = ({
       id: 'SBOMS_PROJECT_VERSION',
       name: 'VERSION',
       selector: (row, index) => {
-        const { projectVersion, createdAt } = row
+        const { projectVersion, createdAt, alternatives } = row
         const parsedCreatedDate = parseISO(createdAt)
         const endDate = addDays(parsedCreatedDate, retention)
         const diff = differenceInDays(endDate, currentDate)
@@ -276,6 +292,18 @@ const VersionsTable = ({
                   {projectVersion}
                 </Text>
               </Link>
+              {alternatives?.length > 0 && (
+                <Tooltip label={ignoreMsg}>
+                  <Box>
+                    <Icon
+                      mt={1}
+                      fontSize={18}
+                      color={textColor}
+                      as={HiOutlineDuplicate}
+                    />
+                  </Box>
+                </Tooltip>
+              )}
               {daysUntilDeletion && !signedUrlParams && (
                 <Tooltip
                   label={`Marked for deletion on ${endDate ? new Date(endDate).toLocaleDateString() : ''}`}
@@ -458,6 +486,9 @@ const VersionsTable = ({
               <MenuList fontSize={16}>
                 <MenuItem onClick={() => handleListSbom(row)}>
                   List SBOM
+                </MenuItem>
+                <MenuItem onClick={() => handleRepSbom(row)}>
+                  Reprocess
                 </MenuItem>
                 <Divider />
                 <MenuItem
@@ -683,6 +714,16 @@ const VersionsTable = ({
           projectGroup={projectGroup}
           isOpen={isArchiveOpen}
           onClose={onArchiveClose}
+        />
+      )}
+
+      {/* REPROCESS VERSION */}
+      {isRepOpen && (
+        <ReprocessSbom
+          data={activeRow}
+          isOpen={isRepOpen}
+          onClose={onRepClose}
+          projectGroup={projectGroup}
         />
       )}
 

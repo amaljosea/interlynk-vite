@@ -1114,6 +1114,9 @@ export const GetVersionsTable = gql`
           lifecycle
           projectVersion
           vulnRunStatus
+          alternatives {
+            id
+          }
           stats {
             compCount
             compLicenseCount
