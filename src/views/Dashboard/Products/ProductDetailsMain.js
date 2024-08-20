@@ -380,10 +380,18 @@ const ProductDetailsMain = () => {
                       fontSize={25}
                       lineHeight={1.2}
                     >
-                      {truncatedValue(name, 20)}
+                      {name?.length > 50 ? (
+                        <Tooltip label={name}>
+                          {truncatedValue(name, 50)}
+                        </Tooltip>
+                      ) : (
+                        name
+                      )}
                     </Text>
                     {/* PRODUCT DESCRIPTION */}
-                    <Text fontSize={'sm'}>{description || ''}</Text>
+                    <Text fontSize={'sm'} wordBreak={'break-all'}>
+                      {description || ''}
+                    </Text>
                     {/* SETTINGS */}
                     <Stack
                       mt={description ? 1 : 0}
@@ -486,7 +494,7 @@ const ProductDetailsMain = () => {
                       />
                     </Tooltip>
                     {/* ARCHIVE PRODUCT */}
-                    <Tooltip label='Archive Product'>
+                    <Tooltip label='Delete Product'>
                       <IconButton
                         colorScheme='red'
                         onClick={onDeleteOpen}
@@ -648,8 +656,8 @@ const ProductDetailsMain = () => {
           onClose={onDeleteClose}
           onConfirm={onProductDelete}
           name={name}
-          title='Archive Product'
-          description='Archiving this product will:'
+          title='Delete Product'
+          description='Deleting this product will:'
           items={[
             'Remove this product, its versions and SBOMs',
             'Remove access to the product for all users',

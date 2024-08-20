@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { hexToRGBA } from 'utils'
 
 import { Button, Checkbox, Divider, Flex, Tag, Text } from '@chakra-ui/react'
@@ -8,67 +8,39 @@ import { UpdateProjectGroup } from 'graphQL/Mutation'
 import { GetLabels } from 'graphQL/Queries'
 
 const LabelInput = ({ data, setOpen, onOpenLabel }) => {
-  const { id, name, desc, labels } = data || ''
+  const { id: prodId, name, desc, labels } = data || ''
   const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
 
-  const { data: prodLabels } = useQuery(GetLabels, {
+  const { data: prodLabels, loading } = useQuery(GetLabels, {
     variables: { first: 100 }
   })
   const { nodes } = prodLabels?.labels || ''
 
-  const inputRef = useRef()
   const [selectedLabels, setSelectedLabels] = useState([])
 
   const addLabels = (id) => {
+    let result = []
     if (selectedLabels?.includes(id)) {
-      const result = selectedLabels?.filter((label) => label !== id)
+      result = selectedLabels?.filter((label) => label !== id)
       setSelectedLabels(result)
     } else {
+      result = [id, ...selectedLabels]
       setSelectedLabels((prev) => [id, ...prev])
     }
-  }
-
-  const updateProduct = useCallback(() => {
     projectGroupUpdate({
       variables: {
-        id,
+        id: prodId,
         name,
         desc,
-        labelIds: selectedLabels
+        labelIds: result
       }
     }).then((res) => {
       const error = res?.data?.projectGroupUpdate?.errors
       if (error?.length > 0) {
         console.log(res.data.projectGroupUpdate.errors[0])
-      } else {
-        setOpen(false)
       }
     })
-  }, [desc, id, name, projectGroupUpdate, selectedLabels, setOpen])
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (inputRef.current && !inputRef.current.contains(event.target)) {
-        updateProduct()
-      }
-    }
-    document.addEventListener('click', handleClickOutside)
-    return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [inputRef, labels?.length, selectedLabels?.length, setOpen, updateProduct])
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        updateProduct()
-      }
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [updateProduct])
+  }
 
   useEffect(() => {
     if (labels?.length > 0) {
@@ -79,19 +51,21 @@ const LabelInput = ({ data, setOpen, onOpenLabel }) => {
     }
   }, [labels])
 
-  if (nodes?.length > 0) {
-    return (
+  if (loading) return false
+
+  return (
+    <>
       <Flex
         px={3}
         py={5}
         gap={4}
-        ref={inputRef}
         minH={'auto'}
         maxH={'250px'}
         flexDir={'column'}
         overflow={'hidden'}
         overflowY={'scroll'}
         alignItems={'flex-start'}
+        hidden={nodes?.length === 0}
       >
         {nodes?.map((row, index) => (
           <Flex alignItems={'center'} gap={2} key={index}>
@@ -112,33 +86,30 @@ const LabelInput = ({ data, setOpen, onOpenLabel }) => {
           </Flex>
         ))}
       </Flex>
-    )
-  }
-
-  return (
-    <Flex
-      width={'100%'}
-      ref={inputRef}
-      flexDir={'column'}
-      alignItems={'center'}
-    >
-      <Text py={5} color={'gray.500'}>
-        No Labels Present
-      </Text>
-      <Divider />
-      <Button
-        my={1}
-        w={'100%'}
-        color={'blue.500'}
-        variant='unstyled'
-        onClick={() => {
-          setOpen(false)
-          onOpenLabel()
-        }}
+      <Flex
+        width={'100%'}
+        flexDir={'column'}
+        alignItems={'center'}
+        hidden={nodes?.length > 0}
       >
-        Create Label
-      </Button>
-    </Flex>
+        <Text py={5} color={'gray.500'}>
+          No Labels Present
+        </Text>
+        <Divider />
+        <Button
+          my={1}
+          w={'100%'}
+          color={'blue.500'}
+          variant='unstyled'
+          onClick={() => {
+            setOpen(false)
+            onOpenLabel()
+          }}
+        >
+          Create Label
+        </Button>
+      </Flex>
+    </>
   )
 }
 

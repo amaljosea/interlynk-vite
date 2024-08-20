@@ -403,7 +403,11 @@ const ProductTable = ({
                   width={'fit-content'}
                   onClick={handleClick}
                 >
-                  {truncatedValue(name, 54)}
+                  {name?.length > 54 ? (
+                    <Tooltip label={name}>{truncatedValue(name, 54)}</Tooltip>
+                  ) : (
+                    name
+                  )}
                 </Text>
                 {labels?.map((item) => (
                   <Tag
@@ -570,13 +574,34 @@ const ProductTable = ({
                   Edit Product
                 </MenuItem>
                 <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    setOpenTagMenu(true)
-                  }}
+                  position={'relative'}
+                  onMouseEnter={() => setOpenTagMenu(true)}
+                  onMouseLeave={() => setOpenTagMenu(false)}
                 >
                   {labels?.length > 0 ? 'Update' : 'Add'} Label
                 </MenuItem>
+                {openTagMenu && (
+                  <Fade initialScale={0.9} in={openTagMenu} delay={0.2}>
+                    <Box
+                      h={'auto'}
+                      bottom={9}
+                      right={224}
+                      width='220px'
+                      borderRadius='md'
+                      bg={labelBgColor}
+                      position='absolute'
+                      border={`1px solid ${labelBorderColor}`}
+                      onMouseEnter={() => setOpenTagMenu(true)}
+                      onMouseLeave={() => setOpenTagMenu(false)}
+                    >
+                      <LabelInput
+                        data={row}
+                        setOpen={setOpenTagMenu}
+                        onOpenLabel={onOpenLabel}
+                      />
+                    </Box>
+                  </Fade>
+                )}
                 {/* UPLOAD SBOM */}
                 <MenuItem
                   onClick={() => {
@@ -604,7 +629,7 @@ const ProductTable = ({
                   }}
                   isDisabled={!canArchiveProduct}
                 >
-                  Archive Product
+                  Delete Product
                 </MenuItem>
               </MenuList>
             </Portal>
@@ -655,28 +680,6 @@ const ProductTable = ({
           <DataTable {...dataTableProps} />
           <Pagination {...paginationProps} />
         </Flex>
-        {openTagMenu && (
-          <Fade initialScale={0.9} in={openTagMenu} delay={0.2}>
-            <Box
-              right='52px'
-              width='220px'
-              bottom={'50%'}
-              position='fixed'
-              height={'auto'}
-              boxShadow={'lg'}
-              borderRadius='md'
-              bg={labelBgColor}
-              transform={`translate(-20%, 60%)`}
-              border={`1px solid ${labelBorderColor}`}
-            >
-              <LabelInput
-                data={activeRow}
-                setOpen={setOpenTagMenu}
-                onOpenLabel={onOpenLabel}
-              />
-            </Box>
-          </Fade>
-        )}
       </Card>
 
       {/* UPLOAD SBOM */}
@@ -706,8 +709,8 @@ const ProductTable = ({
           onClose={onDeleteClose}
           onConfirm={onProductDelete}
           name={activeRow.name}
-          title='Archive Product'
-          description='Archiving this product will:'
+          title='Delete Product'
+          description='Deleting this product will:'
           items={[
             'Remove this product, its versions and SBOMs',
             'Remove access to the product for all users',
