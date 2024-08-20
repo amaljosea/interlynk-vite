@@ -6,11 +6,13 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 import {
+  AbsoluteCenter,
   Alert,
   AlertDescription,
   AlertIcon,
   Box,
   Button,
+  Divider,
   Flex,
   FormControl,
   FormHelperText,
@@ -23,6 +25,9 @@ import {
 import useCustomToast from 'hooks/useCustomToast'
 
 import { UserResendConfirmationEmail } from 'graphQL/Mutation'
+
+import { FaGithub } from 'react-icons/fa6'
+import { FcGoogle } from 'react-icons/fc'
 
 const LoginForm = () => {
   const { showToast } = useCustomToast()
@@ -125,7 +130,7 @@ const LoginForm = () => {
         </Box>
       )}
       <form style={{ width: '100%' }} onSubmit={handleSubmit}>
-        <Stack py={'1rem'} direction={'column'} gap={4} width={'100%'} mt={4}>
+        <Stack py={'1rem'} direction={'column'} gap={3} width={'100%'} mt={2}>
           <FormControl>
             <FormLabel htmlFor='email'>Email address</FormLabel>
             <Input
@@ -172,6 +177,25 @@ const LoginForm = () => {
                 Register
               </Text>
             </Link>
+          </Stack>
+          <Box position='relative' py={1}>
+            <Divider />
+            <AbsoluteCenter
+              px='4'
+              bg={'white'}
+              fontSize={'sm'}
+              color={'darkgray'}
+            >
+              OR
+            </AbsoluteCenter>
+          </Box>
+          <Stack spacing={3}>
+            <Button variant='outline' leftIcon={<FcGoogle fontSize={18} />}>
+              Continue with Google
+            </Button>
+            <Button variant='outline' leftIcon={<FaGithub />}>
+              Continue with Github
+            </Button>
           </Stack>
         </Stack>
       </form>
