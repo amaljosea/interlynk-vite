@@ -45,16 +45,16 @@ const LynkModal = ({
       ? 'Yes'
       : buttonText
   return (
-    <Modal isCentered isOpen={isOpen} onClose={onClose} size='lg'>
+    <Modal isCentered isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent maxW={'600px'}>
         <ModalHeader>
           <Flex alignItems='center' gap={3}>
             {Icon && <Icon color='#60686F' />}
             {title && <Text fontWeight={600}>{title}</Text>}
           </Flex>
         </ModalHeader>
-        <ModalCloseButton marginTop={1.5} />
+        <ModalCloseButton marginTop={1.5} marginRight={3.5} />
         <Divider />
         <ModalBody marginBlock={2}>{children}</ModalBody>
         <Divider />

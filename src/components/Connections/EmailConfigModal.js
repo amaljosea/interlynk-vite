@@ -4,22 +4,16 @@ import { useEffect, useState } from 'react'
 import { AddIcon } from '@chakra-ui/icons'
 import {
   Button,
-  Flex,
   HStack,
   Icon,
   IconButton,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   VStack,
   useColorModeValue
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -51,7 +45,6 @@ const EmailConfigModal = ({
     { address: '', notificationType: 'All', frequency: 'Instant' }
   ])
 
-  const bgColor = useColorModeValue('gray.400', 'gray.200')
   const borderColor = useColorModeValue('gray.200', 'gray.600')
 
   useEffect(() => {
@@ -63,7 +56,6 @@ const EmailConfigModal = ({
         frequency: item.connection?.configs[0]?.frequency || 'Instant'
       }))
 
-      // Update state with the new configurations
       setConfigs(newConfigs)
     }
   }, [data])
@@ -131,11 +123,11 @@ const EmailConfigModal = ({
     })
   }
 
-  const handleSave = () => {
+  /*   const handleSave = () => {
     const validConfigs = configs.filter(
       (config) => config.address.trim() !== ''
     )
-
+   
     if (validConfigs.length === 0) {
       handleDelete()
       onClose()
@@ -165,6 +157,52 @@ const EmailConfigModal = ({
         })
       }
     })
+  } */
+
+  //This save function shows exactly what went wrong while saving
+  const handleSave = async () => {
+    const validConfigs = configs.filter(
+      (config) => config.address.trim() !== ''
+    )
+
+    if (validConfigs.length === 0) {
+      handleDelete()
+      onClose()
+      return
+    }
+
+    try {
+      const res = await createEmailConnection({
+        variables: {
+          org: !!org,
+          configs: validConfigs
+        }
+      })
+
+      const errors = res?.data?.emailConnectionCreate?.errors
+
+      if (!errors || errors.length === 0) {
+        setGreenCheck((prev) => ({ ...prev, email: true }))
+        onClose()
+        showToast({
+          title: 'Configuration saved.',
+          description: 'Your Email configuration has been successfully saved.',
+          status: 'success'
+        })
+      } else {
+        showToast({
+          title: 'Saving failed.',
+          description: `An error occurred: ${errors.join(', ')}`,
+          status: 'error'
+        })
+      }
+    } catch (error) {
+      showToast({
+        title: 'Saving failed.',
+        description: `Unexpected error: ${error.message}`,
+        status: 'error'
+      })
+    }
   }
 
   const handleChange = (index, field, value) => {
@@ -192,116 +230,73 @@ const EmailConfigModal = ({
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent maxW='800px' minH='400px'>
-        <Flex
-          alignItems={'center'}
-          padding={'16px 20px'}
-          borderBottom='1px solid'
-          borderColor={borderColor}
-        >
-          <Icon color={bgColor} w={6} h={6} as={IoSettingsOutline} />
-          <ModalHeader paddingLeft={'8px'} minW={'50%'}>
-            Email Configuration
-          </ModalHeader>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={data ? handleUpdate : handleSave}
+      title='Email Configuration'
+      Icon={IoSettingsOutline}
+      buttonText='Save'
+      isLoading={false}
+      type='default'
+      disabled={configs.length === 0 || !updateCon}
+    >
+      <VStack spacing={4}>
+        {configs.map((config, index) => (
+          <HStack key={index} width='100%'>
+            <Input
+              placeholder='Paste Email Webhook URL'
+              value={config.address}
+              onChange={(e) => handleChange(index, 'address', e.target.value)}
+              isDisabled={!updateCon}
+            />
+            <Select
+              value={config.notificationType}
+              onChange={(e) =>
+                handleChange(index, 'notificationType', e.target.value)
+              }
+              isDisabled={!updateCon}
+            >
+              <option value='All'>All</option>
+              <option value='Alert'>Alert</option>
+              <option value='Warning'>Warning</option>
+              <option value='Info'>Info</option>
+            </Select>
+            <Select
+              value={config.frequency}
+              onChange={(e) => handleChange(index, 'frequency', e.target.value)}
+              isDisabled={!updateCon}
+            >
+              <option value='Instant'>Instant</option>
+            </Select>
 
-          <ModalCloseButton
-            w={8}
-            h={8}
-            marginTop={'20px'}
-            marginRight={'16px'}
-            color={bgColor}
-          />
-        </Flex>
+            <IconButton
+              aria-label='Remove config'
+              icon={<Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />}
+              onClick={() => handleRemoveConfig(index)}
+              isDisabled={!updateCon}
+              border='1px solid'
+              borderColor={borderColor}
+              colorScheme='white'
+            />
+          </HStack>
+        ))}
+      </VStack>
 
-        <ModalBody
-          padding={'20px'}
-          borderBottom='1px solid'
-          borderColor={borderColor}
-        >
-          <VStack spacing={4}>
-            {configs.map((config, index) => (
-              <HStack key={index} width='100%'>
-                <Input
-                  placeholder='Paste Email Webhook URL'
-                  value={config.address}
-                  onChange={(e) =>
-                    handleChange(index, 'address', e.target.value)
-                  }
-                  isDisabled={!updateCon}
-                />
-                <Select
-                  value={config.notificationType}
-                  onChange={(e) =>
-                    handleChange(index, 'notificationType', e.target.value)
-                  }
-                  isDisabled={!updateCon}
-                >
-                  <option value='All'>All</option>
-                  <option value='Alert'>Alert</option>
-                  <option value='Warning'>Warning</option>
-                  <option value='Info'>Info</option>
-                </Select>
-                <Select
-                  value={config.frequency}
-                  onChange={(e) =>
-                    handleChange(index, 'frequency', e.target.value)
-                  }
-                  isDisabled={!updateCon}
-                >
-                  <option value='Instant'>Instant</option>
-                </Select>
-
-                <IconButton
-                  aria-label='Remove config'
-                  icon={
-                    <Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />
-                  }
-                  onClick={() => handleRemoveConfig(index)}
-                  isDisabled={!updateCon}
-                  border='1px solid'
-                  borderColor={borderColor}
-                  colorScheme='white'
-                />
-              </HStack>
-            ))}
-          </VStack>
-
-          <Button
-            aria-label='Add config'
-            onClick={handleAddConfig}
-            isDisabled={!updateCon}
-            colorScheme='white'
-            leftIcon={<AddIcon />}
-            marginTop='10px'
-            fontWeight='500'
-            textColor={'blue.500'}
-            paddingLeft={'2px'}
-          >
-            Add New
-          </Button>
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            ml={3}
-            colorScheme='white'
-            onClick={() => onClose()}
-            isDisabled={!updateCon}
-            textColor={bgColor}
-          >
-            Cancel
-          </Button>
-          <Button
-            colorScheme='blue'
-            onClick={() => (data ? handleUpdate() : handleSave())}
-            isDisabled={configs.length === 0 || !updateCon}
-          >
-            Save
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+      <Button
+        aria-label='Add config'
+        onClick={handleAddConfig}
+        isDisabled={!updateCon}
+        colorScheme='white'
+        leftIcon={<AddIcon />}
+        marginTop='10px'
+        fontWeight='500'
+        textColor={'blue.500'}
+        paddingLeft={'2px'}
+      >
+        Add New
+      </Button>
+    </LynkModal>
   )
 }
 

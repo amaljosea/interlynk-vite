@@ -9,17 +9,12 @@ import {
   Icon,
   IconButton,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   VStack,
   useColorModeValue
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -62,7 +57,6 @@ const TeamsConfigModal = ({
         frequency: item.connection?.configs[0]?.frequency
       }))
 
-      // Update state with the new configurations
       setConfigs(newConfigs)
     }
   }, [data])
@@ -191,117 +185,72 @@ const TeamsConfigModal = ({
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent maxW='800px' minH='400px'>
-        <Flex
-          alignItems={'center'}
-          padding={'16px 20px'}
-          borderBottom='1px solid'
-          borderColor={borderColor}
-        >
-          <Icon color={bgColor} w={6} h={6} as={IoSettingsOutline} />
-          <ModalHeader paddingLeft={'8px'} minW={'50%'}>
-            Teams Configuration
-          </ModalHeader>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={data ? handleUpdate : handleSave}
+      title='Teams Configuration'
+      Icon={IoSettingsOutline}
+      buttonText='Save'
+      isLoading={false}
+      type='default'
+      disabled={configs.length === 0 || !updateCon}
+    >
+      <VStack spacing={4}>
+        {configs.map((config, index) => (
+          <HStack key={index} width='100%'>
+            <Input
+              placeholder='Paste Teams Webhook URL'
+              value={config.address}
+              onChange={(e) => handleChange(index, 'address', e.target.value)}
+              isDisabled={!updateCon}
+            />
+            <Select
+              value={config.notificationType}
+              onChange={(e) =>
+                handleChange(index, 'notificationType', e.target.value)
+              }
+              isDisabled={!updateCon}
+            >
+              <option value='All'>All</option>
+              <option value='Alert'>Alert</option>
+              <option value='Warning'>Warning</option>
+              <option value='Info'>Info</option>
+            </Select>
+            <Select
+              value={config.frequency}
+              onChange={(e) => handleChange(index, 'frequency', e.target.value)}
+              isDisabled={!updateCon}
+            >
+              <option value='Instant'>Instant</option>
+            </Select>
 
-          <ModalCloseButton
-            w={8}
-            h={8}
-            marginTop={'20px'}
-            marginRight={'16px'}
-            color={bgColor}
-          />
-        </Flex>
-
-        <ModalBody
-          padding={'20px'}
-          borderBottom='1px solid'
-          borderColor={borderColor}
-        >
-          <VStack spacing={4}>
-            {configs.map((config, index) => (
-              <HStack key={index} width='100%'>
-                <Input
-                  placeholder='Paste Teams Webhook URL'
-                  value={config.address}
-                  onChange={(e) =>
-                    handleChange(index, 'address', e.target.value)
-                  }
-                  isDisabled={!updateCon}
-                />
-                <Select
-                  value={config.notificationType}
-                  onChange={(e) =>
-                    handleChange(index, 'notificationType', e.target.value)
-                  }
-                  isDisabled={!updateCon}
-                >
-                  <option value='All'>All</option>
-                  <option value='Alert'>Alert</option>
-                  <option value='Warning'>Warning</option>
-                  <option value='Info'>Info</option>
-                </Select>
-                <Select
-                  value={config.frequency}
-                  onChange={(e) =>
-                    handleChange(index, 'frequency', e.target.value)
-                  }
-                  isDisabled={!updateCon}
-                >
-                  <option value='Instant'>Instant</option>
-                </Select>
-
-                <IconButton
-                  aria-label='Remove config'
-                  icon={
-                    <Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />
-                  }
-                  onClick={() => handleRemoveConfig(index)}
-                  isDisabled={!updateCon}
-                  border='1px solid'
-                  borderColor={borderColor}
-                  colorScheme='white'
-                />
-              </HStack>
-            ))}
-          </VStack>
-          <Button
-            aria-label='Add config'
-            onClick={handleAddConfig}
-            isDisabled={!updateCon}
-            colorScheme='white'
-            leftIcon={<AddIcon />}
-            marginTop='10px'
-            fontWeight='500'
-            textColor={'blue.500'}
-            paddingLeft={'2px'}
-          >
-            Add New
-          </Button>
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            ml={3}
-            colorScheme='white'
-            onClick={() => onClose()}
-            isDisabled={!updateCon}
-            textColor={bgColor}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            colorScheme='blue'
-            onClick={() => (data ? handleUpdate() : handleSave())}
-            isDisabled={configs.length === 0 || !updateCon}
-            marginLeft={'10px'}
-          >
-            Save
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+            <IconButton
+              aria-label='Remove config'
+              icon={<Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />}
+              onClick={() => handleRemoveConfig(index)}
+              isDisabled={!updateCon}
+              border='1px solid'
+              borderColor={borderColor}
+              colorScheme='white'
+            />
+          </HStack>
+        ))}
+      </VStack>
+      <Button
+        aria-label='Add config'
+        onClick={handleAddConfig}
+        isDisabled={!updateCon}
+        colorScheme='white'
+        leftIcon={<AddIcon />}
+        marginTop='10px'
+        fontWeight='500'
+        textColor={'blue.500'}
+        paddingLeft={'2px'}
+      >
+        Add New
+      </Button>
+    </LynkModal>
   )
 }
 
