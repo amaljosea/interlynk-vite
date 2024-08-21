@@ -27,7 +27,7 @@ const tabs = [
 ]
 
 const SbomTable = ({ data, loading, error }) => {
-  const { isFreeTier, orgQueryLoading } = useGlobalQueryContext()
+  const { isFreeTier } = useGlobalQueryContext()
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
   const navigate = useNavigate()
@@ -46,7 +46,7 @@ const SbomTable = ({ data, loading, error }) => {
       parts: isFreeTier,
       support: isFreeTier
     }
-    return conditions[item] ? 'none' : 'block'
+    return conditions[item] ? 'none' : 'flex'
   }
 
   const location = useLocation()
@@ -59,6 +59,7 @@ const SbomTable = ({ data, loading, error }) => {
       <Card>
         <Tabs
           isLazy
+          w={'100%'}
           variant='enclosed'
           index={activeTabNumber}
           onChange={onTabChange}

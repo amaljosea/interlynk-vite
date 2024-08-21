@@ -261,6 +261,7 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
                     Expiration Date
                   </FormLabel>
                   <Datetime
+                    closeOnSelect={true}
                     value={selectedDate}
                     onChange={handleDateChange}
                     className={react_datatime}
