@@ -16,6 +16,7 @@ import Parts from './Parts'
 import Policies from './Policies'
 import Support from './Support'
 import Vulnerabilities from './Vulnerabilities'
+import Compliance from './Compliance'
 
 const SbomTable = ({ data, refetch, loading, error }) => {
   const { isFreeTier, orgQueryLoading } = useGlobalQueryContext()
@@ -29,6 +30,7 @@ const SbomTable = ({ data, refetch, loading, error }) => {
     'policies',
     'support',
     'checks',
+    'compliance',
     'changelog'
   ]
 
@@ -105,6 +107,9 @@ const SbomTable = ({ data, refetch, loading, error }) => {
             <TabPanel px={0}>{<Support />}</TabPanel>
             <TabPanel px={0}>
               <Checks />
+            </TabPanel>
+            <TabPanel px={0}>
+              <Compliance />
             </TabPanel>
             <TabPanel px={0}>
               <Changelog />

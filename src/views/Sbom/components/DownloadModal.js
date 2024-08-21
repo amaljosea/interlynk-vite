@@ -234,6 +234,7 @@ const DownloadModal = ({
                 >
                   <Text fontWeight={'medium'}>Compliance Checks</Text>
                   <Text
+                    fontSize={'sm'}
                     color='blue.500'
                     cursor={'pointer'}
                     fontWeight={'medium'}
@@ -255,6 +256,7 @@ const DownloadModal = ({
                       </Text>
                       <Button
                         size='xs'
+                        cursor={'default'}
                         isLoading={item?.loading}
                         isDisabled={item?.score === 0}
                       >
