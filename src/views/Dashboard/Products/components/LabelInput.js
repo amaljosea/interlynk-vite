@@ -1,20 +1,22 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 import { hexToRGBA } from 'utils'
 
-import { Button, Checkbox, Divider, Flex, Tag, Text } from '@chakra-ui/react'
+import {
+  Button,
+  Checkbox,
+  Divider,
+  Flex,
+  Skeleton,
+  Tag,
+  Text
+} from '@chakra-ui/react'
 
 import { UpdateProjectGroup } from 'graphQL/Mutation'
-import { GetLabels } from 'graphQL/Queries'
 
-const LabelInput = ({ data, setOpen, onOpenLabel }) => {
+const LabelInput = ({ data, setOpen, onOpenLabel, nodes }) => {
   const { id: prodId, name, desc, labels } = data || ''
   const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
-
-  const { data: prodLabels, loading } = useQuery(GetLabels, {
-    variables: { first: 100 }
-  })
-  const { nodes } = prodLabels?.labels || ''
 
   const [selectedLabels, setSelectedLabels] = useState([])
 
@@ -51,8 +53,6 @@ const LabelInput = ({ data, setOpen, onOpenLabel }) => {
     }
   }, [labels])
 
-  if (loading) return false
-
   return (
     <>
       <Flex
@@ -62,7 +62,6 @@ const LabelInput = ({ data, setOpen, onOpenLabel }) => {
         minH={'auto'}
         maxH={'250px'}
         flexDir={'column'}
-        overflow={'hidden'}
         overflowY={'scroll'}
         alignItems={'flex-start'}
         hidden={nodes?.length === 0}
@@ -86,19 +85,15 @@ const LabelInput = ({ data, setOpen, onOpenLabel }) => {
           </Flex>
         ))}
       </Flex>
-      <Flex
-        width={'100%'}
-        flexDir={'column'}
-        alignItems={'center'}
-        hidden={nodes?.length > 0}
-      >
-        <Text py={5} color={'gray.500'}>
+      <Flex width={'100%'} flexDir={'column'} hidden={nodes?.length > 0}>
+        <Text p={4} color={'gray.500'}>
           No Labels Present
         </Text>
         <Divider />
         <Button
-          my={1}
+          pl={4}
           w={'100%'}
+          textAlign={'left'}
           color={'blue.500'}
           variant='unstyled'
           onClick={() => {

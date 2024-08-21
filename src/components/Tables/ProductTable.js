@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, hexToRGBA, timeSince } from 'utils'
@@ -52,7 +52,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
-import { GetProductTable, GetSharelynks } from 'graphQL/Queries'
+import { GetLabels, GetSharelynks } from 'graphQL/Queries'
 
 import { FaEllipsisV, FaGithub } from 'react-icons/fa'
 import {
@@ -183,6 +183,11 @@ const ProductTable = ({
       first: totalRows
     }
   })
+
+  const { data: prodLabels, loading: labelLoading } = useQuery(GetLabels, {
+    variables: { first: 100 }
+  })
+  const { nodes } = prodLabels?.labels || ''
 
   const [deleteProjectGroup] = useMutation(DeleteProjectGroup)
 
@@ -439,12 +444,14 @@ const ProductTable = ({
                   </Tag>
                 ))}
               </Flex>
-              <Text color={grayColor}>{description}</Text>
+              <Text color={grayColor} pr={32} wordBreak={'break-all'}>
+                {description}
+              </Text>
             </Flex>
           </Flex>
         )
       },
-      width: '50%',
+      width: '54%',
       wrap: true,
       sortable: true
     },
@@ -598,12 +605,12 @@ const ProductTable = ({
                 >
                   {labels?.length > 0 ? 'Update' : 'Add'} Label
                 </MenuItem>
-                {openTagMenu && (
+                {openTagMenu && !labelLoading && (
                   <Fade initialScale={0.9} in={openTagMenu} delay={0.2}>
                     <Box
                       h={'auto'}
                       bottom={9}
-                      right={224}
+                      right={227}
                       width='220px'
                       borderRadius='md'
                       bg={labelBgColor}
@@ -614,6 +621,7 @@ const ProductTable = ({
                     >
                       <LabelInput
                         data={row}
+                        nodes={nodes}
                         setOpen={setOpenTagMenu}
                         onOpenLabel={onOpenLabel}
                       />
@@ -682,14 +690,6 @@ const ProductTable = ({
     responsive: true,
     persistTableHead: true
   }
-
-  useEffect(() => {
-    if (openTagMenu) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'auto'
-    }
-  }, [openTagMenu])
 
   return (
     <>
