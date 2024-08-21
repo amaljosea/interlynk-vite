@@ -240,6 +240,10 @@ const VersionsTable = ({
       name: 'VERSION',
       selector: (row, index) => {
         const { projectVersion, createdAt, alternatives } = row
+        const createdTime = new Date(createdAt)
+        const currentTime = new Date()
+        const timeDifference = currentTime - createdTime
+        const timeDifferenceInSeconds = timeDifference / 1000
         const parsedCreatedDate = parseISO(createdAt)
         const endDate = addDays(parsedCreatedDate, retention)
         const diff = differenceInDays(endDate, currentDate)
@@ -292,7 +296,7 @@ const VersionsTable = ({
                   {projectVersion}
                 </Text>
               </Link>
-              {alternatives?.length > 0 && (
+              {alternatives?.length > 0 && timeDifferenceInSeconds <= 60 && (
                 <Tooltip label={ignoreMsg}>
                   <Box>
                     <Icon
