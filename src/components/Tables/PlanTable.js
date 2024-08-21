@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import {
   Box,
   Button,
@@ -15,20 +13,72 @@ import {
   ModalOverlay,
   Table,
   Tbody,
-  Td,
   Text,
   Th,
   Thead,
   Tr,
   useDisclosure
 } from '@chakra-ui/react'
+import { useColorModeValue } from '@chakra-ui/react'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 
+import FeatureGroup from './FeatureGroupTable'
+
 const PlanTable = () => {
   const { isFreeTier } = useGlobalQueryContext()
-  const [showAll, setShowAll] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const headerBgColor = useColorModeValue('white', 'gray.700')
+  const usageData = [
+    { feature: 'Users', val1: '5', val2: 'Custom' },
+    { feature: 'Products', val1: '10', val2: 'Unlimited' }
+  ]
+
+  const sbomFeatures = [
+    { feature: 'SBOM Management', val1: true, val2: true },
+    { feature: 'SBOM Manual Build', val1: true, val2: true },
+    { feature: 'SBOM Editor', val1: true, val2: true },
+    { feature: 'SBOM Quality Scoring', val1: true, val2: true },
+    { feature: 'SBOM Compliance Assessment', val1: true, val2: true },
+    { feature: 'SBOM ShareLynk', val1: true, val2: true },
+    { feature: 'SBOM Automation Rules', val1: false, val2: true },
+    { feature: 'SBOM Parts Composition', val1: false, val2: true },
+    { feature: 'SBOM In-Place Signing', val1: false, val2: true },
+    { feature: 'SBOM Component Privacy', val1: false, val2: true }
+  ]
+
+  const riskManagementFeatures = [
+    { feature: 'Vulnerability Management', val1: true, val2: true },
+    { feature: 'Exploitability Editor (VEX)', val1: true, val2: true },
+    {
+      feature: 'End-of-life / End-of-service Detection',
+      val1: false,
+      val2: true
+    },
+    { feature: 'Open Source Risk Scoring', val1: false, val2: true },
+    { feature: 'OpenSSF Scorecard Risk Scoring', val1: false, val2: true }
+  ]
+
+  const managementAndReportingFeatures = [
+    { feature: 'Policy Management', val1: true, val2: true },
+    { feature: 'Role Based Access Control (RBAC)', val1: false, val2: true },
+    { feature: 'Custom Roles', val1: false, val2: true },
+    { feature: 'Integrated License Manager', val1: false, val2: true },
+    { feature: 'Analytics', val1: false, val2: true }
+  ]
+
+  const supportFeatures = [
+    { feature: 'Product Support', val1: 'Email', val2: 'Chat, Slack, Email' }
+  ]
+
+  const integrationsFeatures = [
+    {
+      feature: 'Workflow Integrations',
+      val1: false,
+      val2: 'JIRA, Teams, Slack, GitHub'
+    }
+  ]
 
   return (
     <Box p={8}>
@@ -54,7 +104,7 @@ const PlanTable = () => {
         </GridItem>
       </Grid>
 
-      {/* Upgrade Button */}
+      {/* Upgrade Modal */}
       {isFreeTier && (
         <Flex justify='left' marginTop={'40px'}>
           <Button colorScheme='blue' onClick={onOpen}>
@@ -63,159 +113,59 @@ const PlanTable = () => {
         </Flex>
       )}
 
-      {/* Upgrade Modal */}
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} size='lg'>
         <ModalOverlay />
-        <ModalContent maxW={'800px'}>
+        <ModalContent maxW='800px' h='80vh'>
+          {' '}
           <ModalHeader>Upgrade to Enterprise Plan</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
+          <Table>
+            <Thead bg={headerBgColor}>
+              <Tr
+                textColor={'gray.500'}
+                textAlign={'left'}
+                textTransform={'uppercase'}
+              >
+                <Th paddingLeft={'45px'} w={'190px'}>
+                  Feature
+                </Th>
+                <Th w={'5px'}>Free</Th>
+                <Th w={'50px'}>Enterprise</Th>
+              </Tr>
+            </Thead>
+          </Table>
+          <Box as={ModalBody} overflowY='auto' maxH='calc(80vh - 120px)'>
             <Table variant='simple'>
-              <Thead>
-                <Tr>
-                  <Th w={'500px'}>Feature</Th>
-                  <Th w={'150px'}>Free</Th>
-                  <Th w={'150px'}>Enterprise</Th>
-                </Tr>
-              </Thead>
               <Tbody>
-                {/* Initial rows */}
-                <Tr>
-                  <Td>Users</Td>
-                  <Td>5</Td>
-                  <Td>Custom</Td>
-                </Tr>
-                <Tr>
-                  <Td>Products</Td>
-                  <Td>10</Td>
-                  <Td>Unlimited</Td>
-                </Tr>
-                <Tr>
-                  <Td>SBOM Management</Td>
-                  <Td>Yes</Td>
-                  <Td>Yes</Td>
-                </Tr>
-                <Tr>
-                  <Td>SBOM Manual Build</Td>
-                  <Td>Yes</Td>
-                  <Td>Yes</Td>
-                </Tr>
-                <Tr>
-                  <Td>SBOM Editor</Td>
-                  <Td>Yes</Td>
-                  <Td>Yes</Td>
-                </Tr>
-                <Tr>
-                  <Td>SBOM Quality Scoring</Td>
-                  <Td>Yes</Td>
-                  <Td>Yes</Td>
-                </Tr>
-                <Tr>
-                  <Td>SBOM Compliance Assessment</Td>
-                  <Td>Yes</Td>
-                  <Td>Yes</Td>
-                </Tr>
-                <Tr>
-                  <Td>Vulnerability Management</Td>
-                  <Td>Yes</Td>
-                  <Td>Yes</Td>
-                </Tr>
-                <Tr>
-                  <Td>Exploitability Editor (VEX)</Td>
-                  <Td>Yes</Td>
-                  <Td>Yes</Td>
-                </Tr>
-                <Tr>
-                  <Td>Policy Management</Td>
-                  <Td>Yes</Td>
-                  <Td>Yes</Td>
-                </Tr>
-                {/* Conditionally rendered rows */}
-                {showAll && (
-                  <>
-                    <Tr>
-                      <Td>SBOM ShareLynk</Td>
-                      <Td>Yes</Td>
-                      <Td>Yes</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>Role Based Access Control (RBAC)</Td>
-                      <Td>No</Td>
-                      <Td>Yes</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>Custom Roles</Td>
-                      <Td>No</Td>
-                      <Td>Yes</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>SBOM Automation Rules</Td>
-                      <Td>No</Td>
-                      <Td>Yes</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>SBOM Parts Composition</Td>
-                      <Td>No</Td>
-                      <Td>Yes</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>SBOM In-Place Signing</Td>
-                      <Td>No</Td>
-                      <Td>Yes</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>SBOM Component Privacy</Td>
-                      <Td>No</Td>
-                      <Td>Yes</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>End-of-life / End-of-service Detection</Td>
-                      <Td>No</Td>
-                      <Td>Yes</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>Open Source Risk Scoring</Td>
-                      <Td>No</Td>
-                      <Td>Yes</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>OpenSSF Scorecard Risk Scoring</Td>
-                      <Td>No</Td>
-                      <Td>Yes</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>Integrated License Manager</Td>
-                      <Td>No</Td>
-                      <Td>Yes</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>Analytics</Td>
-                      <Td>No</Td>
-                      <Td>Yes</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>Workflow Integrations</Td>
-                      <Td>Email</Td>
-                      <Td>Email, JIRA, Teams, Slack, GitHub</Td>
-                    </Tr>
-                  </>
-                )}
+                <FeatureGroup title='Usage' features={usageData} />
+                <FeatureGroup title='SBOM Features' features={sbomFeatures} />
+                <FeatureGroup
+                  title='Risk Management'
+                  features={riskManagementFeatures}
+                />
+                <FeatureGroup
+                  title='Management & Reporting'
+                  features={managementAndReportingFeatures}
+                />
+                <FeatureGroup
+                  title='Integrations'
+                  features={integrationsFeatures}
+                />
+                <FeatureGroup title='Support' features={supportFeatures} />
               </Tbody>
-
-              {/* Add more rows as needed */}
             </Table>
-          </ModalBody>
+          </Box>
           <ModalFooter
-            justifyContent='flex-start'
+            justifyContent='flex-end'
             gap={'20px'}
             marginLeft={'10px'}
           >
             <Button
               colorScheme='white'
               textColor={'blue.400'}
-              onClick={() => setShowAll(!showAll)}
+              onClick={() => onClose()}
             >
-              {showAll ? 'Show Less' : 'Show More'}
+              Cancel
             </Button>
             <Button
               colorScheme='blue'

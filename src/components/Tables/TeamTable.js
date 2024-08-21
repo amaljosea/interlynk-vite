@@ -10,6 +10,7 @@ import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
   Avatar,
   Badge,
+  Box,
   Button,
   Flex,
   IconButton,
@@ -71,7 +72,7 @@ const GetCurrentUser = gql`
 
 const TeamTable = () => {
   const activetab = useQueryParam('tab')
-  const { orgView } = useGlobalQueryContext()
+  const { orgView, isFreeTier } = useGlobalQueryContext()
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -91,6 +92,10 @@ const TeamTable = () => {
     skip: !orgView ? true : activetab === 'users' ? false : true,
     variables: { search: filterText === '' ? undefined : filterText }
   })
+
+  console.log(userData?.organization?.users)
+  console.log(isFreeTier)
+  const numberOfUsers = userData?.organization?.users.length
 
   const { users } = userData?.organization || ''
 
@@ -370,17 +375,31 @@ const TeamTable = () => {
           justifyContent={'flex-end'}
         >
           {/* INVITE USER */}
-          <Tooltip label='Invite User' placement='top'>
-            <IconButton
-              onClick={onTeamOpen}
-              icon={<AddIcon />}
-              colorScheme='blue'
-              variant='solid'
-              fontWeight='normal'
-              fontSize={'sm'}
-              isDisabled={!inviteUser}
-            />
-          </Tooltip>
+          <Box position='relative'>
+            <Tooltip
+              label={
+                isFreeTier && numberOfUsers === 5
+                  ? 'Limit reached for free tier'
+                  : 'Invite User'
+              }
+              placement='bottom'
+              isDisabled={false} // Ensure the tooltip is never disabled
+            >
+              <Box>
+                <IconButton
+                  onClick={onTeamOpen}
+                  icon={<AddIcon />}
+                  colorScheme='blue'
+                  variant='solid'
+                  fontWeight='normal'
+                  fontSize={'sm'}
+                  isDisabled={
+                    !inviteUser || (isFreeTier && numberOfUsers === 5)
+                  }
+                />
+              </Box>
+            </Tooltip>
+          </Box>
 
           <Tooltip label='Refresh'>
             <IconButton
@@ -399,7 +418,9 @@ const TeamTable = () => {
     handleClear,
     onTeamOpen,
     inviteUser,
-    refetch
+    refetch,
+    isFreeTier,
+    numberOfUsers
   ])
 
   const handleRemove = async () => {

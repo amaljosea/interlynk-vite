@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { refetchActiveQueries } from 'context/ApolloWrapper'
 import Cookies from 'js-cookie'
 import { useMemo, useState } from 'react'
@@ -49,6 +49,7 @@ import {
   QuitOrganization,
   SwitchOrganization
 } from 'graphQL/Mutation'
+import { MyOrganizations } from 'graphQL/Queries'
 
 import { FaEllipsisVertical } from 'react-icons/fa6'
 
@@ -243,6 +244,25 @@ const OrgTable = ({ data, activeOrg }) => {
           >
             <TagLabel fontSize={14} textTransform={'capitalize'} mx={'auto'}>
               {status}
+            </TagLabel>
+          </Tag>
+        )
+      },
+      wrap: true
+    },
+    {
+      id: 'TIER',
+      name: 'TIER',
+      selector: (row) => {
+        const { tier } = row
+        return (
+          <Tag
+            variant='subtle'
+            width={'100px'}
+            colorScheme={tier === 'enterprise' ? 'green' : 'blue'}
+          >
+            <TagLabel fontSize={14} textTransform={'capitalize'} mx={'auto'}>
+              {tier}
             </TagLabel>
           </Tag>
         )

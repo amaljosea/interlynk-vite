@@ -212,7 +212,9 @@ function Profile() {
                 <TeamTable />
               </TabPanel>
               {/* ROLES */}
-              <TabPanel>{<RoleTable />}</TabPanel>
+              <TabPanel>
+                <RoleTable />
+              </TabPanel>
               {/* FEEDS */}
               <TabPanel>
                 <Feeds />

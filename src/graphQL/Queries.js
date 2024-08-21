@@ -278,6 +278,7 @@ export const MyOrganizations = gql`
         updatedAt
         invitationStatus
         url
+        tier
       }
     }
   }

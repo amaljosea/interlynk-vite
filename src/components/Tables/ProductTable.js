@@ -45,13 +45,14 @@ import IconBox from 'components/Icons/IconBox'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
-import { GetSharelynks } from 'graphQL/Queries'
+import { GetProductTable, GetSharelynks } from 'graphQL/Queries'
 
 import { FaEllipsisV, FaGithub } from 'react-icons/fa'
 import {
@@ -72,6 +73,7 @@ const ProductTable = ({
   setFilters,
   paginationProps
 }) => {
+  const { isFreeTier } = useGlobalQueryContext()
   const navigate = useNavigate()
   const { setIsOpen } = useTour()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
@@ -115,6 +117,7 @@ const ProductTable = ({
   const isGithubConfigSaved = useGithubConfigSaved()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const productCount = data?.length
 
   const {
     isOpen: isOpenUpload,
@@ -289,18 +292,32 @@ const ProductTable = ({
             />
           </Tooltip>
           {/* ADD PRODUCT */}
-          <Tooltip label='Add product'>
-            <IconButton
-              icon={<AddIcon />}
-              colorScheme='blue'
-              isDisabled={!canAddProduct}
-              hidden={signedUrlParams}
-              onClick={() => {
-                setActiveRow(null)
-                onOpen()
-              }}
-            />
-          </Tooltip>
+          <Box position='relative'>
+            <Tooltip
+              label={
+                isFreeTier && productCount === 10
+                  ? 'Limit reached for free tier'
+                  : 'Add product'
+              }
+              placement='bottom'
+              isDisabled={false} // Ensure the tooltip is never disabled
+            >
+              <Box>
+                <IconButton
+                  onClick={() => {
+                    setActiveRow(null)
+                    onOpen()
+                  }}
+                  icon={<AddIcon />}
+                  colorScheme='blue'
+                  hidden={signedUrlParams}
+                  isDisabled={
+                    !canAddProduct || (isFreeTier && productCount === 10)
+                  }
+                />
+              </Box>
+            </Tooltip>
+          </Box>
         </Stack>
       </Flex>
     )
