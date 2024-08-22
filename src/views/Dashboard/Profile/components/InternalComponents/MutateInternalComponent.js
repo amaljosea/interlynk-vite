@@ -3,30 +3,24 @@ import { useEffect, useState } from 'react'
 
 import {
   Box,
-  Button,
   Checkbox,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Text,
   UnorderedList
 } from '@chakra-ui/react'
 
+import LynkModal from 'components/LynkModal'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useCustomToast from 'hooks/useCustomToast'
 
 import { createOrgComp, updateOrgComp } from 'graphQL/Mutation'
-import { getInternalComponents } from 'graphQL/Queries'
+
+import { BiCube } from 'react-icons/bi'
 
 import { TextRegex } from './TestRegex'
 
@@ -86,82 +80,95 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
   }
 
   return (
-    <Modal isOpen={true} onClose={onClose} size='xl'>
-      <ModalOverlay />
-      <form onSubmit={handleSubmit}>
-        <ModalContent>
-          <ModalHeader>{mutateText} Internal Component</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody as={Flex} flexDir='column'>
-            <FormControl isInvalid={!!errorText} isRequired>
-              <FormLabel>Regular Expression</FormLabel>
-              <Input
-                required
-                autoFocus
-                value={matchStr}
-                placeholder='orgname'
-                onChange={(e) => setMatchStr(e.target.value)}
-              />
-              {!!errorText && <FormErrorMessage>{errorText}</FormErrorMessage>}
-            </FormControl>
-            <FormControl mt={3}>
-              <Checkbox
-                defaultChecked={ignoreCase}
-                onChange={() => {
-                  setIgnoreCase(!ignoreCase)
-                }}
-              >
-                Case insensitive
-              </Checkbox>
-            </FormControl>
-            <FormControl display='flex' alignItems='center' mt={3}>
-              <FormLabel marginBlock={0}>Active</FormLabel>
-              <LynkSwitch
-                isChecked={enabled}
-                onChange={() => {
-                  setEnabled(!enabled)
-                }}
-              />
-            </FormControl>
-            <Box py={3}>
-              <Text fontWeight='bold'>Tips:</Text>
-              <UnorderedList mx={10}>
-                <li>{'// are not required'}</li>
-                <li>
-                  <strong>^myname</strong> matches components whose name{' '}
-                  <strong>start with myname</strong>
-                </li>
-                <li>
-                  <strong>myname$</strong> matches components whose name{' '}
-                  <strong>ends with myname</strong>
-                </li>
-                <li>
-                  <strong>myname </strong> matches components whose name
-                  <strong> includes myname</strong>
-                </li>
-              </UnorderedList>
-              <Text fontWeight='bold'>Note:</Text>
-              <UnorderedList mx={10}>
-                <li>All existing and future components will be tagged</li>
-              </UnorderedList>
-            </Box>
-            <TextRegex regex={matchStr} ignoreCase={ignoreCase} />
-          </ModalBody>
-          <ModalFooter>
-            <Button mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button
-              type='submit'
-              isLoading={loading}
-              fontWeight={'medium'}
-              colorScheme='blue'
+    <LynkModal
+      isOpen={true}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      title={`${mutateText} Internal Component`}
+      Icon={BiCube}
+      buttonText={mutateText}
+      isLoading={loading}
+    >
+      <Flex flexDirection={'column'} gap={5}>
+        <Box>
+          <Text fontWeight={600} fontSize={12}>
+            Tips:
+          </Text>
+          <UnorderedList
+            ml={8}
+            fontSize={16}
+            fontWeight={300}
+            lineHeight={'30px'}
+          >
+            <li>
+              <strong style={{ fontWeight: 500 }}>{'//'}</strong> are not
+              required
+            </li>
+            <li>
+              <strong style={{ fontWeight: 500 }}>^myname</strong> matches
+              components whose name{' '}
+              <strong style={{ fontWeight: 500 }}>start with myname</strong>
+            </li>
+            <li>
+              <strong style={{ fontWeight: 500 }}>myname$</strong> matches
+              components whose name{' '}
+              <strong style={{ fontWeight: 500 }}>ends with myname</strong>
+            </li>
+            <li>
+              <strong style={{ fontWeight: 500 }}>myname </strong> matches
+              components whose name
+              <strong style={{ fontWeight: 500 }}> includes myname</strong>
+            </li>
+          </UnorderedList>
+        </Box>
+        <Box>
+          <Text fontWeight={600} fontSize={12}>
+            Note:
+          </Text>
+          <UnorderedList
+            ml={8}
+            fontSize={16}
+            fontWeight={300}
+            lineHeight={'30px'}
+          >
+            <li>All existing and future components will be tagged</li>
+          </UnorderedList>
+        </Box>
+        <Flex direction={'column'} gap={3}>
+          <FormControl isInvalid={!!errorText} isRequired>
+            <FormLabel fontSize={12}>Regular Expression</FormLabel>
+            <Input
+              required
+              autoFocus
+              value={matchStr}
+              placeholder='Org name'
+              onChange={(e) => setMatchStr(e.target.value)}
+              fontSize={14}
+            />
+            {!!errorText && <FormErrorMessage>{errorText}</FormErrorMessage>}
+          </FormControl>
+          <FormControl>
+            <Checkbox
+              defaultChecked={ignoreCase}
+              onChange={() => {
+                setIgnoreCase(!ignoreCase)
+              }}
             >
-              {mutateText}
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </form>
-    </Modal>
+              Case insensitive
+            </Checkbox>
+          </FormControl>
+          <FormControl display='flex' alignItems='center'>
+            <FormLabel marginBlock={0}>Active</FormLabel>
+            <LynkSwitch
+              isChecked={enabled}
+              onChange={() => {
+                setEnabled(!enabled)
+              }}
+            />
+          </FormControl>
+        </Flex>
+        <TextRegex regex={matchStr} ignoreCase={ignoreCase} />
+      </Flex>
+    </LynkModal>
   )
 }

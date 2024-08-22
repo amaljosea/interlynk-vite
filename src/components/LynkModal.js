@@ -35,7 +35,11 @@ const LynkModal = ({
         ? 'red'
         : 'blue'
 
-  const loadingText = title.includes('Delete') ? 'Deleting...' : 'Updating...'
+  const loadingText = isConfirmationModal
+    ? title.includes('Delete')
+      ? 'Deleting...'
+      : 'Updating...'
+    : buttonText
 
   const isDisabled = disabled || isLoading
 
@@ -62,10 +66,12 @@ const LynkModal = ({
           <Flex
             width={'100%'}
             alignItems={'center'}
-            justifyContent={'space-between'}
+            justifyContent={isConfirmationModal ? 'space-between' : 'end'}
             gap={4}
           >
-            <Stack>{isLoading && <Spinner color={colorScheme} />}</Stack>
+            {isConfirmationModal && (
+              <Stack>{isLoading && <Spinner color={colorScheme} />}</Stack>
+            )}
             <Stack direction='row' alignItems='center' gap={1}>
               <Button
                 onClick={onClose}
@@ -80,6 +86,8 @@ const LynkModal = ({
                 width={!isLoading && 93}
                 isDisabled={isDisabled}
                 colorScheme={colorScheme}
+                isLoading={isLoading}
+                loadingText={loadingText}
               >
                 {buttonLabel}
               </Button>
