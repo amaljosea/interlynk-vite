@@ -23,7 +23,7 @@ const LynkModal = ({
   Icon,
   type,
   buttonText,
-  disabled = false,
+  disabled,
   children
 }) => {
   const isConfirmationModal = type === 'confirmation'
@@ -78,7 +78,7 @@ const LynkModal = ({
               <Button
                 onClick={onSubmit}
                 width={!isLoading && 93}
-                disabled={isDisabled}
+                isDisabled={isDisabled}
                 colorScheme={colorScheme}
               >
                 {buttonLabel}

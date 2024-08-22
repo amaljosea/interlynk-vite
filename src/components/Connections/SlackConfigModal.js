@@ -1,10 +1,9 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { AddIcon, DeleteIcon, MinusIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Button,
-  Flex,
   HStack,
   Icon,
   IconButton,
@@ -46,8 +45,10 @@ const SlackConfigModal = ({
     { address: '', notificationType: 'All', frequency: 'Instant' }
   ])
 
-  const bgColor = useColorModeValue('gray.400', 'gray.200')
   const borderColor = useColorModeValue('gray.200', 'gray.600')
+  const isDisabled = configs?.every((item) => item.address === '')
+    ? true
+    : false
 
   useEffect(() => {
     if (data) {
@@ -67,7 +68,6 @@ const SlackConfigModal = ({
       (config) => config.address.trim() !== ''
     )
     if (validConfigs.length === 0) {
-      handleDelete()
       onClose()
       return
     }
@@ -131,7 +131,6 @@ const SlackConfigModal = ({
     )
 
     if (validConfigs.length === 0) {
-      handleDelete()
       onClose()
       return
     }
@@ -193,7 +192,7 @@ const SlackConfigModal = ({
       buttonText='Save'
       Icon={IoSettingsOutline}
       type='configuration'
-      disabled={!updateCon}
+      disabled={isDisabled || !updateCon}
     >
       <VStack spacing={4}>
         {configs.map((config, index) => (
@@ -225,13 +224,14 @@ const SlackConfigModal = ({
             </Select>
 
             <IconButton
-              aria-label='Remove config'
-              icon={<Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />}
-              onClick={() => handleRemoveConfig(index)}
-              isDisabled={!updateCon}
               border='1px solid'
-              borderColor={borderColor}
               colorScheme='white'
+              isDisabled={!updateCon}
+              borderColor={borderColor}
+              aria-label='Remove config'
+              hidden={configs.length === 1}
+              onClick={() => handleRemoveConfig(index)}
+              icon={<Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />}
             />
           </HStack>
         ))}

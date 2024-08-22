@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { AddIcon } from '@chakra-ui/icons'
 import {
   Button,
-  Flex,
   HStack,
   Icon,
   IconButton,
@@ -45,8 +44,10 @@ const TeamsConfigModal = ({
   const [configs, setConfigs] = useState([
     { address: '', notificationType: 'All', frequency: 'Instant' }
   ])
+  const isDisabled = configs?.every((item) => item.address === '')
+    ? true
+    : false
 
-  const bgColor = useColorModeValue('gray.400', 'gray.200')
   const borderColor = useColorModeValue('gray.200', 'gray.600')
 
   useEffect(() => {
@@ -66,7 +67,6 @@ const TeamsConfigModal = ({
       (config) => config.address.trim() !== ''
     )
     if (validConfigs.length === 0) {
-      handleDelete()
       onClose()
       return
     }
@@ -130,7 +130,6 @@ const TeamsConfigModal = ({
     )
 
     if (validConfigs.length === 0) {
-      handleDelete()
       onClose()
       return
     }
@@ -194,7 +193,7 @@ const TeamsConfigModal = ({
       buttonText='Save'
       isLoading={false}
       type='default'
-      disabled={configs.length === 0 || !updateCon}
+      disabled={isDisabled || !updateCon}
     >
       <VStack spacing={4}>
         {configs.map((config, index) => (
@@ -226,13 +225,14 @@ const TeamsConfigModal = ({
             </Select>
 
             <IconButton
-              aria-label='Remove config'
-              icon={<Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />}
-              onClick={() => handleRemoveConfig(index)}
-              isDisabled={!updateCon}
               border='1px solid'
-              borderColor={borderColor}
               colorScheme='white'
+              isDisabled={!updateCon}
+              borderColor={borderColor}
+              aria-label='Remove config'
+              hidden={configs.length === 1}
+              onClick={() => handleRemoveConfig(index)}
+              icon={<Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />}
             />
           </HStack>
         ))}

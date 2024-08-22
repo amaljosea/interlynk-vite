@@ -45,6 +45,10 @@ const EmailConfigModal = ({
     { address: '', notificationType: 'All', frequency: 'Instant' }
   ])
 
+  const isDisabled = configs?.every((item) => item.address === '')
+    ? true
+    : false
+
   const borderColor = useColorModeValue('gray.200', 'gray.600')
 
   useEffect(() => {
@@ -65,7 +69,6 @@ const EmailConfigModal = ({
       (config) => config.address.trim() !== ''
     )
     if (validConfigs.length === 0) {
-      handleDelete()
       onClose()
       return
     }
@@ -123,50 +126,12 @@ const EmailConfigModal = ({
     })
   }
 
-  /*   const handleSave = () => {
-    const validConfigs = configs.filter(
-      (config) => config.address.trim() !== ''
-    )
-   
-    if (validConfigs.length === 0) {
-      handleDelete()
-      onClose()
-      return
-    }
-
-    createEmailConnection({
-      variables: {
-        org: !!org,
-        configs: validConfigs
-      }
-    }).then((res) => {
-      if (res?.data?.emailConnectionCreate?.errors?.length === 0) {
-        setGreenCheck((prev) => ({ ...prev, email: true }))
-        onClose()
-        showToast({
-          title: 'Configuration saved.',
-          description: 'Your Email configuration has been successfully saved.',
-          status: 'success'
-        })
-      } else {
-        showToast({
-          title: 'Saving failed.',
-          description:
-            'An error occurred while saving your Email configuration.',
-          status: 'error'
-        })
-      }
-    })
-  } */
-
-  //This save function shows exactly what went wrong while saving
   const handleSave = async () => {
     const validConfigs = configs.filter(
       (config) => config.address.trim() !== ''
     )
 
     if (validConfigs.length === 0) {
-      handleDelete()
       onClose()
       return
     }
@@ -231,15 +196,15 @@ const EmailConfigModal = ({
 
   return (
     <LynkModal
+      type='default'
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={data ? handleUpdate : handleSave}
-      title='Email Configuration'
-      Icon={IoSettingsOutline}
       buttonText='Save'
       isLoading={false}
-      type='default'
-      disabled={configs.length === 0 || !updateCon}
+      Icon={IoSettingsOutline}
+      title='Email Configuration'
+      disabled={isDisabled || !updateCon}
+      onSubmit={data ? handleUpdate : handleSave}
     >
       <VStack spacing={4}>
         {configs.map((config, index) => (
@@ -271,13 +236,14 @@ const EmailConfigModal = ({
             </Select>
 
             <IconButton
-              aria-label='Remove config'
-              icon={<Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />}
-              onClick={() => handleRemoveConfig(index)}
-              isDisabled={!updateCon}
               border='1px solid'
-              borderColor={borderColor}
               colorScheme='white'
+              isDisabled={!updateCon}
+              borderColor={borderColor}
+              aria-label='Remove config'
+              hidden={configs.length === 1}
+              onClick={() => handleRemoveConfig(index)}
+              icon={<Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />}
             />
           </HStack>
         ))}
