@@ -126,8 +126,8 @@ const EmailConfigModal = ({
   const handleDelete = async () => {
     if (!data) {
       showToast({
-        title: 'Configuration deleted.',
-        description: 'Your Email configuration has been successfully deleted.',
+        title: 'Configuration saved.',
+        description: 'Your Email configuration has been successfully saved.',
         status: 'success'
       })
       return

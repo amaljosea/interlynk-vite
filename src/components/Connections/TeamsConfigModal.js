@@ -129,8 +129,8 @@ const TeamsConfigModal = ({
   const handleDelete = () => {
     if (!data) {
       showToast({
-        title: 'Configuration deleted.',
-        description: 'Your Teams configuration has been successfully deleted.',
+        title: 'Configuration saved.',
+        description: 'Your Teams configuration has been successfully saved.',
         status: 'success'
       })
       return

@@ -127,8 +127,8 @@ const SlackConfigModal = ({
   const handleDelete = async () => {
     if (!data) {
       showToast({
-        title: 'Configuration deleted.',
-        description: 'Your Slack configuration has been successfully deleted.',
+        title: 'Configuration saved.',
+        description: 'Your Slack configuration has been successfully saved.',
         status: 'success'
       })
       return
