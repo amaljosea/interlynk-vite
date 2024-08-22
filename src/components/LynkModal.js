@@ -56,7 +56,7 @@ const LynkModal = ({
         </ModalHeader>
         <ModalCloseButton marginTop={1.5} marginRight={3.5} />
         <Divider />
-        <ModalBody marginBlock={2}>{children}</ModalBody>
+        <ModalBody marginBlock={4}>{children}</ModalBody>
         <Divider />
         <ModalFooter>
           <Flex
