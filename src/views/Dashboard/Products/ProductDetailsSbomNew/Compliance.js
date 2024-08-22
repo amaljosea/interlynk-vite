@@ -74,9 +74,9 @@ const Compliance = () => {
         <Card key={item?.id} gap={6} border={`1px solid ${borderColor}`}>
           {item?.icon}
           <Stack alignItems={'flex-start'}>
-            <Heading fontSize={'16px'} fontFamily={'inherit'}>
+            <Text fontSize={'16px'} fontWeight={'medium'}>
               {item?.title}
-            </Heading>
+            </Text>
             <Text
               color={textColor}
               fontSize={'14px'}
