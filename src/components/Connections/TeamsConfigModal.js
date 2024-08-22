@@ -62,22 +62,45 @@ const TeamsConfigModal = ({
     }
   }, [data])
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     const validConfigs = configs.filter(
       (config) => config.address.trim() !== ''
     )
+
+    // Function to check for duplicates in validConfigs
+    const hasDuplicates = (configs) => {
+      const addresses = configs.map((config) => config.address)
+      return new Set(addresses).size !== addresses.length
+    }
+
     if (validConfigs.length === 0) {
       onClose()
+      handleDelete()
       return
     }
-    updateTeamsConnection({
-      variables: {
-        id: hostId,
-        org: !!org,
-        configs: validConfigs
-      }
-    }).then((res) => {
-      if (res?.data?.teamsConnectionUpdate?.errors?.length === 0) {
+
+    // Check for duplicates
+    if (hasDuplicates(validConfigs)) {
+      showToast({
+        title: 'Saving failed.',
+        description: 'Duplicate URL is not allowed.',
+        status: 'error'
+      })
+      return
+    }
+
+    try {
+      const res = await updateTeamsConnection({
+        variables: {
+          id: hostId,
+          org: !!org,
+          configs: validConfigs
+        }
+      })
+
+      const errors = res?.data?.teamsConnectionUpdate?.errors || []
+
+      if (errors.length === 0) {
         setGreenCheck((prev) => ({ ...prev, teams: true }))
         onClose()
         showToast({
@@ -87,60 +110,105 @@ const TeamsConfigModal = ({
           status: 'success'
         })
       } else {
+        const errorMessage = errors.join(', ')
         showToast({
           title: 'Saving failed.',
-          description:
-            'An error occurred while updating your Teams configuration.',
+          description: `An error occurred while updating your Teams configuration: ${errorMessage}`,
           status: 'error'
         })
       }
-    })
+    } catch (error) {
+      showToast({
+        title: 'Saving failed.',
+        description: `An unexpected error occurred: ${error.message}`,
+        status: 'error'
+      })
+    }
   }
 
   const handleDelete = () => {
+    if (!data) {
+      showToast({
+        title: 'Configuration deleted.',
+        description: 'Your Teams configuration has been successfully deleted.',
+        status: 'success'
+      })
+      return
+    }
+
     deleteTeamsConnection({
       variables: {
         id: hostId,
         org: !!org
       }
-    }).then((res) => {
-      if (res?.data?.teamsConnectionDelete?.errors?.length === 0) {
-        setGreenCheck((prev) => ({ ...prev, teams: false }))
-        onClose()
-        showToast({
-          title: 'Configuration deleted.',
-          description:
-            'Your Teams configuration has been successfully deleted.',
-          status: 'success'
-        })
-      } else {
+    })
+      .then((res) => {
+        const errors = res?.data?.teamsConnectionDelete?.errors || []
+
+        if (errors.length === 0) {
+          setGreenCheck((prev) => ({ ...prev, teams: false }))
+          onClose()
+          showToast({
+            title: 'Configuration deleted.',
+            description:
+              'Your Teams configuration has been successfully deleted.',
+            status: 'success'
+          })
+        } else {
+          const errorMessage = errors.join(', ') // Concatenate errors if multiple
+          showToast({
+            title: 'Deletion failed.',
+            description: `An error occurred while deleting your Teams configuration: ${errorMessage}`,
+            status: 'error'
+          })
+        }
+      })
+      .catch((error) => {
+        // Handle unexpected errors
         showToast({
           title: 'Deletion failed.',
-          description:
-            'An error occurred while deleting your Teams configuration.',
+          description: `An unexpected error occurred: ${error.message}`,
           status: 'error'
         })
-      }
-    })
+      })
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const validConfigs = configs.filter(
       (config) => config.address.trim() !== ''
     )
+    // Function to check for duplicates in validConfigs
+    const hasDuplicates = (configs) => {
+      const addresses = configs.map((config) => config.address)
+      return new Set(addresses).size !== addresses.length
+    }
 
     if (validConfigs.length === 0) {
       onClose()
+      handleDelete()
       return
     }
 
-    createTeamsConnection({
-      variables: {
-        org: !!org,
-        configs: validConfigs
-      }
-    }).then((res) => {
-      if (res?.data?.teamsConnectionCreate?.errors?.length === 0) {
+    // Check for duplicates
+    if (hasDuplicates(validConfigs)) {
+      showToast({
+        title: 'Saving failed.',
+        description: 'Duplicate URL is not allowed.',
+        status: 'error'
+      })
+      return
+    }
+    try {
+      const res = await createTeamsConnection({
+        variables: {
+          org: !!org,
+          configs: validConfigs
+        }
+      })
+
+      const errors = res?.data?.teamsConnectionCreate?.errors
+
+      if (!errors || errors.length === 0) {
         setGreenCheck((prev) => ({ ...prev, teams: true }))
         onClose()
         showToast({
@@ -151,12 +219,17 @@ const TeamsConfigModal = ({
       } else {
         showToast({
           title: 'Saving failed.',
-          description:
-            'An error occurred while saving your Teams configuration.',
+          description: `An error occurred: ${errors.join(', ')}`,
           status: 'error'
         })
       }
-    })
+    } catch (error) {
+      showToast({
+        title: 'Saving failed.',
+        description: `Unexpected error: ${error.message}`,
+        status: 'error'
+      })
+    }
   }
 
   const handleChange = (index, field, value) => {
@@ -193,18 +266,20 @@ const TeamsConfigModal = ({
       buttonText='Save'
       isLoading={false}
       type='default'
-      disabled={isDisabled || !updateCon}
+      disabled={!updateCon}
     >
       <VStack spacing={4}>
         {configs.map((config, index) => (
           <HStack key={index} width='100%'>
             <Input
+              w={'320px'}
               placeholder='Paste Teams Webhook URL'
               value={config.address}
               onChange={(e) => handleChange(index, 'address', e.target.value)}
               isDisabled={!updateCon}
             />
             <Select
+              w={'150px'}
               value={config.notificationType}
               onChange={(e) =>
                 handleChange(index, 'notificationType', e.target.value)
@@ -217,6 +292,7 @@ const TeamsConfigModal = ({
               <option value='Info'>Info</option>
             </Select>
             <Select
+              w={'150px'}
               value={config.frequency}
               onChange={(e) => handleChange(index, 'frequency', e.target.value)}
               isDisabled={!updateCon}
@@ -230,7 +306,6 @@ const TeamsConfigModal = ({
               isDisabled={!updateCon}
               borderColor={borderColor}
               aria-label='Remove config'
-              hidden={configs.length === 1}
               onClick={() => handleRemoveConfig(index)}
               icon={<Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />}
             />

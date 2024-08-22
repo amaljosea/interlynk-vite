@@ -64,22 +64,41 @@ const EmailConfigModal = ({
     }
   }, [data])
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     const validConfigs = configs.filter(
       (config) => config.address.trim() !== ''
     )
+    const hasDuplicates = (configs) => {
+      const addresses = configs.map((config) => config.address)
+      return new Set(addresses).size !== addresses.length
+    }
     if (validConfigs.length === 0) {
       onClose()
+      handleDelete()
       return
     }
-    updateEmailConnection({
-      variables: {
-        id: hostId,
-        org: !!org,
-        configs: validConfigs
-      }
-    }).then((res) => {
-      if (res?.data?.emailConnectionUpdate?.errors?.length === 0) {
+    // Check for duplicates
+    if (hasDuplicates(validConfigs)) {
+      showToast({
+        title: 'Saving failed.',
+        description: 'Duplicate Email Address is not allowed.',
+        status: 'error'
+      })
+      return
+    }
+
+    try {
+      const res = await updateEmailConnection({
+        variables: {
+          id: hostId,
+          org: !!org,
+          configs: validConfigs
+        }
+      })
+
+      const errors = res?.data?.emailConnectionUpdate?.errors
+
+      if (!errors || errors.length === 0) {
         setGreenCheck((prev) => ({ ...prev, email: true }))
         onClose()
         showToast({
@@ -91,22 +110,40 @@ const EmailConfigModal = ({
       } else {
         showToast({
           title: 'Saving failed.',
-          description:
-            'An error occurred while updating your Email configuration.',
+          description: `An error occurred: ${errors.join(', ')}`,
           status: 'error'
         })
       }
-    })
+    } catch (error) {
+      showToast({
+        title: 'Saving failed.',
+        description: `Unexpected error: ${error.message}`,
+        status: 'error'
+      })
+    }
   }
 
-  const handleDelete = () => {
-    deleteEmailConnection({
-      variables: {
-        id: hostId,
-        org: !!org
-      }
-    }).then((res) => {
-      if (res?.data?.emailConnectionDelete?.errors?.length === 0) {
+  const handleDelete = async () => {
+    if (!data) {
+      showToast({
+        title: 'Configuration deleted.',
+        description: 'Your Email configuration has been successfully deleted.',
+        status: 'success'
+      })
+      return
+    }
+
+    try {
+      const res = await deleteEmailConnection({
+        variables: {
+          id: hostId,
+          org: !!org
+        }
+      })
+
+      const errors = res?.data?.emailConnectionDelete?.errors
+
+      if (!errors || errors.length === 0) {
         setGreenCheck((prev) => ({ ...prev, email: false }))
         onClose()
         showToast({
@@ -118,12 +155,17 @@ const EmailConfigModal = ({
       } else {
         showToast({
           title: 'Deletion failed.',
-          description:
-            'An error occurred while deleting your Email configuration.',
+          description: `An error occurred: ${errors.join(', ')}`,
           status: 'error'
         })
       }
-    })
+    } catch (error) {
+      showToast({
+        title: 'Deletion failed.',
+        description: `Unexpected error: ${error.message}`,
+        status: 'error'
+      })
+    }
   }
 
   const handleSave = async () => {
@@ -131,8 +173,23 @@ const EmailConfigModal = ({
       (config) => config.address.trim() !== ''
     )
 
+    const hasDuplicates = (configs) => {
+      const addresses = configs.map((config) => config.address)
+      return new Set(addresses).size !== addresses.length
+    }
+
     if (validConfigs.length === 0) {
       onClose()
+      handleDelete()
+      return
+    }
+    // Check for duplicates
+    if (hasDuplicates(validConfigs)) {
+      showToast({
+        title: 'Saving failed.',
+        description: 'Duplicate Email Address is not allowed.',
+        status: 'error'
+      })
       return
     }
 
@@ -203,19 +260,21 @@ const EmailConfigModal = ({
       isLoading={false}
       Icon={IoSettingsOutline}
       title='Email Configuration'
-      disabled={isDisabled || !updateCon}
+      disabled={!updateCon}
       onSubmit={data ? handleUpdate : handleSave}
     >
       <VStack spacing={4}>
         {configs.map((config, index) => (
           <HStack key={index} width='100%'>
             <Input
+              w={'320px'}
               placeholder='Paste Email Webhook URL'
               value={config.address}
               onChange={(e) => handleChange(index, 'address', e.target.value)}
               isDisabled={!updateCon}
             />
             <Select
+              w={'150px'}
               value={config.notificationType}
               onChange={(e) =>
                 handleChange(index, 'notificationType', e.target.value)
@@ -228,6 +287,7 @@ const EmailConfigModal = ({
               <option value='Info'>Info</option>
             </Select>
             <Select
+              w={'150px'}
               value={config.frequency}
               onChange={(e) => handleChange(index, 'frequency', e.target.value)}
               isDisabled={!updateCon}
@@ -241,7 +301,6 @@ const EmailConfigModal = ({
               isDisabled={!updateCon}
               borderColor={borderColor}
               aria-label='Remove config'
-              hidden={configs.length === 1}
               onClick={() => handleRemoveConfig(index)}
               icon={<Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />}
             />
