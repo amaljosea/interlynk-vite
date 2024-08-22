@@ -2,6 +2,7 @@ import { useLazyQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
+import { truncatedValue } from 'utils'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
 import {
@@ -179,7 +180,7 @@ const SbomDetails = ({ sbomData, refetch }) => {
               gap={2}
             >
               <Text fontWeight={'semibold'} fontSize={25} width={'fit-content'}>
-                {project?.projectGroup?.name}
+                {truncatedValue(project?.projectGroup?.name, 36)}
               </Text>
             </Flex>
           </Stack>
