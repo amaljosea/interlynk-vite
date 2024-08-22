@@ -4,6 +4,8 @@ import {
   InfoIcon,
   WarningTwoIcon
 } from '@chakra-ui/icons'
+// only allowed to import useToast here
+// eslint-disable-next-line no-restricted-imports
 import { Box, Button, Flex, Icon, Text, useToast } from '@chakra-ui/react'
 
 import { FaCircleXmark } from 'react-icons/fa6'
