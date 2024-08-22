@@ -88,7 +88,7 @@ const TokenInfo = () => {
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { data, loading } = useQuery(GetApiKeys, {
-    skip: !orgView || activetab !== 'security-tokens'
+    skip: !orgView || activetab !== 'security tokens'
   })
 
   const { apiKeys } = data?.organization?.currentUser || ''
@@ -470,6 +470,7 @@ const TokenInfo = () => {
                   </FormLabel>
                   <Datetime
                     value={selectedDate}
+                    closeOnSelect={true}
                     className={react_datatime}
                     onChange={handleDateChange}
                     inputProps={{
