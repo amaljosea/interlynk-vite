@@ -13,12 +13,6 @@ import {
   FormHelperText,
   FormLabel,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
   Progress,
   Select,
   Stack,
@@ -27,15 +21,20 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
+import LynkModal from 'components/LynkModal'
+
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { UploadSbom } from 'graphQL/Mutation'
 
+import { PiFileArrowUpBold } from 'react-icons/pi'
+
 const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
   const params = useParams()
   const { showToast } = useCustomToast()
-  const borderColor = useColorModeValue('gray.200', 'gray.600')
+  const borderColor = useColorModeValue('#A0AEC066', 'gray.600')
+  const textColor = useColorModeValue('#1A202C99', 'gray.600')
   const { envName } = useGlobalState()
 
   const { projects, name } = data || ''
@@ -48,9 +47,17 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
 
   const [selectedEnv, setSelectedEnv] = useState(activeEnv || defaultENV?.id)
   const [errorMessage, setErrorMessage] = useState('')
+  const [selectedFile, setSelectedFile] = useState(null)
 
-  const handleUpload = async (file) => {
-    await sbomUpload({ variables: { doc: file, projectId: selectedEnv } })
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      setErrorMessage('No file selected')
+      return
+    }
+
+    await sbomUpload({
+      variables: { doc: selectedFile, projectId: selectedEnv }
+    })
       .then((res) => {
         if (res?.data?.sbomUpload.errors?.length > 0) {
           showToast({
@@ -92,7 +99,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
       const fileExtension = droppedFiles[0].name.split('.').pop().toLowerCase()
       if (validExtensions.includes(fileExtension)) {
         setErrorMessage('')
-        handleUpload(droppedFiles[0])
+        setSelectedFile(droppedFiles[0])
       } else {
         setErrorMessage(
           'Invalid file type, only .xml and .json files are allowed.'
@@ -102,14 +109,14 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
   }
 
   const handleFileChange = async (event) => {
-    const selectedFile = event.target.files[0]
-    if (selectedFile) {
+    const file = event.target.files[0]
+    if (file) {
       const validExtensions = ['xml', 'json']
-      const fileExtension = selectedFile.name.split('.').pop().toLowerCase()
+      const fileExtension = file.name.split('.').pop().toLowerCase()
       console.log(`fileExtension`, fileExtension)
       if (validExtensions.includes(fileExtension)) {
         setErrorMessage('')
-        handleUpload(selectedFile)
+        setSelectedFile(file)
       } else {
         setErrorMessage(
           'Invalid file type, only .xml and .json files are allowed.'
@@ -120,98 +127,97 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Upload SBOM</ModalHeader>
-          <ModalCloseButton onClick={() => setErrorMessage('')} />
-          <ModalBody pb={4}>
-            {!params?.productgroupid && (
-              <Tag colorScheme='blue' mb={4}>
-                <Text fontWeight={'medium'} wordBreak={'break-all'}>
-                  {name}
-                </Text>
-              </Tag>
-            )}
-            {errorMessage !== '' && (
-              <Alert status='error' mb={4} borderRadius={5}>
-                <AlertIcon />
-                <AlertTitle fontSize={'sm'} fontWeight={'medium'}>
-                  {errorMessage}
-                </AlertTitle>
-              </Alert>
-            )}
-            <Stack spacing={6} mb={4}>
-              <FormControl>
-                <FormLabel>Environment</FormLabel>
-                <Select
-                  width={'400px'}
-                  id='dataRetention'
-                  value={selectedEnv}
-                  onChange={(e) => setSelectedEnv(e.target.value)}
-                  textTransform={'capitalize'}
-                >
-                  {projects?.length > 0 &&
-                    filterEnvList(projects).map((item) => (
-                      <option
-                        key={item.id}
-                        value={item.id}
-                        style={{
-                          textTransform: 'capitalize'
-                        }}
-                      >
-                        {item.name}
-                      </option>
-                    ))}
-                </Select>
-                <FormHelperText>
-                  Interlynk supports importing CycloneDX versions 1.2-1.5 in
-                  JSON and XML formats and SPDX 2.2 and 2.3 in JSON format.{' '}
-                </FormHelperText>
-              </FormControl>
-              <Box
-                p={5}
-                borderWidth={2}
-                borderRadius='md'
-                textAlign='center'
-                overflow={'hidden'}
-                onDrop={handleDrop}
-                borderStyle='dashed'
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                borderColor={isDragActive ? 'blue.500' : borderColor}
-                onClick={() => document.getElementById('fileInput').click()}
-              >
-                <Input
-                  id='fileInput'
-                  type='file'
-                  style={{ display: 'none' }}
-                  onChange={handleFileChange}
-                  accept='.json,application/json,application/xml,text/xml'
-                />
-                <Flex
-                  height={32}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  <Text hidden={loading}>
-                    {isDragActive
-                      ? 'Drop the file here'
-                      : 'Drop SBOM here, or click to select a file'}
-                  </Text>
-                  <Text hidden={!loading}>Uploading...</Text>
-                </Flex>
-              </Box>
-              {loading && <Progress size='xs' isIndeterminate />}
-            </Stack>
-            {error && (
-              <Box mb={4}>
-                <Text>Something went wrong!!</Text>
-              </Box>
-            )}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <LynkModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={handleUpload}
+        title={'Upload SBOM'}
+        Icon={PiFileArrowUpBold}
+        disabled={!selectedFile || loading}
+        buttonText='Upload'
+      >
+        {!params?.productgroupid && (
+          <Tag colorScheme='blue' mb={4}>
+            <Text fontWeight={'medium'} wordBreak={'break-all'}>
+              {name}
+            </Text>
+          </Tag>
+        )}
+        {errorMessage !== '' && (
+          <Alert status='error' mb={4} borderRadius={5}>
+            <AlertIcon />
+            <AlertTitle fontSize={'sm'} fontWeight={'medium'}>
+              {errorMessage}
+            </AlertTitle>
+          </Alert>
+        )}
+        <Stack spacing={6} mb={4}>
+          <FormControl>
+            <FormLabel fontSize={12}>Environment</FormLabel>
+            <Select
+              id='dataRetention'
+              value={selectedEnv}
+              onChange={(e) => setSelectedEnv(e.target.value)}
+              textTransform={'capitalize'}
+            >
+              {projects?.length > 0 &&
+                filterEnvList(projects).map((item) => (
+                  <option
+                    key={item.id}
+                    value={item.id}
+                    style={{
+                      textTransform: 'capitalize'
+                    }}
+                  >
+                    {item.name}
+                  </option>
+                ))}
+            </Select>
+            <FormHelperText color={textColor} fontSize={12}>
+              Interlynk supports importing CycloneDX versions 1.2-1.5 in JSON
+              and XML formats and SPDX 2.2 and 2.3 in JSON format.{' '}
+            </FormHelperText>
+          </FormControl>
+          <FormLabel fontSize={12}>Upload File</FormLabel>
+          <Box
+            p={5}
+            borderWidth={2}
+            borderRadius='md'
+            textAlign='center'
+            overflow={'hidden'}
+            onDrop={handleDrop}
+            borderStyle='dashed'
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            borderColor={isDragActive ? 'blue.500' : borderColor}
+            onClick={() => document.getElementById('fileInput').click()}
+          >
+            <Input
+              id='fileInput'
+              type='file'
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+              accept='.json,application/json,application/xml,text/xml'
+            />
+            <Flex height={32} alignItems={'center'} justifyContent={'center'}>
+              <Text hidden={loading} color={textColor}>
+                {isDragActive
+                  ? 'Drop the file here'
+                  : selectedFile
+                    ? selectedFile.name
+                    : 'Drop SBOM here, or click to select a file'}
+              </Text>
+              <Text hidden={!loading}>Uploading...</Text>
+            </Flex>
+          </Box>
+          {loading && <Progress size='xs' isIndeterminate />}
+        </Stack>
+        {error && (
+          <Box mb={4}>
+            <Text>Something went wrong!!</Text>
+          </Box>
+        )}
+      </LynkModal>
     </>
   )
 }
