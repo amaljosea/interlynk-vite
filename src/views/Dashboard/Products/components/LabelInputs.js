@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
-import React, { useEffect, useState } from 'react'
-import { getRandomColor, hexToRGBA } from 'utils'
+import React, { useCallback, useEffect, useState } from 'react'
+import { hexToRGBA } from 'utils'
 import { tagColors } from 'variables/general'
 
 import { AddIcon, EditIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -25,20 +25,23 @@ import useCustomToast from 'hooks/useCustomToast'
 import { LabelCreate, LabelUpdate } from 'graphQL/Mutation'
 
 const LabelInputs = ({ activeRow, setActiveRow }) => {
+  const setData = useCallback(() => {
+    const getLightValue = () => Math.floor(Math.random() * 128) + 128
+    const r = getLightValue().toString(16).padStart(2, '0')
+    const g = getLightValue().toString(16).padStart(2, '0')
+    const b = getLightValue().toString(16).padStart(2, '0')
+    setLabelData((prev) => ({ ...prev, color: `#${r}${g}${b}` }))
+  }, [])
+
   const { showToast } = useCustomToast()
-  const randomColor = getRandomColor()
   const [labelData, setLabelData] = useState({
     id: 0,
     name: '',
-    color: randomColor
+    color: '#90b2e1'
   })
 
   const [createLabel] = useMutation(LabelCreate)
   const [updateLabel] = useMutation(LabelUpdate)
-
-  const handleRefresh = () => {
-    setLabelData((prev) => ({ ...prev, color: randomColor }))
-  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -61,7 +64,7 @@ const LabelInputs = ({ activeRow, setActiveRow }) => {
           description: 'Label added successfully',
           status: 'success'
         })
-        setLabelData({ id: 0, name: '', color: randomColor })
+        setLabelData({ id: 0, name: '', color: '#90b2e1' })
         setActiveRow(null)
       }
     })
@@ -81,7 +84,7 @@ const LabelInputs = ({ activeRow, setActiveRow }) => {
           description: 'Label updated successfully',
           status: 'success'
         })
-        setLabelData({ id: 0, name: '', color: randomColor })
+        setLabelData({ id: 0, name: '', color: '#90b2e1' })
         setActiveRow(null)
       }
     })
@@ -118,7 +121,7 @@ const LabelInputs = ({ activeRow, setActiveRow }) => {
           <FormControl>
             <FormLabel htmlFor='color'>Color</FormLabel>
             <Flex gap={2} alignItems={'center'}>
-              <IconButton icon={<RepeatIcon />} onClick={handleRefresh} />
+              <IconButton icon={<RepeatIcon />} onClick={setData} />
               <Popover>
                 <PopoverTrigger>
                   <Input

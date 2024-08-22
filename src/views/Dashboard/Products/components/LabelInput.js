@@ -3,13 +3,12 @@ import React, { useEffect, useState } from 'react'
 import { hexToRGBA } from 'utils'
 
 import {
-  Button,
   Checkbox,
   Divider,
   Flex,
-  Skeleton,
   Tag,
-  Text
+  Text,
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import { UpdateProjectGroup } from 'graphQL/Mutation'
@@ -17,6 +16,7 @@ import { UpdateProjectGroup } from 'graphQL/Mutation'
 const LabelInput = ({ data, setOpen, onOpenLabel, nodes }) => {
   const { id: prodId, name, desc, labels } = data || ''
   const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
+  const labelColor = useColorModeValue('#3182CE', '#90cdf4')
 
   const [selectedLabels, setSelectedLabels] = useState([])
 
@@ -86,23 +86,23 @@ const LabelInput = ({ data, setOpen, onOpenLabel, nodes }) => {
         ))}
       </Flex>
       <Flex width={'100%'} flexDir={'column'} hidden={nodes?.length > 0}>
-        <Text p={4} color={'gray.500'}>
+        <Text fontSize={'sm'} p={4} color={'gray.500'}>
           No Labels Present
         </Text>
         <Divider />
-        <Button
+        <Text
+          py={3}
           pl={4}
-          w={'100%'}
-          textAlign={'left'}
-          color={'blue.500'}
-          variant='unstyled'
+          fontSize={'sm'}
+          cursor={'pointer'}
+          color={labelColor}
           onClick={() => {
             setOpen(false)
             onOpenLabel()
           }}
         >
           Create Label
-        </Button>
+        </Text>
       </Flex>
     </>
   )

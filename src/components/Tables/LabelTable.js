@@ -5,6 +5,8 @@ import LabelInputs from 'views/Dashboard/Products/components/LabelInputs'
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
+  Button,
+  ButtonGroup,
   Divider,
   Flex,
   IconButton,
@@ -29,7 +31,16 @@ import { GetLabels } from 'graphQL/Queries'
 const LabelTable = ({ isOpen }) => {
   const { showToast } = useCustomToast()
   const borderColor = useColorModeValue('gray.800', 'gray.200')
+  const [disabled, setDisabled] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
+  const [deleteItem, setDeleteItem] = useState(null)
+
+  const disableButtonTemporarily = () => {
+    setDisabled(true)
+    setTimeout(() => {
+      setDisabled(false)
+    }, 3000)
+  }
 
   const divRef = useRef(null)
   const scrollToDiv = () => {
@@ -53,6 +64,7 @@ const LabelTable = ({ isOpen }) => {
   }
 
   const onDelete = (row) => {
+    disableButtonTemporarily()
     deleteLabel({ variables: { id: row?.id } }).then((res) => {
       const { errors } = res?.data?.labelDelete || ''
       if (errors?.length > 0) {
@@ -100,24 +112,43 @@ const LabelTable = ({ isOpen }) => {
                   </Tag>
                 </Td>
                 <Td isNumeric pr={0}>
-                  <Flex
-                    gap={2}
-                    alignItems={'center'}
-                    justifyContent={'flex-end'}
-                  >
-                    <IconButton
-                      size='sm'
-                      variant='outline'
-                      icon={<EditIcon color={borderColor} />}
-                      onClick={() => onEdit(row)}
-                    />
-                    <IconButton
-                      size='sm'
-                      variant='outline'
-                      icon={<DeleteIcon color={'red.500'} />}
-                      onClick={() => onDelete(row)}
-                    />
-                  </Flex>
+                  {deleteItem?.name === row?.name ? (
+                    <ButtonGroup>
+                      <Button
+                        size='sm'
+                        fontSize={'sm'}
+                        variant='outline'
+                        onClick={() => setDeleteItem(null)}
+                      >
+                        No
+                      </Button>
+                      <Button
+                        size='sm'
+                        fontSize={'sm'}
+                        variant='outline'
+                        colorScheme='red'
+                        isDisabled={disabled}
+                        onClick={() => onDelete(row)}
+                      >
+                        Yes
+                      </Button>
+                    </ButtonGroup>
+                  ) : (
+                    <ButtonGroup>
+                      <IconButton
+                        size='sm'
+                        variant='outline'
+                        icon={<EditIcon color={borderColor} />}
+                        onClick={() => onEdit(row)}
+                      />
+                      <IconButton
+                        size='sm'
+                        variant='outline'
+                        icon={<DeleteIcon color={'red.500'} />}
+                        onClick={() => setDeleteItem(row)}
+                      />
+                    </ButtonGroup>
+                  )}
                 </Td>
               </Tr>
             ))}

@@ -340,6 +340,8 @@ const ProductTable = ({
     canAddProduct,
     onOpenLabel,
     refetch,
+    isFreeTier,
+    productCount,
     onOpen
   ])
 
@@ -599,6 +601,7 @@ const ProductTable = ({
                 </MenuItem>
                 <MenuItem
                   position={'relative'}
+                  closeOnSelect={false}
                   onMouseEnter={() => setOpenTagMenu(true)}
                   onMouseLeave={() => setOpenTagMenu(false)}
                   isDisabled={!enabled || !canEditProduct}
@@ -609,8 +612,8 @@ const ProductTable = ({
                   <Fade initialScale={0.9} in={openTagMenu} delay={0.2}>
                     <Box
                       h={'auto'}
-                      bottom={9}
-                      right={227}
+                      top={6}
+                      right={226}
                       width='220px'
                       borderRadius='md'
                       bg={labelBgColor}
