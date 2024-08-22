@@ -7,9 +7,9 @@ import { useParams } from 'react-router-dom'
 import {
   Button,
   Flex,
-  Heading,
   Img,
   SimpleGrid,
+  Spinner,
   Stack,
   Text,
   useColorModeValue
@@ -27,14 +27,20 @@ const Compliance = () => {
   const borderColor = useColorModeValue('#E2E8F0', '#ffffff29')
   const textColor = useColorModeValue('gray.600', 'gray.200')
 
-  const { data: ntiaResult } = useQuery(GetSbomQualityScores, {
-    skip: tab === 'compliance' ? false : true,
-    variables: { sbomIds: [params?.sbomid], reportFormat: 'NTIA' }
-  })
-  const { data: fdaResult } = useQuery(GetSbomQualityScores, {
-    skip: tab === 'compliance' ? false : true,
-    variables: { sbomIds: [params?.sbomid], reportFormat: 'FDA' }
-  })
+  const { data: ntiaResult, loading: ntiaLoading } = useQuery(
+    GetSbomQualityScores,
+    {
+      skip: tab === 'compliance' ? false : true,
+      variables: { sbomIds: [params?.sbomid], reportFormat: 'NTIA' }
+    }
+  )
+  const { data: fdaResult, loading: fdaLoading } = useQuery(
+    GetSbomQualityScores,
+    {
+      skip: tab === 'compliance' ? false : true,
+      variables: { sbomIds: [params?.sbomid], reportFormat: 'FDA' }
+    }
+  )
 
   const { nodes: ntiaData } = ntiaResult?.complianceReports || ''
   const { nodes: fdaData } = fdaResult?.complianceReports || ''
@@ -50,7 +56,11 @@ const Compliance = () => {
       title: 'NTIA Minimum Elements',
       description:
         'This include essential data fields, automation, regular updates, detailed depth, and secure delivery.',
-      score: `${Math.round(ntia?.score)} %`
+      score: ntiaLoading ? (
+        <Spinner size='xs' />
+      ) : (
+        `${Math.round(ntia?.score)} %`
+      )
     },
     {
       id: 2,
@@ -58,7 +68,7 @@ const Compliance = () => {
       title: 'FDA 510(K)',
       description:
         'This  requires an SBOM to ensure software transparency, security, and regulatory adherence in devices.',
-      score: `${Math.round(fda?.score)} %`
+      score: fdaLoading ? <Spinner size='xs' /> : `${Math.round(fda?.score)} %`
     },
     {
       id: 3,
