@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
+import { truncatedValue } from 'utils'
 
 import {
   Button,
@@ -100,7 +101,7 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
                   {productNames?.organization?.projectGroups?.nodes?.map(
                     (item, index) => (
                       <option key={index} value={item.id}>
-                        {item.name}
+                        {truncatedValue(item.name, 24)}
                       </option>
                     )
                   )}
@@ -118,7 +119,7 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
                   <option value=''>Select Environment</option>
                   {projectIds.map((item, index) => (
                     <option key={index} value={item.id}>
-                      {item.name}
+                      {truncatedValue(item.name, 24)}
                     </option>
                   ))}
                 </Select>
