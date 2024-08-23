@@ -416,6 +416,7 @@ const Changelog = () => {
       selector: (row) => (
         <Tooltip placement='top' label={row.changedBy}>
           <Text
+            textAlign={'right'}
             color={textColor}
             cursor={'pointer'}
             onClick={() => {

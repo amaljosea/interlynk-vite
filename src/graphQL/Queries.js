@@ -1616,6 +1616,7 @@ export const GetComponentData = gql`
           sbom {
             projectVersion
             project {
+              id
               projectGroup {
                 name
               }

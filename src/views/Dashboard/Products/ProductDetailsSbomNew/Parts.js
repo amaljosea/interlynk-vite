@@ -46,6 +46,7 @@ import {
   TagLabel,
   Text,
   Tooltip,
+  useColorMode,
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
@@ -83,10 +84,12 @@ const Parts = ({ sbomRefetch }) => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
+  const { colorMode } = useColorMode()
   const { totalRows, prodState, dispatch } = useGlobalState()
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const iconColor = useColorModeValue('#2D3748', '#EDF2F7')
 
   const { enabled, field, direction } = prodState
   const { prodVulnDispatch } = dispatch
@@ -308,10 +311,10 @@ const Parts = ({ sbomRefetch }) => {
           }
         })
 
-        const icon = unknown ? (
-          <BsFillPatchQuestionFill color='#4299E1' fontSize={24} />
+        const icon = unknown || !purl ? (
+          <BsFillPatchQuestionFill fontSize={24} color={iconColor} />
         ) : (
-          GetIcon(purl?.split('/')[0])
+          GetIcon(purl?.split('/')[0], colorMode)
         )
 
         return (

@@ -35,9 +35,12 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   const tabs = ['details', 'identifiers', 'suppliers', 'links', 'relationships']
   const [tab, setTab] = useState(0)
 
+  const { sbomId: bomId } = data || ''
+  const isPart = sbomId !== bomId
+
   const { data: comPath } = useQuery(GetComponentPath, {
     skip: isOpen ? false : true,
-    variables: { compId: data?.id, sbomId: sbomId }
+    variables: { compId: data?.id, sbomId: isPart ? bomId : sbomId }
   })
 
   const onTabChange = (value) => setTab(value)
@@ -91,7 +94,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
                 <CompSupplier data={data} />
               </TabPanel>
               <TabPanel px={0}>
-                <CompLinks component={data} />
+                <CompLinks data={data} />
               </TabPanel>
               <TabPanel px={0}>
                 <CompRelations

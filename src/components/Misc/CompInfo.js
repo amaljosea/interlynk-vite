@@ -1,3 +1,5 @@
+import { truncatedValue } from 'utils'
+
 import { Flex, Tag, Text } from '@chakra-ui/react'
 
 const CompInfo = ({ data }) => {
@@ -5,10 +7,10 @@ const CompInfo = ({ data }) => {
   return (
     <Flex width={'90%'} columnGap={2} flexWrap={'wrap'} alignContent={'center'}>
       <Text fontSize='sm' fontWeight={'normal'} wordBreak={'break-all'}>
-        {name}
+        {truncatedValue(name, 20)}
       </Text>
       <Tag size='sm' colorScheme='blue'>
-        {version}
+        {truncatedValue(version, 20)}
       </Tag>
     </Flex>
   )

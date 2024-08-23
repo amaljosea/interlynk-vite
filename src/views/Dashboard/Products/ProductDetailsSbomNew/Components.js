@@ -5,6 +5,7 @@ import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { GetIcon, customStyles, timeSince } from 'utils'
 import { getFullDateAndTime, isUnknown } from 'utils'
+import { truncatedValue } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 import { openSsf } from 'variables/general'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -302,7 +303,10 @@ const Components = ({ sbomData }) => {
                   fontWeight={'medium'}
                   width={'fit-content'}
                 >
-                  {projectGroup?.name || ''} : {projectVersion || ''}
+                  {projectGroup?.name
+                    ? truncatedValue(projectGroup?.name, 10)
+                    : ''}{' '}
+                  : {projectVersion ? truncatedValue(projectVersion, 10) : ''}
                 </Text>
               )}
               {/* EXTERNAL REFERENCE */}

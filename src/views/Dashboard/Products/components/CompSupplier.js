@@ -1,6 +1,5 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
@@ -32,10 +31,8 @@ const GetSupplier = gql`
 
 const CompSupplier = ({ data }) => {
   const { showToast } = useCustomToast()
-  const params = useParams()
-  const sbomId = params.sbomid
 
-  const { id } = data || ''
+  const { id, sbomId } = data || ''
 
   const { data: result } = useQuery(GetSupplier, {
     variables: { id, sbomId }

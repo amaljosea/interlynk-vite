@@ -38,19 +38,18 @@ const GetCompUrls = gql`
   }
 `
 
-const CompLinks = ({ component }) => {
-  const params = useParams()
-  const sbomId = params.sbomid
+const CompLinks = ({ data }) => {
   const { showToast } = useCustomToast()
-  const { id } = component
+  const { id, sbomId } = data || ''
 
-  const { data } = useQuery(GetCompUrls, {
+  const { data: compUrls } = useQuery(GetCompUrls, {
     variables: { id, sbomId }
   })
-  const { externalUrls } = data?.component || ''
+  const { externalUrls } = compUrls?.component || ''
+
   const filterUrls = externalUrls?.map((item) => ({
     name: item?.name,
-    url: item?.url
+    url: item?.url || ''
   }))
 
   const [type, setType] = useState('')

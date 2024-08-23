@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { infoData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -34,12 +34,12 @@ import { UpdateComponent } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
 
 const CompDetails = ({ data, primaryComp }) => {
-  const { showToast } = useCustomToast()
-  const params = useParams()
   const location = useLocation()
-  const sbomId = params.sbomid
-  const productId = params.productid
+  const { showToast } = useCustomToast()
   const customerView = location.pathname.startsWith('/customer')
+
+  const { sbomId, sbom } = data || ''
+  const { id: productId } = sbom?.project || ''
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 

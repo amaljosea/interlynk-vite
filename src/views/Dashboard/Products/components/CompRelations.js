@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
 
 import { AddIcon, ArrowDownIcon } from '@chakra-ui/icons'
 import {
@@ -31,6 +30,7 @@ import RelDeleteModal from 'components/RelDeleteModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
 import {
@@ -56,15 +56,11 @@ const findShortestPath = (pathArray, currentShortestPath = []) => {
 }
 
 const CompRelations = ({ data, compPath }) => {
-  const params = useParams()
   const { showToast } = useCustomToast()
-  const productId = params.productid
-  const sbomId = params.sbomid
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
+  const activeTab = useQueryParam('tab')
 
-  const { name, version, id } = data || ''
+  const { id, name, version, sbomId, sbom } = data || ''
+  const { id: productId } = sbom?.project || ''
 
   const [dependencyOfList, setDependencyOfList] = useState([])
   const [dependsOnList, setDependsOnList] = useState([])
