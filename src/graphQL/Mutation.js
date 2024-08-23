@@ -11,8 +11,20 @@ export const orgUpdate = gql`
 
 // CREATE ORGANIZATIOPN
 export const RegisterOrganization = gql`
-  mutation RegisterOrganization($name: String!, $url: String, $email: String) {
-    organizationCreate(input: { name: $name, url: $url, email: $email }) {
+  mutation RegisterOrganization(
+    $name: String!
+    $url: String
+    $email: String
+    $awsRegistrationToken: String
+  ) {
+    organizationCreate(
+      input: {
+        name: $name
+        url: $url
+        email: $email
+        awsRegistrationToken: $awsRegistrationToken
+      }
+    ) {
       organization {
         id
         name
@@ -1790,6 +1802,7 @@ export const RegisterUser = gql`
     $email: String!
     $password: String!
     $passwordConfirmation: String!
+    $awsRegistrationToken: String
   ) {
     userRegistration(
       input: {
@@ -1797,6 +1810,7 @@ export const RegisterUser = gql`
         email: $email
         password: $password
         passwordConfirmation: $passwordConfirmation
+        awsRegistrationToken: $awsRegistrationToken
       }
     ) {
       user {
@@ -2959,6 +2973,16 @@ export const LabelDelete = gql`
 export const SbomReprocess = gql`
   mutation SbomReprocess($sbomId: Uuid!) {
     sbomReprocess(input: { sbomId: $sbomId }) {
+      errors
+    }
+  }
+`
+
+export const OrganizationAssignAwsToken = gql`
+  mutation OrganizationAssignAwsToken($awsRegistrationToken: String!) {
+    organizationAssignAwsToken(
+      input: { awsRegistrationToken: $awsRegistrationToken }
+    ) {
       errors
     }
   }

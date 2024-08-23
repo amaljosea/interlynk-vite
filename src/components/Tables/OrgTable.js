@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { refetchActiveQueries } from 'context/ApolloWrapper'
 import Cookies from 'js-cookie'
 import { useMemo, useState } from 'react'
@@ -49,7 +49,6 @@ import {
   QuitOrganization,
   SwitchOrganization
 } from 'graphQL/Mutation'
-import { MyOrganizations } from 'graphQL/Queries'
 
 import { FaEllipsisVertical } from 'react-icons/fa6'
 

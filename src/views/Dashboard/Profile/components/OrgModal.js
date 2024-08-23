@@ -55,13 +55,16 @@ const OrgModal = ({ isOpen, onClose, org, onSwitch }) => {
     }
   }
 
+  const token = process.env.REACT_APP_AWS_TOKEN
+
   const handleCreate = () => {
     disableButtonTemporarily()
     registerOrg({
       variables: {
         name,
         url,
-        email
+        email,
+        awsRegistrationToken: token
       }
     }).then((res) => {
       const { errors } = res?.data?.RegisterOrganization || ''

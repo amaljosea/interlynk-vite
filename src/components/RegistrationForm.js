@@ -24,13 +24,14 @@ import {
   Text
 } from '@chakra-ui/react'
 
+import useQueryParam from 'hooks/useQueryParam'
+
 import { RegisterUser } from 'graphQL/Mutation'
 
 const RegistrationForm = () => {
   const navigate = useNavigate()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const emailId = queryParams.get('id')
+  const emailId = useQueryParam('id')
+  const awsToken = useQueryParam('aws_marketplace_token')
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState(emailId?.replace(/\s+/g, '+') || '')
@@ -105,7 +106,8 @@ const RegistrationForm = () => {
         name: name,
         email: email,
         password: password,
-        passwordConfirmation: confirmPassword
+        passwordConfirmation: confirmPassword,
+        awsRegistrationToken: awsToken
       }
     }).then((res) => {
       if (res.data.userRegistration.errors.length > 0) {

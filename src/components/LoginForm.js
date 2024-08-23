@@ -84,6 +84,8 @@ const LoginForm = () => {
     })
   }
 
+  const token = process.env.REACT_APP_AWS_TOKEN
+
   return (
     <Flex
       mt={2}
@@ -166,7 +168,7 @@ const LoginForm = () => {
             spacing={2}
           >
             <Text fontSize={'sm'}>{`Don't have an account ?`}</Text>
-            <Link to={'/register'}>
+            <Link to={`/register?aws_marketplace_token=${token}`}>
               <Text fontSize='sm' color='blue.500' fontWeight={'medium'}>
                 Register
               </Text>
