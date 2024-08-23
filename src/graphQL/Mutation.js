@@ -292,13 +292,12 @@ export const deleteOrgUser = gql`
 
 // UPDATE ORG USER
 export const updateOrgUser = gql`
-  mutation updateOrgUser($id: ID!, $name: String!, $email: String!) {
-    userUpdate(input: { id: $id, name: $name, email: $email }) {
+  mutation updateOrgUser($id: ID!, $name: String!) {
+    userUpdate(input: { id: $id, name: $name }) {
       errors
       user {
         id
         name
-        email
       }
     }
   }

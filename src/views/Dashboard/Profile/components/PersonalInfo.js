@@ -126,13 +126,6 @@ const PersonalInfo = () => {
     setShowConfPass(!showConfPass)
   }
 
-  useEffect(() => {
-    if (currentUser) {
-      setName(userName)
-      setEmail(userEmail)
-    }
-  }, [currentUser, userEmail, userName])
-
   const handleNameChange = (e) => {
     const { value } = e.target
     setName(value)
@@ -147,13 +140,12 @@ const PersonalInfo = () => {
 
   const handleUpdate = async () => {
     await updateUser({
-      variables: { id: userId, name: name, email: email }
+      variables: { id: userId, name: name }
     }).then((res) => {
       if (res.data.userUpdate.errors.length === 0) {
         setMessage('Saving....')
         setUserName(name)
         localStorage.setItem('username', name)
-        localStorage.setItem('email', email)
         setTimeout(() => {
           setMessage('Update')
           showToast({
@@ -190,6 +182,13 @@ const PersonalInfo = () => {
     })
   }
 
+  useEffect(() => {
+    if (currentUser) {
+      setName(userName)
+      setEmail(userEmail)
+    }
+  }, [currentUser, userEmail, userName])
+
   return (
     <Box px={0} mx={0}>
       <CardHeader p='12px 0' mb='12px'>
@@ -213,15 +212,19 @@ const PersonalInfo = () => {
                 <FormErrorMessage>{error}</FormErrorMessage>
               </FormControl>
               {/* EMAIL */}
-              <FormControl isRequired>
+              <FormControl isRequired isReadOnly>
                 <FormLabel>Email</FormLabel>
                 <Input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                {unconfirmedEmail && (
+                {unconfirmedEmail ? (
                   <FormHelperText>
                     {JSON.stringify(unconfirmedEmail)}
+                  </FormHelperText>
+                ) : (
+                  <FormHelperText>
+                    Changing email address is not allowed
                   </FormHelperText>
                 )}
               </FormControl>
