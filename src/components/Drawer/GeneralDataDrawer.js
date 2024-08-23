@@ -260,7 +260,7 @@ const GeneralDataDrawer = ({
         placement='right'
         onClose={onClose}
         closeOnOverlayClick={true}
-        size='lg'
+        size='md'
       >
         <DrawerOverlay />
         <DrawerContent>
@@ -324,13 +324,16 @@ const GeneralDataDrawer = ({
                     <Table variant='simple' size='sm' mt={4}>
                       <Thead>
                         <Tr my='.8rem'>
-                          {['Vendor Name', 'Tool Name', 'Version', 'Added'].map(
-                            (item, index) => (
-                              <Th fontFamily={'inherit'} key={index} pl={0}>
-                                {item}
-                              </Th>
-                            )
-                          )}
+                          {['Tool', 'Vendor', 'Added'].map((item, index) => (
+                            <Th
+                              pl={0}
+                              key={index}
+                              fontFamily={'inherit'}
+                              isNumeric={index === 2}
+                            >
+                              {item}
+                            </Th>
+                          ))}
                         </Tr>
                       </Thead>
                       <Tbody>
@@ -343,15 +346,13 @@ const GeneralDataDrawer = ({
                             .map((item, index) => (
                               <Tr key={index}>
                                 <Td pl={0} fontSize={'xs'}>
+                                  <Text>{item.name}</Text>
+                                  <Text color={'gray.500'}>{item.version}</Text>
+                                </Td>
+                                <Td pl={0} fontSize={'xs'}>
                                   {item.vendor}
                                 </Td>
-                                <Td pl={0} fontSize={'xs'}>
-                                  {item.name}
-                                </Td>
-                                <Td pl={0} fontSize={'xs'}>
-                                  {item.version}
-                                </Td>
-                                <Td pl={0} fontSize={'xs'}>
+                                <Td pl={0} fontSize={'xs'} isNumeric>
                                   {timeSince(item.updatedAt)}
                                 </Td>
                               </Tr>
@@ -366,15 +367,13 @@ const GeneralDataDrawer = ({
                             .map((item, index) => (
                               <Tr key={index}>
                                 <Td pl={0} fontSize={'xs'}>
+                                  <Text>{item.name}</Text>
+                                  <Text color={'gray.500'}>{item.version}</Text>
+                                </Td>
+                                <Td pl={0} fontSize={'xs'}>
                                   {item.vendor}
                                 </Td>
-                                <Td pl={0} fontSize={'xs'}>
-                                  {item.name}
-                                </Td>
-                                <Td pl={0} fontSize={'xs'}>
-                                  {item.version}
-                                </Td>
-                                <Td pl={0} fontSize={'xs'}>
+                                <Td pl={0} fontSize={'xs'} isNumeric>
                                   <Tooltip
                                     label={getFullDateAndTime(item.updatedAt)}
                                     placement='top'
