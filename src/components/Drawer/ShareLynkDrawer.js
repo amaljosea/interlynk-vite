@@ -288,7 +288,7 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
               </FormControl>
             </ModalBody>
             <ModalFooter>
-              <Button mr={3} fontSize={'sm'} onClick={onClose}>
+              <Button mr={3} fontSize={'sm'} onClick={onShareLynkClose}>
                 Close
               </Button>
               <Button
