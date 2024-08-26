@@ -2,29 +2,26 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { validateEmail } from 'utils'
 
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Alert,
   AlertDescription,
   AlertIcon,
+  Box,
   Button,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Grid,
-  GridItem,
   Heading,
+  Icon,
   IconButton,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Stack
+  Stack,
+  useColorModeValue
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -33,7 +30,8 @@ import {
   OrganizationManufacturerUpdate
 } from 'graphQL/Mutation'
 
-import { FaPlus, FaTrash } from 'react-icons/fa6'
+import { BsGear } from 'react-icons/bs'
+import { MdDeleteOutline } from 'react-icons/md'
 
 const validateUrl = (url) => {
   const urlRegex =
@@ -58,6 +56,8 @@ const LegalModal = ({ data, isOpen, onClose }) => {
   const [deletedContacts, setDeletedContacts] = useState([])
   const [error, setError] = useState('')
   const [isValidUrl, setIsValidUrl] = useState('')
+
+  const borderColor = useColorModeValue('gray.200', 'gray.600')
 
   const containsSpace = /\s/.test(url)
   const checkDataValidity = (data) => {
@@ -283,175 +283,148 @@ const LegalModal = ({ data, isOpen, onClose }) => {
 
   return (
     <>
-      <Modal
-        size='4xl'
+      <LynkModal
         isOpen={isOpen}
         onClose={onClose}
-        closeOnOverlayClick={false}
+        onSubmit={data ? handleUpdate : handleCreate}
+        title={`${data ? 'Edit' : 'Add'} Manufacturer`}
+        Icon={BsGear}
+        disabled={
+          errorMessage || orgName === '' || (url !== '' && isValidUrl !== '')
+        }
+        buttonText={data ? 'Update' : 'Save'}
       >
-        <ModalOverlay />
-        <form onSubmit={data ? handleUpdate : handleCreate}>
-          <ModalContent>
-            <ModalHeader>{data ? 'Edit' : 'Add'} Manufacturer</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Flex width={'100%'} direction={'column'} gap={4}>
-                <Grid
-                  templateColumns={`repeat(2,1fr)`}
-                  alignItems={'flex-start'}
-                  gap={4}
-                >
-                  <GridItem>
-                    <FormControl isRequired>
-                      <FormLabel>Organization Name</FormLabel>
-                      <Input
-                        size='sm'
-                        type='text'
-                        value={orgName}
-                        onChange={(e) => {
-                          setOrgName(e.target.value)
-                          setError('')
-                        }}
-                      />
-                    </FormControl>
-                  </GridItem>
-                  <GridItem>
-                    <FormControl isInvalid={isValidUrl !== '' || containsSpace}>
-                      <FormLabel>URL</FormLabel>
-                      <Input
-                        size='sm'
-                        type='text'
-                        value={url}
-                        onChange={onChangeUrl}
-                      />
-                      <FormErrorMessage>{isValidUrl}</FormErrorMessage>
-                    </FormControl>
-                  </GridItem>
-                </Grid>
-                <Flex
-                  width={'100%'}
-                  my={2}
-                  justifyContent={'space-between'}
-                  alignItems={'center'}
-                >
-                  <Stack spacing={0} alignItems={'flex-start'}>
-                    <Heading
-                      fontWeight={'medium'}
-                      fontFamily={'inherit'}
-                      fontSize={'md'}
-                    >
-                      Contacts
-                    </Heading>
-                  </Stack>
+        <Flex width={'100%'} direction={'column'} gap={4}>
+          <Box>
+            <FormControl isRequired>
+              <FormLabel fontSize={12}>Organization Name</FormLabel>
+              <Input
+                type='text'
+                value={orgName}
+                onChange={(e) => {
+                  setOrgName(e.target.value)
+                  setError('')
+                }}
+              />
+            </FormControl>
+          </Box>
+          <Box>
+            <FormControl isInvalid={isValidUrl !== '' || containsSpace}>
+              <FormLabel fontSize={12}>URL</FormLabel>
+              <Input
+                type='text'
+                value={url}
+                onChange={onChangeUrl}
+                placeholder='Add URL'
+                fontSize={14}
+              />
+              <FormErrorMessage>{isValidUrl}</FormErrorMessage>
+            </FormControl>
+          </Box>
+          <Flex direction='column' gap={2}>
+            <Flex
+              width={'100%'}
+              my={2}
+              justifyContent={'space-between'}
+              alignItems={'center'}
+            >
+              <Stack spacing={0} alignItems={'flex-start'}>
+                <Heading fontWeight={500} fontFamily={'inherit'} fontSize={12}>
+                  Contacts
+                </Heading>
+              </Stack>
+            </Flex>
+            {contacts?.length > 0 &&
+              contacts?.map((item, index) => (
+                <Flex key={index} alignItems={'flex-start'} gap={2}>
+                  <FormControl>
+                    <Input
+                      type='text'
+                      maxLength={50}
+                      placeholder='Name'
+                      value={item?.name}
+                      onChange={(e) =>
+                        handleChange(e.target.value, item.id, 'name')
+                      }
+                      fontSize={12}
+                    />
+                  </FormControl>
+                  <FormControl
+                    isInvalid={item?.email !== '' && item?.emailError !== ''}
+                  >
+                    <Input
+                      type='email'
+                      placeholder='Email'
+                      value={item?.email}
+                      onBlur={(e) => onEmailBlur(e, item)}
+                      onChange={(e) =>
+                        handleChange(e.target.value, item.id, 'email')
+                      }
+                      fontSize={12}
+                    />
+                    {item?.email !== '' && item?.emailError !== '' && (
+                      <FormErrorMessage fontSize='xs'>
+                        {item?.emailError}
+                      </FormErrorMessage>
+                    )}
+                  </FormControl>
+                  <FormControl
+                    isInvalid={item?.phone !== '' && item?.phError !== ''}
+                  >
+                    <Input
+                      type='text'
+                      placeholder='Phone number'
+                      value={item?.phone}
+                      onBlur={(e) => onPhoneBlur(e, item)}
+                      onChange={(e) =>
+                        handleChange(e.target.value, item.id, 'phone')
+                      }
+                      fontSize={12}
+                    />
+                    {item?.phone !== '' && item?.phError !== '' && (
+                      <FormErrorMessage fontSize='xs'>
+                        {item?.phError}
+                      </FormErrorMessage>
+                    )}
+                  </FormControl>
                   <IconButton
-                    size='sm'
-                    colorScheme='blue'
-                    icon={<FaPlus />}
-                    // isDisabled={errorMessage}
-                    onClick={addRow}
+                    border='1px solid'
+                    colorScheme='white'
+                    borderColor={borderColor}
+                    aria-label='Remove config'
+                    onClick={() => deleteRow(item)}
+                    icon={
+                      <Icon
+                        color={'#E53E3E'}
+                        w={6}
+                        h={6}
+                        as={MdDeleteOutline}
+                      />
+                    }
                   />
                 </Flex>
-                {contacts?.length > 0 &&
-                  contacts?.map((item, index) => (
-                    <Grid
-                      key={index}
-                      templateColumns={`repeat(3,1fr)`}
-                      alignItems={'flex-start'}
-                      gap={4}
-                    >
-                      <GridItem>
-                        <FormControl>
-                          <Input
-                            size='sm'
-                            type='text'
-                            maxLength={50}
-                            placeholder='Enter name'
-                            value={item?.name}
-                            onChange={(e) =>
-                              handleChange(e.target.value, item.id, 'name')
-                            }
-                          />
-                        </FormControl>
-                      </GridItem>
-                      <GridItem>
-                        <FormControl
-                          isInvalid={
-                            item?.email !== '' && item?.emailError !== ''
-                          }
-                        >
-                          <Input
-                            size='sm'
-                            type='email'
-                            placeholder='Enter email'
-                            value={item?.email}
-                            onBlur={(e) => onEmailBlur(e, item)}
-                            onChange={(e) =>
-                              handleChange(e.target.value, item.id, 'email')
-                            }
-                          />
-                          {item?.email !== '' && item?.emailError !== '' && (
-                            <FormErrorMessage fontSize='xs'>
-                              {item?.emailError}
-                            </FormErrorMessage>
-                          )}
-                        </FormControl>
-                      </GridItem>
-                      <GridItem as={Flex} gap={4} alignItems='flex-start'>
-                        <FormControl
-                          isInvalid={item?.phone !== '' && item?.phError !== ''}
-                        >
-                          <Input
-                            size='sm'
-                            type='text'
-                            placeholder='Enter phone number'
-                            value={item?.phone}
-                            onBlur={(e) => onPhoneBlur(e, item)}
-                            onChange={(e) =>
-                              handleChange(e.target.value, item.id, 'phone')
-                            }
-                          />
-                          {item?.phone !== '' && item?.phError !== '' && (
-                            <FormErrorMessage fontSize='xs'>
-                              {item?.phError}
-                            </FormErrorMessage>
-                          )}
-                        </FormControl>
-                        <IconButton
-                          size='sm'
-                          colorScheme='red'
-                          icon={<FaTrash />}
-                          onClick={() => deleteRow(item)}
-                        />
-                      </GridItem>
-                    </Grid>
-                  ))}
-                {error !== '' && (
-                  <Alert status='error' borderRadius={4}>
-                    <AlertIcon />
-                    <AlertDescription fontSize={'sm'}>{error}</AlertDescription>
-                  </Alert>
-                )}
-              </Flex>
-            </ModalBody>
-            <ModalFooter mt={4}>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                colorScheme='blue'
-                type='submit'
-                isDisabled={
-                  errorMessage ||
-                  orgName === '' ||
-                  (url !== '' && isValidUrl !== '')
-                }
-              >
-                {data ? 'Update' : 'Save'}
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </form>
-      </Modal>
+              ))}
+          </Flex>
+        </Flex>
+        <Button
+          aria-label='Add config'
+          onClick={addRow}
+          colorScheme='white'
+          leftIcon={<AddIcon />}
+          fontWeight='500'
+          textColor={'blue.500'}
+          paddingLeft={'2px'}
+          fontSize={12}
+        >
+          Add New
+        </Button>
+        {error !== '' && (
+          <Alert status='error' borderRadius={4}>
+            <AlertIcon />
+            <AlertDescription fontSize={'sm'}>{error}</AlertDescription>
+          </Alert>
+        )}
+      </LynkModal>
     </>
   )
 }
