@@ -4,25 +4,20 @@ import { useState } from 'react'
 import {
   Alert,
   AlertIcon,
-  Button,
   FormControl,
   FormLabel,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Stack,
   Text
 } from '@chakra-ui/react'
 
+import LynkModal from 'components/LynkModal'
 import LynkSelect from 'components/LynkSelect'
 
 import { OrgRoleCreate } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
+
+import { BiUserPlus } from 'react-icons/bi'
 
 const CreateRole = ({ isOpen, onClose }) => {
   const [roleName, setRoleName] = useState('')
@@ -90,59 +85,42 @@ const CreateRole = ({ isOpen, onClose }) => {
     roleName === '' || permissions?.length === 0 || error !== '' || disabled
 
   return (
-    <Modal
+    <LynkModal
       isOpen={isOpen}
       onClose={onClose}
-      closeOnOverlayClick={false}
-      motionPreset='slideInBottom'
+      onSubmit={onSave}
+      title={'Add Role'}
+      Icon={BiUserPlus}
+      disabled={isInvalid}
+      buttonText='Save'
     >
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Add Role</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
-            {error !== '' && (
-              <Alert status='error' borderRadius={4}>
-                <AlertIcon />
-                <Text fontSize={'sm'}>{error}</Text>
-              </Alert>
-            )}
-            {/* NAME */}
-            <FormControl isRequired>
-              <FormLabel>Name</FormLabel>
-              <Input type='text' value={roleName} onChange={onNameChange} />
-            </FormControl>
-            {/* PERMISSIONS */}
-            <FormControl isRequired>
-              <FormLabel>Copy Permission From</FormLabel>
-              <LynkSelect
-                value={permissions}
-                options={psOptions}
-                placeholder='Select'
-                onChange={onPermissionChange}
-                components={{
-                  DropdownIndicator: () => null
-                }}
-              />
-            </FormControl>
-          </Stack>
-        </ModalBody>
-        <ModalFooter>
-          <Button mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            variant='solid'
-            onClick={onSave}
-            colorScheme='blue'
-            isDisabled={isInvalid}
-          >
-            Save
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+      <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
+        {error !== '' && (
+          <Alert status='error' borderRadius={4}>
+            <AlertIcon />
+            <Text fontSize={'sm'}>{error}</Text>
+          </Alert>
+        )}
+        {/* NAME */}
+        <FormControl isRequired>
+          <FormLabel fontSize={12}>Name</FormLabel>
+          <Input type='text' value={roleName} onChange={onNameChange} />
+        </FormControl>
+        {/* PERMISSIONS */}
+        <FormControl isRequired>
+          <FormLabel fontSize={12}>Copy Permission From</FormLabel>
+          <LynkSelect
+            value={permissions}
+            options={psOptions}
+            placeholder='Select'
+            onChange={onPermissionChange}
+            components={{
+              DropdownIndicator: () => null
+            }}
+          />
+        </FormControl>
+      </Stack>
+    </LynkModal>
   )
 }
 
