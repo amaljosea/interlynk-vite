@@ -180,17 +180,18 @@ const OrgTable = ({ data, activeOrg }) => {
       selector: (row) => {
         const { name, id } = row
         return (
-          <Stack direction={'row'} my={3} alignItems={'center'}>
+          <Stack direction={'column'} my={3}>
             <Text color={textColor} fontSize={14}>
               {name}
             </Text>
             {activeOrg === id && (
               <Badge
-                variant='outline'
-                colorScheme='blue'
                 py={1}
                 px={2}
                 borderRadius={4}
+                w={'fit-content'}
+                variant='outline'
+                colorScheme='blue'
               >
                 Active
               </Badge>
@@ -252,8 +253,8 @@ const OrgTable = ({ data, activeOrg }) => {
       wrap: true
     },
     {
-      id: 'TIER',
-      name: 'TIER',
+      id: 'PLAN',
+      name: 'PLAN',
       selector: (row) => {
         const { tier } = row
         return (

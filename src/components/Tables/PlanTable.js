@@ -86,7 +86,7 @@ const PlanTable = () => {
       <Grid templateColumns='repeat(4, 1fr)' gap={8} mb={6}>
         <GridItem>
           <Text fontWeight='bold'>Plan</Text>
-          <Text color='blue.500'>
+          <Text>
             {isFreeTier ? 'Free Forever' : 'Enterprise'}
           </Text>
         </GridItem>
