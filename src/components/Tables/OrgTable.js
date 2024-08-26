@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
-import { AddIcon } from '@chakra-ui/icons'
+import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
   Alert,
   AlertDescription,
@@ -40,6 +40,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -50,6 +51,7 @@ import {
   SwitchOrganization
 } from 'graphQL/Mutation'
 
+import { BiExit } from 'react-icons/bi'
 import { FaEllipsisVertical } from 'react-icons/fa6'
 
 const OrgTable = ({ data, activeOrg }) => {
@@ -365,75 +367,48 @@ const OrgTable = ({ data, activeOrg }) => {
       )}
 
       {isWarningOpen && (
-        <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Switch Organization</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>
-                You are about to swich to Organization:{' '}
-                <strong>{activeRow.name}</strong>
-              </Text>
-              <Text mt={6}>Click Continue to confirm</Text>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button fontWeight={'medium'} mr={3} onClick={onWarningClose}>
-                Cancel
-              </Button>
-              <Button
-                fontWeight={'medium'}
-                variant='solid'
-                colorScheme='blue'
-                onClick={() => onSwitchOrg(activeRow.id, activeRow.name)}
-              >
-                Continue
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <LynkModal
+          isOpen={isWarningOpen}
+          onClose={onWarningClose}
+          onSubmit={() => onSwitchOrg(activeRow.id, activeRow.name)}
+          title={'Switch Organization'}
+          Icon={RepeatIcon}
+          buttonText='Continue'
+        >
+          <Text>
+            You are about to swich to Organization:{' '}
+            <strong>{activeRow.name}</strong>
+          </Text>
+          <Text mt={6}>Click Continue to confirm</Text>
+        </LynkModal>
       )}
 
       {isLeaveOpen && (
-        <Modal isOpen={isLeaveOpen} onClose={onLeaveClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Leave Organization</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              {leaveError !== '' && (
-                <Box mb={5} width={'100%'}>
-                  <Alert status='error' borderRadius={4}>
-                    <AlertIcon />
-                    <AlertDescription fontSize={'sm'}>
-                      {leaveError}
-                    </AlertDescription>
-                  </Alert>
-                </Box>
-              )}
-              <Text>
-                You are about to leave Organization:{' '}
-                <strong>{activeRow.name}</strong>
-              </Text>
-              <Text mt={6}>Are you sure you wish to continue ?</Text>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button fontWeight={'medium'} mr={3} onClick={onLeaveClose}>
-                Cancel
-              </Button>
-              <Button
-                fontWeight={'medium'}
-                variant='solid'
-                colorScheme='red'
-                onClick={() => onLeaveOrg(activeRow.id)}
-              >
-                Leave
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <LynkModal
+          isOpen={isLeaveOpen}
+          onClose={onLeaveClose}
+          onSubmit={() => onLeaveOrg(activeRow.id)}
+          title={'Leave Organization'}
+          Icon={BiExit}
+          buttonText='Leave'
+          buttonColor='red'
+        >
+          {leaveError !== '' && (
+            <Box mb={5} width={'100%'}>
+              <Alert status='error' borderRadius={4}>
+                <AlertIcon />
+                <AlertDescription fontSize={'sm'}>
+                  {leaveError}
+                </AlertDescription>
+              </Alert>
+            </Box>
+          )}
+          <Text>
+            You are about to leave Organization:{' '}
+            <strong>{activeRow.name}</strong>
+          </Text>
+          <Text mt={6}>Are you sure you wish to continue ?</Text>
+        </LynkModal>
       )}
     </>
   )
