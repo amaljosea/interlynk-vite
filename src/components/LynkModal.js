@@ -24,6 +24,7 @@ const LynkModal = ({
   type,
   buttonText,
   disabled,
+  buttonColor,
   children
 }) => {
   const isConfirmationModal = type === 'confirmation'
@@ -83,9 +84,9 @@ const LynkModal = ({
               </Button>
               <Button
                 onClick={onSubmit}
-                width={!isLoading && 93}
+                minWidth={!isLoading && 93}
                 isDisabled={isDisabled}
-                colorScheme={colorScheme}
+                colorScheme={buttonColor ?? colorScheme}
                 isLoading={isLoading}
                 loadingText={loadingText}
               >

@@ -5,19 +5,13 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   Flex,
   FormControl,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Text
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -27,6 +21,8 @@ import {
   OrganizationRoleDelete
 } from 'graphQL/Mutation'
 import { GetRoles, GetUsers } from 'graphQL/Queries'
+
+import { BiTrash } from 'react-icons/bi'
 
 const DeleteRole = ({ isOpen, onClose, activeRole }) => {
   const { showToast } = useCustomToast()
@@ -91,49 +87,45 @@ const DeleteRole = ({ isOpen, onClose, activeRole }) => {
   const isDisabled = role === '' || error !== ''
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Delete Role</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody as={Flex} flexDirection='column' gap={3}>
-          {/* ERROR HANDLING */}
-          <Alert status='error' borderRadius={4} hidden={error === ''}>
-            <AlertIcon />
-            <AlertDescription fontSize={'sm'} pr={2}>
-              {error}
-            </AlertDescription>
-          </Alert>
-          <Text>
-            This will delete the role and reassign existing users on this role
-            to a new role.
-          </Text>
-          <Text>Select the role you wish to move the users to</Text>
-          <FormControl display={data ? 'block' : 'none'}>
-            <Select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              textTransform={'capitalize'}
-            >
-              <option value=''>-- Select --</option>
-              {filterRoles?.map((item, index) => (
-                <option key={index} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-        </ModalBody>
-        <ModalFooter>
-          <Button colorScheme='gray' mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button colorScheme='red' onClick={onDelete} isDisabled={isDisabled}>
-            Reassign Users and Delete
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={onDelete}
+      title={'Delete Role'}
+      Icon={BiTrash}
+      disabled={isDisabled}
+      buttonText='Reassign Users and Delete'
+      buttonColor='red'
+    >
+      {/* ERROR HANDLING */}
+      <Flex flexDirection='column' gap={3}>
+        <Alert status='error' borderRadius={4} hidden={error === ''}>
+          <AlertIcon />
+          <AlertDescription fontSize={'sm'} pr={2}>
+            {error}
+          </AlertDescription>
+        </Alert>
+        <Text>
+          This will delete the role and reassign existing users on this role to
+          a new role.
+        </Text>
+        <Text>Select the role you wish to move the users to</Text>
+        <FormControl display={data ? 'block' : 'none'}>
+          <Select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            textTransform={'capitalize'}
+          >
+            <option value=''>-- Select --</option>
+            {filterRoles?.map((item, index) => (
+              <option key={index} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+      </Flex>
+    </LynkModal>
   )
 }
 
