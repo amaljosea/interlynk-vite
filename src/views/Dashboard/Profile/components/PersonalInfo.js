@@ -212,19 +212,15 @@ const PersonalInfo = () => {
                 <FormErrorMessage>{error}</FormErrorMessage>
               </FormControl>
               {/* EMAIL */}
-              <FormControl isRequired isReadOnly>
+              <FormControl isRequired isDisabled>
                 <FormLabel>Email</FormLabel>
                 <Input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                {unconfirmedEmail ? (
+                {unconfirmedEmail && (
                   <FormHelperText>
                     {JSON.stringify(unconfirmedEmail)}
-                  </FormHelperText>
-                ) : (
-                  <FormHelperText>
-                    Changing email address is not allowed
                   </FormHelperText>
                 )}
               </FormControl>
@@ -293,7 +289,7 @@ const PersonalInfo = () => {
                     />
                   </InputRightElement>
                 </InputGroup>
-                {invalidPassword && (
+                {newPassword !== '' && invalidPassword && (
                   <FormHelperText color={'red.500'}>
                     <Text mb={1}>
                       Your password must be 8-16 characters contain:
