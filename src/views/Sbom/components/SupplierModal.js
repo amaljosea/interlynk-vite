@@ -11,16 +11,11 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Tag,
   Text
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -29,6 +24,8 @@ import {
   addComSupplier,
   updateComSupplier
 } from 'graphQL/Mutation'
+
+import { BiCube } from 'react-icons/bi'
 
 const SupplierModal = ({
   id,
@@ -262,136 +259,122 @@ const SupplierModal = ({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInBottom'>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>
-            {data && data.suppliers?.length > 0 ? 'Edit' : 'Add'} Supplier
-          </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {data && (
-              <Flex
-                width='99%'
-                direction={'row'}
-                alignItems={'center'}
-                justifyContent={'flex-start'}
-                flexWrap={'wrap'}
-                gap={2}
-                mb={4}
-              >
-                <Text fontWeight={'medium'} wordBreak={'break-all'}>
-                  {data.name}
-                </Text>
-                <Tag colorScheme='blue'>{data.version}</Tag>
-              </Flex>
-            )}
-            <Flex
-              hidden={component ? false : true}
-              width='100%'
-              direction={'row'}
-              alignItems={'center'}
-              justifyContent={'flex-start'}
-              wrap={'wrap'}
-              gap={2}
-              mb={6}
+      <LynkModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={suppliers?.length > 0 ? handleUpdate : handleSave}
+        title={`${data && data.suppliers?.length > 0 ? 'Edit' : 'Add'} Supplier`}
+        Icon={BiCube}
+        disabled={isInvalid}
+        hidden={resolved}
+        buttonText={suppliers?.length > 0 ? 'Update' : 'Save'}
+        leftFooterContent={
+          !isFreeTier && (
+            <Button
+              fontSize={'sm'}
+              variant='ghost'
+              mr={'auto'}
+              isDisabled={isInvalid}
+              onClick={handleRuleCreate}
+              hidden={friendlyId ? false : true}
+              colorScheme={ruleExists ? 'green' : 'blue'}
             >
-              <Text wordBreak={'break-all'}>{component?.name || '-'}</Text>
-              <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
-            </Flex>
-            <Flex width={'100%'} direction={'column'} gap={4}>
-              {/* ORG NAME */}
-              <FormControl isRequired isDisabled={resolved}>
-                <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
-                <Input
-                  placeholder='Enter organization name'
-                  value={orgName}
-                  onChange={(e) => setOrgName(e.target.value)}
-                />
-              </FormControl>
-              {/* ORG URL */}
-              <FormControl
-                isDisabled={resolved}
-                isInvalid={
-                  (orgUrl !== '' && !validateUrl(orgUrl)) || containsSpace
-                }
-              >
-                <FormLabel fontSize={'sm'}>URL</FormLabel>
-                <Input
-                  placeholder='Enter URL'
-                  value={orgUrl}
-                  onBlur={handleCheckUrl}
-                  onChange={onUrlChange}
-                />
-                <FormErrorMessage>{isValidUrl}</FormErrorMessage>
-              </FormControl>
-              {/* SUPPLIER NAME */}
-              <FormControl
-                isInvalid={supName !== '' && nameError !== ''}
-                isDisabled={resolved}
-              >
-                <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
-                <Input
-                  placeholder='Enter supplier name'
-                  value={supName}
-                  onChange={onSupplierChange}
-                />
-                <FormErrorMessage>{nameError}</FormErrorMessage>
-              </FormControl>
-              {/* SUPPLIER EMAIL */}
-              <FormControl
-                isDisabled={resolved}
-                isInvalid={supEmail !== '' && !validateEmail(supEmail)}
-              >
-                <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
-                <Input
-                  placeholder='Enter supplier email'
-                  value={supEmail}
-                  onBlur={handleCheckEmail}
-                  onChange={(e) => {
-                    setSupEmail(e.target.value)
-                    setEmailError('')
-                  }}
-                />
-                <FormErrorMessage>{emailError}</FormErrorMessage>
-              </FormControl>
-            </Flex>
-          </ModalBody>
-          <ModalFooter>
-            <Flex
-              gap={2}
-              width={'100%'}
-              justifyContent={'flex-end'}
-              alignItems={'center'}
-            >
-              {!isFreeTier && (
-                <Button
-                  fontSize={'sm'}
-                  mr={'auto'}
-                  isDisabled={isInvalid}
-                  onClick={handleRuleCreate}
-                  hidden={friendlyId ? false : true}
-                  colorScheme={ruleExists ? 'green' : 'blue'}
-                >
-                  {ruleExists ? 'View' : 'Save as'} Rule
-                </Button>
-              )}
-
-              <Button colorScheme='gray' onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                colorScheme='blue'
-                isDisabled={isInvalid}
-                hidden={resolved}
-                onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
-              >
-                {suppliers?.length > 0 ? 'Update' : 'Save'}
-              </Button>
-            </Flex>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+              {ruleExists ? 'View' : 'Save as'} Rule
+            </Button>
+          )
+        }
+      >
+        {data && (
+          <Flex
+            width='99%'
+            direction={'row'}
+            alignItems={'center'}
+            justifyContent={'flex-start'}
+            flexWrap={'wrap'}
+            gap={2}
+            mb={4}
+          >
+            <Text fontWeight={'medium'} wordBreak={'break-all'}>
+              {data.name}
+            </Text>
+            <Tag colorScheme='blue'>{data.version}</Tag>
+          </Flex>
+        )}
+        <Flex
+          hidden={component ? false : true}
+          width='100%'
+          direction={'row'}
+          alignItems={'center'}
+          justifyContent={'flex-start'}
+          wrap={'wrap'}
+          gap={2}
+          mb={6}
+        >
+          <Text wordBreak={'break-all'}>{component?.name || '-'}</Text>
+          <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
+        </Flex>
+        <Flex width={'100%'} direction={'column'} gap={4}>
+          {/* ORG NAME */}
+          <FormControl isRequired isDisabled={resolved}>
+            <FormLabel fontSize={12}>Organization Name</FormLabel>
+            <Input
+              placeholder='Enter organization name'
+              value={orgName}
+              onChange={(e) => setOrgName(e.target.value)}
+              fontSize={14}
+            />
+          </FormControl>
+          {/* ORG URL */}
+          <FormControl
+            isDisabled={resolved}
+            isInvalid={(orgUrl !== '' && !validateUrl(orgUrl)) || containsSpace}
+          >
+            <FormLabel fontSize={12}>URL</FormLabel>
+            <Input
+              placeholder='Enter URL'
+              value={orgUrl}
+              onBlur={handleCheckUrl}
+              onChange={onUrlChange}
+              fontSize={14}
+            />
+            <FormErrorMessage>{isValidUrl}</FormErrorMessage>
+          </FormControl>
+          {/* SUPPLIER NAME */}
+          <FormControl
+            isInvalid={supName !== '' && nameError !== ''}
+            isDisabled={resolved}
+          >
+            <FormLabel fontSize={12}>Contact Name</FormLabel>
+            <Input
+              placeholder='Enter supplier name'
+              value={supName}
+              onChange={onSupplierChange}
+              fontSize={14}
+            />
+            <FormErrorMessage>{nameError}</FormErrorMessage>
+          </FormControl>
+          {/* SUPPLIER EMAIL */}
+          <FormControl
+            isDisabled={resolved}
+            isInvalid={supEmail !== '' && !validateEmail(supEmail)}
+          >
+            <FormLabel f fontSize={12}>
+              Contact Email
+            </FormLabel>
+            <Input
+              placeholder='Enter supplier email'
+              value={supEmail}
+              onBlur={handleCheckEmail}
+              onChange={(e) => {
+                setSupEmail(e.target.value)
+                setEmailError('')
+              }}
+              fontSize={14}
+            />
+            <FormErrorMessage>{emailError}</FormErrorMessage>
+          </FormControl>
+        </Flex>
+      </LynkModal>
     </>
   )
 }

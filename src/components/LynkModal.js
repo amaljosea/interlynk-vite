@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Divider,
   Flex,
@@ -24,8 +25,10 @@ const LynkModal = ({
   type,
   buttonText,
   disabled,
-  buttonColor,
-  children
+  children,
+  hidden,
+  leftFooterContent,
+  buttonColor
 }) => {
   const isConfirmationModal = type === 'confirmation'
 
@@ -70,6 +73,7 @@ const LynkModal = ({
             justifyContent={isConfirmationModal ? 'space-between' : 'end'}
             gap={4}
           >
+            {leftFooterContent && <Box mr='auto'>{leftFooterContent}</Box>}
             {isConfirmationModal && (
               <Stack>{isLoading && <Spinner color={colorScheme} />}</Stack>
             )}
@@ -89,6 +93,7 @@ const LynkModal = ({
                 colorScheme={buttonColor ?? colorScheme}
                 isLoading={isLoading}
                 loadingText={loadingText}
+                hidden={hidden}
               >
                 {buttonLabel}
               </Button>
