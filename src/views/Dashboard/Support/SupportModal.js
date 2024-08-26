@@ -17,25 +17,24 @@ import {
   FormLabel,
   HStack,
   Icon,
+  IconButton,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Stack,
   Text,
-  useColorMode
+  useColorMode,
+  useColorModeValue
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import {
   CreateCompSupportOverride,
   UpdateCompSupportOverride
 } from 'graphQL/Mutation'
 
-import { FaPlus, FaTrash } from 'react-icons/fa'
+import { BsHeartPulse } from 'react-icons/bs'
+import { FaPlus } from 'react-icons/fa'
+import { MdDeleteOutline } from 'react-icons/md'
 
 const SupportModal = ({ supports, data, isOpen, onClose }) => {
   const [idUri, setIdUri] = useState('')
@@ -48,6 +47,7 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
   const [outdated, setOutdated] = useState(false)
   const [IDs, setIDs] = useState([{ id: 1, value: '', error: '' }])
 
+  const borderColor = useColorModeValue('gray.200', 'gray.600')
   const { colorMode } = useColorMode()
   const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
 
@@ -263,185 +263,186 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
 
   return (
     <>
-      <Modal size='lg' isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <form onSubmit={data ? handleUpdate : handleCreate}>
-          <ModalContent>
-            <ModalHeader>{data ? 'Edit' : 'Create'} Support</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Flex width={'100%'} direction={'column'} gap={4}>
-                <FormControl
-                  isInvalid={productName !== '' && idUri === productName}
-                >
-                  <FormLabel>Product name</FormLabel>
-                  <Input
-                    type='text'
-                    value={productName}
-                    onChange={(e) => setProductName(e.target.value)}
-                  />
-                  <FormErrorMessage>Invalid name</FormErrorMessage>
-                </FormControl>
-                <FormControl
-                  isInvalid={productVersion !== '' && idUri === productVersion}
-                >
-                  <FormLabel>Product version</FormLabel>
-                  <Input
-                    type='text'
-                    value={productVersion}
-                    onChange={(e) => setProductVersion(e.target.value)}
-                  />
-                  <FormErrorMessage>Invalid version</FormErrorMessage>
-                </FormControl>
-                <FormControl>
-                  <FormLabel mb={1} htmlFor='expire'>
-                    End of life
-                  </FormLabel>
-                  <Datetime
-                    value={eol}
-                    timeFormat={false}
-                    onChange={handleEolChange}
-                    className={react_datatime}
-                    inputProps={{
-                      onCopy: (e) => e.preventDefault(),
-                      onPaste: (e) => e.preventDefault(),
-                      style: {
-                        background: 'none'
-                      }
-                    }}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel mb={1} htmlFor='expire'>
-                    End of service
-                  </FormLabel>
-                  <Datetime
-                    value={eos}
-                    timeFormat={false}
-                    onChange={handleEosChange}
-                    className={react_datatime}
-                    inputProps={{
-                      onCopy: (e) => e.preventDefault(),
-                      onPaste: (e) => e.preventDefault(),
-                      style: {
-                        background: 'none'
-                      }
-                    }}
-                  />
-                </FormControl>
-                <HStack>
-                  <FormControl>
-                    <Checkbox
-                      isChecked={deprecated}
-                      onChange={(e) => setDeprecated(e.target.checked)}
-                    >
-                      Deprecated
-                    </Checkbox>
-                  </FormControl>
-                  <FormControl>
-                    <Checkbox
-                      isChecked={outdated}
-                      onChange={(e) => setOutdated(e.target.checked)}
-                    >
-                      Outdated
-                    </Checkbox>
-                  </FormControl>
-                </HStack>
-                <Stack alignItems={'flex-start'} gap={2}>
-                  <FormControl isRequired>
-                    <FormLabel>IDs</FormLabel>
-                    {data ? (
-                      <Input
-                        type='text'
-                        value={idUri}
-                        onChange={(e) => {
-                          setIdUri(e.target.value)
-                          setError('')
-                        }}
-                        onBlur={onUriBlur}
-                      />
-                    ) : (
-                      <Flex flexDirection={'column'} gap={2}>
-                        {IDs?.length > 0 &&
-                          IDs?.map((item) => (
-                            <Flex
-                              key={item?.id}
-                              width={'100%'}
-                              gap={4}
-                              justifyContent={'space-between'}
-                              alignItems={'items-start'}
-                            >
-                              <Stack width={'100%'}>
-                                <Input
-                                  fontSize={'sm'}
-                                  placeholder='Enter PURL / CPE'
-                                  type='text'
-                                  alue={item?.value}
-                                  onChange={(e) =>
-                                    handleIdChange(e.target.value, item.id)
-                                  }
-                                  onBlur={() => onIdBlur(item)}
-                                />
-                                {item?.error !== '' && (
-                                  <Text
-                                    mt={1}
-                                    color={'red.500'}
-                                    fontSize={'sm'}
-                                  >
-                                    {item?.error}
-                                  </Text>
-                                )}
-                              </Stack>
-                              <Icon
-                                mt={2}
-                                as={FaTrash}
-                                color={'red.500'}
-                                cursor={'pointer'}
-                                onClick={() => deleteRow(item?.id)}
-                                display={item?.id === 1 ? 'none' : 'flex'}
-                              />
-                            </Flex>
-                          ))}
-                      </Flex>
-                    )}
-                  </FormControl>
-                  <Button
-                    fontSize={'sm'}
-                    colorScheme='blue'
-                    variant='link'
-                    fontWeight={'medium'}
-                    leftIcon={<FaPlus />}
-                    onClick={addRow}
-                    hidden={data}
-                  >
-                    Add ID
-                  </Button>
-                </Stack>
-                {error !== '' && (
-                  <Alert status='error' borderRadius={4}>
-                    <AlertIcon />
-                    <AlertDescription fontSize={'sm'} pr={2}>
-                      {error}
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </Flex>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                colorScheme='blue'
-                type='submit'
-                isDisabled={data ? isInvalid : errorMessage || error !== ''}
+      <LynkModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={data ? handleUpdate : handleCreate}
+        title={`${data ? 'Edit' : 'Create'} Support`}
+        Icon={BsHeartPulse}
+        disabled={data ? isInvalid : errorMessage || error !== ''}
+        buttonText={data ? 'Update' : 'Save'}
+      >
+        <Flex width={'100%'} direction={'column'} gap={4}>
+          <FormControl isInvalid={productName !== '' && idUri === productName}>
+            <FormLabel fontSize={12}>Product name</FormLabel>
+            <Input
+              type='text'
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+              placeholder='Enter Product Name'
+              fontSize={14}
+            />
+            <FormErrorMessage>Invalid name</FormErrorMessage>
+          </FormControl>
+          <FormControl
+            isInvalid={productVersion !== '' && idUri === productVersion}
+          >
+            <FormLabel fontSize={12}>Product version</FormLabel>
+            <Input
+              type='text'
+              value={productVersion}
+              onChange={(e) => setProductVersion(e.target.value)}
+              placeholder='Enter Product Version'
+              fontSize={14}
+            />
+            <FormErrorMessage>Invalid version</FormErrorMessage>
+          </FormControl>
+          <FormControl>
+            <FormLabel mb={1} htmlFor='expire' fontSize={12}>
+              End of life
+            </FormLabel>
+            <Datetime
+              value={eol}
+              timeFormat={false}
+              onChange={handleEolChange}
+              className={react_datatime}
+              inputProps={{
+                onCopy: (e) => e.preventDefault(),
+                onPaste: (e) => e.preventDefault(),
+                style: {
+                  background: 'none',
+                  fontSize: '14px'
+                },
+                placeholder: 'Enter End of Life'
+              }}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel mb={1} htmlFor='expire' fontSize={12}>
+              End of service
+            </FormLabel>
+            <Datetime
+              value={eos}
+              timeFormat={false}
+              onChange={handleEosChange}
+              className={react_datatime}
+              inputProps={{
+                onCopy: (e) => e.preventDefault(),
+                onPaste: (e) => e.preventDefault(),
+                style: {
+                  background: 'none',
+                  fontSize: '14px'
+                },
+                placeholder: 'Enter End of Service'
+              }}
+            />
+          </FormControl>
+          <HStack>
+            <FormControl>
+              <Checkbox
+                isChecked={deprecated}
+                onChange={(e) => setDeprecated(e.target.checked)}
               >
-                {data ? 'Update' : 'Save'}
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </form>
-      </Modal>
+                <Text fontSize={12} fontWeight={400}>
+                  Deprecated
+                </Text>
+              </Checkbox>
+            </FormControl>
+            <FormControl>
+              <Checkbox
+                isChecked={outdated}
+                onChange={(e) => setOutdated(e.target.checked)}
+              >
+                <Text fontSize={12} fontWeight={400}>
+                  Outdated
+                </Text>
+              </Checkbox>
+            </FormControl>
+          </HStack>
+          <Stack alignItems={'flex-start'} gap={2}>
+            <FormControl isRequired>
+              <FormLabel fontSize={12}>IDs</FormLabel>
+              {data ? (
+                <Input
+                  type='text'
+                  value={idUri}
+                  onChange={(e) => {
+                    setIdUri(e.target.value)
+                    setError('')
+                  }}
+                  onBlur={onUriBlur}
+                />
+              ) : (
+                <Flex flexDirection={'column'} gap={2}>
+                  {IDs?.length > 0 &&
+                    IDs?.map((item) => (
+                      <Flex
+                        key={item?.id}
+                        width={'100%'}
+                        gap={2}
+                        justifyContent={'space-between'}
+                        alignItems={'items-start'}
+                      >
+                        <Stack width={'100%'}>
+                          <Input
+                            fontSize={12}
+                            placeholder='Enter PURL / CPE'
+                            type='text'
+                            alue={item?.value}
+                            onChange={(e) =>
+                              handleIdChange(e.target.value, item.id)
+                            }
+                            onBlur={() => onIdBlur(item)}
+                          />
+                          {item?.error !== '' && (
+                            <Text mt={1} color={'red.500'} fontSize={'sm'}>
+                              {item?.error}
+                            </Text>
+                          )}
+                        </Stack>
+                        <IconButton
+                          border='1px solid'
+                          colorScheme='white'
+                          borderColor={borderColor}
+                          aria-label='Remove id'
+                          onClick={() => deleteRow(item?.id)}
+                          display={item?.id === 1 ? 'none' : 'flex'}
+                          icon={
+                            <Icon
+                              color={'#E53E3E'}
+                              w={6}
+                              h={6}
+                              as={MdDeleteOutline}
+                            />
+                          }
+                        />
+                      </Flex>
+                    ))}
+                </Flex>
+              )}
+            </FormControl>
+            <Button
+              fontSize={12}
+              colorScheme='blue'
+              variant='link'
+              fontWeight={'medium'}
+              leftIcon={<FaPlus />}
+              onClick={addRow}
+              hidden={data}
+            >
+              Add ID
+            </Button>
+          </Stack>
+          {error !== '' && (
+            <Alert status='error' borderRadius={4}>
+              <AlertIcon />
+              <AlertDescription fontSize={'sm'} pr={2}>
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
+        </Flex>
+      </LynkModal>
     </>
   )
 }
