@@ -287,37 +287,30 @@ const SbomActions = ({ sbom, refetch }) => {
   }
 
   return (
-    <>
+    <Flex gap={3} alignItems={'flex-end'} justifyContent={'flex-end'}>
+      {/* SBOM VERSIONS */}
       <Flex
-        direction={'row'}
-        gap={3}
-        justifyContent='flex-end'
-        ml={'auto'}
-        flexWrap={'wrap'}
+        gap={2}
+        flexDirection={'row'}
+        alignItems={'center'}
+        className='search-version'
       >
-        {/* SBOM VERSIONS */}
-        <Flex
-          gap={2}
-          flexDirection={'row'}
-          alignItems={'center'}
-          className='search-version'
-        >
-          <FaLayerGroup size={21} color='#4299E1' />
-          <LynkSelect
-            components={{
-              DropdownIndicator: () => null
-            }}
-            value={selectedVersion}
-            onChange={handleSBOMChange}
-            isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
-            type='text'
-            placeholder='Search versions'
-            name='versions'
-            options={signedUrlParams ? uniqShareVersions : uniqVersions}
-            noOptionsMessage={() => null}
-          />
-        </Flex>
-
+        <FaLayerGroup size={21} color='#4299E1' />
+        <LynkSelect
+          components={{
+            DropdownIndicator: () => null
+          }}
+          value={selectedVersion}
+          onChange={handleSBOMChange}
+          isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
+          type='text'
+          placeholder='Search versions'
+          name='versions'
+          options={signedUrlParams ? uniqShareVersions : uniqVersions}
+          noOptionsMessage={() => null}
+        />
+      </Flex>
+      <Flex direction={'row'} gap={3} justifyContent='flex-end'>
         {/* UPDATE PRIMARY COMPONENT */}
         <Tooltip label='Edit'>
           <IconButton
@@ -376,7 +369,9 @@ const SbomActions = ({ sbom, refetch }) => {
           ></IconButton>
         </Tooltip>
       </Flex>
-      {signedUrlParams ? '' : <ScoresProgress />}
+
+      {/* {signedUrlParams ? '' : <ScoresProgress />} */}
+
       {/* DOWNLOAD SBOM */}
       {isOpen && (
         <DownloadModal
@@ -456,7 +451,7 @@ const SbomActions = ({ sbom, refetch }) => {
           isLoading={isLoading}
         />
       )}
-    </>
+    </Flex>
   )
 }
 

@@ -85,11 +85,11 @@ const Parts = ({ sbomRefetch }) => {
     useProductUrlContext()
 
   const { colorMode } = useColorMode()
-  const { totalRows, prodState, dispatch } = useGlobalState()
 
+  const { totalRows, prodState, dispatch } = useGlobalState()
+  const iconColor = useColorModeValue('#2D3748', '#EDF2F7')
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-  const iconColor = useColorModeValue('#2D3748', '#EDF2F7')
 
   const { enabled, field, direction } = prodState
   const { prodVulnDispatch } = dispatch
@@ -311,11 +311,12 @@ const Parts = ({ sbomRefetch }) => {
           }
         })
 
-        const icon = unknown || !purl ? (
-          <BsFillPatchQuestionFill fontSize={24} color={iconColor} />
-        ) : (
-          GetIcon(purl?.split('/')[0], colorMode)
-        )
+        const icon =
+          unknown || !purl ? (
+            <BsFillPatchQuestionFill fontSize={24} color={iconColor} />
+          ) : (
+            GetIcon(purl?.split('/')[0], colorMode)
+          )
 
         return (
           <Grid

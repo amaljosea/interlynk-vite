@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 
-import { Stack } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
 
 import { ProgressBar } from 'components/ProgressBar'
 
@@ -22,19 +22,28 @@ export const ScoresProgress = () => {
   })
 
   return (
-    <Stack spacing={3}>
-      <ProgressBar
-        value={qualityScore}
-        loading={loading}
-        text='SBOM Quality Score'
-      />
-      {shouldShowDemoFeatures && (
+    <Grid
+      gap={4}
+      width={'100%'}
+      alignItems={'flex-start'}
+      templateColumns='repeat(12, 1fr)'
+    >
+      <GridItem colSpan={6}>
         <ProgressBar
-          value={healthScore}
+          value={qualityScore}
           loading={loading}
-          text='Version Health Score'
+          text='SBOM Quality Score'
         />
-      )}
-    </Stack>
+      </GridItem>
+      <GridItem colSpan={6}>
+        {shouldShowDemoFeatures && (
+          <ProgressBar
+            value={healthScore}
+            loading={loading}
+            text='Version Health Score'
+          />
+        )}
+      </GridItem>
+    </Grid>
   )
 }

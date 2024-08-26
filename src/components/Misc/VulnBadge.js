@@ -1,16 +1,16 @@
 import { Spinner, Tag, TagLabel, Tooltip } from '@chakra-ui/react'
 
 const VulnBadge = ({ color, children, label, status, onClick }) => {
+  const labels = ['Fail', 'Pass', 'Warn', 'Inform', 'Skipped', 'Error']
+  const isPolicy = labels?.includes(label)
   return (
     <Tooltip label={label} placement='top'>
       <Tag
-        size='md'
-        key='md'
         variant='subtle'
-        width={14}
-        colorScheme={color}
         onClick={onClick}
         cursor={'pointer'}
+        colorScheme={color}
+        w={isPolicy ? '12' : '14'}
       >
         <TagLabel mx={'auto'}>
           {status === 'IN_PROGRESS' ? <Spinner size='xs' mt={0.5} /> : children}

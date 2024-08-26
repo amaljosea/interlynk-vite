@@ -1,6 +1,4 @@
-import SbomActions from 'views/Sbom/components/SbomActions'
-
-import { Flex, Grid, GridItem, Skeleton, Text } from '@chakra-ui/react'
+import { Flex, Skeleton, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -28,27 +26,9 @@ const SbomInfo = ({ data, error, loading, refetch }) => {
   }
 
   return (
-    <Card mb='6' className='version'>
+    <Card className='version'>
       <CardBody>
-        <Grid
-          width={'100%'}
-          templateColumns='repeat(5, 1fr)'
-          alignItems={'top'}
-          gap={10}
-        >
-          <GridItem colSpan={3}>
-            <SbomDetails sbomData={data} refetch={refetch} />
-          </GridItem>
-          <GridItem colSpan={2} height='100%'>
-            <Flex
-              direction='column'
-              justifyContent='space-between'
-              height='100%'
-            >
-              <SbomActions sbom={data} refetch={refetch} />
-            </Flex>
-          </GridItem>
-        </Grid>
+        <SbomDetails sbomData={data} refetch={refetch} />
       </CardBody>
     </Card>
   )
