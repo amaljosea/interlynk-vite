@@ -5,27 +5,23 @@ import { validateEmail } from 'utils'
 import {
   Alert,
   AlertIcon,
-  Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Stack,
   Text
 } from '@chakra-ui/react'
 
+import LynkModal from 'components/LynkModal'
+
 import useCustomToast from 'hooks/useCustomToast'
 
 import { InviteUser } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
+
+import { BiUserPlus } from 'react-icons/bi'
 
 const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
   const { showToast } = useCustomToast()
@@ -61,74 +57,61 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Invite User</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
-            {error !== '' && (
-              <Alert status='error' borderRadius={4}>
-                <AlertIcon />
-                <Text fontSize={'sm'}>{error}</Text>
-              </Alert>
-            )}
-            {/* EMAIL */}
-            <FormControl
-              isRequired
-              isInvalid={email !== '' && !validateEmail(email)}
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={handleAdd}
+      title={'Invite User'}
+      Icon={BiUserPlus}
+      disabled={!validateEmail(email) || role === ''}
+      buttonText='Add'
+    >
+      <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
+        {error !== '' && (
+          <Alert status='error' borderRadius={4}>
+            <AlertIcon />
+            <Text fontSize={'sm'}>{error}</Text>
+          </Alert>
+        )}
+        {/* EMAIL */}
+        <FormControl
+          isRequired
+          isInvalid={email !== '' && !validateEmail(email)}
+        >
+          <FormLabel>Email</FormLabel>
+          <Input
+            type='text'
+            value={email}
+            textTransform={'lowercase'}
+            onChange={(e) => {
+              setEmail(e.target.value)
+              setError('')
+            }}
+          />
+          {email !== '' && !validateEmail(email) && (
+            <FormErrorMessage>Email is invalid</FormErrorMessage>
+          )}
+        </FormControl>
+        {/* ROLES */}
+        {roles && (
+          <FormControl isDisabled={!changeRole}>
+            <FormLabel>Role</FormLabel>
+            <Select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              textTransform='capitalize'
             >
-              <FormLabel>Email</FormLabel>
-              <Input
-                type='text'
-                value={email}
-                textTransform={'lowercase'}
-                onChange={(e) => {
-                  setEmail(e.target.value)
-                  setError('')
-                }}
-              />
-              {email !== '' && !validateEmail(email) && (
-                <FormErrorMessage>Email is invalid</FormErrorMessage>
-              )}
-            </FormControl>
-            {/* ROLES */}
-            {roles && (
-              <FormControl isDisabled={!changeRole}>
-                <FormLabel>Role</FormLabel>
-                <Select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  textTransform='capitalize'
-                >
-                  <option value=''>-- Select --</option>
-                  {roles?.organization?.organizationRoles.map((item, index) => (
-                    <option key={index} value={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-          </Stack>
-        </ModalBody>
-
-        <ModalFooter>
-          <Button mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            variant='solid'
-            colorScheme='blue'
-            disabled={!validateEmail(email) || role === ''}
-            onClick={handleAdd}
-          >
-            Add
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+              <option value=''>-- Select --</option>
+              {roles?.organization?.organizationRoles.map((item, index) => (
+                <option key={index} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+      </Stack>
+    </LynkModal>
   )
 }
 
