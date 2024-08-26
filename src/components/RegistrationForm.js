@@ -107,11 +107,12 @@ const RegistrationForm = () => {
         email: email,
         password: password,
         passwordConfirmation: confirmPassword,
-        awsRegistrationToken: awsToken
+        awsRegistrationToken: awsToken || undefined
       }
     }).then((res) => {
       if (res.data.userRegistration.errors.length > 0) {
         setError(res.data.userRegistration.errors)
+        awsToken && sessionStorage.setItem('awsToken', awsToken)
         setIsLoading(false)
         setIsSuccess(false)
       } else {

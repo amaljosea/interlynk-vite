@@ -31,6 +31,7 @@ const OrgModal = ({ isOpen, onClose, org, onSwitch }) => {
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [isDisabled, setIsDisabled] = useState(false)
+  const awsToken = sessionStorage.getItem('awsToken')
 
   const disableButtonTemporarily = () => {
     setIsDisabled(true)
@@ -55,8 +56,6 @@ const OrgModal = ({ isOpen, onClose, org, onSwitch }) => {
     }
   }
 
-  const token = process.env.REACT_APP_AWS_TOKEN
-
   const handleCreate = () => {
     disableButtonTemporarily()
     registerOrg({
@@ -64,7 +63,7 @@ const OrgModal = ({ isOpen, onClose, org, onSwitch }) => {
         name,
         url,
         email,
-        awsRegistrationToken: token
+        awsRegistrationToken: awsToken || undefined
       }
     }).then((res) => {
       const { errors } = res?.data?.RegisterOrganization || ''

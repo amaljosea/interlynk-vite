@@ -39,7 +39,7 @@ export default function Admin() {
   const sbomId = params.sbomid
   const authToken = Cookies.get('authToken')
   const tabRes = window.matchMedia('(max-width: 1199px)')
-
+  const awsToken = sessionStorage.getItem('awsToken')
   const productView = location.pathname === '/vendor/products'
 
   const {
@@ -233,22 +233,23 @@ export default function Admin() {
   }, [])
 
   useEffect(() => {
-    const token = process.env.REACT_APP_AWS_TOKEN
-    const onAssign = () => {
-      assignAwsToken({
-        variables: { awsRegistrationToken: token }
-      }).then((res) => {
-        const { errors } = res?.data?.organizationAssignAwsToken || ''
-        if (errors?.length > 0) {
-          console.log('Error', errors)
-        } else {
-          console.log('Token', res?.data)
-        }
-      })
-    }
+    if (awsToken) {
+      const onAssign = () => {
+        assignAwsToken({
+          variables: { awsRegistrationToken: awsToken }
+        }).then((res) => {
+          const { errors } = res?.data?.organizationAssignAwsToken || ''
+          if (errors?.length > 0) {
+            console.log('Error', errors)
+          } else {
+            console.log('Token', res?.data)
+          }
+        })
+      }
 
-    onAssign()
-  }, [assignAwsToken])
+      onAssign()
+    }
+  }, [assignAwsToken, awsToken])
 
   return (
     <KBarProvider actions={actions} options={{ enableHistory: true }}>
