@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { truncatedValue } from 'utils'
 
 import { AddIcon, ArrowDownIcon } from '@chakra-ui/icons'
 import {
@@ -262,7 +263,8 @@ const CompRelations = ({ data, compPath }) => {
                     width={'fit-content'}
                   >
                     <TagLabel>
-                      {comp.fromComp.name}-{comp.fromComp.version}
+                      {truncatedValue(comp?.fromComp?.name, 20)}-
+                      {truncatedValue(comp?.fromComp?.version, 20)}
                     </TagLabel>
                   </Tag>
                 ))}
@@ -294,8 +296,8 @@ const CompRelations = ({ data, compPath }) => {
                         width={'fit-content'}
                       >
                         <TagLabel>
-                          {comp?.toComp?.name?.substring(0, 50)}-
-                          {comp?.toComp?.version}
+                          {truncatedValue(comp?.toComp?.name, 20)}-
+                          {truncatedValue(comp?.toComp?.version, 20)}
                         </TagLabel>
                         <TagCloseButton
                           onClick={() => {
@@ -346,7 +348,7 @@ const CompRelations = ({ data, compPath }) => {
                       : 'green'
                   }
                 >
-                  {item.name} - {item.version}
+                  {item?.name} - {truncatedValue(item?.version,20)}
                 </Tag>
                 {index !== shortestPath.path.length - 1 && (
                   <ArrowDownIcon width={4} height={4} color={'blue.500'} />
