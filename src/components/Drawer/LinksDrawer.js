@@ -1,4 +1,3 @@
-import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { validateUrl } from 'utils'
 
@@ -9,7 +8,6 @@ import {
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   Flex,
@@ -30,16 +28,13 @@ import {
   Tr
 } from '@chakra-ui/react'
 
-import { UpdateCompLinks } from 'graphQL/Mutation'
-
-const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
+const LinksDrawer = ({ isOpen, onClose, component, sbomId }) => {
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
   const [linksData, setLinksData] = useState([])
   const [error, setError] = useState('')
   const { id, externalUrls } = component
   const [linkError, setLinkError] = useState('')
-  const [updateLinks] = useMutation(UpdateCompLinks)
 
   const containsSpace = /\s/.test(link)
 
@@ -96,18 +91,6 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
   const handleLinkRemove = (id) => {
     const updatedList = linksData.filter((_, index) => index !== id)
     setLinksData(updatedList)
-  }
-
-  const handleSave = async () => {
-    await updateLinks({
-      variables: {
-        id: id,
-        sbomId: sbomId,
-        urls: linksData
-      }
-    })
-      .then((res) => res.data && fetchCompData())
-      .finally(() => onClose())
   }
 
   return (
@@ -249,14 +232,6 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
               </Flex>
             </form>
           </DrawerBody>
-          <DrawerFooter>
-            <Button mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button variant='solid' colorScheme='blue' onClick={handleSave}>
-              Save
-            </Button>
-          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </>

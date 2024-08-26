@@ -1,5 +1,6 @@
 import { useLazyQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
+import { refetchActiveQueries } from 'context/ApolloWrapper'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -16,7 +17,6 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { RepeatIcon } from '@chakra-ui/icons'
 import {
   Box,
   Divider,
@@ -44,6 +44,7 @@ import CustomLoader from 'components/CustomLoader'
 import ArchivedVersions from 'components/Drawer/ArchivedVersions'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ToolsDrawer from 'components/Drawer/ToolsDrawer'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import VulnBadge from 'components/Misc/VulnBadge'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 import DeleteSbom from 'components/Modal/DeleteSbom'
@@ -116,7 +117,8 @@ const VersionsTable = ({
   const { setIsOpen } = useTour()
 
   const { VERSIONS } = ProductDetailsTabs
-  const { nodes, paginationProps, loading, refetch } = usePaginatatedQuery(
+
+  const { nodes, paginationProps, loading } = usePaginatatedQuery(
     signedUrlParams ? ShareVersionTable : GetVersionsTable,
     {
       skip: (tab === VERSIONS || tab === null) && !isToolOpen ? false : true,
@@ -127,7 +129,9 @@ const VersionsTable = ({
         id: productId,
         ...filters
       },
-      onCompleted: () => setClearSelect(false)
+      onCompleted: () => {
+        setClearSelect(false)
+      }
     }
   )
 
@@ -214,14 +218,16 @@ const VersionsTable = ({
       const inProgress = nodes?.some(
         (item) => item?.vulnRunStatus === 'IN_PROGRESS'
       )
+
       if (inProgress) {
-        refetch()
+        refetchActiveQueries()
       } else {
         clearInterval(refetchInterval)
       }
     }, 5000)
+
     return () => clearInterval(refetchInterval)
-  }, [nodes, refetch])
+  }, [nodes])
 
   const onStartTour = () => {
     setIsOpen(false)
@@ -523,11 +529,6 @@ const VersionsTable = ({
     }
   ]
 
-  // REFRESH PRODUCTS
-  const handleRefresh = useCallback(async () => {
-    refetch()
-  }, [refetch])
-
   const onBuildSbom = useCallback(() => {
     prodCompDispatch({ type: 'CLEAR_LICENSES' })
     onSbomOpen()
@@ -641,14 +642,7 @@ const VersionsTable = ({
               icon={<FaScrewdriverWrench />}
             />
           </Tooltip>
-          {/* REFETCH VERSION */}
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={handleRefresh}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            ></IconButton>
-          </Tooltip>
+          <RefreshBtn />
         </Stack>
       </Flex>
     )
@@ -664,8 +658,7 @@ const VersionsTable = ({
     signedUrlParams,
     onArcOpen,
     createSbom,
-    onBuildSbom,
-    handleRefresh
+    onBuildSbom
   ])
 
   const disableRowCheckBox = (row) => {

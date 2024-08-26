@@ -3,7 +3,6 @@ import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 
-import { RepeatIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
@@ -22,6 +21,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import SearchFilter from 'components/Licenses/LicenseSearchFilter'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -43,7 +43,6 @@ const RequestTable = ({
   loading,
   filters,
   setFilters,
-  refetch,
   paginationProps
 }) => {
   const { showToast } = useCustomToast()
@@ -122,10 +121,6 @@ const RequestTable = ({
     [handleClear]
   )
 
-  const handleRefresh = useCallback(() => {
-    refetch()
-  }, [refetch])
-
   const handleSort = async (column, sortDirection) => {
     setFilters((oldFilters) => ({
       ...oldFilters,
@@ -166,13 +161,8 @@ const RequestTable = ({
               icon={<FaPlus />}
             />
           </Tooltip>
-          <Tooltip label='Refresh'>
-            <IconButton
-              colorScheme='blue'
-              onClick={handleRefresh}
-              icon={<RepeatIcon />}
-            />
-          </Tooltip>
+
+          <RefreshBtn />
         </Stack>
       </Flex>
     )
@@ -181,7 +171,6 @@ const RequestTable = ({
     addReq,
     filterText,
     handleClear,
-    handleRefresh,
     handleSearch,
     onOpen,
     onSearchInputChange,

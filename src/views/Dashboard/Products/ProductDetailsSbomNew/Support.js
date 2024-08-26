@@ -7,7 +7,7 @@ import StatusModal from 'views/Dashboard/Support/StatusModal'
 import SupportModal from 'views/Dashboard/Support/SupportModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { CheckIcon, RepeatIcon } from '@chakra-ui/icons'
+import { CheckIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
@@ -25,6 +25,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import CpeCard from 'components/Misc/CpeCard'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 import PurlCard from 'components/Misc/PurlCard'
@@ -69,8 +70,9 @@ const Support = () => {
   const [activeRow, setActiveRow] = useState(null)
   const [filterText, setFilterText] = useState('')
 
-  const { nodes, paginationProps, refetch, loading, reset } =
-    usePaginatatedQuery(GetSbomSupportTab, {
+  const { nodes, paginationProps, loading, reset } = usePaginatatedQuery(
+    GetSbomSupportTab,
+    {
       skip: activeTab === 'support' ? false : true,
       selector: 'sbom.supports',
       variables: {
@@ -78,12 +80,8 @@ const Support = () => {
         projectId: projectId,
         ...filters
       }
-    })
-
-  const handleRefresh = useCallback(() => {
-    reset()
-    refetch()
-  }, [refetch, reset])
+    }
+  )
 
   const setSearchFilter = useCallback(
     (value) => {
@@ -162,13 +160,7 @@ const Support = () => {
               />
             </Tooltip>
           )}
-          <Tooltip label='Refresh'>
-            <IconButton
-              colorScheme='blue'
-              onClick={handleRefresh}
-              icon={<RepeatIcon />}
-            />
-          </Tooltip>
+          <RefreshBtn onClick={() => reset()} />
         </Stack>
       </Flex>
     )
@@ -178,7 +170,6 @@ const Support = () => {
     handleClear,
     handleSearch,
     sbomId,
-    handleRefresh,
     onOpen
   ])
 

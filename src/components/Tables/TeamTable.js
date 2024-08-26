@@ -6,7 +6,7 @@ import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Avatar,
   Badge,
@@ -28,6 +28,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -78,11 +79,7 @@ const TeamTable = () => {
   const { currentUser } = orgData?.organization || ''
   const { email } = currentUser || ''
 
-  const {
-    data: userData,
-    loading,
-    refetch
-  } = useQuery(GetUsers, {
+  const { data: userData, loading } = useQuery(GetUsers, {
     skip: !orgView ? true : activetab === 'users' ? false : true,
     variables: { search: filterText === '' ? undefined : filterText }
   })
@@ -394,14 +391,7 @@ const TeamTable = () => {
               </Box>
             </Tooltip>
           </Box>
-
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={() => refetch()}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            ></IconButton>
-          </Tooltip>
+          <RefreshBtn />
         </Stack>
       </Flex>
     )
@@ -412,7 +402,6 @@ const TeamTable = () => {
     handleClear,
     onTeamOpen,
     inviteUser,
-    refetch,
     isFreeTier,
     numberOfUsers
   ])

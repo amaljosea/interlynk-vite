@@ -58,7 +58,7 @@ const SettingsTag = ({ icon, label, color }) => {
   )
 }
 
-const SbomDetails = ({ sbomData, refetch }) => {
+const SbomDetails = ({ sbomData }) => {
   const navigate = useNavigate()
   const partsContext = usePartsContext()
   const params = useParams()
@@ -240,15 +240,11 @@ const SbomDetails = ({ sbomData, refetch }) => {
               </Text>
             </GridItem>
             <GridItem colSpan={4}>
-              <SbomActions sbom={sbomData} refetch={refetch} />
+              <SbomActions sbom={sbomData} />
             </GridItem>
           </Grid>
           {/* STATS */}
-          <Grid
-            gap={4}
-            alignItems={'center'}
-            templateColumns='repeat(12, 1fr)'
-          >
+          <Grid gap={4} alignItems={'center'} templateColumns='repeat(12, 1fr)'>
             <GridItem colSpan={4}>
               <Card px={0}>
                 <CardBody px={0} flexDir='column' gap={1}>

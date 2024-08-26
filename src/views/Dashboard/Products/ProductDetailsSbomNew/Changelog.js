@@ -6,11 +6,9 @@ import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import { truncatedValue } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { RepeatIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
-  IconButton,
   Stack,
   Tag,
   TagLabel,
@@ -21,6 +19,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import PurlCard from 'components/Misc/PurlCard'
 import UserCard from 'components/Misc/UserCard'
 import VersionCard from 'components/Misc/VersionCard'
@@ -93,8 +92,9 @@ const Changelog = () => {
     direction: 'DESC'
   })
 
-  const { nodes, paginationProps, refetch, loading, reset } =
-    usePaginatatedQuery(GetChangeLogs, {
+  const { nodes, paginationProps, loading, reset } = usePaginatatedQuery(
+    GetChangeLogs,
+    {
       skip: activeTab === 'changelog' ? false : true,
       selector: 'sbom.activityLogs',
       variables: {
@@ -103,7 +103,8 @@ const Changelog = () => {
         ...logState,
         search: logState.search || undefined
       }
-    })
+    }
+  )
 
   const [getSbom] = useLazyQuery(GetProductData)
   const [getVuln] = useLazyQuery(GetVulnData)
@@ -543,13 +544,8 @@ const Changelog = () => {
             }}
           />
         </Stack>
-        <Tooltip label='Refresh'>
-          <IconButton
-            onClick={() => refetch()}
-            colorScheme='blue'
-            icon={<RepeatIcon />}
-          />
-        </Tooltip>
+
+        <RefreshBtn />
       </Flex>
     )
   }, [
@@ -558,8 +554,7 @@ const Changelog = () => {
     handleSearch,
     handleClear,
     activityLogFilters,
-    reset,
-    refetch
+    reset
   ])
 
   const rowStyles = [

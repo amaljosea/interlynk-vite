@@ -13,20 +13,21 @@ const Support = () => {
     direction: 'DESC'
   })
 
-  const { nodes, paginationProps, reset, loading, refetch } =
-    usePaginatatedQuery(GetSupportTab, {
+  const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
+    GetSupportTab,
+    {
       selector: 'supports',
       variables: {
         ...filters
       }
-    })
+    }
+  )
 
   return (
     <Card>
       <SupportTable
         loading={loading}
         data={nodes}
-        refetch={refetch}
         paginationProps={paginationProps}
         filters={filters}
         setFilters={(newFilters) => {

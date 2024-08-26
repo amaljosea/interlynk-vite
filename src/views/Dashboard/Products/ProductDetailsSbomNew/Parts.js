@@ -1,5 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { refetchActiveQueries } from 'context/ApolloWrapper'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import {
@@ -53,6 +54,7 @@ import {
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -73,7 +75,7 @@ import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 
 import ConfirmationModal from '../components/ConfirmationModal'
 
-const Parts = ({ sbomRefetch }) => {
+const Parts = () => {
   const location = useLocation()
   const params = useParams()
   const partsContext = usePartsContext()
@@ -97,7 +99,7 @@ const Parts = ({ sbomRefetch }) => {
   const { PARTS } = ProductGeneralTabs
 
   // GET SBOM PARTS
-  const { data, refetch, error } = useQuery(GetSbomParts, {
+  const { data, error } = useQuery(GetSbomParts, {
     skip: activeTab === PARTS ? false : true,
     variables: { projectId: prodId, sbomId, first: totalRows }
   })
@@ -283,13 +285,13 @@ const Parts = ({ sbomRefetch }) => {
         (item) => item?.vulnRunStatus === 'IN_PROGRESS'
       )
       if (inProgress) {
-        refetch()
+        refetchActiveQueries()
       } else {
         clearInterval(refetchInterval)
       }
     }, 5000)
     return () => clearInterval(refetchInterval)
-  }, [sbomParts, refetch])
+  }, [sbomParts])
 
   // COLUMNS
   const columns = [
@@ -531,12 +533,6 @@ const Parts = ({ sbomRefetch }) => {
   // CLEAR SERACH
   const handleClear = () => setSearchInput('')
 
-  const handleRefresh = useCallback(async () => {
-    await refetch({ projectId: prodId, sbomId }).then(
-      (res) => res?.data && sbomRefetch({ projectId: prodId, sbomId: sbomId })
-    )
-  }, [prodId, refetch, sbomId, sbomRefetch])
-
   // SUB HEADER
   const subHeaderComponent = useMemo(() => {
     return (
@@ -596,17 +592,11 @@ const Parts = ({ sbomRefetch }) => {
               isDisabled={!updateSboms || signedUrlParams}
             />
           </Tooltip>
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={handleRefresh}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            />
-          </Tooltip>
+          <RefreshBtn />
         </Stack>
       </Flex>
     )
-  }, [searchInput, onOpen, updateSboms, signedUrlParams, handleRefresh])
+  }, [searchInput, onOpen, updateSboms, signedUrlParams])
 
   if (error) {
     return (

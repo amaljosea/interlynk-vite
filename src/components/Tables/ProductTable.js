@@ -42,6 +42,7 @@ import CustomLoader from 'components/CustomLoader'
 import LabelDrawer from 'components/Drawer/LabelDrawer'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 import IconBox from 'components/Icons/IconBox'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
@@ -55,19 +56,12 @@ import { DeleteProjectGroup } from 'graphQL/Mutation'
 import { GetLabels, GetSharelynks } from 'graphQL/Queries'
 
 import { FaEllipsisV, FaGithub } from 'react-icons/fa'
-import {
-  FaCode,
-  FaDesktop,
-  FaInbox,
-  FaRotateRight,
-  FaTag
-} from 'react-icons/fa6'
+import { FaCode, FaDesktop, FaInbox, FaTag } from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
 
 const ProductTable = ({
   data,
-  refetch,
   loading,
   filters,
   setFilters,
@@ -289,13 +283,7 @@ const ProductTable = ({
             />
           </Tooltip>
           {/* REFRESH */}
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={refetch}
-              variant='outline'
-              icon={<FaRotateRight />}
-            />
-          </Tooltip>
+          <RefreshBtn />
           {/* ADD PRODUCT */}
           <Box position='relative'>
             <Tooltip
@@ -339,7 +327,6 @@ const ProductTable = ({
     onGithubOpen,
     canAddProduct,
     onOpenLabel,
-    refetch,
     isFreeTier,
     productCount,
     onOpen

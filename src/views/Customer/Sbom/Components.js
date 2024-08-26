@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -7,7 +7,7 @@ import { GetIcon, customStyles, getFullDateAndTime, timeSince } from 'utils'
 import { openSsf } from 'variables/general'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { RepeatIcon, ViewIcon } from '@chakra-ui/icons'
+import { ViewIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
@@ -29,6 +29,7 @@ import {
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
@@ -37,7 +38,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
-import { ShareCompFilters, ShareComponentData } from 'graphQL/Queries'
+import { ShareComponentData } from 'graphQL/Queries'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import { FaGlobe, FaHouseUser, FaLightbulb, FaSitemap } from 'react-icons/fa'
@@ -87,7 +88,6 @@ const Components = ({ sbomData }) => {
   const {
     nodes: components,
     error,
-    refetch,
     loading,
     reset,
     paginationProps
@@ -104,26 +104,6 @@ const Components = ({ sbomData }) => {
   })
 
   const { primaryComponent } = sbomData || ''
-
-  // GET COMPONENT FILTER HEADS
-  const { refetch: getCompFilters } = useQuery(ShareCompFilters, {
-    fetchPolicy: activeTab === 'components' ? false : true,
-    variables: {
-      sbomId: sbomId
-    },
-    onCompleted: (data) => {
-      prodCompDispatch({
-        type: 'ADD_FILTER_HEADS',
-        payload: data?.shareLynkQuery?.sbom?.filters
-      })
-    }
-  })
-
-  const fetchCompData = useCallback(() => {
-    reset()
-    refetch()
-    getCompFilters()
-  }, [getCompFilters, refetch, reset])
 
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState('')
@@ -470,9 +450,7 @@ const Components = ({ sbomData }) => {
   const [deleteSupplier] = useMutation(deleteComSupplier)
 
   const handleSupRemove = async (id) => {
-    await deleteSupplier({ variables: { id: id } }).then(
-      (res) => res.data && fetchCompData()
-    )
+    await deleteSupplier({ variables: { id: id } }).then((res) => res.data)
   }
 
   // EXPAND SECTION
@@ -808,23 +786,10 @@ const Components = ({ sbomData }) => {
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {filters && <CompFilters />}
         </Stack>
-        <Tooltip label='Refresh'>
-          <IconButton
-            onClick={fetchCompData}
-            colorScheme='blue'
-            icon={<RepeatIcon />}
-          />
-        </Tooltip>
+        <RefreshBtn onClick={() => reset()} />
       </Flex>
     )
-  }, [
-    compSearch,
-    handleSearch,
-    handleClear,
-    onSearchInputChange,
-    filters,
-    fetchCompData
-  ])
+  }, [compSearch, handleSearch, handleClear, onSearchInputChange, filters])
 
   const handleSort = async (column, sortDirection) => {
     prodCompDispatch({
@@ -874,7 +839,6 @@ const Components = ({ sbomData }) => {
           data={activeRow}
           isOpen={isOpen}
           onClose={onClose}
-          filterRefetch={getCompFilters}
           shortDesc={null}
           checkId={null}
           primaryComp={primaryComponent}

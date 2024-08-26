@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
+import { refetchActiveQueries } from 'context/ApolloWrapper'
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -31,7 +32,7 @@ const ProductDetailsSbomNew = () => {
   const { setIsOpen, setCurrentStep } = useTour()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
-  const { data, loading, error, refetch } = useQuery(GetProductData, {
+  const { data, loading, error } = useQuery(GetProductData, {
     variables: { projectId: productId, sbomId: sbomId },
     onCompleted: (data) => {
       if (data?.sbom?.sbomParts?.length > 0) {
@@ -87,57 +88,52 @@ const ProductDetailsSbomNew = () => {
     const refetchInterval = setInterval(() => {
       if (isInitialized) {
         policyRefetch()
-        refetch()
+        refetchActiveQueries()
       } else {
         clearInterval(refetchInterval)
       }
     }, 15000)
     return () => clearInterval(refetchInterval)
-  }, [sbomId, isInitialized, refetch, policyRefetch])
+  }, [sbomId, isInitialized, policyRefetch])
 
   useEffect(() => {
     const refetchInterval = setInterval(() => {
       if (reScanVuln) {
-        refetch()
+        refetchActiveQueries()
       } else if (isInitialized) {
         policyRefetch()
-        refetch()
+        refetchActiveQueries()
       } else {
         clearInterval(refetchInterval)
       }
     }, 15000)
     return () => clearInterval(refetchInterval)
-  }, [sbomId, refetch, reScanVuln, isInitialized, policyRefetch])
+  }, [sbomId, reScanVuln, isInitialized, policyRefetch])
 
   return (
     <Flex width={'100%'} flexDir={'column'} gap={5}>
-      <SbomInfo
-        data={data?.sbom}
-        error={error}
-        loading={loading}
-        refetch={refetch}
-      />
+      <SbomInfo data={data?.sbom} error={error} loading={loading} />
       <Grid
         gap={4}
         width={'100%'}
         alignItems={'flex-start'}
         templateColumns='repeat(12, 1fr)'
       >
-        <GridItem colSpan={[2,2]}>
+        <GridItem colSpan={[2, 2]}>
           <SbomStats
             title={'Components'}
             amount={compCount}
             icon={<FaCube size={20} />}
           />
         </GridItem>
-        <GridItem colSpan={[2,2]}>
+        <GridItem colSpan={[2, 2]}>
           <SbomStats
             title={'Licenses'}
             amount={compLicenseCount}
             icon={<FaBalanceScale size={20} />}
           />
         </GridItem>
-        <GridItem colSpan={[4,3]}>
+        <GridItem colSpan={[4, 3]}>
           <SbomStats
             amount={vulnStats}
             sbomParts={sbomParts}
@@ -146,7 +142,7 @@ const ProductDetailsSbomNew = () => {
             icon={<FaBug size={20} />}
           />
         </GridItem>
-        <GridItem colSpan={[4,5]}>
+        <GridItem colSpan={[4, 5]}>
           <SbomStats
             title={'Policy Results'}
             amount={policyResultMetrics}
@@ -154,12 +150,7 @@ const ProductDetailsSbomNew = () => {
           />
         </GridItem>
       </Grid>
-      <SbomTable
-        data={data?.sbom}
-        error={error}
-        loading={loading}
-        refetch={refetch}
-      />
+      <SbomTable data={data?.sbom} error={error} loading={loading} />
     </Flex>
   )
 }

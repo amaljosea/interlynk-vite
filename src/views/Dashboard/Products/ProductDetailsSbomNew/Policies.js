@@ -1,5 +1,6 @@
 import { useMutation } from '@apollo/client'
 import styled from '@emotion/styled'
+import { refetchActiveQueries } from 'context/ApolloWrapper'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
@@ -56,7 +57,7 @@ const Policies = () => {
     childKey: 'run_policy_scan'
   })
 
-  const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
+  const { nodes, paginationProps, loading } = usePaginatatedQuery(
     PolicyResults,
     {
       skip: activeTab === 'policies' ? false : true,
@@ -107,7 +108,7 @@ const Policies = () => {
         </Tooltip>
       </Flex>
     )
-  }, [policyRun, policyScan, refetch, sbomId, showToast])
+  }, [policyRun, policyScan, sbomId, showToast])
 
   const getColor = (result) => {
     switch (result) {
@@ -320,13 +321,13 @@ const Policies = () => {
   useEffect(() => {
     const refetchInterval = setInterval(() => {
       if (isInitialized) {
-        refetch()
+        refetchActiveQueries()
       } else {
         clearInterval(refetchInterval)
       }
     }, 5000)
     return () => clearInterval(refetchInterval)
-  }, [sbomId, isInitialized, refetch])
+  }, [sbomId, isInitialized])
 
   return (
     <>

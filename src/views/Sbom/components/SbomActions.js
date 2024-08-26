@@ -33,17 +33,16 @@ import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
 import DownloadModal from './DownloadModal'
-import { ScoresProgress } from './ScoresProgress'
 import SigningModal from './SigningModal'
 
-const SbomActions = ({ sbom, refetch }) => {
+const SbomActions = ({ sbom }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
   } = useProductUrlContext()
 
-  const { isFreeTier, orgQueryLoading } = useGlobalQueryContext()
+  const { isFreeTier } = useGlobalQueryContext()
 
   const { totalRows, dispatch, prodCompState } = useGlobalState()
   const {
@@ -165,23 +164,6 @@ const SbomActions = ({ sbom, refetch }) => {
       })
     })
 
-  const refetchSBOM = async (id) => {
-    await refetch({
-      projectId: productId,
-      sbomId: id
-    }).then((res) => {
-      if (res.data) {
-        const url = generateProductVersionDetailPageUrlFromCurrentUrl({
-          sbomid: id,
-          paramsObj: {
-            tab: activeTab
-          }
-        })
-        navigate(url)
-      }
-    })
-  }
-
   const onDownload = () => {
     if (signedUrlParams) {
       onOpen()
@@ -196,7 +178,13 @@ const SbomActions = ({ sbom, refetch }) => {
     prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     setSelectedVersion(select)
-    refetchSBOM(select.value)
+    const url = generateProductVersionDetailPageUrlFromCurrentUrl({
+      sbomid: select.value,
+      paramsObj: {
+        tab: activeTab
+      }
+    })
+    navigate(url)
   }
 
   const { nodes } = usePaginatatedQuery(GetCheckResults, {
@@ -404,7 +392,6 @@ const SbomActions = ({ sbom, refetch }) => {
           onClose={setSBMClose}
           btnRef={btnRef}
           data={sbom?.primaryComponent}
-          filterRefetch={getCompFilters}
           shortDesc={null}
           totalRows={null}
         />

@@ -71,7 +71,7 @@ const ProductDetails = () => {
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const { data, refetch, loading, error } = useQuery(ShareLynkProjectGroup, {
+  const { data, loading, error } = useQuery(ShareLynkProjectGroup, {
     skip: sbomId,
     variables: {
       id: productGroupId
@@ -94,7 +94,7 @@ const ProductDetails = () => {
   }
 
   // GET VULN DATA
-  const { data: vulnData, refetch: vulnRefetch } = useQuery(ShareVulnData, {
+  const { data: vulnData } = useQuery(ShareVulnData, {
     skip: sbomId ? false : true,
     variables: {
       projectId: signedUrlParams ? undefined : productId || activeEnv,
@@ -158,13 +158,7 @@ const ProductDetails = () => {
   }
 
   if (sbomId) {
-    return (
-      <SBOM
-        prodRefetch={refetch}
-        vulnData={vulnData}
-        getVulnData={vulnRefetch}
-      />
-    )
+    return <SBOM />
   }
 
   return (

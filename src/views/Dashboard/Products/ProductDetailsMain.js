@@ -248,7 +248,6 @@ const ProductDetailsMain = () => {
   const {
     nodes: policyData,
     paginationProps: policyPaginationProps,
-    refetch: policyRefetch,
     loading: policyloading
   } = usePaginatatedQuery(GetProjectPolicies, {
     skip: tab === POLICIES ? false : true,
@@ -608,7 +607,6 @@ const ProductDetailsMain = () => {
                   <PolicyTable
                     data={policyData}
                     loading={policyloading}
-                    refetch={policyRefetch}
                     paginationProps={policyPaginationProps}
                   />
                 </TabPanel>

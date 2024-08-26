@@ -12,15 +12,12 @@ const Requests = () => {
     direction: 'DESC'
   })
 
-  const { nodes, paginationProps, reset, refetch } = usePaginatatedQuery(
-    GetRequests,
-    {
-      selector: 'requests',
-      variables: {
-        ...filters
-      }
+  const { nodes, paginationProps, reset } = usePaginatatedQuery(GetRequests, {
+    selector: 'requests',
+    variables: {
+      ...filters
     }
-  )
+  })
 
   return (
     <Card>
@@ -33,7 +30,6 @@ const Requests = () => {
           setFilters(newFilters)
           reset()
         }}
-        refetch={refetch}
       />
     </Card>
   )

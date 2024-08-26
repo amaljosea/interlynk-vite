@@ -10,7 +10,6 @@ import {
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   Flex,
@@ -72,7 +71,6 @@ const RelationshipDrawer = ({
   onClose,
   data,
   activeRow,
-  fetchCompData,
   compPath,
   ruleExists,
   comPathLoading,
@@ -192,11 +190,6 @@ const RelationshipDrawer = ({
       .finally(() => {
         onDelClose()
       })
-  }
-
-  const handleSave = () => {
-    fetchCompData()
-    onClose()
   }
 
   const getConditionsAttributes = () => {
@@ -560,16 +553,6 @@ const RelationshipDrawer = ({
                 </CardBody>
               </Card>
             </DrawerBody>
-            <DrawerFooter>
-              <Button
-                variant='solid'
-                colorScheme='blue'
-                onClick={handleSave}
-                hidden={resolved}
-              >
-                Done
-              </Button>
-            </DrawerFooter>
           </>
         )}
       </DrawerContent>

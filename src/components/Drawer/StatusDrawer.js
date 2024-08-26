@@ -41,7 +41,6 @@ import {
 const StatusDrawer = ({
   isOpen,
   onClose,
-  btnRef,
   cve,
   status,
   component,
@@ -50,7 +49,6 @@ const StatusDrawer = ({
   imageInfo,
   textColor,
   setSelectVersion,
-  vulnRefetch,
   setVulData
 }) => {
   const { showToast } = useCustomToast()
@@ -65,7 +63,7 @@ const StatusDrawer = ({
 
   const { data: allVexStatus } = useQuery(getVexStatuses, {})
   const { data: allVexJustify } = useQuery(getVexJustifications, {})
-  const { data: allVexLogs, refetch } = useQuery(getVexLogs, {
+  const { data: allVexLogs } = useQuery(getVexLogs, {
     variables: {
       imageVersionId: imgVersionId,
       cveId: cve,
@@ -74,9 +72,7 @@ const StatusDrawer = ({
     }
   })
 
-  const [vexVulnCreate] = useMutation(VexVulnCreate, {
-    onCompleted: refetch
-  })
+  const [vexVulnCreate] = useMutation(VexVulnCreate)
 
   const handleStatusChange = (e) => {
     const { value } = e.target
@@ -107,7 +103,7 @@ const StatusDrawer = ({
             vexJustificationID: justification,
             vexStatusID: statusTitle
           }
-        }).then(() => refetch())
+        })
       } else {
         await vexVulnCreate({
           variables: {
@@ -119,7 +115,7 @@ const StatusDrawer = ({
             vexStatusID: statusTitle,
             fixedVersionID: selectedTag
           }
-        }).then(() => refetch())
+        })
       }
       setSelectVersion('')
       setJustification('')
@@ -207,9 +203,7 @@ const StatusDrawer = ({
     >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton
-          onClick={() => vulnRefetch !== null && vulnRefetch()}
-        />
+        <DrawerCloseButton />
         <DrawerHeader borderBottomWidth='1px'>{cve} Status</DrawerHeader>
         <DrawerBody>
           <Stack spacing='24px'>

@@ -18,13 +18,15 @@ const ProductList = () => {
     enabled: true
   })
 
-  const { nodes, paginationProps, reset, refetch, loading, error } =
-    usePaginatatedQuery(ShareLynkProjectGroups, {
+  const { nodes, paginationProps, reset, loading, error } = usePaginatatedQuery(
+    ShareLynkProjectGroups,
+    {
       selector: 'shareLynkQuery.projectGroups',
       variables: {
         ...filters
       }
-    })
+    }
+  )
 
   if (error) {
     return (
@@ -43,7 +45,6 @@ const ProductList = () => {
     <ProductTable
       data={nodes}
       loading={loading}
-      refetch={refetch}
       filters={filters}
       reset={() => reset()}
       paginationProps={paginationProps}

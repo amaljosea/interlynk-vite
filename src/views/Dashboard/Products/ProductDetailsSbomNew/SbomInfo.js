@@ -5,7 +5,7 @@ import CardBody from 'components/Card/CardBody'
 
 import SbomDetails from './SbomDetails/index'
 
-const SbomInfo = ({ data, error, loading, refetch }) => {
+const SbomInfo = ({ data, error, loading }) => {
   if (error) {
     return (
       <Card>
@@ -28,7 +28,7 @@ const SbomInfo = ({ data, error, loading, refetch }) => {
   return (
     <Card className='version'>
       <CardBody>
-        <SbomDetails sbomData={data} refetch={refetch} />
+        <SbomDetails sbomData={data} />
       </CardBody>
     </Card>
   )

@@ -1,3 +1,4 @@
+import { refetchActiveQueries } from 'context/ApolloWrapper'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
@@ -19,6 +20,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import UserCard from 'components/Misc/UserCard'
 
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -69,8 +71,9 @@ const ChangelogTable = ({ activeEnv }) => {
 
   const { CHANGE_LOG } = ProductDetailsTabs
 
-  const { nodes, paginationProps, refetch, loading, reset } =
-    usePaginatatedQuery(GetProjectLogs, {
+  const { nodes, paginationProps, loading, reset } = usePaginatatedQuery(
+    GetProjectLogs,
+    {
       fetchPolicy: 'network-only',
       skip: tab === CHANGE_LOG ? false : true,
       selector: 'project.activityLogs',
@@ -78,7 +81,8 @@ const ChangelogTable = ({ activeEnv }) => {
         id: activeEnv,
         ...prodLogState
       }
-    })
+    }
+  )
 
   // COLUMNS
   const columns = [
@@ -187,11 +191,6 @@ const ChangelogTable = ({ activeEnv }) => {
     }
   ]
 
-  const handleRefresh = useCallback(async () => {
-    reset()
-    refetch()
-  }, [refetch, reset])
-
   const setSearchFilter = useCallback(
     (value) => {
       setProdLogState((oldFilter) => ({
@@ -279,13 +278,8 @@ const ChangelogTable = ({ activeEnv }) => {
             }}
           />
         </Stack>
-        <Tooltip label='Refresh'>
-          <IconButton
-            onClick={handleRefresh}
-            colorScheme='blue'
-            icon={<RepeatIcon />}
-          ></IconButton>
-        </Tooltip>
+
+        <RefreshBtn onClick={() => reset()} />
       </Flex>
     )
   }, [
@@ -294,7 +288,6 @@ const ChangelogTable = ({ activeEnv }) => {
     handleClear,
     handleSearch,
     activeEnv,
-    handleRefresh,
     reset
   ])
 

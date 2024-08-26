@@ -15,8 +15,7 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  ExternalLinkIcon,
-  RepeatIcon
+  ExternalLinkIcon
 } from '@chakra-ui/icons'
 import {
   Badge,
@@ -38,6 +37,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import CvssCard from 'components/Misc/CvssCard'
 import Pagination from 'components/Pagination'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
@@ -236,8 +236,9 @@ const Vulnerabilities = ({ sbomData }) => {
     max: parseFloat(vulnEpss[1]) / 100
   }
 
-  const { nodes, paginationProps, reset, refetch, loading } =
-    usePaginatatedQuery(ShareVulnData, {
+  const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
+    ShareVulnData,
+    {
       skip: sbomId && activeTab === 'vulnerabilities' ? false : true,
       selector: 'shareLynkQuery.sbom.vulns',
       variables: {
@@ -260,7 +261,8 @@ const Vulnerabilities = ({ sbomData }) => {
         field: field,
         direction: direction
       }
-    })
+    }
+  )
 
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const firstDegreePart = nodes?.filter(
@@ -689,11 +691,6 @@ const Vulnerabilities = ({ sbomData }) => {
     [prodVulnDispatch, reset]
   )
 
-  const handleRefresh = useCallback(() => {
-    refetch()
-    reset()
-  }, [refetch, reset])
-
   const subHeader = useMemo(() => {
     return (
       <Flex
@@ -728,19 +725,12 @@ const Vulnerabilities = ({ sbomData }) => {
           )}
         </Flex>
         {/* REFRESH */}
-        <Tooltip label='Refresh'>
-          <IconButton
-            onClick={handleRefresh}
-            colorScheme='blue'
-            icon={<RepeatIcon />}
-          />
-        </Tooltip>
+        <RefreshBtn onClick={() => reset()} />
       </Flex>
     )
   }, [
     filters,
     handleClear,
-    handleRefresh,
     handleSearch,
     onSearchInputChange,
     reset,

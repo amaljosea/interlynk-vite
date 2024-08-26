@@ -1,4 +1,5 @@
 import { useLazyQuery } from '@apollo/client'
+import { refetchActiveQueries } from 'context/ApolloWrapper'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
@@ -37,7 +38,7 @@ import {
 } from 'react-icons/fa'
 import { FaCircleCheck } from 'react-icons/fa6'
 
-const SbomDetails = ({ sbomData, refetch }) => {
+const SbomDetails = ({ sbomData }) => {
   const partsContext = usePartsContext()
   const navigate = useNavigate()
   const params = useParams()
@@ -133,15 +134,15 @@ const SbomDetails = ({ sbomData, refetch }) => {
 
   useEffect(() => {
     const refetchInterval = setInterval(() => {
-      if (sbomData && sbomData?.vulnRunStatus === 'IN_PROGRESS') {
-        refetch({ projectId, sbomId })
+      if (sbomData?.vulnRunStatus === 'IN_PROGRESS') {
+        refetchActiveQueries()
       } else {
         clearInterval(refetchInterval)
       }
     }, 5000)
 
     return () => clearInterval(refetchInterval)
-  }, [sbomData, refetch, projectId, sbomId])
+  }, [sbomData, projectId, sbomId])
 
   return (
     <>

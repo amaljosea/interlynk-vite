@@ -15,7 +15,6 @@ import PolicyModal from 'views/Dashboard/Policies/PolicyModal'
 import RuleModal from 'views/Dashboard/Policies/RuleModal'
 import WarnModal from 'views/Dashboard/Policies/WarnModal'
 
-import { RepeatIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
@@ -44,6 +43,8 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import RefreshBtn from 'components/Icons/RefreshBtn'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -53,9 +54,8 @@ import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
 
 import { FaEllipsisV, FaPlus } from 'react-icons/fa'
-import LynkSwitch from 'components/Misc/LynkSwitch'
 
-const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
+const PolicyTable = ({ data, loading, paginationProps }) => {
   const { showToast } = useCustomToast()
   const location = useLocation()
   const params = useParams()
@@ -123,10 +123,6 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
     onClose: onRuleClose
   } = useDisclosure()
 
-  const handleRefresh = useCallback(() => {
-    refetch()
-  }, [refetch])
-
   const handleCreateExclusion = async (id) => {
     await createExclusion({
       variables: { policyId: id, projectId: productId }
@@ -137,8 +133,6 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
           description: errors[0],
           status: 'error'
         })
-      } else {
-        handleRefresh()
       }
     })
   }
@@ -153,8 +147,6 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
           description: errors[0],
           status: 'error'
         })
-      } else {
-        handleRefresh()
       }
     })
   }
@@ -177,18 +169,11 @@ const PolicyTable = ({ data, loading, paginationProps, refetch }) => {
               icon={<FaPlus />}
             />
           </Tooltip>
-          <Tooltip label='Refresh'>
-            <IconButton
-              hidden={sbomId}
-              colorScheme='blue'
-              onClick={handleRefresh}
-              icon={<RepeatIcon />}
-            />
-          </Tooltip>
+          <RefreshBtn />
         </Stack>
       </Flex>
     )
-  }, [handleRefresh, onOpen, productId, sbomId, updatePolicy])
+  }, [onOpen, productId, sbomId, updatePolicy])
 
   // COLUMNS
   const columns = [

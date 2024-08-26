@@ -10,7 +10,7 @@ import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 
-import { CheckIcon, RepeatIcon } from '@chakra-ui/icons'
+import { CheckIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -28,6 +28,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import LicenseModal from 'components/LicenseModal'
 import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
@@ -92,8 +93,9 @@ const Checks = () => {
     direction: 'DESC'
   })
 
-  const { nodes, paginationProps, refetch, loading, reset } =
-    usePaginatatedQuery(GetCheckResults, {
+  const { nodes, paginationProps, loading, reset } = usePaginatatedQuery(
+    GetCheckResults,
+    {
       skip: activeTab === 'checks' ? false : true,
       selector: 'sbom.checkResults',
       variables: {
@@ -101,7 +103,8 @@ const Checks = () => {
         projectId: productId,
         ...checkState
       }
-    })
+    }
+  )
 
   // GET HEALTH CHECK FILTER HEADS
   const { data: filterHead } = useQuery(GetCheckFilterData, {
@@ -221,17 +224,11 @@ const Checks = () => {
     onClose: onRelClose
   } = useDisclosure()
 
-  /*   const handleRefetch = useCallback(() => {
+  const handleReCheck = useCallback(async () => {
     showToast({
-      description:
-        'Checks rescan is in progress. Please refresh the page to see the updated results.',
+      description: 'Checks rescan is in progress',
       status: 'info'
     })
-    reset()
-    refetch()
-  }, [refetch, reset, showToast]) */
-
-  const handleReCheck = useCallback(async () => {
     await healthRecheck({
       variables: {
         sbomId: sbomId
@@ -244,6 +241,7 @@ const Checks = () => {
         })
       }
     })
+    reset()
   }, [healthRecheck, sbomId, showToast])
 
   const setSearchFilter = useCallback(
@@ -341,13 +339,7 @@ const Checks = () => {
               icon={<FaCheckDouble size={16} />}
             />
           </Tooltip>
-          <Tooltip label='Refresh'>
-            <IconButton
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-              onClick={() => refetch()}
-            />
-          </Tooltip>
+          <RefreshBtn />
         </Stack>
       </Flex>
     )
@@ -359,8 +351,7 @@ const Checks = () => {
     filterHead,
     handleReCheck,
     editChecks,
-    reset,
-    refetch
+    reset
   ])
 
   const handleOpenLicense = () => {
@@ -950,7 +941,6 @@ const Checks = () => {
             <RelationshipDrawer
               data={null}
               isOpen={isRelOpen}
-              fetchCompData={refetch}
               onClose={onRelClose}
               activeRow={activeRow}
               ruleExists={ruleExists}

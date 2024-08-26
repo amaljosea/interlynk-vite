@@ -7,7 +7,7 @@ import CardBody from 'components/Card/CardBody'
 
 import SbomDetails from './SbomDetails'
 
-const SbomInfo = ({ data, error, loading, refetch }) => {
+const SbomInfo = ({ data, error, loading }) => {
   if (error) {
     return (
       <Card>
@@ -37,10 +37,10 @@ const SbomInfo = ({ data, error, loading, refetch }) => {
           gap={10}
         >
           <GridItem colSpan={3}>
-            <SbomDetails sbomData={data} refetch={refetch} />
+            <SbomDetails sbomData={data} />
           </GridItem>
           <GridItem colSpan={2} height={'fit-content'}>
-            <SbomActions sbom={data} refetch={refetch} />
+            <SbomActions sbom={data} />
           </GridItem>
         </Grid>
       </CardBody>

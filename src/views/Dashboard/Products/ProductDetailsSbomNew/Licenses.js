@@ -1,21 +1,19 @@
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
 
-import { RepeatIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
-  IconButton,
   Tag,
   TagLabel,
   Text,
-  Tooltip,
   useColorModeValue
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import Pagination from 'components/Pagination'
 
 import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
@@ -33,7 +31,7 @@ const Licenses = () => {
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
-  const { nodes, paginationProps, loading, refetch } = usePaginatatedQuery(
+  const { nodes, paginationProps, loading } = usePaginatatedQuery(
     GetSbomLicensesTable,
     {
       skip: activeTab === 'licenses' ? false : true,
@@ -45,10 +43,6 @@ const Licenses = () => {
     }
   )
 
-  const handleRefresh = useCallback(() => {
-    refetch()
-  }, [refetch])
-
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex
@@ -57,16 +51,10 @@ const Licenses = () => {
         justifyContent='flex-end'
         gap={3}
       >
-        <Tooltip label='Refresh'>
-          <IconButton
-            onClick={handleRefresh}
-            colorScheme='blue'
-            icon={<RepeatIcon />}
-          ></IconButton>
-        </Tooltip>
+        <RefreshBtn />
       </Flex>
     )
-  }, [handleRefresh])
+  })
 
   // COLUMNS
   const columns = [

@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import {
@@ -11,7 +11,7 @@ import {
 } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
-import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
@@ -32,6 +32,8 @@ import {
 
 import CardBody from 'components/Card/CardBody'
 import CustomLoader from 'components/CustomLoader'
+import RefreshBtn from 'components/Icons/RefreshBtn'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -51,7 +53,6 @@ import CopyRule from './components/CopyRule'
 import CreateRule from './components/CreateRule'
 import DeleteWarning from './components/DeleteWarning'
 import StatusWarning from './components/StatusWarning'
-import LynkSwitch from 'components/Misc/LynkSwitch'
 
 const Automation = ({ projects }) => {
   const { showToast } = useCustomToast()
@@ -79,7 +80,7 @@ const Automation = ({ projects }) => {
     }
   )
 
-  const { nodes, paginationProps, refetch, loading } = usePaginatatedQuery(
+  const { nodes, paginationProps, loading } = usePaginatatedQuery(
     GetProjectCheck,
     {
       skip: tab === AUTOMATION_RULES ? false : true,
@@ -415,10 +416,6 @@ const Automation = ({ projects }) => {
     }
   ]
 
-  const handleRefresh = useCallback(() => {
-    refetch()
-  }, [refetch])
-
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
@@ -433,17 +430,12 @@ const Automation = ({ projects }) => {
               icon={<AddIcon />}
             />
           </Tooltip>
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={handleRefresh}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            />
-          </Tooltip>
+
+          <RefreshBtn />
         </Stack>
       </Flex>
     )
-  }, [onRuleOpen, handleRefresh])
+  }, [onRuleOpen])
 
   return (
     <>

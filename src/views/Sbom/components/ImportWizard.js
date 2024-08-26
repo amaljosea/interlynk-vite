@@ -15,7 +15,6 @@ import StepTwo from './Wizard/StepTwo'
 
 const ImportWizard = ({
   variant,
-  refetch,
   currentSbomId,
   currentProductId,
   onClose
@@ -38,11 +37,6 @@ const ImportWizard = ({
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
   const [uniqVersions, setUniqVersions] = useState([])
-
-  const refetchCurrentVuln = () => {
-    refetch()
-    onClose()
-  }
 
   const handleSubmit = () => {
     const importData = []
@@ -127,12 +121,8 @@ const ImportWizard = ({
         py={5}
         pr={8}
       >
-        {hasCompletedAllSteps ? (
-          <Button
-            variant='solid'
-            colorScheme='green'
-            onClick={refetchCurrentVuln}
-          >
+        {!hasCompletedAllSteps ? (
+          <Button variant='solid' colorScheme='green' onClick={() => onClose()}>
             Done
           </Button>
         ) : (

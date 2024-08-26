@@ -17,8 +17,7 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  ExternalLinkIcon,
-  RepeatIcon
+  ExternalLinkIcon
 } from '@chakra-ui/icons'
 import {
   Badge,
@@ -53,6 +52,7 @@ import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
 import CustomLoader from 'components/CustomLoader'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import { FixedIcon } from 'components/Icons/Icons'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import CvssCard from 'components/Misc/CvssCard'
 import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
@@ -334,8 +334,9 @@ const Vulnerabilities = ({ sbomData }) => {
     direction: prodVulnState?.direction
   }
 
-  const { nodes, paginationProps, refetch, loading, reset } =
-    usePaginatatedQuery(GetVulnData, {
+  const { nodes, paginationProps, loading, reset } = usePaginatatedQuery(
+    GetVulnData,
+    {
       skip: sbomId && activeTab === 'vulnerabilities' ? false : true,
       selector: 'sbom.vulns',
       variables: {
@@ -359,7 +360,8 @@ const Vulnerabilities = ({ sbomData }) => {
         vexComplete: vexComplete === 'all' ? undefined : false,
         orderBy: searchInput === '' ? orderBy : undefined
       }
-    })
+    }
+  )
 
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const firstDegreePart = nodes?.filter(
@@ -966,11 +968,6 @@ const Vulnerabilities = ({ sbomData }) => {
     showToast
   ])
 
-  const handleRefresh = useCallback(() => {
-    reset()
-    refetch()
-  }, [refetch, reset])
-
   const subHeader = useMemo(() => {
     return (
       <Flex
@@ -1035,20 +1032,13 @@ const Vulnerabilities = ({ sbomData }) => {
             />
           </Tooltip>
           {/* REFRESH */}
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={handleRefresh}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            />
-          </Tooltip>
+          <RefreshBtn onClick={() => reset()} />
         </Stack>
       </Flex>
     )
   }, [
     editVulns,
     handleClear,
-    handleRefresh,
     handleScan,
     handleSearch,
     onOpen,
@@ -1071,11 +1061,6 @@ const Vulnerabilities = ({ sbomData }) => {
     })
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-
-  const handleSelectRow = useCallback(
-    (row, bool) => !bool && refetch(),
-    [refetch]
-  )
 
   return (
     <>
@@ -1109,7 +1094,6 @@ const Vulnerabilities = ({ sbomData }) => {
           selectableRows={!signedUrlParams}
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
-          onRowExpandToggled={(bool, row) => handleSelectRow(row, bool)}
         />
       </Flex>
 
@@ -1153,7 +1137,6 @@ const Vulnerabilities = ({ sbomData }) => {
               {/* IMPORT WIZARD */}
               <ImportWizard
                 variant='circle'
-                refetch={refetch}
                 currentSbomId={sbomId}
                 currentProductId={productId}
                 onClose={onTableClose}

@@ -23,7 +23,7 @@ export const usePaginatatedQuery = (
   const [paginationVariables, setPaginationVariables] = useState(
     DEFAULT_PAGINATION_VARIABLES
   )
-  const { data, loading, previousData, refetch, error } = useQuery(QUERY, {
+  const { data, loading, previousData, error } = useQuery(QUERY, {
     skip: skip,
     variables: {
       ...variables,
@@ -76,7 +76,7 @@ export const usePaginatatedQuery = (
     error: error,
     // it is good not to allow any variables for refetch
     // if you need to change the variables, pass it as props, it will rerender
-    refetch: () => refetch(),
+
     paginationProps: {
       loading,
       paginationHidden: !resource,

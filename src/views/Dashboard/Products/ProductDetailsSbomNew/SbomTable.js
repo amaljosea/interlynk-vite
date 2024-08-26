@@ -9,6 +9,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import Changelog from './Changelog'
 import Checks from './Checks'
+import Compliance from './Compliance'
 import Components from './Components'
 import General from './General'
 import Licenses from './Licenses'
@@ -16,9 +17,8 @@ import Parts from './Parts'
 import Policies from './Policies'
 import Support from './Support'
 import Vulnerabilities from './Vulnerabilities'
-import Compliance from './Compliance'
 
-const SbomTable = ({ data, refetch, loading, error }) => {
+const SbomTable = ({ data, loading, error }) => {
   const { isFreeTier, orgQueryLoading } = useGlobalQueryContext()
 
   const tabs = [
@@ -91,9 +91,9 @@ const SbomTable = ({ data, refetch, loading, error }) => {
                 loading={loading || orgQueryLoading}
               />
             </TabPanel>
-            <TabPanel px={0}>{<Parts sbomRefetch={refetch} />}</TabPanel>
+            <TabPanel px={0}>{<Parts />}</TabPanel>
             <TabPanel px={0}>
-              <Components sbomData={data} sbomRefetch={refetch} />
+              <Components sbomData={data} />
             </TabPanel>
             <TabPanel px={0}>
               <Vulnerabilities sbomData={data} />

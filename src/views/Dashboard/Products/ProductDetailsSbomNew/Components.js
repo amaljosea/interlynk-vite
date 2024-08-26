@@ -12,7 +12,7 @@ import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 
-import { AddIcon, RepeatIcon, ViewIcon } from '@chakra-ui/icons'
+import { AddIcon, ViewIcon } from '@chakra-ui/icons'
 import {
   Box,
   Divider,
@@ -44,6 +44,7 @@ import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import GraphDrawer from 'components/Drawer/GraphDrawer'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
@@ -125,8 +126,9 @@ const Components = ({ sbomData }) => {
   const orderBy = { field, direction }
 
   // GET COMPONENT DATA
-  const { nodes, refetch, error, paginationProps, reset, loading } =
-    usePaginatatedQuery(GetComponentData, {
+  const { nodes, error, paginationProps, reset, loading } = usePaginatatedQuery(
+    GetComponentData,
+    {
       selector: 'sbom.components',
       variables: {
         ...compData,
@@ -142,20 +144,18 @@ const Components = ({ sbomData }) => {
           payload: data?.sbom?.components?.totalCount
         })
       }
-    })
+    }
+  )
 
   const { lifecycle, primaryComponent } = sbomData || ''
 
   // GET COMPONENT FILTER HEADS
-  const { data: compFilters, refetch: getCompFilters } = useQuery(
-    GetCompFilterData,
-    {
-      variables: {
-        projectId: productId,
-        sbomId: sbomId
-      }
+  const { data: compFilters } = useQuery(GetCompFilterData, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId
     }
-  )
+  })
 
   const [activeComp, setActiveComp] = useState(null)
 
@@ -163,12 +163,6 @@ const Components = ({ sbomData }) => {
     parentKey: 'view_sbom',
     childKey: 'update_sbom_components'
   })
-
-  const fetchCompData = () => {
-    reset()
-    refetch()
-    getCompFilters()
-  }
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -688,9 +682,7 @@ const Components = ({ sbomData }) => {
   const [deleteSupplier] = useMutation(deleteComSupplier)
 
   const handleSupRemove = async (id) => {
-    await deleteSupplier({ variables: { id: id } }).then(
-      (res) => res.data && fetchCompData()
-    )
+    await deleteSupplier({ variables: { id: id } }).then((res) => res.data)
   }
 
   // EXPAND SECTION
@@ -1059,13 +1051,7 @@ const Components = ({ sbomData }) => {
               isDisabled={restricted}
             />
           </Tooltip>
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={() => refetch()}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            />
-          </Tooltip>
+          <RefreshBtn onClick={() => reset()} />
         </Stack>
       </Flex>
     )
@@ -1080,8 +1066,7 @@ const Components = ({ sbomData }) => {
     onCreateComponent,
     signedUrlParams,
     restricted,
-    reset,
-    refetch
+    reset
   ])
 
   const handleSort = async (column, sortDirection) => {
@@ -1148,7 +1133,6 @@ const Components = ({ sbomData }) => {
           data={activeRow}
           isOpen={isOpen}
           onClose={onClose}
-          filterRefetch={getCompFilters}
           shortDesc={null}
           checkId={null}
           primaryComp={primaryComponent}
@@ -1181,7 +1165,6 @@ const Components = ({ sbomData }) => {
           btnRef={linkRef}
           isOpen={isLinkOpen}
           onClose={onLinkClose}
-          fetchCompData={fetchCompData}
           productId={productId}
           sbomId={sbomId}
         />
@@ -1194,7 +1177,6 @@ const Components = ({ sbomData }) => {
           ruleExists={false}
           isOpen={isRelationOpen}
           onClose={onRelationClose}
-          fetchCompData={fetchCompData}
           compPath={comPath?.component?.pathToPrimary}
           comPathLoading={comPathLoading}
           isFreeTier={isFreeTier}
@@ -1224,7 +1206,6 @@ const Components = ({ sbomData }) => {
           data={activeRow}
           isOpen={isCompOpen}
           onClose={onCompClose}
-          refetch={fetchCompData}
           primaryComp={primaryComponent}
         />
       )}
