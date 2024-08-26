@@ -11,20 +11,12 @@ import {
   Avatar,
   Badge,
   Box,
-  Button,
   Flex,
   IconButton,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Portal,
   Stack,
   Tag,
@@ -36,6 +28,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -45,6 +38,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
 import { GetUsers } from 'graphQL/Queries'
 
+import { BiTrash } from 'react-icons/bi'
 import { FaEllipsisV } from 'react-icons/fa'
 
 function userTimeStart(row) {
@@ -488,32 +482,35 @@ const TeamTable = () => {
 
       {/* REMOVE User */}
       {isOpen && activeRow && (
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Remove User</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Stack direction={'column'} spacing={2} alignItems={'flex-start'}>
-                <Text>
-                  Are you sure you want to remove the following user from the
-                  organization ?
-                </Text>
-                <Text fontWeight={'semibold'} wordBreak={'break-all'}>
-                  {activeRow.name} {`(${activeRow.email})`}
-                </Text>
-              </Stack>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button variant='solid' colorScheme='red' onClick={handleRemove}>
-                Remove
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <LynkModal
+          isOpen={isOpen}
+          onClose={onClose}
+          onSubmit={handleRemove}
+          title={'Remove User'}
+          Icon={BiTrash}
+          buttonText='Remove'
+          buttonColor='red'
+        >
+          <Stack
+            direction={'column'}
+            gap={2}
+            spacing={2}
+            alignItems={'flex-start'}
+          >
+            <Text fontWeight={300} fontSize={16} lineHeight={'30px'}>
+              Are you sure you want to remove the following user from the
+              organization ?
+            </Text>
+            <Text
+              fontWeight={500}
+              fontSize={16}
+              lineHeight={'30px'}
+              wordBreak={'break-all'}
+            >
+              {activeRow.name} {`(${activeRow.email})`}
+            </Text>
+          </Stack>
+        </LynkModal>
       )}
     </>
   )
