@@ -667,7 +667,7 @@ const Vulnerabilities = ({ sbomData }) => {
           </Tag>
         )
       },
-      width: '8.2%',
+      width: '8.3%',
       sortable: true,
       wrap: true
     },
@@ -828,6 +828,7 @@ const Vulnerabilities = ({ sbomData }) => {
         const dateB = new Date(b.vuln.updatedAt)
         return dateA - dateB // Sort in descending order
       },
+      width:'10%',
       wrap: true,
       right: 'true'
     },
@@ -897,7 +898,6 @@ const Vulnerabilities = ({ sbomData }) => {
           </Menu>
         )
       },
-      width: '10%',
       wrap: true,
       right: 'true',
       omit: customerView ? true : false
@@ -960,7 +960,6 @@ const Vulnerabilities = ({ sbomData }) => {
   }, [
     onVulnScan,
     prodVulnDispatch,
-    productId,
     reset,
     sbomData?.vulnRunStatus,
     sbomId,
