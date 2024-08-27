@@ -432,6 +432,16 @@ export const GetProductTable = gql`
   }
 `
 
+export const GetTotalProduct = gql`
+  query GetTotalProduct($first: Int) {
+    organization {
+      projectGroups(first: $first) {
+        totalCount
+      }
+    }
+  }
+`
+
 // GET PROJECT GROUPS
 export const GetProjectGroups = gql`
   query GetProjectGroups(

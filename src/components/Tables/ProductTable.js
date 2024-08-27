@@ -53,7 +53,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
-import { GetLabels, GetSharelynks } from 'graphQL/Queries'
+import { GetLabels, GetSharelynks, GetTotalProduct } from 'graphQL/Queries'
 
 import { FaEllipsisV, FaGithub } from 'react-icons/fa'
 import { FaCode, FaDesktop, FaInbox, FaTag } from 'react-icons/fa6'
@@ -67,12 +67,18 @@ const ProductTable = ({
   setFilters,
   paginationProps
 }) => {
-  const { isFreeTier } = useGlobalQueryContext()
   const navigate = useNavigate()
   const { setIsOpen } = useTour()
+  const { orgView, isFreeTier } = useGlobalQueryContext()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+
+  const { data: prodData } = useQuery(GetTotalProduct, {
+    skip: !orgView,
+    variables: { first: 100 }
+  })
+  const { totalCount } = prodData?.organization?.projectGroups || ''
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#FFFFFF')
@@ -105,13 +111,12 @@ const ProductTable = ({
 
   const { prodDispatch } = dispatch
 
-  const [filterText, setFilterText] = useState(search || '')
   const [activeRow, setActiveRow] = useState(null)
-  const [openTagMenu, setOpenTagMenu] = useState(false)
   const isGithubConfigSaved = useGithubConfigSaved()
+  const [openTagMenu, setOpenTagMenu] = useState(false)
+  const [filterText, setFilterText] = useState(search || '')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const productCount = data?.length
 
   const {
     isOpen: isOpenUpload,
@@ -288,7 +293,7 @@ const ProductTable = ({
           <Box position='relative'>
             <Tooltip
               label={
-                isFreeTier && productCount === 10
+                isFreeTier && totalCount === 10
                   ? 'Limit reached for free tier'
                   : 'Add product'
               }
@@ -305,7 +310,7 @@ const ProductTable = ({
                   colorScheme='blue'
                   hidden={signedUrlParams}
                   isDisabled={
-                    !canAddProduct || (isFreeTier && productCount === 10)
+                    !canAddProduct || (isFreeTier && totalCount === 10)
                   }
                 />
               </Box>
@@ -328,7 +333,7 @@ const ProductTable = ({
     canAddProduct,
     onOpenLabel,
     isFreeTier,
-    productCount,
+    totalCount,
     onOpen
   ])
 
