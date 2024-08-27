@@ -119,21 +119,21 @@ const ProductDetailsSbomNew = () => {
         alignItems={'flex-start'}
         templateColumns='repeat(12, 1fr)'
       >
-        <GridItem colSpan={[2, 2]}>
+        <GridItem colSpan={3}>
           <SbomStats
             title={'Components'}
             amount={compCount}
             icon={<FaCube size={20} />}
           />
         </GridItem>
-        <GridItem colSpan={[2, 2]}>
+        <GridItem colSpan={3}>
           <SbomStats
             title={'Licenses'}
             amount={compLicenseCount}
             icon={<FaBalanceScale size={20} />}
           />
         </GridItem>
-        <GridItem colSpan={[4, 3]}>
+        <GridItem colSpan={3}>
           <SbomStats
             amount={vulnStats}
             sbomParts={sbomParts}
@@ -142,7 +142,7 @@ const ProductDetailsSbomNew = () => {
             icon={<FaBug size={20} />}
           />
         </GridItem>
-        <GridItem colSpan={[4, 5]}>
+        <GridItem colSpan={3}>
           <SbomStats
             title={'Policy Results'}
             amount={policyResultMetrics}

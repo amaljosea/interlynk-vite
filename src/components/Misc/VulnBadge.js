@@ -1,8 +1,11 @@
+import { useParams } from 'react-router-dom'
+
 import { Spinner, Tag, TagLabel, Tooltip } from '@chakra-ui/react'
 
 const VulnBadge = ({ color, children, label, status, onClick }) => {
-  const labels = ['Fail', 'Pass', 'Warn', 'Inform', 'Skipped', 'Error']
-  const isPolicy = labels?.includes(label)
+  const params = useParams()
+  const sbomId = params?.sbomid
+
   return (
     <Tooltip label={label} placement='top'>
       <Tag
@@ -10,9 +13,14 @@ const VulnBadge = ({ color, children, label, status, onClick }) => {
         onClick={onClick}
         cursor={'pointer'}
         colorScheme={color}
-        w={isPolicy ? '12' : '14'}
+        p={sbomId ? 0 : 'inherit'}
+        width={sbomId ? 'auto' : '14'}
       >
-        <TagLabel mx={'auto'}>
+        <TagLabel
+          mx={'auto'}
+          p={sbomId ? 0 : 'inherit'}
+          fontSize={[sbomId ? '12px' : '13px', sbomId ? '13px' : '14px']}
+        >
           {status === 'IN_PROGRESS' ? <Spinner size='xs' mt={0.5} /> : children}
         </TagLabel>
       </Tag>

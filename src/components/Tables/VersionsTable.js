@@ -31,6 +31,7 @@ import {
   MenuList,
   Link as Olink,
   Portal,
+  SimpleGrid,
   Stack,
   Tag,
   TagLabel,
@@ -391,13 +392,7 @@ const VersionsTable = ({
           }
         })
         return (
-          <Flex
-            my={2}
-            gap={1}
-            flexWrap={'wrap'}
-            alignItems={'center'}
-            fontWeight={'medium'}
-          >
+          <SimpleGrid gap={1} width={'100%'} columns={5}>
             <Link to={link} onClick={() => onFilterSev(['critical'])}>
               <VulnBadge color='red' label='Critical' status={vulnRunStatus}>
                 {stats?.vulnStats?.critical || 0}
@@ -423,7 +418,7 @@ const VersionsTable = ({
                 {stats?.vulnStats?.unknown || 0}
               </VulnBadge>
             </Link>
-          </Flex>
+          </SimpleGrid>
         )
       },
       width: '26.8%'

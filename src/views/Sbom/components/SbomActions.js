@@ -1,5 +1,4 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { client } from 'context/ApolloWrapper'
+import { useMutation, useQuery } from '@apollo/client'
 import { useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
@@ -18,16 +17,9 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { sbomDelete } from 'graphQL/Mutation'
 import { recheckHealth } from 'graphQL/Mutation'
-import {
-  GetCheckResults,
-  GetCompFilterData,
-  GetComponentData,
-  GetProject,
-  ShareCompFilters,
-  ShareProject
-} from 'graphQL/Queries'
+import { GetCheckResults, GetProject, ShareProject } from 'graphQL/Queries'
 
-import { FaFileDownload, FaLayerGroup } from 'react-icons/fa'
+import { FaFileDownload } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 
 import CheckModal from './CheckModal'
@@ -44,17 +36,7 @@ const SbomActions = ({ sbom }) => {
 
   const { isFreeTier } = useGlobalQueryContext()
 
-  const { totalRows, dispatch, prodCompState } = useGlobalState()
-  const {
-    field,
-    direction,
-    searchInput,
-    ecosystems,
-    kinds,
-    licenses,
-    suppliers,
-    scope
-  } = prodCompState
+  const { dispatch } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch, sbomDispatch } = dispatch
 
   const archiveSboms = useHasPermission({
@@ -89,10 +71,6 @@ const SbomActions = ({ sbom }) => {
       id: productId
     }
   })
-
-  const [getCompFilters] = useLazyQuery(
-    signedUrlParams ? ShareCompFilters : GetCompFilterData
-  )
 
   const [deleteSbom] = useMutation(sbomDelete)
   const [healthRecheck] = useMutation(recheckHealth)
@@ -219,46 +197,6 @@ const SbomActions = ({ sbom }) => {
     }
   }
 
-  const fetchCompData = async () => {
-    await client
-      .query({
-        query: GetComponentData,
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          search: searchInput !== '' ? searchInput : undefined,
-          ecosystem:
-            ecosystems.includes('all') || ecosystems.length === 0
-              ? undefined
-              : ecosystems,
-          kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-          licenses:
-            licenses.includes('all') || licenses.length === 0
-              ? undefined
-              : licenses,
-          supplierName:
-            suppliers.includes('all') || suppliers.length === 0
-              ? undefined
-              : suppliers,
-          primary: scope === 'primary' ? true : undefined,
-          internal: scope === 'internal' ? true : undefined,
-          first: totalRows,
-          field: field,
-          direction: direction
-        }
-      })
-      .then((res) => {
-        if (res.data) {
-          const url = generateProductVersionDetailPageUrlFromCurrentUrl({
-            paramsObj: {
-              tab: activeTab
-            }
-          })
-          navigate(url)
-        }
-      })
-  }
-
   const handleDelete = async () => {
     setIsLoading(true)
     await deleteSbom({
@@ -277,27 +215,19 @@ const SbomActions = ({ sbom }) => {
   return (
     <Flex gap={3} alignItems={'flex-end'} justifyContent={'flex-end'}>
       {/* SBOM VERSIONS */}
-      <Flex
-        gap={2}
-        flexDirection={'row'}
-        alignItems={'center'}
-        className='search-version'
-      >
-        <FaLayerGroup size={21} color='#4299E1' />
-        <LynkSelect
-          components={{
-            DropdownIndicator: () => null
-          }}
-          value={selectedVersion}
-          onChange={handleSBOMChange}
-          isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
-          type='text'
-          placeholder='Search versions'
-          name='versions'
-          options={signedUrlParams ? uniqShareVersions : uniqVersions}
-          noOptionsMessage={() => null}
-        />
-      </Flex>
+      <LynkSelect
+        components={{
+          DropdownIndicator: () => null
+        }}
+        type='text'
+        name='versions'
+        value={selectedVersion}
+        onChange={handleSBOMChange}
+        placeholder='Search versions'
+        noOptionsMessage={() => null}
+        options={signedUrlParams ? uniqShareVersions : uniqVersions}
+        isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
+      />
       <Flex direction={'row'} gap={3} justifyContent='flex-end'>
         {/* UPDATE PRIMARY COMPONENT */}
         <Tooltip label='Edit'>

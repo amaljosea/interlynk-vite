@@ -244,9 +244,9 @@ const SbomDetails = ({ sbomData }) => {
             </GridItem>
           </Grid>
           {/* STATS */}
-          <Grid gap={4} alignItems={'center'} templateColumns='repeat(12, 1fr)'>
+          <Grid gap={4} alignItems={'flex-start'} templateColumns='repeat(12, 1fr)'>
             <GridItem colSpan={4}>
-              <Card px={0}>
+              <Card px={0} shadow='none'>
                 <CardBody px={0} flexDir='column' gap={1}>
                   {/* UPDATED AT */}
                   <Tooltip
@@ -262,8 +262,8 @@ const SbomDetails = ({ sbomData }) => {
                     </Text>
                   </Tooltip>
                   <Flex
-                    mt={1}
                     gap={1}
+                    mt={0.5}
                     flexDir='row'
                     alignItems={'center'}
                     hidden={signedUrlParams}
@@ -312,7 +312,6 @@ const SbomDetails = ({ sbomData }) => {
                 value={qualityScore}
                 loading={scoreLoading}
                 text='SBOM Quality Score'
-                icon={<FaCircleCheck size={20} />}
               />
             </GridItem>
             {shouldShowDemoFeatures && (
@@ -321,7 +320,6 @@ const SbomDetails = ({ sbomData }) => {
                   value={healthScore}
                   loading={scoreLoading}
                   text='Version Health Score'
-                  icon={<FaCircleCheck size={20} />}
                 />
               </GridItem>
             )}

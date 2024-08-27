@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import {
   Flex,
-  Stack,
+  SimpleGrid,
   Stat,
   StatLabel,
   StatNumber,
@@ -128,7 +128,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
   return (
     <Card width='100%' h={'97px'}>
       <CardBody>
-        <Flex gap={3} align='center'>
+        <Flex width={'100%'} gap={3} align='center'>
           <IconBox h={12} w={12} color={iconColor} bg={activeBg}>
             {icon}
           </IconBox>
@@ -143,7 +143,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
               {title}
             </StatLabel>
             {title === 'Vulnerabilities' ? (
-              <Stack spacing={1} direction={'row'}>
+              <SimpleGrid gap={1} width={'100%'} columns={5}>
                 <VulnBadge
                   color='red'
                   label='Critical'
@@ -184,9 +184,9 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
                 >
                   {amount?.unknown || 0}
                 </VulnBadge>
-              </Stack>
+              </SimpleGrid>
             ) : title === 'Policy Results' ? (
-              <Stack spacing={1} direction={'row'}>
+              <SimpleGrid gap={1} width={'100%'} columns={6}>
                 <VulnBadge color='red' status={policyStatus} label='Fail'>
                   {amount?.failedCount || 0}
                 </VulnBadge>
@@ -205,7 +205,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
                 <VulnBadge color='gray' status={policyStatus} label='Error'>
                   {amount?.errorCount || 0}
                 </VulnBadge>
-              </Stack>
+              </SimpleGrid>
             ) : (
               <StatNumber fontSize='lg' color={textColor}>
                 {amount || 0}
