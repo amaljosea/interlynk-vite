@@ -1,4 +1,3 @@
-import { useMutation } from '@apollo/client'
 import { TourProvider, useTour } from '@reactour/tour'
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
@@ -18,8 +17,6 @@ import Sidebar from 'components/Sidebar'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { OrganizationAssignAwsToken } from 'graphQL/Mutation'
-
 import { FaArrowLeft, FaArrowRight, FaRegFile } from 'react-icons/fa6'
 
 import { getActiveNavbar, getActiveRoute, tourStyles } from '../utils'
@@ -33,13 +30,10 @@ export default function Admin() {
   const { colorMode } = useColorMode()
   const { orgView, orgLoading } = useGlobalQueryContext()
 
-  const [assignAwsToken] = useMutation(OrganizationAssignAwsToken)
-
   const productId = params.productid
   const sbomId = params.sbomid
   const authToken = Cookies.get('authToken')
   const tabRes = window.matchMedia('(max-width: 1199px)')
-  const awsToken = sessionStorage.getItem('awsToken')
   const productView = location.pathname === '/vendor/products'
 
   const {
@@ -228,28 +222,10 @@ export default function Admin() {
   useEffect(() => {
     if (location.pathname.startsWith('/vendor')) {
       redirect('/vendor/dashboard')
+      sessionStorage.removeItem('awsToken')
       sessionStorage.removeItem('signedUrlParams')
     }
   }, [])
-
-  useEffect(() => {
-    if (awsToken) {
-      const onAssign = () => {
-        assignAwsToken({
-          variables: { awsRegistrationToken: awsToken }
-        }).then((res) => {
-          const { errors } = res?.data?.organizationAssignAwsToken || ''
-          if (errors?.length > 0) {
-            console.log('Error', errors)
-          } else {
-            console.log('Token', res?.data)
-          }
-        })
-      }
-
-      onAssign()
-    }
-  }, [assignAwsToken, awsToken])
 
   return (
     <KBarProvider actions={actions} options={{ enableHistory: true }}>

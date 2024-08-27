@@ -1,5 +1,4 @@
 import DashboardBg from 'assets/img/dashboard.png'
-// core components
 import InterlynkLogo from 'assets/img/logo.png'
 import React, { useRef } from 'react'
 
