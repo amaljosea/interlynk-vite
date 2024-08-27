@@ -33,7 +33,7 @@ import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { SbomPolicyScan } from 'graphQL/Mutation'
 import { PolicyResults } from 'graphQL/Queries'
@@ -57,16 +57,13 @@ const Policies = () => {
     childKey: 'run_policy_scan'
   })
 
-  const { nodes, paginationProps, loading } = usePaginatatedQuery(
-    PolicyResults,
-    {
-      skip: activeTab === 'policies' ? false : true,
-      selector: 'policyResults',
-      variables: {
-        sbomId
-      }
+  const { nodes, paginationProps, loading } = usePaginatedQuery(PolicyResults, {
+    skip: activeTab === 'policies' ? false : true,
+    selector: 'policyResults',
+    variables: {
+      sbomId
     }
-  )
+  })
 
   const isInitialized = nodes?.some((item) => item?.result === 'initialized')
 

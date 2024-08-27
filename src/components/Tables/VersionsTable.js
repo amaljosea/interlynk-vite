@@ -54,7 +54,7 @@ import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
@@ -119,7 +119,7 @@ const VersionsTable = ({
 
   const { VERSIONS } = ProductDetailsTabs
 
-  const { nodes, paginationProps, loading } = usePaginatatedQuery(
+  const { nodes, paginationProps, loading } = usePaginatedQuery(
     signedUrlParams ? ShareVersionTable : GetVersionsTable,
     {
       skip: (tab === VERSIONS || tab === null) && !isToolOpen ? false : true,

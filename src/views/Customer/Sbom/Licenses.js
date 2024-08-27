@@ -17,7 +17,7 @@ import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import Pagination from 'components/Pagination'
 
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { GetShareLicensesTable } from 'graphQL/Queries'
 
@@ -31,7 +31,7 @@ const Licenses = () => {
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
-  const { nodes, loading, error, paginationProps } = usePaginatatedQuery(
+  const { nodes, loading, error, paginationProps } = usePaginatedQuery(
     GetShareLicensesTable,
     {
       skip: activeTab !== 'licenses',

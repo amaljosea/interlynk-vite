@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Card from 'components/Card/Card'
 import SupportTable from 'components/Tables/SupportTable'
 
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { GetSupportTab } from 'graphQL/Queries'
 
@@ -13,7 +13,7 @@ const Support = () => {
     direction: 'DESC'
   })
 
-  const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
+  const { nodes, paginationProps, reset, loading } = usePaginatedQuery(
     GetSupportTab,
     {
       selector: 'supports',

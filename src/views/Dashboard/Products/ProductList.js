@@ -9,7 +9,7 @@ import ProductTable from 'components/Tables/ProductTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { GetProductTable } from 'graphQL/Queries'
 
@@ -33,7 +33,7 @@ function ProductList() {
     labelIds: []
   })
 
-  const { nodes, paginationProps, reset, loading, error } = usePaginatatedQuery(
+  const { nodes, paginationProps, reset, loading, error } = usePaginatedQuery(
     GetProductTable,
     {
       skip: productPermissions === false,

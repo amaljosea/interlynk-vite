@@ -1,12 +1,12 @@
 import Card from 'components/Card/Card'
 import PolicyTable from 'components/Tables/PolicyTable'
 
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { GetPolicies } from 'graphQL/Queries'
 
 const Policies = () => {
-  const { nodes, paginationProps, loading } = usePaginatatedQuery(GetPolicies, {
+  const { nodes, paginationProps, loading } = usePaginatedQuery(GetPolicies, {
     selector: 'policies'
   })
 

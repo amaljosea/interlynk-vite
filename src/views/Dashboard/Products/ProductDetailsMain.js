@@ -40,7 +40,7 @@ import VersionsTable from 'components/Tables/VersionsTable'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
@@ -233,7 +233,7 @@ const ProductDetailsMain = () => {
     paginationProps,
     reset,
     loading: globalVulnloading
-  } = usePaginatatedQuery(GetGlobalVulns, {
+  } = usePaginatedQuery(GetGlobalVulns, {
     skip: tab === VULNERABILITIES ? false : true,
     selector: 'organization.vulns',
     variables: {
@@ -249,7 +249,7 @@ const ProductDetailsMain = () => {
     nodes: policyData,
     paginationProps: policyPaginationProps,
     loading: policyloading
-  } = usePaginatatedQuery(GetProjectPolicies, {
+  } = usePaginatedQuery(GetProjectPolicies, {
     skip: tab === POLICIES ? false : true,
     selector: 'projectPolicies',
     variables: {

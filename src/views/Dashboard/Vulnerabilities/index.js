@@ -5,7 +5,7 @@ import Card from 'components/Card/Card'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 
 import { useHasPermission } from 'hooks/useHasPermission'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { GetGlobalVulns } from 'graphQL/Queries'
 
@@ -24,7 +24,7 @@ const Vulnerabilities = () => {
 
   const vulnsPermissions = useHasPermission({ parentKey: 'view_feeds' })
 
-  const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
+  const { nodes, paginationProps, reset, loading } = usePaginatedQuery(
     GetGlobalVulns,
     {
       skip: !vulnsPermissions,

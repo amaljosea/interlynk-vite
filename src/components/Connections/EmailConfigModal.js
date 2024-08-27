@@ -45,10 +45,6 @@ const EmailConfigModal = ({
     { address: '', notificationType: 'All', frequency: 'Instant' }
   ])
 
-  const isDisabled = configs?.every((item) => item.address === '')
-    ? true
-    : false
-
   const borderColor = useColorModeValue('gray.200', 'gray.600')
 
   useEffect(() => {

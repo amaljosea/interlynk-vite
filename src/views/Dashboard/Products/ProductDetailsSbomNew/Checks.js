@@ -37,7 +37,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import {
   UpdateComponent,
@@ -93,7 +93,7 @@ const Checks = () => {
     direction: 'DESC'
   })
 
-  const { nodes, paginationProps, loading, reset } = usePaginatatedQuery(
+  const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
     GetCheckResults,
     {
       skip: activeTab === 'checks' ? false : true,

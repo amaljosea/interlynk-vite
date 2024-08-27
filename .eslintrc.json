@@ -44,6 +44,17 @@
           }
         ]
       }
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "VariableDeclarator[init.callee.name=/use(Query|PaginatedQuery)/] > ObjectPattern > Property[key.name='refetch']",
+        "message": "Avoid using 'refetch'. Apollo client is configured to refetch all active queries after mutations. If refetch is still required, consider using 'refetchActiveQueries' or the 'RefreshBtn' component."
+      },
+      {
+        "selector": "VariableDeclarator[init.callee.name='useLazyQuery'] > ArrayPattern > ObjectPattern > Property[key.name='refetch']",
+        "message": "Avoid using 'refetch'. Apollo client is configured to refetch all active queries after mutations. If refetch is still required, consider using 'refetchActiveQueries' or the 'RefreshBtn' component."
+      }
     ]
   }
 }

@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Card from 'components/Card/Card'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { GetLicensesTable } from 'graphQL/Queries'
 
@@ -17,7 +17,7 @@ const Licenses = () => {
     orderBy: { field: 'ORGANIZATION_LICENSES_STATE', direction: 'ASC' }
   })
 
-  const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
+  const { nodes, paginationProps, reset, loading } = usePaginatedQuery(
     GetLicensesTable,
     {
       skip: !orgView,

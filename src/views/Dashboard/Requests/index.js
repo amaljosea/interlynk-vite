@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Card from 'components/Card/Card'
 
 import { GetRequests } from '../../../graphQL/Queries'
-import { usePaginatatedQuery } from '../../../hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from '../../../hooks/usePaginatedQuery'
 import RequestTable from './RequestTable'
 
 const Requests = () => {
@@ -12,7 +12,7 @@ const Requests = () => {
     direction: 'DESC'
   })
 
-  const { nodes, paginationProps, reset } = usePaginatatedQuery(GetRequests, {
+  const { nodes, paginationProps, reset } = usePaginatedQuery(GetRequests, {
     selector: 'requests',
     variables: {
       ...filters

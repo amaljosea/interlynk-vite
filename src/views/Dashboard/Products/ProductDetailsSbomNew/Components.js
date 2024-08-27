@@ -53,7 +53,7 @@ import { ProgressBar } from 'components/ProgressBar'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
@@ -126,7 +126,7 @@ const Components = ({ sbomData }) => {
   const orderBy = { field, direction }
 
   // GET COMPONENT DATA
-  const { nodes, error, paginationProps, reset, loading } = usePaginatatedQuery(
+  const { nodes, error, paginationProps, reset, loading } = usePaginatedQuery(
     GetComponentData,
     {
       selector: 'sbom.components',

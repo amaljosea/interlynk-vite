@@ -43,7 +43,7 @@ import Pagination from 'components/Pagination'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import {
   FirstDegreePartVulns,
@@ -236,7 +236,7 @@ const Vulnerabilities = ({ sbomData }) => {
     max: parseFloat(vulnEpss[1]) / 100
   }
 
-  const { nodes, paginationProps, reset, loading } = usePaginatatedQuery(
+  const { nodes, paginationProps, reset, loading } = usePaginatedQuery(
     ShareVulnData,
     {
       skip: sbomId && activeTab === 'vulnerabilities' ? false : true,

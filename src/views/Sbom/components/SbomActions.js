@@ -12,7 +12,7 @@ import LynkSelect from 'components/LynkSelect'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { sbomDelete } from 'graphQL/Mutation'
@@ -165,7 +165,7 @@ const SbomActions = ({ sbom }) => {
     navigate(url)
   }
 
-  const { nodes } = usePaginatatedQuery(GetCheckResults, {
+  const { nodes } = usePaginatedQuery(GetCheckResults, {
     skip: !checks,
     fetchPolicy: 'network-only',
     selector: 'sbom.checkResults',

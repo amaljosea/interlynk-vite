@@ -23,7 +23,7 @@ import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import UserCard from 'components/Misc/UserCard'
 
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { GetProjectLogs } from 'graphQL/Queries'
 
@@ -71,7 +71,7 @@ const ChangelogTable = ({ activeEnv }) => {
 
   const { CHANGE_LOG } = ProductDetailsTabs
 
-  const { nodes, paginationProps, loading, reset } = usePaginatatedQuery(
+  const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
     GetProjectLogs,
     {
       fetchPolicy: 'network-only',

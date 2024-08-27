@@ -31,7 +31,7 @@ import VersionCard from 'components/Misc/VersionCard'
 import Pagination from 'components/Pagination'
 
 import { useHasPermission } from 'hooks/useHasPermission'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { GetCompVulnData, GetConnectedSbom } from 'graphQL/Queries'
 
@@ -55,7 +55,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
     vexComplete: false
   })
 
-  const { nodes, paginationProps, loading, reset } = usePaginatatedQuery(
+  const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
     GetCompVulnData,
     {
       skip: vulnId ? false : true,

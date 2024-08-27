@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
+import { refetchActiveQueries } from 'context/ApolloWrapper'
 import DataTable from 'react-data-table-component'
 import { customStyles, sevColor } from 'utils'
 
@@ -30,7 +31,7 @@ const Checks = () => {
     childKey: 'update_organization'
   })
 
-  const { data, refetch } = useQuery(GetOrgRules, {
+  const { data } = useQuery(GetOrgRules, {
     skip: !orgView ? true : activetab === 'checks' ? false : true,
     variables: {
       field: 'RULES_FRIENDLY_ID',
@@ -131,11 +132,8 @@ const Checks = () => {
     }
   ]
 
-  const handleSort = (column, sortDirection) => {
-    refetch({
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-    })
+  const handleSort = () => {
+    refetchActiveQueries()
   }
 
   const handleChange = async (value, id) => {

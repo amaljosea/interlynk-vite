@@ -38,7 +38,7 @@ import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { AutomationRuleDelete, AutomationRuleUpdate } from 'graphQL/Mutation'
 import {
@@ -80,7 +80,7 @@ const Automation = ({ projects }) => {
     }
   )
 
-  const { nodes, paginationProps, loading } = usePaginatatedQuery(
+  const { nodes, paginationProps, loading } = usePaginatedQuery(
     GetProjectCheck,
     {
       skip: tab === AUTOMATION_RULES ? false : true,

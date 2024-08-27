@@ -61,7 +61,7 @@ import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { ManualVulnScan } from 'graphQL/Mutation'
 import {
@@ -334,7 +334,7 @@ const Vulnerabilities = ({ sbomData }) => {
     direction: prodVulnState?.direction
   }
 
-  const { nodes, paginationProps, loading, reset } = usePaginatatedQuery(
+  const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
     GetVulnData,
     {
       skip: sbomId && activeTab === 'vulnerabilities' ? false : true,
@@ -830,7 +830,7 @@ const Vulnerabilities = ({ sbomData }) => {
         const dateB = new Date(b.vuln.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      width:'10%',
+      width: '10%',
       wrap: true,
       right: 'true'
     },

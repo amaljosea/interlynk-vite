@@ -6,7 +6,7 @@ const PAGINATION_SIZES = [25, 50, 100]
 
 const DEFAULT_PAGINATION_SIZE = PAGINATION_SIZES[0]
 
-export const usePaginatatedQuery = (
+export const usePaginatedQuery = (
   QUERY,
   { skip, selector, onCompleted, variables = {} }
 ) => {

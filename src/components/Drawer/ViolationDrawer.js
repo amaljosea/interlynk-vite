@@ -18,7 +18,7 @@ import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
 
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { PolicyRuleViolations } from 'graphQL/Queries'
 
@@ -27,7 +27,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
-  const { nodes, paginationProps, loading } = usePaginatatedQuery(
+  const { nodes, paginationProps, loading } = usePaginatedQuery(
     PolicyRuleViolations,
     {
       skip: activeRow?.id ? false : true,

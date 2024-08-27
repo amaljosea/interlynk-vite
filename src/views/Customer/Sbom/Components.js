@@ -35,7 +35,7 @@ import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
 import { ShareComponentData } from 'graphQL/Queries'
@@ -91,7 +91,7 @@ const Components = ({ sbomData }) => {
     loading,
     reset,
     paginationProps
-  } = usePaginatatedQuery(ShareComponentData, {
+  } = usePaginatedQuery(ShareComponentData, {
     skip: activeTab !== 'components',
     selector: 'shareLynkQuery.sbom.components',
     variables: {

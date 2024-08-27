@@ -31,7 +31,7 @@ import LynkSwitch from 'components/Misc/LynkSwitch'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { GetSbomSupportTab } from 'graphQL/Queries'
 
@@ -70,7 +70,7 @@ const Support = () => {
   const [activeRow, setActiveRow] = useState(null)
   const [filterText, setFilterText] = useState('')
 
-  const { nodes, paginationProps, loading, reset } = usePaginatatedQuery(
+  const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
     GetSbomSupportTab,
     {
       skip: activeTab === 'support' ? false : true,

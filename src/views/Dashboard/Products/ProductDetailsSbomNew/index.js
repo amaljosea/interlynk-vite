@@ -58,13 +58,10 @@ const ProductDetailsSbomNew = () => {
   const { vulnScanningEnabled: vulnScan } = projectSetting || ''
   const reScanVuln = vulnScan === true && vulnRunStatus !== 'FINISHED'
 
-  const { data: policies, refetch: policyRefetch } = useQuery(
-    PolicyResultsType,
-    {
-      skip: sbomId ? false : true,
-      variables: { sbomId: sbomId, first: 100 }
-    }
-  )
+  const { data: policies } = useQuery(PolicyResultsType, {
+    skip: sbomId ? false : true,
+    variables: { sbomId: sbomId, first: 100 }
+  })
 
   const { nodes } = policies?.policyResults || ''
   const isInitialized = nodes?.some((item) => item?.result === 'initialized')
@@ -86,29 +83,14 @@ const ProductDetailsSbomNew = () => {
 
   useEffect(() => {
     const refetchInterval = setInterval(() => {
-      if (isInitialized) {
-        policyRefetch()
+      if (reScanVuln || isInitialized) {
         refetchActiveQueries()
       } else {
         clearInterval(refetchInterval)
       }
     }, 15000)
     return () => clearInterval(refetchInterval)
-  }, [sbomId, isInitialized, policyRefetch])
-
-  useEffect(() => {
-    const refetchInterval = setInterval(() => {
-      if (reScanVuln) {
-        refetchActiveQueries()
-      } else if (isInitialized) {
-        policyRefetch()
-        refetchActiveQueries()
-      } else {
-        clearInterval(refetchInterval)
-      }
-    }, 15000)
-    return () => clearInterval(refetchInterval)
-  }, [sbomId, reScanVuln, isInitialized, policyRefetch])
+  }, [sbomId, reScanVuln, isInitialized])
 
   return (
     <Flex width={'100%'} flexDir={'column'} gap={5}>

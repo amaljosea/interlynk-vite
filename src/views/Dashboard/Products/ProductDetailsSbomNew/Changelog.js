@@ -27,7 +27,7 @@ import VulnCard from 'components/Misc/VulnCard'
 import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
 
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import {
   GetChangeLogs,
@@ -92,7 +92,7 @@ const Changelog = () => {
     direction: 'DESC'
   })
 
-  const { nodes, paginationProps, loading, reset } = usePaginatatedQuery(
+  const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
     GetChangeLogs,
     {
       skip: activeTab === 'changelog' ? false : true,

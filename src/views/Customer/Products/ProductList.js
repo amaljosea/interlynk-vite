@@ -7,7 +7,7 @@ import { Flex, Text } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import ProductTable from 'components/Tables/ProductTable'
 
-import { usePaginatatedQuery } from 'hooks/usePaginatatedQuery'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { ShareLynkProjectGroups } from 'graphQL/Queries'
 
@@ -18,7 +18,7 @@ const ProductList = () => {
     enabled: true
   })
 
-  const { nodes, paginationProps, reset, loading, error } = usePaginatatedQuery(
+  const { nodes, paginationProps, reset, loading, error } = usePaginatedQuery(
     ShareLynkProjectGroups,
     {
       selector: 'shareLynkQuery.projectGroups',
