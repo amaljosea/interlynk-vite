@@ -25,9 +25,13 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 
 import FeatureGroup from './FeatureGroupTable'
 
-const PlanTable = () => {
+const PlanTable = ({ orgs }) => {
   const { isFreeTier } = useGlobalQueryContext()
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const userEmail = localStorage.getItem('email')
+  const organization = localStorage.getItem('organization')
+
+  const activeOrg = orgs?.find((item) => item?.name === organization)
 
   const headerBgColor = useColorModeValue('white', 'gray.700')
   const usageData = [
@@ -80,15 +84,26 @@ const PlanTable = () => {
     }
   ]
 
+  const handleContact = () => {
+    const email = 'support@interlynk.io'
+    const subject = 'URGENT: Enterprise Upgrade Request'
+
+    const body = `
+      User: ${userEmail}
+      Organization: ${activeOrg?.name}
+      Organization ID: ${activeOrg?.id}
+      `
+
+    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  }
+
   return (
     <Box p={8}>
       {/* Plan Overview Section */}
       <Grid templateColumns='repeat(4, 1fr)' gap={8} mb={6}>
         <GridItem>
           <Text fontWeight='bold'>Plan</Text>
-          <Text>
-            {isFreeTier ? 'Free Forever' : 'Enterprise'}
-          </Text>
+          <Text>{isFreeTier ? 'Free Forever' : 'Enterprise'}</Text>
         </GridItem>
         <GridItem>
           <Text fontWeight='bold'>Products</Text>
@@ -156,9 +171,9 @@ const PlanTable = () => {
             </Table>
           </Box>
           <ModalFooter
-            justifyContent='flex-end'
             gap={'20px'}
             marginLeft={'10px'}
+            justifyContent='flex-end'
           >
             <Button
               colorScheme='white'
@@ -167,12 +182,7 @@ const PlanTable = () => {
             >
               Cancel
             </Button>
-            <Button
-              colorScheme='blue'
-              onClick={() =>
-                (window.location.href = 'mailto:sales@interlynk.io')
-              }
-            >
+            <Button colorScheme='blue' onClick={handleContact}>
               Contact Us
             </Button>
           </ModalFooter>

@@ -235,7 +235,7 @@ function Profile() {
                 <Connections org={true} />
               </TabPanel>
               <TabPanel>
-                <PlanTable />
+                <PlanTable orgs={myOrgList} />
               </TabPanel>
             </TabPanels>
           </Tabs>
