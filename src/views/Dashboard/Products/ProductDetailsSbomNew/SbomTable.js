@@ -34,6 +34,10 @@ const SbomTable = ({ data, loading, error }) => {
     'changelog'
   ]
 
+  const filterTabs = isFreeTier
+    ? tabs?.filter((item) => item !== 'compliance')
+    : tabs
+
   const navigate = useNavigate()
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
@@ -71,7 +75,7 @@ const SbomTable = ({ data, loading, error }) => {
           onChange={onTabChange}
         >
           <TabList mt='20px'>
-            {tabs.map((item, index) => (
+            {filterTabs?.map((item, index) => (
               <Tab
                 key={index}
                 display={getDisplay(item)}
