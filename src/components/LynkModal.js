@@ -53,7 +53,7 @@ const LynkModal = ({
       ? 'Yes'
       : buttonText
   return (
-    <Modal isCentered isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent maxW={'600px'}>
         <ModalHeader>
