@@ -34,11 +34,12 @@ const ComplianceChecks = ({
   ntia,
   fda,
   ntiaLoading,
-  fdaLoading
+  fdaLoading,
+  activeTab
 }) => {
   const bgColor = useColorModeValue('white', 'gray.700')
   const tabs = ['NTIA', 'FDA 510(K)', 'BSI TR-03183']
-  const [tab, setTab] = useState(0)
+  const [tab, setTab] = useState(activeTab || 0)
   const onTabChange = (value) => setTab(value)
 
   const sbomCategory = ['Timestamp', 'Supplier Name', 'Unique ID', 'Author']
@@ -89,7 +90,7 @@ const ComplianceChecks = ({
             <Button
               size='xs'
               color={'#000'}
-              width={'80px'}
+              width={'60px'}
               isLoading={loading}
               cursor={'default'}
               bg={getBgColor(item?.score)}
@@ -135,7 +136,7 @@ const ComplianceChecks = ({
           <Text fontSize={'sm'} fontWeight={'medium'}>
             Score
           </Text>
-          <Button size='xs' cursor={'default'}>
+          <Button size='xs' width={'60px'} cursor={'default'}>
             {Math.round(data?.score)} %
           </Button>
         </Flex>
@@ -149,10 +150,10 @@ const ComplianceChecks = ({
       <DrawerContent>
         <DrawerCloseButton mt={2} />
         <DrawerHeader pl={4}>
-          <Text mb={1} fontWeight={'medium'}>
-            Compliance Checks
-          </Text>
+          <Text fontWeight={'medium'}>Compliance Checks</Text>
           <Tag
+            mt={1}
+            hidden={!name}
             fontSize={'xs'}
             w={'fit-content'}
             colorScheme='blue'
