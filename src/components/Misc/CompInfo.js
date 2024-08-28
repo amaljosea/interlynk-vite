@@ -9,7 +9,7 @@ const CompInfo = ({ data }) => {
       <Text fontSize='sm' fontWeight={'normal'} wordBreak={'break-all'}>
         {truncatedValue(name, 20)}
       </Text>
-      <Tag size='sm' colorScheme='blue'>
+      <Tag size='sm' colorScheme='blue' hidden={!version}>
         {truncatedValue(version, 20)}
       </Tag>
     </Flex>

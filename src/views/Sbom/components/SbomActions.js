@@ -215,15 +215,17 @@ const SbomActions = ({ sbom }) => {
   return (
     <Flex gap={3} alignItems={'flex-end'} justifyContent={'flex-end'}>
       {/* SBOM VERSIONS */}
-      <LynkSelect
-        type='text'
-        name='versions'
-        value={selectedVersion}
-        onChange={handleSBOMChange}
-        placeholder='Search versions'
-        options={signedUrlParams ? uniqShareVersions : uniqVersions}
-        isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
-      />
+      <div className='search-version'>
+        <LynkSelect
+          type='text'
+          name='versions'
+          value={selectedVersion}
+          onChange={handleSBOMChange}
+          placeholder='Search versions'
+          options={signedUrlParams ? uniqShareVersions : uniqVersions}
+          isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
+        />
+      </div>
       <Flex direction={'row'} gap={3} justifyContent='flex-end'>
         {/* UPDATE PRIMARY COMPONENT */}
         <Tooltip label='Edit'>
