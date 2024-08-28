@@ -112,9 +112,11 @@ const SbomTable = ({ data, loading, error }) => {
             <TabPanel px={0}>
               <Checks />
             </TabPanel>
-            <TabPanel px={0}>
-              <Compliance />
-            </TabPanel>
+            {!isFreeTier && (
+              <TabPanel px={0}>
+                <Compliance />
+              </TabPanel>
+            )}
             <TabPanel px={0}>
               <Changelog />
             </TabPanel>
