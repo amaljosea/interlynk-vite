@@ -256,6 +256,7 @@ const DownloadModal = ({
                       </Text>
                       <Button
                         size='xs'
+                        minW={'60px'}
                         cursor={'default'}
                         isLoading={item?.loading}
                         isDisabled={item?.score === 0}
