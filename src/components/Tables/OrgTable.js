@@ -14,7 +14,6 @@ import {
   AlertIcon,
   Badge,
   Box,
-  Button,
   Flex,
   IconButton,
   Link,
@@ -22,13 +21,6 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Portal,
   Stack,
   Tag,
@@ -259,8 +251,9 @@ const OrgTable = ({ data, activeOrg }) => {
         const { tier } = row
         return (
           <Tag
-            variant='subtle'
+            hidden={!tier}
             width={'100px'}
+            variant='subtle'
             colorScheme={tier === 'enterprise' ? 'green' : 'blue'}
           >
             <TagLabel fontSize={14} textTransform={'capitalize'} mx={'auto'}>
