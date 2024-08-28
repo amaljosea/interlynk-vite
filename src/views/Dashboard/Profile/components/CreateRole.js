@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
+import ReactSelect from 'react-select'
 
 import {
   Alert,
@@ -12,7 +13,8 @@ import {
 } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
-import LynkSelect from 'components/LynkSelect'
+
+import { useSelect } from 'hooks/useSelect'
 
 import { OrgRoleCreate } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
@@ -26,6 +28,8 @@ const CreateRole = ({ isOpen, onClose }) => {
   const [error, setError] = useState('')
 
   const [createRole] = useMutation(OrgRoleCreate)
+
+  const { style } = useSelect('field')
 
   const psOptions = []
 
@@ -109,13 +113,15 @@ const CreateRole = ({ isOpen, onClose }) => {
         {/* PERMISSIONS */}
         <FormControl isRequired>
           <FormLabel fontSize={12}>Copy Permission From</FormLabel>
-          <LynkSelect
+          <ReactSelect
+            styles={style}
+            className='react-select'
             value={permissions}
             options={psOptions}
             placeholder='Select'
             onChange={onPermissionChange}
             components={{
-              DropdownIndicator: () => null
+              IndicatorSeparator: () => null
             }}
           />
         </FormControl>

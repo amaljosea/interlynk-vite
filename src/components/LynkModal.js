@@ -58,19 +58,19 @@ const LynkModal = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent maxW={maxW || '600px'} maxH={maxH || ''}>
-        <ModalHeader>
+        <ModalHeader paddingInline={'16px'}>
           <Flex alignItems='center' gap={3}>
             {Icon && <Icon color='#60686F' />}
             {title && <Text fontWeight={600}>{title}</Text>}
           </Flex>
         </ModalHeader>
-        <ModalCloseButton marginTop={1.5} marginRight={3.5} />
+        <ModalCloseButton marginTop={1.5} />
         <Divider />
-        <ModalBody marginBlock={4} overflow={'scroll'}>
+        <ModalBody paddingInline={'16px'} marginBlock={4} overflow={'scroll'}>
           {children}
         </ModalBody>
         <Divider />
-        <ModalFooter>
+        <ModalFooter paddingInline={'16px'}>
           <Flex
             width={'100%'}
             alignItems={'center'}
