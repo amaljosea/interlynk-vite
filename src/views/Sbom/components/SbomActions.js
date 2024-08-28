@@ -216,15 +216,11 @@ const SbomActions = ({ sbom }) => {
     <Flex gap={3} alignItems={'flex-end'} justifyContent={'flex-end'}>
       {/* SBOM VERSIONS */}
       <LynkSelect
-        components={{
-          DropdownIndicator: () => null
-        }}
         type='text'
         name='versions'
         value={selectedVersion}
         onChange={handleSBOMChange}
         placeholder='Search versions'
-        noOptionsMessage={() => null}
         options={signedUrlParams ? uniqShareVersions : uniqVersions}
         isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
       />

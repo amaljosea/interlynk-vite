@@ -204,11 +204,11 @@ const SbomDetails = ({ sbomData }) => {
                   })}
               </Breadcrumb>
               <Flex
-                flexDir={'row'}
-                fontWeight={'semibold'}
                 gap={1}
-                alignItems={'center'}
+                flexDir={'row'}
                 flexWrap={'wrap'}
+                alignItems={'center'}
+                fontWeight={'semibold'}
               >
                 {name && <Text fontSize={22}>{name}</Text>}
                 {version && <Text fontSize={22}>:</Text>}
@@ -244,7 +244,11 @@ const SbomDetails = ({ sbomData }) => {
             </GridItem>
           </Grid>
           {/* STATS */}
-          <Grid gap={4} alignItems={'flex-start'} templateColumns='repeat(12, 1fr)'>
+          <Grid
+            gap={4}
+            alignItems={'flex-start'}
+            templateColumns='repeat(12, 1fr)'
+          >
             <GridItem colSpan={4}>
               <Card px={0} shadow='none'>
                 <CardBody px={0} flexDir='column' gap={1}>

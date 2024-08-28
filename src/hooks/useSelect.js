@@ -79,7 +79,8 @@ export const useSelect = (type) => {
     valueContainer: (provided) => {
       return {
         ...provided,
-        padding: isBreadcrumb ? '1px 5px' : '6px 10px'
+        height: isBreadcrumb ? '32px' : '39px'
+        // padding: isBreadcrumb ? '1px 5px' : '5px 10px'
       }
     }
   }
