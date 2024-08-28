@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client'
 import React from 'react'
 
 import { CheckCircleIcon, CloseIcon } from '@chakra-ui/icons'
@@ -16,7 +17,10 @@ import { useColorModeValue } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+
+import { EnterpriseUpgradeRequest } from 'graphQL/Mutation'
 
 import { GiScales } from 'react-icons/gi'
 
@@ -24,14 +28,12 @@ const BalanceIconComponent = () => {
   return <Icon as={GiScales} boxSize={6} color='gray.500' />
 }
 
-const PlanTable = ({ orgs }) => {
+const PlanTable = () => {
+  const { showToast } = useCustomToast()
   const { isFreeTier } = useGlobalQueryContext()
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const userEmail = localStorage.getItem('email')
-  const organization = localStorage.getItem('organization')
-
-  const activeOrg = orgs?.find((item) => item?.name === organization)
+  const [sendRequest, { loading }] = useMutation(EnterpriseUpgradeRequest)
 
   const usageData = {
     title: 'Usage',
@@ -111,15 +113,15 @@ const PlanTable = ({ orgs }) => {
   const iconColor = useColorModeValue('white', 'black')
 
   const handleContact = () => {
-    const email = 'support@interlynk.io'
-    const subject = 'URGENT: Enterprise Upgrade Request'
-    const body = `
-      User: ${userEmail}
-      Organization: ${activeOrg?.name}
-      Organization ID: ${activeOrg?.id}
-      `
-
-    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    sendRequest().then((res) => {
+      if (res?.data?.enterpriseUpgradeRequest?.success) {
+        showToast({
+          description: 'A support request has been created for you.',
+          status: 'success'
+        })
+        onClose()
+      }
+    })
   }
 
   // Combine all feature objects into one array
@@ -167,6 +169,7 @@ const PlanTable = ({ orgs }) => {
       <LynkModal
         isOpen={isOpen}
         onClose={onClose}
+        isLoading={loading}
         onSubmit={handleContact}
         title='Upgrade to Enterprise Plan'
         buttonText='Contact Us'

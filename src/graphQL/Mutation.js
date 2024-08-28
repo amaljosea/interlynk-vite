@@ -2986,3 +2986,11 @@ export const OrganizationAssignAwsToken = gql`
     }
   }
 `
+
+export const EnterpriseUpgradeRequest = gql`
+  mutation EnterpriseUpgradeRequest {
+    enterpriseUpgradeRequest(input: {}) {
+      success
+    }
+  }
+`
