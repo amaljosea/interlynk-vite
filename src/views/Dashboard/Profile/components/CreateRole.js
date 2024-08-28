@@ -24,10 +24,9 @@ import { BiUserPlus } from 'react-icons/bi'
 const CreateRole = ({ isOpen, onClose }) => {
   const [roleName, setRoleName] = useState('')
   const [permissions, setPermissions] = useState('')
-  const [disabled, setDisabled] = useState(false)
   const [error, setError] = useState('')
 
-  const [createRole] = useMutation(OrgRoleCreate)
+  const [createRole, { loading }] = useMutation(OrgRoleCreate)
 
   const { style } = useSelect('field')
 
@@ -47,13 +46,6 @@ const CreateRole = ({ isOpen, onClose }) => {
       psOptions?.push({ value: allPs, label: item?.name })
     })
 
-  const disableButtonTemporarily = () => {
-    setDisabled(true)
-    setTimeout(() => {
-      setDisabled(false)
-    }, 3000)
-  }
-
   const onNameChange = (e) => {
     setRoleName(e.target.value)
     setError('')
@@ -68,7 +60,6 @@ const CreateRole = ({ isOpen, onClose }) => {
     if (roleName?.length < 4) {
       setError('Input must be at least 4 characters')
     } else {
-      disableButtonTemporarily()
       createRole({
         variables: {
           name: roleName,
@@ -85,18 +76,18 @@ const CreateRole = ({ isOpen, onClose }) => {
     }
   }
 
-  const isInvalid =
-    roleName === '' || permissions?.length === 0 || error !== '' || disabled
+  const isInvalid = roleName === '' || permissions?.length === 0 || error !== ''
 
   return (
     <LynkModal
       isOpen={isOpen}
+      buttonText='Save'
       onClose={onClose}
       onSubmit={onSave}
-      title={'Add Role'}
       Icon={BiUserPlus}
+      title={'Add Role'}
+      isLoading={loading}
       disabled={isInvalid}
-      buttonText='Save'
     >
       <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
         {error !== '' && (

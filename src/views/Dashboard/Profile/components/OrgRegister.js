@@ -38,7 +38,8 @@ const OrgRegister = ({ loading }) => {
 
   const containsSpace = /\s/.test(url)
 
-  const [registerOrg] = useMutation(RegisterOrganization)
+  const [registerOrg, { loading: regLoading }] =
+    useMutation(RegisterOrganization)
   const [switchOrg] = useMutation(SwitchOrganization)
 
   const handleCheckEmail = () => {
@@ -71,15 +72,15 @@ const OrgRegister = ({ loading }) => {
       .finally(() => (window.location.href = '/vendor/dashboard'))
   }
 
-  const handleCreate = async () => {
-    await registerOrg({
+  const handleCreate = () => {
+    registerOrg({
       variables: {
         name,
         url,
         email
       }
     }).then((res) => {
-      if (res.data) {
+      if (res?.data) {
         const orgId = res.data.organizationCreate.organization.id
         localStorage.setItem(
           'organization',
@@ -122,11 +123,12 @@ const OrgRegister = ({ loading }) => {
         <LynkModal
           isOpen={isOpen}
           onClose={onClose}
+          buttonText='Save'
+          disabled={isInvalid}
+          isLoading={regLoading}
           onSubmit={handleCreate}
           title={'Register Organization'}
           Icon={RegisterOrganizationIcon}
-          disabled={isInvalid}
-          buttonText='Update'
         >
           <Flex width={'100%'} direction={'column'} gap={4}>
             {error !== '' && (

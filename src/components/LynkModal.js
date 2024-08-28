@@ -20,7 +20,7 @@ const LynkModal = ({
   onClose,
   onSubmit,
   title,
-  isLoading = false,
+  isLoading,
   Icon,
   type,
   buttonText,
