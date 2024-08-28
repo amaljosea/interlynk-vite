@@ -39,7 +39,7 @@ const VulnFilters = ({ setFilter, sbomVersions }) => {
     setIsComplete(e.target.checked)
     setFilter((oldFilters) => ({
       ...oldFilters,
-      vexComplete: e.target.checked === true ? true : undefined
+      vexComplete: e?.target?.checked
     }))
   }
 
