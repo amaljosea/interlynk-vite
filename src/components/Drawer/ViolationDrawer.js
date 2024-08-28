@@ -27,6 +27,8 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
+  console.log('activeRow', activeRow)
+
   const { nodes, paginationProps, loading } = usePaginatedQuery(
     PolicyRuleViolations,
     {
@@ -97,6 +99,8 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
     }
   ]
 
+  const supplierExists = subject === 'SBOM_SUPPLIER' && nodes?.length > 0
+
   return (
     <Drawer size={'lg'} isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
@@ -127,13 +131,17 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
                   {value}
                 </Text>
               )}
-              {subject === 'SBOM_SUPPLIER' && (
-                <Text>
-                  <strong>Value:</strong>{' '}
-                  <span style={{ textTransform: 'capitalize' }}>{name}</span> -{' '}
-                  {value}
-                </Text>
-              )}
+              {supplierExists &&
+                nodes?.map((item, index) => (
+                  <Flex key={index} gap={2} flexWrap={'wrap'}>
+                    <Text>Value:</Text>
+                    {item?.violation?.suppliers?.map((sup, idx) => (
+                      <Text key={idx}>
+                        {`${sup?.contactName} (${sup?.contactEmail}) - ${sup?.name}`}
+                      </Text>
+                    ))}
+                  </Flex>
+                ))}
               {(subject === 'VERSION_PRIMARY' ||
                 subject === 'SBOM_PRIMARY_COMPONENT_RELATIONSHIPS') &&
                 nodes?.length > 0 && (

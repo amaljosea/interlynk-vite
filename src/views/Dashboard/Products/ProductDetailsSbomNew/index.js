@@ -41,14 +41,8 @@ const ProductDetailsSbomNew = () => {
     }
   })
 
-  const { stats, vulnRunStatus } = data?.sbom || ''
-  const {
-    compCount,
-    compLicenseCount,
-    vulnStats,
-    sbomParts,
-    policyResultMetrics
-  } = stats || ''
+  const { stats, vulnRunStatus, policyResultMetrics } = data?.sbom || ''
+  const { compCount, compLicenseCount, vulnStats, sbomParts } = stats || ''
 
   const { data: settings } = useQuery(GetProjectSettings, {
     variables: { id: productId }
