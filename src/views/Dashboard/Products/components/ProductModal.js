@@ -7,26 +7,21 @@ import {
   Alert,
   AlertIcon,
   Box,
-  Button,
   Flex,
   FormControl,
   FormLabel,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Text,
   Textarea
 } from '@chakra-ui/react'
 
+import LynkModal from 'components/LynkModal'
 import LynkSelect from 'components/LynkSelect'
 
 import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
 import { GetLabels } from 'graphQL/Queries'
+
+import { BiSolidLayerPlus } from 'react-icons/bi'
 
 const ProductModal = ({ isOpen, onClose, data }) => {
   const { id, name, description, labels: activeLabels } = data || ''
@@ -131,65 +126,56 @@ const ProductModal = ({ isOpen, onClose, data }) => {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <form onSubmit={data ? updateProduct : handleSave}>
-          <ModalContent>
-            <ModalHeader>{data ? 'Edit' : 'Add'} Product</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Flex width={'100%'} direction={'column'} gap={4}>
-                {error !== '' && (
-                  <Alert status='error' borderRadius={4}>
-                    <AlertIcon />
-                    <Text fontSize={'sm'}>{errorMapping[error] || error}</Text>
-                  </Alert>
-                )}
-                <FormControl isRequired>
-                  <FormLabel>Name</FormLabel>
-                  <Input
-                    type='text'
-                    value={productName}
-                    onChange={onNameChange}
-                    placeholder={`Add product name`}
-                  />
-                </FormControl>
-                <FormControl hidden>
-                  <FormLabel>Labels</FormLabel>
-                  <LynkSelect
-                    isMulti
-                    components={{
-                      DropdownIndicator: () => null,
-                      Option
-                    }}
-                    options={options}
-                    placeholder='Select'
-                    value={productLabels}
-                    onChange={(value) => setProductLabels(value)}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Description</FormLabel>
-                  <Textarea
-                    rows={5}
-                    value={productDesc}
-                    onChange={onDescChange}
-                    placeholder={`Add product description`}
-                  />
-                </FormControl>
-              </Flex>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button colorScheme='blue' type='submit' disabled={isInvalid}>
-                {data ? 'Update' : 'Save'}
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </form>
-      </Modal>
+      <LynkModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={data ? updateProduct : handleSave}
+        title={`${data ? 'Edit' : 'Add'} Product`}
+        Icon={BiSolidLayerPlus}
+        disabled={isInvalid}
+        buttonText={data ? 'Update' : 'Save'}
+      >
+        <Flex width={'100%'} direction={'column'} gap={4}>
+          {error !== '' && (
+            <Alert status='error' borderRadius={4}>
+              <AlertIcon />
+              <Text fontSize={'sm'}>{errorMapping[error] || error}</Text>
+            </Alert>
+          )}
+          <FormControl isRequired>
+            <FormLabel>Name</FormLabel>
+            <Input
+              type='text'
+              value={productName}
+              onChange={onNameChange}
+              placeholder={`Add product name`}
+            />
+          </FormControl>
+          <FormControl hidden>
+            <FormLabel>Labels</FormLabel>
+            <LynkSelect
+              isMulti
+              components={{
+                DropdownIndicator: () => null,
+                Option
+              }}
+              options={options}
+              placeholder='Select'
+              value={productLabels}
+              onChange={(value) => setProductLabels(value)}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Description</FormLabel>
+            <Textarea
+              rows={5}
+              value={productDesc}
+              onChange={onDescChange}
+              placeholder={`Add product description`}
+            />
+          </FormControl>
+        </Flex>
+      </LynkModal>
     </>
   )
 }
