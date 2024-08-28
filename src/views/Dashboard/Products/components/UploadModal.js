@@ -35,6 +35,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
   const { showToast } = useCustomToast()
   const borderColor = useColorModeValue('#A0AEC066', 'gray.600')
   const textColor = useColorModeValue('#1A202C99', 'gray.600')
+  const highlightedTextColor = useColorModeValue('blue.600', 'blue.300') // New highlighted text color
   const { envName } = useGlobalState()
 
   const { projects, name } = data || ''
@@ -179,8 +180,10 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
             </FormHelperText>
           </FormControl>
           <FormLabel fontSize={12}>Upload File</FormLabel>
-          <Box
+          <Flex
             p={5}
+            height={'110px'}
+            justifyContent={'center'}
             borderWidth={2}
             borderRadius='md'
             textAlign='center'
@@ -199,8 +202,12 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
               onChange={handleFileChange}
               accept='.json,application/json,application/xml,text/xml'
             />
-            <Flex height={32} alignItems={'center'} justifyContent={'center'}>
-              <Text hidden={loading} color={textColor}>
+            <Flex alignItems={'center'} justifyContent={'center'}>
+              <Text
+                hidden={loading}
+                color={selectedFile ? highlightedTextColor : textColor}
+                fontWeight={500}
+              >
                 {isDragActive
                   ? 'Drop the file here'
                   : selectedFile
@@ -209,7 +216,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
               </Text>
               <Text hidden={!loading}>Uploading...</Text>
             </Flex>
-          </Box>
+          </Flex>
           {loading && <Progress size='xs' isIndeterminate />}
         </Stack>
         {error && (
