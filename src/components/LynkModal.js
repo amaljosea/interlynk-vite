@@ -28,7 +28,9 @@ const LynkModal = ({
   children,
   hidden,
   leftFooterContent,
-  buttonColor
+  buttonColor,
+  maxW,
+  maxH
 }) => {
   const isConfirmationModal = type === 'confirmation'
 
@@ -55,7 +57,7 @@ const LynkModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent maxW={'600px'}>
+      <ModalContent maxW={maxW || '600px'} maxH={maxH || ''}>
         <ModalHeader>
           <Flex alignItems='center' gap={3}>
             {Icon && <Icon color='#60686F' />}
@@ -64,7 +66,9 @@ const LynkModal = ({
         </ModalHeader>
         <ModalCloseButton marginTop={1.5} marginRight={3.5} />
         <Divider />
-        <ModalBody marginBlock={4}>{children}</ModalBody>
+        <ModalBody marginBlock={4} overflow={'scroll'}>
+          {children}
+        </ModalBody>
         <Divider />
         <ModalFooter>
           <Flex

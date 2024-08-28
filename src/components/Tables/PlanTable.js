@@ -1,93 +1,118 @@
+import React from 'react'
+
+import { CheckCircleIcon, CloseIcon } from '@chakra-ui/icons'
+import { Icon } from '@chakra-ui/react'
 import {
   Box,
   Button,
   Flex,
   Grid,
   GridItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Table,
-  Tbody,
+  SimpleGrid,
   Text,
-  Th,
-  Thead,
-  Tr,
   useDisclosure
 } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/react'
 
+import LynkModal from 'components/LynkModal'
+
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 
-import FeatureGroup from './FeatureGroupTable'
+import { GiScales } from 'react-icons/gi'
+
+const BalanceIconComponent = () => {
+  return <Icon as={GiScales} boxSize={6} color='gray.500' />
+}
 
 const PlanTable = ({ orgs }) => {
   const { isFreeTier } = useGlobalQueryContext()
   const { isOpen, onOpen, onClose } = useDisclosure()
+
   const userEmail = localStorage.getItem('email')
   const organization = localStorage.getItem('organization')
 
   const activeOrg = orgs?.find((item) => item?.name === organization)
 
-  const headerBgColor = useColorModeValue('white', 'gray.700')
-  const usageData = [
-    { feature: 'Users', val1: '5', val2: 'Custom' },
-    { feature: 'Products', val1: '10', val2: 'Unlimited' }
-  ]
+  const usageData = {
+    title: 'Usage',
+    features: [
+      { feature: 'Users', val1: '5', val2: 'Custom' },
+      { feature: 'Products', val1: '10', val2: 'Unlimited' }
+    ]
+  }
 
-  const sbomFeatures = [
-    { feature: 'SBOM Management', val1: true, val2: true },
-    { feature: 'SBOM Manual Build', val1: true, val2: true },
-    { feature: 'SBOM Editor', val1: true, val2: true },
-    { feature: 'SBOM Quality Scoring', val1: true, val2: true },
-    { feature: 'SBOM Compliance Assessment', val1: true, val2: true },
-    { feature: 'SBOM ShareLynk', val1: true, val2: true },
-    { feature: 'SBOM Automation Rules', val1: false, val2: true },
-    { feature: 'SBOM Parts Composition', val1: false, val2: true },
-    { feature: 'SBOM In-Place Signing', val1: false, val2: true },
-    { feature: 'SBOM Component Privacy', val1: false, val2: true }
-  ]
+  const sbomFeatures = {
+    title: 'SBOM Features',
+    features: [
+      { feature: 'SBOM Management', val1: true, val2: true },
+      { feature: 'SBOM Manual Build', val1: true, val2: true },
+      { feature: 'SBOM Editor', val1: true, val2: true },
+      { feature: 'SBOM Quality Scoring', val1: true, val2: true },
+      { feature: 'SBOM Compliance Assessment', val1: true, val2: true },
+      { feature: 'SBOM ShareLynk', val1: true, val2: true },
+      { feature: 'SBOM Automation Rules', val1: false, val2: true },
+      { feature: 'SBOM Parts Composition', val1: false, val2: true },
+      { feature: 'SBOM In-Place Signing', val1: false, val2: true },
+      { feature: 'SBOM Component Privacy', val1: false, val2: true }
+    ]
+  }
 
-  const riskManagementFeatures = [
-    { feature: 'Vulnerability Management', val1: true, val2: true },
-    { feature: 'Exploitability Editor (VEX)', val1: true, val2: true },
-    {
-      feature: 'End-of-life / End-of-service Detection',
-      val1: false,
-      val2: true
-    },
-    { feature: 'Open Source Risk Scoring', val1: false, val2: true },
-    { feature: 'OpenSSF Scorecard Risk Scoring', val1: false, val2: true }
-  ]
+  const riskManagementFeatures = {
+    title: 'Risk Management Features',
+    features: [
+      { feature: 'Vulnerability Management', val1: true, val2: true },
+      { feature: 'Exploitability Editor (VEX)', val1: true, val2: true },
+      {
+        feature: 'End-of-life / End-of-service Detection',
+        val1: false,
+        val2: true
+      },
+      { feature: 'Open Source Risk Scoring', val1: false, val2: true },
+      { feature: 'OpenSSF Scorecard Risk Scoring', val1: false, val2: true }
+    ]
+  }
 
-  const managementAndReportingFeatures = [
-    { feature: 'Policy Management', val1: true, val2: true },
-    { feature: 'Role Based Access Control (RBAC)', val1: false, val2: true },
-    { feature: 'Custom Roles', val1: false, val2: true },
-    { feature: 'Integrated License Manager', val1: false, val2: true },
-    { feature: 'Analytics', val1: false, val2: true }
-  ]
+  const managementAndReportingFeatures = {
+    title: 'Management & Reporting Features',
+    features: [
+      { feature: 'Policy Management', val1: true, val2: true },
+      { feature: 'Role Based Access Control (RBAC)', val1: false, val2: true },
+      { feature: 'Custom Roles', val1: false, val2: true },
+      { feature: 'Integrated License Manager', val1: false, val2: true },
+      { feature: 'Analytics', val1: false, val2: true }
+    ]
+  }
 
-  const supportFeatures = [
-    { feature: 'Product Support', val1: 'Email', val2: 'Chat, Slack, Email' }
-  ]
+  const supportFeatures = {
+    title: 'Support Features',
+    features: [
+      { feature: 'Product Support', val1: 'Email', val2: 'Chat, Slack, Email' }
+    ]
+  }
 
-  const integrationsFeatures = [
-    {
-      feature: 'Workflow Integrations',
-      val1: false,
-      val2: 'JIRA, Teams, Slack, GitHub'
-    }
-  ]
+  const integrationsFeatures = {
+    title: 'Integrations Features',
+    features: [
+      {
+        feature: 'Workflow Integrations',
+        val1: false,
+        val2: 'JIRA, Teams, Slack, GitHub'
+      }
+    ]
+  }
+
+  const boxShadow = useColorModeValue(
+    '0px 4px 16px rgba(0, 0, 0, 0.1)',
+    '0px 4px 16px rgba(255, 255, 255, 0.15)'
+  )
+
+  const titleColor = useColorModeValue('#000', 'blue.500')
+
+  const iconColor = useColorModeValue('white', 'black')
 
   const handleContact = () => {
     const email = 'support@interlynk.io'
     const subject = 'URGENT: Enterprise Upgrade Request'
-
     const body = `
       User: ${userEmail}
       Organization: ${activeOrg?.name}
@@ -96,6 +121,16 @@ const PlanTable = ({ orgs }) => {
 
     window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
   }
+
+  // Combine all feature objects into one array
+  const allFeatures = [
+    usageData,
+    sbomFeatures,
+    riskManagementFeatures,
+    managementAndReportingFeatures,
+    supportFeatures,
+    integrationsFeatures
+  ]
 
   return (
     <Box p={8}>
@@ -119,7 +154,7 @@ const PlanTable = ({ orgs }) => {
         </GridItem>
       </Grid>
 
-      {/* Upgrade Modal */}
+      {/* Upgrade Modal Button */}
       {isFreeTier && (
         <Flex justify='left' marginTop={'40px'}>
           <Button colorScheme='blue' onClick={onOpen}>
@@ -128,66 +163,206 @@ const PlanTable = ({ orgs }) => {
         </Flex>
       )}
 
-      <Modal isOpen={isOpen} onClose={onClose} size='lg'>
-        <ModalOverlay />
-        <ModalContent maxW='800px' h='80vh'>
-          {' '}
-          <ModalHeader>Upgrade to Enterprise Plan</ModalHeader>
-          <ModalCloseButton />
-          <Table>
-            <Thead bg={headerBgColor}>
-              <Tr
-                textColor={'gray.500'}
-                textAlign={'left'}
-                textTransform={'uppercase'}
-              >
-                <Th paddingLeft={'45px'} w={'190px'}>
-                  Feature
-                </Th>
-                <Th w={'5px'}>Free</Th>
-                <Th w={'50px'}>Enterprise</Th>
-              </Tr>
-            </Thead>
-          </Table>
-          <Box as={ModalBody} overflowY='auto' maxH='calc(80vh - 120px)'>
-            <Table variant='simple'>
-              <Tbody>
-                <FeatureGroup title='Usage' features={usageData} />
-                <FeatureGroup title='SBOM Features' features={sbomFeatures} />
-                <FeatureGroup
-                  title='Risk Management'
-                  features={riskManagementFeatures}
-                />
-                <FeatureGroup
-                  title='Management & Reporting'
-                  features={managementAndReportingFeatures}
-                />
-                <FeatureGroup
-                  title='Integrations'
-                  features={integrationsFeatures}
-                />
-                <FeatureGroup title='Support' features={supportFeatures} />
-              </Tbody>
-            </Table>
-          </Box>
-          <ModalFooter
-            gap={'20px'}
-            marginLeft={'10px'}
-            justifyContent='flex-end'
-          >
-            <Button
-              colorScheme='white'
-              textColor={'blue.400'}
-              onClick={() => onClose()}
+      {/* Replace the existing modal implementation with LynkModal */}
+      <LynkModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={handleContact}
+        title='Upgrade to Enterprise Plan'
+        buttonText='Contact Us'
+        buttonColor='blue'
+        maxW='800px'
+        maxH='700px'
+        Icon={BalanceIconComponent}
+      >
+        {/* Main Grid Layout with Three Columns */}
+        <SimpleGrid columns={3} spacing={4}>
+          {/* Left Column: Feature Names and Titles */}
+          <Box p={4} w={'400px'}>
+            <Text
+              fontSize='md'
+              fontWeight='semibold'
+              mb={2}
+              h='30px'
+              color={'gray.500'}
+              textTransform={'uppercase'}
             >
-              Cancel
-            </Button>
-            <Button colorScheme='blue' onClick={handleContact}>
-              Contact Us
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+              {''}
+            </Text>
+            {allFeatures.map((featureSet, featureIndex) => (
+              <React.Fragment key={featureIndex}>
+                {/* Feature Set Title */}
+                <Text
+                  fontSize='md'
+                  fontWeight='semibold'
+                  mb={1}
+                  mt={'20px'}
+                  h='30px'
+                  color={titleColor}
+                >
+                  {featureSet.title}
+                </Text>
+
+                {/* Feature Names */}
+                {featureSet.features.map((item, index) => (
+                  <Text
+                    key={index}
+                    mb={2}
+                    display='flex'
+                    alignItems='center'
+                    h='30px'
+                    fontSize='sm'
+                    fontWeight='normal'
+                  >
+                    {item.feature}
+                  </Text>
+                ))}
+              </React.Fragment>
+            ))}
+          </Box>
+
+          {/* Center Column: Free Plan Values */}
+          <Box
+            p={4}
+            display='flex'
+            flexDirection={'column'}
+            alignItems={'center'}
+          >
+            <Text
+              fontSize='md'
+              fontWeight='normal'
+              mb={2}
+              h='30px'
+              color={'gray.500'}
+              textTransform={'uppercase'}
+            >
+              {'Free'}
+            </Text>
+            {allFeatures.map((featureSet, featureIndex) => (
+              <React.Fragment key={featureIndex}>
+                <Text
+                  fontSize='md'
+                  fontWeight='semibold'
+                  mb={'5px'}
+                  mt={'10px'}
+                  h='30px'
+                >
+                  {' '}
+                </Text>
+                {featureSet.features.map((item, index) => (
+                  <Text
+                    key={index}
+                    mb={2}
+                    textAlign='center'
+                    display='flex'
+                    alignItems='center'
+                    h='30px'
+                    color={
+                      typeof item.val1 === 'boolean'
+                        ? item.val1
+                          ? 'green.500'
+                          : 'red.500'
+                        : 'inherit'
+                    }
+                  >
+                    {typeof item.val1 === 'boolean' ? (
+                      item.val1 ? (
+                        <CheckCircleIcon />
+                      ) : (
+                        <Box
+                          display='flex'
+                          alignItems='center'
+                          justifyContent='center'
+                          bg='red.500'
+                          borderRadius='full'
+                          width='16px'
+                          height='16px'
+                        >
+                          <CloseIcon color={iconColor} boxSize='8px' />
+                        </Box>
+                      )
+                    ) : (
+                      item.val1
+                    )}
+                  </Text>
+                ))}
+              </React.Fragment>
+            ))}
+          </Box>
+
+          {/* Right Column: Enterprise Plan Values */}
+          <Box
+            borderRadius={'10px'}
+            p={4}
+            w={'240px'}
+            display='flex'
+            flexDirection={'column'}
+            alignItems={'center'}
+            boxShadow={boxShadow}
+          >
+            <Text
+              fontSize='md'
+              fontWeight='semibold'
+              mb={2}
+              h='30px'
+              color={'blue.500'}
+              textTransform={'uppercase'}
+            >
+              {'Enterprise'}
+            </Text>
+            {allFeatures.map((featureSet, featureIndex) => (
+              <React.Fragment key={featureIndex}>
+                <Text
+                  fontSize='md'
+                  fontWeight='semibold'
+                  mb={'5px'}
+                  mt={'9px'}
+                  h='30px'
+                >
+                  {''}
+                </Text>
+                {featureSet.features.map((item, index) => (
+                  <Text
+                    key={index}
+                    mb={2}
+                    textAlign='center'
+                    display='flex'
+                    alignItems='center'
+                    h='30px'
+                    color={
+                      typeof item.val2 === 'boolean'
+                        ? item.val2
+                          ? 'green.500'
+                          : 'red.500'
+                        : 'inherit'
+                    }
+                  >
+                    {typeof item.val2 === 'boolean' ? (
+                      item.val2 ? (
+                        <CheckCircleIcon />
+                      ) : (
+                        <Box
+                          display='flex'
+                          alignItems='center'
+                          justifyContent='center'
+                          bg='red.500'
+                          borderRadius='full'
+                          width='16px'
+                          height='16px'
+                        >
+                          <CloseIcon color={iconColor} boxSize='8px' />
+                        </Box>
+                      )
+                    ) : (
+                      item.val2
+                    )}
+                  </Text>
+                ))}
+              </React.Fragment>
+            ))}
+          </Box>
+        </SimpleGrid>
+      </LynkModal>
     </Box>
   )
 }
