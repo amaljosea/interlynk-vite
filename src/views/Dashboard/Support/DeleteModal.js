@@ -30,8 +30,8 @@ const DeleteModal = ({ isOpen, onClose, data }) => {
       isOpen={isOpen}
       onClose={onClose}
       onConfirm={onDeleteSupport}
-      title='Archive Support'
-      description='Archiving this entry will:'
+      title='Delete Support'
+      description='Deleting this entry will:'
       items={['Remove this support detail from existing products']}
     />
   )

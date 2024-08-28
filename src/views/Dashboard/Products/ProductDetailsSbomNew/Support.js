@@ -164,14 +164,7 @@ const Support = () => {
         </Stack>
       </Flex>
     )
-  }, [
-    filterText,
-    onSearchInputChange,
-    handleClear,
-    handleSearch,
-    sbomId,
-    onOpen
-  ])
+  }, [filterText, onSearchInputChange, handleClear, handleSearch, sbomId, onOpen, reset])
 
   const getColor = (eolDate) => {
     const currentDate = new Date()
