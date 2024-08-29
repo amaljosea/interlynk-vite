@@ -355,7 +355,7 @@ const SupportTable = ({
                     onDeleteOpen()
                   }}
                 >
-                  Archive Support
+                  Delete Support
                 </MenuItem>
               </MenuList>
             </Portal>

@@ -337,7 +337,7 @@ const Support = () => {
                     onDeleteOpen()
                   }}
                 >
-                  Archive Support
+                  Delete Support
                 </MenuItem>
               </MenuList>
             </Portal>
