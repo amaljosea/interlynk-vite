@@ -4,10 +4,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { validateCpe } from 'utils'
 import { infoData } from 'variables/general'
-import CpeModal from 'views/Dashboard/Products/components/CpeModal'
-import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 
-import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
+import { InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Button,
   Checkbox,
@@ -15,47 +13,34 @@ import {
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  IconButton,
   Input,
-  InputGroup,
-  InputRightElement,
   Select,
   Stack,
   Text,
   Textarea,
+  Tooltip,
   chakra,
   useDisclosure
 } from '@chakra-ui/react'
 
 import CpeField from 'components/CpeField'
-import InfoModal from 'components/InfoModal'
 import LicenseField from 'components/Licenses/LicenseField'
-import Info from 'components/Misc/Info'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import {
-  CreateCompRelation,
-  CreateComponent,
-  UpdateComponent
-} from 'graphQL/Mutation'
+import { CreateCompRelation, CreateComponent } from 'graphQL/Mutation'
 import { CpeAutoComplete, GetAllComponents, GetAllSboms } from 'graphQL/Queries'
 
-import { FaExpandAlt } from 'react-icons/fa'
-
 function ComponentDrawer(props) {
-  const { isFreeTier } = useGlobalQueryContext()
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -79,14 +64,13 @@ function ComponentDrawer(props) {
 
   const { isOpen, onClose, data, primaryComp, shortDesc } = props
   const { prodCompState, dispatch } = useGlobalState()
-  const { licenseType, purlString, expLicense, totalComp } = prodCompState
+  const { purlString, expLicense, totalComp } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const [addRelation] = useMutation(CreateCompRelation)
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
-  const [createComponent] = useMutation(CreateComponent)
-  const [updateComponent] = useMutation(UpdateComponent)
+  const [createComponent, { loading }] = useMutation(CreateComponent)
 
   const cpeRef = useRef()
 
@@ -97,22 +81,14 @@ function ComponentDrawer(props) {
   const [compKind, setCompKind] = useState('')
   const [compScope, setCompScope] = useState('')
   const [cpeValue, setCpeValue] = useState('')
-  const [cpeList, setCpeList] = useState([])
   const [cpeData, setCpeData] = useState([])
-  const [selectedCpe, setSelectedCpe] = useState(null)
   const [purlValue, setPurlValue] = useState('')
-  const [purlData, setPurlData] = useState(null)
   const [isPURLInputValid, setPURLInputValid] = useState(true)
   const [isPrimary, setIsPrimary] = useState(false)
   const [isInternal, setIsInternal] = useState(false)
   const [relation, setRelation] = useState('')
   const [component, setComponent] = useState('')
   const [isValid] = useState(true)
-  const [infoHeading, setInfoHeading] = useState('')
-  const [infoText, setInfoText] = useState('')
-  const [infoUrl, setInfoUrl] = useState('')
-  const [disabled, setDisabled] = useState(false)
-  const [allVersions, setAllVersions] = useState([])
   const [allComponents, setAllComponents] = useState([])
 
   useQuery(GetAllComponents, {
@@ -130,28 +106,21 @@ function ComponentDrawer(props) {
     }
   })
 
-  useQuery(GetAllSboms, {
+  let SBOMs = []
+  const { data: allSboms } = useQuery(GetAllSboms, {
     fetchPolicy: 'network-only',
     skip: signedUrlParams === null ? false : true,
     variables: {
       id: productId
-    },
-    onCompleted: (data) => {
-      if (data) {
-        const result = data?.project?.sboms?.map((item) => item?.projectVersion)
-        setAllVersions(result)
-      }
     }
   })
 
-  const isExists = allVersions?.includes(compVersion)
-
-  const disableButtonTemporarily = () => {
-    setDisabled(true)
-    setTimeout(() => {
-      setDisabled(false)
-    }, 3000)
+  if (allSboms) {
+    const result = allSboms?.project?.sboms?.map((item) => item?.projectVersion)
+    SBOMs = result
   }
+
+  const invalidVersion = compVersion !== '' && SBOMs?.includes(compVersion)
 
   useEffect(() => {
     if (data) {
@@ -216,21 +185,6 @@ function ComponentDrawer(props) {
   }, [shortDesc])
 
   const {
-    isOpen: isInfoOpen,
-    onOpen: onInfoOpen,
-    onClose: onInfoClose
-  } = useDisclosure()
-  const {
-    isOpen: isPurlOpen,
-    onOpen: onPurlOpen,
-    onClose: onPurlClose
-  } = useDisclosure()
-  const {
-    isOpen: isCpeOpen,
-    onOpen: onCpeOpen,
-    onClose: onCpeClose
-  } = useDisclosure()
-  const {
     isOpen: isWarningOpen,
     onOpen: onWarningOpen,
     onClose: onWarningClose
@@ -254,22 +208,7 @@ function ComponentDrawer(props) {
     }
   }
 
-  const handlePurlModal = () => {
-    if (purlValue && purlValue !== '' && isPURLInputValid) {
-      const pkg = PackageURL.fromString(purlValue)
-      setPurlData(pkg)
-      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
-    } else {
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: 'pkg:type/name@version?key=value'
-      })
-    }
-    onPurlOpen()
-  }
-
   const handleCreateCom = () => {
-    disableButtonTemporarily()
     createComponent({
       variables: {
         sbomId: sbomId,
@@ -307,78 +246,6 @@ function ComponentDrawer(props) {
       })
   }
 
-  const handleUpdateCom = () => {
-    disableButtonTemporarily()
-    updateComponent({
-      variables: {
-        id: data?.id,
-        sbomId: sbomId,
-        kind: compKind,
-        name: compName,
-        description: compDesc,
-        version: compVersion,
-        group: groupInfo,
-        scope: compScope,
-        licenses: {
-          licensesExp:
-            licenseType === 'license_exp'
-              ? expLicense
-                ? expLicense
-                : ''
-              : undefined
-        },
-        cpes: cpeValue !== '' ? [cpeValue] : [],
-        purl: purlValue,
-        primary: isPrimary,
-        internal: isInternal
-      }
-    }).then((res) => {
-      const { errors } = res?.data?.componentUpdate || ''
-      if (errors?.length > 0) {
-        showToast({ description: errors[0], status: 'error' })
-      } else {
-        prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        navigate(link)
-        onClose()
-      }
-    })
-  }
-
-  const handleCreateCpe = (string) => {
-    const cpeItem = cpeList?.find((item) => item === string)
-    if (cpeItem) {
-      showToast({
-        description: 'CPE already exists',
-        status: 'error'
-      })
-    } else {
-      setCpeList([...cpeList, string])
-      setCpeData([])
-      setCpeValue('')
-      setSelectedCpe(null)
-    }
-  }
-
-  const handleUpdateCpe = (string, id) => {
-    const cpeItem = cpeList?.find((item) => item === string)
-    if (cpeItem) {
-      showToast({
-        description: 'CPE already exists',
-        status: 'error'
-      })
-    } else if (cpeList?.find((item, index) => index === id)) {
-      const updatedData = cpeList?.map((item, index) => {
-        if (index === id) {
-          return string
-        }
-        return item
-      })
-      setCpeList(updatedData)
-      setCpeValue('')
-      setSelectedCpe(null)
-    }
-  }
-
   const handleCpeChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
@@ -394,35 +261,18 @@ function ComponentDrawer(props) {
     })
   }
 
-  const onCheck = (title) => {
-    const result = infoData.find((item) => item?.title === title)
-    setInfoHeading(result?.title)
-    setInfoText(result?.desc)
-    setInfoUrl('')
-    onInfoOpen()
-  }
-
-  const onCheckName = () => onCheck(`Component Name`)
-  const onCheckDesc = () => onCheck(`Component Description`)
-  const onCheckVersion = () => onCheck(`Component Version`)
-  const onCheckGroup = () => onCheck(`Component Group`)
-  const onCheckType = () => onCheck(`Component Type`)
-  const onCheckIdentifiers = () => onCheck(`Component Identifiers`)
-  const onCheckScope = () => onCheck(`Component Scope`)
-  const onCheckPrimary = () => onCheck(`Primary Component`)
-  const onCheckInternal = () => onCheck(`Internal Component`)
-
   const onDrawerClose = () => {
     navigate(link)
     onClose()
   }
 
+  const onCheck = (title) => {
+    const result = infoData.find((item) => item?.title === title)
+    return result?.desc
+  }
+
   const isInvalid =
-    compKind === '' ||
-    compName === '' ||
-    compVersion === '' ||
-    !isValid ||
-    disabled
+    compKind === '' || compName === '' || compVersion === '' || !isValid
 
   return (
     <>
@@ -435,7 +285,7 @@ function ComponentDrawer(props) {
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerCloseButton />
+          <DrawerCloseButton mt={2} />
           <DrawerHeader borderBottomWidth='1px'>
             {signedUrlParams
               ? 'Component'
@@ -444,7 +294,7 @@ function ComponentDrawer(props) {
                 : 'Add Component'}
           </DrawerHeader>
           <DrawerBody overflowX={'hidden'}>
-            <Stack direction={'column'} spacing={4} my={3}>
+            <Stack direction={'column'} spacing={4} pt={2} pb={4}>
               {/* Name */}
               <FormControl isReadOnly={signedUrlParams}>
                 <FormLabel htmlFor='compName' fontSize={'sm'}>
@@ -455,7 +305,9 @@ function ComponentDrawer(props) {
                         *
                       </chakra.span>
                     </Text>
-                    <Info onClick={onCheckName} />
+                    <Tooltip label={onCheck(`Component Name`)}>
+                      <InfoIcon color={'blue.500'} />
+                    </Tooltip>
                   </Flex>
                 </FormLabel>
                 <Input
@@ -471,7 +323,9 @@ function ComponentDrawer(props) {
                 <FormLabel htmlFor='compDescription' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Description</Text>
-                    <Info onClick={onCheckDesc} />
+                    <Tooltip label={onCheck(`Component Description`)}>
+                      <InfoIcon color={'blue.500'} />
+                    </Tooltip>
                   </Flex>
                 </FormLabel>
                 <Textarea
@@ -485,7 +339,7 @@ function ComponentDrawer(props) {
               {/* Version */}
               <FormControl
                 isReadOnly={signedUrlParams}
-                isInvalid={data?.version !== compVersion && isExists}
+                isInvalid={invalidVersion}
               >
                 <FormLabel htmlFor='compVersion' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
@@ -495,7 +349,9 @@ function ComponentDrawer(props) {
                         *
                       </chakra.span>
                     </Text>
-                    <Info onClick={onCheckVersion} />
+                    <Tooltip label={onCheck(`Component Version`)}>
+                      <InfoIcon color={'blue.500'} />
+                    </Tooltip>
                   </Flex>
                 </FormLabel>
                 <Input
@@ -515,7 +371,9 @@ function ComponentDrawer(props) {
                 <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Group</Text>
-                    <Info onClick={onCheckGroup} />
+                    <Tooltip label={onCheck(`Component Group`)}>
+                      <InfoIcon color={'blue.500'} />
+                    </Tooltip>
                   </Flex>
                 </FormLabel>
                 <Input
@@ -536,7 +394,9 @@ function ComponentDrawer(props) {
                         *
                       </chakra.span>
                     </Text>
-                    <Info onClick={onCheckType} />
+                    <Tooltip label={onCheck(`Component Type`)}>
+                      <InfoIcon color={'blue.500'} />
+                    </Tooltip>
                   </Flex>
                 </FormLabel>
                 <Select
@@ -582,92 +442,54 @@ function ComponentDrawer(props) {
                 isDisabled={signedUrlParams}
                 license={data?.licensesExp}
               />
+              <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                {shortDesc === 'Component Identifier' && purlString === '' && (
+                  <WarningTwoIcon w={4} h={4} color='red.500' />
+                )}
+                <Text fontSize={'sm'} fontWeight={'medium'}>
+                  Identifiers
+                </Text>
+                <Tooltip label={onCheck(`Component Identifiers`)}>
+                  <InfoIcon color={'blue.500'} />
+                </Tooltip>
+              </Flex>
               {/* PURL INPUI */}
               <FormControl
                 isReadOnly={customerView}
                 isInvalid={purlValue !== '' && !isPURLInputValid}
               >
-                <FormLabel htmlFor='purl' fontSize={'sm'}>
-                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    {shortDesc === 'Component Identifier' &&
-                      purlString === '' && (
-                        <WarningTwoIcon w={4} h={4} color='red.500' />
-                      )}
-                    <Text>Identifiers</Text>
-                    <Info onClick={onCheckIdentifiers} />
-                  </Flex>
-                </FormLabel>
-                <Stack direction={'row'} spacing={2}>
-                  <InputGroup>
-                    <Input
-                      type='text'
-                      size='md'
-                      id='purl'
-                      name='purl'
-                      fontSize={'sm'}
-                      placeholder='PURL'
-                      value={purlValue}
-                      autoComplete='off'
-                      onChange={handlePURLInputChange}
-                      onBlur={purlInputBlur}
-                    />
-                    <InputRightElement align='center' zIndex={-1}>
-                      {purlValue != null && purlValue !== '' ? (
-                        isPURLInputValid ? (
-                          <CheckIcon color='green' />
-                        ) : (
-                          <WarningTwoIcon color='red' />
-                        )
-                      ) : null}
-                    </InputRightElement>
-                  </InputGroup>
-                  {!signedUrlParams && (
-                    <IconButton
-                      icon={<FaExpandAlt />}
-                      size='md'
-                      fontWeight={'normal'}
-                      variant='solid'
-                      colorScheme='blue'
-                      width={'fit-content'}
-                      onClick={handlePurlModal}
-                    >
-                      Details
-                    </IconButton>
-                  )}
-                </Stack>
+                <Input
+                  type='text'
+                  size='md'
+                  id='purl'
+                  name='purl'
+                  fontSize={'sm'}
+                  placeholder='PURL'
+                  value={purlValue}
+                  autoComplete='off'
+                  onChange={handlePURLInputChange}
+                  onBlur={purlInputBlur}
+                />
               </FormControl>
               {/* CPE INPUT */}
               <FormControl>
-                <Stack direction={'row'} width={'100%'} spacing={2}>
-                  <CpeField
-                    inputRef={cpeRef}
-                    inputValue={cpeValue}
-                    setInputValue={setCpeValue}
-                    cpeList={cpeData}
-                    setCpeList={setCpeData}
-                    onChange={handleCpeChange}
-                  />
-                  {!signedUrlParams && (
-                    <IconButton
-                      icon={<FaExpandAlt />}
-                      size='md'
-                      fontWeight={'normal'}
-                      variant='solid'
-                      colorScheme='blue'
-                      width={'fit-content'}
-                      onClick={onCpeOpen}
-                    >
-                      Details
-                    </IconButton>
-                  )}
-                </Stack>
+                <CpeField
+                  inputRef={cpeRef}
+                  inputValue={cpeValue}
+                  setInputValue={setCpeValue}
+                  cpeList={cpeData}
+                  setCpeList={setCpeData}
+                  onChange={handleCpeChange}
+                />
               </FormControl>
               {/* SCOPE */}
               <FormControl>
                 <FormLabel htmlFor='compScope'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Scope</Text>
-                    <Info onClick={onCheckScope} />
+                    <Tooltip label={onCheck(`Component Scope`)}>
+                      <InfoIcon color={'blue.500'} />
+                    </Tooltip>
                   </Flex>
                 </FormLabel>
                 <Select
@@ -701,7 +523,9 @@ function ComponentDrawer(props) {
                   >
                     Primary component
                   </Checkbox>
-                  <Info onClick={onCheckPrimary} />
+                  <Tooltip label={onCheck(`Primary Component`)}>
+                    <InfoIcon fontSize={14} color={'blue.500'} />
+                  </Tooltip>
                 </Flex>
               </FormControl>
               {/* INTERNAL COMPONENT */}
@@ -715,108 +539,71 @@ function ComponentDrawer(props) {
                   >
                     Internal component
                   </Checkbox>
-                  <Info onClick={onCheckInternal} />
+                  <Tooltip label={onCheck(`Internal Component`)}>
+                    <InfoIcon fontSize={14} color={'blue.500'} />
+                  </Tooltip>
                 </Flex>
               </FormControl>
               {/* ADD RELATION */}
-              {signedUrlParams === null && (
-                <Flex
-                  display={data ? 'none' : 'flex'}
-                  flexDir={'column'}
-                  gap={3}
+              <Text fontSize={'sm'} fontWeight={'medium'}>
+                Relationships
+              </Text>
+              <FormControl hidden={signedUrlParams}>
+                <FormLabel htmlFor='relation' color='gray.600'>
+                  Type
+                </FormLabel>
+                <Select
+                  size='md'
+                  id='relation'
+                  fontSize={'sm'}
+                  value={relation}
+                  onChange={(e) => setRelation(e.target.value)}
                 >
-                  <Text>Relationships</Text>
-                  <FormControl>
-                    <FormLabel htmlFor='relation' color='gray.600'>
-                      Type
-                    </FormLabel>
-                    <Select
-                      id='relation'
-                      size='sm'
-                      value={relation}
-                      onChange={(e) => setRelation(e.target.value)}
-                    >
-                      <option value=''>-- Select --</option>
-                      {[{ value: 'depends_on', label: 'Depends On' }].map(
-                        (item, idx) => (
-                          <option key={idx} value={item.value}>
-                            {item.label}
-                          </option>
-                        )
-                      )}
-                    </Select>
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel htmlFor='component' color='gray.600'>
-                      Component
-                    </FormLabel>
-                    <Select
-                      id='component'
-                      size='sm'
-                      value={component}
-                      onChange={(e) => setComponent(e.target.value)}
-                      mb={10}
-                    >
-                      <option value=''>-- Select --</option>
-                      {[...allComponents]
-                        .sort((a, b) => a?.name?.localeCompare(b?.name))
-                        .map((item, idx) => (
-                          <option key={idx} value={item.id}>
-                            {item.name}-{item.version}
-                          </option>
-                        ))}
-                    </Select>
-                  </FormControl>
-                </Flex>
-              )}
+                  <option value=''>-- Select --</option>
+                  {[{ value: 'depends_on', label: 'Depends On' }].map(
+                    (item, idx) => (
+                      <option key={idx} value={item.value}>
+                        {item.label}
+                      </option>
+                    )
+                  )}
+                </Select>
+              </FormControl>
+              <FormControl hidden={signedUrlParams}>
+                <FormLabel htmlFor='component' color='gray.600'>
+                  Component
+                </FormLabel>
+                <Select
+                  size='md'
+                  id='component'
+                  fontSize={'sm'}
+                  value={component}
+                  onChange={(e) => setComponent(e.target.value)}
+                >
+                  <option value=''>-- Select --</option>
+                  {[...allComponents]
+                    .sort((a, b) => a?.name?.localeCompare(b?.name))
+                    .map((item, idx) => (
+                      <option key={idx} value={item.id}>
+                        {item.name}-{item.version}
+                      </option>
+                    ))}
+                </Select>
+              </FormControl>
+              <Button
+                colorScheme='blue'
+                variant={'outline'}
+                isLoading={loading}
+                width={'fit-content'}
+                isDisabled={isInvalid}
+                onClick={handleCreateCom}
+              >
+                Save
+              </Button>
             </Stack>
           </DrawerBody>
-          <DrawerFooter borderTopWidth='1px' hidden={signedUrlParams !== null}>
-            <Button mr={3} onClick={onDrawerClose}>
-              Cancel
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={data ? handleUpdateCom : handleCreateCom}
-              isDisabled={isInvalid}
-            >
-              {data ? 'Update' : 'Save'}
-            </Button>
-          </DrawerFooter>
         </DrawerContent>
       </Drawer>
-
-      {/* PURL EDITOR */}
-      {isPurlOpen && (
-        <PurlModal
-          data={purlData}
-          isOpen={isPurlOpen}
-          onClose={onPurlClose}
-          setPurlValue={setPurlValue}
-          setIsValid={setPURLInputValid}
-          purlValue={purlValue}
-          getCpe={getCpe}
-          activeComp={data}
-          isFreeTier={isFreeTier}
-        />
-      )}
-
-      {/* CPE EDITOR */}
-      {isCpeOpen && (
-        <CpeModal
-          data={cpeData}
-          isOpen={isCpeOpen}
-          onClose={onCpeClose}
-          cpeValue={cpeValue}
-          setCpeValue={setCpeValue}
-          onCreateCpe={handleCreateCpe}
-          onUpdateCpe={handleUpdateCpe}
-          selectedCpe={selectedCpe}
-          getCpe={getCpe}
-          activeComp={data}
-          isFreeTier={isFreeTier}
-        />
-      )}
 
       {/* PRIMARY COMPONENT WARNING */}
       {isWarningOpen && (
@@ -827,17 +614,6 @@ function ComponentDrawer(props) {
           setData={setIsPrimary}
           onClose={onWarningClose}
           primaryComp={primaryComp}
-        />
-      )}
-
-      {/* INFO MODAL */}
-      {isInfoOpen && (
-        <InfoModal
-          isOpen={isInfoOpen}
-          onClose={onInfoClose}
-          heading={infoHeading}
-          body={infoText}
-          url={infoUrl}
         />
       )}
     </>
