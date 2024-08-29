@@ -743,9 +743,9 @@ const VersionsTable = ({
       {/* BUILD SBOM */}
       {isSbomOpen && projectGroup && (
         <ProductSbomDrawer
+          data={projectGroup}
           isOpen={isSbomOpen}
           onClose={onSbomClose}
-          data={projectGroup}
           productId={productId}
         />
       )}

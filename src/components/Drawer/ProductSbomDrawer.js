@@ -1,11 +1,9 @@
-import { useLazyQuery, useMutation } from '@apollo/client'
-import { PackageURL } from 'packageurl-js'
-import React, { useRef, useState } from 'react'
+import { useMutation, useQuery } from '@apollo/client'
+import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import CpeModal from 'views/Dashboard/Products/components/CpeModal'
-import PurlModal from 'views/Dashboard/Products/components/PurlModal'
+import { infoData } from 'variables/general'
 
-import { CheckIcon, InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
+import { InfoIcon } from '@chakra-ui/icons'
 import {
   Button,
   Checkbox,
@@ -13,187 +11,62 @@ import {
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
-  Icon,
-  IconButton,
   Input,
-  InputGroup,
-  InputRightElement,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Stack,
   Text,
   Textarea,
   Tooltip,
-  useDisclosure
+  chakra
 } from '@chakra-ui/react'
 
-import CpeInput from 'components/CpeInput'
 import LicenseField from 'components/Licenses/LicenseField'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { CreateComponent, sbomCreate } from 'graphQL/Mutation'
-import { CpeAutoComplete } from 'graphQL/Queries'
-
-import { FaExpandAlt } from 'react-icons/fa'
+import { GetAllSboms } from 'graphQL/Queries'
 
 function ProductSbomDrawer({ isOpen, onClose, data }) {
-  const { isFreeTier } = useGlobalQueryContext()
-  const { showToast } = useCustomToast()
   const params = useParams()
-  const productId = params.productid
-  const { prodCompState, dispatch } = useGlobalState()
-  const { expLicense } = prodCompState
-  const { prodCompDispatch } = dispatch
+  const { showToast } = useCustomToast()
+  const { prodCompState } = useGlobalState()
+  const customerView = location.pathname.startsWith('/customer')
 
-  const [sbomName, setSbomName] = useState('')
-  const [compDesc, setCompDesc] = useState('')
-  const [version, setVersion] = useState('')
-  const [compType, setCompType] = useState('')
+  const productId = params.productid
+  const { expLicense } = prodCompState
+
   const [groupInfo, setGroupInfo] = useState('')
-  const [compScope, setCompScope] = useState('required')
-  const [cpeValue, setCpeValue] = useState('')
-  const [cpeList, setCpeList] = useState([])
-  const [cpeData, setCpeData] = useState([])
-  const [selectedCpe, setSelectedCpe] = useState(null)
-  const [purlValue, setPurlValue] = useState('')
-  const [purlData, setPurlData] = useState(null)
-  const [isPURLInputValid, setPURLInputValid] = useState(true)
-  const [isValid, setIsValid] = useState(true)
-  const [disabled, setDisabled] = useState(false)
-  const [isPrimary, setIsPrimary] = useState(true)
+  const [compName, setCompName] = useState('')
+  const [compDesc, setCompDesc] = useState('')
+  const [compVersion, setCompVersion] = useState('')
+  const [compKind, setCompKind] = useState('')
+  const [compScope, setCompScope] = useState('')
   const [isInternal, setIsInternal] = useState(false)
 
-  const [getCpe] = useLazyQuery(CpeAutoComplete)
-  const [createSbom] = useMutation(sbomCreate)
-  const [createComponent] = useMutation(CreateComponent)
-
-  const { isOpen: isWarningOpen, onClose: onWarningClose } = useDisclosure()
-  const {
-    isOpen: isPurlOpen,
-    onOpen: onPurlOpen,
-    onClose: onPurlClose
-  } = useDisclosure()
-  const {
-    isOpen: isCpeOpen,
-    onOpen: onCpeOpen,
-    onClose: onCpeClose
-  } = useDisclosure()
-
-  // PURL
-  const handlePURLInputChange = (e) => {
-    const { value } = e.target
-    const val = value.replace(/\s/g, '')
-    setPurlValue(val)
-  }
-
-  const purlInputBlur = () => {
-    if (purlValue !== '') {
-      try {
-        PackageURL.fromString(purlValue)
-        setPURLInputValid(true)
-      } catch (ex) {
-        console.error('ex', ex)
-        setPURLInputValid(false)
-      }
-    }
-  }
-
-  const handlePurlModal = () => {
-    if (purlValue && purlValue !== '' && isPURLInputValid) {
-      const pkg = PackageURL.fromString(purlValue)
-      setPurlData(pkg)
-      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
-    } else {
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: 'pkg:type/name@version?key=value'
-      })
-    }
-    onPurlOpen()
-  }
-
-  // CPE
-  const cpeRef = useRef()
-
-  const handleCreateCpe = (string) => {
-    const cpeItem = cpeList?.find((item) => item === string)
-    if (cpeItem) {
-      showToast({
-        description: 'CPE already exists',
-        status: 'error'
-      })
-    } else {
-      setCpeList([...cpeList, string])
-      setCpeData([])
-      setCpeValue('')
-      setSelectedCpe(null)
-    }
-  }
-
-  const handleUpdateCpe = (string, id) => {
-    const cpeItem = cpeList?.find((item) => item === string)
-    if (cpeItem) {
-      showToast({
-        description: 'CPE already exists',
-        status: 'error'
-      })
-    } else if (cpeList?.find((item, index) => index === id)) {
-      const updatedData = cpeList?.map((item, index) => {
-        if (index === id) {
-          return string
-        }
-        return item
-      })
-      setCpeList(updatedData)
-      setCpeValue('')
-      setSelectedCpe(null)
-    }
-  }
-
-  const handleCpeChange = (e) => {
-    const { value } = e.target
-    const val = value.replace(/\s/g, '')
-    setCpeValue(val)
-    getCpe({
-      variables: {
-        input: { idType: 'cpe', ecosystem: 'cpe', search: { idUri: val } }
-      }
-    }).then((res) => {
-      if (res?.data) {
-        setCpeData(res?.data?.idAutoComplete?.result || [])
-      }
-    })
-  }
+  const [createSbom, { loading: sbomLoading }] = useMutation(sbomCreate)
+  const [createComponent, { loading: compLoading }] =
+    useMutation(CreateComponent)
 
   const handleCreateComp = async (id) => {
     await createComponent({
       variables: {
         sbomId: id,
-        name: sbomName,
-        kind: compType,
-        purl: purlValue,
-        version: version,
-        group: groupInfo,
+        primary: true,
+        name: compName,
+        kind: compKind,
         scope: compScope,
-        primary: isPrimary,
+        group: groupInfo,
         internal: isInternal,
+        version: compVersion,
         description: compDesc,
-        cpes: cpeValue !== '' ? [cpeValue] : [],
         licenses: { licensesExp: expLicense || '' }
       }
     }).then(
@@ -207,7 +80,6 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
   }
 
   const onCreateSBOM = () => {
-    setDisabled(true)
     createSbom({
       variables: {
         projectId: productId,
@@ -215,60 +87,83 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
         specVersion: '1.4',
         format: 'json'
       }
+    }).then((res) => {
+      if (res.data.sbomCreate.errors.length === 0) {
+        handleCreateComp(res?.data?.sbomCreate?.sbom?.id)
+        onClose()
+      } else {
+        showToast({
+          description: res.data.sbomCreate.errors,
+          status: 'error'
+        })
+      }
     })
-      .then((res) => {
-        if (res.data.sbomCreate.errors.length === 0) {
-          setDisabled(false)
-          handleCreateComp(res.data.sbomCreate.sbom.id)
-        } else {
-          showToast({
-            description: res.data.sbomCreate.errors,
-            status: 'error'
-          })
-        }
-      })
-      .finally(() => onClose())
-    setSbomName('')
-    setVersion('')
-    setCompType('')
-    setGroupInfo('')
-    setCompScope('required')
-    setCpeValue('')
-    setCpeList([])
-    setCpeData([])
-    setSelectedCpe(null)
-    setPurlValue('')
-    setPurlData(null)
   }
+
+  const onCheck = (title) => {
+    const result = infoData.find((item) => item?.title === title)
+    return result?.desc
+  }
+
+  let SBOMs = []
+  const { data: allSboms } = useQuery(GetAllSboms, {
+    fetchPolicy: 'network-only',
+    skip: customerView,
+    variables: {
+      id: productId
+    }
+  })
+
+  if (allSboms) {
+    const result = allSboms?.project?.sboms?.map((item) => item?.projectVersion)
+    SBOMs = result
+  }
+
+  const invalidVersion = compVersion !== '' && SBOMs?.includes(compVersion)
+
+  const isInvalid = compKind === '' || compName === '' || compVersion === ''
 
   return (
     <>
       <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerCloseButton />
+          <DrawerCloseButton mt={2} />
           <DrawerHeader borderBottomWidth='1px'>Build Version</DrawerHeader>
           <DrawerBody overflowX={'hidden'}>
-            <Stack direction={'column'} spacing={4} mt={2}>
-              {/* NAME */}
-              <FormControl isRequired>
-                <FormLabel htmlFor='sbomName' fontSize={'sm'}>
-                  Name
+            <Stack direction={'column'} spacing={4} pt={2} pb={4}>
+              {/* Name */}
+              <FormControl isReadOnly={customerView}>
+                <FormLabel htmlFor='compName' fontSize={'sm'}>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                    <Text>
+                      Name
+                      <chakra.span color={'red.500'} ml={1}>
+                        *
+                      </chakra.span>
+                    </Text>
+                    <Tooltip label={onCheck(`Component Name`)}>
+                      <InfoIcon color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
                 </FormLabel>
                 <Input
+                  size='md'
                   fontSize={'sm'}
-                  type='text'
-                  id='sbomName'
-                  name='sbomName'
-                  value={sbomName}
-                  onChange={(e) => setSbomName(e.target.value)}
                   placeholder='Enter name'
+                  value={compName}
+                  onChange={(e) => setCompName(e.target.value)}
                 />
               </FormControl>
               {/* Description */}
-              <FormControl>
+              <FormControl isReadOnly={customerView}>
                 <FormLabel htmlFor='compDescription' fontSize={'sm'}>
-                  Description
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                    <Text>Description</Text>
+                    <Tooltip label={onCheck(`Component Description`)}>
+                      <InfoIcon color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
                 </FormLabel>
                 <Textarea
                   size='md'
@@ -278,28 +173,40 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
                   onChange={(e) => setCompDesc(e.target.value)}
                 />
               </FormControl>
-              {/* VERSION */}
-              <FormControl isRequired>
-                <FormLabel htmlFor='sbomVersion' fontSize={'sm'}>
-                  Version
+              {/* Version */}
+              <FormControl isReadOnly={customerView} isInvalid={invalidVersion}>
+                <FormLabel htmlFor='compVersion' fontSize={'sm'}>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                    <Text>
+                      Version{' '}
+                      <chakra.span color={'red.500'} ml={1}>
+                        *
+                      </chakra.span>
+                    </Text>
+                    <Tooltip label={onCheck(`Component Version`)}>
+                      <InfoIcon color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
                 </FormLabel>
                 <Input
+                  size='md'
                   fontSize={'sm'}
-                  type='text'
-                  id='sbomVersion'
-                  name='sbomVersion'
-                  vaue={version}
-                  onChange={(e) => setVersion(e.target.value)}
                   placeholder='Enter version'
+                  value={compVersion}
+                  onChange={(e) => setCompVersion(e.target.value)}
                 />
+                <FormErrorMessage>
+                  This version of the product already exists. Continuing will
+                  override one of these versions.
+                </FormErrorMessage>
               </FormControl>
-              {/* Group */}
-              <FormControl>
+              {/* GROUP */}
+              <FormControl isReadOnly={customerView}>
                 <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Group</Text>
-                    <Tooltip label='Group Info'>
-                      <Icon as={InfoIcon} color={'blue.500'} />
+                    <Tooltip label={onCheck(`Component Group`)}>
+                      <InfoIcon color={'blue.500'} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -311,122 +218,81 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
                   onChange={(e) => setGroupInfo(e.target.value)}
                 />
               </FormControl>
-              {/* Format */}
-              <FormControl isRequired>
-                <FormLabel htmlFor='compType' fontSize={'sm'}>
-                  Type
-                </FormLabel>
-                <Select
-                  id='compType'
-                  name='compType'
-                  fontSize={'sm'}
-                  value={compType}
-                  onChange={(e) => setCompType(e.target.value)}
-                >
-                  <option value=''>-- Select --</option>
-                  <option value='application'>Application</option>
-                  <option value='library'>Library</option>
-                  <option value='operating-system'>Operating System</option>
-                  <option value='firmware'>Firmware</option>
-                  <option value='file'>File</option>
-                  <option value='device'>Device</option>
-                  <option value='container'>Container</option>
-                  <option value='framework'>Framework</option>
-                  <option value='source'>Source</option>
-                  <option value='archive'>Archive</option>
-                  <option value='install'>Install</option>
-                  <option value='other'>Other</option>
-                  <option value='unspecified'>Unspecified</option>
-                </Select>
-              </FormControl>
-              {/* Licenses */}
-              <LicenseField
-                sbomView={false}
-                isValid={isValid}
-                setIsValid={setIsValid}
-              />
-              {/* PURL INPUI */}
-              <FormControl isInvalid={purlValue !== '' && !isPURLInputValid}>
-                <FormLabel htmlFor='purl' fontSize={'sm'}>
+              {/* KIND */}
+              <FormControl>
+                <FormLabel htmlFor='componentType' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>Identifiers</Text>
-                    <Tooltip label='Component identifiers such as package URL (PURL) or Common Platform Enumeration (CPE) are used for consistent naming of the component. Both CycloneDX and SPDX supports identifying component names with CPE and PURL'>
-                      <Icon as={InfoIcon} color={'blue.500'} />
+                    <Text>
+                      Type{' '}
+                      <chakra.span color={'red.500'} ml={1}>
+                        *
+                      </chakra.span>
+                    </Text>
+                    <Tooltip label={onCheck(`Component Type`)}>
+                      <InfoIcon color={'blue.500'} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
-                <Stack direction={'row'} spacing={2}>
-                  <InputGroup>
-                    <Input
-                      type='text'
-                      size='md'
-                      id='purl'
-                      name='purl'
-                      fontSize={'sm'}
-                      placeholder='PURL'
-                      value={purlValue}
-                      autoComplete='off'
-                      onChange={handlePURLInputChange}
-                      onBlur={purlInputBlur}
-                    />
-                    <InputRightElement align='center' zIndex={-1}>
-                      {purlValue != null && purlValue !== '' ? (
-                        isPURLInputValid ? (
-                          <CheckIcon color='green' />
-                        ) : (
-                          <WarningTwoIcon color='red' />
-                        )
-                      ) : null}
-                    </InputRightElement>
-                  </InputGroup>
-                  <IconButton
-                    icon={<FaExpandAlt />}
-                    size='md'
-                    fontWeight={'normal'}
-                    variant='solid'
-                    colorScheme='blue'
-                    width={'fit-content'}
-                    onClick={handlePurlModal}
-                  >
-                    Details
-                  </IconButton>
-                </Stack>
+                <Select
+                  id='componentType'
+                  name='componentType'
+                  size='md'
+                  fontSize={'sm'}
+                  value={compKind}
+                  isDisabled={customerView}
+                  onChange={(e) => setCompKind(e.target.value)}
+                  textTransform={'capitalize'}
+                >
+                  <option value='' style={{ background: 'lightgray' }}>
+                    -- Select --
+                  </option>
+                  {[
+                    'application',
+                    'framework',
+                    'library',
+                    'container',
+                    'platform',
+                    'operating-system',
+                    'device',
+                    'device-driver',
+                    'firmware',
+                    'file',
+                    'machine-learning-model',
+                    'data'
+                  ].map((item, index) => (
+                    <option
+                      key={index}
+                      value={item}
+                      style={{ textTransform: 'capitalize' }}
+                    >
+                      {item}
+                    </option>
+                  ))}
+                </Select>
               </FormControl>
-              {/* CPE INPUT */}
-              <FormControl>
-                <Stack direction={'row'} width={'100%'} spacing={2}>
-                  <CpeInput
-                    name='cpe'
-                    inputValue={cpeValue}
-                    setInputValue={setCpeValue}
-                    cpeList={cpeData}
-                    setCpeList={setCpeData}
-                    onChange={handleCpeChange}
-                    inputRef={cpeRef}
-                    validation={true}
-                  />
-                  <IconButton
-                    icon={<FaExpandAlt />}
-                    ize='md'
-                    fontWeight={'normal'}
-                    variant='solid'
-                    colorScheme='blue'
-                    width={'fit-content'}
-                    onClick={onCpeOpen}
-                  >
-                    Details
-                  </IconButton>
-                </Stack>
-              </FormControl>
+              {/* LICENSES */}
+              <LicenseField
+                sbomView={false}
+                isDisabled={customerView}
+                license={data?.licensesExp}
+              />
               {/* SCOPE */}
               <FormControl>
-                <FormLabel htmlFor='compScope'>Scope</FormLabel>
+                <FormLabel htmlFor='compScope'>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                    <Text>Scope</Text>
+                    <Tooltip label={onCheck(`Component Scope`)}>
+                      <InfoIcon color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
+                </FormLabel>
                 <Select
                   id='compScope'
                   name='compScope'
                   size='md'
                   fontSize={'sm'}
                   value={compScope}
+                  isDisabled={customerView}
                   onChange={(e) => setCompScope(e.target.value)}
                 >
                   <option value='' style={{ background: 'lightgray' }}>
@@ -438,108 +304,46 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
                 </Select>
               </FormControl>
               {/* PRIMARY COMPONENT */}
-              <FormControl htmlFor={'isPrimary'}>
-                <Checkbox
-                  mt={4}
-                  size='sm'
-                  id='isPrimary'
-                  name='isPrimary'
-                  colorScheme='blue'
-                  isChecked={isPrimary}
-                  onChange={() => setIsPrimary(!isPrimary)}
-                >
-                  Primary component
-                </Checkbox>
+              <FormControl isReadOnly={customerView} isDisabled>
+                <Flex alignItems={'center'} gap={2}>
+                  <Checkbox size='sm' colorScheme='blue' defaultChecked={true}>
+                    Primary component
+                  </Checkbox>
+                  <Tooltip label={onCheck(`Primary Component`)}>
+                    <InfoIcon fontSize={14} color={'blue.500'} />
+                  </Tooltip>
+                </Flex>
               </FormControl>
               {/* INTERNAL COMPONENT */}
-              <FormControl htmlFor={'isInternal'}>
-                <Checkbox
-                  size='sm'
-                  id='isInternal'
-                  name='isInternal'
-                  colorScheme='blue'
-                  isChecked={isInternal}
-                  onChange={() => setIsInternal(!isInternal)}
-                >
-                  Internal component
-                </Checkbox>
+              <FormControl isReadOnly={customerView}>
+                <Flex alignItems={'center'} gap={2}>
+                  <Checkbox
+                    size='sm'
+                    colorScheme='blue'
+                    isChecked={isInternal}
+                    onChange={() => setIsInternal(!isInternal)}
+                  >
+                    Internal component
+                  </Checkbox>
+                  <Tooltip label={onCheck(`Internal Component`)}>
+                    <InfoIcon fontSize={14} color={'blue.500'} />
+                  </Tooltip>
+                </Flex>
               </FormControl>
+              <Button
+                colorScheme='blue'
+                variant={'outline'}
+                width={'fit-content'}
+                isDisabled={isInvalid}
+                onClick={onCreateSBOM}
+                isLoading={sbomLoading || compLoading}
+              >
+                Save
+              </Button>
             </Stack>
           </DrawerBody>
-          <DrawerFooter borderTopWidth='1px'>
-            <Button mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={onCreateSBOM}
-              disabled={
-                sbomName === '' || compType === '' || version === '' || disabled
-              }
-            >
-              Save
-            </Button>
-          </DrawerFooter>
         </DrawerContent>
       </Drawer>
-
-      {/* WARNING */}
-      {isWarningOpen && (
-        <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>{version}</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>
-                An SBOM with the same version already exists. Continuing with
-                building this SBOM will delete existing version data and replace
-                it with the SBOM being built.{' '}
-              </Text>
-              <Text mt={10}>Are you sure you wish to continue?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onWarningClose}>
-                Cancel
-              </Button>
-              <Button colorScheme='red' onClick={onCreateSBOM}>
-                Ok
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
-
-      {isPurlOpen && (
-        <PurlModal
-          data={purlData}
-          isOpen={isPurlOpen}
-          onClose={onPurlClose}
-          setPurlValue={setPurlValue}
-          setIsValid={setPURLInputValid}
-          purlValue={purlValue}
-          getCpe={getCpe}
-          activeComp={data?.defaultProject}
-          isFreeTier={isFreeTier}
-        />
-      )}
-
-      {isCpeOpen && (
-        <CpeModal
-          data={cpeData}
-          isOpen={isCpeOpen}
-          onClose={onCpeClose}
-          cpeValue={cpeValue}
-          setCpeValue={setCpeValue}
-          onCreateCpe={handleCreateCpe}
-          onUpdateCpe={handleUpdateCpe}
-          selectedCpe={selectedCpe}
-          getCpe={getCpe}
-          activeComp={data?.defaultProject}
-          activeRow={null}
-          isFreeTier={isFreeTier}
-        />
-      )}
     </>
   )
 }
