@@ -44,7 +44,7 @@ const CompIdentifiers = ({ data }) => {
   const { isCpeValid } = prodCompState
   const { prodCompDispatch } = dispatch
 
-  const [updateComponent] = useMutation(UpdateComponent)
+  const [updateComponent, { loading }] = useMutation(UpdateComponent)
 
   const cpeRef = useRef()
   const [cpeValue, setCpeValue] = useState('')
@@ -54,19 +54,6 @@ const CompIdentifiers = ({ data }) => {
   const [isPURLInputValid, setPURLInputValid] = useState(true)
   const [purlOpen, setPurlOpen] = useState(false)
   const [cpeOpen, setCpeOpen] = useState(false)
-  const [disabled, setDisabled] = useState(false)
-
-  const disableButtonTemporarily = () => {
-    setDisabled(true)
-    setTimeout(() => {
-      setDisabled(false)
-    }, 3000)
-  }
-
-  // const onCheck = (title) => {
-  //   const result = infoData.find((item) => item?.title === title)
-  //   return result?.desc
-  // }
 
   const handlePURLInputChange = (e) => {
     const { value } = e.target
@@ -122,7 +109,6 @@ const CompIdentifiers = ({ data }) => {
     (cpeValue !== '' && !isCpeValid)
 
   const handleUpdateCom = () => {
-    disableButtonTemporarily()
     updateComponent({
       variables: {
         id: data?.id,
@@ -273,7 +259,7 @@ const CompIdentifiers = ({ data }) => {
         width={'fit-content'}
         hidden={purlOpen || cpeOpen}
         onClick={handleUpdateCom}
-        isDisabled={disabled || isInvalid}
+        isDisabled={loading || isInvalid}
       >
         Save
       </Button>

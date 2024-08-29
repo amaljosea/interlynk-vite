@@ -1,6 +1,5 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { validateUrl } from 'utils'
 
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
@@ -55,18 +54,10 @@ const CompLinks = ({ data }) => {
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
   const [error, setError] = useState('')
-  const [disabled, setDisabled] = useState(false)
   const [activeLink, setActiveLink] = useState(null)
   const [linkError, setLinkError] = useState('')
 
-  const [updateLinks] = useMutation(UpdateCompLinks)
-
-  const disableButtonTemporarily = () => {
-    setDisabled(true)
-    setTimeout(() => {
-      setDisabled(false)
-    }, 3000)
-  }
+  const [updateLinks, { loading }] = useMutation(UpdateCompLinks)
 
   const containsSpace = /\s/.test(link)
 
@@ -104,7 +95,6 @@ const CompLinks = ({ data }) => {
   }
 
   const handleLinkAdd = () => {
-    disableButtonTemporarily()
     const result = { url: link, name: type }
     updateLinks({
       variables: {
@@ -133,7 +123,6 @@ const CompLinks = ({ data }) => {
     const updatedList = filterUrls?.filter(
       (url) => url?.name !== activeLink?.name
     )
-    disableButtonTemporarily()
     updateLinks({
       variables: {
         id,
@@ -144,7 +133,7 @@ const CompLinks = ({ data }) => {
   }
 
   const isInvalid =
-    !validateUrl(link.trim()) || error !== '' || linkError !== '' || disabled
+    !validateUrl(link.trim()) || error !== '' || linkError !== '' || loading
 
   return (
     <>
@@ -252,7 +241,7 @@ const CompLinks = ({ data }) => {
                             fontSize={'sm'}
                             variant='outline'
                             colorScheme='red'
-                            isDisabled={disabled}
+                            isDisabled={loading}
                             onClick={handleLinkRemove}
                           >
                             Yes

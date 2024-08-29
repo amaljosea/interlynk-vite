@@ -46,14 +46,6 @@ const CompSupplier = ({ data }) => {
   const [nameError, setNameError] = useState('')
   const [supEmail, setSupEmail] = useState('')
   const [emailError, setEmailError] = useState('')
-  const [isDisabled, setIsDisabled] = useState(false)
-
-  const disableButtonTemporarily = () => {
-    setIsDisabled(true)
-    setTimeout(() => {
-      setIsDisabled(false)
-    }, 3000)
-  }
 
   const containsSpace = /\s/.test(orgUrl)
 
@@ -67,11 +59,12 @@ const CompSupplier = ({ data }) => {
     }
   }
 
-  const [createSupplier] = useMutation(addComSupplier)
-  const [updateSupplier] = useMutation(updateComSupplier)
+  const [createSupplier, { loading: createLoading }] =
+    useMutation(addComSupplier)
+  const [updateSupplier, { loading: updateLoading }] =
+    useMutation(updateComSupplier)
 
   const handleSave = () => {
-    disableButtonTemporarily()
     createSupplier({
       variables: {
         name: orgName,
@@ -91,7 +84,6 @@ const CompSupplier = ({ data }) => {
   }
 
   const handleUpdate = () => {
-    disableButtonTemporarily()
     if (suppliers?.length > 0) {
       updateSupplier({
         variables: {
@@ -131,7 +123,8 @@ const CompSupplier = ({ data }) => {
   }
 
   const isInvalid =
-    isDisabled ||
+    createLoading ||
+    updateLoading ||
     orgName === '' ||
     nameError !== '' ||
     (supEmail !== '' && !validateEmail(supEmail)) ||

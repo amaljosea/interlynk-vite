@@ -29,6 +29,7 @@ import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { UpdateComponent } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
@@ -36,6 +37,7 @@ import { GetAllSboms } from 'graphQL/Queries'
 const CompDetails = ({ data, primaryComp }) => {
   const location = useLocation()
   const { showToast } = useCustomToast()
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const customerView = location.pathname.startsWith('/customer')
 
   const { sbomId, sbom } = data || ''
@@ -47,7 +49,7 @@ const CompDetails = ({ data, primaryComp }) => {
   const { expLicense } = prodCompState
   const { prodCompDispatch } = dispatch
 
-  const [updateComponent] = useMutation(UpdateComponent)
+  const [updateComponent, { loading }] = useMutation(UpdateComponent)
 
   const [groupInfo, setGroupInfo] = useState('')
   const [compName, setCompName] = useState('')
@@ -58,7 +60,6 @@ const CompDetails = ({ data, primaryComp }) => {
   const [compSupport, setCompSupport] = useState('')
   const [isPrimary, setIsPrimary] = useState(false)
   const [isInternal, setIsInternal] = useState(false)
-  const [disabled, setDisabled] = useState(false)
 
   const [selectedDate, setSelectedDate] = useState('')
   const [isValidDate, setIsValidDate] = useState(true)
@@ -77,40 +78,19 @@ const CompDetails = ({ data, primaryComp }) => {
     }
   }
 
-  const disableButtonTemporarily = () => {
-    setDisabled(true)
-    setTimeout(() => {
-      setDisabled(false)
-    }, 3000)
-  }
-
-  let isExists
-  useQuery(GetAllSboms, {
+  let SBOMs = []
+  const { data: allSboms } = useQuery(GetAllSboms, {
     fetchPolicy: 'network-only',
     skip: customerView,
     variables: {
       id: productId
-    },
-    onCompleted: (data) => {
-      if (data) {
-        const result = data?.project?.sboms?.map((item) => item?.projectVersion)
-        isExists = result
-      }
     }
   })
 
-  useEffect(() => {
-    if (data) {
-      setGroupInfo(data?.group)
-      setCompName(data?.name)
-      setCompDesc(data?.description)
-      setCompVersion(data?.version)
-      setCompKind(data?.kind)
-      setCompScope(data?.scope)
-      setIsPrimary(data?.primary)
-      setIsInternal(data?.internal)
-    }
-  }, [data])
+  if (allSboms) {
+    const result = data?.project?.sboms?.map((item) => item?.projectVersion)
+    SBOMs = result
+  }
 
   const onCheck = (title) => {
     const result = infoData.find((item) => item?.title === title)
@@ -118,7 +98,6 @@ const CompDetails = ({ data, primaryComp }) => {
   }
 
   const handleUpdateCom = () => {
-    disableButtonTemporarily()
     updateComponent({
       variables: {
         id: data?.id,
@@ -147,8 +126,23 @@ const CompDetails = ({ data, primaryComp }) => {
     })
   }
 
+  const invalidVersion = compVersion !== '' && SBOMs?.includes(compVersion)
+
   const isInvalid =
-    compKind === '' || compName === '' || compVersion === '' || disabled
+    compKind === '' || compName === '' || compVersion === '' || loading
+
+  useEffect(() => {
+    if (data) {
+      setGroupInfo(data?.group)``
+      setCompName(data?.name)
+      setCompDesc(data?.description)
+      setCompVersion(data?.version)
+      setCompKind(data?.kind)
+      setCompScope(data?.scope)
+      setIsPrimary(data?.primary)
+      setIsInternal(data?.internal)
+    }
+  }, [data])
 
   return (
     <>
@@ -195,10 +189,7 @@ const CompDetails = ({ data, primaryComp }) => {
           />
         </FormControl>
         {/* Version */}
-        <FormControl
-          isReadOnly={customerView}
-          isInvalid={data?.version !== compVersion && isExists}
-        >
+        <FormControl isReadOnly={customerView} isInvalid={invalidVersion}>
           <FormLabel htmlFor='compVersion' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>
@@ -328,7 +319,7 @@ const CompDetails = ({ data, primaryComp }) => {
           </Select>
         </FormControl>
         {/* SUPPRT LEVEL */}
-        <FormControl>
+        <FormControl hidden={!shouldShowDemoFeatures}>
           <FormLabel htmlFor='compScope'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>Support Level</Text>
@@ -360,6 +351,7 @@ const CompDetails = ({ data, primaryComp }) => {
           mb={5}
           isInvalid={!isValidDate}
           isDisabled={compSupport === ''}
+          hidden={!shouldShowDemoFeatures}
         >
           <FormLabel mb={1} htmlFor='endOfSupport'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
