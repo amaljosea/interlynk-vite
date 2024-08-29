@@ -116,7 +116,7 @@ const PlanTable = () => {
     sendRequest().then((res) => {
       if (res?.data?.enterpriseUpgradeRequest?.success) {
         showToast({
-          description: 'A support request has been created for you.',
+          description: 'A support request has been created for you. We will contact you within 2-business days.',
           status: 'success'
         })
         onClose()
@@ -140,7 +140,7 @@ const PlanTable = () => {
       <Grid templateColumns='repeat(4, 1fr)' gap={8} mb={6}>
         <GridItem>
           <Text fontWeight='bold'>Plan</Text>
-          <Text>{isFreeTier ? 'Free Forever' : 'Enterprise'}</Text>
+          <Text>{isFreeTier ? 'Free' : 'Enterprise'}</Text>
         </GridItem>
         <GridItem>
           <Text fontWeight='bold'>Products</Text>
