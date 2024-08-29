@@ -191,7 +191,7 @@ function ProductLinkDrawer(props) {
                   ))}
                 </Stack>
                 <Input
-                  placeholder='Enter email address'
+                  placeholder='Enter Email Address'
                   size='sm'
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

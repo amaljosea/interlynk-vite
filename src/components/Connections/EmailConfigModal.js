@@ -264,7 +264,7 @@ const EmailConfigModal = ({
           <HStack key={index} width='100%'>
             <Input
               w={'320px'}
-              placeholder='Paste Email Webhook URL'
+              placeholder='Enter Email Address'
               value={config.address}
               onChange={(e) => handleChange(index, 'address', e.target.value)}
               isDisabled={!updateCon}

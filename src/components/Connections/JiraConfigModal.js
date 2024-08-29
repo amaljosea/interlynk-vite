@@ -89,14 +89,14 @@ const JiraConfigModal = ({
         onClose()
         showToast({
           title: 'Configuration saved.',
-          description: 'Your JIRA configuration has been successfully saved.',
+          description: 'Your Jira configuration has been successfully saved.',
           status: 'success'
         })
       } else {
         showToast({
           title: 'Saving failed.',
           description:
-            'An error occurred while saving your JIRA configuration.',
+            'An error occurred while saving your Jira configuration.',
           status: 'error'
         })
       }
@@ -118,14 +118,14 @@ const JiraConfigModal = ({
         onClose()
         showToast({
           title: 'Configuration saved.',
-          description: 'Your JIRA configuration has been successfully updated.',
+          description: 'Your Jira configuration has been successfully updated.',
           status: 'success'
         })
       } else {
         showToast({
           title: 'Saving failed.',
           description:
-            'An error occurred while updating your JIRA configuration.',
+            'An error occurred while updating your Jira configuration.',
           status: 'error'
         })
       }
@@ -172,7 +172,7 @@ const JiraConfigModal = ({
         onClose()
         showToast({
           title: 'Configuration deleted.',
-          description: 'Your JIRA configuration has been successfully deleted.',
+          description: 'Your Jira configuration has been successfully deleted.',
           status: 'success'
         })
       } else {
@@ -180,7 +180,7 @@ const JiraConfigModal = ({
         showToast({
           title: 'Deletion failed.',
           description:
-            'An error occurred while deleting your JIRA configuration.',
+            'An error occurred while deleting your Jira configuration.',
           status: 'error'
         })
       }
@@ -212,14 +212,14 @@ const JiraConfigModal = ({
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>JIRA Configuration</ModalHeader>
+        <ModalHeader>Jira Configuration</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <FormControl isRequired mt={4} isDisabled={!updateCon}>
-            <FormLabel>JIRA Host URL</FormLabel>
+            <FormLabel>Jira Host URL</FormLabel>
             <Input
               value={jiraHost}
-              placeholder='Enter JIRA Host URL'
+              placeholder='Enter Jira Host URL'
               onChange={(e) => {
                 setJiraHost(e.target.value)
                 setIsJiraHostChanged(true)
@@ -227,14 +227,14 @@ const JiraConfigModal = ({
             />
           </FormControl>
           <FormControl isRequired mt={4} isDisabled={!updateCon}>
-            <FormLabel>User Name</FormLabel>
+            <FormLabel>User Email</FormLabel>
             <Input
               value={jiraUsername}
               onChange={(e) => {
                 setJiraUsername(e.target.value)
                 setIsJiraUsernameChanged(true)
               }}
-              placeholder='Enter User Name'
+              placeholder='Enter User Email'
             />
           </FormControl>
           <FormControl isRequired mt={4} isDisabled={!updateCon}>

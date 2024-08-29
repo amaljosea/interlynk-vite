@@ -270,7 +270,7 @@ const SlackConfigModal = ({
           <HStack key={index} width='100%'>
             <Input
               w={'320px'}
-              placeholder='Paste Slack Webhook URL'
+              placeholder='Enter Slack Webhook URL'
               value={config.address}
               onChange={(e) => handleChange(index, 'address', e.target.value)}
               isDisabled={!updateCon}

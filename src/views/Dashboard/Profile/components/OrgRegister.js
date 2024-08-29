@@ -183,7 +183,7 @@ const OrgRegister = ({ loading }) => {
                   setEmail(e.target.value)
                   setEmailError('')
                 }}
-                placeholder='Enter email'
+                placeholder='Enter Email Address'
               />
               {emailError !== '' && (
                 <FormErrorMessage>{emailError}</FormErrorMessage>

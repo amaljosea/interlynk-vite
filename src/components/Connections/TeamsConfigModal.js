@@ -273,7 +273,7 @@ const TeamsConfigModal = ({
           <HStack key={index} width='100%'>
             <Input
               w={'320px'}
-              placeholder='Paste Teams Webhook URL'
+              placeholder='Enter Teams Webhook URL'
               value={config.address}
               onChange={(e) => handleChange(index, 'address', e.target.value)}
               isDisabled={!updateCon}

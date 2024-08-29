@@ -236,7 +236,7 @@ function SBOMDrawer(props) {
             </Checkbox>
             <FormControl isInvalid={!validateEmail(email) && email !== ''}>
               <Input
-                placeholder='Enter email address'
+                placeholder='Enter Email Address'
                 size='md'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
