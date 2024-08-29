@@ -6,6 +6,8 @@ import Select, { components } from 'react-select'
 
 import { Divider, Spinner, useColorModeValue } from '@chakra-ui/react'
 
+import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
+
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -14,7 +16,6 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { GetProjectGroupDetails } from 'graphQL/Queries'
 
 import { customFilter } from './customFilter'
-import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
 const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
   const navigate = useNavigate()
@@ -41,7 +42,8 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
     skip: !orgView || viewProds === false,
     variables: {
       field: 'PROJECT_GROUPS_NAME',
-      direction: 'ASC'
+      direction: 'ASC',
+      first: 999999999
     }
   })
 
