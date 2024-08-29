@@ -107,79 +107,66 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerBody>
-          <Flex
-            height={'100%'}
-            flexDir={'column'}
-            justifyContent={'space-between'}
-            width={'100%'}
-            pos={'relative'}
-            gap={2}
-          >
-            <Stack spacing={2} direction={'column'}>
+          <Stack spacing={2} direction={'column'}>
+            <Text>
+              <strong>Policy:</strong> {policy}
+            </Text>
+            <Text>
+              <strong>Condition:</strong>{' '}
+              <span style={{ textTransform: 'capitalize' }}>{category}</span>{' '}
+              {name} {operatorWording} {value}
+            </Text>
+            {subject === 'VERSION_AUTHOR' && (
               <Text>
-                <strong>Policy:</strong> {policy}
+                <strong>Value:</strong>{' '}
+                <span style={{ textTransform: 'capitalize' }}>{name}</span> -{' '}
+                {value}
               </Text>
-              <Text>
-                <strong>Condition:</strong>{' '}
-                <span style={{ textTransform: 'capitalize' }}>{category}</span>{' '}
-                {name} {operatorWording} {value}
-              </Text>
-              {subject === 'VERSION_AUTHOR' && (
+            )}
+            {supplierExists &&
+              nodes?.map((item, index) => (
+                <Flex key={index} gap={2} flexWrap={'wrap'}>
+                  <Text>Value:</Text>
+                  {item?.violation?.suppliers?.map((sup, idx) => (
+                    <Text key={idx}>
+                      {`${sup?.contactName} (${sup?.contactEmail}) - ${sup?.name}`}
+                    </Text>
+                  ))}
+                </Flex>
+              ))}
+            {(subject === 'VERSION_PRIMARY' ||
+              subject === 'SBOM_PRIMARY_COMPONENT_RELATIONSHIPS') &&
+              nodes?.length > 0 && (
                 <Text>
                   <strong>Value:</strong>{' '}
-                  <span style={{ textTransform: 'capitalize' }}>{name}</span> -{' '}
-                  {value}
+                  <span style={{ textTransform: 'capitalize' }}>
+                    {nodes[0].violation?.primaryComponent?.name}
+                  </span>{' '}
+                  - {nodes[0].violation?.primaryComponent?.version}
                 </Text>
               )}
-              {supplierExists &&
-                nodes?.map((item, index) => (
-                  <Flex key={index} gap={2} flexWrap={'wrap'}>
-                    <Text>Value:</Text>
-                    {item?.violation?.suppliers?.map((sup, idx) => (
-                      <Text key={idx}>
-                        {`${sup?.contactName} (${sup?.contactEmail}) - ${sup?.name}`}
-                      </Text>
-                    ))}
-                  </Flex>
-                ))}
-              {(subject === 'VERSION_PRIMARY' ||
-                subject === 'SBOM_PRIMARY_COMPONENT_RELATIONSHIPS') &&
-                nodes?.length > 0 && (
-                  <Text>
-                    <strong>Value:</strong>{' '}
-                    <span style={{ textTransform: 'capitalize' }}>
-                      {nodes[0].violation?.primaryComponent?.name}
-                    </span>{' '}
-                    - {nodes[0].violation?.primaryComponent?.version}
-                  </Text>
-                )}
-              <Text
-                fontWeight={'bold'}
-                fontSize={'md'}
-                hidden={category === 'version'}
-              >
-                Violations List
-              </Text>
-            </Stack>
-            <Box
-              height={'85%'}
-              overflowY={'scroll'}
+            <Text
+              fontWeight={'bold'}
+              fontSize={'md'}
               hidden={category === 'version'}
             >
-              <DataTable
-                responsive
-                columns={columns}
-                data={nodes || []}
-                customStyles={customStyles(headColor)}
-                progressPending={loading}
-                progressComponent={<CustomLoader />}
-                persistTableHead
-              />
-            </Box>
-            <Box hidden={category === 'version'}>
-              <Pagination {...paginationProps} />
-            </Box>
-          </Flex>
+              Violations List
+            </Text>
+          </Stack>
+          <Box overflowY={'scroll'} hidden={category === 'version'}>
+            <DataTable
+              responsive
+              columns={columns}
+              data={nodes || []}
+              customStyles={customStyles(headColor)}
+              progressPending={loading}
+              progressComponent={<CustomLoader />}
+              persistTableHead
+            />
+          </Box>
+          <Box hidden={category === 'version'}>
+            <Pagination {...paginationProps} />
+          </Box>
         </DrawerBody>
       </DrawerContent>
     </Drawer>
