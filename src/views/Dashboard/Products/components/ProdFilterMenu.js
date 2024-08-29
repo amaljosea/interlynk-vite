@@ -3,12 +3,14 @@ import { hexToRGBA } from 'utils'
 
 import {
   Box,
+  IconButton,
   Menu,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
   Stack,
-  Tag
+  Tag,
+  useColorModeValue
 } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
@@ -16,8 +18,24 @@ import MenuHeading from 'components/Misc/MenuHeading'
 
 import { GetLabels } from 'graphQL/Queries'
 
-const ProdFilterMenu = ({ filters, setFilters }) => {
+import { FaCheck } from 'react-icons/fa6'
+import { RxDotFilled } from 'react-icons/rx'
+
+const ItemCheck = ({ icon }) => {
+  return (
+    <IconButton size='12' bg={'none'} _hover={{ bg: 'none' }} icon={icon} />
+  )
+}
+
+const ProdFilterMenu = ({
+  filters,
+  setFilters,
+  filterMode,
+  setFilterMode,
+  setSelectedTags
+}) => {
   const { enabled, labelIds } = filters || ''
+  const iconColor = useColorModeValue('#444', '#f3f3f3')
 
   const onFilterActive = (value) => {
     setFilters((oldFilter) => ({
@@ -45,6 +63,26 @@ const ProdFilterMenu = ({ filters, setFilters }) => {
     )
   }
 
+  const handleMenuClick = (event, value) => {
+    if (event.shiftKey) {
+      console.log('Shift key was held down during selection!', value)
+      setFilterMode('OR')
+    } else {
+      console.log('No Shift key.', value)
+      setFilterMode('AND')
+    }
+    console.log('Selected value:', value)
+    if (value !== 'All') {
+      setSelectedTags((prevTags) =>
+        prevTags.includes(value)
+          ? prevTags.filter((t) => t !== value)
+          : [...prevTags, value]
+      )
+    } else {
+      setSelectedTags([])
+    }
+  }
+
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* ACTIVE */}
@@ -67,7 +105,13 @@ const ProdFilterMenu = ({ filters, setFilters }) => {
       >
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Labels'} active={labelIds?.length !== 0} />
-          <MenuList minH='auto' maxH={'320px'} overflowY={'scroll'}>
+          <MenuList
+            minW={'250px'}
+            maxW={'350px'}
+            minH='auto'
+            maxH={'320px'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type={'checkbox'}
               value={labelIds}
@@ -76,10 +120,21 @@ const ProdFilterMenu = ({ filters, setFilters }) => {
               {prodLabels?.map((item, index) => (
                 <MenuItemOption
                   key={index}
-                  maxW={'300px'}
                   fontSize={'sm'}
                   value={item?.id}
                   wordBreak={'break-all'}
+                  onClick={(e) => handleMenuClick(e, item?.name)}
+                  icon={
+                    filterMode === 'AND' ? (
+                      <ItemCheck
+                        icon={<FaCheck size={14} color={iconColor} />}
+                      />
+                    ) : (
+                      <ItemCheck
+                        icon={<RxDotFilled size={16} color={iconColor} />}
+                      />
+                    )
+                  }
                 >
                   <Tag
                     width={'fit-content'}

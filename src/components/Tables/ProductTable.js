@@ -116,6 +116,9 @@ const ProductTable = ({
   const [openTagMenu, setOpenTagMenu] = useState(false)
   const [filterText, setFilterText] = useState(search || '')
 
+  const [selectedTags, setSelectedTags] = useState([])
+  const [filterMode, setFilterMode] = useState('AND')
+
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
@@ -244,6 +247,30 @@ const ProductTable = ({
     onLynkOpen()
   }
 
+  console.log('activeRow', activeRow)
+  console.log('filterMode', filterMode)
+  console.log('selectedTags', selectedTags)
+
+  // const filteredData = nodes?.filter((item) => {
+  //   if (filterMode === 'AND') {
+  //     return selectedTags?.every((tag) => item?.name?.includes(tag))
+  //   } else {
+  //     return selectedTags?.some((tag) => item?.name?.includes(tag))
+  //   }
+  // })
+
+  const filteredNodes = data?.filter((node) => {
+    const nodeTags = node?.labels?.map((label) => label.name)
+    if (filterMode === 'AND') {
+      return selectedTags.every((tag) => nodeTags.includes(tag))
+    } else if (filterMode === 'OR') {
+      return selectedTags.some((tag) => nodeTags.includes(tag))
+    }
+    return true
+  })
+
+  console.log('filteredData', filteredNodes)
+
   // HEADER
   const subHeaderComponent = useMemo(() => {
     return (
@@ -263,7 +290,13 @@ const ProductTable = ({
           />
           {/* FILTER PRODUCTS */}
           {!signedUrlParams && (
-            <ProdFilterMenu filters={filters} setFilters={setFilters} />
+            <ProdFilterMenu
+              filters={filters}
+              setFilters={setFilters}
+              filterMode={filterMode}
+              setFilterMode={setFilterMode}
+              setSelectedTags={setSelectedTags}
+            />
           )}
         </Stack>
         <Stack direction={'row'} spacing={3} alignItems={'center'}>
@@ -327,6 +360,7 @@ const ProductTable = ({
     signedUrlParams,
     filters,
     setFilters,
+    filterMode,
     shouldShowDemoFeatures,
     isGithubConfigSaved,
     onGithubOpen,
@@ -594,7 +628,10 @@ const ProductTable = ({
                 <MenuItem
                   position={'relative'}
                   closeOnSelect={false}
-                  onMouseEnter={() => setOpenTagMenu(true)}
+                  onMouseEnter={() => {
+                    setOpenTagMenu(true)
+                    setActiveRow(row)
+                  }}
                   onMouseLeave={() => setOpenTagMenu(false)}
                   isDisabled={!enabled || !canEditProduct}
                 >
@@ -673,7 +710,7 @@ const ProductTable = ({
 
   const dataTableProps = {
     columns: columns,
-    data: data || [],
+    data: filterMode === 'AND' ? filteredNodes : data,
     onSort: handleSort,
     customStyles: customStyles(headColor, dividerColor),
     defaultSortFieldId: field,
