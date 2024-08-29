@@ -251,7 +251,6 @@ const OrgTable = ({ data, activeOrg }) => {
         const { tier } = row
         return (
           <Tag
-            hidden={!tier}
             width={'100px'}
             variant='subtle'
             colorScheme={tier === 'enterprise' ? 'green' : 'blue'}
@@ -262,7 +261,8 @@ const OrgTable = ({ data, activeOrg }) => {
           </Tag>
         )
       },
-      wrap: true
+      wrap: true,
+      omit: true
     },
     {
       id: 'UPDATED_AT',
