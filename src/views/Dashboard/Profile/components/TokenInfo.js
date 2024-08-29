@@ -7,28 +7,22 @@ import 'react-datetime/css/react-datetime.css'
 import { getFullDateAndTime } from 'utils'
 import { customStyles } from 'utils'
 
-import { AddIcon } from '@chakra-ui/icons'
+import { AddIcon, CopyIcon } from '@chakra-ui/icons'
 import {
-  Button,
   Checkbox,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
+  Icon,
   IconButton,
   Input,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Portal,
+  Progress,
   Stack,
   Tag,
   TagLabel,
@@ -41,6 +35,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkModal from 'components/LynkModal'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import useQueryParam from 'hooks/useQueryParam'
@@ -52,6 +47,7 @@ import {
   updateApiToken
 } from 'graphQL/Mutation'
 
+import { BiCheck, BiShieldQuarter } from 'react-icons/bi'
 import { FaEllipsisV } from 'react-icons/fa'
 
 const GetApiKeys = gql`
@@ -86,6 +82,7 @@ const TokenInfo = () => {
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const borderColor = useColorModeValue('gray.200', 'gray.600')
 
   const { data, loading } = useQuery(GetApiKeys, {
     skip: !orgView || activetab !== 'security tokens'
@@ -409,6 +406,35 @@ const TokenInfo = () => {
     }
   ]
 
+  const onButtonClick =
+    token !== '' ? handleSubmit : activeRow ? handleUpdate : handleCreate
+
+  const modalTitle = activeRow
+    ? activeRow.notes.length > 20
+      ? `${activeRow.notes.substring(0, 20)}...`
+      : activeRow.notes
+    : 'Create Security Token'
+
+  const buttonName =
+    token !== ''
+      ? 'Done'
+      : activeRow
+        ? 'Update'
+        : isLoading
+          ? 'Creating...'
+          : 'Create'
+
+  const isButtonDisabled =
+    token !== ''
+      ? token === ''
+      : activeRow
+        ? !isValidDate
+        : !keyName ||
+          (selectedDate !== '' && !isValid(selectedDate)) ||
+          isLoading ||
+          error !== '' ||
+          !isValidDate
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
@@ -428,138 +454,107 @@ const TokenInfo = () => {
       </Flex>
 
       {isOpen && (
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>
-              {activeRow
-                ? activeRow.notes.length > 20
-                  ? `${activeRow.notes.substring(0, 20)}...`
-                  : activeRow.notes
-                : 'Create Security Token'}
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              {!activeRow && (
-                <FormControl
-                  mb={5}
-                  isRequired
-                  isInvalid={keyName !== '' && error !== ''}
-                >
-                  <FormLabel mb={1} htmlFor='keyName'>
-                    Token Name
-                  </FormLabel>
-                  <Input
-                    type='text'
-                    id='keyName'
-                    name='keyName'
-                    value={keyName}
-                    minLength={4}
-                    maxLength={128}
-                    onBlur={onTokenBlur}
-                    onChange={handleChange}
-                    isDisabled={token !== ''}
-                  />
-                  <FormErrorMessage>{error}</FormErrorMessage>
-                </FormControl>
+        <LynkModal
+          isOpen={isOpen}
+          onClose={onClose}
+          onSubmit={onButtonClick}
+          title={modalTitle}
+          Icon={BiShieldQuarter}
+          disabled={isButtonDisabled}
+          buttonText={buttonName}
+        >
+          {!activeRow && (
+            <FormControl
+              mb={5}
+              isRequired
+              isInvalid={keyName !== '' && error !== ''}
+            >
+              <FormLabel fontSize={12} htmlFor='keyName'>
+                Token Name
+              </FormLabel>
+              <Input
+                type='text'
+                id='keyName'
+                name='keyName'
+                value={keyName}
+                minLength={4}
+                maxLength={128}
+                onBlur={onTokenBlur}
+                onChange={handleChange}
+                isDisabled={token !== ''}
+              />
+              <FormErrorMessage>{error}</FormErrorMessage>
+            </FormControl>
+          )}
+          {!noExpire && (
+            <FormControl mb={5} isRequired isInvalid={!isValidDate}>
+              <FormLabel fontSize={12} htmlFor='expire'>
+                Expiration Date
+              </FormLabel>
+              <Datetime
+                value={selectedDate}
+                closeOnSelect={true}
+                className={react_datatime}
+                onChange={handleDateChange}
+                inputProps={{
+                  placeholder: 'Select Date and Time',
+                  disabled: token !== '',
+                  onCopy: (e) => e.preventDefault(),
+                  onPaste: (e) => e.preventDefault(),
+                  style: {
+                    background: 'none'
+                  }
+                }}
+              />
+              {!isValidDate && (
+                <FormErrorMessage>
+                  Please enter a valid datetime
+                </FormErrorMessage>
               )}
-              {!noExpire && (
-                <FormControl mb={5} isRequired isInvalid={!isValidDate}>
-                  <FormLabel mb={1} htmlFor='expire'>
-                    Expiration Date
-                  </FormLabel>
-                  <Datetime
-                    value={selectedDate}
-                    closeOnSelect={true}
-                    className={react_datatime}
-                    onChange={handleDateChange}
-                    inputProps={{
-                      placeholder: 'Select Date and Time',
-                      disabled: token !== '',
-                      onCopy: (e) => e.preventDefault(),
-                      onPaste: (e) => e.preventDefault(),
-                      style: {
-                        background: 'none'
-                      }
-                    }}
-                  />
-                  {!isValidDate && (
-                    <FormErrorMessage>
-                      Please enter a valid datetime
-                    </FormErrorMessage>
-                  )}
-                </FormControl>
-              )}
-              <FormControl mb={5}>
-                <Checkbox
-                  isChecked={noExpire}
-                  onChange={handleExpireChange}
-                  isDisabled={token !== ''}
-                >
-                  No Expiration
-                </Checkbox>
+            </FormControl>
+          )}
+          <FormControl mb={5}>
+            <Checkbox
+              isChecked={noExpire}
+              onChange={handleExpireChange}
+              isDisabled={token !== ''}
+            >
+              <Text fontSize={12}>No Expiration</Text>
+            </Checkbox>
+          </FormControl>
+          {isLoading && <Progress size='xs' isIndeterminate />}
+          {token !== '' && (
+            <Stack direction={'row'} alignItems={'center'}>
+              <FormControl>
+                <Input type={'text'} defaultValue={token} readOnly />
               </FormControl>
-              {token !== '' && (
-                <>
-                  <FormControl my={5}>
-                    <Input type={'text'} defaultValue={token} readOnly />
-                  </FormControl>
-                  {/* ACTION */}
-                  <Stack direction={'row'} alignItems={'center'}>
-                    <Button
-                      variant='solid'
-                      colorScheme={'blue'}
-                      onClick={() => key.onCopy()}
-                    >
-                      {key.hasCopied ? 'Copied!' : 'Copy'}
-                    </Button>
-                  </Stack>
-                </>
-              )}
-            </ModalBody>
-
-            <ModalFooter>
-              {activeRow && (
-                <Button
-                  variant='solid'
-                  colorScheme='blue'
-                  onClick={handleUpdate}
-                  isDisabled={!isValidDate}
-                >
-                  Update
-                </Button>
-              )}
-
-              {token !== '' ? (
-                <Button
-                  variant='solid'
-                  colorScheme='blue'
-                  disabled={token === ''}
-                  onClick={handleSubmit}
-                >
-                  Done
-                </Button>
-              ) : (
-                !activeRow && (
-                  <Button
-                    variant='solid'
-                    colorScheme='blue'
-                    isDisabled={
-                      !keyName ||
-                      (selectedDate !== '' && !isValid(selectedDate)) ||
-                      isLoading ||
-                      error !== '' ||
-                      !isValidDate
-                    }
-                    onClick={handleCreate}
-                  >
-                    {isLoading ? 'Creating...' : 'Create'}
-                  </Button>
-                )
-              )}
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+              {/* ACTION */}
+              <Tooltip
+                label={key.hasCopied ? 'Copied!' : 'Copy'}
+                closeOnClick={false}
+                hasArrow
+                placement='top'
+              >
+                <IconButton
+                  border='1px solid'
+                  colorScheme='white'
+                  borderColor={borderColor}
+                  onClick={() => {
+                    key.onCopy()
+                  }}
+                  icon={
+                    <Icon
+                      color={'#A0AEC0'}
+                      w={6}
+                      h={6}
+                      as={key.hasCopied ? BiCheck : CopyIcon}
+                    />
+                  }
+                />
+              </Tooltip>
+            </Stack>
+          )}
+        </LynkModal>
       )}
     </>
   )
