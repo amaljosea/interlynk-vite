@@ -624,7 +624,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                       )}
                     </FormControl>
                     {/* OPERATOR */}
-                    <FormControl width={'20%'}>
+                    <FormControl width={'30%'}>
                       <Select
                         id='operator'
                         name='operator'

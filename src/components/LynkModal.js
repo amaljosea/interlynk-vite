@@ -66,7 +66,7 @@ const LynkModal = ({
         </ModalHeader>
         <ModalCloseButton marginTop={1.5} />
         <Divider />
-        <ModalBody paddingInline={'16px'} marginBlock={4} overflow={'scroll'}>
+        <ModalBody paddingInline={'16px'} marginBlock={4}>
           {children}
         </ModalBody>
         <Divider />
