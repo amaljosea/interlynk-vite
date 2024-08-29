@@ -75,13 +75,13 @@ const VulnInfo = () => {
             <Icon as={FaBug} h={'64px'} w={'64px'} color='blue.300' />
             <Flex direction={'column'} gap={0.5}>
               {/* PRODUCT TITLE */}
-              <Link to={linkURl(source, vulnId)} target={'_blank'}>
+              <Link to={linkURl(source, vuln?.vulnId)} target={'_blank'}>
                 <Text
                   fontWeight={'semibold'}
                   fontSize={18}
                   _hover={{ color: 'blue.500' }}
                 >
-                  {vulnId}
+                  {vuln?.vulnId}
                 </Text>
               </Link>
               <Text fontSize={'sm'} my={0.5}>
