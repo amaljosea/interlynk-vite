@@ -55,7 +55,7 @@ const ComplianceChecks = ({
   }
 
   const onCheck = (title) => {
-    const result = complianceData.find((item) => item?.title === title)
+    const result = complianceData?.find((item) => item?.title === title)
     return result?.desc
   }
 

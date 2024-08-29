@@ -829,7 +829,20 @@ export const complianceData = [
     )
   },
   {
-    title: `Component Support Level`,
-    desc: `...`
+    title: `Component support level`,
+    desc: (
+      <Stack>
+        <Text>
+          {`Component Support attribute describes the level of support provided
+          through monitoring and maintenance.`}
+        </Text>
+        <Text>
+          {`To find all components that are missing support details, go to Checks
+          Tab and filter for "SB-HC-25: Component has support level".`}
+        </Text>
+        <Text>{`To resolve this, select support level for each component using Component
+        Tab > Edit Components > Details > Support Level`}</Text>
+      </Stack>
+    )
   }
 ]
