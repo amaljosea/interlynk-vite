@@ -1,7 +1,7 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { getFullDateAndTime, timeSince } from 'utils'
+import { useParams } from 'react-router-dom'
+import { getFullDateAndTime, timeSince, truncatedValue } from 'utils'
 import SbomActions from 'views/Sbom/components/SbomActions'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
@@ -58,20 +58,13 @@ const SettingsTag = ({ icon, label, color }) => {
 }
 
 const SbomDetails = ({ sbomData }) => {
-  const navigate = useNavigate()
-  const partsContext = usePartsContext()
   const params = useParams()
+  const partsContext = usePartsContext()
+  const { sbomHookData } = useGlobalQueryContext()
   const projectId = params.productid
   const sbomId = params.sbomid
 
-  const { sbomHookData } = useGlobalQueryContext()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
-
-  const mainText = useColorModeValue('blue.500', 'blue.300')
-
-  const filterText = (item) => {
-    return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
-  }
 
   const {
     projectVersion,
@@ -127,10 +120,6 @@ const SbomDetails = ({ sbomData }) => {
     partsContext.pop()
   }
 
-  const { name: projectGroupName, loading } = useProjectGroup({
-    projectGroupId: params.productgroupid
-  })
-
   const {
     qualityScore,
     healthScore,
@@ -139,6 +128,16 @@ const SbomDetails = ({ sbomData }) => {
     sbomId,
     projectId: projectId,
     skip: !shouldShowDemoFeatures
+  })
+
+  const mainText = useColorModeValue('blue.500', 'blue.300')
+
+  const filterText = (item) => {
+    return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
+  }
+
+  const { name: projectGroupName, loading } = useProjectGroup({
+    projectGroupId: params.productgroupid
   })
 
   useEffect(() => {
@@ -168,8 +167,8 @@ const SbomDetails = ({ sbomData }) => {
           >
             <GridItem colSpan={8}>
               <Breadcrumb
-                separator={<FaLongArrowAltRight color='darkgray' />}
                 fontSize={'sm'}
+                separator={<FaLongArrowAltRight color='darkgray' />}
               >
                 {!loading &&
                   partsContext.isParts &&
@@ -180,21 +179,14 @@ const SbomDetails = ({ sbomData }) => {
                       versionName: sbomHookData.versionName,
                       url: null
                     }
-                  ].map((part, index) => {
+                  ].map((part) => {
                     return (
                       <BreadcrumbItem
                         isCurrentPage={!!part.url}
                         key={part.url}
                         color={mainText}
                       >
-                        <BreadcrumbLink
-                          onClick={() => {
-                            if (part.url) {
-                              partsContext.goTo(index)
-                              navigate(part.url)
-                            }
-                          }}
-                        >
+                        <BreadcrumbLink _hover={{ textDecoration: 'none' }}>
                           {filterText(part.projectGroupName)} (
                           {filterText(part.versionName)})
                         </BreadcrumbLink>
@@ -209,10 +201,14 @@ const SbomDetails = ({ sbomData }) => {
                 alignItems={'center'}
                 fontWeight={'semibold'}
               >
-                {name && <Text fontSize={22}>{name}</Text>}
+                {name && (
+                  <Text fontSize={22} wordBreak={'break-all'}>
+                    {truncatedValue(name, 40)}
+                  </Text>
+                )}
                 {version && <Text fontSize={22}>:</Text>}
-                <Text mr={2} fontSize={22}>
-                  {projectVersion}
+                <Text mr={2} fontSize={22} wordBreak={'breal-all'}>
+                  {truncatedValue(projectVersion, 40)}
                 </Text>
                 <Tooltip label='Lifecycle stage' fontSize='md'>
                   <Tag

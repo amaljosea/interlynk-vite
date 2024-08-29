@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { permissionList } from 'utils'
 
 import { ChevronRightIcon } from '@chakra-ui/icons'
@@ -26,6 +26,7 @@ import ProjectGroupBreadcrumb from './ProjectGroupBreadcrumb'
 import VersionBreadcrumb from './VersionBreadcrumb'
 
 export default function AdminNavbar(props) {
+  const navigate = useNavigate()
   const partsContext = usePartsContext()
   const { setUserPermissions } = useGlobalState()
   const { sbomHookData, orgView } = useGlobalQueryContext()
@@ -62,9 +63,17 @@ export default function AdminNavbar(props) {
   let mainText = useColorModeValue('gray.700', 'gray.200')
   let secondaryText = useColorModeValue('gray.400', 'gray.200')
 
-  const { name: projectGroupName, projects } = useProjectGroup({
+  const {
+    name: projectGroupName,
+    projects,
+    loading
+  } = useProjectGroup({
     projectGroupId: params.productgroupid
   })
+
+  const filterText = (item) => {
+    return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
+  }
 
   return (
     <Grid
@@ -96,6 +105,36 @@ export default function AdminNavbar(props) {
           <BreadcrumbItem color={mainText} textTransform={'capitalize'}>
             <Link to={`/${path}/${category}`}>{category}</Link>
           </BreadcrumbItem>
+          {!loading &&
+            partsContext.isParts &&
+            [
+              ...partsContext.parts,
+              {
+                projectGroupName: projectGroupName,
+                versionName: sbomHookData.versionName,
+                url: null
+              }
+            ].map((part, index) => {
+              return (
+                <BreadcrumbItem
+                  isCurrentPage={!!part.url}
+                  key={part.url}
+                  color={mainText}
+                >
+                  <BreadcrumbLink
+                    onClick={() => {
+                      if (part.url) {
+                        partsContext.goTo(index)
+                        navigate(part.url)
+                      }
+                    }}
+                  >
+                    {filterText(part.projectGroupName)} (
+                    {filterText(part.versionName)})
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+              )
+            })}
           {projectGroupName && prodID && !partsContext.isParts && (
             <BreadcrumbItem
               color={mainText}

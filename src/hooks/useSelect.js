@@ -2,6 +2,7 @@ import { useColorModeValue } from '@chakra-ui/system'
 
 export const useSelect = (type) => {
   const isBreadcrumb = type === 'breadcrumb'
+  const isVersion = type === 'version'
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
   const optionColor = useColorModeValue('#718096', '#A0AEC0')
@@ -79,8 +80,8 @@ export const useSelect = (type) => {
     valueContainer: (provided) => {
       return {
         ...provided,
-        height: isBreadcrumb ? '32px' : '39px'
-        // padding: isBreadcrumb ? '1px 5px' : '5px 10px'
+        height: isBreadcrumb ? '32px' : '39px',
+        paddingLeft: isVersion ? '36px' : 'auto'
       }
     }
   }

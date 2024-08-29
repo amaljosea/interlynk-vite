@@ -14,7 +14,7 @@ import { truncatedValue } from 'utils'
 import { ProductGeneralTabs } from 'utils/TabsObjects'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Alert,
   AlertDescription,
@@ -42,6 +42,7 @@ import {
   ModalOverlay,
   Portal,
   Select,
+  SimpleGrid,
   Stack,
   Tag,
   TagLabel,
@@ -418,70 +419,45 @@ const Parts = () => {
       selector: (row) => {
         const { part, vulnRunStatus } = row
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-          productgroupid: part.project.projectGroup.id,
-          productid: part.project.id,
-          sbomid: part.id,
+          productgroupid: part?.project?.projectGroup?.id,
+          productid: part?.project?.id,
+          sbomid: part?.id,
           paramsObj: {
             tab: 'vulnerabilities',
             parts: true
           }
         })
         return (
-          <Stack fontWeight={'medium'} direction={'row'}>
-            <Link to={link}>
-              <VulnBadge
-                color='red'
-                label='Critical'
-                onClick={() => onFilterSev(part, ['critical'])}
-                status={vulnRunStatus}
-              >
+          <SimpleGrid gap={1} width={'100%'} columns={5}>
+            <Link to={link} onClick={() => onFilterSev(part, ['critical'])}>
+              <VulnBadge color='red' label='Critical' status={vulnRunStatus}>
                 {part?.stats?.vulnStats?.critical || 0}
               </VulnBadge>
             </Link>
-            <Link to={link}>
-              <VulnBadge
-                color='orange'
-                label='High'
-                onClick={() => onFilterSev(part, ['high'])}
-                status={vulnRunStatus}
-              >
+            <Link to={link} onClick={() => onFilterSev(part, ['high'])}>
+              <VulnBadge color='orange' label='High' status={vulnRunStatus}>
                 {part?.stats?.vulnStats?.high || 0}
               </VulnBadge>
             </Link>
-            <Link to={link}>
-              <VulnBadge
-                color='yellow'
-                label='Medium'
-                onClick={() => onFilterSev(part, ['medium'])}
-                status={vulnRunStatus}
-              >
+            <Link to={link} onClick={() => onFilterSev(part, ['medium'])}>
+              <VulnBadge color='yellow' label='Medium' status={vulnRunStatus}>
                 {part?.stats?.vulnStats?.medium || 0}
               </VulnBadge>
             </Link>
-            <Link to={link}>
-              <VulnBadge
-                color='green'
-                label='Low'
-                onClick={() => onFilterSev(part, ['low'])}
-                status={vulnRunStatus}
-              >
+            <Link to={link} onClick={() => onFilterSev(part, ['low'])}>
+              <VulnBadge color='green' label='Low' status={vulnRunStatus}>
                 {part?.stats?.vulnStats?.low || 0}
               </VulnBadge>
             </Link>
-            <Link to={link}>
-              <VulnBadge
-                color='gray'
-                label='Unknown'
-                onClick={() => onFilterSev(part, ['unknown'])}
-                status={vulnRunStatus}
-              >
+            <Link to={link} onClick={() => onFilterSev(part, ['unknown'])}>
+              <VulnBadge color='gray' label='Unknown' status={vulnRunStatus}>
                 {part?.stats?.vulnStats?.unknown || 0}
               </VulnBadge>
             </Link>
-          </Stack>
+          </SimpleGrid>
         )
       },
-      width: '30%'
+      width: '26.8%'
     },
     {
       id: 'STATUS',

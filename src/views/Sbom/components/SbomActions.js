@@ -1,19 +1,20 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import ReactSelect from 'react-select'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
-import { Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
+import { DeleteIcon, EditIcon, SearchIcon } from '@chakra-ui/icons'
+import { Box, Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
-import LynkSelect from 'components/LynkSelect'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useSelect } from 'hooks/useSelect'
 
 import { sbomDelete } from 'graphQL/Mutation'
 import { recheckHealth } from 'graphQL/Mutation'
@@ -212,20 +213,35 @@ const SbomActions = ({ sbom }) => {
     })
   }
 
+  const { style } = useSelect('version')
+
   return (
     <Flex gap={3} alignItems={'flex-end'} justifyContent={'flex-end'}>
       {/* SBOM VERSIONS */}
-      <div className='search-version'>
-        <LynkSelect
+      <Box className='search-version' pos={'relative'}>
+        <SearchIcon
+          top={3}
+          left={3}
+          zIndex={111}
+          color='#60686F'
+          pos={'absolute'}
+        />
+        <ReactSelect
           type='text'
           name='versions'
+          styles={style}
           value={selectedVersion}
+          className='react-select'
           onChange={handleSBOMChange}
           placeholder='Search versions'
+          components={{
+            DropdownIndicator: () => null,
+            IndicatorSeparator: () => null
+          }}
           options={signedUrlParams ? uniqShareVersions : uniqVersions}
           isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
         />
-      </div>
+      </Box>
       <Flex direction={'row'} gap={3} justifyContent='flex-end'>
         {/* UPDATE PRIMARY COMPONENT */}
         <Tooltip label='Edit'>
