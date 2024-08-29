@@ -123,7 +123,7 @@ const Compliance = () => {
               <Text fontSize={'sm'} fontWeight={'medium'}>
                 Score
               </Text>
-              <Button fontSize={'xs'} size='sm' cursor={'default'}>
+              <Button size='sm' fontSize={'xs'} onClick={() => onCheck(index)}>
                 {item?.score}
               </Button>
             </Flex>
