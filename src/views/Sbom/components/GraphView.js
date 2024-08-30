@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import React, { useCallback, useEffect, useState } from 'react'
 import Tree from 'react-d3-tree'
 import { useParams } from 'react-router-dom'
@@ -9,7 +9,6 @@ import {
   Flex,
   IconButton,
   Stack,
-  Tag,
   Text,
   Tooltip,
   useColorModeValue
@@ -37,19 +36,17 @@ export const useCenteredTree = (defaultTranslate = { x: 0, y: 0 }) => {
   return [dimensions, translate, containerRef]
 }
 
-const renderForeignObjectNode = ({
+const CustomNode = ({
   nodeDatum,
   toggleNode,
   foreignObjectProps,
   activeComp,
   bgColor,
-  textColor,
-  component
+  textColor
 }) => {
-  const result = component !== '' && nodeDatum?.name?.includes(component)
   return (
-    <g transform='translate(-56,-50)'>
-      <svg xmlns='http://www.w3.org/2000/svg' onClick={toggleNode}>
+    <g transform='translate(-56,-50)' onClick={toggleNode}>
+      <svg xmlns='http://www.w3.org/2000/svg'>
         <circle cx='50' cy='50' r='25' fill='dodgerBlue' stroke='transparent' />
         <text
           x='50'
@@ -77,8 +74,8 @@ const renderForeignObjectNode = ({
             position={'relative'}
             fontWeight={'medium'}
             wordBreak={'break-all'}
-            bg={result ? 'blue.500' : bgColor}
-            color={result ? 'gray.50' : textColor}
+            bg={bgColor}
+            color={textColor}
           >
             <Stack direction={'column'}>
               <Text
@@ -90,9 +87,9 @@ const renderForeignObjectNode = ({
                 {nodeDatum?.name}
               </Text>
               {activeComp === null && !nodeDatum?.attributes?.version && (
-                <Tag size='sm' width={'fit-content'}>
+                <Text color={'gray.500'} width={'fit-content'}>
                   Primary
-                </Tag>
+                </Text>
               )}
             </Stack>
             {nodeDatum.attributes?.version && (
@@ -117,7 +114,6 @@ const GraphView = ({ data, activeComp }) => {
 
   const [treeView, setTreeView] = useState(null)
   const [filterText, setFilterText] = useState('')
-  const [component, setComponent] = useState('')
   const [zoom, setZoom] = useState(Number(0.6))
   const position = { x: 20, y: 250 }
   const [containerRef] = useCenteredTree()
@@ -141,6 +137,9 @@ const GraphView = ({ data, activeComp }) => {
       }
     }
   )
+  const { dependsOn, id, name, version } = signedUrlParams
+    ? compDependency?.shareLynkQuery?.component || ''
+    : compDependency?.component || ''
 
   const handleZoomIn = () => setZoom(zoom + Number(0.1))
   const handleZoomOut = () => setZoom(zoom - Number(0.1))
@@ -152,45 +151,37 @@ const GraphView = ({ data, activeComp }) => {
 
   useEffect(() => {
     if (compDependency) {
-      if (signedUrlParams) {
-        const dependsOnNodes =
-          compDependency?.shareLynkQuery?.component?.dependsOn?.map(
-            (relation) => ({
-              name: relation.toComp.name,
-              attributes: { version: relation.toComp.version }
-            })
-          )
-        const data = {
-          name:
-            compDependency?.shareLynkQuery?.component?.name ||
-            compDependency?.shareLynkQuery?.component?.version ||
-            '----',
-          children: dependsOnNodes
+      const dependsOnNodes = dependsOn?.map((relation) => {
+        return {
+          id: relation?.toComp?.id,
+          name: relation?.toComp?.name,
+          attributes: { version: relation?.toComp?.version }
         }
-        setTreeView(data)
-      } else {
-        const dependsOnNodes = compDependency?.component?.dependsOn?.map(
-          (relation) => ({
-            name: relation.toComp.name,
-            attributes: { version: relation.toComp.version }
-          })
-        )
-        const data = {
-          name:
-            compDependency?.component?.name ||
-            compDependency?.component?.version ||
-            '----',
-          children: dependsOnNodes
-        }
-        setTreeView(data)
+      })
+      const data = {
+        id: id,
+        name: name || version || '----',
+        children: dependsOnNodes
       }
+      console.log('data', data)
+
+      setTreeView(data)
     }
-  }, [compDependency, signedUrlParams])
+  }, [compDependency, dependsOn, id, name, version])
 
   // CLEAR SERACH
   const handleClear = () => {
     setFilterText('')
-    setComponent('')
+    const dependsOnNodes = dependsOn?.map((relation) => ({
+      id: relation?.toComp?.id,
+      name: relation?.toComp?.name,
+      attributes: { version: relation?.toComp?.version }
+    }))
+    const data = {
+      name: name || version || '----',
+      children: dependsOnNodes
+    }
+    setTreeView(data)
   }
 
   // ON SEARCH INPUT CHANGE
@@ -207,7 +198,10 @@ const GraphView = ({ data, activeComp }) => {
   const handleSearch = (event) => {
     const { value } = event.target
     if (event.key === 'Enter' && value !== '') {
-      setComponent(value)
+      const result = treeView?.children?.filter((item) =>
+        item?.name?.includes(value)
+      )
+      setTreeView((prev) => ({ ...prev, children: [...result] }))
     }
   }
 
@@ -254,25 +248,24 @@ const GraphView = ({ data, activeComp }) => {
               data={treeView}
               translate={position}
               zoom={Number(zoom)}
-              initialDepth='2'
+              initialDepth='3'
               separation={{ nonSiblings: 1, siblings: 1.2 }}
               depthFactor={350}
               enableLegacyTransitions={true}
               pathFunc={'step'}
-              renderCustomNodeElement={(rd3tProps) =>
-                renderForeignObjectNode({
-                  ...rd3tProps,
-                  nodeDatum: transformNode(
-                    rd3tProps.nodeDatum,
-                    rd3tProps.depth
-                  ),
-                  foreignObjectProps,
-                  activeComp,
-                  bgColor,
-                  textColor,
-                  component
-                })
-              }
+              renderCustomNodeElement={(rd3tProps) => (
+                <CustomNode
+                  {...rd3tProps}
+                  nodeDatum={transformNode(
+                    rd3tProps?.nodeDatum,
+                    rd3tProps?.depth
+                  )}
+                  bgColor={bgColor}
+                  textColor={textColor}
+                  activeComp={activeComp}
+                  foreignObjectProps={foreignObjectProps}
+                />
+              )}
             />
           )}
         </Box>
