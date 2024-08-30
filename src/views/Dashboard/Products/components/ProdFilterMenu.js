@@ -107,7 +107,7 @@ const ProdFilterMenu = ({
           <MenuHeading title={'Labels'} active={labelIds?.length !== 0} />
           <MenuList
             minW={'250px'}
-            maxW={'350px'}
+            maxW={'400px'}
             minH='auto'
             maxH={'320px'}
             overflowY={'scroll'}

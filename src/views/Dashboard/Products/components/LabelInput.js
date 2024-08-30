@@ -76,7 +76,8 @@ const LabelInput = ({ data, setOpen, onOpenLabel, nodes }) => {
             <Tag
               py={1}
               size='sm'
-              width={'fit-content'}
+              width={'full'}
+              wordBreak={'break-all'}
               borderColor={row?.color}
               bg={hexToRGBA(row?.color, 0.5)}
             >
