@@ -1,4 +1,6 @@
+import { useMutation } from '@apollo/client'
 import { useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { complianceData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -25,6 +27,10 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
+import useCustomToast from 'hooks/useCustomToast'
+
+import { recheckHealth } from 'graphQL/Mutation'
+
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 
 const ComplianceChecks = ({
@@ -37,10 +43,14 @@ const ComplianceChecks = ({
   fdaLoading,
   activeTab
 }) => {
+  const params = useParams()
+  const { showToast } = useCustomToast()
   const bgColor = useColorModeValue('white', 'gray.700')
   const tabs = ['NTIA', 'FDA 510(K)', 'BSI TR-03183']
   const [tab, setTab] = useState(activeTab || 0)
   const onTabChange = (value) => setTab(value)
+
+  const [healthRecheck] = useMutation(recheckHealth)
 
   const sbomCategory = ['Timestamp', 'Supplier Name', 'Unique ID', 'Author']
 
@@ -144,6 +154,25 @@ const ComplianceChecks = ({
     )
   }
 
+  const handleSave = () => {
+    showToast({
+      description: 'Checks rescan is in progress',
+      status: 'info'
+    })
+    healthRecheck({
+      variables: {
+        sbomId: params?.sbomid
+      }
+    }).then((res) => {
+      if (res?.data) {
+        showToast({
+          description: 'Health re-check successfully',
+          status: 'success'
+        })
+      }
+    })
+  }
+
   return (
     <Drawer size='sm' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
@@ -165,42 +194,57 @@ const ComplianceChecks = ({
         </DrawerHeader>
         <Divider />
         <DrawerBody p={0}>
-          <Tabs index={tab} onChange={onTabChange}>
-            <TabList
-              position={'fixed'}
-              bg={bgColor}
-              zIndex={1}
-              left={0}
-              right={0}
-            >
-              {tabs.map((item, index) => (
-                <Tab
-                  py={3.5}
-                  key={index}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                  _focus={{ outline: 'none', bg: 'none' }}
-                >
-                  {item}
-                </Tab>
-              ))}
-            </TabList>
-            <TabPanels pos={'relative'} top={14} overflowX={'hidden'}>
-              <TabPanel>
-                <ScoreBoard loading={ntiaLoading} data={ntia} />
-              </TabPanel>
-              <TabPanel>
-                <ScoreBoard loading={fdaLoading} data={fda} />
-              </TabPanel>
-              <TabPanel>
-                <Flex alignItems={'center'} justifyContent={'center'}>
-                  <Text py={24} color={'gray.500'}>
-                    Coming Soon...
-                  </Text>
-                </Flex>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
+          {ntia?.score === 0 && fda?.score === 0 ? (
+            <Stack p={4} spacing={4}>
+              <Text>Run checks to see compliance scores</Text>
+              <Button
+                fontSize={'sm'}
+                w={'fit-content'}
+                variant='outline'
+                colorScheme='blue'
+                onClick={handleSave}
+              >
+                Run
+              </Button>
+            </Stack>
+          ) : (
+            <Tabs index={tab} onChange={onTabChange}>
+              <TabList
+                position={'fixed'}
+                bg={bgColor}
+                zIndex={1}
+                left={0}
+                right={0}
+              >
+                {tabs.map((item, index) => (
+                  <Tab
+                    py={3.5}
+                    key={index}
+                    fontSize={'sm'}
+                    textTransform={'capitalize'}
+                    _focus={{ outline: 'none', bg: 'none' }}
+                  >
+                    {item}
+                  </Tab>
+                ))}
+              </TabList>
+              <TabPanels pos={'relative'} top={14} overflowX={'hidden'}>
+                <TabPanel>
+                  <ScoreBoard loading={ntiaLoading} data={ntia} />
+                </TabPanel>
+                <TabPanel>
+                  <ScoreBoard loading={fdaLoading} data={fda} />
+                </TabPanel>
+                <TabPanel>
+                  <Flex alignItems={'center'} justifyContent={'center'}>
+                    <Text py={24} color={'gray.500'}>
+                      Coming Soon...
+                    </Text>
+                  </Flex>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          )}
         </DrawerBody>
       </DrawerContent>
     </Drawer>

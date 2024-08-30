@@ -31,6 +31,7 @@ const Compliance = () => {
   const textColor = useColorModeValue('gray.600', 'gray.200')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+
   const [activeTab, setActiveTab] = useState(0)
 
   const { data: ntiaResult, loading: ntiaLoading } = useQuery(
@@ -85,8 +86,8 @@ const Compliance = () => {
     }
   ]
 
-  const onCheck = (value) => {
-    setActiveTab(value)
+  const onCheck = (index) => {
+    setActiveTab(index)
     onOpen()
   }
 
@@ -124,7 +125,7 @@ const Compliance = () => {
                 Score
               </Text>
               <Button size='sm' fontSize={'xs'} onClick={() => onCheck(index)}>
-                {item?.score}
+                {item?.score === '0 %' ? 'N/A' : item?.score}
               </Button>
             </Flex>
           </Card>

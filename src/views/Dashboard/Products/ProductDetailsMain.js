@@ -53,7 +53,6 @@ import {
   GetProjectSettings,
   GetVersionsDate
 } from 'graphQL/Queries'
-import { GetOrgName } from 'graphQL/Queries'
 
 import { FaBug, FaRobot, FaTag } from 'react-icons/fa'
 import {
