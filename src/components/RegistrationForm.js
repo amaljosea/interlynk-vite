@@ -227,7 +227,7 @@ const RegistrationForm = () => {
                 size='sm'
                 bg={'transparent'}
                 onClick={handleTogglePassword}
-                icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                icon={showPassword ? <ViewIcon /> : <ViewOffIcon />}
               />
             </InputRightElement>
           </InputGroup>
@@ -258,7 +258,7 @@ const RegistrationForm = () => {
                 size='sm'
                 bg={'transparent'}
                 onClick={handleToggleConfirm}
-                icon={showConfPassword ? <ViewOffIcon /> : <ViewIcon />}
+                icon={showConfPassword ? <ViewIcon /> : <ViewOffIcon />}
               />
             </InputRightElement>
           </InputGroup>

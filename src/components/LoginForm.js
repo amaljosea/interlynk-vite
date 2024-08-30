@@ -4,6 +4,7 @@ import Cookies from 'js-cookie'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
   Alert,
   AlertDescription,
@@ -14,9 +15,13 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
+  IconButton,
   Input,
+  InputGroup,
+  InputRightElement,
   Stack,
-  Text
+  Text,
+  chakra
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -34,8 +39,13 @@ const LoginForm = () => {
   const [email, setEmail] = useState(emailId ? emailId : '')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const [resendInvitation] = useMutation(UserResendConfirmationEmail)
+
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword)
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -141,15 +151,26 @@ const LoginForm = () => {
           </FormControl>
           <FormControl>
             <FormLabel htmlFor='password'>Password</FormLabel>
-            <Input
-              type='password'
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value)
-                setError('')
-              }}
-              placeholder='*******'
-            />
+            <InputGroup>
+              <Input
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  setError('')
+                }}
+                placeholder='*******'
+                type={showPassword ? 'text' : 'password'}
+              />
+              <InputRightElement width='3.1rem'>
+                <IconButton
+                  h='1.75rem'
+                  size='sm'
+                  bg={'transparent'}
+                  onClick={handleTogglePassword}
+                  icon={showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                />
+              </InputRightElement>
+            </InputGroup>
             <Link to={'/reset_password'}>
               <FormHelperText _hover={{ color: 'blue.500' }}>
                 Forgot password ?
@@ -171,6 +192,23 @@ const LoginForm = () => {
                 Register
               </Text>
             </Link>
+          </Stack>
+          <Stack>
+            <Text fontSize={'xs'} color={'gray.500'} textAlign={'center'}>
+              By logging in, you acknowledge that you have read and agree to the
+              <chakra.span color={'blue.600'}>
+                {' '}
+                <Link target='_blank' to={'https://www.interlynk.io/privacy'}>
+                  Privary Policy
+                </Link>
+              </chakra.span>{' '}
+              and{' '}
+              <chakra.span color={'blue.600'}>
+                <Link target='_blank' to={'https://www.interlynk.io/terms'}>
+                  Terms of Service
+                </Link>
+              </chakra.span>
+            </Text>
           </Stack>
         </Stack>
       </form>
