@@ -153,7 +153,7 @@ const Connections = ({ org }) => {
       <Card p={0}>
         <CardHeader p='12px 0' mb='12px'>
           <Text fontSize='lg' fontWeight='bold'>
-            Connected Accounts {org && '(Organization Level)'}
+            Integrations {org && '(Organization Level)'}
           </Text>
         </CardHeader>
         <CardBody px='5px'>

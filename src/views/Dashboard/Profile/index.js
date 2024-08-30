@@ -60,7 +60,7 @@ function Profile() {
     'checks',
     'lists',
     'legal',
-    'connections-org',
+    'integrations-org',
     'plan'
   ]
 
@@ -68,7 +68,7 @@ function Profile() {
     'personal-details',
     'organizations',
     'security tokens',
-    'connections'
+    'integrations'
   ]
 
   const navigate = useNavigate()
