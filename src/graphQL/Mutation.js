@@ -887,6 +887,7 @@ export const UpdateComponent = gql`
     $kind: String
     $name: String
     $description: String
+    $copyright: String
     $version: String
     $group: String
     $licenses: LicenseInput
@@ -903,6 +904,7 @@ export const UpdateComponent = gql`
         sbomId: $sbomId
         kind: $kind
         name: $name
+        copyright: $copyright
         description: $description
         version: $version
         group: $group

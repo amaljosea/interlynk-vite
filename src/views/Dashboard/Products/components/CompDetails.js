@@ -54,6 +54,7 @@ const CompDetails = ({ data, primaryComp }) => {
   const [groupInfo, setGroupInfo] = useState('')
   const [compName, setCompName] = useState('')
   const [compDesc, setCompDesc] = useState('')
+  const [compCopyright, setCompCopyright] = useState('')
   const [compVersion, setCompVersion] = useState('')
   const [compKind, setCompKind] = useState('')
   const [compScope, setCompScope] = useState('')
@@ -104,13 +105,14 @@ const CompDetails = ({ data, primaryComp }) => {
         sbomId: sbomId,
         kind: compKind,
         name: compName,
-        description: compDesc,
-        version: compVersion,
-        group: groupInfo,
         scope: compScope,
-        licenses: { licensesExp: expLicense || '' },
+        group: groupInfo,
         primary: isPrimary,
-        internal: isInternal
+        internal: isInternal,
+        version: compVersion,
+        description: compDesc,
+        copyright: compCopyright,
+        licenses: { licensesExp: expLicense || '' }
       }
     }).then((res) => {
       const { errors } = res?.data?.componentUpdate || ''
@@ -133,8 +135,9 @@ const CompDetails = ({ data, primaryComp }) => {
 
   useEffect(() => {
     if (data) {
-      setGroupInfo(data?.group)``
+      setGroupInfo(data?.group)
       setCompName(data?.name)
+      setCompCopyright(data?.copyright)
       setCompDesc(data?.description)
       setCompVersion(data?.version)
       setCompKind(data?.kind)
@@ -186,6 +189,24 @@ const CompDetails = ({ data, primaryComp }) => {
             placeholder='Add description'
             value={compDesc}
             onChange={(e) => setCompDesc(e.target.value)}
+          />
+        </FormControl>
+        {/* Copyright */}
+        <FormControl isReadOnly={customerView}>
+          <FormLabel htmlFor='copyright' fontSize={'sm'}>
+            <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+              <Text>Copyright</Text>
+              <Tooltip label={onCheck(`Component Copyright`)}>
+                <InfoIcon color={'blue.500'} />
+              </Tooltip>
+            </Flex>
+          </FormLabel>
+          <Textarea
+            size='md'
+            fontSize={'sm'}
+            placeholder='Add copyright'
+            value={compCopyright}
+            onChange={(e) => setCompCopyright(e.target.value)}
           />
         </FormControl>
         {/* Version */}
