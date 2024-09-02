@@ -86,7 +86,7 @@ const SidebarContent = ({ routes }) => {
             className={dashboardView ? name.toLowerCase() : ''}
             to={
               path === '/settings'
-                ? `${layout}${path}?tab=${!orgView ? 'organization' : 'general'}`
+                ? `${layout}${path}?tab=${!orgView ? 'organization' : 'users'}`
                 : layout + path
             }
             onClick={() => handleClick(prop)}

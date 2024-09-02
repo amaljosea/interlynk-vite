@@ -482,6 +482,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
         Icon={TbShieldSearch}
         disabled={errorMessage || error !== '' || isDisabled}
         buttonText={data ? 'Update' : 'Save'}
+        maxW='720px'
       >
         <Flex
           width={'100%'}
@@ -583,14 +584,16 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                     alignItems={'flex-start'}
                     justifyContent={'space-bewteen'}
                   >
-                    <Box hidden={item?.subject === ''}>
-                      <Tooltip label={getLabel(item?.subject)} placement='top'>
+                    <Box>
+                      <Tooltip
+                        label={item?.subject !== '' && getLabel(item?.subject)}
+                        placement='top'
+                      >
                         <Box>
                           <IconButton
                             border='1px solid'
                             colorScheme='white'
                             borderColor={borderColor}
-                            onClick={() => deleteRow(item)}
                             icon={
                               <Icon
                                 color='blue.500'

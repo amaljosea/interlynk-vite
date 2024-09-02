@@ -116,7 +116,8 @@ const PlanTable = () => {
     sendRequest().then((res) => {
       if (res?.data?.enterpriseUpgradeRequest?.success) {
         showToast({
-          description: 'A support request has been created for you. We will contact you within 2-business days.',
+          description:
+            'A support request has been created for you. We will contact you within 2-business days.',
           status: 'success'
         })
         onClose()
@@ -179,7 +180,20 @@ const PlanTable = () => {
         Icon={BalanceIconComponent}
       >
         {/* Main Grid Layout with Three Columns */}
-        <SimpleGrid columns={3} spacing={4}>
+        <SimpleGrid
+          columns={3}
+          spacing={4}
+          maxH={'500px'}
+          overflowY={'scroll'}
+          css={{
+            '&::-webkit-scrollbar': {
+              display: 'none' // Hides the scrollbar in WebKit browsers (Chrome, Safari)
+            },
+            scrollbarWidth: 'none' // Hides the scrollbar in Firefox
+          }}
+          paddingTop={'10px'}
+          paddingBottom={'20px'}
+        >
           {/* Left Column: Feature Names and Titles */}
           <Box p={4} w={'400px'}>
             <Text

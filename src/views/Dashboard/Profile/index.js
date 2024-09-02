@@ -16,7 +16,6 @@ import {
 
 import Card from 'components/Card/Card'
 import LegalTable from 'components/Tables/LegalTable'
-import OrgTable from 'components/Tables/OrgTable'
 import PlanTable from 'components/Tables/PlanTable'
 import RoleTable from 'components/Tables/RoleTable'
 import TeamTable from 'components/Tables/TeamTable'
@@ -32,10 +31,8 @@ import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 import Connections from '../../../components/Connections/Connections'
 import Checks from './components/Checks'
 import Feeds from './components/Feeds'
-import GeneralFeed from './components/GeneralFeed'
 import Header from './components/Header'
 import { InternalComponents } from './components/InternalComponents'
-import PersonalInfo from './components/PersonalInfo'
 import TokenInfo from './components/TokenInfo'
 
 const GetOrganization = gql`
@@ -53,7 +50,6 @@ function Profile() {
   const { orgView, isFreeTier } = useGlobalQueryContext()
 
   const orgTabs = [
-    'general',
     'users',
     'roles',
     'feeds',
@@ -64,12 +60,9 @@ function Profile() {
     'plan'
   ]
 
-  const psTabs = [
-    'personal-details',
-    'organizations',
-    'security tokens',
-    'integrations'
-  ]
+
+  const psTabs = ['security tokens', 'integrations']
+
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -204,9 +197,9 @@ function Profile() {
             </TabList>
             <TabPanels>
               {/* GEENRAL */}
-              <TabPanel>
+              {/*  <TabPanel>
                 <GeneralFeed />
-              </TabPanel>
+              </TabPanel> */}
               {/* TEAMS */}
               <TabPanel display={data ? 'block' : 'none'}>
                 <TeamTable />
@@ -268,19 +261,6 @@ function Profile() {
               ))}
             </TabList>
             <TabPanels>
-              {/* PERSONA DETAILS */}
-              <TabPanel>
-                <PersonalInfo />
-              </TabPanel>
-              {/* ORG DETAILS */}
-              <TabPanel>
-                <OrgTable
-                  isAdmin={isAdmin}
-                  activeOrg={id || null}
-                  data={isAdmin ? allOrgList : myOrgList}
-                />
-              </TabPanel>
-              {/* SECURITY TOKEN */}
               <TabPanel>{<TokenInfo />}</TabPanel>
               <TabPanel>
                 <Connections />

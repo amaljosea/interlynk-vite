@@ -42,6 +42,7 @@ const Connections = ({ org }) => {
   const isGithubConfigSaved = useGithubConfigSaved()
 
   const iconColor = useColorModeValue('#24292f', '#f1f1f1')
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const updateCon = useHasPermission({
     parentKey: 'view_connections',
@@ -151,9 +152,19 @@ const Connections = ({ org }) => {
   return (
     <>
       <Card p={0}>
-        <CardHeader p='12px 0' mb='12px'>
-          <Text fontSize='lg' fontWeight='bold'>
-            Integrations {org && '(Organization Level)'}
+
+        <CardHeader
+          p='12px 0'
+          mb='8px'
+          display={'flex'}
+          flexDirection={'column'}
+        >
+          <Text fontSize='lg' color={textColor} fontWeight='bold'>
+            Connect Apps
+          </Text>
+          <Text fontSize={'sm'}>
+            Integrate with your favorite tools to streamline SBOM management.
+
           </Text>
         </CardHeader>
         <CardBody px='5px'>
@@ -165,6 +176,9 @@ const Connections = ({ org }) => {
                 onConfigure={onJiraOpen}
                 isConnected={greenCheck.jira}
                 color='#0070f3'
+                description={
+                  'Sync tasks within SBOM compliance, streamlining issue tracking and management.'
+                }
               />
             )}
             {!isFreeTier && (
@@ -174,6 +188,9 @@ const Connections = ({ org }) => {
                 onConfigure={onSlackOpen}
                 isConnected={greenCheck.slack}
                 color='#E01E5A'
+                description={
+                  'Get instant SBOM updates in Slack, ensuring real-time compliance monitoring.'
+                }
               />
             )}
 
@@ -184,6 +201,9 @@ const Connections = ({ org }) => {
                 onConfigure={onTeamsOpen}
                 isConnected={greenCheck.teams}
                 color='#6264A7'
+                description={
+                  'Track SBOM changes in Teams, boosting collaboration and compliance efficiency'
+                }
               />
             )}
 
@@ -193,6 +213,9 @@ const Connections = ({ org }) => {
               onConfigure={onEmailOpen}
               isConnected={greenCheck.email}
               color='#FF4500'
+              description={
+                'Receive immediate SBOM alerts via email, staying informed on critical updates.'
+              }
             />
             {org && shouldShowDemoFeatures && (
               <ConnectionCard
@@ -202,6 +225,9 @@ const Connections = ({ org }) => {
                 isConnected={greenCheck.github}
                 isDisabled={!updateCon}
                 color={iconColor}
+                description={
+                  'Monitor SBOM directly in GitHub, simplifying compliance checks within repositories'
+                }
               />
             )}
           </Wrap>

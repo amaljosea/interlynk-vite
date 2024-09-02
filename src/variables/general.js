@@ -2,12 +2,6 @@ import { Stack, Text } from '@chakra-ui/react'
 
 export const settingActions = [
   {
-    id: 'general',
-    name: 'General',
-    section: 'Organization',
-    path: '/vendor/settings?tab=general'
-  },
-  {
     id: 'users',
     name: 'Users',
     section: 'Organization',

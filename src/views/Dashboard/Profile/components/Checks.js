@@ -112,12 +112,13 @@ const Checks = () => {
             size='sm'
             name={id}
             id={id}
-            width={'130px'}
+            width={'100px'}
             value={severity}
             color={textColor}
             isDisabled={!updateOrg}
             onChange={(e) => handleStatusChange(id, e.target.value)}
             bg={sevColor(severity.toLowerCase()) + '.300'}
+            borderRadius={'6px'}
           >
             {options.map((itm, index) => (
               <option key={index} value={itm.value}>
@@ -164,9 +165,13 @@ const Checks = () => {
 
   return (
     <Card p={0}>
-      <CardHeader p='12px 0' mb='8px'>
+      <CardHeader p='12px 0' mb='8px' display={'flex'} flexDirection={'column'}>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
-          SBOM Checks
+          SBOM Check
+        </Text>
+        <Text fontSize={'sm'}>
+          Verify SBOM compliance with essential security, license, and quality
+          checks
         </Text>
       </CardHeader>
       <CardBody>

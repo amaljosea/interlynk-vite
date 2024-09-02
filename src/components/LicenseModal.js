@@ -1,22 +1,13 @@
 import { useMutation } from '@apollo/client'
 
-import {
-  Button,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay
-} from '@chakra-ui/react'
-
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { sbomUpdate } from 'graphQL/Mutation'
 
+import { FaScaleBalanced } from 'react-icons/fa6'
+
 import LicenseField from './Licenses/LicenseField'
+import LynkModal from './LynkModal'
 
 const LicenseModal = ({ data, isOpen, onClose, activeRow }) => {
   const { status, sbom } = activeRow || ''
@@ -41,38 +32,22 @@ const LicenseModal = ({ data, isOpen, onClose, activeRow }) => {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInBottom'>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>{resolved ? 'View' : 'Add'} License</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <LicenseField
-            sbomView={true}
-            resolved={resolved}
-            license={status === 'resolved' ? sbom?.licensesExp : ''}
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Flex
-            gap={2}
-            width={'100%'}
-            justifyContent={'flex-end'}
-            alignItems={'center'}
-          >
-            <Button onClick={onClose}>Cancel</Button>
-            <Button
-              colorScheme='blue'
-              onClick={handleUpdateSBOM}
-              disabled={isInvalidLicense}
-              hidden={resolved}
-            >
-              Save
-            </Button>
-          </Flex>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={handleUpdateSBOM}
+      title={`${resolved ? 'View' : 'Add'} License`}
+      Icon={FaScaleBalanced}
+      disabled={isInvalidLicense}
+      hidden={resolved}
+      buttonText={'Save'}
+    >
+      <LicenseField
+        sbomView={true}
+        resolved={resolved}
+        license={status === 'resolved' ? sbom?.licensesExp : ''}
+      />
+    </LynkModal>
   )
 }
 

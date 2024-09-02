@@ -9,12 +9,14 @@ import { customStyles } from 'utils'
 
 import { AddIcon, CopyIcon } from '@chakra-ui/icons'
 import {
+  Box,
+  Button,
   Checkbox,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Icon,
+  Heading,
   IconButton,
   Input,
   Menu,
@@ -215,7 +217,21 @@ const TokenInfo = () => {
     const defaultDate = new Date()
     defaultDate.setDate(defaultDate.getDate() + 90)
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+        marginBottom={'12px'}
+      >
+        <Box>
+          <Heading as='h2' fontSize={'16px'} mb={1}>
+            Security Tokens
+          </Heading>
+          <Text fontSize={'12px'} color='gray.600'>
+            Secure your organization with essential tokens for data protection
+          </Text>
+        </Box>
+
         {/* NER TOKEN */}
         <Tooltip label='New Token'>
           <IconButton
@@ -345,7 +361,7 @@ const TokenInfo = () => {
             colorScheme={color()}
             textTransform={'capitalize'}
             width={'100%'}
-            borderRadius='full'
+            borderRadius={'6px'}
             alignItems={'center'}
             justifyContent={'center'}
           >

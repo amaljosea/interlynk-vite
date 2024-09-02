@@ -129,8 +129,8 @@ const TeamTable = () => {
   const columns = [
     // NAME
     {
-      id: 'name',
-      name: 'NAME',
+      id: 'email',
+      name: 'EMAIL',
       selector: (row) => {
         const { name, profileImage } = row
         return (
@@ -153,20 +153,9 @@ const TeamTable = () => {
               direction={'row'}
               alignItems={'center'}
             >
-              <Text color={textColor} width={'fit-content'} fontSize={'14px'}>
-                {name}
+              <Text color={textColor} my={2}>
+                {row?.email}
               </Text>
-              {row.email === email && (
-                <Badge
-                  variant='outline'
-                  colorScheme='blue'
-                  py={1}
-                  px={2}
-                  borderRadius={4}
-                >
-                  You
-                </Badge>
-              )}
             </Stack>
           </Flex>
         )
@@ -176,12 +165,29 @@ const TeamTable = () => {
     },
     // AUTH
     {
-      id: 'email',
-      name: 'EMAIL',
+      id: 'name',
+      name: 'NAME',
       selector: (row) => (
-        <Text color={textColor} my={2}>
-          {row?.email}
-        </Text>
+        <Stack
+          spacing={row.name !== '' ? 2 : 0}
+          direction={'row'}
+          align={'center'}
+        >
+          <Text color={textColor} width={'fit-content'} fontSize={'14px'}>
+            {row.name}
+          </Text>
+          {row.email === email && (
+            <Badge
+              variant='outline'
+              colorScheme='blue'
+              py={1}
+              px={2}
+              borderRadius={4}
+            >
+              You
+            </Badge>
+          )}
+        </Stack>
       ),
       wrap: true,
       width: '20%'
@@ -194,7 +200,38 @@ const TeamTable = () => {
         <Text color={textColor} textTransform={'capitalize'}>
           {row?.role?.name || ''}
         </Text>
-      )
+      ),
+      width: '15%'
+    },
+
+    // JOINED DATE
+    {
+      id: 'joinedDate',
+      name: 'JOINED',
+      selector: (row) => {
+        const timeStart = userTimeStart(row)
+        return (
+          <Tooltip label={getFullDateAndTime(timeStart)} placement={'top'}>
+            <Text color={textColor} textTransform={'capitalize'}>
+              {timeStart ? timeSince(timeStart) : ''}
+            </Text>
+          </Tooltip>
+        )
+      },
+      center: true,
+      sortable: true,
+
+      sortFunction: (a, b) => {
+        const aUserStart = userTimeStart(a)
+        const bUserStart = userTimeStart(b)
+        if (!aUserStart && !bUserStart) return 0
+        if (!aUserStart) return 1
+        if (!bUserStart) return -1
+        const dateA = new Date(aUserStart)
+        const dateB = new Date(bUserStart)
+        return dateA - dateB // Sort in descending order
+      },
+      width: '25%'
     },
     // STATUS
     {
@@ -222,34 +259,9 @@ const TeamTable = () => {
             </TagLabel>
           </Tag>
         )
-      }
-    },
-    // JOINED DATE
-    {
-      id: 'joinedDate',
-      name: 'JOINED',
-      selector: (row) => {
-        const timeStart = userTimeStart(row)
-        return (
-          <Tooltip label={getFullDateAndTime(timeStart)} placement={'top'}>
-            <Text color={textColor} textTransform={'capitalize'}>
-              {timeStart ? timeSince(timeStart) : ''}
-            </Text>
-          </Tooltip>
-        )
       },
-      right: 'true',
-      sortable: true,
-      sortFunction: (a, b) => {
-        const aUserStart = userTimeStart(a)
-        const bUserStart = userTimeStart(b)
-        if (!aUserStart && !bUserStart) return 0
-        if (!aUserStart) return 1
-        if (!bUserStart) return -1
-        const dateA = new Date(aUserStart)
-        const dateB = new Date(bUserStart)
-        return dateA - dateB // Sort in descending order
-      }
+      center: true,
+      width: '20%'
     },
     // ACTION
     {
@@ -308,7 +320,7 @@ const TeamTable = () => {
     }
   ]
 
-  // CLEAR SERACH
+  // CLEAR SEARCH
   const handleClear = useCallback(async () => {
     setSearchInput('')
     setFilterText('')

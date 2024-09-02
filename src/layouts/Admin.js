@@ -122,7 +122,7 @@ export default function Admin() {
       name: 'Settings',
       section: 'navigation',
       icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/settings?tab=general')
+      perform: () => navigate('/vendor/settings?tab=users')
     }
   ]
 

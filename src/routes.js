@@ -104,7 +104,7 @@ export const dashRoutes = [
     layout: '/vendor'
   },
   {
-    path: '/settings',
+    path: '/settings?tab=users',
     name: 'Settings',
     icon: <FaRegSun color='inherit' />,
     component: Profile,
