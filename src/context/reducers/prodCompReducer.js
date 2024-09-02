@@ -1,3 +1,11 @@
+const toggleSelection = (currentSelection, payload) => {
+  return payload === 'All'
+    ? []
+    : currentSelection?.includes(payload)
+      ? currentSelection?.filter((item) => item !== payload)
+      : [...currentSelection, payload]
+}
+
 const prodCompReducer = (state, action) => {
   const { type, payload } = action
   switch (type) {
@@ -71,7 +79,7 @@ const prodCompReducer = (state, action) => {
     case 'FILTER_ECOSYSTEM':
       return {
         ...state,
-        ecosystems: [...payload].includes('all') ? [] : payload,
+        ecosystems: toggleSelection(state.ecosystems, payload),
         pageIndex: 1,
         after: '',
         before: ''
@@ -79,7 +87,7 @@ const prodCompReducer = (state, action) => {
     case 'FILTER_KIND':
       return {
         ...state,
-        kinds: [...payload].includes('all') ? [] : payload,
+        kinds: toggleSelection(state.kinds, payload),
         pageIndex: 1,
         after: '',
         before: ''
@@ -87,7 +95,7 @@ const prodCompReducer = (state, action) => {
     case 'FILTER_LICENSE':
       return {
         ...state,
-        licenses: [...payload].includes('all') ? [] : payload,
+        licenses: toggleSelection(state.licenses, payload),
         pageIndex: 1,
         after: '',
         before: ''
@@ -95,7 +103,7 @@ const prodCompReducer = (state, action) => {
     case 'FILTER_SUPPLIER':
       return {
         ...state,
-        suppliers: [...payload].includes('all') ? [] : payload,
+        suppliers: toggleSelection(state.suppliers, payload),
         pageIndex: 1,
         after: '',
         before: ''

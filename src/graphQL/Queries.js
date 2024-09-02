@@ -1688,6 +1688,38 @@ export const GetComponentData = gql`
   }
 `
 
+// GET COMOPONENT TREE
+export const GetComponentTree = gql`
+  query GetComponentTree($id: Uuid!, $sbomId: Uuid!) {
+    component(id: $id, sbomId: $sbomId) {
+      dependencyOf {
+        id
+        relType
+        fromId
+        toId
+        fromComp {
+          id
+          name
+          version
+        }
+        updatedAt
+      }
+      dependsOn {
+        id
+        relType
+        fromId
+        toId
+        toComp {
+          id
+          name
+          version
+        }
+        updatedAt
+      }
+    }
+  }
+`
+
 // GET TOTAL COMPONENTS
 export const GetTotalComponents = gql`
   query GetTotalComponents(
@@ -2035,21 +2067,6 @@ export const AllShareComponents = gql`
             version
           }
         }
-      }
-    }
-  }
-`
-
-// GET COMPONENT FILTER DATA
-export const GetCompFilterData = gql`
-  query GetCompFilterData($projectId: Uuid!, $sbomId: Uuid!) {
-    sbom(projectId: $projectId, sbomId: $sbomId) {
-      id
-      filters {
-        ecosystems
-        supplierNames
-        kinds
-        licenses
       }
     }
   }

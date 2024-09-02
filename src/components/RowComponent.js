@@ -4,11 +4,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { ArrowForwardIcon, ViewIcon } from '@chakra-ui/icons'
 import {
-  Flex,
   Tag,
   TagLabel,
   TagRightIcon,
-  Text,
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
@@ -18,7 +16,6 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { GetComponentData } from 'graphQL/Queries'
 
-import Actions from './Misc/Actions'
 import ComponentCard from './Misc/ComponentCard'
 
 const RowComponent = ({ content }) => {
@@ -31,7 +28,6 @@ const RowComponent = ({ content }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [isHovered, setIsHovered] = useState(false)
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-  const iconColor = useColorModeValue('blue.500', 'blue.300')
 
   const isChnagelog = typeof content === 'string'
   const data = isChnagelog ? activeRow : content
