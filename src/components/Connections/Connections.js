@@ -35,7 +35,7 @@ const Connections = ({ org }) => {
   const { data } = useQuery(org ? GetOrgConnections : GetPersonalConnections, {
     skip: !orgView
       ? true
-      : activetab === 'connections' || activetab === 'connections-org'
+      : activetab === 'integrations' || activetab === 'integrations-org'
         ? false
         : true
   })
