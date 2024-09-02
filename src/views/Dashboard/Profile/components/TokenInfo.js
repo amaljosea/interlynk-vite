@@ -558,14 +558,14 @@ const TokenInfo = () => {
                   onClick={() => {
                     key.onCopy()
                   }}
-                  icon={
-                    <Icon
-                      color={'#A0AEC0'}
-                      w={6}
-                      h={6}
-                      as={key.hasCopied ? BiCheck : CopyIcon}
-                    />
-                  }
+                  //icon={
+                  //   <Icon
+                  //     color={'#A0AEC0'}
+                  //     w={6}
+                  //     h={6}
+                  //     as={key.hasCopied ? BiCheck : CopyIcon}
+                  //   />
+                  // }
                 />
               </Tooltip>
             </Stack>
