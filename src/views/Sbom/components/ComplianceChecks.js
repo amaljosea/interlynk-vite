@@ -46,6 +46,7 @@ const ComplianceChecks = ({
   const params = useParams()
   const { showToast } = useCustomToast()
   const bgColor = useColorModeValue('white', 'gray.700')
+  const alertBg = useColorModeValue('blue.50', 'gray.800')
   const tabs = ['NTIA', 'FDA 510(K)', 'BSI TR-03183']
   const [tab, setTab] = useState(activeTab || 0)
   const onTabChange = (value) => setTab(value)
@@ -114,46 +115,6 @@ const ComplianceChecks = ({
     )
   }
 
-  const ScoreBoard = ({ data, loading }) => {
-    const sbomData = data?.scoreByCategory?.filter(
-      (item) => !item?.category?.startsWith('Component')
-    )
-    const compData = data?.scoreByCategory?.filter((item) =>
-      item?.category?.startsWith('Component')
-    )
-
-    return (
-      <Flex flexDir={'column'} alignItems={'flex-start'} gap={3}>
-        <Text fontSize={'sm'} fontWeight={'medium'}>
-          Details
-        </Text>
-        {sbomData?.map((item, index) => (
-          <ComplianceReport key={index} item={item} loading={loading} />
-        ))}
-        <Text mt={3} fontSize={'sm'} fontWeight={'medium'}>
-          Component Details
-        </Text>
-        {compData?.map((item, index) => (
-          <ComplianceReport key={index} item={item} loading={loading} />
-        ))}
-        <Divider mt={1} />
-        <Flex
-          mt={1}
-          width={'100%'}
-          alignItems={'center'}
-          justifyContent={'space-between'}
-        >
-          <Text fontSize={'sm'} fontWeight={'medium'}>
-            Score
-          </Text>
-          <Button size='xs' width={'60px'} cursor={'default'}>
-            {Math.round(data?.score)} %
-          </Button>
-        </Flex>
-      </Flex>
-    )
-  }
-
   const handleSave = () => {
     showToast({
       description: 'Checks rescan is in progress',
@@ -173,8 +134,85 @@ const ComplianceChecks = ({
     })
   }
 
+  const RunAlert = () => {
+    return (
+      <Flex
+        p={3}
+        mt={2}
+        gap={3}
+        bg={alertBg}
+        width={'100%'}
+        borderRadius={5}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
+        <Flex gap={2} alignItems={'center'}>
+          <InfoIcon color={'blue.500'} />
+          <Text fontSize={'sm'}>Run checks to see compliance scores</Text>
+        </Flex>
+        <Text
+          fontSize={'sm'}
+          color='blue.600'
+          cursor={'pointer'}
+          onClick={handleSave}
+          fontWeight={'medium'}
+        >
+          Run Checks
+        </Text>
+      </Flex>
+    )
+  }
+
+  const ScoreBoard = ({ data, loading }) => {
+    const sbomData = data?.scoreByCategory?.filter(
+      (item) => !item?.category?.startsWith('Component')
+    )
+    const compData = data?.scoreByCategory?.filter((item) =>
+      item?.category?.startsWith('Component')
+    )
+
+    return (
+      <Flex flexDir={'column'} alignItems={'flex-start'} gap={3}>
+        <Flex
+          gap={3}
+          width={'100%'}
+          flexDir={'column'}
+          hidden={data?.score === 0}
+        >
+          <Text fontSize={'sm'} fontWeight={'medium'}>
+            Details
+          </Text>
+          {sbomData?.map((item, index) => (
+            <ComplianceReport key={index} item={item} loading={loading} />
+          ))}
+          <Text mt={3} fontSize={'sm'} fontWeight={'medium'}>
+            Component Details
+          </Text>
+          {compData?.map((item, index) => (
+            <ComplianceReport key={index} item={item} loading={loading} />
+          ))}
+          <Divider mt={1} />
+        </Flex>
+        <Flex
+          mt={1}
+          width={'100%'}
+          alignItems={'center'}
+          justifyContent={'space-between'}
+        >
+          <Text fontSize={'sm'} fontWeight={'medium'}>
+            Score
+          </Text>
+          <Button size='xs' width={'60px'} cursor={'default'}>
+            {data?.score === 0 ? 'N/A' : `${Math.round(data?.score)} %`}
+          </Button>
+        </Flex>
+        {data?.score === 0 && <RunAlert />}
+      </Flex>
+    )
+  }
+
   return (
-    <Drawer size='sm' isOpen={isOpen} placement='right' onClose={onClose}>
+    <Drawer size='md' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton mt={2} />
@@ -194,57 +232,42 @@ const ComplianceChecks = ({
         </DrawerHeader>
         <Divider />
         <DrawerBody p={0}>
-          {ntia?.score === 0 && fda?.score === 0 ? (
-            <Stack p={4} spacing={4}>
-              <Text>Run checks to see compliance scores</Text>
-              <Button
-                fontSize={'sm'}
-                w={'fit-content'}
-                variant='outline'
-                colorScheme='blue'
-                onClick={handleSave}
-              >
-                Run
-              </Button>
-            </Stack>
-          ) : (
-            <Tabs index={tab} onChange={onTabChange}>
-              <TabList
-                position={'fixed'}
-                bg={bgColor}
-                zIndex={1}
-                left={0}
-                right={0}
-              >
-                {tabs.map((item, index) => (
-                  <Tab
-                    py={3.5}
-                    key={index}
-                    fontSize={'sm'}
-                    textTransform={'capitalize'}
-                    _focus={{ outline: 'none', bg: 'none' }}
-                  >
-                    {item}
-                  </Tab>
-                ))}
-              </TabList>
-              <TabPanels pos={'relative'} top={14} overflowX={'hidden'}>
-                <TabPanel>
-                  <ScoreBoard loading={ntiaLoading} data={ntia} />
-                </TabPanel>
-                <TabPanel>
-                  <ScoreBoard loading={fdaLoading} data={fda} />
-                </TabPanel>
-                <TabPanel>
-                  <Flex alignItems={'center'} justifyContent={'center'}>
-                    <Text py={24} color={'gray.500'}>
-                      Coming Soon...
-                    </Text>
-                  </Flex>
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
-          )}
+          <Tabs index={tab} onChange={onTabChange}>
+            <TabList
+              position={'fixed'}
+              bg={bgColor}
+              zIndex={1}
+              left={0}
+              right={0}
+            >
+              {tabs.map((item, index) => (
+                <Tab
+                  py={3.5}
+                  key={index}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                  _focus={{ outline: 'none', bg: 'none' }}
+                >
+                  {item}
+                </Tab>
+              ))}
+            </TabList>
+            <TabPanels pos={'relative'} top={14} overflowX={'hidden'}>
+              <TabPanel>
+                <ScoreBoard loading={ntiaLoading} data={ntia} />
+              </TabPanel>
+              <TabPanel>
+                <ScoreBoard loading={fdaLoading} data={fda} />
+              </TabPanel>
+              <TabPanel>
+                <Flex alignItems={'center'} justifyContent={'center'}>
+                  <Text py={24} color={'gray.500'}>
+                    Coming Soon...
+                  </Text>
+                </Flex>
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
         </DrawerBody>
       </DrawerContent>
     </Drawer>
