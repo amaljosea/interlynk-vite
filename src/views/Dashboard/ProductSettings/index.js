@@ -37,7 +37,7 @@ import { ProjectSettingUpdate } from 'graphQL/Mutation'
 import { GetJiraProjects } from 'graphQL/Queries'
 
 const Settings = ({ enabled, data, mfc }) => {
-  const { orgView } = useGlobalQueryContext()
+  const { orgView, isFreeTier } = useGlobalQueryContext()
 
   const {
     id,
@@ -264,7 +264,7 @@ const Settings = ({ enabled, data, mfc }) => {
                 ))}
               </Select>
             </FormControl>
-            <FormControl mt={4} width={'400px'}>
+            <FormControl mt={4} width={'400px'} hidden={isFreeTier}>
               <FormLabel>
                 Jira Default Project
                 <Info ml={2} onClick={onCheckJira} />

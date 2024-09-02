@@ -59,6 +59,7 @@ import RowComponent from 'components/RowComponent'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
@@ -289,6 +290,7 @@ const Vulnerabilities = ({ sbomData }) => {
   const activeTab = queryParams.get('tab')
   const customerView = location.pathname.startsWith('/customer')
 
+  const { isFreeTier } = useGlobalQueryContext()
   const { totalRows, prodVulnState, dispatch } = useGlobalState()
   const {
     field,
@@ -863,6 +865,7 @@ const Vulnerabilities = ({ sbomData }) => {
                   (externalUrl) => externalUrl.name === 'issue-tracker'
                 ) ? (
                   <MenuItem
+                    hidden={isFreeTier}
                     isDisabled={!updateCon}
                     onClick={() => {
                       window.open(
@@ -877,6 +880,7 @@ const Vulnerabilities = ({ sbomData }) => {
                   </MenuItem>
                 ) : (
                   <MenuItem
+                    hidden={isFreeTier}
                     isDisabled={!updateCon}
                     onClick={() => {
                       if (jiraConfigWarning) {
