@@ -57,7 +57,11 @@ const LynkModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent maxW={maxW || '600px'} maxH={maxH || ''}>
+      <ModalContent
+        maxW={maxW || '600px'}
+        maxH={maxH || ''}
+        borderRadius='16px'
+      >
         <ModalHeader paddingInline={'16px'}>
           <Flex alignItems='center' gap={3}>
             {Icon && <Icon color='#60686F' />}

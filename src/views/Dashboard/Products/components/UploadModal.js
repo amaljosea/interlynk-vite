@@ -152,7 +152,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
             </AlertTitle>
           </Alert>
         )}
-        <Stack spacing={6} mb={4}>
+        <Stack spacing={6} minHeight='310px'>
           <FormControl>
             <FormLabel fontSize={12}>Environment</FormLabel>
             <Select

@@ -180,7 +180,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
               fontSize={'11px'}
               onClick={handleExpand}
             >
-              {drawerSize === 'md' && '(Expand)'}
+              {drawerSize === 'md' ? '(Expand)' : '(Collapse)'}
             </Link>
           </FormLabel>
           <Textarea
