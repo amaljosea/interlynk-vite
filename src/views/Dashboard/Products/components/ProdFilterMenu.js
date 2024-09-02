@@ -164,10 +164,10 @@ const ProdFilterMenu = ({
               border={`1px solid ${borderColor}`}
             >
               <Text fontSize={'xs'}>
-                Use <Kbd>alt</Kbd> + <Kbd>click/return</Kbd> to exclude labels
+                Use <Kbd>⇧</Kbd> + <Kbd>click/return</Kbd> to exclude labels
               </Text>
               <Text fontSize={'xs'}>
-                or <Kbd>⇧</Kbd> + <Kbd>click/return</Kbd> for logical OR
+                or <Kbd>alt</Kbd> + <Kbd>click/return</Kbd> for logical OR
               </Text>
             </Stack>
           </MenuList>
