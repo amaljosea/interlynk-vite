@@ -68,7 +68,7 @@ function ProductList() {
 
   if (error) {
     return (
-      <Alert mt={32} status='error'>
+      <Alert status='error'>
         <AlertIcon />
         <AlertDescription>
           {displayErrorMessage(error.networkError?.statusCode, error.message)}

@@ -163,7 +163,7 @@ function Profile() {
 
   if (error) {
     return (
-      <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
+      <Flex alignItems={'center'} justifyContent={'center'} gap={2}>
         <WarningTwoIcon color='blue.500' />
         <Text textAlign={'center'} fontSize={14}>
           {displayErrorMessage(error.networkError?.statusCode, error.message)}
