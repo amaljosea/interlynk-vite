@@ -38,6 +38,7 @@ const ProdFilterMenu = ({
 }) => {
   const { enabled, labelIds } = filters || ''
   const iconColor = useColorModeValue('#444', '#f3f3f3')
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const bgColor = useColorModeValue('#fff', '#1A202C')
   const borderColor = useColorModeValue('#E2E8F0', '#2D3748')
 
@@ -56,6 +57,7 @@ const ProdFilterMenu = ({
   }
 
   const { data } = useQuery(GetLabels, {
+    skip: signedUrlParams,
     variables: { first: 100 }
   })
   const { nodes } = data?.labels || ''

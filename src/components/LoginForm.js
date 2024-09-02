@@ -2,15 +2,17 @@ import { useMutation } from '@apollo/client'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
+  AbsoluteCenter,
   Alert,
   AlertDescription,
   AlertIcon,
   Box,
   Button,
+  Divider,
   Flex,
   FormControl,
   FormHelperText,
@@ -20,19 +22,20 @@ import {
   InputGroup,
   InputRightElement,
   Stack,
-  Text,
-  chakra
+  Text
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { UserResendConfirmationEmail } from 'graphQL/Mutation'
 
+import PolicyTerms from './PolicyTerms'
+import SocialLogin from './SocialLogin'
+
 const LoginForm = () => {
   const { showToast } = useCustomToast()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const emailId = queryParams.get('id')
+  const emailId = useQueryParam('id')
 
   const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
 
@@ -111,7 +114,7 @@ const LoginForm = () => {
         <Box mt={4} width={'100%'}>
           <Alert status='error' borderRadius={4}>
             <AlertIcon />
-            <AlertDescription>
+            <AlertDescription fontSize='sm'>
               {error}
               {error ===
                 'You have to confirm your email address before continuing.' && (
@@ -135,7 +138,7 @@ const LoginForm = () => {
       )}
       <form style={{ width: '100%' }} onSubmit={handleSubmit}>
         <Stack py={'1rem'} direction={'column'} gap={3} width={'100%'} mt={2}>
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel htmlFor='email'>Email address</FormLabel>
             <Input
               type='email'
@@ -149,7 +152,7 @@ const LoginForm = () => {
               isReadOnly={emailId}
             />
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel htmlFor='password'>Password</FormLabel>
             <InputGroup>
               <Input
@@ -177,7 +180,12 @@ const LoginForm = () => {
               </FormHelperText>
             </Link>
           </FormControl>
-          <Button width='full' colorScheme='blue' type='submit'>
+          <Button
+            width='full'
+            type='submit'
+            colorScheme='blue'
+            isDisabled={email === '' || password === ''}
+          >
             Log in
           </Button>
           <Stack
@@ -193,23 +201,19 @@ const LoginForm = () => {
               </Text>
             </Link>
           </Stack>
-          <Stack>
-            <Text fontSize={'xs'} color={'gray.500'} textAlign={'center'}>
-              By logging in, you acknowledge that you have read and agree to the
-              <chakra.span color={'blue.600'}>
-                {' '}
-                <Link target='_blank' to={'https://www.interlynk.io/privacy'}>
-                  Privary Policy
-                </Link>
-              </chakra.span>{' '}
-              and{' '}
-              <chakra.span color={'blue.600'}>
-                <Link target='_blank' to={'https://www.interlynk.io/terms'}>
-                  Terms of Service
-                </Link>
-              </chakra.span>
-            </Text>
-          </Stack>
+          <Box position='relative' py={1}>
+            <Divider />
+            <AbsoluteCenter
+              px='2'
+              bg={'white'}
+              fontSize={'xs'}
+              color={'darkgray'}
+            >
+              OR LOGIN WITH
+            </AbsoluteCenter>
+          </Box>
+          <SocialLogin />
+          <PolicyTerms />
         </Stack>
       </form>
     </Flex>

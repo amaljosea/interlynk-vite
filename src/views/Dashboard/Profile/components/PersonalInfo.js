@@ -49,6 +49,7 @@ const PersonalInfo = () => {
   const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
   const textColor = useColorModeValue('gray.700', 'white')
+  const loginType = localStorage.getItem('loginType')
 
   const { setUserName } = useGlobalState()
   const { orgView } = useGlobalQueryContext()
@@ -240,7 +241,7 @@ const PersonalInfo = () => {
               </Button>
             </Flex>
           </GridItem>
-          <GridItem>
+          <GridItem hidden={loginType === 'social'}>
             <Flex
               width={'100%'}
               flexDirection={'column'}
@@ -263,7 +264,7 @@ const PersonalInfo = () => {
                       size='sm'
                       bg={'transparent'}
                       onClick={onToggleOldPass}
-                      icon={showOldPass ? <ViewOffIcon /> : <ViewIcon />}
+                      icon={showOldPass ? <ViewIcon /> : <ViewOffIcon />}
                     />
                   </InputRightElement>
                 </InputGroup>
@@ -285,7 +286,7 @@ const PersonalInfo = () => {
                       size='sm'
                       bg={'transparent'}
                       onClick={onToggleNewPass}
-                      icon={showNewPass ? <ViewOffIcon /> : <ViewIcon />}
+                      icon={showNewPass ? <ViewIcon /> : <ViewOffIcon />}
                     />
                   </InputRightElement>
                 </InputGroup>
@@ -325,7 +326,7 @@ const PersonalInfo = () => {
                       size='sm'
                       bg={'transparent'}
                       onClick={onToggleConfirmPass}
-                      icon={showConfPass ? <ViewOffIcon /> : <ViewIcon />}
+                      icon={showConfPass ? <ViewIcon /> : <ViewOffIcon />}
                     />
                   </InputRightElement>
                 </InputGroup>

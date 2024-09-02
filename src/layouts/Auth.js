@@ -1,28 +1,15 @@
-import DashboardBg from 'assets/img/dashboard.png'
 import InterlynkLogo from 'assets/img/logo.png'
 import Cookies from 'js-cookie'
-import { useEffect, useRef } from 'react'
-// core components
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import {
-  Box,
-  Flex,
-  Image,
-  Img,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalOverlay,
-  Text
-} from '@chakra-ui/react'
+import { Flex, Grid, GridItem, Heading, Img, Text } from '@chakra-ui/react'
 
 import LoginForm from 'components/LoginForm'
 
 export default function Auth() {
   const authToken = Cookies.get('authToken')
   const navigate = useNavigate()
-  const navRef = useRef()
 
   useEffect(() => {
     if (authToken) {
@@ -31,33 +18,49 @@ export default function Auth() {
   }, [authToken, navigate])
 
   return (
-    <Box ref={navRef} w='100%' height={'100vh'} position={'relative'}>
-      <Image
-        src={DashboardBg}
-        width={'100%'}
-        height={'100%'}
-        pos={'absolute'}
-      />
-      <Modal isCentered size={'sm'} isOpen={true}>
-        <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(4px)' />
-        <ModalContent>
-          <ModalBody py={8}>
-            <Flex
-              width={'100%'}
-              alignItems={'center'}
-              justifyContent={'center'}
-              gap={1}
-            >
-              <Img src={InterlynkLogo} w='40px' h='40px' me='5px' />
-              <Text fontSize={'3xl'} fontWeight={600}>
-                Interlynk
-              </Text>
-            </Flex>
-            {/* LOGIN FORM */}
-            <LoginForm />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-    </Box>
+    <Grid width={'100%'} height={'100vh'} templateColumns='repeat(12, 1fr)'>
+      <GridItem
+        p={10}
+        as={Flex}
+        colSpan={8}
+        flexDir='column'
+        alignItems='flex-start'
+        justifyContent='space-between'
+        bgGradient='linear(to-br, #4299e1, #1A365D)'
+      >
+        <Flex width={'100%'} gap={1}>
+          <Img
+            w='40px'
+            h='40px'
+            me='5px'
+            src={InterlynkLogo}
+            filter={'brightness(0) invert(1)'}
+          />
+          <Text fontSize={'3xl'} color={'gray.50'} fontWeight={600}>
+            Interlynk
+          </Text>
+        </Flex>
+        <Heading
+          opacity={0.8}
+          fontSize={'5xl'}
+          color={'blue.200'}
+          fontFamily={'inherit'}
+        >
+          Interlynk automates your SBOM compliance without compromising privacy
+          or control.
+        </Heading>
+      </GridItem>
+      <GridItem
+        p={10}
+        colSpan={4}
+        bg={'white'}
+        display={'flex'}
+        flexDir={'column'}
+        alignItems={'center'}
+        justifyContent={'center'}
+      >
+        <LoginForm />
+      </GridItem>
+    </Grid>
   )
 }

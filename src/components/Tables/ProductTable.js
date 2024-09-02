@@ -187,6 +187,7 @@ const ProductTable = ({
   })
 
   const { data: prodLabels, loading: labelLoading } = useQuery(GetLabels, {
+    skip: signedUrlParams,
     variables: { first: 100 }
   })
   const { nodes } = prodLabels?.labels || ''

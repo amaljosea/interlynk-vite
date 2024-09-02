@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { validPassword } from 'utils'
 
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
@@ -24,14 +24,12 @@ import {
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
+import useQueryParam from 'hooks/useQueryParam'
 
 const ResetForm = () => {
   const { showToast } = useCustomToast()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const emailId = queryParams.get('id')
-  const token = queryParams.get('reset_password_token')
+  const emailId = useQueryParam('id')
+  const token = useQueryParam('reset_password_token')
 
   const resetURL = process.env.REACT_APP_VENDOR_RESET_URL
 
@@ -136,7 +134,6 @@ const ResetForm = () => {
             description: 'Password changed successfully 👍',
             status: 'success'
           })
-          navigate('/auth')
         }
       })
       .catch((error) => {

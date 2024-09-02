@@ -32,7 +32,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
-import { GetOrgName } from 'graphQL/Queries'
 
 const CpeModal = ({
   isOpen,

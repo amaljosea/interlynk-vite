@@ -27,6 +27,7 @@ export const GlobalQueryContextWrapper = ({ children }) => {
   const [isFreeTier, setIsFreeTier] = useState(false)
 
   const { data: orgData, loading: orgQueryLoading } = useQuery(GetOrgName, {
+    fetchPolicy: 'network-only',
     skip: authToken ? false : true
   })
 

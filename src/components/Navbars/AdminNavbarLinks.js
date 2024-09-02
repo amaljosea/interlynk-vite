@@ -52,6 +52,8 @@ export const GetProfilePic = gql`
   query GetProfilePic {
     organization {
       currentUser {
+        name
+        email
         profileImage {
           filename
           url
@@ -77,45 +79,31 @@ export default function HeaderLinks(props) {
   const dashboardView = location.pathname === '/vendor/dashboard'
   const productView = location.pathname === '/vendor/products'
   const signedUrlParams = location.pathname.startsWith('/customer')
-  const name = localStorage.getItem('username')
-  const email = localStorage.getItem('email')
-  const userEmail = localStorage.getItem('userEmail')
 
   const { userName, setUserName } = useGlobalState()
   const { orgView } = useGlobalQueryContext()
 
   const { data: org } = useQuery(GetProfilePic, { skip: signedUrlParams })
   const { currentUser } = org?.organization || ''
-  const { profileImage } = currentUser || ''
+  const { profileImage, name, email } = currentUser || ''
 
   const [fetchOrg, { data }] = useLazyQuery(GetOrgName, {
-    skip: signedUrlParams,
-    fetchPolicy: 'network-only'
+    skip: !orgView || signedUrlParams
   })
 
   const { ...rest } = props
 
   useEffect(() => {
     if (location.pathname.startsWith('/vendor')) {
-      setUserName(name || email)
-    } else if (location.pathname.startsWith('/customer')) {
-      setUserName(userEmail)
+      setUserName(name || '')
     }
-  }, [email, location, name, setUserName, userEmail])
-
-  useEffect(() => {
-    if (!email && location.pathname.startsWith('/vendor')) {
-      logoutUser().then(() => navigate('/auth'))
-    }
-  }, [email, location, navigate])
+  }, [location, name, setUserName])
 
   const handleLogout = async () => {
     await logoutUser()
     setColorMode('light')
     navigate('/auth')
   }
-
-  // const shortcuts = [{ key: 'Ctrl + /', title: 'Search' }]
 
   const detectOS = () => {
     const { userAgent } = window.navigator
@@ -218,7 +206,7 @@ export default function HeaderLinks(props) {
           </MenuButton>
           <MenuList>
             <MenuGroup title=''>
-              <MenuItem>
+              <MenuItem hidden={!name}>
                 <Flex flexDirection='row' alignItems={'flex-start'} gap={3}>
                   <Icon as={FaUser} width={2.5} mt={1} />
                   <Stack direction={'column'} spacing={-1}>
@@ -232,7 +220,7 @@ export default function HeaderLinks(props) {
                   </Stack>
                 </Flex>
               </MenuItem>
-              <MenuDivider hidden={!data?.organization} />
+              <MenuDivider hidden={!name} />
               <Link to={`/vendor/settings?tab=personal-details`}>
                 <MenuItem
                   icon={<SettingsIcon />}
@@ -258,7 +246,7 @@ export default function HeaderLinks(props) {
                   Organizations
                 </MenuItem>
               </Link>
-              <MenuDivider />
+              <MenuDivider hidden={!data?.organization} />
               <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
                 Logout
               </MenuItem>

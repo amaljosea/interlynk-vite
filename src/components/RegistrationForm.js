@@ -1,15 +1,17 @@
 import { useMutation } from '@apollo/client'
 import React, { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { validPassword, validateEmail } from 'utils'
 
 import { CheckCircleIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
+  AbsoluteCenter,
   Alert,
   AlertDescription,
   AlertIcon,
   Box,
   Button,
+  Divider,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -27,6 +29,8 @@ import {
 import useQueryParam from 'hooks/useQueryParam'
 
 import { RegisterUser } from 'graphQL/Mutation'
+
+import SocialLogin from './SocialLogin'
 
 const RegistrationForm = () => {
   const navigate = useNavigate()
@@ -152,6 +156,7 @@ const RegistrationForm = () => {
   return (
     <Flex
       mt={2}
+      width='100%'
       direction={'column'}
       alignItems={'center'}
       justifyContent={'center'}
@@ -166,7 +171,7 @@ const RegistrationForm = () => {
         <Box mt={4} width={'100%'}>
           <Alert status='error' borderRadius={4}>
             <AlertIcon />
-            <AlertDescription>
+            <AlertDescription fontSize={'sm'}>
               {error.map((item, index) => (
                 <Text fontSize={'sm'} key={index}>
                   {item}
@@ -176,8 +181,7 @@ const RegistrationForm = () => {
           </Alert>
         </Box>
       )}
-
-      <Stack py={'1rem'} direction={'column'} gap={2} width={'100%'}>
+      <Stack pt={8} direction={'column'} gap={3} width={'100%'}>
         {/* NAME */}
         <FormControl>
           <FormLabel htmlFor='organization'>Name</FormLabel>
@@ -265,13 +269,13 @@ const RegistrationForm = () => {
           {passError !== '' && <FormErrorMessage>{passError}</FormErrorMessage>}
         </FormControl>
         <Button
-          width='full'
           mt={5}
-          onClick={handleSubmit}
+          width='full'
           colorScheme='blue'
-          disabled={isInvalid || isLoading}
           isLoading={isLoading}
+          onClick={handleSubmit}
           loadingText='Submitting'
+          disabled={isInvalid || isLoading}
         >
           Register
         </Button>
@@ -289,6 +293,18 @@ const RegistrationForm = () => {
             </Text>
           </Link>
         </Stack>
+        <Box position='relative' py={1}>
+          <Divider />
+          <AbsoluteCenter
+            px='2'
+            bg={'white'}
+            fontSize={'xs'}
+            color={'darkgray'}
+          >
+            OR CREATE ACCOUNT WITH
+          </AbsoluteCenter>
+        </Box>
+        <SocialLogin />
       </Stack>
     </Flex>
   )

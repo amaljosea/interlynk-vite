@@ -2,7 +2,6 @@ import DashboardBg from 'assets/img/dashboard.png'
 import InterlynkLogo from 'assets/img/logo.png'
 import Cookies from 'js-cookie'
 import { useEffect, useRef } from 'react'
-// core components
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -38,7 +37,7 @@ export default function Reset() {
         height={'100%'}
         pos={'absolute'}
       />
-      <Modal isCentered size={'sm'} isOpen={true}>
+      <Modal isCentered size={'md'} isOpen={true}>
         <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(4px)' />
         <ModalContent>
           <ModalBody py={8}>

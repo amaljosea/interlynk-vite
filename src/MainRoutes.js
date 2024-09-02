@@ -2,6 +2,7 @@ import { GlobalQueryContextWrapper } from 'context/GlobalQueryContext.js'
 import { PartsContextWrapper } from 'context/PartsContext.js'
 import { ProductUrlContextWrapper } from 'context/ProductUrlContext.js'
 import Cookies from 'js-cookie'
+import Callback from 'layouts/Callback.js'
 import Reset from 'layouts/Reset'
 import Success from 'layouts/Success'
 import React from 'react'
@@ -65,6 +66,7 @@ export const MainRoutes = () => {
         <Route path={`register`} element={<Register />} />
         <Route path={`accept-user-invitation`} element={<Success />} />
         <Route path={`confirmation`} element={<Success />} />
+        <Route path={`oauth_callback`} element={<Callback />} />
         <Route
           path={`vendor`}
           element={

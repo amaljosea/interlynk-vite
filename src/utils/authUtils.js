@@ -12,6 +12,7 @@ export const logoutUser = async () => {
     // Attempt to inform the server about the logout
     await axios.delete(`${logoutURL}`, {
       headers: {
+        credentials: 'include',
         Authorization: authToken
       }
     })
@@ -25,6 +26,7 @@ export const logoutUser = async () => {
     Cookies.remove('signedParamId')
     Cookies.remove('userToken')
     client.clearStore()
+    window.location.href === '/auth'
   }
 }
 
