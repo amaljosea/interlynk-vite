@@ -4,12 +4,14 @@ import { hexToRGBA } from 'utils'
 import {
   Box,
   IconButton,
+  Kbd,
   Menu,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
   Stack,
   Tag,
+  Text,
   useColorModeValue
 } from '@chakra-ui/react'
 
@@ -36,6 +38,8 @@ const ProdFilterMenu = ({
 }) => {
   const { enabled, labelIds } = filters || ''
   const iconColor = useColorModeValue('#444', '#f3f3f3')
+  const bgColor = useColorModeValue('#fff', '#1A202C')
+  const borderColor = useColorModeValue('#E2E8F0', '#2D3748')
 
   const onFilterActive = (value) => {
     setFilters((oldFilter) => ({
@@ -66,10 +70,10 @@ const ProdFilterMenu = ({
   const handleMenuClick = (event, value) => {
     if (event.shiftKey) {
       console.log('Shift key was held down during selection!', value)
-      setFilterMode('OR')
+      setFilterMode('AND')
     } else {
       console.log('No Shift key.', value)
-      setFilterMode('AND')
+      setFilterMode('OR')
     }
     console.log('Selected value:', value)
     if (value !== 'All') {
@@ -106,7 +110,7 @@ const ProdFilterMenu = ({
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Labels'} active={labelIds?.length !== 0} />
           <MenuList
-            minW={'250px'}
+            minW={'280px'}
             maxW={'400px'}
             minH='auto'
             maxH={'320px'}
@@ -146,6 +150,24 @@ const ProdFilterMenu = ({
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
+            <Stack
+              px={3}
+              py={2}
+              left={0}
+              right={0}
+              bottom={-14}
+              bg={bgColor}
+              pos='absolute'
+              borderBottomRadius={5}
+              border={`1px solid ${borderColor}`}
+            >
+              <Text fontSize={'xs'}>
+                Use <Kbd>alt</Kbd> + <Kbd>click/return</Kbd> to exclude labels
+              </Text>
+              <Text fontSize={'xs'}>
+                or <Kbd>⇧</Kbd> + <Kbd>click/return</Kbd> for logical OR
+              </Text>
+            </Stack>
           </MenuList>
         </Menu>
       </Box>

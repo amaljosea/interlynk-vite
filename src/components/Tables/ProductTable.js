@@ -117,7 +117,7 @@ const ProductTable = ({
   const [filterText, setFilterText] = useState(search || '')
 
   const [selectedTags, setSelectedTags] = useState([])
-  const [filterMode, setFilterMode] = useState('AND')
+  const [filterMode, setFilterMode] = useState('OR')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
