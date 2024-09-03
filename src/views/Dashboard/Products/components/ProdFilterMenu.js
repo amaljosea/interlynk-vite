@@ -133,11 +133,11 @@ const ProdFilterMenu = ({
                   icon={
                     filterMode === 'AND' ? (
                       <ItemCheck
-                        icon={<FaCheck size={14} color={iconColor} />}
+                        icon={<RxDotFilled size={16} color={iconColor} />}
                       />
                     ) : (
                       <ItemCheck
-                        icon={<RxDotFilled size={16} color={iconColor} />}
+                        icon={<FaCheck size={14} color={iconColor} />}
                       />
                     )
                   }
@@ -157,17 +157,14 @@ const ProdFilterMenu = ({
               py={2}
               left={0}
               right={0}
-              bottom={-14}
+              bottom={-8}
               bg={bgColor}
               pos='absolute'
               borderBottomRadius={5}
               border={`1px solid ${borderColor}`}
             >
               <Text fontSize={'xs'}>
-                Use <Kbd>⇧</Kbd> + <Kbd>click/return</Kbd> to exclude labels
-              </Text>
-              <Text fontSize={'xs'}>
-                or <Kbd>alt</Kbd> + <Kbd>click/return</Kbd> for logical OR
+                Use <Kbd>⇧</Kbd> + <Kbd>click/return</Kbd> for logical AND
               </Text>
             </Stack>
           </MenuList>
