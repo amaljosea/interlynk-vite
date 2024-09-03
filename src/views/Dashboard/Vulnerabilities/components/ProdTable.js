@@ -160,7 +160,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
       ),
       wrap: true,
       right: 'true',
-      width: '10%'
+      width: '12%'
     },
     // VULN COMPONENT
     {
@@ -186,7 +186,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
         )
       },
       wrap: true,
-      width: '15%'
+      width: '24%'
     },
     // ENV
     {

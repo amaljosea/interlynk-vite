@@ -119,7 +119,7 @@ const GlobalVulnTable = ({
           </Stack>
         )
       },
-      width: '15%',
+      width: '18%',
       sortable: true
     },
     // SEVERITY
