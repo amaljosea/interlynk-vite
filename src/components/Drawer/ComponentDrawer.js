@@ -1,6 +1,8 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import React, { useEffect, useRef, useState } from 'react'
+import Datetime from 'react-datetime'
+import 'react-datetime/css/react-datetime.css'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { validateCpe } from 'utils'
 import { infoData } from 'variables/general'
@@ -26,6 +28,7 @@ import {
   Textarea,
   Tooltip,
   chakra,
+  useColorMode,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -62,6 +65,20 @@ function ComponentDrawer(props) {
     }
   })
 
+  const { colorMode } = useColorMode()
+  const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
+
+  const handleDateChange = (newDate) => {
+    console.log('newDate', newDate)
+    const isValidDate = newDate && !isNaN(newDate)
+    setSelectedDate(newDate._d)
+    if (isValidDate) {
+      setIsValidDate(true)
+    } else {
+      setIsValidDate(false)
+    }
+  }
+
   const { isOpen, onClose, data, primaryComp, shortDesc } = props
   const { prodCompState, dispatch } = useGlobalState()
   const { purlString, expLicense, totalComp } = prodCompState
@@ -89,7 +106,13 @@ function ComponentDrawer(props) {
   const [relation, setRelation] = useState('')
   const [component, setComponent] = useState('')
   const [isValid] = useState(true)
+  const [compSupport, setCompSupport] = useState('')
   const [allComponents, setAllComponents] = useState([])
+
+  const defaultDate = new Date()
+  defaultDate.setDate(defaultDate.getDate() + 90)
+  const [selectedDate, setSelectedDate] = useState('')
+  const [isValidDate, setIsValidDate] = useState(true)
 
   useQuery(GetAllComponents, {
     fetchPolicy: 'network-only',
@@ -214,27 +237,31 @@ function ComponentDrawer(props) {
         sbomId: sbomId,
         kind: compKind,
         name: compName,
-        description: compDesc,
-        version: compVersion,
-        group: groupInfo,
-        scope: compScope,
-        licenses: { licensesExp: expLicense || '' },
-        cpes: cpeValue !== '' ? [cpeValue] : [],
         purl: purlValue,
+        scope: compScope,
+        group: groupInfo,
         primary: isPrimary,
-        internal: isInternal
+        internal: isInternal,
+        version: compVersion,
+        description: compDesc,
+        supportLevel: compSupport,
+        endOfSupport: selectedDate,
+        cpes: cpeValue !== '' ? [cpeValue] : [],
+        licenses: { licensesExp: expLicense || '' }
       }
     })
       .then((res) => {
         if (res.data) {
           prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-          addRelation({
-            variables: {
-              from: res.data.componentCreate.component.id,
-              to: component,
-              relType: relation
-            }
-          })
+          if (relation !== '') {
+            addRelation({
+              variables: {
+                from: res.data.componentCreate.component.id,
+                to: component,
+                relType: relation
+              }
+            })
+          }
         }
       })
       .finally(() => {
@@ -508,6 +535,71 @@ function ComponentDrawer(props) {
                   <option value='optional'>Optional</option>
                   <option value='required'>Required</option>
                 </Select>
+              </FormControl>
+              {/* SUPPRT LEVEL */}
+              <FormControl>
+                <FormLabel htmlFor='compScope'>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                    <Text>Support Level</Text>
+                    <Tooltip label={onCheck(`Component Support`)}>
+                      <InfoIcon color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
+                </FormLabel>
+                <Select
+                  id='compSupport'
+                  name='compSupport'
+                  size='md'
+                  fontSize={'sm'}
+                  value={compSupport}
+                  isDisabled={customerView}
+                  onChange={(e) => {
+                    setCompSupport(e.target.value)
+                    setSelectedDate(defaultDate)
+                  }}
+                >
+                  <option value='' style={{ background: 'lightgray' }}>
+                    -- Select --
+                  </option>
+                  <option value='UNSPECIFIED'>Unspecified</option>
+                  <option value='ACTIVELY_MAINTAINED'>
+                    Actively Maintained
+                  </option>
+                  <option value='NO_LONGER_MAINTAINED'>
+                    No Longer Maintained
+                  </option>
+                  <option value='ABANDONED'>Abandoned</option>
+                </Select>
+              </FormControl>
+              {/* END-OF-SUPPORT DATE */}
+              <FormControl mb={5} isInvalid={!isValidDate}>
+                <FormLabel mb={1} htmlFor='endOfSupport'>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                    <Text>End-Of-Support Date</Text>
+                    <Tooltip label={onCheck(`Component Support Date`)}>
+                      <InfoIcon color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
+                </FormLabel>
+                <Datetime
+                  value={selectedDate}
+                  closeOnSelect={true}
+                  className={`${react_datatime} endOfSupport`}
+                  onChange={handleDateChange}
+                  inputProps={{
+                    disabled: compSupport === '',
+                    onCopy: (e) => e.preventDefault(),
+                    onPaste: (e) => e.preventDefault(),
+                    style: {
+                      background: 'none'
+                    }
+                  }}
+                />
+                {!isValidDate && (
+                  <FormErrorMessage>
+                    Please enter a valid datetime
+                  </FormErrorMessage>
+                )}
               </FormControl>
               {/* PRIMARY COMPONENT */}
               <FormControl isReadOnly={signedUrlParams}>

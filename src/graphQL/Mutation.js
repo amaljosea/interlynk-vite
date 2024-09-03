@@ -848,6 +848,8 @@ export const CreateComponent = gql`
     $scope: String
     $primary: Boolean
     $internal: Boolean
+    $supportLevel: ComponentSupportLevelEnum
+    $endOfSupport: ISO8601Date
   ) {
     componentCreate(
       input: {
@@ -862,6 +864,8 @@ export const CreateComponent = gql`
         purl: $purl
         scope: $scope
         primary: $primary
+        supportLevel: $supportLevel
+        endOfSupport: $endOfSupport
         internal: $internal
       }
     ) {
@@ -897,6 +901,8 @@ export const UpdateComponent = gql`
     $internal: Boolean
     $uniqueId: Boolean
     $scope: String
+    $supportLevel: ComponentSupportLevelEnum
+    $endOfSupport: ISO8601Date
   ) {
     componentUpdate(
       input: {
@@ -914,6 +920,8 @@ export const UpdateComponent = gql`
         scope: $scope
         primary: $primary
         internal: $internal
+        supportLevel: $supportLevel
+        endOfSupport: $endOfSupport
         generateUniqueId: $uniqueId
       }
     ) {

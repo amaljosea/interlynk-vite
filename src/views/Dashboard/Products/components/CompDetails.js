@@ -29,7 +29,6 @@ import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { UpdateComponent } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
@@ -37,7 +36,6 @@ import { GetAllSboms } from 'graphQL/Queries'
 const CompDetails = ({ data, primaryComp }) => {
   const location = useLocation()
   const { showToast } = useCustomToast()
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const customerView = location.pathname.startsWith('/customer')
 
   const { sbomId, sbom } = data || ''
@@ -62,6 +60,8 @@ const CompDetails = ({ data, primaryComp }) => {
   const [isPrimary, setIsPrimary] = useState(false)
   const [isInternal, setIsInternal] = useState(false)
 
+  const defaultDate = new Date()
+  defaultDate.setDate(defaultDate.getDate() + 90)
   const [selectedDate, setSelectedDate] = useState('')
   const [isValidDate, setIsValidDate] = useState(true)
 
@@ -112,6 +112,8 @@ const CompDetails = ({ data, primaryComp }) => {
         version: compVersion,
         description: compDesc,
         copyright: compCopyright,
+        supportLevel: compSupport,
+        endOfSupport: selectedDate,
         licenses: { licensesExp: expLicense || '' }
       }
     }).then((res) => {
@@ -135,15 +137,17 @@ const CompDetails = ({ data, primaryComp }) => {
 
   useEffect(() => {
     if (data) {
-      setGroupInfo(data?.group)
       setCompName(data?.name)
-      setCompCopyright(data?.copyright)
-      setCompDesc(data?.description)
-      setCompVersion(data?.version)
       setCompKind(data?.kind)
       setCompScope(data?.scope)
+      setGroupInfo(data?.group)
       setIsPrimary(data?.primary)
+      setCompVersion(data?.version)
       setIsInternal(data?.internal)
+      setCompDesc(data?.description)
+      setCompCopyright(data?.copyright)
+      setCompSupport(data?.supportLevel)
+      setSelectedDate(data?.endOfSupport ? new Date(data?.endOfSupport) : '')
     }
   }, [data])
 
@@ -340,7 +344,7 @@ const CompDetails = ({ data, primaryComp }) => {
           </Select>
         </FormControl>
         {/* SUPPRT LEVEL */}
-        <FormControl hidden={!shouldShowDemoFeatures}>
+        <FormControl>
           <FormLabel htmlFor='compScope'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>Support Level</Text>
@@ -356,24 +360,22 @@ const CompDetails = ({ data, primaryComp }) => {
             fontSize={'sm'}
             value={compSupport}
             isDisabled={customerView}
-            onChange={(e) => setCompSupport(e.target.value)}
+            onChange={(e) => {
+              setCompSupport(e.target.value)
+              setSelectedDate(defaultDate)
+            }}
           >
             <option value='' style={{ background: 'lightgray' }}>
               -- Select --
             </option>
-            <option value='unspecified'>Unspecified</option>
-            <option value='actively_maintained'>Actively Maintained</option>
-            <option value='no_longer_maintained'>No Longer Maintained</option>
-            <option value='abandoned'>Abandoned</option>
+            <option value='UNSPECIFIED'>Unspecified</option>
+            <option value='ACTIVELY_MAINTAINED'>Actively Maintained</option>
+            <option value='NO_LONGER_MAINTAINED'>No Longer Maintained</option>
+            <option value='ABANDONED'>Abandoned</option>
           </Select>
         </FormControl>
         {/* END-OF-SUPPORT DATE */}
-        <FormControl
-          mb={5}
-          isInvalid={!isValidDate}
-          isDisabled={compSupport === ''}
-          hidden={!shouldShowDemoFeatures}
-        >
+        <FormControl mb={5} isInvalid={!isValidDate}>
           <FormLabel mb={1} htmlFor='endOfSupport'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>End-Of-Support Date</Text>

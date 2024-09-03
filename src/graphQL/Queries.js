@@ -1647,6 +1647,8 @@ export const GetComponentData = gql`
           licensesExp
           group
           scope
+          endOfSupport
+          supportLevel
           externalUrls {
             name
             url
@@ -1657,30 +1659,6 @@ export const GetComponentData = gql`
             url
             contactEmail
             contactName
-          }
-          dependencyOf {
-            id
-            relType
-            fromId
-            toId
-            fromComp {
-              id
-              name
-              version
-            }
-            updatedAt
-          }
-          dependsOn {
-            id
-            relType
-            fromId
-            toId
-            toComp {
-              id
-              name
-              version
-            }
-            updatedAt
           }
         }
       }
