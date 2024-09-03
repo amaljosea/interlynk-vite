@@ -34,7 +34,7 @@ const ConnectionCard = ({
           </Text>
         </Flex>
 
-        <Text fontSize={'12px'} color='gray.500'>
+        <Text fontSize={'12px'} minH={'50px'} maxH={'auto'} color='gray.500'>
           {description}
         </Text>
 

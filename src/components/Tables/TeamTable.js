@@ -160,7 +160,7 @@ const TeamTable = () => {
           </Flex>
         )
       },
-      width: '20%',
+      width: '22%',
       wrap: true
     },
     // AUTH
@@ -200,10 +200,8 @@ const TeamTable = () => {
         <Text color={textColor} textTransform={'capitalize'}>
           {row?.role?.name || ''}
         </Text>
-      ),
-      width: '15%'
+      )
     },
-
     // JOINED DATE
     {
       id: 'joinedDate',
@@ -220,7 +218,6 @@ const TeamTable = () => {
       },
       center: true,
       sortable: true,
-
       sortFunction: (a, b) => {
         const aUserStart = userTimeStart(a)
         const bUserStart = userTimeStart(b)
@@ -230,8 +227,7 @@ const TeamTable = () => {
         const dateA = new Date(aUserStart)
         const dateB = new Date(bUserStart)
         return dateA - dateB // Sort in descending order
-      },
-      width: '25%'
+      }
     },
     // STATUS
     {
@@ -259,9 +255,7 @@ const TeamTable = () => {
             </TagLabel>
           </Tag>
         )
-      },
-      center: true,
-      width: '20%'
+      }
     },
     // ACTION
     {
@@ -315,8 +309,7 @@ const TeamTable = () => {
           </Menu>
         )
       },
-      right: 'true',
-      width: '10%'
+      right: 'true'
     }
   ]
 

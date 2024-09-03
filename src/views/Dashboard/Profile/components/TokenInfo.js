@@ -4,13 +4,11 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
-import { getFullDateAndTime } from 'utils'
-import { customStyles } from 'utils'
+import { customStyles, getFullDateAndTime } from 'utils'
 
-import { AddIcon, CopyIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Box,
-  Button,
   Checkbox,
   Flex,
   FormControl,
@@ -49,7 +47,7 @@ import {
   updateApiToken
 } from 'graphQL/Mutation'
 
-import { BiCheck, BiShieldQuarter } from 'react-icons/bi'
+import { BiShieldQuarter } from 'react-icons/bi'
 import { FaEllipsisV } from 'react-icons/fa'
 
 const GetApiKeys = gql`
@@ -224,7 +222,7 @@ const TokenInfo = () => {
         marginBottom={'12px'}
       >
         <Box>
-          <Heading as='h2' fontSize={'16px'} mb={1}>
+          <Heading as='h2' fontSize={'16px'} mb={1} fontFamily={'inherit'}>
             Security Tokens
           </Heading>
           <Text fontSize={'12px'} color='gray.600'>

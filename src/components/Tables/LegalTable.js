@@ -126,7 +126,6 @@ const LegalTable = () => {
         </Stack>
         <Tooltip label='Add Manufacturer'>
           <IconButton
-            size='sm'
             isDisabled={!updateOrg}
             colorScheme='blue'
             onClick={() => {

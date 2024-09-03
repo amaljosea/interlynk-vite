@@ -1,7 +1,12 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { Text, Wrap, useColorModeValue, useDisclosure } from '@chakra-ui/react'
+import {
+  SimpleGrid,
+  Text,
+  useColorModeValue,
+  useDisclosure
+} from '@chakra-ui/react'
 
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -152,7 +157,6 @@ const Connections = ({ org }) => {
   return (
     <>
       <Card p={0}>
-
         <CardHeader
           p='12px 0'
           mb='8px'
@@ -164,11 +168,10 @@ const Connections = ({ org }) => {
           </Text>
           <Text fontSize={'sm'}>
             Integrate with your favorite tools to streamline SBOM management.
-
           </Text>
         </CardHeader>
         <CardBody px='5px'>
-          <Wrap spacing={4}>
+          <SimpleGrid columns={4} spacing={4}>
             {org && !isFreeTier && (
               <ConnectionCard
                 icon={FaJira}
@@ -193,7 +196,6 @@ const Connections = ({ org }) => {
                 }
               />
             )}
-
             {!isFreeTier && (
               <ConnectionCard
                 icon={FaMicrosoft}
@@ -206,7 +208,6 @@ const Connections = ({ org }) => {
                 }
               />
             )}
-
             <ConnectionCard
               icon={FaEnvelope}
               name='Email'
@@ -230,7 +231,7 @@ const Connections = ({ org }) => {
                 }
               />
             )}
-          </Wrap>
+          </SimpleGrid>
         </CardBody>
       </Card>
 

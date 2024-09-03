@@ -209,7 +209,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     setIsPasswordEdit(false)
   }
 
-  //Function to switch organisation
+  //Function to switch organization
   const onSwitchOrg = async (id, name) => {
     await switchOrg({
       variables: {
@@ -479,9 +479,11 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   }, [data, name])
 
   return (
-    <Flex direction='column'>
-      <Flex justify='space-between' align='center' mb='8' px={4}>
-        <Heading size='lg'>Settings</Heading>
+    <>
+      <Flex justify='space-between' align='center' mb={5}>
+        <Heading fontFamily='inherit' size='lg'>
+          Settings
+        </Heading>
         <Menu>
           <MenuButton
             as={Button}
@@ -528,7 +530,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           </MenuList>
         </Menu>
       </Flex>
-      <Card mb='6'>
+      <Card mb={5}>
         <CardBody>
           {/* USER INFO */}
           <Flex
@@ -669,7 +671,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
       </Card>
 
       {/* Personal Drawer */}
-
       <Drawer
         isOpen={isPersonalModalOpen}
         placement='right'
@@ -864,6 +865,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
+
       {/* Org Drawer */}
       <Drawer
         isOpen={isOrgModalOpen}
@@ -875,12 +877,12 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottom={'1px solid #A0AEC0'} mb='10px'>
-            Organisations
+            Organization
           </DrawerHeader>
 
           <DrawerBody>
             <Text fontSize='16px' mb='20px' textColor={'gray.500'}>
-              My organisations
+              My organization
             </Text>
 
             {organisationList?.map((org, index) => (
@@ -946,7 +948,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
               </Box>
             ))}
             <Button
-              aria-label='Add Organisation'
+              aria-label='Add Organization'
               colorScheme='white'
               leftIcon={<AddIcon />}
               marginTop='10px'
@@ -956,11 +958,12 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
               borderColor='blue.500'
               onClick={onOpen}
             >
-              Add Organisation
+              Add Organization
             </Button>
           </DrawerBody>
         </DrawerContent>
       </Drawer>
+
       {/* Edit organisation Drawer */}
       <Drawer
         isOpen={isOrgInfoOpen}
@@ -972,7 +975,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottom={'1px solid #A0AEC0'} mb='10px'>
-            Edit Organisation
+            Edit Organization
           </DrawerHeader>
 
           <DrawerBody>
@@ -981,7 +984,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 Name
               </FormLabel>
               <Input
-                placeholder='Enter organisation name'
+                placeholder='Enter organization name'
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
               />
@@ -997,6 +1000,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           </DrawerBody>
         </DrawerContent>
       </Drawer>
+
       {isOpen && (
         <OrgModal
           isOpen={isOpen}
@@ -1005,6 +1009,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           onSwitch={onSwitchOrg}
         />
       )}
+
       {isWarningOpen && (
         <LynkModal
           isOpen={isWarningOpen}
@@ -1021,7 +1026,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           <Text mt={6}>Click Continue to confirm</Text>
         </LynkModal>
       )}
-    </Flex>
+    </>
   )
 }
 

@@ -21,10 +21,7 @@ import RoleTable from 'components/Tables/RoleTable'
 import TeamTable from 'components/Tables/TeamTable'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
-
-import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
 
 import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 
@@ -60,16 +57,12 @@ function Profile() {
     'plan'
   ]
 
-
   const psTabs = ['security tokens', 'integrations']
-
 
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
-
-  const { totalRows } = useGlobalState()
 
   const [orgIndex, setOrgIndex] = useState(0)
   const [psIndex, setPsIndex] = useState(0)
@@ -82,6 +75,7 @@ function Profile() {
         setPsIndex(Math.max(psTabs.indexOf(activetab), 0))
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activetab])
 
   const tabs = useMemo(() => {
@@ -110,21 +104,6 @@ function Profile() {
   })
 
   const { organization } = data || ''
-  const { id, currentUser } = organization || ''
-
-  const isAdmin = currentUser?.superAdmin
-
-  const { data: myOrgs } = useQuery(MyOrganizations, {
-    skip: isAdmin === true ? true : false,
-    variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
-  })
-  const { nodes: myOrgList } = myOrgs?.myOrganizations || ''
-
-  const { data: allOrgs } = useQuery(AllOrganizations, {
-    skip: isAdmin === true ? false : true,
-    variables: { first: totalRows, status: 'approved' }
-  })
-  const { nodes: allOrgList } = allOrgs?.allOrganizations || ''
 
   const onOrgTabChange = (index) => {
     navigate(`/vendor/settings?tab=${orgTabs[index]}`)
@@ -152,6 +131,7 @@ function Profile() {
     } else {
       setSelectedTab(tabs[0].name)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activetab, tabs])
 
   if (error) {
