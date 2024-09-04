@@ -17,13 +17,6 @@ import {
   Input,
   List,
   ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Tag,
   Text,
@@ -32,12 +25,15 @@ import {
 } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
+import LynkModal from 'components/LynkModal'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 import { GetComponentData } from 'graphQL/Queries'
+
+import { BiWrench } from 'react-icons/bi'
 
 const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
   const params = useParams()
@@ -157,6 +153,8 @@ const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
       case 'Componet has deprecated license/s':
         return 'Component License'
       case 'Component has restrictive licenses specified':
+        return 'Component License'
+      case 'Document has data license specified':
         return 'Component License'
     }
   }
@@ -306,188 +304,170 @@ const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
   }, [direction, field, getCompData, isPrimary, productId, sbomId])
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInBottom'>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>{heading(shortDesc)}</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          {error !== '' && (
-            <Alert status='error' borderRadius={4} mb={5}>
-              <AlertIcon />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          <Flex
-            hidden={component ? false : true}
-            width='100%'
-            direction={'row'}
-            alignItems={'center'}
-            justifyContent={'flex-start'}
-            wrap={'wrap'}
-            gap={2}
-            mb={6}
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      title={heading(shortDesc)}
+      Icon={BiWrench}
+      disabled={isInvalidLicense || isEmptyVersion || isDisabled}
+      hidden={resolved}
+      buttonText={'Save'}
+      leftFooterContent={
+        !isFreeTier && (
+          <Button
+            variant='ghost'
+            mr={'auto'}
+            fontSize={'sm'}
+            onClick={handleRuleCreate}
+            hidden={!isComponentLicense && !isComponentVersion}
+            isDisabled={isInvalidLicense || isEmptyVersion || isDisabled}
+            colorScheme={ruleExists ? 'green' : 'blue'}
           >
-            <Text fontWeight={'medium'} wordBreak={'break-all'}>
-              {component?.name || '-'}
-            </Text>
-            <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
-          </Flex>
+            {ruleExists ? 'View' : 'Save as'} Rule
+          </Button>
+        )
+      }
+    >
+      {error !== '' && (
+        <Alert status='error' borderRadius={4} mb={5}>
+          <AlertIcon />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      <Flex
+        hidden={component ? false : true}
+        width='100%'
+        direction={'row'}
+        alignItems={'center'}
+        justifyContent={'flex-start'}
+        wrap={'wrap'}
+        gap={2}
+        mb={6}
+      >
+        <Text fontWeight={'medium'} wordBreak={'break-all'}>
+          {component?.name || '-'}
+        </Text>
+        <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
+      </Flex>
 
-          {shortDesc === 'Document has a primary component' && (
-            <Flex
-              gap={4}
-              flexDirection={'column'}
-              alignItems={'flex-start'}
-              position={'relative'}
+      {shortDesc === 'Document has a primary component' && (
+        <Flex
+          gap={4}
+          flexDirection={'column'}
+          alignItems={'flex-start'}
+          position={'relative'}
+        >
+          <FormControl isRequired isDisabled={resolved}>
+            <FormLabel>Select</FormLabel>
+            <Input value={comp} onChange={handleComponentChange} />
+          </FormControl>
+
+          {comp !== '' && componentList.length > 0 && (
+            <Box
+              position='absolute'
+              zIndex='1'
+              width='100%'
+              top={10}
+              mt='8'
+              bg={bgColor}
+              border={`1px solid ${hoverColor}`}
+              minH={'auto'}
+              maxH={'300px'}
+              overflowY={'scroll'}
+              borderRadius={4}
+              ref={compRef}
             >
-              <FormControl isRequired isDisabled={resolved}>
-                <FormLabel>Select</FormLabel>
-                <Input value={comp} onChange={handleComponentChange} />
-              </FormControl>
+              <List>
+                {componentList.map((item, index) => (
+                  <ListItem
+                    key={index}
+                    cursor='pointer'
+                    fontSize={'sm'}
+                    onClick={() => {
+                      setActiveComp(item)
+                      setComp(item.name)
+                      setComponentList([])
+                    }}
+                    p='2'
+                    _hover={{ background: hoverColor }}
+                  >
+                    <Text>{item.name}</Text>
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
+          )}
+        </Flex>
+      )}
 
-              {comp !== '' && componentList.length > 0 && (
-                <Box
-                  position='absolute'
-                  zIndex='1'
-                  width='100%'
-                  top={10}
-                  mt='8'
-                  bg={bgColor}
-                  border={`1px solid ${hoverColor}`}
-                  minH={'auto'}
-                  maxH={'300px'}
-                  overflowY={'scroll'}
-                  borderRadius={4}
-                  ref={compRef}
-                >
-                  <List>
-                    {componentList.map((item, index) => (
-                      <ListItem
-                        key={index}
-                        cursor='pointer'
-                        fontSize={'sm'}
-                        onClick={() => {
-                          setActiveComp(item)
-                          setComp(item.name)
-                          setComponentList([])
-                        }}
-                        p='2'
-                        _hover={{ background: hoverColor }}
-                      >
-                        <Text>{item.name}</Text>
-                      </ListItem>
-                    ))}
-                  </List>
-                </Box>
-              )}
+      {shortDesc === 'Document creation timestamp' && (
+        <FormControl isRequired isDisabled={resolved}>
+          <FormLabel>Created At</FormLabel>
+          <Input
+            placeholder='Select Time'
+            size='md'
+            type='datetime-local'
+            value={timestamp}
+            onChange={(e) => console.log(e.target.value)}
+          />
+        </FormControl>
+      )}
+
+      {(shortDesc === 'Component has a type' ||
+        shortDesc === 'Component has a valid type') && (
+        <FormControl isDisabled={resolved}>
+          <FormLabel fontSize={'sm'}>
+            <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+              <Text>Type</Text>
+              <Tooltip label='Component Type'>
+                <Icon as={InfoIcon} color={'blue.500'} />
+              </Tooltip>
             </Flex>
-          )}
-
-          {shortDesc === 'Document creation timestamp' && (
-            <FormControl isRequired isDisabled={resolved}>
-              <FormLabel>Created At</FormLabel>
-              <Input
-                placeholder='Select Time'
-                size='md'
-                type='datetime-local'
-                value={timestamp}
-                onChange={(e) => console.log(e.target.value)}
-              />
-            </FormControl>
-          )}
-
-          {(shortDesc === 'Component has a type' ||
-            shortDesc === 'Component has a valid type') && (
-            <FormControl isDisabled={resolved}>
-              <FormLabel fontSize={'sm'}>
-                <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                  <Text>Type</Text>
-                  <Tooltip label='Component Type'>
-                    <Icon as={InfoIcon} color={'blue.500'} />
-                  </Tooltip>
-                </Flex>
-              </FormLabel>
-              <Select
-                id='type'
-                name='type'
-                size='sm'
-                value={compType}
-                onChange={(e) => setCompType(e.target.value)}
-              >
-                <option value=''>-- Select --</option>
-                <option value='application'>Application</option>
-                <option value='library'>Library</option>
-                <option value='operating-system'>Operating System</option>
-                <option value='firmware'>Firmware</option>
-                <option value='file'>File</option>
-                <option value='device'>Device</option>
-                <option value='container'>Container</option>
-                <option value='framework'>Framework</option>
-                <option value='source'>Source</option>
-                <option value='archive'>Archive</option>
-                <option value='install'>Install</option>
-                <option value='other'>Other</option>
-                <option value='unspecified'>Unspecified</option>
-              </Select>
-            </FormControl>
-          )}
-
-          {shortDesc === 'Component has a version' && (
-            <FormControl isRequired isDisabled={resolved}>
-              <FormLabel>Version</FormLabel>
-              <Input
-                value={compVersion}
-                onChange={(e) => setCompVersion(e.target.value)}
-              />
-            </FormControl>
-          )}
-
-          {isComponentLicense && (
-            <LicenseField
-              sbomView={false}
-              resolved={resolved}
-              license={licensesExp || ''}
-            />
-          )}
-        </ModalBody>
-
-        <ModalFooter>
-          <Flex
-            gap={2}
-            width={'100%'}
-            alignItems={'center'}
-            justifyContent={'flex-end'}
+          </FormLabel>
+          <Select
+            id='type'
+            name='type'
+            size='sm'
+            value={compType}
+            onChange={(e) => setCompType(e.target.value)}
           >
-            {!isFreeTier && (
-              <Button
-                mr={'auto'}
-                fontSize={'sm'}
-                onClick={handleRuleCreate}
-                hidden={!isComponentLicense && !isComponentVersion}
-                isDisabled={isInvalidLicense || isEmptyVersion || isDisabled}
-                colorScheme={ruleExists ? 'green' : 'blue'}
-              >
-                {ruleExists ? 'View' : 'Save as'} Rule
-              </Button>
-            )}
+            <option value=''>-- Select --</option>
+            <option value='application'>Application</option>
+            <option value='library'>Library</option>
+            <option value='operating-system'>Operating System</option>
+            <option value='firmware'>Firmware</option>
+            <option value='file'>File</option>
+            <option value='device'>Device</option>
+            <option value='container'>Container</option>
+            <option value='framework'>Framework</option>
+            <option value='source'>Source</option>
+            <option value='archive'>Archive</option>
+            <option value='install'>Install</option>
+            <option value='other'>Other</option>
+            <option value='unspecified'>Unspecified</option>
+          </Select>
+        </FormControl>
+      )}
 
-            <Button fontSize={'sm'} onClick={onClose}>
-              Close
-            </Button>
-            <Button
-              fontSize={'sm'}
-              colorScheme='blue'
-              onClick={handleSubmit}
-              isDisabled={isInvalidLicense || isEmptyVersion || isDisabled}
-              hidden={resolved}
-            >
-              Save
-            </Button>
-          </Flex>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+      {shortDesc === 'Component has a version' && (
+        <FormControl isRequired isDisabled={resolved}>
+          <FormLabel>Version</FormLabel>
+          <Input
+            value={compVersion}
+            onChange={(e) => setCompVersion(e.target.value)}
+          />
+        </FormControl>
+      )}
+
+      {isComponentLicense && (
+        <LicenseField
+          sbomView={false}
+          resolved={resolved}
+          license={licensesExp || ''}
+        />
+      )}
+    </LynkModal>
   )
 }
 

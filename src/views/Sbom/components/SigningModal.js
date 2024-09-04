@@ -4,21 +4,17 @@ import {
   Alert,
   AlertIcon,
   Box,
-  Button,
   Flex,
   FormControl,
   FormLabel,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Text,
   Textarea
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
+
+import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 
 const SigningModal = ({
   isOpen,
@@ -99,104 +95,92 @@ const SigningModal = ({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <form onSubmit={message === '' ? handleSave : handleSubmit}>
-          <ModalContent>
-            <ModalHeader>
-              {sbomData.lifecycle === 'signed' ? 'Unsign' : 'Sign'} SBOM
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Flex width={'100%'} direction={'column'} gap={4}>
-                <Box
-                  bg='blue.600'
-                  w='100%'
-                  p={2}
-                  color='white'
-                  fontWeight='medium'
-                  fontSize='16px'
-                  align='center'
-                  borderRadius='lg'
-                  boxShadow='md'
-                >
-                  SBOM Signing coming soon...
-                </Box>
-                {/* Algorithm */}
-                <FormControl isRequired>
-                  <FormLabel fontSize={14}>Algorithm</FormLabel>
-                  <Select
-                    id='algorithm'
-                    name='algorithm'
-                    size='sm'
-                    value={algorithm}
-                    disabled={true}
-                    onChange={(e) => setAlgorithm(e.target.value)}
-                  >
-                    <option value=''>-- Select --</option>
-                    <option value='RS256'>RS256</option>
-                  </Select>
-                </FormControl>
-                {algorithm === 'RS256' && (
-                  <>
-                    {/* Cerificate */}
-                    <FormControl isRequired>
-                      <FormLabel fontSize={14}>Cerificate</FormLabel>
-                      <Textarea
-                        value={certificate}
-                        onChange={(e) => setCertificate(e.target.value)}
-                        fontSize={'sm'}
-                        rows={8}
-                      />
-                    </FormControl>
-                    {/* CycloneDX Signature */}
-                    <FormControl isRequired>
-                      <FormLabel fontSize={14}>CycloneDX Signature</FormLabel>
-                      <Textarea
-                        value={cycloneDxSign}
-                        onChange={(e) => setCycloneDxSign(e.target.value)}
-                        fontSize={'sm'}
-                        rows={2}
-                      />
-                    </FormControl>
-                    {/* SPDX Signature */}
-                    <FormControl isRequired>
-                      <FormLabel fontSize={14}>SPDX Signature</FormLabel>
-                      <Textarea
-                        value={spdxSign}
-                        onChange={(e) => setSpdxSign(e.target.value)}
-                        fontSize={'sm'}
-                        rows={2}
-                      />
-                    </FormControl>
-                  </>
-                )}
+      <LynkModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={message === '' ? handleSave : handleSubmit}
+        title={`${sbomData.lifecycle === 'signed' ? 'Unsign' : 'Sign'} SBOM`}
+        Icon={sbomData.lifecycle === 'signed' ? TbSignatureOff : TbSignature}
+        buttonText={
+          message === ''
+            ? status === 'signed'
+              ? 'Unsign'
+              : 'Validate and Sign'
+            : 'Yes'
+        }
+      >
+        <Flex width={'100%'} direction={'column'} gap={4}>
+          <Box
+            bg='blue.600'
+            w='100%'
+            p={2}
+            color='white'
+            fontWeight='medium'
+            fontSize='16px'
+            align='center'
+            borderRadius='lg'
+            boxShadow='md'
+          >
+            SBOM Signing coming soon...
+          </Box>
+          {/* Algorithm */}
+          <FormControl isRequired>
+            <FormLabel fontSize={14}>Algorithm</FormLabel>
+            <Select
+              id='algorithm'
+              name='algorithm'
+              size='sm'
+              value={algorithm}
+              disabled={true}
+              onChange={(e) => setAlgorithm(e.target.value)}
+            >
+              <option value=''>-- Select --</option>
+              <option value='RS256'>RS256</option>
+            </Select>
+          </FormControl>
+          {algorithm === 'RS256' && (
+            <>
+              {/* Cerificate */}
+              <FormControl isRequired>
+                <FormLabel fontSize={14}>Cerificate</FormLabel>
+                <Textarea
+                  value={certificate}
+                  onChange={(e) => setCertificate(e.target.value)}
+                  fontSize={'sm'}
+                  rows={8}
+                />
+              </FormControl>
+              {/* CycloneDX Signature */}
+              <FormControl isRequired>
+                <FormLabel fontSize={14}>CycloneDX Signature</FormLabel>
+                <Textarea
+                  value={cycloneDxSign}
+                  onChange={(e) => setCycloneDxSign(e.target.value)}
+                  fontSize={'sm'}
+                  rows={2}
+                />
+              </FormControl>
+              {/* SPDX Signature */}
+              <FormControl isRequired>
+                <FormLabel fontSize={14}>SPDX Signature</FormLabel>
+                <Textarea
+                  value={spdxSign}
+                  onChange={(e) => setSpdxSign(e.target.value)}
+                  fontSize={'sm'}
+                  rows={2}
+                />
+              </FormControl>
+            </>
+          )}
 
-                {message !== '' && (
-                  <Alert status='info'>
-                    <AlertIcon />
-                    <Text fontSize={'sm'}>{message}</Text>
-                  </Alert>
-                )}
-              </Flex>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              {/*               {message === '' ? (
-                <Button colorScheme='blue' type='submit'>
-                  {status === 'signed' ? 'Unsign' : 'Validate and Sign'}
-                </Button>
-              ) : (
-                <Button colorScheme='blue' type={'submit'}>
-                  Yes
-                </Button>
-              )} */}
-            </ModalFooter>
-          </ModalContent>
-        </form>
-      </Modal>
+          {message !== '' && (
+            <Alert status='info'>
+              <AlertIcon />
+              <Text fontSize={'sm'}>{message}</Text>
+            </Alert>
+          )}
+        </Flex>
+      </LynkModal>
     </>
   )
 }

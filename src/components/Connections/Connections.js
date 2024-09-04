@@ -16,13 +16,8 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetOrgConnections, GetPersonalConnections } from 'graphQL/Queries'
 
-import {
-  FaEnvelope,
-  FaGithub,
-  FaJira,
-  FaMicrosoft,
-  FaSlack
-} from 'react-icons/fa'
+import { FaGithub } from 'react-icons/fa'
+import { SiGmail, SiJira, SiMicrosoftteams, SiSlack } from 'react-icons/si'
 
 import Card from '../Card/Card'
 import CardBody from '../Card/CardBody'
@@ -156,7 +151,7 @@ const Connections = ({ org }) => {
 
   return (
     <>
-      <Card p={0}>
+      <Card p={0} boxShadow='none'>
         <CardHeader
           p='12px 0'
           mb='8px'
@@ -174,19 +169,19 @@ const Connections = ({ org }) => {
           <SimpleGrid columns={4} spacing={4}>
             {org && !isFreeTier && (
               <ConnectionCard
-                icon={FaJira}
+                icon={SiJira}
                 name='Jira'
                 onConfigure={onJiraOpen}
                 isConnected={greenCheck.jira}
                 color='#0070f3'
                 description={
-                  'Sync tasks within SBOM compliance, streamlining issue tracking and management.'
+                  'Sync tasks within SBOM compliance, improving issue tracking and management.'
                 }
               />
             )}
             {!isFreeTier && (
               <ConnectionCard
-                icon={FaSlack}
+                icon={SiSlack}
                 name='Slack'
                 onConfigure={onSlackOpen}
                 isConnected={greenCheck.slack}
@@ -198,7 +193,7 @@ const Connections = ({ org }) => {
             )}
             {!isFreeTier && (
               <ConnectionCard
-                icon={FaMicrosoft}
+                icon={SiMicrosoftteams}
                 name='Teams'
                 onConfigure={onTeamsOpen}
                 isConnected={greenCheck.teams}
@@ -209,7 +204,7 @@ const Connections = ({ org }) => {
               />
             )}
             <ConnectionCard
-              icon={FaEnvelope}
+              icon={SiGmail}
               name='Email'
               onConfigure={onEmailOpen}
               isConnected={greenCheck.email}

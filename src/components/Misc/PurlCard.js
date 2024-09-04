@@ -1,20 +1,11 @@
 import { PackageURL } from 'packageurl-js'
 
 import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
-import {
-  Divider,
-  Flex,
-  Grid,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Stack,
-  Tag,
-  Text
-} from '@chakra-ui/react'
+import { Divider, Flex, Grid, Stack, Tag, Text } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
+
+import { FaCircleInfo } from 'react-icons/fa6'
 
 const PurlText = ({ children }) => (
   <Tag
@@ -44,76 +35,71 @@ const PurlCard = ({ value, isOpen, onClose }) => {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>PURL Details</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody pb={6}>
-          <Stack spacing={1}>
-            <Tag
-              justifyContent={'center'}
-              alignItems={'center'}
-              fontSize={'sm'}
-              py={2}
-              wordBreak={'break-all'}
-            >
-              {value}
-            </Tag>
-            <Divider />
-            <Stack spacing={2} py={3}>
-              <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-                <Text fontSize={'sm'}>Type</Text>
-                {purlString(value)?.type && (
-                  <PurlText>{purlString(value)?.type}</PurlText>
-                )}
-              </Grid>
-              <Divider />
-              <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-                <Text fontSize={'sm'}>Namespace</Text>
-                {purlString(value)?.namespace && (
-                  <PurlText>{purlString(value)?.namespace}</PurlText>
-                )}
-              </Grid>
-              <Divider />
-              <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-                <Text fontSize={'sm'}>Package Name</Text>
-                {purlString()?.name && (
-                  <PurlText>{purlString()?.name}</PurlText>
-                )}
-              </Grid>
-              <Divider />
-              <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-                <Text fontSize={'sm'}>Package Version</Text>
-                {purlString()?.version && (
-                  <PurlText>{purlString()?.version}</PurlText>
-                )}
-              </Grid>
-              <Divider />
-              <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-                <Text fontSize={'sm'}>Qualifiers</Text>
-                {purlString()?.qualifiers && (
-                  <PurlText>
-                    {JSON.stringify(purlString()?.qualifiers)}
-                  </PurlText>
-                )}
-              </Grid>
-              <Divider />
-              <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-                <Text fontSize={'sm'}>Validity</Text>
-                <Flex alignItems={'flex-end'} justifyContent={'flex-end'}>
-                  {purlString() ? (
-                    <CheckCircleIcon color={'green.500'} />
-                  ) : (
-                    <WarningIcon color={'red.500'} />
-                  )}
-                </Flex>
-              </Grid>
-            </Stack>
-          </Stack>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={'PURL Details'}
+      Icon={FaCircleInfo}
+      noFooter
+    >
+      <Stack spacing={1}>
+        <Tag
+          justifyContent={'center'}
+          alignItems={'center'}
+          fontSize={'sm'}
+          py={2}
+          wordBreak={'break-all'}
+        >
+          {value}
+        </Tag>
+        <Divider />
+        <Stack spacing={2} py={3}>
+          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+            <Text fontSize={'sm'}>Type</Text>
+            {purlString(value)?.type && (
+              <PurlText>{purlString(value)?.type}</PurlText>
+            )}
+          </Grid>
+          <Divider />
+          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+            <Text fontSize={'sm'}>Namespace</Text>
+            {purlString(value)?.namespace && (
+              <PurlText>{purlString(value)?.namespace}</PurlText>
+            )}
+          </Grid>
+          <Divider />
+          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+            <Text fontSize={'sm'}>Package Name</Text>
+            {purlString()?.name && <PurlText>{purlString()?.name}</PurlText>}
+          </Grid>
+          <Divider />
+          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+            <Text fontSize={'sm'}>Package Version</Text>
+            {purlString()?.version && (
+              <PurlText>{purlString()?.version}</PurlText>
+            )}
+          </Grid>
+          <Divider />
+          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+            <Text fontSize={'sm'}>Qualifiers</Text>
+            {purlString()?.qualifiers && (
+              <PurlText>{JSON.stringify(purlString()?.qualifiers)}</PurlText>
+            )}
+          </Grid>
+          <Divider />
+          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+            <Text fontSize={'sm'}>Validity</Text>
+            <Flex alignItems={'flex-end'} justifyContent={'flex-end'}>
+              {purlString() ? (
+                <CheckCircleIcon color={'green.500'} />
+              ) : (
+                <WarningIcon color={'red.500'} />
+              )}
+            </Flex>
+          </Grid>
+        </Stack>
+      </Stack>
+    </LynkModal>
   )
 }
 

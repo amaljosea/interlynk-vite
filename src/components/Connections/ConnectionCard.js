@@ -5,6 +5,7 @@ import Card from '../Card/Card'
 
 const ConnectionCard = ({
   icon: Icon,
+  iconSrc,
   name,
   onConfigure,
   isConnected,
@@ -22,7 +23,16 @@ const ConnectionCard = ({
     >
       <Flex direction='column' height='100%' gap={'16px'}>
         <Flex align='center'>
-          <Icon size='40px' color={color} />
+          {iconSrc ? (
+            <img
+              src={iconSrc}
+              alt={`${name} icon`}
+              width='40px'
+              height='40px'
+            />
+          ) : (
+            <Icon color={color} size='40px' />
+          )}
           <Text
             ml={3}
             noOfLines={1}

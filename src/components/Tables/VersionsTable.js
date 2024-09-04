@@ -1,6 +1,5 @@
 import { useLazyQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { refetchActiveQueries } from 'context/ApolloWrapper'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -119,9 +118,8 @@ const VersionsTable = ({
 
   const { VERSIONS } = ProductDetailsTabs
 
-  const { nodes, paginationProps, loading } = usePaginatedQuery(
-    signedUrlParams ? ShareVersionTable : GetVersionsTable,
-    {
+  const { nodes, paginationProps, loading, startPolling, stopPolling } =
+    usePaginatedQuery(signedUrlParams ? ShareVersionTable : GetVersionsTable, {
       skip: (tab === VERSIONS || tab === null) && !isToolOpen ? false : true,
       selector: signedUrlParams
         ? 'shareLynkQuery.project.sbomVersions'
@@ -133,8 +131,16 @@ const VersionsTable = ({
       onCompleted: () => {
         setClearSelect(false)
       }
+    })
+
+  useEffect(() => {
+    const inProgress = nodes?.some((item) => item?.vulnRunStatus !== 'FINISHED')
+    if (inProgress) {
+      startPolling(1000)
+    } else {
+      stopPolling()
     }
-  )
+  }, [nodes, startPolling, stopPolling])
 
   const createSbom = useHasPermission({
     parentKey: 'view_sbom',
@@ -213,22 +219,6 @@ const VersionsTable = ({
       })
     )
   }
-
-  useEffect(() => {
-    const refetchInterval = setInterval(() => {
-      const inProgress = nodes?.some(
-        (item) => item?.vulnRunStatus === 'IN_PROGRESS'
-      )
-
-      if (inProgress) {
-        refetchActiveQueries()
-      } else {
-        clearInterval(refetchInterval)
-      }
-    }, 5000)
-
-    return () => clearInterval(refetchInterval)
-  }, [nodes])
 
   const onStartTour = () => {
     setIsOpen(false)

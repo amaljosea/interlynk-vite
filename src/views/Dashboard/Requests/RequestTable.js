@@ -33,10 +33,10 @@ import { FaEllipsisV } from 'react-icons/fa'
 import { FaPlus } from 'react-icons/fa6'
 
 import Pagination from '../../../components/Pagination'
+import ConfirmationModal from '../Products/components/ConfirmationModal'
 import Filters from './Filters'
 import RequestAcceptModal from './RequestAcceptModal'
 import RequestModal from './RequestModal'
-import WarningModal from './WarningModal'
 
 const RequestTable = ({
   data,
@@ -371,11 +371,15 @@ const RequestTable = ({
       )}
 
       {isWarningOpen && (
-        <WarningModal
+        <ConfirmationModal
           isOpen={isWarningOpen}
           onClose={onWarningClose}
-          handleCancel={handleCancel}
-          row={activeRow}
+          title='Cancel Request'
+          description={`This will cancel the request by ${activeRow.email}`}
+          onConfirm={() => {
+            handleCancel(activeRow)
+            onWarningClose()
+          }}
         />
       )}
     </>

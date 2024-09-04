@@ -31,7 +31,8 @@ const LynkModal = ({
   buttonColor,
   maxW,
   maxH,
-  noFooter = false
+  noFooter = false,
+  hideCancelButton = false
 }) => {
   const isConfirmationModal = type === 'confirmation'
 
@@ -92,6 +93,7 @@ const LynkModal = ({
                 fontWeight={400}
                 color={'#60686F'}
                 variant='ghost'
+                hidden={hideCancelButton}
               >
                 Cancel
               </Button>

@@ -226,21 +226,21 @@ export const sevIcon = (severity) => {
 export const sevColor = (severity) => {
   switch (severity) {
     case 'critical':
-      return 'red'
+      return '#FED7D7'
     case 'super critical':
-      return 'red'
+      return '#FED7D7'
     case 'high':
-      return 'orange'
+      return '#FEEBC8'
     case 'super high':
-      return 'orange'
+      return '#FEEBC8'
     case 'medium':
-      return 'yellow'
+      return '#FEFCBF'
     case 'low':
-      return 'green'
+      return '#C6F6D5'
     case 'super low':
-      return 'green'
+      return '#C6F6D5'
     case 'negligible':
-      return 'green'
+      return '#C6F6D5'
     default:
       return 'gray'
   }

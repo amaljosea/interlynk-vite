@@ -1,6 +1,5 @@
 import { useMutation } from '@apollo/client'
 import styled from '@emotion/styled'
-import { refetchActiveQueries } from 'context/ApolloWrapper'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
@@ -57,13 +56,14 @@ const Policies = () => {
     childKey: 'run_policy_scan'
   })
 
-  const { nodes, paginationProps, loading } = usePaginatedQuery(PolicyResults, {
-    skip: activeTab === 'policies' ? false : true,
-    selector: 'policyResults',
-    variables: {
-      sbomId
-    }
-  })
+  const { nodes, paginationProps, loading, startPolling, stopPolling } =
+    usePaginatedQuery(PolicyResults, {
+      skip: activeTab === 'policies' ? false : true,
+      selector: 'policyResults',
+      variables: {
+        sbomId
+      }
+    })
 
   const isInitialized = nodes?.some((item) => item?.result === 'initialized')
 
@@ -316,15 +316,12 @@ const Policies = () => {
   }
 
   useEffect(() => {
-    const refetchInterval = setInterval(() => {
-      if (isInitialized) {
-        refetchActiveQueries()
-      } else {
-        clearInterval(refetchInterval)
-      }
-    }, 5000)
-    return () => clearInterval(refetchInterval)
-  }, [sbomId, isInitialized])
+    if (isInitialized) {
+      startPolling(1000)
+    } else {
+      stopPolling()
+    }
+  }, [sbomId, isInitialized, startPolling, stopPolling])
 
   return (
     <>

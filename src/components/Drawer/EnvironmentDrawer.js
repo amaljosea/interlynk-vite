@@ -8,6 +8,7 @@ import {
   isDefaultEnv,
   timeSince
 } from 'utils'
+import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 
 import { AddIcon, CheckCircleIcon, DeleteIcon } from '@chakra-ui/icons'
@@ -22,18 +23,9 @@ import {
   DrawerOverlay,
   Flex,
   IconButton,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Stack,
   Text,
   Tooltip,
-  UnorderedList,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -217,43 +209,22 @@ const EnvironmentDrawer = ({
       )}
 
       {/* DELETE WARNING */}
-      {isWarningOpen && activeRow && (
-        <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Delete {activeRow?.name}</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>Deleting this environment will: </Text>
-              <UnorderedList>
-                <Flex flexDir={'column'} gap={1} mt={4}>
-                  {[
-                    'remove the environment, included versions and SBOMs',
-                    'remove any external access to versions in this environment',
-                    'disable import of SBOM to this environment'
-                  ].map((item, index) => (
-                    <ListItem key={index}>{item}</ListItem>
-                  ))}
-                </Flex>
-              </UnorderedList>
-              <Text mt={10}>Are you sure you wish to continue?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onWarningClose}>
-                Cancel
-              </Button>
-              <Button
-                colorScheme='red'
-                isLoading={loading}
-                loadingText='Deleting...'
-                onClick={() => handleDelete(activeRow?.id)}
-              >
-                Ok
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
+      {
+        <ConfirmationModal
+          isOpen={isWarningOpen}
+          onClose={onWarningClose}
+          onConfirm={() => handleDelete(activeRow?.id)}
+          isLoading={loading}
+          name={activeRow?.name}
+          title={`Delete ${activeRow?.name}`}
+          description='Deleting this environment will:'
+          items={[
+            'remove the environment, included versions and SBOMs',
+            'remove any external access to versions in this environment',
+            'disable import of SBOM to this environment'
+          ]}
+        />
+      }
     </>
   )
 }

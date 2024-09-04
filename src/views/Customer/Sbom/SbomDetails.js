@@ -132,6 +132,8 @@ const SbomDetails = ({ sbomData }) => {
     }
   })
 
+  console.log('details', sbomData)
+
   useEffect(() => {
     const refetchInterval = setInterval(() => {
       if (sbomData?.vulnRunStatus === 'IN_PROGRESS') {
@@ -235,6 +237,7 @@ const SbomDetails = ({ sbomData }) => {
             </Tooltip>
             <Tooltip label='Vulnerability Scan'>
               <IconButton
+                border={'5px solid red'}
                 size='xs'
                 colorScheme={
                   vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'

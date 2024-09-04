@@ -127,7 +127,6 @@ const TeamTable = () => {
 
   // COLUMNS
   const columns = [
-    // NAME
     {
       id: 'email',
       name: 'EMAIL',
@@ -160,10 +159,10 @@ const TeamTable = () => {
           </Flex>
         )
       },
-      width: '22%',
+      width: '25%',
       wrap: true
     },
-    // AUTH
+
     {
       id: 'name',
       name: 'NAME',
@@ -189,10 +188,10 @@ const TeamTable = () => {
           )}
         </Stack>
       ),
-      wrap: true,
-      width: '20%'
+      width: '19%',
+      wrap: true
     },
-    // ROLE
+
     {
       id: 'role',
       name: 'ROLE',
@@ -200,9 +199,10 @@ const TeamTable = () => {
         <Text color={textColor} textTransform={'capitalize'}>
           {row?.role?.name || ''}
         </Text>
-      )
+      ),
+      width: '10%'
     },
-    // JOINED DATE
+
     {
       id: 'joinedDate',
       name: 'JOINED',
@@ -227,9 +227,10 @@ const TeamTable = () => {
         const dateA = new Date(aUserStart)
         const dateB = new Date(bUserStart)
         return dateA - dateB // Sort in descending order
-      }
+      },
+      width: '18%'
     },
-    // STATUS
+
     {
       id: 'status',
       name: 'STATUS',
@@ -255,9 +256,11 @@ const TeamTable = () => {
             </TagLabel>
           </Tag>
         )
-      }
+      },
+      center: true,
+      width: '14%'
     },
-    // ACTION
+
     {
       id: 'action',
       name: 'ACTION',
@@ -309,7 +312,8 @@ const TeamTable = () => {
           </Menu>
         )
       },
-      right: 'true'
+      right: 'true',
+      width: '14%'
     }
   ]
 

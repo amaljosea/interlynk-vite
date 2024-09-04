@@ -23,14 +23,15 @@ export const usePaginatedQuery = (
   const [paginationVariables, setPaginationVariables] = useState(
     DEFAULT_PAGINATION_VARIABLES
   )
-  const { data, loading, previousData, error } = useQuery(QUERY, {
-    skip: skip,
-    variables: {
-      ...variables,
-      ...paginationVariables
-    },
-    onCompleted: onCompleted
-  })
+  const { data, loading, previousData, error, startPolling, stopPolling } =
+    useQuery(QUERY, {
+      skip: skip,
+      variables: {
+        ...variables,
+        ...paginationVariables
+      },
+      onCompleted: onCompleted
+    })
 
   const resource = get(data || previousData, selector)
   const { hasNextPage, hasPreviousPage, endCursor, startCursor } =
@@ -74,6 +75,8 @@ export const usePaginatedQuery = (
       setPage(1)
     },
     error: error,
+    startPolling,
+    stopPolling,
     // it is good not to allow any variables for refetch
     // if you need to change the variables, pass it as props, it will rerender
 

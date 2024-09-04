@@ -1,5 +1,4 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { refetchActiveQueries } from 'context/ApolloWrapper'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useParams } from 'react-router-dom'
@@ -95,7 +94,7 @@ const Parts = () => {
   const { PARTS } = ProductGeneralTabs
 
   // GET SBOM PARTS
-  const { data, error } = useQuery(GetSbomParts, {
+  const { data, error, startPolling, stopPolling } = useQuery(GetSbomParts, {
     skip: activeTab === PARTS ? false : true,
     variables: { projectId: prodId, sbomId, first: totalRows }
   })
@@ -276,18 +275,15 @@ const Parts = () => {
   }
 
   useEffect(() => {
-    const refetchInterval = setInterval(() => {
-      const inProgress = sbomParts?.some(
-        (item) => item?.vulnRunStatus === 'IN_PROGRESS'
-      )
-      if (inProgress) {
-        refetchActiveQueries()
-      } else {
-        clearInterval(refetchInterval)
-      }
-    }, 5000)
-    return () => clearInterval(refetchInterval)
-  }, [sbomParts])
+    const inProgress = sbomParts?.some(
+      (item) => item?.part?.vulnRunStatus !== 'FINISHED'
+    )
+    if (inProgress) {
+      startPolling(1000)
+    } else {
+      stopPolling()
+    }
+  }, [sbomParts, startPolling, stopPolling])
 
   // COLUMNS
   const columns = [

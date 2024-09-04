@@ -14,8 +14,6 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Heading,
-  Icon,
   IconButton,
   Input,
   Menu,
@@ -222,11 +220,11 @@ const TokenInfo = () => {
         justifyContent={'space-between'}
         marginBottom={'12px'}
       >
-        <Box>
-          <Heading as='h2' fontSize={'16px'} mb={1} fontFamily={'inherit'}>
+        <Box p='12px 0' mb='8px' display={'flex'} flexDirection={'column'}>
+          <Text fontSize='lg' color={textColor} fontWeight='bold'>
             Security Tokens
-          </Heading>
-          <Text fontSize={'12px'} color='gray.600'>
+          </Text>
+          <Text fontSize={'sm'}>
             Secure your organization with essential tokens for data protection
           </Text>
         </Box>
@@ -253,7 +251,7 @@ const TokenInfo = () => {
         </Tooltip>
       </Flex>
     )
-  }, [onOpen])
+  }, [onOpen, textColor])
 
   useEffect(() => {
     if (activeRow) {

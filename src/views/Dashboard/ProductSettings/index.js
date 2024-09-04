@@ -4,19 +4,11 @@ import { capitalizeFirstLetter } from 'utils'
 import { infoData } from 'variables/general'
 
 import {
-  Button,
   Flex,
   FormControl,
   FormLabel,
   Grid,
   GridItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Text,
   VStack,
@@ -35,6 +27,8 @@ import { useHasPermission } from 'hooks/useHasPermission'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
 import { GetJiraProjects } from 'graphQL/Queries'
+
+import ConfirmationModal from '../Products/components/ConfirmationModal'
 
 const Settings = ({ enabled, data, mfc }) => {
   const { orgView, isFreeTier } = useGlobalQueryContext()
@@ -283,70 +277,34 @@ const Settings = ({ enabled, data, mfc }) => {
 
       {/* CHECKS */}
       {isChecksOpen && (
-        <Modal isOpen={isChecksOpen} onClose={onChecksClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>{checks ? 'Disable' : 'Enable'} Checks</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>
-                {checks ? 'Disabling' : 'Enabling'} this will{' '}
-                {checks ? 'stop' : 'start'} SBOM checks applied to uploaded
-                SBOMs
-              </Text>
-              <Text mt={8}>Are you sure you wish to continue?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onChecksClose}>
-                No
-              </Button>
-              <Button
-                colorScheme={checks ? 'red' : 'green'}
-                onClick={() => {
-                  setChecks(!checks)
-                  onChecksClose()
-                }}
-              >
-                Yes
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <ConfirmationModal
+          isOpen={isChecksOpen}
+          onClose={onChecksClose}
+          onConfirm={() => {
+            setChecks(!checks)
+            onChecksClose()
+          }}
+          title={`${checks ? 'Disable' : 'Enable'} Checks`}
+          description={`${checks ? 'Disabling' : 'Enabling'} this will${' '}
+                  ${checks ? 'stop' : 'start'} SBOM checks applied to uploaded
+                  SBOMs`}
+        />
       )}
 
       {/* INTERNAL COMPONENT */}
       {isCompOpen && (
-        <Modal isOpen={isCompOpen} onClose={onCompClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>
-              {internalComp ? 'Disable' : 'Enable'} Component
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>
-                {internalComp ? 'Disabling' : 'Enabling'} this check will{' '}
-                {internalComp ? 'stop' : 'start'} marketing internal components
-                to uploaded SBOMs
-              </Text>
-              <Text mt={8}>Are you sure you wish to continue?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onCompClose}>
-                No
-              </Button>
-              <Button
-                colorScheme={internalComp ? 'red' : 'green'}
-                onClick={() => {
-                  setInternalComp(!internalComp)
-                  onCompClose()
-                }}
-              >
-                Yes
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <ConfirmationModal
+          isOpen={isCompOpen}
+          onClose={onCompClose}
+          onConfirm={() => {
+            setInternalComp(!internalComp)
+            onCompClose()
+          }}
+          title={`${internalComp ? 'Disable' : 'Enable'} Component`}
+          description={`${internalComp ? 'Disabling' : 'Enabling'} this check will${' '}
+                ${internalComp ? 'stop' : 'start'} marketing internal components
+                to uploaded SBOMs`}
+        />
       )}
 
       {/* INFO MODAL */}

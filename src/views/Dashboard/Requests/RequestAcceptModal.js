@@ -2,25 +2,16 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { truncatedValue } from 'utils'
 
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select
-} from '@chakra-ui/react'
+import { Flex, FormControl, FormLabel, Select } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
 import { RequestAccept } from 'graphQL/Mutation'
 import { GetProductNamesForRequest } from 'graphQL/Queries'
+
+import { FaCheckToSlot } from 'react-icons/fa6'
 
 const RequestAcceptModal = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
@@ -79,64 +70,47 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
   }
 
   return (
-    <Modal
-      size='lg'
+    <LynkModal
       isOpen={isOpen}
       onClose={onClose}
-      motionPreset='slideInBottom'
-      closeOnOverlayClick={false}
-      closeOnEsc={false}
+      title={'Accept SBOM'}
+      buttonText='Accept'
+      onSubmit={handleAccept}
+      Icon={FaCheckToSlot}
     >
-      <ModalOverlay />
-      <form onSubmit={handleAccept}>
-        <ModalContent>
-          <ModalHeader>Accept SBOM</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Flex width={'100%'} direction={'column'} gap={4}>
-              <FormControl isRequired>
-                <FormLabel>Product</FormLabel>
-                <Select onChange={handleProductChange}>
-                  <option value=''>Select Product</option>
-                  {productNames?.organization?.projectGroups?.nodes?.map(
-                    (item, index) => (
-                      <option key={index} value={item.id}>
-                        {truncatedValue(item.name, 24)}
-                      </option>
-                    )
-                  )}
-                </Select>
-              </FormControl>
-              <FormControl isRequired>
-                <FormLabel>Environment</FormLabel>
-                <Select
-                  onChange={(e) => {
-                    setProjectId(e.target.value)
-                  }}
-                  value={projectId}
-                  textTransform={'capitalize'}
-                >
-                  <option value=''>Select Environment</option>
-                  {projectIds.map((item, index) => (
-                    <option key={index} value={item.id}>
-                      {truncatedValue(item.name, 24)}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-            </Flex>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='gray' mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button colorScheme='blue' type='submit'>
-              Accept
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </form>
-    </Modal>
+      <Flex width={'100%'} direction={'column'} gap={4}>
+        <FormControl isRequired>
+          <FormLabel fontSize={12}>Product</FormLabel>
+          <Select onChange={handleProductChange}>
+            <option value=''>Select Product</option>
+            {productNames?.organization?.projectGroups?.nodes?.map(
+              (item, index) => (
+                <option key={index} value={item.id}>
+                  {truncatedValue(item.name, 24)}
+                </option>
+              )
+            )}
+          </Select>
+        </FormControl>
+        <FormControl isRequired>
+          <FormLabel fontSize={12}>Environment</FormLabel>
+          <Select
+            onChange={(e) => {
+              setProjectId(e.target.value)
+            }}
+            value={projectId}
+            textTransform={'capitalize'}
+          >
+            <option value=''>Select Environment</option>
+            {projectIds.map((item, index) => (
+              <option key={index} value={item.id}>
+                {truncatedValue(item.name, 24)}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+      </Flex>
+    </LynkModal>
   )
 }
 

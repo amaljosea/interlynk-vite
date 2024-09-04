@@ -9,11 +9,8 @@ import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
 import {
   AddIcon,
-  ArrowBackIcon,
-  ArrowForwardIcon,
   ChevronDownIcon,
   EditIcon,
-  RepeatIcon,
   ViewIcon,
   ViewOffIcon
 } from '@chakra-ui/icons'
@@ -38,12 +35,14 @@ import {
   InputRightElement,
   Menu,
   MenuButton,
-  MenuItem,
+  MenuItemOption,
   MenuList,
+  MenuOptionGroup,
   Skeleton,
   Tag,
   TagLabel,
   Text,
+  Tooltip,
   VStack,
   useColorModeValue,
   useDisclosure
@@ -65,7 +64,8 @@ import {
 import { orgUpdate } from 'graphQL/Mutation'
 import { AllOrganizations, GetRoles, MyOrganizations } from 'graphQL/Queries'
 
-import { FaBuilding, FaCity } from 'react-icons/fa'
+import { FaExchangeAlt } from 'react-icons/fa'
+import { FaCity } from 'react-icons/fa'
 import { MdDeleteOutline } from 'react-icons/md'
 
 const GetCurrentUser = gql`
@@ -125,6 +125,8 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const navigate = useNavigate()
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const iconColor = useColorModeValue('#EDF2F7', '#2D3748')
+  const switchIconColor = useColorModeValue('gray.500', 'white')
+  const switchBgColor = useColorModeValue('white', '#2D3748')
 
   const cityIconColor = useColorModeValue('#3182CE', '#3182CE')
 
@@ -487,10 +489,14 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
         <Menu>
           <MenuButton
             as={Button}
+            fontSize='sm'
             colorScheme='blue'
+            fontWeight='medium'
+            textTransform='capitalize'
             display={!organization ? 'none' : 'block'}
           >
             <Flex align='center'>
+              {/* Left Icon */}
               {tabs
                 .filter((tab) => tab.name === selectedTab)
                 .map((tab, index) => (
@@ -502,30 +508,28 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     style={{ marginRight: '8px' }}
                   />
                 ))}
-              <Text fontSize={'14px'}>{selectedTab}</Text>
-              <ChevronDownIcon ml='4px' boxSize='25px' />
+
+              {/* Text */}
+              <Text fontSize='sm'>{selectedTab.toLowerCase()}</Text>
+              {/* Right Icon */}
+              <ChevronDownIcon ml='4px' boxSize='20px' />
             </Flex>
           </MenuButton>
           <MenuList>
             {tabs.map((tab, index) => (
-              <MenuItem
-                key={index}
-                onClick={() => {
-                  setSelectedTab(tab.name)
-                  handleTabChange(tab.name)
-                }}
-              >
-                <Flex align='center'>
-                  <tab.icon
-                    w='20px'
-                    h='20px'
-                    color={`${selectedTab === tab.name ? iconColor : '#3182CE'}`}
-                  />
-                  <Text fontSize='sm' fontWeight='bold' ml='6px'>
-                    {tab.name}
-                  </Text>
-                </Flex>
-              </MenuItem>
+              <MenuOptionGroup value={selectedTab} key={index} type='radio'>
+                <MenuItemOption
+                  value={tab.name}
+                  onClick={() => {
+                    setSelectedTab(tab.name)
+                    handleTabChange(tab.name)
+                  }}
+                  fontSize='sm'
+                  textTransform={'capitalize'}
+                >
+                  {tab.name.toLowerCase()}
+                </MenuItemOption>
+              </MenuOptionGroup>
             ))}
           </MenuList>
         </Menu>
@@ -605,10 +609,11 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 <>
                   <Box display={'flex'} gap={'10px'} alignItems={'center'}>
                     <Text
-                      fontWeight='bold'
+                      fontWeight={'semibold'}
+                      fontSize={25}
+                      lineHeight={1.2}
                       color={textColor}
                       ms={{ sm: '8px', md: '0px' }}
-                      fontSize={{ sm: 'lg', lg: 'xl' }}
                     >
                       {selectedTab === 'ORGANIZATION'
                         ? userOrganization
@@ -636,11 +641,12 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   <Text
                     color={'gray.600'}
                     fontWeight='normal'
-                    fontSize={'14px'}
+                    fontSize={'sm'}
+                    wordBreak={'break-all'}
                     textTransform={'capitalize'}
                   >
                     {selectedTab === 'ORGANIZATION'
-                      ? `${activeOrgTier}. Updated ${timeAgo}`
+                      ? `${activeOrgTier} · Updated ${timeAgo}`
                       : userOrganization}
                   </Text>
                 </>
@@ -648,23 +654,38 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
             </Flex>
           </Flex>
           <Flex gap={2}>
-            <IconButton
-              aria-label='Edit'
-              icon={selectedTab === 'PERSONAL' ? <FaBuilding /> : <EditIcon />}
-              colorScheme='blue'
-              variant='solid'
-              onClick={
-                selectedTab === 'PERSONAL' ? switchOrgClick : handleEditOrgClick
+            <Tooltip
+              label={
+                selectedTab === 'PERSONAL'
+                  ? 'Switch Organization'
+                  : 'Edit Organization'
               }
-            />
-            {selectedTab === 'PERSONAL' && (
+            >
               <IconButton
                 aria-label='Edit'
-                icon={<EditIcon />}
+                icon={
+                  selectedTab === 'PERSONAL' ? <FaExchangeAlt /> : <EditIcon />
+                }
                 colorScheme='blue'
                 variant='solid'
-                onClick={handleEditProfileClick}
+                onClick={
+                  selectedTab === 'PERSONAL'
+                    ? switchOrgClick
+                    : handleEditOrgClick
+                }
               />
+            </Tooltip>
+
+            {selectedTab === 'PERSONAL' && (
+              <Tooltip label='Edit Profile'>
+                <IconButton
+                  aria-label='Edit'
+                  icon={<EditIcon />}
+                  colorScheme='blue'
+                  variant='solid'
+                  onClick={handleEditProfileClick}
+                />
+              </Tooltip>
             )}
           </Flex>
         </CardBody>
@@ -679,15 +700,16 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           resetStates()
         }}
         size='md'
+        closeOnOverlayClick={false}
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader borderBottom={'1px solid #A0AEC0'} mb={4}>
+          <DrawerCloseButton mt={1} />
+          <DrawerHeader fontWeight='500' borderBottomWidth='1px'>
             Edit Profile
           </DrawerHeader>
 
-          <DrawerBody>
+          <DrawerBody overflowX={'hidden'}>
             {/* Modal Body Content */}
             <Text fontSize='16px' mb='10px' textColor={'gray.400'}>
               Profile picture
@@ -700,18 +722,23 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 </Text>
               </Box>
               <Flex ml='auto' gap={2}>
-                <IconButton
-                  icon={<EditIcon />}
-                  aria-label='Edit Profile Picture'
-                  variant='outline'
-                  onClick={onProfileClick}
-                />
-                <IconButton
-                  icon={<MdDeleteOutline />}
-                  aria-label='Delete Profile Picture'
-                  variant='outline'
-                  colorScheme='red'
-                />
+                <Tooltip label='Upload Profile Picture'>
+                  <IconButton
+                    icon={<EditIcon />}
+                    aria-label='Edit Profile Picture'
+                    variant='outline'
+                    onClick={onProfileClick}
+                  />
+                </Tooltip>
+                <Tooltip label='Delete Profile Picture'>
+                  <IconButton
+                    icon={<MdDeleteOutline />}
+                    aria-label='Delete Profile Picture'
+                    variant='outline'
+                    borderColor='gray.200'
+                    colorScheme='red'
+                  />
+                </Tooltip>
               </Flex>
             </Flex>
 
@@ -737,13 +764,15 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     placeholder='************'
                     disabled={true}
                   />
-                  <IconButton
-                    onClick={() => setIsPasswordEdit(true)}
-                    icon={<EditIcon />}
-                    aria-label='Edit Password'
-                    variant='outline'
-                    ml={2}
-                  />
+                  <Tooltip label='Edit Password'>
+                    <IconButton
+                      onClick={() => setIsPasswordEdit(true)}
+                      icon={<EditIcon />}
+                      aria-label='Edit Password'
+                      variant='outline'
+                      ml={2}
+                    />
+                  </Tooltip>
                 </Flex>
               </FormControl>
             )}
@@ -838,11 +867,12 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   {passError !== '' && <Text color='red.500'>{passError}</Text>}
                 </FormControl>
                 <Button
+                  w={'120px'}
                   mt={4}
-                  colorScheme='red'
+                  bg={'#FED7D7'}
                   onClick={() => setIsPasswordEdit(false)}
                 >
-                  Cancel Password Edit
+                  Cancel Edit
                 </Button>
               </Box>
             )}
@@ -872,6 +902,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
         placement='right'
         onClose={onOrgModalClose}
         size='md'
+        closeOnOverlayClick={false}
       >
         <DrawerOverlay />
         <DrawerContent>
@@ -924,26 +955,20 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   </Text>
                 </VStack>
                 {activeOrgId !== org.id && (
-                  <Box
-                    border='1px'
-                    borderColor='gray.200'
-                    p={0}
-                    borderRadius='md'
-                    minW={'40px'}
-                    minH={'40px'}
-                    display={'flex'}
-                    flexDirection={'column'}
-                    justifyContent={'center'}
-                    alignItems={'center'}
-                    cursor={'pointer'}
-                    onClick={() => {
-                      setActiveRow({ id: org.id, name: org.name })
-                      onWarningOpen()
-                    }}
-                  >
-                    <ArrowBackIcon mr={2} boxSize={3} />
-                    <ArrowForwardIcon ml={2} boxSize={3} />
-                  </Box>
+                  <Tooltip label={`Switch to ${org.name}`}>
+                    <IconButton
+                      aria-label='Switch'
+                      icon={<FaExchangeAlt color={switchIconColor} />}
+                      border='1px'
+                      borderColor='gray.200'
+                      bg={switchBgColor}
+                      variant='solid'
+                      onClick={() => {
+                        setActiveRow({ id: org.id, name: org.name })
+                        onWarningOpen()
+                      }}
+                    />
+                  </Tooltip>
                 )}
               </Box>
             ))}
@@ -954,7 +979,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
               marginTop='10px'
               fontWeight='500'
               textColor={'blue.500'}
-              border='2px'
+              border='1px'
               borderColor='blue.500'
               onClick={onOpen}
             >
@@ -970,6 +995,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
         placement='right'
         onClose={onOrgInfoClose}
         size='md'
+        closeOnOverlayClick={false}
       >
         <DrawerOverlay />
         <DrawerContent>
@@ -1016,7 +1042,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           onClose={onWarningClose}
           onSubmit={() => onSwitchOrg(activeRow.id, activeRow.name)}
           title={'Switch Organization'}
-          Icon={RepeatIcon}
+          Icon={FaExchangeAlt}
           buttonText='Continue'
         >
           <Text>

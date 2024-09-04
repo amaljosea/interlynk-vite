@@ -11,18 +11,11 @@ import {
   Progress,
   useDisclosure
 } from '@chakra-ui/react'
-import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay
-} from '@chakra-ui/react'
+import { Button } from '@chakra-ui/react'
 
 import { FaUpload } from 'react-icons/fa'
+
+import LynkModal from './LynkModal'
 
 const FileUpload = () => {
   const {
@@ -81,59 +74,55 @@ const FileUpload = () => {
           Upload
         </Button>
       )}
-      <Modal isOpen={isUploadOpen} onClose={onUploadClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Upload SBOM</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Box>
-              <FormLabel htmlFor='file'>
-                <Input
-                  type='file'
-                  id='file'
-                  style={{ display: 'none' }}
-                  onChange={handleFileChange}
-                />
-                <Flex
-                  p={10}
-                  border={'1px dotted lightgray'}
-                  borderWidth={'3px'}
-                  rounded={'lg'}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  <FaUpload color='darkgray' size={32} />
-                </Flex>
-              </FormLabel>
-            </Box>
-            <Box mt={4}>
-              {file && (
-                <Flex direction={'column'} gap={4}>
-                  <p>Uploading: {file.name}</p>
-                  <Progress value={progress} />
-                </Flex>
-              )}
-            </Box>
-            {progress === 100 && (
-              <FormControl isRequired mt={4}>
-                <Input
-                  type='email'
-                  size='lg'
-                  value={fileName}
-                  onChange={(e) => setFileName(e.target.value)}
-                  placeholder='Enter file name'
-                />
-              </FormControl>
-            )}
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='blue' borderRadius={8} onClick={handleSubmit}>
-              Submit
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <LynkModal
+        isOpen={isUploadOpen}
+        onClose={onUploadClose}
+        buttonText='Submit'
+        onSubmit={handleSubmit}
+        title={'Upload SBOM'}
+        Icon={FaUpload}
+        hideCancelButton
+      >
+        <Box>
+          <FormLabel htmlFor='file'>
+            <Input
+              type='file'
+              id='file'
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
+            <Flex
+              p={10}
+              border={'1px dotted lightgray'}
+              borderWidth={'3px'}
+              rounded={'lg'}
+              alignItems={'center'}
+              justifyContent={'center'}
+            >
+              <FaUpload color='darkgray' size={32} />
+            </Flex>
+          </FormLabel>
+        </Box>
+        <Box mt={4}>
+          {file && (
+            <Flex direction={'column'} gap={4}>
+              <p>Uploading: {file.name}</p>
+              <Progress value={progress} />
+            </Flex>
+          )}
+        </Box>
+        {progress === 100 && (
+          <FormControl isRequired mt={4}>
+            <Input
+              type='email'
+              size='lg'
+              value={fileName}
+              onChange={(e) => setFileName(e.target.value)}
+              placeholder='Enter file name'
+            />
+          </FormControl>
+        )}
+      </LynkModal>
     </>
   )
 }

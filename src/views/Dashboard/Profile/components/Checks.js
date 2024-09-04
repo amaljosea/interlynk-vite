@@ -117,7 +117,7 @@ const Checks = () => {
             color={textColor}
             isDisabled={!updateOrg}
             onChange={(e) => handleStatusChange(id, e.target.value)}
-            bg={sevColor(severity.toLowerCase()) + '.300'}
+            bg={sevColor(severity.toLowerCase())}
             borderRadius={'6px'}
           >
             {options.map((itm, index) => (

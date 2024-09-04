@@ -359,7 +359,11 @@ const ProductDetailsMain = () => {
     <>
       <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
         {/* INFO SECTION */}
-        <Card display={data ? 'block' : 'none'} className='product-details'>
+        <Card
+          display={data ? 'block' : 'none'}
+          className='product-details'
+          minH={'100px'}
+        >
           <CardBody>
             <Grid
               width={'100%'}

@@ -176,10 +176,6 @@ function Profile() {
               ))}
             </TabList>
             <TabPanels>
-              {/* GEENRAL */}
-              {/*  <TabPanel>
-                <GeneralFeed />
-              </TabPanel> */}
               {/* TEAMS */}
               <TabPanel display={data ? 'block' : 'none'}>
                 <TeamTable />

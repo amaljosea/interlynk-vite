@@ -609,7 +609,7 @@ const Checks = () => {
           <Tag
             size='md'
             variant='subtle'
-            colorScheme={sevColor(organizationRule.severity)}
+            bg={sevColor(organizationRule.severity)}
             textTransform={'capitalize'}
             width={'80px'}
           >

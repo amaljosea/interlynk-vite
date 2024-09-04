@@ -38,7 +38,7 @@ const AdvisoryFeeds = ({ data, manageFeeds }) => {
   }
 
   return (
-    <Card p={0}>
+    <Card p={0} boxShadow='none'>
       <CardHeader p='12px 0' mb='12px'>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
           Advisory Feeds

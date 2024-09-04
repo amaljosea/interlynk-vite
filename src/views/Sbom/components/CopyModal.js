@@ -1,24 +1,19 @@
 import { useEffect } from 'react'
 import { useState } from 'react'
 
+import { CopyIcon } from '@chakra-ui/icons'
 import {
   Alert,
-  Button,
   Flex,
   FormControl,
   FormLabel,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Stack,
   Text
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 const CopyModal = ({ isOpen, onClose, product, version }) => {
   const [message, setMessage] = useState('')
@@ -50,80 +45,60 @@ const CopyModal = ({ isOpen, onClose, product, version }) => {
   }
 
   return (
-    <>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <form onSubmit={message === '' ? handleSave : handleSubmit}>
-          <ModalContent>
-            <ModalHeader>Copy SBOM</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text mt={2}>
-                Copy{' '}
-                <strong>
-                  {product}:{version}
-                </strong>{' '}
-                SBOM Content to :
-              </Text>
-              <Flex flexDir={'column'} gap={5} mt={6}>
-                {data && (
-                  <FormControl isRequired>
-                    <FormLabel fontSize={16}>Product</FormLabel>
-                    <Select
-                      name='product'
-                      value={selectedProduct}
-                      onChange={(e) => setSelectedProduct(e.target.value)}
-                    >
-                      {data.projects.nodes.length > 0 &&
-                        data.projects.nodes.map((pv, index) => (
-                          <option value={pv.id} key={index}>
-                            {pv.name}
-                          </option>
-                        ))}
-                    </Select>
-                  </FormControl>
-                )}
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={message === '' ? handleSave : handleSubmit}
+      title={'Copy SBOM'}
+      buttonText={message === '' ? 'Copy' : 'Yes'}
+      Icon={CopyIcon}
+    >
+      <Text mt={2}>
+        Copy{' '}
+        <strong>
+          {product}:{version}
+        </strong>{' '}
+        SBOM Content to :
+      </Text>
+      <Flex flexDir={'column'} gap={5} mt={6}>
+        {data && (
+          <FormControl isRequired>
+            <FormLabel fontSize={16}>Product</FormLabel>
+            <Select
+              name='product'
+              value={selectedProduct}
+              onChange={(e) => setSelectedProduct(e.target.value)}
+            >
+              {data.projects.nodes.length > 0 &&
+                data.projects.nodes.map((pv, index) => (
+                  <option value={pv.id} key={index}>
+                    {pv.name}
+                  </option>
+                ))}
+            </Select>
+          </FormControl>
+        )}
 
-                <FormControl isRequired>
-                  <FormLabel fontSize={16}>Version</FormLabel>
-                  <Input
-                    type='text'
-                    value={selectedVersion}
-                    placeholder='Add version'
-                    onChange={(e) => setSelectedVersion(e.target.value)}
-                  />
-                </FormControl>
+        <FormControl isRequired>
+          <FormLabel fontSize={12}>Version</FormLabel>
+          <Input
+            type='text'
+            value={selectedVersion}
+            placeholder='Add version'
+            onChange={(e) => setSelectedVersion(e.target.value)}
+          />
+        </FormControl>
 
-                {message !== '' && (
-                  <Alert status='info'>
-                    <Stack direction={'column'} gap={2}>
-                      <Text fontSize={'sm'}>{message}</Text>
-                      <Text fontSize={'sm'}>
-                        Are you sure you want to continue ?
-                      </Text>
-                    </Stack>
-                  </Alert>
-                )}
-              </Flex>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              {message === '' ? (
-                <Button colorScheme='blue' type='submit'>
-                  Copy
-                </Button>
-              ) : (
-                <Button colorScheme='blue' type={'submit'}>
-                  Yes
-                </Button>
-              )}
-            </ModalFooter>
-          </ModalContent>
-        </form>
-      </Modal>
-    </>
+        {message !== '' && (
+          <Alert status='info'>
+            <Stack direction={'column'} gap={2}>
+              <Text fontSize={'sm'}>{message}</Text>
+              <Text fontSize={'sm'}>Are you sure you want to continue ?</Text>
+            </Stack>
+          </Alert>
+        )}
+      </Flex>
+    </LynkModal>
   )
 }
 

@@ -1,6 +1,5 @@
 import { useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { refetchActiveQueries } from 'context/ApolloWrapper'
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -32,14 +31,17 @@ const ProductDetailsSbomNew = () => {
   const { setIsOpen, setCurrentStep } = useTour()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
-  const { data, loading, error } = useQuery(GetProductData, {
-    variables: { projectId: productId, sbomId: sbomId },
-    onCompleted: (data) => {
-      if (data?.sbom?.sbomParts?.length > 0) {
-        prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
+  const { data, loading, error, startPolling, stopPolling } = useQuery(
+    GetProductData,
+    {
+      variables: { projectId: productId, sbomId: sbomId },
+      onCompleted: (data) => {
+        if (data?.sbom?.sbomParts?.length > 0) {
+          prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
+        }
       }
     }
-  })
+  )
 
   const { stats, vulnRunStatus, policyResultMetrics } = data?.sbom || ''
   const { compCount, compLicenseCount, vulnStats, sbomParts } = stats || ''
@@ -76,15 +78,12 @@ const ProductDetailsSbomNew = () => {
   }, [data, activeTour, setCurrentStep, setIsOpen, shouldShowDemoFeatures])
 
   useEffect(() => {
-    const refetchInterval = setInterval(() => {
-      if (reScanVuln || isInitialized) {
-        refetchActiveQueries()
-      } else {
-        clearInterval(refetchInterval)
-      }
-    }, 15000)
-    return () => clearInterval(refetchInterval)
-  }, [sbomId, reScanVuln, isInitialized])
+    if (reScanVuln || isInitialized) {
+      startPolling(1000)
+    } else {
+      stopPolling()
+    }
+  }, [sbomId, reScanVuln, isInitialized, startPolling, stopPolling])
 
   return (
     <Flex width={'100%'} flexDir={'column'} gap={5}>

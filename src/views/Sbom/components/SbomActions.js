@@ -255,29 +255,22 @@ const SbomActions = ({ sbom }) => {
         </Tooltip>
 
         {/* SIGNED SBOM */}
-        {status === 'signed' ? (
-          <Tooltip label='Signed'>
-            <IconButton
-              display={signedUrlParams ? 'none' : 'flex'}
-              colorScheme='blue'
-              icon={<TbSignature size={22} />}
-              onClick={setVerifyOpen}
-              // isDisabled={!signSboms || !updateSboms}
-              isDisabled={true}
-            />
-          </Tooltip>
-        ) : (
-          <Tooltip label='Unsigned'>
-            <IconButton
-              display={signedUrlParams ? 'none' : 'flex'}
-              colorScheme='blue'
-              icon={<TbSignatureOff size={22} />}
-              onClick={setVerifyOpen}
-              // isDisabled={!signSboms || !updateSboms}
-              isDisabled={true}
-            />
-          </Tooltip>
-        )}
+        <Tooltip label={status === 'signed' ? 'Signed' : 'Unsigned'}>
+          <IconButton
+            display={signedUrlParams ? 'none' : 'flex'}
+            colorScheme='blue'
+            icon={
+              status === 'signed' ? (
+                <TbSignature size={22} />
+              ) : (
+                <TbSignatureOff size={22} />
+              )
+            }
+            onClick={setVerifyOpen}
+            // isDisabled={!signSboms || !updateSboms}
+            isDisabled={true}
+          />
+        </Tooltip>
 
         {/* DOWNLOAD SBOM */}
         <Tooltip label='Download'>

@@ -11,13 +11,6 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Tag,
   Text,
@@ -25,11 +18,14 @@ import {
 } from '@chakra-ui/react'
 
 import CpeInput from 'components/CpeInput'
+import LynkModal from 'components/LynkModal'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
+
+import { FaCircleInfo } from 'react-icons/fa6'
 
 const PurlModal = ({
   data,
@@ -626,248 +622,222 @@ const PurlModal = ({
   }, [purl, setPurlValue])
 
   return (
-    <>
-      <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInBottom'>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>PURL Details</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {component && (
-              <Flex
-                width='100%'
-                direction={'row'}
-                alignItems={'center'}
-                justifyContent={'flex-start'}
-                wrap={'wrap'}
-                gap={2}
-                mb={6}
-              >
-                <Text wordBreak={'break-all'}>{component?.name || ''}</Text>
-                <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
-              </Flex>
-            )}
-            {activeComp && (
-              <Flex
-                width='100%'
-                direction={'row'}
-                alignItems={'center'}
-                justifyContent={'flex-start'}
-                wrap={'wrap'}
-                gap={2}
-                mb={6}
-              >
-                <Text wordBreak={'break-all'}>
-                  {activeComp.name ? activeComp.name : ''}
-                </Text>
-                {activeComp.version && (
-                  <Tag colorScheme='blue'>{activeComp.version}</Tag>
-                )}
-              </Flex>
-            )}
-            <Flex width={'100%'} direction={'column'} gap={4}>
-              {/* Package URL */}
-              <FormControl isDisabled={resolved}>
-                <FormLabel>Package URL</FormLabel>
-                <Textarea
-                  type='text'
-                  variant='filled'
-                  mt={1.5}
-                  value={purlString}
-                  fontSize='16px'
-                  fontStyle={'bold'}
-                  isInvalid
-                  errorBorderColor='blue.600'
-                  onChange={(e) => console.log(e.target.value)}
-                  disabled
-                />
-              </FormControl>
-              {/* Type */}
-              <FormControl isDisabled={resolved}>
-                <FormLabel htmlFor='packageType'>Package Type</FormLabel>
-                <Select
-                  size='md'
-                  fontSize={'sm'}
-                  id='packageType'
-                  name='packageType'
-                  value={purlType}
-                  onChange={handleTypeChange}
-                  onBlur={onTypeBlur}
-                >
-                  {typeOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-              {/* Namespace */}
-              {purlType === 'maven' ||
-              purlType === 'npm' ||
-              purlType === 'gem' ? (
-                <CpeInput
-                  name='namespace'
-                  isDisabled={resolved}
-                  inputValue={namespace}
-                  setInputValue={setNamespace}
-                  cpeList={namespaceList}
-                  setCpeList={setNamespaceList}
-                  inputRef={namespaceRef}
-                  validation={false}
-                  onChange={onNamespaceInputChange}
-                />
-              ) : namespaceOptions[purlType] &&
-                namespaceOptions[purlType].length > 0 ? (
-                <FormControl isDisabled={resolved}>
-                  <FormLabel>Namespace</FormLabel>
-                  <Select
-                    size='md'
-                    fontSize={'sm'}
-                    id='namespace'
-                    name='namespace'
-                    value={namespace}
-                    onChange={handleNamespaceChange}
-                    onBlur={onNamespaceBlur}
-                  >
-                    {namespaceOptions[purlType].map((item, index) => (
-                      <option key={index} value={item.value}>
-                        {item.label}
-                      </option>
-                    ))}
-                  </Select>
-                </FormControl>
-              ) : (
-                <FormControl
-                  isDisabled={resolved}
-                  display={
-                    purlType === 'nuget' || purlType === 'oci'
-                      ? 'none'
-                      : 'block'
-                  }
-                >
-                  <FormLabel>Namespace</FormLabel>
-                  <Input
-                    size='md'
-                    fontSize={'sm'}
-                    id='namespace'
-                    name='namespace'
-                    value={namespace}
-                    onChange={handleNamespaceChange}
-                    onBlur={onNamespaceBlur}
-                    placeholder='Enter namespace'
-                  />
-                </FormControl>
-              )}
-              {/* Name */}
-              {isAutoComplete ? (
-                <CpeInput
-                  name='packageName'
-                  isDisabled={resolved}
-                  inputValue={purlName}
-                  setInputValue={setPurlName}
-                  cpeList={purlNameList}
-                  setCpeList={setPurlNameList}
-                  inputRef={packageNameRef}
-                  validation={false}
-                  onChange={onNameInputChange}
-                />
-              ) : (
-                <FormControl isDisabled={resolved}>
-                  <FormLabel>Package Name</FormLabel>
-                  <Input
-                    type='text'
-                    mt={1.5}
-                    value={purlName}
-                    fontSize={'sm'}
-                    onChange={handleNameChange}
-                    onBlur={onNameBlur}
-                    placeholder='Enter packageName'
-                  />
-                </FormControl>
-              )}
-              {/* Version */}
-              {isAutoComplete ? (
-                <CpeInput
-                  validation={false}
-                  isDisabled={resolved}
-                  name='packageVersion'
-                  inputValue={purlVersion}
-                  setInputValue={setPurlVersion}
-                  cpeList={purlVersionList}
-                  setCpeList={setPurlVersionList}
-                  inputRef={purlVersionRef}
-                  onChange={onVersionInputChange}
-                />
-              ) : (
-                <FormControl isDisabled={resolved}>
-                  <FormLabel>Version</FormLabel>
-                  <Input
-                    size='md'
-                    fontSize={'sm'}
-                    mt={1.5}
-                    type='text'
-                    value={purlVersion}
-                    onChange={handleVersionChange}
-                    onBlur={onVersionBlur}
-                    placeholder='Enter version'
-                  />
-                </FormControl>
-              )}
-              {/* Qualifiers */}
-              <FormControl isDisabled={resolved}>
-                <FormLabel>Qualifiers</FormLabel>
-                <Input
-                  size='md'
-                  fontSize={'sm'}
-                  id='qualifiers'
-                  name='qualifiers'
-                  value={qualifiers}
-                  onChange={handleQualifierChange}
-                  onBlur={onQualifierBlur}
-                  placeholder='Enter qualifiers'
-                />
-              </FormControl>
-            </Flex>
-          </ModalBody>
-
-          <ModalFooter>
-            <Flex
-              gap={2}
-              width={'100%'}
-              justifyContent={'flex-end'}
-              alignItems={'center'}
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={friendlyId ? handleComUpdate : handleSave}
+      title={'PURL Details'}
+      Icon={FaCircleInfo}
+      hidden={resolved}
+      disabled={isInvalid || isDisabled}
+      buttonText={'Save'}
+      leftFooterContent={
+        !isFreeTier && (
+          <Button
+            variant='ghost'
+            mr={'auto'}
+            fontSize={'sm'}
+            isDisabled={isDisabled || isInvalid}
+            onClick={handleRuleCreate}
+            hidden={friendlyId ? false : true}
+            colorScheme={ruleExists ? 'green' : 'blue'}
+          >
+            {ruleExists ? 'View' : 'Save as'} Rule
+          </Button>
+        )
+      }
+    >
+      {component && (
+        <Flex
+          width='100%'
+          direction={'row'}
+          alignItems={'center'}
+          justifyContent={'flex-start'}
+          wrap={'wrap'}
+          gap={2}
+          mb={6}
+        >
+          <Text wordBreak={'break-all'}>{component?.name || ''}</Text>
+          <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
+        </Flex>
+      )}
+      {activeComp && (
+        <Flex
+          width='100%'
+          direction={'row'}
+          alignItems={'center'}
+          justifyContent={'flex-start'}
+          wrap={'wrap'}
+          gap={2}
+          mb={6}
+        >
+          <Text wordBreak={'break-all'}>
+            {activeComp.name ? activeComp.name : ''}
+          </Text>
+          {activeComp.version && (
+            <Tag colorScheme='blue'>{activeComp.version}</Tag>
+          )}
+        </Flex>
+      )}
+      <Flex width={'100%'} direction={'column'} gap={4}>
+        {/* Package URL */}
+        <FormControl isDisabled={resolved}>
+          <FormLabel fontSize={12}>Package URL</FormLabel>
+          <Textarea
+            type='text'
+            variant='filled'
+            value={purlString}
+            fontSize='16px'
+            fontStyle={'bold'}
+            isInvalid
+            errorBorderColor='blue.600'
+            onChange={(e) => console.log(e.target.value)}
+            disabled
+          />
+        </FormControl>
+        {/* Type */}
+        <FormControl isDisabled={resolved}>
+          <FormLabel fontSize={12} htmlFor='packageType'>
+            Package Type
+          </FormLabel>
+          <Select
+            size='md'
+            fontSize={'sm'}
+            id='packageType'
+            name='packageType'
+            value={purlType}
+            onChange={handleTypeChange}
+            onBlur={onTypeBlur}
+          >
+            {typeOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+        {/* Namespace */}
+        {purlType === 'maven' || purlType === 'npm' || purlType === 'gem' ? (
+          <CpeInput
+            name='namespace'
+            isDisabled={resolved}
+            inputValue={namespace}
+            setInputValue={setNamespace}
+            cpeList={namespaceList}
+            setCpeList={setNamespaceList}
+            inputRef={namespaceRef}
+            validation={false}
+            onChange={onNamespaceInputChange}
+          />
+        ) : namespaceOptions[purlType] &&
+          namespaceOptions[purlType].length > 0 ? (
+          <FormControl isDisabled={resolved}>
+            <FormLabel fontSize={12}>Namespace</FormLabel>
+            <Select
+              size='md'
+              fontSize={'sm'}
+              id='namespace'
+              name='namespace'
+              value={namespace}
+              onChange={handleNamespaceChange}
+              onBlur={onNamespaceBlur}
             >
-              {!isFreeTier && (
-                <Button
-                  mr={'auto'}
-                  fontSize={'sm'}
-                  isDisabled={isDisabled || isInvalid}
-                  onClick={handleRuleCreate}
-                  hidden={friendlyId ? false : true}
-                  colorScheme={ruleExists ? 'green' : 'blue'}
-                >
-                  {ruleExists ? 'View' : 'Save as'} Rule
-                </Button>
-              )}
-
-              <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                variant='solid'
-                fontSize={'sm'}
-                hidden={resolved}
-                colorScheme={'blue'}
-                isDisabled={isInvalid || isDisabled}
-                onClick={friendlyId ? handleComUpdate : handleSave}
-              >
-                Save
-              </Button>
-            </Flex>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
+              {namespaceOptions[purlType].map((item, index) => (
+                <option key={index} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+        ) : (
+          <FormControl
+            isDisabled={resolved}
+            display={
+              purlType === 'nuget' || purlType === 'oci' ? 'none' : 'block'
+            }
+          >
+            <FormLabel fontSize={12}>Namespace</FormLabel>
+            <Input
+              size='md'
+              fontSize={'sm'}
+              id='namespace'
+              name='namespace'
+              value={namespace}
+              onChange={handleNamespaceChange}
+              onBlur={onNamespaceBlur}
+              placeholder='Enter namespace'
+            />
+          </FormControl>
+        )}
+        {/* Name */}
+        {isAutoComplete ? (
+          <CpeInput
+            name='packageName'
+            isDisabled={resolved}
+            inputValue={purlName}
+            setInputValue={setPurlName}
+            cpeList={purlNameList}
+            setCpeList={setPurlNameList}
+            inputRef={packageNameRef}
+            validation={false}
+            onChange={onNameInputChange}
+          />
+        ) : (
+          <FormControl isDisabled={resolved}>
+            <FormLabel fontSize={12}>Package Name</FormLabel>
+            <Input
+              type='text'
+              value={purlName}
+              fontSize={'sm'}
+              onChange={handleNameChange}
+              onBlur={onNameBlur}
+              placeholder='Enter packageName'
+            />
+          </FormControl>
+        )}
+        {/* Version */}
+        {isAutoComplete ? (
+          <CpeInput
+            validation={false}
+            isDisabled={resolved}
+            name='packageVersion'
+            inputValue={purlVersion}
+            setInputValue={setPurlVersion}
+            cpeList={purlVersionList}
+            setCpeList={setPurlVersionList}
+            inputRef={purlVersionRef}
+            onChange={onVersionInputChange}
+          />
+        ) : (
+          <FormControl isDisabled={resolved}>
+            <FormLabel fontSize={12}>Version</FormLabel>
+            <Input
+              size='md'
+              fontSize={'sm'}
+              type='text'
+              value={purlVersion}
+              onChange={handleVersionChange}
+              onBlur={onVersionBlur}
+              placeholder='Enter version'
+            />
+          </FormControl>
+        )}
+        {/* Qualifiers */}
+        <FormControl isDisabled={resolved}>
+          <FormLabel fontSize={12}>Qualifiers</FormLabel>
+          <Input
+            size='md'
+            fontSize={'sm'}
+            id='qualifiers'
+            name='qualifiers'
+            value={qualifiers}
+            onChange={handleQualifierChange}
+            onBlur={onQualifierBlur}
+            placeholder='Enter qualifiers'
+          />
+        </FormControl>
+      </Flex>
+    </LynkModal>
   )
 }
 
