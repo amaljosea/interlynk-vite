@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom'
 import ComplianceChecks from 'views/Sbom/components/ComplianceChecks'
 
 import {
+  Box,
   Button,
   Flex,
   Img,
@@ -96,8 +97,8 @@ const Compliance = () => {
       <SimpleGrid columns={4} spacing={5} mt={2}>
         {data?.map((item, index) => (
           <Card key={item?.id} gap={6} border={`1px solid ${borderColor}`}>
-            {item?.icon}
-            <Stack alignItems={'flex-start'}>
+            <Flex gap={4} alignItems={'center'} justifyContent={'flex-start'}>
+              <Box>{item?.icon}</Box>
               <Text
                 fontSize={'16px'}
                 cursor={'pointer'}
@@ -107,15 +108,15 @@ const Compliance = () => {
               >
                 {item?.title}
               </Text>
-              <Text
-                color={textColor}
-                fontSize={'14px'}
-                fontWeight={'light'}
-                pt={item?.description === 'Coming soon...' ? 5 : 0}
-              >
-                {item?.description}
-              </Text>
-            </Stack>
+            </Flex>
+            <Text
+              color={textColor}
+              fontSize={'14px'}
+              fontWeight={'light'}
+              pt={item?.description === 'Coming soon...' ? 5 : 0}
+            >
+              {item?.description}
+            </Text>
             <Flex
               alignItems={'center'}
               justifyContent={'space-between'}
