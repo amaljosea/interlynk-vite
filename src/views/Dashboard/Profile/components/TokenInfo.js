@@ -15,6 +15,7 @@ import {
   FormErrorMessage,
   FormLabel,
   Heading,
+  Icon,
   IconButton,
   Input,
   Menu,

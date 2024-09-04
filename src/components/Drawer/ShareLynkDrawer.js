@@ -8,7 +8,6 @@ import { getShareLinklUrl } from 'utils/url'
 
 import {
   Alert,
-  Button,
   Checkbox,
   Drawer,
   DrawerBody,
@@ -22,13 +21,6 @@ import {
   FormLabel,
   IconButton,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Text,
   Tooltip,
   useClipboard,
@@ -38,10 +30,12 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkModal from 'components/LynkModal'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import { CreateShareLynk } from 'graphQL/Mutation'
 
+import { BiShare } from 'react-icons/bi'
 import { FaCheck, FaPlus, FaRegCopy } from 'react-icons/fa6'
 import { PiFileSvgDuotone } from 'react-icons/pi'
 
@@ -249,63 +243,50 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
       </Drawer>
 
       {isShareLykOpen && (
-        <Modal isOpen={isShareLykOpen} onClose={onShareLynkClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Create ShareLynk</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              {!noExpire && (
-                <FormControl mb={3} isInvalid={!isValidDate}>
-                  <FormLabel mb={1} htmlFor='expire'>
-                    Expiration Date
-                  </FormLabel>
-                  <Datetime
-                    closeOnSelect={true}
-                    value={selectedDate}
-                    onChange={handleDateChange}
-                    className={react_datatime}
-                    inputProps={{
-                      placeholder: 'Select Date and Time',
-                      onCopy: (e) => e.preventDefault(),
-                      onPaste: (e) => e.preventDefault(),
-                      style: {
-                        background: 'none'
-                      }
-                    }}
-                  />
-                  {!isValidDate && (
-                    <FormErrorMessage>
-                      Please enter a valid expiry date
-                    </FormErrorMessage>
-                  )}
-                </FormControl>
+        <LynkModal
+          isOpen={isShareLykOpen}
+          onClose={onShareLynkClose}
+          onSubmit={handleCreateLynk}
+          title={'Create ShareLynk'}
+          Icon={BiShare}
+          disabled={
+            (selectedDate !== '' && !isValidDate) ||
+            (!selectedDate && noExpire === false)
+          }
+          buttonText={'Add'}
+        >
+          {!noExpire && (
+            <FormControl mb={3} isInvalid={!isValidDate}>
+              <FormLabel mb={1} htmlFor='expire'>
+                Expiration Date
+              </FormLabel>
+              <Datetime
+                closeOnSelect={true}
+                value={selectedDate}
+                onChange={handleDateChange}
+                className={react_datatime}
+                inputProps={{
+                  placeholder: 'Select Date and Time',
+                  onCopy: (e) => e.preventDefault(),
+                  onPaste: (e) => e.preventDefault(),
+                  style: {
+                    background: 'none'
+                  }
+                }}
+              />
+              {!isValidDate && (
+                <FormErrorMessage>
+                  Please enter a valid expiry date
+                </FormErrorMessage>
               )}
-              <FormControl mb={3}>
-                <Checkbox isChecked={noExpire} onChange={handleExpireChange}>
-                  No Expiration
-                </Checkbox>
-              </FormControl>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} fontSize={'sm'} onClick={onShareLynkClose}>
-                Close
-              </Button>
-              <Button
-                fontSize={'sm'}
-                variant='solid'
-                colorScheme='blue'
-                isDisabled={
-                  (selectedDate !== '' && !isValidDate) ||
-                  (!selectedDate && noExpire === false)
-                }
-                onClick={handleCreateLynk}
-              >
-                Add
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+            </FormControl>
+          )}
+          <FormControl mb={3}>
+            <Checkbox isChecked={noExpire} onChange={handleExpireChange}>
+              No Expiration
+            </Checkbox>
+          </FormControl>
+        </LynkModal>
       )}
     </>
   )

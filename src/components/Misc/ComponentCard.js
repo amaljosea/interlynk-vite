@@ -1,19 +1,11 @@
 import { PackageURL } from 'packageurl-js'
 import { useEffect, useState } from 'react'
 
-import {
-  Divider,
-  Grid,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Stack,
-  Text,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Divider, Grid, Stack, Text, useColorModeValue } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
+
+import { BiLayer } from 'react-icons/bi'
 
 import CustomTag from './CustomTag'
 
@@ -47,30 +39,29 @@ const ComponentCard = ({ data, isOpen, onClose }) => {
   }, [purl])
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Component Details</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody pb={6}>
-          <Stack spacing={2} py={3}>
-            <ListItem label={'Ecosystem'} value={pkg?.type} />
-            <Divider />
-            <ListItem label={'Name'} value={name} />
-            <Divider />
-            <ListItem label={'Version'} value={version} />
-            <Divider />
-            <ListItem label={'Type'} value={kind} />
-            <Divider />
-            <ListItem label={'License'} value={licensesExp} />
-            <Divider />
-            <ListItem label={'Primary'} value={primary ? 'Yes' : 'No'} />
-            <Divider />
-            <ListItem label={'Internal'} value={internal ? 'Yes' : 'No'} />
-          </Stack>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title='Component Details'
+      Icon={BiLayer}
+      noFooter={true}
+    >
+      <Stack spacing={2} py={3}>
+        <ListItem label={'Ecosystem'} value={pkg?.type} />
+        <Divider />
+        <ListItem label={'Name'} value={name} />
+        <Divider />
+        <ListItem label={'Version'} value={version} />
+        <Divider />
+        <ListItem label={'Type'} value={kind} />
+        <Divider />
+        <ListItem label={'License'} value={licensesExp} />
+        <Divider />
+        <ListItem label={'Primary'} value={primary ? 'Yes' : 'No'} />
+        <Divider />
+        <ListItem label={'Internal'} value={internal ? 'Yes' : 'No'} />
+      </Stack>
+    </LynkModal>
   )
 }
 

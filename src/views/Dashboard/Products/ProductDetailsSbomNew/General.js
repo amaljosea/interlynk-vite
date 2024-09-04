@@ -7,19 +7,11 @@ import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 
 import { EditIcon, InfoIcon } from '@chakra-ui/icons'
 import {
-  Button,
   Flex,
   HStack,
   Icon,
   IconButton,
   Link,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Skeleton,
   Stack,
   Table,
@@ -41,6 +33,7 @@ import CardBody from 'components/Card/CardBody'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import InfoModal from 'components/InfoModal'
 import LicenseField from 'components/Licenses/LicenseField'
+import LynkModal from 'components/LynkModal'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -52,6 +45,10 @@ import {
   supplierDelete,
   toolDelete
 } from 'graphQL/Mutation'
+
+import { FaScaleBalanced } from 'react-icons/fa6'
+
+import ConfirmationModal from '../components/ConfirmationModal'
 
 const InfoLabel = ({ title, onClick }) => {
   return (
@@ -132,6 +129,21 @@ const General = ({ data, loading, error }) => {
     onOpen: onInfoOpen,
     onClose: onInfoClose
   } = useDisclosure()
+  const {
+    isOpen: isAutDelOpen,
+    onOpen: onAutDelOpen,
+    onClose: onAutDelClose
+  } = useDisclosure()
+  const {
+    isOpen: isSupplierDelOpen,
+    onOpen: onSupplierDelOpen,
+    onClose: onSupplierDelClose
+  } = useDisclosure()
+  const {
+    isOpen: isLicenseDelOpen,
+    onOpen: onLicenseDelOpen,
+    onClose: onLicenseDelClose
+  } = useDisclosure()
 
   const [deleteSupplier] = useMutation(supplierDelete)
   const [deleteTool] = useMutation(toolDelete)
@@ -150,9 +162,9 @@ const General = ({ data, loading, error }) => {
 
   const handleAuthorRemove = async (id) => {
     try {
-      await deleteAuthor({ variables: { authorId: id, sbomId } }).then(
-        (res) => res?.data
-      )
+      await deleteAuthor({ variables: { authorId: id, sbomId } })
+        .then((res) => res?.data)
+        .finally(() => onAutDelClose())
     } catch (error) {
       console.log(`Mutation error`, error)
     }
@@ -164,7 +176,9 @@ const General = ({ data, loading, error }) => {
   }
 
   const handleSupRemove = async (id) => {
-    await deleteSupplier({ variables: { id: id } }).then((res) => res.data)
+    await deleteSupplier({ variables: { id: id } })
+      .then((res) => res.data)
+      .finally(() => onSupplierDelClose())
   }
 
   // const onRemoveLicense = async () => console.log('License');
@@ -183,7 +197,7 @@ const General = ({ data, loading, error }) => {
       }
     })
       .then((res) => res.data && sbomDispatch({ type: 'CLEAR_LICENSES' }))
-      .finally(() => onSBMClose())
+      .finally(() => onLicenseDelClose())
   }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
@@ -333,7 +347,10 @@ const General = ({ data, loading, error }) => {
                         </TagLabel>
                         {updateComponent && (
                           <TagCloseButton
-                            onClick={() => handleAuthorRemove(item.id)}
+                            onClick={() => {
+                              setActiveTool(item)
+                              onAutDelOpen()
+                            }}
                           />
                         )}
                       </Tag>
@@ -386,7 +403,10 @@ const General = ({ data, loading, error }) => {
                         </TagLabel>
                         {updateComponent && (
                           <TagCloseButton
-                            onClick={() => handleSupRemove(item.id)}
+                            onClick={() => {
+                              setActiveTool(item)
+                              onSupplierDelOpen()
+                            }}
                           />
                         )}
                       </Tag>
@@ -434,7 +454,7 @@ const General = ({ data, loading, error }) => {
                     >
                       <TagLabel>{licensesExp}</TagLabel>
                       {updateComponent && (
-                        <TagCloseButton onClick={onUpdateLicense} />
+                        <TagCloseButton onClick={onLicenseDelOpen} />
                       )}
                     </Tag>
                   )}
@@ -464,38 +484,24 @@ const General = ({ data, loading, error }) => {
           isFreeTier={isFreeTier}
         />
       )}
-      {/* SBOM LICENSE DRAWER */}
+      {/* SBOM LICENSE MODAL */}
       {isSBMOpen && data && (
-        <Modal isOpen={isSBMOpen} onClose={onSBMClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>
-              {licensesExp?.length > 0 ? 'Update' : 'Add'} License
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <LicenseField
-                sbomView={true}
-                isValid={isValid}
-                setIsValid={setIsValid}
-                license={licensesExp}
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button fontSize={'sm'} mr={3} onClick={onSBMClose}>
-                Close
-              </Button>
-              <Button
-                fontSize={'sm'}
-                colorScheme='blue'
-                onClick={onUpdateLicense}
-                isDisabled={!isValid}
-              >
-                {licensesExp?.length > 0 ? 'Update' : 'Save'}
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <LynkModal
+          isOpen={isSBMOpen}
+          onClose={onSBMClose}
+          buttonText={licensesExp?.length > 0 ? 'Update' : 'Save'}
+          disabled={!isValid}
+          onSubmit={onUpdateLicense}
+          title={`${licensesExp?.length > 0 ? 'Update' : 'Add'} License`}
+          Icon={FaScaleBalanced}
+        >
+          <LicenseField
+            sbomView={true}
+            isValid={isValid}
+            setIsValid={setIsValid}
+            license={licensesExp}
+          />
+        </LynkModal>
       )}
       {/* SUPPLIER MODAL */}
       {isSupOpen && (
@@ -509,32 +515,47 @@ const General = ({ data, loading, error }) => {
       )}
       {/* TOOL DELETE MODAL */}
       {isDelOpen && activeTool && (
-        <Modal isOpen={isDelOpen} onClose={onDelClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Remove Tool</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>
-                You are about to delete the creator Tool : {activeTool.name}-
-                {activeTool.version} from this version.
-              </Text>
-              <Text mt={4}>Are you sure you wish to continue?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onDelClose}>
-                Cancel
-              </Button>
-              <Button
-                variant='solid'
-                colorScheme='red'
-                onClick={() => handleToolRemove(activeTool.id)}
-              >
-                Delete
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <ConfirmationModal
+          isOpen={isDelOpen}
+          onClose={onDelClose}
+          onConfirm={() => handleToolRemove(activeTool.id)}
+          name={`${activeTool.name}-${activeTool.version} `}
+          title={'Remove Tool'}
+          description={`You are about to delete the creator Tool : ${activeTool.name}-${activeTool.version} from this version.`}
+        />
+      )}
+      {/* AUTHOR DELETE MODAL */}
+      {isAutDelOpen && activeTool && (
+        <ConfirmationModal
+          isOpen={isAutDelOpen}
+          onClose={onAutDelClose}
+          onConfirm={() => handleAuthorRemove(activeTool.id)}
+          name={`${activeTool.name}-${activeTool.email} `}
+          title={'Remove Author'}
+          description={`You are about to delete the Author : ${activeTool.name}-${activeTool.email} from this version.`}
+        />
+      )}
+      {/* SUPPLIER DELETE MODAL */}
+      {isSupplierDelOpen && activeTool && (
+        <ConfirmationModal
+          isOpen={isSupplierDelOpen}
+          onClose={onSupplierDelClose}
+          onConfirm={() => handleSupRemove(activeTool.id)}
+          name={activeTool.name}
+          title={'Remove Supplier'}
+          description={`You are about to delete the Supplier : ${activeTool.name} from this version.`}
+        />
+      )}
+      {/* LICENSE DELETE MODAL */}
+      {isLicenseDelOpen && (
+        <ConfirmationModal
+          isOpen={isLicenseDelOpen}
+          onClose={onLicenseDelClose}
+          onConfirm={onUpdateLicense}
+          name={licensesExp}
+          title={'Remove License'}
+          description={`You are about to delete the License : ${licensesExp} from this version.`}
+        />
       )}
       {/* INFO MODAL */}
       {isInfoOpen && (

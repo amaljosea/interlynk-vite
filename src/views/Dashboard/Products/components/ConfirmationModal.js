@@ -10,7 +10,7 @@ const getIcon = (title) => {
   if (title.includes('Restore')) return MdOutlineUnarchive
   if (title.includes('Disable')) return FaToggleOff
   if (title.includes('Enable')) return FaToggleOn
-  if (title.includes('Delete')) return MdDelete
+  if (title.includes('Delete') || title.includes('Remove')) return MdDelete
   if (title.includes('Reprocess')) return FaArrowRotateRight
   return null
 }

@@ -33,13 +33,6 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Portal,
   Select,
   SimpleGrid,
@@ -56,6 +49,7 @@ import {
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import LynkModal from 'components/LynkModal'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -71,6 +65,7 @@ import {
   GetSbomParts
 } from 'graphQL/Queries'
 
+import { BiLayerPlus } from 'react-icons/bi'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 
@@ -599,121 +594,108 @@ const Parts = () => {
       </Flex>
 
       {isOpen && (
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Add Parts</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Stack spacing={4} direction={'column'} gap={2}>
-                {/* PROJECTS */}
-                <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
-                    Project
-                  </FormLabel>
-                  <Select
-                    fontSize={'sm'}
-                    name='groups'
-                    id='groups'
-                    value={selectedGroup}
-                    onChange={handleSelectGroup}
-                  >
-                    <option value={''}>-- Select --</option>
-                    {allProjects?.organization?.projectGroups?.nodes.map(
-                      (item, index) => (
-                        <option key={index} value={item.id}>
-                          {truncatedValue(item.name, 30)}
-                        </option>
-                      )
-                    )}
-                  </Select>
-                </FormControl>
-                {/* ENVIRONMENTS */}
-                <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
-                    Environment
-                  </FormLabel>
-                  <Select
-                    fontSize={'sm'}
-                    name='product'
-                    id='product'
-                    value={selectedProd}
-                    onChange={handleSelectProduct}
-                  >
-                    <option value={''}>-- Select --</option>
-                    {envList?.length > 0 &&
-                      envOrderList(envList).map((item, index) => (
-                        <option
-                          key={index}
-                          value={item.value}
-                          label={
-                            isDefaultEnv(item.label)
-                              ? capitalizeFirstLetter(item.label)
-                              : item.label
-                          }
-                        >
-                          {item.label}
-                        </option>
-                      ))}
-                  </Select>
-                </FormControl>
-                {/* Version */}
-                <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='versions' fontSize='md' color='gray.600'>
-                    Version
-                  </FormLabel>
-                  {sbomVersions?.length === 0 ? (
-                    <Alert borderRadius={'md'} py={'8px'} status='info'>
-                      <AlertIcon />
-                      No version available
-                    </Alert>
-                  ) : (
-                    <Select
-                      fontSize={'sm'}
-                      name='versions'
-                      id='versions'
-                      value={selectedVersion}
-                      onChange={(e) => setSelectedVersion(e.target.value)}
-                    >
-                      <option value={''}>-- Select --</option>
-                      {sbomVersions.map((item, index) => (
-                        <option key={index} value={item.value}>
-                          {truncatedValue(item?.label, 30)}
-                        </option>
-                      ))}
-                    </Select>
-                  )}
-                </FormControl>
-                {(isExists === true || existingNodes) && (
-                  <Alert borderRadius={4} status='error'>
-                    <AlertIcon />
-                    <AlertDescription>
-                      Same version already exists inside selected SBOM
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </Stack>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} fontSize={'sm'} onClick={onClose}>
-                Close
-              </Button>
-              <Button
+        <LynkModal
+          isOpen={isOpen}
+          onClose={onClose}
+          title={'Add Parts'}
+          buttonText='Add'
+          disabled={
+            selectedVersion === '' ||
+            isExists === true ||
+            existingNodes === true
+          }
+          onSubmit={handleCreatePart}
+          Icon={BiLayerPlus}
+        >
+          <Stack spacing={4} direction={'column'} gap={2}>
+            {/* PROJECTS */}
+            <FormControl fontSize={'sm'}>
+              <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+                Project
+              </FormLabel>
+              <Select
                 fontSize={'sm'}
-                variant='solid'
-                colorScheme='blue'
-                onClick={handleCreatePart}
-                disabled={
-                  selectedVersion === '' ||
-                  isExists === true ||
-                  existingNodes === true
-                }
+                name='groups'
+                id='groups'
+                value={selectedGroup}
+                onChange={handleSelectGroup}
               >
-                Add
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+                <option value={''}>-- Select --</option>
+                {allProjects?.organization?.projectGroups?.nodes.map(
+                  (item, index) => (
+                    <option key={index} value={item.id}>
+                      {truncatedValue(item.name, 30)}
+                    </option>
+                  )
+                )}
+              </Select>
+            </FormControl>
+            {/* ENVIRONMENTS */}
+            <FormControl fontSize={'sm'}>
+              <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+                Environment
+              </FormLabel>
+              <Select
+                fontSize={'sm'}
+                name='product'
+                id='product'
+                value={selectedProd}
+                onChange={handleSelectProduct}
+              >
+                <option value={''}>-- Select --</option>
+                {envList?.length > 0 &&
+                  envOrderList(envList).map((item, index) => (
+                    <option
+                      key={index}
+                      value={item.value}
+                      label={
+                        isDefaultEnv(item.label)
+                          ? capitalizeFirstLetter(item.label)
+                          : item.label
+                      }
+                    >
+                      {item.label}
+                    </option>
+                  ))}
+              </Select>
+            </FormControl>
+            {/* Version */}
+            <FormControl fontSize={'sm'}>
+              <FormLabel htmlFor='versions' fontSize='md' color='gray.600'>
+                Version
+              </FormLabel>
+              {sbomVersions?.length === 0 ? (
+                <Alert borderRadius={'md'} py={'8px'} status='info'>
+                  <AlertIcon />
+                  No version available
+                </Alert>
+              ) : (
+                <Select
+                  fontSize={'sm'}
+                  name='versions'
+                  id='versions'
+                  value={selectedVersion}
+                  onChange={(e) => setSelectedVersion(e.target.value)}
+                >
+                  <option value={''}>-- Select --</option>
+                  {sbomVersions.map((item, index) => (
+                    <option key={index} value={item.value}>
+                      {truncatedValue(item?.label, 30)}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            </FormControl>
+            {(isExists === true || existingNodes) && (
+              <Alert borderRadius={4} status='error'>
+                <AlertIcon />
+                <AlertDescription>
+                  Same version already exists inside selected SBOM
+                </AlertDescription>
+              </Alert>
+            )}
+          </Stack>
+        </LynkModal>
       )}
 
       {/* DISABLED */}

@@ -10,14 +10,6 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  Icon,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Radio,
   RadioGroup,
   Stack,
@@ -26,6 +18,8 @@ import {
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -164,141 +158,101 @@ const DownloadModal = ({
 
   return (
     <>
-      <Modal
-        size='lg'
+      <LynkModal
         isOpen={isOpen}
         onClose={onClose}
-        finalFocusRef={finalRef}
-        initialFocusRef={initialRef}
+        onSubmit={handleDownload}
+        title={'Download SBOM'}
+        Icon={DownloadIcon}
+        isLoading={isLoading}
+        buttonText={'Download'}
       >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader as={Flex} alignItems='center' gap={2.5}>
-            <Icon as={DownloadIcon} color='#60686F' />
-            <Text fontWeight={600}>Download SBOM</Text>
-          </ModalHeader>
-          <ModalCloseButton mt={2} />
+        <Flex flexDirection={'column'} gap={4}>
+          <Tag
+            fontSize={'xs'}
+            w={'fit-content'}
+            colorScheme='blue'
+            textAlign={'right'}
+            wordBreak={'break-all'}
+          >
+            {fileName}
+          </Tag>
+          <FormControl>
+            <FormLabel>Specification</FormLabel>
+            <RadioGroup value={spec} onChange={(value) => setSpec(value)}>
+              <Stack spacing={4} direction='row'>
+                {(activeUser === 'sp@interlynk.io' ||
+                  activeUser === 'surendra.pathak@interlynk') && (
+                  <Radio value='spdx'>SPDX</Radio>
+                )}
+                <Radio value='cyclonedx'>CycloneDX</Radio>
+              </Stack>
+            </RadioGroup>
+          </FormControl>
+          <FormControl>
+            <FormLabel>File Format</FormLabel>
+            <RadioGroup value={format} onChange={(value) => setFormat(value)}>
+              <Stack spacing={4} direction='row'>
+                <Radio value='json'>JSON</Radio>
+                {/* <Radio value='xml'>XML</Radio> */}
+              </Stack>
+            </RadioGroup>
+          </FormControl>
+          <Checkbox
+            isChecked={includeVulns}
+            onChange={() => setIncludeVulns(!includeVulns)}
+            isDisabled={spec === 'spdx'}
+          >
+            Include Vulnerabilities
+          </Checkbox>
           <Divider />
-          <ModalBody pb={6} mt={2.5}>
-            <Flex flexDirection={'column'} gap={4}>
-              <Tag
-                fontSize={'xs'}
-                w={'fit-content'}
-                colorScheme='blue'
-                textAlign={'right'}
-                wordBreak={'break-all'}
-              >
-                {fileName}
-              </Tag>
-              <FormControl>
-                <FormLabel>Specification</FormLabel>
-                <RadioGroup value={spec} onChange={(value) => setSpec(value)}>
-                  <Stack spacing={4} direction='row'>
-                    {(activeUser === 'sp@interlynk.io' ||
-                      activeUser === 'surendra.pathak@interlynk') && (
-                      <Radio value='spdx'>SPDX</Radio>
-                    )}
-                    <Radio value='cyclonedx'>CycloneDX</Radio>
-                  </Stack>
-                </RadioGroup>
-              </FormControl>
-              <FormControl>
-                <FormLabel>File Format</FormLabel>
-                <RadioGroup
-                  value={format}
-                  onChange={(value) => setFormat(value)}
-                >
-                  <Stack spacing={4} direction='row'>
-                    <Radio value='json'>JSON</Radio>
-                    {/* <Radio value='xml'>XML</Radio> */}
-                  </Stack>
-                </RadioGroup>
-              </FormControl>
-              <Checkbox
-                isChecked={includeVulns}
-                onChange={() => setIncludeVulns(!includeVulns)}
-                isDisabled={spec === 'spdx'}
-              >
-                Include Vulnerabilities
-              </Checkbox>
-              <Divider />
-              <Flex
-                flexDir={'column'}
-                gap={4}
-                display={!signedUrlParams ? 'flex' : 'none'}
-              >
-                <Flex
-                  flexDir={'row'}
-                  alignItems='center'
-                  justifyContent='space-between'
-                >
-                  <Text fontWeight={'medium'}>Compliance Checks</Text>
-                  <Text
-                    fontSize={'sm'}
-                    color='blue.500'
-                    cursor={'pointer'}
-                    fontWeight={'medium'}
-                    onClick={onOpenDetails}
-                  >
-                    View Details
-                  </Text>
-                </Flex>
-                <Flex gap={4} flexDir={'column'} alignItems='flex-start'>
-                  {checklists.map((item, index) => (
-                    <Flex
-                      w={'100%'}
-                      key={index}
-                      alignItems='center'
-                      justifyContent={'space-between'}
-                    >
-                      <Text fontSize={'sm'} color={textColor}>
-                        {item?.name}
-                      </Text>
-                      <Button
-                        size='xs'
-                        minW={'60px'}
-                        cursor={'default'}
-                        isLoading={item?.loading}
-                        isDisabled={item?.score === 0}
-                      >
-                        {item?.score === 0
-                          ? `Coming Soon..`
-                          : `${item?.score} %`}
-                      </Button>
-                    </Flex>
-                  ))}
-                </Flex>
-              </Flex>
-            </Flex>
-          </ModalBody>
-          <Divider />
-          <ModalFooter>
+          <Flex
+            flexDir={'column'}
+            gap={4}
+            display={!signedUrlParams ? 'flex' : 'none'}
+          >
             <Flex
-              gap={4}
-              width={'100%'}
-              alignItems={'center'}
-              justifyContent={'flex-end'}
+              flexDir={'row'}
+              alignItems='center'
+              justifyContent='space-between'
             >
-              <Button
-                variant='ghost'
-                color={textColor}
-                onClick={onClose}
-                fontWeight={'normal'}
+              <Text fontWeight={'medium'}>Compliance Checks</Text>
+              <Text
+                fontSize={'sm'}
+                color='blue.500'
+                cursor={'pointer'}
+                fontWeight={'medium'}
+                onClick={onOpenDetails}
               >
-                Cancel
-              </Button>
-              <Button
-                colorScheme='blue'
-                isLoading={isLoading}
-                loadingText='Loading...'
-                onClick={handleDownload}
-              >
-                Download
-              </Button>
+                View Details
+              </Text>
             </Flex>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            <Flex gap={4} flexDir={'column'} alignItems='flex-start'>
+              {checklists.map((item, index) => (
+                <Flex
+                  w={'100%'}
+                  key={index}
+                  alignItems='center'
+                  justifyContent={'space-between'}
+                >
+                  <Text fontSize={'sm'} color={textColor}>
+                    {item?.name}
+                  </Text>
+                  <Button
+                    size='xs'
+                    minW={'60px'}
+                    cursor={'default'}
+                    isLoading={item?.loading}
+                    isDisabled={item?.score === 0}
+                  >
+                    {item?.score === 0 ? `Coming Soon..` : `${item?.score} %`}
+                  </Button>
+                </Flex>
+              ))}
+            </Flex>
+          </Flex>
+        </Flex>
+      </LynkModal>
 
       {isOpenDetails && (
         <ComplianceChecks

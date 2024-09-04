@@ -482,7 +482,6 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
         Icon={TbShieldSearch}
         disabled={errorMessage || error !== '' || isDisabled}
         buttonText={data ? 'Update' : 'Save'}
-        maxW='720px'
       >
         <Flex
           width={'100%'}
@@ -605,7 +604,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                       </Tooltip>
                     </Box>
                     {/* SUBJECT */}
-                    <FormControl width={'30%'}>
+                    <FormControl>
                       <Select
                         fontSize='sm'
                         value={item?.subject}
@@ -627,7 +626,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                       )}
                     </FormControl>
                     {/* OPERATOR */}
-                    <FormControl width={'30%'}>
+                    <FormControl>
                       <Select
                         id='operator'
                         name='operator'
@@ -656,7 +655,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                       )}
                     </FormControl>
                     {/* VALUE */}
-                    <Flex alignItems={'center'} gap={4} width={'30%'}>
+                    <Flex alignItems={'center'} gap={4}>
                       {item?.subject === 'VULNERABILITY_SEV' && (
                         <FormControl isRequired>
                           <Select
@@ -982,6 +981,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                             onChange={(e) =>
                               handleChange(e.target.value, item.id, 'value')
                             }
+                            minWidth={140}
                           />
                         )}
                       <Flex gap={4} justifyContent={'space-between'}>

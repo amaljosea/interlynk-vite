@@ -1,16 +1,8 @@
-import {
-  Divider,
-  Grid,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Stack,
-  Text,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Divider, Grid, Stack, Text, useColorModeValue } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
+
+import { GoVersions } from 'react-icons/go'
 
 import CustomTag from './CustomTag'
 
@@ -19,37 +11,36 @@ const VersionCard = ({ data, isOpen, onClose }) => {
   const { sbom } = data || ''
   const { project, primaryComponent } = sbom || ''
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Version Details</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody pb={6}>
-          <Stack spacing={2} py={3}>
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text color={textColor} fontSize={'sm'}>
-                Product
-              </Text>
-              <CustomTag>{project?.projectGroup?.name || '-'}</CustomTag>
-            </Grid>
-            <Divider />
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text color={textColor} fontSize={'sm'}>
-                Version
-              </Text>
-              <CustomTag>{primaryComponent?.version || '-'}</CustomTag>
-            </Grid>
-            <Divider />
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text color={textColor} fontSize={'sm'}>
-                SBOM File
-              </Text>
-              <CustomTag>{primaryComponent?.name || '-'}</CustomTag>
-            </Grid>
-          </Stack>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title='Version Details'
+      Icon={GoVersions}
+      noFooter={true}
+    >
+      <Stack spacing={2} py={3}>
+        <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+          <Text color={textColor} fontSize={'sm'}>
+            Product
+          </Text>
+          <CustomTag>{project?.projectGroup?.name || '-'}</CustomTag>
+        </Grid>
+        <Divider />
+        <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+          <Text color={textColor} fontSize={'sm'}>
+            Version
+          </Text>
+          <CustomTag>{primaryComponent?.version || '-'}</CustomTag>
+        </Grid>
+        <Divider />
+        <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+          <Text color={textColor} fontSize={'sm'}>
+            SBOM File
+          </Text>
+          <CustomTag>{primaryComponent?.name || '-'}</CustomTag>
+        </Grid>
+      </Stack>
+    </LynkModal>
   )
 }
 

@@ -30,7 +30,8 @@ const LynkModal = ({
   leftFooterContent,
   buttonColor,
   maxW,
-  maxH
+  maxH,
+  noFooter = false
 }) => {
   const isConfirmationModal = type === 'confirmation'
 
@@ -74,7 +75,7 @@ const LynkModal = ({
           {children}
         </ModalBody>
         <Divider />
-        <ModalFooter paddingInline={'16px'}>
+        <ModalFooter paddingInline={'16px'} hidden={noFooter}>
           <Flex
             width={'100%'}
             alignItems={'center'}

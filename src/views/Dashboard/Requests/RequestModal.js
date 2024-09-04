@@ -1,25 +1,15 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Textarea
-} from '@chakra-ui/react'
+import { Flex, FormControl, FormLabel, Input, Textarea } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
 import { RequestCreate } from 'graphQL/Mutation'
+
+import { GoVersions } from 'react-icons/go'
 
 const RequestModal = ({ isOpen, onClose }) => {
   const { showToast } = useCustomToast()
@@ -65,70 +55,50 @@ const RequestModal = ({ isOpen, onClose }) => {
   }
 
   return (
-    <Modal
-      size='lg'
+    <LynkModal
       isOpen={isOpen}
       onClose={onClose}
-      motionPreset='slideInBottom'
-      closeOnOverlayClick={false}
-      closeOnEsc={false}
+      onSubmit={handleCreate}
+      title={'Request SBOM'}
+      Icon={GoVersions}
+      disabled={isSaveDisabled}
+      buttonText={'Save'}
     >
-      <ModalOverlay />
-      <form onSubmit={handleCreate}>
-        <ModalContent>
-          <ModalHeader>Request SBOM</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Flex width={'100%'} direction={'column'} gap={4}>
-              <FormControl isRequired>
-                <FormLabel>Email</FormLabel>
-                <Input
-                  type='email'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Product Name</FormLabel>
-                <Input
-                  type='text'
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Product Version</FormLabel>
-                <Input
-                  type='text'
-                  value={productVersion}
-                  onChange={(e) => setProductVersion(e.target.value)}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Notes</FormLabel>
-                <Textarea
-                  type='text'
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                />
-              </FormControl>
-            </Flex>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='gray' mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button
-              isDisabled={isSaveDisabled}
-              colorScheme='blue'
-              type='submit'
-            >
-              Save
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </form>
-    </Modal>
+      <Flex width={'100%'} direction={'column'} gap={4}>
+        <FormControl isRequired>
+          <FormLabel>Email</FormLabel>
+          <Input
+            type='email'
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Product Name</FormLabel>
+          <Input
+            type='text'
+            value={productName}
+            onChange={(e) => setProductName(e.target.value)}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Product Version</FormLabel>
+          <Input
+            type='text'
+            value={productVersion}
+            onChange={(e) => setProductVersion(e.target.value)}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Notes</FormLabel>
+          <Textarea
+            type='text'
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
+        </FormControl>
+      </Flex>
+    </LynkModal>
   )
 }
 

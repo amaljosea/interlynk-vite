@@ -1,22 +1,9 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import {
-  Button,
-  FormControl,
-  FormLabel,
-  Grid,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Textarea
-} from '@chakra-ui/react'
+import { FormControl, FormLabel, Grid, Input, Textarea } from '@chakra-ui/react'
 
+import LynkModal from 'components/LynkModal'
 import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -24,6 +11,8 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 
 import { CreateJiraIssue } from 'graphQL/Mutation'
 import { GetJiraOptions, GetJiraProjects } from 'graphQL/Queries'
+
+import { FaJira } from 'react-icons/fa6'
 
 const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
   const { orgView } = useGlobalQueryContext()
@@ -200,101 +189,84 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
   }
 
   return (
-    <Modal
+    <LynkModal
       isOpen={isOpen}
       onClose={onClose}
-      motionPreset='slideInBottom'
-      size='xl'
+      onSubmit={handleCreate}
+      title={'Create Jira Issue'}
+      Icon={FaJira}
+      disabled={isCreateDisabled}
+      buttonText={'Create'}
     >
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Create Jira Issue </ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <FormControl isRequired>
-            <FormLabel>Summary</FormLabel>
-            <Input
-              value={summary}
-              onChange={(e) => setSummary(e.target.value)}
-              placeholder='Summary'
-            />
-          </FormControl>
+      <FormControl isRequired>
+        <FormLabel>Summary</FormLabel>
+        <Input
+          value={summary}
+          onChange={(e) => setSummary(e.target.value)}
+          placeholder='Summary'
+        />
+      </FormControl>
 
-          <Grid pt='15px' pb='15px' templateColumns='repeat(2, 1fr)' gap={6}>
-            <FormControl isRequired>
-              <FormLabel>Project (Default Selected)</FormLabel>
-              <LynkSelect
-                value={project}
-                placeholder='Project'
-                options={projects}
-                onChange={(e) => {
-                  getOptions({ variables: { pKey: e.value } })
-                  setProject(e)
-                }}
-              />
-            </FormControl>
+      <Grid pt='15px' pb='15px' templateColumns='repeat(2, 1fr)' gap={6}>
+        <FormControl isRequired>
+          <FormLabel>Project (Default Selected)</FormLabel>
+          <LynkSelect
+            value={project}
+            placeholder='Project'
+            options={projects}
+            onChange={(e) => {
+              getOptions({ variables: { pKey: e.value } })
+              setProject(e)
+            }}
+          />
+        </FormControl>
 
-            <FormControl isRequired>
-              <FormLabel>Issue Type</FormLabel>
-              <LynkSelect
-                value={issueType}
-                placeholder='Issue Type'
-                options={issueTypes}
-                onChange={(e) => setIssueType(e)}
-              />
-            </FormControl>
+        <FormControl isRequired>
+          <FormLabel>Issue Type</FormLabel>
+          <LynkSelect
+            value={issueType}
+            placeholder='Issue Type'
+            options={issueTypes}
+            onChange={(e) => setIssueType(e)}
+          />
+        </FormControl>
 
-            <FormControl isRequired>
-              <FormLabel>Reporter</FormLabel>
-              <LynkSelect
-                value={reporter}
-                placeholder='Reporter'
-                options={reporters}
-                onChange={(e) => setReporter(e)}
-              />
-            </FormControl>
+        <FormControl isRequired>
+          <FormLabel>Reporter</FormLabel>
+          <LynkSelect
+            value={reporter}
+            placeholder='Reporter'
+            options={reporters}
+            onChange={(e) => setReporter(e)}
+          />
+        </FormControl>
 
-            <FormControl isRequired>
-              <FormLabel>Assignee</FormLabel>
-              <LynkSelect
-                value={assignee}
-                placeholder='Assignee'
-                options={assignees}
-                onChange={(e) => setAssignee(e)}
-              />
-            </FormControl>
-          </Grid>
+        <FormControl isRequired>
+          <FormLabel>Assignee</FormLabel>
+          <LynkSelect
+            value={assignee}
+            placeholder='Assignee'
+            options={assignees}
+            onChange={(e) => setAssignee(e)}
+          />
+        </FormControl>
+      </Grid>
 
-          <FormControl pt='15px'>
-            <FormLabel>Description</FormLabel>
-            <Textarea
-              height='200px'
-              name='text'
-              id='text'
-              fontSize={'sm'}
-              value={description}
-              placeholder='Description'
-              onChange={(e) => setDescription(e.target.value)}
-              disabled={false}
-              resize={'none'}
-            />
-          </FormControl>
-        </ModalBody>
-        <ModalFooter>
-          <Button variant='unstyled' colorScheme='red' onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            colorScheme='blue'
-            ml={3}
-            onClick={handleCreate}
-            isDisabled={isCreateDisabled}
-          >
-            Create
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+      <FormControl pt='15px'>
+        <FormLabel>Description</FormLabel>
+        <Textarea
+          height='200px'
+          name='text'
+          id='text'
+          fontSize={'sm'}
+          value={description}
+          placeholder='Description'
+          onChange={(e) => setDescription(e.target.value)}
+          disabled={false}
+          resize={'none'}
+        />
+      </FormControl>
+    </LynkModal>
   )
 }
 

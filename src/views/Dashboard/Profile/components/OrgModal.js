@@ -5,21 +5,16 @@ import { validateEmail, validateUrl } from 'utils'
 import {
   Alert,
   AlertIcon,
-  Button,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Text
 } from '@chakra-ui/react'
+
+import { RegisterOrganizationIcon } from 'components/Icons/Icons'
+import LynkModal from 'components/LynkModal'
 
 import { RegisterOrganization } from 'graphQL/Mutation'
 
@@ -42,7 +37,8 @@ const OrgModal = ({ isOpen, onClose, org, onSwitch }) => {
 
   const containsSpace = /\s/.test(url)
 
-  const [registerOrg] = useMutation(RegisterOrganization)
+  const [registerOrg, { loading: regLoading }] =
+    useMutation(RegisterOrganization)
 
   const handleCheckEmail = () => {
     if (!validateEmail(email)) {
@@ -87,84 +83,75 @@ const OrgModal = ({ isOpen, onClose, org, onSwitch }) => {
     (url !== '' && !validateUrl(url))
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Register Organization</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Flex width={'100%'} direction={'column'} gap={4}>
-            {error !== '' && (
-              <Alert status='error'>
-                <AlertIcon />
-                <Text fontSize={'sm'}>{error}</Text>
-              </Alert>
-            )}
-            {/* NAME */}
-            <FormControl isRequired>
-              <FormLabel>Name</FormLabel>
-              <Input
-                type='text'
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value)
-                  setError('')
-                }}
-                placeholder='Enter name'
-              />
-            </FormControl>
-            {/* URL */}
-            <FormControl
-              isInvalid={(url !== '' && !validateUrl(url)) || containsSpace}
-            >
-              <FormLabel>URL</FormLabel>
-              <Input
-                type='text'
-                value={url}
-                onBlur={handleCheckUrl}
-                onChange={(e) => {
-                  setUrl(e.target.value)
-                  setUrlError('')
-                }}
-                placeholder='Enter url'
-              />
-              {urlError !== '' && (
-                <FormErrorMessage>{urlError}</FormErrorMessage>
-              )}
-            </FormControl>
-            {/* EMAIL */}
-            <FormControl isInvalid={email !== '' && !validateEmail(email)}>
-              <FormLabel>Email</FormLabel>
-              <Input
-                type='text'
-                value={email}
-                onBlur={handleCheckEmail}
-                onChange={(e) => {
-                  setEmail(e.target.value)
-                  setEmailError('')
-                }}
-                placeholder='Enter email address'
-              />
-              {emailError !== '' && (
-                <FormErrorMessage>{emailError}</FormErrorMessage>
-              )}
-            </FormControl>
-          </Flex>
-        </ModalBody>
-        <ModalFooter>
-          <Button mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            colorScheme='blue'
-            isDisabled={isInvalid}
-            onClick={handleCreate}
-          >
-            Save
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      buttonText='Save'
+      disabled={isInvalid}
+      isLoading={regLoading}
+      onSubmit={handleCreate}
+      title={'Register Organization'}
+      Icon={RegisterOrganizationIcon}
+    >
+      <Flex width={'100%'} direction={'column'} gap={4}>
+        {error !== '' && (
+          <Alert status='error'>
+            <AlertIcon />
+            <Text fontSize={'sm'}>{error}</Text>
+          </Alert>
+        )}
+        {/* NAME */}
+        <FormControl isRequired>
+          <FormLabel fontSize={12}>Name</FormLabel>
+          <Input
+            type='text'
+            fontSize={14}
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value)
+              setError('')
+            }}
+            placeholder='Enter name'
+          />
+        </FormControl>
+        {/* URL */}
+        <FormControl
+          isInvalid={(url !== '' && !validateUrl(url)) || containsSpace}
+        >
+          <FormLabel fontSize={12}>URL</FormLabel>
+          <Input
+            type='text'
+            fontSize={14}
+            value={url}
+            onBlur={handleCheckUrl}
+            onChange={(e) => {
+              setUrl(e.target.value)
+              setUrlError('')
+            }}
+            placeholder='Enter URL'
+          />
+          {urlError !== '' && <FormErrorMessage>{urlError}</FormErrorMessage>}
+        </FormControl>
+        {/* EMAIL */}
+        <FormControl isInvalid={email !== '' && !validateEmail(email)}>
+          <FormLabel fontSize={12}>Email</FormLabel>
+          <Input
+            type='text'
+            fontSize={14}
+            value={email}
+            onBlur={handleCheckEmail}
+            onChange={(e) => {
+              setEmail(e.target.value)
+              setEmailError('')
+            }}
+            placeholder='Enter Email Address'
+          />
+          {emailError !== '' && (
+            <FormErrorMessage>{emailError}</FormErrorMessage>
+          )}
+        </FormControl>
+      </Flex>
+    </LynkModal>
   )
 }
 

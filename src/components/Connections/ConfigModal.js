@@ -305,12 +305,12 @@ const ConfigModal = ({
       disabled={!updateCon}
       onSubmit={data ? handleUpdate : handleSave}
     >
-      <VStack spacing={4}>
+      <VStack>
         {configs.map((config, index) => (
           <HStack key={index} width='100%' pb={2}>
             <Box position={'relative'}>
               <Input
-                w={'300px'}
+                w={'270px'}
                 placeholder={addressPlaceholder}
                 value={config.address}
                 onChange={(e) => handleChange(index, 'address', e.target.value)}
@@ -324,7 +324,6 @@ const ConfigModal = ({
               )}
             </Box>
             <Select
-              w={'170px'}
               value={config.notificationType}
               onChange={(e) =>
                 handleChange(index, 'notificationType', e.target.value)
@@ -338,7 +337,6 @@ const ConfigModal = ({
               ))}
             </Select>
             <Select
-              w={'200px'}
               value={config.frequency}
               onChange={(e) => handleChange(index, 'frequency', e.target.value)}
               isDisabled={!updateCon}
@@ -360,10 +358,13 @@ const ConfigModal = ({
         {updateCon && (
           <Button
             leftIcon={<AddIcon />}
-            colorScheme='blue'
+            colorScheme='white'
             onClick={handleAddConfig}
-            variant='ghost'
             alignSelf={'flex-start'}
+            fontWeight='500'
+            textColor={'blue.500'}
+            paddingLeft={'2px'}
+            fontSize={12}
           >
             Add New
           </Button>
