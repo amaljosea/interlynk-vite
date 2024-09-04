@@ -113,8 +113,8 @@ const CompDetails = ({ data, primaryComp }) => {
         description: compDesc,
         copyright: compCopyright,
         supportLevel: compSupport,
-        endOfSupport: selectedDate,
-        licenses: { licensesExp: expLicense || '' }
+        licenses: { licensesExp: expLicense || '' },
+        endOfSupport: selectedDate !== '' ? selectedDate : undefined
       }
     }).then((res) => {
       const { errors } = res?.data?.componentUpdate || ''
