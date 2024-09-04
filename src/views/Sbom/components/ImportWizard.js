@@ -21,7 +21,6 @@ const ImportWizard = ({
 }) => {
   const params = useParams()
   const groupId = params.productgroupid
-
   const bgColor = useColorModeValue('gray.50', 'gray.700')
 
   const [compVexImport] = useMutation(ComponentVulnVexImport)
@@ -32,6 +31,7 @@ const ImportWizard = ({
 
   const { nextStep, prevStep, activeStep } = useSteps({ initialStep: 0 })
 
+  const [productId, setProductId] = useState('')
   const [sbomId, setSbomId] = useState('')
   const [selectedGroup, setSelectedGroup] = useState(groupId || '')
   const [selectedProd, setSelectedProd] = useState('')
@@ -58,6 +58,7 @@ const ImportWizard = ({
       label: 'Product',
       component: (
         <StepOne
+          setProductId={setProductId}
           setSbomId={setSbomId}
           currentSbomId={currentSbomId}
           currentProductId={currentProductId}
@@ -82,7 +83,7 @@ const ImportWizard = ({
 
   return (
     <Flex flexDir='column' width='100%'>
-      <Box pos={'fixed'} top={20} left={6} right={6}>
+      <Box position='fixed' top={20} left={6} right={6}>
         <Steps variant={variant} colorScheme='blue' activeStep={activeStep}>
           {steps.map(({ label, component }, index) => (
             <Step label={label} key={index}>
@@ -90,6 +91,7 @@ const ImportWizard = ({
                 width={'100%'}
                 flexDir={'column'}
                 alignItems={'center'}
+                transform={'scale(0.9)'}
                 justifyContent={'center'}
                 sx={{ p: 8, rounded: 'md' }}
               >
@@ -121,8 +123,8 @@ const ImportWizard = ({
         py={5}
         pr={8}
       >
-        {!hasCompletedAllSteps ? (
-          <Button variant='solid' colorScheme='green' onClick={() => onClose()}>
+        {hasCompletedAllSteps ? (
+          <Button variant='solid' colorScheme='green' onClick={onClose}>
             Done
           </Button>
         ) : (

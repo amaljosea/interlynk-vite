@@ -19,6 +19,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { GetProject, GetProjectGroups } from 'graphQL/Queries'
 
 const StepOne = ({
+  setProductId,
   setSbomId,
   currentSbomId,
   currentProductId,
@@ -64,8 +65,10 @@ const StepOne = ({
         (item) => item.id === currentProductId
       )
       setSelectedProd(currentProd?.id)
+      setProductId(currentProd?.id)
     }
-  }, [activeGroup, currentProductId, setSelectedProd])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const [getProduct] = useLazyQuery(GetProject)
 
@@ -79,6 +82,7 @@ const StepOne = ({
     const { value } = e.target
     setSelectedVersion('')
     setSelectedProd(value)
+    setProductId(value)
   }
 
   useEffect(() => {
@@ -98,15 +102,8 @@ const StepOne = ({
         }
       })
     }
-  }, [
-    currentSbomId,
-    getProduct,
-    selectedProd,
-    selectedVersion,
-    setSbomId,
-    setSelectedVersion,
-    setUniqVersions
-  ])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedProd])
 
   return (
     <>
