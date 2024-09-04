@@ -67,7 +67,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
             <TabList
               position={'fixed'}
               bg={bgColor}
-              zIndex={1}
+              zIndex={11}
               left={0}
               right={0}
             >
