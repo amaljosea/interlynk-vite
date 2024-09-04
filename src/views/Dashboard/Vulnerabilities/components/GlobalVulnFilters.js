@@ -19,35 +19,22 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import CheckMark from 'components/Misc/CheckMark'
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
-
-import { useGlobalState } from 'hooks/useGlobalState'
-import { useHasPermission } from 'hooks/useHasPermission'
 
 import { GetProductNames } from 'graphQL/Queries'
 
 const GlobalVulnsFilters = ({ setFilters }) => {
   const params = useParams()
-
-  const { totalRows, prodState } = useGlobalState()
-
-  const productPermissions = useHasPermission({
-    parentKey: 'view_product_group'
-  })
+  const productView = window.location.pathname.startsWith(`/vendor/products`)
 
   const { data } = useQuery(GetProductNames, {
-    skip:
-      window.location.pathname.startsWith(`/vendor/products`) ||
-      productPermissions === false
-        ? true
-        : false,
+    skip: productView ? true : false,
     variables: {
-      first: totalRows,
+      first: 500,
       enabled: true,
-      field: prodState?.field,
-      direction: prodState?.direction
+      direction: 'ASC',
+      field: 'PROJECT_GROUPS_NAME'
     }
   })
 
