@@ -75,7 +75,7 @@ const Compliance = () => {
     {
       id: 2,
       icon: <Img src={FDA} mr={'auto'} objectFit={'contain'} height={'44px'} />,
-      title: 'FDA 510(K)',
+      title: 'FDA Cybersecurity Compliance',
       description:
         'SBOM requirements from FDA issued the final guidance Cybersecurity in Medical Devices: Quality System Considerations and Content of Premarket Submissions.',
       url: 'https://www.fda.gov/media/119933/download',
@@ -122,6 +122,8 @@ const Compliance = () => {
               pt={item?.description === 'Coming soon...' ? 5 : 0}
             >
               {item?.description}{' '}
+              <br />
+              <br />
               <chakra.span>
                 Click{' '}
                 <Link href={item?.url} isExternal color={linkColor}>

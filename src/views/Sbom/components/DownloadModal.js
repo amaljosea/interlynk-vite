@@ -143,7 +143,7 @@ const DownloadModal = ({
       score: ntiaData?.length > 0 ? Math.round(ntiaData[0].score) : 0
     },
     {
-      name: 'FDA 510(K) Compliance',
+      name: 'FDA Cybersecurity Compliance',
       loading: fdaLoading,
       score: fdaData?.length > 0 ? Math.round(fdaData[0].score) : 0
     },

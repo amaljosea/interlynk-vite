@@ -47,7 +47,7 @@ const ComplianceChecks = ({
   const { showToast } = useCustomToast()
   const bgColor = useColorModeValue('white', 'gray.700')
   const alertBg = useColorModeValue('blue.50', 'gray.800')
-  const tabs = ['NTIA', 'FDA 510(K)', 'BSI TR-03183']
+  const tabs = ['NTIA', 'FDA', 'BSI']
   const [tab, setTab] = useState(activeTab || 0)
   const onTabChange = (value) => setTab(value)
 
