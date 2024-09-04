@@ -43,7 +43,7 @@ const Licenses = () => {
     }
   )
 
-  const subHeaderComponent = useMemo(() => {
+  const subHeaderComponent = () => {
     return (
       <Flex
         width={'100%'}
@@ -54,7 +54,7 @@ const Licenses = () => {
         <RefreshBtn />
       </Flex>
     )
-  })
+  }
 
   // COLUMNS
   const columns = [
@@ -120,7 +120,7 @@ const Licenses = () => {
         return (
           <Tag
             size='md'
-            variant='solid'
+            variant='subtle'
             colorScheme={
               derivedState === 'approved'
                 ? 'green'

@@ -193,7 +193,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
         return (
           <Tag
             size='md'
-            variant='solid'
+            variant='subtle'
             colorScheme={
               state === 'approved'
                 ? 'green'
