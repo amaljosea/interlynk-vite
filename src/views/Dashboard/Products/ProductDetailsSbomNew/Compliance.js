@@ -11,10 +11,11 @@ import {
   Button,
   Flex,
   Img,
+  Link,
   SimpleGrid,
   Spinner,
-  Stack,
   Text,
+  chakra,
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
@@ -30,6 +31,7 @@ const Compliance = () => {
   const tab = useQueryParam('tab')
   const borderColor = useColorModeValue('#E2E8F0', '#ffffff29')
   const textColor = useColorModeValue('gray.600', 'gray.200')
+  const linkColor = useColorModeValue('#3182ce', '#63b3ed')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -62,8 +64,8 @@ const Compliance = () => {
         <Img src={NTIA} mr={'auto'} objectFit={'contain'} height={'46px'} />
       ),
       title: 'NTIA Minimum Elements',
-      description:
-        'This include essential data fields, automation, regular updates, detailed depth, and secure delivery.',
+      description: `The NTIA (National Telecommunications and Information Administration) Minimum Elements for a Software Bill of Materials (SBOM) are a set of guidelines and recommendations that define the essential information an SBOM should contain.`,
+      url: 'https://www.ntia.doc.gov/files/ntia/publications/sbom_minimum_elements_report.pdf',
       score: ntiaLoading ? (
         <Spinner size='xs' />
       ) : (
@@ -75,14 +77,17 @@ const Compliance = () => {
       icon: <Img src={FDA} mr={'auto'} objectFit={'contain'} height={'44px'} />,
       title: 'FDA 510(K)',
       description:
-        'This  requires an SBOM to ensure software transparency, security, and regulatory adherence in devices.',
+        'SBOM requirements from FDA issued the final guidance Cybersecurity in Medical Devices: Quality System Considerations and Content of Premarket Submissions.',
+      url: 'https://www.fda.gov/media/119933/download',
       score: fdaLoading ? <Spinner size='xs' /> : `${Math.round(fda?.score)} %`
     },
     {
       id: 3,
       icon: <Img src={BSI} mr={'auto'} objectFit={'contain'} height={'46px'} />,
       title: 'BSI TR-03183',
-      description: 'Coming soon...',
+      description:
+        'The Technical Guideline TR-03183: Cyber Resilience Requirements for Manufacturers and Products aims to provide manufacturers with advance access to the type of requirements that will be imposed on them by the future Cyber Resilience Act (CRA) of the EU.',
+      url: 'https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/TechGuidelines/TR03183/BSI-TR-03183-2.pdf?__blob=publicationFile&v=5',
       score: ''
     }
   ]
@@ -94,7 +99,7 @@ const Compliance = () => {
 
   return (
     <>
-      <SimpleGrid columns={4} spacing={5} mt={2}>
+      <SimpleGrid columns={3} spacing={5} mt={2}>
         {data?.map((item, index) => (
           <Card key={item?.id} gap={6} border={`1px solid ${borderColor}`}>
             <Flex gap={4} alignItems={'center'} justifyContent={'flex-start'}>
@@ -110,22 +115,31 @@ const Compliance = () => {
               </Text>
             </Flex>
             <Text
+              height={32}
               color={textColor}
               fontSize={'14px'}
               fontWeight={'light'}
               pt={item?.description === 'Coming soon...' ? 5 : 0}
             >
-              {item?.description}
+              {item?.description}{' '}
+              <chakra.span>
+                Click{' '}
+                <Link href={item?.url} isExternal color={linkColor}>
+                  here
+                </Link>{' '}
+                for more details.
+              </chakra.span>
             </Text>
-            <Flex
-              alignItems={'center'}
-              justifyContent={'space-between'}
-              hidden={!item?.score}
-            >
+            <Flex alignItems={'center'} justifyContent={'space-between'}>
               <Text fontSize={'sm'} fontWeight={'medium'}>
-                Score
+                {!item?.score ? 'Coming soon...' : 'Score'}
               </Text>
-              <Button size='sm' fontSize={'xs'} onClick={() => onCheck(index)}>
+              <Button
+                size='sm'
+                fontSize={'xs'}
+                hidden={!item?.score}
+                onClick={() => onCheck(index)}
+              >
                 {item?.score === '0 %' ? 'N/A' : item?.score}
               </Button>
             </Flex>
