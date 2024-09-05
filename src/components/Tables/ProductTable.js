@@ -642,7 +642,7 @@ const ProductTable = ({
                   <Fade initialScale={0.9} in={openTagMenu} delay={0.2}>
                     <Box
                       h={'auto'}
-                      top={6}
+                      top={0}
                       right={226}
                       width='220px'
                       borderRadius='md'
