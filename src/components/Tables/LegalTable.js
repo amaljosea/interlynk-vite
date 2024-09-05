@@ -34,7 +34,6 @@ import InfoModal from 'components/InfoModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -47,7 +46,6 @@ const LegalTable = () => {
   const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
-  const { totalRows } = useGlobalState()
 
   const updateOrg = useHasPermission({
     parentKey: 'view_organization',
@@ -115,14 +113,23 @@ const LegalTable = () => {
         justifyContent={'space-between'}
       >
         <Stack direction={'row'} alignItems={'center'}>
-          <Text fontSize='lg' color={textColor} fontWeight='bold'>
-            Manufacturer Identities
-          </Text>
-          <InfoIcon
-            color={'blue.500'}
-            cursor={'pointer'}
-            onClick={onCheckMfc}
-          />
+          <Flex flexDirection={'column'} mb={6}>
+            <Flex alignItems={'center'} gap={1}>
+              <Text fontSize='lg' color={textColor} fontWeight='bold'>
+                Manufacturer Identities
+              </Text>
+              <InfoIcon
+                color={'blue.500'}
+                cursor={'pointer'}
+                onClick={onCheckMfc}
+              />
+            </Flex>
+
+            <Text fontSize={'sm'}>
+              View and manage the identities of manufacturers, ensuring
+              authenticity and compliance across the supply chain.
+            </Text>
+          </Flex>
         </Stack>
         <Tooltip label='Add Manufacturer'>
           <IconButton

@@ -113,6 +113,7 @@ const Checks = () => {
             name={id}
             id={id}
             width={'100px'}
+            height={'32px'}
             value={severity}
             color={textColor}
             isDisabled={!updateOrg}

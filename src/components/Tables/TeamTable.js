@@ -159,7 +159,7 @@ const TeamTable = () => {
           </Flex>
         )
       },
-      width: '25%',
+      width: '35%',
       wrap: true
     },
 
@@ -228,7 +228,7 @@ const TeamTable = () => {
         const dateB = new Date(bUserStart)
         return dateA - dateB // Sort in descending order
       },
-      width: '18%'
+      width: '12%'
     },
 
     {
@@ -258,7 +258,7 @@ const TeamTable = () => {
         )
       },
       center: true,
-      width: '14%'
+      width: '12%'
     },
 
     {
@@ -313,7 +313,7 @@ const TeamTable = () => {
         )
       },
       right: 'true',
-      width: '14%'
+      width: '9%'
     }
   ]
 
@@ -448,20 +448,18 @@ const TeamTable = () => {
 
   return (
     <>
-      <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          subHeader
-          responsive={true}
-          columns={columns}
-          data={users || []}
-          defaultSortAsc={false}
-          progressPending={loading}
-          defaultSortFieldId={'joinedDate'}
-          progressComponent={<CustomLoader />}
-          customStyles={customStyles(headColor)}
-          subHeaderComponent={subHeaderComponent}
-        />
-      </Flex>
+      <DataTable
+        subHeader
+        responsive={true}
+        columns={columns}
+        data={users || []}
+        defaultSortAsc={false}
+        progressPending={loading}
+        defaultSortFieldId={'joinedDate'}
+        progressComponent={<CustomLoader />}
+        customStyles={customStyles(headColor)}
+        subHeaderComponent={subHeaderComponent}
+      />
 
       {/* ADD / UPDATE User */}
       {isTeamOpen && (

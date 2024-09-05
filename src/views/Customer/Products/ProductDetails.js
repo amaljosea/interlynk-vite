@@ -191,7 +191,7 @@ const ProductDetails = () => {
                   <Text
                     fontWeight={'semibold'}
                     wordBreak={'break-all'}
-                    fontSize={25}
+                    fontSize={22}
                   >
                     {truncatedValue(name, 30) || ''}
                   </Text>

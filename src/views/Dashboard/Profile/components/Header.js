@@ -28,7 +28,6 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  Heading,
   IconButton,
   Input,
   InputGroup,
@@ -209,6 +208,12 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     setSelectedFile('')
     setNameError('')
     setIsPasswordEdit(false)
+    setOldPassword('')
+    setNewPassword('')
+    setConfirmPassword('')
+    setShowOldPass(false)
+    setShowNewPass(false)
+    setShowConfPass(false)
   }
 
   //Function to switch organization
@@ -314,7 +319,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
       const { errors } = res?.data?.userUpdatePassword || ''
       if (errors?.length > 0) {
         showToast({
-          description: `Failed to updated password ${errors[0]}`,
+          description: `Failed to update password ${errors[0]}`,
           status: 'error'
         })
       } else {
@@ -328,6 +333,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   }
 
   const handleUpdateName = async () => {
+    if (localStorage.getItem('username') === newUserName) {
+      return
+    }
     await updateUser({
       variables: { id: id, name: newUserName }
     }).then((res) => {
@@ -406,6 +414,10 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   }
 
   const handleUpdateOrgName = async () => {
+    if (localStorage.getItem('organization', orgName) === orgName) {
+      onOrgInfoClose()
+      return
+    }
     setIsSaving(true)
     await updateOrg({
       variables: {
@@ -420,18 +432,20 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           description: 'Organization name updated successfully',
           status: 'success'
         })
+        onOrgInfoClose()
       }
     })
   }
 
   const handleSave = async () => {
     setIsSaving(true)
-    // Check if there's a valid change to the name and no errors
+
     if (
       nameError === '' &&
       newUserName.trim() !== '' &&
       newUserName !== userName
     ) {
+      // Check if there's a valid change to the name and no errors
       await handleUpdateName()
     }
 
@@ -483,9 +497,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   return (
     <>
       <Flex justify='space-between' align='center' mb={5}>
-        <Heading fontFamily='inherit' size='lg'>
+        <Text fontWeight='semibold' fontSize={20}>
           Settings
-        </Heading>
+        </Text>
         <Menu>
           <MenuButton
             as={Button}
@@ -517,7 +531,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           </MenuButton>
           <MenuList>
             {tabs.map((tab, index) => (
-              <MenuOptionGroup value={selectedTab} key={index} type='radio'>
+              <MenuOptionGroup key={index} value={selectedTab} type='radio'>
                 <MenuItemOption
                   value={tab.name}
                   onClick={() => {
@@ -611,7 +625,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     <Text
                       fontWeight={'semibold'}
                       fontSize={22}
-                      lineHeight={1.2}
                       color={textColor}
                       ms={{ sm: '8px', md: '0px' }}
                     >
@@ -621,26 +634,17 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     </Text>
                     {selectedTab === 'PERSONAL' && (
                       <Tag
-                        variant='subtle'
-                        height='20px'
-                        backgroundColor='blue.500'
-                        colorScheme={'blue'}
+                        size={'sm'}
+                        variant='solid'
+                        colorScheme='blue'
+                        w={'fit-content'}
                       >
-                        <TagLabel
-                          fontSize={14}
-                          textTransform={'capitalize'}
-                          mx={'auto'}
-                          textColor={'white'}
-                        >
-                          {role}
-                        </TagLabel>
+                        <TagLabel textTransform={'capitalize'}>{role}</TagLabel>
                       </Tag>
                     )}
                   </Box>
 
                   <Text
-                    color={'gray.600'}
-                    fontWeight='normal'
                     fontSize={'sm'}
                     wordBreak={'break-all'}
                     textTransform={'capitalize'}
@@ -779,10 +783,10 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
             {/* Conditionally Render Password Edit Fields */}
             {isPasswordEdit && (
-              <Box>
+              <Flex flexDirection={'column'} gap={6}>
                 {/* Old Password */}
                 <FormControl>
-                  <FormLabel>Old Password</FormLabel>
+                  <FormLabel fontSize='13px'>Old Password</FormLabel>
                   <InputGroup>
                     <Input
                       type={showOldPass ? 'text' : 'password'}
@@ -804,7 +808,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
                 {/* New Password */}
                 <FormControl>
-                  <FormLabel>New Password</FormLabel>
+                  <FormLabel fontSize='13px'>New Password</FormLabel>
                   <InputGroup>
                     <Input
                       type={showNewPass ? 'text' : 'password'}
@@ -845,7 +849,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
                 {/* Confirm Password */}
                 <FormControl isInvalid={passError !== ''}>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel fontSize='13px'>Confirm Password</FormLabel>
                   <InputGroup>
                     <Input
                       type={showConfPass ? 'text' : 'password'}
@@ -866,15 +870,15 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   </InputGroup>
                   {passError !== '' && <Text color='red.500'>{passError}</Text>}
                 </FormControl>
-                <Button
+                {/*  <Button
                   w={'120px'}
                   mt={4}
                   bg={'#FED7D7'}
                   onClick={() => setIsPasswordEdit(false)}
                 >
                   Cancel Edit
-                </Button>
-              </Box>
+                </Button> */}
+              </Flex>
             )}
           </DrawerBody>
 
@@ -999,7 +1003,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerCloseButton />
+          <DrawerCloseButton mt={1} />
           <DrawerHeader fontWeight='500' borderBottomWidth='1px'>
             Edit Organization
           </DrawerHeader>
