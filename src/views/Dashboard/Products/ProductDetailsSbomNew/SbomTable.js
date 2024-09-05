@@ -74,7 +74,7 @@ const SbomTable = ({ data, loading, error }) => {
           index={activeTabNumber}
           onChange={onTabChange}
         >
-          <TabList mt='20px'>
+          <TabList>
             {filterTabs?.map((item, index) => (
               <Tab
                 key={index}
