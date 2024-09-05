@@ -360,10 +360,7 @@ const CompDetails = ({ data, primaryComp }) => {
             fontSize={'sm'}
             value={compSupport}
             isDisabled={customerView}
-            onChange={(e) => {
-              setCompSupport(e.target.value)
-              setSelectedDate(defaultDate)
-            }}
+            onChange={(e) => setCompSupport(e.target.value)}
           >
             <option value='' style={{ background: 'lightgray' }}>
               -- Select --
