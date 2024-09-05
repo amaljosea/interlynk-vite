@@ -1,5 +1,12 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import { TabContext } from 'context/TabContext'
+import React, {
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
@@ -72,6 +79,8 @@ const Checks = () => {
   const activeTab = queryParams.get('tab')
   const customerView = location.pathname.startsWith('/customer')
 
+  const { setTabData } = useContext(TabContext)
+
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
@@ -126,10 +135,6 @@ const Checks = () => {
     childKey: 'update_sbom_components'
   })
 
-  const [purlValue, setPurlValue] = useState('')
-  const [cpeList, setCpeList] = useState([])
-  const [cpeValue, setCpeValue] = useState('')
-  const [selectedCpe, setSelectedCpe] = useState(null)
   const [checkSearch, setCheckSearch] = useState('')
   const [activeRow, setActiveRow] = useState(null)
   const [ruleExists, setRuleExists] = useState(false)
@@ -482,10 +487,10 @@ const Checks = () => {
       shortDesc === 'Component has a purl' ||
       shortDesc === 'Component has a valid purl'
     ) {
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: 'pkg:type/name@version'
-      })
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: { ...prev.identifiers, purl: 'pkg:type/name@version' }
+      }))
       return onPurlOpen()
     }
 
@@ -494,10 +499,10 @@ const Checks = () => {
       shortDesc === 'Component has a valid cpe' ||
       shortDesc === 'Component has a cpe'
     ) {
-      prodCompDispatch({
-        type: 'SET_CPE_STRING',
-        payload: 'cpe:2.3:::::*:*:*:*:*:*:*'
-      })
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: { ...prev.identifiers, cpe: 'cpe:2.3:::::*:*:*:*:*:*:*' }
+      }))
       return onCpeOpen()
     }
 
@@ -508,41 +513,6 @@ const Checks = () => {
       shortDesc === 'Component has restrictive licenses specified'
     ) {
       return handleOpenLicense()
-    }
-  }
-
-  const handleCreateCpe = (string) => {
-    const cpeItem = cpeList?.find((item) => item === string)
-    if (cpeItem) {
-      showToast({
-        description: 'CPE already exists',
-        status: 'error'
-      })
-    } else {
-      setCpeList([...cpeList, string])
-      setCpeValue('')
-      setSelectedCpe(null)
-      onCpeClose()
-    }
-  }
-
-  const handleUpdateCpe = (string, id) => {
-    const cpeItem = cpeList?.find((item) => item === string)
-    if (cpeItem) {
-      showToast({
-        description: 'CPE already exists',
-        status: 'error'
-      })
-    } else if (cpeList?.find((item, index) => index === id)) {
-      const updatedData = cpeList?.map((item, index) => {
-        if (index === id) {
-          return string
-        }
-        return item
-      })
-      setCpeList(updatedData)
-      setCpeValue('')
-      setSelectedCpe(null)
     }
   }
 
@@ -565,7 +535,6 @@ const Checks = () => {
         }
       })
         .then((res) => {
-          console.log(res?.data)
           const result = res?.data?.project?.automationRules?.nodes
           if (result?.length > 0) {
             setRuleExists(true)
@@ -672,7 +641,6 @@ const Checks = () => {
       name: 'RESOLUTION',
       selector: (row) => {
         const { status, id, componentId } = row
-        console.log(row)
         const { friendlyId } = row?.organizationRule?.rule || ''
         const fixedIDs = ['SB-HC-4', 'SB-HC-5', 'SB-HC-6', 'SB-HC-16']
         const fixedByDefault = fixedIDs.includes(friendlyId)
@@ -866,11 +834,9 @@ const Checks = () => {
               data={null}
               getCpe={getCpe}
               isOpen={isPurlOpen}
-              purlValue={purlValue}
               activeRow={activeRow}
               onClose={onPurlClose}
               ruleExists={ruleExists}
-              setPurlValue={setPurlValue}
               isFreeTier={isFreeTier}
             />
           )}
@@ -878,18 +844,12 @@ const Checks = () => {
           {/* CPE MODAL */}
           {isCpeOpen && (
             <CpeModal
-              data={null}
               getCpe={getCpe}
               activeComp={null}
               isOpen={isCpeOpen}
-              cpeValue={cpeValue}
               onClose={onCpeClose}
               activeRow={activeRow}
               ruleExists={ruleExists}
-              selectedCpe={selectedCpe}
-              setCpeValue={setCpeValue}
-              onCreateCpe={handleCreateCpe}
-              onUpdateCpe={handleUpdateCpe}
               isFreeTier={isFreeTier}
             />
           )}

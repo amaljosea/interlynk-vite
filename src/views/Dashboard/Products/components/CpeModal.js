@@ -1,5 +1,6 @@
 import { useMutation } from '@apollo/client'
-import { useEffect, useRef, useState } from 'react'
+import { TabContext } from 'context/TabContext'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { validateCpe } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
@@ -28,7 +29,6 @@ import {
 
 import CpeInput from 'components/CpeInput'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
@@ -36,8 +36,6 @@ import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 const CpeModal = ({
   isOpen,
   onClose,
-  setCpeValue,
-  cpeValue,
   activeComp,
   getCpe,
   activeRow,
@@ -52,6 +50,10 @@ const CpeModal = ({
   const sbomId = params.sbomid
   const productId = params.productid
   const navigate = useNavigate()
+
+  const { tabData, handleChange, setTabData, saveChanges } =
+    useContext(TabContext)
+  const { identifiers } = tabData
 
   const [error, setError] = useState('')
   const [vendor, setVendor] = useState('')
@@ -71,94 +73,86 @@ const CpeModal = ({
   const [targetSoftware, setTargetSoftware] = useState('')
   const [hardware, setHardware] = useState('')
   const [other, setOther] = useState('')
-  const [isDisabled, setIsDisabled] = useState(false)
 
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const isInvalid =
     type === '' || vendor === '' || product === '' || version === ''
 
-  const disableButtonTemporarily = () => {
-    setIsDisabled(true)
-    setTimeout(() => {
-      setIsDisabled(false)
-    }, 3000)
-  }
-
-  const { prodCompState, dispatch } = useGlobalState()
-  const { cpeString } = prodCompState
-  const { prodCompDispatch } = dispatch
-
-  const [updateComponent] = useMutation(UpdateComponent)
+  const [updateComponent, { loading }] = useMutation(UpdateComponent)
 
   // ON BLUR UPDATE
   const onBlurUpdate = () => {
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[6] = update === '' ? '*' : update
     const cpe = cpeParts.join(':')
-    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON BLUR EDITION
   const onBlurEdition = () => {
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[7] = edition === '' ? '*' : edition
     const cpe = cpeParts.join(':')
-    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON BLUR LANGUAGE
   const onBlurLanguage = () => {
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[8] = language === '' ? '*' : language
     const cpe = cpeParts.join(':')
-    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON BLUR SW EDITION
   const onBlurSwEdition = () => {
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[9] = swEdition === '' ? '*' : swEdition
     const cpe = cpeParts.join(':')
-    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON BLUR TARGET SOFTWARE
   const onBlurTargetSoftware = () => {
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[10] = targetSoftware === '' ? '*' : targetSoftware
     const cpe = cpeParts.join(':')
-    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON BLUR OTHER
   const onBlurOther = () => {
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[12] = other === '' ? '*' : other
     const cpe = cpeParts.join(':')
-    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON CPE SAVE
   const handleSave = () => {
-    setCpeValue(cpeString)
+    saveChanges()
     onClose()
   }
 
   // ON CPE UPDATE
   const handleComUpdate = () => {
-    disableButtonTemporarily()
     if (resolved) {
       onClose()
     } else {
-      if (validateCpe(cpeString)) {
+      if (validateCpe(identifiers?.cpe)) {
         updateComponent({
           variables: {
             id: component?.id,
             sbomId: sbomId,
-            cpes: [cpeString]
+            cpes: [identifiers?.cpe]
           }
-        }).then((res) => res?.data && onClose())
+        }).then((res) => {
+          if (res?.data) {
+            saveChanges()
+            onClose()
+          }
+        })
       } else {
         setError('Invalid CPE')
       }
@@ -194,22 +188,16 @@ const CpeModal = ({
   // ON TYPE CHANGE
   const handleTypeChange = (e) => {
     const { value } = e.target
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     setType(value)
     if (value !== '') {
       cpeParts[2] = e.target.value
       const cpe = cpeParts.join(':')
-      prodCompDispatch({
-        type: 'SET_CPE_STRING',
-        payload: cpe
-      })
+      handleChange('identifiers', 'cpe', cpe)
     } else {
       cpeParts[2] = ''
       const cpe = cpeParts.join(':')
-      prodCompDispatch({
-        type: 'SET_CPE_STRING',
-        payload: cpe
-      })
+      handleChange('identifiers', 'cpe', cpe)
     }
   }
 
@@ -280,13 +268,10 @@ const CpeModal = ({
   const handleHardwareChange = (e) => {
     const { value } = e.target
     setHardware(value)
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[11] = value === '' ? '*' : value
     const cpe = cpeParts.join(':')
-    prodCompDispatch({
-      type: 'SET_CPE_STRING',
-      payload: cpe
-    })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON CHANGE
@@ -296,7 +281,8 @@ const CpeModal = ({
     }
   }
 
-  const [createRule] = useMutation(AutomationRuleCreate)
+  const [createRule, { loading: ruleLoading }] =
+    useMutation(AutomationRuleCreate)
 
   const conditionsAttributes = [
     {
@@ -327,7 +313,7 @@ const CpeModal = ({
     {
       subject: 'component',
       field: 'component_cpe',
-      value: cpeString
+      value: identifiers?.cpe
     }
   ]
 
@@ -339,12 +325,11 @@ const CpeModal = ({
     }
   })
 
-  const handleRuleCreate = async () => {
+  const handleRuleCreate = () => {
     if (ruleExists) {
       navigate(link)
     } else {
-      disableButtonTemporarily()
-      await createRule({
+      createRule({
         variables: {
           active: true,
           name: shortDesc,
@@ -369,16 +354,10 @@ const CpeModal = ({
     }
   }
 
-  useEffect(() => {
-    if (cpes?.length > 0) {
-      setCpeValue(cpes[0])
-    }
-  }, [cpes, setCpeValue])
-
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
-    if (cpeValue !== '') {
-      const components = cpeValue.split(':')
+    if (cpes?.length > 0) {
+      const components = cpes[0].split(':')
       const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
       const isValid =
         components[2] && allowedValues.includes(components[2].toLowerCase())
@@ -397,25 +376,31 @@ const CpeModal = ({
       setTargetSoftware(components[10]?.replace(/\*/g, '') || '')
       setHardware(components[11]?.replace(/\*/g, '') || '')
       setOther(components[12]?.replace(/\*/g, '') || '')
-      prodCompDispatch({
-        type: 'SET_CPE_STRING',
-        payload: `cpe:2.3:${isValid ? components[2].toLowerCase() : '*'}:${
-          components[3] || '*'
-        }:${components[4] || '*'}:${components[5] || '*'}:${
-          components[6] || '*'
-        }:${components[7] || '*'}:${components[8] || '*'}:${
-          components[9] || '*'
-        }:${components[10] || '*'}:${components[11] || '*'}:${
-          components[12] || '*'
-        }`
-      })
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: {
+          ...prev?.identifiers,
+          cpe: `cpe:2.3:${isValid ? components[2].toLowerCase() : '*'}:${
+            components[3] || '*'
+          }:${components[4] || '*'}:${components[5] || '*'}:${
+            components[6] || '*'
+          }:${components[7] || '*'}:${components[8] || '*'}:${
+            components[9] || '*'
+          }:${components[10] || '*'}:${components[11] || '*'}:${
+            components[12] || '*'
+          }`
+        }
+      }))
     } else {
-      prodCompDispatch({
-        type: 'SET_CPE_STRING',
-        payload: 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*'
-      })
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: {
+          ...prev?.identifiers,
+          cpe: 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*'
+        }
+      }))
     }
-  }, [cpeValue, prodCompDispatch])
+  }, [cpes, setTabData])
 
   return (
     <>
@@ -465,16 +450,16 @@ const CpeModal = ({
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* CPE STRING */}
               <FormControl isDisabled={resolved}>
-                <FormLabel htmlFor='cpeString'>CPE String</FormLabel>
+                <FormLabel htmlFor='cpe'>CPE String</FormLabel>
                 <Textarea
                   type='text'
                   variant='outline'
-                  name='cpeString'
-                  id='cpeString'
+                  name='cpe'
+                  id='cpe'
                   mt={1.5}
-                  value={cpeString}
                   fontSize='16px'
                   fontStyle={'bold'}
+                  value={identifiers?.cpe}
                   onChange={(e) => console.log(e.target.value)}
                   disabled
                 />
@@ -664,8 +649,8 @@ const CpeModal = ({
                   fontSize={'sm'}
                   onClick={handleRuleCreate}
                   hidden={friendlyId ? false : true}
-                  isDisabled={isDisabled || isInvalid}
                   colorScheme={ruleExists ? 'green' : 'blue'}
+                  isDisabled={ruleLoading || loading || isInvalid}
                 >
                   {ruleExists ? 'View' : 'Save as'} Rule
                 </Button>
@@ -678,7 +663,7 @@ const CpeModal = ({
                 fontSize={'sm'}
                 variant='solid'
                 colorScheme={'blue'}
-                isDisabled={isInvalid || isDisabled}
+                isDisabled={isInvalid || loading}
                 hidden={status === 'resolved'}
                 onClick={friendlyId ? handleComUpdate : handleSave}
               >

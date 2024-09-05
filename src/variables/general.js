@@ -1,5 +1,38 @@
 import { Stack, Text } from '@chakra-ui/react'
 
+export const namespaceOptions = {
+  alpm: [
+    { value: '', label: '-- Select --' },
+    { value: 'arch', label: 'arch' },
+    { value: 'arch32', label: 'arch32' },
+    { value: 'archarm', label: 'archarm' },
+    { value: 'manjaro', label: 'manjaro' },
+    { value: 'msys', label: 'msys' }
+  ],
+  apk: [
+    { value: '', label: '-- Select --' },
+    { value: 'alpine', label: 'alpine' },
+    { value: 'openwrt', label: 'openwrt' }
+  ],
+  bitnami: [],
+  cocoapods: [],
+  cargo: [],
+  conda: [],
+  cran: [],
+  deb: [
+    { value: '', label: '-- Select --' },
+    { value: 'debian', label: 'debian' },
+    { value: 'ubuntu', label: 'ubuntu' }
+  ],
+  generic: [],
+  hackage: [],
+  mflow: [],
+  nuget: [],
+  oci: [],
+  pub: [],
+  pypi: []
+}
+
 export const settingActions = [
   {
     id: 'users',

@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
-import React, { useState } from 'react'
+import { TabContext } from 'context/TabContext'
+import React, { useContext, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { infoData } from 'variables/general'
 
@@ -29,7 +30,6 @@ import {
 import LicenseField from 'components/Licenses/LicenseField'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalState } from 'hooks/useGlobalState'
 
 import { CreateComponent, sbomCreate } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
@@ -37,11 +37,12 @@ import { GetAllSboms } from 'graphQL/Queries'
 function ProductSbomDrawer({ isOpen, onClose, data }) {
   const params = useParams()
   const { showToast } = useCustomToast()
-  const { prodCompState } = useGlobalState()
   const customerView = location.pathname.startsWith('/customer')
 
+  const { tabData, saveChanges } = useContext(TabContext)
+  const { details } = tabData
+
   const productId = params.productid
-  const { expLicense } = prodCompState
 
   const [groupInfo, setGroupInfo] = useState('')
   const [compName, setCompName] = useState('')
@@ -55,6 +56,7 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
   const [createComponent, { loading: compLoading }] =
     useMutation(CreateComponent)
 
+  const license = details?.licenses?.length > 0 ? details.licenses[0].value : ''
   const handleCreateComp = async (id) => {
     await createComponent({
       variables: {
@@ -67,16 +69,18 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
         internal: isInternal,
         version: compVersion,
         description: compDesc,
-        licenses: { licensesExp: expLicense || '' }
+        licenses: { licensesExp: license }
       }
-    }).then(
-      (res) =>
-        res.data &&
+    }).then((res) => {
+      if (res?.data) {
+        saveChanges()
         showToast({
           description: 'SBOM added successfully',
           status: 'success'
         })
-    )
+        onClose()
+      }
+    })
   }
 
   const onCreateSBOM = () => {
@@ -90,7 +94,6 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
     }).then((res) => {
       if (res.data.sbomCreate.errors.length === 0) {
         handleCreateComp(res?.data?.sbomCreate?.sbom?.id)
-        onClose()
       } else {
         showToast({
           description: res.data.sbomCreate.errors,

@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { TabContext } from 'context/TabContext'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { validateCpe } from 'utils'
 
 import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
@@ -16,18 +17,11 @@ import {
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const CpeField = ({
-  inputValue,
-  setInputValue,
-  cpeList,
-  setCpeList,
-  inputRef,
-  onChange
-}) => {
+const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
+  const { tabData, setTabData, handleChange } = useContext(TabContext)
+  const { identifiers } = tabData || ''
+
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const { prodCompState, dispatch } = useGlobalState()
-  const { isCpeValid } = prodCompState
-  const { prodCompDispatch } = dispatch
 
   const [focusedIndex, setFocusedIndex] = useState(null)
   const listItemsRef = useRef([])
@@ -38,22 +32,28 @@ const CpeField = ({
   const handleValidate = (value) => {
     const matches = validateCpe(value)
     if (matches && value !== '') {
-      prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: true })
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: { ...prev?.identifiers, isValidCpe: true }
+      }))
     } else {
-      prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: false })
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: { ...prev?.identifiers, isValidCpe: false }
+      }))
     }
   }
 
   const handleSelect = (value) => {
     handleValidate(value)
-    setInputValue(value)
+    handleChange('identifiers', 'cpe', value)
     setFocusedIndex(null)
     setCpeList([])
   }
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === 'Tab') {
-      setInputValue(inputValue)
+      handleChange('identifiers', 'cpe', identifiers?.cpe)
       setCpeList([])
     }
 
@@ -90,7 +90,7 @@ const CpeField = ({
 
   const handleBlur = (e) => {
     e.preventDefault()
-    inputValue !== '' && handleValidate(inputValue)
+    identifiers?.cpe !== '' && handleValidate(identifiers?.cpe)
   }
 
   useEffect(() => {
@@ -117,7 +117,9 @@ const CpeField = ({
       pos={'relative'}
       ref={inputRef}
     >
-      <FormControl isInvalid={inputValue !== '' && !isCpeValid}>
+      <FormControl
+        isInvalid={identifiers?.cpe !== '' && !identifiers?.isValidCpe}
+      >
         <InputGroup>
           <Input
             id={'cpe'}
@@ -126,15 +128,15 @@ const CpeField = ({
             fontSize={'sm'}
             placeholder={'CPE'}
             readOnly={signedUrlParams}
-            value={inputValue}
+            value={identifiers?.cpe}
             onChange={onChange}
             autoComplete='off'
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
           />
-          {inputValue !== '' && (
+          {identifiers?.cpe !== '' && (
             <InputRightElement align='center' zIndex={-1}>
-              {isCpeValid === true ? (
+              {identifiers?.isValidCpe === true ? (
                 <CheckIcon color='green' />
               ) : (
                 <WarningTwoIcon color='red' />
@@ -143,7 +145,7 @@ const CpeField = ({
           )}
         </InputGroup>
       </FormControl>
-      {inputValue !== '' && cpeList?.length > 0 && (
+      {identifiers?.cpe !== '' && cpeList?.length > 0 && (
         <Box
           pos={'absolute'}
           width={'100%'}

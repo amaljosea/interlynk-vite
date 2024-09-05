@@ -1,5 +1,6 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { TabContext } from 'context/TabContext'
+import { useContext, useEffect, useState } from 'react'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
@@ -39,19 +40,19 @@ const CompSupplier = ({ data }) => {
   })
   const { suppliers } = result?.component || ''
 
-  const [orgName, setOrgName] = useState('')
-  const [orgUrl, setOrgUrl] = useState('')
+  const { tabData, setTabData, handleChange, saveChanges } =
+    useContext(TabContext)
+  const { supplier } = tabData
+
   const [isValidUrl, setIsValidUrl] = useState('')
-  const [supName, setSupName] = useState('')
   const [nameError, setNameError] = useState('')
-  const [supEmail, setSupEmail] = useState('')
   const [emailError, setEmailError] = useState('')
 
-  const containsSpace = /\s/.test(orgUrl)
+  const containsSpace = /\s/.test(supplier?.url)
 
   const onSupplierChange = (e) => {
     const { value } = e.target
-    setSupName(value)
+    handleChange('supplier', 'contactName', value)
     if ((value.length > 0 && value.length < 4) || value.length > 256) {
       setNameError('Input must be between 4 and 256 characters')
     } else {
@@ -67,78 +68,84 @@ const CompSupplier = ({ data }) => {
   const handleSave = () => {
     createSupplier({
       variables: {
-        name: orgName,
-        url: orgUrl,
-        contactName: supName,
-        contactEmail: supEmail,
-        componentId: id
+        componentId: id,
+        url: supplier?.url,
+        name: supplier?.name,
+        contactName: supplier?.contactName,
+        contactEmail: supplier?.contactEmail
       }
-    }).then(
-      (res) =>
-        res?.data &&
+    }).then((res) => {
+      if (res?.data) {
+        saveChanges()
         showToast({
           description: 'Supplier added successfully',
           status: 'success'
         })
-    )
+      }
+    })
   }
 
   const handleUpdate = () => {
     if (suppliers?.length > 0) {
       updateSupplier({
         variables: {
-          name: orgName,
-          url: orgUrl,
-          contactName: supName,
-          contactEmail: supEmail,
-          id: suppliers[0].id
+          id: suppliers[0].id,
+          url: supplier?.url,
+          name: supplier?.name,
+          contactName: supplier?.contactName,
+          contactEmail: supplier?.contactEmail
         }
-      }).then(
-        (res) =>
-          res.data &&
+      }).then((res) => {
+        if (res?.data) {
+          saveChanges()
           showToast({
             description: 'Supplier updated successfully',
             status: 'success'
           })
-      )
+        }
+      })
     }
   }
 
   const handleCheckEmail = () => {
-    if (!validateEmail(supEmail)) {
+    if (!validateEmail(supplier?.contactEmail)) {
       setEmailError('Email is invalid')
     }
   }
 
   const handleCheckUrl = () => {
-    if (!validateUrl(orgUrl)) {
+    if (!validateUrl(supplier?.url)) {
       setIsValidUrl('Please enter a valid URL')
     }
   }
 
   const onUrlChange = (e) => {
-    const { value } = e.target
-    setOrgUrl(value)
+    handleChange('supplier', 'url', e.target.value)
     setIsValidUrl('')
   }
 
   const isInvalid =
     createLoading ||
     updateLoading ||
-    orgName === '' ||
+    supplier?.name === '' ||
     nameError !== '' ||
-    (supEmail !== '' && !validateEmail(supEmail)) ||
-    (orgUrl !== '' && !validateUrl(orgUrl))
+    (supplier?.contactEmail !== '' && !validateEmail(supplier?.contactEmail)) ||
+    (supplier?.url !== '' && !validateUrl(supplier?.url))
 
   useEffect(() => {
     if (data && data?.suppliers?.length > 0) {
       const { suppliers } = data
-      setOrgName(suppliers[0].name || '')
-      setOrgUrl(suppliers[0].url || '')
-      setSupName(suppliers[0].contactName || '')
-      setSupEmail(suppliers[0].contactEmail || '')
+      setTabData((prev) => ({
+        ...prev,
+        supplier: {
+          name: suppliers[0].name || '',
+          url: suppliers[0].url || '',
+          contactName: suppliers[0].contactName || '',
+          contactEmail: suppliers[0].contactEmail || ''
+        }
+      }))
     }
-  }, [data])
+  }, [data, setTabData])
 
   return (
     <Flex width={'100%'} direction={'column'} gap={4} px={6} pb={20}>
@@ -147,19 +154,21 @@ const CompSupplier = ({ data }) => {
         <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
         <Input
           fontSize={'sm'}
-          value={orgName}
+          value={supplier?.name}
           placeholder='Enter organization name'
-          onChange={(e) => setOrgName(e.target.value)}
+          onChange={(e) => handleChange('supplier', 'name', e.target.value)}
         />
       </FormControl>
       {/* ORG URL */}
       <FormControl
-        isInvalid={(orgUrl !== '' && !validateUrl(orgUrl)) || containsSpace}
+        isInvalid={
+          (supplier?.url !== '' && !validateUrl(supplier?.url)) || containsSpace
+        }
       >
         <FormLabel fontSize={'sm'}>URL</FormLabel>
         <Input
-          value={orgUrl}
           fontSize={'sm'}
+          value={supplier?.url}
           placeholder='Enter URL'
           onBlur={handleCheckUrl}
           onChange={onUrlChange}
@@ -167,26 +176,31 @@ const CompSupplier = ({ data }) => {
         <FormErrorMessage>{isValidUrl}</FormErrorMessage>
       </FormControl>
       {/* SUPPLIER NAME */}
-      <FormControl isInvalid={supName !== '' && nameError !== ''}>
+      <FormControl isInvalid={supplier?.contactName !== '' && nameError !== ''}>
         <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
         <Input
           fontSize={'sm'}
-          placeholder='Enter supplier name'
-          value={supName}
           onChange={onSupplierChange}
+          value={supplier.contactName}
+          placeholder='Enter supplier name'
         />
         <FormErrorMessage>{nameError}</FormErrorMessage>
       </FormControl>
       {/* SUPPLIER EMAIL */}
-      <FormControl isInvalid={supEmail !== '' && !validateEmail(supEmail)}>
+      <FormControl
+        isInvalid={
+          supplier?.contactEmail !== '' &&
+          !validateEmail(supplier?.contactEmail)
+        }
+      >
         <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
         <Input
           fontSize={'sm'}
-          value={supEmail}
           onBlur={handleCheckEmail}
+          value={supplier?.contactEmail}
           placeholder='Enter supplier email'
           onChange={(e) => {
-            setSupEmail(e.target.value)
+            handleChange('supplier', 'contactEmail', e.target.value)
             setEmailError('')
           }}
         />

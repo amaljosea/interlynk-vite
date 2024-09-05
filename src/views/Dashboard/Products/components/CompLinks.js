@@ -1,6 +1,7 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
-import { useState } from 'react'
-import { validateUrl } from 'utils'
+import { TabContext } from 'context/TabContext'
+import { useContext, useState } from 'react'
+import { truncatedValue, validateUrl } from 'utils'
 
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
@@ -41,6 +42,10 @@ const CompLinks = ({ data }) => {
   const { showToast } = useCustomToast()
   const { id, sbomId } = data || ''
 
+  const { tabData, setTabData, handleChange, saveChanges } =
+    useContext(TabContext)
+  const { links } = tabData
+
   const { data: compUrls } = useQuery(GetCompUrls, {
     variables: { id, sbomId }
   })
@@ -51,19 +56,17 @@ const CompLinks = ({ data }) => {
     url: item?.url || ''
   }))
 
-  const [type, setType] = useState('')
-  const [link, setLink] = useState('')
   const [error, setError] = useState('')
   const [activeLink, setActiveLink] = useState(null)
   const [linkError, setLinkError] = useState('')
 
   const [updateLinks, { loading }] = useMutation(UpdateCompLinks)
 
-  const containsSpace = /\s/.test(link)
+  const containsSpace = /\s/.test(links?.url)
 
   const handleTypeChange = (e) => {
     const { value } = e.target
-    setType(value)
+    handleChange('links', 'name', value)
     const isExists =
       externalUrls?.length > 0 &&
       externalUrls?.find((item) => item.name === value)
@@ -75,7 +78,7 @@ const CompLinks = ({ data }) => {
   }
 
   const handleCheckUrl = () => {
-    const trimmedLink = link.trim()
+    const trimmedLink = links?.url?.trim()
     console.log(trimmedLink)
     if (!validateUrl(trimmedLink)) {
       setLinkError('Please enter a valid URL')
@@ -85,7 +88,7 @@ const CompLinks = ({ data }) => {
   const handleLinkChange = (e) => {
     const { value } = e.target
     const trimmedLink = value.trim()
-    setLink(value)
+    handleChange('links', 'url', value)
     setLinkError('')
     if (trimmedLink.length > 1024) {
       setLinkError('Input must be 1024 characters')
@@ -95,7 +98,7 @@ const CompLinks = ({ data }) => {
   }
 
   const handleLinkAdd = () => {
-    const result = { url: link, name: type }
+    const result = { url: links?.url, name: links?.name }
     updateLinks({
       variables: {
         id,
@@ -104,14 +107,14 @@ const CompLinks = ({ data }) => {
       }
     }).then((res) => {
       if (res?.data) {
+        saveChanges()
         showToast({
           description: 'Links updated successfully',
           status: 'success'
         })
       }
     })
-    setType('')
-    setLink('')
+    setTabData((prev) => ({ ...prev, links: { name: '', url: '' } }))
     setActiveLink(null)
   }
 
@@ -133,7 +136,10 @@ const CompLinks = ({ data }) => {
   }
 
   const isInvalid =
-    !validateUrl(link.trim()) || error !== '' || linkError !== '' || loading
+    !validateUrl(links?.url.trim()) ||
+    error !== '' ||
+    linkError !== '' ||
+    loading
 
   return (
     <>
@@ -145,7 +151,11 @@ const CompLinks = ({ data }) => {
         {/* NAME */}
         <FormControl isRequired isInvalid={error}>
           <FormLabel>Type</FormLabel>
-          <Select fontSize={'sm'} value={type} onChange={handleTypeChange}>
+          <Select
+            fontSize={'sm'}
+            value={links?.name}
+            onChange={handleTypeChange}
+          >
             <option value=''>-- Select --</option>
             {[
               'vcs',
@@ -176,13 +186,14 @@ const CompLinks = ({ data }) => {
         <FormControl
           isRequired
           isInvalid={
-            (link !== '' && !validateUrl(link.trim())) || containsSpace
+            (links?.url !== '' && !validateUrl(links?.url?.trim())) ||
+            containsSpace
           }
         >
           <FormLabel>Link</FormLabel>
           <Input
             fontSize={'sm'}
-            value={link}
+            value={links?.url}
             placeholder='Add URL'
             onBlur={handleCheckUrl}
             onChange={handleLinkChange}
@@ -215,9 +226,7 @@ const CompLinks = ({ data }) => {
                       <Text>
                         {item?.url ? (
                           <Tooltip label={item.url}>
-                            {item.url.length > 50
-                              ? `${item.url.substring(0, 50)}...`
-                              : item.url}
+                            {truncatedValue(item.url, 50)}
                           </Tooltip>
                         ) : null}
                       </Text>

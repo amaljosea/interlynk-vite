@@ -1,5 +1,6 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { useEffect, useRef, useState } from 'react'
+import { TabContext } from 'context/TabContext'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
@@ -42,6 +43,9 @@ const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
   const navigate = useNavigate()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
+  const { tabData } = useContext(TabContext)
+  const { details } = tabData
+
   const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
   const hoverColor = useColorModeValue('#EDF2F7', '#2D3748')
 
@@ -60,7 +64,7 @@ const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
   const [createRule] = useMutation(AutomationRuleCreate)
 
   const { prodCompState } = useGlobalState()
-  const { field, direction, expLicense } = prodCompState
+  const { field, direction } = prodCompState
 
   const now = new Date()
   const timestamp = currentTime
@@ -90,7 +94,8 @@ const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
   const isComponent =
     isPrimary || isComponentType || isComponentVersion || isComponentLicense
 
-  const isInvalidLicense = isComponentLicense && expLicense === ''
+  const isInvalidLicense =
+    isComponentLicense && details?.licenses[0]?.value === ''
 
   const isEmptyVersion = isComponentVersion && compVersion === ''
 
@@ -109,7 +114,9 @@ const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
           kind: isComponentType ? compType : undefined,
           version: isComponentVersion ? compVersion : undefined,
           licenses: {
-            licensesExp: isPrimary ? undefined : expLicense || undefined
+            licensesExp: isPrimary
+              ? undefined
+              : details?.licenses[0]?.value || undefined
           }
         }
       }).then((res) => {
@@ -217,7 +224,7 @@ const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
         {
           subject: 'component',
           field: 'component_licenses_exp',
-          value: expLicense
+          value: details?.licenses[0]?.value || ''
         }
       ]
     } else if (isComponentVersion) {

@@ -736,7 +736,6 @@ const VersionsTable = ({
           data={projectGroup}
           isOpen={isSbomOpen}
           onClose={onSbomClose}
-          productId={productId}
         />
       )}
 

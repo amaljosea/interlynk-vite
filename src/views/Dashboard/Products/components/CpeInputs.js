@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { TabContext } from 'context/TabContext'
+import { useContext, useEffect, useRef, useState } from 'react'
 
 import {
   Button,
@@ -6,25 +7,22 @@ import {
   FormControl,
   FormLabel,
   Grid,
-  Icon,
   Input,
   Select,
   Stack,
-  Text,
   Textarea
 } from '@chakra-ui/react'
 
 import CpeInput from 'components/CpeInput'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
-import { FaChevronDown } from 'react-icons/fa6'
-
 import IdentifierLabel from './IdentifierLabel'
 
-const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
+const CpeInputs = ({ onClose, getCpe, activeRow }) => {
   const { component } = activeRow || ''
   const { cpes } = component || ''
+
+  const { tabData, setTabData, handleChange } = useContext(TabContext)
+  const { identifiers } = tabData
 
   const [vendor, setVendor] = useState('')
   const [vendorList, setVendorList] = useState([])
@@ -47,61 +45,56 @@ const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
   const isInvalid =
     type === '' || vendor === '' || product === '' || version === ''
 
-  const { prodCompState, dispatch } = useGlobalState()
-  const { cpeString } = prodCompState
-  const { prodCompDispatch } = dispatch
-
   // ON BLUR UPDATE
   const onBlurUpdate = () => {
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[6] = update === '' ? '*' : update
     const cpe = cpeParts.join(':')
-    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON BLUR EDITION
   const onBlurEdition = () => {
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[7] = edition === '' ? '*' : edition
     const cpe = cpeParts.join(':')
-    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON BLUR LANGUAGE
   const onBlurLanguage = () => {
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[8] = language === '' ? '*' : language
     const cpe = cpeParts.join(':')
-    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON BLUR SW EDITION
   const onBlurSwEdition = () => {
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[9] = swEdition === '' ? '*' : swEdition
     const cpe = cpeParts.join(':')
-    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON BLUR TARGET SOFTWARE
   const onBlurTargetSoftware = () => {
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[10] = targetSoftware === '' ? '*' : targetSoftware
     const cpe = cpeParts.join(':')
-    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON BLUR OTHER
   const onBlurOther = () => {
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[12] = other === '' ? '*' : other
     const cpe = cpeParts.join(':')
-    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON CPE SAVE
   const handleSave = () => {
-    setCpeValue(cpeString)
     onClose()
   }
 
@@ -134,22 +127,16 @@ const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
   // ON TYPE CHANGE
   const handleTypeChange = (e) => {
     const { value } = e.target
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     setType(value)
     if (value !== '') {
       cpeParts[2] = e.target.value
       const cpe = cpeParts.join(':')
-      prodCompDispatch({
-        type: 'SET_CPE_STRING',
-        payload: cpe
-      })
+      handleChange('identifiers', 'cpe', cpe)
     } else {
       cpeParts[2] = ''
       const cpe = cpeParts.join(':')
-      prodCompDispatch({
-        type: 'SET_CPE_STRING',
-        payload: cpe
-      })
+      handleChange('identifiers', 'cpe', cpe)
     }
   }
 
@@ -220,13 +207,10 @@ const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
   const handleHardwareChange = (e) => {
     const { value } = e.target
     setHardware(value)
-    const cpeParts = cpeString.split(':')
+    const cpeParts = identifiers?.cpe?.split(':')
     cpeParts[11] = value === '' ? '*' : value
     const cpe = cpeParts.join(':')
-    prodCompDispatch({
-      type: 'SET_CPE_STRING',
-      payload: cpe
-    })
+    handleChange('identifiers', 'cpe', cpe)
   }
 
   // ON CHANGE
@@ -238,14 +222,17 @@ const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
 
   useEffect(() => {
     if (cpes?.length > 0) {
-      setCpeValue(cpes[0])
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: { ...prev?.identifiers, cpe: cpes[0] }
+      }))
     }
-  }, [cpes, setCpeValue])
+  }, [cpes, setTabData])
 
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
-    if (cpeValue !== '') {
-      const components = cpeValue.split(':')
+    if (identifiers?.cpe !== '') {
+      const components = identifiers?.cpe?.split(':')
       const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
       const isValid =
         components[2] && allowedValues.includes(components[2].toLowerCase())
@@ -264,25 +251,31 @@ const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
       setTargetSoftware(components[10]?.replace(/\*/g, '') || '')
       setHardware(components[11]?.replace(/\*/g, '') || '')
       setOther(components[12]?.replace(/\*/g, '') || '')
-      prodCompDispatch({
-        type: 'SET_CPE_STRING',
-        payload: `cpe:2.3:${isValid ? components[2].toLowerCase() : '*'}:${
-          components[3] || '*'
-        }:${components[4] || '*'}:${components[5] || '*'}:${
-          components[6] || '*'
-        }:${components[7] || '*'}:${components[8] || '*'}:${
-          components[9] || '*'
-        }:${components[10] || '*'}:${components[11] || '*'}:${
-          components[12] || '*'
-        }`
-      })
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: {
+          ...prev?.identifiers,
+          cpe: `cpe:2.3:${isValid ? components[2].toLowerCase() : '*'}:${
+            components[3] || '*'
+          }:${components[4] || '*'}:${components[5] || '*'}:${
+            components[6] || '*'
+          }:${components[7] || '*'}:${components[8] || '*'}:${
+            components[9] || '*'
+          }:${components[10] || '*'}:${components[11] || '*'}:${
+            components[12] || '*'
+          }`
+        }
+      }))
     } else {
-      prodCompDispatch({
-        type: 'SET_CPE_STRING',
-        payload: 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*'
-      })
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: {
+          ...prev?.identifiers,
+          cpe: `cpe:2.3:*:*:*:*:*:*:*:*:*:*:*`
+        }
+      }))
     }
-  }, [cpeValue, prodCompDispatch])
+  }, [identifiers?.cpe, setTabData])
 
   return (
     <Flex width={'100%'} direction={'column'} gap={4}>
@@ -294,7 +287,7 @@ const CpeInputs = ({ onClose, setCpeValue, cpeValue, getCpe, activeRow }) => {
           isReadOnly
           fontSize='sm'
           variant='filled'
-          value={cpeString}
+          value={identifiers?.cpe}
           onChange={(e) => console.log(e.target.value)}
         />
       </FormControl>

@@ -1,6 +1,8 @@
+import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { typeOptions } from 'utils'
+import { namespaceOptions } from 'variables/general'
 
 import {
   Button,
@@ -14,25 +16,14 @@ import {
 
 import CpeInput from 'components/CpeInput'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
-
 import IdentifierLabel from './IdentifierLabel'
 
-const PurlInputs = ({
-  data,
-  onClose,
-  setPurlValue,
-  getCpe,
-  activeRow,
-  setIsValid
-}) => {
+const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
   const { component } = activeRow || ''
   const { purl } = component || ''
 
-  const { prodCompState, dispatch } = useGlobalState()
-  const { purlString } = prodCompState
-  const { prodCompDispatch } = dispatch
+  const { tabData, handleChange } = useContext(TabContext)
+  const { identifiers } = tabData
 
   const [purlType, setPurlType] = useState('')
   const [namespace, setNamespace] = useState('')
@@ -52,39 +43,6 @@ const PurlInputs = ({
     purlName === '' ||
     purlType === '' ||
     (purlType === 'swift' && namespace === '')
-
-  const namespaceOptions = {
-    alpm: [
-      { value: '', label: '-- Select --' },
-      { value: 'arch', label: 'arch' },
-      { value: 'arch32', label: 'arch32' },
-      { value: 'archarm', label: 'archarm' },
-      { value: 'manjaro', label: 'manjaro' },
-      { value: 'msys', label: 'msys' }
-    ],
-    apk: [
-      { value: '', label: '-- Select --' },
-      { value: 'alpine', label: 'alpine' },
-      { value: 'openwrt', label: 'openwrt' }
-    ],
-    bitnami: [],
-    cocoapods: [],
-    cargo: [],
-    conda: [],
-    cran: [],
-    deb: [
-      { value: '', label: '-- Select --' },
-      { value: 'debian', label: 'debian' },
-      { value: 'ubuntu', label: 'ubuntu' }
-    ],
-    generic: [],
-    hackage: [],
-    mflow: [],
-    nuget: [],
-    oci: [],
-    pub: [],
-    pypi: []
-  }
 
   const isAutoComplete =
     purlType === 'maven' ||
@@ -148,10 +106,10 @@ const PurlInputs = ({
         })
       }
     } else {
-      const pkg = PackageURL.fromString(purlString)
+      const pkg = PackageURL.fromString(identifiers?.purl)
       pkg.namespace = ''
       pkg.name = 'name'
-      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
@@ -245,13 +203,13 @@ const PurlInputs = ({
   }
 
   const onNameBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
+    const pkg = PackageURL.fromString(identifiers?.purl)
     if (purlName !== '') {
       pkg.name = purlName
-      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
+      handleChange('identifiers', 'purl', pkg.toString())
     } else {
       pkg.name = 'name'
-      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
@@ -350,33 +308,19 @@ const PurlInputs = ({
         })
       }
     } else {
-      const pkg = PackageURL.fromString(purlString)
+      const pkg = PackageURL.fromString(identifiers?.purl)
       pkg.version = ''
-      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
   const handleTypeChange = (e) => {
     const { value } = e.target
     setPurlType(value)
-    prodCompDispatch({
-      type: 'SET_PURL_STRING',
-      payload: 'pkg:type/name@version'
-    })
-    setNamespace('')
-    setPurlName('')
-    setPurlVersion('')
-    setQualifiers('')
-  }
-
-  const onTypeBlur = () => {
-    if (purlType !== '') {
-      const pkg = PackageURL.fromString(purlString)
-      pkg.type = purlType
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+    if (value !== '') {
+      const pkg = PackageURL.fromString(identifiers?.purl)
+      pkg.type = value
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
@@ -387,19 +331,13 @@ const PurlInputs = ({
   }
 
   const onNamespaceBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
+    const pkg = PackageURL.fromString(identifiers?.purl)
     if (namespace !== '') {
       pkg.namespace = namespace
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+      handleChange('identifiers', 'purl', pkg.toString())
     } else {
       pkg.namespace = ''
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
@@ -416,19 +354,13 @@ const PurlInputs = ({
   }
 
   const onVersionBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
+    const pkg = PackageURL.fromString(identifiers?.purl)
     if (purlVersion !== '') {
       pkg.version = purlVersion
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+      handleChange('identifiers', 'purl', pkg.toString())
     } else {
       pkg.version = 'version'
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
@@ -439,8 +371,7 @@ const PurlInputs = ({
   }
 
   const onQualifierBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
-    console.log('pkg', pkg)
+    const pkg = PackageURL.fromString(identifiers?.purl)
     const convertedObject = {}
     if (qualifiers !== '') {
       const params = new URLSearchParams(qualifiers)
@@ -448,26 +379,19 @@ const PurlInputs = ({
         convertedObject[key] = value
       }
       pkg.qualifiers = convertedObject
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+      handleChange('identifiers', 'purl', pkg.toString())
     } else {
       pkg.qualifiers = ''
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
   const handleSave = () => {
     try {
-      const pkg = PackageURL.fromString(purlString)
+      const pkg = PackageURL.fromString(identifiers?.purl)
       pkg.namespace = pkg.namespace === 'namespace' ? '' : pkg.namespace
       pkg.version = pkg.version === 'version' ? '' : pkg.version
-      console.log('value', pkg.toString())
-      setPurlValue(pkg.toString())
+      handleChange('identifiers', 'purl', pkg.toString())
       setIsValid(true)
       onClose()
     } catch (error) {
@@ -498,9 +422,9 @@ const PurlInputs = ({
       setPurlType(pkg?.type)
       setPurlVersion(pkg?.version)
       setQualifiers(pkg?.qualifiers)
-      setPurlValue(pkg.toString())
+      handleChange('identifiers', 'purl', pkg.toString())
     }
-  }, [purl, setPurlValue])
+  }, [handleChange, purl])
 
   return (
     <Flex width={'100%'} direction={'column'} gap={4}>
@@ -512,7 +436,7 @@ const PurlInputs = ({
           isReadOnly
           fontSize='sm'
           variant='filled'
-          value={purlString}
+          value={identifiers?.purl}
           onChange={(e) => console.log(e.target.value)}
         />
       </FormControl>
@@ -526,7 +450,6 @@ const PurlInputs = ({
           name='packageType'
           value={purlType}
           onChange={handleTypeChange}
-          onBlur={onTypeBlur}
         >
           {typeOptions.map((option) => (
             <option key={option.value} value={option.value}>

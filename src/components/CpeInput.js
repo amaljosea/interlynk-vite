@@ -1,5 +1,6 @@
+import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { validateCpe } from 'utils'
 
 import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
@@ -16,8 +17,6 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 const CpeInput = ({
   name,
   isDisabled,
@@ -29,48 +28,43 @@ const CpeInput = ({
   validation,
   onChange
 }) => {
+  const { tabData, setTabData, handleChange } = useContext(TabContext)
+  const { identifiers } = tabData
   const [focusedIndex, setFocusedIndex] = useState(null)
   const listItemsRef = useRef([])
 
   const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
   const hoverColor = useColorModeValue('#EDF2F7', '#2D3748')
 
-  const { prodCompState, dispatch } = useGlobalState()
-  const { cpeString, purlString, isCpeValid } = prodCompState
-  const { prodCompDispatch } = dispatch
-
   const updateString = (name, value) => {
-    const cpeParts = cpeString.split(':')
-    if (name === 'vendor') {
-      cpeParts[3] = value
-      const cpe = cpeParts.join(':')
-      prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
-    } else if (name === 'product') {
-      cpeParts[4] = value
-      cpeParts[5] = '*'
-      const cpe = cpeParts.join(':')
-      prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
-    } else if (name === 'version') {
-      cpeParts[5] = value === '' ? '*' : value
-      const cpe = cpeParts.join(':')
-      prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
-    } else if (name === 'namespace') {
-      const pkg = PackageURL.fromString(purlString)
-      pkg.namespace = value
-      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
-    } else if (name === 'packageName') {
-      const pkg = PackageURL.fromString(purlString)
-      if (value === '') {
-        pkg.name = 'name'
-        prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
-      } else {
+    const cpeParts = identifiers?.cpe?.split(':')
+    if (value !== '') {
+      if (name === 'vendor') {
+        cpeParts[3] = value
+        const cpe = cpeParts.join(':')
+        handleChange('identifiers', 'cpe', cpe)
+      } else if (name === 'product') {
+        cpeParts[4] = value
+        cpeParts[5] = '*'
+        const cpe = cpeParts.join(':')
+        handleChange('identifiers', 'cpe', cpe)
+      } else if (name === 'version') {
+        cpeParts[5] = value === '' ? '*' : value
+        const cpe = cpeParts.join(':')
+        handleChange('identifiers', 'cpe', cpe)
+      } else if (name === 'namespace') {
+        const pkg = PackageURL.fromString(identifiers?.purl)
+        pkg.namespace = value
+        handleChange('identifiers', 'purl', pkg.toString())
+      } else if (name === 'packageName') {
+        const pkg = PackageURL.fromString(identifiers?.purl)
         pkg.name = value
-        prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
+        handleChange('identifiers', 'purl', pkg.toString())
+      } else if (name === 'packageVersion') {
+        const pkg = PackageURL.fromString(identifiers?.purl)
+        pkg.version = value
+        handleChange('identifiers', 'purl', pkg.toString())
       }
-    } else if (name === 'packageVersion') {
-      const pkg = PackageURL.fromString(purlString)
-      pkg.version = value
-      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
     }
   }
 
@@ -132,12 +126,18 @@ const CpeInput = ({
       const matches = validateCpe(inputValue)
       console.log('matches', matches)
       if (matches) {
-        prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: true })
+        setTabData((prev) => ({
+          ...prev,
+          identifiers: { ...prev?.identifiers, isValidCpe: true }
+        }))
       } else {
-        prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: false })
+        setTabData((prev) => ({
+          ...prev,
+          identifiers: { ...prev?.identifiers, isValidCpe: false }
+        }))
       }
     }
-  }, [inputValue, prodCompDispatch, validation])
+  }, [inputValue, setTabData, validation])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -162,7 +162,9 @@ const CpeInput = ({
     >
       <FormControl
         isDisabled={isDisabled}
-        isInvalid={name === 'cpe' && inputValue !== '' && !isCpeValid}
+        isInvalid={
+          name === 'cpe' && inputValue !== '' && !identifiers?.isValidCpe
+        }
       >
         {name !== 'cpe' && (
           <FormLabel textTransform={'capitalize'}>
@@ -189,7 +191,7 @@ const CpeInput = ({
           {validation === true && (
             <InputRightElement align='center' zIndex={-1}>
               {inputValue != null && inputValue !== '' ? (
-                isCpeValid ? (
+                identifiers?.isValidCpe ? (
                   <CheckIcon color='green' />
                 ) : (
                   <WarningTwoIcon color='red' />

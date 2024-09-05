@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
-import React, { useEffect, useState } from 'react'
+import { TabContext } from 'context/TabContext'
+import React, { useContext, useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
 import { useLocation } from 'react-router-dom'
@@ -38,31 +39,24 @@ const CompDetails = ({ data, primaryComp }) => {
   const { showToast } = useCustomToast()
   const customerView = location.pathname.startsWith('/customer')
 
+  const { dispatch } = useGlobalState()
+  const { prodCompDispatch } = dispatch
+
+  const { tabData, setTabData, handleChange, saveChanges } =
+    useContext(TabContext)
+  const { details } = tabData
+
+  const inputStyle = { size: 'md', fontSize: 'sm' }
+
   const { sbomId, sbom } = data || ''
   const { id: productId } = sbom?.project || ''
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { prodCompState, dispatch } = useGlobalState()
-  const { expLicense } = prodCompState
-  const { prodCompDispatch } = dispatch
-
   const [updateComponent, { loading }] = useMutation(UpdateComponent)
-
-  const [groupInfo, setGroupInfo] = useState('')
-  const [compName, setCompName] = useState('')
-  const [compDesc, setCompDesc] = useState('')
-  const [compCopyright, setCompCopyright] = useState('')
-  const [compVersion, setCompVersion] = useState('')
-  const [compKind, setCompKind] = useState('')
-  const [compScope, setCompScope] = useState('')
-  const [compSupport, setCompSupport] = useState('')
-  const [isPrimary, setIsPrimary] = useState(false)
-  const [isInternal, setIsInternal] = useState(false)
 
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
-  const [selectedDate, setSelectedDate] = useState('')
   const [isValidDate, setIsValidDate] = useState(true)
 
   const { colorMode } = useColorMode()
@@ -71,7 +65,10 @@ const CompDetails = ({ data, primaryComp }) => {
   const handleDateChange = (newDate) => {
     console.log('newDate', newDate)
     const isValidDate = newDate && !isNaN(newDate)
-    setSelectedDate(newDate._d)
+    setTabData((prev) => ({
+      ...prev,
+      details: { ...prev?.details, endOfSupport: newDate._d }
+    }))
     if (isValidDate) {
       setIsValidDate(true)
     } else {
@@ -98,29 +95,32 @@ const CompDetails = ({ data, primaryComp }) => {
     return result?.desc
   }
 
+  const license = details?.licenses?.length > 0 ? details.licenses[0].value : ''
+
   const handleUpdateCom = () => {
     updateComponent({
       variables: {
         id: data?.id,
         sbomId: sbomId,
-        kind: compKind,
-        name: compName,
-        scope: compScope,
-        group: groupInfo,
-        primary: isPrimary,
-        internal: isInternal,
-        version: compVersion,
-        description: compDesc,
-        copyright: compCopyright,
-        supportLevel: compSupport,
-        licenses: { licensesExp: expLicense || '' },
-        endOfSupport: selectedDate !== '' ? selectedDate : undefined
+        kind: details?.kind,
+        name: details?.name,
+        scope: details?.scope,
+        group: details?.group,
+        primary: details?.primary,
+        internal: details?.internal,
+        version: details?.version,
+        description: details?.description,
+        copyright: details?.copyright,
+        supportLevel: details?.supportLevel,
+        endOfSupport: details?.endOfSupport,
+        licenses: { licensesExp: license }
       }
     }).then((res) => {
       const { errors } = res?.data?.componentUpdate || ''
       if (errors?.length > 0) {
         showToast({ description: errors[0], status: 'error' })
       } else {
+        saveChanges()
         showToast({
           description: 'Details updated successfully',
           status: 'success'
@@ -130,33 +130,43 @@ const CompDetails = ({ data, primaryComp }) => {
     })
   }
 
-  const invalidVersion = compVersion !== '' && SBOMs?.includes(compVersion)
+  const invalidVersion =
+    details?.version !== '' && SBOMs?.includes(details?.version)
 
   const isInvalid =
-    compKind === '' || compName === '' || compVersion === '' || loading
+    details?.kind === '' ||
+    details?.name === '' ||
+    details?.version === '' ||
+    loading
 
   useEffect(() => {
     if (data) {
-      setCompName(data?.name)
-      setCompKind(data?.kind)
-      setCompScope(data?.scope)
-      setGroupInfo(data?.group)
-      setIsPrimary(data?.primary)
-      setCompVersion(data?.version)
-      setIsInternal(data?.internal)
-      setCompDesc(data?.description)
-      setCompCopyright(data?.copyright)
-      setCompSupport(data?.supportLevel)
-      setSelectedDate(data?.endOfSupport ? new Date(data?.endOfSupport) : '')
+      setTabData((prev) => ({
+        ...prev,
+        details: {
+          ...prev.details,
+          name: data?.name,
+          kind: data?.kind,
+          scope: data?.scope,
+          group: data?.group,
+          primary: data?.primary,
+          version: data?.version,
+          internal: data?.internal,
+          description: data?.description,
+          copyright: data?.copyright,
+          supportLevel: data?.supportLevel,
+          endOfSupport: data?.endOfSupport
+        }
+      }))
     }
-  }, [data])
+  }, [data, setTabData])
 
   return (
     <>
       <Stack direction={'column'} spacing={4} px={6}>
         {/* Name */}
         <FormControl isReadOnly={customerView}>
-          <FormLabel htmlFor='compName' fontSize={'sm'}>
+          <FormLabel htmlFor='name' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>
                 Name
@@ -170,11 +180,11 @@ const CompDetails = ({ data, primaryComp }) => {
             </Flex>
           </FormLabel>
           <Input
-            size='md'
-            fontSize={'sm'}
+            name='name'
+            sx={inputStyle}
+            value={details?.name}
             placeholder='Enter name'
-            value={compName}
-            onChange={(e) => setCompName(e.target.value)}
+            onChange={(e) => handleChange('details', 'name', e.target.value)}
           />
         </FormControl>
         {/* Description */}
@@ -188,11 +198,13 @@ const CompDetails = ({ data, primaryComp }) => {
             </Flex>
           </FormLabel>
           <Textarea
-            size='md'
-            fontSize={'sm'}
+            sx={inputStyle}
+            name='description'
+            value={details?.description}
             placeholder='Add description'
-            value={compDesc}
-            onChange={(e) => setCompDesc(e.target.value)}
+            onChange={(e) =>
+              handleChange('details', 'description', e.target.value)
+            }
           />
         </FormControl>
         {/* Copyright */}
@@ -206,16 +218,18 @@ const CompDetails = ({ data, primaryComp }) => {
             </Flex>
           </FormLabel>
           <Textarea
-            size='md'
-            fontSize={'sm'}
+            sx={inputStyle}
+            name='copyright'
+            value={details?.copyright}
             placeholder='Add copyright'
-            value={compCopyright}
-            onChange={(e) => setCompCopyright(e.target.value)}
+            onChange={(e) =>
+              handleChange('details', 'copyright', e.target.value)
+            }
           />
         </FormControl>
         {/* Version */}
         <FormControl isReadOnly={customerView} isInvalid={invalidVersion}>
-          <FormLabel htmlFor='compVersion' fontSize={'sm'}>
+          <FormLabel htmlFor='version' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>
                 Version{' '}
@@ -229,11 +243,11 @@ const CompDetails = ({ data, primaryComp }) => {
             </Flex>
           </FormLabel>
           <Input
-            size='md'
-            fontSize={'sm'}
+            name='version'
+            sx={inputStyle}
+            value={details?.version}
             placeholder='Enter version'
-            value={compVersion}
-            onChange={(e) => setCompVersion(e.target.value)}
+            onChange={(e) => handleChange('details', 'version', e.target.value)}
           />
           <FormErrorMessage>
             This version of the product already exists. Continuing will override
@@ -251,11 +265,11 @@ const CompDetails = ({ data, primaryComp }) => {
             </Flex>
           </FormLabel>
           <Input
-            size='md'
-            fontSize={'sm'}
+            name='group'
+            value={details?.group}
+            sx={inputStyle}
             placeholder='Add group'
-            value={groupInfo}
-            onChange={(e) => setGroupInfo(e.target.value)}
+            onChange={(e) => handleChange('details', 'group', e.target.value)}
           />
         </FormControl>
         {/* KIND */}
@@ -274,14 +288,12 @@ const CompDetails = ({ data, primaryComp }) => {
             </Flex>
           </FormLabel>
           <Select
-            id='componentType'
-            name='componentType'
-            size='md'
-            fontSize={'sm'}
-            value={compKind}
+            name='kind'
+            value={details?.kind}
+            sx={inputStyle}
             isDisabled={customerView}
-            onChange={(e) => setCompKind(e.target.value)}
             textTransform={'capitalize'}
+            onChange={(e) => handleChange('details', 'kind', e.target.value)}
           >
             <option value='' style={{ background: 'lightgray' }}>
               -- Select --
@@ -327,13 +339,11 @@ const CompDetails = ({ data, primaryComp }) => {
             </Flex>
           </FormLabel>
           <Select
-            id='compScope'
-            name='compScope'
-            size='md'
-            fontSize={'sm'}
-            value={compScope}
+            name='scope'
+            value={details?.scope}
+            sx={inputStyle}
             isDisabled={customerView}
-            onChange={(e) => setCompScope(e.target.value)}
+            onChange={(e) => handleChange('details', 'scope', e.target.value)}
           >
             <option value='' style={{ background: 'lightgray' }}>
               -- Select --
@@ -354,13 +364,13 @@ const CompDetails = ({ data, primaryComp }) => {
             </Flex>
           </FormLabel>
           <Select
-            id='compSupport'
-            name='compSupport'
-            size='md'
-            fontSize={'sm'}
-            value={compSupport}
+            sx={inputStyle}
+            name='supportLevel'
+            value={details?.supportLevel}
             isDisabled={customerView}
-            onChange={(e) => setCompSupport(e.target.value)}
+            onChange={(e) =>
+              handleChange('details', 'supportLevel', e.target.value)
+            }
           >
             <option value='' style={{ background: 'lightgray' }}>
               -- Select --
@@ -382,16 +392,19 @@ const CompDetails = ({ data, primaryComp }) => {
             </Flex>
           </FormLabel>
           <Datetime
-            value={selectedDate}
+            value={details?.endOfSupport}
             closeOnSelect={true}
             className={`${react_datatime} endOfSupport`}
             onChange={handleDateChange}
             inputProps={{
-              disabled: compSupport === '',
+              name: 'endOfSupport',
+              placeholder: 'Add support date',
+              disabled: details?.supportLevel === '',
               onCopy: (e) => e.preventDefault(),
               onPaste: (e) => e.preventDefault(),
               style: {
-                background: 'none'
+                background: 'none',
+                fontSize: '14px'
               }
             }}
           />
@@ -404,9 +417,10 @@ const CompDetails = ({ data, primaryComp }) => {
           <Flex alignItems={'center'} gap={2}>
             <Checkbox
               size='sm'
+              name='primary'
               onChange={onOpen}
               colorScheme='blue'
-              isChecked={isPrimary}
+              isChecked={details?.primary}
             >
               Primary component
             </Checkbox>
@@ -420,9 +434,12 @@ const CompDetails = ({ data, primaryComp }) => {
           <Flex alignItems={'center'} gap={2}>
             <Checkbox
               size='sm'
+              name='internal'
               colorScheme='blue'
-              isChecked={isInternal}
-              onChange={() => setIsInternal(!isInternal)}
+              isChecked={details?.internal}
+              onChange={(e) =>
+                handleChange('details', 'internal', e.target.checked)
+              }
             >
               Internal component
             </Checkbox>
@@ -445,10 +462,7 @@ const CompDetails = ({ data, primaryComp }) => {
       {isOpen && (
         <PrimaryWarning
           isOpen={isOpen}
-          name={compName}
           onClose={onClose}
-          version={compVersion}
-          setData={setIsPrimary}
           primaryComp={primaryComp}
         />
       )}

@@ -1,9 +1,11 @@
 import { useMutation } from '@apollo/client'
+import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { typeOptions } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
+import { namespaceOptions } from 'variables/general'
 
 import {
   Button,
@@ -20,7 +22,6 @@ import {
 import CpeInput from 'components/CpeInput'
 import LynkModal from 'components/LynkModal'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
@@ -31,10 +32,8 @@ const PurlModal = ({
   data,
   isOpen,
   onClose,
-  setPurlValue,
   getCpe,
   activeRow,
-  setIsValid,
   activeComp,
   ruleExists,
   isFreeTier
@@ -44,16 +43,16 @@ const PurlModal = ({
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
 
+  const { tabData, handleChange, setTabData, saveChanges } =
+    useContext(TabContext)
+  const { identifiers } = tabData
+
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
   const navigate = useNavigate()
 
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
-
-  const { prodCompState, dispatch } = useGlobalState()
-  const { purlString } = prodCompState
-  const { prodCompDispatch } = dispatch
 
   const [purlType, setPurlType] = useState('')
   const [namespace, setNamespace] = useState('')
@@ -66,14 +65,6 @@ const PurlModal = ({
   const [purlVersionList, setPurlVersionList] = useState([])
   const purlVersionRef = useRef()
   const [qualifiers, setQualifiers] = useState('')
-  const [isDisabled, setIsDisabled] = useState(false)
-
-  const disableButtonTemporarily = () => {
-    setIsDisabled(true)
-    setTimeout(() => {
-      setIsDisabled(false)
-    }, 3000)
-  }
 
   // const hasNamespace = validPurlTypes.includes(purlType)
 
@@ -82,43 +73,9 @@ const PurlModal = ({
     purlType === '' ||
     (purlType === 'swift' && namespace === '')
 
-  const namespaceOptions = {
-    alpm: [
-      { value: '', label: '-- Select --' },
-      { value: 'arch', label: 'arch' },
-      { value: 'arch32', label: 'arch32' },
-      { value: 'archarm', label: 'archarm' },
-      { value: 'manjaro', label: 'manjaro' },
-      { value: 'msys', label: 'msys' }
-    ],
-    apk: [
-      { value: '', label: '-- Select --' },
-      { value: 'alpine', label: 'alpine' },
-      { value: 'openwrt', label: 'openwrt' }
-    ],
-    bitnami: [],
-    cocoapods: [],
-    cargo: [],
-    conda: [],
-    cran: [],
-    deb: [
-      { value: '', label: '-- Select --' },
-      { value: 'debian', label: 'debian' },
-      { value: 'ubuntu', label: 'ubuntu' }
-    ],
-    generic: [],
-    hackage: [],
-    mflow: [],
-    nuget: [],
-    oci: [],
-    pub: [],
-    pypi: []
-  }
-
-  const [updateComponent] = useMutation(UpdateComponent)
+  const [updateComponent, { loading }] = useMutation(UpdateComponent)
 
   const handleComUpdate = () => {
-    disableButtonTemporarily()
     if (resolved) {
       onClose()
     } else {
@@ -126,9 +83,14 @@ const PurlModal = ({
         variables: {
           id: component?.id,
           sbomId: sbomId,
-          purl: purlString
+          purl: identifiers?.purl
         }
-      }).then((res) => res?.data && onClose())
+      }).then((res) => {
+        if (res?.data) {
+          saveChanges()
+          onClose()
+        }
+      })
     }
   }
 
@@ -194,10 +156,10 @@ const PurlModal = ({
         })
       }
     } else {
-      const pkg = PackageURL.fromString(purlString)
+      const pkg = PackageURL.fromString(identifiers?.purl)
       pkg.namespace = ''
       pkg.name = 'name'
-      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
@@ -291,13 +253,13 @@ const PurlModal = ({
   }
 
   const onNameBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
+    const pkg = PackageURL.fromString(identifiers?.purl)
     if (purlName !== '') {
       pkg.name = purlName
-      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
+      handleChange('identifiers', 'purl', pkg.toString())
     } else {
       pkg.name = 'name'
-      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
@@ -396,33 +358,19 @@ const PurlModal = ({
         })
       }
     } else {
-      const pkg = PackageURL.fromString(purlString)
+      const pkg = PackageURL.fromString(identifiers?.purl)
       pkg.version = ''
-      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
   const handleTypeChange = (e) => {
     const { value } = e.target
     setPurlType(value)
-    prodCompDispatch({
-      type: 'SET_PURL_STRING',
-      payload: 'pkg:type/name@version'
-    })
-    setNamespace('')
-    setPurlName('')
-    setPurlVersion('')
-    setQualifiers('')
-  }
-
-  const onTypeBlur = () => {
-    if (purlType !== '') {
-      const pkg = PackageURL.fromString(purlString)
-      pkg.type = purlType
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+    if (value !== '') {
+      const pkg = PackageURL.fromString(identifiers?.purl)
+      pkg.type = value
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
@@ -433,19 +381,13 @@ const PurlModal = ({
   }
 
   const onNamespaceBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
+    const pkg = PackageURL.fromString(identifiers?.purl)
     if (namespace !== '') {
       pkg.namespace = namespace
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+      handleChange('identifiers', 'purl', pkg.toString())
     } else {
       pkg.namespace = ''
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
@@ -462,19 +404,13 @@ const PurlModal = ({
   }
 
   const onVersionBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
+    const pkg = PackageURL.fromString(identifiers?.purl)
     if (purlVersion !== '') {
       pkg.version = purlVersion
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+      handleChange('identifiers', 'purl', pkg.toString())
     } else {
       pkg.version = 'version'
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
@@ -485,7 +421,7 @@ const PurlModal = ({
   }
 
   const onQualifierBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
+    const pkg = PackageURL.fromString(identifiers?.purl)
     console.log('pkg', pkg)
     const convertedObject = {}
     if (qualifiers !== '') {
@@ -494,34 +430,29 @@ const PurlModal = ({
         convertedObject[key] = value
       }
       pkg.qualifiers = convertedObject
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+      handleChange('identifiers', 'purl', pkg.toString())
     } else {
       pkg.qualifiers = ''
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: pkg.toString()
-      })
+      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
   const handleSave = () => {
     try {
-      const pkg = PackageURL.fromString(purlString)
+      const pkg = PackageURL.fromString(identifiers?.purl)
       pkg.namespace = pkg.namespace === 'namespace' ? '' : pkg.namespace
       pkg.version = pkg.version === 'version' ? '' : pkg.version
       console.log('value', pkg.toString())
-      setPurlValue(pkg.toString())
-      setIsValid(true)
+      handleChange('identifiers', 'purl', pkg.toString())
+      handleChange('identifiers', 'isValidPurl', true)
       onClose()
     } catch (error) {
-      setIsValid(false)
+      handleChange('identifiers', 'isValidPurl', false)
     }
   }
 
-  const [createRule] = useMutation(AutomationRuleCreate)
+  const [createRule, { loading: ruleLoading }] =
+    useMutation(AutomationRuleCreate)
 
   const conditionsAttributes = [
     {
@@ -552,7 +483,7 @@ const PurlModal = ({
     {
       subject: 'component',
       field: 'component_purl',
-      value: purlString
+      value: identifiers?.purl
     }
   ]
 
@@ -564,12 +495,11 @@ const PurlModal = ({
     }
   })
 
-  const handleRuleCreate = async () => {
+  const handleRuleCreate = () => {
     if (ruleExists) {
       navigate(link)
     } else {
-      disableButtonTemporarily()
-      await createRule({
+      createRule({
         variables: {
           active: true,
           name: shortDesc,
@@ -617,9 +547,12 @@ const PurlModal = ({
       setPurlType(pkg?.type)
       setPurlVersion(pkg?.version)
       setQualifiers(pkg?.qualifiers)
-      setPurlValue(pkg.toString())
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: { ...prev.identifiers, purl: pkg.toString() }
+      }))
     }
-  }, [purl, setPurlValue])
+  }, [purl, setTabData])
 
   return (
     <LynkModal
@@ -629,7 +562,7 @@ const PurlModal = ({
       title={'PURL Details'}
       Icon={FaCircleInfo}
       hidden={resolved}
-      disabled={isInvalid || isDisabled}
+      isDisabled={isInvalid || loading}
       buttonText={'Save'}
       leftFooterContent={
         !isFreeTier && (
@@ -637,10 +570,10 @@ const PurlModal = ({
             variant='ghost'
             mr={'auto'}
             fontSize={'sm'}
-            isDisabled={isDisabled || isInvalid}
             onClick={handleRuleCreate}
             hidden={friendlyId ? false : true}
             colorScheme={ruleExists ? 'green' : 'blue'}
+            isDisabled={ruleLoading || loading || isInvalid}
           >
             {ruleExists ? 'View' : 'Save as'} Rule
           </Button>
@@ -682,11 +615,12 @@ const PurlModal = ({
       <Flex width={'100%'} direction={'column'} gap={4}>
         {/* Package URL */}
         <FormControl isDisabled={resolved}>
-          <FormLabel fontSize={12}>Package URL</FormLabel>
+          <FormLabel>Package URL</FormLabel>
           <Textarea
             type='text'
             variant='filled'
-            value={purlString}
+            mt={1.5}
+            value={identifiers?.purl}
             fontSize='16px'
             fontStyle={'bold'}
             isInvalid
@@ -697,9 +631,7 @@ const PurlModal = ({
         </FormControl>
         {/* Type */}
         <FormControl isDisabled={resolved}>
-          <FormLabel fontSize={12} htmlFor='packageType'>
-            Package Type
-          </FormLabel>
+          <FormLabel htmlFor='packageType'>Package Type</FormLabel>
           <Select
             size='md'
             fontSize={'sm'}
@@ -707,7 +639,6 @@ const PurlModal = ({
             name='packageType'
             value={purlType}
             onChange={handleTypeChange}
-            onBlur={onTypeBlur}
           >
             {typeOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -732,7 +663,7 @@ const PurlModal = ({
         ) : namespaceOptions[purlType] &&
           namespaceOptions[purlType].length > 0 ? (
           <FormControl isDisabled={resolved}>
-            <FormLabel fontSize={12}>Namespace</FormLabel>
+            <FormLabel>Namespace</FormLabel>
             <Select
               size='md'
               fontSize={'sm'}
@@ -756,7 +687,7 @@ const PurlModal = ({
               purlType === 'nuget' || purlType === 'oci' ? 'none' : 'block'
             }
           >
-            <FormLabel fontSize={12}>Namespace</FormLabel>
+            <FormLabel>Namespace</FormLabel>
             <Input
               size='md'
               fontSize={'sm'}
@@ -784,9 +715,10 @@ const PurlModal = ({
           />
         ) : (
           <FormControl isDisabled={resolved}>
-            <FormLabel fontSize={12}>Package Name</FormLabel>
+            <FormLabel>Package Name</FormLabel>
             <Input
               type='text'
+              mt={1.5}
               value={purlName}
               fontSize={'sm'}
               onChange={handleNameChange}
@@ -810,10 +742,11 @@ const PurlModal = ({
           />
         ) : (
           <FormControl isDisabled={resolved}>
-            <FormLabel fontSize={12}>Version</FormLabel>
+            <FormLabel>Version</FormLabel>
             <Input
               size='md'
               fontSize={'sm'}
+              mt={1.5}
               type='text'
               value={purlVersion}
               onChange={handleVersionChange}
@@ -824,7 +757,7 @@ const PurlModal = ({
         )}
         {/* Qualifiers */}
         <FormControl isDisabled={resolved}>
-          <FormLabel fontSize={12}>Qualifiers</FormLabel>
+          <FormLabel>Qualifiers</FormLabel>
           <Input
             size='md'
             fontSize={'sm'}

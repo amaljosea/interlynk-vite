@@ -1,6 +1,7 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
+import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { validateCpe } from 'utils'
 
@@ -38,18 +39,19 @@ const CompIdentifiers = ({ data }) => {
   const sbomId = params.sbomid
   const customerView = location.pathname.startsWith('/customer')
 
+  const { tabData, setTabData, handleChange, saveChanges } =
+    useContext(TabContext)
+  const { identifiers } = tabData
+
   const [getCpe] = useLazyQuery(CpeAutoComplete)
 
-  const { dispatch, prodCompState } = useGlobalState()
-  const { isCpeValid } = prodCompState
+  const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
 
   const [updateComponent, { loading }] = useMutation(UpdateComponent)
 
   const cpeRef = useRef()
-  const [cpeValue, setCpeValue] = useState('')
   const [cpeData, setCpeData] = useState([])
-  const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
   const [isPURLInputValid, setPURLInputValid] = useState(true)
   const [purlOpen, setPurlOpen] = useState(false)
@@ -58,13 +60,13 @@ const CompIdentifiers = ({ data }) => {
   const handlePURLInputChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
-    setPurlValue(val)
+    handleChange('identifiers', 'purl', val)
   }
 
   const purlInputBlur = () => {
-    if (purlValue !== '') {
+    if (identifiers?.purl !== '') {
       try {
-        PackageURL.fromString(purlValue)
+        PackageURL.fromString(identifiers?.purl)
         setPURLInputValid(true)
       } catch (ex) {
         console.error('ex', ex)
@@ -74,16 +76,25 @@ const CompIdentifiers = ({ data }) => {
   }
 
   const handlePurlModal = () => {
-    if (purlValue !== '' && isPURLInputValid) {
-      const pkg = PackageURL.fromString(purlValue)
+    if (identifiers?.purl && identifiers?.isValidPurl) {
+      const pkg = PackageURL.fromString(identifiers?.purl)
       setPurlData(pkg)
-      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: {
+          ...prev.identifiers,
+          purl: pkg.toString()
+        }
+      }))
     } else {
       setPurlData(null)
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: 'pkg:type/name@version?key=value'
-      })
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: {
+          ...prev.identifiers,
+          purl: 'pkg:type/name@version'
+        }
+      }))
     }
     setPurlOpen(true)
   }
@@ -91,7 +102,7 @@ const CompIdentifiers = ({ data }) => {
   const handleCpeChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
-    setCpeValue(val)
+    handleChange('identifiers', 'cpe', val)
     getCpe({
       variables: {
         input: { idType: 'cpe', ecosystem: 'cpe', search: { idUri: val } }
@@ -104,23 +115,26 @@ const CompIdentifiers = ({ data }) => {
   }
 
   const isInvalid =
-    (purlValue === '' && cpeValue === '') ||
-    (purlValue !== '' && !isPURLInputValid) ||
-    (cpeValue !== '' && !isCpeValid)
+    (identifiers?.purl === '' && identifiers?.cpe === '') ||
+    (identifiers?.purl !== '' &&
+      !identifiers.isValidPurl &&
+      identifiers?.cpe !== '' &&
+      !identifiers.isValidCpe)
 
   const handleUpdateCom = () => {
     updateComponent({
       variables: {
         id: data?.id,
         sbomId: sbomId,
-        cpes: cpeValue !== '' ? [cpeValue] : [],
-        purl: purlValue
+        purl: identifiers?.purl,
+        cpes: identifiers?.cpe !== '' ? [identifiers?.cpe] : undefined
       }
     }).then((res) => {
       const { errors } = res?.data?.componentUpdate || ''
       if (errors?.length > 0) {
         showToast({ description: errors[0], status: 'error' })
       } else {
+        saveChanges()
         showToast({
           description: 'Identifiers updated successfully',
           status: 'success'
@@ -134,28 +148,44 @@ const CompIdentifiers = ({ data }) => {
     if (data) {
       const { cpes, purl } = data || ''
       if (purl) {
-        setPurlValue(purl)
+        setTabData((prev) => ({
+          ...prev,
+          identifiers: { ...prev.identifiers, purl: purl }
+        }))
         try {
           PackageURL.fromString(purl)
-          setPURLInputValid(true)
+          setTabData((prev) => ({
+            ...prev,
+            identifiers: { ...prev?.identifiers, isValidPurl: true }
+          }))
         } catch (ex) {
-          setPURLInputValid(false)
+          setTabData((prev) => ({
+            ...prev,
+            identifiers: { ...prev?.identifiers, isValidPurl: false }
+          }))
         }
-      } else {
-        setPurlValue('')
-        setPURLInputValid(true)
       }
+
       if (cpes?.length > 0) {
-        setCpeValue(cpes[0])
+        setTabData((prev) => ({
+          ...prev,
+          identifiers: { ...prev?.identifiers, cpe: cpes[0] }
+        }))
         const matches = validateCpe(cpes[0])
         if (matches && cpes[0] !== '') {
-          prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: true })
+          setTabData((prev) => ({
+            ...prev,
+            identifiers: { ...prev?.identifiers, isValidCpe: true }
+          }))
         } else {
-          prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: false })
+          setTabData((prev) => ({
+            ...prev,
+            identifiers: { ...prev?.identifiers, isValidCpe: false }
+          }))
         }
       }
     }
-  }, [data, prodCompDispatch])
+  }, [data, prodCompDispatch, setTabData])
 
   return (
     <Stack
@@ -170,7 +200,6 @@ const CompIdentifiers = ({ data }) => {
           getCpe={getCpe}
           data={purlData}
           activeComp={data}
-          setPurlValue={setPurlValue}
           setIsValid={setPURLInputValid}
           onClose={() => setPurlOpen(false)}
         />
@@ -178,7 +207,7 @@ const CompIdentifiers = ({ data }) => {
       <FormControl
         hidden={purlOpen}
         isReadOnly={customerView}
-        isInvalid={purlValue !== '' && !isPURLInputValid}
+        isInvalid={identifiers?.purl && !identifiers?.isValidPurl}
       >
         <FormLabel htmlFor='purl' fontSize={'sm'}>
           <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
@@ -201,13 +230,13 @@ const CompIdentifiers = ({ data }) => {
             name='purl'
             fontSize={'sm'}
             placeholder='PURL'
-            value={purlValue}
+            value={identifiers?.purl}
             autoComplete='off'
             onChange={handlePURLInputChange}
             onBlur={purlInputBlur}
           />
           <InputRightElement align='center' zIndex={-1}>
-            {purlValue != null && purlValue !== '' ? (
+            {identifiers?.purl != null && identifiers?.purl !== '' ? (
               isPURLInputValid ? (
                 <CheckIcon color='green' />
               ) : (
@@ -224,8 +253,6 @@ const CompIdentifiers = ({ data }) => {
           data={cpeData}
           getCpe={getCpe}
           activeComp={data}
-          cpeValue={cpeValue}
-          setCpeValue={setCpeValue}
           onClose={() => setCpeOpen(false)}
         />
       )}
@@ -245,8 +272,6 @@ const CompIdentifiers = ({ data }) => {
         </FormLabel>
         <CpeField
           inputRef={cpeRef}
-          inputValue={cpeValue}
-          setInputValue={setCpeValue}
           cpeList={cpeData}
           setCpeList={setCpeData}
           onChange={handleCpeChange}

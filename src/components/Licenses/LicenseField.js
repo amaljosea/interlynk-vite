@@ -1,5 +1,6 @@
 import { useLazyQuery } from '@apollo/client'
-import { useCallback, useEffect, useState } from 'react'
+import { TabContext } from 'context/TabContext'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { components } from 'react-select'
 import { infoData } from 'variables/general'
 
@@ -23,15 +24,11 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { LicenseAutoComplete } from 'graphQL/Queries'
 
 const LicenseField = ({ resolved, sbomView, license }) => {
-  const { prodCompState, dispatch, sbomState } = useGlobalState()
+  const { tabData, setTabData, handleChange } = useContext(TabContext)
+  const { details } = tabData
+  const { dispatch, sbomState } = useGlobalState()
 
-  const { prodCompDispatch, sbomDispatch } = dispatch
-
-  const licenseString = sbomView
-    ? sbomState.licenseString
-    : prodCompState.licenseString
-
-  const dispatcher = sbomView ? sbomDispatch : prodCompDispatch
+  const { sbomDispatch } = dispatch
 
   const [licenseList, setLicenseList] = useState([])
   const [licenseType, setLicenseType] = useState('')
@@ -60,7 +57,11 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   const onLicenseChange = (selected) => {
     selected = [selected]
 
-    dispatcher({ type: 'SET_LICENSE_FIELD', payload: selected })
+    if (sbomView) {
+      sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: selected })
+    } else {
+      handleChange('details', 'licenses', selected)
+    }
 
     setLicenseType(selected[0]?.type)
   }
@@ -68,10 +69,15 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   const handleInputChange = useCallback(
     (value) => {
       if (value !== '') {
+        if (sbomView) {
+          sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: [] })
+        } else {
+          setTabData((prev) => ({
+            ...prev,
+            details: { ...prev.details, licenses: [] }
+          }))
+        }
         const formattedValue = formatLicenseString(value)
-
-        dispatcher({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field
-
         getLicense({
           variables: {
             search: formattedValue
@@ -92,7 +98,6 @@ const LicenseField = ({ resolved, sbomView, license }) => {
             const uniqueLicenses = licenses?.filter(
               (v, i, a) => a.findIndex((t) => t.value === v.value) === i
             )
-
             setLicenseList(uniqueLicenses)
           }
         })
@@ -100,7 +105,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
         setLicenseList([])
       }
     },
-    [dispatcher, getLicense]
+    [getLicense, sbomDispatch, sbomView, setTabData]
   )
 
   useEffect(() => {
@@ -119,18 +124,33 @@ const LicenseField = ({ resolved, sbomView, license }) => {
     'Custom License': 'orange'
   }
 
+  const licenseString = sbomView ? sbomState.licenseString : details?.licenses
+
   useEffect(() => {
     if (license) {
       const payload = {
         value: license,
         label: license
       }
-      dispatcher({ type: 'SET_LICENSE_FIELD', payload: [payload] })
+      if (sbomView) {
+        sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: [payload] })
+      } else {
+        setTabData((prev) => ({
+          ...prev,
+          details: { ...prev.details, licenses: [payload] }
+        }))
+      }
+    } else {
+      if (sbomView) {
+        sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: [] })
+      } else {
+        setTabData((prev) => ({
+          ...prev,
+          details: { ...prev.details, licenses: [] }
+        }))
+      }
     }
-    return () => {
-      dispatcher({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field while unmounting
-    }
-  }, [dispatcher, license])
+  }, [license, sbomDispatch, sbomView, setTabData])
 
   const Option = (props) => {
     return (

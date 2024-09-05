@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { TabContext } from 'context/TabContext'
+import { useContext, useEffect, useState } from 'react'
 import { truncatedValue } from 'utils'
 
 import { AddIcon, ArrowDownIcon } from '@chakra-ui/icons'
@@ -63,10 +64,12 @@ const CompRelations = ({ data, compPath }) => {
   const { id, name, version, sbomId, sbom } = data || ''
   const { id: productId } = sbom?.project || ''
 
+  const { tabData, setTabData, handleChange, saveChanges } =
+    useContext(TabContext)
+  const { relations } = tabData
+
   const [dependencyOfList, setDependencyOfList] = useState([])
   const [dependsOnList, setDependsOnList] = useState([])
-  const [relation, setRelation] = useState('')
-  const [component, setComponent] = useState('')
   const [activeComp, setActiveComp] = useState(null)
   const [isAdded, setIsAdded] = useState(false)
 
@@ -95,8 +98,7 @@ const CompRelations = ({ data, compPath }) => {
     },
     onCompleted: (data) => {
       if (data) {
-        setRelation('')
-        setComponent('')
+        setTabData((prev) => ({ ...prev, relations: { to: '', relType: '' } }))
       }
     }
   })
@@ -122,13 +124,16 @@ const CompRelations = ({ data, compPath }) => {
     }
   }, [compDependency])
 
-  const list = dependsOnList?.filter((item) => item?.toComp?.id === component)
+  const list = dependsOnList?.filter(
+    (item) => item?.toComp?.id === relations?.to
+  )
 
   const handleAdd = () => {
     addRelation({
-      variables: { from: id, to: component, relType: relation }
+      variables: { from: id, to: relations?.to, relType: relations?.relType }
     }).then((res) => {
       if (res?.data) {
+        saveChanges()
         setIsAdded(true)
         setDependsOnList((prev) => [
           ...prev,
@@ -140,8 +145,7 @@ const CompRelations = ({ data, compPath }) => {
         })
       }
     })
-    setRelation('')
-    setComponent('')
+    setTabData((prev) => ({ ...prev, relations: { to: '', relType: '' } }))
   }
 
   const handleRemove = async () => {
@@ -172,14 +176,16 @@ const CompRelations = ({ data, compPath }) => {
         alignItems={'flex-start'}
       >
         <FormControl>
-          <FormLabel htmlFor='relation' color='gray.600'>
+          <FormLabel htmlFor='relType' color='gray.600'>
             Type
           </FormLabel>
           <Select
-            id='relation'
             fontSize='sm'
-            value={relation}
-            onChange={(e) => setRelation(e.target.value)}
+            name='relType'
+            value={relations?.relType}
+            onChange={(e) =>
+              handleChange('relations', 'relType', e.target.value)
+            }
           >
             <option value=''>-- Select --</option>
             {[{ value: 'depends_on', label: 'Depends On' }].map((item, idx) => (
@@ -191,14 +197,14 @@ const CompRelations = ({ data, compPath }) => {
         </FormControl>
         {allComponents && (
           <FormControl isInvalid={list.length > 0}>
-            <FormLabel htmlFor='component' color='gray.600'>
+            <FormLabel htmlFor='to' color='gray.600'>
               Component
             </FormLabel>
             <Select
-              id='component'
               fontSize='sm'
-              value={component}
-              onChange={(e) => setComponent(e.target.value)}
+              name='to'
+              value={relations?.to}
+              onChange={(e) => handleChange('relations', 'to', e.target.value)}
             >
               <option value=''>-- Select --</option>
               {[...allComponents.sbom.components.nodes]
@@ -227,7 +233,9 @@ const CompRelations = ({ data, compPath }) => {
           colorScheme='blue'
           onClick={handleAdd}
           leftIcon={<AddIcon />}
-          isDisabled={relation === '' || component === '' || list.length > 0}
+          isDisabled={
+            relations?.relType === '' || relations?.to === '' || list.length > 0
+          }
         >
           Add
         </Button>
@@ -336,8 +344,8 @@ const CompRelations = ({ data, compPath }) => {
           alignItems={'center'}
           justifyContent={'center'}
         >
-          {shortestPath.path?.length > 0 ? (
-            shortestPath.path.map((item, index) => (
+          {shortestPath?.path?.length > 0 ? (
+            shortestPath?.path?.map((item, index) => (
               <>
                 <Tag
                   key={item.id}
@@ -348,7 +356,7 @@ const CompRelations = ({ data, compPath }) => {
                       : 'green'
                   }
                 >
-                  {item?.name} - {truncatedValue(item?.version,20)}
+                  {item?.name} - {truncatedValue(item?.version, 20)}
                 </Tag>
                 {index !== shortestPath.path.length - 1 && (
                   <ArrowDownIcon width={4} height={4} color={'blue.500'} />
