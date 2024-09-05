@@ -134,7 +134,9 @@ const VersionsTable = ({
     })
 
   useEffect(() => {
-    const inProgress = nodes?.some((item) => item?.vulnRunStatus !== 'FINISHED')
+    const inProgress = nodes?.some(
+      (item) => item?.vulnRunStatus === 'IN_PROGRESS'
+    )
     if (inProgress) {
       startPolling(1000)
     } else {
