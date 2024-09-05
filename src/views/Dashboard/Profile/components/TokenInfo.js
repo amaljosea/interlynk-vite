@@ -6,7 +6,7 @@ import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
 import { customStyles, getFullDateAndTime } from 'utils'
 
-import { AddIcon } from '@chakra-ui/icons'
+import { AddIcon, CopyIcon } from '@chakra-ui/icons'
 import {
   Box,
   Checkbox,
@@ -36,6 +36,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import LynkModal from 'components/LynkModal'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -46,7 +47,7 @@ import {
   updateApiToken
 } from 'graphQL/Mutation'
 
-import { BiShieldQuarter } from 'react-icons/bi'
+import { BiCheck, BiShieldQuarter } from 'react-icons/bi'
 import { FaEllipsisV } from 'react-icons/fa'
 
 const GetApiKeys = gql`
@@ -71,6 +72,7 @@ const GetApiKeys = gql`
 `
 
 const TokenInfo = () => {
+  const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
 
@@ -133,73 +135,68 @@ const TokenInfo = () => {
   const [deleteToken] = useMutation(deleteApiToken)
   const [updateToken] = useMutation(updateApiToken)
 
-  const handleCreate = async () => {
+  const handleCreate = () => {
     setIsLoading(true)
-    try {
-      await generateToken({
-        variables: {
-          notes: keyName,
-          expiresAt: selectedDate
-            ? selectedDate.toISOString().replace(/\.\d{3}Z$/, 'Z')
-            : null
-        }
-      }).then((res) => {
-        if (res.data) {
-          setTimeout(() => {
-            setToken(res.data.apiTokenCreate.apiKey.rawToken)
-            setIsLoading(false)
-          }, 3000)
-        }
-      })
-    } catch (error) {
-      console.log('Mutation error', error)
-    }
+    generateToken({
+      variables: {
+        notes: keyName,
+        expiresAt: selectedDate
+          ? selectedDate.toISOString().replace(/\.\d{3}Z$/, 'Z')
+          : null
+      }
+    }).then((res) => {
+      if (res?.data?.apiTokenCreate?.errors?.length > 0) {
+        showToast({
+          description: res?.data?.apiTokenCreate?.errors[0],
+          status: 'error'
+        })
+      } else {
+        setTimeout(() => {
+          setToken(res.data.apiTokenCreate.apiKey.rawToken)
+          setIsLoading(false)
+        }, 3000)
+      }
+    })
   }
 
-  const handleDelete = async (id) => {
-    try {
-      await deleteToken({
-        variables: {
-          apiKeyId: id
-        }
-      }).then((res) => res && onClose())
-    } catch (error) {
-      console.log('Mutation error', error)
-    }
+  const handleDelete = (id) => {
+    deleteToken({
+      variables: {
+        apiKeyId: id
+      }
+    }).then((res) => res && onClose())
   }
 
-  const handleUpdate = async () => {
-    try {
-      await updateToken({
-        variables: {
-          id: activeRow.id,
-          expires: noExpire === true ? null : selectedDate
-        }
-      }).then((res) => res.data && onClose())
-    } catch (error) {
-      console.log('Mutation error', error)
-    }
+  const handleUpdate = () => {
+    updateToken({
+      variables: {
+        id: activeRow.id,
+        expires: noExpire === true ? null : selectedDate
+      }
+    }).then((res) => {
+      if (res?.data?.apiTokenUpdate?.errors?.length > 0) {
+        showToast({
+          description: res?.data?.apiTokenUpdate?.errors[0],
+          status: 'error'
+        })
+      } else {
+        onClose()
+      }
+    })
   }
 
-  const handleRevoked = async (id) => {
-    try {
-      await updateToken({
-        variables: {
-          id: id,
-          revoked: new Date().toISOString()
-        }
-      }).then((res) => res?.data && onClose())
-    } catch (error) {
-      console.log('Mutation error', error)
-    }
+  const handleRevoked = (id) => {
+    updateToken({
+      variables: {
+        id: id,
+        revoked: new Date().toISOString()
+      }
+    }).then((res) => res?.data && onClose())
   }
 
-  const handleSubmit = () => {
-    onClose()
-  }
+  const handleSubmit = () => onClose()
 
   const handleDateChange = (newDate) => {
-    console.log('newDate', newDate)
     const isValidDate = newDate && !isNaN(newDate)
     setSelectedDate(newDate._d)
     if (isValidDate) {
@@ -550,19 +547,9 @@ const TokenInfo = () => {
               >
                 <IconButton
                   border='1px solid'
-                  colorScheme='white'
                   borderColor={borderColor}
-                  onClick={() => {
-                    key.onCopy()
-                  }}
-                  //icon={
-                  //   <Icon
-                  //     color={'#A0AEC0'}
-                  //     w={6}
-                  //     h={6}
-                  //     as={key.hasCopied ? BiCheck : CopyIcon}
-                  //   />
-                  // }
+                  onClick={() => key.onCopy()}
+                  icon={key.hasCopied ? <BiCheck /> : <CopyIcon />}
                 />
               </Tooltip>
             </Stack>
