@@ -3,21 +3,15 @@ import { useEffect, useState } from 'react'
 
 import {
   Box,
-  Button,
   Checkbox,
   Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Skeleton,
   Spinner,
   Text,
   useColorModeValue
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import { CreateProjectGroup } from 'graphQL/Mutation'
 
@@ -168,108 +162,88 @@ const GithubAddModal = ({ isOpen, onClose }) => {
     initialLoading || !Object.values(selectedProjects).some((value) => value)
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size='2xl'>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader border='1px' borderColor='gray.200'>
-          <Flex align='center'>
-            <FaGithub style={{ marginRight: '8px' }} />
-            Add GitHub Project
-          </Flex>
-        </ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          {initialLoading ? (
-            <LoadingSkeleton />
-          ) : (
-            <>
-              <Checkbox
-                isChecked={selectAll}
-                onChange={() => setSelectAll(!selectAll)}
-                mb={4}
-              >
-                Select All
-              </Checkbox>
-              {projects.map((project) => (
-                <Box
-                  key={project.name}
-                  mb={2}
-                  p={4}
-                  border='1px'
-                  borderColor='gray.200'
-                  borderRadius='md'
-                  _hover={{ backgroundColor: 'gray.50' }}
-                  backgroundColor={
-                    selectedProjects[project.name] ? 'gray.100' : 'white'
-                  }
-                >
-                  <Flex justify='space-between' align='center'>
-                    <Flex direction='column' flex={1}>
-                      <Checkbox
-                        mr={2}
-                        isChecked={selectedProjects[project.name] || false}
-                        onChange={() =>
-                          handleProjectCheckboxChange(project.name)
-                        }
-                      >
-                        <Flex align='center'>
-                          <FaCodeBranch
-                            style={{ marginRight: '8px' }}
-                            color={headingColor}
-                          />
-                          <Text fontWeight='semibold' color={headingColor}>
-                            {project.name}
-                          </Text>
-                        </Flex>
-                      </Checkbox>
-                    </Flex>
-                    <Flex flex={1} justify='flex-end'>
-                      {projectLoading[project.name] ? (
-                        <Spinner size='sm' />
-                      ) : (
-                        <Text fontSize={14} color={labelColor}>
-                          {project.label}
-                        </Text>
-                      )}
-                    </Flex>
-                  </Flex>
-                  {project.checkboxLabel &&
-                    !projectLoading[project.name] &&
-                    selectedProjects[project.name] && (
-                      <Checkbox
-                        mt={2}
-                        ml={6}
-                        isChecked={importOptions[project.name] || false}
-                        onChange={() =>
-                          handleImportCheckboxChange(project.name)
-                        }
-                        size='sm'
-                      >
-                        <Text fontSize={14} color={labelColor}>
-                          {project.checkboxLabel}
-                        </Text>
-                      </Checkbox>
-                    )}
-                </Box>
-              ))}
-            </>
-          )}
-        </ModalBody>
-        <ModalFooter borderTop='1px' borderColor='gray.200'>
-          <Button colorScheme='gray' mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            colorScheme='blue'
-            onClick={handleFinish}
-            isLoading={buttonLoading}
-            disabled={isButtonDisabled}
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={'Add GitHub Project'}
+      buttonText={'Add selected repositories'}
+      isLoading={buttonLoading}
+      disabled={isButtonDisabled}
+      onSubmit={handleFinish}
+      Icon={FaGithub}
+    >
+      {initialLoading ? (
+        <LoadingSkeleton />
+      ) : (
+        <>
+          <Checkbox
+            isChecked={selectAll}
+            onChange={() => setSelectAll(!selectAll)}
+            mb={4}
           >
-            Add selected repositories
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+            Select All
+          </Checkbox>
+          {projects.map((project) => (
+            <Box
+              key={project.name}
+              mb={2}
+              p={4}
+              border='1px'
+              borderColor='gray.200'
+              borderRadius='md'
+              _hover={{ backgroundColor: 'gray.50' }}
+              backgroundColor={
+                selectedProjects[project.name] ? 'gray.100' : 'white'
+              }
+            >
+              <Flex justify='space-between' align='center'>
+                <Flex direction='column' flex={1}>
+                  <Checkbox
+                    mr={2}
+                    isChecked={selectedProjects[project.name] || false}
+                    onChange={() => handleProjectCheckboxChange(project.name)}
+                  >
+                    <Flex align='center'>
+                      <FaCodeBranch
+                        style={{ marginRight: '8px' }}
+                        color={headingColor}
+                      />
+                      <Text fontWeight='semibold' color={headingColor}>
+                        {project.name}
+                      </Text>
+                    </Flex>
+                  </Checkbox>
+                </Flex>
+                <Flex flex={1} justify='flex-end'>
+                  {projectLoading[project.name] ? (
+                    <Spinner size='sm' />
+                  ) : (
+                    <Text fontSize={14} color={labelColor}>
+                      {project.label}
+                    </Text>
+                  )}
+                </Flex>
+              </Flex>
+              {project.checkboxLabel &&
+                !projectLoading[project.name] &&
+                selectedProjects[project.name] && (
+                  <Checkbox
+                    mt={2}
+                    ml={6}
+                    isChecked={importOptions[project.name] || false}
+                    onChange={() => handleImportCheckboxChange(project.name)}
+                    size='sm'
+                  >
+                    <Text fontSize={14} color={labelColor}>
+                      {project.checkboxLabel}
+                    </Text>
+                  </Checkbox>
+                )}
+            </Box>
+          ))}
+        </>
+      )}
+    </LynkModal>
   )
 }
 

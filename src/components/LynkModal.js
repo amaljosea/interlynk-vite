@@ -28,6 +28,7 @@ const LynkModal = ({
   children,
   hidden,
   leftFooterContent,
+  rightFooterContent,
   buttonColor,
   maxW,
   maxH,
@@ -108,6 +109,7 @@ const LynkModal = ({
               >
                 {buttonLabel}
               </Button>
+              {rightFooterContent && <Box mr='auto'>{rightFooterContent}</Box>}
             </Stack>
           </Flex>
         </ModalFooter>

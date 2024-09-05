@@ -5,22 +5,18 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
+  Flex,
   FormControl,
   FormLabel,
   IconButton,
   Input,
   InputGroup,
   InputRightElement,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Text,
   useColorModeValue
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -30,6 +26,8 @@ import {
   UpdateJiraConnection
 } from 'graphQL/Mutation'
 import { VerifyJiraToken } from 'graphQL/Queries'
+
+import { IoSettingsOutline } from 'react-icons/io5'
 
 const JiraConfigModal = ({
   isOpen,
@@ -204,151 +202,132 @@ const JiraConfigModal = ({
   const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
 
   return (
-    <Modal
+    <LynkModal
       isOpen={isOpen}
       onClose={onClose}
-      motionPreset='slideInBottom'
-      size='xl'
+      title={'Jira Configuration'}
+      onSubmit={saveOrVerify ? handleVerify : data ? handleUpdate : handleSave}
+      buttonText={saveOrVerify ? 'Verify' : data ? 'Update' : 'Save'}
+      buttonColor={saveOrVerify ? 'blue' : isSaveDisabled ? 'blue' : 'green'}
+      isLoading={saveOrVerify && (isLoading || verifyLoading)}
+      disabled={saveOrVerify ? !updateCon : isSaveDisabled || !updateCon}
+      Icon={IoSettingsOutline}
+      hideCancelButton
+      leftFooterContent={
+        (success || failure) && (
+          <Text
+            color={success ? 'green.500' : 'red.500'}
+            fontSize='sm'
+            mr='auto'
+          >
+            {success ? 'Verified successfully!' : 'Verification failed!'}
+          </Text>
+        )
+      }
+      rightFooterContent={
+        data && (
+          <Button
+            colorScheme='red'
+            onClick={handleDelete}
+            isDisabled={!updateCon}
+          >
+            Delete
+          </Button>
+        )
+      }
     >
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Jira Configuration</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <FormControl isRequired mt={4} isDisabled={!updateCon}>
-            <FormLabel>Jira Host URL</FormLabel>
+      <Flex direction='column' gap={4}>
+        <FormControl isRequired isDisabled={!updateCon}>
+          <FormLabel fontSize={12}>Jira Host URL</FormLabel>
+          <Input
+            value={jiraHost}
+            placeholder='Enter Jira Host URL'
+            onChange={(e) => {
+              setJiraHost(e.target.value)
+              setIsJiraHostChanged(true)
+            }}
+          />
+        </FormControl>
+        <FormControl isRequired isDisabled={!updateCon}>
+          <FormLabel fontSize={12}>User Email</FormLabel>
+          <Input
+            value={jiraUsername}
+            onChange={(e) => {
+              setJiraUsername(e.target.value)
+              setIsJiraUsernameChanged(true)
+            }}
+            placeholder='Enter User Email'
+          />
+        </FormControl>
+        <FormControl isRequired isDisabled={!updateCon}>
+          <FormLabel fontSize={12}>API Token</FormLabel>
+          <InputGroup size='md'>
             <Input
-              value={jiraHost}
-              placeholder='Enter Jira Host URL'
+              pr='4.5rem'
+              type={showApiToken ? 'text' : 'password'}
+              value={jiraApiToken}
+              placeholder='Enter API Token'
               onChange={(e) => {
-                setJiraHost(e.target.value)
-                setIsJiraHostChanged(true)
+                setJiraApiToken(e.target.value)
+                setIsJiraApiTokenChanged(true)
               }}
             />
-          </FormControl>
-          <FormControl isRequired mt={4} isDisabled={!updateCon}>
-            <FormLabel>User Email</FormLabel>
-            <Input
-              value={jiraUsername}
-              onChange={(e) => {
-                setJiraUsername(e.target.value)
-                setIsJiraUsernameChanged(true)
-              }}
-              placeholder='Enter User Email'
-            />
-          </FormControl>
-          <FormControl isRequired mt={4} isDisabled={!updateCon}>
-            <FormLabel>API Token</FormLabel>
-            <InputGroup size='md'>
-              <Input
-                pr='4.5rem'
-                type={showApiToken ? 'text' : 'password'}
-                value={jiraApiToken}
-                placeholder='Enter API Token'
-                onChange={(e) => {
-                  setJiraApiToken(e.target.value)
-                  setIsJiraApiTokenChanged(true)
-                }}
-              />
-              <InputRightElement width='4.5rem' hidden={data}>
-                <IconButton
-                  right='2'
-                  size='sm'
-                  h='1.75rem'
-                  position='absolute'
-                  isDisabled={!updateCon}
-                  onClick={handleToggleVisibility}
-                >
-                  {showApiToken ? <ViewOffIcon /> : <ViewIcon />}
-                </IconButton>
-              </InputRightElement>
-            </InputGroup>
-          </FormControl>
-          {verificationDetails && (
-            <Box
-              mt={4}
-              p={4}
-              border='1px'
-              borderColor='gray.200'
-              borderRadius='md'
-              boxShadow='md'
-              bg={bgColor}
-            >
-              <Text fontWeight='bold' mb={2}>
-                Verification Details:
-              </Text>
-              <Text>
-                <strong>Email:</strong> {verificationDetails.email}
-              </Text>
-              <Text>
-                <strong>Name:</strong> {verificationDetails.name}
-              </Text>
-              <Text>
-                <strong>Account ID:</strong> {verificationDetails.accountId}
-              </Text>
-              <Text>
-                <strong>Account Type:</strong> {verificationDetails.accountType}
-              </Text>
-              <Text>
-                <strong>URL:</strong> {verificationDetails.url}
-              </Text>
-              <Text>
-                <strong>Version:</strong> {verificationDetails.version}
-              </Text>
-              <Text>
-                <strong>Deployment Type:</strong>{' '}
-                {verificationDetails.deploymentType}
-              </Text>
-              <Text>
-                <strong>Server Title:</strong> {verificationDetails.serverTitle}
-              </Text>
-            </Box>
-          )}
-        </ModalBody>
-        <ModalFooter>
-          {success && (
-            <Text color='green.500' fontSize='sm' mr='auto'>
-              {'Verified successfully!'}
+            <InputRightElement width='4.5rem' hidden={data}>
+              <IconButton
+                right='2'
+                size='sm'
+                h='1.75rem'
+                position='absolute'
+                isDisabled={!updateCon}
+                onClick={handleToggleVisibility}
+              >
+                {showApiToken ? <ViewOffIcon /> : <ViewIcon />}
+              </IconButton>
+            </InputRightElement>
+          </InputGroup>
+        </FormControl>
+        {verificationDetails && (
+          <Box
+            mt={4}
+            p={4}
+            border='1px'
+            borderColor='gray.200'
+            borderRadius='md'
+            boxShadow='md'
+            bg={bgColor}
+          >
+            <Text fontWeight='bold' mb={2}>
+              Verification Details:
             </Text>
-          )}
-          {failure && (
-            <Text color='red.500' fontSize='sm' mr='auto'>
-              {'Verification failed!'}
+            <Text>
+              <strong>Email:</strong> {verificationDetails.email}
             </Text>
-          )}
-          {saveOrVerify ? (
-            <Button
-              ml={3}
-              colorScheme='blue'
-              onClick={handleVerify}
-              isDisabled={!updateCon}
-              isLoading={isLoading || verifyLoading}
-            >
-              Verify
-            </Button>
-          ) : (
-            <Button
-              ml={3}
-              isDisabled={isSaveDisabled || !updateCon}
-              onClick={data ? handleUpdate : handleSave}
-              colorScheme={isSaveDisabled ? 'blue' : 'green'}
-            >
-              {data ? 'Update' : 'Save'}
-            </Button>
-          )}
-          {data && (
-            <Button
-              ml={3}
-              colorScheme='red'
-              onClick={handleDelete}
-              isDisabled={!updateCon}
-            >
-              Delete
-            </Button>
-          )}
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+            <Text>
+              <strong>Name:</strong> {verificationDetails.name}
+            </Text>
+            <Text>
+              <strong>Account ID:</strong> {verificationDetails.accountId}
+            </Text>
+            <Text>
+              <strong>Account Type:</strong> {verificationDetails.accountType}
+            </Text>
+            <Text>
+              <strong>URL:</strong> {verificationDetails.url}
+            </Text>
+            <Text>
+              <strong>Version:</strong> {verificationDetails.version}
+            </Text>
+            <Text>
+              <strong>Deployment Type:</strong>{' '}
+              {verificationDetails.deploymentType}
+            </Text>
+            <Text>
+              <strong>Server Title:</strong> {verificationDetails.serverTitle}
+            </Text>
+          </Box>
+        )}
+      </Flex>
+    </LynkModal>
   )
 }
 

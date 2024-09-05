@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getIcon, getLabel, updatedValue } from 'utils'
 
+import { EditIcon } from '@chakra-ui/icons'
 import {
   Alert,
   AlertDescription,
@@ -27,6 +28,8 @@ import {
   Select,
   Tooltip
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import { AutomationRuleCreate, AutomationRuleUpdate } from 'graphQL/Mutation'
 
@@ -476,299 +479,280 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
   }, [data, automationConditionSubjectFieldMapping])
 
   return (
-    <Modal
-      size='5xl'
+    <LynkModal
       isOpen={isOpen}
       onClose={onClose}
-      closeOnOverlayClick={false}
-      motionPreset='slideInBottom'
+      title={`${data ? 'Edit' : 'Create'} Rule`}
+      onSubmit={data ? handleRuleUpdate : handleRuleCreate}
+      disabled={submitError}
+      noFooter={isSystem}
+      buttonText={data ? 'Update' : 'Create'}
+      Icon={EditIcon}
     >
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>{data ? 'Edit' : 'Create'} Rule</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Flex flexDir={'column'} alignItems={'flex-start'} gap={4}>
-            <FormControl isRequired>
-              <FormLabel htmlFor='ruleName'>Rule Name</FormLabel>
-              <Input
-                type='text'
-                name='ruleName'
-                fontSize={'sm'}
-                placeholder='Enter rule name'
-                value={ruleName}
-                onChange={onNameChange}
-                pointerEvents={isSystem ? 'none' : 'auto'}
-              />
-            </FormControl>
-            {/* CONDITIONS */}
-            <FormControl>
-              <FormLabel htmlFor='conditions'>Conditions</FormLabel>
-              {conditions?.length > 0 &&
-                conditions?.map((item, index) => (
-                  <Flex
-                    gap={4}
-                    mt={2}
-                    key={index}
-                    width={'100%'}
-                    alignItems={'flex-start'}
-                    justifyContent={'space-bewteen'}
+      <Flex flexDir={'column'} alignItems={'flex-start'} gap={4}>
+        <FormControl isRequired>
+          <FormLabel fontSize={12} htmlFor='ruleName'>
+            Rule Name
+          </FormLabel>
+          <Input
+            type='text'
+            name='ruleName'
+            fontSize={'sm'}
+            placeholder='Enter rule name'
+            value={ruleName}
+            onChange={onNameChange}
+            pointerEvents={isSystem ? 'none' : 'auto'}
+          />
+        </FormControl>
+        {/* CONDITIONS */}
+        <FormControl>
+          <FormLabel fontSize={12} htmlFor='conditions'>
+            Conditions
+          </FormLabel>
+          {conditions?.length > 0 &&
+            conditions?.map((item, index) => (
+              <Flex
+                gap={4}
+                mt={2}
+                key={index}
+                width={'100%'}
+                alignItems={'flex-start'}
+                justifyContent={'space-bewteen'}
+              >
+                {/* ICON */}
+                <SubjectIcon subject={item?.subject} isSystem={isSystem} />
+                {/* SUBJECT */}
+                <FormControl isInvalid={item?.subError !== ''}>
+                  <Select
+                    value={item?.subject}
+                    onChange={(e) =>
+                      onCondtionChange(e.target.value, item.id, 'subject')
+                    }
+                    onBlur={() => onSubjectBlur(item)}
+                    placeholder='-- Subject --'
+                    fontSize='sm'
+                    onBlurCapture={() => onSubjectBlur(item)}
+                    textTransform={'capitalize'}
+                    isDisabled={isSystem}
                   >
-                    {/* ICON */}
-                    <SubjectIcon subject={item?.subject} isSystem={isSystem} />
-                    {/* SUBJECT */}
-                    <FormControl
-                      width={'40%'}
-                      isInvalid={item?.subError !== ''}
-                    >
-                      <Select
-                        value={item?.subject}
-                        onChange={(e) =>
-                          onCondtionChange(e.target.value, item.id, 'subject')
-                        }
-                        onBlur={() => onSubjectBlur(item)}
-                        placeholder='-- Subject --'
-                        fontSize='sm'
-                        onBlurCapture={() => onSubjectBlur(item)}
-                        textTransform={'capitalize'}
-                        isDisabled={isSystem}
-                      >
-                        {conditions?.length > 1 &&
-                        conditions?.some(
-                          (item) => item?.category === 'component'
-                        )
-                          ? [...categories]
-                              ?.filter((item) => item !== 'version')
-                              .map((category) => (
-                                <optgroup key={category} label={category}>
-                                  {optionsByCategory[category]}
-                                </optgroup>
-                              ))
-                          : conditions?.length > 1 &&
-                              conditions?.some(
-                                (item) => item?.category === 'version'
-                              )
-                            ? [...categories]
-                                ?.filter((item) => item !== 'component')
-                                .map((category) => (
-                                  <optgroup key={category} label={category}>
-                                    {optionsByCategory[category]}
-                                  </optgroup>
-                                ))
-                            : categories.map((category) => (
-                                <optgroup key={category} label={category}>
-                                  {optionsByCategory[category]}
-                                </optgroup>
-                              ))}
-                      </Select>
-                      <FormErrorMessage>{item?.subError}</FormErrorMessage>
-                    </FormControl>
-                    {/* OPERATOR */}
-                    <FormControl width={'20%'} isInvalid={item?.opError !== ''}>
-                      <Select
-                        id='operator'
-                        name='operator'
-                        value={item?.operator}
-                        onChange={(e) =>
-                          onCondtionChange(e.target.value, item.id, 'operator')
-                        }
-                        fontSize='sm'
-                        placeholder='-- Operator --'
-                        onBlur={() => onOperatorBlur(item)}
-                        isDisabled={isSystem}
-                      >
-                        {item?.list?.map((option) => (
-                          <option value={option} key={option}>
-                            {updatedValue(option)}
-                          </option>
-                        ))}
-                      </Select>
-                      <FormErrorMessage>{item?.opError}</FormErrorMessage>
-                    </FormControl>
-                    {item?.operator !== 'exists' &&
-                      item?.operator !== 'not_exists' && (
-                        <Flex width={'50%'} alignItems={'center'} gap={4}>
-                          <Input
-                            type={'text'}
-                            fontSize='sm'
-                            placeholder='Value'
-                            value={item?.value}
-                            onChange={(e) =>
-                              onCondtionChange(e.target.value, item.id, 'value')
-                            }
-                          />
-                        </Flex>
-                      )}
-                    <Flex gap={4} justifyContent={'space-between'}>
-                      {conditions?.length > 1 &&
-                        conditions?.length - 1 !== index && (
-                          <Kbd mt={2}>AND</Kbd>
-                        )}
-                      {conditions?.length > 1 && (
-                        <Icon
-                          ml={'auto'}
-                          mt={2}
-                          as={FaTrash}
-                          color={'red.500'}
-                          cursor={'pointer'}
-                          onClick={() => onDeleteCondtion(item)}
-                        />
-                      )}
-                    </Flex>
-                  </Flex>
-                ))}
-            </FormControl>
-            <Button
-              fontSize={'sm'}
-              colorScheme='blue'
-              variant='link'
-              fontWeight={'medium'}
-              leftIcon={<FaPlus />}
-              onClick={onAddCondtion}
-              isDisabled={isSystem}
-            >
-              Add condition
-            </Button>
-            <Divider />
-            {/* ACTIONS */}
-            <FormControl>
-              <FormLabel htmlFor='actions'>Actions</FormLabel>
-              {actions?.length > 0 &&
-                actions?.map((item, index) => (
-                  <Flex
-                    gap={4}
-                    mt={2}
-                    key={index}
-                    width={'100%'}
-                    alignItems={'flex-start'}
-                    justifyContent={'space-bewteen'}
+                    {conditions?.length > 1 &&
+                    conditions?.some((item) => item?.category === 'component')
+                      ? [...categories]
+                          ?.filter((item) => item !== 'version')
+                          .map((category) => (
+                            <optgroup key={category} label={category}>
+                              {optionsByCategory[category]}
+                            </optgroup>
+                          ))
+                      : conditions?.length > 1 &&
+                          conditions?.some(
+                            (item) => item?.category === 'version'
+                          )
+                        ? [...categories]
+                            ?.filter((item) => item !== 'component')
+                            .map((category) => (
+                              <optgroup key={category} label={category}>
+                                {optionsByCategory[category]}
+                              </optgroup>
+                            ))
+                        : categories.map((category) => (
+                            <optgroup key={category} label={category}>
+                              {optionsByCategory[category]}
+                            </optgroup>
+                          ))}
+                  </Select>
+                  <FormErrorMessage>{item?.subError}</FormErrorMessage>
+                </FormControl>
+                {/* OPERATOR */}
+                <FormControl isInvalid={item?.opError !== ''}>
+                  <Select
+                    id='operator'
+                    name='operator'
+                    value={item?.operator}
+                    onChange={(e) =>
+                      onCondtionChange(e.target.value, item.id, 'operator')
+                    }
+                    fontSize='sm'
+                    placeholder='-- Operator --'
+                    onBlur={() => onOperatorBlur(item)}
+                    isDisabled={isSystem}
                   >
-                    {/* ICON */}
-                    <SubjectIcon subject={item?.subject} isSystem={isSystem} />
-                    {/* SUBJECT */}
-                    <FormControl as={Flex} alignItems='center'>
-                      <Select
-                        value={item?.field}
-                        onChange={(e) =>
-                          onActionChange(e.target.value, item.id, 'field')
-                        }
-                        placeholder='-- Subject --'
-                        fontSize='sm'
-                        textTransform={'capitalize'}
-                        isDisabled={
-                          conditionErrorMessage ||
-                          conditions?.length === 0 ||
-                          isSystem
-                        }
-                      >
-                        {conditions?.some(
-                          (item) => item?.category === 'component'
-                        )
-                          ? [...categories]
-                              ?.filter((item) => item !== 'version')
-                              .map((category) => (
-                                <optgroup key={category} label={category}>
-                                  {optionsByCategory[category]}
-                                </optgroup>
-                              ))
-                          : [...categories]
-                              ?.filter((item) => item !== 'component')
-                              .map((category) => (
-                                <optgroup key={category} label={category}>
-                                  {optionsByCategory[category]}
-                                </optgroup>
-                              ))}
-                      </Select>
-                    </FormControl>
-                    {/* OPERATOR */}
-                    <Input
-                      width='130px'
-                      fontSize={'sm'}
-                      textTransform={'capitalize'}
-                      defaultValue={item?.operator}
-                      pointerEvents={'none'}
-                      isDisabled={
-                        conditionErrorMessage ||
-                        conditions?.length === 0 ||
-                        isSystem
-                      }
-                    />
-                    {/* VALUE */}
-                    <FormControl as={Flex} alignItems='center' gap={4}>
+                    {item?.list?.map((option) => (
+                      <option value={option} key={option}>
+                        {updatedValue(option)}
+                      </option>
+                    ))}
+                  </Select>
+                  <FormErrorMessage>{item?.opError}</FormErrorMessage>
+                </FormControl>
+                {item?.operator !== 'exists' &&
+                  item?.operator !== 'not_exists' && (
+                    <Flex alignItems={'center'} gap={4}>
                       <Input
                         type={'text'}
                         fontSize='sm'
-                        placeholder={'Add value'}
-                        value={item.value}
+                        placeholder='Value'
+                        value={item?.value}
                         onChange={(e) =>
-                          onActionChange(e.target.value, item.id, 'value')
-                        }
-                        isDisabled={
-                          conditionErrorMessage ||
-                          conditions?.length === 0 ||
-                          isSystem
+                          onCondtionChange(e.target.value, item.id, 'value')
                         }
                       />
-                      <Flex gap={4} justifyContent={'space-between'}>
-                        {actions?.length > 1 &&
-                          actions?.length - 1 !== index && <Kbd>AND</Kbd>}
-                        {actions?.length > 1 && (
-                          <Icon
-                            ml={'auto'}
-                            mt={0.6}
-                            as={FaTrash}
-                            color={'red.500'}
-                            cursor={'pointer'}
-                            onClick={() => onDeleteAction(item)}
-                            display={
-                              conditionErrorMessage || conditions?.length === 0
-                                ? 'none'
-                                : 'flex'
-                            }
-                          />
-                        )}
-                      </Flex>
-                    </FormControl>
+                    </Flex>
+                  )}
+                <Flex gap={4} justifyContent={'space-between'}>
+                  {conditions?.length > 1 &&
+                    conditions?.length - 1 !== index && <Kbd mt={2}>AND</Kbd>}
+                  {conditions?.length > 1 && (
+                    <Icon
+                      ml={'auto'}
+                      mt={2}
+                      as={FaTrash}
+                      color={'red.500'}
+                      cursor={'pointer'}
+                      onClick={() => onDeleteCondtion(item)}
+                    />
+                  )}
+                </Flex>
+              </Flex>
+            ))}
+        </FormControl>
+        <Button
+          fontSize={'sm'}
+          colorScheme='blue'
+          variant='link'
+          fontWeight={'medium'}
+          leftIcon={<FaPlus />}
+          onClick={onAddCondtion}
+          isDisabled={isSystem}
+        >
+          Add condition
+        </Button>
+        <Divider />
+        {/* ACTIONS */}
+        <FormControl>
+          <FormLabel fontSize={12} htmlFor='actions'>
+            Actions
+          </FormLabel>
+          {actions?.length > 0 &&
+            actions?.map((item, index) => (
+              <Flex
+                gap={4}
+                mt={2}
+                key={index}
+                width={'100%'}
+                alignItems={'flex-start'}
+                justifyContent={'space-bewteen'}
+              >
+                {/* ICON */}
+                <SubjectIcon subject={item?.subject} isSystem={isSystem} />
+                {/* SUBJECT */}
+                <FormControl as={Flex} alignItems='center'>
+                  <Select
+                    value={item?.field}
+                    onChange={(e) =>
+                      onActionChange(e.target.value, item.id, 'field')
+                    }
+                    placeholder='-- Subject --'
+                    fontSize='sm'
+                    textTransform={'capitalize'}
+                    isDisabled={
+                      conditionErrorMessage ||
+                      conditions?.length === 0 ||
+                      isSystem
+                    }
+                  >
+                    {conditions?.some((item) => item?.category === 'component')
+                      ? [...categories]
+                          ?.filter((item) => item !== 'version')
+                          .map((category) => (
+                            <optgroup key={category} label={category}>
+                              {optionsByCategory[category]}
+                            </optgroup>
+                          ))
+                      : [...categories]
+                          ?.filter((item) => item !== 'component')
+                          .map((category) => (
+                            <optgroup key={category} label={category}>
+                              {optionsByCategory[category]}
+                            </optgroup>
+                          ))}
+                  </Select>
+                </FormControl>
+                {/* OPERATOR */}
+                <Input
+                  width='130px'
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                  defaultValue={item?.operator}
+                  pointerEvents={'none'}
+                  isDisabled={
+                    conditionErrorMessage ||
+                    conditions?.length === 0 ||
+                    isSystem
+                  }
+                />
+                {/* VALUE */}
+                <FormControl as={Flex} alignItems='center' gap={4}>
+                  <Input
+                    type={'text'}
+                    fontSize='sm'
+                    placeholder={'Add value'}
+                    value={item.value}
+                    onChange={(e) =>
+                      onActionChange(e.target.value, item.id, 'value')
+                    }
+                    isDisabled={
+                      conditionErrorMessage ||
+                      conditions?.length === 0 ||
+                      isSystem
+                    }
+                  />
+                  <Flex gap={4} justifyContent={'space-between'}>
+                    {actions?.length > 1 && actions?.length - 1 !== index && (
+                      <Kbd>AND</Kbd>
+                    )}
+                    {actions?.length > 1 && (
+                      <Icon
+                        ml={'auto'}
+                        mt={0.6}
+                        as={FaTrash}
+                        color={'red.500'}
+                        cursor={'pointer'}
+                        onClick={() => onDeleteAction(item)}
+                        display={
+                          conditionErrorMessage || conditions?.length === 0
+                            ? 'none'
+                            : 'flex'
+                        }
+                      />
+                    )}
                   </Flex>
-                ))}
-            </FormControl>
-            <Button
-              fontSize={'sm'}
-              colorScheme='blue'
-              variant='link'
-              fontWeight={'medium'}
-              leftIcon={<FaPlus />}
-              onClick={onAddAction}
-              isDisabled={isSystem}
-            >
-              Add action
-            </Button>
-            {/* ERROR HANDLING */}
-            {error !== '' && (
-              <Alert status='error' borderRadius={4}>
-                <AlertIcon />
-                <AlertDescription fontSize={'sm'} pr={2}>
-                  {error}
-                </AlertDescription>
-              </Alert>
-            )}
-          </Flex>
-        </ModalBody>
-        <ModalFooter mt={2}>
-          <Button colorScheme='gray' mr={3} onClick={onClose} hidden={isSystem}>
-            Cancel
-          </Button>
-          <Button
-            colorScheme='blue'
-            isDisabled={submitError}
-            onClick={data ? handleRuleUpdate : handleRuleCreate}
-            hidden={isSystem}
-          >
-            {data ? 'Update' : 'Create'}
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+                </FormControl>
+              </Flex>
+            ))}
+        </FormControl>
+        <Button
+          fontSize={'sm'}
+          colorScheme='blue'
+          variant='link'
+          fontWeight={'medium'}
+          leftIcon={<FaPlus />}
+          onClick={onAddAction}
+          isDisabled={isSystem}
+        >
+          Add action
+        </Button>
+        {/* ERROR HANDLING */}
+        {error !== '' && (
+          <Alert status='error' borderRadius={4}>
+            <AlertIcon />
+            <AlertDescription fontSize={'sm'} pr={2}>
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
+      </Flex>
+    </LynkModal>
   )
 }
 

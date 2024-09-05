@@ -2,23 +2,18 @@ import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { errorMapping } from 'utils/errorUtils'
 
+import { PlusSquareIcon } from '@chakra-ui/icons'
 import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   Flex,
   FormControl,
   FormLabel,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay
+  Input
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -55,48 +50,37 @@ const EnvModal = ({ groupId, isOpen, onClose }) => {
   const isInvalid = productName === '' || error !== ''
 
   return (
-    <>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <form onSubmit={handleSave}>
-          <ModalContent>
-            <ModalHeader>Add Environment</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Flex width={'100%'} direction={'column'} gap={4}>
-                {error !== '' && (
-                  <Alert status='error' borderRadius={4}>
-                    <AlertIcon />
-                    <AlertDescription fontSize={'sm'} pr={2}>
-                      {error}
-                    </AlertDescription>
-                  </Alert>
-                )}
-                <FormControl isRequired>
-                  <FormLabel>Name</FormLabel>
-                  <Input
-                    type='text'
-                    value={productName || ''}
-                    onChange={(e) => {
-                      setProductName(e.target.value)
-                      setError('')
-                    }}
-                  />
-                </FormControl>
-              </Flex>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button colorScheme='blue' type='submit' disabled={isInvalid}>
-                Save
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </form>
-      </Modal>
-    </>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={'Add Environment'}
+      buttonText={'Save'}
+      disabled={isInvalid}
+      onSubmit={handleSave}
+      Icon={PlusSquareIcon}
+    >
+      <Flex width={'100%'} direction={'column'} gap={4}>
+        {error !== '' && (
+          <Alert status='error' borderRadius={4}>
+            <AlertIcon />
+            <AlertDescription fontSize={'sm'} pr={2}>
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
+        <FormControl isRequired>
+          <FormLabel fontSize={12}>Name</FormLabel>
+          <Input
+            type='text'
+            value={productName || ''}
+            onChange={(e) => {
+              setProductName(e.target.value)
+              setError('')
+            }}
+          />
+        </FormControl>
+      </Flex>
+    </LynkModal>
   )
 }
 

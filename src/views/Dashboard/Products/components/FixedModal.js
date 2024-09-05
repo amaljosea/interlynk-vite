@@ -1,25 +1,19 @@
-import {
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Text
-} from '@chakra-ui/react'
+import { CheckCircleIcon } from '@chakra-ui/icons'
+import { Text } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 const FixedModal = ({ isOpen, onClose }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInBottom'>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Fixed</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody pb={8}>
-          <Text>The platform automatically fixed this issue.</Text>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={'Fixed'}
+      noFooter
+      Icon={CheckCircleIcon}
+    >
+      <Text>The platform automatically fixed this issue.</Text>
+    </LynkModal>
   )
 }
 

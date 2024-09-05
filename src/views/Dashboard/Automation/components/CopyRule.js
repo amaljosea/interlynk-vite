@@ -2,22 +2,16 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { capitalizeFirstLetter } from 'utils'
 
+import { CopyIcon } from '@chakra-ui/icons'
 import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Text,
   chakra
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -100,47 +94,36 @@ const CopyRule = ({ isOpen, onClose, env, data }) => {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Copy Automation</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody as={Flex} flexDirection='column' gap={3}>
-          {/* ERROR HANDLING */}
-          <Alert status='error' borderRadius={4} hidden={error === ''}>
-            <AlertIcon />
-            <AlertDescription fontSize={'sm'} pr={2}>
-              {error}
-            </AlertDescription>
-          </Alert>
-          {/* DETAILS */}
-          <Text>
-            Copy Rule{' '}
-            <chakra.span fontWeight={'semibold'}>{ruleName}</chakra.span> to{' '}
-            <chakra.span fontWeight={'semibold'}>
-              {capitalizeFirstLetter(projectName)}
-            </chakra.span>
-          </Text>
-          <Text>
-            This will copy the current rule, conditions, and actions to the
-            {capitalizeFirstLetter(projectName)}. If a rule with the same name
-            already exists, you must rename that first.
-          </Text>
-        </ModalBody>
-        <ModalFooter>
-          <Button mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            colorScheme='blue'
-            onClick={onSubmit}
-            isDisabled={isDisabled || error !== ''}
-          >
-            Copy
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={'Copy Automation'}
+      onSubmit={onSubmit}
+      disabled={isDisabled || error !== ''}
+      buttonText='Copy'
+      Icon={CopyIcon}
+    >
+      {/* ERROR HANDLING */}
+      <Alert status='error' borderRadius={4} hidden={error === ''}>
+        <AlertIcon />
+        <AlertDescription fontSize={'sm'} pr={2}>
+          {error}
+        </AlertDescription>
+      </Alert>
+      {/* DETAILS */}
+      <Text>
+        Copy Rule <chakra.span fontWeight={'semibold'}>{ruleName}</chakra.span>{' '}
+        to{' '}
+        <chakra.span fontWeight={'semibold'}>
+          {capitalizeFirstLetter(projectName)}
+        </chakra.span>
+      </Text>
+      <Text>
+        This will copy the current rule, conditions, and actions to the
+        {capitalizeFirstLetter(projectName)}. If a rule with the same name
+        already exists, you must rename that first.
+      </Text>
+    </LynkModal>
   )
 }
 

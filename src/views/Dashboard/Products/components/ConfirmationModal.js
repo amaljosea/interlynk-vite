@@ -1,4 +1,4 @@
-import { Flex, ListItem, Tag, Text, UnorderedList } from '@chakra-ui/react'
+import { Box, Flex, ListItem, Tag, Text, UnorderedList } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
@@ -29,7 +29,8 @@ const ConfirmationModal = ({
   title,
   description,
   items,
-  isLoading = false
+  isLoading = false,
+  children
 }) => {
   const Icon = getIcon(title)
 
@@ -62,6 +63,7 @@ const ConfirmationModal = ({
           </Flex>
         </UnorderedList>
       )}
+      {children && <Box>{children}</Box>}
       <br />
       <Text fontWeight={500}>Are you sure you want to proceed?</Text>
     </LynkModal>

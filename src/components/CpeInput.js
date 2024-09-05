@@ -167,7 +167,7 @@ const CpeInput = ({
         }
       >
         {name !== 'cpe' && (
-          <FormLabel textTransform={'capitalize'}>
+          <FormLabel fontSize={12} textTransform={'capitalize'}>
             {name === 'packageName'
               ? 'Package Name'
               : name === 'packageVersion'

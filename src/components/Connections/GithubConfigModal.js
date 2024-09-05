@@ -3,25 +3,21 @@ import { useEffect, useState } from 'react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
   Box,
-  Button,
   FormControl,
   FormLabel,
   IconButton,
   Input,
   InputGroup,
   InputRightElement,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Text,
   useColorModeValue
 } from '@chakra-ui/react'
 
+import LynkModal from 'components/LynkModal'
+
 import useCustomToast from 'hooks/useCustomToast'
+
+import { IoSettingsOutline } from 'react-icons/io5'
 
 const GithubConfigModal = ({ isOpen, onClose, setGreenCheck, data }) => {
   const { showToast } = useCustomToast()
@@ -82,8 +78,6 @@ const GithubConfigModal = ({ isOpen, onClose, setGreenCheck, data }) => {
 
   const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
 
-  const handleDelete = () => {}
-
   const handleToggleVisibility = () => setShowApiToken(!showApiToken)
 
   const resetChanges = () => {
@@ -97,128 +91,103 @@ const GithubConfigModal = ({ isOpen, onClose, setGreenCheck, data }) => {
   const saveOrVerify = isValuesChanged && githubUsername && githubApiToken
 
   return (
-    <Modal
+    <LynkModal
       isOpen={isOpen}
       onClose={onClose}
-      motionPreset='slideInBottom'
-      size='xl'
+      title={'Configure GitHub Connection'}
+      onSubmit={saveOrVerify ? handleVerify : data ? handleUpdate : handleSave}
+      buttonText={saveOrVerify ? 'Verify' : data ? 'Update' : 'Save'}
+      buttonColor={saveOrVerify ? 'blue' : isSaveDisabled ? 'blue' : 'green'}
+      isLoading={saveOrVerify && isLoading}
+      disabled={!saveOrVerify && isSaveDisabled}
+      Icon={IoSettingsOutline}
+      hideCancelButton
+      leftFooterContent={
+        success && (
+          <Text color='green.500' fontSize='sm' mr='auto'>
+            {'Verified successfully!'}
+          </Text>
+        )
+      }
     >
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Configure GitHub Connection</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <FormControl isRequired mt={4}>
-            <FormLabel>User Name</FormLabel>
-            <Input
-              value={githubUsername}
-              onChange={(e) => {
-                setGithubUsername(e.target.value)
-                setIsGithubUsernameChanged(true)
-              }}
-              placeholder='Enter User Name'
-            />
-          </FormControl>
-          <FormControl isRequired mt={4}>
-            <FormLabel>API Token</FormLabel>
-            <InputGroup size='md'>
-              <Input
-                pr='4.5rem'
-                type={showApiToken ? 'text' : 'password'}
-                value={githubApiToken}
-                placeholder='Enter API Token'
-                onChange={(e) => {
-                  setGithubApiToken(e.target.value)
-                  setIsGithubApiTokenChanged(true)
-                }}
-              />
-              <InputRightElement width='4.5rem'>
-                <IconButton
-                  size='sm'
-                  h='1.75rem'
-                  onClick={handleToggleVisibility}
-                  position='absolute'
-                  right='2'
-                >
-                  {showApiToken ? <ViewOffIcon /> : <ViewIcon />}
-                </IconButton>
-              </InputRightElement>
-            </InputGroup>
-          </FormControl>
-          {verificationDetails && (
-            <Box
-              mt={4}
-              p={4}
-              border='1px'
-              borderColor='gray.200'
-              borderRadius='md'
-              boxShadow='md'
-              bg={bgColor}
+      <FormControl isRequired mt={4}>
+        <FormLabel>User Name</FormLabel>
+        <Input
+          value={githubUsername}
+          onChange={(e) => {
+            setGithubUsername(e.target.value)
+            setIsGithubUsernameChanged(true)
+          }}
+          placeholder='Enter User Name'
+        />
+      </FormControl>
+      <FormControl isRequired mt={4}>
+        <FormLabel>API Token</FormLabel>
+        <InputGroup size='md'>
+          <Input
+            pr='4.5rem'
+            type={showApiToken ? 'text' : 'password'}
+            value={githubApiToken}
+            placeholder='Enter API Token'
+            onChange={(e) => {
+              setGithubApiToken(e.target.value)
+              setIsGithubApiTokenChanged(true)
+            }}
+          />
+          <InputRightElement width='4.5rem'>
+            <IconButton
+              size='sm'
+              h='1.75rem'
+              onClick={handleToggleVisibility}
+              position='absolute'
+              right='2'
             >
-              <Text fontWeight='bold' mb={2}>
-                Verification Details:
-              </Text>
-              <Text>
-                <strong>Email:</strong> {verificationDetails.email}
-              </Text>
-              <Text>
-                <strong>Name:</strong> {verificationDetails.name}
-              </Text>
-              <Text>
-                <strong>Account ID:</strong> {verificationDetails.accountId}
-              </Text>
-              <Text>
-                <strong>Account Type:</strong> {verificationDetails.accountType}
-              </Text>
-              <Text>
-                <strong>URL:</strong> {verificationDetails.url}
-              </Text>
-              <Text>
-                <strong>Version:</strong> {verificationDetails.version}
-              </Text>
-              <Text>
-                <strong>Deployment Type:</strong>{' '}
-                {verificationDetails.deploymentType}
-              </Text>
-              <Text>
-                <strong>Server Title:</strong> {verificationDetails.serverTitle}
-              </Text>
-            </Box>
-          )}
-        </ModalBody>
-        <ModalFooter>
-          {success && (
-            <Text color='green.500' fontSize='sm' mr='auto'>
-              {'Verified successfully!'}
-            </Text>
-          )}
-          {saveOrVerify ? (
-            <Button
-              colorScheme='blue'
-              ml={3}
-              onClick={handleVerify}
-              isLoading={isLoading}
-            >
-              Verify
-            </Button>
-          ) : (
-            <Button
-              colorScheme={isSaveDisabled ? 'blue' : 'green'}
-              ml={3}
-              onClick={data ? handleUpdate : handleSave}
-              isDisabled={isSaveDisabled}
-            >
-              {data ? 'Update' : 'Save'}
-            </Button>
-          )}
-          {data && (
-            <Button colorScheme='red' ml={3} onClick={handleDelete}>
-              Delete
-            </Button>
-          )}
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+              {showApiToken ? <ViewOffIcon /> : <ViewIcon />}
+            </IconButton>
+          </InputRightElement>
+        </InputGroup>
+      </FormControl>
+      {verificationDetails && (
+        <Box
+          mt={4}
+          p={4}
+          border='1px'
+          borderColor='gray.200'
+          borderRadius='md'
+          boxShadow='md'
+          bg={bgColor}
+        >
+          <Text fontWeight='bold' mb={2}>
+            Verification Details:
+          </Text>
+          <Text>
+            <strong>Email:</strong> {verificationDetails.email}
+          </Text>
+          <Text>
+            <strong>Name:</strong> {verificationDetails.name}
+          </Text>
+          <Text>
+            <strong>Account ID:</strong> {verificationDetails.accountId}
+          </Text>
+          <Text>
+            <strong>Account Type:</strong> {verificationDetails.accountType}
+          </Text>
+          <Text>
+            <strong>URL:</strong> {verificationDetails.url}
+          </Text>
+          <Text>
+            <strong>Version:</strong> {verificationDetails.version}
+          </Text>
+          <Text>
+            <strong>Deployment Type:</strong>{' '}
+            {verificationDetails.deploymentType}
+          </Text>
+          <Text>
+            <strong>Server Title:</strong> {verificationDetails.serverTitle}
+          </Text>
+        </Box>
+      )}
+    </LynkModal>
   )
 }
 

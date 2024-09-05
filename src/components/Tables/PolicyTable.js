@@ -499,7 +499,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
       {isRuleOpen && (
         <RuleModal
           activeRow={activeRow}
-          data={activeRule}
+          data={activeRow.policyRules[0]}
           isOpen={isRuleOpen}
           onClose={onRuleClose}
         />

@@ -2,27 +2,23 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { updatedValue } from 'utils'
 
+import { EditIcon } from '@chakra-ui/icons'
 import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   Flex,
   FormControl,
   FormLabel,
   Grid,
   GridItem,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
-  Tag
+  Tag,
+  createIcon
 } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -141,151 +137,136 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
   }, [data])
 
   return (
-    <>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <form onSubmit={data ? handleUpdate : handleCreate}>
-          <ModalContent>
-            <ModalHeader>{data ? 'Edit' : 'Create'} Policy Rule</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Tag colorScheme='blue' mb={4} wordBreak={'break-all'} p={2}>
-                {activeRow?.name}
-              </Tag>
-              <Flex width={'100%'} direction={'column'} gap={4}>
-                {error !== '' && (
-                  <Alert status='error' borderRadius={4}>
-                    <AlertIcon />
-                    <AlertDescription fontSize={'sm'} pr={2}>
-                      {error}
-                    </AlertDescription>
-                  </Alert>
-                )}
-                <FormControl isRequired>
-                  <FormLabel>Subject</FormLabel>
-                  <Select
-                    fontSize={'sm'}
-                    value={subject}
-                    onChange={onSubjectChange}
-                    placeholder='-- Select --'
-                    textTransform={'capitalize'}
-                  >
-                    {subOperators?.policySubjectOperatorMapping?.map(
-                      (rule, index) => (
-                        <option
-                          key={index}
-                          value={rule.subject}
-                          style={{ textTransform: 'capitalize' }}
-                        >
-                          {rule.category} {rule?.name}
-                        </option>
-                      )
-                    )}
-                  </Select>
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Operator</FormLabel>
-                  <Select
-                    id='operator'
-                    name='operator'
-                    value={operator}
-                    onChange={onOperatorChange}
-                    textTransform={'capitalize'}
-                    fontSize='sm'
-                  >
-                    <option value=''>-- Select --</option>
-                    {filterOperators?.operators?.map((item, index) => (
-                      <option
-                        key={index}
-                        value={item}
-                        style={{ textTransform: 'capitalize' }}
-                      >
-                        {updatedValue(item)}
-                      </option>
-                    ))}
-                  </Select>
-                </FormControl>
-                {subject === 'VULNERABILITY_SEV' && (
-                  <FormControl isRequired>
-                    <FormLabel>Value</FormLabel>
-                    <Select
-                      id='operator'
-                      name='operator'
-                      value={value}
-                      onChange={onValueChange}
-                      textTransform={'capitalize'}
-                      fontSize='sm'
-                    >
-                      <option value=''>-- Select --</option>
-                      {['Critical', 'High', 'Medium', 'Low'].map(
-                        (item, index) => (
-                          <option
-                            key={index}
-                            value={item}
-                            style={{ textTransform: 'capitalize' }}
-                          >
-                            {item}
-                          </option>
-                        )
-                      )}
-                    </Select>
-                  </FormControl>
-                )}
-                {operator === 'RANGE' && (
-                  <Grid templateColumns={`repeat(2,1fr)`} gap={4}>
-                    <GridItem>
-                      <FormControl isRequired>
-                        <FormLabel>Min</FormLabel>
-                        <Input
-                          type='text'
-                          name='min'
-                          value={min}
-                          fontSize='sm'
-                          onChange={(e) => setMin(e.target.value)}
-                        />
-                      </FormControl>
-                    </GridItem>
-                    <GridItem>
-                      <FormControl isRequired>
-                        <FormLabel>Max</FormLabel>
-                        <Input
-                          type='text'
-                          name='max'
-                          value={max}
-                          fontSize='sm'
-                          onChange={(e) => setMax(e.target.value)}
-                          onKeyDown={() => setValue(`{min:${min},max:${max}}`)}
-                        />
-                      </FormControl>
-                    </GridItem>
-                  </Grid>
-                )}
-                {subject !== 'VULNERABILITY_SEV' && operator !== 'RANGE' && (
-                  <FormControl isRequired>
-                    <FormLabel>Value</FormLabel>
-                    <Input
-                      type='text'
-                      name='value'
-                      value={value}
-                      fontSize='sm'
-                      onChange={onValueChange}
-                    />
-                  </FormControl>
-                )}
-              </Flex>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button colorScheme='blue' type='submit' disabled={isInvalid}>
-                {data ? 'Update' : 'Save'}
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </form>
-      </Modal>
-    </>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`${data ? 'Edit' : 'Create'} Policy Rule`}
+      buttonText={data ? 'Update' : 'Save'}
+      disabled={isInvalid}
+      onSubmit={data ? handleUpdate : handleCreate}
+      Icon={data ? EditIcon : createIcon}
+    >
+      <Tag colorScheme='blue' mb={4} wordBreak={'break-all'}>
+        {activeRow?.name}
+      </Tag>
+      <Flex width={'100%'} direction={'column'} gap={4}>
+        {error !== '' && (
+          <Alert status='error' borderRadius={4}>
+            <AlertIcon />
+            <AlertDescription fontSize={'sm'} pr={2}>
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
+        <FormControl isRequired>
+          <FormLabel fontSize={12}>Subject</FormLabel>
+          <Select
+            fontSize={'sm'}
+            value={subject}
+            onChange={onSubjectChange}
+            placeholder='-- Select --'
+            textTransform={'capitalize'}
+          >
+            {subOperators?.policySubjectOperatorMapping?.map((rule, index) => (
+              <option
+                key={index}
+                value={rule.subject}
+                style={{ textTransform: 'capitalize' }}
+              >
+                {rule.category} {rule?.name}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl isRequired>
+          <FormLabel fontSize={12}>Operator</FormLabel>
+          <Select
+            id='operator'
+            name='operator'
+            value={operator}
+            onChange={onOperatorChange}
+            textTransform={'capitalize'}
+            fontSize='sm'
+          >
+            <option value=''>-- Select --</option>
+            {filterOperators?.operators?.map((item, index) => (
+              <option
+                key={index}
+                value={item}
+                style={{ textTransform: 'capitalize' }}
+              >
+                {updatedValue(item)}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+        {subject === 'VULNERABILITY_SEV' && (
+          <FormControl isRequired>
+            <FormLabel fontSize={12}>Value</FormLabel>
+            <Select
+              id='operator'
+              name='operator'
+              value={value}
+              onChange={onValueChange}
+              textTransform={'capitalize'}
+              fontSize='sm'
+            >
+              <option value=''>-- Select --</option>
+              {['Critical', 'High', 'Medium', 'Low'].map((item, index) => (
+                <option
+                  key={index}
+                  value={item}
+                  style={{ textTransform: 'capitalize' }}
+                >
+                  {item}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+        {operator === 'RANGE' && (
+          <Grid templateColumns={`repeat(2,1fr)`} gap={4}>
+            <GridItem>
+              <FormControl isRequired>
+                <FormLabel fontSize={12}>Min</FormLabel>
+                <Input
+                  type='text'
+                  name='min'
+                  value={min}
+                  fontSize='sm'
+                  onChange={(e) => setMin(e.target.value)}
+                />
+              </FormControl>
+            </GridItem>
+            <GridItem>
+              <FormControl isRequired>
+                <FormLabel fontSize={12}>Max</FormLabel>
+                <Input
+                  type='text'
+                  name='max'
+                  value={max}
+                  fontSize='sm'
+                  onChange={(e) => setMax(e.target.value)}
+                  onKeyDown={() => setValue(`{min:${min},max:${max}}`)}
+                />
+              </FormControl>
+            </GridItem>
+          </Grid>
+        )}
+        {subject !== 'VULNERABILITY_SEV' && operator !== 'RANGE' && (
+          <FormControl isRequired>
+            <FormLabel fontSize={12}>Value</FormLabel>
+            <Input
+              type='text'
+              name='value'
+              value={value}
+              fontSize='sm'
+              onChange={onValueChange}
+            />
+          </FormControl>
+        )}
+      </Flex>
+    </LynkModal>
   )
 }
 

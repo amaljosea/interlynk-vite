@@ -1,19 +1,16 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
+import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
 import {
-  Button,
   Checkbox,
   IconButton,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Portal,
-  Text
+  Portal
 } from '@chakra-ui/react'
-
-import { ConfirmationModal } from 'components/Modal/ConfirmationModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -54,37 +51,6 @@ export const DeleteInternalComponent = ({
 
   return (
     <>
-      {isConfirming && (
-        <ConfirmationModal
-          onClose={onCancel}
-          onConfirm={handleDelete}
-          confirmText='Delete'
-          header='Delete Regular Expression'
-          footer={
-            <>
-              <Button mr={3} onClick={onCancel}>
-                Cancel
-              </Button>
-              <Button
-                isLoading={deleting}
-                colorScheme={'red'}
-                onClick={handleDelete}
-              >
-                Delete
-              </Button>
-            </>
-          }
-        >
-          <Text>
-            Do you wish to delete regular expression:{' '}
-            <strong>{matchStr}</strong> that is being used to find{' '}
-            <strong>Internal Components</strong>?
-          </Text>
-          <Checkbox mt={3} isChecked={untag} onChange={() => setUntag(!untag)}>
-            Also remove the internal flag from previously tagged components.
-          </Checkbox>
-        </ConfirmationModal>
-      )}
       <Menu>
         <MenuButton
           as={IconButton}
@@ -104,6 +70,21 @@ export const DeleteInternalComponent = ({
           </MenuList>
         </Portal>
       </Menu>
+      {isConfirming && (
+        <ConfirmationModal
+          isOpen={isConfirming}
+          onClose={onCancel}
+          onConfirm={handleDelete}
+          isLoading={deleting}
+          name={matchStr}
+          title={'Delete Regular Expression'}
+          description={`Do you wish to delete regular expression: ${matchStr} that is being used to find ${' '} Internal Components ?`}
+        >
+          <Checkbox mt={3} isChecked={untag} onChange={() => setUntag(!untag)}>
+            Also remove the internal flag from previously tagged components.
+          </Checkbox>
+        </ConfirmationModal>
+      )}
     </>
   )
 }
