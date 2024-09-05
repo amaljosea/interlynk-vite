@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import {
@@ -60,7 +60,6 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
   const location = useLocation()
   const params = useParams()
   const productId = params.productid
-  const sbomId = params.sbomid
   const queryParams = new URLSearchParams(location.search)
   const tab = queryParams.get('tab')
 
@@ -173,7 +172,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
         </Stack>
       </Flex>
     )
-  }, [onOpen, productId, sbomId, updatePolicy])
+  }, [onOpen, productId, updatePolicy])
 
   // COLUMNS
   const columns = [
@@ -236,7 +235,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
               resultType === 'inform'
                 ? 'blue'
                 : resultType === 'warn'
-                  ? 'orange'
+                  ? 'yellow'
                   : 'red'
             }
           >
@@ -442,7 +441,6 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
                         color={textColor}
                         fontSize={'sm'}
                         wordBreak={'break-all'}
-                        textTransform={'capitalize'}
                         hidden={
                           item?.operator === 'EXISTS' ||
                           item?.operator === 'NOT_EXISTS'
