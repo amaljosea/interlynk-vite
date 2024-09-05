@@ -54,6 +54,7 @@ const ConnectionCard = ({
           size='md'
           width={isConnected ? '150px' : '120px'}
           color={isConnected ? 'white' : 'blue.500'}
+          bg={isConnected ? 'blue.500' : ''}
           leftIcon={
             isConnected ? (
               <CheckIcon

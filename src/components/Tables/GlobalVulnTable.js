@@ -128,12 +128,14 @@ const GlobalVulnTable = ({
       name: 'SEVERITY',
       selector: (row) => {
         const { sev } = row
+
         return (
           <Tag
             size='md'
             variant='subtle'
             width={'80px'}
-            colorScheme={sevColor(sev)}
+            textColor={sevColor(sev).text}
+            bg={sevColor(sev).bg}
           >
             <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
               {sev || '-'}

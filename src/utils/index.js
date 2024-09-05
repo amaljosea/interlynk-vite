@@ -226,23 +226,19 @@ export const sevIcon = (severity) => {
 export const sevColor = (severity) => {
   switch (severity) {
     case 'critical':
-      return '#FED7D7'
     case 'super critical':
-      return '#FED7D7'
+      return { bg: '#FED7D7', text: '#822727' }
     case 'high':
-      return '#FEEBC8'
     case 'super high':
-      return '#FEEBC8'
+      return { bg: '#FEEBC8', text: '#7B341E' }
     case 'medium':
-      return '#FEFCBF'
+      return { bg: '#FEFCBF', text: '#744210' }
     case 'low':
-      return '#C6F6D5'
     case 'super low':
-      return '#C6F6D5'
     case 'negligible':
-      return '#C6F6D5'
+      return { bg: '#C6F6D5', text: '#22543D' }
     default:
-      return 'gray'
+      return { bg: 'gray', text: 'black' }
   }
 }
 

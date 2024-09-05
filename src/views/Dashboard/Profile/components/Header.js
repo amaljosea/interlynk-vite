@@ -874,9 +874,11 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   w={'120px'}
                   mt={4}
                   bg={'#FED7D7'}
+                  textColor={'#1A202C'}
+                  fontWeight={400}
                   onClick={() => setIsPasswordEdit(false)}
                 >
-                  Cancel Edit
+                  Cancel Password Edit
                 </Button> */}
               </Flex>
             )}

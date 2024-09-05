@@ -578,7 +578,8 @@ const Checks = () => {
           <Tag
             size='md'
             variant='subtle'
-            bg={sevColor(organizationRule.severity)}
+            bg={sevColor(organizationRule.severity).bg}
+            color={sevColor(organizationRule.severity).text}
             textTransform={'capitalize'}
             width={'80px'}
           >
