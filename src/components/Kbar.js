@@ -17,7 +17,6 @@ import { SearchIcon } from '@chakra-ui/icons'
 import { useColorModeValue } from '@chakra-ui/system'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useThemeActions from 'hooks/useThemeAction'
 
@@ -41,14 +40,10 @@ const Kbar = () => {
   const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
   const textHoverColor = useColorModeValue('#EDF2F7', '#2D3748')
 
-  const productPermissions = useHasPermission({
-    parentKey: 'view_product_group'
-  })
-
   const { data: productData } = useQuery(GetProjectGroupAndVersionDetails, {
-    skip: !productPermissions,
     fetchPolicy: 'network-only',
     variables: {
+      first: 500,
       field: 'PROJECT_GROUPS_UPDATED_AT',
       direction: 'DESC',
       enabled: true
