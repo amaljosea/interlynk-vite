@@ -43,6 +43,20 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   const [searchText, setSearchText] = useState('')
   const debouncedSearchTerm = useDebounce(searchText, 300)
 
+  const formatLicenseString = (str = '') => {
+    const matchingWords = ['or', 'and', 'with']
+
+    return str
+      .split(' ')
+      .map((word) => {
+        if (matchingWords.includes(word)) {
+          return word.toUpperCase()
+        }
+        return word
+      })
+      .join(' ')
+  }
+
   const onLicenseChange = (selected) => {
     selected = [selected]
 
@@ -54,11 +68,13 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   const handleInputChange = useCallback(
     (value) => {
       if (value !== '') {
+        const formattedValue = formatLicenseString(value)
+
         dispatcher({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field
 
         getLicense({
           variables: {
-            search: value
+            search: formattedValue
           }
         }).then((res) => {
           if (res.data) {
