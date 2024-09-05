@@ -10,6 +10,7 @@ import { InfoIcon } from '@chakra-ui/icons'
 import {
   Button,
   Checkbox,
+  Divider,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -448,6 +449,7 @@ const CompDetails = ({ data, primaryComp }) => {
             </Tooltip>
           </Flex>
         </FormControl>
+        <Divider />
         <Button
           colorScheme='blue'
           variant={'outline'}

@@ -277,6 +277,7 @@ const CompIdentifiers = ({ data }) => {
           onChange={handleCpeChange}
         />
       </FormControl>
+      <Divider />
       {/* ACTIONS */}
       <Button
         colorScheme='blue'

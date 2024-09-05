@@ -5,6 +5,7 @@ import { validateEmail, validateUrl } from 'utils'
 
 import {
   Button,
+  Divider,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -206,6 +207,7 @@ const CompSupplier = ({ data }) => {
         />
         <FormErrorMessage>{emailError}</FormErrorMessage>
       </FormControl>
+      <Divider />
       {/* ACTIONS */}
       <Button
         variant='outline'

@@ -68,7 +68,6 @@ const General = ({ data, loading, error }) => {
   const { isFreeTier } = useGlobalQueryContext()
   const location = useLocation()
   const params = useParams()
-  const productId = params.productid
   const sbomId = params.sbomid
 
   const {
@@ -102,7 +101,6 @@ const General = ({ data, loading, error }) => {
   const customerView = location?.pathname?.startsWith('/customer')
   const [selectedKey, setSelectedKey] = useState('')
   const [activeTool, setActiveTool] = useState(null)
-  const [isValid, setIsValid] = useState(true)
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
@@ -148,7 +146,7 @@ const General = ({ data, loading, error }) => {
   const [deleteSupplier] = useMutation(supplierDelete)
   const [deleteTool] = useMutation(toolDelete)
   const [deleteAuthor] = useMutation(authorDelete)
-  const [updateSbom] = useMutation(sbomUpdate)
+  const [updateSbom, { loading: sbomLoading }] = useMutation(sbomUpdate)
 
   const handleToolRemove = async (id) => {
     try {
@@ -197,7 +195,7 @@ const General = ({ data, loading, error }) => {
       }
     })
       .then((res) => res.data && sbomDispatch({ type: 'CLEAR_LICENSES' }))
-      .finally(() => onLicenseDelClose())
+      .finally(() => onSBMClose())
   }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
@@ -485,20 +483,19 @@ const General = ({ data, loading, error }) => {
         />
       )}
       {/* SBOM LICENSE MODAL */}
-      {isSBMOpen && data && (
+      {isSBMOpen && (
         <LynkModal
           isOpen={isSBMOpen}
           onClose={onSBMClose}
-          buttonText={licensesExp?.length > 0 ? 'Update' : 'Save'}
-          disabled={!isValid}
-          onSubmit={onUpdateLicense}
-          title={`${licensesExp?.length > 0 ? 'Update' : 'Add'} License`}
+          disabled={sbomLoading}
           Icon={FaScaleBalanced}
+          onSubmit={onUpdateLicense}
+          buttonText={licensesExp?.length > 0 ? 'Update' : 'Save'}
+          title={`${licensesExp?.length > 0 ? 'Update' : 'Add'} License`}
         >
           <LicenseField
             sbomView={true}
-            isValid={isValid}
-            setIsValid={setIsValid}
+            isDisabled={customerView}
             license={licensesExp}
           />
         </LynkModal>

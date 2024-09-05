@@ -1,3 +1,4 @@
+import { TabProvider } from 'context/TabContext'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
@@ -66,7 +67,7 @@ const SbomTable = ({ data, loading, error }) => {
   const activeTabNumber = Math.max(tabs.indexOf(tab), 0)
 
   return (
-    <>
+    <TabProvider>
       <Card>
         <Tabs
           isLazy
@@ -123,7 +124,7 @@ const SbomTable = ({ data, loading, error }) => {
           </TabPanels>
         </Tabs>
       </Card>
-    </>
+    </TabProvider>
   )
 }
 
