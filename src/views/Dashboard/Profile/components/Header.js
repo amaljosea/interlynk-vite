@@ -610,7 +610,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   <Box display={'flex'} gap={'10px'} alignItems={'center'}>
                     <Text
                       fontWeight={'semibold'}
-                      fontSize={25}
+                      fontSize={22}
                       lineHeight={1.2}
                       color={textColor}
                       ms={{ sm: '8px', md: '0px' }}

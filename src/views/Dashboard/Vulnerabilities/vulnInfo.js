@@ -3,11 +3,9 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { getFullDateAndTime, linkURl } from 'utils'
 
 import {
-  Box,
   Flex,
   Grid,
   GridItem,
-  HStack,
   Icon,
   Stack,
   Stat,
@@ -33,10 +31,9 @@ import VulnBadge from 'components/Misc/VulnBadge'
 
 import { GetGlobalVulnData } from 'graphQL/Queries'
 
-import { FaBalanceScale, FaBug, FaCube, FaCubes } from 'react-icons/fa'
+import { FaBug, FaCube, FaCubes } from 'react-icons/fa'
 import { FaCodeMerge } from 'react-icons/fa6'
 
-import SbomStats from '../Products/ProductDetailsSbomNew/SbomDetails/SbomStats'
 import VulnProdTable from './components/ProdTable'
 
 const StatsContainer = ({ icon, title, children }) => {
@@ -52,7 +49,7 @@ const StatsContainer = ({ icon, title, children }) => {
             {icon}
           </IconBox>
           <Stat>
-            <StatLabel mb={1} fontSize='md' fontWeight={'normal'}>
+            <StatLabel mb={1} fontSize='md'>
               {title}
             </StatLabel>
             <StatNumber fontSize='lg' color={textColor}>
@@ -71,8 +68,6 @@ const VulnInfo = () => {
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
   const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const textColor = useColorModeValue('gray.700', 'white')
 
   const { data } = useQuery(GetGlobalVulnData, {
     skip: vulnId ? false : true,
@@ -116,7 +111,7 @@ const VulnInfo = () => {
                 <Link to={linkURl(source, vuln?.vulnId)} target={'_blank'}>
                   <Text
                     fontWeight={'semibold'}
-                    fontSize={18}
+                    fontSize={22}
                     _hover={{ color: 'blue.500' }}
                   >
                     {vuln?.vulnId}
@@ -192,7 +187,7 @@ const VulnInfo = () => {
           </GridItem>
           <GridItem colSpan={3}>
             <StatsContainer icon={<FaCube size={18} />} title={'Components'}>
-              {sbomVersionsCount || 0}
+              {componentCount || 0}
             </StatsContainer>
           </GridItem>
           <GridItem colSpan={3}>

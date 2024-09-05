@@ -389,16 +389,10 @@ const ProductDetailsMain = () => {
                     {/* PRODUCT TITLE */}
                     <Text
                       fontWeight={'semibold'}
-                      fontSize={25}
+                      fontSize={22}
                       lineHeight={1.2}
                     >
-                      {name?.length > 50 ? (
-                        <Tooltip label={name}>
-                          {truncatedValue(name, 50)}
-                        </Tooltip>
-                      ) : (
-                        name
-                      )}
+                      <Tooltip label={name}>{truncatedValue(name, 50)}</Tooltip>
                     </Text>
                     {/* PRODUCT DESCRIPTION */}
                     <Text fontSize={'sm'} wordBreak={'break-all'}>

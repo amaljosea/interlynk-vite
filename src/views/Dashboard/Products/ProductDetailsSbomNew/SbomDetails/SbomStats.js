@@ -137,7 +137,6 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
               mb={1}
               fontSize='md'
               cursor={'pointer'}
-              fontWeight={'normal'}
               onClick={() => handleClick(title)}
             >
               {title}
