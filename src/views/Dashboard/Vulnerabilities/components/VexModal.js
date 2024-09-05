@@ -163,6 +163,11 @@ const VexModal = ({
     (responseTitle !== '' && actionStatement === '') ||
     (responseTitle === 'update' && selectedTag === '')
 
+  const handleClose = () => {
+    setSelectedVulns([])
+    onClose()
+  }
+
   useEffect(() => {
     if (statusName === 'Not Affected') {
       setUpstream(true)
@@ -174,8 +179,8 @@ const VexModal = ({
   return (
     <LynkModal
       isOpen={isOpen}
-      onClose={onClose}
       onSubmit={handleSave}
+      onClose={handleClose}
       title={'Update Status'}
       Icon={FaPenToSquare}
       disabled={isInvalid}

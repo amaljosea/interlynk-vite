@@ -630,6 +630,44 @@ export const openSsf = [
   }
 ]
 
+// VEX STATUS TOOLTIPS
+export const vexInfoData = [
+  {
+    title: 'Status',
+    desc: 'Declares the current state of an occurrence of a vulnerability, after automated or manual analysis.'
+  },
+  {
+    title: 'Justification',
+    desc: 'For statements conveying a "not affected" status, a VEX statement MUST include either a status justification or an impact statement informing why the product is not affected by the vulnerability. Justifications are fixed labels defined by VEX. See Status Justifications below for valid values.'
+  },
+  {
+    title: 'Response',
+    desc: 'A response to the vulnerability by the manufacturer, supplier, or project responsible for the affected component or service. Responses are strongly encouraged for vulnerabilities where the analysis state is exploitable.'
+  },
+  {
+    title: 'Fixed Version',
+    desc: 'For "affected" status with "update" response, Fixed Version can be used to indicate which version of the product includes a fix.'
+  },
+  {
+    title: 'Impact Statement',
+    desc: 'For status “not affected”, if justification is not provided, an impact statement must be included \
+    that further explains how or why the listed product is “not affected” by this vulnerability. Impact Statement is optional if a justification is provided.'
+  },
+  {
+    title: 'Action Statement',
+    desc: `For status “affected”, an action statement must be included that describes actions to remediate or mitigate the vulnerability.`
+  },
+  {
+    title: 'Details',
+    desc: `Detailed description of the impact including methods used during assessment. If a vulnerability is not exploitable, this field should include specific details on why the component or service is not impacted by this vulnerability.`
+  },
+  {
+    title: 'Internal Notes',
+    desc: `Internal notes or observations made by the team handling the vulnerability, which may include additional context, discussions, or considerations relevant to the analysis or response process. \
+    These notes are not exported with the product SBOM or VEX are only used for internal communication and documentation purposes.`
+  }
+]
+
 // SBOM TOOLTIPS
 export const infoData = [
   {

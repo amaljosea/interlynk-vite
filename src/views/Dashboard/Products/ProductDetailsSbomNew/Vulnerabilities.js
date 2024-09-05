@@ -128,7 +128,7 @@ const ExpandedComponent = ({
       p={5}
       boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
     >
-      <Grid templateColumns='repeat(5, 1fr)' gap={12}>
+      <Grid templateColumns='repeat(5, 1fr)' gap={12} py={2}>
         {/* VULN DATA */}
         <GridItem
           w='100%'
