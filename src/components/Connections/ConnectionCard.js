@@ -21,7 +21,7 @@ const ConnectionCard = ({
       overflow='hidden'
       position='relative'
     >
-      <Flex direction='column' height='100%' gap={'16px'}>
+      <Flex direction='column' height='100%' gap={'16px'} mb={2}>
         <Flex align='center'>
           {iconSrc ? (
             <img

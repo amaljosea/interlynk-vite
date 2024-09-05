@@ -136,7 +136,7 @@ const PlanTable = () => {
   ]
 
   return (
-    <Box p={8}>
+    <Box pt={'10px'}>
       {/* Plan Overview Section */}
       <Grid templateColumns='repeat(4, 1fr)' gap={8} mb={6}>
         <GridItem>

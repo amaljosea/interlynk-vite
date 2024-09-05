@@ -711,7 +711,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
           <DrawerBody overflowX={'hidden'}>
             {/* Modal Body Content */}
-            <Text fontSize='16px' mb='10px' textColor={'gray.400'}>
+            <Text fontSize='16px' mb='20px' textColor={'gray.500'}>
               Profile picture
             </Text>
             <Flex alignItems='center' mb={4}>
@@ -906,8 +906,8 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader borderBottom={'1px solid #A0AEC0'} mb='10px'>
+          <DrawerCloseButton mt={1} />
+          <DrawerHeader fontWeight='500' borderBottomWidth='1px'>
             Organization
           </DrawerHeader>
 
@@ -1000,7 +1000,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader borderBottom={'1px solid #A0AEC0'} mb='10px'>
+          <DrawerHeader fontWeight='500' borderBottomWidth='1px'>
             Edit Organization
           </DrawerHeader>
 

@@ -1,12 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import {
-  SimpleGrid,
-  Text,
-  useColorModeValue,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Flex, Text, useColorModeValue, useDisclosure } from '@chakra-ui/react'
 
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -166,7 +161,11 @@ const Connections = ({ org }) => {
           </Text>
         </CardHeader>
         <CardBody px='5px'>
-          <SimpleGrid columns={4} spacing={4}>
+          <Flex
+            /* columns={4} */
+            wrap='wrap'
+            gap={4}
+          >
             {org && !isFreeTier && (
               <ConnectionCard
                 icon={SiJira}
@@ -226,7 +225,7 @@ const Connections = ({ org }) => {
                 }
               />
             )}
-          </SimpleGrid>
+          </Flex>
         </CardBody>
       </Card>
 
