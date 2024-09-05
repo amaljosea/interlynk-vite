@@ -11,11 +11,6 @@ import {
   Stat,
   StatLabel,
   StatNumber,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
   Tag,
   TagLabel,
   Text,
@@ -212,23 +207,7 @@ const VulnInfo = () => {
 
         {/* Tab List */}
         <Card>
-          <Tabs variant='enclosed'>
-            {/* TAB LIST */}
-            <TabList>
-              {['Products'].map((item, index) => (
-                <Tab key={index} _focus={{ outline: 'none' }}>
-                  {item}
-                </Tab>
-              ))}
-            </TabList>
-            {/* TAB PANELS */}
-            <TabPanels>
-              {/* PRODUCTS TABLE */}
-              <TabPanel px={1}>
-                <VulnProdTable sbomVersions={sbomVersions} vulnId={vulnId} />
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
+          <VulnProdTable sbomVersions={sbomVersions} vulnId={vulnId} />
         </Card>
       </Flex>
 
