@@ -203,7 +203,7 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
   return (
     <Drawer isOpen={isOpen} onClose={onClose} size='xl'>
       <DrawerOverlay />
-      <DrawerContent style={customDrawerStyle}>
+      <DrawerContent>
         <DrawerHeader>
           <Text fontSize={20} fontWeight={500}>
             Product TrailLynk
@@ -211,7 +211,7 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
           <Tag colorScheme='blue'>{name}</Tag>
         </DrawerHeader>
         <Divider />
-        <DrawerCloseButton />
+        <DrawerCloseButton marginTop={4} />
         <Flex m={5} justifyContent={'space-between'} alignItems={'center'}>
           <Flex gap={4}>
             <FilterMenu
@@ -262,13 +262,7 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
           </Menu>
         </Flex>
         <DrawerBody borderRadius={10} p={0}>
-          <Flex
-            gap={4}
-            marginTop={10}
-            minHeight={600}
-            p={5}
-            justifyContent={'space-evenly'}
-          >
+          <Flex gap={4} minHeight={600} p={5} justifyContent={'space-evenly'}>
             {renderTree(defaultData, 'default')}
             {renderTree(developmentData, 'development')}
             {renderTree(productionData, 'production')}

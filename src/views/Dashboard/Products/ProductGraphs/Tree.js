@@ -99,7 +99,7 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
         ++index
       })
 
-      const width = 300
+      const width = 250
       const svg = d3.select(svgRef.current)
 
       svg.selectAll('*').remove()
