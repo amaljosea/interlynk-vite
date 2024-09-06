@@ -467,7 +467,8 @@ const Vulnerabilities = ({ sbomData }) => {
             size='md'
             variant='subtle'
             width={'80px'}
-            colorScheme={sevColor(vuln?.sev)}
+            textColor={sevColor(vuln?.sev).text}
+            bg={sevColor(vuln?.sev).bg}
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}

@@ -41,6 +41,7 @@ import QpkgIcon from 'assets/svg/qpkg.png'
 import RpmIcon from 'assets/svg/rpm.png'
 import SwidIcon from 'assets/svg/swid.png'
 import SwiftIcon from 'assets/svg/swift.png'
+import { toLower } from 'lodash'
 import { PackageURL } from 'packageurl-js'
 import { sbomOrigin } from 'variables/general'
 
@@ -224,7 +225,7 @@ export const sevIcon = (severity) => {
 }
 
 export const sevColor = (severity) => {
-  switch (severity) {
+  switch (toLower(severity)) {
     case 'critical':
     case 'super critical':
       return { bg: '#FED7D7', text: '#822727' }

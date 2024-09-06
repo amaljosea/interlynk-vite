@@ -106,7 +106,8 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
                 size='md'
                 variant='subtle'
                 width={'80px'}
-                colorScheme={sevColor(`${toVuln?.vuln?.sev}`)}
+                color={sevColor(`${toVuln?.vuln?.sev}`).text}
+                bg={sevColor(`${toVuln?.vuln?.sev}`).bg}
               >
                 <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
                   {toVuln?.vuln?.sev}
