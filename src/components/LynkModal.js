@@ -2,7 +2,7 @@ import {
   Box,
   Button,
   Divider,
-  Flex,
+  Flex, // eslint-disable-next-line no-restricted-imports
   Modal,
   ModalBody,
   ModalCloseButton,

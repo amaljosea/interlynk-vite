@@ -6,7 +6,7 @@ import { WarningIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
-  Icon,
+  Icon, // eslint-disable-next-line no-restricted-imports
   Modal,
   ModalBody,
   ModalContent,

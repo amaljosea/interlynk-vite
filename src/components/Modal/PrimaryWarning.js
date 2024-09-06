@@ -3,18 +3,10 @@ import { TabContext } from 'context/TabContext'
 import { useContext } from 'react'
 import { useParams } from 'react-router-dom'
 
-import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Tag,
-  Text
-} from '@chakra-ui/react'
+import { QuestionIcon } from '@chakra-ui/icons'
+import { Tag, Text } from '@chakra-ui/react'
+
+import LynkModal from 'components/LynkModal'
 
 import { GetAllSboms } from 'graphQL/Queries'
 
@@ -50,54 +42,47 @@ const PrimaryWarning = ({ isOpen, onClose, primaryComp }) => {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Primary Component Change</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Text>
-            You are about to change primary component
-            <br />
-            <br />
-            From:
-            <br />
-            <Tag py={1} wordBreak={'break-all'}>
-              {primaryComp?.name ? primaryComp?.name : 'None'}
-              {primaryComp?.version ? `- ${primaryComp?.version}` : ''}
-            </Tag>
-            <br />
-            <br />
-            To:
-            <br />
-            <Tag py={1} wordBreak={'break-all'}>
-              {primaryComp?.name === name ? 'None' : details?.name}
-              {primaryComp?.name === name ? '' : `- ${details?.version}`}
-            </Tag>
-          </Text>
-          <br />
-          <Tag
-            py={1}
-            variant='subtle'
-            colorScheme='red'
-            hidden={!isExists}
-            wordBreak={'break-all'}
-          >
-            This version of the product already exists. Continuing will override
-            one of these versions.
-          </Tag>
-          <Text mt={6}>Are you sure you wish to continue ?</Text>
-        </ModalBody>
-        <ModalFooter>
-          <Button mr={3} onClick={onClose}>
-            No
-          </Button>
-          <Button colorScheme={'red'} onClick={handleSave}>
-            Yes
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={'Primary Component Change'}
+      onSubmit={handleSave}
+      buttonText='Yes'
+      buttonColor='red'
+      Icon={QuestionIcon}
+    >
+      <Text>
+        You are about to change primary component
+        <br />
+        <br />
+        From:
+        <br />
+        <Tag py={1} wordBreak={'break-all'}>
+          {primaryComp?.name ? primaryComp?.name : 'None'}
+          {primaryComp?.version ? `- ${primaryComp?.version}` : ''}
+        </Tag>
+        <br />
+        <br />
+        To:
+        <br />
+        <Tag py={1} wordBreak={'break-all'}>
+          {primaryComp?.name === name ? 'None' : details?.name}
+          {primaryComp?.name === name ? '' : `- ${details?.version}`}
+        </Tag>
+      </Text>
+      <br />
+      <Tag
+        py={1}
+        variant='subtle'
+        colorScheme='red'
+        hidden={!isExists}
+        wordBreak={'break-all'}
+      >
+        This version of the product already exists. Continuing will override one
+        of these versions.
+      </Tag>
+      <Text mt={6}>Are you sure you wish to continue ?</Text>
+    </LynkModal>
   )
 }
 

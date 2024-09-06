@@ -7,7 +7,7 @@ import {
   Button,
   Flex,
   HStack,
-  Icon,
+  Icon, // eslint-disable-next-line no-restricted-imports
   Modal,
   ModalBody,
   ModalContent,
