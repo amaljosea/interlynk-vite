@@ -15,6 +15,7 @@ import {
   SimpleGrid,
   Spinner,
   Text,
+  chakra,
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
@@ -121,13 +122,16 @@ const Compliance = () => {
               pt={item?.description === 'Coming soon...' ? 5 : 0}
             >
               {item?.description}
-            </Text>
-            <Text color={textColor} fontSize={'14px'} fontWeight={'light'}>
-              Click{' '}
-              <Link href={item?.url} isExternal color={linkColor}>
-                here
-              </Link>{' '}
-              for more details.
+              <chakra.span
+                color={textColor}
+                fontSize={'14px'}
+                fontWeight={'light'}
+              >
+                <Link href={item?.url} isExternal color={linkColor}>
+                  {' '}
+                  Read more
+                </Link>{' '}
+              </chakra.span>
             </Text>
             <Flex alignItems={'center'} justifyContent={'space-between'}>
               <Text fontSize={'sm'} fontWeight={'medium'}>
