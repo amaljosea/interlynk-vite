@@ -9,7 +9,6 @@ import { EditIcon, InfoIcon } from '@chakra-ui/icons'
 import {
   Flex,
   HStack,
-  Icon,
   IconButton,
   Link,
   Skeleton,
@@ -23,6 +22,7 @@ import {
   Text,
   Th,
   Thead,
+  Tooltip,
   Tr,
   useColorModeValue,
   useDisclosure
@@ -31,7 +31,6 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
-import InfoModal from 'components/InfoModal'
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkModal from 'components/LynkModal'
 
@@ -50,16 +49,13 @@ import { FaScaleBalanced } from 'react-icons/fa6'
 
 import ConfirmationModal from '../components/ConfirmationModal'
 
-const InfoLabel = ({ title, onClick }) => {
+const InfoLabel = ({ title, onCheck }) => {
   return (
     <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
       <Text>{title}</Text>
-      <Icon
-        as={InfoIcon}
-        color={'blue.500'}
-        cursor={'pointer'}
-        onClick={onClick}
-      />
+      <Tooltip label={onCheck}>
+        <InfoIcon color={'blue.500'} />
+      </Tooltip>
     </Flex>
   )
 }
@@ -101,9 +97,6 @@ const General = ({ data, loading, error }) => {
   const customerView = location?.pathname?.startsWith('/customer')
   const [selectedKey, setSelectedKey] = useState('')
   const [activeTool, setActiveTool] = useState(null)
-  const [infoHeading, setInfoHeading] = useState('')
-  const [infoText, setInfoText] = useState('')
-  const [infoUrl, setInfoUrl] = useState('')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -121,11 +114,6 @@ const General = ({ data, loading, error }) => {
     isOpen: isSupOpen,
     onOpen: onSupOpen,
     onClose: onSupClose
-  } = useDisclosure()
-  const {
-    isOpen: isInfoOpen,
-    onOpen: onInfoOpen,
-    onClose: onInfoClose
   } = useDisclosure()
   const {
     isOpen: isAutDelOpen,
@@ -210,16 +198,8 @@ const General = ({ data, loading, error }) => {
 
   const onCheck = (title) => {
     const result = infoData.find((item) => item?.title === title)
-    setInfoHeading(result?.title)
-    setInfoText(result?.desc)
-    setInfoUrl('')
-    onInfoOpen()
+    return result?.desc
   }
-
-  const onCheckTime = () => onCheck(`Created At`)
-  const onCheckTool = () => onCheck(`Creation Tool`)
-  const onCheckAuthor = () => onCheck(`Authors`)
-  const onCheckSupplier = () => onCheck(`Supplier`)
 
   // KEYBOARD EVENT LISTNER FOR SBOM DRAWER
   useEffect(() => {
@@ -268,7 +248,10 @@ const General = ({ data, loading, error }) => {
             {/* CREATED AT */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
-                <InfoLabel title={`Created At`} onClick={onCheckTime} />
+                <InfoLabel
+                  title={`Created At`}
+                  onCheck={onCheck('Created At')}
+                />
               </Td>
               <Td pl={0}>
                 <Text my={2}>
@@ -280,7 +263,10 @@ const General = ({ data, loading, error }) => {
             {/* CREATION TOOLS */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
-                <InfoLabel title={`Creation Tool`} onClick={onCheckTool} />
+                <InfoLabel
+                  title={`Creation Tool`}
+                  onCheck={onCheck('Creation Tool')}
+                />
               </Td>
               <Td pl={0}>
                 <Flex
@@ -326,7 +312,7 @@ const General = ({ data, loading, error }) => {
             {/* AUTHORS */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
-                <InfoLabel title={`Authors`} onClick={onCheckAuthor} />
+                <InfoLabel title={`Authors`} onCheck={onCheck('Authors')} />
               </Td>
               <Td pl={0}>
                 <Stack spacing={2} direction={'column'} my={2}>
@@ -367,7 +353,7 @@ const General = ({ data, loading, error }) => {
             {/* SUPPLIERS */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
-                <InfoLabel title={`Supplier`} onClick={onCheckSupplier} />
+                <InfoLabel title={`Supplier`} onCheck={onCheck('Supplier')} />
               </Td>
               <Td pl={0}>
                 <HStack spacing={4}>
@@ -552,16 +538,6 @@ const General = ({ data, loading, error }) => {
           name={licensesExp}
           title={'Remove License'}
           description={`You are about to delete the License : ${licensesExp} from this version.`}
-        />
-      )}
-      {/* INFO MODAL */}
-      {isInfoOpen && (
-        <InfoModal
-          isOpen={isInfoOpen}
-          onClose={onInfoClose}
-          heading={infoHeading}
-          body={infoText}
-          url={infoUrl}
         />
       )}
     </>
