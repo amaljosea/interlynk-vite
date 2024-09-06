@@ -111,26 +111,27 @@ const LegalTable = () => {
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}
+        mb={'24px'}
       >
-        <Stack direction={'row'} alignItems={'center'}>
-          <Flex flexDirection={'column'} mb={6}>
-            <Flex alignItems={'center'} gap={1}>
-              <Text fontSize='lg' color={textColor} fontWeight='bold'>
-                Manufacturer Identities
-              </Text>
-              <InfoIcon
-                color={'blue.500'}
-                cursor={'pointer'}
-                onClick={onCheckMfc}
-              />
-            </Flex>
 
-            <Text fontSize={'sm'}>
-              View and manage the identities of manufacturers, ensuring
-              authenticity and compliance across the supply chain.
+        <Flex flexDirection={'column'}>
+          <Stack direction={'row'} alignItems={'center'}>
+            <Text fontSize='lg' color={textColor} fontWeight='bold'>
+              Manufacturer Identities
             </Text>
-          </Flex>
-        </Stack>
+            <InfoIcon
+              color={'blue.500'}
+              cursor={'pointer'}
+              onClick={onCheckMfc}
+            />
+          </Stack>
+          <Text fontSize={'sm'}>
+            View and manage the identities of manufacturers, ensuring
+            authenticity and compliance across the supply chain.
+          </Text>
+        </Flex>
+
+
         <Tooltip label='Add Manufacturer'>
           <IconButton
             isDisabled={!updateOrg}

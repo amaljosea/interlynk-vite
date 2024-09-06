@@ -75,7 +75,7 @@ function Profile() {
         setPsIndex(Math.max(psTabs.indexOf(activetab), 0))
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activetab])
 
   const tabs = useMemo(() => {
@@ -131,7 +131,7 @@ function Profile() {
     } else {
       setSelectedTab(tabs[0].name)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activetab, tabs])
 
   if (error) {
@@ -177,33 +177,33 @@ function Profile() {
             </TabList>
             <TabPanels>
               {/* TEAMS */}
-              <TabPanel display={data ? 'block' : 'none'}>
+              <TabPanel display={data ? 'block' : 'none'} px={0}>
                 <TeamTable />
               </TabPanel>
               {/* ROLES */}
-              <TabPanel>
+              <TabPanel px={0}>
                 <RoleTable />
               </TabPanel>
               {/* FEEDS */}
-              <TabPanel>
+              <TabPanel px={0}>
                 <Feeds />
               </TabPanel>
               {/* RULES */}
-              <TabPanel>
+              <TabPanel px={0}>
                 <Checks />
               </TabPanel>
               {/* LISTS */}
-              <TabPanel>
+              <TabPanel px={0}>
                 <InternalComponents />
               </TabPanel>
               {/* LEGAL */}
-              <TabPanel>
+              <TabPanel px={0}>
                 <LegalTable />
               </TabPanel>
-              <TabPanel>
+              <TabPanel px={0}>
                 <Connections org={true} />
               </TabPanel>
-              <TabPanel>
+              <TabPanel px={0}>
                 <PlanTable />
               </TabPanel>
             </TabPanels>

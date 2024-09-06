@@ -2,6 +2,7 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { getIcon, getLabel, updatedValue } from 'utils'
 
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Alert,
   AlertDescription,
@@ -18,6 +19,7 @@ import {
   Input,
   InputGroup,
   InputLeftAddon,
+  InputLeftElement,
   InputRightAddon,
   Select,
   Stack,
@@ -32,7 +34,6 @@ import LynkModal from 'components/LynkModal'
 
 import { PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
 
-import { FaPlus } from 'react-icons/fa'
 import { MdDeleteOutline } from 'react-icons/md'
 import { TbShieldSearch } from 'react-icons/tb'
 
@@ -583,48 +584,41 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                     alignItems={'flex-start'}
                     justifyContent={'space-bewteen'}
                   >
-                    <Box>
-                      <Tooltip
-                        label={item?.subject !== '' && getLabel(item?.subject)}
-                        placement='top'
-                      >
-                        <Box>
-                          <IconButton
-                            border='1px solid'
-                            colorScheme='white'
-                            borderColor={borderColor}
-                            icon={
-                              <Icon
-                                color='blue.500'
-                                as={getIcon(item.subject)}
-                              />
-                            }
-                          />
-                        </Box>
-                      </Tooltip>
-                    </Box>
-                    {/* SUBJECT */}
-                    <FormControl>
-                      <Select
-                        fontSize='sm'
-                        value={item?.subject}
-                        onChange={(e) =>
-                          handleChange(e.target.value, item.id, 'subject')
-                        }
-                        placeholder='-- subject --'
-                      >
-                        {categories.map((category) => (
-                          <optgroup key={category} label={category}>
-                            {optionsByCategory[category]}
-                          </optgroup>
-                        ))}
-                      </Select>
-                      {item?.subError !== '' && (
-                        <Text mt={1} color={'red.500'} fontSize={'sm'}>
-                          {item?.subError}
-                        </Text>
-                      )}
-                    </FormControl>
+                    <InputGroup>
+                      <InputLeftElement pointerEvents='none'>
+                        <Tooltip
+                          label={
+                            item?.subject !== '' && getLabel(item?.subject)
+                          }
+                          placement='top'
+                        >
+                          <Icon color='blue.500' as={getIcon(item.subject)} />
+                        </Tooltip>
+                      </InputLeftElement>
+                      {/* SUBJECT */}
+                      <FormControl>
+                        <Select
+                          fontSize='sm'
+                          value={item?.subject}
+                          onChange={(e) =>
+                            handleChange(e.target.value, item.id, 'subject')
+                          }
+                          placeholder='-- subject --'
+                          sx={{ paddingLeft: '34px' }}
+                        >
+                          {categories.map((category) => (
+                            <optgroup key={category} label={category}>
+                              {optionsByCategory[category]}
+                            </optgroup>
+                          ))}
+                        </Select>
+                        {item?.subError !== '' && (
+                          <Text mt={1} color='red.500' fontSize='sm'>
+                            {item?.subError}
+                          </Text>
+                        )}
+                      </FormControl>
+                    </InputGroup>
                     {/* OPERATOR */}
                     <FormControl>
                       <Select
@@ -657,7 +651,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                     {/* VALUE */}
                     <Flex alignItems={'center'} gap={4}>
                       {item?.subject === 'VULNERABILITY_SEV' && (
-                        <FormControl isRequired>
+                        <FormControl isRequired minWidth={140}>
                           <Select
                             id='operator'
                             name='operator'
@@ -692,7 +686,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                         </FormControl>
                       )}
                       {item?.subject === 'VULNERABILITY_KEV' && (
-                        <FormControl isRequired>
+                        <FormControl isRequired minWidth={140}>
                           <Select
                             id='operator'
                             name='operator'
@@ -717,7 +711,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                         </FormControl>
                       )}
                       {item?.subject === 'VULNERABILITY_STATUS' && (
-                        <FormControl isRequired>
+                        <FormControl isRequired minWidth={140}>
                           <Select
                             id='vulnStatus'
                             name='vulnStatus'
@@ -753,7 +747,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                       )}
                       {item?.subject === 'VULNERABILITY_STATUS_COMPLETENESS' &&
                         item?.operator === 'IS' && (
-                          <FormControl isRequired>
+                          <FormControl isRequired minWidth={140}>
                             <Select
                               id='statusCompleteness'
                               name='statusCompleteness'
@@ -793,6 +787,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                               }
                               textTransform={'capitalize'}
                               fontSize='sm'
+                              minWidth={140}
                             >
                               <option value=''>-- select --</option>
                               {[
@@ -923,7 +918,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                         (item?.operator === 'LESS_THAN' ||
                           item?.operator === 'MORE_THAN' ||
                           item?.operator === '') && (
-                          <InputGroup>
+                          <InputGroup minWidth={140}>
                             <Input
                               type='number'
                               fontSize={'sm'}
@@ -943,8 +938,9 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                         (item?.operator === 'LESS_THAN' ||
                           item?.operator === 'MORE_THAN' ||
                           item?.operator === '') && (
-                          <InputGroup>
+                          <InputGroup minWidth={140}>
                             <Input
+                              padding={2}
                               type='number'
                               fontSize='sm'
                               placeholder='Value'
@@ -1007,18 +1003,23 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                   </Flex>
                   {conditions?.length > 1 &&
                     conditions?.length - 1 !== index && (
-                      <Tag mt={2}>{operator === 'ALL' ? 'AND' : 'OR'}</Tag>
+                      <Tag mt={2}>
+                        <Text fontSize={12}>
+                          {operator === 'ALL' ? 'AND' : 'OR'}
+                        </Text>
+                      </Tag>
                     )}
                 </>
               ))}
           </FormControl>
           {/* ADD CONDITIONS */}
           <Button
-            fontSize={'sm'}
-            colorScheme='blue'
-            variant='link'
-            fontWeight={'medium'}
-            leftIcon={<FaPlus />}
+            fontSize={12}
+            colorScheme='white'
+            fontWeight={'500'}
+            textColor={'blue.500'}
+            paddingLeft={'2px'}
+            leftIcon={<AddIcon />}
             onClick={addRow}
           >
             Add condition

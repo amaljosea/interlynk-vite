@@ -134,8 +134,8 @@ const GlobalVulnTable = ({
             size='md'
             variant='subtle'
             width={'80px'}
-            textColor={sevColor(sev).text}
             bg={sevColor(sev).bg}
+            textColor={sevColor(sev).text}
           >
             <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
               {sev || '-'}

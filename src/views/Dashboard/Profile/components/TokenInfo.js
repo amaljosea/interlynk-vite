@@ -215,7 +215,7 @@ const TokenInfo = () => {
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}
-        marginBottom={'12px'}
+        marginBottom={'24px'}
       >
         <Box p='12px 0' mb='8px' display={'flex'} flexDirection={'column'}>
           <Text fontSize='lg' color={textColor} fontWeight='bold'>

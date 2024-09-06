@@ -247,7 +247,7 @@ const Checks = () => {
       }
     })
     reset()
-  }, [healthRecheck, sbomId, showToast])
+  }, [healthRecheck, sbomId, showToast, reset])
 
   const setSearchFilter = useCallback(
     (value) => {
@@ -579,7 +579,7 @@ const Checks = () => {
             size='md'
             variant='subtle'
             bg={sevColor(organizationRule.severity).bg}
-            color={sevColor(organizationRule.severity).text}
+            textColor={sevColor(organizationRule.severity).text}
             textTransform={'capitalize'}
             width={'80px'}
           >

@@ -19,6 +19,7 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import CustomLoader from 'components/CustomLoader'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 import { RegexHighlighter } from 'components/RegexHighlighter'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -31,7 +32,6 @@ import { getInternalComponents } from 'graphQL/Queries'
 
 import { DeleteInternalComponent } from './DeleteInternalComponent'
 import { UpdateInternalComponent } from './MutateInternalComponent'
-import LynkSwitch from 'components/Misc/LynkSwitch'
 
 export const InternalComponents = () => {
   const activetab = useQueryParam('tab')
@@ -155,15 +155,16 @@ export const InternalComponents = () => {
   }
 
   return (
-    <Card p={0}>
+    <Card p={0} boxShadow='none'>
       <CardHeader
         p='12px 0'
-        mb='8px'
+        mb='24px'
         as={Flex}
         flexDirection='row'
         justifyContent='space-between'
+        alignItems={'center'}
       >
-        <div>
+        <Flex flexDirection={'column'}>
           <Text fontSize='lg' color={textColor} fontWeight='bold'>
             Internal Components
           </Text>
@@ -171,7 +172,7 @@ export const InternalComponents = () => {
             Tag components as internal, if their name match the regular
             expression
           </Text>
-        </div>
+        </Flex>
         <div>
           <Tooltip placement='left' label='Add Internal components'>
             <IconButton

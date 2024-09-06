@@ -351,6 +351,7 @@ const TeamTable = () => {
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}
+        mb={'24px'}
       >
         {/* SEARCH COMPONENTS */}
         <Stack

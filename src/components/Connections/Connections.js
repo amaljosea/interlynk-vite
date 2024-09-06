@@ -12,8 +12,11 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { GetOrgConnections, GetPersonalConnections } from 'graphQL/Queries'
 
 import { FaGithub } from 'react-icons/fa'
-import { SiGmail, SiJira, SiMicrosoftteams, SiSlack } from 'react-icons/si'
 
+import jiraPng from '../../assets/img/Jira.png'
+import mailPng from '../../assets/img/Mail.png'
+import slackPng from '../../assets/img/Slack.png'
+import teamsPng from '../../assets/img/Teams.png'
 import Card from '../Card/Card'
 import CardBody from '../Card/CardBody'
 import CardHeader from '../Card/CardHeader'
@@ -136,7 +139,7 @@ const Connections = ({ org }) => {
     if (nodes) {
       handleConnectionData(nodes)
     }
-  }, [data])
+  }, [data, org])
 
   useEffect(() => {
     if (isGithubConfigSaved) {
@@ -149,7 +152,7 @@ const Connections = ({ org }) => {
       <Card p={0} boxShadow='none'>
         <CardHeader
           p='12px 0'
-          mb='8px'
+          mb='24px'
           display={'flex'}
           flexDirection={'column'}
         >
@@ -161,14 +164,10 @@ const Connections = ({ org }) => {
           </Text>
         </CardHeader>
         <CardBody px='5px'>
-          <Flex
-            /* columns={4} */
-            wrap='wrap'
-            gap={4}
-          >
+          <Flex wrap='wrap' gap={'20px'}>
             {org && !isFreeTier && (
               <ConnectionCard
-                icon={SiJira}
+                iconSrc={jiraPng}
                 name='Jira'
                 onConfigure={onJiraOpen}
                 isConnected={greenCheck.jira}
@@ -180,7 +179,7 @@ const Connections = ({ org }) => {
             )}
             {!isFreeTier && (
               <ConnectionCard
-                icon={SiSlack}
+                iconSrc={slackPng}
                 name='Slack'
                 onConfigure={onSlackOpen}
                 isConnected={greenCheck.slack}
@@ -192,7 +191,7 @@ const Connections = ({ org }) => {
             )}
             {!isFreeTier && (
               <ConnectionCard
-                icon={SiMicrosoftteams}
+                iconSrc={teamsPng}
                 name='Teams'
                 onConfigure={onTeamsOpen}
                 isConnected={greenCheck.teams}
@@ -203,7 +202,7 @@ const Connections = ({ org }) => {
               />
             )}
             <ConnectionCard
-              icon={SiGmail}
+              iconSrc={mailPng}
               name='Email'
               onConfigure={onEmailOpen}
               isConnected={greenCheck.email}

@@ -20,8 +20,9 @@ const ConnectionCard = ({
       borderRadius='lg'
       overflow='hidden'
       position='relative'
+      padding={'20px'}
     >
-      <Flex direction='column' height='100%' gap={'16px'} mb={2}>
+      <Flex direction='column' height='100%' gap={'16px'}>
         <Flex align='center'>
           {iconSrc ? (
             <img
@@ -34,7 +35,7 @@ const ConnectionCard = ({
             <Icon color={color} size='40px' />
           )}
           <Text
-            ml={3}
+            ml={'16px'}
             noOfLines={1}
             fontSize='lg'
             fontWeight='500'
@@ -44,7 +45,7 @@ const ConnectionCard = ({
           </Text>
         </Flex>
 
-        <Text fontSize={'12px'} minH={'50px'} maxH={'auto'} color='gray.500'>
+        <Text fontSize={'12px'} color='gray.500'>
           {description}
         </Text>
 

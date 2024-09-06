@@ -22,7 +22,6 @@ import {
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   Flex,
@@ -38,6 +37,7 @@ import {
   MenuList,
   MenuOptionGroup,
   Skeleton,
+  Spinner,
   Tag,
   TagLabel,
   Text,
@@ -65,7 +65,6 @@ import { AllOrganizations, GetRoles, MyOrganizations } from 'graphQL/Queries'
 
 import { FaExchangeAlt } from 'react-icons/fa'
 import { FaCity } from 'react-icons/fa'
-import { MdDeleteOutline } from 'react-icons/md'
 
 const GetCurrentUser = gql`
   query GetCurrentUser {
@@ -120,6 +119,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const [isSaving, setIsSaving] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
   const [orgName, setOrgName] = useState('')
+  const [dpLoading, setDpLoading] = useState(false)
   const { showToast } = useCustomToast()
   const navigate = useNavigate()
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -310,6 +310,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
   const handleUpdatePassword = async () => {
     await updatePassword({
+      refetchQueries: [],
       variables: {
         currentPassword: oldPassword,
         newPassword: newPassword,
@@ -323,7 +324,10 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           status: 'error'
         })
       } else {
+        console.log(Cookies.get('authToken'))
         Cookies.set('authToken', res?.data?.userUpdatePassword?.updatedToken)
+        console.log(res?.data?.userUpdatePassword?.updatedToken)
+        refetchActiveQueries()
         showToast({
           description: 'Password updated successfully',
           status: 'success'
@@ -372,6 +376,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   }
 
   const onImageChange = async (file) => {
+    setDpLoading(true)
     await uploadProfile({
       variables: {
         userId: id,
@@ -390,6 +395,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           description: 'Profile Picture uploaded successfully',
           status: 'success'
         })
+        setTimeout(() => {
+          setDpLoading(false)
+        }, 500)
       })
   }
 
@@ -568,14 +576,19 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 position='relative'
                 borderRadius='full'
               >
-                <Avatar
-                  width='80px'
-                  height='80px'
-                  objectFit='cover'
-                  borderRadius='full'
-                  me={{ md: '22px' }}
-                  src={profileImage || ''}
-                />
+                {dpLoading ? (
+                  <Spinner width='80px' height='80px' />
+                ) : (
+                  <Avatar
+                    width='80px'
+                    height='80px'
+                    objectFit='cover'
+                    borderRadius='full'
+                    me={{ md: '22px' }}
+                    src={profileImage || ''}
+                    name={userName}
+                  />
+                )}
 
                 <Input
                   top='0'
@@ -719,7 +732,12 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
               Profile picture
             </Text>
             <Flex alignItems='center' mb={4}>
-              <Avatar name={userName} ml='10px' src={profileImage} />
+              {dpLoading ? (
+                <Spinner />
+              ) : (
+                <Avatar name={userName} ml='10px' src={profileImage} />
+              )}
+
               <Box ml={4}>
                 <Text fontSize='15px'>
                   {selectedFile?.name || dp?.filename}
@@ -732,15 +750,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     aria-label='Edit Profile Picture'
                     variant='outline'
                     onClick={onProfileClick}
-                  />
-                </Tooltip>
-                <Tooltip label='Delete Profile Picture'>
-                  <IconButton
-                    icon={<MdDeleteOutline />}
-                    aria-label='Delete Profile Picture'
-                    variant='outline'
-                    borderColor='gray.200'
-                    colorScheme='red'
                   />
                 </Tooltip>
               </Flex>
@@ -870,35 +879,24 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   </InputGroup>
                   {passError !== '' && <Text color='red.500'>{passError}</Text>}
                 </FormControl>
-                {/*  <Button
-                  w={'120px'}
-                  mt={4}
-                  bg={'#FED7D7'}
-                  textColor={'#1A202C'}
-                  fontWeight={400}
-                  onClick={() => setIsPasswordEdit(false)}
-                >
-                  Cancel Password Edit
-                </Button> */}
               </Flex>
             )}
+            <Flex mt={4}>
+              <Button
+                variant='outline'
+                mr={3}
+                onClick={() => {
+                  onPersonalModalClose()
+                  resetStates()
+                }}
+              >
+                Cancel
+              </Button>
+              <Button colorScheme='blue' onClick={handleSave}>
+                {isSaving ? 'saving...' : 'Save'}
+              </Button>
+            </Flex>
           </DrawerBody>
-
-          <DrawerFooter>
-            <Button
-              variant='outline'
-              mr={3}
-              onClick={() => {
-                onPersonalModalClose()
-                resetStates()
-              }}
-            >
-              Cancel
-            </Button>
-            <Button colorScheme='blue' onClick={handleSave}>
-              {isSaving ? 'saving...' : 'Save'}
-            </Button>
-          </DrawerFooter>
         </DrawerContent>
       </Drawer>
 

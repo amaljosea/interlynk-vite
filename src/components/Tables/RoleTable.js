@@ -146,7 +146,22 @@ const RoleTable = () => {
   // HEADER SECTION
   const subHeader = useMemo(() => {
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+        mb={'24px'}
+      >
+        <Flex flexDirection={'column'}>
+          <Text fontSize='lg' color={textColor} fontWeight='bold'>
+            Roles Management
+          </Text>
+          <Text fontSize={'sm'}>
+            Manage user roles, assign permissions, and control access within
+            your system.
+          </Text>
+        </Flex>
+
         <Tooltip label='Add Role'>
           <IconButton
             icon={<AddIcon />}
@@ -157,7 +172,7 @@ const RoleTable = () => {
         </Tooltip>
       </Flex>
     )
-  }, [updateOrgs, onRoleOpen])
+  }, [updateOrgs, onRoleOpen, textColor])
 
   return (
     <>

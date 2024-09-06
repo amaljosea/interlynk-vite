@@ -606,7 +606,7 @@ const Parts = () => {
           <Stack spacing={4} direction={'column'} gap={2}>
             {/* PROJECTS */}
             <FormControl fontSize={'sm'}>
-              <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+              <FormLabel htmlFor='product' fontSize={12}>
                 Project
               </FormLabel>
               <Select
@@ -628,7 +628,7 @@ const Parts = () => {
             </FormControl>
             {/* ENVIRONMENTS */}
             <FormControl fontSize={'sm'}>
-              <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+              <FormLabel htmlFor='product' fontSize={12}>
                 Environment
               </FormLabel>
               <Select
@@ -657,7 +657,7 @@ const Parts = () => {
             </FormControl>
             {/* Version */}
             <FormControl fontSize={'sm'}>
-              <FormLabel htmlFor='versions' fontSize='md' color='gray.600'>
+              <FormLabel htmlFor='versions' fontSize={12}>
                 Version
               </FormLabel>
               {sbomVersions?.length === 0 ? (

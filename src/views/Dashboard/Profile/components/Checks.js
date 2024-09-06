@@ -5,7 +5,6 @@ import { customStyles, sevColor } from 'utils'
 
 import { Flex, Select, Text, useColorModeValue } from '@chakra-ui/react'
 
-// Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
@@ -112,14 +111,17 @@ const Checks = () => {
             size='sm'
             name={id}
             id={id}
-            width={'100px'}
-            height={'32px'}
             value={severity}
             color={sevColor(severity.toLowerCase()).text}
             isDisabled={!updateOrg}
             onChange={(e) => handleStatusChange(id, e.target.value)}
             bg={sevColor(severity.toLowerCase()).bg}
             borderRadius={'6px'}
+            border='none'
+            focusBorderColor='transparent'
+            _focus={{
+              boxShadow: 'none'
+            }}
           >
             {options.map((itm, index) => (
               <option key={index} value={itm.value}>
@@ -165,8 +167,13 @@ const Checks = () => {
   }
 
   return (
-    <Card p={0}>
-      <CardHeader p='12px 0' mb='8px' display={'flex'} flexDirection={'column'}>
+    <Card p={0} boxShadow='none'>
+      <CardHeader
+        p='12px 0'
+        mb='24px'
+        display={'flex'}
+        flexDirection={'column'}
+      >
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
           SBOM Check
         </Text>
