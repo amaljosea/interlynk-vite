@@ -316,9 +316,9 @@ const ProductTable = ({
             <IconButton
               icon={<FaTag />}
               variant='outline'
-              isDisabled={!canAddProduct}
-              hidden={signedUrlParams}
               onClick={onOpenLabel}
+              isDisabled={!canAddProduct}
+              hidden={signedUrlParams || isFreeTier}
             />
           </Tooltip>
           {/* REFRESH */}
@@ -627,6 +627,7 @@ const ProductTable = ({
                   Edit Product
                 </MenuItem>
                 <MenuItem
+                  hidden={isFreeTier}
                   position={'relative'}
                   closeOnSelect={false}
                   onMouseEnter={() => {
