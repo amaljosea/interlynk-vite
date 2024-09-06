@@ -198,10 +198,10 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
                 <VulnBadge color='green' status={policyStatus} label='Pass'>
                   {amount?.passedCount || 0}
                 </VulnBadge>
-                <VulnBadge color='orange' status={policyStatus} label='Skipped'>
+                <VulnBadge color='gray' status={policyStatus} label='Skipped'>
                   {amount?.skippedCount || 0}
                 </VulnBadge>
-                <VulnBadge color='gray' status={policyStatus} label='Error'>
+                <VulnBadge color='orange' status={policyStatus} label='Error'>
                   {amount?.errorCount || 0}
                 </VulnBadge>
               </SimpleGrid>
