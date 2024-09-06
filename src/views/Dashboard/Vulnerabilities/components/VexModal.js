@@ -5,12 +5,14 @@ import { filterEnvList } from 'utils'
 
 import {
   Alert,
+  Box,
   Checkbox,
   FormControl,
   FormLabel,
   Select,
   SimpleGrid,
   Stack,
+  Tag,
   Textarea
 } from '@chakra-ui/react'
 
@@ -181,11 +183,16 @@ const VexModal = ({
       isOpen={isOpen}
       onSubmit={handleSave}
       onClose={handleClose}
-      title={'Update Status'}
+      title={'Vulnerabilty Status'}
       Icon={FaPenToSquare}
       disabled={isInvalid}
       buttonText={'Save'}
     >
+      <Box mb={4}>
+        <Tag variant='subtle' colorScheme='blue' wordBreak={'break-all'}>
+          {selectedVulns?.length > 0 && selectedVulns[0]?.vuln.vulnId}
+        </Tag>
+      </Box>
       <SimpleGrid row={5} spacing={4}>
         {/* STATUS */}
         <FormControl>
