@@ -262,17 +262,11 @@ const ResetForm = () => {
   }
 
   return (
-    <Flex
-      mt={10}
-      gap={4}
-      direction={'column'}
-      alignItems={'center'}
-      justifyContent={'center'}
-    >
-      <Text fontSize={'xl'} textAlign={'center'} fontWeight={'medium'}>
+    <Flex mt={10} gap={4} direction={'column'} alignItems={'flex-start'}>
+      <Text fontSize={'20px'} fontWeight={'semibold'}>
         Reset your password
       </Text>
-      <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
+      <Text fontSize={'sm'} color={'#555'}>
         Enter the email address associated with your account and we will send
         you a link to reset your password.
       </Text>
@@ -309,16 +303,10 @@ const ResetForm = () => {
           >
             Continue
           </Button>
-          <Link to={'/auth'}>
-            <Text
-              fontSize='sm'
-              color='blue.500'
-              fontWeight={'medium'}
-              textAlign={'center'}
-            >
-              Return to sign in
-            </Text>
-          </Link>
+          <Text fontSize='sm' fontWeight={'medium'} textAlign={'center'}>
+            Return to
+            <Link to={'/auth'} style={{color:'#3182ce'}}>{' '}Login</Link>
+          </Text>
         </Stack>
       </form>
     </Flex>

@@ -154,14 +154,8 @@ const RegistrationForm = () => {
   }
 
   return (
-    <Flex
-      mt={2}
-      width='100%'
-      direction={'column'}
-      alignItems={'center'}
-      justifyContent={'center'}
-    >
-      <Text fontSize={'lg'} textAlign={'center'}>
+    <Flex mt={2} width='100%' direction={'column'} alignItems={'flex-start'}>
+      <Text fontSize={'20px'} fontWeight={'semibold'} textAlign={'center'}>
         Welcome
       </Text>
       <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
@@ -236,7 +230,7 @@ const RegistrationForm = () => {
             </InputRightElement>
           </InputGroup>
           {invalidPassword && (
-            <FormHelperText color={'red.500'}>
+            <FormHelperText fontSize={'12px'} color={'red.500'}>
               <Text mb={1}>Your password must be 8-16 characters contain:</Text>
               <Text>1. Lower case letters {`(a-z)`}</Text>
               <Text>2. Upper case letters {`(A-Z)`}</Text>
@@ -266,7 +260,9 @@ const RegistrationForm = () => {
               />
             </InputRightElement>
           </InputGroup>
-          {passError !== '' && <FormErrorMessage>{passError}</FormErrorMessage>}
+          {passError !== '' && (
+            <FormErrorMessage fontSize={'12px'}>{passError}</FormErrorMessage>
+          )}
         </FormControl>
         <Button
           mt={5}
@@ -301,7 +297,7 @@ const RegistrationForm = () => {
             fontSize={'xs'}
             color={'darkgray'}
           >
-            OR CREATE ACCOUNT WITH
+            Or Register With
           </AbsoluteCenter>
         </Box>
         <SocialLogin />

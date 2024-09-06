@@ -98,17 +98,12 @@ const LoginForm = () => {
   }
 
   return (
-    <Flex
-      mt={2}
-      direction={'column'}
-      alignItems={'center'}
-      justifyContent={'center'}
-    >
-      <Text fontSize={'lg'} textAlign={'center'}>
+    <Flex mt={2} direction={'column'} alignItems={'flex-start'}>
+      <Text fontSize={'20px'} fontWeight={'semibold'} textAlign={'center'}>
         Welcome
       </Text>
       <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
-        Log in to Interlynk to continue to the dashboard.
+        Log in to continue to the dashboard
       </Text>
       {error !== '' && (
         <Box mt={4} width={'100%'}>
@@ -175,7 +170,10 @@ const LoginForm = () => {
               </InputRightElement>
             </InputGroup>
             <Link to={'/reset_password'}>
-              <FormHelperText _hover={{ color: 'blue.500' }}>
+              <FormHelperText
+                textAlign={'right'}
+                _hover={{ color: 'blue.500' }}
+              >
                 Forgot password ?
               </FormHelperText>
             </Link>
@@ -209,7 +207,7 @@ const LoginForm = () => {
               fontSize={'xs'}
               color={'darkgray'}
             >
-              OR LOGIN WITH
+              Or Login With
             </AbsoluteCenter>
           </Box>
           <SocialLogin />
