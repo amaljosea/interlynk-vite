@@ -51,9 +51,9 @@ const CompIdentifiers = ({ data }) => {
   const [updateComponent, { loading }] = useMutation(UpdateComponent)
 
   const cpeRef = useRef()
+  const [purlValue, setPurlValue] = useState('')
+  const [cpeValue, setCpeValue] = useState('')
   const [cpeData, setCpeData] = useState([])
-  const [purlData, setPurlData] = useState(null)
-  const [isPURLInputValid, setPURLInputValid] = useState(true)
   const [purlOpen, setPurlOpen] = useState(false)
   const [cpeOpen, setCpeOpen] = useState(false)
 
@@ -63,40 +63,26 @@ const CompIdentifiers = ({ data }) => {
     handleChange('identifiers', 'purl', val)
   }
 
-  const purlInputBlur = () => {
-    if (identifiers?.purl !== '') {
+  const purlInputBlur = (e) => {
+    if (e.target.value !== '') {
       try {
-        PackageURL.fromString(identifiers?.purl)
-        setPURLInputValid(true)
+        PackageURL.fromString(e.target.value)
+        handleChange('identifiers', 'isValidPurl', true)
       } catch (ex) {
         console.error('ex', ex)
-        setPURLInputValid(false)
+        handleChange('identifiers', 'isValidPurl', false)
       }
     }
   }
 
   const handlePurlModal = () => {
-    if (identifiers?.purl && identifiers?.isValidPurl) {
-      const pkg = PackageURL.fromString(identifiers?.purl)
-      setPurlData(pkg)
-      setTabData((prev) => ({
-        ...prev,
-        identifiers: {
-          ...prev.identifiers,
-          purl: pkg.toString()
-        }
-      }))
-    } else {
-      setPurlData(null)
-      setTabData((prev) => ({
-        ...prev,
-        identifiers: {
-          ...prev.identifiers,
-          purl: 'pkg:type/name@version'
-        }
-      }))
-    }
+    setPurlValue(identifiers?.purl || 'pkg:type/name@version')
     setPurlOpen(true)
+  }
+
+  const handleCpeModal = () => {
+    setCpeValue(identifiers?.cpe || 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*')
+    setCpeOpen(true)
   }
 
   const handleCpeChange = (e) => {
@@ -145,47 +131,39 @@ const CompIdentifiers = ({ data }) => {
   }
 
   useEffect(() => {
-    if (data) {
-      const { cpes, purl } = data || ''
-      if (purl) {
-        setTabData((prev) => ({
-          ...prev,
-          identifiers: { ...prev.identifiers, purl: purl }
-        }))
-        try {
-          PackageURL.fromString(purl)
-          setTabData((prev) => ({
-            ...prev,
-            identifiers: { ...prev?.identifiers, isValidPurl: true }
-          }))
-        } catch (ex) {
-          setTabData((prev) => ({
-            ...prev,
-            identifiers: { ...prev?.identifiers, isValidPurl: false }
-          }))
-        }
-      }
+    if (!data) return
+    const { cpes, purl } = data || {}
 
-      if (cpes?.length > 0) {
-        setTabData((prev) => ({
-          ...prev,
-          identifiers: { ...prev?.identifiers, cpe: cpes[0] }
-        }))
-        const matches = validateCpe(cpes[0])
-        if (matches && cpes[0] !== '') {
-          setTabData((prev) => ({
-            ...prev,
-            identifiers: { ...prev?.identifiers, isValidCpe: true }
-          }))
-        } else {
-          setTabData((prev) => ({
-            ...prev,
-            identifiers: { ...prev?.identifiers, isValidCpe: false }
-          }))
-        }
-      }
+    // HANDLE PURL
+    const updatePurl = (isValidPurl) => {
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: { ...prev.identifiers, purl: purl || '', isValidPurl }
+      }))
     }
-  }, [data, prodCompDispatch, setTabData])
+    if (purl) {
+      try {
+        PackageURL.fromString(purl)
+        updatePurl(true)
+      } catch (ex) {
+        updatePurl(false)
+      }
+    } else {
+      updatePurl(true)
+    }
+
+    // HANDLE CPE
+    const cpe = cpes?.[0] || ''
+    const isValidCpe = cpe && validateCpe(cpe)
+    setTabData((prev) => ({
+      ...prev,
+      identifiers: {
+        ...prev.identifiers,
+        cpe,
+        isValidCpe: Boolean(isValidCpe) || !cpe
+      }
+    }))
+  }, [data, setTabData])
 
   return (
     <Stack
@@ -197,10 +175,9 @@ const CompIdentifiers = ({ data }) => {
       {/* PURL INPUI */}
       {purlOpen && (
         <PurlInputs
-          getCpe={getCpe}
-          data={purlData}
           activeComp={data}
-          setIsValid={setPURLInputValid}
+          value={purlValue}
+          setValue={setPurlValue}
           onClose={() => setPurlOpen(false)}
         />
       )}
@@ -232,12 +209,12 @@ const CompIdentifiers = ({ data }) => {
             placeholder='PURL'
             value={identifiers?.purl}
             autoComplete='off'
-            onChange={handlePURLInputChange}
             onBlur={purlInputBlur}
+            onChange={handlePURLInputChange}
           />
           <InputRightElement align='center' zIndex={-1}>
             {identifiers?.purl != null && identifiers?.purl !== '' ? (
-              isPURLInputValid ? (
+              identifiers?.isValidPurl ? (
                 <CheckIcon color='green' />
               ) : (
                 <WarningTwoIcon color='red' />
@@ -250,9 +227,9 @@ const CompIdentifiers = ({ data }) => {
       {/* CPE INPUT */}
       {cpeOpen && (
         <CpeInputs
-          data={cpeData}
-          getCpe={getCpe}
+          value={cpeValue}
           activeComp={data}
+          setValue={setCpeValue}
           onClose={() => setCpeOpen(false)}
         />
       )}
@@ -263,7 +240,7 @@ const CompIdentifiers = ({ data }) => {
               fontSize={12}
               color={'#718096'}
               cursor={'pointer'}
-              onClick={() => setCpeOpen(true)}
+              onClick={handleCpeModal}
               display={customerView ? 'none' : 'flex'}
               as={cpeOpen ? FaChevronDown : FaChevronRight}
             />

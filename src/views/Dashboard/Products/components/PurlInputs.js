@@ -1,3 +1,4 @@
+import { useLazyQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
 import { useContext, useEffect, useRef, useState } from 'react'
@@ -16,47 +17,88 @@ import {
 
 import CpeInput from 'components/CpeInput'
 
+import { CpeAutoComplete } from 'graphQL/Queries'
+
 import IdentifierLabel from './IdentifierLabel'
 
-const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
-  const { component } = activeRow || ''
-  const { purl } = component || ''
+const PurlInputs = ({ value, setValue, onClose, activeComp }) => {
+  const [getCpe] = useLazyQuery(CpeAutoComplete)
 
-  const { tabData, handleChange } = useContext(TabContext)
-  const { identifiers } = tabData
+  const { purl } = activeComp || ''
 
-  const [purlType, setPurlType] = useState('')
-  const [namespace, setNamespace] = useState('')
-  const [namespaceList, setNamespaceList] = useState([])
+  const { handleChange } = useContext(TabContext)
+
+  const [purlData, setPurlData] = useState({
+    type: '',
+    namespace: '',
+    name: '',
+    version: '',
+    qualifiers: ''
+  })
+
+  const isSearchable =
+    purlData?.type === 'maven' ||
+    purlData?.type === 'npm' ||
+    purlData?.type === 'gem'
+
+  const isSelectable =
+    namespaceOptions[purlData?.type] &&
+    namespaceOptions[purlData?.type].length > 0
+
+  const isHidden = purlData?.type === 'nuget' || purlData?.type === 'oci'
+
   const namespaceRef = useRef()
-  const [purlName, setPurlName] = useState('')
-  const [purlNameList, setPurlNameList] = useState([])
-  const packageNameRef = useRef()
-  const [purlVersion, setPurlVersion] = useState('')
-  const [purlVersionList, setPurlVersionList] = useState([])
   const purlVersionRef = useRef()
-  const [qualifiers, setQualifiers] = useState('')
+  const packageNameRef = useRef()
+  const [namespaceList, setNamespaceList] = useState([])
+  const [purlNameList, setPurlNameList] = useState([])
+  const [purlVersionList, setPurlVersionList] = useState([])
 
   // const hasNamespace = validPurlTypes.includes(purlType)
 
   const isInvalid =
-    purlName === '' ||
-    purlType === '' ||
-    (purlType === 'swift' && namespace === '')
+    purlData?.name === '' ||
+    purlData?.type === '' ||
+    (purlData?.type === 'swift' && purlData?.namespace === '')
 
   const isAutoComplete =
-    purlType === 'maven' ||
-    purlType === 'npm' ||
-    purlType === 'gem' ||
-    purlType === 'nuget'
+    purlData?.type === 'maven' ||
+    purlData?.type === 'npm' ||
+    purlData?.type === 'gem' ||
+    purlData?.type === 'nuget'
+
+  const handleInputChange = (field, value) => {
+    const filterValue = value?.replace(/\s/g, '')
+    setPurlData((prev) => ({ ...prev, [field]: filterValue }))
+  }
+
+  const handleInputBlur = (field, val) => {
+    try {
+      const pkg = PackageURL.fromString(value)
+      if (field === 'qualifiers') {
+        const convertedObject = {}
+        const params = new URLSearchParams(val)
+        for (const [key, value] of params) {
+          convertedObject[key] = value
+        }
+        pkg[field] = convertedObject
+        setValue(pkg.toString())
+      } else {
+        pkg[field] = val !== '' ? val : field
+        setValue(pkg.toString())
+      }
+    } catch (error) {
+      console.log('Something went wrong', error)
+    }
+  }
 
   // ON NAMESPACE INPUT CHANGE
   const onNamespaceInputChange = (event) => {
     const { value } = event.target
     const val = value.replace(/\s/g, '')
-    setNamespace(val)
+    handleInputChange('namespace', value)
     if (val !== '') {
-      if (purlType === 'npm') {
+      if (purlData?.type === 'npm') {
         getCpe({
           variables: {
             input: {
@@ -72,7 +114,7 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
             setNamespaceList(res.data.idAutoComplete.result)
           }
         })
-      } else if (purlType === 'maven') {
+      } else if (purlData?.type === 'maven') {
         getCpe({
           variables: {
             input: {
@@ -88,7 +130,7 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
             setNamespaceList(res.data.idAutoComplete.result)
           }
         })
-      } else if (purlType === 'gem') {
+      } else if (purlData?.type === 'gem') {
         getCpe({
           variables: {
             input: {
@@ -105,11 +147,6 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
           }
         })
       }
-    } else {
-      const pkg = PackageURL.fromString(identifiers?.purl)
-      pkg.namespace = ''
-      pkg.name = 'name'
-      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
@@ -117,9 +154,9 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
   const onNameInputChange = (event) => {
     const { value } = event.target
     const val = value.replace(/\s/g, '')
-    setPurlName(val)
+    handleInputChange('name', value)
     if (val !== '') {
-      if (purlType === 'maven') {
+      if (purlData?.type === 'maven') {
         getCpe({
           variables: {
             input: {
@@ -130,7 +167,7 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
               },
               hints: {
                 purl: {
-                  namespace: namespace
+                  namespace: purlData?.namespace
                 }
               }
             }
@@ -140,7 +177,7 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
             setPurlNameList(res.data.idAutoComplete.result)
           }
         })
-      } else if (purlType === 'nuget') {
+      } else if (purlData?.type === 'nuget') {
         getCpe({
           variables: {
             input: {
@@ -156,7 +193,7 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
             setPurlNameList(res.data.idAutoComplete.result)
           }
         })
-      } else if (purlType === 'npm') {
+      } else if (purlData?.type === 'npm') {
         getCpe({
           variables: {
             input: {
@@ -167,7 +204,7 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
               },
               hints: {
                 purl: {
-                  namespace: namespace
+                  namespace: purlData?.namespace
                 }
               }
             }
@@ -177,7 +214,7 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
             setPurlNameList(res.data.idAutoComplete.result)
           }
         })
-      } else if (purlType === 'gem') {
+      } else if (purlData?.type === 'gem') {
         getCpe({
           variables: {
             input: {
@@ -188,7 +225,7 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
               },
               hints: {
                 purl: {
-                  namespace: namespace
+                  namespace: purlData?.namespace
                 }
               }
             }
@@ -199,17 +236,6 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
           }
         })
       }
-    }
-  }
-
-  const onNameBlur = () => {
-    const pkg = PackageURL.fromString(identifiers?.purl)
-    if (purlName !== '') {
-      pkg.name = purlName
-      handleChange('identifiers', 'purl', pkg.toString())
-    } else {
-      pkg.name = 'name'
-      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
@@ -217,9 +243,9 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
   const onVersionInputChange = (event) => {
     const { value } = event.target
     const val = value.replace(/\s/g, '')
-    setPurlVersion(val)
+    handleInputChange('version', value)
     if (val !== '') {
-      if (purlType === 'maven') {
+      if (purlData?.type === 'maven') {
         getCpe({
           variables: {
             input: {
@@ -230,8 +256,8 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
               },
               hints: {
                 purl: {
-                  namespace: namespace,
-                  name: purlName
+                  namespace: purlData?.namespace,
+                  name: purlData?.name
                 }
               }
             }
@@ -241,7 +267,7 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
             setPurlVersionList(res.data.idAutoComplete.result)
           }
         })
-      } else if (purlType === 'nuget') {
+      } else if (purlData?.type === 'nuget') {
         getCpe({
           variables: {
             input: {
@@ -252,7 +278,7 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
               },
               hints: {
                 purl: {
-                  name: purlName
+                  name: purlData?.name
                 }
               }
             }
@@ -262,7 +288,7 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
             setPurlVersionList(res.data.idAutoComplete.result)
           }
         })
-      } else if (purlType === 'npm') {
+      } else if (purlData?.type === 'npm') {
         getCpe({
           variables: {
             input: {
@@ -273,8 +299,8 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
               },
               hints: {
                 purl: {
-                  namespace: namespace,
-                  name: purlName
+                  namespace: purlData?.namespace,
+                  name: purlData?.name
                 }
               }
             }
@@ -284,7 +310,7 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
             setPurlVersionList(res.data.idAutoComplete.result)
           }
         })
-      } else if (purlType === 'gem') {
+      } else if (purlData?.type === 'gem') {
         getCpe({
           variables: {
             input: {
@@ -295,8 +321,8 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
               },
               hints: {
                 purl: {
-                  namespace: namespace,
-                  name: purlName
+                  namespace: purlData?.namespace,
+                  name: purlData?.name
                 }
               }
             }
@@ -307,124 +333,39 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
           }
         })
       }
-    } else {
-      const pkg = PackageURL.fromString(identifiers?.purl)
-      pkg.version = ''
-      handleChange('identifiers', 'purl', pkg.toString())
-    }
-  }
-
-  const handleTypeChange = (e) => {
-    const { value } = e.target
-    setPurlType(value)
-    if (value !== '') {
-      const pkg = PackageURL.fromString(identifiers?.purl)
-      pkg.type = value
-      handleChange('identifiers', 'purl', pkg.toString())
-    }
-  }
-
-  const handleNamespaceChange = (e) => {
-    const { value } = e.target
-    const val = value.replace(/\s/g, '')
-    setNamespace(val)
-  }
-
-  const onNamespaceBlur = () => {
-    const pkg = PackageURL.fromString(identifiers?.purl)
-    if (namespace !== '') {
-      pkg.namespace = namespace
-      handleChange('identifiers', 'purl', pkg.toString())
-    } else {
-      pkg.namespace = ''
-      handleChange('identifiers', 'purl', pkg.toString())
-    }
-  }
-
-  const handleNameChange = (e) => {
-    const { value } = e.target
-    const val = value.replace(/\s/g, '')
-    setPurlName(val)
-  }
-
-  const handleVersionChange = (e) => {
-    const { value } = e.target
-    const val = value.replace(/\s/g, '')
-    setPurlVersion(val)
-  }
-
-  const onVersionBlur = () => {
-    const pkg = PackageURL.fromString(identifiers?.purl)
-    if (purlVersion !== '') {
-      pkg.version = purlVersion
-      handleChange('identifiers', 'purl', pkg.toString())
-    } else {
-      pkg.version = 'version'
-      handleChange('identifiers', 'purl', pkg.toString())
-    }
-  }
-
-  const handleQualifierChange = (e) => {
-    const { value } = e.target
-    const val = value.replace(/\s/g, '')
-    setQualifiers(val)
-  }
-
-  const onQualifierBlur = () => {
-    const pkg = PackageURL.fromString(identifiers?.purl)
-    const convertedObject = {}
-    if (qualifiers !== '') {
-      const params = new URLSearchParams(qualifiers)
-      for (const [key, value] of params) {
-        convertedObject[key] = value
-      }
-      pkg.qualifiers = convertedObject
-      handleChange('identifiers', 'purl', pkg.toString())
-    } else {
-      pkg.qualifiers = ''
-      handleChange('identifiers', 'purl', pkg.toString())
     }
   }
 
   const handleSave = () => {
     try {
-      const pkg = PackageURL.fromString(identifiers?.purl)
+      const pkg = PackageURL.fromString(value)
       pkg.namespace = pkg.namespace === 'namespace' ? '' : pkg.namespace
       pkg.version = pkg.version === 'version' ? '' : pkg.version
       handleChange('identifiers', 'purl', pkg.toString())
-      setIsValid(true)
+      handleChange('identifiers', 'isValidaPurl', true)
       onClose()
     } catch (error) {
-      setIsValid(false)
+      handleChange('identifiers', 'isValidaPurl', false)
     }
   }
 
   useEffect(() => {
-    if (data) {
-      setPurlType(data.type === null ? '' : data.type)
-      setNamespace(data.namespace === null ? '' : data.namespace)
-      setPurlName(data.name === null ? '' : data.name)
-      setPurlVersion(data.version === null ? '' : data.version)
-      if (data.qualifiers) {
-        const queryString = Object.entries(data.qualifiers)
-          .map(([key, value]) => `${key}=${value}`)
-          .join('&')
-        setQualifiers(queryString)
-      }
-    }
-  }, [data])
-
-  useEffect(() => {
     if (purl) {
-      const pkg = PackageURL.fromString(purl)
-      setPurlName(pkg?.name)
-      setNamespace(pkg?.namespace)
-      setPurlType(pkg?.type)
-      setPurlVersion(pkg?.version)
-      setQualifiers(pkg?.qualifiers)
-      handleChange('identifiers', 'purl', pkg.toString())
+      const data = PackageURL.fromString(purl)
+      setPurlData((prev) => ({
+        ...prev,
+        type: data?.type || '',
+        namespace: data?.namespace || '',
+        name: data?.name || '',
+        version: data?.version || '',
+        qualifiers: data?.qualifiers
+          ? Object.entries(data.qualifiers)
+              .map(([key, value]) => `${key}=${value}`)
+              .join('&')
+          : ''
+      }))
     }
-  }, [handleChange, purl])
+  }, [purl])
 
   return (
     <Flex width={'100%'} direction={'column'} gap={4}>
@@ -432,11 +373,11 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
       <FormControl>
         <IdentifierLabel title={`Package URL (PURL)`} onClose={onClose} />
         <Textarea
-          type='text'
           isReadOnly
+          type='text'
+          value={value}
           fontSize='sm'
           variant='filled'
-          value={identifiers?.purl}
           onChange={(e) => console.log(e.target.value)}
         />
       </FormControl>
@@ -448,8 +389,9 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
           fontSize={'sm'}
           id='packageType'
           name='packageType'
-          value={purlType}
-          onChange={handleTypeChange}
+          value={purlData?.type}
+          onBlur={(e) => handleInputBlur('type', e.target.value)}
+          onChange={(e) => handleInputChange('type', e.target.value)}
         >
           {typeOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -459,19 +401,20 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
         </Select>
       </FormControl>
       {/* Namespace */}
-      {purlType === 'maven' || purlType === 'npm' || purlType === 'gem' ? (
+      {isSearchable ? (
         <CpeInput
           name='namespace'
-          inputValue={namespace}
-          setInputValue={setNamespace}
-          cpeList={namespaceList}
-          setCpeList={setNamespaceList}
-          inputRef={namespaceRef}
           validation={false}
+          string={value}
+          setString={setValue}
+          cpeList={namespaceList}
+          inputRef={namespaceRef}
+          setInputValue={setPurlData}
+          setCpeList={setNamespaceList}
+          inputValue={purlData?.namespace}
           onChange={onNamespaceInputChange}
         />
-      ) : namespaceOptions[purlType] &&
-        namespaceOptions[purlType].length > 0 ? (
+      ) : isSelectable ? (
         <FormControl>
           <FormLabel>Namespace</FormLabel>
           <Select
@@ -479,11 +422,11 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
             fontSize={'sm'}
             id='namespace'
             name='namespace'
-            value={namespace}
-            onChange={handleNamespaceChange}
-            onBlur={onNamespaceBlur}
+            value={purlData?.namespace}
+            onBlur={(e) => handleInputBlur('namespace', e.target.value)}
+            onChange={(e) => handleInputChange('namespace', e.target.value)}
           >
-            {namespaceOptions[purlType].map((item, index) => (
+            {namespaceOptions[purlData?.type].map((item, index) => (
               <option key={index} value={item.value}>
                 {item.label}
               </option>
@@ -491,74 +434,74 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
           </Select>
         </FormControl>
       ) : (
-        <FormControl
-          display={
-            purlType === 'nuget' || purlType === 'oci' ? 'none' : 'block'
-          }
-        >
+        <FormControl display={isHidden ? 'none' : 'block'}>
           <FormLabel>Namespace</FormLabel>
           <Input
             size='md'
-            fontSize={'sm'}
             id='namespace'
+            fontSize={'sm'}
             name='namespace'
-            value={namespace}
-            onChange={handleNamespaceChange}
-            onBlur={onNamespaceBlur}
+            value={purlData?.namespace}
             placeholder='Enter namespace'
+            onBlur={(e) => handleInputBlur('namespace', e.target.value)}
+            onChange={(e) => handleInputChange('namespace', e.target.value)}
           />
         </FormControl>
       )}
       {/* Name */}
       {isAutoComplete ? (
         <CpeInput
-          name='packageName'
-          inputValue={purlName}
-          setInputValue={setPurlName}
-          cpeList={purlNameList}
-          setCpeList={setPurlNameList}
-          inputRef={packageNameRef}
+          name='name'
+          string={value}
           validation={false}
+          setString={setValue}
+          cpeList={purlNameList}
+          inputRef={packageNameRef}
+          inputValue={purlData?.name}
+          setInputValue={setPurlData}
+          setCpeList={setPurlNameList}
           onChange={onNameInputChange}
         />
       ) : (
         <FormControl>
           <FormLabel>Package Name</FormLabel>
           <Input
-            type='text'
             mt={1.5}
-            value={purlName}
+            type='text'
             fontSize={'sm'}
-            onChange={handleNameChange}
-            onBlur={onNameBlur}
+            value={purlData?.name}
             placeholder='Enter packageName'
+            onBlur={(e) => handleInputBlur('name', e.target.value)}
+            onChange={(e) => handleInputChange('name', e.target.value)}
           />
         </FormControl>
       )}
       {/* Version */}
       {isAutoComplete ? (
         <CpeInput
+          name='version'
           validation={false}
-          name='packageVersion'
-          inputValue={purlVersion}
-          setInputValue={setPurlVersion}
+          string={value}
+          setString={setValue}
           cpeList={purlVersionList}
-          setCpeList={setPurlVersionList}
           inputRef={purlVersionRef}
+          setInputValue={setPurlData}
+          inputValue={purlData?.version}
+          setCpeList={setPurlVersionList}
           onChange={onVersionInputChange}
         />
       ) : (
         <FormControl>
           <FormLabel>Version</FormLabel>
           <Input
-            size='md'
-            fontSize={'sm'}
             mt={1.5}
+            size='md'
             type='text'
-            value={purlVersion}
-            onChange={handleVersionChange}
-            onBlur={onVersionBlur}
+            fontSize={'sm'}
+            value={purlData?.version}
             placeholder='Enter version'
+            onBlur={(e) => handleInputBlur('version', e.target.value)}
+            onChange={(e) => handleInputChange('version', e.target.value)}
           />
         </FormControl>
       )}
@@ -570,10 +513,10 @@ const PurlInputs = ({ data, onClose, getCpe, activeRow, setIsValid }) => {
           fontSize={'sm'}
           id='qualifiers'
           name='qualifiers'
-          value={qualifiers}
-          onChange={handleQualifierChange}
-          onBlur={onQualifierBlur}
+          value={purlData?.qualifiers}
           placeholder='Enter qualifiers'
+          onBlur={(e) => handleInputBlur('qualifiers', e.target.value)}
+          onChange={(e) => handleInputChange('qualifiers', e.target.value)}
         />
       </FormControl>
       <Flex alignItems={'center'} justifyContent={'flex-end'} gap={2}>

@@ -1,3 +1,4 @@
+import { useLazyQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useRef, useState } from 'react'
 
@@ -15,86 +16,58 @@ import {
 
 import CpeInput from 'components/CpeInput'
 
+import { CpeAutoComplete } from 'graphQL/Queries'
+
 import IdentifierLabel from './IdentifierLabel'
 
-const CpeInputs = ({ onClose, getCpe, activeRow }) => {
-  const { component } = activeRow || ''
-  const { cpes } = component || ''
+const CpeInputs = ({ onClose, activeComp, value, setValue }) => {
+  const { cpes } = activeComp || ''
 
-  const { tabData, setTabData, handleChange } = useContext(TabContext)
-  const { identifiers } = tabData
+  const { handleChange } = useContext(TabContext)
 
-  const [vendor, setVendor] = useState('')
-  const [vendorList, setVendorList] = useState([])
+  const [cpeData, setCpeData] = useState({
+    part: '',
+    vendor: '',
+    product: '',
+    cpeVersion: '',
+    update: '',
+    edition: '',
+    language: '',
+    swEdition: '',
+    targetSoftware: '',
+    targetHardware: '',
+    other: ''
+  })
+
   const vendorRef = useRef()
-  const [product, setProduct] = useState('')
-  const [productList, setProductList] = useState([])
   const productRef = useRef()
-  const [type, setType] = useState('')
-  const [version, setVersion] = useState('')
-  const [versionList, setVersionList] = useState([])
   const versionRef = useRef()
-  const [update, setUpdate] = useState('')
-  const [edition, setEdition] = useState('')
-  const [language, setLanguage] = useState('')
-  const [swEdition, setSwEdition] = useState('')
-  const [targetSoftware, setTargetSoftware] = useState('')
-  const [hardware, setHardware] = useState('')
-  const [other, setOther] = useState('')
+  const [vendorList, setVendorList] = useState([])
+  const [productList, setProductList] = useState([])
+  const [versionList, setVersionList] = useState([])
+
+  const [getCpe] = useLazyQuery(CpeAutoComplete)
 
   const isInvalid =
-    type === '' || vendor === '' || product === '' || version === ''
+    cpeData?.part === '' ||
+    cpeData?.vendor === '' ||
+    cpeData?.product === '' ||
+    cpeData?.cpeVersion === ''
 
-  // ON BLUR UPDATE
-  const onBlurUpdate = () => {
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[6] = update === '' ? '*' : update
-    const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
+  const handleInputChange = (field, value) => {
+    setCpeData((prev) => ({ ...prev, [field]: value }))
   }
 
-  // ON BLUR EDITION
-  const onBlurEdition = () => {
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[7] = edition === '' ? '*' : edition
+  const handleInputBlur = (index, val) => {
+    const cpeParts = value?.split(':')
+    cpeParts[index] = val === '' ? '*' : val
     const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
-  }
-
-  // ON BLUR LANGUAGE
-  const onBlurLanguage = () => {
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[8] = language === '' ? '*' : language
-    const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
-  }
-
-  // ON BLUR SW EDITION
-  const onBlurSwEdition = () => {
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[9] = swEdition === '' ? '*' : swEdition
-    const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
-  }
-
-  // ON BLUR TARGET SOFTWARE
-  const onBlurTargetSoftware = () => {
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[10] = targetSoftware === '' ? '*' : targetSoftware
-    const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
-  }
-
-  // ON BLUR OTHER
-  const onBlurOther = () => {
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[12] = other === '' ? '*' : other
-    const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
+    setValue(cpe)
   }
 
   // ON CPE SAVE
   const handleSave = () => {
+    handleChange('identifiers', 'cpe', value)
     onClose()
   }
 
@@ -103,7 +76,7 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
     const { value } = event.target
     const val = value.replace(/\s/g, '')
     if (!val.includes('*') && !value.includes(':')) {
-      setVendor(val)
+      setCpeData((prev) => ({ ...prev, vendor: val }))
       if (val !== '') {
         getCpe({
           variables: {
@@ -124,28 +97,12 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
     }
   }
 
-  // ON TYPE CHANGE
-  const handleTypeChange = (e) => {
-    const { value } = e.target
-    const cpeParts = identifiers?.cpe?.split(':')
-    setType(value)
-    if (value !== '') {
-      cpeParts[2] = e.target.value
-      const cpe = cpeParts.join(':')
-      handleChange('identifiers', 'cpe', cpe)
-    } else {
-      cpeParts[2] = ''
-      const cpe = cpeParts.join(':')
-      handleChange('identifiers', 'cpe', cpe)
-    }
-  }
-
   // ON PRODUCT INPUT CHANGE
   const onProductInputChange = (event) => {
     const { value } = event.target
     const val = value.replace(/\s/g, '')
     if (!val.includes('*') && !val.includes(':')) {
-      setProduct(val)
+      setCpeData((prev) => ({ ...prev, product: val }))
       if (val !== '') {
         getCpe({
           variables: {
@@ -157,7 +114,7 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
               },
               hints: {
                 cpe: {
-                  vendor: vendor
+                  vendor: cpeData?.vendor
                 }
               }
             }
@@ -176,7 +133,7 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
     const { value } = event.target
     const val = value.replace(/\s/g, '')
     if (!val.includes('*') && !val.includes(':')) {
-      setVersion(val)
+      setCpeData((prev) => ({ ...prev, cpeVersion: val }))
       if (val !== '') {
         getCpe({
           variables: {
@@ -188,8 +145,8 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
               },
               hints: {
                 cpe: {
-                  vendor: vendor,
-                  product: product
+                  vendor: cpeData?.vendor,
+                  product: cpeData?.product
                 }
               }
             }
@@ -203,79 +160,29 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
     }
   }
 
-  // ON HARDWARE CHANGE
-  const handleHardwareChange = (e) => {
-    const { value } = e.target
-    setHardware(value)
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[11] = value === '' ? '*' : value
-    const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
-  }
-
-  // ON CHANGE
-  const handleOnChange = (value, setStateFunc) => {
-    if (!value.includes(':') && !value.includes('*')) {
-      setStateFunc(value)
-    }
-  }
-
-  useEffect(() => {
-    if (cpes?.length > 0) {
-      setTabData((prev) => ({
-        ...prev,
-        identifiers: { ...prev?.identifiers, cpe: cpes[0] }
-      }))
-    }
-  }, [cpes, setTabData])
-
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
-    if (identifiers?.cpe !== '') {
-      const components = identifiers?.cpe?.split(':')
+    if (cpes?.length > 0) {
       const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
+      const components = cpes[0].split(':')
       const isValid =
         components[2] && allowedValues.includes(components[2].toLowerCase())
-      if (isValid) {
-        setType(components[2].toLowerCase())
-      } else {
-        setType('')
-      }
-      setVendor(components[3]?.replace(/\*/g, '') || '')
-      setProduct(components[4]?.replace(/\*/g, '') || '')
-      setVersion(components[5]?.replace(/\*/g, '') || '')
-      setUpdate(components[6]?.replace(/\*/g, '') || '')
-      setEdition(components[7]?.replace(/\*/g, '') || '')
-      setLanguage(components[8]?.replace(/\*/g, '') || '')
-      setSwEdition(components[9]?.replace(/\*/g, '') || '')
-      setTargetSoftware(components[10]?.replace(/\*/g, '') || '')
-      setHardware(components[11]?.replace(/\*/g, '') || '')
-      setOther(components[12]?.replace(/\*/g, '') || '')
-      setTabData((prev) => ({
+      setCpeData((prev) => ({
         ...prev,
-        identifiers: {
-          ...prev?.identifiers,
-          cpe: `cpe:2.3:${isValid ? components[2].toLowerCase() : '*'}:${
-            components[3] || '*'
-          }:${components[4] || '*'}:${components[5] || '*'}:${
-            components[6] || '*'
-          }:${components[7] || '*'}:${components[8] || '*'}:${
-            components[9] || '*'
-          }:${components[10] || '*'}:${components[11] || '*'}:${
-            components[12] || '*'
-          }`
-        }
-      }))
-    } else {
-      setTabData((prev) => ({
-        ...prev,
-        identifiers: {
-          ...prev?.identifiers,
-          cpe: `cpe:2.3:*:*:*:*:*:*:*:*:*:*:*`
-        }
+        part: isValid ? components[2].toLowerCase() : '',
+        vendor: components[3]?.replace(/\*/g, '') || '',
+        product: components[4]?.replace(/\*/g, '') || '',
+        cpeVersion: components[5]?.replace(/\*/g, '') || '',
+        update: components[6]?.replace(/\*/g, '') || '',
+        edition: components[7]?.replace(/\*/g, '') || '',
+        language: components[8]?.replace(/\*/g, '') || '',
+        swEdition: components[9]?.replace(/\*/g, '') || '',
+        targetSoftware: components[10]?.replace(/\*/g, '') || '',
+        targetHardware: components[11]?.replace(/\*/g, '') || '',
+        other: components[12]?.replace(/\*/g, '') || ''
       }))
     }
-  }, [identifiers?.cpe, setTabData])
+  }, [cpes])
 
   return (
     <Flex width={'100%'} direction={'column'} gap={4}>
@@ -287,7 +194,7 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
           isReadOnly
           fontSize='sm'
           variant='filled'
-          value={identifiers?.cpe}
+          value={value}
           onChange={(e) => console.log(e.target.value)}
         />
       </FormControl>
@@ -296,12 +203,12 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
         <FormControl>
           <FormLabel htmlFor='type'>Part</FormLabel>
           <Select
-            id='part'
-            name='part'
             size='md'
+            name='part'
             fontSize={'sm'}
-            value={type}
-            onChange={handleTypeChange}
+            value={cpeData?.part}
+            onBlur={(e) => handleInputBlur(2, e.target.value)}
+            onChange={(e) => handleInputChange('part', e.target.value)}
           >
             <option value=''>-- Select --</option>
             <option value='a'>Application</option>
@@ -312,8 +219,10 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
         {/* VENDOR */}
         <CpeInput
           name='vendor'
-          inputValue={vendor}
-          setInputValue={setVendor}
+          string={value}
+          setString={setValue}
+          inputValue={cpeData?.vendor}
+          setInputValue={setCpeData}
           cpeList={vendorList}
           setCpeList={setVendorList}
           inputRef={vendorRef}
@@ -323,8 +232,10 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
         {/* PRODUCT */}
         <CpeInput
           name='product'
-          inputValue={product}
-          setInputValue={setProduct}
+          string={value}
+          setString={setValue}
+          inputValue={cpeData?.product}
+          setInputValue={setCpeData}
           cpeList={productList}
           setCpeList={setProductList}
           inputRef={productRef}
@@ -333,9 +244,11 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
         />
         {/* VERSION */}
         <CpeInput
-          name='version'
-          inputValue={version}
-          setInputValue={setVersion}
+          name='cpeVersion'
+          string={value}
+          setString={setValue}
+          inputValue={cpeData?.cpeVersion}
+          setInputValue={setCpeData}
           cpeList={versionList}
           setCpeList={setVersionList}
           inputRef={versionRef}
@@ -346,13 +259,14 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
         <FormControl>
           <FormLabel>Update</FormLabel>
           <Input
-            type='text'
-            value={update}
             size='md'
+            type='text'
+            name='update'
             fontSize={'sm'}
-            onChange={(e) => handleOnChange(e.target.value, setUpdate)}
-            onBlur={onBlurUpdate}
+            value={cpeData?.update}
             placeholder='Enter update'
+            onBlur={(e) => handleInputBlur(6, e.target.value)}
+            onChange={(e) => handleInputChange('update', e.target.value)}
           />
         </FormControl>
         {/* EDITION */}
@@ -360,12 +274,12 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
           <FormLabel>Edition</FormLabel>
           <Input
             type='text'
-            value={edition}
             size='md'
             fontSize={'sm'}
-            onChange={(e) => handleOnChange(e.target.value, setEdition)}
-            onBlur={onBlurEdition}
+            value={cpeData?.edition}
             placeholder='Enter edition'
+            onBlur={(e) => handleInputBlur(7, e.target.value)}
+            onChange={(e) => handleInputChange('edition', e.target.value)}
           />
         </FormControl>
         {/* LANGUAGE */}
@@ -373,12 +287,12 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
           <FormLabel>Language</FormLabel>
           <Input
             type='text'
-            value={language}
             size='md'
             fontSize={'sm'}
-            onChange={(e) => handleOnChange(e.target.value, setLanguage)}
-            onBlur={onBlurLanguage}
+            value={cpeData?.language}
             placeholder='Enter language'
+            onBlur={(e) => handleInputBlur(8, e.target.value)}
+            onChange={(e) => handleInputChange('language', e.target.value)}
           />
         </FormControl>
         {/* SW EDITION */}
@@ -386,25 +300,27 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
           <FormLabel>SW Edition</FormLabel>
           <Input
             type='text'
-            value={swEdition}
             size='md'
             fontSize={'sm'}
-            onChange={(e) => handleOnChange(e.target.value, setSwEdition)}
-            onBlur={onBlurSwEdition}
+            value={cpeData?.swEdition}
             placeholder='Enter sw edition'
+            onBlur={(e) => handleInputBlur(9, e.target.value)}
+            onChange={(e) => handleInputChange('swEdition', e.target.value)}
           />
         </FormControl>
         {/* TARGET SOFTWARE */}
         <FormControl>
           <FormLabel>Target Software</FormLabel>
           <Input
-            type='text'
-            value={targetSoftware}
             size='md'
+            type='text'
             fontSize={'sm'}
-            onChange={(e) => handleOnChange(e.target.value, setTargetSoftware)}
-            onBlur={onBlurTargetSoftware}
+            value={cpeData?.targetSoftware}
             placeholder='Enter target software'
+            onBlur={(e) => handleInputBlur(10, e.target.value)}
+            onChange={(e) =>
+              handleInputChange('targetSoftware', e.target.value)
+            }
           />
         </FormControl>
         {/* TARGET HARDWARE */}
@@ -414,10 +330,12 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
             <Select
               size='md'
               fontSize={'sm'}
-              id='targetHardware'
               name='targetHardware'
-              value={hardware}
-              onChange={handleHardwareChange}
+              value={cpeData?.targetHardware}
+              onBlur={(e) => handleInputBlur(11, e.target.value)}
+              onChange={(e) =>
+                handleInputChange('targetHardware', e.target.value)
+              }
             >
               <option value=''>-- Select --</option>
               <option value='x64'>x64</option>
@@ -440,11 +358,11 @@ const CpeInputs = ({ onClose, getCpe, activeRow }) => {
           <Input
             size='md'
             type='text'
-            value={other}
             fontSize={'sm'}
-            onBlur={onBlurOther}
+            value={cpeData?.other}
             placeholder='Enter other'
-            onChange={(e) => handleOnChange(e.target.value, setOther)}
+            onBlur={(e) => handleInputBlur(12, e.target.value)}
+            onChange={(e) => handleInputChange('other', e.target.value)}
           />
         </FormControl>
       </Grid>

@@ -19,6 +19,7 @@ import {
 
 const CpeInput = ({
   name,
+  string,
   isDisabled,
   inputValue,
   setInputValue,
@@ -26,9 +27,10 @@ const CpeInput = ({
   setCpeList,
   inputRef,
   validation,
-  onChange
+  onChange,
+  setString
 }) => {
-  const { tabData, setTabData, handleChange } = useContext(TabContext)
+  const { tabData, setTabData } = useContext(TabContext)
   const { identifiers } = tabData
   const [focusedIndex, setFocusedIndex] = useState(null)
   const listItemsRef = useRef([])
@@ -36,50 +38,52 @@ const CpeInput = ({
   const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
   const hoverColor = useColorModeValue('#EDF2F7', '#2D3748')
 
+  const updatePurl = (field, value) => {
+    try {
+      const pkg = PackageURL.fromString(string)
+      pkg[field] = value
+      setString(pkg.toString())
+    } catch (error) {
+      console.log('Something went wrong', error)
+    }
+  }
+
+  const updateCpe = (index, value) => {
+    const cpeParts = string?.split(':')
+    cpeParts[index] = value
+    const cpe = cpeParts.join(':')
+    setString(cpe)
+  }
+
   const updateString = (name, value) => {
-    const cpeParts = identifiers?.cpe?.split(':')
     if (value !== '') {
       if (name === 'vendor') {
-        cpeParts[3] = value
-        const cpe = cpeParts.join(':')
-        handleChange('identifiers', 'cpe', cpe)
+        updateCpe(3, value)
       } else if (name === 'product') {
-        cpeParts[4] = value
-        cpeParts[5] = '*'
-        const cpe = cpeParts.join(':')
-        handleChange('identifiers', 'cpe', cpe)
-      } else if (name === 'version') {
-        cpeParts[5] = value === '' ? '*' : value
-        const cpe = cpeParts.join(':')
-        handleChange('identifiers', 'cpe', cpe)
+        updateCpe(4, value)
+      } else if (name === 'cpeVersion') {
+        updateCpe(5, value)
       } else if (name === 'namespace') {
-        const pkg = PackageURL.fromString(identifiers?.purl)
-        pkg.namespace = value
-        handleChange('identifiers', 'purl', pkg.toString())
-      } else if (name === 'packageName') {
-        const pkg = PackageURL.fromString(identifiers?.purl)
-        pkg.name = value
-        handleChange('identifiers', 'purl', pkg.toString())
-      } else if (name === 'packageVersion') {
-        const pkg = PackageURL.fromString(identifiers?.purl)
-        pkg.version = value
-        handleChange('identifiers', 'purl', pkg.toString())
+        updatePurl('namespace', value)
+      } else if (name === 'name') {
+        updatePurl('name', value)
+      } else if (name === 'version') {
+        updatePurl('version', value)
       }
     }
   }
 
   const handleSelect = () => {
     const value = cpeList.length > 0 && cpeList[focusedIndex]
-    console.log('value', value)
     updateString(name, String(value))
-    setInputValue(value)
+    setInputValue((prev) => ({ ...prev, [name]: value }))
     setFocusedIndex(null)
     setCpeList([])
   }
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === 'Tab') {
-      setInputValue(inputValue)
+      setInputValue((prev) => ({ ...prev, [name]: inputValue }))
       setCpeList([])
       if (inputValue === '') {
         updateString(name, inputValue)
@@ -123,7 +127,7 @@ const CpeInput = ({
 
   useEffect(() => {
     if (validation) {
-      const matches = validateCpe(inputValue)
+      const matches = validateCpe(string)
       console.log('matches', matches)
       if (matches) {
         setTabData((prev) => ({
@@ -137,7 +141,7 @@ const CpeInput = ({
         }))
       }
     }
-  }, [inputValue, setTabData, validation])
+  }, [string, setTabData, validation])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -230,7 +234,7 @@ const CpeInput = ({
                 width={'100%'}
                 cursor={'pointer'}
                 onClick={() => {
-                  setInputValue(item)
+                  setInputValue((prev) => ({ ...prev, [name]: item }))
                   updateString(name, item)
                   setFocusedIndex(null)
                   setCpeList([])

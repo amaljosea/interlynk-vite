@@ -15,8 +15,6 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-
 const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
   const { tabData, setTabData, handleChange } = useContext(TabContext)
   const { identifiers } = tabData || ''
