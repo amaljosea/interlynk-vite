@@ -45,11 +45,11 @@ import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import GraphDrawer from 'components/Drawer/GraphDrawer'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
+import { HealthScore } from 'components/HealthScore'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
-import { ProgressBar } from 'components/ProgressBar'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -414,7 +414,7 @@ const Components = ({ sbomData }) => {
           componentName: name,
           componentVersion: version
         }).healthScore
-        return <ProgressBar value={score} width={100} />
+        return <HealthScore value={score} />
       },
       width: '12%',
       right: 'true'
