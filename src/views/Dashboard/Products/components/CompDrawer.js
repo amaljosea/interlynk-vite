@@ -42,7 +42,8 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   const bgColor = useColorModeValue('white', 'gray.700')
   const tabs = ['details', 'identifiers', 'suppliers', 'links', 'relationships']
 
-  const { tabData, unsavedChanges, saveChanges } = useContext(TabContext)
+  const { tabData, resetData, unsavedChanges, saveChanges } =
+    useContext(TabContext)
 
   const [tab, setTab] = useState(0)
   const [pendingTabIndex, setPendingTabIndex] = useState(null)
@@ -87,7 +88,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerCloseButton mt={3} onClick={saveChanges} />
+          <DrawerCloseButton mt={3} onClick={resetData} />
           <DrawerHeader borderBottomWidth='1px'>
             <Text mb={1} fontWeight={'medium'}>
               {data ? 'Edit' : 'Add'} Component

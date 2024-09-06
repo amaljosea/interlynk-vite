@@ -66,8 +66,11 @@ export const TabProvider = ({ children }) => {
 
   const saveChanges = () => {
     console.log('Saving data:', tabData)
-    setTabData(initialTabData)
     setUnsavedChanges(initialUnsavedChanges)
+  }
+
+  const resetData = () => {
+    setTabData(initialTabData)
   }
 
   return (
@@ -77,7 +80,8 @@ export const TabProvider = ({ children }) => {
         setTabData,
         handleChange,
         unsavedChanges,
-        saveChanges
+        saveChanges,
+        resetData
       }}
     >
       {children}

@@ -113,8 +113,8 @@ const CompDetails = ({ data, primaryComp }) => {
         version: details?.version,
         description: details?.description,
         copyright: details?.copyright,
-        supportLevel: details?.supportLevel,
-        endOfSupport: details?.endOfSupport,
+        supportLevel: details?.supportLevel || undefined,
+        endOfSupport: details?.endOfSupport || undefined,
         licenses: { licensesExp: license }
       }
     }).then((res) => {
@@ -402,7 +402,6 @@ const CompDetails = ({ data, primaryComp }) => {
             inputProps={{
               name: 'endOfSupport',
               placeholder: 'Add support date',
-              disabled: details?.supportLevel === '',
               onCopy: (e) => e.preventDefault(),
               onPaste: (e) => e.preventDefault(),
               style: {

@@ -56,7 +56,7 @@ function ComponentDrawer(props) {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const customerView = location.pathname.startsWith('/customer')
 
-  const { tabData, handleChange, saveChanges, setTabData } =
+  const { tabData, handleChange, resetData, setTabData } =
     useContext(TabContext)
   const { details, identifiers } = tabData
 
@@ -262,8 +262,8 @@ function ComponentDrawer(props) {
         internal: isInternal,
         version: compVersion,
         description: compDesc,
-        supportLevel: compSupport,
-        endOfSupport: selectedDate,
+        supportLevel: compSupport || undefined,
+        endOfSupport: selectedDate || undefined,
         purl: identifiers?.purl,
         licenses: { licensesExp: license || '' },
         cpes: identifiers?.cpe !== '' ? [identifiers?.cpe] : undefined
@@ -288,7 +288,7 @@ function ComponentDrawer(props) {
           description: `Data added successfully`,
           status: 'success'
         })
-        saveChanges()
+        resetData()
         onClose()
       })
   }

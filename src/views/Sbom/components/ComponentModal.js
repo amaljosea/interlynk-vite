@@ -6,7 +6,6 @@ import { DeleteComponent } from 'graphQL/Mutation'
 
 const ComponentModal = ({ isOpen, onClose, activeRow }) => {
   const params = useParams()
-  const prodId = params.productid
   const sbomId = params.sbomid
   const { id, name } = activeRow
 
