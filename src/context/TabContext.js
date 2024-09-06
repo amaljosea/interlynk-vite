@@ -3,7 +3,7 @@ import React, { createContext, useState } from 'react'
 export const TabContext = createContext()
 
 export const TabProvider = ({ children }) => {
-  const [tabData, setTabData] = useState({
+  const initialTabData = {
     details: {
       kind: '',
       name: '',
@@ -38,15 +38,17 @@ export const TabProvider = ({ children }) => {
       to: '',
       relType: ''
     }
-  })
-
-  const [unsavedChanges, setUnsavedChanges] = useState({
+  }
+  const initialUnsavedChanges = {
     details: false,
     identifiers: false,
     supplier: false,
     links: false,
     relations: false
-  })
+  }
+
+  const [tabData, setTabData] = useState(initialTabData)
+  const [unsavedChanges, setUnsavedChanges] = useState(initialUnsavedChanges)
 
   const handleChange = (tab, field, value) => {
     setTabData((prevData) => ({
@@ -64,13 +66,8 @@ export const TabProvider = ({ children }) => {
 
   const saveChanges = () => {
     console.log('Saving data:', tabData)
-    setUnsavedChanges({
-      details: false,
-      identifiers: false,
-      supplier: false,
-      links: false,
-      relations: false
-    })
+    setTabData(initialTabData)
+    setUnsavedChanges(initialUnsavedChanges)
   }
 
   return (

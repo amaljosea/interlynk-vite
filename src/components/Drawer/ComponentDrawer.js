@@ -1,6 +1,7 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -55,6 +56,10 @@ function ComponentDrawer(props) {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const customerView = location.pathname.startsWith('/customer')
 
+  const { tabData, handleChange, saveChanges, setTabData } =
+    useContext(TabContext)
+  const { details, identifiers } = tabData
+
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
@@ -69,19 +74,20 @@ function ComponentDrawer(props) {
   const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
 
   const handleDateChange = (newDate) => {
-    console.log('newDate', newDate)
     const isValidDate = newDate && !isNaN(newDate)
     setSelectedDate(newDate._d)
-    if (isValidDate) {
-      setIsValidDate(true)
-    } else {
-      setIsValidDate(false)
+    if (newDate) {
+      if (isValidDate) {
+        setIsValidDate(true)
+      } else {
+        setIsValidDate(false)
+      }
     }
   }
 
   const { isOpen, onClose, data, primaryComp, shortDesc } = props
   const { prodCompState, dispatch } = useGlobalState()
-  const { purlString, expLicense, totalComp } = prodCompState
+  const { purlString, totalComp } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const [addRelation] = useMutation(CreateCompRelation)
@@ -97,15 +103,11 @@ function ComponentDrawer(props) {
   const [compVersion, setCompVersion] = useState('')
   const [compKind, setCompKind] = useState('')
   const [compScope, setCompScope] = useState('')
-  const [cpeValue, setCpeValue] = useState('')
   const [cpeData, setCpeData] = useState([])
-  const [purlValue, setPurlValue] = useState('')
-  const [isPURLInputValid, setPURLInputValid] = useState(true)
   const [isPrimary, setIsPrimary] = useState(false)
   const [isInternal, setIsInternal] = useState(false)
   const [relation, setRelation] = useState('')
   const [component, setComponent] = useState('')
-  const [isValid] = useState(true)
   const [compSupport, setCompSupport] = useState('')
   const [allComponents, setAllComponents] = useState([])
 
@@ -163,26 +165,41 @@ function ComponentDrawer(props) {
       setCompName(name)
       setCompDesc(description)
       setCompVersion(version)
-      console.log('purl', purl)
       if (purl !== null) {
-        setPurlValue(purl)
+        setTabData((prev) => ({
+          ...prev,
+          identifiers: { ...prev.identifiers, purl: purl }
+        }))
         try {
           PackageURL.fromString(purl)
-          setPURLInputValid(true)
+          setTabData((prev) => ({
+            ...prev,
+            identifiers: { ...prev?.identifiers, isValidPurl: true }
+          }))
         } catch (ex) {
-          setPURLInputValid(false)
+          setTabData((prev) => ({
+            ...prev,
+            identifiers: { ...prev?.identifiers, isValidPurl: false }
+          }))
         }
-      } else {
-        setPurlValue('')
-        setPURLInputValid(true)
       }
+
       if (cpes?.length > 0) {
-        setCpeValue(cpes[0])
+        setTabData((prev) => ({
+          ...prev,
+          identifiers: { ...prev?.identifiers, cpe: cpes[0] }
+        }))
         const matches = validateCpe(cpes[0])
         if (matches && cpes[0] !== '') {
-          prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: true })
+          setTabData((prev) => ({
+            ...prev,
+            identifiers: { ...prev?.identifiers, isValidCpe: true }
+          }))
         } else {
-          prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: false })
+          setTabData((prev) => ({
+            ...prev,
+            identifiers: { ...prev?.identifiers, isValidCpe: false }
+          }))
         }
       }
       setCompKind(kind)
@@ -190,7 +207,7 @@ function ComponentDrawer(props) {
       setIsPrimary(primary)
       setIsInternal(internal)
     }
-  }, [data, prodCompDispatch])
+  }, [data, setTabData])
 
   // Health Check
   useEffect(() => {
@@ -216,20 +233,22 @@ function ComponentDrawer(props) {
   const handlePURLInputChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
-    setPurlValue(val)
+    handleChange('identifiers', 'purl', val)
   }
 
   const purlInputBlur = () => {
-    if (purlValue !== '') {
+    if (identifiers?.purl !== '') {
       try {
-        PackageURL.fromString(purlValue)
-        setPURLInputValid(true)
+        PackageURL.fromString(identifiers?.purl)
+        handleChange('identifiers', 'isValidPurl', true)
       } catch (ex) {
         console.error('ex', ex)
-        setPURLInputValid(false)
+        handleChange('identifiers', 'isValidPurl', false)
       }
     }
   }
+
+  const license = details?.licenses?.length > 0 ? details.licenses[0].value : ''
 
   const handleCreateCom = () => {
     createComponent({
@@ -237,7 +256,6 @@ function ComponentDrawer(props) {
         sbomId: sbomId,
         kind: compKind,
         name: compName,
-        purl: purlValue,
         scope: compScope,
         group: groupInfo,
         primary: isPrimary,
@@ -246,8 +264,9 @@ function ComponentDrawer(props) {
         description: compDesc,
         supportLevel: compSupport,
         endOfSupport: selectedDate,
-        cpes: cpeValue !== '' ? [cpeValue] : [],
-        licenses: { licensesExp: expLicense || '' }
+        purl: identifiers?.purl,
+        licenses: { licensesExp: license || '' },
+        cpes: identifiers?.cpe !== '' ? [identifiers?.cpe] : undefined
       }
     })
       .then((res) => {
@@ -269,6 +288,7 @@ function ComponentDrawer(props) {
           description: `Data added successfully`,
           status: 'success'
         })
+        saveChanges()
         onClose()
       })
   }
@@ -276,7 +296,7 @@ function ComponentDrawer(props) {
   const handleCpeChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
-    setCpeValue(val)
+    handleChange('identifiers', 'cpe', value)
     getCpe({
       variables: {
         input: { idType: 'cpe', ecosystem: 'cpe', search: { idUri: val } }
@@ -298,8 +318,7 @@ function ComponentDrawer(props) {
     return result?.desc
   }
 
-  const isInvalid =
-    compKind === '' || compName === '' || compVersion === '' || !isValid
+  const isInvalid = compKind === '' || compName === '' || compVersion === ''
 
   return (
     <>
@@ -483,7 +502,7 @@ function ComponentDrawer(props) {
               {/* PURL INPUI */}
               <FormControl
                 isReadOnly={customerView}
-                isInvalid={purlValue !== '' && !isPURLInputValid}
+                isInvalid={identifiers?.purl && !identifiers?.isValidPurl}
               >
                 <Input
                   type='text'
@@ -492,7 +511,7 @@ function ComponentDrawer(props) {
                   name='purl'
                   fontSize={'sm'}
                   placeholder='PURL'
-                  value={purlValue}
+                  value={identifiers?.purl}
                   autoComplete='off'
                   onChange={handlePURLInputChange}
                   onBlur={purlInputBlur}
@@ -502,8 +521,6 @@ function ComponentDrawer(props) {
               <FormControl>
                 <CpeField
                   inputRef={cpeRef}
-                  inputValue={cpeValue}
-                  setInputValue={setCpeValue}
                   cpeList={cpeData}
                   setCpeList={setCpeData}
                   onChange={handleCpeChange}
@@ -541,7 +558,7 @@ function ComponentDrawer(props) {
                 <FormLabel htmlFor='compScope'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Support Level</Text>
-                    <Tooltip label={onCheck(`Component Support`)}>
+                    <Tooltip label={onCheck(`Support Level`)}>
                       <InfoIcon color={'blue.500'} />
                     </Tooltip>
                   </Flex>
@@ -553,10 +570,7 @@ function ComponentDrawer(props) {
                   fontSize={'sm'}
                   value={compSupport}
                   isDisabled={customerView}
-                  onChange={(e) => {
-                    setCompSupport(e.target.value)
-                    setSelectedDate(defaultDate)
-                  }}
+                  onChange={(e) => setCompSupport(e.target.value)}
                 >
                   <option value='' style={{ background: 'lightgray' }}>
                     -- Select --
@@ -576,22 +590,25 @@ function ComponentDrawer(props) {
                 <FormLabel mb={1} htmlFor='endOfSupport'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>End-Of-Support Date</Text>
-                    <Tooltip label={onCheck(`Component Support Date`)}>
+                    <Tooltip label={onCheck(`End-of-Support Date`)}>
                       <InfoIcon color={'blue.500'} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
                 <Datetime
+                  timeFormat={false}
                   value={selectedDate}
                   closeOnSelect={true}
                   className={`${react_datatime} endOfSupport`}
                   onChange={handleDateChange}
                   inputProps={{
-                    disabled: compSupport === '',
+                    name: 'endOfSupport',
+                    placeholder: 'Add support date',
                     onCopy: (e) => e.preventDefault(),
                     onPaste: (e) => e.preventDefault(),
                     style: {
-                      background: 'none'
+                      background: 'none',
+                      fontSize: '14px'
                     }
                   }}
                 />
