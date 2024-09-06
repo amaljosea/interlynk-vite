@@ -1,18 +1,18 @@
 import { Box, Text, useColorModeValue } from '@chakra-ui/react'
 
-export const HealthScore = ({ value }) => {
+export const HealthScore = ({ value, isComponent }) => {
   const bgColor = useColorModeValue('gray.100', 'gray.600')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   return (
     <Box
       mt={0.5}
-      height={'24px'}
-      width={'100px'}
       overflow={'hidden'}
       position='relative'
       borderLeftRadius={'md'}
       borderRightRadius={'md'}
+      height={isComponent ? '20px' : '18px'}
+      width={isComponent ? '100px' : '100%'}
     >
       <Box
         height={'100%'}

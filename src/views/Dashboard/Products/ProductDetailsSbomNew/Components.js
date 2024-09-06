@@ -415,7 +415,7 @@ const Components = ({ sbomData }) => {
           componentName: name,
           componentVersion: version
         }).healthScore
-        return <HealthScore value={score} />
+        return <HealthScore isComponent value={score} />
       },
       width: '12%',
       right: 'true'
