@@ -20,8 +20,6 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
-import CardHeader from 'components/Card/CardHeader'
 import CustomLoader from 'components/CustomLoader'
 import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 
@@ -176,17 +174,6 @@ const RoleTable = () => {
 
   return (
     <>
-      <Card boxShadow={'none'} p={0}>
-        <CardHeader p='12px 0' display={'flex'} flexDirection={'column'}>
-          <Text fontSize='lg' color={textColor} fontWeight='bold'>
-            Roles Management
-          </Text>
-          <Text fontSize={'sm'}>
-            Manage user roles, assign permissions, and control access within
-            your system.
-          </Text>
-        </CardHeader>
-      </Card>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           subHeader

@@ -18,13 +18,6 @@ import {
   Icon,
   Input,
   Kbd,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Tooltip
 } from '@chakra-ui/react'
