@@ -484,7 +484,10 @@ const VersionsTable = ({
                 <MenuItem onClick={() => handleListSbom(row)}>
                   List SBOM
                 </MenuItem>
-                <MenuItem onClick={() => handleRepSbom(row)}>
+                <MenuItem
+                  onClick={() => handleRepSbom(row)}
+                  hidden={signedUrlParams}
+                >
                   Reprocess
                 </MenuItem>
                 <Divider />
