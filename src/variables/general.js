@@ -757,6 +757,14 @@ export const infoData = [
   {
     title: `Internal Component`,
     desc: `A component is marked internal when the component is represents internally developed components.`
+  },
+  {
+    title: `Support Level`,
+    desc: `The software level of support provided through monitoring and maintenance from the software component manufacturer (e.g., actively maintained or abandoned)`
+  },
+  {
+    title: `End-of-Support Date`,
+    desc: `The end-of-support date refers to the point in time when a company or software provider will no longer offer updates, fixes, or technical support for a particular component`
   }
 ]
 

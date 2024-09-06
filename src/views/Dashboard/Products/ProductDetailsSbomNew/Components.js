@@ -6,6 +6,7 @@ import { useLocation, useParams } from 'react-router-dom'
 import { GetIcon, customStyles, timeSince } from 'utils'
 import { getFullDateAndTime, isUnknown } from 'utils'
 import { truncatedValue } from 'utils'
+import { capitalizeFirstLetter } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 import { openSsf } from 'variables/general'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -708,123 +709,107 @@ const Components = ({ sbomData }) => {
       internal,
       licenses,
       licensesExp,
-      licensesCustom
+      licensesCustom,
+      supportLevel,
+      endOfSupport
     } = data
     const { dependencyOf, dependsOn } = activeRow || ''
     const openSSF = openSsf?.find((item) => item?.name === purl)
 
+    const textStyle = {
+      color: textColor,
+      mt: 1,
+      fontSize: 14,
+      workBreak: 'break-all'
+    }
+
     return (
       <Box
-        width={'100%'}
         p={5}
+        width={'100%'}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        <Grid templateColumns='repeat(3, 1fr)' gap={6}>
+        <Grid templateColumns='repeat(3, 1fr)' py={2} gap={6}>
           <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
-            <Text
-              color={textColor}
-              width={'90%'}
-              mt={1}
-              fontSize={14}
-              wordBreak={'break-all'}
-            >
-              {description !== null ? description : ''}
+            <Text sx={textStyle} width={'90%'}>
+              {description !== null ? description : 'N/A'}
             </Text>
           </GridItem>
           <GridItem>
             <CustomText>Component :</CustomText>
-            <Text
-              color={textColor}
-              width={'90%'}
-              mt={1}
-              fontSize={14}
-              wordBreak={'break-all'}
-            >
-              {name}
+            <Text sx={textStyle} width={'90%'}>
+              {name || 'N/A'}
             </Text>
           </GridItem>
           <GridItem>
             <CustomText>Type :</CustomText>
-            <Text
-              color={textColor}
-              mt={1}
-              fontSize={14}
-              textTransform={'capitalize'}
-            >
-              {kind}
-            </Text>
+            <Text sx={textStyle}>{kind || 'N/A'}</Text>
           </GridItem>
           <GridItem>
             <CustomText>Internal :</CustomText>
-            <Text
-              color={textColor}
-              mt={1}
-              fontSize={14}
-              wordBreak={'break-all'}
-            >
-              {internal ? 'True' : 'False'}
-            </Text>
+            <Text sx={textStyle}>{internal ? 'True' : 'False'}</Text>
           </GridItem>
           <GridItem>
             <CustomText>Supplier :</CustomText>
             <VStack spacing={4} mt={1} alignItems={'left'}>
-              {suppliers &&
-                suppliers.map((item, index) => (
-                  <Tag
-                    size={'md'}
-                    key={index}
-                    variant='subtle'
-                    colorScheme='orange'
-                    width={'fit-content'}
-                  >
-                    <Text wordBreak={'break-all'}>
-                      {item?.contactName}
-                      {item?.contactEmail && ` (${item?.contactEmail})`}
-                      {item?.url ? (
-                        <Link
-                          href={
-                            item?.url?.startsWith(`https://`) === true
-                              ? item?.url
-                              : `https://${item?.url}`
-                          }
-                          isExternal
-                        >
-                          {' '}
-                          {item.name}
-                        </Link>
-                      ) : (
-                        ` ${item.name}`
-                      )}
-                    </Text>
-                    <TagCloseButton
-                      hidden={signedUrlParams}
-                      onClick={() => handleSupRemove(item.id)}
-                    />
-                  </Tag>
-                ))}
+              {suppliers?.length > 0 ? (
+                <>
+                  {suppliers.map((item, index) => (
+                    <Tag
+                      size={'md'}
+                      key={index}
+                      variant='subtle'
+                      colorScheme='orange'
+                      width={'fit-content'}
+                    >
+                      <Text wordBreak={'break-all'}>
+                        {item?.contactName}
+                        {item?.contactEmail && ` (${item?.contactEmail})`}
+                        {item?.url ? (
+                          <Link
+                            href={
+                              item?.url?.startsWith(`https://`) === true
+                                ? item?.url
+                                : `https://${item?.url}`
+                            }
+                            isExternal
+                          >
+                            {' '}
+                            {item.name}
+                          </Link>
+                        ) : (
+                          ` ${item.name}`
+                        )}
+                      </Text>
+                      <TagCloseButton
+                        hidden={signedUrlParams}
+                        onClick={() => handleSupRemove(item.id)}
+                      />
+                    </Tag>
+                  ))}
+                </>
+              ) : (
+                <Text sx={textStyle}>N/A</Text>
+              )}
             </VStack>
           </GridItem>
           <GridItem>
             <CustomText>PURL :</CustomText>
             <Text
-              wordBreak={'break-all'}
-              mt={1}
-              color={textColor}
-              fontSize={14}
+              sx={textStyle}
               cursor={'pointer'}
               onClick={() => {
                 setActiveRow(data)
                 onPurlOpen()
               }}
             >
-              {purl !== null && purl !== '' ? purl : ''}
+              {purl !== null && purl !== '' ? purl : 'N/A'}
             </Text>
           </GridItem>
           <GridItem>
             <CustomText>CPES :</CustomText>
             <Flex
-              mt={1}
               flexDirection={'column'}
               alignItems={'flex-start'}
               gap={1}
@@ -834,9 +819,7 @@ const Components = ({ sbomData }) => {
                 cpes.map((item, index) => (
                   <Text
                     key={index}
-                    fontSize={14}
-                    color={textColor}
-                    wordBreak={'break-all'}
+                    sx={textStyle}
                     cursor={'pointer'}
                     onClick={() => {
                       setActiveRow(data)
@@ -854,7 +837,7 @@ const Components = ({ sbomData }) => {
               <Skeleton width={32} height={4} />
             ) : (
               <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-                {dependsOn?.length > 0 &&
+                {dependsOn?.length > 0 ? (
                   [...dependsOn]
                     .sort(
                       (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
@@ -877,7 +860,10 @@ const Components = ({ sbomData }) => {
                           </Text>
                         </Tag>
                       </Tooltip>
-                    ))}
+                    ))
+                ) : (
+                  <Text sx={textStyle}>N/A</Text>
+                )}
               </Flex>
             )}
           </GridItem>
@@ -887,7 +873,7 @@ const Components = ({ sbomData }) => {
               <Skeleton width={32} height={4} />
             ) : (
               <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-                {dependencyOf?.length > 0 &&
+                {dependencyOf?.length > 0 ? (
                   dependencyOf?.map((comp, index) => (
                     <Tooltip
                       key={index}
@@ -905,19 +891,17 @@ const Components = ({ sbomData }) => {
                         </Text>
                       </Tag>
                     </Tooltip>
-                  ))}
+                  ))
+                ) : (
+                  <Text sx={textStyle}>N/A</Text>
+                )}
               </Flex>
             )}
           </GridItem>
           <GridItem>
             <CustomText>Scope :</CustomText>
-            <Text
-              color={textColor}
-              mt={1}
-              fontSize={14}
-              textTransform={'capitalize'}
-            >
-              {scope}
+            <Text sx={textStyle} textTransform={'capitalize'}>
+              {scope || 'N/A'}
             </Text>
           </GridItem>
           <GridItem>
@@ -965,8 +949,20 @@ const Components = ({ sbomData }) => {
           <GridItem>
             <CustomText>OpenSSF Scorecard :</CustomText>
             <Tag mt={1.5} variant='subtle' colorScheme={'blue'}>
-              {openSSF?.score || '-'}
+              {openSSF?.score || 'N/A'}
             </Tag>
+          </GridItem>
+          <GridItem>
+            <CustomText>Support Level :</CustomText>
+            <Text sx={textStyle}>
+              {supportLevel ? supportLevel?.replace('_', ' ') : 'N/A'}
+            </Text>
+          </GridItem>
+          <GridItem>
+            <CustomText>End-of-Support Date :</CustomText>
+            <Text sx={textStyle}>
+              {endOfSupport ? getFullDateAndTime(endOfSupport) : 'N/A'}
+            </Text>
           </GridItem>
         </Grid>
       </Box>

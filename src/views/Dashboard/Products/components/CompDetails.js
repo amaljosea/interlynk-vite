@@ -64,16 +64,17 @@ const CompDetails = ({ data, primaryComp }) => {
   const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
 
   const handleDateChange = (newDate) => {
-    console.log('newDate', newDate)
     const isValidDate = newDate && !isNaN(newDate)
     setTabData((prev) => ({
       ...prev,
       details: { ...prev?.details, endOfSupport: newDate._d }
     }))
-    if (isValidDate) {
-      setIsValidDate(true)
-    } else {
-      setIsValidDate(false)
+    if (newDate) {
+      if (isValidDate) {
+        setIsValidDate(true)
+      } else {
+        setIsValidDate(false)
+      }
     }
   }
 
@@ -359,7 +360,7 @@ const CompDetails = ({ data, primaryComp }) => {
           <FormLabel htmlFor='compScope'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>Support Level</Text>
-              <Tooltip label={onCheck(`Component Support`)}>
+              <Tooltip label={onCheck(`Support Level`)}>
                 <InfoIcon color={'blue.500'} />
               </Tooltip>
             </Flex>
@@ -387,14 +388,15 @@ const CompDetails = ({ data, primaryComp }) => {
           <FormLabel mb={1} htmlFor='endOfSupport'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>End-Of-Support Date</Text>
-              <Tooltip label={onCheck(`Component Support Date`)}>
+              <Tooltip label={onCheck(`End-of-Support Date`)}>
                 <InfoIcon color={'blue.500'} />
               </Tooltip>
             </Flex>
           </FormLabel>
           <Datetime
-            value={details?.endOfSupport}
+            timeFormat={false}
             closeOnSelect={true}
+            value={details?.endOfSupport}
             className={`${react_datatime} endOfSupport`}
             onChange={handleDateChange}
             inputProps={{
