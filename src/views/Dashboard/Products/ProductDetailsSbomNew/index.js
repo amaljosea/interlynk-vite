@@ -79,7 +79,7 @@ const ProductDetailsSbomNew = () => {
 
   useEffect(() => {
     if (reScanVuln || isInitialized) {
-      startPolling(1000)
+      startPolling(5000)
     } else {
       stopPolling()
     }

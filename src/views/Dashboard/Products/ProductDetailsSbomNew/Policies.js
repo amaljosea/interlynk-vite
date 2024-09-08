@@ -317,7 +317,7 @@ const Policies = () => {
 
   useEffect(() => {
     if (isInitialized) {
-      startPolling(1000)
+      startPolling(5000)
     } else {
       stopPolling()
     }

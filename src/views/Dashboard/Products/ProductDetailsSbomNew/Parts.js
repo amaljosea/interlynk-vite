@@ -279,7 +279,7 @@ const Parts = () => {
       (item) => item?.part?.vulnRunStatus !== 'FINISHED'
     )
     if (inProgress) {
-      startPolling(1000)
+      startPolling(5000)
     } else {
       stopPolling()
     }
