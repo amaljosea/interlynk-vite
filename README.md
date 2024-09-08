@@ -46,6 +46,8 @@ npm -v
 cd lynk-dash-app
 ```
 
+Create a `.env` file by copying either `.env.local` or `.env.staging`, depending on your preferred backend.
+
 5. and then run these commands
 
 ```

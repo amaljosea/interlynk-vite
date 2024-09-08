@@ -6,3 +6,4 @@ build
 
 # Sentry Config File
 .sentryclirc
+.env
