@@ -170,6 +170,7 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
           borderColor={grayBorder}
           borderRadius={4}
           padding={3}
+          maxWidth={'300px'}
         >
           <Flex gap={2} alignItems={'center'}>
             <Flex
@@ -228,39 +229,37 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
               onChange={(value) => setTargetVulnerability(value)}
               options={allVulnerabilities}
             />
+            <Menu>
+              <MenuHeading
+                title={'Environment'}
+                icon={FaFilter}
+                active={env.length > 0 && !env.includes('all')}
+              />
+              <MenuList>
+                <MenuOptionGroup
+                  value={env}
+                  onChange={onFilterEnv}
+                  type='checkbox'
+                >
+                  {['all', 'default', 'development', 'production'].map(
+                    (item, index) => (
+                      <MenuItemOption
+                        key={index}
+                        value={item}
+                        fontSize='sm'
+                        textTransform={'capitalize'}
+                      >
+                        {item}
+                      </MenuItemOption>
+                    )
+                  )}
+                </MenuOptionGroup>
+              </MenuList>
+            </Menu>
           </Flex>
         </Flex>
         <Divider />
-        <Flex m={5} justifyContent={'space-between'} alignItems={'center'}>
-          <Menu>
-            <MenuButton textTransform={'capitalize'}>
-              <Flex gap={2} alignItems={'center'}>
-                {`Environment: ${env.length === 0 ? 'All' : env.join(', ')}`}
-                <FaChevronDown />
-              </Flex>
-            </MenuButton>
-            <MenuList>
-              <MenuOptionGroup
-                value={env}
-                onChange={onFilterEnv}
-                type='checkbox'
-              >
-                {['all', 'default', 'development', 'production'].map(
-                  (item, index) => (
-                    <MenuItemOption
-                      key={index}
-                      value={item}
-                      fontSize='sm'
-                      textTransform={'capitalize'}
-                    >
-                      {item}
-                    </MenuItemOption>
-                  )
-                )}
-              </MenuOptionGroup>
-            </MenuList>
-          </Menu>
-        </Flex>
+
         <DrawerBody borderRadius={10} p={0}>
           <Flex gap={4} minHeight={600} p={5} justifyContent={'space-evenly'}>
             {renderTree(defaultData, 'default')}

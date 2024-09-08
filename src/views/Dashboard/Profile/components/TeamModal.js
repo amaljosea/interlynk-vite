@@ -78,7 +78,7 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
           isRequired
           isInvalid={email !== '' && !validateEmail(email)}
         >
-          <FormLabel>Email</FormLabel>
+          <FormLabel fontSize={12}>Email</FormLabel>
           <Input
             type='text'
             value={email}
@@ -95,7 +95,7 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
         {/* ROLES */}
         {roles && (
           <FormControl isDisabled={!changeRole}>
-            <FormLabel>Role</FormLabel>
+            <FormLabel fontSize={12}>Role</FormLabel>
             <Select
               value={role}
               onChange={(e) => setRole(e.target.value)}

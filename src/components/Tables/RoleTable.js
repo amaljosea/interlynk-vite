@@ -64,6 +64,8 @@ const RoleTable = () => {
     onClose: onRoleClose
   } = useDisclosure()
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const paddingCell = 0
+  const paddingHeadCell = 0
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const columns = [
@@ -148,7 +150,6 @@ const RoleTable = () => {
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}
-        mb={'24px'}
       >
         <Flex flexDirection={'column'}>
           <Text fontSize='lg' color={textColor} fontWeight='bold'>
@@ -185,7 +186,12 @@ const RoleTable = () => {
           data={organizationRoles || []}
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(
+            headColor,
+            null,
+            paddingCell,
+            paddingHeadCell
+          )}
         />
       </Flex>
 

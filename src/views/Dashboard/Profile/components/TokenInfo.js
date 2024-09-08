@@ -8,7 +8,6 @@ import { customStyles, getFullDateAndTime } from 'utils'
 
 import { AddIcon, CopyIcon } from '@chakra-ui/icons'
 import {
-  Box,
   Checkbox,
   Flex,
   FormControl,
@@ -82,6 +81,8 @@ const TokenInfo = () => {
   const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const paddingCell = 0
+  const paddingHeadCell = 0
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const borderColor = useColorModeValue('gray.200', 'gray.600')
 
@@ -215,16 +216,15 @@ const TokenInfo = () => {
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}
-        marginBottom={'24px'}
       >
-        <Box p='12px 0' mb='8px' display={'flex'} flexDirection={'column'}>
+        <Flex flexDirection={'column'}>
           <Text fontSize='lg' color={textColor} fontWeight='bold'>
             Security Tokens
           </Text>
           <Text fontSize={'sm'}>
             Secure your organization with essential tokens for data protection
           </Text>
-        </Box>
+        </Flex>
 
         {/* NER TOKEN */}
         <Tooltip label='New Token'>
@@ -458,7 +458,12 @@ const TokenInfo = () => {
           progressPending={loading}
           defaultSortFieldId={'updated'}
           progressComponent={<CustomLoader />}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(
+            headColor,
+            null,
+            paddingCell,
+            paddingHeadCell
+          )}
           subHeaderComponent={subHeaderComponent}
         />
       </Flex>

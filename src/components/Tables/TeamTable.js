@@ -70,6 +70,8 @@ const TeamTable = () => {
   const { orgView, isFreeTier } = useGlobalQueryContext()
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const paddingCell = 0
+  const paddingHeadCell = 0
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { data: orgData } = useQuery(GetCurrentUser, {
@@ -84,8 +86,6 @@ const TeamTable = () => {
     variables: { search: filterText === '' ? undefined : filterText }
   })
 
-  console.log(userData?.organization?.users)
-  console.log(isFreeTier)
   const numberOfUsers = userData?.organization?.users.length
 
   const { users } = userData?.organization || ''
@@ -188,7 +188,7 @@ const TeamTable = () => {
           )}
         </Stack>
       ),
-      width: '19%',
+      width: '21%',
       wrap: true
     },
 
@@ -200,7 +200,7 @@ const TeamTable = () => {
           {row?.role?.name || ''}
         </Text>
       ),
-      width: '10%'
+      width: '8%'
     },
 
     {
@@ -228,7 +228,7 @@ const TeamTable = () => {
         const dateB = new Date(bUserStart)
         return dateA - dateB // Sort in descending order
       },
-      width: '12%'
+      width: '16%'
     },
 
     {
@@ -258,7 +258,7 @@ const TeamTable = () => {
         )
       },
       center: true,
-      width: '12%'
+      width: '8%'
     },
 
     {
@@ -313,7 +313,7 @@ const TeamTable = () => {
         )
       },
       right: 'true',
-      width: '9%'
+      width: '12%'
     }
   ]
 
@@ -351,7 +351,6 @@ const TeamTable = () => {
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}
-        mb={'24px'}
       >
         {/* SEARCH COMPONENTS */}
         <Stack
@@ -458,7 +457,12 @@ const TeamTable = () => {
         progressPending={loading}
         defaultSortFieldId={'joinedDate'}
         progressComponent={<CustomLoader />}
-        customStyles={customStyles(headColor)}
+        customStyles={customStyles(
+          headColor,
+          null,
+          paddingCell,
+          paddingHeadCell
+        )}
         subHeaderComponent={subHeaderComponent}
       />
 

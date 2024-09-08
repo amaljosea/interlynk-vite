@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils'
 import { getFullDateAndTime } from 'utils'
@@ -9,15 +9,11 @@ import { AddIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
-  Stack,
   Text,
   Tooltip,
   useColorModeValue
 } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
-import CardBody from 'components/Card/CardBody'
-import CardHeader from 'components/Card/CardHeader'
 import CustomLoader from 'components/CustomLoader'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 import { RegexHighlighter } from 'components/RegexHighlighter'
@@ -69,6 +65,8 @@ export const InternalComponents = () => {
   }
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const paddingCell = 0
+  const paddingHeadCell = 0
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const columns = [
@@ -154,15 +152,13 @@ export const InternalComponents = () => {
     setEditingRow(null)
   }
 
-  return (
-    <Card p={0} boxShadow='none'>
-      <CardHeader
-        p='12px 0'
-        mb='24px'
-        as={Flex}
-        flexDirection='row'
-        justifyContent='space-between'
+  // HEADER SECTION
+  const subHeader = useMemo(() => {
+    return (
+      <Flex
+        width={'100%'}
         alignItems={'center'}
+        justifyContent={'space-between'}
       >
         <Flex flexDirection={'column'}>
           <Text fontSize='lg' color={textColor} fontWeight='bold'>
@@ -173,46 +169,45 @@ export const InternalComponents = () => {
             expression
           </Text>
         </Flex>
-        <div>
-          <Tooltip placement='left' label='Add Internal components'>
-            <IconButton
-              icon={<AddIcon />}
-              colorScheme='blue'
-              variant='solid'
-              isDisabled={!manageListing}
-              onClick={() => {
-                setIsOpen(true)
-              }}
-            />
-          </Tooltip>
-        </div>
-      </CardHeader>
 
-      <CardBody px='5px'>
-        <Stack direction={'column'} alignItems={'flex-start'} gap={2}>
-          <Flex
-            flexDirection={'row'}
-            flexWrap={'wrap'}
-            spacing={2}
-            gap={2}
-          ></Flex>
-        </Stack>
-      </CardBody>
+        <Tooltip label='Add Internal components' placement='left'>
+          <IconButton
+            icon={<AddIcon />}
+            colorScheme='blue'
+            onClick={() => {
+              setIsOpen(true)
+            }}
+            isDisabled={!manageListing}
+          />
+        </Tooltip>
+      </Flex>
+    )
+  }, [manageListing, textColor])
+
+  return (
+    <>
+      <DataTable
+        subHeader
+        responsive
+        columns={columns}
+        data={data?.organization?.organizationComponents}
+        subHeaderComponent={subHeader}
+        customStyles={customStyles(
+          headColor,
+          null,
+          paddingCell,
+          paddingHeadCell
+        )}
+        progressPending={loading}
+        progressComponent={<CustomLoader />}
+        persistTableHead
+      />
       {isOpen && (
         <UpdateInternalComponent
           onClose={onClose}
           internalComponent={editingRow}
         />
       )}
-      <DataTable
-        responsive
-        columns={columns}
-        data={data?.organization?.organizationComponents}
-        customStyles={customStyles(headColor)}
-        progressPending={loading}
-        progressComponent={<CustomLoader />}
-        persistTableHead
-      />
-    </Card>
+    </>
   )
 }

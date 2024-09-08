@@ -143,7 +143,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
             </Alert>
           )}
           <FormControl isRequired>
-            <FormLabel>Name</FormLabel>
+            <FormLabel fontSize={12}>Name</FormLabel>
             <Input
               type='text'
               value={productName}
@@ -152,7 +152,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
             />
           </FormControl>
           <FormControl hidden>
-            <FormLabel>Labels</FormLabel>
+            <FormLabel fontSize={12}>Labels</FormLabel>
             <LynkSelect
               isMulti
               components={{
@@ -166,7 +166,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
             />
           </FormControl>
           <FormControl>
-            <FormLabel>Description</FormLabel>
+            <FormLabel fontSize={12}>Description</FormLabel>
             <Textarea
               rows={5}
               value={productDesc}

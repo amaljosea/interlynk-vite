@@ -13,6 +13,7 @@ import {
   InfoIcon,
   PhoneIcon
 } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Icon,
@@ -40,7 +41,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { OrganizationManufacturerDelete } from 'graphQL/Mutation'
 import { GetOrgManufacturers } from 'graphQL/Queries'
 
-import { FaEllipsisVertical, FaPlus } from 'react-icons/fa6'
+import { FaEllipsisVertical } from 'react-icons/fa6'
 
 const LegalTable = () => {
   const { showToast } = useCustomToast()
@@ -57,6 +58,8 @@ const LegalTable = () => {
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const paddingCell = 0
+  const paddingHeadCell = 0
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const iconColor = useColorModeValue('#718096', '#F7FAFC')
 
@@ -111,9 +114,7 @@ const LegalTable = () => {
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}
-        mb={'24px'}
       >
-
         <Flex flexDirection={'column'}>
           <Stack direction={'row'} alignItems={'center'}>
             <Text fontSize='lg' color={textColor} fontWeight='bold'>
@@ -131,8 +132,7 @@ const LegalTable = () => {
           </Text>
         </Flex>
 
-
-        <Tooltip label='Add Manufacturer'>
+        <Tooltip label='Add Manufacturer' placement='left'>
           <IconButton
             isDisabled={!updateOrg}
             colorScheme='blue'
@@ -140,7 +140,7 @@ const LegalTable = () => {
               setActiveRow(null)
               onOpen()
             }}
-            icon={<FaPlus size={20} />}
+            icon={<AddIcon />}
           />
         </Tooltip>
       </Flex>
@@ -315,7 +315,12 @@ const LegalTable = () => {
           data={nodes || []}
           progressPending={loading}
           subHeaderComponent={subHeader}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(
+            headColor,
+            null,
+            paddingCell,
+            paddingHeadCell
+          )}
           progressComponent={<CustomLoader />}
         />
       </Flex>

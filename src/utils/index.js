@@ -640,14 +640,20 @@ export function generateRandomId(length = 12) {
   return randomId
 }
 
-export const customStyles = (headColor, dividerColor) => {
+export const customStyles = (
+  headColor,
+  dividerColor,
+  paddingCell,
+  paddingHeadCell
+) => {
   return {
     headCells: {
       style: {
         fontFamily: 'inherit',
         fontWeight: 700,
         backgroundColor: 'transparent', // change this to the desired color
-        color: headColor // change this to the desired text color
+        color: headColor, // change this to the desired text color
+        padding: paddingHeadCell
       }
     },
     headRow: {
@@ -659,7 +665,8 @@ export const customStyles = (headColor, dividerColor) => {
     },
     cells: {
       style: {
-        backgroundColor: 'transparent' // cell background color
+        backgroundColor: 'transparent', // cell background color
+        padding: paddingCell
       }
     },
     rows: {

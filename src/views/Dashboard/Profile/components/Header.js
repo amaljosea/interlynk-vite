@@ -2,8 +2,8 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { refetchActiveQueries } from 'context/ApolloWrapper'
 import { formatDistanceToNow } from 'date-fns'
 import Cookies from 'js-cookie'
-import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { validPassword } from 'utils'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
@@ -102,6 +102,8 @@ const GetOrganization = gql`
 `
 
 const Header = ({ selectedTab, setSelectedTab, tabs }) => {
+  const location = useLocation()
+
   const userName = localStorage.getItem('username')
   const [profileImage, setProfileImage] = useState(null)
   const [newUserName, setNewUserName] = useState(userName)
@@ -120,6 +122,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [orgName, setOrgName] = useState('')
   const [dpLoading, setDpLoading] = useState(false)
+  const [isSaveDisabled, setIsSaveDisabled] = useState(false)
   const { showToast } = useCustomToast()
   const navigate = useNavigate()
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -135,7 +138,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
   const { orgView } = useGlobalQueryContext()
 
-  const { data } = useQuery(GetCurrentUser, {
+  const { data, loading } = useQuery(GetCurrentUser, {
     skip: !orgView
   })
   const isSuperAdmin = data?.organization?.currentUser?.superAdmin
@@ -214,6 +217,8 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     setShowOldPass(false)
     setShowNewPass(false)
     setShowConfPass(false)
+    setPassError('')
+    setIsSaveDisabled(false)
   }
 
   //Function to switch organization
@@ -239,7 +244,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   //Function to change tab (org <> personal)
   const handleTabChange = (name) => {
     setSelectedTab(name)
-    console.log('name is', name)
     if (name === 'PERSONAL') {
       if (activeOrgTier === 'free') {
         navigate('/vendor/settings?tab=integrations')
@@ -324,9 +328,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           status: 'error'
         })
       } else {
-        console.log(Cookies.get('authToken'))
         Cookies.set('authToken', res?.data?.userUpdatePassword?.updatedToken)
-        console.log(res?.data?.userUpdatePassword?.updatedToken)
         refetchActiveQueries()
         showToast({
           description: 'Password updated successfully',
@@ -361,9 +363,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     onOrgInfoOpen()
   }
 
-  const switchOrgClick = () => {
+  const switchOrgClick = useCallback(() => {
     onOrgModalOpen()
-  }
+  }, [onOrgModalOpen]) // Include onOrgModalOpen in the dependencies array
 
   const isValidFileType = (file) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
@@ -397,7 +399,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
         })
         setTimeout(() => {
           setDpLoading(false)
-        }, 500)
+        }, 1000)
       })
   }
 
@@ -482,12 +484,16 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
   useEffect(() => {
     if (dp) {
+      setDpLoading(true)
       if (dp?.url) {
         setProfileImage(`${SERVER_URL}/${dp?.url}`)
       } else {
         setProfileImage(null)
       }
     }
+    setTimeout(() => {
+      setDpLoading(false)
+    }, 1000)
   }, [SERVER_URL, dp])
 
   useEffect(() => {
@@ -501,6 +507,35 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
       setNewUserName(name)
     }
   }, [data, name])
+
+  useEffect(() => {
+    if (location.state?.openOrgListDrawer) {
+      switchOrgClick()
+    }
+  }, [location.state, switchOrgClick])
+
+  useEffect(() => {
+    if (isPasswordEdit) {
+      if (
+        newPassword &&
+        !invalidPassword &&
+        oldPassword &&
+        newPassword &&
+        oldPassword !== newPassword &&
+        newPassword === confirmPassword
+      ) {
+        setIsSaveDisabled(false)
+      } else {
+        setIsSaveDisabled(true)
+      }
+    }
+  }, [
+    isPasswordEdit,
+    invalidPassword,
+    oldPassword,
+    newPassword,
+    confirmPassword
+  ])
 
   return (
     <>
@@ -576,7 +611,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 position='relative'
                 borderRadius='full'
               >
-                {dpLoading ? (
+                {dpLoading || loading ? (
                   <Spinner width='80px' height='80px' />
                 ) : (
                   <Avatar
@@ -585,8 +620,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     objectFit='cover'
                     borderRadius='full'
                     me={{ md: '22px' }}
-                    src={profileImage || ''}
+                    src={profileImage}
                     name={userName}
+                    ignoreFallback={dp || profileImage ? true : false}
                   />
                 )}
 
@@ -677,6 +713,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   ? 'Switch Organization'
                   : 'Edit Organization'
               }
+              placement={'left'}
             >
               <IconButton
                 aria-label='Edit'
@@ -726,18 +763,23 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
             Edit Profile
           </DrawerHeader>
 
-          <DrawerBody overflowX={'hidden'}>
+          <DrawerBody overflowX={'hidden'} padding={'20px'}>
             {/* Modal Body Content */}
-            <Text fontSize='16px' mb='20px' textColor={'gray.500'}>
+            <Text fontSize='16px' mb='12px' textColor={'gray.500'}>
               Profile picture
             </Text>
             <Flex alignItems='center' mb={4}>
-              {dpLoading ? (
+              {dpLoading || loading ? (
                 <Spinner />
               ) : (
-                <Avatar name={userName} ml='10px' src={profileImage} />
-              )}
-
+                <Avatar
+                  name={userName}
+                  ml='10px'
+                  src={profileImage}
+                  ignoreFallback={dp || profileImage ? true : false}
+                />
+              )}{' '}
+              {/* Only show Avatar when there's an image */}
               <Box ml={4}>
                 <Text fontSize='15px'>
                   {selectedFile?.name || dp?.filename}
@@ -795,7 +837,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
               <Flex flexDirection={'column'} gap={6}>
                 {/* Old Password */}
                 <FormControl>
-                  <FormLabel fontSize='13px'>Old Password</FormLabel>
+                  <FormLabel fontSize='13px'>Current Password</FormLabel>
                   <InputGroup>
                     <Input
                       type={showOldPass ? 'text' : 'password'}
@@ -816,7 +858,13 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 </FormControl>
 
                 {/* New Password */}
-                <FormControl>
+                <FormControl
+                  isInvalid={
+                    oldPassword !== '' &&
+                    newPassword !== '' &&
+                    (newPassword === oldPassword || !validPassword(newPassword))
+                  }
+                >
                   <FormLabel fontSize='13px'>New Password</FormLabel>
                   <InputGroup>
                     <Input
@@ -836,6 +884,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                       />
                     </InputRightElement>
                   </InputGroup>
+
                   {newPassword !== '' && invalidPassword && (
                     <Text color='red.500'>
                       <Text mb={1}>
@@ -850,7 +899,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   {oldPassword !== '' &&
                     newPassword !== '' &&
                     oldPassword === newPassword && (
-                      <Text color='red.500'>
+                      <Text fontSize='sm' color='red.500'>
                         Old password and new password cannot be the same
                       </Text>
                     )}
@@ -864,7 +913,10 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                       type={showConfPass ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={handleConfirmChange}
-                      isDisabled={!validPassword(newPassword)}
+                      isDisabled={
+                        !validPassword(newPassword) ||
+                        oldPassword === newPassword
+                      }
                       placeholder='*******'
                     />
                     <InputRightElement width='3.1rem'>
@@ -877,7 +929,11 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                       />
                     </InputRightElement>
                   </InputGroup>
-                  {passError !== '' && <Text color='red.500'>{passError}</Text>}
+                  {passError !== '' && (
+                    <Text fontSize='sm' color='red.500'>
+                      {passError}
+                    </Text>
+                  )}
                 </FormControl>
               </Flex>
             )}
@@ -892,7 +948,11 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
               >
                 Cancel
               </Button>
-              <Button colorScheme='blue' onClick={handleSave}>
+              <Button
+                isDisabled={isSaveDisabled}
+                colorScheme='blue'
+                onClick={handleSave}
+              >
                 {isSaving ? 'saving...' : 'Save'}
               </Button>
             </Flex>
@@ -959,7 +1019,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   </Text>
                 </VStack>
                 {activeOrgId !== org.id && (
-                  <Tooltip label={`Switch to ${org.name}`}>
+                  <Tooltip placement={'left'} label={`Switch to ${org.name}`}>
                     <IconButton
                       aria-label='Switch'
                       icon={<FaExchangeAlt color={switchIconColor} />}

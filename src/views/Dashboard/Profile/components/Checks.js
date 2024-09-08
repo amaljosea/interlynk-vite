@@ -23,6 +23,8 @@ const Checks = () => {
   const { orgView } = useGlobalQueryContext()
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const paddingCell = 0
+  const paddingHeadCell = 0
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const updateOrg = useHasPermission({
@@ -168,12 +170,7 @@ const Checks = () => {
 
   return (
     <Card p={0} boxShadow='none'>
-      <CardHeader
-        p='12px 0'
-        mb='24px'
-        display={'flex'}
-        flexDirection={'column'}
-      >
+      <CardHeader display={'flex'} flexDirection={'column'}>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
           SBOM Check
         </Text>
@@ -190,7 +187,12 @@ const Checks = () => {
             data={data && data.organization.organizationRules}
             defaultSortAsc={true}
             defaultSortFieldId={'RULES_FRIENDLY_ID'}
-            customStyles={customStyles(headColor)}
+            customStyles={customStyles(
+              headColor,
+              null,
+              paddingCell,
+              paddingHeadCell
+            )}
             progressPending={data ? false : true}
             progressComponent={<CustomLoader />}
             responsive={true}

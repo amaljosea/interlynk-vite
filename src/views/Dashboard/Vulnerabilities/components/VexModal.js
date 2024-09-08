@@ -196,7 +196,7 @@ const VexModal = ({
       <SimpleGrid row={5} spacing={4}>
         {/* STATUS */}
         <FormControl>
-          <FormLabel htmlFor='vexType' fontSize='sm'>
+          <FormLabel htmlFor='vexType' fontSize={12}>
             Status
           </FormLabel>
           <Select
@@ -221,7 +221,7 @@ const VexModal = ({
         {/* JUSTIFICATION */}
         {statusName === 'Not Affected' && (
           <FormControl>
-            <FormLabel htmlFor='justification' fontSize='sm'>
+            <FormLabel htmlFor='justification' fontSize={12}>
               Justification
             </FormLabel>
             <Select
@@ -247,7 +247,7 @@ const VexModal = ({
         {/* RESPONSE */}
         {statusName === 'Affected' && (
           <FormControl>
-            <FormLabel htmlFor='response' fontSize='sm'>
+            <FormLabel htmlFor='response' fontSize={12}>
               Response
             </FormLabel>
             {allCdx && (
@@ -278,7 +278,7 @@ const VexModal = ({
             alignItems={'flex-start'}
           >
             <FormControl width={'100%'}>
-              <FormLabel htmlFor='fixedVersion' fontSize='sm'>
+              <FormLabel htmlFor='fixedVersion' fontSize={12}>
                 Project Environment
               </FormLabel>
               <Select
@@ -304,7 +304,7 @@ const VexModal = ({
               </Select>
             </FormControl>
             <FormControl width={'100%'}>
-              <FormLabel htmlFor='fixedVersion' fontSize='sm'>
+              <FormLabel htmlFor='fixedVersion' fontSize={12}>
                 Fixed Version
               </FormLabel>
               <Select
@@ -343,7 +343,7 @@ const VexModal = ({
         {/* IMPACT STATEMENT */}
         {statusName === 'Not Affected' && (
           <FormControl>
-            <FormLabel htmlFor='impactStatement' fontSize='sm'>
+            <FormLabel htmlFor='impactStatement' fontSize={12}>
               Impact Statement
             </FormLabel>
             <Textarea
@@ -361,7 +361,7 @@ const VexModal = ({
         {/* ACTION STATEMENT */}
         {statusName === 'Affected' && (
           <FormControl>
-            <FormLabel htmlFor='actionStatement' fontSize='sm'>
+            <FormLabel htmlFor='actionStatement' fontSize={12}>
               Action Statement
             </FormLabel>
             <Textarea
@@ -378,7 +378,7 @@ const VexModal = ({
         {/* DETAILS */}
         {statusName === 'In Triage' && (
           <FormControl>
-            <FormLabel htmlFor='details' fontSize='sm'>
+            <FormLabel htmlFor='details' fontSize={12}>
               Details
             </FormLabel>
             <Textarea
@@ -394,7 +394,7 @@ const VexModal = ({
         )}
         {/* INTERNAL NOTES */}
         <FormControl>
-          <FormLabel htmlFor='internalNotes' fontSize='sm'>
+          <FormLabel htmlFor='internalNotes' fontSize={12}>
             Internal Notes
           </FormLabel>
           <Textarea

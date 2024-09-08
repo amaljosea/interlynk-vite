@@ -42,9 +42,9 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
-import { GetOrgName } from 'graphQL/Queries'
+import { AllOrganizations, GetOrgName, MyOrganizations } from 'graphQL/Queries'
 
-import { FaExchangeAlt, FaSignOutAlt } from 'react-icons/fa'
+import { FaBuilding, FaExchangeAlt, FaSignOutAlt } from 'react-icons/fa'
 import { FaLocationArrow, FaMoon, FaSun, FaUser } from 'react-icons/fa6'
 
 // GET PROFILE PHOTO
@@ -57,6 +57,41 @@ export const GetProfilePic = gql`
         profileImage {
           filename
           url
+        }
+      }
+    }
+  }
+`
+
+export const GetCurrentUser = gql`
+  query GetCurrentUser {
+    organization {
+      currentUser {
+        id
+        name
+        email
+        superAdmin
+        profileImage {
+          filename
+          url
+        }
+      }
+    }
+  }
+`
+
+export const GetOrganization = gql`
+  query GetOrganization {
+    organization {
+      id
+      name
+      tier
+      updatedAt
+      currentUser {
+        superAdmin
+        role {
+          id
+          name
         }
       }
     }
@@ -90,6 +125,32 @@ export default function HeaderLinks(props) {
   const [fetchOrg, { data }] = useLazyQuery(GetOrgName, {
     skip: !orgView || signedUrlParams
   })
+
+  const { data: currentUserData } = useQuery(GetCurrentUser, {
+    skip: !orgView
+  })
+
+  const isSuperAdmin = currentUserData?.organization?.currentUser?.superAdmin
+
+  const { data: allOrgs } = useQuery(AllOrganizations, {
+    skip: isSuperAdmin === true ? false : true,
+    variables: { first: 100, status: 'approved' }
+  })
+  const { data: myOrgs } = useQuery(MyOrganizations, {
+    skip: isSuperAdmin === true ? true : false,
+    variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
+  })
+
+  const { nodes: allOrgList } = allOrgs?.allOrganizations || ''
+  const { nodes: myOrgList } = myOrgs?.myOrganizations || ''
+
+  const organisationList = isSuperAdmin ? allOrgList : myOrgList
+
+  const linkState =
+    organisationList?.length > 1 ? { openOrgListDrawer: true } : undefined
+
+  const searchParams =
+    organisationList?.length > 1 ? '?tab=security tokens' : '?tab=users'
 
   const { ...rest } = props
 
@@ -238,9 +299,15 @@ export default function HeaderLinks(props) {
                   Start {productView ? 'Product' : ''} Tour
                 </MenuItem>
               )}
-              <Link to='/vendor/settings?tab=organizations'>
+              <Link to={`/vendor/settings/${searchParams}`} state={linkState}>
                 <MenuItem
-                  icon={<FaExchangeAlt />}
+                  icon={
+                    organisationList?.length <= 1 ? (
+                      <FaBuilding />
+                    ) : (
+                      <FaExchangeAlt />
+                    )
+                  }
                   display={data?.organization ? 'flex' : 'none'}
                 >
                   Organizations

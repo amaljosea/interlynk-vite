@@ -237,8 +237,8 @@ function Profile() {
               ))}
             </TabList>
             <TabPanels>
-              <TabPanel>{<TokenInfo />}</TabPanel>
-              <TabPanel>
+              <TabPanel px={0}>{<TokenInfo />}</TabPanel>
+              <TabPanel px={0}>
                 <Connections />
               </TabPanel>
             </TabPanels>

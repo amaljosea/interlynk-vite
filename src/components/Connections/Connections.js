@@ -150,12 +150,7 @@ const Connections = ({ org }) => {
   return (
     <>
       <Card p={0} boxShadow='none'>
-        <CardHeader
-          p='12px 0'
-          mb='24px'
-          display={'flex'}
-          flexDirection={'column'}
-        >
+        <CardHeader mb={'16px'} display={'flex'} flexDirection={'column'}>
           <Text fontSize='lg' color={textColor} fontWeight='bold'>
             Connect Apps
           </Text>
@@ -163,7 +158,7 @@ const Connections = ({ org }) => {
             Integrate with your favorite tools to streamline SBOM management.
           </Text>
         </CardHeader>
-        <CardBody px='5px'>
+        <CardBody>
           <Flex wrap='wrap' gap={'20px'}>
             {org && !isFreeTier && (
               <ConnectionCard

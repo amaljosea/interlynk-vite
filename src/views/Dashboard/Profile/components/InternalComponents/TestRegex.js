@@ -105,6 +105,7 @@ export const TextRegex = ({ regex, ignoreCase }) => {
         leftIcon={<AddIcon />}
         marginTop='10px'
         fontWeight='500'
+        fontSize={12}
         textColor={'blue.500'}
         paddingLeft={'2px'}
       >
