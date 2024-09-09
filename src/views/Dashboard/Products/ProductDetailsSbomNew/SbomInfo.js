@@ -26,7 +26,7 @@ const SbomInfo = ({ data, error, loading }) => {
   }
 
   return (
-    <Card className='version'>
+    <Card className='version' pb={7}>
       <CardBody>
         <SbomDetails sbomData={data} />
       </CardBody>

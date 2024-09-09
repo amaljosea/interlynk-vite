@@ -158,7 +158,7 @@ const SbomDetails = ({ sbomData }) => {
           onClick={handleRelationView}
           cursor={'pointer'}
         />
-        <Flex width={'100%'} flexDir={'column'} gap={4}>
+        <Flex width={'100%'} flexDir={'column'} gap={5}>
           <Grid
             gap={10}
             alignItems={'flex-start'}
@@ -241,11 +241,11 @@ const SbomDetails = ({ sbomData }) => {
           {/* STATS */}
           <Grid
             gap={4}
-            alignItems={'flex-start'}
+            alignItems={'flex-end'}
             templateColumns='repeat(12, 1fr)'
           >
             <GridItem colSpan={4}>
-              <Card px={0} shadow='none'>
+              <Card px={0} shadow='none' py={0}>
                 <CardBody px={0} flexDir='column' gap={1}>
                   {/* UPDATED AT */}
                   <Tooltip

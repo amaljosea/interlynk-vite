@@ -30,7 +30,7 @@ export const ProgressBar = ({ value, loading, text }) => {
   }
 
   return (
-    <Card shadow='none'>
+    <Card shadow='none' py={0}>
       <CardBody flexDir='column' gap={1}>
         <Stat>
           <StatLabel
