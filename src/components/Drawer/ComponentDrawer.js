@@ -35,6 +35,7 @@ import {
 
 import CpeField from 'components/CpeField'
 import LicenseField from 'components/Licenses/LicenseField'
+import CompInfo from 'components/Misc/CompInfo'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -333,11 +334,10 @@ function ComponentDrawer(props) {
         <DrawerContent>
           <DrawerCloseButton mt={2} />
           <DrawerHeader borderBottomWidth='1px'>
-            {signedUrlParams
-              ? 'Component'
-              : data
-                ? 'Edit Component'
-                : 'Add Component'}
+            <Text mb={signedUrlParams ? 1 : 0} fontWeight={'medium'}>
+              {signedUrlParams ? 'Component' : 'Add Component'}
+            </Text>
+            {signedUrlParams && <CompInfo data={data} />}
           </DrawerHeader>
           <DrawerBody overflowX={'hidden'}>
             <Stack direction={'column'} spacing={4} pt={2} pb={4}>
@@ -569,7 +569,7 @@ function ComponentDrawer(props) {
                   size='md'
                   fontSize={'sm'}
                   value={compSupport}
-                  isDisabled={customerView}
+                  isDisabled={signedUrlParams}
                   onChange={(e) => setCompSupport(e.target.value)}
                 >
                   <option value='' style={{ background: 'lightgray' }}>
@@ -603,6 +603,7 @@ function ComponentDrawer(props) {
                   onChange={handleDateChange}
                   inputProps={{
                     name: 'endOfSupport',
+                    disabled: signedUrlParams,
                     placeholder: 'Add support date',
                     onCopy: (e) => e.preventDefault(),
                     onPaste: (e) => e.preventDefault(),
@@ -654,7 +655,11 @@ function ComponentDrawer(props) {
                 </Flex>
               </FormControl>
               {/* ADD RELATION */}
-              <Text fontSize={'sm'} fontWeight={'medium'}>
+              <Text
+                fontSize={'sm'}
+                fontWeight={'medium'}
+                hidden={signedUrlParams}
+              >
                 Relationships
               </Text>
               <FormControl hidden={signedUrlParams}>
@@ -705,6 +710,7 @@ function ComponentDrawer(props) {
                 isLoading={loading}
                 width={'fit-content'}
                 isDisabled={isInvalid}
+                hidden={signedUrlParams}
                 onClick={handleCreateCom}
               >
                 Save

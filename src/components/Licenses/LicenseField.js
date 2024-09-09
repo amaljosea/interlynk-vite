@@ -24,6 +24,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { LicenseAutoComplete } from 'graphQL/Queries'
 
 const LicenseField = ({ resolved, sbomView, license }) => {
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const { tabData, setTabData, handleChange } = useContext(TabContext)
   const { details } = tabData
   const { dispatch, sbomState } = useGlobalState()
@@ -201,8 +202,11 @@ const LicenseField = ({ resolved, sbomView, license }) => {
           <LynkSelect
             isClearable={resolved ? false : true}
             isSearchable={resolved ? false : true}
+            isDisabled={signedUrlParams}
             isLoading={loading}
-            noOptionsMessage={() => `Please search...`}
+            noOptionsMessage={() =>
+              signedUrlParams ? null : `Please search...`
+            }
             components={{
               DropdownIndicator: () => null,
               Menu,
