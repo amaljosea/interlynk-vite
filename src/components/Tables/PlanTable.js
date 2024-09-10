@@ -38,8 +38,8 @@ const PlanTable = () => {
   const usageData = {
     title: 'Usage',
     features: [
-      { feature: 'Users', val1: '5', val2: 'Custom' },
-      { feature: 'Products', val1: '10', val2: 'Unlimited' }
+      { feature: 'Users', val1: '2', val2: 'Custom' },
+      { feature: 'Products', val1: '5', val2: 'Unlimited' }
     ]
   }
 
@@ -145,11 +145,11 @@ const PlanTable = () => {
         </GridItem>
         <GridItem>
           <Text fontWeight='bold'>Products</Text>
-          <Text>{isFreeTier ? '10' : 'Unlimited'}</Text>
+          <Text>{isFreeTier ? '5' : 'Unlimited'}</Text>
         </GridItem>
         <GridItem>
           <Text fontWeight='bold'>Users</Text>
-          <Text>{isFreeTier ? '5' : 'Unlimited'}</Text>
+          <Text>{isFreeTier ? '2' : 'Unlimited'}</Text>
         </GridItem>
         <GridItem>
           <Text fontWeight='bold'>Renewal Date</Text>

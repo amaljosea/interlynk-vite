@@ -248,18 +248,6 @@ const ProductTable = ({
     onLynkOpen()
   }
 
-  console.log('activeRow', activeRow)
-  console.log('filterMode', filterMode)
-  console.log('selectedTags', selectedTags)
-
-  // const filteredData = nodes?.filter((item) => {
-  //   if (filterMode === 'AND') {
-  //     return selectedTags?.every((tag) => item?.name?.includes(tag))
-  //   } else {
-  //     return selectedTags?.some((tag) => item?.name?.includes(tag))
-  //   }
-  // })
-
   const filteredNodes = data?.filter((node) => {
     const nodeTags = node?.labels?.map((label) => label.name)
     if (filterMode === 'AND') {
@@ -269,8 +257,6 @@ const ProductTable = ({
     }
     return true
   })
-
-  console.log('filteredData', filteredNodes)
 
   // HEADER
   const subHeaderComponent = useMemo(() => {
@@ -327,7 +313,7 @@ const ProductTable = ({
           <Box position='relative'>
             <Tooltip
               label={
-                isFreeTier && totalCount === 10
+                isFreeTier && totalCount === 5
                   ? 'Limit reached for free tier'
                   : 'Add product'
               }
@@ -344,7 +330,7 @@ const ProductTable = ({
                   colorScheme='blue'
                   hidden={signedUrlParams}
                   isDisabled={
-                    !canAddProduct || (isFreeTier && totalCount === 10)
+                    !canAddProduct || (isFreeTier && totalCount === 5)
                   }
                 />
               </Box>

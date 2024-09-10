@@ -378,7 +378,7 @@ const TeamTable = () => {
           <Box position='relative'>
             <Tooltip
               label={
-                isFreeTier && numberOfUsers === 5
+                isFreeTier && numberOfUsers === 2
                   ? 'Limit reached for free tier'
                   : 'Invite User'
               }
@@ -394,7 +394,7 @@ const TeamTable = () => {
                   fontWeight='normal'
                   fontSize={'sm'}
                   isDisabled={
-                    !inviteUser || (isFreeTier && numberOfUsers === 5)
+                    !inviteUser || (isFreeTier && numberOfUsers === 2)
                   }
                 />
               </Box>
