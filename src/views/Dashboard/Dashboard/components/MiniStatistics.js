@@ -1,9 +1,5 @@
-import React from 'react'
-
 import {
-  Box,
   Flex,
-  Stack,
   Stat,
   StatLabel,
   StatNumber,
@@ -11,7 +7,6 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
-// Custom components
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import IconBox from 'components/Icons/IconBox'
@@ -19,40 +14,38 @@ import IconBox from 'components/Icons/IconBox'
 const MiniStatistics = ({ title, amount, icon }) => {
   const activeBg = useColorModeValue('blue.500', 'blue.500')
   const textColor = useColorModeValue('gray.700', 'white')
-
+  const fontStyle = { fontSize: title === 'Vulnerabilities' ? '12px' : '14px' }
   return (
-    <Card minH='83px'>
-      <CardBody>
-        <Flex flexDirection='row' align='center' justify='center' w='100%'>
+    <Card px={4}>
+      <CardBody p={0}>
+        <Flex flexDirection='row' align='flex-start' gap={2} w='100%'>
           <Stat me='auto'>
             <StatLabel fontSize='md' pb='.1rem'>
               {title}
             </StatLabel>
-            <Box height={5}>
-              {title === 'Vulnerabilities' ? (
-                <Stack mt={1} spacing={1} direction={'row'}>
-                  <Tag variant='subtle' colorScheme='red'>
-                    {amount?.critical || 0}
-                  </Tag>
-                  <Tag variant='subtle' colorScheme='orange'>
-                    {amount?.high || 0}
-                  </Tag>
-                  <Tag variant='subtle' colorScheme='yellow'>
-                    {amount?.medium || 0}
-                  </Tag>
-                  <Tag variant='subtle' colorScheme='green'>
-                    {amount?.low || 0}
-                  </Tag>
-                  <Tag variant='subtle' colorScheme='gray'>
-                    {amount?.unknown || 0}
-                  </Tag>
-                </Stack>
-              ) : (
-                <StatNumber fontSize='lg' color={textColor}>
-                  {amount || 0}
-                </StatNumber>
-              )}
-            </Box>
+            {title === 'Vulnerabilities' ? (
+              <Flex mt={1} gap={1} direction={'row'} flexWrap={'wrap'}>
+                <Tag variant='subtle' colorScheme='red' sx={fontStyle}>
+                  {amount?.critical || 0}
+                </Tag>
+                <Tag variant='subtle' colorScheme='orange' sx={fontStyle}>
+                  {amount?.high || 0}
+                </Tag>
+                <Tag variant='subtle' colorScheme='yellow' sx={fontStyle}>
+                  {amount?.medium || 0}
+                </Tag>
+                <Tag variant='subtle' colorScheme='green' sx={fontStyle}>
+                  {amount?.low || 0}
+                </Tag>
+                <Tag variant='subtle' colorScheme='gray' sx={fontStyle}>
+                  {amount?.unknown || 0}
+                </Tag>
+              </Flex>
+            ) : (
+              <StatNumber fontSize='lg' color={textColor}>
+                {amount || 0}
+              </StatNumber>
+            )}
           </Stat>
           <IconBox h={'45px'} w={'45px'} color={'white'} bg={activeBg}>
             {icon}

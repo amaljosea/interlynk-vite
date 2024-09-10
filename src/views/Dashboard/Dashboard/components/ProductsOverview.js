@@ -88,7 +88,7 @@ const ProductsOverview = ({ title, data }) => {
             style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }}
             onClick={() => handleClick(row)}
           >
-            <Text color={uniqueSbom ? 'blue.500' : 'gray.500'}>
+            <Text my={1} color={uniqueSbom ? 'blue.500' : 'gray.500'}>
               {project?.projectGroup?.name}
             </Text>
           </Link>
