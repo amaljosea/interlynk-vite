@@ -52,7 +52,8 @@ const ProductDetails = () => {
     setActiveCsProdTab,
     prodVulnState,
     dispatch,
-    envName
+    envName,
+    onChangeEnv
   } = useGlobalState()
 
   const environment = envName
@@ -137,6 +138,13 @@ const ProductDetails = () => {
       setActiveEnv(env?.id)
     }
   }, [data, environment])
+
+  useEffect(() => {
+    if (productId && projectGroup) {
+      const env = projectGroup.projects.find((item) => item.id === productId)
+      onChangeEnv(env?.name)
+    }
+  }, [productId, projectGroup])
 
   if (loading) {
     return (
