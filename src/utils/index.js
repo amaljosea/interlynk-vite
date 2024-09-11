@@ -540,6 +540,13 @@ export const getActiveNavbar = (routes) => {
   return activeNavbar
 }
 
+export const disableButtonTemporarily = (setDisabled, delay = 3000) => {
+  setDisabled(true)
+  setTimeout(() => {
+    setDisabled(false)
+  }, delay)
+}
+
 export const convertDateFormat = (inputDate) => {
   const date = new Date(inputDate)
   const month = date.toLocaleString('default', { month: 'short' })

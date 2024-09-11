@@ -98,6 +98,8 @@ const CompDetails = ({ data, primaryComp }) => {
   }
 
   const handleUpdateCom = () => {
+    const license =
+      details?.licenses?.length > 0 ? details.licenses[0].value : ''
     updateComponent({
       variables: {
         id: data?.id,
@@ -111,9 +113,9 @@ const CompDetails = ({ data, primaryComp }) => {
         version: details?.version,
         description: details?.description,
         copyright: details?.copyright,
-        supportLevel: details?.supportLevel || undefined,
-        endOfSupport: details?.endOfSupport || undefined,
-        licenses: { licensesExp: details?.licenses?.value || '' }
+        supportLevel: details?.supportLevel,
+        endOfSupport: details?.endOfSupport,
+        licenses: { licensesExp: license }
       }
     }).then((res) => {
       const { errors } = res?.data?.componentUpdate || ''

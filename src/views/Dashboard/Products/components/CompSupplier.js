@@ -1,11 +1,11 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
-import { validateEmail, validateUrl } from 'utils'
+import { disableButtonTemporarily, validateEmail, validateUrl } from 'utils'
 
 import {
   Button,
-  Divider,
+  ButtonGroup,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -16,6 +16,7 @@ import {
 import useCustomToast from 'hooks/useCustomToast'
 
 import { addComSupplier, updateComSupplier } from 'graphQL/Mutation'
+import { deleteComSupplier } from 'graphQL/Mutation'
 
 const GetSupplier = gql`
   query GetCompUrls($id: Uuid!, $sbomId: Uuid!) {
@@ -48,6 +49,7 @@ const CompSupplier = ({ data }) => {
   const [isValidUrl, setIsValidUrl] = useState('')
   const [nameError, setNameError] = useState('')
   const [emailError, setEmailError] = useState('')
+  const [isDisabled, setIsDisabled] = useState(false)
 
   const containsSpace = /\s/.test(supplier?.url)
 
@@ -61,12 +63,34 @@ const CompSupplier = ({ data }) => {
     }
   }
 
-  const [createSupplier, { loading: createLoading }] =
-    useMutation(addComSupplier)
-  const [updateSupplier, { loading: updateLoading }] =
-    useMutation(updateComSupplier)
+  const [createSupplier] = useMutation(addComSupplier)
+  const [updateSupplier] = useMutation(updateComSupplier)
+  const [deleteSupplier] = useMutation(deleteComSupplier)
+
+  const handleRemove = () => {
+    disableButtonTemporarily(setIsDisabled, 4000)
+    deleteSupplier({ variables: { id: suppliers[0]?.id } }).then((res) => {
+      if (res?.data) {
+        saveChanges()
+        setTabData((prev) => ({
+          ...prev,
+          supplier: {
+            name: '',
+            url: '',
+            contactName: '',
+            contactEmail: ''
+          }
+        }))
+        showToast({
+          description: 'Supplier removed successfully',
+          status: 'success'
+        })
+      }
+    })
+  }
 
   const handleSave = () => {
+    disableButtonTemporarily(setIsDisabled)
     createSupplier({
       variables: {
         componentId: id,
@@ -87,6 +111,7 @@ const CompSupplier = ({ data }) => {
   }
 
   const handleUpdate = () => {
+    disableButtonTemporarily(setIsDisabled)
     if (suppliers?.length > 0) {
       updateSupplier({
         variables: {
@@ -126,8 +151,7 @@ const CompSupplier = ({ data }) => {
   }
 
   const isInvalid =
-    createLoading ||
-    updateLoading ||
+    isDisabled ||
     supplier?.name === '' ||
     nameError !== '' ||
     (supplier?.contactEmail !== '' && !validateEmail(supplier?.contactEmail)) ||
@@ -207,17 +231,27 @@ const CompSupplier = ({ data }) => {
         />
         <FormErrorMessage>{emailError}</FormErrorMessage>
       </FormControl>
-      <Divider />
       {/* ACTIONS */}
-      <Button
-        variant='outline'
-        colorScheme='blue'
-        width={'fit-content'}
-        isDisabled={isInvalid}
-        onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
-      >
-        Save
-      </Button>
+      <ButtonGroup mt={2}>
+        <Button
+          variant='outline'
+          colorScheme='blue'
+          isDisabled={isInvalid}
+          onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
+        >
+          Save
+        </Button>
+        <Button
+          variant='ghost'
+          fontWeight={400}
+          color={'#60686F'}
+          onClick={handleRemove}
+          isDisabled={isDisabled}
+          hidden={suppliers?.length === 0}
+        >
+          Remove Supplier
+        </Button>
+      </ButtonGroup>
     </Flex>
   )
 }

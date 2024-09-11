@@ -57,11 +57,11 @@ const LicenseField = ({ resolved, sbomView, license }) => {
 
   const onLicenseChange = (selected) => {
     if (sbomView) {
-      sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: selected || null })
+      sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: selected })
     } else {
-      handleChange('details', 'licenses', selected || null)
+      handleChange('details', 'licenses', selected || [])
     }
-    setLicenseType(selected ? selected?.type : '')
+    setLicenseType(selected?.type || '')
   }
 
   const handleInputChange = useCallback(
