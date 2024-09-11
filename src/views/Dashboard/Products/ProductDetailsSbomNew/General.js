@@ -30,6 +30,7 @@ import LicenseField from 'components/Licenses/LicenseField'
 import LynkModal from 'components/LynkModal'
 import SupplierTag from 'components/SupplierTag'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -41,7 +42,7 @@ import {
   toolDelete
 } from 'graphQL/Mutation'
 
-import { BsPencil } from 'react-icons/bs'
+import { FaEdit } from 'react-icons/fa'
 import { FaScaleBalanced } from 'react-icons/fa6'
 
 import AuthorModal from '../components/AuthorModal'
@@ -52,7 +53,7 @@ const InfoLabel = ({ title, onCheck }) => {
   return (
     <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
       <Text fontSize={'sm'}>{title}</Text>
-      <Tooltip label={onCheck}>
+      <Tooltip label={onCheck} placement='top'>
         <InfoIcon color={'blue.500'} />
       </Tooltip>
     </Flex>
@@ -61,6 +62,7 @@ const InfoLabel = ({ title, onCheck }) => {
 
 const General = ({ data, loading, error }) => {
   const { isFreeTier } = useGlobalQueryContext()
+  const { showToast } = useCustomToast()
   const location = useLocation()
   const params = useParams()
   const sbomId = params.sbomid
@@ -134,9 +136,13 @@ const General = ({ data, loading, error }) => {
       }
     })
       .then((res) => res.data && sbomDispatch({ type: 'CLEAR_LICENSES' }))
-      .finally(() =>
+      .finally(() => {
+        showToast({
+          description: 'Licenses updated successfully',
+          status: 'success'
+        })
         DELETE_LICENSE?.isOpen ? DELETE_LICENSE?.onClose() : LICENSE?.onClose()
-      )
+      })
   }
 
   const onDeleteSup = (item) => {
@@ -215,11 +221,11 @@ const General = ({ data, loading, error }) => {
                 />
               </Td>
               <Td width={'85%'}>
-                <Flex alignItems={'flex-center'} flexWrap={'wrap'} gap={3}>
+                <Flex alignItems={'center'} flexWrap={'wrap'} gap={3}>
                   {tools?.map((item, index) => (
                     <Tag
-                      size={'md'}
                       key={index}
+                      height={8}
                       variant='subtle'
                       colorScheme='teal'
                     >
@@ -237,7 +243,7 @@ const General = ({ data, loading, error }) => {
                     </Tag>
                   ))}
                   <Button
-                    size='sm'
+                    size='xs'
                     variant='unstyled'
                     onClick={TOOL?.onOpen}
                     leftIcon={<AddIcon />}
@@ -255,10 +261,10 @@ const General = ({ data, loading, error }) => {
                 <InfoLabel title={`Authors`} onCheck={onCheck('Authors')} />
               </Td>
               <Td width={'85%'}>
-                <Flex alignItems={'flex-center'} flexWrap={'wrap'} gap={3}>
+                <Flex alignItems={'center'} flexWrap={'wrap'} gap={3}>
                   {authors?.map((item, index) => (
                     <Tag
-                      size={'md'}
+                      height={8}
                       key={index}
                       variant='subtle'
                       colorScheme='blue'
@@ -278,7 +284,7 @@ const General = ({ data, loading, error }) => {
                     </Tag>
                   ))}
                   <Button
-                    size='sm'
+                    size='xs'
                     variant='unstyled'
                     leftIcon={<AddIcon />}
                     onClick={AUTHOR?.onOpen}
@@ -309,7 +315,7 @@ const General = ({ data, loading, error }) => {
                   ))
                 ) : (
                   <Button
-                    size='sm'
+                    size='xs'
                     variant='unstyled'
                     color={'blue.500'}
                     onClick={SUPPLIER?.onOpen}
@@ -330,7 +336,7 @@ const General = ({ data, loading, error }) => {
                 {licensesExp && licensesExp !== '' ? (
                   <Tag
                     my={2}
-                    size={'md'}
+                    height={8}
                     variant='subtle'
                     colorScheme='green'
                     width={'fit-content'}
@@ -338,7 +344,7 @@ const General = ({ data, loading, error }) => {
                     <TagLabel>{licensesExp}</TagLabel>
                     <TagRightIcon
                       fontSize={12}
-                      as={BsPencil}
+                      as={FaEdit}
                       cursor={'pointer'}
                       onClick={onLicenseOpen}
                       hidden={!updateComponent}
@@ -350,7 +356,7 @@ const General = ({ data, loading, error }) => {
                   </Tag>
                 ) : (
                   <Button
-                    size='sm'
+                    size='xs'
                     variant='unstyled'
                     color={'blue.500'}
                     leftIcon={<AddIcon />}

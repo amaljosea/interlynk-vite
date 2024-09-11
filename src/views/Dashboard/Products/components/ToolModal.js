@@ -7,6 +7,8 @@ import { Flex, FormControl, FormLabel, Input } from '@chakra-ui/react'
 import LynkError from 'components/LynkError'
 import LynkModal from 'components/LynkModal'
 
+import useCustomToast from 'hooks/useCustomToast'
+
 import { toolCreate } from 'graphQL/Mutation'
 
 import { FaWrench } from 'react-icons/fa6'
@@ -25,6 +27,7 @@ const TextInput = ({ name, value, onChange, placeholder }) => {
 
 const ToolModal = ({ isOpen, onClose, resolved = false }) => {
   const params = useParams()
+  const { showToast } = useCustomToast()
   const [createTool, { loading }] = useMutation(toolCreate)
   const initialData = {
     name: '',
@@ -54,6 +57,10 @@ const ToolModal = ({ isOpen, onClose, resolved = false }) => {
       if (res?.data?.toolCreate?.errors?.length > 0) {
         setError(res?.data?.toolCreate?.errors[0])
       } else {
+        showToast({
+          description: 'Tool Added successfully',
+          status: 'success'
+        })
         setToolData(initialData)
         onClose()
       }

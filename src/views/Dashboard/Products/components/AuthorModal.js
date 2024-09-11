@@ -8,6 +8,7 @@ import { Button, Flex, FormControl, FormLabel, Input } from '@chakra-ui/react'
 import LynkError from 'components/LynkError'
 import LynkModal from 'components/LynkModal'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
@@ -34,6 +35,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
   const params = useParams()
   const navigate = useNavigate()
   const activeTab = useQueryParam('tab')
+  const { showToast } = useCustomToast()
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
@@ -99,6 +101,10 @@ const AuthorModal = ({ isOpen, onClose }) => {
       if (res?.data?.authorCreate?.errors?.length > 0) {
         setError(res?.data?.authorCreate?.errors[0])
       } else {
+        showToast({
+          description: 'Author Added successfully',
+          status: 'success'
+        })
         setAuthorData(initialData)
         onClose()
       }

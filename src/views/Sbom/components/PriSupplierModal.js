@@ -21,6 +21,7 @@ import { supplierCreate, supplierUpdate } from 'graphQL/Mutation'
 import { AutomationRuleCreate } from 'graphQL/Mutation'
 
 import { BiShieldPlus } from 'react-icons/bi'
+import useCustomToast from 'hooks/useCustomToast'
 
 const PriSupplierModal = ({
   isOpen,
@@ -34,6 +35,7 @@ const PriSupplierModal = ({
   const sbomId = params.sbomid
   const productId = params.productid
   const navigate = useNavigate()
+  const { showToast } = useCustomToast()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const { status, sbom } = activeRow || ''
@@ -113,7 +115,15 @@ const PriSupplierModal = ({
           contactEmail: supEmail,
           sbomId: sbomId
         }
-      }).then((res) => res?.data && onClose())
+      }).then((res) => {
+        if (res?.data) {
+          showToast({
+            description: 'Supplier Added successfully',
+            status: 'success'
+          })
+          onClose()
+        }
+      })
     }
   }
 
@@ -126,7 +136,15 @@ const PriSupplierModal = ({
         contactEmail: supEmail,
         id: suppliers[0].id
       }
-    }).then((res) => res?.data && onClose())
+    }).then((res) => {
+      if (res?.data) {
+        showToast({
+          description: 'Supplier Updated successfully',
+          status: 'success'
+        })
+        onClose()
+      }
+    })
   }
 
   const [createRule] = useMutation(AutomationRuleCreate)

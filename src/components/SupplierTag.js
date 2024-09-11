@@ -9,13 +9,13 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 
-import { BsPencil } from 'react-icons/bs'
+import { FaEdit } from 'react-icons/fa'
 
 const SupplierTag = ({ key, item, premission, onEdit, onDelete, editable }) => {
   const { contactName, contactEmail, url, name } = item || {}
   const supplierURL = url?.startsWith('http') ? item.url : `http://${url}`
   return (
-    <Tag size={'md'} key={key} variant='subtle' colorScheme='orange'>
+    <Tag height={8} key={key} variant='subtle' colorScheme='orange'>
       <Tooltip
         label={
           <Stack dir='column' spacing={1}>
@@ -35,7 +35,7 @@ const SupplierTag = ({ key, item, premission, onEdit, onDelete, editable }) => {
       {editable && (
         <TagRightIcon
           fontSize={12}
-          as={BsPencil}
+          as={FaEdit}
           cursor={'pointer'}
           onClick={onEdit}
           hidden={!premission}

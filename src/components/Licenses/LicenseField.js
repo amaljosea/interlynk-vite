@@ -38,7 +38,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
     fetchPolicy: 'network-only'
   })
 
-  const [searchText, setSearchText] = useState('')
+  const [searchText, setSearchText] = useState('A')
   const debouncedSearchTerm = useDebounce(searchText, 300)
 
   const formatLicenseString = (str = '') => {
@@ -214,7 +214,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
             options={licenseList}
             onChange={onLicenseChange}
             onInputChange={setSearchText}
-            placeholder={'Enter License'}
+            placeholder={'Search for a License'}
           />
           {licenseType && (
             <Flex justifyContent='flex-end'>
