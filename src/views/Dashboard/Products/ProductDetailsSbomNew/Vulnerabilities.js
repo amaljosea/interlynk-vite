@@ -790,13 +790,7 @@ const Vulnerabilities = ({ sbomData }) => {
               vexStatus ? vexStatus.name : 'Unspecified'
             )}
           >
-            <TagLabel
-              style={{ textTransform: 'capitalize' }}
-              mx={'auto'}
-              as={Flex}
-              gap={2}
-              alignItems='center'
-            >
+            <TagLabel mx={'auto'} as={Flex} gap={2} alignItems='center'>
               {isComplete === false && <BsCircleHalf />}{' '}
               {vexStatus !== null ? vexStatus.name : 'Unspecified'}
             </TagLabel>

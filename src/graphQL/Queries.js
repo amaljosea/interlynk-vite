@@ -3666,29 +3666,15 @@ export const GetSbomSupportTab = gql`
     sbom(projectId: $projectId, sbomId: $sbomId) {
       supports {
         nodes {
-          ... on ComponentSupport {
+          ... on SbomComponent {
             id
-            productName
-            productVersion
+            productName: name
+            productVersion: version
             idUri
             deprecated
             outdated
             eos
             eol
-            createdAt
-            updatedAt
-          }
-          ... on ComponentSupportOverride {
-            id
-            enabled
-            productName
-            productVersion
-            idUri
-            deprecated
-            outdated
-            eos
-            eol
-            createdAt
             updatedAt
           }
         }

@@ -42,8 +42,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   const bgColor = useColorModeValue('white', 'gray.700')
   const tabs = ['details', 'identifiers', 'suppliers', 'links', 'relationships']
 
-  const { tabData, resetData, unsavedChanges, saveChanges } =
-    useContext(TabContext)
+  const { tabData, resetData, unsavedChanges } = useContext(TabContext)
 
   const [tab, setTab] = useState(0)
   const [pendingTabIndex, setPendingTabIndex] = useState(null)

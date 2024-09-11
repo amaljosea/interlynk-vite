@@ -10,11 +10,12 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Stack,
+  Tag,
   Text,
   useColorModeValue
 } from '@chakra-ui/react'
 
-const VexInfoDrawer = ({ isOpen, onClose, data }) => {
+const VexInfoDrawer = ({ isOpen, onClose, data, vulnId }) => {
   const {
     changedBy,
     status,
@@ -41,9 +42,16 @@ const VexInfoDrawer = ({ isOpen, onClose, data }) => {
     <Drawer size='sm' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton />
-        <DrawerHeader>View Status</DrawerHeader>
-        <DrawerBody>
+        <DrawerCloseButton mt={3} />
+        <DrawerHeader borderBottomWidth='1px'>
+          <Text mb={1} fontWeight={'medium'}>
+            View Status
+          </Text>
+          <Tag variant='subtle' colorScheme='blue' wordBreak={'break-all'}>
+            {vulnId || ''}
+          </Tag>
+        </DrawerHeader>
+        <DrawerBody mt={2}>
           <Stack spacing={6}>
             <Box>
               <CustomText>STATUS</CustomText>

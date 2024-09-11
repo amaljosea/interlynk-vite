@@ -35,6 +35,7 @@ import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { GetCompVulnData, GetConnectedSbom } from 'graphQL/Queries'
 
+import { BsCircleHalf } from 'react-icons/bs'
 import { FaFolderTree } from 'react-icons/fa6'
 
 import VexModal from './VexModal'
@@ -208,7 +209,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
       id: 'VEX_STATUSES_NAME',
       name: 'STATUS',
       selector: (row) => {
-        const { vexStatus } = row
+        const { vexStatus, isComplete } = row
         return (
           <Tag
             size='md'
@@ -216,7 +217,8 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
             width={'130px'}
             colorScheme={statusColor(vexStatus?.name || 'Unspecified')}
           >
-            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
+            <TagLabel mx={'auto'} as={Flex} gap={2} alignItems='center'>
+              {isComplete === false && <BsCircleHalf />}{' '}
               {vexStatus?.name || 'Unspecified'}
             </TagLabel>
           </Tag>

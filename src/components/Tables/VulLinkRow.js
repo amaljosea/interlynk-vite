@@ -15,7 +15,7 @@ import VexInfoDrawer from 'components/Drawer/VexInfoDrawer'
 
 import { FaEye } from 'react-icons/fa6'
 
-const VulLinkRow = ({ key, data }) => {
+const VulLinkRow = ({ key, data, vulnId }) => {
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const iconColor = useColorModeValue('#4A5568', '#E2E8F0')
 
@@ -52,7 +52,7 @@ const VulLinkRow = ({ key, data }) => {
       </Tr>
 
       {isOpen && (
-        <VexInfoDrawer data={data} isOpen={isOpen} onClose={onClose} />
+        <VexInfoDrawer vulnId={vulnId} data={data} isOpen={isOpen} onClose={onClose} />
       )}
     </>
   )
