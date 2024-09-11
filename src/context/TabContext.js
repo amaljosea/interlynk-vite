@@ -16,7 +16,7 @@ export const TabProvider = ({ children }) => {
       copyright: '',
       supportLevel: '',
       endOfSupport: '',
-      licenses: []
+      licenses: null
     },
     identifiers: {
       cpe: '',

@@ -133,7 +133,7 @@ const GlobalStateProvider = ({ children }) => {
     customLicenses: [],
     customList: [],
     expLicense: '',
-    licenseString: []
+    licenseString: null
   })
   // SBOM VERSIONS
   const [toolsState, toolsDispatch] = useReducer(toolsReducer, {

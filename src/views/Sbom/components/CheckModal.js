@@ -95,7 +95,7 @@ const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
     isPrimary || isComponentType || isComponentVersion || isComponentLicense
 
   const isInvalidLicense =
-    isComponentLicense && details?.licenses[0]?.value === ''
+    isComponentLicense && details?.licenses?.value === ''
 
   const isEmptyVersion = isComponentVersion && compVersion === ''
 
@@ -116,7 +116,7 @@ const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
           licenses: {
             licensesExp: isPrimary
               ? undefined
-              : details?.licenses[0]?.value || undefined
+              : details?.licenses?.value || undefined
           }
         }
       }).then((res) => {

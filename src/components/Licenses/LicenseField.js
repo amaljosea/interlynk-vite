@@ -56,26 +56,23 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   }
 
   const onLicenseChange = (selected) => {
-    selected = [selected]
-
     if (sbomView) {
-      sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: selected })
+      sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: selected || null })
     } else {
-      handleChange('details', 'licenses', selected)
+      handleChange('details', 'licenses', selected || null)
     }
-
-    setLicenseType(selected[0]?.type)
+    setLicenseType(selected ? selected?.type : '')
   }
 
   const handleInputChange = useCallback(
     (value) => {
       if (value !== '') {
         if (sbomView) {
-          sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: [] })
+          sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: null })
         } else {
           setTabData((prev) => ({
             ...prev,
-            details: { ...prev.details, licenses: [] }
+            details: { ...prev.details, licenses: null }
           }))
         }
         const formattedValue = formatLicenseString(value)
@@ -134,20 +131,20 @@ const LicenseField = ({ resolved, sbomView, license }) => {
         label: license
       }
       if (sbomView) {
-        sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: [payload] })
+        sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: payload })
       } else {
         setTabData((prev) => ({
           ...prev,
-          details: { ...prev.details, licenses: [payload] }
+          details: { ...prev.details, licenses: payload }
         }))
       }
     } else {
       if (sbomView) {
-        sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: [] })
+        sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: null })
       } else {
         setTabData((prev) => ({
           ...prev,
-          details: { ...prev.details, licenses: [] }
+          details: { ...prev.details, licenses: null }
         }))
       }
     }
@@ -222,10 +219,10 @@ const LicenseField = ({ resolved, sbomView, license }) => {
           {licenseType && (
             <Flex justifyContent='flex-end'>
               <Tag
-                width={'fit-content'}
-                size={'sm'}
                 my={2}
+                size={'sm'}
                 variant='subtle'
+                width={'fit-content'}
                 colorScheme={colorScheme[licenseType]}
               >
                 <TagLabel>{licenseType}</TagLabel>
