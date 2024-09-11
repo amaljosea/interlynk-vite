@@ -52,9 +52,8 @@ const ProductModal = ({ isOpen, onClose, data }) => {
     productLabels?.map((item) => labelIds?.push(item?.value))
   }
 
-  const updateProduct = async (e) => {
-    e.preventDefault()
-    await projectGroupUpdate({
+  const updateProduct = () => {
+    projectGroupUpdate({
       variables: {
         id: id,
         name: productName,
@@ -71,9 +70,8 @@ const ProductModal = ({ isOpen, onClose, data }) => {
     })
   }
 
-  const handleSave = async (e) => {
-    e.preventDefault()
-    await projectGroupCreate({
+  const handleSave = () => {
+    projectGroupCreate({
       variables: {
         enabled: true,
         name: productName,
