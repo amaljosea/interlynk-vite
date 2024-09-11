@@ -954,9 +954,7 @@ const Components = ({ sbomData }) => {
           </GridItem>
           <GridItem>
             <CustomText>Support Level :</CustomText>
-            <Text sx={textStyle}>
-              {supportLevel ? supportLevel?.replace('_', ' ') : 'N/A'}
-            </Text>
+            <Text sx={textStyle}>{supportLevel || 'N/A'}</Text>
           </GridItem>
           <GridItem>
             <CustomText>End-of-Support Date :</CustomText>

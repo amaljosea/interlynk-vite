@@ -15,6 +15,7 @@ import {
   IconButton,
   Input,
   Select,
+  Stack,
   Table,
   Tbody,
   Td,
@@ -23,9 +24,13 @@ import {
   Tr
 } from '@chakra-ui/react'
 
+import LynkError from 'components/LynkError'
+
 import useCustomToast from 'hooks/useCustomToast'
 
 import { UpdateCompLinks } from 'graphQL/Mutation'
+
+import ActionButton from './ActionButton'
 
 const GetCompUrls = gql`
   query GetCompUrls($id: Uuid!, $sbomId: Uuid!) {
@@ -42,8 +47,15 @@ const CompLinks = ({ data }) => {
   const { showToast } = useCustomToast()
   const { id, sbomId } = data || ''
 
-  const { tabData, setTabData, handleChange, saveChanges } =
-    useContext(TabContext)
+  const {
+    tabData,
+    setTabData,
+    handleChange,
+    saveChanges,
+    unsavedChanges,
+    alert,
+    setAlert
+  } = useContext(TabContext)
   const { links } = tabData
 
   const { data: compUrls } = useQuery(GetCompUrls, {
@@ -116,6 +128,19 @@ const CompLinks = ({ data }) => {
     })
     setTabData((prev) => ({ ...prev, links: { name: '', url: '' } }))
     setActiveLink(null)
+  }
+
+  const checkData = () => {
+    const { links, ...rest } = unsavedChanges
+    return Object.values(rest).some((value) => value === true)
+  }
+
+  const handleSubmit = () => {
+    if (checkData()) {
+      setAlert(true)
+    } else {
+      handleLinkAdd()
+    }
   }
 
   const onDelete = (data) => {
@@ -200,17 +225,26 @@ const CompLinks = ({ data }) => {
           />
           <FormErrorMessage>{linkError}</FormErrorMessage>
         </FormControl>
-        {/* ACTIONS */}
-        <Button
-          fontSize={'sm'}
-          variant='outline'
-          colorScheme='blue'
-          leftIcon={<AddIcon />}
-          onClick={handleLinkAdd}
-          isDisabled={isInvalid}
-        >
-          Add Link
-        </Button>
+        {alert ? (
+          <Stack spacing={4}>
+            <LynkError
+              status='warning'
+              error='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
+            />
+            <ActionButton
+              title={'Save Link'}
+              isDisabled={isInvalid}
+              onClick={handleLinkAdd}
+            />
+          </Stack>
+        ) : (
+          <ActionButton
+            title={'Add Link'}
+            leftIcon={<AddIcon />}
+            isDisabled={isInvalid}
+            onClick={handleSubmit}
+          />
+        )}
         <Divider my={2} pos={'relative'} left={0} right={0} />
         {/* TABLE */}
         <Flex mb={4} width={'100%'} flexDir={'column'}>

@@ -47,6 +47,7 @@ export const TabProvider = ({ children }) => {
     relations: false
   }
 
+  const [alert, setAlert] = useState(false)
   const [tabData, setTabData] = useState(initialTabData)
   const [unsavedChanges, setUnsavedChanges] = useState(initialUnsavedChanges)
 
@@ -65,12 +66,14 @@ export const TabProvider = ({ children }) => {
   }
 
   const saveChanges = () => {
-    console.log('Saving data:', tabData)
+    setAlert(false)
     setUnsavedChanges(initialUnsavedChanges)
   }
 
   const resetData = () => {
+    setAlert(false)
     setTabData(initialTabData)
+    setUnsavedChanges(initialUnsavedChanges)
   }
 
   return (
@@ -81,7 +84,9 @@ export const TabProvider = ({ children }) => {
         handleChange,
         unsavedChanges,
         saveChanges,
-        resetData
+        resetData,
+        alert,
+        setAlert
       }}
     >
       {children}

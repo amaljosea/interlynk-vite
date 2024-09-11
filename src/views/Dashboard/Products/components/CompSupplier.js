@@ -6,17 +6,23 @@ import { disableButtonTemporarily, validateEmail, validateUrl } from 'utils'
 import {
   Button,
   ButtonGroup,
+  Divider,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Input
+  Input,
+  Stack
 } from '@chakra-ui/react'
+
+import LynkError from 'components/LynkError'
 
 import useCustomToast from 'hooks/useCustomToast'
 
 import { addComSupplier, updateComSupplier } from 'graphQL/Mutation'
 import { deleteComSupplier } from 'graphQL/Mutation'
+
+import ActionButton from './ActionButton'
 
 const GetSupplier = gql`
   query GetCompUrls($id: Uuid!, $sbomId: Uuid!) {
@@ -42,8 +48,15 @@ const CompSupplier = ({ data }) => {
   })
   const { suppliers } = result?.component || ''
 
-  const { tabData, setTabData, handleChange, saveChanges } =
-    useContext(TabContext)
+  const {
+    tabData,
+    setTabData,
+    handleChange,
+    saveChanges,
+    unsavedChanges,
+    alert,
+    setAlert
+  } = useContext(TabContext)
   const { supplier } = tabData
 
   const [isValidUrl, setIsValidUrl] = useState('')
@@ -111,25 +124,35 @@ const CompSupplier = ({ data }) => {
   }
 
   const handleUpdate = () => {
-    disableButtonTemporarily(setIsDisabled)
-    if (suppliers?.length > 0) {
-      updateSupplier({
-        variables: {
-          id: suppliers[0].id,
-          url: supplier?.url,
-          name: supplier?.name,
-          contactName: supplier?.contactName,
-          contactEmail: supplier?.contactEmail
-        }
-      }).then((res) => {
-        if (res?.data) {
-          saveChanges()
-          showToast({
-            description: 'Supplier updated successfully',
-            status: 'success'
-          })
-        }
-      })
+    updateSupplier({
+      variables: {
+        id: suppliers[0].id,
+        url: supplier?.url,
+        name: supplier?.name,
+        contactName: supplier?.contactName,
+        contactEmail: supplier?.contactEmail
+      }
+    }).then((res) => {
+      if (res?.data) {
+        saveChanges()
+        showToast({
+          description: 'Supplier updated successfully',
+          status: 'success'
+        })
+      }
+    })
+  }
+
+  const checkData = () => {
+    const { supplier, ...rest } = unsavedChanges
+    return Object.values(rest).some((value) => value === true)
+  }
+
+  const handleSubmit = () => {
+    if (checkData()) {
+      setAlert(true)
+    } else {
+      suppliers?.length > 0 ? handleUpdate() : handleSave()
     }
   }
 
@@ -231,27 +254,38 @@ const CompSupplier = ({ data }) => {
         />
         <FormErrorMessage>{emailError}</FormErrorMessage>
       </FormControl>
-      {/* ACTIONS */}
-      <ButtonGroup mt={2}>
-        <Button
-          variant='outline'
-          colorScheme='blue'
-          isDisabled={isInvalid}
-          onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
-        >
-          Save
-        </Button>
-        <Button
-          variant='ghost'
-          fontWeight={400}
-          color={'#60686F'}
-          onClick={handleRemove}
-          isDisabled={isDisabled}
-          hidden={suppliers?.length === 0}
-        >
-          Remove Supplier
-        </Button>
-      </ButtonGroup>
+      <Divider />
+      {alert ? (
+        <Stack spacing={4}>
+          <LynkError
+            status='warning'
+            error='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
+          />
+          <ActionButton
+            title={'Save Supplier'}
+            isDisabled={isInvalid}
+            onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
+          />
+        </Stack>
+      ) : (
+        <ButtonGroup mt={2}>
+          <ActionButton
+            title={'Save'}
+            isDisabled={isInvalid}
+            onClick={handleSubmit}
+          />
+          <Button
+            variant='ghost'
+            fontWeight={400}
+            color={'#60686F'}
+            onClick={handleRemove}
+            isDisabled={isDisabled}
+            hidden={suppliers?.length === 0}
+          >
+            Remove Supplier
+          </Button>
+        </ButtonGroup>
+      )}
     </Flex>
   )
 }

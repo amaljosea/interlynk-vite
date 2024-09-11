@@ -8,7 +8,6 @@ import { infoData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
-  Button,
   Checkbox,
   Divider,
   Flex,
@@ -27,6 +26,7 @@ import {
 } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
+import LynkError from 'components/LynkError'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -34,6 +34,8 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { UpdateComponent } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
+
+import ActionButton from './ActionButton'
 
 const CompDetails = ({ data, primaryComp }) => {
   const location = useLocation()
@@ -43,8 +45,15 @@ const CompDetails = ({ data, primaryComp }) => {
   const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
 
-  const { tabData, setTabData, handleChange, saveChanges } =
-    useContext(TabContext)
+  const {
+    unsavedChanges,
+    tabData,
+    setTabData,
+    handleChange,
+    saveChanges,
+    alert,
+    setAlert
+  } = useContext(TabContext)
   const { details } = tabData
 
   const inputStyle = { size: 'md', fontSize: 'sm' }
@@ -65,6 +74,7 @@ const CompDetails = ({ data, primaryComp }) => {
 
   const handleDateChange = (newDate) => {
     const isValidDate = newDate && !isNaN(newDate)
+    console.log(newDate)
     setTabData((prev) => ({
       ...prev,
       details: { ...prev?.details, endOfSupport: newDate._d }
@@ -113,8 +123,8 @@ const CompDetails = ({ data, primaryComp }) => {
         version: details?.version,
         description: details?.description,
         copyright: details?.copyright,
-        supportLevel: details?.supportLevel,
-        endOfSupport: details?.endOfSupport,
+        supportLevel: details?.supportLevel || 'null',
+        endOfSupport: details?.endOfSupport || undefined,
         licenses: { licensesExp: license }
       }
     }).then((res) => {
@@ -132,6 +142,19 @@ const CompDetails = ({ data, primaryComp }) => {
     })
   }
 
+  const checkData = () => {
+    const { details, ...rest } = unsavedChanges
+    return Object.values(rest).some((value) => value === true)
+  }
+
+  const handleSubmit = () => {
+    if (checkData()) {
+      setAlert(true)
+    } else {
+      handleUpdateCom()
+    }
+  }
+
   const invalidVersion =
     details?.version !== '' && SBOMs?.includes(details?.version)
 
@@ -143,6 +166,7 @@ const CompDetails = ({ data, primaryComp }) => {
 
   useEffect(() => {
     if (data) {
+      console.log('data', data)
       setTabData((prev) => ({
         ...prev,
         details: {
@@ -157,7 +181,7 @@ const CompDetails = ({ data, primaryComp }) => {
           description: data?.description,
           copyright: data?.copyright,
           supportLevel: data?.supportLevel,
-          endOfSupport: data?.endOfSupport
+          endOfSupport: data?.endOfSupport ? new Date(data?.endOfSupport) : ''
         }
       }))
     }
@@ -451,15 +475,25 @@ const CompDetails = ({ data, primaryComp }) => {
           </Flex>
         </FormControl>
         <Divider />
-        <Button
-          colorScheme='blue'
-          variant={'outline'}
-          width={'fit-content'}
-          isDisabled={isInvalid}
-          onClick={handleUpdateCom}
-        >
-          Save
-        </Button>
+        {alert ? (
+          <Stack spacing={4}>
+            <LynkError
+              status='warning'
+              error='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
+            />
+            <ActionButton
+              title={'Save Details'}
+              isDisabled={isInvalid}
+              onClick={handleUpdateCom}
+            />
+          </Stack>
+        ) : (
+          <ActionButton
+            title={'Save'}
+            isDisabled={isInvalid}
+            onClick={handleSubmit}
+          />
+        )}
       </Stack>
 
       {isOpen && (

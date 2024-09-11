@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react'
 
 const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
-  const { tabData, setTabData, handleChange } = useContext(TabContext)
+  const { tabData, handleChange } = useContext(TabContext)
   const { identifiers } = tabData || ''
 
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
@@ -29,22 +29,16 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
 
   const handleValidate = (value) => {
     const matches = validateCpe(value)
-    if (matches && value !== '') {
-      setTabData((prev) => ({
-        ...prev,
-        identifiers: { ...prev?.identifiers, isValidCpe: true }
-      }))
+    if (matches) {
+      handleChange('identifiers', 'isValidCpe', true)
     } else {
-      setTabData((prev) => ({
-        ...prev,
-        identifiers: { ...prev?.identifiers, isValidCpe: false }
-      }))
+      handleChange('identifiers', 'isValidCpe', false)
     }
   }
 
   const handleSelect = (value) => {
-    handleValidate(value)
     handleChange('identifiers', 'cpe', value)
+    value !== '' && handleValidate(value)
     setFocusedIndex(null)
     setCpeList([])
   }
@@ -132,9 +126,9 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
           />
-          {identifiers?.cpe !== '' && (
+          {identifiers?.cpe && (
             <InputRightElement align='center' zIndex={-1}>
-              {identifiers?.isValidCpe === true ? (
+              {identifiers?.isValidCpe ? (
                 <CheckIcon color='green' />
               ) : (
                 <WarningTwoIcon color='red' />

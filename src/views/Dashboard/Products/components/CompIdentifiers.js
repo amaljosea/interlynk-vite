@@ -7,7 +7,6 @@ import { validateCpe } from 'utils'
 
 import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
-  Button,
   Divider,
   Flex,
   FormControl,
@@ -21,6 +20,7 @@ import {
 } from '@chakra-ui/react'
 
 import CpeField from 'components/CpeField'
+import LynkError from 'components/LynkError'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -30,6 +30,7 @@ import { CpeAutoComplete } from 'graphQL/Queries'
 
 import { FaChevronDown, FaChevronRight } from 'react-icons/fa6'
 
+import ActionButton from './ActionButton'
 import CpeInputs from './CpeInputs'
 import PurlInputs from './PurlInputs'
 
@@ -39,8 +40,15 @@ const CompIdentifiers = ({ data }) => {
   const sbomId = params.sbomid
   const customerView = location.pathname.startsWith('/customer')
 
-  const { tabData, setTabData, handleChange, saveChanges } =
-    useContext(TabContext)
+  const {
+    tabData,
+    setTabData,
+    handleChange,
+    saveChanges,
+    unsavedChanges,
+    alert,
+    setAlert
+  } = useContext(TabContext)
   const { identifiers } = tabData
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
@@ -130,6 +138,19 @@ const CompIdentifiers = ({ data }) => {
     })
   }
 
+  const checkData = () => {
+    const { identifiers, ...rest } = unsavedChanges
+    return Object.values(rest).some((value) => value === true)
+  }
+
+  const handleSubmit = () => {
+    if (checkData()) {
+      setAlert(true)
+    } else {
+      handleUpdateCom()
+    }
+  }
+
   useEffect(() => {
     if (!data) return
     const { cpes, purl } = data || {}
@@ -160,113 +181,125 @@ const CompIdentifiers = ({ data }) => {
       identifiers: {
         ...prev.identifiers,
         cpe,
-        isValidCpe: Boolean(isValidCpe) || !cpe
+        isValidCpe: Boolean(isValidCpe)
       }
     }))
   }, [data, setTabData])
 
   return (
-    <Stack
-      px={6}
-      spacing={4}
-      direction={'column'}
-      height={cpeOpen || purlOpen ? '100%' : '70vh'}
-    >
-      {/* PURL INPUI */}
-      {purlOpen && (
-        <PurlInputs
-          activeComp={data}
-          value={purlValue}
-          setValue={setPurlValue}
-          onClose={() => setPurlOpen(false)}
-        />
-      )}
-      <FormControl
-        hidden={purlOpen}
-        isReadOnly={customerView}
-        isInvalid={identifiers?.purl && !identifiers?.isValidPurl}
+    <>
+      <Stack
+        px={6}
+        spacing={4}
+        direction={'column'}
+        height={cpeOpen || purlOpen ? '100%' : '70vh'}
       >
-        <FormLabel htmlFor='purl' fontSize={'sm'}>
-          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-            <Icon
-              fontSize={12}
-              color={'#718096'}
-              cursor={'pointer'}
-              onClick={handlePurlModal}
-              display={customerView ? 'none' : 'flex'}
-              as={purlOpen ? FaChevronDown : FaChevronRight}
-            />
-            <Text>Package URL {`(PURL)`}</Text>
-          </Flex>
-        </FormLabel>
-        <InputGroup>
-          <Input
-            type='text'
-            size='md'
-            id='purl'
-            name='purl'
-            fontSize={'sm'}
-            placeholder='PURL'
-            value={identifiers?.purl}
-            autoComplete='off'
-            onBlur={purlInputBlur}
-            onChange={handlePURLInputChange}
+        {/* PURL INPUI */}
+        {purlOpen && (
+          <PurlInputs
+            activeComp={data}
+            value={purlValue}
+            setValue={setPurlValue}
+            onClose={() => setPurlOpen(false)}
           />
-          <InputRightElement align='center' zIndex={-1}>
-            {identifiers?.purl != null && identifiers?.purl !== '' ? (
-              identifiers?.isValidPurl ? (
-                <CheckIcon color='green' />
-              ) : (
-                <WarningTwoIcon color='red' />
-              )
-            ) : null}
-          </InputRightElement>
-        </InputGroup>
-      </FormControl>
-      <Divider />
-      {/* CPE INPUT */}
-      {cpeOpen && (
-        <CpeInputs
-          value={cpeValue}
-          activeComp={data}
-          setValue={setCpeValue}
-          onClose={() => setCpeOpen(false)}
-        />
-      )}
-      <FormControl hidden={cpeOpen}>
-        <FormLabel htmlFor='cpe' fontSize={'sm'}>
-          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-            <Icon
-              fontSize={12}
-              color={'#718096'}
-              cursor={'pointer'}
-              onClick={handleCpeModal}
-              display={customerView ? 'none' : 'flex'}
-              as={cpeOpen ? FaChevronDown : FaChevronRight}
+        )}
+        <FormControl
+          hidden={purlOpen}
+          isReadOnly={customerView}
+          isInvalid={identifiers?.purl && !identifiers?.isValidPurl}
+        >
+          <FormLabel htmlFor='purl' fontSize={'sm'}>
+            <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+              <Icon
+                fontSize={12}
+                color={'#718096'}
+                cursor={'pointer'}
+                onClick={handlePurlModal}
+                display={customerView ? 'none' : 'flex'}
+                as={purlOpen ? FaChevronDown : FaChevronRight}
+              />
+              <Text>Package URL {`(PURL)`}</Text>
+            </Flex>
+          </FormLabel>
+          <InputGroup>
+            <Input
+              type='text'
+              size='md'
+              id='purl'
+              name='purl'
+              fontSize={'sm'}
+              placeholder='PURL'
+              value={identifiers?.purl}
+              autoComplete='off'
+              onBlur={purlInputBlur}
+              onChange={handlePURLInputChange}
             />
-            <Text>CPE</Text>
-          </Flex>
-        </FormLabel>
-        <CpeField
-          inputRef={cpeRef}
-          cpeList={cpeData}
-          setCpeList={setCpeData}
-          onChange={handleCpeChange}
-        />
-      </FormControl>
-      <Divider />
-      {/* ACTIONS */}
-      <Button
-        colorScheme='blue'
-        variant='outline'
-        width={'fit-content'}
-        hidden={purlOpen || cpeOpen}
-        onClick={handleUpdateCom}
-        isDisabled={loading || isInvalid}
-      >
-        Save
-      </Button>
-    </Stack>
+            <InputRightElement align='center' zIndex={-1}>
+              {identifiers?.purl != null && identifiers?.purl !== '' ? (
+                identifiers?.isValidPurl ? (
+                  <CheckIcon color='green' />
+                ) : (
+                  <WarningTwoIcon color='red' />
+                )
+              ) : null}
+            </InputRightElement>
+          </InputGroup>
+        </FormControl>
+        <Divider />
+        {/* CPE INPUT */}
+        {cpeOpen && (
+          <CpeInputs
+            value={cpeValue}
+            activeComp={data}
+            setValue={setCpeValue}
+            onClose={() => setCpeOpen(false)}
+          />
+        )}
+        <FormControl hidden={cpeOpen}>
+          <FormLabel htmlFor='cpe' fontSize={'sm'}>
+            <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+              <Icon
+                fontSize={12}
+                color={'#718096'}
+                cursor={'pointer'}
+                onClick={handleCpeModal}
+                display={customerView ? 'none' : 'flex'}
+                as={cpeOpen ? FaChevronDown : FaChevronRight}
+              />
+              <Text>CPE</Text>
+            </Flex>
+          </FormLabel>
+          <CpeField
+            inputRef={cpeRef}
+            cpeList={cpeData}
+            setCpeList={setCpeData}
+            onChange={handleCpeChange}
+          />
+        </FormControl>
+        <Divider />
+        {alert ? (
+          <Stack spacing={4}>
+            <LynkError
+              status='warning'
+              error='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
+            />
+            <ActionButton
+              title={'Save Identifiers'}
+              onClick={handleUpdateCom}
+              hidden={purlOpen || cpeOpen}
+              isDisabled={loading || isInvalid}
+            />
+          </Stack>
+        ) : (
+          <ActionButton
+            title={'Save'}
+            onClick={handleSubmit}
+            hidden={purlOpen || cpeOpen}
+            isDisabled={loading || isInvalid}
+          />
+        )}
+      </Stack>
+    </>
   )
 }
 
