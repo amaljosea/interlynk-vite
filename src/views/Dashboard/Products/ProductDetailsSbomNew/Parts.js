@@ -1,5 +1,5 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import {
@@ -52,6 +52,7 @@ import LynkModal from 'components/LynkModal'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
@@ -274,16 +275,11 @@ const Parts = () => {
     onSelectPart(part)
   }
 
-  useEffect(() => {
-    const inProgress = sbomParts?.some(
-      (item) => item?.part?.vulnRunStatus !== 'FINISHED'
-    )
-    if (inProgress) {
-      startPolling(5000)
-    } else {
-      stopPolling()
-    }
-  }, [sbomParts, startPolling, stopPolling])
+  const shouldPoll = sbomParts?.some(
+    (item) => item?.part?.vulnRunStatus !== 'FINISHED'
+  )
+
+  useGradualPolling({ shouldPoll, startPolling, stopPolling })
 
   // COLUMNS
   const columns = [

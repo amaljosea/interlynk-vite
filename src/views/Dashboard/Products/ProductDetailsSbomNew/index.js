@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom'
 import { Flex, Grid, GridItem } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetProductData } from 'graphQL/Queries'
@@ -77,13 +78,9 @@ const ProductDetailsSbomNew = () => {
     }
   }, [data, activeTour, setCurrentStep, setIsOpen, shouldShowDemoFeatures])
 
-  useEffect(() => {
-    if (reScanVuln || isInitialized) {
-      startPolling(5000)
-    } else {
-      stopPolling()
-    }
-  }, [sbomId, reScanVuln, isInitialized, startPolling, stopPolling])
+  const shouldPoll = reScanVuln || isInitialized
+
+  useGradualPolling({ shouldPoll, startPolling, stopPolling })
 
   return (
     <Flex width={'100%'} flexDir={'column'} gap={5}>

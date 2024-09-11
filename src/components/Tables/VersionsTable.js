@@ -1,7 +1,7 @@
 import { useLazyQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
@@ -52,6 +52,7 @@ import ReprocessSbom from 'components/Modal/ReprocessSbom'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
@@ -133,14 +134,9 @@ const VersionsTable = ({
       }
     })
 
-  useEffect(() => {
-    const inProgress = nodes?.some((item) => item?.vulnRunStatus !== 'FINISHED')
-    if (inProgress) {
-      startPolling(2000)
-    } else {
-      stopPolling()
-    }
-  }, [nodes, startPolling, stopPolling])
+  const shouldPoll = nodes?.some((item) => item?.vulnRunStatus !== 'FINISHED')
+
+  useGradualPolling({ shouldPoll, startPolling, stopPolling })
 
   const createSbom = useHasPermission({
     parentKey: 'view_sbom',

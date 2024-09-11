@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import styled from '@emotion/styled'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
@@ -31,6 +31,7 @@ import ViolationDrawer from 'components/Drawer/ViolationDrawer'
 import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
@@ -73,6 +74,10 @@ const Policies = () => {
   const [activePolicy, setActivePolicy] = useState('')
 
   const [policyScan] = useMutation(SbomPolicyScan)
+
+  const shouldPoll = isInitialized
+
+  useGradualPolling({ shouldPoll, startPolling, stopPolling })
 
   // SUB HEADER
   const subHeader = useMemo(() => {
@@ -314,14 +319,6 @@ const Policies = () => {
       </Flex>
     )
   }
-
-  useEffect(() => {
-    if (isInitialized) {
-      startPolling(5000)
-    } else {
-      stopPolling()
-    }
-  }, [sbomId, isInitialized, startPolling, stopPolling])
 
   return (
     <>
