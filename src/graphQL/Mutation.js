@@ -970,14 +970,14 @@ export const DeleteComponent = gql`
 // CREATE SBOM TOOL
 export const toolCreate = gql`
   mutation toolCreate(
-    $sbomID: Uuid!
+    $sbomId: Uuid!
     $name: String!
     $version: String
     $vendor: String
   ) {
     toolCreate(
       input: {
-        sbomId: $sbomID
+        sbomId: $sbomId
         name: $name
         version: $version
         vendor: $vendor

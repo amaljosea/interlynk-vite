@@ -202,7 +202,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
             isDisabled={signedUrlParams}
             isLoading={loading}
             noOptionsMessage={() =>
-              signedUrlParams ? null : `Please search...`
+              resolved || signedUrlParams ? null : `Please search...`
             }
             components={{
               DropdownIndicator: () => null,

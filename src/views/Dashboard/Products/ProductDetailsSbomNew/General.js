@@ -1,27 +1,23 @@
 import { useMutation } from '@apollo/client'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import { infoData } from 'variables/general'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 
-import { EditIcon, InfoIcon } from '@chakra-ui/icons'
+import { AddIcon, InfoIcon } from '@chakra-ui/icons'
 import {
+  Button,
   Flex,
-  HStack,
-  IconButton,
-  Link,
   Skeleton,
-  Stack,
   Table,
   Tag,
   TagCloseButton,
   TagLabel,
+  TagRightIcon,
   Tbody,
   Td,
   Text,
-  Th,
-  Thead,
   Tooltip,
   Tr,
   useColorModeValue,
@@ -30,9 +26,9 @@ import {
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkModal from 'components/LynkModal'
+import SupplierTag from 'components/SupplierTag'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -45,14 +41,17 @@ import {
   toolDelete
 } from 'graphQL/Mutation'
 
+import { BsPencil } from 'react-icons/bs'
 import { FaScaleBalanced } from 'react-icons/fa6'
 
+import AuthorModal from '../components/AuthorModal'
 import ConfirmationModal from '../components/ConfirmationModal'
+import ToolModal from '../components/ToolModal'
 
 const InfoLabel = ({ title, onCheck }) => {
   return (
     <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-      <Text>{title}</Text>
+      <Text fontSize={'sm'}>{title}</Text>
       <Tooltip label={onCheck}>
         <InfoIcon color={'blue.500'} />
       </Tooltip>
@@ -66,16 +65,8 @@ const General = ({ data, loading, error }) => {
   const params = useParams()
   const sbomId = params.sbomid
 
-  const {
-    id,
-    spec,
-    suppliers,
-    licensesExp,
-    licenses,
-    authors,
-    creationAt,
-    tools
-  } = data || ''
+  const { id, spec, suppliers, licensesExp, authors, creationAt, tools } =
+    data || ''
 
   const { sbomState, dispatch } = useGlobalState()
   const { expLicense } = sbomState
@@ -91,87 +82,47 @@ const General = ({ data, loading, error }) => {
     childKey: 'update_sbom'
   })
 
-  const btnRef = useRef(null)
   const textColor = useColorModeValue('gray.700', 'white')
-  const iconColor = useColorModeValue('blue.500', 'gray.100')
   const customerView = location?.pathname?.startsWith('/customer')
-  const [selectedKey, setSelectedKey] = useState('')
   const [activeTool, setActiveTool] = useState(null)
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isDelOpen,
-    onOpen: onDelOpen,
-    onClose: onDelClose
-  } = useDisclosure()
-  const {
-    isOpen: isSBMOpen,
-    onOpen: onSBMOpen,
-    onClose: onSBMClose,
-    onToggle: onSBMToggle
-  } = useDisclosure()
-  const {
-    isOpen: isSupOpen,
-    onOpen: onSupOpen,
-    onClose: onSupClose
-  } = useDisclosure()
-  const {
-    isOpen: isAutDelOpen,
-    onOpen: onAutDelOpen,
-    onClose: onAutDelClose
-  } = useDisclosure()
-  const {
-    isOpen: isSupplierDelOpen,
-    onOpen: onSupplierDelOpen,
-    onClose: onSupplierDelClose
-  } = useDisclosure()
-  const {
-    isOpen: isLicenseDelOpen,
-    onOpen: onLicenseDelOpen,
-    onClose: onLicenseDelClose
-  } = useDisclosure()
+  const TOOL = useDisclosure()
+  const DELETE_TOOL = useDisclosure()
+  const AUTHOR = useDisclosure()
+  const DELETE_AUTHOR = useDisclosure()
+  const LICENSE = useDisclosure()
+  const DELETE_LICENSE = useDisclosure()
+  const SUPPLIER = useDisclosure()
+  const DELETE_SUPPLIER = useDisclosure()
 
-  const [deleteSupplier] = useMutation(supplierDelete)
-  const [deleteTool] = useMutation(toolDelete)
-  const [deleteAuthor] = useMutation(authorDelete)
+  const [deleteSupplier, { loading: supLoading }] = useMutation(supplierDelete)
+  const [deleteTool, { loading: toolLoading }] = useMutation(toolDelete)
+  const [deleteAuthor, { loading: authorLoading }] = useMutation(authorDelete)
   const [updateSbom, { loading: sbomLoading }] = useMutation(sbomUpdate)
 
-  const handleToolRemove = async (id) => {
-    try {
-      await deleteTool({ variables: { toolID: id, sbomID: sbomId } })
-        .then((res) => res?.data)
-        .finally(() => onDelClose())
-    } catch (error) {
-      console.log(`Mutation error`, error)
-    }
+  const handleToolRemove = (id) => {
+    deleteTool({ variables: { toolID: id, sbomID: sbomId } })
+      .then((res) => res?.data)
+      .finally(() => DELETE_TOOL?.onClose())
   }
 
   const handleAuthorRemove = async (id) => {
-    try {
-      await deleteAuthor({ variables: { authorId: id, sbomId } })
-        .then((res) => res?.data)
-        .finally(() => onAutDelClose())
-    } catch (error) {
-      console.log(`Mutation error`, error)
-    }
-  }
-
-  const handleClick = (ref) => {
-    setSelectedKey(ref)
-    onOpen()
+    await deleteAuthor({ variables: { authorId: id, sbomId } })
+      .then((res) => res?.data)
+      .finally(() => DELETE_AUTHOR?.onClose())
   }
 
   const handleSupRemove = async (id) => {
     await deleteSupplier({ variables: { id: id } })
       .then((res) => res.data)
-      .finally(() => onSupplierDelClose())
+      .finally(() => DELETE_SUPPLIER?.onClose())
   }
 
   // const onRemoveLicense = async () => console.log('License');
 
   const onLicenseOpen = () => {
     sbomDispatch({ type: 'SET_LICENSES', payload: licensesExp })
-    onSBMOpen()
+    LICENSE?.onOpen()
   }
 
   const onUpdateLicense = async () => {
@@ -183,17 +134,24 @@ const General = ({ data, loading, error }) => {
       }
     })
       .then((res) => res.data && sbomDispatch({ type: 'CLEAR_LICENSES' }))
-      .finally(() => onSBMClose())
+      .finally(() =>
+        DELETE_LICENSE?.isOpen ? DELETE_LICENSE?.onClose() : LICENSE?.onClose()
+      )
+  }
+
+  const onDeleteSup = (item) => {
+    setActiveTool(item)
+    DELETE_SUPPLIER?.onOpen()
   }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
   const handleSBMDown = useCallback(
     (event) => {
       if (event.altKey && event.key === '2') {
-        onSBMToggle()
+        LICENSE?.onToggle()
       }
     },
-    [onSBMToggle]
+    [LICENSE]
   )
 
   const onCheck = (title) => {
@@ -234,312 +192,249 @@ const General = ({ data, loading, error }) => {
           __css={{ tableLayout: 'fixed', width: 'full' }}
           variant='simple'
           color={textColor}
-          size='sm'
         >
-          {/* TABLE HEAD */}
-          <Thead>
-            <Tr>
-              {[1, 2, 3].map((_, index) => (
-                <Th key={index}></Th>
-              ))}
-            </Tr>
-          </Thead>
-          <Tbody>
+          <Tbody w={'100%'}>
             {/* CREATED AT */}
             <Tr>
-              <Td pl={0} fontWeight={'medium'}>
+              <Td pl={0} fontWeight={'medium'} width={'15%'}>
                 <InfoLabel
                   title={`Created At`}
                   onCheck={onCheck('Created At')}
                 />
               </Td>
-              <Td pl={0}>
-                <Text my={2}>
-                  {creationAt ? getFullDateAndTime(creationAt) : ''}
-                </Text>
+              <Td fontSize={'sm'} color={'gray.500'} width={'85%'}>
+                {creationAt ? getFullDateAndTime(creationAt) : ''}
               </Td>
-              <Td pl={0}></Td>
             </Tr>
             {/* CREATION TOOLS */}
             <Tr>
-              <Td pl={0} fontWeight={'medium'}>
+              <Td pl={0} fontWeight={'medium'} width={'15%'}>
                 <InfoLabel
                   title={`Creation Tool`}
                   onCheck={onCheck('Creation Tool')}
                 />
               </Td>
-              <Td pl={0}>
-                <Flex
-                  my={2}
-                  flexDirection={'row'}
-                  alignItems={'flex-start'}
-                  flexWrap={'wrap'}
-                  gap={2.5}
-                >
-                  {tools &&
-                    tools.map((item, index) => (
-                      <Tag
-                        size={'md'}
-                        key={index}
-                        variant='subtle'
-                        colorScheme='teal'
-                        width={'fit-content'}
-                      >
-                        <TagLabel>
-                          {item.name} - {item.version}
-                        </TagLabel>
-                        {updateComponent && (
-                          <TagCloseButton
-                            onClick={() => {
-                              setActiveTool(item)
-                              onDelOpen()
-                            }}
-                          />
-                        )}
-                      </Tag>
-                    ))}
+              <Td width={'85%'}>
+                <Flex alignItems={'flex-center'} flexWrap={'wrap'} gap={3}>
+                  {tools?.map((item, index) => (
+                    <Tag
+                      size={'md'}
+                      key={index}
+                      variant='subtle'
+                      colorScheme='teal'
+                    >
+                      <TagLabel>
+                        {item.name} - {item.version}
+                      </TagLabel>
+                      {updateComponent && (
+                        <TagCloseButton
+                          onClick={() => {
+                            setActiveTool(item)
+                            DELETE_TOOL?.onOpen()
+                          }}
+                        />
+                      )}
+                    </Tag>
+                  ))}
+                  <Button
+                    size='sm'
+                    variant='unstyled'
+                    onClick={TOOL?.onOpen}
+                    leftIcon={<AddIcon />}
+                    isDisabled={customerView || !editSboms}
+                    color={tools?.length > 0 ? 'gray.500' : 'blue.500'}
+                  >
+                    {tools?.length > 0 ? 'Add New' : 'Add Tool'}
+                  </Button>
                 </Flex>
-              </Td>
-              <Td pl={0}>
-                <IconButton
-                  size='sm'
-                  isDisabled={customerView || !editSboms}
-                  icon={<EditIcon color={iconColor} />}
-                  onClick={() => handleClick('tools')}
-                />
               </Td>
             </Tr>
             {/* AUTHORS */}
             <Tr>
-              <Td pl={0} fontWeight={'medium'}>
+              <Td pl={0} fontWeight={'medium'} width={'15%'}>
                 <InfoLabel title={`Authors`} onCheck={onCheck('Authors')} />
               </Td>
-              <Td pl={0}>
-                <Stack spacing={2} direction={'column'} my={2}>
-                  {authors &&
-                    authors.length > 0 &&
-                    authors.map((item, index) => (
-                      <Tag
-                        size={'md'}
-                        key={index}
-                        variant='subtle'
-                        colorScheme='blue'
-                        width={'fit-content'}
-                      >
-                        <TagLabel>
-                          {item.name} - {item.email}
-                        </TagLabel>
-                        {updateComponent && (
-                          <TagCloseButton
-                            onClick={() => {
-                              setActiveTool(item)
-                              onAutDelOpen()
-                            }}
-                          />
-                        )}
-                      </Tag>
-                    ))}
-                </Stack>
-              </Td>
-              <Td pl={0}>
-                <IconButton
-                  size='sm'
-                  isDisabled={customerView || !editSboms}
-                  icon={<EditIcon color={iconColor} />}
-                  onClick={() => handleClick('author')}
-                />
+              <Td width={'85%'}>
+                <Flex alignItems={'flex-center'} flexWrap={'wrap'} gap={3}>
+                  {authors?.map((item, index) => (
+                    <Tag
+                      size={'md'}
+                      key={index}
+                      variant='subtle'
+                      colorScheme='blue'
+                      width={'fit-content'}
+                    >
+                      <TagLabel>
+                        {item.name} - {item.email}
+                      </TagLabel>
+                      {updateComponent && (
+                        <TagCloseButton
+                          onClick={() => {
+                            setActiveTool(item)
+                            DELETE_AUTHOR?.onOpen()
+                          }}
+                        />
+                      )}
+                    </Tag>
+                  ))}
+                  <Button
+                    size='sm'
+                    variant='unstyled'
+                    leftIcon={<AddIcon />}
+                    onClick={AUTHOR?.onOpen}
+                    isDisabled={customerView || !editSboms}
+                    color={authors?.length > 0 ? 'gray.500' : 'blue.500'}
+                  >
+                    {authors?.length > 0 ? 'Add New' : 'Add Author'}
+                  </Button>
+                </Flex>
               </Td>
             </Tr>
             {/* SUPPLIERS */}
             <Tr>
-              <Td pl={0} fontWeight={'medium'}>
+              <Td pl={0} fontWeight={'medium'} w={'15%'}>
                 <InfoLabel title={`Supplier`} onCheck={onCheck('Supplier')} />
               </Td>
-              <Td pl={0}>
-                <HStack spacing={4}>
-                  {suppliers?.length > 0 &&
-                    suppliers.map((item, index) => (
-                      <Tag
-                        my={2}
-                        size={'md'}
-                        key={index}
-                        variant='subtle'
-                        colorScheme='orange'
-                      >
-                        <TagLabel>
-                          {item?.contactName || ''}
-                          {item?.contactEmail && ` (${item.contactEmail})`}
-                          {item.url ? (
-                            <Link
-                              href={
-                                item?.url?.startsWith('http')
-                                  ? item.url
-                                  : `http://${item.url}`
-                              }
-                              isExternal
-                            >
-                              {' '}
-                              {item?.name || ''}
-                            </Link>
-                          ) : (
-                            ` ${item?.name || ''}`
-                          )}
-                        </TagLabel>
-                        {updateComponent && (
-                          <TagCloseButton
-                            onClick={() => {
-                              setActiveTool(item)
-                              onSupplierDelOpen()
-                            }}
-                          />
-                        )}
-                      </Tag>
-                    ))}
-                </HStack>
-              </Td>
-              <Td pl={0}>
-                <IconButton
-                  size='sm'
-                  isDisabled={customerView || !editSboms}
-                  icon={<EditIcon color={iconColor} />}
-                  onClick={onSupOpen}
-                />
+              <Td w={'85%'}>
+                {suppliers?.length > 0 ? (
+                  suppliers?.map((item, index) => (
+                    <SupplierTag
+                      key={index}
+                      item={item}
+                      editable={true}
+                      onEdit={SUPPLIER?.onOpen}
+                      premission={updateComponent}
+                      onDelete={() => onDeleteSup(item)}
+                    />
+                  ))
+                ) : (
+                  <Button
+                    size='sm'
+                    variant='unstyled'
+                    color={'blue.500'}
+                    onClick={SUPPLIER?.onOpen}
+                    leftIcon={<AddIcon />}
+                    isDisabled={customerView || !editSboms}
+                  >
+                    Add Supplier
+                  </Button>
+                )}
               </Td>
             </Tr>
             {/* LICENSES */}
             <Tr>
-              <Td pl={0} fontWeight={'medium'}>
+              <Td pl={0} fontSize={'sm'} fontWeight={'medium'} w={'15%'}>
                 Data License
               </Td>
-              <Td pl={0}>
-                <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
-                  {/* SPDX */}
-                  {licenses?.length > 0 &&
-                    licenses?.map((item, index) => (
-                      <Tag
-                        my={2}
-                        size={'md'}
-                        key={index}
-                        variant='subtle'
-                        colorScheme='green'
-                        width={'fit-content'}
-                      >
-                        <TagLabel>{item}</TagLabel>
-                      </Tag>
-                    ))}
-                  {/* EXPRESSION */}
-                  {licensesExp && licensesExp !== '' && (
-                    <Tag
-                      my={2}
-                      size={'md'}
-                      variant='subtle'
-                      colorScheme='green'
-                      width={'fit-content'}
-                    >
-                      <TagLabel>{licensesExp}</TagLabel>
-                      {updateComponent && (
-                        <TagCloseButton onClick={onLicenseDelOpen} />
-                      )}
-                    </Tag>
-                  )}
-                </Flex>
-              </Td>
-              <Td pl={0}>
-                <IconButton
-                  size='sm'
-                  isDisabled={customerView || !editSboms}
-                  icon={<EditIcon color={iconColor} />}
-                  onClick={onLicenseOpen}
-                />
+              <Td w={'85%'}>
+                {licensesExp && licensesExp !== '' ? (
+                  <Tag
+                    my={2}
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                  >
+                    <TagLabel>{licensesExp}</TagLabel>
+                    <TagRightIcon
+                      fontSize={12}
+                      as={BsPencil}
+                      cursor={'pointer'}
+                      onClick={onLicenseOpen}
+                      hidden={!updateComponent}
+                    />
+                    <TagCloseButton
+                      hidden={!updateComponent}
+                      onClick={DELETE_LICENSE?.onOpen}
+                    />
+                  </Tag>
+                ) : (
+                  <Button
+                    size='sm'
+                    variant='unstyled'
+                    color={'blue.500'}
+                    leftIcon={<AddIcon />}
+                    onClick={onLicenseOpen}
+                    isDisabled={customerView || !editSboms}
+                  >
+                    Add License
+                  </Button>
+                )}
               </Td>
             </Tr>
           </Tbody>
         </Table>
       </CardBody>
-      {/* GENERAL DRAWER */}
-      {data && isOpen && (
-        <GeneralDataDrawer
-          isOpen={isOpen}
-          onClose={onClose}
-          btnRef={btnRef}
-          data={data}
-          selectedKey={selectedKey}
-          checkId={null}
-          isFreeTier={isFreeTier}
-        />
-      )}
+
       {/* SBOM LICENSE MODAL */}
-      {isSBMOpen && (
-        <LynkModal
-          isOpen={isSBMOpen}
-          onClose={onSBMClose}
-          disabled={sbomLoading}
-          Icon={FaScaleBalanced}
-          onSubmit={onUpdateLicense}
-          buttonText={licensesExp?.length > 0 ? 'Update' : 'Save'}
-          title={`${licensesExp?.length > 0 ? 'Update' : 'Add'} License`}
-        >
-          <LicenseField
-            sbomView={true}
-            isDisabled={customerView}
-            license={licensesExp}
-          />
-        </LynkModal>
-      )}
+      <LynkModal
+        isLoading={sbomLoading}
+        Icon={FaScaleBalanced}
+        isOpen={LICENSE?.isOpen}
+        onClose={LICENSE?.onClose}
+        onSubmit={onUpdateLicense}
+        buttonText={licensesExp?.length > 0 ? 'Update' : 'Save'}
+        title={`${licensesExp?.length > 0 ? 'Update' : 'Add'} License`}
+      >
+        <LicenseField
+          sbomView={true}
+          isDisabled={customerView}
+          license={licensesExp}
+        />
+      </LynkModal>
       {/* SUPPLIER MODAL */}
-      {isSupOpen && (
-        <PriSupplierModal
-          isOpen={isSupOpen}
-          onClose={onSupClose}
-          suppliers={suppliers}
-          activeRow={null}
-          isFreeTier={isFreeTier}
-        />
-      )}
+      <PriSupplierModal
+        activeRow={null}
+        suppliers={suppliers}
+        isFreeTier={isFreeTier}
+        isOpen={SUPPLIER?.isOpen}
+        onClose={SUPPLIER?.onClose}
+      />
       {/* TOOL DELETE MODAL */}
-      {isDelOpen && activeTool && (
-        <ConfirmationModal
-          isOpen={isDelOpen}
-          onClose={onDelClose}
-          onConfirm={() => handleToolRemove(activeTool.id)}
-          name={`${activeTool.name}-${activeTool.version} `}
-          title={'Remove Tool'}
-          description={`You are about to delete the creator Tool : ${activeTool.name}-${activeTool.version} from this version.`}
-        />
-      )}
+      <ConfirmationModal
+        title={'Remove Tool'}
+        isLoading={toolLoading}
+        isOpen={DELETE_TOOL?.isOpen}
+        onClose={DELETE_TOOL?.onClose}
+        onConfirm={() => handleToolRemove(activeTool?.id)}
+        name={`${activeTool?.name}-${activeTool?.version} `}
+        description={`You are about to delete the creator Tool : ${activeTool?.name}-${activeTool?.version} from this version.`}
+      />
       {/* AUTHOR DELETE MODAL */}
-      {isAutDelOpen && activeTool && (
-        <ConfirmationModal
-          isOpen={isAutDelOpen}
-          onClose={onAutDelClose}
-          onConfirm={() => handleAuthorRemove(activeTool.id)}
-          name={`${activeTool.name}-${activeTool.email} `}
-          title={'Remove Author'}
-          description={`You are about to delete the Author : ${activeTool.name}-${activeTool.email} from this version.`}
-        />
-      )}
+      <ConfirmationModal
+        isOpen={DELETE_AUTHOR?.isOpen}
+        onClose={DELETE_AUTHOR?.onClose}
+        title={'Remove Author'}
+        isLoading={authorLoading}
+        name={`${activeTool?.name}-${activeTool?.email} `}
+        onConfirm={() => handleAuthorRemove(activeTool?.id)}
+        description={`You are about to delete the Author : ${activeTool?.name}-${activeTool?.email} from this version.`}
+      />
       {/* SUPPLIER DELETE MODAL */}
-      {isSupplierDelOpen && activeTool && (
-        <ConfirmationModal
-          isOpen={isSupplierDelOpen}
-          onClose={onSupplierDelClose}
-          onConfirm={() => handleSupRemove(activeTool.id)}
-          name={activeTool.name}
-          title={'Remove Supplier'}
-          description={`You are about to delete the Supplier : ${activeTool.name} from this version.`}
-        />
-      )}
+      <ConfirmationModal
+        isLoading={supLoading}
+        name={activeTool?.name}
+        title={'Remove Supplier'}
+        isOpen={DELETE_SUPPLIER?.isOpen}
+        onClose={DELETE_SUPPLIER?.onClose}
+        onConfirm={() => handleSupRemove(activeTool?.id)}
+        description={`You are about to delete the Supplier : ${activeTool?.name} from this version.`}
+      />
       {/* LICENSE DELETE MODAL */}
-      {isLicenseDelOpen && (
-        <ConfirmationModal
-          isOpen={isLicenseDelOpen}
-          onClose={onLicenseDelClose}
-          onConfirm={onUpdateLicense}
-          name={licensesExp}
-          title={'Remove License'}
-          description={`You are about to delete the License : ${licensesExp} from this version.`}
-        />
-      )}
+      <ConfirmationModal
+        name={licensesExp}
+        isLoading={sbomLoading}
+        title={'Remove License'}
+        isOpen={DELETE_LICENSE?.isOpen}
+        onClose={DELETE_LICENSE?.onClose}
+        onConfirm={onUpdateLicense}
+        description={`You are about to delete the License : ${licensesExp} from this version.`}
+      />
+
+      {/* TOOL MODAL */}
+      <ToolModal isOpen={TOOL?.isOpen} onClose={TOOL?.onClose} />
+      {/* AUTHOR MODAL */}
+      <AuthorModal isOpen={AUTHOR?.isOpen} onClose={AUTHOR?.onClose} />
     </>
   )
 }

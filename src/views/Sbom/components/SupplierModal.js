@@ -24,6 +24,7 @@ import {
   addComSupplier,
   updateComSupplier
 } from 'graphQL/Mutation'
+import { recheckHealth } from 'graphQL/Mutation'
 
 import { BiCube } from 'react-icons/bi'
 
@@ -40,6 +41,10 @@ const SupplierModal = ({
   const productId = params.productid
   const navigate = useNavigate()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
+
+  const [recheck] = useMutation(recheckHealth)
+  const [createSupplier] = useMutation(addComSupplier)
+  const [updateSupplier] = useMutation(updateComSupplier)
 
   const { status, component } = activeRow || ''
   const { name, version } = component || ''
@@ -74,9 +79,6 @@ const SupplierModal = ({
     }
   }
 
-  const [createSupplier] = useMutation(addComSupplier)
-  const [updateSupplier] = useMutation(updateComSupplier)
-
   const { suppliers } = data || ''
 
   useEffect(() => {
@@ -88,6 +90,16 @@ const SupplierModal = ({
       setSupEmail(suppliers[0].contactEmail || '')
     }
   }, [data])
+
+  const handleRecheck = () => {
+    recheck({
+      variables: {
+        sbomId: params?.sbomid,
+        friendlyCheckId: friendlyId,
+        componentId: component?.id
+      }
+    })
+  }
 
   const handleSave = () => {
     disableButtonTemporarily()
@@ -102,7 +114,9 @@ const SupplierModal = ({
           contactEmail: supEmail,
           componentId: component?.id || id
         }
-      }).then((res) => res?.data && onClose())
+      })
+        .then(() => friendlyId && handleRecheck())
+        .finally(() => onClose())
     }
   }
 
@@ -116,7 +130,9 @@ const SupplierModal = ({
         contactEmail: supEmail,
         id: data && data.suppliers && data.suppliers[0].id
       }
-    }).then((res) => res.data && onClose())
+    })
+      .then(() => friendlyId && handleRecheck())
+      .finally(() => onClose())
   }
 
   const handleCheckEmail = () => {

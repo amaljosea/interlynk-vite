@@ -86,11 +86,7 @@ const PriSupplierModal = ({
     setIsValidUrl('')
   }
 
-  const isInvalid =
-    orgName === '' ||
-    supplierError !== '' ||
-    (supEmail !== '' && !validateEmail(supEmail)) ||
-    (orgUrl !== '' && !validateUrl(orgUrl))
+  const isInvalid = orgUrl !== '' && !validateUrl(orgUrl)
 
   const [createSupplier] = useMutation(supplierCreate)
   const [updateSupplier] = useMutation(supplierUpdate)
@@ -223,14 +219,14 @@ const PriSupplierModal = ({
   }
 
   useEffect(() => {
-    if (status === 'resolved' && sbom?.suppliers?.length > 0) {
+    if (sbom?.suppliers?.length > 0) {
       const { suppliers } = sbom
       setOrgName(suppliers[0]?.name)
       setOrgUrl(suppliers[0]?.url)
       setSupName(suppliers[0]?.contactName)
       setSupEmail(suppliers[0]?.contactEmail)
     }
-  }, [sbom, status])
+  }, [sbom])
 
   return (
     <>
@@ -300,6 +296,7 @@ const PriSupplierModal = ({
           >
             <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
             <Input
+              type='email'
               placeholder='Enter supplier email'
               value={supEmail}
               onBlur={handleCheckEmail}

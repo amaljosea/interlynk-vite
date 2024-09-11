@@ -1,12 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
-import React, {
-  useCallback,
-  useContext,
-  useMemo,
-  useRef,
-  useState
-} from 'react'
+import React, { useCallback, useContext, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
@@ -33,7 +27,6 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
-import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import LicenseModal from 'components/LicenseModal'
@@ -65,6 +58,7 @@ import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
 import { GoSkip } from 'react-icons/go'
 
+import AuthorModal from '../components/AuthorModal'
 import FixedModal from '../components/FixedModal'
 import CheckFilters from './CheckFilters'
 
@@ -146,9 +140,6 @@ const Checks = () => {
   const [healthRecheck] = useMutation(recheckHealth)
   const [updateSbom] = useMutation(sbomUpdate)
 
-  const creationToolBtn = useRef(null)
-  const authorBtn = useRef(null)
-
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
@@ -161,12 +152,6 @@ const Checks = () => {
     isOpen: isDataLicenseOpen,
     onOpen: onDataLicenseOpen,
     onClose: onDataLicenseClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isCreationOpen,
-    onOpen: onCreationOpen,
-    onClose: onCreationClose
   } = useDisclosure()
 
   const {
@@ -429,11 +414,6 @@ const Checks = () => {
     // TIMESTAMP SELECTOR UI
     if (shortDesc === 'Document creation timestamp') {
       return onOpen()
-    }
-
-    // CREATION TOOL SIDE DRAWER
-    if (shortDesc === 'Document has creation tools present') {
-      return onCreationOpen()
     }
 
     // AUTHOR SIDE DRAWER
@@ -855,33 +835,9 @@ const Checks = () => {
             />
           )}
 
-          {/* CREATION TOOLS DRAWER */}
-          {isCreationOpen && (
-            <GeneralDataDrawer
-              data={null}
-              selectedKey={'tools'}
-              activeRow={activeRow}
-              isOpen={isCreationOpen}
-              ruleExists={ruleExists}
-              btnRef={creationToolBtn}
-              onClose={onCreationClose}
-              isFreeTier={isFreeTier}
-            />
-          )}
-
           {/* AUTHOR DRAWER */}
           {isAuthorOpen && (
-            <GeneralDataDrawer
-              data={null}
-              getCpe={getCpe}
-              btnRef={authorBtn}
-              activeRow={activeRow}
-              isOpen={isAuthorOpen}
-              selectedKey={'author'}
-              onClose={onAuthorClose}
-              ruleExists={ruleExists}
-              isFreeTier={isFreeTier}
-            />
+            <AuthorModal isOpen={isAuthorOpen} onClose={onAuthorClose} />
           )}
 
           {/* DOCUMENT SUPPLIER DRAWER */}
