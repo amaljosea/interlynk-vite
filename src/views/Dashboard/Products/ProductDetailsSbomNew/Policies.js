@@ -160,15 +160,13 @@ const Policies = () => {
       id: 'VIOLATIONS',
       name: 'VIOLATIONS',
       selector: (row) => {
-        const { resultType, policyRuleViolations } = row
-        const { totalCount } = policyRuleViolations || ''
-        const countZero = resultType === 'pass' || resultType === 'skip'
+        const { resultType, violationsCount } = row
         if (isInitialized) return <Spinner size='xs' mt={0.5} />
-        const vColor = totalCount === 0 ? 'green' : getColor(resultType)
+        const vColor = violationsCount === 0 ? 'green' : getColor(resultType)
         return (
           <Tag width={'60px'} colorScheme={vColor}>
             <TagLabel mx={'auto'} pt={0.5}>
-              {countZero ? 0 : totalCount}
+              {violationsCount}
             </TagLabel>
           </Tag>
         )

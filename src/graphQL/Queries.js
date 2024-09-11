@@ -3934,9 +3934,7 @@ export const PolicyResults = gql`
       }
       nodes {
         id
-        policyRuleViolations {
-          totalCount
-        }
+        violationsCount
         createdAt
         updatedAt
         result
