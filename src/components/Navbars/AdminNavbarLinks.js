@@ -137,7 +137,7 @@ export default function HeaderLinks(props) {
     variables: { first: 100, status: 'approved' }
   })
   const { data: myOrgs } = useQuery(MyOrganizations, {
-    skip: isSuperAdmin === true ? true : false,
+    skip: isSuperAdmin === true || signedUrlParams ? true : false,
     variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
   })
 

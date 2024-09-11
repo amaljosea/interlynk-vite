@@ -103,7 +103,7 @@ const GetOrganization = gql`
 
 const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const location = useLocation()
-
+  const customerView = location.pathname.startsWith('/customer')
   const userName = localStorage.getItem('username')
   const [profileImage, setProfileImage] = useState(null)
   const [newUserName, setNewUserName] = useState(userName)
@@ -164,7 +164,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     variables: { first: 100, status: 'approved' }
   })
   const { data: myOrgs } = useQuery(MyOrganizations, {
-    skip: isSuperAdmin === true ? true : false,
+    skip: isSuperAdmin === true || customerView ? true : false,
     variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
   })
   const { nodes: allOrgList } = allOrgs?.allOrganizations || ''
