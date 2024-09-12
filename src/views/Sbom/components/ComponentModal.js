@@ -11,17 +11,13 @@ const ComponentModal = ({ isOpen, onClose, activeRow }) => {
 
   const [deleteComponent] = useMutation(DeleteComponent)
 
-  const handleDelete = async () => {
-    await deleteComponent({
+  const handleDelete = () => {
+    deleteComponent({
       variables: {
         id: id,
         sbomId: sbomId
       }
-    }).then((res) => {
-      if (res?.data) {
-        onClose()
-      }
-    })
+    }).then((res) => res?.data && onClose())
   }
 
   return (

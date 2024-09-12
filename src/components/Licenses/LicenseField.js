@@ -59,7 +59,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
     if (sbomView) {
       sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: selected })
     } else {
-      handleChange('details', 'licenses', selected || [])
+      handleChange('details', 'licenses', selected ? [selected] : [])
     }
     setLicenseType(selected?.type || '')
   }
@@ -125,30 +125,14 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   const licenseString = sbomView ? sbomState.licenseString : details?.licenses
 
   useEffect(() => {
-    if (license) {
+    if (license && sbomView) {
       const payload = {
         value: license,
         label: license
       }
-      if (sbomView) {
-        sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: payload })
-      } else {
-        setTabData((prev) => ({
-          ...prev,
-          details: { ...prev.details, licenses: payload }
-        }))
-      }
-    } else {
-      if (sbomView) {
-        sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: null })
-      } else {
-        setTabData((prev) => ({
-          ...prev,
-          details: { ...prev.details, licenses: null }
-        }))
-      }
+      sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: payload })
     }
-  }, [license, sbomDispatch, sbomView, setTabData])
+  }, [license, sbomDispatch, sbomView])
 
   const Option = (props) => {
     return (
@@ -169,7 +153,6 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   }
 
   const Menu = (props) => {
-    console.log(props)
     return resolved ? null : (
       <components.Menu {...props}>{props.children}</components.Menu>
     )

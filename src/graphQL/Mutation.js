@@ -840,6 +840,7 @@ export const CreateComponent = gql`
     $kind: String!
     $name: String!
     $description: String
+    $copyright: String
     $version: String
     $group: String
     $licenses: LicenseInput
@@ -849,13 +850,14 @@ export const CreateComponent = gql`
     $primary: Boolean
     $internal: Boolean
     $supportLevel: ComponentSupportLevelEnum
-    $endOfSupport: ISO8601Date
+    $endOfSupport: DateOrEmptyString
   ) {
     componentCreate(
       input: {
         sbomId: $sbomId
         kind: $kind
         name: $name
+        copyright: $copyright
         description: $description
         version: $version
         group: $group
@@ -874,6 +876,7 @@ export const CreateComponent = gql`
         name
         version
         group
+        copyright
         primary
         internal
         purl
@@ -902,7 +905,7 @@ export const UpdateComponent = gql`
     $uniqueId: Boolean
     $scope: String
     $supportLevel: ComponentSupportLevelEnum
-    $endOfSupport: ISO8601Date
+    $endOfSupport: DateOrEmptyString
   ) {
     componentUpdate(
       input: {
@@ -928,6 +931,7 @@ export const UpdateComponent = gql`
       component {
         id
         name
+        copyright
         version
         primary
         purl

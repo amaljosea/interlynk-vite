@@ -9,14 +9,14 @@ export const TabProvider = ({ children }) => {
       name: '',
       scope: '',
       group: '',
-      primary: '',
-      internal: '',
+      primary: false,
+      internal: false,
       version: '',
       description: '',
       copyright: '',
       supportLevel: '',
       endOfSupport: '',
-      licenses: null
+      licenses: []
     },
     identifiers: {
       cpe: '',

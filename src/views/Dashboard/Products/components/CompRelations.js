@@ -176,7 +176,6 @@ const CompRelations = ({ data, compPath }) => {
     })
       .then((res) => {
         if (res.data) {
-          console.log(res.data)
           const filterData = dependsOnList.filter(
             (item) => item.id !== activeComp.id
           )

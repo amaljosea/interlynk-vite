@@ -1,11 +1,10 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { validateCpe } from 'utils'
 import { infoData } from 'variables/general'
 
 import { InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
@@ -59,7 +58,7 @@ function ComponentDrawer(props) {
 
   const { tabData, handleChange, resetData, setTabData } =
     useContext(TabContext)
-  const { details, identifiers } = tabData
+  const { details, identifiers, relations } = tabData
 
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
@@ -74,18 +73,6 @@ function ComponentDrawer(props) {
   const { colorMode } = useColorMode()
   const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
 
-  const handleDateChange = (newDate) => {
-    const isValidDate = newDate && !isNaN(newDate)
-    setSelectedDate(newDate._d)
-    if (newDate) {
-      if (isValidDate) {
-        setIsValidDate(true)
-      } else {
-        setIsValidDate(false)
-      }
-    }
-  }
-
   const { isOpen, onClose, data, primaryComp, shortDesc } = props
   const { prodCompState, dispatch } = useGlobalState()
   const { purlString, totalComp } = prodCompState
@@ -98,24 +85,27 @@ function ComponentDrawer(props) {
 
   const cpeRef = useRef()
 
-  const [groupInfo, setGroupInfo] = useState('')
-  const [compName, setCompName] = useState('')
-  const [compDesc, setCompDesc] = useState('')
-  const [compVersion, setCompVersion] = useState('')
-  const [compKind, setCompKind] = useState('')
-  const [compScope, setCompScope] = useState('')
   const [cpeData, setCpeData] = useState([])
-  const [isPrimary, setIsPrimary] = useState(false)
-  const [isInternal, setIsInternal] = useState(false)
-  const [relation, setRelation] = useState('')
-  const [component, setComponent] = useState('')
-  const [compSupport, setCompSupport] = useState('')
   const [allComponents, setAllComponents] = useState([])
 
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
-  const [selectedDate, setSelectedDate] = useState('')
   const [isValidDate, setIsValidDate] = useState(true)
+
+  const handleDateChange = (newDate) => {
+    const isValidDate = newDate && !isNaN(newDate)
+    setTabData((prev) => ({
+      ...prev,
+      details: { ...prev?.details, endOfSupport: newDate._d }
+    }))
+    if (newDate) {
+      if (isValidDate) {
+        setIsValidDate(true)
+      } else {
+        setIsValidDate(false)
+      }
+    }
+  }
 
   useQuery(GetAllComponents, {
     fetchPolicy: 'network-only',
@@ -127,8 +117,7 @@ function ComponentDrawer(props) {
     },
     onCompleted: (data) => {
       data && setAllComponents(data?.sbom?.components?.nodes)
-      setRelation('')
-      setComponent('')
+      setTabData((prev) => ({ ...prev, relations: { relType: '', to: '' } }))
     }
   })
 
@@ -146,84 +135,7 @@ function ComponentDrawer(props) {
     SBOMs = result
   }
 
-  const invalidVersion = compVersion !== '' && SBOMs?.includes(compVersion)
-
-  useEffect(() => {
-    if (data) {
-      const {
-        name,
-        description,
-        version,
-        kind,
-        cpes,
-        purl,
-        primary,
-        internal,
-        group,
-        scope
-      } = data || ''
-      setGroupInfo(group)
-      setCompName(name)
-      setCompDesc(description)
-      setCompVersion(version)
-      if (purl !== null) {
-        setTabData((prev) => ({
-          ...prev,
-          identifiers: { ...prev.identifiers, purl: purl }
-        }))
-        try {
-          PackageURL.fromString(purl)
-          setTabData((prev) => ({
-            ...prev,
-            identifiers: { ...prev?.identifiers, isValidPurl: true }
-          }))
-        } catch (ex) {
-          setTabData((prev) => ({
-            ...prev,
-            identifiers: { ...prev?.identifiers, isValidPurl: false }
-          }))
-        }
-      }
-
-      if (cpes?.length > 0) {
-        setTabData((prev) => ({
-          ...prev,
-          identifiers: { ...prev?.identifiers, cpe: cpes[0] }
-        }))
-        const matches = validateCpe(cpes[0])
-        if (matches && cpes[0] !== '') {
-          setTabData((prev) => ({
-            ...prev,
-            identifiers: { ...prev?.identifiers, isValidCpe: true }
-          }))
-        } else {
-          setTabData((prev) => ({
-            ...prev,
-            identifiers: { ...prev?.identifiers, isValidCpe: false }
-          }))
-        }
-      }
-      setCompKind(kind)
-      setCompScope(scope)
-      setIsPrimary(primary)
-      setIsInternal(internal)
-    }
-  }, [data, setTabData])
-
-  // Health Check
-  useEffect(() => {
-    if (shortDesc === 'Component Name') {
-      setCompVersion('2.0.35')
-      setCompName('')
-    }
-    if (
-      shortDesc === 'Component Version' ||
-      shortDesc === 'Primary Component Version'
-    ) {
-      setCompName('dropwizard-core')
-      setCompVersion('')
-    }
-  }, [shortDesc])
+  const inputStyle = { size: 'md', fontSize: 'sm' }
 
   const {
     isOpen: isWarningOpen,
@@ -249,36 +161,38 @@ function ComponentDrawer(props) {
     }
   }
 
-  const license = details?.licenses?.length > 0 ? details.licenses[0].value : ''
-
   const handleCreateCom = () => {
+    const license =
+      details?.licenses?.length > 0 ? details.licenses[0].value : ''
     createComponent({
       variables: {
+        id: data?.id,
         sbomId: sbomId,
-        kind: compKind,
-        name: compName,
-        scope: compScope,
-        group: groupInfo,
-        primary: isPrimary,
-        internal: isInternal,
-        version: compVersion,
-        description: compDesc,
-        supportLevel: compSupport || undefined,
-        endOfSupport: selectedDate || undefined,
+        kind: details?.kind,
+        name: details?.name,
+        group: details?.group,
+        scope: details?.scope,
         purl: identifiers?.purl,
-        licenses: { licensesExp: license || '' },
+        primary: details?.primary,
+        version: details?.version,
+        internal: details?.internal,
+        copyright: details?.copyright,
+        description: details?.description,
+        licenses: { licensesExp: license },
+        supportLevel: details?.supportLevel || 'NONE',
+        endOfSupport: details?.endOfSupport || '',
         cpes: identifiers?.cpe !== '' ? [identifiers?.cpe] : undefined
       }
     })
       .then((res) => {
         if (res.data) {
           prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-          if (relation !== '') {
+          if (relations?.relType !== '') {
             addRelation({
               variables: {
                 from: res.data.componentCreate.component.id,
-                to: component,
-                relType: relation
+                to: relations?.to,
+                relType: relations?.relType
               }
             })
           }
@@ -319,7 +233,14 @@ function ComponentDrawer(props) {
     return result?.desc
   }
 
-  const isInvalid = compKind === '' || compName === '' || compVersion === ''
+  const invalidVersion =
+    details?.version !== '' && SBOMs?.includes(details?.version)
+
+  const isInvalid =
+    details?.kind === '' ||
+    details?.name === '' ||
+    details?.version === '' ||
+    loading
 
   return (
     <>
@@ -342,8 +263,9 @@ function ComponentDrawer(props) {
           <DrawerBody overflowX={'hidden'}>
             <Stack direction={'column'} spacing={4} pt={2} pb={4}>
               {/* Name */}
-              <FormControl isReadOnly={signedUrlParams}>
-                <FormLabel htmlFor='compName' fontSize={'sm'}>
+              {/* Name */}
+              <FormControl isReadOnly={customerView}>
+                <FormLabel htmlFor='name' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Name
@@ -357,15 +279,17 @@ function ComponentDrawer(props) {
                   </Flex>
                 </FormLabel>
                 <Input
-                  size='md'
-                  fontSize={'sm'}
+                  name='name'
+                  sx={inputStyle}
+                  value={details?.name}
                   placeholder='Enter name'
-                  value={compName}
-                  onChange={(e) => setCompName(e.target.value)}
+                  onChange={(e) =>
+                    handleChange('details', 'name', e.target.value)
+                  }
                 />
               </FormControl>
               {/* Description */}
-              <FormControl isReadOnly={signedUrlParams}>
+              <FormControl isReadOnly={customerView}>
                 <FormLabel htmlFor='compDescription' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Description</Text>
@@ -375,19 +299,38 @@ function ComponentDrawer(props) {
                   </Flex>
                 </FormLabel>
                 <Textarea
-                  size='md'
-                  fontSize={'sm'}
+                  sx={inputStyle}
+                  name='description'
+                  value={details?.description}
                   placeholder='Add description'
-                  value={compDesc}
-                  onChange={(e) => setCompDesc(e.target.value)}
+                  onChange={(e) =>
+                    handleChange('details', 'description', e.target.value)
+                  }
+                />
+              </FormControl>
+              {/* Copyright */}
+              <FormControl isReadOnly={customerView}>
+                <FormLabel htmlFor='copyright' fontSize={'sm'}>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                    <Text>Copyright</Text>
+                    <Tooltip label={onCheck(`Component Copyright`)}>
+                      <InfoIcon color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
+                </FormLabel>
+                <Textarea
+                  sx={inputStyle}
+                  name='copyright'
+                  value={details?.copyright}
+                  placeholder='Add copyright'
+                  onChange={(e) =>
+                    handleChange('details', 'copyright', e.target.value)
+                  }
                 />
               </FormControl>
               {/* Version */}
-              <FormControl
-                isReadOnly={signedUrlParams}
-                isInvalid={invalidVersion}
-              >
-                <FormLabel htmlFor='compVersion' fontSize={'sm'}>
+              <FormControl isReadOnly={customerView} isInvalid={invalidVersion}>
+                <FormLabel htmlFor='version' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Version{' '}
@@ -401,11 +344,13 @@ function ComponentDrawer(props) {
                   </Flex>
                 </FormLabel>
                 <Input
-                  size='md'
-                  fontSize={'sm'}
+                  name='version'
+                  sx={inputStyle}
+                  value={details?.version}
                   placeholder='Enter version'
-                  value={compVersion}
-                  onChange={(e) => setCompVersion(e.target.value)}
+                  onChange={(e) =>
+                    handleChange('details', 'version', e.target.value)
+                  }
                 />
                 <FormErrorMessage>
                   This version of the product already exists. Continuing will
@@ -413,7 +358,7 @@ function ComponentDrawer(props) {
                 </FormErrorMessage>
               </FormControl>
               {/* GROUP */}
-              <FormControl isReadOnly={signedUrlParams}>
+              <FormControl isReadOnly={customerView}>
                 <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Group</Text>
@@ -423,11 +368,13 @@ function ComponentDrawer(props) {
                   </Flex>
                 </FormLabel>
                 <Input
-                  size='md'
-                  fontSize={'sm'}
+                  name='group'
+                  value={details?.group}
+                  sx={inputStyle}
                   placeholder='Add group'
-                  value={groupInfo}
-                  onChange={(e) => setGroupInfo(e.target.value)}
+                  onChange={(e) =>
+                    handleChange('details', 'group', e.target.value)
+                  }
                 />
               </FormControl>
               {/* KIND */}
@@ -446,14 +393,14 @@ function ComponentDrawer(props) {
                   </Flex>
                 </FormLabel>
                 <Select
-                  id='componentType'
-                  name='componentType'
-                  size='md'
-                  fontSize={'sm'}
-                  value={compKind}
-                  isDisabled={signedUrlParams}
-                  onChange={(e) => setCompKind(e.target.value)}
+                  name='kind'
+                  value={details?.kind}
+                  sx={inputStyle}
+                  isDisabled={customerView}
                   textTransform={'capitalize'}
+                  onChange={(e) =>
+                    handleChange('details', 'kind', e.target.value)
+                  }
                 >
                   <option value='' style={{ background: 'lightgray' }}>
                     -- Select --
@@ -537,13 +484,13 @@ function ComponentDrawer(props) {
                   </Flex>
                 </FormLabel>
                 <Select
-                  id='compScope'
-                  name='compScope'
-                  size='md'
-                  fontSize={'sm'}
-                  value={compScope}
-                  isDisabled={signedUrlParams}
-                  onChange={(e) => setCompScope(e.target.value)}
+                  name='scope'
+                  value={details?.scope}
+                  sx={inputStyle}
+                  isDisabled={customerView}
+                  onChange={(e) =>
+                    handleChange('details', 'scope', e.target.value)
+                  }
                 >
                   <option value='' style={{ background: 'lightgray' }}>
                     -- Select --
@@ -564,13 +511,13 @@ function ComponentDrawer(props) {
                   </Flex>
                 </FormLabel>
                 <Select
-                  id='compSupport'
-                  name='compSupport'
-                  size='md'
-                  fontSize={'sm'}
-                  value={compSupport}
-                  isDisabled={signedUrlParams}
-                  onChange={(e) => setCompSupport(e.target.value)}
+                  sx={inputStyle}
+                  name='supportLevel'
+                  value={details?.supportLevel}
+                  isDisabled={customerView}
+                  onChange={(e) =>
+                    handleChange('details', 'supportLevel', e.target.value)
+                  }
                 >
                   <option value='' style={{ background: 'lightgray' }}>
                     -- Select --
@@ -597,13 +544,12 @@ function ComponentDrawer(props) {
                 </FormLabel>
                 <Datetime
                   timeFormat={false}
-                  value={selectedDate}
                   closeOnSelect={true}
+                  value={details?.endOfSupport}
                   className={`${react_datatime} endOfSupport`}
                   onChange={handleDateChange}
                   inputProps={{
                     name: 'endOfSupport',
-                    disabled: signedUrlParams,
                     placeholder: 'Add support date',
                     onCopy: (e) => e.preventDefault(),
                     onPaste: (e) => e.preventDefault(),
@@ -620,16 +566,14 @@ function ComponentDrawer(props) {
                 )}
               </FormControl>
               {/* PRIMARY COMPONENT */}
-              <FormControl isReadOnly={signedUrlParams}>
+              <FormControl isReadOnly={customerView}>
                 <Flex alignItems={'center'} gap={2}>
-                  {shortDesc === 'Primary Component' && !isPrimary && (
-                    <WarningTwoIcon w={4} h={4} color='red.500' />
-                  )}
                   <Checkbox
                     size='sm'
+                    name='primary'
                     colorScheme='blue'
-                    isChecked={isPrimary}
                     onChange={onWarningOpen}
+                    isChecked={details?.primary}
                   >
                     Primary component
                   </Checkbox>
@@ -639,13 +583,16 @@ function ComponentDrawer(props) {
                 </Flex>
               </FormControl>
               {/* INTERNAL COMPONENT */}
-              <FormControl isReadOnly={signedUrlParams}>
+              <FormControl isReadOnly={customerView}>
                 <Flex alignItems={'center'} gap={2}>
                   <Checkbox
                     size='sm'
+                    name='internal'
                     colorScheme='blue'
-                    isChecked={isInternal}
-                    onChange={() => setIsInternal(!isInternal)}
+                    isChecked={details?.internal}
+                    onChange={(e) =>
+                      handleChange('details', 'internal', e.target.checked)
+                    }
                   >
                     Internal component
                   </Checkbox>
@@ -670,8 +617,10 @@ function ComponentDrawer(props) {
                   size='md'
                   id='relation'
                   fontSize={'sm'}
-                  value={relation}
-                  onChange={(e) => setRelation(e.target.value)}
+                  value={relations?.relType}
+                  onChange={(e) =>
+                    handleChange('relations', 'relType', e.target.value)
+                  }
                 >
                   <option value=''>-- Select --</option>
                   {[{ value: 'depends_on', label: 'Depends On' }].map(
@@ -691,8 +640,10 @@ function ComponentDrawer(props) {
                   size='md'
                   id='component'
                   fontSize={'sm'}
-                  value={component}
-                  onChange={(e) => setComponent(e.target.value)}
+                  value={relations?.to}
+                  onChange={(e) =>
+                    handleChange('relations', 'to', e.target.value)
+                  }
                 >
                   <option value=''>-- Select --</option>
                   {[...allComponents]
@@ -723,10 +674,7 @@ function ComponentDrawer(props) {
       {/* PRIMARY COMPONENT WARNING */}
       {isWarningOpen && (
         <PrimaryWarning
-          name={compName}
-          version={compVersion}
           isOpen={isWarningOpen}
-          setData={setIsPrimary}
           onClose={onWarningClose}
           primaryComp={primaryComp}
         />

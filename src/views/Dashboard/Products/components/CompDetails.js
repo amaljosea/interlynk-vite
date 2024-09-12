@@ -74,7 +74,6 @@ const CompDetails = ({ data, primaryComp }) => {
 
   const handleDateChange = (newDate) => {
     const isValidDate = newDate && !isNaN(newDate)
-    console.log(newDate)
     setTabData((prev) => ({
       ...prev,
       details: { ...prev?.details, endOfSupport: newDate._d }
@@ -123,8 +122,8 @@ const CompDetails = ({ data, primaryComp }) => {
         version: details?.version,
         description: details?.description,
         copyright: details?.copyright,
-        supportLevel: details?.supportLevel || 'null',
-        endOfSupport: details?.endOfSupport || undefined,
+        supportLevel: details?.supportLevel || 'NONE',
+        endOfSupport: details?.endOfSupport || '',
         licenses: { licensesExp: license }
       }
     }).then((res) => {
@@ -166,7 +165,7 @@ const CompDetails = ({ data, primaryComp }) => {
 
   useEffect(() => {
     if (data) {
-      console.log('data', data)
+      const { supportLevel, licensesExp } = data || {}
       setTabData((prev) => ({
         ...prev,
         details: {
@@ -180,7 +179,10 @@ const CompDetails = ({ data, primaryComp }) => {
           internal: data?.internal,
           description: data?.description,
           copyright: data?.copyright,
-          supportLevel: data?.supportLevel,
+          supportLevel: supportLevel?.replaceAll(' ', '_').toUpperCase() || '',
+          licenses: licensesExp
+            ? [{ value: licensesExp, label: licensesExp }]
+            : [],
           endOfSupport: data?.endOfSupport ? new Date(data?.endOfSupport) : ''
         }
       }))

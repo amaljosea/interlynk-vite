@@ -91,7 +91,6 @@ const CompLinks = ({ data }) => {
 
   const handleCheckUrl = () => {
     const trimmedLink = links?.url?.trim()
-    console.log(trimmedLink)
     if (!validateUrl(trimmedLink)) {
       setLinkError('Please enter a valid URL')
     }

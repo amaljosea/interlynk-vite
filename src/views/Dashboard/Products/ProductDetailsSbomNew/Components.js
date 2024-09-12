@@ -6,7 +6,6 @@ import { useLocation, useParams } from 'react-router-dom'
 import { GetIcon, customStyles, timeSince } from 'utils'
 import { getFullDateAndTime, isUnknown } from 'utils'
 import { truncatedValue } from 'utils'
-import { capitalizeFirstLetter } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 import { openSsf } from 'variables/general'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -686,15 +685,18 @@ const Components = ({ sbomData }) => {
     await deleteSupplier({ variables: { id: id } }).then((res) => res.data)
   }
 
-  const handleExpand = (expanded, row) => {
-    if (expanded) {
-      getCompTree({ variables: { id: row?.id, sbomId } }).then((res) => {
-        if (res?.data) {
-          setActiveRow(res?.data?.component)
-        }
-      })
-    }
-  }
+  const handleExpand = useCallback(
+    (expanded, row) => {
+      if (expanded) {
+        getCompTree({ variables: { id: row?.id, sbomId } }).then((res) => {
+          if (res?.data) {
+            setActiveRow(res?.data?.component)
+          }
+        })
+      }
+    },
+    [getCompTree, sbomId]
+  )
 
   // EXPAND SECTION
   const ExpandedComponent = ({ data }) => {
