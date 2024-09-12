@@ -74,7 +74,7 @@ const VexInfoDrawer = ({ isOpen, onClose, data, vulnId }) => {
               <Text sx={style}>{actionStmt || 'N/A'}</Text>
             </Box>
             <Box>
-              <CustomText>FIXED VERSOIN</CustomText>
+              <CustomText>FIXED VERSION</CustomText>
               <Text sx={style}>{fixedIn || 'N/A'}</Text>
             </Box>
             <Box>

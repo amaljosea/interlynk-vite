@@ -214,7 +214,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
           <Tag
             size='md'
             variant='solid'
-            width={'130px'}
+            width={'150px'}
             colorScheme={statusColor(vexStatus?.name || 'Unspecified')}
           >
             <TagLabel mx={'auto'} as={Flex} gap={2} alignItems='center'>
