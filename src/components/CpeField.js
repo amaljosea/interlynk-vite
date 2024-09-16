@@ -80,11 +80,6 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
     }
   }
 
-  const handleBlur = (e) => {
-    e.preventDefault()
-    identifiers?.cpe !== '' && handleValidate(identifiers?.cpe)
-  }
-
   useEffect(() => {
     listItemsRef.current[0]?.focus()
   }, [])
@@ -123,7 +118,6 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
             value={identifiers?.cpe}
             onChange={onChange}
             autoComplete='off'
-            onBlur={handleBlur}
             onKeyDown={handleKeyDown}
           />
           {identifiers?.cpe && (
@@ -154,6 +148,9 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
           <List>
             {cpeList.map((item, index) => (
               <ListItem
+                py={1}
+                px={4}
+                p={2}
                 key={index}
                 ref={(el) => (listItemsRef.current[index] = el)}
                 tabIndex='0'
@@ -163,13 +160,10 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
                 }}
                 onMouseEnter={() => setFocusedIndex(null)}
                 outline='none'
-                p={2}
                 fontSize={'sm'}
                 width={'100%'}
                 cursor={'pointer'}
                 onClick={() => handleSelect(item)}
-                py={1}
-                px={4}
               >
                 {item}
               </ListItem>

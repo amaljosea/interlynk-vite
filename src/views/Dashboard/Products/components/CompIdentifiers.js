@@ -97,6 +97,12 @@ const CompIdentifiers = ({ data }) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
     handleChange('identifiers', 'cpe', val)
+    const matches = validateCpe(val)
+    if (matches) {
+      handleChange('identifiers', 'isValidCpe', true)
+    } else {
+      handleChange('identifiers', 'isValidCpe', false)
+    }
     getCpe({
       variables: {
         input: { idType: 'cpe', ecosystem: 'cpe', search: { idUri: val } }
@@ -250,7 +256,6 @@ const CompIdentifiers = ({ data }) => {
         {cpeOpen && (
           <CpeInputs
             value={cpeValue}
-            activeComp={data}
             setValue={setCpeValue}
             onClose={() => setCpeOpen(false)}
           />

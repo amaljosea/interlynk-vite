@@ -1,6 +1,7 @@
 import { useLazyQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useRef, useState } from 'react'
+import { validateCpe } from 'utils'
 
 import {
   Button,
@@ -20,9 +21,7 @@ import { CpeAutoComplete } from 'graphQL/Queries'
 
 import IdentifierLabel from './IdentifierLabel'
 
-const CpeInputs = ({ onClose, activeComp, value, setValue }) => {
-  const { cpes } = activeComp || ''
-
+const CpeInputs = ({ onClose, value, setValue }) => {
   const { handleChange } = useContext(TabContext)
 
   const [cpeData, setCpeData] = useState({
@@ -68,6 +67,12 @@ const CpeInputs = ({ onClose, activeComp, value, setValue }) => {
   // ON CPE SAVE
   const handleSave = () => {
     handleChange('identifiers', 'cpe', value)
+    const matches = validateCpe(value)
+    if (matches) {
+      handleChange('identifiers', 'isValidCpe', true)
+    } else {
+      handleChange('identifiers', 'isValidCpe', false)
+    }
     onClose()
   }
 
@@ -162,9 +167,9 @@ const CpeInputs = ({ onClose, activeComp, value, setValue }) => {
 
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
-    if (cpes?.length > 0) {
+    if (value) {
       const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
-      const components = cpes[0].split(':')
+      const components = value?.split(':')
       const isValid =
         components[2] && allowedValues.includes(components[2].toLowerCase())
       setCpeData((prev) => ({
@@ -182,7 +187,7 @@ const CpeInputs = ({ onClose, activeComp, value, setValue }) => {
         other: components[12]?.replace(/\*/g, '') || ''
       }))
     }
-  }, [cpes])
+  }, [value])
 
   return (
     <Flex width={'100%'} direction={'column'} gap={4}>

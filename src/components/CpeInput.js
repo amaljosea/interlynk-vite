@@ -55,6 +55,14 @@ const CpeInput = ({
     setString(cpe)
   }
 
+  const nameMapping = {
+    packageName: 'Package Name',
+    packageVersion: 'Version',
+    cpeVersion: 'Version'
+  }
+
+  const label = nameMapping[name] || name
+
   const updateString = (name, value) => {
     if (value !== '') {
       if (name === 'vendor') {
@@ -171,13 +179,7 @@ const CpeInput = ({
         }
       >
         {name !== 'cpe' && (
-          <FormLabel fontSize={12} textTransform={'capitalize'}>
-            {name === 'packageName'
-              ? 'Package Name'
-              : name === 'packageVersion'
-                ? 'Version'
-                : name}
-          </FormLabel>
+          <FormLabel textTransform={'capitalize'}>{label}</FormLabel>
         )}
         <InputGroup>
           <Input
