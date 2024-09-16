@@ -22,7 +22,7 @@ export const HealthScore = ({ value, isComponent }) => {
         borderRightRadius={'md'}
         sx={{
           background:
-            'linear-gradient(90deg, rgba(245,101,101,1) 0%, rgba(236,201,75,1) 50%, rgba(72,187,120,1) 100%)'
+            'linear-gradient(to right, #FF9F9B, #FFBB8A, #FFDB8A, #88EEB0)'
         }}
       />
       <Box
