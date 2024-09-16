@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import DeleteModal from 'views/Dashboard/Support/DeleteModal'
 import StatusModal from 'views/Dashboard/Support/StatusModal'
@@ -32,6 +32,7 @@ import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { GetSbomSupportTab } from 'graphQL/Queries'
 
@@ -42,9 +43,7 @@ const Support = ({ sbomData }) => {
   const params = useParams()
   const projectId = params.productid
   const sbomId = params.sbomid
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
+  const activeTab = useQueryParam('tab')
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
@@ -303,8 +302,10 @@ const Support = ({ sbomData }) => {
       id: 'COMPONENT_SUPPORT_OVERRIDES_UPDATED_AT',
       name: 'UPDATED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-          <Text color={textColor}>{timeSince(row.updatedAt)}</Text>
+        <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
+          <Text color={textColor}>
+            {row?.updatedAt ? timeSince(row?.updatedAt) : ''}
+          </Text>
         </Tooltip>
       ),
       right: 'true',
