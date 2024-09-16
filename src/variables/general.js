@@ -71,34 +71,28 @@ export const settingActions = [
     path: '/vendor/settings?tab=legal'
   },
   {
-    id: 'connections',
-    name: 'Connections',
+    id: 'integrations-org',
+    name: 'Integrations (Org)',
     section: 'Organization',
-    path: '/vendor/settings?tab=connections'
+    path: '/vendor/settings?tab=integrations-org'
   },
   {
-    id: 'personal-details',
-    name: 'Personal Details',
-    section: 'Personal',
-    path: '/vendor/settings?tab=personal-details'
+    id: 'plan',
+    name: 'Plan',
+    section: 'Organization',
+    path: '/vendor/settings?tab=plan'
   },
   {
-    id: 'organizations',
-    name: 'Organizations',
+    id: 'integrations',
+    name: 'Integrations',
     section: 'Personal',
-    path: '/vendor/settings?tab=organizations'
+    path: '/vendor/settings?tab=integrations'
   },
   {
     id: 'security-tokens',
     name: 'Security Tokens',
     section: 'Personal',
     path: '/vendor/settings?tab=security-tokens'
-  },
-  {
-    id: 'notifications',
-    name: 'Notifications',
-    section: 'Personal',
-    path: '/vendor/settings?tab=notifications'
   }
 ]
 
