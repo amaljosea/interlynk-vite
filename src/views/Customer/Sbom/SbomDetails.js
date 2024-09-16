@@ -1,5 +1,5 @@
 import { useLazyQuery } from '@apollo/client'
-import { refetchActiveQueries } from 'context/ApolloWrapper'
+import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
@@ -24,9 +24,11 @@ import GraphDrawer from 'components/Drawer/GraphDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useGradualPolling } from 'hooks/useGradualPolling'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
+import { GetProductData } from 'graphQL/Queries'
 import { GetSharPrimartComp } from 'graphQL/Queries'
 
 import {
@@ -38,7 +40,7 @@ import {
 } from 'react-icons/fa'
 import { FaCircleCheck } from 'react-icons/fa6'
 
-const SbomDetails = ({ sbomData }) => {
+const SbomDetails = () => {
   const partsContext = usePartsContext()
   const navigate = useNavigate()
   const params = useParams()
@@ -55,6 +57,16 @@ const SbomDetails = ({ sbomData }) => {
     })
     navigate(link)
   }
+  const { prodCompState, dispatch } = useGlobalState()
+  const { prodCompDispatch, prodVulnDispatch } = dispatch
+
+  const { data, startPolling, stopPolling } = useQuery(GetProductData, {
+    variables: { projectId: projectId, sbomId: sbomId }
+  })
+
+  const shouldPoll = data?.sbom?.vulnRunStatus !== 'FINISHED'
+
+  useGradualPolling({ shouldPoll, startPolling, stopPolling })
 
   const {
     project,
@@ -65,12 +77,11 @@ const SbomDetails = ({ sbomData }) => {
     lifecycle,
     stats,
     sbomParts
-  } = sbomData || ''
+  } = data?.sbom || ''
   const { compCount, compLicenseCount, vulnStats } = stats || ''
   const { critical, high, medium, low, unknown } = vulnStats || ''
-  const { prodCompState, dispatch } = useGlobalState()
+
   const { field, direction } = prodCompState
-  const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
@@ -131,20 +142,6 @@ const SbomDetails = ({ sbomData }) => {
       handlePart()
     }
   })
-
-  console.log('details', sbomData)
-
-  useEffect(() => {
-    const refetchInterval = setInterval(() => {
-      if (sbomData?.vulnRunStatus === 'IN_PROGRESS') {
-        refetchActiveQueries()
-      } else {
-        clearInterval(refetchInterval)
-      }
-    }, 5000)
-
-    return () => clearInterval(refetchInterval)
-  }, [sbomData, projectId, sbomId])
 
   return (
     <>
