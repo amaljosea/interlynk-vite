@@ -6,22 +6,20 @@ import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { infoData } from 'variables/general'
+import CpeInputs from 'views/Dashboard/Products/components/CpeInputs'
+import PurlInputs from 'views/Dashboard/Products/components/PurlInputs'
 
-import { InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
+import { CheckIcon, InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
-  Button,
   Checkbox,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Input,
+  InputGroup,
+  InputRightElement,
+  Link,
   Select,
   Stack,
   Text,
@@ -34,6 +32,7 @@ import {
 
 import CpeField from 'components/CpeField'
 import LicenseField from 'components/Licenses/LicenseField'
+import LynkModal from 'components/LynkModal'
 import CompInfo from 'components/Misc/CompInfo'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
@@ -43,6 +42,8 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { CreateCompRelation, CreateComponent } from 'graphQL/Mutation'
 import { CpeAutoComplete, GetAllComponents, GetAllSboms } from 'graphQL/Queries'
+
+import { BiLayer } from 'react-icons/bi'
 
 function ComponentDrawer(props) {
   const navigate = useNavigate()
@@ -87,6 +88,10 @@ function ComponentDrawer(props) {
 
   const [cpeData, setCpeData] = useState([])
   const [allComponents, setAllComponents] = useState([])
+  const [showPurl, setShowPurl] = useState(false)
+  const [showCpe, setShowCpe] = useState(false)
+  const [purlValue, setPurlValue] = useState('')
+  const [cpeValue, setCpeValue] = useState('')
 
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
@@ -223,7 +228,7 @@ function ComponentDrawer(props) {
     })
   }
 
-  const onDrawerClose = () => {
+  const onModalClose = () => {
     navigate(link)
     onClose()
   }
@@ -242,28 +247,60 @@ function ComponentDrawer(props) {
     details?.version === '' ||
     loading
 
+  const handlePurlExpand = () => {
+    if (showPurl) setShowPurl(false)
+    else {
+      setPurlValue(identifiers?.purl || 'pkg:type/name@version')
+      setShowPurl(true)
+    }
+  }
+
+  const handleCpeExpand = () => {
+    if (showCpe) setShowCpe(false)
+    else {
+      setCpeValue(identifiers?.cpe || 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*')
+      setShowCpe(true)
+    }
+  }
   return (
     <>
-      <Drawer
-        size='md'
+      <LynkModal
         isOpen={isOpen}
-        placement='right'
-        onClose={onDrawerClose}
-        closeOnOverlayClick={false}
+        onClose={onModalClose}
+        onSubmit={
+          showPurl
+            ? handlePurlExpand
+            : showCpe
+              ? handleCpeExpand
+              : handleCreateCom
+        }
+        isLoading={loading}
+        disabled={showPurl || showCpe ? false : isInvalid}
+        hidden={signedUrlParams}
+        title={signedUrlParams ? 'Component' : 'Add Component'}
+        Icon={BiLayer}
+        buttonText={showPurl || showCpe ? 'Back' : 'Save'}
+        noFooter={showPurl || showCpe}
       >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton mt={2} />
-          <DrawerHeader borderBottomWidth='1px'>
-            <Text mb={signedUrlParams ? 1 : 0} fontWeight={'medium'}>
-              {signedUrlParams ? 'Component' : 'Add Component'}
-            </Text>
-            {signedUrlParams && <CompInfo data={data} />}
-          </DrawerHeader>
-          <DrawerBody overflowX={'hidden'}>
-            <Stack direction={'column'} spacing={4} pt={2} pb={4}>
-              {/* Name */}
-              {/* Name */}
+        <Stack direction={'column'} spacing={4} pb={4}>
+          {/* Name */}
+          {signedUrlParams && <CompInfo data={data} />}
+          {showPurl ? (
+            <PurlInputs
+              activeComp={data}
+              value={purlValue}
+              setValue={setPurlValue}
+              onClose={handlePurlExpand}
+            />
+          ) : showCpe ? (
+            <CpeInputs
+              value={cpeValue}
+              activeComp={data}
+              setValue={setCpeValue}
+              onClose={handleCpeExpand}
+            />
+          ) : (
+            <>
               <FormControl isReadOnly={customerView}>
                 <FormLabel htmlFor='name' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
@@ -451,21 +488,60 @@ function ComponentDrawer(props) {
                 isReadOnly={customerView}
                 isInvalid={identifiers?.purl && !identifiers?.isValidPurl}
               >
-                <Input
-                  type='text'
-                  size='md'
-                  id='purl'
-                  name='purl'
-                  fontSize={'sm'}
-                  placeholder='PURL'
-                  value={identifiers?.purl}
-                  autoComplete='off'
-                  onChange={handlePURLInputChange}
-                  onBlur={purlInputBlur}
-                />
+                <FormLabel fontSize={12} htmlFor='text'>
+                  Package URL
+                  <Link
+                    color={'blue.500'}
+                    mx={2}
+                    _hover={{ textDecoration: 'underline' }}
+                    fontWeight={'medium'}
+                    fontSize={'11px'}
+                    onClick={handlePurlExpand}
+                    hidden={customerView}
+                  >
+                    {showPurl ? '(Collapse)' : '(Expand)'}
+                  </Link>
+                </FormLabel>
+                <InputGroup>
+                  <Input
+                    type='text'
+                    size='md'
+                    id='purl'
+                    name='purl'
+                    fontSize={'sm'}
+                    placeholder='PURL'
+                    value={identifiers?.purl}
+                    autoComplete='off'
+                    onChange={handlePURLInputChange}
+                    onBlur={purlInputBlur}
+                  />
+                  <InputRightElement align='center' zIndex={-1}>
+                    {identifiers?.purl != null && identifiers?.purl !== '' ? (
+                      identifiers?.isValidPurl ? (
+                        <CheckIcon color='green' />
+                      ) : (
+                        <WarningTwoIcon color='red' />
+                      )
+                    ) : null}
+                  </InputRightElement>
+                </InputGroup>
               </FormControl>
               {/* CPE INPUT */}
               <FormControl>
+                <FormLabel fontSize={12} htmlFor='text'>
+                  CPE
+                  <Link
+                    color={'blue.500'}
+                    mx={2}
+                    _hover={{ textDecoration: 'underline' }}
+                    fontWeight={'medium'}
+                    fontSize={'11px'}
+                    onClick={handleCpeExpand}
+                    hidden={customerView}
+                  >
+                    {showCpe ? '(Collapse)' : '(Expand)'}
+                  </Link>
+                </FormLabel>
                 <CpeField
                   inputRef={cpeRef}
                   cpeList={cpeData}
@@ -473,6 +549,7 @@ function ComponentDrawer(props) {
                   onChange={handleCpeChange}
                 />
               </FormControl>
+
               {/* SCOPE */}
               <FormControl>
                 <FormLabel htmlFor='compScope'>
@@ -655,21 +732,10 @@ function ComponentDrawer(props) {
                     ))}
                 </Select>
               </FormControl>
-              <Button
-                colorScheme='blue'
-                variant={'outline'}
-                isLoading={loading}
-                width={'fit-content'}
-                isDisabled={isInvalid}
-                hidden={signedUrlParams}
-                onClick={handleCreateCom}
-              >
-                Save
-              </Button>
-            </Stack>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
+            </>
+          )}
+        </Stack>
+      </LynkModal>
 
       {/* PRIMARY COMPONENT WARNING */}
       {isWarningOpen && (
