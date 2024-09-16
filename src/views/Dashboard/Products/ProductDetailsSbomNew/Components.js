@@ -4,8 +4,7 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { GetIcon, customStyles, timeSince } from 'utils'
-import { getFullDateAndTime, isUnknown } from 'utils'
-import { truncatedValue } from 'utils'
+import { getFullDateAndTime, isUnknown, truncatedValue } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 import { openSsf } from 'variables/general'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -29,7 +28,6 @@ import {
   Skeleton,
   Stack,
   Tag,
-  TagCloseButton,
   TagLabel,
   Text,
   Tooltip,
@@ -50,6 +48,7 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
+import SupplierTag from 'components/SupplierTag'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -94,6 +93,8 @@ const Components = ({ sbomData }) => {
   const customerView = location.pathname.startsWith('/customer')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const { colorMode } = useColorMode()
+
+  const isArchived = sbomData?.lifecycle === 'archived'
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -671,7 +672,8 @@ const Components = ({ sbomData }) => {
       },
       width: '10%',
       wrap: true,
-      right: 'true'
+      right: 'true',
+      omit: isArchived
     }
   ]
 
@@ -681,8 +683,10 @@ const Components = ({ sbomData }) => {
   }
   const [deleteSupplier] = useMutation(deleteComSupplier)
 
-  const handleSupRemove = async (id) => {
-    await deleteSupplier({ variables: { id: id } }).then((res) => res.data)
+  const handleSupRemove = async (item) => {
+    await deleteSupplier({ variables: { id: item?.id } }).then(
+      (res) => res.data
+    )
   }
 
   const handleExpand = useCallback(
@@ -755,40 +759,16 @@ const Components = ({ sbomData }) => {
           <GridItem>
             <CustomText>Supplier :</CustomText>
             <VStack spacing={4} mt={1} alignItems={'left'}>
-              {suppliers?.length > 0 ? (
+              {!signedUrlParams && suppliers?.length > 0 ? (
                 <>
                   {suppliers.map((item, index) => (
-                    <Tag
-                      size={'md'}
+                    <SupplierTag
                       key={index}
-                      variant='subtle'
-                      colorScheme='orange'
-                      width={'fit-content'}
-                    >
-                      <Text wordBreak={'break-all'}>
-                        {item?.contactName}
-                        {item?.contactEmail && ` (${item?.contactEmail})`}
-                        {item?.url ? (
-                          <Link
-                            href={
-                              item?.url?.startsWith(`https://`) === true
-                                ? item?.url
-                                : `https://${item?.url}`
-                            }
-                            isExternal
-                          >
-                            {' '}
-                            {item.name}
-                          </Link>
-                        ) : (
-                          ` ${item.name}`
-                        )}
-                      </Text>
-                      <TagCloseButton
-                        hidden={signedUrlParams}
-                        onClick={() => handleSupRemove(item.id)}
-                      />
-                    </Tag>
+                      item={item}
+                      editable={false}
+                      premission={isArchived}
+                      onDelete={() => handleSupRemove(item)}
+                    />
                   ))}
                 </>
               ) : (
@@ -1053,8 +1033,8 @@ const Components = ({ sbomData }) => {
               variant='solid'
               fontWeight='normal'
               fontSize={'sm'}
-              hidden={signedUrlParams}
               isDisabled={restricted}
+              hidden={signedUrlParams || isArchived}
             />
           </Tooltip>
           <RefreshBtn onClick={() => reset()} />
@@ -1071,6 +1051,7 @@ const Components = ({ sbomData }) => {
     onCreateComponent,
     signedUrlParams,
     restricted,
+    isArchived,
     reset
   ])
 

@@ -15,7 +15,13 @@ const SupplierTag = ({ key, item, premission, onEdit, onDelete, editable }) => {
   const { contactName, contactEmail, url, name } = item || {}
   const supplierURL = url?.startsWith('http') ? item.url : `http://${url}`
   return (
-    <Tag height={8} key={key} variant='subtle' colorScheme='orange'>
+    <Tag
+      key={key}
+      height={8}
+      variant='subtle'
+      colorScheme='orange'
+      width={'fit-content'}
+    >
       <Tooltip
         label={
           <Stack dir='column' spacing={1}>
@@ -38,10 +44,10 @@ const SupplierTag = ({ key, item, premission, onEdit, onDelete, editable }) => {
           as={FaEdit}
           cursor={'pointer'}
           onClick={onEdit}
-          hidden={!premission}
+          hidden={premission}
         />
       )}
-      <TagCloseButton hidden={!premission} onClick={() => onDelete(item)} />
+      <TagCloseButton hidden={premission} onClick={() => onDelete(item)} />
     </Tag>
   )
 }

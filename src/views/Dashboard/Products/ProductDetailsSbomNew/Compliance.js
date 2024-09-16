@@ -26,12 +26,14 @@ import useQueryParam from 'hooks/useQueryParam'
 
 import { GetSbomQualityScores } from 'graphQL/Queries'
 
-const Compliance = () => {
+const Compliance = ({ sbomData }) => {
   const params = useParams()
   const tab = useQueryParam('tab')
   const borderColor = useColorModeValue('#E2E8F0', '#ffffff29')
   const textColor = useColorModeValue('gray.600', 'gray.200')
   const linkColor = useColorModeValue('#3182ce', '#63b3ed')
+
+  const isArchived = sbomData?.lifecycle === 'archived'
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -108,7 +110,6 @@ const Compliance = () => {
                 fontSize={'16px'}
                 cursor={'pointer'}
                 fontWeight={'medium'}
-                onClick={() => onCheck(index)}
                 _hover={{ color: 'blue.500' }}
               >
                 {item?.title}
@@ -141,6 +142,7 @@ const Compliance = () => {
                 size='sm'
                 fontSize={'xs'}
                 hidden={!item?.score}
+                isDisabled={isArchived}
                 onClick={() => onCheck(index)}
               >
                 {item?.score === '0 %' ? 'N/A' : item?.score}

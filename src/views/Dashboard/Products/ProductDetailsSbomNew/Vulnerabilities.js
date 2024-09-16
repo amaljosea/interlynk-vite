@@ -110,9 +110,7 @@ const ExpandedComponent = ({
   setActiveRow,
   onCvssOpen,
   textColor,
-  allVexStatus,
-  allVexJustify,
-  allCdx
+  isArchived
 }) => {
   const { vuln, fixedVersions, lastAffectedVersions } = data
   const CustomText = styled(Text)`
@@ -253,14 +251,7 @@ const ExpandedComponent = ({
         </GridItem>
         {/* STATUS UPDATE */}
         <GridItem w='90%' ml={'auto'} colSpan={3}>
-          {data && (
-            <VexStatusComponent
-              data={data}
-              allVexStatus={allVexStatus}
-              allVexJustify={allVexJustify}
-              allCdx={allCdx}
-            />
-          )}
+          {data && <VexStatusComponent data={data} isArchived={isArchived} />}
         </GridItem>
       </Grid>
     </Box>
@@ -272,6 +263,8 @@ const Vulnerabilities = ({ sbomData }) => {
   const productId = params.productid
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+
+  const isArchived = sbomData?.lifecycle === 'archived'
 
   const { data: configs } = useQuery(GetOrgConnections, {
     fetchPolicy: 'network-only'
@@ -901,7 +894,7 @@ const Vulnerabilities = ({ sbomData }) => {
       },
       wrap: true,
       right: 'true',
-      omit: customerView ? true : false
+      omit: customerView || isArchived ? true : false
     }
   ]
 
@@ -1010,7 +1003,7 @@ const Vulnerabilities = ({ sbomData }) => {
             <IconButton
               colorScheme='blue'
               onClick={handleScan}
-              hidden={signedUrlParams}
+              hidden={signedUrlParams || isArchived}
               icon={<FaBug />}
             />
           </Tooltip>
@@ -1025,7 +1018,7 @@ const Vulnerabilities = ({ sbomData }) => {
                 prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
                 onTableOpen()
               }}
-              hidden={signedUrlParams}
+              hidden={signedUrlParams || isArchived}
               isDisabled={!editVulns}
               icon={<FaCopy size={18} />}
             />
@@ -1041,6 +1034,7 @@ const Vulnerabilities = ({ sbomData }) => {
     handleScan,
     handleSearch,
     onOpen,
+    isArchived,
     onSearchInputChange,
     onTableOpen,
     prodVulnDispatch,
@@ -1083,12 +1077,11 @@ const Vulnerabilities = ({ sbomData }) => {
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
           expandableRowsComponentProps={{
+            allCdx,
             setActiveRow,
             onCvssOpen,
             textColor,
-            allVexStatus,
-            allVexJustify,
-            allCdx
+            isArchived
           }}
           selectableRows={!signedUrlParams}
           clearSelectedRows={toggleClear}

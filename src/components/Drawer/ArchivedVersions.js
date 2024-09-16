@@ -1,18 +1,19 @@
 import { useQuery } from '@apollo/client'
 import { useState } from 'react'
-import DataTable from 'react-data-table-component'
-import { useParams } from 'react-router-dom'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { useNavigate, useParams } from 'react-router-dom'
+import { getFullDateAndTime, timeSince, truncatedValue } from 'utils'
 
 import {
-  Box,
+  ButtonGroup,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
   DrawerOverlay,
+  Flex,
   IconButton,
+  Stack,
   Text,
   Tooltip,
   useColorModeValue,
@@ -23,16 +24,20 @@ import CustomLoader from 'components/CustomLoader'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { GetArchivedVersions, GetVersions } from 'graphQL/Queries'
 
+import { FaEye } from 'react-icons/fa6'
 import { MdOutlineUnarchive } from 'react-icons/md'
 
 const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
+  const navigate = useNavigate()
   const { showToast } = useCustomToast()
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
   const params = useParams()
   const productId = params?.productid
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const [activeRow, setActiveRow] = useState(null)
 
@@ -78,55 +83,15 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
     }
   }
 
-  const columns = [
-    // VERSION
-    {
-      id: 'SBOMS_PROJECT_VERSION',
-      name: 'VERSION',
-      selector: (row) => {
-        const { projectVersion } = row
-        return (
-          <Text color={textColor} fontSize={14}>
-            {projectVersion}
-          </Text>
-        )
-      },
-      wrap: true
-    },
-    // CREATED AT
-    {
-      id: 'SBOMS_CREATED_AT',
-      name: 'UPLOADED',
-      selector: (row) => {
-        const { createdAt } = row
-        return (
-          <Tooltip label={getFullDateAndTime(createdAt)} placement='top'>
-            <Text color={textColor} textAlign={'right'}>
-              {timeSince(createdAt)}
-            </Text>
-          </Tooltip>
-        )
-      },
-      right: 'true'
-    },
-    // ACTIONS
-    {
-      id: 'ACTION',
-      name: 'ACTION',
-      selector: (row) => {
-        return (
-          <Tooltip label='Restore' placement='top'>
-            <IconButton
-              size='xs'
-              onClick={() => onRestore(row)}
-              icon={<MdOutlineUnarchive size={20} color={textColor} />}
-            />
-          </Tooltip>
-        )
-      },
-      right: 'true'
-    }
-  ]
+  const onView = (row) => {
+    const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+      sbomid: row?.id,
+      paramsObj: {
+        tab: 'general'
+      }
+    })
+    navigate(link)
+  }
 
   return (
     <>
@@ -142,17 +107,53 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
           <DrawerCloseButton mt={2} />
           <DrawerHeader borderBottomWidth='1px'>Archived Versions</DrawerHeader>
           <DrawerBody>
-            <Box height={'85%'} overflowY={'scroll'}>
-              <DataTable
-                responsive
-                persistTableHead
-                columns={columns}
-                data={sbomArchived || []}
-                progressPending={loading}
-                progressComponent={<CustomLoader />}
-                customStyles={customStyles(headColor)}
-              />
-            </Box>
+            {loading ? (
+              <CustomLoader />
+            ) : (
+              <Flex my={2} flexDir={'column'} alignItems={'flex-start'} gap={5}>
+                {sbomArchived?.map((item, index) => (
+                  <Flex
+                    w={'full'}
+                    key={index}
+                    alignItems={'flex-start'}
+                    justifyContent={'space-between'}
+                  >
+                    <Stack spacing={0}>
+                      <Text>
+                        {truncatedValue(item?.project?.projectGroup?.name, 20)}{' '}
+                        : {truncatedValue(item?.projectVersion, 20)}
+                      </Text>
+                      <Tooltip
+                        label={getFullDateAndTime(item?.createdAt)}
+                        placement='top'
+                      >
+                        <Text color={'gray.500'} fontSize={'sm'}>
+                          Last updated {timeSince(item?.createdAt)}
+                        </Text>
+                      </Tooltip>
+                    </Stack>
+                    <ButtonGroup>
+                      <Tooltip label='View' placement='top'>
+                        <IconButton
+                          variant='outline'
+                          onClick={() => onView(item)}
+                          icon={<FaEye size={16} color={textColor} />}
+                        />
+                      </Tooltip>
+                      <Tooltip label='Restore' placement='top'>
+                        <IconButton
+                          variant='outline'
+                          onClick={() => onRestore(item)}
+                          icon={
+                            <MdOutlineUnarchive size={20} color={textColor} />
+                          }
+                        />
+                      </Tooltip>
+                    </ButtonGroup>
+                  </Flex>
+                ))}
+              </Flex>
+            )}
           </DrawerBody>
         </DrawerContent>
       </Drawer>

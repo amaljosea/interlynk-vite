@@ -1172,6 +1172,11 @@ export const GetArchivedVersions = gql`
         createdAt
         lifecycle
         projectVersion
+        project {
+          projectGroup {
+            name
+          }
+        }
       }
     }
   }

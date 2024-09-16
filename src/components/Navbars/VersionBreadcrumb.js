@@ -3,15 +3,17 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Select from 'react-select'
 
-import { Spinner, useColorModeValue } from '@chakra-ui/react'
+import { Spinner, Text, useColorModeValue } from '@chakra-ui/react'
+
+import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { GetProjectVersionAndId } from 'graphQL/Queries'
+import { GetArchivedVersions } from 'graphQL/Queries'
 
 import { customFilter } from './customFilter'
-import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
 const VersionBreadcrumb = ({ selectStyles }) => {
   const navigate = useNavigate()
@@ -29,6 +31,12 @@ const VersionBreadcrumb = ({ selectStyles }) => {
 
   const prodID = params.productid
   const sbomId = params.sbomid
+
+  const { data: archiveData } = useQuery(GetArchivedVersions, {
+    variables: { id: prodID }
+  })
+  const { sbomArchived } = archiveData?.project || ''
+  const archivedVersion = sbomArchived?.find((item) => item?.id === sbomId)
 
   const { data: versionData, loading } = useQuery(GetProjectVersionAndId, {
     variables: {
@@ -63,6 +71,10 @@ const VersionBreadcrumb = ({ selectStyles }) => {
     })
     navigate(link)
   }
+
+  if (archivedVersion?.id)
+    return <Link to={'#'}>{archivedVersion?.projectVersion}</Link>
+
   if (path === 'customer' && sbomHookData.versionName) {
     return (
       <Link to={generateProductVersionDetailPageUrlFromCurrentUrl()}>

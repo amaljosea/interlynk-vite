@@ -38,13 +38,15 @@ import { GetSbomSupportTab } from 'graphQL/Queries'
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaPlus } from 'react-icons/fa6'
 
-const Support = () => {
+const Support = ({ sbomData }) => {
   const params = useParams()
   const projectId = params.productid
   const sbomId = params.sbomid
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
+
+  const isArchived = sbomData?.lifecycle === 'archived'
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -164,7 +166,15 @@ const Support = () => {
         </Stack>
       </Flex>
     )
-  }, [filterText, onSearchInputChange, handleClear, handleSearch, sbomId, onOpen, reset])
+  }, [
+    filterText,
+    onSearchInputChange,
+    handleClear,
+    handleSearch,
+    sbomId,
+    onOpen,
+    reset
+  ])
 
   const getColor = (eolDate) => {
     const currentDate = new Date()
@@ -346,7 +356,7 @@ const Support = () => {
       },
       width: '8%',
       right: 'true',
-      omit: sbomId ? true : false
+      omit: sbomId || isArchived ? true : false
     }
   ]
 

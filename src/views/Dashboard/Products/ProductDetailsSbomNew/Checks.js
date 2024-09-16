@@ -62,7 +62,7 @@ import AuthorModal from '../components/AuthorModal'
 import FixedModal from '../components/FixedModal'
 import CheckFilters from './CheckFilters'
 
-const Checks = () => {
+const Checks = ({ sbomData }) => {
   const { isFreeTier } = useGlobalQueryContext()
   const { showToast } = useCustomToast()
   const params = useParams()
@@ -74,6 +74,8 @@ const Checks = () => {
   const customerView = location.pathname.startsWith('/customer')
 
   const { setTabData } = useContext(TabContext)
+
+  const isArchived = sbomData?.lifecycle === 'archived'
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -89,7 +91,7 @@ const Checks = () => {
   const [getComPath, { data: relation }] = useLazyQuery(GetComponentPath)
   const { pathToPrimary } = relation?.component || ''
 
-  const { sbom: sbomData } = prodData || ''
+  const { sbom } = prodData || ''
 
   const [checkState, setCheckState] = useState({
     field: 'CHECK_RESULTS_UPDATED_AT',
@@ -325,6 +327,7 @@ const Checks = () => {
               colorScheme='blue'
               fontWeight='normal'
               onClick={handleReCheck}
+              hidden={isArchived}
               isDisabled={!editChecks}
               icon={<FaCheckDouble size={16} />}
             />
@@ -334,6 +337,7 @@ const Checks = () => {
       </Flex>
     )
   }, [
+    isArchived,
     checkSearch,
     onSearchInputChange,
     handleSearch,
@@ -639,7 +643,7 @@ const Checks = () => {
                     fontWeight='normal'
                     icon={<BiSolidWrench size={18} />}
                     onClick={() => onCheckOpen(row)}
-                    disabled={customerView || !isEditable}
+                    disabled={customerView || !isEditable || isArchived}
                   />
                 </Tooltip>
 
@@ -651,7 +655,7 @@ const Checks = () => {
                     fontWeight='normal'
                     icon={<GoSkip size={18} />}
                     onClick={() => updateIssue(id)}
-                    disabled={customerView || !editChecks}
+                    disabled={customerView || !editChecks || isArchived}
                   />
                 </Tooltip>
               </Stack>
@@ -666,7 +670,7 @@ const Checks = () => {
                 colorScheme='whatsapp'
                 leftIcon={<CheckIcon />}
                 onClick={() => (isPrimary ? null : onFixedOpen())}
-                disabled={customerView || !editChecks}
+                disabled={customerView || !editChecks || isArchived}
               >
                 {isPrimary ? 'Fixed' : 'View'}
               </Button>
@@ -678,6 +682,7 @@ const Checks = () => {
                 fontSize={'xs'}
                 variant='solid'
                 colorScheme='whatsapp'
+                isDisabled={isArchived}
                 leftIcon={<CheckIcon />}
                 onClick={() => (isPrimary ? null : onCheckOpen(row))}
                 isLoading={activeRow?.id === id && loadingRules}
@@ -735,7 +740,7 @@ const Checks = () => {
           {/* SBOM DATA LICENSES DRAWER */}
           {isDataLicenseOpen && (
             <LicenseModal
-              data={sbomData}
+              data={sbom}
               activeRow={activeRow}
               isOpen={isDataLicenseOpen}
               onClose={onDataLicenseClose}

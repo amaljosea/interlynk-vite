@@ -41,13 +41,15 @@ import { PolicyResults } from 'graphQL/Queries'
 import { BiScan } from 'react-icons/bi'
 import { FaEye } from 'react-icons/fa6'
 
-const Policies = () => {
+const Policies = ({ sbomData }) => {
   const { showToast } = useCustomToast()
   const params = useParams()
   const sbomId = params.sbomid
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
+
+  const isArchived = sbomData?.lifecycle === 'archived'
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -103,6 +105,7 @@ const Policies = () => {
         <Tooltip label='Policy Scan'>
           <IconButton
             colorScheme='blue'
+            hidden={isArchived}
             onClick={handleRefresh}
             isDisabled={!policyRun}
             icon={<BiScan size={20} />}
@@ -110,7 +113,7 @@ const Policies = () => {
         </Tooltip>
       </Flex>
     )
-  }, [policyRun, policyScan, sbomId, showToast])
+  }, [policyRun, policyScan, sbomId, showToast, isArchived])
 
   const getColor = (result) => {
     switch (result) {

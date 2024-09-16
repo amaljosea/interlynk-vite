@@ -96,7 +96,7 @@ const SbomTable = ({ data, loading, error }) => {
                 loading={loading || orgQueryLoading}
               />
             </TabPanel>
-            <TabPanel px={0}>{<Parts />}</TabPanel>
+            <TabPanel px={0}>{<Parts data={data} />}</TabPanel>
             <TabPanel px={0}>
               <Components sbomData={data} />
             </TabPanel>
@@ -107,15 +107,15 @@ const SbomTable = ({ data, loading, error }) => {
               <Licenses />
             </TabPanel>
             <TabPanel px={0}>
-              <Policies />
+              <Policies sbomData={data} />
             </TabPanel>
-            <TabPanel px={0}>{<Support />}</TabPanel>
+            <TabPanel px={0}>{<Support sbomData={data} />}</TabPanel>
             <TabPanel px={0}>
-              <Checks />
+              <Checks sbomData={data} />
             </TabPanel>
             {!isFreeTier && (
               <TabPanel px={0}>
-                <Compliance />
+                <Compliance sbomData={data} />
               </TabPanel>
             )}
             <TabPanel px={0}>

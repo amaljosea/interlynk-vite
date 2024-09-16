@@ -70,6 +70,8 @@ const General = ({ data, loading, error }) => {
   const { id, spec, suppliers, licensesExp, authors, creationAt, tools } =
     data || ''
 
+  const isArchived = data?.lifecycle === 'archived'
+
   const { sbomState, dispatch } = useGlobalState()
   const { expLicense } = sbomState
   const { sbomDispatch } = dispatch
@@ -234,6 +236,7 @@ const General = ({ data, loading, error }) => {
                       </TagLabel>
                       {updateComponent && (
                         <TagCloseButton
+                          hidden={isArchived}
                           onClick={() => {
                             setActiveTool(item)
                             DELETE_TOOL?.onOpen()
@@ -245,6 +248,7 @@ const General = ({ data, loading, error }) => {
                   <Button
                     size='xs'
                     variant='unstyled'
+                    hidden={isArchived}
                     onClick={TOOL?.onOpen}
                     leftIcon={<AddIcon />}
                     isDisabled={customerView || !editSboms}
@@ -275,6 +279,7 @@ const General = ({ data, loading, error }) => {
                       </TagLabel>
                       {updateComponent && (
                         <TagCloseButton
+                          hidden={isArchived}
                           onClick={() => {
                             setActiveTool(item)
                             DELETE_AUTHOR?.onOpen()
@@ -288,6 +293,7 @@ const General = ({ data, loading, error }) => {
                     variant='unstyled'
                     leftIcon={<AddIcon />}
                     onClick={AUTHOR?.onOpen}
+                    hidden={isArchived}
                     isDisabled={customerView || !editSboms}
                     color={authors?.length > 0 ? 'gray.500' : 'blue.500'}
                   >
@@ -309,7 +315,7 @@ const General = ({ data, loading, error }) => {
                       item={item}
                       editable={true}
                       onEdit={SUPPLIER?.onOpen}
-                      premission={updateComponent}
+                      premission={!updateComponent || isArchived}
                       onDelete={() => onDeleteSup(item)}
                     />
                   ))
@@ -318,6 +324,7 @@ const General = ({ data, loading, error }) => {
                     size='xs'
                     variant='unstyled'
                     color={'blue.500'}
+                    hidden={isArchived}
                     onClick={SUPPLIER?.onOpen}
                     leftIcon={<AddIcon />}
                     isDisabled={customerView || !editSboms}
@@ -347,11 +354,11 @@ const General = ({ data, loading, error }) => {
                       as={FaEdit}
                       cursor={'pointer'}
                       onClick={onLicenseOpen}
-                      hidden={!updateComponent}
+                      hidden={!updateComponent || isArchived}
                     />
                     <TagCloseButton
-                      hidden={!updateComponent}
                       onClick={DELETE_LICENSE?.onOpen}
+                      hidden={!updateComponent || isArchived}
                     />
                   </Tag>
                 ) : (
@@ -359,6 +366,7 @@ const General = ({ data, loading, error }) => {
                     size='xs'
                     variant='unstyled'
                     color={'blue.500'}
+                    hidden={isArchived}
                     leftIcon={<AddIcon />}
                     onClick={onLicenseOpen}
                     isDisabled={customerView || !editSboms}

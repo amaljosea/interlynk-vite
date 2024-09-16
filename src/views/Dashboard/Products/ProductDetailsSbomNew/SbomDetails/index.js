@@ -234,7 +234,7 @@ const SbomDetails = ({ sbomData }) => {
                 {description}
               </Text>
             </GridItem>
-            <GridItem colSpan={4}>
+            <GridItem colSpan={4} hidden={lifecycle === 'archived'}>
               <SbomActions sbom={sbomData} />
             </GridItem>
           </Grid>

@@ -71,9 +71,10 @@ import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 
 import ConfirmationModal from '../components/ConfirmationModal'
 
-const Parts = () => {
-  const location = useLocation()
+const Parts = ({ data }) => {
   const params = useParams()
+  const location = useLocation()
+  const { colorMode } = useColorMode()
   const partsContext = usePartsContext()
   const sbomId = params.sbomid
   const prodId = params.productid
@@ -82,7 +83,7 @@ const Parts = () => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const { colorMode } = useColorMode()
+  const isArchived = data?.lifecycle === 'archived'
 
   const { totalRows, prodState, dispatch } = useGlobalState()
   const iconColor = useColorModeValue('#2D3748', '#EDF2F7')
@@ -95,12 +96,17 @@ const Parts = () => {
   const { PARTS } = ProductGeneralTabs
 
   // GET SBOM PARTS
-  const { data, error, startPolling, stopPolling } = useQuery(GetSbomParts, {
+  const {
+    data: sbomData,
+    error,
+    startPolling,
+    stopPolling
+  } = useQuery(GetSbomParts, {
     skip: activeTab === PARTS ? false : true,
     variables: { projectId: prodId, sbomId, first: totalRows }
   })
 
-  const { sbomParts } = data?.sbom || ''
+  const { sbomParts } = sbomData?.sbom || ''
 
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
@@ -486,80 +492,37 @@ const Parts = () => {
           </Menu>
         )
       },
-      right: 'true'
+      right: 'true',
+      omit: isArchived
     }
   ]
-
-  // SEARCH COMPONENT
-  const handleSearch = () => console.log('hello')
-
-  // CLEAR SERACH
-  const handleClear = () => setSearchInput('')
 
   // SUB HEADER
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex
+        gap={2}
         width={'100%'}
         alignItems={'center'}
-        justifyContent={'space-between'}
+        justifyContent={'flex-end'}
       >
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={2}
-          alignItems={'flex-start'}
-          justifyContent={'flex-end'}
-        >
-          <HStack spacing={4} display={'none'}>
-            {/* SEARCH COMPONENTS */}
-            <SearchFilter
-              id='team'
-              filterText={searchInput}
-              setFilterText={setSearchInput}
-              onFilter={handleSearch}
-              onClear={handleClear}
-            />
-            {/* FILTER */}
-            <Menu closeOnSelect={true}>
-              <MenuButton
-                as={Button}
-                colorScheme='blue'
-                fontWeight='normal'
-                fontSize={'sm'}
-                leftIcon={<FaFilter size={14} />}
-              >
-                Supplier
-              </MenuButton>
-              <MenuList>
-                <MenuOptionGroup type='checkbox'>
-                  {['Interlynk', 'Biotronik', 'Oracle'].map((item, index) => (
-                    <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                      {item}
-                    </MenuItemOption>
-                  ))}
-                </MenuOptionGroup>
-              </MenuList>
-            </Menu>
-          </HStack>
-
-          <Tooltip label='Add Part' placement='top'>
-            <IconButton
-              ref={addBtn}
-              onClick={onOpen}
-              icon={<AddIcon />}
-              colorScheme='blue'
-              variant='solid'
-              fontWeight='normal'
-              fontSize={'sm'}
-              isDisabled={!updateSboms || signedUrlParams}
-            />
-          </Tooltip>
-          <RefreshBtn />
-        </Stack>
+        <Tooltip label='Add Part' placement='top'>
+          <IconButton
+            ref={addBtn}
+            variant='solid'
+            fontSize={'sm'}
+            onClick={onOpen}
+            colorScheme='blue'
+            fontWeight='normal'
+            icon={<AddIcon />}
+            hidden={isArchived}
+            isDisabled={!updateSboms || signedUrlParams}
+          />
+        </Tooltip>
+        <RefreshBtn />
       </Flex>
     )
-  }, [searchInput, onOpen, updateSboms, signedUrlParams])
+  }, [isArchived, onOpen, signedUrlParams, updateSboms])
 
   if (error) {
     return (
