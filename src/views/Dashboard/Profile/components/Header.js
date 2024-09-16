@@ -4,7 +4,7 @@ import { formatDistanceToNow } from 'date-fns'
 import Cookies from 'js-cookie'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { validPassword } from 'utils'
+import { isCustomerView, validPassword } from 'utils'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
 import {
@@ -103,7 +103,7 @@ const GetOrganization = gql`
 
 const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const location = useLocation()
-  const customerView = location.pathname.startsWith('/customer')
+  const customerView = isCustomerView()
   const userName = localStorage.getItem('username')
   const [profileImage, setProfileImage] = useState(null)
   const [newUserName, setNewUserName] = useState(userName)

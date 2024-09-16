@@ -5,6 +5,7 @@ import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { GetIcon, customStyles, getFullDateAndTime, timeSince } from 'utils'
 import { openSsf } from 'variables/general'
+import CompDrawer from 'views/Dashboard/Products/components/CompDrawer'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { ViewIcon } from '@chakra-ui/icons'
@@ -789,7 +790,14 @@ const Components = ({ sbomData }) => {
         <RefreshBtn onClick={() => reset()} />
       </Flex>
     )
-  }, [compSearch, handleSearch, handleClear, onSearchInputChange, filters])
+  }, [
+    compSearch,
+    handleSearch,
+    handleClear,
+    onSearchInputChange,
+    filters,
+    reset
+  ])
 
   const handleSort = async (column, sortDirection) => {
     prodCompDispatch({
@@ -835,12 +843,10 @@ const Components = ({ sbomData }) => {
       <Pagination {...paginationProps} />
 
       {isOpen && (
-        <ComponentDrawer
+        <CompDrawer
           data={activeRow}
           isOpen={isOpen}
           onClose={onClose}
-          shortDesc={null}
-          checkId={null}
           primaryComp={primaryComponent}
         />
       )}

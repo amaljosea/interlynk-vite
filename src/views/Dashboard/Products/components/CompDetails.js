@@ -3,7 +3,6 @@ import { TabContext } from 'context/TabContext'
 import React, { useContext, useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
-import { useLocation } from 'react-router-dom'
 import { infoData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -36,11 +35,11 @@ import { UpdateComponent } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
 
 import ActionButton from './ActionButton'
+import { isCustomerView } from 'utils'
 
 const CompDetails = ({ data, primaryComp }) => {
-  const location = useLocation()
   const { showToast } = useCustomToast()
-  const customerView = location.pathname.startsWith('/customer')
+  const customerView = isCustomerView()
 
   const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
@@ -382,7 +381,7 @@ const CompDetails = ({ data, primaryComp }) => {
           </Select>
         </FormControl>
         {/* SUPPRT LEVEL */}
-        <FormControl>
+        <FormControl hidden={customerView}>
           <FormLabel htmlFor='compScope'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>Support Level</Text>
@@ -410,7 +409,7 @@ const CompDetails = ({ data, primaryComp }) => {
           </Select>
         </FormControl>
         {/* END-OF-SUPPORT DATE */}
-        <FormControl mb={5} isInvalid={!isValidDate}>
+        <FormControl mb={5} isInvalid={!isValidDate} hidden={customerView}>
           <FormLabel mb={1} htmlFor='endOfSupport'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>End-Of-Support Date</Text>
@@ -492,6 +491,7 @@ const CompDetails = ({ data, primaryComp }) => {
         ) : (
           <ActionButton
             title={'Save'}
+            hidden={customerView}
             isDisabled={isInvalid}
             onClick={handleSubmit}
           />

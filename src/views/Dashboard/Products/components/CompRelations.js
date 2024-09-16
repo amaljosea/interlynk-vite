@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
-import { truncatedValue } from 'utils'
+import { truncatedValue, isCustomerView } from 'utils'
 
 import { AddIcon, ArrowDownIcon } from '@chakra-ui/icons'
 import {
@@ -62,6 +62,7 @@ const findShortestPath = (pathArray, currentShortestPath = []) => {
 const CompRelations = ({ data, compPath }) => {
   const { showToast } = useCustomToast()
   const activeTab = useQueryParam('tab')
+  const customerView = isCustomerView()
 
   const { id, name, version, sbomId, sbom } = data || ''
   const { id: productId } = sbom?.project || ''
@@ -93,6 +94,7 @@ const CompRelations = ({ data, compPath }) => {
   }
 
   const { data: compData } = useQuery(GetTotalComponents, {
+    skip: customerView,
     fetchPolicy: activeTab === 'components' ? false : true,
     variables: {
       ...compState
@@ -100,7 +102,7 @@ const CompRelations = ({ data, compPath }) => {
   })
 
   const { data: allComponents } = useQuery(GetAllComponents, {
-    skip: compData ? false : true,
+    skip: compData && !customerView ? false : true,
     variables: {
       ...compState,
       first: compData?.sbom?.components?.totalCount
@@ -115,6 +117,7 @@ const CompRelations = ({ data, compPath }) => {
   const [addRelation] = useMutation(CreateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
   const { data: compDependency } = useQuery(GetCompDependency, {
+    skip: customerView,
     variables: { compId: id, sbomId: sbomId }
   })
 

@@ -2,14 +2,9 @@ import { useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation, useParams } from 'react-router-dom'
-import {
-  customStyles,
-  getFullDateAndTime,
-  linkURl,
-  sevColor,
-  timeSince
-} from 'utils'
+import { useParams } from 'react-router-dom'
+import { customStyles, getFullDateAndTime, linkURl, sevColor } from 'utils'
+import { isCustomerView, timeSince } from 'utils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -63,6 +58,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { ManualVulnScan } from 'graphQL/Mutation'
 import {
@@ -278,10 +274,8 @@ const Vulnerabilities = ({ sbomData }) => {
 
   const { showToast } = useCustomToast()
   const sbomId = params.sbomid
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
-  const customerView = location.pathname.startsWith('/customer')
+  const activeTab = useQueryParam('tab')
+  const customerView = isCustomerView()
 
   const { isFreeTier } = useGlobalQueryContext()
   const { totalRows, prodVulnState, dispatch } = useGlobalState()

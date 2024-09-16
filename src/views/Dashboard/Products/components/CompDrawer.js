@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { isCustomerView } from 'utils'
 
 import {
   Drawer,
@@ -33,9 +34,12 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   const params = useParams()
   const sbomId = params.sbomid
   const bgColor = useColorModeValue('white', 'gray.700')
-  const tabs = ['details', 'identifiers', 'suppliers', 'links', 'relationships']
+  const customerView = isCustomerView()
+  const tabs = customerView
+    ? ['details', 'identifiers']
+    : ['details', 'identifiers', 'suppliers', 'links', 'relationships']
 
-  const {  resetData } = useContext(TabContext)
+  const { resetData } = useContext(TabContext)
 
   const [tab, setTab] = useState(0)
 
@@ -43,7 +47,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   const isPart = sbomId !== bomId
 
   const { data: comPath } = useQuery(GetComponentPath, {
-    skip: isOpen ? false : true,
+    skip: isOpen && !customerView ? false : true,
     variables: { compId: data?.id, sbomId: isPart ? bomId : sbomId }
   })
 

@@ -4,6 +4,7 @@ import React, { useCallback, useContext, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
+import { isCustomerView } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckModal from 'views/Sbom/components/CheckModal'
@@ -71,7 +72,7 @@ const Checks = ({ sbomData }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
-  const customerView = location.pathname.startsWith('/customer')
+  const customerView = isCustomerView()
 
   const { setTabData } = useContext(TabContext)
 

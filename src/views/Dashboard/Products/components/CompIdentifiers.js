@@ -3,7 +3,7 @@ import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { validateCpe } from 'utils'
+import { isCustomerView, validateCpe } from 'utils'
 
 import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
@@ -38,7 +38,7 @@ const CompIdentifiers = ({ data }) => {
   const { showToast } = useCustomToast()
   const params = useParams()
   const sbomId = params.sbomid
-  const customerView = location.pathname.startsWith('/customer')
+  const customerView = isCustomerView()
 
   const {
     tabData,
@@ -299,8 +299,8 @@ const CompIdentifiers = ({ data }) => {
           <ActionButton
             title={'Save'}
             onClick={handleSubmit}
-            hidden={purlOpen || cpeOpen}
             isDisabled={loading || isInvalid}
+            hidden={purlOpen || cpeOpen || customerView}
           />
         )}
       </Stack>

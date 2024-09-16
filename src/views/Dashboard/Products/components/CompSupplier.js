@@ -2,6 +2,7 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
 import { disableButtonTemporarily, validateEmail, validateUrl } from 'utils'
+import { isCustomerView } from 'utils'
 
 import {
   Button,
@@ -40,10 +41,12 @@ const GetSupplier = gql`
 
 const CompSupplier = ({ data }) => {
   const { showToast } = useCustomToast()
+  const customerView = isCustomerView()
 
   const { id, sbomId } = data || ''
 
   const { data: result } = useQuery(GetSupplier, {
+    skip: customerView,
     variables: { id, sbomId }
   })
   const { suppliers } = result?.component || ''

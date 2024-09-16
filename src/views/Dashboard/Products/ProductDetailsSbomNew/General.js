@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
-import { getFullDateAndTime } from 'utils'
+import { useParams } from 'react-router-dom'
+import { getFullDateAndTime, isCustomerView } from 'utils'
 import { infoData } from 'variables/general'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 
@@ -62,7 +62,6 @@ const InfoLabel = ({ title, onCheck }) => {
 const General = ({ data, loading, error }) => {
   const { isFreeTier } = useGlobalQueryContext()
   const { showToast } = useCustomToast()
-  const location = useLocation()
   const params = useParams()
   const sbomId = params.sbomid
 
@@ -86,7 +85,7 @@ const General = ({ data, loading, error }) => {
   })
 
   const textColor = useColorModeValue('gray.700', 'white')
-  const customerView = location?.pathname?.startsWith('/customer')
+  const customerView = isCustomerView()
   const [activeTool, setActiveTool] = useState(null)
 
   const TOOL = useDisclosure()

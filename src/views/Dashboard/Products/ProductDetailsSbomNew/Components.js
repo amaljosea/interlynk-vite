@@ -2,9 +2,10 @@ import { useLazyQuery, useMutation } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation, useParams } from 'react-router-dom'
+import {  useParams } from 'react-router-dom'
 import { GetIcon, customStyles, timeSince } from 'utils'
-import { getFullDateAndTime, isUnknown, truncatedValue } from 'utils'
+import { getFullDateAndTime, isUnknown } from 'utils'
+import { truncatedValue, isCustomerView } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 import { openSsf } from 'variables/general'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -88,9 +89,8 @@ const Components = ({ sbomData }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const location = useLocation()
   const expandView = useQueryParam('expand')
-  const customerView = location.pathname.startsWith('/customer')
+  const customerView = isCustomerView()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const { colorMode } = useColorMode()
 

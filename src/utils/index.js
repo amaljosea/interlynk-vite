@@ -61,6 +61,10 @@ import {
 
 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
+export const isCustomerView = () => {
+  return window.location.pathname.startsWith('/customer')
+}
+
 export const getLink = (name) => {
   const result = sbomOrigin?.find((item) => item.value === name)
   const { link } = result || ''

@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
 
 import {
   Button,
@@ -23,10 +22,10 @@ import { useHasPermission } from 'hooks/useHasPermission'
 
 import { orgUpdate } from 'graphQL/Mutation'
 import { GetOrgName } from 'graphQL/Queries'
+import { isCustomerView } from 'utils'
 
 const GeneralFeed = () => {
-  const location = useLocation()
-  const customerView = location.pathname.startsWith('/customer')
+  const customerView = isCustomerView()
   const { orgView } = useGlobalQueryContext()
 
   const { data } = useQuery(GetOrgName, {

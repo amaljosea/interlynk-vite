@@ -33,11 +33,12 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { CreateComponent, sbomCreate } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
+import { isCustomerView } from 'utils'
 
 function ProductSbomDrawer({ isOpen, onClose, data }) {
   const params = useParams()
   const { showToast } = useCustomToast()
-  const customerView = location.pathname.startsWith('/customer')
+  const customerView = isCustomerView()
 
   const { tabData, saveChanges } = useContext(TabContext)
   const { details } = tabData

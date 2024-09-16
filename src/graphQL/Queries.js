@@ -1831,6 +1831,7 @@ export const ShareComponentData = gql`
             primary
             internal
             purl
+            copyright
             cpes
             updatedAt
             uniqueId

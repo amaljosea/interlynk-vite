@@ -1,7 +1,7 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -42,6 +42,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { CreateCompRelation, CreateComponent } from 'graphQL/Mutation'
 import { CpeAutoComplete, GetAllComponents, GetAllSboms } from 'graphQL/Queries'
+import { isCustomerView } from 'utils'
 
 import { BiLayer } from 'react-icons/bi'
 
@@ -55,7 +56,7 @@ function ComponentDrawer(props) {
   const productId = params.productid
   const sbomId = params.sbomid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const customerView = location.pathname.startsWith('/customer')
+  const customerView = isCustomerView()
 
   const { tabData, handleChange, resetData, setTabData } =
     useContext(TabContext)
@@ -578,7 +579,7 @@ function ComponentDrawer(props) {
                 </Select>
               </FormControl>
               {/* SUPPRT LEVEL */}
-              <FormControl>
+              <FormControl hidden={signedUrlParams}>
                 <FormLabel htmlFor='compScope'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Support Level</Text>
@@ -610,7 +611,11 @@ function ComponentDrawer(props) {
                 </Select>
               </FormControl>
               {/* END-OF-SUPPORT DATE */}
-              <FormControl mb={5} isInvalid={!isValidDate}>
+              <FormControl
+                mb={5}
+                isInvalid={!isValidDate}
+                hidden={signedUrlParams}
+              >
                 <FormLabel mb={1} htmlFor='endOfSupport'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>End-Of-Support Date</Text>
