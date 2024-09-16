@@ -30,6 +30,7 @@ import useQueryParam from 'hooks/useQueryParam'
 
 import { RegisterUser } from 'graphQL/Mutation'
 
+import PolicyTerms from './PolicyTerms'
 import SocialLogin from './SocialLogin'
 
 const RegistrationForm = () => {
@@ -133,32 +134,41 @@ const RegistrationForm = () => {
   if (isSuccess) {
     return (
       <Flex
-        mt={2}
+        gap={10}
         direction={'column'}
         alignItems={'center'}
         justifyContent={'center'}
       >
-        <Icon mt={5} color={'green.400'} boxSize={16} as={CheckCircleIcon} />
-        <Text fontSize={'lg'} textAlign={'center'} mt={4}>
-          Registration Successful
-        </Text>
-        <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
-          Please check your email to confirm your account or{' '}
-          <Link to='/auth' style={{ color: '#3182CE' }}>
-            click here{' '}
-          </Link>{' '}
-          to login.
+        <Icon color={'green.500'} boxSize={16} as={CheckCircleIcon} />
+        <Stack spacing={1}>
+          <Text fontSize={'20px'} fontWeight={'semibold'} textAlign={'center'}>
+            Registration Successful
+          </Text>
+          <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
+            Please check your email to confirm your account
+          </Text>
+        </Stack>
+        <Text fontSize='sm' fontWeight={'medium'} textAlign={'center'}>
+          Return to{' '}
+          <Link to={'/auth'} style={{ color: '#3182ce' }}>
+            Login
+          </Link>
         </Text>
       </Flex>
     )
   }
 
   return (
-    <Flex mt={2} width='100%' direction={'column'} alignItems={'flex-start'}>
+    <Flex
+      height={'100%'}
+      mt={[4, 6, 8, 24]}
+      direction={'column'}
+      alignItems={'flex-start'}
+    >
       <Text fontSize={'20px'} fontWeight={'semibold'} textAlign={'center'}>
         Welcome
       </Text>
-      <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
+      <Text fontSize={'sm'} color={'#555'}>
         Register to continue to the dashboard.
       </Text>
       {error.length > 0 && (
@@ -301,6 +311,7 @@ const RegistrationForm = () => {
           </AbsoluteCenter>
         </Box>
         <SocialLogin />
+        <PolicyTerms />
       </Stack>
     </Flex>
   )

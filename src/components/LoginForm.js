@@ -98,11 +98,16 @@ const LoginForm = () => {
   }
 
   return (
-    <Flex mt={2} direction={'column'} alignItems={'flex-start'}>
+    <Flex
+      height={'100%'}
+      mt={[4, 6, 8, 24]}
+      direction={'column'}
+      alignItems={'flex-start'}
+    >
       <Text fontSize={'20px'} fontWeight={'semibold'} textAlign={'center'}>
         Welcome
       </Text>
-      <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
+      <Text fontSize={'sm'} color={'#555'}>
         Log in to continue to the dashboard
       </Text>
       {error !== '' && (

@@ -4,7 +4,7 @@ import { Stack, Text, chakra } from '@chakra-ui/react'
 
 const PolicyTerms = () => {
   return (
-    <Stack>
+    <Stack pb={10}>
       <Text fontSize={'xs'} color={'gray.500'} textAlign={'center'}>
         By logging in, you acknowledge that you have read and agree to the
         <chakra.span color={'blue.600'}>

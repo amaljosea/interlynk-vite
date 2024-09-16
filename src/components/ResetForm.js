@@ -20,7 +20,8 @@ import {
   InputGroup,
   InputRightElement,
   Stack,
-  Text
+  Text,
+  chakra
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -86,7 +87,6 @@ const ResetForm = () => {
     axios
       .post(`${resetURL}`, { user: { email } })
       .then((response) => {
-        console.log('response', response)
         const { status } = response
         if (status === 201) {
           setIsLoading(false)
@@ -100,7 +100,6 @@ const ResetForm = () => {
       })
       .catch((error) => {
         setIsLoading(false)
-        console.log(`Error: ${error}`)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
@@ -126,7 +125,6 @@ const ResetForm = () => {
         }
       })
       .then((response) => {
-        console.log('response', response)
         const { status } = response
         if (status === 204) {
           setIsLoading(false)
@@ -137,7 +135,12 @@ const ResetForm = () => {
         }
       })
       .catch((error) => {
-        console.log(`Error: ${JSON.stringify(error)}`)
+        showToast({
+          description:
+            error?.response?.data?.errors?.reset_password_token ||
+            error?.response?.data?.errors,
+          status: 'error'
+        })
         setIsLoading(false)
       })
   }
@@ -154,14 +157,16 @@ const ResetForm = () => {
         <Text fontSize={'xl'} textAlign={'center'} fontWeight={'medium'}>
           Check your email
         </Text>
-        <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
-          Thanks! If <strong>{email}</strong> matches an email we have on file,
-          then we have sent you an email containing further instructions for
-          resetting your password.
+        <Text fontSize={'sm'} textAlign={'center'} color={'gray.600'}>
+          Thanks! If <chakra.span fontWeight={'medium'}>{email}</chakra.span>{' '}
+          matches an email we have on file, then we have sent you an email
+          containing further instructions for resetting your password.
         </Text>
-        <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
-          If you have not received an email in 5 minutes, check your{' '}
-          <strong>spam</strong> or try a <strong>different email</strong>.
+        <Text fontSize={'sm'} textAlign={'center'} color={'gray.600'}>
+          If you have not received an email in 5 minutes, check your spam or{' '}
+          <chakra.span color={'blue.500'} fontWeight={'medium'}>
+            try a different email.
+          </chakra.span>
         </Text>
       </Flex>
     )
@@ -172,11 +177,12 @@ const ResetForm = () => {
       <Flex
         mt={10}
         gap={4}
+        width={'100%'}
         direction={'column'}
-        alignItems={'center'}
+        alignItems={'flex-start'}
         justifyContent={'center'}
       >
-        <Text fontSize={'xl'} textAlign={'center'} fontWeight={'medium'}>
+        <Text fontSize={'xl'} fontWeight={'medium'}>
           Reset your password
         </Text>
         <form style={{ width: '100%' }} onSubmit={handleReset}>
@@ -262,7 +268,13 @@ const ResetForm = () => {
   }
 
   return (
-    <Flex mt={10} gap={4} direction={'column'} alignItems={'flex-start'}>
+    <Flex
+      gap={4}
+      mt={[6, 8, 10]}
+      direction={'column'}
+      alignItems={'flex-start'}
+      justifyContent={'center'}
+    >
       <Text fontSize={'20px'} fontWeight={'semibold'}>
         Reset your password
       </Text>
@@ -305,7 +317,10 @@ const ResetForm = () => {
           </Button>
           <Text fontSize='sm' fontWeight={'medium'} textAlign={'center'}>
             Return to
-            <Link to={'/auth'} style={{color:'#3182ce'}}>{' '}Login</Link>
+            <Link to={'/auth'} style={{ color: '#3182ce' }}>
+              {' '}
+              Login
+            </Link>
           </Text>
         </Stack>
       </form>

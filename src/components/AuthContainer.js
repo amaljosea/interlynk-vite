@@ -41,8 +41,10 @@ const AuthContainer = ({ children }) => {
         p={10}
         colSpan={4}
         bg={'white'}
+        height={'100%'}
         display={'flex'}
         flexDir={'column'}
+        overflowY={'scroll'}
         alignItems={'center'}
         justifyContent={'center'}
       >

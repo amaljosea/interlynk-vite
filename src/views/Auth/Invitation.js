@@ -2,19 +2,10 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
-import {
-  Box,
-  Button,
-  Flex,
-  HStack,
-  Icon, // eslint-disable-next-line no-restricted-imports
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalOverlay,
-  Text
-} from '@chakra-ui/react'
+import { WarningIcon } from '@chakra-ui/icons'
+import { Button, Flex, Icon, Stack, Text } from '@chakra-ui/react'
+
+import CustomLoader from 'components/CustomLoader'
 
 import useCustomToast from 'hooks/useCustomToast'
 import useQueryParam from 'hooks/useQueryParam'
@@ -22,11 +13,13 @@ import useQueryParam from 'hooks/useQueryParam'
 import { AcceptInvitation, DeclineInvitation } from 'graphQL/Mutation'
 import { OrgUserInvitationInfo } from 'graphQL/Queries'
 
+import { FaTimesCircle } from 'react-icons/fa'
+
 const Invitation = () => {
   const { showToast } = useCustomToast()
   const navigate = useNavigate()
   const token = useQueryParam('token')
-  const nonce = useQueryParam('nonce')
+  const nonce = useQueryParam('amp;nonce')
 
   const [error, setError] = useState([])
   const [isRejected, setIsRejected] = useState(false)
@@ -84,76 +77,68 @@ const Invitation = () => {
     })
   }
 
+  if (loading) return <CustomLoader />
+
   if (error?.length > 0) {
     return (
-      <Modal isCentered size={'3xl'} isOpen={true}>
-        <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(4px)' />
-        <ModalContent>
-          <ModalBody py={12}>
-            {error.length > 0 && (
-              <Box
-                textAlign={'center'}
-                as={Flex}
-                alignItems={'center'}
-                justifyContent={'center'}
-                flexDir={'column'}
-              >
-                <Icon color={'red.400'} boxSize={20} as={WarningIcon} />
-                <Text my={6}>
-                  That did not work because of the following error:
-                  <br />
-                  {error[0]}.
-                  <br />
-                  <br />
-                  This usually happen with a stale or revoked invitation link.
-                  <br />
-                  Please contact the admin to re-send the link.
-                </Text>
-              </Box>
-            )}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <Flex
+        flexDir={'column'}
+        textAlign={'center'}
+        alignItems={'center'}
+        justifyContent={'center'}
+      >
+        <Icon color={'red.400'} boxSize={20} as={WarningIcon} />
+        <Text my={6}>
+          That did not work because of the following error:
+          <br />
+          {error[0]}.
+          <br />
+          <br />
+          This usually happen with a stale or revoked invitation link.
+          <br />
+          Please contact the admin to re-send the link.
+        </Text>
+      </Flex>
     )
   }
 
   return (
-    <Modal isCentered size={'3xl'} isOpen={loading ? false : true}>
-      <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(4px)' />
-      <ModalContent>
-        <ModalBody py={12}>
-          <Box
-            textAlign={'center'}
-            as={Flex}
-            alignItems={'center'}
-            justifyContent={'center'}
-            flexDir={'column'}
+    <Flex
+      gap={2}
+      width={'100%'}
+      flexDir={'column'}
+      alignItems={'center'}
+      justifyContent={'center'}
+    >
+      {isRejected && (
+        <Icon mb={6} color={'red.500'} boxSize={16} as={FaTimesCircle} />
+      )}
+      <Text fontSize={'20px'} fontWeight={'semibold'}>
+        {isRejected
+          ? 'Invitation Rejected'
+          : `Invitation to join ${organizationName}`}
+      </Text>
+      <Text fontSize={'sm'} textAlign={'center'} color={'#718096'}>
+        {isRejected
+          ? `You have declined an invitation to join ${organizationName}`
+          : `You are invited to join ${organizationName} at Interlynk`}
+      </Text>
+      {!isRejected && (
+        <Stack mt={8} spacing={4} w={'full'}>
+          <Button
+            w={'100%'}
+            variant='solid'
+            colorScheme='blue'
+            onClick={onAccept}
           >
-            <Icon
-              color={isRejected ? 'red.400' : 'green.500'}
-              boxSize={20}
-              as={isRejected ? WarningIcon : CheckCircleIcon}
-            />
-            <Text my={6} fontSize={20}>
-              {isRejected
-                ? 'Invitation Rejected'
-                : `This is an invitation to join ${organizationName || ''}`}
-            </Text>
-            {!isRejected && (
-              <HStack spacing={2}>
-                <Button variant='outline' colorScheme='blue' onClick={onReject}>
-                  Decline
-                </Button>
-
-                <Button variant='solid' colorScheme='blue' onClick={onAccept}>
-                  Accept
-                </Button>
-              </HStack>
-            )}
-          </Box>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+            Accept Invitation
+          </Button>
+          <Button variant='ghost' colorScheme='blue' onClick={onReject}>
+            Decline
+          </Button>
+        </Stack>
+      )}
+    </Flex>
   )
 }
 
