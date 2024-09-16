@@ -1,5 +1,5 @@
 import DataTable from 'react-data-table-component'
-import { customStyles } from 'utils'
+import { customStyles, truncatedValue } from 'utils'
 
 import {
   Box,
@@ -7,6 +7,7 @@ import {
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
+  DrawerHeader,
   DrawerOverlay,
   Flex,
   Stack,
@@ -26,8 +27,6 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
   const { subject, category, name, operatorWording, value } = activeRow || null
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-
-  console.log('activeRow', activeRow)
 
   const { nodes, paginationProps, loading } = usePaginatedQuery(
     PolicyRuleViolations,
@@ -105,11 +104,12 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
     <Drawer size={'lg'} isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton />
-        <DrawerBody>
+        <DrawerCloseButton mt={1} />
+        <DrawerHeader borderBottomWidth='1px'>Violations</DrawerHeader>
+        <DrawerBody py={4}>
           <Stack spacing={2} direction={'column'}>
             <Text>
-              <strong>Policy:</strong> {policy}
+              <strong>Policy:</strong> {truncatedValue(policy, 30)}
             </Text>
             <Text>
               <strong>Condition:</strong>{' '}
