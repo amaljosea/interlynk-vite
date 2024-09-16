@@ -132,7 +132,9 @@ const VexModal = ({
   const handleStatusChange = (e) => {
     const { value } = e.target
     const status = e.target.options[e.target.selectedIndex].text
-    status === 'Not Affected' && !vulnId ? setUpstream(true) : setUpstream(false)
+    status === 'Not Affected' && !vulnId
+      ? setUpstream(true)
+      : setUpstream(false)
     setStatusTitle(value)
     setStatusName(status)
     setJustification('')
@@ -215,7 +217,7 @@ const VexModal = ({
       onClose={handleClose}
       title={'Vulnerabilty Status'}
     >
-      {!vulnId && (
+      {sbomId && (
         <Box mb={4}>
           <Tag variant='subtle' colorScheme='blue' wordBreak={'break-all'}>
             {selectedVulns?.length > 0 ? selectedVulns[0]?.vuln.vulnId : ''}
