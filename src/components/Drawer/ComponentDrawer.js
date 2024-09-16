@@ -240,7 +240,8 @@ function ComponentDrawer(props) {
   }
 
   const invalidVersion =
-    details?.version !== '' && SBOMs?.includes(details?.version)
+    details?.name === primaryComp?.name &&
+    details?.version === primaryComp?.version
 
   const isInvalid =
     details?.kind === '' ||

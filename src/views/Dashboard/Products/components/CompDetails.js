@@ -153,9 +153,6 @@ const CompDetails = ({ data, primaryComp }) => {
     }
   }
 
-  const invalidVersion =
-    details?.version !== '' && SBOMs?.includes(details?.version)
-
   const isInvalid =
     details?.kind === '' ||
     details?.name === '' ||
@@ -255,7 +252,7 @@ const CompDetails = ({ data, primaryComp }) => {
           />
         </FormControl>
         {/* Version */}
-        <FormControl isReadOnly={customerView} isInvalid={invalidVersion}>
+        <FormControl isReadOnly={customerView}>
           <FormLabel htmlFor='version' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>
