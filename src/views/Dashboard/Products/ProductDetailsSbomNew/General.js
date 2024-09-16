@@ -42,8 +42,7 @@ import {
   toolDelete
 } from 'graphQL/Mutation'
 
-import { FaEdit } from 'react-icons/fa'
-import { FaScaleBalanced } from 'react-icons/fa6'
+import { FaPen, FaScaleBalanced } from 'react-icons/fa6'
 
 import AuthorModal from '../components/AuthorModal'
 import ConfirmationModal from '../components/ConfirmationModal'
@@ -121,8 +120,6 @@ const General = ({ data, loading, error }) => {
       .then((res) => res.data)
       .finally(() => DELETE_SUPPLIER?.onClose())
   }
-
-  // const onRemoveLicense = async () => console.log('License');
 
   const onLicenseOpen = () => {
     sbomDispatch({ type: 'SET_LICENSES', payload: licensesExp })
@@ -227,7 +224,7 @@ const General = ({ data, loading, error }) => {
                   {tools?.map((item, index) => (
                     <Tag
                       key={index}
-                      height={8}
+                      height={7}
                       variant='subtle'
                       colorScheme='teal'
                     >
@@ -268,7 +265,7 @@ const General = ({ data, loading, error }) => {
                 <Flex alignItems={'center'} flexWrap={'wrap'} gap={3}>
                   {authors?.map((item, index) => (
                     <Tag
-                      height={8}
+                      height={7}
                       key={index}
                       variant='subtle'
                       colorScheme='blue'
@@ -343,7 +340,7 @@ const General = ({ data, loading, error }) => {
                 {licensesExp && licensesExp !== '' ? (
                   <Tag
                     my={2}
-                    height={8}
+                    height={7}
                     variant='subtle'
                     colorScheme='green'
                     width={'fit-content'}
@@ -351,7 +348,7 @@ const General = ({ data, loading, error }) => {
                     <TagLabel>{licensesExp}</TagLabel>
                     <TagRightIcon
                       fontSize={12}
-                      as={FaEdit}
+                      as={FaPen}
                       cursor={'pointer'}
                       onClick={onLicenseOpen}
                       hidden={!updateComponent || isArchived}

@@ -38,7 +38,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
     fetchPolicy: 'network-only'
   })
 
-  const [searchText, setSearchText] = useState('A')
+  const [searchText, setSearchText] = useState('')
   const debouncedSearchTerm = useDebounce(searchText, 300)
 
   const formatLicenseString = (str = '') => {

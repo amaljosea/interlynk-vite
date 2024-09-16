@@ -67,14 +67,20 @@ const ToolModal = ({ isOpen, onClose, resolved = false }) => {
     })
   }
 
+  const handleClose = () => {
+    setToolData(initialData)
+    setError('')
+    onClose()
+  }
+
   return (
     <LynkModal
       isOpen={isOpen}
       Icon={FaWrench}
-      onClose={onClose}
       isLoading={loading}
       buttonText={'Save'}
       title={`Add Tools`}
+      onClose={handleClose}
       onSubmit={handleAddTool}
     >
       <Flex direction={'column'} alignItems={'flex-start'} gap={3}>

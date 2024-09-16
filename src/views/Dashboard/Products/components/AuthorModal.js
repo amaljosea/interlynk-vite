@@ -163,6 +163,12 @@ const AuthorModal = ({ isOpen, onClose }) => {
     }
   }
 
+  const handleClose = () => {
+    setAuthorData(initialData)
+    setError('')
+    onClose()
+  }
+
   useEffect(() => {
     if (sbom?.authors?.length > 0) {
       const { name, email } = sbom.authors[0]
@@ -174,10 +180,10 @@ const AuthorModal = ({ isOpen, onClose }) => {
     <LynkModal
       isOpen={isOpen}
       Icon={FaUserPlus}
-      onClose={onClose}
       isLoading={loading}
       buttonText={'Save'}
       title={`Add Author`}
+      onClose={handleClose}
       onSubmit={handleAddAuthor}
       hidden={status === 'resolved'}
       leftFooterContent={
