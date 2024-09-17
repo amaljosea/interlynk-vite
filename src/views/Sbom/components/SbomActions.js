@@ -1,13 +1,12 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import ReactSelect from 'react-select'
+import CompDrawer from 'views/Dashboard/Products/components/CompDrawer'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
 import { DeleteIcon, EditIcon, SearchIcon } from '@chakra-ui/icons'
 import { Box, Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
-
-import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -18,7 +17,12 @@ import { useSelect } from 'hooks/useSelect'
 
 import { sbomDelete } from 'graphQL/Mutation'
 import { recheckHealth } from 'graphQL/Mutation'
-import { GetCheckResults, GetProject, ShareProject } from 'graphQL/Queries'
+import {
+  GetCheckResults,
+  GetComponentData,
+  GetProject,
+  ShareProject
+} from 'graphQL/Queries'
 
 import { FaFileDownload } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
@@ -63,7 +67,6 @@ const SbomActions = ({ sbom }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedVersion, setSelectedVersion] = useState(null)
 
-  const btnRef = useRef(null)
   const initialRef = useRef(null)
   const finalRef = useRef(null)
 
@@ -179,6 +182,26 @@ const SbomActions = ({ sbom }) => {
     }
   })
 
+  // GET PRIMARY COMPONENT DATA
+  const { nodes: primaryComponent, error } = usePaginatedQuery(
+    GetComponentData,
+    {
+      selector: 'sbom.components',
+      variables: {
+        primary: true,
+        sbomId: sbomId,
+        projectId: productId
+      }
+    }
+  )
+  const noPrimaryComp = primaryComponent?.length === 0
+
+  useEffect(() => {
+    if (noPrimaryComp) {
+      setSBMClose()
+    }
+  }, [noPrimaryComp])
+
   const activeRow = nodes?.length > 0 ? nodes[0] : null
 
   const handleEditSbom = () => {
@@ -215,6 +238,10 @@ const SbomActions = ({ sbom }) => {
 
   const { style } = useSelect('version')
 
+  if (error) {
+    return null
+  }
+
   return (
     <Flex gap={3} alignItems={'flex-end'} justifyContent={'flex-end'}>
       {/* SBOM VERSIONS */}
@@ -244,14 +271,23 @@ const SbomActions = ({ sbom }) => {
       </Box>
       <Flex direction={'row'} gap={3} justifyContent='flex-end'>
         {/* UPDATE PRIMARY COMPONENT */}
-        <Tooltip label='Edit'>
-          <IconButton
-            display={signedUrlParams ? 'none' : 'flex'}
-            isDisabled={status === 'signed' || !updateSboms}
-            colorScheme='blue'
-            icon={<EditIcon />}
-            onClick={handleEditSbom}
-          />
+        <Tooltip
+          label={
+            noPrimaryComp
+              ? 'No primary component for this SBOM to edit'
+              : 'Edit'
+          }
+          isDisabled={false}
+        >
+          <Box>
+            <IconButton
+              display={signedUrlParams ? 'none' : 'flex'}
+              isDisabled={status === 'signed' || !updateSboms || noPrimaryComp}
+              colorScheme='blue'
+              icon={<EditIcon />}
+              onClick={handleEditSbom}
+            />
+          </Box>
         </Tooltip>
 
         {/* SIGNED SBOM */}
@@ -323,14 +359,12 @@ const SbomActions = ({ sbom }) => {
       )}
 
       {/* UPDATE PRIMARY COMPONENT */}
-      {isSBMOpen && (
-        <ComponentDrawer
+      {isSBMOpen && !noPrimaryComp && (
+        <CompDrawer
+          data={primaryComponent[0]}
           isOpen={isSBMOpen}
           onClose={setSBMClose}
-          btnRef={btnRef}
-          data={sbom?.primaryComponent}
-          shortDesc={null}
-          totalRows={null}
+          primaryComp={sbom?.primaryComponent}
         />
       )}
 
