@@ -2,7 +2,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import React, { useCallback, useContext, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
 import { isCustomerView } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
@@ -35,10 +35,10 @@ import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useQueryParam from 'hooks/useQueryParam'
 
 import {
   UpdateComponent,
@@ -64,14 +64,11 @@ import FixedModal from '../components/FixedModal'
 import CheckFilters from './CheckFilters'
 
 const Checks = ({ sbomData }) => {
-  const { isFreeTier } = useGlobalQueryContext()
   const { showToast } = useCustomToast()
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
+  const activeTab = useQueryParam('tab')
   const customerView = isCustomerView()
 
   const { setTabData } = useContext(TabContext)
@@ -89,7 +86,8 @@ const Checks = ({ sbomData }) => {
     variables: { projectId: productId, sbomId }
   })
 
-  const [getComPath, { data: relation }] = useLazyQuery(GetComponentPath)
+  const [getComPath, { data: relation, loading: comPathLoading }] =
+    useLazyQuery(GetComponentPath)
   const { pathToPrimary } = relation?.component || ''
 
   const { sbom } = prodData || ''
@@ -122,6 +120,18 @@ const Checks = ({ sbomData }) => {
     }
   })
 
+  const [recheck] = useMutation(recheckHealth)
+
+  const handleRecheck = () => {
+    recheck({
+      variables: {
+        sbomId: params?.sbomid,
+        checkId: activeRow?.organizationRule?.rule?.friendlyId || undefined,
+        compId: activeRow?.component?.id || undefined
+      }
+    })
+  }
+
   const editChecks = useHasPermission({
     parentKey: 'view_sbom',
     childKey: 'edit_checks'
@@ -136,7 +146,6 @@ const Checks = ({ sbomData }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [ruleExists, setRuleExists] = useState(false)
 
-  const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [getRules, { loading: loadingRules }] = useLazyQuery(GetExistingRules)
   const [updateResult] = useMutation(checkResultUpdate)
   const [updateComponent] = useMutation(UpdateComponent)
@@ -743,6 +752,7 @@ const Checks = ({ sbomData }) => {
             <LicenseModal
               data={sbom}
               activeRow={activeRow}
+              recheck={handleRecheck}
               isOpen={isDataLicenseOpen}
               onClose={onDataLicenseClose}
             />
@@ -754,8 +764,8 @@ const Checks = ({ sbomData }) => {
               activeRow={activeRow}
               isOpen={isPrimaryOpen}
               ruleExists={ruleExists}
+              recheck={handleRecheck}
               onClose={onPrimaryClose}
-              isFreeTier={isFreeTier}
             />
           )}
 
@@ -765,8 +775,8 @@ const Checks = ({ sbomData }) => {
               activeRow={activeRow}
               isOpen={isVersionOpen}
               ruleExists={ruleExists}
+              recheck={handleRecheck}
               onClose={onVersionClose}
-              isFreeTier={isFreeTier}
             />
           )}
 
@@ -776,8 +786,8 @@ const Checks = ({ sbomData }) => {
               activeRow={activeRow}
               isOpen={isLicenseOpen}
               ruleExists={ruleExists}
+              recheck={handleRecheck}
               onClose={onLicenseClose}
-              isFreeTier={isFreeTier}
             />
           )}
 
@@ -787,21 +797,19 @@ const Checks = ({ sbomData }) => {
               isOpen={isTypeOpen}
               onClose={onTypeClose}
               activeRow={activeRow}
+              recheck={handleRecheck}
               ruleExists={ruleExists}
-              isFreeTier={isFreeTier}
             />
           )}
 
           {/* SUPPLIER MODAL */}
           {isSupplierOpen && (
             <SupplierModal
-              id={null}
-              data={null}
               activeRow={activeRow}
               isOpen={isSupplierOpen}
               ruleExists={ruleExists}
+              recheck={handleRecheck}
               onClose={onSupplierClose}
-              isFreeTier={isFreeTier}
             />
           )}
 
@@ -811,64 +819,62 @@ const Checks = ({ sbomData }) => {
               onClose={onClose}
               activeRow={activeRow}
               ruleExists={ruleExists}
-              isFreeTier={isFreeTier}
+              recheck={handleRecheck}
             />
           )}
 
           {/* PURL MODAL */}
           {isPurlOpen && (
             <PurlModal
-              data={null}
-              getCpe={getCpe}
               isOpen={isPurlOpen}
-              activeRow={activeRow}
               onClose={onPurlClose}
+              activeRow={activeRow}
+              recheck={handleRecheck}
               ruleExists={ruleExists}
-              isFreeTier={isFreeTier}
             />
           )}
 
           {/* CPE MODAL */}
           {isCpeOpen && (
             <CpeModal
-              getCpe={getCpe}
-              activeComp={null}
               isOpen={isCpeOpen}
               onClose={onCpeClose}
               activeRow={activeRow}
+              recheck={handleRecheck}
               ruleExists={ruleExists}
-              isFreeTier={isFreeTier}
             />
           )}
 
           {/* AUTHOR DRAWER */}
           {isAuthorOpen && (
-            <AuthorModal isOpen={isAuthorOpen} onClose={onAuthorClose} />
+            <AuthorModal
+              isOpen={isAuthorOpen}
+              onClose={onAuthorClose}
+              recheck={handleRecheck}
+            />
           )}
 
           {/* DOCUMENT SUPPLIER DRAWER */}
           {isDocSupOpen && (
             <PriSupplierModal
-              getCpe={getCpe}
-              suppliers={null}
               activeRow={activeRow}
               isOpen={isDocSupOpen}
               ruleExists={ruleExists}
               onClose={onDocSupClose}
-              isFreeTier={isFreeTier}
+              recheck={handleRecheck}
             />
           )}
 
           {/* COMPONENT RELATIONSHIP DRAWER */}
           {isRelOpen && (
             <RelationshipDrawer
-              data={null}
               isOpen={isRelOpen}
               onClose={onRelClose}
               activeRow={activeRow}
               ruleExists={ruleExists}
+              recheck={handleRecheck}
               compPath={pathToPrimary}
-              isFreeTier={isFreeTier}
+              comPathLoading={comPathLoading}
             />
           )}
         </>

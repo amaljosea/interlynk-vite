@@ -2421,6 +2421,7 @@ export const GetCheckResults = gql`
               updatedAt
             }
             suppliers {
+              id
               name
               url
               contactEmail
@@ -2443,6 +2444,7 @@ export const GetCheckResults = gql`
             purl
             cpes
             suppliers {
+              id
               name
               url
               contactEmail

@@ -15,30 +15,27 @@ import {
 
 import LynkModal from 'components/LynkModal'
 
+import useCustomToast from 'hooks/useCustomToast'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { supplierCreate, supplierUpdate } from 'graphQL/Mutation'
 import { AutomationRuleCreate } from 'graphQL/Mutation'
 
 import { BiShieldPlus } from 'react-icons/bi'
-import useCustomToast from 'hooks/useCustomToast'
 
-const PriSupplierModal = ({
-  isOpen,
-  onClose,
-  suppliers,
-  activeRow,
-  ruleExists,
-  isFreeTier
-}) => {
+const PriSupplierModal = (props) => {
+  const { isOpen, onClose, activeRow, ruleExists, recheck } = props
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
   const navigate = useNavigate()
   const { showToast } = useCustomToast()
+  const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const { status, sbom } = activeRow || ''
+  const { suppliers } = sbom || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
 
@@ -90,8 +87,12 @@ const PriSupplierModal = ({
 
   const isInvalid = orgUrl !== '' && !validateUrl(orgUrl)
 
-  const [createSupplier] = useMutation(supplierCreate)
-  const [updateSupplier] = useMutation(supplierUpdate)
+  const [createSupplier] = useMutation(supplierCreate, {
+    onCompleted: () => recheck()
+  })
+  const [updateSupplier] = useMutation(supplierUpdate, {
+    onCompleted: () => recheck()
+  })
 
   useEffect(() => {
     if (suppliers && suppliers.length > 0) {
@@ -118,7 +119,7 @@ const PriSupplierModal = ({
       }).then((res) => {
         if (res?.data) {
           showToast({
-            description: 'Supplier Added successfully',
+            description: 'Supplier added successfully',
             status: 'success'
           })
           onClose()
@@ -139,7 +140,7 @@ const PriSupplierModal = ({
     }).then((res) => {
       if (res?.data) {
         showToast({
-          description: 'Supplier Updated successfully',
+          description: 'Supplier updated successfully',
           status: 'success'
         })
         onClose()
@@ -251,10 +252,10 @@ const PriSupplierModal = ({
       <LynkModal
         isOpen={isOpen}
         onClose={onClose}
+        hidden={resolved}
         title={`Add ${friendlyId ? 'SBOM' : ''} Supplier`}
         buttonText={suppliers?.length > 0 ? 'Update' : 'Save'}
         disabled={isInvalid || isDisabled}
-        hidden={resolved}
         onSubmit={suppliers?.length > 0 ? handleUpdate : handleSave}
         Icon={BiShieldPlus}
         leftFooterContent={

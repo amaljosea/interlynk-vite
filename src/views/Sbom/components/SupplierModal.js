@@ -17,6 +17,7 @@ import {
 
 import LynkModal from 'components/LynkModal'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import {
@@ -24,30 +25,28 @@ import {
   addComSupplier,
   updateComSupplier
 } from 'graphQL/Mutation'
-import { recheckHealth } from 'graphQL/Mutation'
 
 import { BiCube } from 'react-icons/bi'
 
-const SupplierModal = ({
-  id,
-  data,
-  isOpen,
-  onClose,
-  activeRow,
-  ruleExists,
-  isFreeTier
-}) => {
+const SupplierModal = (props) => {
+  const { isOpen, onClose, activeRow, ruleExists, recheck } = props
+
   const params = useParams()
   const productId = params.productid
   const navigate = useNavigate()
+  const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
-  const [recheck] = useMutation(recheckHealth)
-  const [createSupplier] = useMutation(addComSupplier)
-  const [updateSupplier] = useMutation(updateComSupplier)
+  const [createSupplier] = useMutation(addComSupplier, {
+    onCompleted: () => recheck()
+  })
+  const [updateSupplier] = useMutation(updateComSupplier, {
+    onCompleted: () => recheck()
+  })
 
   const { status, component } = activeRow || ''
-  const { name, version } = component || ''
+  const { name, version, suppliers } = component || ''
+
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
 
@@ -79,24 +78,21 @@ const SupplierModal = ({
     }
   }
 
-  const { suppliers } = data || ''
-
   useEffect(() => {
-    if (data && data?.suppliers?.length > 0) {
-      const { suppliers } = data
+    if (suppliers?.length > 0) {
       setOrgName(suppliers[0].name || '')
       setOrgUrl(suppliers[0].url || '')
       setSupName(suppliers[0].contactName || '')
       setSupEmail(suppliers[0].contactEmail || '')
     }
-  }, [data])
+  }, [suppliers])
 
   const handleRecheck = () => {
     recheck({
       variables: {
         sbomId: params?.sbomid,
-        friendlyCheckId: friendlyId,
-        componentId: component?.id
+        checkId: friendlyId,
+        compId: component?.id
       }
     })
   }
@@ -112,7 +108,7 @@ const SupplierModal = ({
           url: orgUrl,
           contactName: supName,
           contactEmail: supEmail,
-          componentId: component?.id || id
+          componentId: component?.id
         }
       })
         .then(() => friendlyId && handleRecheck())
@@ -128,7 +124,7 @@ const SupplierModal = ({
         url: orgUrl,
         contactName: supName,
         contactEmail: supEmail,
-        id: data && data.suppliers && data.suppliers[0].id
+        id: suppliers && suppliers[0].id
       }
     })
       .then(() => friendlyId && handleRecheck())
@@ -279,7 +275,7 @@ const SupplierModal = ({
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={suppliers?.length > 0 ? handleUpdate : handleSave}
-        title={`${data && data.suppliers?.length > 0 ? 'Edit' : 'Add'} Supplier`}
+        title={`${suppliers?.length > 0 ? 'Edit' : 'Add'} Supplier`}
         Icon={BiCube}
         disabled={isInvalid}
         hidden={resolved}
@@ -300,22 +296,6 @@ const SupplierModal = ({
           )
         }
       >
-        {data && (
-          <Flex
-            width='99%'
-            direction={'row'}
-            alignItems={'center'}
-            justifyContent={'flex-start'}
-            flexWrap={'wrap'}
-            gap={2}
-            mb={4}
-          >
-            <Text fontWeight={'medium'} wordBreak={'break-all'}>
-              {data.name}
-            </Text>
-            <Tag colorScheme='blue'>{data.version}</Tag>
-          </Flex>
-        )}
         <Flex
           hidden={component ? false : true}
           width='100%'

@@ -39,6 +39,7 @@ import CardHeader from 'components/Card/CardHeader'
 import LoadingSpinner from 'components/LoadingSpinner'
 import RelDeleteModal from 'components/RelDeleteModal'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -66,26 +67,19 @@ const findShortestPath = (pathArray, currentShortestPath = []) => {
   ])
 }
 
-const RelationshipDrawer = ({
-  isOpen,
-  onClose,
-  data,
-  activeRow,
-  compPath,
-  ruleExists,
-  comPathLoading,
-  isFreeTier
-}) => {
+const RelationshipDrawer = (props) => {
+  const { isOpen, onClose, activeRow, compPath, ruleExists, recheck } = props
+  
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
   const location = useLocation()
   const navigate = useNavigate()
+  const { isFreeTier } = useGlobalQueryContext()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
-  const { name, version, id } = data || ''
   const { status, component: comp } = activeRow || ''
   const { id: compId, name: compName, version: compVersion } = comp || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
@@ -133,12 +127,14 @@ const RelationshipDrawer = ({
     }
   })
 
-  const isLoading = comPathLoading || !allComponents
+  const isLoading = props?.comPathLoading || !allComponents
 
-  const [addRelation] = useMutation(CreateCompRelation)
+  const [addRelation] = useMutation(CreateCompRelation, {
+    onCompleted: () => recheck()
+  })
   const [removeRelation] = useMutation(DeleteCompRelation)
   const { data: compDependency } = useQuery(GetCompDependency, {
-    variables: { compId: compId || id, sbomId: sbomId }
+    variables: { compId: compId || activeRow?.id, sbomId: sbomId }
   })
 
   const shortestPath = findShortestPath(compPath)[0]
@@ -160,7 +156,11 @@ const RelationshipDrawer = ({
 
   const handleAdd = () => {
     addRelation({
-      variables: { from: compId || id, to: component, relType: relation }
+      variables: {
+        from: compId || activeRow?.id,
+        to: component,
+        relType: relation
+      }
     }).then((res) => {
       if (res?.data) {
         setIsAdded(true)
@@ -284,8 +284,10 @@ const RelationshipDrawer = ({
                     gap={2}
                   >
                     <Text fontWeight={'medium'}>{name || compName}</Text>
-                    {(version || compVersion) && (
-                      <Tag colorScheme='blue'>{version || compVersion}</Tag>
+                    {(activeRow?.version || compVersion) && (
+                      <Tag colorScheme='blue'>
+                        {activeRow?.version || compVersion}
+                      </Tag>
                     )}
                   </Flex>
                 </CardHeader>
@@ -545,7 +547,8 @@ const RelationshipDrawer = ({
                         justifyContent={'center'}
                       >
                         <Tag size='sm' colorScheme='green'>
-                          {name || compName} - {version || compVersion}
+                          {activeRow?.name || compName} -{' '}
+                          {activeRow?.version || compVersion}
                         </Tag>
                       </Stack>
                     )}

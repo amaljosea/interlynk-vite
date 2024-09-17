@@ -2,15 +2,14 @@ import { useLazyQuery, useMutation } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import {  useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { GetIcon, customStyles, timeSince } from 'utils'
 import { getFullDateAndTime, isUnknown } from 'utils'
-import { truncatedValue, isCustomerView } from 'utils'
+import { isCustomerView, truncatedValue } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 import { openSsf } from 'variables/general'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import SupplierModal from 'views/Sbom/components/SupplierModal'
 
 import { AddIcon, ViewIcon } from '@chakra-ui/icons'
 import {
@@ -42,7 +41,6 @@ import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import GraphDrawer from 'components/Drawer/GraphDrawer'
-import LinksDrawer from 'components/Drawer/LinksDrawer'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import { HealthScore } from 'components/HealthScore'
 import RefreshBtn from 'components/Icons/RefreshBtn'
@@ -166,7 +164,6 @@ const Components = ({ sbomData }) => {
   })
 
   const compBtn = useRef(null)
-  const linkRef = useRef(null)
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState(searchInput)
 
@@ -184,16 +181,7 @@ const Components = ({ sbomData }) => {
     onOpen: onGraphOpen,
     onClose: onGraphClose
   } = useDisclosure()
-  const {
-    isOpen: isSupOpen,
-    onOpen: onSupOpen,
-    onClose: onSupClose
-  } = useDisclosure()
-  const {
-    isOpen: isLinkOpen,
-    onOpen: onLinkOpen,
-    onClose: onLinkClose
-  } = useDisclosure()
+
   const {
     isOpen: isMapOpen,
     onOpen: onMapOpen,
@@ -580,7 +568,7 @@ const Components = ({ sbomData }) => {
       id: 'action',
       name: 'ACTION',
       selector: (row) => {
-        const { suppliers, status, primary } = row
+        const { status, primary } = row
         return (
           <>
             {!customerView ? (
@@ -606,26 +594,6 @@ const Components = ({ sbomData }) => {
                       isDisabled={!updateComponent}
                     >
                       Edit Relationships
-                    </MenuItem>
-                    <MenuItem
-                      hidden
-                      onClick={() => {
-                        setActiveRow(row)
-                        onSupOpen()
-                      }}
-                      isDisabled={status === 'signed' || !updateComponent}
-                    >
-                      {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
-                    </MenuItem>
-                    <MenuItem
-                      hidden
-                      onClick={() => {
-                        setActiveRow(row)
-                        onLinkOpen()
-                      }}
-                      isDisabled={status === 'signed' || !updateComponent}
-                    >
-                      Edit Links
                     </MenuItem>
                     <MenuItem
                       onClick={() => handleGraphView(row)}
@@ -1133,39 +1101,13 @@ const Components = ({ sbomData }) => {
         />
       )}
 
-      {isSupOpen && (
-        <SupplierModal
-          id={activeRow.id}
-          isOpen={isSupOpen}
-          onClose={onSupClose}
-          data={activeRow}
-          shortDesc={null}
-          checkId={null}
-          isFreeTier={isFreeTier}
-        />
-      )}
-
-      {isLinkOpen && (
-        <LinksDrawer
-          component={activeRow}
-          btnRef={linkRef}
-          isOpen={isLinkOpen}
-          onClose={onLinkClose}
-          productId={productId}
-          sbomId={sbomId}
-        />
-      )}
-
       {isRelationOpen && (
         <RelationshipDrawer
-          data={activeRow}
-          activeRow={null}
-          ruleExists={false}
+          activeRow={activeRow}
           isOpen={isRelationOpen}
           onClose={onRelationClose}
-          compPath={comPath?.component?.pathToPrimary}
           comPathLoading={comPathLoading}
-          isFreeTier={isFreeTier}
+          compPath={comPath?.component?.pathToPrimary}
         />
       )}
 

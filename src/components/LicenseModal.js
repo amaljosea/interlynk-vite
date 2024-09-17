@@ -9,7 +9,7 @@ import { FaScaleBalanced } from 'react-icons/fa6'
 import LicenseField from './Licenses/LicenseField'
 import LynkModal from './LynkModal'
 
-const LicenseModal = ({ data, isOpen, onClose, activeRow }) => {
+const LicenseModal = ({ data, isOpen, onClose, activeRow, recheck }) => {
   const { status, sbom } = activeRow || ''
   const resolved = status === 'resolved'
   const { sbomState } = useGlobalState()
@@ -17,7 +17,7 @@ const LicenseModal = ({ data, isOpen, onClose, activeRow }) => {
 
   const isInvalidLicense = expLicense === ''
 
-  const [updateSbom] = useMutation(sbomUpdate)
+  const [updateSbom] = useMutation(sbomUpdate, { onCompleted: () => recheck() })
 
   const handleUpdateSBOM = () => {
     updateSbom({

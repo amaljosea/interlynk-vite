@@ -28,6 +28,7 @@ import {
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkModal from 'components/LynkModal'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -36,11 +37,14 @@ import { GetComponentData } from 'graphQL/Queries'
 
 import { BiWrench } from 'react-icons/bi'
 
-const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
+const CheckModal = (props) => {
+  const { isOpen, onClose, activeRow, ruleExists, recheck } = props
+
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
   const navigate = useNavigate()
+  const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const { tabData } = useContext(TabContext)
@@ -94,18 +98,21 @@ const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
   const isComponent =
     isPrimary || isComponentType || isComponentVersion || isComponentLicense
 
-  const isInvalidLicense =
-    isComponentLicense && details?.licenses?.value === ''
+  const isInvalidLicense = isComponentLicense && details?.licenses?.value === ''
 
   const isEmptyVersion = isComponentVersion && compVersion === ''
 
-  const [updateComponent] = useMutation(UpdateComponent)
+  const [updateComponent] = useMutation(UpdateComponent, {
+    onCompleted: () => recheck()
+  })
 
   const handleComUpdate = () => {
     disableButtonTemporarily()
     if (resolved) {
       onClose()
     } else {
+      const license =
+        details?.licenses?.length > 0 ? details?.licenses[0].value : ''
       updateComponent({
         variables: {
           sbomId: sbomId,
@@ -114,9 +121,7 @@ const CheckModal = ({ isOpen, onClose, activeRow, ruleExists, isFreeTier }) => {
           kind: isComponentType ? compType : undefined,
           version: isComponentVersion ? compVersion : undefined,
           licenses: {
-            licensesExp: isPrimary
-              ? undefined
-              : details?.licenses?.value || undefined
+            licensesExp: isPrimary ? undefined : license
           }
         }
       }).then((res) => {
