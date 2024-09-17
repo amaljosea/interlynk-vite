@@ -50,6 +50,7 @@ const CpeInput = ({
 
   const updateCpe = (index, value) => {
     const cpeParts = string?.split(':')
+    console.log('cpe', cpeParts)
     cpeParts[index] = value
     const cpe = cpeParts.join(':')
     setString(cpe)
@@ -136,7 +137,6 @@ const CpeInput = ({
   useEffect(() => {
     if (validation) {
       const matches = validateCpe(string)
-      console.log('matches', matches)
       if (matches) {
         setTabData((prev) => ({
           ...prev,

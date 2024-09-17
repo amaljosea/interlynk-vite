@@ -47,7 +47,6 @@ import {
   sbomUpdate
 } from 'graphQL/Mutation'
 import {
-  CpeAutoComplete,
   GetCheckFilterData,
   GetCheckResults,
   GetExistingRules,
@@ -70,8 +69,6 @@ const Checks = ({ sbomData }) => {
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
   const customerView = isCustomerView()
-
-  const { setTabData } = useContext(TabContext)
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
@@ -152,79 +149,19 @@ const Checks = ({ sbomData }) => {
   const [healthRecheck] = useMutation(recheckHealth)
   const [updateSbom] = useMutation(sbomUpdate)
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const {
-    isOpen: isLicenseOpen,
-    onOpen: onLicenseOpen,
-    onClose: onLicenseClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isDataLicenseOpen,
-    onOpen: onDataLicenseOpen,
-    onClose: onDataLicenseClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isDocSupOpen,
-    onOpen: onDocSupOpen,
-    onClose: onDocSupClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isTypeOpen,
-    onOpen: onTypeOpen,
-    onClose: onTypeClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isAuthorOpen,
-    onOpen: onAuthorOpen,
-    onClose: onAuthorClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isSupplierOpen,
-    onOpen: onSupplierOpen,
-    onClose: onSupplierClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isPrimaryOpen,
-    onOpen: onPrimaryOpen,
-    onClose: onPrimaryClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isPurlOpen,
-    onOpen: onPurlOpen,
-    onClose: onPurlClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isCpeOpen,
-    onOpen: onCpeOpen,
-    onClose: onCpeClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isFixedOpen,
-    onOpen: onFixedOpen,
-    onClose: onFixedClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isVersionOpen,
-    onOpen: onVersionOpen,
-    onClose: onVersionClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isRelOpen,
-    onOpen: onRelOpen,
-    onClose: onRelClose
-  } = useDisclosure()
+  const DOC_CREATION_TIME = useDisclosure()
+  const DOC_LICENSE = useDisclosure()
+  const DOC_SUPPLIER = useDisclosure()
+  const DOC_PRIMARY = useDisclosure()
+  const DOC_AUTHOR = useDisclosure()
+  const COMP_LICENSE = useDisclosure()
+  const COMP_SUPPLIER = useDisclosure()
+  const COMP_TYPE = useDisclosure()
+  const COMP_VERSION = useDisclosure()
+  const COMP_RELATION = useDisclosure()
+  const COMP_PURL = useDisclosure()
+  const COMP_CPE = useDisclosure()
+  const FIXED = useDisclosure()
 
   const handleReCheck = useCallback(async () => {
     showToast({
@@ -360,7 +297,7 @@ const Checks = ({ sbomData }) => {
 
   const handleOpenLicense = () => {
     prodCompDispatch({ type: 'CLEAR_LICENSES' })
-    onLicenseOpen()
+    COMP_LICENSE.onOpen()
   }
 
   const handleComUpdate = async (row) => {
@@ -427,28 +364,28 @@ const Checks = ({ sbomData }) => {
 
     // TIMESTAMP SELECTOR UI
     if (shortDesc === 'Document creation timestamp') {
-      return onOpen()
+      return DOC_CREATION_TIME.onOpen()
     }
 
     // AUTHOR SIDE DRAWER
     if (shortDesc === 'Document has authors present') {
-      return onAuthorOpen()
+      return DOC_AUTHOR.onOpen()
     }
 
     // SUPPLIER SIDE DRAWER
     if (shortDesc === 'Document has suppliers present') {
-      return onDocSupOpen()
+      return DOC_SUPPLIER.onOpen()
     }
 
     // SUPPLIER SIDE DRAWER
     if (shortDesc === 'Document has data license specified') {
       sbomDispatch({ type: 'CLEAR_LICENSES' })
-      return onDataLicenseOpen()
+      return DOC_LICENSE.onOpen()
     }
 
     // PRIMARY COMPONENT SELECTOR MODAL
     if (shortDesc === 'Document has a primary component') {
-      return onPrimaryOpen()
+      return DOC_PRIMARY.onOpen()
     }
 
     // COMPONENT TYPE SELECTOR MODAL
@@ -456,24 +393,24 @@ const Checks = ({ sbomData }) => {
       shortDesc === 'Component has a valid type' ||
       shortDesc === 'Component has a type'
     ) {
-      return onTypeOpen()
+      return COMP_TYPE.onOpen()
     }
 
     // COMPONENT VERSION SELECTOR MODAL
     if (shortDesc === 'Component has a version') {
-      return onVersionOpen()
+      return COMP_VERSION.onOpen()
     }
 
     // COMPONENT ADD SUPPLIER MODAL
     if (shortDesc === 'Component has a supplier') {
-      return onSupplierOpen()
+      return COMP_SUPPLIER.onOpen()
     }
 
     // COMPONENT HAS RELATIONSHIP
     if (shortDesc === 'Component has relationship/s') {
       getComPath({
         variables: { compId: row?.component?.id, sbomId: sbomId }
-      }).then((res) => res?.data && onRelOpen())
+      }).then((res) => res?.data && COMP_RELATION.onOpen())
     }
 
     // PURL MODAL
@@ -481,11 +418,7 @@ const Checks = ({ sbomData }) => {
       shortDesc === 'Component has a purl' ||
       shortDesc === 'Component has a valid purl'
     ) {
-      setTabData((prev) => ({
-        ...prev,
-        identifiers: { ...prev.identifiers, purl: 'pkg:type/name@version' }
-      }))
-      return onPurlOpen()
+      return COMP_PURL.onOpen()
     }
 
     // CPE MODAL
@@ -493,11 +426,7 @@ const Checks = ({ sbomData }) => {
       shortDesc === 'Component has a valid cpe' ||
       shortDesc === 'Component has a cpe'
     ) {
-      setTabData((prev) => ({
-        ...prev,
-        identifiers: { ...prev.identifiers, cpe: 'cpe:2.3:::::*:*:*:*:*:*:*' }
-      }))
-      return onCpeOpen()
+      return COMP_CPE.onOpen()
     }
 
     // COMPONENT LICENSE SELECTOR MODAL
@@ -679,7 +608,7 @@ const Checks = ({ sbomData }) => {
                 fontWeight='normal'
                 colorScheme='whatsapp'
                 leftIcon={<CheckIcon />}
-                onClick={() => (isPrimary ? null : onFixedOpen())}
+                onClick={() => (isPrimary ? null : FIXED.onOpen())}
                 disabled={customerView || !editChecks || isArchived}
               >
                 {isPrimary ? 'Fixed' : 'View'}
@@ -748,75 +677,75 @@ const Checks = ({ sbomData }) => {
       {activeRow !== null && (
         <>
           {/* SBOM DATA LICENSES DRAWER */}
-          {isDataLicenseOpen && (
+          {DOC_LICENSE.isOpen && (
             <LicenseModal
               data={sbom}
               activeRow={activeRow}
               recheck={handleRecheck}
-              isOpen={isDataLicenseOpen}
-              onClose={onDataLicenseClose}
+              isOpen={DOC_LICENSE.isOpen}
+              onClose={DOC_LICENSE.onClose}
             />
           )}
 
           {/* COMPONENT PRIMARY MODAL */}
-          {isPrimaryOpen && (
+          {DOC_PRIMARY.isOpen && (
             <CheckModal
               activeRow={activeRow}
-              isOpen={isPrimaryOpen}
               ruleExists={ruleExists}
               recheck={handleRecheck}
-              onClose={onPrimaryClose}
+              isOpen={DOC_PRIMARY.isOpen}
+              onClose={DOC_PRIMARY.onClose}
             />
           )}
 
           {/* COMPONENT VERSION MODAL */}
-          {isVersionOpen && (
+          {COMP_VERSION.isOpen && (
             <CheckModal
               activeRow={activeRow}
-              isOpen={isVersionOpen}
               ruleExists={ruleExists}
               recheck={handleRecheck}
-              onClose={onVersionClose}
+              isOpen={COMP_VERSION.isOpen}
+              onClose={COMP_VERSION.onClose}
             />
           )}
 
           {/* COMPONENT LICENSE MODAL */}
-          {isLicenseOpen && (
+          {COMP_LICENSE.isOpen && (
             <CheckModal
               activeRow={activeRow}
-              isOpen={isLicenseOpen}
               ruleExists={ruleExists}
               recheck={handleRecheck}
-              onClose={onLicenseClose}
+              isOpen={COMP_LICENSE.isOpen}
+              onClose={COMP_LICENSE.onClose}
             />
           )}
 
           {/* COMPONENT TYPE MODAL */}
-          {isTypeOpen && (
+          {COMP_TYPE.isOpen && (
             <CheckModal
-              isOpen={isTypeOpen}
-              onClose={onTypeClose}
               activeRow={activeRow}
               recheck={handleRecheck}
               ruleExists={ruleExists}
+              isOpen={COMP_TYPE.isOpen}
+              onClose={COMP_TYPE.onClose}
             />
           )}
 
           {/* SUPPLIER MODAL */}
-          {isSupplierOpen && (
+          {COMP_SUPPLIER.isOpen && (
             <SupplierModal
               activeRow={activeRow}
-              isOpen={isSupplierOpen}
               ruleExists={ruleExists}
               recheck={handleRecheck}
-              onClose={onSupplierClose}
+              isOpen={COMP_SUPPLIER.isOpen}
+              onClose={COMP_SUPPLIER.onClose}
             />
           )}
 
-          {isOpen && (
+          {DOC_CREATION_TIME.isOpen && (
             <CheckModal
-              isOpen={isOpen}
-              onClose={onClose}
+              isOpen={DOC_CREATION_TIME.isOpen}
+              onClose={DOC_CREATION_TIME.onClose}
               activeRow={activeRow}
               ruleExists={ruleExists}
               recheck={handleRecheck}
@@ -824,64 +753,64 @@ const Checks = ({ sbomData }) => {
           )}
 
           {/* PURL MODAL */}
-          {isPurlOpen && (
+          {COMP_PURL.isOpen && (
             <PurlModal
-              isOpen={isPurlOpen}
-              onClose={onPurlClose}
               activeRow={activeRow}
               recheck={handleRecheck}
               ruleExists={ruleExists}
+              isOpen={COMP_PURL.isOpen}
+              onClose={COMP_PURL.onClose}
             />
           )}
 
           {/* CPE MODAL */}
-          {isCpeOpen && (
+          {COMP_CPE.isOpen && (
             <CpeModal
-              isOpen={isCpeOpen}
-              onClose={onCpeClose}
               activeRow={activeRow}
               recheck={handleRecheck}
               ruleExists={ruleExists}
+              isOpen={COMP_CPE.isOpen}
+              onClose={COMP_CPE.onClose}
             />
           )}
 
           {/* AUTHOR DRAWER */}
-          {isAuthorOpen && (
+          {DOC_AUTHOR.isOpen && (
             <AuthorModal
-              isOpen={isAuthorOpen}
-              onClose={onAuthorClose}
               recheck={handleRecheck}
+              isOpen={DOC_AUTHOR.isOpen}
+              onClose={DOC_AUTHOR.onClose}
             />
           )}
 
           {/* DOCUMENT SUPPLIER DRAWER */}
-          {isDocSupOpen && (
+          {DOC_SUPPLIER.isOpen && (
             <PriSupplierModal
               activeRow={activeRow}
-              isOpen={isDocSupOpen}
-              ruleExists={ruleExists}
-              onClose={onDocSupClose}
               recheck={handleRecheck}
+              ruleExists={ruleExists}
+              isOpen={DOC_SUPPLIER.isOpen}
+              onClose={DOC_SUPPLIER.onClose}
             />
           )}
 
           {/* COMPONENT RELATIONSHIP DRAWER */}
-          {isRelOpen && (
+          {COMP_RELATION.isOpen && (
             <RelationshipDrawer
-              isOpen={isRelOpen}
-              onClose={onRelClose}
               activeRow={activeRow}
               ruleExists={ruleExists}
               recheck={handleRecheck}
               compPath={pathToPrimary}
+              isOpen={COMP_RELATION.isOpen}
+              onClose={COMP_RELATION.onClose}
               comPathLoading={comPathLoading}
             />
           )}
         </>
       )}
 
-      {isFixedOpen && (
-        <FixedModal isOpen={isFixedOpen} onClose={onFixedClose} />
+      {FIXED.isOpen && (
+        <FixedModal isOpen={FIXED.isOpen} onClose={FIXED.onClose} />
       )}
     </>
   )

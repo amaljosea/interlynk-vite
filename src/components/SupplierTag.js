@@ -15,7 +15,13 @@ const SupplierTag = ({ key, item, premission, onEdit, onDelete, editable }) => {
   const { contactName, contactEmail, url, name } = item || {}
   const supplierURL = url?.startsWith('http') ? item.url : `http://${url}`
   return (
-    <Tag height={7} key={key} variant='subtle' colorScheme='orange'>
+    <Tag
+      height={7}
+      key={key}
+      variant='subtle'
+      colorScheme='orange'
+      w='fit-content'
+    >
       <Tooltip
         label={
           <Stack dir='column' spacing={1}>

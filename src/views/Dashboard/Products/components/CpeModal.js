@@ -1,6 +1,5 @@
-import { useMutation } from '@apollo/client'
-import { TabContext } from 'context/TabContext'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useLazyQuery, useMutation } from '@apollo/client'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { validateCpe } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
@@ -24,19 +23,13 @@ import {
 import CpeInput from 'components/CpeInput'
 import LynkModal from 'components/LynkModal'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
+import { CpeAutoComplete } from 'graphQL/Queries'
 
-const CpeModal = ({
-  isOpen,
-  onClose,
-  activeComp,
-  getCpe,
-  activeRow,
-  ruleExists,
-  isFreeTier
-}) => {
+const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const { status, component } = activeRow || ''
   const { name: compName, version: compVersion, cpes } = component || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
@@ -45,109 +38,58 @@ const CpeModal = ({
   const sbomId = params.sbomid
   const productId = params.productid
   const navigate = useNavigate()
+  const { isFreeTier } = useGlobalQueryContext()
 
-  const { tabData, handleChange, setTabData, saveChanges } =
-    useContext(TabContext)
-  const { identifiers } = tabData
+  const [getCpe] = useLazyQuery(CpeAutoComplete)
 
-  const [error, setError] = useState('')
-  const [vendor, setVendor] = useState('')
-  const [vendorList, setVendorList] = useState([])
+  const [value, setValue] = useState('cpe:2.3:::::*:*:*:*:*:*:*')
+  const [cpeData, setCpeData] = useState({
+    part: '',
+    vendor: '',
+    product: '',
+    cpeVersion: '',
+    update: '',
+    edition: '',
+    language: '',
+    swEdition: '',
+    targetSoftware: '',
+    targetHardware: '',
+    other: ''
+  })
+
   const vendorRef = useRef()
-  const [product, setProduct] = useState('')
-  const [productList, setProductList] = useState([])
   const productRef = useRef()
-  const [type, setType] = useState('')
-  const [version, setVersion] = useState('')
-  const [versionList, setVersionList] = useState([])
   const versionRef = useRef()
-  const [update, setUpdate] = useState('')
-  const [edition, setEdition] = useState('')
-  const [language, setLanguage] = useState('')
-  const [swEdition, setSwEdition] = useState('')
-  const [targetSoftware, setTargetSoftware] = useState('')
-  const [hardware, setHardware] = useState('')
-  const [other, setOther] = useState('')
+  const [error, setError] = useState('')
+  const [vendorList, setVendorList] = useState([])
+  const [productList, setProductList] = useState([])
+  const [versionList, setVersionList] = useState([])
 
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const isInvalid =
-    type === '' || vendor === '' || product === '' || version === ''
+    cpeData?.part === '' ||
+    cpeData?.vendor === '' ||
+    cpeData?.product === '' ||
+    cpeData?.cpeVersion === ''
 
-  const [updateComponent, { loading }] = useMutation(UpdateComponent)
-
-  // ON BLUR UPDATE
-  const onBlurUpdate = () => {
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[6] = update === '' ? '*' : update
-    const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
-  }
-
-  // ON BLUR EDITION
-  const onBlurEdition = () => {
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[7] = edition === '' ? '*' : edition
-    const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
-  }
-
-  // ON BLUR LANGUAGE
-  const onBlurLanguage = () => {
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[8] = language === '' ? '*' : language
-    const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
-  }
-
-  // ON BLUR SW EDITION
-  const onBlurSwEdition = () => {
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[9] = swEdition === '' ? '*' : swEdition
-    const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
-  }
-
-  // ON BLUR TARGET SOFTWARE
-  const onBlurTargetSoftware = () => {
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[10] = targetSoftware === '' ? '*' : targetSoftware
-    const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
-  }
-
-  // ON BLUR OTHER
-  const onBlurOther = () => {
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[12] = other === '' ? '*' : other
-    const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
-  }
-
-  // ON CPE SAVE
-  const handleSave = () => {
-    saveChanges()
-    onClose()
-  }
+  const [updateComponent, { loading }] = useMutation(UpdateComponent, {
+    onCompleted: () => recheck()
+  })
 
   // ON CPE UPDATE
   const handleComUpdate = () => {
     if (resolved) {
       onClose()
     } else {
-      if (validateCpe(identifiers?.cpe)) {
+      if (validateCpe(value)) {
         updateComponent({
           variables: {
             id: component?.id,
             sbomId: sbomId,
-            cpes: [identifiers?.cpe]
+            cpes: [value]
           }
-        }).then((res) => {
-          if (res?.data) {
-            saveChanges()
-            onClose()
-          }
-        })
+        }).then((res) => res?.data && onClose())
       } else {
         setError('Invalid CPE')
       }
@@ -157,9 +99,9 @@ const CpeModal = ({
   // ON VENDOR INPUT CHANGE
   const onVendorInputChange = (event) => {
     const { value } = event.target
+    setCpeData((prev) => ({ ...prev, vendor: value }))
     const val = value.replace(/\s/g, '')
     if (!val.includes('*') && !value.includes(':')) {
-      setVendor(val)
       if (val !== '') {
         getCpe({
           variables: {
@@ -180,28 +122,12 @@ const CpeModal = ({
     }
   }
 
-  // ON TYPE CHANGE
-  const handleTypeChange = (e) => {
-    const { value } = e.target
-    const cpeParts = identifiers?.cpe?.split(':')
-    setType(value)
-    if (value !== '') {
-      cpeParts[2] = e.target.value
-      const cpe = cpeParts.join(':')
-      handleChange('identifiers', 'cpe', cpe)
-    } else {
-      cpeParts[2] = ''
-      const cpe = cpeParts.join(':')
-      handleChange('identifiers', 'cpe', cpe)
-    }
-  }
-
   // ON PRODUCT INPUT CHANGE
   const onProductInputChange = (event) => {
     const { value } = event.target
+    setCpeData((prev) => ({ ...prev, product: value }))
     const val = value.replace(/\s/g, '')
     if (!val.includes('*') && !val.includes(':')) {
-      setProduct(val)
       if (val !== '') {
         getCpe({
           variables: {
@@ -213,7 +139,7 @@ const CpeModal = ({
               },
               hints: {
                 cpe: {
-                  vendor: vendor
+                  vendor: cpeData?.vendor
                 }
               }
             }
@@ -230,9 +156,9 @@ const CpeModal = ({
   // ON VERSION INPUT CHANGE
   const onVersionInputChange = (event) => {
     const { value } = event.target
+    setCpeData((prev) => ({ ...prev, cpeVersion: value }))
     const val = value.replace(/\s/g, '')
     if (!val.includes('*') && !val.includes(':')) {
-      setVersion(val)
       if (val !== '') {
         getCpe({
           variables: {
@@ -244,8 +170,8 @@ const CpeModal = ({
               },
               hints: {
                 cpe: {
-                  vendor: vendor,
-                  product: product
+                  vendor: cpeData?.vendor,
+                  product: cpeData?.product
                 }
               }
             }
@@ -256,23 +182,6 @@ const CpeModal = ({
           }
         })
       }
-    }
-  }
-
-  // ON HARDWARE CHANGE
-  const handleHardwareChange = (e) => {
-    const { value } = e.target
-    setHardware(value)
-    const cpeParts = identifiers?.cpe?.split(':')
-    cpeParts[11] = value === '' ? '*' : value
-    const cpe = cpeParts.join(':')
-    handleChange('identifiers', 'cpe', cpe)
-  }
-
-  // ON CHANGE
-  const handleOnChange = (value, setStateFunc) => {
-    if (!value.includes(':') && !value.includes('*')) {
-      setStateFunc(value)
     }
   }
 
@@ -308,7 +217,7 @@ const CpeModal = ({
     {
       subject: 'component',
       field: 'component_cpe',
-      value: identifiers?.cpe
+      value: value || ''
     }
   ]
 
@@ -349,62 +258,54 @@ const CpeModal = ({
     }
   }
 
+  const handleInputChange = (field, value) => {
+    setCpeData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleInputBlur = (index, val) => {
+    const cpeParts = value?.split(':')
+    cpeParts[index] = val === '' ? '*' : val
+    const cpe = cpeParts.join(':')
+    setValue(cpe)
+  }
+
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
     if (cpes?.length > 0) {
-      const components = cpes[0].split(':')
-      const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
-      const isValid =
-        components[2] && allowedValues.includes(components[2].toLowerCase())
-      if (isValid) {
-        setType(components[2].toLowerCase())
+      if (validateCpe(cpes[0])) {
+        setValue(cpes[0])
+        const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
+        const components = cpes[0]?.split(':')
+        const isValid =
+          components[2] && allowedValues.includes(components[2].toLowerCase())
+        setCpeData((prev) => ({
+          ...prev,
+          part: isValid ? components[2].toLowerCase() : '',
+          vendor: components[3]?.replace(/\*/g, '') || '',
+          product: components[4]?.replace(/\*/g, '') || '',
+          cpeVersion: components[5]?.replace(/\*/g, '') || '',
+          update: components[6]?.replace(/\*/g, '') || '',
+          edition: components[7]?.replace(/\*/g, '') || '',
+          language: components[8]?.replace(/\*/g, '') || '',
+          swEdition: components[9]?.replace(/\*/g, '') || '',
+          targetSoftware: components[10]?.replace(/\*/g, '') || '',
+          targetHardware: components[11]?.replace(/\*/g, '') || '',
+          other: components[12]?.replace(/\*/g, '') || ''
+        }))
       } else {
-        setType('')
+        setValue('cpe:2.3:::::*:*:*:*:*:*:*')
       }
-      setVendor(components[3]?.replace(/\*/g, '') || '')
-      setProduct(components[4]?.replace(/\*/g, '') || '')
-      setVersion(components[5]?.replace(/\*/g, '') || '')
-      setUpdate(components[6]?.replace(/\*/g, '') || '')
-      setEdition(components[7]?.replace(/\*/g, '') || '')
-      setLanguage(components[8]?.replace(/\*/g, '') || '')
-      setSwEdition(components[9]?.replace(/\*/g, '') || '')
-      setTargetSoftware(components[10]?.replace(/\*/g, '') || '')
-      setHardware(components[11]?.replace(/\*/g, '') || '')
-      setOther(components[12]?.replace(/\*/g, '') || '')
-      setTabData((prev) => ({
-        ...prev,
-        identifiers: {
-          ...prev?.identifiers,
-          cpe: `cpe:2.3:${isValid ? components[2].toLowerCase() : '*'}:${
-            components[3] || '*'
-          }:${components[4] || '*'}:${components[5] || '*'}:${
-            components[6] || '*'
-          }:${components[7] || '*'}:${components[8] || '*'}:${
-            components[9] || '*'
-          }:${components[10] || '*'}:${components[11] || '*'}:${
-            components[12] || '*'
-          }`
-        }
-      }))
-    } else {
-      setTabData((prev) => ({
-        ...prev,
-        identifiers: {
-          ...prev?.identifiers,
-          cpe: 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*'
-        }
-      }))
     }
-  }, [cpes, setTabData])
+  }, [cpes])
 
   return (
     <>
       <LynkModal
+        Icon={InfoIcon}
         isOpen={isOpen}
         onClose={onClose}
-        onSubmit={friendlyId ? handleComUpdate : handleSave}
         title={'CPE Details'}
-        Icon={InfoIcon}
+        onSubmit={handleComUpdate}
         disabled={isInvalid || loading}
         hidden={status === 'resolved'}
         buttonText={'Save'}
@@ -438,24 +339,6 @@ const CpeModal = ({
             <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
           </Flex>
         )}
-        {activeComp && (
-          <Flex
-            width='100%'
-            direction={'row'}
-            alignItems={'center'}
-            justifyContent={'flex-start'}
-            wrap={'wrap'}
-            gap={2}
-            mb={6}
-          >
-            <Text wordBreak={'break-all'}>
-              {activeComp.name ? activeComp.name : ''}
-            </Text>
-            {activeComp.version && (
-              <Tag colorScheme='blue'>{activeComp.version}</Tag>
-            )}
-          </Flex>
-        )}
         <Flex width={'100%'} direction={'column'} gap={4}>
           {/* CPE STRING */}
           <FormControl isDisabled={resolved}>
@@ -470,25 +353,23 @@ const CpeModal = ({
               mt={1.5}
               fontSize='16px'
               fontStyle={'bold'}
-              value={identifiers?.cpe}
-              onChange={(e) => console.log(e.target.value)}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
               disabled
             />
             {error !== '' && <FormErrorMessage>{error}</FormErrorMessage>}
           </FormControl>
           <Grid templateColumns='repeat(2, 1fr)' gap={6}>
             {/* PART */}
-            <FormControl isDisabled={resolved}>
-              <FormLabel fontSize={12} htmlFor='type'>
-                Part
-              </FormLabel>
+            <FormControl>
+              <FormLabel htmlFor='type'>Part</FormLabel>
               <Select
-                id='part'
-                name='part'
                 size='md'
+                name='part'
                 fontSize={'sm'}
-                value={type}
-                onChange={handleTypeChange}
+                value={cpeData?.part}
+                onBlur={(e) => handleInputBlur(2, e.target.value)}
+                onChange={(e) => handleInputChange('part', e.target.value)}
               >
                 <option value=''>-- Select --</option>
                 <option value='a'>Application</option>
@@ -499,9 +380,10 @@ const CpeModal = ({
             {/* VENDOR */}
             <CpeInput
               name='vendor'
-              isDisabled={resolved}
-              inputValue={vendor}
-              setInputValue={setVendor}
+              string={value}
+              setString={setValue}
+              inputValue={cpeData?.vendor}
+              setInputValue={setCpeData}
               cpeList={vendorList}
               setCpeList={setVendorList}
               inputRef={vendorRef}
@@ -511,9 +393,10 @@ const CpeModal = ({
             {/* PRODUCT */}
             <CpeInput
               name='product'
-              isDisabled={resolved}
-              inputValue={product}
-              setInputValue={setProduct}
+              string={value}
+              setString={setValue}
+              inputValue={cpeData?.product}
+              setInputValue={setCpeData}
               cpeList={productList}
               setCpeList={setProductList}
               inputRef={productRef}
@@ -522,10 +405,11 @@ const CpeModal = ({
             />
             {/* VERSION */}
             <CpeInput
-              name='version'
-              isDisabled={resolved}
-              inputValue={version}
-              setInputValue={setVersion}
+              name='cpeVersion'
+              string={value}
+              setString={setValue}
+              inputValue={cpeData?.cpeVersion}
+              setInputValue={setCpeData}
               cpeList={versionList}
               setCpeList={setVersionList}
               inputRef={versionRef}
@@ -533,85 +417,86 @@ const CpeModal = ({
               onChange={onVersionInputChange}
             />
             {/* UPDATE */}
-            <FormControl isDisabled={resolved}>
-              <FormLabel fontSize={12}>Update</FormLabel>
+            <FormControl>
+              <FormLabel>Update</FormLabel>
               <Input
-                type='text'
-                value={update}
                 size='md'
+                type='text'
+                name='update'
                 fontSize={'sm'}
-                onChange={(e) => handleOnChange(e.target.value, setUpdate)}
-                onBlur={onBlurUpdate}
+                value={cpeData?.update}
                 placeholder='Enter update'
+                onBlur={(e) => handleInputBlur(6, e.target.value)}
+                onChange={(e) => handleInputChange('update', e.target.value)}
               />
             </FormControl>
             {/* EDITION */}
-            <FormControl isDisabled={resolved}>
-              <FormLabel fontSize={12}>Edition</FormLabel>
+            <FormControl>
+              <FormLabel>Edition</FormLabel>
               <Input
                 type='text'
-                value={edition}
                 size='md'
                 fontSize={'sm'}
-                onChange={(e) => handleOnChange(e.target.value, setEdition)}
-                onBlur={onBlurEdition}
+                value={cpeData?.edition}
                 placeholder='Enter edition'
+                onBlur={(e) => handleInputBlur(7, e.target.value)}
+                onChange={(e) => handleInputChange('edition', e.target.value)}
               />
             </FormControl>
             {/* LANGUAGE */}
-            <FormControl isDisabled={resolved}>
-              <FormLabel fontSize={12}>Language</FormLabel>
+            <FormControl>
+              <FormLabel>Language</FormLabel>
               <Input
                 type='text'
-                value={language}
                 size='md'
                 fontSize={'sm'}
-                onChange={(e) => handleOnChange(e.target.value, setLanguage)}
-                onBlur={onBlurLanguage}
+                value={cpeData?.language}
                 placeholder='Enter language'
+                onBlur={(e) => handleInputBlur(8, e.target.value)}
+                onChange={(e) => handleInputChange('language', e.target.value)}
               />
             </FormControl>
             {/* SW EDITION */}
-            <FormControl isDisabled={resolved}>
-              <FormLabel fontSize={12}>SW Edition</FormLabel>
+            <FormControl>
+              <FormLabel>SW Edition</FormLabel>
               <Input
                 type='text'
-                value={swEdition}
                 size='md'
                 fontSize={'sm'}
-                onChange={(e) => handleOnChange(e.target.value, setSwEdition)}
-                onBlur={onBlurSwEdition}
+                value={cpeData?.swEdition}
                 placeholder='Enter sw edition'
+                onBlur={(e) => handleInputBlur(9, e.target.value)}
+                onChange={(e) => handleInputChange('swEdition', e.target.value)}
               />
             </FormControl>
             {/* TARGET SOFTWARE */}
-            <FormControl isDisabled={resolved}>
-              <FormLabel fontSize={12}>Target Software</FormLabel>
+            <FormControl>
+              <FormLabel>Target Software</FormLabel>
               <Input
-                type='text'
-                value={targetSoftware}
                 size='md'
+                type='text'
                 fontSize={'sm'}
-                onChange={(e) =>
-                  handleOnChange(e.target.value, setTargetSoftware)
-                }
-                onBlur={onBlurTargetSoftware}
+                value={cpeData?.targetSoftware}
                 placeholder='Enter target software'
+                onBlur={(e) => handleInputBlur(10, e.target.value)}
+                onChange={(e) =>
+                  handleInputChange('targetSoftware', e.target.value)
+                }
               />
             </FormControl>
             {/* TARGET HARDWARE */}
-            <FormControl isDisabled={resolved}>
-              <FormLabel fontSize={12} htmlFor='targetHardware'>
-                Target Hardware
-              </FormLabel>
+            <FormControl>
+              <FormLabel htmlFor='targetHardware'>Target Hardware</FormLabel>
               <Stack direction='column' spacing={1}>
                 <Select
                   size='md'
                   fontSize={'sm'}
-                  id='targetHardware'
                   name='targetHardware'
-                  value={hardware}
-                  onChange={handleHardwareChange}
+                  value={cpeData?.targetHardware}
+                  onBlur={(e) => handleInputBlur(11, e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange('targetHardware', e.target.value)
+                  }
                 >
                   <option value=''>-- Select --</option>
                   <option value='x64'>x64</option>
@@ -629,16 +514,16 @@ const CpeModal = ({
               </Stack>
             </FormControl>
             {/* OTHERE */}
-            <FormControl isDisabled={resolved}>
-              <FormLabel fontSize={12}>Other</FormLabel>
+            <FormControl>
+              <FormLabel>Other</FormLabel>
               <Input
                 size='md'
                 type='text'
-                value={other}
                 fontSize={'sm'}
-                onBlur={onBlurOther}
+                value={cpeData?.other}
                 placeholder='Enter other'
-                onChange={(e) => handleOnChange(e.target.value, setOther)}
+                onBlur={(e) => handleInputBlur(12, e.target.value)}
+                onChange={(e) => handleInputChange('other', e.target.value)}
               />
             </FormControl>
           </Grid>
