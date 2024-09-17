@@ -19,7 +19,7 @@ const Invitation = () => {
   const { showToast } = useCustomToast()
   const navigate = useNavigate()
   const token = useQueryParam('token')
-  const nonce = useQueryParam('amp;nonce')
+  const nonce = useQueryParam('nonce')
 
   const [error, setError] = useState([])
   const [isRejected, setIsRejected] = useState(false)
