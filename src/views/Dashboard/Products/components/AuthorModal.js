@@ -102,7 +102,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
         setError(res?.data?.authorCreate?.errors[0])
       } else {
         showToast({
-          description: 'Author Added successfully',
+          description: 'Author added successfully',
           status: 'success'
         })
         setAuthorData(initialData)
