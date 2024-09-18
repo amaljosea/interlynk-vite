@@ -3,6 +3,7 @@ import { TabContext } from 'context/TabContext'
 import React, { useContext, useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
+import { isCustomerView } from 'utils'
 import { infoData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -35,7 +36,6 @@ import { UpdateComponent } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
 
 import ActionButton from './ActionButton'
-import { isCustomerView } from 'utils'
 
 const CompDetails = ({ data, primaryComp }) => {
   const { showToast } = useCustomToast()
@@ -96,9 +96,16 @@ const CompDetails = ({ data, primaryComp }) => {
   })
 
   if (allSboms) {
-    const result = data?.project?.sboms?.map((item) => item?.projectVersion)
+    const result = allSboms?.project?.sboms
+      ?.filter((item) => item?.id !== sbomId)
+      ?.map((item) => item?.projectVersion)
     SBOMs = result
   }
+
+  const invalidVersion =
+    details?.primary &&
+    details?.version !== '' &&
+    SBOMs?.includes(details?.version)
 
   const onCheck = (title) => {
     const result = infoData.find((item) => item?.title === title)
@@ -252,7 +259,7 @@ const CompDetails = ({ data, primaryComp }) => {
           />
         </FormControl>
         {/* Version */}
-        <FormControl isReadOnly={customerView}>
+        <FormControl isReadOnly={customerView} isInvalid={invalidVersion}>
           <FormLabel htmlFor='version' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>
