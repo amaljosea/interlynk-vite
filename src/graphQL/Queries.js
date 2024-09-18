@@ -1413,6 +1413,83 @@ export const GetShareSbomAlternatives = gql`
   }
 `
 
+export const GetShareProductData = gql`
+  query GetShareProductData($sbomId: Uuid!) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        id
+        updatedAt
+        projectVersion
+        primaryComponent {
+          id
+          name
+          version
+          primary
+          internal
+          purl
+          cpes
+          licensesExp
+          updatedAt
+          uniqueId
+          kind
+          copyright
+          publisher
+          description
+          licensesExp
+          group
+          scope
+        }
+        stats {
+          compCount
+          compLicenseCount
+          compCpeCount
+          compPurlCount
+          vulnStats
+        }
+        project {
+          id
+          name
+          projectGroup {
+            id
+            name
+          }
+        }
+        lifecycle
+        createdAt
+        creationAt
+        updatedAt
+        licensesExp
+        format
+        spec
+        specVersion
+        tools {
+          id
+          name
+          version
+          vendor
+          updatedAt
+        }
+        project {
+          name
+        }
+        authors {
+          id
+          name
+          email
+          updatedAt
+        }
+        suppliers {
+          id
+          name
+          url
+          contactEmail
+          contactName
+        }
+      }
+    }
+  }
+`
+
 // GET PRODUCT INFO
 export const GetProductData = gql`
   query GetProductData($projectId: Uuid!, $sbomId: Uuid!) {

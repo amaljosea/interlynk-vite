@@ -2,8 +2,9 @@ import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Select from 'react-select'
+import { isCustomerView } from 'utils'
 
-import { Spinner, Text, useColorModeValue } from '@chakra-ui/react'
+import { Spinner, useColorModeValue } from '@chakra-ui/react'
 
 import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
@@ -17,6 +18,7 @@ import { customFilter } from './customFilter'
 
 const VersionBreadcrumb = ({ selectStyles }) => {
   const navigate = useNavigate()
+  const customerView = isCustomerView()
   const { sbomHookData, orgView } = useGlobalQueryContext()
   const params = useParams()
   const location = useLocation()
@@ -33,6 +35,7 @@ const VersionBreadcrumb = ({ selectStyles }) => {
   const sbomId = params.sbomid
 
   const { data: archiveData } = useQuery(GetArchivedVersions, {
+    skip: customerView,
     variables: { id: prodID }
   })
   const { sbomArchived } = archiveData?.project || ''

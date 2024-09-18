@@ -5,13 +5,11 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
 import { truncatedValue } from 'utils'
 
-import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
 import {
-  Badge,
   Flex,
   HStack,
   Icon,
-  IconButton,
+  Skeleton,
   Stack,
   Tag,
   TagLabel,
@@ -24,12 +22,10 @@ import GraphDrawer from 'components/Drawer/GraphDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useGradualPolling } from 'hooks/useGradualPolling'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { GetProductData } from 'graphQL/Queries'
-import { GetSharPrimartComp } from 'graphQL/Queries'
+import { GetSharPrimartComp, GetShareProductData } from 'graphQL/Queries'
 
 import {
   FaAngleLeft,
@@ -38,7 +34,6 @@ import {
   FaCube,
   FaCubes
 } from 'react-icons/fa'
-import { FaCircleCheck } from 'react-icons/fa6'
 
 const SbomDetails = () => {
   const partsContext = usePartsContext()
@@ -60,24 +55,18 @@ const SbomDetails = () => {
   const { prodCompState, dispatch } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
-  const { data, startPolling, stopPolling } = useQuery(GetProductData, {
-    variables: { projectId: projectId, sbomId: sbomId }
+  const { data, loading } = useQuery(GetShareProductData, {
+    variables: { sbomId: sbomId }
   })
-
-  const shouldPoll = data?.sbom?.vulnRunStatus !== 'FINISHED'
-
-  useGradualPolling({ shouldPoll, startPolling, stopPolling })
 
   const {
     project,
     projectVersion,
     primaryComponent,
-    vulnRunStatus,
     updatedAt,
     lifecycle,
-    stats,
-    sbomParts
-  } = data?.sbom || ''
+    stats
+  } = data?.shareLynkQuery?.sbom || {}
   const { compCount, compLicenseCount, vulnStats } = stats || ''
   const { critical, high, medium, low, unknown } = vulnStats || ''
 
@@ -111,10 +100,6 @@ const SbomDetails = () => {
 
   const onSelectVulns = () => {
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
-    prodVulnDispatch({
-      type: 'FILTER_INCLUDE',
-      payload: sbomParts?.length > 0 ? ['parts'] : []
-    })
     setActiveTab('vulnerabilities')
   }
 
@@ -125,10 +110,6 @@ const SbomDetails = () => {
   const onFilterVuln = (value) => {
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-    prodVulnDispatch({
-      type: 'FILTER_INCLUDE',
-      payload: sbomParts?.length > 0 ? ['parts'] : []
-    })
     setActiveTab('vulnerabilities')
   }
 
@@ -142,6 +123,8 @@ const SbomDetails = () => {
       handlePart()
     }
   })
+
+  if (loading) return <Skeleton width={'full'} height={8} />
 
   return (
     <>
@@ -204,59 +187,6 @@ const SbomDetails = () => {
           <Text fontSize={'sm'} my={1}>
             {primaryComponent?.description}
           </Text>
-          {/* SCAN STATUS */}
-          <Flex
-            my={2}
-            gap={2}
-            width='100%'
-            flexDir='row'
-            alignItems={'center'}
-            hidden={signedUrlParams}
-          >
-            <Tooltip label='Imported'>
-              <IconButton
-                size='xs'
-                colorScheme={'blue'}
-                icon={<DownloadIcon />}
-              />
-            </Tooltip>
-            <Tooltip label='SBOM Checks'>
-              <IconButton
-                size='xs'
-                colorScheme={
-                  vulnRunStatus === 'FINISHED' ||
-                  vulnRunStatus === 'IN_PROGRESS'
-                    ? 'blue'
-                    : 'blackAlpha'
-                }
-                icon={<Search2Icon />}
-              />
-            </Tooltip>
-            <Tooltip label='Vulnerability Scan'>
-              <IconButton
-                border={'5px solid red'}
-                size='xs'
-                colorScheme={
-                  vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
-                }
-                icon={<FaBug />}
-              />
-            </Tooltip>
-            <Tooltip label='Ready'>
-              <IconButton
-                size='xs'
-                colorScheme={
-                  vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
-                }
-                icon={<FaCircleCheck />}
-              />
-            </Tooltip>
-            {vulnRunStatus === 'IN_PROGRESS' && (
-              <Badge px={2} py={1} fontWeight={'semibold'}>
-                Scanning...
-              </Badge>
-            )}
-          </Flex>
           {/* UPDATED AT */}
           <Tooltip placement='top' label={getFullDateAndTime(updatedAt)}>
             <Text width={'fit-content'} fontSize='xs' cursor={'pointer'}>
