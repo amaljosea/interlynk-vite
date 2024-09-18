@@ -145,6 +145,11 @@ const ResetForm = () => {
       })
   }
 
+  const handleChange = () => {
+    setEmail('')
+    setSuccess(false)
+  }
+
   if (success) {
     return (
       <Flex
@@ -164,7 +169,12 @@ const ResetForm = () => {
         </Text>
         <Text fontSize={'sm'} textAlign={'center'} color={'gray.600'}>
           If you have not received an email in 5 minutes, check your spam or{' '}
-          <chakra.span color={'blue.500'} fontWeight={'medium'}>
+          <chakra.span
+            color={'blue.500'}
+            cursor={'pointer'}
+            fontWeight={'medium'}
+            onClick={handleChange}
+          >
             try a different email.
           </chakra.span>
         </Text>
