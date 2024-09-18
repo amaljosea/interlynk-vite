@@ -361,7 +361,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           </FormControl>
           <Grid templateColumns='repeat(2, 1fr)' gap={6}>
             {/* PART */}
-            <FormControl>
+            <FormControl isDisabled={resolved}>
               <FormLabel htmlFor='type'>Part</FormLabel>
               <Select
                 size='md'
@@ -382,6 +382,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
               name='vendor'
               string={value}
               setString={setValue}
+              isDisabled={resolved}
               inputValue={cpeData?.vendor}
               setInputValue={setCpeData}
               cpeList={vendorList}
@@ -395,6 +396,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
               name='product'
               string={value}
               setString={setValue}
+              isDisabled={resolved}
               inputValue={cpeData?.product}
               setInputValue={setCpeData}
               cpeList={productList}
@@ -408,6 +410,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
               name='cpeVersion'
               string={value}
               setString={setValue}
+              isDisabled={resolved}
               inputValue={cpeData?.cpeVersion}
               setInputValue={setCpeData}
               cpeList={versionList}
@@ -417,7 +420,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
               onChange={onVersionInputChange}
             />
             {/* UPDATE */}
-            <FormControl>
+            <FormControl isDisabled={resolved}>
               <FormLabel>Update</FormLabel>
               <Input
                 size='md'
@@ -431,7 +434,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
               />
             </FormControl>
             {/* EDITION */}
-            <FormControl>
+            <FormControl isDisabled={resolved}>
               <FormLabel>Edition</FormLabel>
               <Input
                 type='text'
@@ -444,7 +447,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
               />
             </FormControl>
             {/* LANGUAGE */}
-            <FormControl>
+            <FormControl isDisabled={resolved}>
               <FormLabel>Language</FormLabel>
               <Input
                 type='text'
@@ -457,7 +460,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
               />
             </FormControl>
             {/* SW EDITION */}
-            <FormControl>
+            <FormControl isDisabled={resolved}>
               <FormLabel>SW Edition</FormLabel>
               <Input
                 type='text'
@@ -470,7 +473,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
               />
             </FormControl>
             {/* TARGET SOFTWARE */}
-            <FormControl>
+            <FormControl isDisabled={resolved}>
               <FormLabel>Target Software</FormLabel>
               <Input
                 size='md'
@@ -485,7 +488,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
               />
             </FormControl>
             {/* TARGET HARDWARE */}
-            <FormControl>
+            <FormControl isDisabled={resolved}>
               <FormLabel htmlFor='targetHardware'>Target Hardware</FormLabel>
               <Stack direction='column' spacing={1}>
                 <Select
@@ -514,7 +517,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
               </Stack>
             </FormControl>
             {/* OTHERE */}
-            <FormControl>
+            <FormControl isDisabled={resolved}>
               <FormLabel>Other</FormLabel>
               <Input
                 size='md'

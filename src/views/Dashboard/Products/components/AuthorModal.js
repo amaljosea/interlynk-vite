@@ -202,7 +202,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
     >
       <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
         {error && <LynkError error={error} />}
-        <FormControl isRequired isReadOnly={status === 'resolved'}>
+        <FormControl isRequired isDisabled={status === 'resolved'}>
           <FormLabel htmlFor='name'>Name</FormLabel>
           <TextInput
             type='text'
@@ -212,7 +212,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
             onChange={handleChange}
           />
         </FormControl>
-        <FormControl isRequired isReadOnly={status === 'resolved'}>
+        <FormControl isRequired isDisabled={status === 'resolved'}>
           <FormLabel htmlFor='email'>Email</FormLabel>
           <Input
             type='email'

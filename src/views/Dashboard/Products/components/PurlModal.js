@@ -523,7 +523,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
       )}
       <Flex width={'100%'} direction={'column'} gap={4}>
         {/* Package URL */}
-        <FormControl>
+        <FormControl isDisabled={resolved}>
           <Textarea
             isReadOnly
             type='text'
@@ -534,7 +534,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           />
         </FormControl>
         {/* Type */}
-        <FormControl>
+        <FormControl isDisabled={resolved}>
           <FormLabel htmlFor='packageType'>Package Type</FormLabel>
           <Select
             size='md'
@@ -559,6 +559,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             validation={false}
             string={value}
             setString={setValue}
+            isDisabled={resolved}
             cpeList={namespaceList}
             inputRef={namespaceRef}
             setInputValue={setPurlData}
@@ -567,7 +568,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             onChange={onNamespaceInputChange}
           />
         ) : isSelectable ? (
-          <FormControl>
+          <FormControl isDisabled={resolved}>
             <FormLabel>Namespace</FormLabel>
             <Select
               size='md'
@@ -586,7 +587,10 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             </Select>
           </FormControl>
         ) : (
-          <FormControl display={isHidden ? 'none' : 'block'}>
+          <FormControl
+            isDisabled={resolved}
+            display={isHidden ? 'none' : 'block'}
+          >
             <FormLabel>Namespace</FormLabel>
             <Input
               size='md'
@@ -607,6 +611,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             string={value}
             validation={false}
             setString={setValue}
+            isDisabled={resolved}
             cpeList={purlNameList}
             inputRef={packageNameRef}
             inputValue={purlData?.name}
@@ -615,7 +620,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             onChange={onNameInputChange}
           />
         ) : (
-          <FormControl>
+          <FormControl isDisabled={resolved}>
             <FormLabel>Package Name</FormLabel>
             <Input
               mt={1.5}
@@ -635,6 +640,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             validation={false}
             string={value}
             setString={setValue}
+            isDisabled={resolved}
             cpeList={purlVersionList}
             inputRef={purlVersionRef}
             setInputValue={setPurlData}
@@ -643,7 +649,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             onChange={onVersionInputChange}
           />
         ) : (
-          <FormControl>
+          <FormControl isDisabled={resolved}>
             <FormLabel>Version</FormLabel>
             <Input
               mt={1.5}
@@ -658,7 +664,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           </FormControl>
         )}
         {/* Qualifiers */}
-        <FormControl>
+        <FormControl isDisabled={resolved}>
           <FormLabel>Qualifiers</FormLabel>
           <Input
             size='md'
