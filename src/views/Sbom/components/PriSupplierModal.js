@@ -279,8 +279,9 @@ const PriSupplierModal = (props) => {
           <FormControl isRequired isDisabled={resolved}>
             <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
             <Input
-              placeholder='Enter organization name'
               value={orgName}
+              autoComplete='off'
+              placeholder='Enter organization name'
               onChange={(e) => setOrgName(e.target.value)}
             />
           </FormControl>
@@ -291,10 +292,11 @@ const PriSupplierModal = (props) => {
           >
             <FormLabel fontSize={'sm'}>URL</FormLabel>
             <Input
-              placeholder='Enter URL'
               value={orgUrl}
-              onBlur={handleCheckUrl}
+              autoComplete='off'
               onChange={onUrlChange}
+              placeholder='Enter URL'
+              onBlur={handleCheckUrl}
             />
             <FormErrorMessage>{isValidUrl}</FormErrorMessage>
           </FormControl>
@@ -302,9 +304,10 @@ const PriSupplierModal = (props) => {
           <FormControl isInvalid={supplierError} isDisabled={resolved}>
             <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
             <Input
-              placeholder='Enter supplier name'
               value={supName}
+              autoComplete='no'
               onChange={onSupplierChange}
+              placeholder='Enter supplier name'
             />
             <FormErrorMessage>{supplierError}</FormErrorMessage>
           </FormControl>
@@ -316,9 +319,10 @@ const PriSupplierModal = (props) => {
             <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
             <Input
               type='email'
-              placeholder='Enter supplier email'
               value={supEmail}
+              autoComplete='off'
               onBlur={handleCheckEmail}
+              placeholder='Enter supplier email'
               onChange={(e) => {
                 setSupEmail(e.target.value)
                 setEmailError('')

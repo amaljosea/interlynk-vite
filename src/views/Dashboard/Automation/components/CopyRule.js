@@ -84,7 +84,7 @@ const CopyRule = ({ isOpen, onClose, env, data }) => {
           setError(errors[0])
         } else {
           showToast({
-            description: 'Copy rule completed',
+            description: 'Rule copied successfully',
             status: 'success'
           })
           onClose()

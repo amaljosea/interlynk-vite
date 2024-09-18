@@ -224,7 +224,7 @@ const CompFilters = ({ reset }) => {
         <Menu closeOnSelect={false}>
           <MenuHeading
             title={'Visibility'}
-            active={scope !== '' && scope !== 'All'}
+            active={scope !== '' && scope !== 'all'}
           />
           <CustomList
             type='radio'

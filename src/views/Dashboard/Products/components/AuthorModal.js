@@ -26,6 +26,7 @@ const TextInput = ({ name, value, onChange, placeholder }) => {
       name={name}
       value={value}
       onChange={onChange}
+      autoComplete={'off'}
       placeholder={placeholder}
     />
   )
@@ -217,6 +218,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
           <Input
             type='email'
             name='email'
+            autoComplete={'off'}
             onChange={handleChange}
             value={authorData?.email}
             placeholder='Add email address'

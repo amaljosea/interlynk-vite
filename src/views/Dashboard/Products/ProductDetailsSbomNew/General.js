@@ -383,6 +383,7 @@ const General = ({ data, loading, error }) => {
         isOpen={LICENSE?.isOpen}
         onClose={LICENSE?.onClose}
         onSubmit={onUpdateLicense}
+        disabled={!sbomState?.licenseString}
         buttonText={licensesExp?.length > 0 ? 'Update' : 'Save'}
         title={`${licensesExp?.length > 0 ? 'Update' : 'Add'} License`}
       >

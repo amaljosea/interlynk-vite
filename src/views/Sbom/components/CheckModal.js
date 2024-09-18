@@ -287,6 +287,12 @@ const CheckModal = (props) => {
     }
   }
 
+  const disabled =
+    isInvalidLicense ||
+    isEmptyVersion ||
+    isDisabled ||
+    (isComponentLicense && details?.licenses?.length === 0)
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (compRef.current && !compRef.current.contains(event.target)) {
@@ -322,7 +328,7 @@ const CheckModal = (props) => {
       onSubmit={handleSubmit}
       title={heading(shortDesc)}
       Icon={BiWrench}
-      disabled={isInvalidLicense || isEmptyVersion || isDisabled}
+      disabled={disabled}
       hidden={resolved}
       buttonText={'Save'}
       leftFooterContent={

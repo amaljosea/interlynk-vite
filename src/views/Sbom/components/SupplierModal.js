@@ -314,10 +314,11 @@ const SupplierModal = (props) => {
           <FormControl isRequired isDisabled={resolved}>
             <FormLabel fontSize={12}>Organization Name</FormLabel>
             <Input
-              placeholder='Enter organization name'
-              value={orgName}
-              onChange={(e) => setOrgName(e.target.value)}
               fontSize={14}
+              value={orgName}
+              autoComplete='off'
+              placeholder='Enter organization name'
+              onChange={(e) => setOrgName(e.target.value)}
             />
           </FormControl>
           {/* ORG URL */}
@@ -327,11 +328,12 @@ const SupplierModal = (props) => {
           >
             <FormLabel fontSize={12}>URL</FormLabel>
             <Input
-              placeholder='Enter URL'
-              value={orgUrl}
-              onBlur={handleCheckUrl}
-              onChange={onUrlChange}
               fontSize={14}
+              value={orgUrl}
+              autoComplete='off'
+              onChange={onUrlChange}
+              placeholder='Enter URL'
+              onBlur={handleCheckUrl}
             />
             <FormErrorMessage>{isValidUrl}</FormErrorMessage>
           </FormControl>
@@ -342,10 +344,11 @@ const SupplierModal = (props) => {
           >
             <FormLabel fontSize={12}>Contact Name</FormLabel>
             <Input
-              placeholder='Enter supplier name'
-              value={supName}
-              onChange={onSupplierChange}
               fontSize={14}
+              value={supName}
+              autoComplete='no'
+              onChange={onSupplierChange}
+              placeholder='Enter supplier name'
             />
             <FormErrorMessage>{nameError}</FormErrorMessage>
           </FormControl>
@@ -358,8 +361,9 @@ const SupplierModal = (props) => {
               Contact Email
             </FormLabel>
             <Input
-              placeholder='Enter supplier email'
               value={supEmail}
+              autoComplete='off'
+              placeholder='Enter supplier email'
               onBlur={handleCheckEmail}
               onChange={(e) => {
                 setSupEmail(e.target.value)

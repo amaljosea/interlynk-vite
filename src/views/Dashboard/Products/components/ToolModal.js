@@ -20,6 +20,7 @@ const TextInput = ({ name, value, onChange, placeholder }) => {
       name={name}
       value={value}
       onChange={onChange}
+      autoComplete={'off'}
       placeholder={placeholder}
     />
   )
