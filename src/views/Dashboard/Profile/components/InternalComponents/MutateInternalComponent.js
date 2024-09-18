@@ -32,7 +32,8 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
   const isEdit = !!internalComponent
   const [matchStr, setMatchStr] = useState(internalComponent?.matchStr || '')
   const [errorText, setErrorText] = useState(null)
-  const [ignoreCase, setIgnoreCase] = useState(!!internalComponent?.ignoreCase)
+  // FIXME: Change the below default value back to !!internalComponent?.ignoreCase when migration for setting the default value to true has been merged in the backend.
+  const [ignoreCase, setIgnoreCase] = useState(true)
   const [enabled, setEnabled] = useState(
     isEdit ? !!internalComponent?.enabled : true
   )
@@ -149,12 +150,12 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
           </FormControl>
           <FormControl>
             <Checkbox
-              defaultChecked={ignoreCase}
+              defaultChecked={!ignoreCase}
               onChange={() => {
                 setIgnoreCase(!ignoreCase)
               }}
             >
-              Case insensitive
+              Case sensitive
             </Checkbox>
           </FormControl>
           <FormControl display='flex' alignItems='center'>
