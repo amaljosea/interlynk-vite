@@ -85,6 +85,7 @@ const Changelog = () => {
     onOpen: onVulnOpen,
     onClose: onVulnClose
   } = useDisclosure()
+
   const [activeRow, setActiveRow] = useState('')
   const [logSearch, setLogSearch] = useState('')
   const [logState, setLogState] = useState({
@@ -153,6 +154,15 @@ const Changelog = () => {
   })
 
   const { activityLogFilters } = filters?.sbom || ''
+
+  const checkUser = (row) => {
+    if (row?.changedBy === 'Sharelynk user') {
+      return null
+    } else {
+      setActiveRow(row)
+      onUserOpen()
+    }
+  }
 
   // COLUMNS
   const columns = [
@@ -420,10 +430,7 @@ const Changelog = () => {
             textAlign={'right'}
             color={textColor}
             cursor={'pointer'}
-            onClick={() => {
-              setActiveRow(row)
-              onUserOpen()
-            }}
+            onClick={() => checkUser(row)}
           >
             {row.changedBy}
           </Text>
