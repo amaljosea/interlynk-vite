@@ -4,7 +4,7 @@ import { UpdateProjectGroup } from 'graphQL/Mutation'
 
 import ConfirmationModal from './ConfirmationModal'
 
-const StatusModal = ({ isOpen, onClose, group }) => {
+const StatusModal = ({ isOpen, onClose, group, reset }) => {
   const { id, enabled, name } = group
 
   const [projectGroupUpdate, { loading }] = useMutation(UpdateProjectGroup)
@@ -21,6 +21,7 @@ const StatusModal = ({ isOpen, onClose, group }) => {
       if (errors?.length > 0) {
         console.log(errors[0])
       } else {
+        reset()
         onClose()
       }
     })

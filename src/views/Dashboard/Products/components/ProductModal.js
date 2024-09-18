@@ -1,12 +1,10 @@
-import { useMutation, useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
-import { components } from 'react-select'
+import { useMutation } from '@apollo/client'
+import { useState } from 'react'
 import { errorMapping } from 'utils/errorUtils'
 
 import {
   Alert,
   AlertIcon,
-  Box,
   Flex,
   FormControl,
   FormLabel,
@@ -16,49 +14,26 @@ import {
 } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
-import LynkSelect from 'components/LynkSelect'
 
 import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
-import { GetLabels } from 'graphQL/Queries'
 
 import { BiSolidLayerPlus } from 'react-icons/bi'
 
 const ProductModal = ({ isOpen, onClose, data }) => {
-  const { id, name, description, labels: activeLabels } = data || ''
+  const { id, name, description } = data || ''
   const [projectGroupCreate] = useMutation(CreateProjectGroup)
   const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
 
-  const { data: prodLabels } = useQuery(GetLabels, {
-    skip: isOpen ? false : true,
-    variables: { first: 100 }
-  })
-  const { labels } = prodLabels || ''
-
-  const options = []
-  labels?.nodes?.map((item) =>
-    options.push({
-      label: item?.name,
-      value: item?.id
-    })
-  )
-
   const [productName, setProductName] = useState(name || '')
   const [productDesc, setProductDesc] = useState(description || '')
-  const [productLabels, setProductLabels] = useState([])
   const [error, setError] = useState('')
-
-  const labelIds = []
-  if (productLabels?.length > 0) {
-    productLabels?.map((item) => labelIds?.push(item?.value))
-  }
 
   const updateProduct = () => {
     projectGroupUpdate({
       variables: {
         id: id,
         name: productName,
-        desc: productDesc,
-        labelIds: activeLabels?.map((item) => item?.id)
+        desc: productDesc
       }
     }).then((res) => {
       const error = res?.data?.projectGroupUpdate?.errors
@@ -96,31 +71,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
     setError('')
   }
 
-  const Option = (props) => {
-    const result = labels?.nodes?.find(
-      (item) => item?.name === props.data.label
-    )
-    return (
-      <components.Option {...props}>
-        <Flex alignItems={'center'} gap={2}>
-          <Box borderRadius={'full'} p={1.5} bg={result?.color}></Box>
-          <Text cursor={'pointer'}>{props.data.label}</Text>
-        </Flex>
-      </components.Option>
-    )
-  }
-
   const isInvalid = productName === '' || error !== ''
-
-  useEffect(() => {
-    if (activeLabels?.length > 0) {
-      const result = []
-      activeLabels?.map((item) =>
-        result?.push({ label: item?.name, value: item?.id })
-      )
-      setProductLabels(result)
-    }
-  }, [activeLabels])
 
   return (
     <>
@@ -147,20 +98,6 @@ const ProductModal = ({ isOpen, onClose, data }) => {
               value={productName}
               onChange={onNameChange}
               placeholder={`Add product name`}
-            />
-          </FormControl>
-          <FormControl hidden>
-            <FormLabel fontSize={12}>Labels</FormLabel>
-            <LynkSelect
-              isMulti
-              components={{
-                DropdownIndicator: () => null,
-                Option
-              }}
-              options={options}
-              placeholder='Select'
-              value={productLabels}
-              onChange={(value) => setProductLabels(value)}
             />
           </FormControl>
           <FormControl>

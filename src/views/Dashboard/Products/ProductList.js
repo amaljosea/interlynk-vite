@@ -80,9 +80,9 @@ function ProductList() {
   return (
     <ProductTable
       data={nodes}
+      reset={reset}
       loading={loading}
       filters={filters}
-      reset={() => reset()}
       paginationProps={paginationProps}
       setFilters={(newFilters) => {
         setFilters(newFilters)

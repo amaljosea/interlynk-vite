@@ -62,6 +62,7 @@ import Pagination from '../Pagination'
 
 const ProductTable = ({
   data,
+  reset,
   loading,
   filters,
   setFilters,
@@ -760,9 +761,10 @@ const ProductTable = ({
       {/* DISABLED */}
       {isWarningOpen && data && (
         <StatusModal
+          reset={reset}
+          group={activeRow}
           isOpen={isWarningOpen}
           onClose={onWarningClose}
-          group={activeRow}
         />
       )}
 
