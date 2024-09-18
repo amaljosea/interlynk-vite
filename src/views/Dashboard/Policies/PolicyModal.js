@@ -34,8 +34,7 @@ import LynkModal from 'components/LynkModal'
 
 import { PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
 
-import { MdDeleteOutline } from 'react-icons/md'
-import { TbShieldSearch } from 'react-icons/tb'
+import { MdDeleteOutline, MdPolicy } from 'react-icons/md'
 
 const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
   const [name, setName] = useState('')
@@ -480,7 +479,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
         onClose={onClose}
         onSubmit={data ? handleUpdate : handleCreate}
         title={`${data ? 'Edit' : 'Create'} Policy`}
-        Icon={TbShieldSearch}
+        Icon={MdPolicy}
         disabled={errorMessage || error !== '' || isDisabled}
         buttonText={data ? 'Update' : 'Save'}
       >
