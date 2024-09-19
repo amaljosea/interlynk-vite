@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { validateEmail } from 'utils'
 
-import { AddIcon } from '@chakra-ui/icons'
 import {
   Alert,
   AlertDescription,
@@ -31,6 +30,7 @@ import {
 } from 'graphQL/Mutation'
 
 import { BsGear } from 'react-icons/bs'
+import { FaPlus } from 'react-icons/fa6'
 import { MdDeleteOutline } from 'react-icons/md'
 
 const validateUrl = (url) => {
@@ -409,12 +409,12 @@ const LegalModal = ({ data, isOpen, onClose }) => {
         <Button
           aria-label='Add config'
           onClick={addRow}
-          colorScheme='white'
-          leftIcon={<AddIcon />}
-          fontWeight='500'
-          textColor={'blue.500'}
+          colorScheme='blue'
+          leftIcon={<FaPlus />}
+          fontWeight={'medium'}
           paddingLeft={'2px'}
-          fontSize={12}
+          fontSize={'sm'}
+          variant='link'
         >
           Add New
         </Button>

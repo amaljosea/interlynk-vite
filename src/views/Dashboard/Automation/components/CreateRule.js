@@ -515,7 +515,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
               <Box key={index}>
                 <Flex
                   gap={2}
-                  mt={2}
+                  mt={1.5}
                   key={index}
                   width={'100%'}
                   alignItems={'flex-start'}
@@ -634,8 +634,10 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
                   </Flex>
                 </Flex>
                 {conditions?.length > 1 && conditions?.length - 1 !== index && (
-                  <Tag mt={2}>
-                    <Text fontSize={12}>AND</Text>
+                  <Tag mt={1.5}>
+                    <Text fontSize={10} fontWeight={600}>
+                      AND
+                    </Text>
                   </Tag>
                 )}
               </Box>
@@ -663,7 +665,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
               <Box key={index}>
                 <Flex
                   gap={2}
-                  mt={2}
+                  mt={1.5}
                   key={index}
                   width={'100%'}
                   alignItems={'flex-start'}
@@ -771,8 +773,10 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
                   </FormControl>
                 </Flex>
                 {actions?.length > 1 && actions?.length - 1 !== index && (
-                  <Tag mt={2}>
-                    <Text fontSize={12}>AND</Text>
+                  <Tag mt={1.5}>
+                    <Text fontSize={10} fontWeight={600}>
+                      AND
+                    </Text>
                   </Tag>
                 )}
               </Box>

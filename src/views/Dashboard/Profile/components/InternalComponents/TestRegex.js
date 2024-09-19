@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
-import { AddIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -15,7 +14,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
-import { FaCircleCheck } from 'react-icons/fa6'
+import { FaCircleCheck, FaPlus } from 'react-icons/fa6'
 import { IoIosCloseCircle } from 'react-icons/io'
 import { MdDeleteOutline } from 'react-icons/md'
 
@@ -101,12 +100,12 @@ export const TextRegex = ({ regex, ignoreCase }) => {
           setItems([...items, { id: uuidv4(), value: '' }])
         }}
         aria-label='Add config'
-        colorScheme='white'
-        leftIcon={<AddIcon />}
+        colorScheme='blue'
+        leftIcon={<FaPlus />}
         marginTop='10px'
-        fontWeight='500'
-        fontSize={12}
-        textColor={'blue.500'}
+        fontWeight={'medium'}
+        fontSize={'sm'}
+        variant='link'
         paddingLeft={'2px'}
       >
         Add more test

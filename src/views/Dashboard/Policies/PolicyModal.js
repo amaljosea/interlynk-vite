@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { getIcon, getLabel, updatedValue } from 'utils'
 
-import { AddIcon } from '@chakra-ui/icons'
 import {
   Alert,
   AlertDescription,
@@ -34,6 +33,7 @@ import LynkModal from 'components/LynkModal'
 
 import { PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
 
+import { FaPlus } from 'react-icons/fa6'
 import { MdDeleteOutline, MdPolicy } from 'react-icons/md'
 
 const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
@@ -577,7 +577,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                 <>
                   <Flex
                     gap={2}
-                    mt={3}
+                    mt={1.5}
                     key={index}
                     width={'100%'}
                     alignItems={'flex-start'}
@@ -1002,8 +1002,8 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                   </Flex>
                   {conditions?.length > 1 &&
                     conditions?.length - 1 !== index && (
-                      <Tag mt={2}>
-                        <Text fontSize={12}>
+                      <Tag mt={1.5} p={1}>
+                        <Text fontSize={10} fontWeight={600}>
                           {operator === 'ALL' ? 'AND' : 'OR'}
                         </Text>
                       </Tag>
@@ -1013,12 +1013,12 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
           </FormControl>
           {/* ADD CONDITIONS */}
           <Button
-            fontSize={12}
-            colorScheme='white'
-            fontWeight={'500'}
-            textColor={'blue.500'}
+            fontSize={'sm'}
+            colorScheme='blue'
+            variant='link'
+            fontWeight={'medium'}
             paddingLeft={'2px'}
-            leftIcon={<AddIcon />}
+            leftIcon={<FaPlus />}
             onClick={addRow}
           >
             Add condition

@@ -422,7 +422,7 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
               )}
             </FormControl>
             <Button
-              fontSize={12}
+              fontSize={'sm'}
               colorScheme='blue'
               variant='link'
               fontWeight={'medium'}

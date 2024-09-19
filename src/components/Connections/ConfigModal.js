@@ -1,7 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { AddIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -19,6 +18,7 @@ import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
+import { FaPlus } from 'react-icons/fa6'
 import { MdDeleteOutline } from 'react-icons/md'
 
 const ConfigModal = ({
@@ -357,14 +357,14 @@ const ConfigModal = ({
         ))}
         {updateCon && (
           <Button
-            leftIcon={<AddIcon />}
-            colorScheme='white'
             onClick={handleAddConfig}
             alignSelf={'flex-start'}
-            fontWeight='500'
-            textColor={'blue.500'}
             paddingLeft={'2px'}
-            fontSize={12}
+            fontSize={'sm'}
+            colorScheme='blue'
+            variant='link'
+            fontWeight={'medium'}
+            leftIcon={<FaPlus />}
           >
             Add New
           </Button>
