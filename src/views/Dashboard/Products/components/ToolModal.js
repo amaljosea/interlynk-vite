@@ -59,7 +59,7 @@ const ToolModal = ({ isOpen, onClose, resolved = false }) => {
         setError(res?.data?.toolCreate?.errors[0])
       } else {
         showToast({
-          description: 'Tool Added successfully',
+          description: 'Tool added successfully',
           status: 'success'
         })
         setToolData(initialData)
@@ -86,7 +86,7 @@ const ToolModal = ({ isOpen, onClose, resolved = false }) => {
     >
       <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
         {error && <LynkError error={error} />}
-        <FormControl isRequired hidden={resolved}>
+        <FormControl hidden={resolved}>
           <FormLabel htmlFor='vendor'>Vendor Name</FormLabel>
           <TextInput
             name='vendor'

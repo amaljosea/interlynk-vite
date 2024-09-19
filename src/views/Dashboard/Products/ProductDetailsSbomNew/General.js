@@ -395,8 +395,7 @@ const General = ({ data, loading, error }) => {
       </LynkModal>
       {/* SUPPLIER MODAL */}
       <PriSupplierModal
-        activeRow={null}
-        suppliers={suppliers}
+        activeRow={suppliers}
         isFreeTier={isFreeTier}
         isOpen={SUPPLIER?.isOpen}
         onClose={SUPPLIER?.onClose}

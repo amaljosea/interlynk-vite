@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { validateEmail, validateUrl } from 'utils'
+import { validateUrl } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import {
@@ -26,6 +26,7 @@ import { BiShieldPlus } from 'react-icons/bi'
 
 const PriSupplierModal = (props) => {
   const { isOpen, onClose, activeRow, ruleExists, recheck } = props
+
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
@@ -34,87 +35,63 @@ const PriSupplierModal = (props) => {
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
-  const { status, sbom } = activeRow || ''
-  const { suppliers } = sbom || ''
-  const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
+  const { status } = activeRow || ''
   const resolved = status === 'resolved'
+  const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
 
-  const [orgName, setOrgName] = useState('')
-  const [orgUrl, setOrgUrl] = useState('')
+  const initialData = useMemo(
+    () => ({
+      name: '',
+      url: '',
+      contactName: '',
+      contactEmail: ''
+    }),
+    []
+  )
+
+  const [formData, setFormData] = useState(initialData)
   const [isValidUrl, setIsValidUrl] = useState('')
-  const [supName, setSupName] = useState('')
-  const [supEmail, setSupEmail] = useState('')
-  const [emailError, setEmailError] = useState('')
-  const [supplierError, setSupplierError] = useState('')
-  const [isDisabled, setIsDisabled] = useState(false)
 
-  const disableButtonTemporarily = () => {
-    setIsDisabled(true)
-    setTimeout(() => {
-      setIsDisabled(false)
-    }, 3000)
+  const data = activeRow?.sbom ? activeRow?.sbom?.suppliers : activeRow
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }))
   }
 
-  const containsSpace = /\s/.test(orgUrl)
-
-  const onSupplierChange = (e) => {
-    const { value } = e.target
-    setSupName(value)
-    if ((value.length > 0 && value.length < 4) || value.length > 256) {
-      setSupplierError('Input must be between 4 and 256 characters')
-    } else {
-      setSupplierError('')
-    }
-  }
+  const containsSpace = /\s/.test(formData?.url)
 
   const handleCheckUrl = () => {
-    if (!validateUrl(orgUrl)) {
+    if (!validateUrl(formData?.url)) {
       setIsValidUrl('Please enter a valid URL')
     }
   }
 
-  const handleCheckEmail = () => {
-    if (!validateEmail(supEmail)) {
-      setEmailError('Email is invalid')
-    }
-  }
+  const isInvalid = formData?.url !== '' && !validateUrl(formData?.url)
 
-  const onUrlChange = (e) => {
-    const { value } = e.target
-    setOrgUrl(value)
-    setIsValidUrl('')
-  }
-
-  const isInvalid = orgUrl !== '' && !validateUrl(orgUrl)
-
-  const [createSupplier] = useMutation(supplierCreate, {
-    onCompleted: () => recheck()
+  const [createSupplier, { loading: crLoading }] = useMutation(supplierCreate, {
+    onCompleted: () => (friendlyId ? recheck() : null)
   })
-  const [updateSupplier] = useMutation(supplierUpdate, {
-    onCompleted: () => recheck()
+  const [updateSupplier, { loading: upLoading }] = useMutation(supplierUpdate, {
+    onCompleted: () => (friendlyId ? recheck() : null)
   })
 
-  useEffect(() => {
-    if (suppliers && suppliers.length > 0) {
-      setOrgName(suppliers[0].name || '')
-      setOrgUrl(suppliers[0].url || '')
-      setSupName(suppliers[0].contactName || '')
-      setSupEmail(suppliers[0].contactEmail || '')
-    }
-  }, [suppliers])
+  const [createRule, { loading: rlLoading }] = useMutation(AutomationRuleCreate)
 
   const handleSave = () => {
-    disableButtonTemporarily()
     if (resolved) {
       onClose()
     } else {
       createSupplier({
         variables: {
-          name: orgName,
-          url: orgUrl,
-          contactName: supName,
-          contactEmail: supEmail,
-          sbomId: sbomId
+          sbomId: sbomId,
+          url: formData?.url,
+          name: formData?.name,
+          contactName: formData?.contactName,
+          contactEmail: formData?.contactEmail
         }
       }).then((res) => {
         if (res?.data) {
@@ -131,11 +108,11 @@ const PriSupplierModal = (props) => {
   const handleUpdate = () => {
     updateSupplier({
       variables: {
-        name: orgName,
-        url: orgUrl,
-        contactName: supName,
-        contactEmail: supEmail,
-        id: suppliers[0].id
+        url: formData?.url,
+        name: formData?.name,
+        contactName: formData?.contactName,
+        contactEmail: formData?.contactEmail,
+        id: data?.length > 0 && data[0].id
       }
     }).then((res) => {
       if (res?.data) {
@@ -147,8 +124,6 @@ const PriSupplierModal = (props) => {
       }
     })
   }
-
-  const [createRule] = useMutation(AutomationRuleCreate)
 
   const conditionsAttributes = [
     {
@@ -181,22 +156,22 @@ const PriSupplierModal = (props) => {
     {
       subject: 'version',
       field: 'version_supplier_name',
-      value: orgName || undefined
+      value: formData?.name || undefined
     },
     {
       subject: 'version',
       field: 'version_supplier_url',
-      value: orgUrl || undefined
+      value: formData?.url || undefined
     },
     {
       subject: 'version',
       field: 'version_supplier_contact_name',
-      value: supName || undefined
+      value: formData?.contactName || undefined
     },
     {
       subject: 'version',
       field: 'version_supplier_contact_email',
-      value: supEmail || undefined
+      value: formData?.contactEmail || undefined
     }
   ]
 
@@ -216,7 +191,6 @@ const PriSupplierModal = (props) => {
     if (ruleExists) {
       navigate(link)
     } else {
-      disableButtonTemporarily()
       await createRule({
         variables: {
           active: true,
@@ -238,14 +212,17 @@ const PriSupplierModal = (props) => {
   }
 
   useEffect(() => {
-    if (sbom?.suppliers?.length > 0) {
-      const { suppliers } = sbom
-      setOrgName(suppliers[0]?.name)
-      setOrgUrl(suppliers[0]?.url)
-      setSupName(suppliers[0]?.contactName)
-      setSupEmail(suppliers[0]?.contactEmail)
+    if (data?.length > 0) {
+      setFormData(() => ({
+        name: data[0]?.name,
+        url: data[0]?.url,
+        contactName: data[0]?.contactName,
+        contactEmail: data[0]?.contactEmail
+      }))
+    } else {
+      setFormData(initialData)
     }
-  }, [sbom])
+  }, [data, initialData])
 
   return (
     <>
@@ -253,21 +230,22 @@ const PriSupplierModal = (props) => {
         isOpen={isOpen}
         onClose={onClose}
         hidden={resolved}
-        title={`Add ${friendlyId ? 'SBOM' : ''} Supplier`}
-        buttonText={suppliers?.length > 0 ? 'Update' : 'Save'}
-        disabled={isInvalid || isDisabled}
-        onSubmit={suppliers?.length > 0 ? handleUpdate : handleSave}
         Icon={BiShieldPlus}
+        disabled={isInvalid || crLoading || upLoading}
+        title={`Add ${friendlyId ? 'SBOM' : ''} Supplier`}
+        buttonText={data?.length > 0 > 0 ? 'Update' : 'Save'}
+        onSubmit={data?.length > 0 ? handleUpdate : handleSave}
         leftFooterContent={
           !isFreeTier && (
             <Button
+              mr={'auto'}
               fontSize={'sm'}
               variant='ghost'
-              mr={'auto'}
-              isDisabled={isInvalid || isDisabled}
+              isLoading={rlLoading}
               onClick={handleRuleCreate}
               hidden={friendlyId ? false : true}
               colorScheme={ruleExists ? 'green' : 'blue'}
+              isDisabled={isInvalid || crLoading || upLoading}
             >
               {ruleExists ? 'View' : 'Save as'} Rule
             </Button>
@@ -279,56 +257,53 @@ const PriSupplierModal = (props) => {
           <FormControl isRequired isDisabled={resolved}>
             <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
             <Input
-              value={orgName}
+              name='name'
               autoComplete='off'
+              onChange={handleChange}
+              value={formData?.name}
               placeholder='Enter organization name'
-              onChange={(e) => setOrgName(e.target.value)}
             />
           </FormControl>
           {/* ORG URL */}
           <FormControl
             isDisabled={resolved}
-            isInvalid={(orgUrl !== '' && !validateUrl(orgUrl)) || containsSpace}
+            isInvalid={isInvalid || containsSpace}
           >
             <FormLabel fontSize={'sm'}>URL</FormLabel>
             <Input
-              value={orgUrl}
+              name='url'
               autoComplete='off'
-              onChange={onUrlChange}
+              onChange={handleChange}
               placeholder='Enter URL'
               onBlur={handleCheckUrl}
+              value={formData?.url}
             />
             <FormErrorMessage>{isValidUrl}</FormErrorMessage>
           </FormControl>
           {/* SUPPLIER NAME */}
-          <FormControl isInvalid={supplierError} isDisabled={resolved}>
+          <FormControl isDisabled={resolved}>
             <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
             <Input
-              value={supName}
+              minLength={4}
+              maxLength={256}
               autoComplete='no'
-              onChange={onSupplierChange}
+              name='contactName'
+              onChange={handleChange}
+              value={formData?.contactName}
               placeholder='Enter supplier name'
             />
-            <FormErrorMessage>{supplierError}</FormErrorMessage>
           </FormControl>
           {/* SUPPLIER EMAIL */}
-          <FormControl
-            isDisabled={resolved}
-            isInvalid={supEmail !== '' && !validateEmail(supEmail)}
-          >
+          <FormControl isDisabled={resolved}>
             <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
             <Input
               type='email'
-              value={supEmail}
               autoComplete='off'
-              onBlur={handleCheckEmail}
+              name='contactEmail'
+              onChange={handleChange}
+              value={formData?.contactEmail}
               placeholder='Enter supplier email'
-              onChange={(e) => {
-                setSupEmail(e.target.value)
-                setEmailError('')
-              }}
             />
-            <FormErrorMessage>{emailError}</FormErrorMessage>
           </FormControl>
         </Flex>
       </LynkModal>
