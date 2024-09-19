@@ -648,6 +648,7 @@ const ProductDetailsMain = () => {
       {/* DISABLED */}
       {isWarningOpen && data && (
         <StatusModal
+          reset={reset}
           isOpen={isWarningOpen}
           onClose={onWarningClose}
           group={projectGroup}
