@@ -15,8 +15,7 @@ import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useSelect } from 'hooks/useSelect'
 
-import { sbomDelete } from 'graphQL/Mutation'
-import { recheckHealth } from 'graphQL/Mutation'
+import { recheckHealth, sbomDelete } from 'graphQL/Mutation'
 import {
   GetCheckResults,
   GetComponentData,
@@ -186,6 +185,7 @@ const SbomActions = ({ sbom }) => {
   const { nodes: primaryComponent, error } = usePaginatedQuery(
     GetComponentData,
     {
+      skip: signedUrlParams,
       selector: 'sbom.components',
       variables: {
         primary: true,
