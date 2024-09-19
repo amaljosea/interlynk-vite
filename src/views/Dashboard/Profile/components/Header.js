@@ -18,10 +18,12 @@ import {
   Avatar,
   Box,
   Button,
+  Divider,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
+  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   Flex,
@@ -108,7 +110,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const [profileImage, setProfileImage] = useState(null)
   const [newUserName, setNewUserName] = useState(userName)
   const [nameError, setNameError] = useState('')
-  const [selectedFile, setSelectedFile] = useState(null)
   const [oldPassword, setOldPassword] = useState('')
   const [showOldPass, setShowOldPass] = useState(false)
   const [newPassword, setNewPassword] = useState('')
@@ -208,7 +209,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
   const resetStates = () => {
     setNewUserName(userName)
-    setSelectedFile('')
     setNameError('')
     setIsPasswordEdit(false)
     setOldPassword('')
@@ -457,11 +457,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     ) {
       // Check if there's a valid change to the name and no errors
       await handleUpdateName()
-    }
-
-    // Check if there is a new image to be uploaded
-    if (selectedFile) {
-      await onImageChange(selectedFile)
     }
 
     // If password editing is enabled and there are no password errors
@@ -765,10 +760,10 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
           <DrawerBody overflowX={'hidden'} padding={'20px'}>
             {/* Modal Body Content */}
-            <Text fontSize='16px' mb='12px' textColor={'gray.500'}>
+            <Text fontSize='12px' mb='12px' textColor={'gray.500'}>
               Profile picture
             </Text>
-            <Flex alignItems='center' mb={4}>
+            <Flex alignItems='center' mb={4} height={'48px'}>
               {dpLoading || loading ? (
                 <Spinner />
               ) : (
@@ -780,11 +775,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 />
               )}{' '}
               {/* Only show Avatar when there's an image */}
-              <Box ml={4}>
-                <Text fontSize='15px'>
-                  {selectedFile?.name || dp?.filename}
-                </Text>
-              </Box>
               <Flex ml='auto' gap={2}>
                 <Tooltip label='Upload Profile Picture'>
                   <IconButton
@@ -937,10 +927,14 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 </FormControl>
               </Flex>
             )}
-            <Flex mt={4}>
+          </DrawerBody>
+          <Divider />
+          <DrawerFooter>
+            <Flex gap={1}>
               <Button
-                variant='outline'
-                mr={3}
+                fontWeight={400}
+                color={'#60686F'}
+                variant='ghost'
                 onClick={() => {
                   onPersonalModalClose()
                   resetStates()
@@ -956,7 +950,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 {isSaving ? 'saving...' : 'Save'}
               </Button>
             </Flex>
-          </DrawerBody>
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
 
