@@ -1,5 +1,4 @@
 import { useMutation } from '@apollo/client'
-import { refetchActiveQueries } from 'context/ApolloWrapper'
 import React, { useEffect, useState } from 'react'
 
 import {
@@ -73,7 +72,6 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
         osiApproved
       }
     })
-    refetchActiveQueries()
     onClose()
   }
 
@@ -95,14 +93,13 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
         osiApproved
       }
     }).then(() => {
-      refetchActiveQueries()
+      showToast({
+        description:
+          'License properties and all product versions, including this license, are being updated. This could take some time.',
+        status: 'success'
+      })
+      onClose()
     })
-    showToast({
-      description:
-        'License properties and all product versions, including this license, are being updated. This could take some time.',
-      status: 'success'
-    })
-    onClose()
   }
 
   useEffect(() => {

@@ -1,4 +1,3 @@
-import { refetchActiveQueries } from 'context/ApolloWrapper'
 import { useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils'
@@ -50,7 +49,6 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
       onOpen={onOpen}
       createLic={updateLic}
       setActiveRow={setActiveRow}
-      handleRefresh={() => refetchActiveQueries()}
       setFilters={setFilters}
     />
   )

@@ -1,5 +1,4 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
-import { refetchActiveQueries } from 'context/ApolloWrapper'
 import { formatDistanceToNow } from 'date-fns'
 import Cookies from 'js-cookie'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -236,7 +235,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
             status: 'success'
           })
         }
-        refetchActiveQueries()
       })
       .finally(() => navigate('/vendor/dashboard'))
   }
@@ -329,7 +327,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
         })
       } else {
         Cookies.set('authToken', res?.data?.userUpdatePassword?.updatedToken)
-        refetchActiveQueries()
         showToast({
           description: 'Password updated successfully',
           status: 'success'

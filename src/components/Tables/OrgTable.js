@@ -1,5 +1,4 @@
 import { useMutation } from '@apollo/client'
-import { refetchActiveQueries } from 'context/ApolloWrapper'
 import Cookies from 'js-cookie'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -88,7 +87,6 @@ const OrgTable = ({ data, activeOrg }) => {
             status: 'success'
           })
         }
-        refetchActiveQueries()
       })
       .finally(() => navigate('/vendor/dashboard'))
   }

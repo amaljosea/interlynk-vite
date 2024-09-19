@@ -71,26 +71,6 @@ const SigningModal = ({
       })
       onClose()
     }
-
-    // try {
-    //   await sbomSign({
-    //     variables: {
-    //       sbomID: sbomId,
-    //       sig: cycloneDxSign,
-    //       sigType: algorithm,
-    //       pubKey: certificate
-    //     }
-    //   })
-    //     .then(() => {
-    //       refetch({
-    //         projectId: projectId,
-    //         sbomId: sbomId
-    //       })
-    //     })
-    //     .finally(() => onClose())
-    // } catch (error) {
-    //   console.log(`Something went wrong `, error)
-    // }
   }
 
   return (

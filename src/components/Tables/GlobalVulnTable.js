@@ -1,4 +1,3 @@
-import { refetchActiveQueries } from 'context/ApolloWrapper'
 import DataTable from 'react-data-table-component'
 import { Link, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
@@ -337,11 +336,7 @@ const GlobalVulnTable = ({
 
   // HEADER
   const subHeaderComponent = (
-    <SubHeader
-      filters={filters}
-      setFilters={setFilters}
-      handleRefresh={() => refetchActiveQueries()}
-    />
+    <SubHeader filters={filters} setFilters={setFilters} />
   )
 
   // SORTING

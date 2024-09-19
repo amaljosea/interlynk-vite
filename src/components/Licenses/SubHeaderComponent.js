@@ -1,5 +1,7 @@
-import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
+
+import RefreshBtn from 'components/Icons/RefreshBtn'
 
 import Filter from './Filter'
 
@@ -7,8 +9,7 @@ export const SubHeaderComponent = ({
   setFilters,
   onOpen,
   createLic,
-  setActiveRow,
-  handleRefresh
+  setActiveRow
 }) => {
   return (
     <Flex width={'100%'} alignItems={'center'} gap={3}>
@@ -31,13 +32,7 @@ export const SubHeaderComponent = ({
           fontSize={'sm'}
         />
       </Tooltip>
-      <Tooltip label='Refresh'>
-        <IconButton
-          onClick={handleRefresh}
-          colorScheme='blue'
-          icon={<RepeatIcon />}
-        />
-      </Tooltip>
+      <RefreshBtn />
     </Flex>
   )
 }

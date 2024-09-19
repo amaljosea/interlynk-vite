@@ -1,4 +1,3 @@
-import { refetchActiveQueries } from 'context/ApolloWrapper'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
@@ -7,10 +6,8 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { RepeatIcon } from '@chakra-ui/icons'
 import {
   Flex,
-  IconButton,
   Stack,
   Tag,
   Text,

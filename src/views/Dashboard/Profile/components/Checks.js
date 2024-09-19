@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { refetchActiveQueries } from 'context/ApolloWrapper'
 import DataTable from 'react-data-table-component'
 import { customStyles, sevColor } from 'utils'
 
@@ -138,10 +137,6 @@ const Checks = () => {
     }
   ]
 
-  const handleSort = () => {
-    refetchActiveQueries()
-  }
-
   const handleChange = async (value, id) => {
     try {
       await updateRule({
@@ -183,7 +178,6 @@ const Checks = () => {
         {data && data.organization && (
           <DataTable
             columns={columns}
-            onSort={handleSort}
             data={data && data.organization.organizationRules}
             defaultSortAsc={true}
             defaultSortFieldId={'RULES_FRIENDLY_ID'}
