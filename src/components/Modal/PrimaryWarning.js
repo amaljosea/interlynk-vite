@@ -76,7 +76,7 @@ const PrimaryWarning = ({ isOpen, onClose, primaryComp }) => {
         variant='subtle'
         colorScheme='red'
         hidden={!isExists}
-        wordBreak={'break-all'}
+        wordBreak={'break-word'}
       >
         This version of the product already exists. Continuing will override one
         of these versions.
