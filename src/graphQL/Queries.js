@@ -592,6 +592,9 @@ export const GetProjectGroup = gql`
         id
         name
         projectGroupId
+        projectGroup {
+          name
+        }
         updatedAt
         sboms {
           id

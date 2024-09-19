@@ -1,14 +1,9 @@
-import { useMutation, useQuery } from '@apollo/client'
-import { useMemo, useState } from 'react'
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
-import {
-  capitalizeFirstLetter,
-  customStyles,
-  getFullDateAndTime,
-  timeSince,
-  updatedValue
-} from 'utils'
+import { capitalizeFirstLetter, customStyles, getFullDateAndTime } from 'utils'
+import { timeSince, updatedValue } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { AddIcon } from '@chakra-ui/icons'
@@ -47,12 +42,22 @@ import {
 } from 'graphQL/Queries'
 
 import { FaEllipsisV } from 'react-icons/fa'
+import { FaFileExport, FaFileImport } from 'react-icons/fa6'
 import { MdDragIndicator } from 'react-icons/md'
 
 import CopyRule from './components/CopyRule'
 import CreateRule from './components/CreateRule'
 import DeleteWarning from './components/DeleteWarning'
+import ImportRule from './components/ImportRule'
 import StatusWarning from './components/StatusWarning'
+
+const RuleExport = gql`
+  query RuleExport($id: Uuid!) {
+    project(id: $id) {
+      automationRulesExport
+    }
+  }
+`
 
 const Automation = ({ projects }) => {
   const { showToast } = useCustomToast()
@@ -60,6 +65,7 @@ const Automation = ({ projects }) => {
   const productId = params.productid
 
   const filterProjects = projects?.filter((item) => item?.id !== productId)
+  const activeProject = projects?.find((item) => item?.id === productId)
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -73,6 +79,7 @@ const Automation = ({ projects }) => {
 
   const { AUTOMATION_RULES } = ProductDetailsTabs
 
+  const [exportRule, { loading: exportLoading }] = useLazyQuery(RuleExport)
   const { data: subOperators } = useQuery(
     AutomationConditionSubjectFieldMapping,
     {
@@ -101,26 +108,11 @@ const Automation = ({ projects }) => {
     childKey: 'edit_product_automations'
   })
 
-  const {
-    isOpen: isRuleOpen,
-    onOpen: onRuleOpen,
-    onClose: onRuleClose
-  } = useDisclosure()
-  const {
-    isOpen: isCopyOpen,
-    onOpen: onCopyOpen,
-    onClose: onCopyClose
-  } = useDisclosure()
-  const {
-    isOpen: isActiveOpen,
-    onOpen: onActiveOpen,
-    onClose: onActiveClose
-  } = useDisclosure()
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose
-  } = useDisclosure()
+  const RULE = useDisclosure()
+  const RULE_COPY = useDisclosure()
+  const RULE_ACTIVE = useDisclosure()
+  const RULE_DELETE = useDisclosure()
+  const RULE_IMPORT = useDisclosure()
 
   const handleDelete = async () => {
     await deleteRule({ variables: { id: activeRow?.id } }).then((res) => {
@@ -131,7 +123,7 @@ const Automation = ({ projects }) => {
           status: 'error'
         })
       } else {
-        onDeleteClose()
+        RULE_DELETE.onClose()
       }
     })
   }
@@ -150,7 +142,7 @@ const Automation = ({ projects }) => {
           status: 'error'
         })
       } else {
-        onActiveClose()
+        RULE_ACTIVE.onClose()
       }
     })
   }
@@ -206,7 +198,7 @@ const Automation = ({ projects }) => {
             isDisabled={!editAutomations}
             onChange={() => {
               setActiveRow(row)
-              onActiveOpen()
+              RULE_ACTIVE.onOpen()
             }}
           />
         )
@@ -374,7 +366,7 @@ const Automation = ({ projects }) => {
                   isDisabled={!editAutomations}
                   onClick={() => {
                     setActiveRow(row)
-                    onRuleOpen()
+                    RULE.onOpen()
                   }}
                 >
                   {isSystem ? 'View' : 'Edit'} Rule
@@ -388,7 +380,7 @@ const Automation = ({ projects }) => {
                     onClick={() => {
                       setActiveRow(row)
                       setActiveEnv(item)
-                      onCopyOpen()
+                      RULE_COPY.onOpen()
                     }}
                   >
                     Copy to {capitalizeFirstLetter(item?.name)}
@@ -399,7 +391,7 @@ const Automation = ({ projects }) => {
                   color='red'
                   onClick={() => {
                     setActiveRow(row)
-                    onDeleteOpen()
+                    RULE_DELETE.onOpen()
                   }}
                   isDisabled={!editAutomations}
                   hidden={isSystem}
@@ -416,26 +408,68 @@ const Automation = ({ projects }) => {
     }
   ]
 
+  const downloadJsonFile = useCallback(
+    (data) => {
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json'
+      })
+      const link = document.createElement('a')
+      link.download = `${activeProject?.projectGroup?.name}-${activeProject?.name}.json`
+      link.href = window.URL.createObjectURL(blob)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    },
+    [activeProject]
+  )
+
+  const handleExport = useCallback(() => {
+    exportRule({
+      variables: {
+        id: productId
+      }
+    }).then((res) => {
+      if (res.called) {
+        const data = res?.data?.project?.automationRulesExport
+        data && downloadJsonFile(data)
+      }
+    })
+  }, [downloadJsonFile, exportRule, productId])
+
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          <Tooltip label='Import Rules'>
+            <IconButton
+              colorScheme='blue'
+              icon={<FaFileImport />}
+              onClick={RULE_IMPORT.onOpen}
+            />
+          </Tooltip>
+          <Tooltip label='Export Rules'>
+            <IconButton
+              colorScheme='blue'
+              icon={<FaFileExport />}
+              onClick={handleExport}
+              isLoading={exportLoading}
+            />
+          </Tooltip>
           <Tooltip label='Add Rule'>
             <IconButton
               onClick={() => {
                 setActiveRow(null)
-                onRuleOpen()
+                RULE.onOpen()
               }}
               colorScheme='blue'
               icon={<AddIcon />}
             />
           </Tooltip>
-
           <RefreshBtn />
         </Stack>
       </Flex>
     )
-  }, [onRuleOpen])
+  }, [RULE, RULE_IMPORT, handleExport, exportLoading])
 
   return (
     <>
@@ -443,53 +477,56 @@ const Automation = ({ projects }) => {
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable
             subHeader
+            data={nodes}
             persistTableHead
             responsive={true}
             columns={columns}
-            data={nodes}
-            // onSort={handleSort}
-            customStyles={customStyles(headColor)}
-            progressComponent={<CustomLoader />}
             progressPending={loading}
+            progressComponent={<CustomLoader />}
+            customStyles={customStyles(headColor)}
             subHeaderComponent={subHeaderComponent}
           />
           <Pagination {...paginationProps} />
         </Flex>
       </CardBody>
 
-      {isRuleOpen && (
+      {RULE.isOpen && (
         <CreateRule
           data={activeRow}
-          isOpen={isRuleOpen}
-          onClose={onRuleClose}
+          isOpen={RULE.isOpen}
+          onClose={RULE.onClose}
           subOperators={subOperators}
         />
       )}
 
-      {isDeleteOpen && (
+      {RULE_DELETE.isOpen && (
         <DeleteWarning
-          isOpen={isDeleteOpen}
-          onClose={onDeleteClose}
+          isOpen={RULE_DELETE.isOpen}
+          onClose={RULE_DELETE.onCLose}
           onDelete={handleDelete}
         />
       )}
 
-      {isActiveOpen && (
+      {RULE_ACTIVE.isOpen && (
         <StatusWarning
-          isOpen={isActiveOpen}
-          onClose={onActiveClose}
+          isOpen={RULE_ACTIVE.isOpen}
+          onClose={RULE_ACTIVE.onClose}
           onToggle={toggleStatus}
           data={activeRow}
         />
       )}
 
-      {isCopyOpen && (
+      {RULE_COPY.isOpen && (
         <CopyRule
           env={activeEnv}
           data={activeRow}
-          isOpen={isCopyOpen}
-          onClose={onCopyClose}
+          isOpen={RULE_COPY.isOpen}
+          onClose={RULE_COPY.onClose}
         />
+      )}
+
+      {RULE_IMPORT.isOpen && (
+        <ImportRule isOpen={RULE_IMPORT.isOpen} onClose={RULE_IMPORT.onClose} />
       )}
     </>
   )
