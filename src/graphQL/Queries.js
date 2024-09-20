@@ -2223,6 +2223,7 @@ export const GetVulnData = gql`
             url
           }
           vuln {
+            id
             vulnId
             desc
             sev

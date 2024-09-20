@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, linkURl, sevColor } from 'utils'
 import { isCustomerView, timeSince } from 'utils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
@@ -28,7 +28,6 @@ import {
   GridItem,
   Icon,
   IconButton,
-  Link,
   Menu,
   MenuButton,
   MenuItem,
@@ -68,9 +67,7 @@ import {
   GetOrgConnections,
   GetVulnData,
   GetVulnFilterData,
-  ShareVulnFilters,
-  getVexJustifications,
-  getVexStatuses
+  ShareVulnFilters
 } from 'graphQL/Queries'
 
 import { BsCircleHalf } from 'react-icons/bs'
@@ -80,6 +77,7 @@ import {
   FaBug,
   FaBullhorn,
   FaCopy,
+  FaEye,
   FaLink,
   FaListCheck,
   FaPen
@@ -101,14 +99,47 @@ const statusColor = (status) => {
   }
 }
 
-const ExpandedComponent = ({
-  data,
-  setActiveRow,
-  onCvssOpen,
-  textColor,
-  isArchived
-}) => {
-  const { vuln, fixedVersions, lastAffectedVersions } = data
+const getUrl = (url) => {
+  if (url?.startsWith('http')) {
+    return url
+  } else {
+    return `http://${url}`
+  }
+}
+
+const LynkIcon = ({ icon, disabled }) => {
+  return (
+    <IconButton
+      size='xs'
+      icon={icon}
+      type='button'
+      variant='solid'
+      colorScheme='gray'
+      isDisabled={disabled}
+    />
+  )
+}
+
+const ExpandedComponent = (props) => {
+  const { data, setActiveRow, onCvssOpen, textColor, isArchived } = props
+  const {
+    vuln,
+    isPart,
+    fixedVersions,
+    lastAffectedVersions,
+    currentExternalUrls,
+    externalUrls
+  } = data
+  const advisories = isPart
+    ? currentExternalUrls?.find((item) => item.name === 'advisories')
+    : externalUrls?.find((item) => item.name === 'advisories')
+  const documentation = isPart
+    ? currentExternalUrls?.find((item) => item.name === 'documentation')
+    : externalUrls?.find((item) => item.name === 'documentation')
+  const other = isPart
+    ? currentExternalUrls?.find((item) => item.name === 'other')
+    : externalUrls?.find((item) => item.name === 'other')
+
   const CustomText = styled(Text)`
     font-size: 13px;
     font-weight: bold;
@@ -138,6 +169,39 @@ const ExpandedComponent = ({
               {vuln.desc}
             </Text>
           </Box>
+          {/* EXTERNAL LINKS */}
+          <Box>
+            <CustomText>External Links :</CustomText>
+            <Stack direction={'row'} alignItems={'center'} mt={1}>
+              {/* advisories */}
+              <Tooltip placement='top' label={advisories?.url}>
+                <Link href={getUrl(advisories?.url)} target='_blank'>
+                  <LynkIcon
+                    disabled={!advisories}
+                    icon={<FaBullhorn color={textColor} fontSize={16} />}
+                  />
+                </Link>
+              </Tooltip>
+              {/* documentation */}
+              <Tooltip placement='top' label={documentation?.url}>
+                <Link href={getUrl(documentation?.url)} target='_blank'>
+                  <LynkIcon
+                    disabled={!documentation}
+                    icon={<FaBookOpen color={textColor} fontSize={16} />}
+                  />
+                </Link>
+              </Tooltip>
+              {/* other */}
+              <Tooltip placement='top' label={other?.url}>
+                <Link href={getUrl(other?.url)} target='_blank'>
+                  <LynkIcon
+                    disabled={!other}
+                    icon={<FaLink color={textColor} fontSize={16} />}
+                  />
+                </Link>
+              </Tooltip>
+            </Stack>
+          </Box>
           {/* Published At  */}
           <Box>
             <CustomText>Published:</CustomText>
@@ -157,7 +221,7 @@ const ExpandedComponent = ({
             <CustomText>Fixed Version:</CustomText>
             <Flex mt={1} flexWrap={'wrap'} alignItems={'center'} gap={2}>
               {fixedVersions?.map((item, index) => (
-                <Tag colorScheme='blue' size='sm' key={index} pt={1}>
+                <Tag colorScheme='blue' size='sm' key={index}>
                   {item}
                 </Tag>
               ))}
@@ -314,8 +378,6 @@ const Vulnerabilities = ({ sbomData }) => {
     max: parseFloat(vulnEpss[1]) / 100
   }
 
-  const { data: allVexStatus } = useQuery(getVexStatuses)
-  const { data: allVexJustify } = useQuery(getVexJustifications)
   const { data: allCdx } = useQuery(GetCdxResponses)
 
   const orderBy = {
@@ -455,33 +517,15 @@ const Vulnerabilities = ({ sbomData }) => {
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vuln, isPart, component, externalUrls, currentExternalUrls } =
+        const { vuln, isPart, component, currentExternalUrls, externalUrls } =
           row
-        const advisories = isPart
-          ? currentExternalUrls?.find((item) => item.name === 'advisories')
-          : externalUrls?.find((item) => item.name === 'advisories')
-        const documentation = isPart
-          ? currentExternalUrls?.find((item) => item.name === 'documentation')
-          : externalUrls?.find((item) => item.name === 'documentation')
+        const { sbom } = component
+        const { projectVersion, project } = sbom
+        const { id, vulnInfo } = vuln
+        const { kev } = vulnInfo ? vulnInfo : ''
         const issueTracker = isPart
           ? currentExternalUrls?.find((item) => item.name === 'issue-tracker')
           : externalUrls?.find((item) => item.name === 'issue-tracker')
-        const other = isPart
-          ? currentExternalUrls?.find((item) => item.name === 'other')
-          : externalUrls?.find((item) => item.name === 'other')
-        const { sbom } = component
-        const { projectVersion, project } = sbom
-        const { vulnInfo } = vuln
-        const { kev } = vulnInfo ? vulnInfo : ''
-
-        const getUrl = (url) => {
-          if (url?.startsWith('http')) {
-            return url
-          } else {
-            return `http://${url}`
-          }
-        }
-
         return (
           <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
             <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
@@ -493,11 +537,9 @@ const Vulnerabilities = ({ sbomData }) => {
               />
             </Link>
             <Stack direction={'column'} spacing={1.5}>
-              <Tooltip label={vuln.vulnId} placement={'top'}>
-                <Text fontSize='sm' color={textColor} data-tag='allowRowEvents'>
-                  {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
-                </Text>
-              </Tooltip>
+              <Text fontSize='sm' color={textColor} data-tag='allowRowEvents'>
+                {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
+              </Text>
               {isPart && (
                 <Text
                   fontSize={'xs'}
@@ -508,66 +550,33 @@ const Vulnerabilities = ({ sbomData }) => {
                   {project?.projectGroup?.name || ''} : {projectVersion || ''}
                 </Text>
               )}
-              {/* EXTERNAL REFERENCE */}
               <Stack direction={'row'} alignItems={'center'}>
+                {/* info link */}
+                <Link to={`/vendor/vulnerabilities?vulnId=${id}`}>
+                  <LynkIcon
+                    disabled={customerView}
+                    icon={<FaEye color={textColor} fontSize={16} />}
+                  />
+                </Link>
                 {/* issueTracker */}
                 <Tooltip placement='top' label={issueTracker?.url}>
-                  <Link href={getUrl(issueTracker?.url)} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      colorScheme='gray'
-                      isDisabled={!issueTracker}
+                  <Link href={getUrl(issueTracker?.url)} target='_blank'>
+                    <LynkIcon
+                      disabled={!issueTracker}
                       icon={<FaListCheck color={textColor} fontSize={16} />}
                     />
                   </Link>
                 </Tooltip>
-                {/* advisories */}
-                <Tooltip placement='top' label={advisories?.url}>
-                  <Link href={getUrl(advisories?.url)} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      isDisabled={!advisories}
-                      colorScheme='gray'
-                      icon={<FaBullhorn color={textColor} fontSize={16} />}
-                    />
-                  </Link>
-                </Tooltip>
-                {/* documentation */}
-                <Tooltip placement='top' label={documentation?.url}>
-                  <Link href={getUrl(documentation?.url)} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      colorScheme='gray'
-                      isDisabled={!documentation}
-                      icon={<FaBookOpen color={textColor} fontSize={16} />}
-                    />
-                  </Link>
-                </Tooltip>
-                {/* other */}
-                <Tooltip placement='top' label={other?.url}>
-                  <Link href={getUrl(other?.url)} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      isDisabled={!other}
-                      colorScheme='gray'
-                      icon={<FaLink color={textColor} fontSize={16} />}
-                    />
-                  </Link>
-                </Tooltip>
+                {kev === true && (
+                  <Badge
+                    width={'fit-content'}
+                    variant='subtle'
+                    colorScheme='red'
+                  >
+                    KEV
+                  </Badge>
+                )}
               </Stack>
-              {kev === true && (
-                <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
-                  KEV
-                </Badge>
-              )}
             </Stack>
           </Flex>
         )
