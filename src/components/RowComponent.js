@@ -55,8 +55,7 @@ const RowComponent = ({ content }) => {
 
   const link = generateProductVersionDetailPageUrlFromCurrentUrl({
     paramsObj: {
-      tab: 'components',
-      expand: true
+      tab: 'components'
     }
   })
 
@@ -68,12 +67,14 @@ const RowComponent = ({ content }) => {
         type: 'CHANGE_SEARCH_INPUT',
         payload: activeRow?.name
       })
+      prodCompDispatch({ type: 'SET_EXPAND', payload: activeRow?.name })
       navigate(link)
     } else {
       prodCompDispatch({
         type: 'CHANGE_SEARCH_INPUT',
         payload: name
       })
+      prodCompDispatch({ type: 'SET_EXPAND', payload: name })
       navigate(link)
     }
   }

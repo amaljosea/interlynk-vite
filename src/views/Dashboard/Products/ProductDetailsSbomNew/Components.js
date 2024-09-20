@@ -3,9 +3,8 @@ import styled from '@emotion/styled'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { GetIcon, customStyles, timeSince } from 'utils'
-import { getFullDateAndTime, isUnknown } from 'utils'
-import { isCustomerView, truncatedValue } from 'utils'
+import { GetIcon, customStyles, timeSince, truncatedValue } from 'utils'
+import { getFullDateAndTime, isCustomerView, isUnknown } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 import { openSsf } from 'variables/general'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -25,7 +24,6 @@ import {
   MenuItem,
   MenuList,
   Portal,
-  Skeleton,
   Stack,
   Tag,
   TagLabel,
@@ -49,16 +47,13 @@ import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 import SupplierTag from 'components/SupplierTag'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
-import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
 import { GetComponentData, GetComponentPath } from 'graphQL/Queries'
-import { GetComponentTree } from 'graphQL/Queries'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import {
@@ -83,11 +78,9 @@ const CustomText = styled(Text)`
 `
 
 const Components = ({ sbomData }) => {
-  const { isFreeTier } = useGlobalQueryContext()
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const expandView = useQueryParam('expand')
   const customerView = isCustomerView()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const { colorMode } = useColorMode()
@@ -109,7 +102,8 @@ const Components = ({ sbomData }) => {
     suppliers,
     scope,
     direct,
-    totalComp
+    totalComp,
+    expandedRows
   } = prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -129,8 +123,6 @@ const Components = ({ sbomData }) => {
   }, [direct, ecosystems, kinds, licenses, scope, suppliers])
 
   const orderBy = { field, direction }
-
-  const [getCompTree, { loading: treeLoading }] = useLazyQuery(GetComponentTree)
 
   // GET COMPONENT DATA
   const { nodes, error, paginationProps, reset, loading } = usePaginatedQuery(
@@ -212,13 +204,11 @@ const Components = ({ sbomData }) => {
 
   const onCreateComponent = useCallback(() => {
     setActiveRow(null)
-    prodCompDispatch({ type: 'CLEAR_LICENSES' })
     onOpen()
-  }, [onOpen, prodCompDispatch])
+  }, [onOpen])
 
   const onEditOpen = (row) => {
     setActiveRow(row)
-    prodCompDispatch({ type: 'SET_LICENSES', payload: row })
     onCompOpen()
   }
 
@@ -657,19 +647,6 @@ const Components = ({ sbomData }) => {
     )
   }
 
-  const handleExpand = useCallback(
-    (expanded, row) => {
-      if (expanded) {
-        getCompTree({ variables: { id: row?.id, sbomId } }).then((res) => {
-          if (res?.data) {
-            setActiveRow(res?.data?.component)
-          }
-        })
-      }
-    },
-    [getCompTree, sbomId]
-  )
-
   // EXPAND SECTION
   const ExpandedComponent = ({ data }) => {
     const {
@@ -685,9 +662,10 @@ const Components = ({ sbomData }) => {
       licensesExp,
       licensesCustom,
       supportLevel,
-      endOfSupport
+      endOfSupport,
+      dependencyOf,
+      dependsOn
     } = data
-    const { dependencyOf, dependsOn } = activeRow || ''
     const openSSF = openSsf?.find((item) => item?.name === purl)
 
     const textStyle = {
@@ -783,51 +761,14 @@ const Components = ({ sbomData }) => {
           </GridItem>
           <GridItem>
             <CustomText>Depends On :</CustomText>
-            {treeLoading ? (
-              <Skeleton width={32} height={4} />
-            ) : (
-              <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-                {dependsOn?.length > 0 ? (
-                  [...dependsOn]
-                    .sort(
-                      (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
-                    )
-                    .map((comp, index) => (
-                      <Tooltip
-                        key={index}
-                        label={comp.toComp.name}
-                        placement='top'
-                      >
-                        <Tag
-                          size='sm'
-                          padding={1}
-                          variant='subtle'
-                          colorScheme={'blue'}
-                          wordBreak={'break-all'}
-                        >
-                          <Text wordBreak={'break-all'}>
-                            {comp.toComp.name}-{comp.toComp.version}
-                          </Text>
-                        </Tag>
-                      </Tooltip>
-                    ))
-                ) : (
-                  <Text sx={textStyle}>N/A</Text>
-                )}
-              </Flex>
-            )}
-          </GridItem>
-          <GridItem>
-            <CustomText>Dependency Of :</CustomText>
-            {treeLoading ? (
-              <Skeleton width={32} height={4} />
-            ) : (
-              <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-                {dependencyOf?.length > 0 ? (
-                  dependencyOf?.map((comp, index) => (
+            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
+              {dependsOn?.length > 0 ? (
+                [...dependsOn]
+                  .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                  .map((comp, index) => (
                     <Tooltip
                       key={index}
-                      label={comp.fromComp.name}
+                      label={comp.toComp.name}
                       placement='top'
                     >
                       <Tag
@@ -835,18 +776,45 @@ const Components = ({ sbomData }) => {
                         padding={1}
                         variant='subtle'
                         colorScheme={'blue'}
+                        wordBreak={'break-all'}
                       >
                         <Text wordBreak={'break-all'}>
-                          {comp.fromComp.name}-{comp.fromComp.version}
+                          {comp.toComp.name}-{comp.toComp.version}
                         </Text>
                       </Tag>
                     </Tooltip>
                   ))
-                ) : (
-                  <Text sx={textStyle}>N/A</Text>
-                )}
-              </Flex>
-            )}
+              ) : (
+                <Text sx={textStyle}>N/A</Text>
+              )}
+            </Flex>
+          </GridItem>
+          <GridItem>
+            <CustomText>Dependency Of :</CustomText>
+            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
+              {dependencyOf?.length > 0 ? (
+                dependencyOf?.map((comp, index) => (
+                  <Tooltip
+                    key={index}
+                    label={comp.fromComp.name}
+                    placement='top'
+                  >
+                    <Tag
+                      size='sm'
+                      padding={1}
+                      variant='subtle'
+                      colorScheme={'blue'}
+                    >
+                      <Text wordBreak={'break-all'}>
+                        {comp.fromComp.name}-{comp.fromComp.version}
+                      </Text>
+                    </Tag>
+                  </Tooltip>
+                ))
+              ) : (
+                <Text sx={textStyle}>N/A</Text>
+              )}
+            </Flex>
           </GridItem>
           <GridItem>
             <CustomText>Scope :</CustomText>
@@ -1033,10 +1001,8 @@ const Components = ({ sbomData }) => {
     })
   }
 
-  const isRowExpandable = (row) => {
-    if (expandView === 'true') {
-      return row?.name === compSearch
-    }
+  const handleRowClick = (row) => {
+    prodCompDispatch({ type: 'SET_EXPAND', payload: row?.name })
   }
 
   if (error) {
@@ -1061,12 +1027,12 @@ const Components = ({ sbomData }) => {
           onSort={handleSort}
           defaultSortAsc={false}
           progressPending={loading}
+          onRowClicked={handleRowClick}
           subHeaderComponent={subHeader}
-          onRowExpandToggled={handleExpand}
           progressComponent={<CustomLoader />}
           customStyles={customStyles(headColor)}
           expandableRowsComponent={ExpandedComponent}
-          expandableRowExpanded={(row) => isRowExpandable(row)}
+          expandableRowExpanded={(row) => expandedRows?.includes(row?.name)}
         />
       </Flex>
 

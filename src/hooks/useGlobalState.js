@@ -78,13 +78,10 @@ const GlobalStateProvider = ({ children }) => {
     direct: false,
     filters: null,
     licenseType: 'license_exp',
-    spdxLicenses: [],
-    spdxList: [],
-    customLicenses: [],
-    customList: [],
     expLicense: '',
     cpeString: '',
     isCpeValid: true,
+    expandedRows: [],
     purlString: ''
   })
   const [prodVulnState, prodVulnDispatch] = useReducer(prodVulnReducer, {
@@ -128,10 +125,6 @@ const GlobalStateProvider = ({ children }) => {
   })
   const [sbomState, sbomDispatch] = useReducer(sbomReducer, {
     licenseType: 'license_exp',
-    spdxLicenses: [],
-    spdxList: [],
-    customLicenses: [],
-    customList: [],
     expLicense: '',
     licenseString: null
   })

@@ -10,7 +10,6 @@ const sbomReducer = (state, action) => {
       return {
         ...state,
         licenseType: 'license_exp',
-        spdxList: [],
         licenseString: [],
         expLicense: ''
       }

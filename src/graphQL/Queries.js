@@ -1747,39 +1747,31 @@ export const GetComponentData = gql`
             contactEmail
             contactName
           }
+          dependencyOf {
+            id
+            relType
+            fromId
+            toId
+            fromComp {
+              id
+              name
+              version
+            }
+            updatedAt
+          }
+          dependsOn {
+            id
+            relType
+            fromId
+            toId
+            toComp {
+              id
+              name
+              version
+            }
+            updatedAt
+          }
         }
-      }
-    }
-  }
-`
-
-// GET COMOPONENT TREE
-export const GetComponentTree = gql`
-  query GetComponentTree($id: Uuid!, $sbomId: Uuid!) {
-    component(id: $id, sbomId: $sbomId) {
-      dependencyOf {
-        id
-        relType
-        fromId
-        toId
-        fromComp {
-          id
-          name
-          version
-        }
-        updatedAt
-      }
-      dependsOn {
-        id
-        relType
-        fromId
-        toId
-        toComp {
-          id
-          name
-          version
-        }
-        updatedAt
       }
     }
   }

@@ -6,6 +6,15 @@ const toggleSelection = (currentSelection, payload) => {
       : [...currentSelection, payload]
 }
 
+const toggleExpandRow = (state, payload) => {
+  if (payload?.length === 0) {
+    return []
+  }
+  return state.expandedRows.includes(payload)
+    ? state.expandedRows.filter((item) => item !== payload)
+    : [...state.expandedRows, payload]
+}
+
 const prodCompReducer = (state, action) => {
   const { type, payload } = action
   switch (type) {
@@ -128,7 +137,6 @@ const prodCompReducer = (state, action) => {
       return {
         ...state,
         licenseType: 'license_exp',
-        spdxList: [],
         expLicense: ''
       }
     case 'SET_LICENSES':
@@ -157,6 +165,11 @@ const prodCompReducer = (state, action) => {
         ...state,
         licenseString: payload,
         expLicense: payload[0]?.value
+      }
+    case 'SET_EXPAND':
+      return {
+        ...state,
+        expandedRows: toggleExpandRow(state, payload)
       }
     default:
       return state
