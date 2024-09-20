@@ -3,6 +3,7 @@ import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
+import { componentTypes } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
@@ -446,24 +447,19 @@ const CheckModal = (props) => {
           <Select
             id='type'
             name='type'
-            size='sm'
             value={compType}
             onChange={(e) => setCompType(e.target.value)}
           >
             <option value=''>-- Select --</option>
-            <option value='application'>Application</option>
-            <option value='library'>Library</option>
-            <option value='operating-system'>Operating System</option>
-            <option value='firmware'>Firmware</option>
-            <option value='file'>File</option>
-            <option value='device'>Device</option>
-            <option value='container'>Container</option>
-            <option value='framework'>Framework</option>
-            <option value='source'>Source</option>
-            <option value='archive'>Archive</option>
-            <option value='install'>Install</option>
-            <option value='other'>Other</option>
-            <option value='unspecified'>Unspecified</option>
+            {componentTypes?.map((item, index) => (
+              <option
+                key={index}
+                value={item}
+                style={{ textTransform: 'capitalize' }}
+              >
+                {item}
+              </option>
+            ))}
           </Select>
         </FormControl>
       )}

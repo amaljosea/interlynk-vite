@@ -2,7 +2,9 @@ import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import React, { useContext, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { isCustomerView } from 'utils'
 import { infoData } from 'variables/general'
+import { componentTypes } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
@@ -33,7 +35,6 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { CreateComponent, sbomCreate } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
-import { isCustomerView } from 'utils'
 
 function ProductSbomDrawer({ isOpen, onClose, data }) {
   const params = useParams()
@@ -238,32 +239,16 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
                   </Flex>
                 </FormLabel>
                 <Select
-                  id='componentType'
-                  name='componentType'
-                  size='md'
                   fontSize={'sm'}
                   value={compKind}
+                  id='componentType'
+                  name='componentType'
                   isDisabled={customerView}
                   onChange={(e) => setCompKind(e.target.value)}
                   textTransform={'capitalize'}
                 >
-                  <option value='' style={{ background: 'lightgray' }}>
-                    -- Select --
-                  </option>
-                  {[
-                    'application',
-                    'framework',
-                    'library',
-                    'container',
-                    'platform',
-                    'operating-system',
-                    'device',
-                    'device-driver',
-                    'firmware',
-                    'file',
-                    'machine-learning-model',
-                    'data'
-                  ].map((item, index) => (
+                  <option value=''>-- Select --</option>
+                  {componentTypes?.map((item, index) => (
                     <option
                       key={index}
                       value={item}

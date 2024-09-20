@@ -1,5 +1,20 @@
 import { Stack, Text } from '@chakra-ui/react'
 
+export const componentTypes = [
+  'application',
+  'container',
+  'data',
+  'device',
+  'device-driver',
+  'file',
+  'firmware',
+  'framework',
+  'library',
+  'machine-learning-model',
+  'operating-system',
+  'platform'
+]
+
 export const namespaceOptions = {
   alpm: [
     { value: '', label: '-- Select --' },

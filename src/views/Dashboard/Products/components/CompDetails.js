@@ -5,6 +5,7 @@ import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
 import { isCustomerView } from 'utils'
 import { infoData } from 'variables/general'
+import { componentTypes } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
@@ -326,23 +327,8 @@ const CompDetails = ({ data, primaryComp }) => {
             textTransform={'capitalize'}
             onChange={(e) => handleChange('details', 'kind', e.target.value)}
           >
-            <option value='' style={{ background: 'lightgray' }}>
-              -- Select --
-            </option>
-            {[
-              'application',
-              'framework',
-              'library',
-              'container',
-              'platform',
-              'operating-system',
-              'device',
-              'device-driver',
-              'firmware',
-              'file',
-              'machine-learning-model',
-              'data'
-            ].map((item, index) => (
+            <option value=''>-- Select --</option>
+            {componentTypes?.map((item, index) => (
               <option
                 key={index}
                 value={item}

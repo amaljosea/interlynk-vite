@@ -1,11 +1,13 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { isCustomerView } from 'utils'
 import { infoData } from 'variables/general'
+import { componentTypes } from 'variables/general'
 import CpeInputs from 'views/Dashboard/Products/components/CpeInputs'
 import PurlInputs from 'views/Dashboard/Products/components/PurlInputs'
 
@@ -42,7 +44,6 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { CreateCompRelation, CreateComponent } from 'graphQL/Mutation'
 import { CpeAutoComplete, GetAllComponents, GetAllSboms } from 'graphQL/Queries'
-import { isCustomerView } from 'utils'
 
 import { BiLayer } from 'react-icons/bi'
 
@@ -441,23 +442,8 @@ function ComponentDrawer(props) {
                     handleChange('details', 'kind', e.target.value)
                   }
                 >
-                  <option value='' style={{ background: 'lightgray' }}>
-                    -- Select --
-                  </option>
-                  {[
-                    'application',
-                    'framework',
-                    'library',
-                    'container',
-                    'platform',
-                    'operating-system',
-                    'device',
-                    'device-driver',
-                    'firmware',
-                    'file',
-                    'machine-learning-model',
-                    'data'
-                  ].map((item, index) => (
+                  <option value=''>-- Select --</option>
+                  {componentTypes?.map((item, index) => (
                     <option
                       key={index}
                       value={item}

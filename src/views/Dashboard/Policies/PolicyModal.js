@@ -1,12 +1,12 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { getIcon, getLabel, updatedValue } from 'utils'
+import { componentTypes } from 'variables/general'
 
 import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
   Button,
   Checkbox,
   Divider,
@@ -789,20 +789,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                               minWidth={140}
                             >
                               <option value=''>-- select --</option>
-                              {[
-                                'application',
-                                'framework',
-                                'library',
-                                'container',
-                                'platform',
-                                'operating-system',
-                                'device',
-                                'device-driver',
-                                'firmware',
-                                'file',
-                                'machine-learning-model',
-                                'data'
-                              ].map((item, index) => (
+                              {componentTypes?.map((item, index) => (
                                 <option
                                   key={index}
                                   value={item}
