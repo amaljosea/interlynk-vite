@@ -217,8 +217,8 @@ const Support = ({ sbomData }) => {
       selector: (row) => {
         return (
           <Stack my={4}>
-            <Text color={textColor}>{row?.name}</Text>
-            <Text color={textColor}>{row?.version}</Text>
+            <Text color={textColor}>{row?.productName || row?.name}</Text>
+            <Text color={textColor}>{row?.productVersion || row?.version}</Text>
           </Stack>
         )
       },
