@@ -199,26 +199,26 @@ const General = ({ data, loading, error }) => {
         >
           <Tbody w={'100%'}>
             {/* CREATED AT */}
-            <Tr>
-              <Td pl={0} fontWeight={'medium'} width={'15%'}>
+            <Tr height={'64px'}>
+              <Td p={0} fontWeight={'medium'} width={'15%'}>
                 <InfoLabel
                   title={`Created At`}
                   onCheck={onCheck('Created At')}
                 />
               </Td>
-              <Td fontSize={'sm'} color={'gray.500'} width={'85%'}>
+              <Td py={0} fontSize={'sm'} color={'gray.500'} width={'85%'}>
                 {creationAt ? getFullDateAndTime(creationAt) : ''}
               </Td>
             </Tr>
             {/* CREATION TOOLS */}
-            <Tr>
+            <Tr height={'64px'}>
               <Td pl={0} fontWeight={'medium'} width={'15%'}>
                 <InfoLabel
                   title={`Creation Tool`}
                   onCheck={onCheck('Creation Tool')}
                 />
               </Td>
-              <Td width={'85%'}>
+              <Td width={'85%'} py={0}>
                 <Flex alignItems={'center'} flexWrap={'wrap'} gap={3}>
                   {tools?.map((item, index) => (
                     <Tag
@@ -256,11 +256,11 @@ const General = ({ data, loading, error }) => {
               </Td>
             </Tr>
             {/* AUTHORS */}
-            <Tr>
-              <Td pl={0} fontWeight={'medium'} width={'15%'}>
+            <Tr height={'64px'}>
+              <Td p={0} fontWeight={'medium'} width={'15%'}>
                 <InfoLabel title={`Authors`} onCheck={onCheck('Authors')} />
               </Td>
-              <Td width={'85%'}>
+              <Td width={'85%'} py={0}>
                 <Flex alignItems={'center'} flexWrap={'wrap'} gap={3}>
                   {authors?.map((item, index) => (
                     <Tag
@@ -299,11 +299,11 @@ const General = ({ data, loading, error }) => {
               </Td>
             </Tr>
             {/* SUPPLIERS */}
-            <Tr>
+            <Tr height={'64px'}>
               <Td pl={0} fontWeight={'medium'} w={'15%'}>
                 <InfoLabel title={`Supplier`} onCheck={onCheck('Supplier')} />
               </Td>
-              <Td w={'85%'}>
+              <Td w={'85%'} py={0}>
                 {suppliers?.length > 0 ? (
                   suppliers?.map((item, index) => (
                     <SupplierTag
@@ -331,11 +331,11 @@ const General = ({ data, loading, error }) => {
               </Td>
             </Tr>
             {/* LICENSES */}
-            <Tr>
+            <Tr height={'64px'}>
               <Td pl={0} fontSize={'sm'} fontWeight={'medium'} w={'15%'}>
                 Data License
               </Td>
-              <Td w={'85%'}>
+              <Td w={'85%'} py={0}>
                 {licensesExp && licensesExp !== '' ? (
                   <Tag
                     my={2}
@@ -348,7 +348,9 @@ const General = ({ data, loading, error }) => {
                     <TagRightIcon
                       fontSize={12}
                       as={FaPen}
+                      opacity={0.5}
                       cursor={'pointer'}
+                      _hover={{ opacity: 1 }}
                       onClick={onLicenseOpen}
                       hidden={!updateComponent || isArchived}
                     />

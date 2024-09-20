@@ -40,11 +40,13 @@ const SupplierTag = ({ key, item, premission, onEdit, onDelete, editable }) => {
       </Tooltip>
       {editable && (
         <TagRightIcon
-          fontSize={12}
           as={FaPen}
-          cursor={'pointer'}
+          fontSize={12}
+          opacity={0.5}
           onClick={onEdit}
+          cursor={'pointer'}
           hidden={premission}
+          _hover={{ opacity: 1 }}
         />
       )}
       <TagCloseButton hidden={premission} onClick={() => onDelete(item)} />
