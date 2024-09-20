@@ -273,12 +273,13 @@ const CompSupplier = ({ data }) => {
       ) : (
         <ButtonGroup mt={2}>
           <ActionButton
-            title={'Save'}
             isDisabled={isInvalid}
             onClick={handleSubmit}
+            title={suppliers?.length > 0 ? 'Update' : 'Add  Supplier'}
           />
           <Button
             variant='ghost'
+            fontSize='14px'
             fontWeight={400}
             color={'#60686F'}
             onClick={handleRemove}
