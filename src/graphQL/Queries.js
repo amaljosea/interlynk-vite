@@ -796,6 +796,7 @@ export const GetCompVulnData = gql`
         vulnId
         updatedAt
         isComplete
+        fixedVersions
         vexStatus {
           id
           name
@@ -2084,7 +2085,7 @@ export const GetAllComponents = gql`
 `
 // GET ALL VUNERABILITIES
 export const GetAllVulnerabilities = gql`
-  query GetVulnData(
+  query GetAllVulnerabilities(
     $projectId: Uuid!
     $sbomId: Uuid!
     $first: Int
