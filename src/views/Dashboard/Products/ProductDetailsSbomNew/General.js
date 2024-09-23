@@ -5,7 +5,7 @@ import { getFullDateAndTime, isCustomerView } from 'utils'
 import { infoData } from 'variables/general'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 
-import { AddIcon, InfoIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
@@ -18,7 +18,6 @@ import {
   Tbody,
   Td,
   Text,
-  Tooltip,
   Tr,
   useColorModeValue,
   useDisclosure
@@ -47,17 +46,7 @@ import { FaPen, FaScaleBalanced } from 'react-icons/fa6'
 import AuthorModal from '../components/AuthorModal'
 import ConfirmationModal from '../components/ConfirmationModal'
 import ToolModal from '../components/ToolModal'
-
-const InfoLabel = ({ title, onCheck }) => {
-  return (
-    <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-      <Text fontSize={'sm'}>{title}</Text>
-      <Tooltip label={onCheck} placement='top'>
-        <InfoIcon color={'blue.500'} />
-      </Tooltip>
-    </Flex>
-  )
-}
+import InfoLabel from 'components/Misc/InfoLabel'
 
 const General = ({ data, loading, error }) => {
   const { isFreeTier } = useGlobalQueryContext()

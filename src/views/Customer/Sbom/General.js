@@ -1,70 +1,32 @@
-import { useState } from 'react'
 import { getFullDateAndTime } from 'utils'
 import { infoData } from 'variables/general'
 
-import { InfoIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Grid,
   GridItem,
-  HStack,
-  Icon,
-  Link,
   Skeleton,
   Stack,
   Tag,
   TagLabel,
-  Text,
-  useColorModeValue,
-  useDisclosure
+  Text
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import InfoModal from 'components/InfoModal'
-
-const InfoLabel = ({ title, onClick }) => {
-  return (
-    <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-      <Text fontSize={'sm'}>{title}</Text>
-      <Icon
-        as={InfoIcon}
-        color={'blue.500'}
-        cursor={'pointer'}
-        onClick={onClick}
-      />
-    </Flex>
-  )
-}
+import InfoLabel from 'components/Misc/InfoLabel'
+import SupplierTag from 'components/SupplierTag'
 
 const General = ({ data, loading, error }) => {
   const { suppliers, licensesExp, licenses, authors, creationAt, tools } =
     data || ''
-  const textColor = useColorModeValue('#E2E8F0', '#1A202C')
-  const border = `1px solid ${textColor}`
 
-  const [infoHeading, setInfoHeading] = useState('')
-  const [infoText, setInfoText] = useState('')
-  const [infoUrl, setInfoUrl] = useState('')
-
-  const {
-    isOpen: isInfoOpen,
-    onOpen: onInfoOpen,
-    onClose: onInfoClose
-  } = useDisclosure()
+  const tagStyle = { width: 'fit-content', size: 'md', variant: 'subtle' }
 
   const onCheck = (title) => {
     const result = infoData.find((item) => item?.title === title)
-    setInfoHeading(result?.title)
-    setInfoText(result?.desc)
-    setInfoUrl('')
-    onInfoOpen()
+    return result?.desc
   }
-
-  const onCheckDate = () => onCheck(`Created At`)
-  const onCheckTool = () => onCheck(`Creation Tool`)
-  const onCheckAuthor = () => onCheck(`Authors`)
-  const onCheckSupplier = () => onCheck(`Supplier`)
 
   if (loading) {
     return (
@@ -85,150 +47,106 @@ const General = ({ data, loading, error }) => {
   }
 
   return (
-    <>
-      <CardBody>
-        <Grid mt={2} width={'100%'} templateColumns='repeat(2, 1fr)'>
-          {/* CREATED AT */}
-          <GridItem py={3} borderTop={border} w='100%'>
-            <InfoLabel title={`Created At`} onClick={onCheckDate} />
-          </GridItem>
-          <GridItem py={3} borderTop={border} w='100%'>
-            <Text fontSize={'sm'}>{getFullDateAndTime(creationAt)}</Text>
-          </GridItem>
-          {/* CREATION TOOLS */}
-          <GridItem py={3} borderY={border} w='100%'>
-            <InfoLabel title={`Creation Tool`} onClick={onCheckTool} />
-          </GridItem>
-          <GridItem py={3} borderY={border} w='100%'>
-            <Flex
-              flexDirection={'row'}
-              alignItems={'flex-start'}
-              flexWrap={'wrap'}
-              gap={2.5}
-            >
-              {tools &&
-                tools.map((item, index) => (
-                  <Tag
-                    size={'md'}
-                    key={index}
-                    variant='subtle'
-                    colorScheme='teal'
-                    width={'fit-content'}
-                  >
-                    <TagLabel>
-                      {item.name} - {item.version}
-                    </TagLabel>
-                  </Tag>
-                ))}
-            </Flex>
-          </GridItem>
-          {/* AUTHORS */}
-          <GridItem py={3} borderBottom={border} w='100%'>
-            <InfoLabel title={`Authors`} onClick={onCheckAuthor} />
-          </GridItem>
-          <GridItem py={3} borderBottom={border} w='100%'>
-            <Stack spacing={2} direction={'column'}>
-              {authors &&
-                authors.length > 0 &&
-                authors.map((item, index) => (
-                  <Tag
-                    size={'md'}
-                    key={index}
-                    variant='subtle'
-                    colorScheme='blue'
-                    width={'fit-content'}
-                  >
-                    <TagLabel>
-                      {item.name} - {item.email}
-                    </TagLabel>
-                  </Tag>
-                ))}
-            </Stack>
-          </GridItem>
-          {/* SUPPLIERS */}
-          <GridItem py={3} borderBottom={border} w='100%'>
-            <InfoLabel title={`Supplier`} onClick={onCheckSupplier} />
-          </GridItem>
-          <GridItem py={3} borderBottom={border} w='100%'>
-            <HStack spacing={4}>
-              {suppliers?.length > 0 &&
-                suppliers.map((item, index) => (
-                  <Tag
-                    size={'md'}
-                    key={index}
-                    variant='subtle'
-                    colorScheme='orange'
-                  >
-                    <TagLabel>
-                      {item?.contactName || ''}
-                      {item?.contactEmail && ` (${item.contactEmail})`}
-                      {item.url ? (
-                        <Link
-                          href={
-                            item?.url?.startsWith('http')
-                              ? item.url
-                              : `http://${item.url}`
-                          }
-                          isExternal
-                        >
-                          {' '}
-                          {item?.name || ''}
-                        </Link>
-                      ) : (
-                        ` ${item?.name || ''}`
-                      )}
-                    </TagLabel>
-                  </Tag>
-                ))}
-            </HStack>
-          </GridItem>
-          {/* DATA LICENSES */}
-          <GridItem py={3} borderBottom={border} w='100%'>
-            <Text fontSize={'sm'}>Data License</Text>
-          </GridItem>
-          <GridItem py={3} borderBottom={border} w='100%'>
-            <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
-              {/* SPDX */}
-              {licenses?.length > 0 &&
-                licenses?.map((item, index) => (
-                  <Tag
-                    size={'md'}
-                    key={index}
-                    variant='subtle'
-                    colorScheme='green'
-                    width={'fit-content'}
-                  >
-                    <TagLabel>{item}</TagLabel>
-                  </Tag>
-                ))}
-              {/* EXPRESSION */}
-              {licensesExp && licensesExp !== '' && (
-                <Tag
-                  my={2}
-                  size={'md'}
-                  variant='subtle'
-                  colorScheme='green'
-                  width={'fit-content'}
-                >
-                  <TagLabel>{licensesExp}</TagLabel>
+    <CardBody>
+      <Grid
+        width={'100%'}
+        alignItems={'center'}
+        templateColumns='repeat(12, 1fr)'
+      >
+        {/* CREATED AT */}
+        <GridItem colSpan={2} py={3} w='100%'>
+          <InfoLabel title={`Created At`} onCheck={onCheck('Created At')} />
+        </GridItem>
+        <GridItem colSpan={10} py={3} w='100%'>
+          <Text fontSize={'sm'}>
+            {creationAt ? getFullDateAndTime(creationAt) : 'N/A'}
+          </Text>
+        </GridItem>
+        {/* CREATION TOOLS */}
+        <GridItem colSpan={2} py={3} w='100%'>
+          <InfoLabel
+            title={`Creation Tool`}
+            onCheck={onCheck('Creation Tool')}
+          />
+        </GridItem>
+        <GridItem colSpan={10} py={3} w='100%'>
+          <Flex
+            flexDirection={'row'}
+            alignItems={'flex-start'}
+            flexWrap={'wrap'}
+            gap={2.5}
+          >
+            {tools?.length > 0 ? (
+              tools.map((item, index) => (
+                <Tag key={index} colorScheme='teal' sx={tagStyle}>
+                  <TagLabel>
+                    {item.name} - {item.version}
+                  </TagLabel>
                 </Tag>
-              )}
-            </Flex>
-          </GridItem>
-        </Grid>
-      </CardBody>
-
-      {/* INFO MODAL */}
-      {isInfoOpen && (
-        <InfoModal
-          isOpen={isInfoOpen}
-          onClose={onInfoClose}
-          heading={infoHeading}
-          body={infoText}
-          url={infoUrl}
-        />
-      )}
-    </>
+              ))
+            ) : (
+              <Tag sx={tagStyle}>N/A</Tag>
+            )}
+          </Flex>
+        </GridItem>
+        {/* AUTHORS */}
+        <GridItem colSpan={2} py={3} w='100%'>
+          <InfoLabel title={`Authors`} onCheck={onCheck('Authors')} />
+        </GridItem>
+        <GridItem colSpan={10} py={3} w='100%'>
+          <Stack spacing={2} direction={'column'}>
+            {authors?.length > 0 ? (
+              authors.map((item, index) => (
+                <Tag key={index} colorScheme='blue' sx={tagStyle}>
+                  <TagLabel>
+                    {item?.name} - {item?.email}
+                  </TagLabel>
+                </Tag>
+              ))
+            ) : (
+              <Tag sx={tagStyle}>N/A</Tag>
+            )}
+          </Stack>
+        </GridItem>
+        {/* SUPPLIERS */}
+        <GridItem colSpan={2} py={3} w='100%'>
+          <InfoLabel title={`Supplier`} onCheck={onCheck('Supplier')} />
+        </GridItem>
+        <GridItem colSpan={10} py={3} w='100%'>
+          {suppliers?.length > 0 ? (
+            suppliers.map((item, index) => (
+              <SupplierTag key={index} item={item} editable={false} />
+            ))
+          ) : (
+            <Tag sx={tagStyle}>N/A</Tag>
+          )}
+        </GridItem>
+        {/* DATA LICENSES */}
+        <GridItem colSpan={2} py={3} w='100%'>
+          <Text fontSize={'sm'}>Data License</Text>
+        </GridItem>
+        <GridItem colSpan={10} py={3} w='100%'>
+          <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
+            {/* SPDX */}
+            {licenses?.length > 0 &&
+              licenses?.map((item, index) => (
+                <Tag key={index} colorScheme='green' sx={tagStyle}>
+                  <TagLabel>{item}</TagLabel>
+                </Tag>
+              ))}
+            {/* EXPRESSION */}
+            {licensesExp && licensesExp !== '' && (
+              <Tag my={2} colorScheme='green' sx={tagStyle}>
+                <TagLabel>{licensesExp}</TagLabel>
+              </Tag>
+            )}
+            {licenses?.length === 0 && !licensesExp && (
+              <Tag sx={tagStyle}>N/A</Tag>
+            )}
+          </Flex>
+        </GridItem>
+      </Grid>
+    </CardBody>
   )
 }
 
