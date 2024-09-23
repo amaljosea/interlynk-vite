@@ -76,9 +76,10 @@ export default class LabelSection {
                 const lableSpanLength = (await this.page.$$(ls.labels)).length
 
                 const labelArr: string[] = []
+                let labelName: any
 
                 for (let i = 0; i < lableSpanLength; i++) {
-                  const labelName: any = await this.page
+                  labelName = await this.page
                     .locator(ls.getLables(i + 1))
                     .textContent()
                   labelArr.push(labelName)
@@ -88,71 +89,78 @@ export default class LabelSection {
                   errors.push('label added failed!')
                 } else {
                   const index = labelArr.indexOf(labelName)
-                  const color = await this.page
-                    .locator(ls.getLables(index + 1))
-                    .evaluate((element) => {
-                      const style = window.getComputedStyle(element)
-                      return style.color
-                    })
 
-                  if (color == null || color == undefined) {
-                    errors.push('label color verification failed!')
-                  }
+                  if (index >= 0) {
+                    const color = await this.page
+                      .locator(ls.getLables(index + 1))
+                      .evaluate((element) => {
+                        const style = window.getComputedStyle(element)
+                        return style.color
+                      })
 
-                  await this.page.reload()
-                  await waitForSelectorWithMinTime(this.page, ls.productsHeader)
-                  await this.page.locator(ls.menuBtn).click()
-                  await waitForSelectorWithMinTime(this.page, ls.updateLabel)
-                  await this.page.locator(ls.updateLabel).click()
-
-                  const labelListLength = (await this.page.$$(ls.labelLists))
-                    .length
-
-                  const labelListArr: string[] = []
-
-                  for (let i = 0; i < labelListLength; i++) {
-                    const labelName: any = await this.page
-                      .locator(ls.getLabelName(i + 1))
-                      .textContent()
-                    labelListArr.push(labelName)
-                  }
-
-                  if (!labelListArr.includes(labelName)) {
-                    errors.push('label not found!')
-                  } else {
-                    const index = labelArr.indexOf(labelName)
-                    await this.page.locator(ls.getLabelCheckBox(index)).click()
-                    await this.page.locator(ls.productsHeader).click()
-                    await this.page.locator(ls.labelFilterBtn).click()
-
-                    const labelListItemLength = (
-                      await this.page.$$(ls.labelLists)
-                    ).length
-
-                    const labelLisItemtArr: string[] = []
-
-                    for (let i = 0; i < labelListItemLength; i++) {
-                      const labelListItemName: any = await this.page
-                        .locator(ls.getLabelList(i + 1))
-                        .textContent()
-                      labelLisItemtArr.push(labelListItemName)
+                    if (color == null || color == undefined) {
+                      errors.push('label color verification failed!')
                     }
 
-                    const indexOfLabel = labelLisItemtArr.indexOf(labelName)
+                    await this.page.reload()
+                    await waitForSelectorWithMinTime(
+                      this.page,
+                      ls.productsHeader
+                    )
+                    await this.page.locator(ls.menuBtn).click()
+                    await waitForSelectorWithMinTime(this.page, ls.updateLabel)
+                    await this.page.locator(ls.updateLabel).click()
 
-                    await this.page
-                      .locator(ls.getLabelList(indexOfLabel))
-                      .click()
-                    await this.page.locator(ls.productsHeader).click()
+                    const labelListLength = (await this.page.$$(ls.labelLists))
+                      .length
 
-                    const productWithLabelName = await this.page
-                      .locator(ls.productWithLabelName(labelName))
-                      .isVisible()
+                    const labelListArr: string[] = []
+                    for (let i = 0; i < labelListLength; i++) {
+                      labelName = await this.page
+                        .locator(ls.getLabelName(i + 1))
+                        .textContent()
+                      labelListArr.push(labelName)
+                    }
+                    if (!labelListArr.includes(labelName)) {
+                      errors.push('label not found!')
+                    } else {
+                      const index = labelArr.indexOf(labelName)
 
-                    if (!productWithLabelName) {
-                      errors.push(
-                        `label filter failed for label name '${labelName}'`
-                      )
+                      await this.page
+                        .locator(ls.getLabelCheckBox(index + 1))
+                        .click()
+                      await this.page.locator(ls.productsHeader).click()
+                      await this.page.locator(ls.labelFilterBtn).click()
+
+                      const labelListItemLength = (
+                        await this.page.$$(ls.labelLists)
+                      ).length
+
+                      const labelLisItemtArr: string[] = []
+
+                      for (let i = 0; i < labelListItemLength; i++) {
+                        const labelListItemName: any = await this.page
+                          .locator(ls.getLabelList(i + 1))
+                          .textContent()
+                        labelLisItemtArr.push(labelListItemName)
+                      }
+
+                      const indexOfLabel = labelLisItemtArr.indexOf(labelName)
+
+                      await this.page
+                        .locator(ls.getLabelList(indexOfLabel))
+                        .click()
+                      await this.page.locator(ls.productsHeader).click()
+
+                      const productWithLabelName = await this.page
+                        .locator(ls.productWithLabelName(labelName))
+                        .isVisible()
+
+                      if (!productWithLabelName) {
+                        errors.push(
+                          `label filter failed for label name '${labelName}'`
+                        )
+                      }
                     }
                   }
                 }

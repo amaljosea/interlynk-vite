@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto(url)
 })
 
-test('TC_005 Sbom Upload And Delete Test', async ({ page }) => {
+test('TC_006 Sbom Upload And Delete Test', async ({ page }) => {
   test.setTimeout(120000)
   const lp = new LoginPage(page)
   await lp.appLoginCommonFunctionality(email, password)
