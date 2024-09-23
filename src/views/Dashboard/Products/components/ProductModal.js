@@ -81,6 +81,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
           <FormControl isRequired>
             <FormLabel fontSize={12}>Name</FormLabel>
             <Input
+              id='product-name'
               type='text'
               value={productName}
               onChange={onNameChange}

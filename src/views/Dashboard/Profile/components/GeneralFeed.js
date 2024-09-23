@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { isCustomerView } from 'utils'
 
 import {
   Button,
@@ -22,7 +23,6 @@ import { useHasPermission } from 'hooks/useHasPermission'
 
 import { orgUpdate } from 'graphQL/Mutation'
 import { GetOrgName } from 'graphQL/Queries'
-import { isCustomerView } from 'utils'
 
 const GeneralFeed = () => {
   const customerView = isCustomerView()

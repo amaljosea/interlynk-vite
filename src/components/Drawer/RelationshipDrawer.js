@@ -69,7 +69,7 @@ const findShortestPath = (pathArray, currentShortestPath = []) => {
 
 const RelationshipDrawer = (props) => {
   const { isOpen, onClose, activeRow, compPath, ruleExists, recheck } = props
-  
+
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid

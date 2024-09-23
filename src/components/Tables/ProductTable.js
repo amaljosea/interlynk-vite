@@ -323,6 +323,7 @@ const ProductTable = ({
             >
               <Box>
                 <IconButton
+                  aria-label='Add product'
                   onClick={() => {
                     setActiveRow(null)
                     onOpen()
@@ -591,12 +592,13 @@ const ProductTable = ({
       id: 'ACTIONS',
       name: '',
       selector: (row) => {
-        const { enabled, labels } = row
+        const { enabled, labels, name } = row
         return (
           <Menu>
             <MenuButton
               variant='none'
               as={IconButton}
+              aria-label={`Dropdown menu for ${name}`}
               color='gray.400'
               icon={<FaEllipsisV />}
               onClick={() => setOpenTagMenu(false)}
@@ -669,6 +671,7 @@ const ProductTable = ({
                 <Divider />
                 {/* ARCHIVE PRODUCT GROUP */}
                 <MenuItem
+                  aria-label={`Delete product ${name}`}
                   color='red'
                   onClick={() => {
                     setActiveRow(row)

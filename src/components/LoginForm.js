@@ -141,6 +141,7 @@ const LoginForm = () => {
           <FormControl isRequired>
             <FormLabel htmlFor='email'>Email address</FormLabel>
             <Input
+              id='email'
               type='email'
               value={email}
               onChange={(e) => {
@@ -156,6 +157,7 @@ const LoginForm = () => {
             <FormLabel htmlFor='password'>Password</FormLabel>
             <InputGroup>
               <Input
+                id='passowrd'
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value)

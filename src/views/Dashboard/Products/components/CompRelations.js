@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
-import { truncatedValue, isCustomerView } from 'utils'
+import { isCustomerView, truncatedValue } from 'utils'
 
 import { AddIcon, ArrowDownIcon } from '@chakra-ui/icons'
 import {
