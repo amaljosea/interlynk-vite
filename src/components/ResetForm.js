@@ -5,9 +5,6 @@ import { validPassword } from 'utils'
 
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Box,
   Button,
   Flex,
@@ -26,6 +23,8 @@ import {
 
 import useCustomToast from 'hooks/useCustomToast'
 import useQueryParam from 'hooks/useQueryParam'
+
+import LynkAlert from './LynkAlert'
 
 const ResetForm = () => {
   const { showToast } = useCustomToast()
@@ -294,10 +293,7 @@ const ResetForm = () => {
       </Text>
       {error !== '' && (
         <Box mt={4} width={'100%'}>
-          <Alert status='error' borderRadius={4}>
-            <AlertIcon />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
+          <LynkAlert msg={error} />
         </Box>
       )}
       <form style={{ width: '100%' }} onSubmit={handleSubmit}>

@@ -1,14 +1,14 @@
 import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/react'
 
-const LynkError = ({ error, status = 'error' }) => {
+const LynkAlert = ({ msg, status = 'error' }) => {
   return (
     <Alert status={status} borderRadius={4}>
       <AlertIcon />
       <AlertDescription fontSize={'sm'} pr={2}>
-        {error}
+        {msg}
       </AlertDescription>
     </Alert>
   )
 }
 
-export default LynkError
+export default LynkAlert

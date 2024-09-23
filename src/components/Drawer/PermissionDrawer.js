@@ -2,9 +2,6 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Box,
   Checkbox,
   Divider,
@@ -19,6 +16,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkAlert from 'components/LynkAlert'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -139,12 +137,7 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole }) => {
                   {activeRole?.name} permissions cannot be modified
                 </Tag>
               )}
-              {error !== '' && (
-                <Alert status='error' borderRadius={4}>
-                  <AlertIcon />
-                  <AlertDescription fontSize={'sm'}>{error}</AlertDescription>
-                </Alert>
-              )}
+              {error !== '' && <LynkAlert msg={error} />}
               <Stack spacing={4} dir='blue'>
                 {/* ORGANIZATION MANAGEMENT */}
                 <Permissions category={'Organization Management'} />

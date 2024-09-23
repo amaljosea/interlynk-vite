@@ -27,7 +27,7 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import LynkError from 'components/LynkError'
+import LynkAlert from 'components/LynkAlert'
 import RelDeleteModal from 'components/RelDeleteModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -260,9 +260,9 @@ const CompRelations = ({ data, compPath }) => {
 
           {alert ? (
             <Stack spacing={4}>
-              <LynkError
+              <LynkAlert
                 status='warning'
-                error='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
+                msg='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
               />
               <ActionButton
                 onClick={handleAdd}

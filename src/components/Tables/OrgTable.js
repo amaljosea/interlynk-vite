@@ -8,9 +8,6 @@ import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Badge,
   Box,
   Flex,
@@ -31,6 +28,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -387,12 +385,7 @@ const OrgTable = ({ data, activeOrg }) => {
         >
           {leaveError !== '' && (
             <Box mb={5} width={'100%'}>
-              <Alert status='error' borderRadius={4}>
-                <AlertIcon />
-                <AlertDescription fontSize={'sm'}>
-                  {leaveError}
-                </AlertDescription>
-              </Alert>
+              <LynkAlert msg={leaveError} />
             </Box>
           )}
           <Text>

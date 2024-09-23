@@ -3,14 +3,9 @@ import { useState } from 'react'
 import { capitalizeFirstLetter } from 'utils'
 
 import { CopyIcon } from '@chakra-ui/icons'
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  Text,
-  chakra
-} from '@chakra-ui/react'
+import { Text, chakra } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -104,12 +99,7 @@ const CopyRule = ({ isOpen, onClose, env, data }) => {
       Icon={CopyIcon}
     >
       {/* ERROR HANDLING */}
-      <Alert status='error' borderRadius={4} hidden={error === ''}>
-        <AlertIcon />
-        <AlertDescription fontSize={'sm'} pr={2}>
-          {error}
-        </AlertDescription>
-      </Alert>
+      {error !== '' && <LynkAlert msg={error} />}
       {/* DETAILS */}
       <Text>
         Copy Rule <chakra.span fontWeight={'semibold'}>{ruleName}</chakra.span>{' '}

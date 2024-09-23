@@ -5,9 +5,6 @@ import { getIcon, getLabel, updatedValue } from 'utils'
 
 import { EditIcon } from '@chakra-ui/icons'
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Box,
   Button,
   Divider,
@@ -20,7 +17,6 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Kbd,
   Select,
   Tag,
   Text,
@@ -34,6 +30,7 @@ import { AutomationRuleCreate, AutomationRuleUpdate } from 'graphQL/Mutation'
 
 import { FaPlus, FaTrash } from 'react-icons/fa6'
 import { MdDeleteOutline } from 'react-icons/md'
+import LynkAlert from 'components/LynkAlert'
 
 const SubjectIcon = ({ subject, isSystem = { isSystem } }) => {
   return (
@@ -794,14 +791,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
           Add action
         </Button>
         {/* ERROR HANDLING */}
-        {error !== '' && (
-          <Alert status='error' borderRadius={4}>
-            <AlertIcon />
-            <AlertDescription fontSize={'sm'} pr={2}>
-              {error}
-            </AlertDescription>
-          </Alert>
-        )}
+        {error !== '' && <LynkAlert msg={error} />}
       </Flex>
     </LynkModal>
   )

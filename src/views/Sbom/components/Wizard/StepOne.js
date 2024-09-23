@@ -3,8 +3,6 @@ import { useEffect } from 'react'
 import { envOrderList } from 'utils'
 
 import {
-  Alert,
-  AlertIcon,
   Box,
   FormControl,
   FormLabel,
@@ -13,6 +11,8 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
+
+import LynkAlert from 'components/LynkAlert'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -203,10 +203,7 @@ const StepOne = ({
                   ))}
                 </Select>
               ) : (
-                <Alert borderRadius={'md'} py={'8px'} status='info'>
-                  <AlertIcon />
-                  No version available
-                </Alert>
+                <LynkAlert status='info' msg={'No version available'} />
               )}
             </FormControl>
           </Stack>

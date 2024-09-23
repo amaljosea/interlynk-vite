@@ -4,8 +4,6 @@ import { useState } from 'react'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
-  Alert,
-  AlertIcon,
   Button,
   Flex,
   FormControl,
@@ -14,12 +12,12 @@ import {
   Heading,
   Input,
   Skeleton,
-  Text,
   useDisclosure
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import { RegisterOrganizationIcon } from 'components/Icons/Icons'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -131,12 +129,7 @@ const OrgRegister = ({ loading }) => {
           Icon={RegisterOrganizationIcon}
         >
           <Flex width={'100%'} direction={'column'} gap={4}>
-            {error !== '' && (
-              <Alert status='error'>
-                <AlertIcon />
-                <Text fontSize={'sm'}>{error}</Text>
-              </Alert>
-            )}
+            {error !== '' && <LynkAlert msg={error} />}
             {/* NAME */}
             <FormControl isRequired>
               <FormLabel fontSize={12}>Name</FormLabel>

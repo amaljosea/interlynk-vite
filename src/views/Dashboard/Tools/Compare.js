@@ -4,9 +4,6 @@ import { envOrderList, sortByUpdatedAt } from 'utils'
 import { truncatedValue } from 'utils'
 
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Button,
   Flex,
   FormControl,
@@ -25,6 +22,7 @@ import {
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import LynkAlert from 'components/LynkAlert'
 import LynkSelect from 'components/LynkSelect'
 import SbomInfo from 'components/SbomInfo'
 import DiffTable from 'components/Tables/DiffTable'
@@ -435,10 +433,7 @@ const Compare = ({ selectedSboms }) => {
                       noOptionsMessage={() => null}
                     />
                   ) : (
-                    <Alert borderRadius={'md'} py={'8px'}>
-                      <AlertIcon />
-                      <AlertDescription>No version available</AlertDescription>
-                    </Alert>
+                    <LynkAlert msg='No version available' />
                   )}
                 </FormControl>
               </Stack>
@@ -568,10 +563,7 @@ const Compare = ({ selectedSboms }) => {
                       isDisabled={selectedVersionOne === null}
                     />
                   ) : (
-                    <Alert borderRadius={'md'} py={'8px'}>
-                      <AlertIcon />
-                      <AlertDescription>No version available</AlertDescription>
-                    </Alert>
+                    <LynkAlert msg='No version available' />
                   )}
                 </FormControl>
               </Stack>

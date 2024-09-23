@@ -1,18 +1,10 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import {
-  Alert,
-  AlertIcon,
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
-  Stack,
-  Text
-} from '@chakra-ui/react'
+import { FormControl, FormLabel, Input, Select, Stack } from '@chakra-ui/react'
 
 import { ChangeRoleIcon } from 'components/Icons/Icons'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import { UpdateOrganizationUserRole } from 'graphQL/Mutation'
@@ -58,12 +50,7 @@ const RoleModal = ({ isOpen, onClose, data }) => {
       buttonText='Update'
     >
       <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
-        {error !== '' && (
-          <Alert status='error' borderRadius={4}>
-            <AlertIcon />
-            <Text fontSize={'sm'}>{error}</Text>
-          </Alert>
-        )}
+        {error !== '' && <LynkAlert msg={error} />}
         {/* NAME */}
         <FormControl>
           <FormLabel fontSize={12}>Name</FormLabel>

@@ -1,17 +1,15 @@
 import { useEffect, useState } from 'react'
 
 import {
-  Alert,
-  AlertIcon,
   Box,
   Flex,
   FormControl,
   FormLabel,
   Select,
-  Text,
   Textarea
 } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
@@ -153,12 +151,7 @@ const SigningModal = ({
             </>
           )}
 
-          {message !== '' && (
-            <Alert status='info'>
-              <AlertIcon />
-              <Text fontSize={'sm'}>{message}</Text>
-            </Alert>
-          )}
+          {message !== '' && <LynkAlert status='info' msg={message} />}
         </Flex>
       </LynkModal>
     </>

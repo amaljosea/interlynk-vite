@@ -4,9 +4,6 @@ import { updatedValue } from 'utils'
 
 import { EditIcon } from '@chakra-ui/icons'
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Flex,
   FormControl,
   FormLabel,
@@ -18,6 +15,7 @@ import {
   createIcon
 } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -150,14 +148,7 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
         {activeRow?.name}
       </Tag>
       <Flex width={'100%'} direction={'column'} gap={4}>
-        {error !== '' && (
-          <Alert status='error' borderRadius={4}>
-            <AlertIcon />
-            <AlertDescription fontSize={'sm'} pr={2}>
-              {error}
-            </AlertDescription>
-          </Alert>
-        )}
+        {error !== '' && <LynkAlert msg={error} />}
         <FormControl isRequired>
           <FormLabel fontSize={12}>Subject</FormLabel>
           <Select

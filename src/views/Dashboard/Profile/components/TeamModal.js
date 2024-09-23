@@ -3,17 +3,15 @@ import { useState } from 'react'
 import { validateEmail } from 'utils'
 
 import {
-  Alert,
-  AlertIcon,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Input,
   Select,
-  Stack,
-  Text
+  Stack
 } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -67,12 +65,7 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
       buttonText='Add'
     >
       <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
-        {error !== '' && (
-          <Alert status='error' borderRadius={4}>
-            <AlertIcon />
-            <Text fontSize={'sm'}>{error}</Text>
-          </Alert>
-        )}
+        {error !== '' && <LynkAlert msg={error} />}
         {/* EMAIL */}
         <FormControl
           isRequired

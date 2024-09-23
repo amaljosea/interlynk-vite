@@ -2,36 +2,22 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import {
-  capitalizeFirstLetter,
-  customStyles,
-  envOrderList,
-  isDefaultEnv
-} from 'utils'
-import { GetIcon, isUnknown } from 'utils'
-import { truncatedValue } from 'utils'
+import { capitalizeFirstLetter, customStyles, envOrderList } from 'utils'
+import { GetIcon, isDefaultEnv, isUnknown, truncatedValue } from 'utils'
 import { ProductGeneralTabs } from 'utils/TabsObjects'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { AddIcon } from '@chakra-ui/icons'
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  Button,
   Flex,
   FormControl,
   FormLabel,
   Grid,
   GridItem,
-  HStack,
   IconButton,
   Menu,
   MenuButton,
   MenuItem,
-  MenuItemOption,
   MenuList,
-  MenuOptionGroup,
   Portal,
   Select,
   SimpleGrid,
@@ -48,6 +34,7 @@ import {
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 import VulnBadge from 'components/Misc/VulnBadge'
 
@@ -67,7 +54,7 @@ import {
 
 import { BiLayerPlus } from 'react-icons/bi'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
-import { FaEllipsisV, FaFilter } from 'react-icons/fa'
+import { FaEllipsisV } from 'react-icons/fa'
 
 import ConfirmationModal from '../components/ConfirmationModal'
 
@@ -125,7 +112,6 @@ const Parts = ({ data }) => {
   const addBtn = useRef()
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
-  const [searchInput, setSearchInput] = useState('')
   const [activeRow, setActiveRow] = useState(null)
   const [selectedGroup, setSelectedGroup] = useState('')
   const [envList, setEnvList] = useState([])
@@ -620,10 +606,7 @@ const Parts = ({ data }) => {
                 Version
               </FormLabel>
               {sbomVersions?.length === 0 ? (
-                <Alert borderRadius={'md'} py={'8px'} status='info'>
-                  <AlertIcon />
-                  No version available
-                </Alert>
+                <LynkAlert msg='No version available' />
               ) : (
                 <Select
                   fontSize={'sm'}
@@ -642,12 +625,7 @@ const Parts = ({ data }) => {
               )}
             </FormControl>
             {(isExists === true || existingNodes) && (
-              <Alert borderRadius={4} status='error'>
-                <AlertIcon />
-                <AlertDescription>
-                  Same version already exists inside selected SBOM
-                </AlertDescription>
-              </Alert>
+              <LynkAlert msg='Same version already exists inside selected SBOM' />
             )}
           </Stack>
         </LynkModal>

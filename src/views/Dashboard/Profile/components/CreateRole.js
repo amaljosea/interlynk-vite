@@ -2,15 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import ReactSelect from 'react-select'
 
-import {
-  Alert,
-  AlertIcon,
-  FormControl,
-  FormLabel,
-  Input,
-  Stack,
-  Text
-} from '@chakra-ui/react'
+import { FormControl, FormLabel, Input, Stack } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
@@ -20,6 +12,7 @@ import { OrgRoleCreate } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
 
 import { BiUserPlus } from 'react-icons/bi'
+import LynkAlert from 'components/LynkAlert'
 
 const CreateRole = ({ isOpen, onClose }) => {
   const [roleName, setRoleName] = useState('')
@@ -90,12 +83,7 @@ const CreateRole = ({ isOpen, onClose }) => {
       disabled={isInvalid}
     >
       <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
-        {error !== '' && (
-          <Alert status='error' borderRadius={4}>
-            <AlertIcon />
-            <Text fontSize={'sm'}>{error}</Text>
-          </Alert>
-        )}
+        {error !== '' && <LynkAlert msg={error} />}
         {/* NAME */}
         <FormControl isRequired>
           <FormLabel fontSize={12}>Name</FormLabel>

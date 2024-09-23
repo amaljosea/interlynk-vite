@@ -1,16 +1,9 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  Flex,
-  FormControl,
-  Select,
-  Text
-} from '@chakra-ui/react'
+import { Flex, FormControl, Select, Text } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -99,12 +92,7 @@ const DeleteRole = ({ isOpen, onClose, activeRole }) => {
     >
       {/* ERROR HANDLING */}
       <Flex flexDirection='column' gap={3}>
-        <Alert status='error' borderRadius={4} hidden={error === ''}>
-          <AlertIcon />
-          <AlertDescription fontSize={'sm'} pr={2}>
-            {error}
-          </AlertDescription>
-        </Alert>
+        {error !== '' && <LynkAlert msg={error} />}
         <Text>
           This will delete the role and reassign existing users on this role to
           a new role.

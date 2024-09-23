@@ -4,9 +4,6 @@ import { getIcon, getLabel, updatedValue } from 'utils'
 import { componentTypes } from 'variables/general'
 
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Button,
   Checkbox,
   Divider,
@@ -29,6 +26,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import { PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
@@ -1032,14 +1030,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
             </Stack>
           </FormControl>
           {/* ERROR HANDLING */}
-          {error !== '' && (
-            <Alert status='error' borderRadius={4}>
-              <AlertIcon />
-              <AlertDescription fontSize={'sm'} pr={2}>
-                {error}
-              </AlertDescription>
-            </Alert>
-          )}
+          {error !== '' && <LynkAlert msg={error} />}
         </Flex>
       </LynkModal>
     </>

@@ -27,7 +27,7 @@ import {
 } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
-import LynkError from 'components/LynkError'
+import LynkAlert from 'components/LynkAlert'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -468,9 +468,9 @@ const CompDetails = ({ data, primaryComp }) => {
         <Divider />
         {alert ? (
           <Stack spacing={4}>
-            <LynkError
+            <LynkAlert
               status='warning'
-              error='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
+              msg='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
             />
             <ActionButton
               title={'Save Details'}

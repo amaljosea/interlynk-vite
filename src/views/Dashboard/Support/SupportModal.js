@@ -6,9 +6,6 @@ import 'react-datetime/css/react-datetime.css'
 import { validateCpe } from 'utils'
 
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Button,
   Checkbox,
   Flex,
@@ -25,6 +22,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import {
@@ -433,14 +431,7 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
               Add ID
             </Button>
           </Stack>
-          {error !== '' && (
-            <Alert status='error' borderRadius={4}>
-              <AlertIcon />
-              <AlertDescription fontSize={'sm'} pr={2}>
-                {error}
-              </AlertDescription>
-            </Alert>
-          )}
+          {error !== '' && <LynkAlert msg={error} />}
         </Flex>
       </LynkModal>
     </>

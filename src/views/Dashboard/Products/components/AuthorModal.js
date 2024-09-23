@@ -5,7 +5,7 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { Button, Flex, FormControl, FormLabel, Input } from '@chakra-ui/react'
 
-import LynkError from 'components/LynkError'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -202,7 +202,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
       }
     >
       <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-        {error && <LynkError error={error} />}
+        {error && <LynkAlert msg={error} />}
         <FormControl isRequired isDisabled={status === 'resolved'}>
           <FormLabel htmlFor='name'>Name</FormLabel>
           <TextInput

@@ -7,7 +7,6 @@ import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import { getShareLinklUrl } from 'utils/url'
 
 import {
-  Alert,
   Checkbox,
   Drawer,
   DrawerBody,
@@ -30,6 +29,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
@@ -220,11 +220,7 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
           <DrawerHeader>ShareLynks</DrawerHeader>
           <DrawerBody>
             {error ? (
-              <Alert status='error'>
-                <Text wordBreak={'break-all'}>
-                  {error?.message || 'Something went wrong'}
-                </Text>
-              </Alert>
+              <LynkAlert msg={error?.message || 'Something went wrong'} />
             ) : (
               <DataTable
                 subHeader

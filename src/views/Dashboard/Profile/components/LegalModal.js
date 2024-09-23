@@ -3,9 +3,6 @@ import { useEffect, useState } from 'react'
 import { validateEmail } from 'utils'
 
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Box,
   Button,
   Flex,
@@ -20,9 +17,8 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
-
-import { useGlobalState } from 'hooks/useGlobalState'
 
 import {
   OrganizationManufacturerCreate,
@@ -40,7 +36,6 @@ const validateUrl = (url) => {
 }
 
 const LegalModal = ({ data, isOpen, onClose }) => {
-  const { totalRows } = useGlobalState()
   const [orgName, setOrgName] = useState('')
   const [url, setUrl] = useState('')
   // {
@@ -418,12 +413,7 @@ const LegalModal = ({ data, isOpen, onClose }) => {
         >
           Add New
         </Button>
-        {error !== '' && (
-          <Alert status='error' borderRadius={4}>
-            <AlertIcon />
-            <AlertDescription fontSize={'sm'}>{error}</AlertDescription>
-          </Alert>
-        )}
+        {error !== '' && <LynkAlert msg={error} />}
       </LynkModal>
     </>
   )

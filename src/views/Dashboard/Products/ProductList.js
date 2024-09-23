@@ -3,8 +3,7 @@ import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
 
-import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/react'
-
+import LynkAlert from 'components/LynkAlert'
 import ProductTable from 'components/Tables/ProductTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -68,12 +67,9 @@ function ProductList() {
 
   if (error) {
     return (
-      <Alert status='error'>
-        <AlertIcon />
-        <AlertDescription>
-          {displayErrorMessage(error.networkError?.statusCode, error.message)}
-        </AlertDescription>
-      </Alert>
+      <LynkAlert
+        msg={displayErrorMessage(error.networkError?.statusCode, error.message)}
+      />
     )
   }
 

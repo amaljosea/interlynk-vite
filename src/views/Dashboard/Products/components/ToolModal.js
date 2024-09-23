@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom'
 
 import { Flex, FormControl, FormLabel, Input } from '@chakra-ui/react'
 
-import LynkError from 'components/LynkError'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -85,7 +85,7 @@ const ToolModal = ({ isOpen, onClose, resolved = false }) => {
       onSubmit={handleAddTool}
     >
       <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-        {error && <LynkError error={error} />}
+        {error && <LynkAlert msg={error} />}
         <FormControl hidden={resolved}>
           <FormLabel htmlFor='vendor'>Vendor Name</FormLabel>
           <TextInput

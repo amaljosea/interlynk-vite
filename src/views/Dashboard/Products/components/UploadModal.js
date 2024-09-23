@@ -4,9 +4,6 @@ import { useParams } from 'react-router-dom'
 import { filterEnvList } from 'utils'
 
 import {
-  Alert,
-  AlertIcon,
-  AlertTitle,
   Box,
   Flex,
   FormControl,
@@ -21,6 +18,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -144,14 +142,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
             </Text>
           </Tag>
         )}
-        {errorMessage !== '' && (
-          <Alert status='error' mb={4} borderRadius={5}>
-            <AlertIcon />
-            <AlertTitle fontSize={'sm'} fontWeight={'medium'}>
-              {errorMessage}
-            </AlertTitle>
-          </Alert>
-        )}
+        {errorMessage !== '' && <LynkAlert msg={errorMessage} />}
         <Stack spacing={6} minHeight='310px'>
           <FormControl>
             <FormLabel fontSize={12}>Environment</FormLabel>

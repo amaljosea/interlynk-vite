@@ -1,10 +1,9 @@
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import React, { useCallback, useEffect, useState } from 'react'
 import Tree from 'react-d3-tree'
 import { useParams } from 'react-router-dom'
 
 import {
-  Alert,
   Box,
   Flex,
   IconButton,
@@ -13,6 +12,8 @@ import {
   Tooltip,
   useColorModeValue
 } from '@chakra-ui/react'
+
+import LynkAlert from 'components/LynkAlert'
 
 import { GetCompDependency } from 'graphQL/Queries'
 import { GetShareCompDependency } from 'graphQL/Queries'
@@ -240,7 +241,7 @@ const GraphView = ({ data, activeComp }) => {
         </Flex>
       </Flex>
       {data?.nodes?.length === 0 && !compDependency ? (
-        <Alert>No relationship found</Alert>
+        <LynkAlert msg={'No relationship found'} />
       ) : (
         <Box style={containerStyles} ref={containerRef}>
           {treeView && (

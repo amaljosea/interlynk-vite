@@ -4,9 +4,6 @@ import { validateUrl } from 'utils'
 
 import { DeleteIcon } from '@chakra-ui/icons'
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Button,
   Drawer,
   DrawerBody,
@@ -32,6 +29,8 @@ import {
   Tooltip,
   Tr
 } from '@chakra-ui/react'
+
+import LynkAlert from 'components/LynkAlert'
 
 import { ComponentVulnUpdate } from 'graphQL/Mutation'
 import { DispositionByParentUpdate } from 'graphQL/Mutation'
@@ -177,12 +176,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
         <DrawerHeader>Edit Links</DrawerHeader>
         <DrawerBody>
           {data && <Tag colorScheme='blue'>{vuln?.vulnId}</Tag>}
-          {error !== '' && (
-            <Alert my={2} status='error' borderRadius={4}>
-              <AlertIcon />
-              <AlertDescription fontSize={'sm'}>{error}</AlertDescription>
-            </Alert>
-          )}
+          {error !== '' && <LynkAlert msg={error} />}
           <form onSubmit={handleLinkAdd}>
             <Flex mt={4} direction={'column'} alignItems={'flex-start'} gap={3}>
               {/* NAME */}

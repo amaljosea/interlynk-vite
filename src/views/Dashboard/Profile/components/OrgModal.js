@@ -3,17 +3,15 @@ import { useState } from 'react'
 import { validateEmail, validateUrl } from 'utils'
 
 import {
-  Alert,
-  AlertIcon,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Input,
-  Text
+  Input
 } from '@chakra-ui/react'
 
 import { RegisterOrganizationIcon } from 'components/Icons/Icons'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import { RegisterOrganization } from 'graphQL/Mutation'
@@ -94,12 +92,7 @@ const OrgModal = ({ isOpen, onClose, org, onSwitch }) => {
       Icon={RegisterOrganizationIcon}
     >
       <Flex width={'100%'} direction={'column'} gap={4}>
-        {error !== '' && (
-          <Alert status='error'>
-            <AlertIcon />
-            <Text fontSize={'sm'}>{error}</Text>
-          </Alert>
-        )}
+        {error !== '' && <LynkAlert msg={error} />}
         {/* NAME */}
         <FormControl isRequired>
           <FormLabel fontSize={12}>Name</FormLabel>

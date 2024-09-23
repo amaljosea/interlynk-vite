@@ -2,17 +2,9 @@ import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { errorMapping } from 'utils/errorUtils'
 
-import {
-  Alert,
-  AlertIcon,
-  Flex,
-  FormControl,
-  FormLabel,
-  Input,
-  Text,
-  Textarea
-} from '@chakra-ui/react'
+import { Flex, FormControl, FormLabel, Input, Textarea } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
@@ -85,12 +77,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
         buttonText={data ? 'Update' : 'Save'}
       >
         <Flex width={'100%'} direction={'column'} gap={4}>
-          {error !== '' && (
-            <Alert status='error' borderRadius={4}>
-              <AlertIcon />
-              <Text fontSize={'sm'}>{errorMapping[error] || error}</Text>
-            </Alert>
-          )}
+          {error !== '' && <LynkAlert msg={errorMapping[error] || error} />}
           <FormControl isRequired>
             <FormLabel fontSize={12}>Name</FormLabel>
             <Input

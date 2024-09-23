@@ -6,9 +6,6 @@ import { validPassword, validateEmail } from 'utils'
 import { CheckCircleIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
   AbsoluteCenter,
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Box,
   Button,
   Divider,
@@ -30,6 +27,7 @@ import useQueryParam from 'hooks/useQueryParam'
 
 import { RegisterUser } from 'graphQL/Mutation'
 
+import LynkAlert from './LynkAlert'
 import PolicyTerms from './PolicyTerms'
 import SocialLogin from './SocialLogin'
 
@@ -173,16 +171,7 @@ const RegistrationForm = () => {
       </Text>
       {error.length > 0 && (
         <Box mt={4} width={'100%'}>
-          <Alert status='error' borderRadius={4}>
-            <AlertIcon />
-            <AlertDescription fontSize={'sm'}>
-              {error.map((item, index) => (
-                <Text fontSize={'sm'} key={index}>
-                  {item}
-                </Text>
-              ))}
-            </AlertDescription>
-          </Alert>
+          <LynkAlert msg={error[0]} />
         </Box>
       )}
       <Stack pt={8} direction={'column'} gap={3} width={'100%'}>

@@ -7,9 +7,6 @@ import { componentTypes } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Box,
   Button,
   Flex,
@@ -27,6 +24,7 @@ import {
 } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -348,12 +346,7 @@ const CheckModal = (props) => {
         )
       }
     >
-      {error !== '' && (
-        <Alert status='error' borderRadius={4} mb={5}>
-          <AlertIcon />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+      {error !== '' && <LynkAlert msg={error} />}
       <Flex
         hidden={component ? false : true}
         width='100%'

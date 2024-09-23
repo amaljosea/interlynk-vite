@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom'
 
 import { CheckIcon } from '@chakra-ui/icons'
 import {
-  Alert,
   Box,
   Checkbox,
   Flex,
@@ -34,6 +33,7 @@ import {
 
 import { FaTimes } from 'react-icons/fa'
 import { FaPenToSquare } from 'react-icons/fa6'
+import LynkAlert from 'components/LynkAlert'
 
 const VexModal = ({
   selectedGroup,
@@ -361,14 +361,11 @@ const VexModal = ({
           {statusName === 'Affected' &&
             responseTitle === 'Update' &&
             !groups && (
-              <Alert
-                status='error'
-                borderRadius={4}
-                size={'sm'}
-                fontSize={'sm'}
-              >
-                Product versions are different. Please select same version.
-              </Alert>
+              <LynkAlert
+                msg={
+                  'Product versions are different. Please select same version.'
+                }
+              />
             )}
           {/* IMPACT STATEMENT */}
           {statusName === 'Not Affected' && (
