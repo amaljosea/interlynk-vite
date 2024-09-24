@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { validateEmail, validateUrl } from 'utils'
+import { validateUrl } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import {
@@ -20,11 +20,7 @@ import LynkModal from 'components/LynkModal'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import {
-  AutomationRuleCreate,
-  addComSupplier,
-  updateComSupplier
-} from 'graphQL/Mutation'
+import { AutomationRuleCreate, addComSupplier } from 'graphQL/Mutation'
 
 import { BiCube } from 'react-icons/bi'
 
@@ -37,12 +33,10 @@ const SupplierModal = (props) => {
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
-  const [createSupplier] = useMutation(addComSupplier, {
+  const [createSupplier, { loading }] = useMutation(addComSupplier, {
     onCompleted: () => recheck()
   })
-  const [updateSupplier] = useMutation(updateComSupplier, {
-    onCompleted: () => recheck()
-  })
+  const [createRule, { loading: rlLoading }] = useMutation(AutomationRuleCreate)
 
   const { status, component } = activeRow || ''
   const { name, version, suppliers } = component || ''
@@ -50,106 +44,45 @@ const SupplierModal = (props) => {
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
 
-  const [orgName, setOrgName] = useState('')
-  const [orgUrl, setOrgUrl] = useState('')
+  const initialData = useMemo(
+    () => ({
+      name: '',
+      url: '',
+      contactName: '',
+      contactEmail: ''
+    }),
+    []
+  )
+  const [formData, setFormData] = useState(initialData)
   const [isValidUrl, setIsValidUrl] = useState('')
-  const [supName, setSupName] = useState('')
-  const [nameError, setNameError] = useState('')
-  const [supEmail, setSupEmail] = useState('')
-  const [emailError, setEmailError] = useState('')
-  const [isDisabled, setIsDisabled] = useState(false)
 
-  const disableButtonTemporarily = () => {
-    setIsDisabled(true)
-    setTimeout(() => {
-      setIsDisabled(false)
-    }, 3000)
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }))
   }
 
-  const containsSpace = /\s/.test(orgUrl)
-
-  const onSupplierChange = (e) => {
-    const { value } = e.target
-    setSupName(value)
-    if ((value.length > 0 && value.length < 4) || value.length > 256) {
-      setNameError('Input must be between 4 and 256 characters')
-    } else {
-      setNameError('')
-    }
-  }
-
-  useEffect(() => {
-    if (suppliers?.length > 0) {
-      setOrgName(suppliers[0].name || '')
-      setOrgUrl(suppliers[0].url || '')
-      setSupName(suppliers[0].contactName || '')
-      setSupEmail(suppliers[0].contactEmail || '')
-    }
-  }, [suppliers])
-
-  const handleRecheck = () => {
-    recheck({
-      variables: {
-        sbomId: params?.sbomid,
-        checkId: friendlyId,
-        compId: component?.id
-      }
-    })
-  }
+  const containsSpace = /\s/.test(formData?.url)
 
   const handleSave = () => {
-    disableButtonTemporarily()
-    if (resolved) {
-      onClose()
-    } else {
-      createSupplier({
-        variables: {
-          name: orgName,
-          url: orgUrl,
-          contactName: supName,
-          contactEmail: supEmail,
-          componentId: component?.id
-        }
-      })
-        .then(() => friendlyId && handleRecheck())
-        .finally(() => onClose())
-    }
-  }
-
-  const handleUpdate = () => {
-    disableButtonTemporarily()
-    updateSupplier({
+    createSupplier({
       variables: {
-        name: orgName,
-        url: orgUrl,
-        contactName: supName,
-        contactEmail: supEmail,
-        id: suppliers && suppliers[0].id
+        url: formData?.url,
+        name: formData?.name,
+        componentId: component?.id,
+        contactName: formData?.contactName,
+        contactEmail: formData?.contactEmail
       }
-    })
-      .then(() => friendlyId && handleRecheck())
-      .finally(() => onClose())
-  }
-
-  const handleCheckEmail = () => {
-    if (!validateEmail(supEmail)) {
-      setEmailError('Email is invalid')
-    }
+    }).finally(() => onClose())
   }
 
   const handleCheckUrl = () => {
-    if (!validateUrl(orgUrl)) {
+    if (!validateUrl(formData?.url)) {
       setIsValidUrl('Please enter a valid URL')
     }
   }
-
-  const onUrlChange = (e) => {
-    const { value } = e.target
-    setOrgUrl(value)
-    setIsValidUrl('')
-  }
-
-  const [createRule] = useMutation(AutomationRuleCreate)
 
   const conditionsAttributes = [
     {
@@ -194,22 +127,22 @@ const SupplierModal = (props) => {
     {
       subject: 'component',
       field: 'component_supplier_name',
-      value: orgName || undefined
+      value: formData?.name || undefined
     },
     {
       subject: 'component',
       field: 'component_supplier_url',
-      value: orgUrl || undefined
+      value: formData?.url || undefined
     },
     {
       subject: 'component',
       field: 'component_supplier_contact_name',
-      value: supName || undefined
+      value: formData?.contactName || undefined
     },
     {
       subject: 'component',
       field: 'component_supplier_contact_email',
-      value: supEmail || undefined
+      value: formData?.contactEmail || undefined
     }
   ]
 
@@ -229,7 +162,6 @@ const SupplierModal = (props) => {
     if (ruleExists) {
       navigate(link)
     } else {
-      disableButtonTemporarily()
       await createRule({
         variables: {
           active: true,
@@ -246,49 +178,48 @@ const SupplierModal = (props) => {
         if (errors?.length > 0) {
           console.log(errors[0])
         } else {
-          handleSave()
+          component?.suppliers?.length > 0 ? onClose() : handleSave()
         }
       })
     }
   }
 
-  const isInvalid =
-    isDisabled ||
-    orgName === '' ||
-    nameError !== '' ||
-    (supEmail !== '' && !validateEmail(supEmail)) ||
-    (orgUrl !== '' && !validateUrl(orgUrl))
+  const isInvalid = formData?.url !== '' && !validateUrl(formData?.url)
 
   useEffect(() => {
-    if (status === 'resolved' && component?.suppliers?.length > 0) {
-      const { suppliers } = component
-      setOrgName(suppliers[0]?.name)
-      setOrgUrl(suppliers[0]?.url)
-      setSupName(suppliers[0]?.contactName)
-      setSupEmail(suppliers[0]?.contactEmail)
+    if (component?.suppliers?.length > 0) {
+      setFormData(() => ({
+        name: component?.suppliers[0]?.name,
+        url: component?.suppliers[0]?.url,
+        contactName: component?.suppliers[0]?.contactName,
+        contactEmail: component?.suppliers[0]?.contactEmail
+      }))
+    } else {
+      setFormData(initialData)
     }
-  }, [component, status])
+  }, [component, initialData])
 
   return (
     <>
       <LynkModal
-        isOpen={isOpen}
-        onClose={onClose}
-        onSubmit={suppliers?.length > 0 ? handleUpdate : handleSave}
-        title={`${suppliers?.length > 0 ? 'Edit' : 'Add'} Supplier`}
         Icon={BiCube}
-        disabled={isInvalid}
+        isOpen={isOpen}
         hidden={resolved}
+        onClose={onClose}
+        onSubmit={handleSave}
+        title={`Add Supplier`}
+        disabled={isInvalid || loading}
         buttonText={suppliers?.length > 0 ? 'Update' : 'Save'}
         leftFooterContent={
           !isFreeTier && (
             <Button
+              mr={'auto'}
               fontSize={'sm'}
               variant='ghost'
-              mr={'auto'}
-              isDisabled={isInvalid}
               onClick={handleRuleCreate}
+              isLoading={rlLoading || loading}
               hidden={friendlyId ? false : true}
+              isDisabled={isInvalid || formData?.name === ''}
               colorScheme={ruleExists ? 'green' : 'blue'}
             >
               {ruleExists ? 'View' : 'Save as'} Rule
@@ -296,17 +227,8 @@ const SupplierModal = (props) => {
           )
         }
       >
-        <Flex
-          hidden={component ? false : true}
-          width='100%'
-          direction={'row'}
-          alignItems={'center'}
-          justifyContent={'flex-start'}
-          wrap={'wrap'}
-          gap={2}
-          mb={6}
-        >
-          <Text wordBreak={'break-all'}>{component?.name || '-'}</Text>
+        <Flex mb={6} gap={2} width='100%' alignItems={'center'}>
+          <Text wordBreak={'break-word'}>{component?.name || '-'}</Text>
           <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
         </Flex>
         <Flex width={'100%'} direction={'column'} gap={4}>
@@ -314,64 +236,53 @@ const SupplierModal = (props) => {
           <FormControl isRequired isDisabled={resolved}>
             <FormLabel fontSize={12}>Organization Name</FormLabel>
             <Input
-              fontSize={14}
-              value={orgName}
+              name='name'
               autoComplete='off'
+              value={formData?.name}
+              onChange={handleChange}
               placeholder='Enter organization name'
-              onChange={(e) => setOrgName(e.target.value)}
             />
           </FormControl>
           {/* ORG URL */}
           <FormControl
             isDisabled={resolved}
-            isInvalid={(orgUrl !== '' && !validateUrl(orgUrl)) || containsSpace}
+            isInvalid={isInvalid || containsSpace}
           >
             <FormLabel fontSize={12}>URL</FormLabel>
             <Input
-              fontSize={14}
-              value={orgUrl}
+              name='url'
               autoComplete='off'
-              onChange={onUrlChange}
+              value={formData?.url}
+              onChange={handleChange}
               placeholder='Enter URL'
               onBlur={handleCheckUrl}
             />
             <FormErrorMessage>{isValidUrl}</FormErrorMessage>
           </FormControl>
           {/* SUPPLIER NAME */}
-          <FormControl
-            isInvalid={supName !== '' && nameError !== ''}
-            isDisabled={resolved}
-          >
+          <FormControl isDisabled={resolved}>
             <FormLabel fontSize={12}>Contact Name</FormLabel>
             <Input
-              fontSize={14}
-              value={supName}
+              minLength={4}
+              maxLength={256}
               autoComplete='no'
-              onChange={onSupplierChange}
+              name='contactName'
+              onChange={handleChange}
+              value={formData?.contactName}
               placeholder='Enter supplier name'
             />
-            <FormErrorMessage>{nameError}</FormErrorMessage>
           </FormControl>
           {/* SUPPLIER EMAIL */}
-          <FormControl
-            isDisabled={resolved}
-            isInvalid={supEmail !== '' && !validateEmail(supEmail)}
-          >
-            <FormLabel f fontSize={12}>
-              Contact Email
-            </FormLabel>
+          <FormControl isDisabled={resolved}>
+            <FormLabel fontSize={12}>Contact Email</FormLabel>
             <Input
-              value={supEmail}
+              type='email'
               autoComplete='off'
+              name='contactEmail'
+              onChange={handleChange}
+              value={formData?.contactEmail}
               placeholder='Enter supplier email'
-              onBlur={handleCheckEmail}
-              onChange={(e) => {
-                setSupEmail(e.target.value)
-                setEmailError('')
-              }}
-              fontSize={14}
             />
-            <FormErrorMessage>{emailError}</FormErrorMessage>
           </FormControl>
         </Flex>
       </LynkModal>

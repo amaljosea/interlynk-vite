@@ -732,15 +732,13 @@ const Checks = ({ sbomData }) => {
           )}
 
           {/* SUPPLIER MODAL */}
-          {COMP_SUPPLIER.isOpen && (
-            <SupplierModal
-              activeRow={activeRow}
-              ruleExists={ruleExists}
-              recheck={handleRecheck}
-              isOpen={COMP_SUPPLIER.isOpen}
-              onClose={COMP_SUPPLIER.onClose}
-            />
-          )}
+          <SupplierModal
+            activeRow={activeRow}
+            ruleExists={ruleExists}
+            recheck={handleRecheck}
+            isOpen={COMP_SUPPLIER.isOpen}
+            onClose={COMP_SUPPLIER.onClose}
+          />
 
           {DOC_CREATION_TIME.isOpen && (
             <CheckModal
