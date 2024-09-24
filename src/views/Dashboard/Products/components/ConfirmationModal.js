@@ -45,7 +45,7 @@ const ConfirmationModal = ({
       type='confirmation'
     >
       {name && (
-        <Tag colorScheme='blue' mb={5}>
+        <Tag colorScheme='blue' mb={5} py={1.5}>
           <Text fontWeight={400} wordBreak={'break-all'}>
             {name}
           </Text>
