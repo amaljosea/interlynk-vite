@@ -107,7 +107,7 @@ export const settingActions = [
     id: 'security-tokens',
     name: 'Security Tokens',
     section: 'Personal',
-    path: '/vendor/settings?tab=security-tokens'
+    path: '/vendor/settings?tab=security tokens'
   }
 ]
 
