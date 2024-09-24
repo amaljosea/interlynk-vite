@@ -51,7 +51,7 @@ class LabelSelectors {
   public static noRecordMsg = "//div[text()='There are no records to display']"
 
   public static productWithLabelName(name: string) {
-    return `(//span[text()='${name}'])[1]`
+    return `(//div[@data-tag='allowRowEvents']//span[text()='${name}'])[1]`
   }
 }
 export { LabelSelectors }

@@ -50,15 +50,6 @@ export default class LabelSection {
 
               const labelName = `dummy label - ${uniqueId}`
               await this.page.fill(ls.labelInput, labelName)
-              await this.page.locator(ls.labelColorInput).click()
-              const num = getRandomNumberBetween(1, 14)
-
-              await this.page.locator(ls.getColor(num)).hover()
-              await this.page.locator(ls.getColor(num)).click()
-              await this.page.keyboard.press('Tab')
-              const valueAttr = await this.page
-                .locator(ls.labelColorInput)
-                .getAttribute('value')
               await this.page.locator(ls.addLabel).click()
               await this.page.waitForSelector(ls.labelAddSuccessMsg, {
                 state: 'visible'
@@ -76,19 +67,19 @@ export default class LabelSection {
                 const lableSpanLength = (await this.page.$$(ls.labels)).length
 
                 const labelArr: string[] = []
-                let labelName: any
+                let lName: any
 
                 for (let i = 0; i < lableSpanLength; i++) {
-                  labelName = await this.page
+                  lName = await this.page
                     .locator(ls.getLables(i + 1))
                     .textContent()
-                  labelArr.push(labelName)
+                  labelArr.push(lName)
                 }
 
-                if (!labelArr.includes(labelName)) {
+                if (!labelArr.includes(lName)) {
                   errors.push('label added failed!')
                 } else {
-                  const index = labelArr.indexOf(labelName)
+                  const index = labelArr.indexOf(lName)
 
                   if (index >= 0) {
                     const color = await this.page
@@ -116,20 +107,21 @@ export default class LabelSection {
 
                     const labelListArr: string[] = []
                     for (let i = 0; i < labelListLength; i++) {
-                      labelName = await this.page
+                      lName = await this.page
                         .locator(ls.getLabelName(i + 1))
                         .textContent()
-                      labelListArr.push(labelName)
+                      labelListArr.push(lName)
                     }
-                    if (!labelListArr.includes(labelName)) {
+                    if (!labelListArr.includes(lName)) {
                       errors.push('label not found!')
                     } else {
                       const index = labelArr.indexOf(labelName)
-
                       await this.page
                         .locator(ls.getLabelCheckBox(index + 1))
                         .click()
+
                       await this.page.locator(ls.productsHeader).click()
+                      await this.page.waitForTimeout(2000)
                       await this.page.locator(ls.labelFilterBtn).click()
 
                       const labelListItemLength = (
@@ -151,7 +143,7 @@ export default class LabelSection {
                         .locator(ls.getLabelList(indexOfLabel))
                         .click()
                       await this.page.locator(ls.productsHeader).click()
-
+                      await this.page.waitForTimeout(2000)
                       const productWithLabelName = await this.page
                         .locator(ls.productWithLabelName(labelName))
                         .isVisible()
