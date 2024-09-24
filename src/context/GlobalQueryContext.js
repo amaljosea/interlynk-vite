@@ -28,7 +28,7 @@ export const GlobalQueryContextWrapper = ({ children }) => {
 
   const { data: orgData, loading: orgQueryLoading } = useQuery(GetOrgName, {
     fetchPolicy: 'network-only',
-    skip: authToken ? false : true
+    skip: location.pathname.startsWith('/vendor') && authToken ? false : true
   })
 
   useEffect(() => {

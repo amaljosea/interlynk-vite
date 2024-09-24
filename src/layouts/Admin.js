@@ -5,19 +5,38 @@ import { KBarProvider } from 'kbar'
 import React, { useEffect } from 'react'
 import { Outlet, redirect, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
+import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
-import { Box, Flex, Stack, Text, useColorMode } from '@chakra-ui/react'
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Button,
+  Center,
+  Flex,
+  Stack,
+  Text,
+  useColorMode
+} from '@chakra-ui/react'
 
 import Kbar from 'components/Kbar'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { FaArrowLeft, FaArrowRight, FaRegFile } from 'react-icons/fa6'
 
-import { getActiveNavbar, getActiveRoute, tourStyles } from '../utils'
+import {
+  displayErrorMessage,
+  getActiveNavbar,
+  getActiveRoute,
+  tourStyles
+} from '../utils'
 import { logoutUser } from '../utils/authUtils'
 
 export default function Admin() {
@@ -25,7 +44,8 @@ export default function Admin() {
 
   const { steps } = useTour()
   const navigate = useNavigate()
-  const { colorMode } = useColorMode()
+  const { colorMode, setColorMode } = useColorMode()
+  const { orgView, orgLoading, error } = useGlobalQueryContext()
 
   const productId = params.productid
   const sbomId = params.sbomid
@@ -196,6 +216,12 @@ export default function Admin() {
     props?.setIsOpen(false)
   }
 
+  const handleLogout = async () => {
+    await logoutUser()
+    setColorMode('light')
+    navigate('/auth')
+  }
+
   useEffect(() => {
     if (authToken) {
       try {
@@ -223,6 +249,33 @@ export default function Admin() {
       sessionStorage.removeItem('signedUrlParams')
     }
   }, [])
+
+  if (error) {
+    return (
+      <Center>
+        <Alert
+          status='error'
+          variant='subtle'
+          flexDirection='column'
+          alignItems='center'
+          justifyContent='center'
+          textAlign='center'
+          height='240px'
+        >
+          <AlertIcon boxSize='40px' mr={0} />
+          <AlertTitle mt={4} mb={1} fontSize='lg'>
+            {displayErrorMessage(
+              error?.networkError?.statusCode,
+              error?.message
+            )}
+          </AlertTitle>
+          <AlertDescription mt={4} maxWidth='sm'>
+            <Button onClick={handleLogout}>Logout</Button>
+          </AlertDescription>
+        </Alert>
+      </Center>
+    )
+  }
 
   return (
     <KBarProvider actions={actions} options={{ enableHistory: true }}>
@@ -296,7 +349,7 @@ export default function Admin() {
               />
             </Box>
             <Box my={5} px={6}>
-              <Outlet />
+              {orgView ? <Outlet /> : <OrgRegister loading={orgLoading} />}
             </Box>
           </Flex>
         </TourProvider>

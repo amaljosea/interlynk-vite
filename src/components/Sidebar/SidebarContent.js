@@ -71,7 +71,7 @@ const SidebarContent = ({ routes }) => {
     const name = parts[2]
     if (routeName === '/customer/') {
       return 'active'
-    } else if (name === category) {
+    } else if (name?.includes(category)) {
       return 'active'
     }
   }

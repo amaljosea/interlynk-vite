@@ -1,7 +1,6 @@
 import { gql, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
-import { displayErrorMessage } from 'utils'
 
 import {
   Flex,
@@ -14,7 +13,6 @@ import {
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
-import LynkAlert from 'components/LynkAlert'
 import EnvFilter from 'components/Misc/EnvFilter'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -44,7 +42,7 @@ export default function Dashboard() {
   const product = useQueryParam('id')
   const { setIsOpen } = useTour()
   const { dispatch, envName } = useGlobalState()
-  const { orgView, error } = useGlobalQueryContext()
+  const { orgView } = useGlobalQueryContext()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const { data, loading } = useQuery(GetOrganization, {
@@ -76,17 +74,6 @@ export default function Dashboard() {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
   }, [prodCompDispatch, prodVulnDispatch, product, setIsOpen])
-
-  if (error) {
-    return (
-      <LynkAlert
-        msg={displayErrorMessage(
-          error?.networkError?.statusCode,
-          error?.message
-        )}
-      />
-    )
-  }
 
   if (loading) {
     return (

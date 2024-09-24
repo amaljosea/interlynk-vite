@@ -14,6 +14,7 @@ import { AcceptInvitation, DeclineInvitation } from 'graphQL/Mutation'
 import { OrgUserInvitationInfo } from 'graphQL/Queries'
 
 import { FaTimesCircle } from 'react-icons/fa'
+import { logoutUser } from 'utils/authUtils'
 
 const Invitation = () => {
   const { showToast } = useCustomToast()
@@ -45,6 +46,7 @@ const Invitation = () => {
         setError(res.data.organizationUserInvitationAccept.errors)
       } else {
         setError([])
+        logoutUser()
         if (res.data.organizationUserInvitationAccept.userType === 'new_user') {
           navigate(
             `/register?id=${res.data.organizationUserInvitationAccept.user.email}`

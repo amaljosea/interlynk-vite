@@ -18,6 +18,8 @@ import {
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+
 import { GetLabels } from 'graphQL/Queries'
 
 import { FaCheck } from 'react-icons/fa6'
@@ -37,6 +39,7 @@ const ProdFilterMenu = ({
   setSelectedTags
 }) => {
   const { enabled, labelIds } = filters || ''
+  const { orgView } = useGlobalQueryContext()
   const iconColor = useColorModeValue('#444', '#f3f3f3')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const bgColor = useColorModeValue('#fff', '#1A202C')
@@ -57,7 +60,7 @@ const ProdFilterMenu = ({
   }
 
   const { data } = useQuery(GetLabels, {
-    skip: signedUrlParams,
+    skip: signedUrlParams || !orgView,
     variables: { first: 100 }
   })
   const { nodes } = data?.labels || ''
