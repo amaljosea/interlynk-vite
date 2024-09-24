@@ -43,13 +43,12 @@ const RegistrationForm = () => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showConfPassword, setShowConfPassword] = useState(false)
-  const [error, setError] = useState([])
+  const [error, setError] = useState('')
   const [invalidPassword, setInvalidPassword] = useState(false)
   const [passError, setPassError] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
 
-  const [orgRegister] = useMutation(RegisterUser)
+  const [orgRegister, { loading }] = useMutation(RegisterUser)
 
   const isInvalid =
     email === '' ||
@@ -73,7 +72,7 @@ const RegistrationForm = () => {
       setPassError('')
     }
     setInvalidPassword(false)
-    setError([])
+    setError('')
   }
 
   const handleCheckPassword = () => {
@@ -91,7 +90,7 @@ const RegistrationForm = () => {
       setPassError('')
     }
     setInvalidPassword(false)
-    setError([])
+    setError('')
   }
 
   const handleTogglePassword = () => {
@@ -103,30 +102,31 @@ const RegistrationForm = () => {
   }
 
   const handleSubmit = () => {
-    setIsLoading(true)
-    orgRegister({
-      variables: {
-        name: name,
-        email: email,
-        password: password,
-        passwordConfirmation: confirmPassword,
-        awsRegistrationToken: awsToken || undefined
-      }
-    }).then((res) => {
-      if (res.data.userRegistration.errors.length > 0) {
-        setError(res.data.userRegistration.errors)
-        awsToken && sessionStorage.setItem('awsToken', awsToken)
-        setIsLoading(false)
-        setIsSuccess(false)
-      } else {
-        if (res.data.userRegistration.confirmationNeeded) {
-          setIsSuccess(true)
-          setIsLoading(false)
-        } else {
-          navigate('/auth')
+    try {
+      orgRegister({
+        variables: {
+          name: name,
+          email: email,
+          password: password,
+          passwordConfirmation: confirmPassword,
+          awsRegistrationToken: awsToken || undefined
         }
-      }
-    })
+      }).then((res) => {
+        if (res?.data?.userRegistration?.errors?.length > 0) {
+          setError(res?.data?.userRegistration?.errors[0])
+          awsToken && sessionStorage.setItem('awsToken', awsToken)
+          setIsSuccess(false)
+        } else {
+          if (res.data.userRegistration.confirmationNeeded) {
+            setIsSuccess(true)
+          } else {
+            navigate('/auth')
+          }
+        }
+      })
+    } catch (error) {
+      setError(JSON.stringify(error))
+    }
   }
 
   if (isSuccess) {
@@ -169,9 +169,9 @@ const RegistrationForm = () => {
       <Text fontSize={'sm'} color={'#555'}>
         Register to continue to the dashboard.
       </Text>
-      {error.length > 0 && (
+      {error !== '' && (
         <Box mt={4} width={'100%'}>
-          <LynkAlert msg={error[0]} />
+          <LynkAlert msg={error} />
         </Box>
       )}
       <Stack pt={8} direction={'column'} gap={3} width={'100%'}>
@@ -195,7 +195,7 @@ const RegistrationForm = () => {
             onChange={(e) => {
               setEmail(e.target.value)
               setEmailError('')
-              setError([])
+              setError('')
             }}
             placeholder='Enter email address'
             autoComplete='off'
@@ -267,10 +267,10 @@ const RegistrationForm = () => {
           mt={5}
           width='full'
           colorScheme='blue'
-          isLoading={isLoading}
+          isLoading={loading}
           onClick={handleSubmit}
           loadingText='Submitting'
-          disabled={isInvalid || isLoading}
+          disabled={isInvalid || loading || error}
         >
           Register
         </Button>
