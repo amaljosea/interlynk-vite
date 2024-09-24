@@ -166,7 +166,7 @@ const VexModal = ({
       variables: {
         comVulnIds: vulnIds,
         sbomId: sbomId || undefined,
-        propagateVex: sbomId ? undefined : upstream,
+        propagateVex: upstream,
         vexStatusId: statusTitle,
         detail: details !== '' ? details : undefined,
         note: notes !== '' ? notes : undefined,
