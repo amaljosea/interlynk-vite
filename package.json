@@ -55,6 +55,7 @@
     "react-error-overlay": "6.0.9"
   },
   "scripts": {
+    "prestart": "node checkEnv.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
