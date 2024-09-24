@@ -1,6 +1,7 @@
-import { useQuery } from '@apollo/client'
+import { gql, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
+import { displayErrorMessage } from 'utils'
 
 import {
   Flex,
@@ -13,13 +14,14 @@ import {
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
+import LynkAlert from 'components/LynkAlert'
 import EnvFilter from 'components/Misc/EnvFilter'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
-import { GetOrg, GetOrgMetrics } from 'graphQL/Queries'
+import { GetOrgMetrics } from 'graphQL/Queries'
 
 import { FaBug, FaCube, FaLayerGroup, FaWindowMaximize } from 'react-icons/fa'
 
@@ -27,14 +29,25 @@ import ActivitiesOverview from './components/ActivitiesOverview'
 import MiniStatistics from './components/MiniStatistics'
 import ProductsOverview from './components/ProductsOverview'
 
+const GetOrganization = gql`
+  query GetOrganization {
+    organization {
+      name
+      currentUser {
+        name
+      }
+    }
+  }
+`
+
 export default function Dashboard() {
   const product = useQueryParam('id')
   const { setIsOpen } = useTour()
   const { dispatch, envName } = useGlobalState()
-  const { orgView } = useGlobalQueryContext()
+  const { orgView, error } = useGlobalQueryContext()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
-  const { data, loading } = useQuery(GetOrg, {
+  const { data, loading } = useQuery(GetOrganization, {
     skip: !orgView,
     fetchPolicy: 'network-only',
     onCompleted: (data) => {
@@ -63,6 +76,17 @@ export default function Dashboard() {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
   }, [prodCompDispatch, prodVulnDispatch, product, setIsOpen])
+
+  if (error) {
+    return (
+      <LynkAlert
+        msg={displayErrorMessage(
+          error?.networkError?.statusCode,
+          error?.message
+        )}
+      />
+    )
+  }
 
   if (loading) {
     return (

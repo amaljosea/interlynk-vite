@@ -4,6 +4,7 @@ import Cookies from 'js-cookie'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { isCustomerView, validPassword } from 'utils'
+import { displayErrorMessage } from 'utils'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
 import {
@@ -50,6 +51,7 @@ import {
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -136,7 +138,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { orgView } = useGlobalQueryContext()
+  const { orgView, error } = useGlobalQueryContext()
 
   const { data, loading } = useQuery(GetCurrentUser, {
     skip: !orgView
@@ -528,6 +530,17 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     newPassword,
     confirmPassword
   ])
+
+  if (error) {
+    return (
+      <LynkAlert
+        msg={displayErrorMessage(
+          error?.networkError?.statusCode,
+          error?.message
+        )}
+      />
+    )
+  }
 
   return (
     <>

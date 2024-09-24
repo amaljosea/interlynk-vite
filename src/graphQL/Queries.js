@@ -50,68 +50,6 @@ export const GetUsers = gql`
   }
 `
 
-// GET ORG INFO
-export const GetOrg = gql`
-  query GetOrganization {
-    organization {
-      email
-      id
-      name
-      updatedAt
-      url
-      currentUser {
-        id
-        name
-        email
-        superAdmin
-        unconfirmedEmail
-        profileImage {
-          filename
-          url
-        }
-        role {
-          id
-          name
-        }
-        apiKeys {
-          id
-          rawToken
-          tokenMask
-          revoked
-          expired
-          createdAt
-          updatedAt
-          revokedAt
-          expiresAt
-          notes
-        }
-      }
-      users {
-        id
-        name
-        email
-        role {
-          id
-          name
-          permissions
-        }
-        createdAt
-        invitationStatus
-        invitationAcceptedAt
-        profileImage {
-          filename
-          url
-        }
-      }
-      organizationComponents {
-        id
-        matchStr
-        updatedAt
-      }
-    }
-  }
-`
-
 // GET USER PERMISSIONS
 export const GetUserPermissions = gql`
   query GetUserPermissions {

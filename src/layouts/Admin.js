@@ -5,7 +5,6 @@ import { KBarProvider } from 'kbar'
 import React, { useEffect } from 'react'
 import { Outlet, redirect, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
-import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import { Box, Flex, Stack, Text, useColorMode } from '@chakra-ui/react'
 
@@ -14,7 +13,6 @@ import Kbar from 'components/Kbar'
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { FaArrowLeft, FaArrowRight, FaRegFile } from 'react-icons/fa6'
@@ -28,7 +26,6 @@ export default function Admin() {
   const { steps } = useTour()
   const navigate = useNavigate()
   const { colorMode } = useColorMode()
-  const { orgView, orgLoading } = useGlobalQueryContext()
 
   const productId = params.productid
   const sbomId = params.sbomid
@@ -299,7 +296,7 @@ export default function Admin() {
               />
             </Box>
             <Box my={5} px={6}>
-              {orgView ? <Outlet /> : <OrgRegister loading={orgLoading} />}
+              <Outlet />
             </Box>
           </Flex>
         </TourProvider>

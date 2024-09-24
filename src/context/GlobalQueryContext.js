@@ -23,7 +23,7 @@ export const GlobalQueryContextWrapper = ({ children }) => {
     skip: !params?.sbomid
   })
 
-  const { data, loading } = useOrg()
+  const { data, loading, error } = useOrg()
   const [isFreeTier, setIsFreeTier] = useState(false)
 
   const { data: orgData, loading: orgQueryLoading } = useQuery(GetOrgName, {
@@ -45,6 +45,7 @@ export const GlobalQueryContextWrapper = ({ children }) => {
     <GlobalQueryContext.Provider
       value={{
         sbomHookData,
+        error: error,
         orgLoading: loading,
         orgView: data?.organization?.name ? true : false,
         isFreeTier,

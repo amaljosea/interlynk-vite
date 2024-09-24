@@ -5,10 +5,10 @@ import { GetOrgName } from 'graphQL/Queries'
 
 const useOrg = () => {
   const location = useLocation()
-  const { data, loading } = useQuery(GetOrgName, {
+  const { data, loading, error } = useQuery(GetOrgName, {
     skip: location?.pathname?.startsWith('/vendor') === false
   })
-  return { data, loading }
+  return { data, loading, error }
 }
 
 export default useOrg
