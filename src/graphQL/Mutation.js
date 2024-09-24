@@ -1365,8 +1365,8 @@ export const checkResultUpdate = gql`
 
 // Mutation to create a api-token for CI/CD
 export const createApiToken = gql`
-  mutation createApiToken($expiresAt: ISO8601DateTime, $notes: String) {
-    apiTokenCreate(input: { expiresAt: $expiresAt, notes: $notes }) {
+  mutation createApiToken($expiresAt: ISO8601DateTime, $tokenName: String) {
+    apiTokenCreate(input: { expiresAt: $expiresAt, tokenName: $tokenName }) {
       apiKey {
         id
         rawToken
@@ -1377,7 +1377,7 @@ export const createApiToken = gql`
         updatedAt
         revokedAt
         expiresAt
-        notes
+        tokenName
       }
       errors
     }
@@ -1399,14 +1399,14 @@ export const updateApiToken = gql`
     $id: Uuid!
     $expires: ISO8601DateTime
     $revoked: ISO8601DateTime
-    $notes: String
+    $tokenName: String
   ) {
     apiTokenUpdate(
       input: {
         apiKeyId: $id
         expiresAt: $expires
         revokedAt: $revoked
-        notes: $notes
+        tokenName: $tokenName
       }
     ) {
       apiKey {

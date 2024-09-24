@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
-import { customStyles, getFullDateAndTime } from 'utils'
+import { customStyles, getFullDateAndTime, truncatedValue } from 'utils'
 
 import { AddIcon, CopyIcon } from '@chakra-ui/icons'
 import {
@@ -35,7 +35,6 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import LynkModal from 'components/LynkModal'
 
-import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -63,7 +62,7 @@ const GetApiKeys = gql`
           updatedAt
           revokedAt
           expiresAt
-          notes
+          tokenName
         }
       }
     }
@@ -71,7 +70,6 @@ const GetApiKeys = gql`
 `
 
 const TokenInfo = () => {
-  const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
 
@@ -140,17 +138,15 @@ const TokenInfo = () => {
     setIsLoading(true)
     generateToken({
       variables: {
-        notes: keyName,
+        tokenName: keyName,
         expiresAt: selectedDate
           ? selectedDate.toISOString().replace(/\.\d{3}Z$/, 'Z')
           : null
       }
     }).then((res) => {
       if (res?.data?.apiTokenCreate?.errors?.length > 0) {
-        showToast({
-          description: res?.data?.apiTokenCreate?.errors[0],
-          status: 'error'
-        })
+        setError(res?.data?.apiTokenCreate?.errors[0])
+        setIsLoading(false)
       } else {
         setTimeout(() => {
           setToken(res.data.apiTokenCreate.apiKey.rawToken)
@@ -176,10 +172,7 @@ const TokenInfo = () => {
       }
     }).then((res) => {
       if (res?.data?.apiTokenUpdate?.errors?.length > 0) {
-        showToast({
-          description: res?.data?.apiTokenUpdate?.errors[0],
-          status: 'error'
-        })
+        setError(res?.data?.apiTokenUpdate?.errors[0])
       } else {
         onClose()
       }
@@ -232,6 +225,7 @@ const TokenInfo = () => {
             ref={tokenRef}
             onClick={() => {
               setKeyName('')
+              setError('')
               setSelectedDate(defaultDate)
               setToken('')
               setNoExpire(false)
@@ -252,7 +246,7 @@ const TokenInfo = () => {
 
   useEffect(() => {
     if (activeRow) {
-      setKeyName(activeRow.notes)
+      setKeyName(activeRow?.tokenName)
       setSelectedDate(new Date(activeRow.expiresAt))
       setNoExpire(activeRow.expiresAt === null ? true : false)
     }
@@ -266,11 +260,9 @@ const TokenInfo = () => {
       name: 'TOKEN NAME',
       wrap: true,
       selector: (row) => (
-        <Tooltip label={row.notes} placement='top'>
+        <Tooltip label={row?.tokenName} placement='top'>
           <Text color={textColor} my={2}>
-            {row.notes.length > 30
-              ? `${row.notes.substring(0, 30)}...`
-              : row.notes}
+            {truncatedValue(row?.tokenName, 30)}
           </Text>
         </Tooltip>
       )
@@ -420,9 +412,7 @@ const TokenInfo = () => {
     token !== '' ? handleSubmit : activeRow ? handleUpdate : handleCreate
 
   const modalTitle = activeRow
-    ? activeRow.notes.length > 20
-      ? `${activeRow.notes.substring(0, 20)}...`
-      : activeRow.notes
+    ? truncatedValue(activeRow?.tokenName, 20)
     : 'Create Security Token'
 
   const buttonName =
