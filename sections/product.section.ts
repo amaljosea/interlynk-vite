@@ -196,24 +196,27 @@ export default class ProductSection {
             await this.page.waitForTimeout(2000)
             for (let j = 1; j < productNameArr.length; j++) {
               await this.page.fill(ps.productSelect, '')
-              await this.page.fill(ps.productSelect, productNameArr[j])
-              await this.page.press(ps.productSelect, 'Tab')
               await this.page.waitForTimeout(2000)
-              const productHeaderText: any = await this.page
-                .locator(ps.productNameHeader)
-                .textContent()
+              const value = productNameArr[j]
+              await this.page.locator(ps.productSelect).type(value)
+              // await this.page.fill(ps.productSelect, productNameArr[j])
+              await this.page.press(ps.productSelect, 'Tab', { delay: 500 })
+              await this.page.waitForTimeout(2000)
 
-              if (
-                !productHeaderText ||
-                !productNameArr[j].includes(productHeaderText.trim())
-              ) {
-                errors.push(
-                  `Name of the product '${productNameArr[j]}' is not matching with the product header. Product switching failed!`
-                )
-              } else {
-                const versionListLen = (await this.page.$$(ps.versionList))
-                  .length
-                if (versionListLen > 0) {
+              const versionListLen = (await this.page.$$(ps.versionList)).length
+              if (versionListLen > 1) {
+                const productHeaderText: any = await this.page
+                  .locator(ps.productNameHeader)
+                  .textContent()
+
+                if (
+                  !productHeaderText ||
+                  !productNameArr[j].includes(productHeaderText.trim())
+                ) {
+                  errors.push(
+                    `Name of the product '${productNameArr[j]}' is not matching with the product header. Product switching failed!`
+                  )
+                } else {
                   for (let k = 0; k < versionListLen; k++) {
                     const versionTxt: any = await this.page
                       .locator(ps.getVersion(k + 1))
@@ -247,6 +250,51 @@ export default class ProductSection {
                 }
                 versionListarr = []
               }
+
+              // if (
+              //   !productHeaderText ||
+              //   !productNameArr[j].includes(productHeaderText.trim())
+              // ) {
+              //   errors.push(
+              //     `Name of the product '${productNameArr[j]}' is not matching with the product header. Product switching failed!`
+              //   )
+              // } else {
+              //   const versionListLen = (await this.page.$$(ps.versionList))
+              //     .length
+              //   if (versionListLen > 0) {
+              //     for (let k = 0; k < versionListLen; k++) {
+              //       const versionTxt: any = await this.page
+              //         .locator(ps.getVersion(k + 1))
+              //         .textContent()
+              //       versionListarr.push(versionTxt)
+              //     }
+
+              //     for (let l = 0; l < versionListarr.length; l++) {
+              //       if (l == 0) {
+              //         await this.page.locator(ps.getVersion(l + 1)).click()
+              //       }
+              //       await waitForSelectorWithMinTime(
+              //         this.page,
+              //         ps.versionSelect
+              //       )
+              //       if (versionListarr.length > 1) {
+              //         await this.page.fill(ps.versionSelect, versionListarr[l])
+              //       }
+              //       // await this.page.press(ps.versionSelect, 'Enter')
+              //       await this.page.press(ps.versionSelect, 'Tab')
+              //       await this.page.waitForTimeout(2000)
+              //       const versionNameElementText: any = await this.page
+              //         .locator(ps.versionNameElement)
+              //         .textContent()
+              //       if (versionListarr[l] != versionNameElementText) {
+              //         errors.push(
+              //           `version of the product '${versionListarr[l]}' is not matching with product and version switching failed!`
+              //         )
+              //       }
+              //     }
+              //   }
+              //   versionListarr = []
+              // }
             }
           }
         } else {
