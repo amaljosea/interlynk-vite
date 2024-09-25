@@ -1,3 +1,5 @@
+import { isCustomerView } from 'utils'
+
 import {
   Link,
   Stack,
@@ -12,15 +14,15 @@ import {
 import { FaPen } from 'react-icons/fa6'
 
 const SupplierTag = ({ key, item, premission, onEdit, onDelete, editable }) => {
+  const customerView = isCustomerView()
   const { contactName, contactEmail, url, name } = item || {}
   const supplierURL = url?.startsWith('http') ? item.url : `http://${url}`
   return (
     <Tag
-      height={7}
       key={key}
       variant='subtle'
       colorScheme='orange'
-      w='fit-content'
+      sx={{ h: 7, w: 'fit-content' }}
     >
       <Tooltip
         label={
@@ -41,15 +43,16 @@ const SupplierTag = ({ key, item, premission, onEdit, onDelete, editable }) => {
       {editable && (
         <TagRightIcon
           as={FaPen}
-          fontSize={12}
-          opacity={0.5}
           onClick={onEdit}
-          cursor={'pointer'}
           hidden={premission}
           _hover={{ opacity: 1 }}
+          sx={{ fontSize: 12, opacity: 0.5, cursor: 'pointer' }}
         />
       )}
-      <TagCloseButton hidden={premission} onClick={() => onDelete(item)} />
+      <TagCloseButton
+        hidden={premission || customerView}
+        onClick={() => onDelete(item)}
+      />
     </Tag>
   )
 }
