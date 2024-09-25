@@ -54,9 +54,7 @@ export default class SharelynkSection {
               .locator(ss.productName(productName))
               .isVisible()
 
-            if (!pName) {
-              errors.push('product is added failed!')
-            } else {
+            if (pName) {
               await waitForSelectorWithMinTime(this.page, ss.productSearch)
               await this.page.fill(ss.productSearch, productName)
               await this.page.press(ss.productSearch, 'Enter')

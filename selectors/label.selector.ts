@@ -32,6 +32,7 @@ class LabelSelectors {
   public static menuBtn =
     "(//div[@data-tag='allowRowEvents']//button[@aria-haspopup='menu'])[1]"
   public static updateLabel = "(//div[@role='menu'])[4]//button[2]"
+  public static addLabelBtn = "(//div[@role='menu'])[4]//button[2]"
   public static labelCheckBoxes = "((//div[@role='menu'])[4]//div//label//span)"
 
   public static getLabelCheckBox(index: number) {

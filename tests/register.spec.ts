@@ -20,12 +20,6 @@ test('TC_002 Registration with Email ID Test', async ({ page }) => {
   await rp.userRegisterFunctionality(name, address, password)
 })
 
-// test.only('TC_003 Sign up with Google Test', async ({ page }) => {
-//   test.setTimeout(0)
-//   const rp = new RegisterPage(page)
-//   await rp.signUpWithGoogleFunctionality()
-// })
-
 test.afterEach(async ({ page }) => {
   await page.close()
 })
