@@ -118,7 +118,9 @@ export default function HeaderLinks(props) {
   const { userName, setUserName } = useGlobalState()
   const { orgView } = useGlobalQueryContext()
 
-  const { data: org } = useQuery(GetProfilePic, { skip: signedUrlParams })
+  const { data: org } = useQuery(GetProfilePic, {
+    skip: signedUrlParams
+  })
   const { currentUser } = org?.organization || ''
   const { profileImage, name, email } = currentUser || ''
 

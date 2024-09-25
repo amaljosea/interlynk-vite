@@ -77,10 +77,11 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     })
   }
 })
+
 export const client = new ApolloClient({
   link: ApolloLink.from([errorLink, authLink, uploadLink]),
   cache: new InMemoryCache(),
-  queryDeduplication: false,
+  queryDeduplication: true,
   connectToDevTools: true,
   defaultOptions: {
     query: {
