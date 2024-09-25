@@ -6,13 +6,13 @@ on:
 jobs:
   test:
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: windows-latest  # Changed to Windows
 
     # Define environment variables (use secrets for sensitive info)
     env:
-      url: https://staging.interlynk.io/auth
-      email: amaljoseami@gmail.com
-      password: LynkRisk@1.0
+      PLAYWRIGHT_TEST_URL: https://staging.interlynk.io/auth
+      PLAYWRIGHT_USER_EMAIL: amaljoseami@gmail.com
+      PLAYWRIGHT_USER_PASSWORD: LynkRisk@1.0
 
     steps:
     - uses: actions/checkout@v4
@@ -27,11 +27,11 @@ jobs:
       run: npx playwright install --with-deps
 
     - name: Run Playwright tests
-      run: npx playwright test
+      run: npx playwright test --test-dir=playwright-test
       env:
-        url: ${{ env.url }}
-        email: ${{ env.email }}
-        password: ${{ env.password }}
+        PLAYWRIGHT_TEST_URL: ${{ env.PLAYWRIGHT_TEST_URL }}
+        PLAYWRIGHT_USER_EMAIL: ${{ env.PLAYWRIGHT_USER_EMAIL }}
+        PLAYWRIGHT_USER_PASSWORD: ${{ env.PLAYWRIGHT_USER_PASSWORD }}
 
     - uses: actions/upload-artifact@v4
       if: always()

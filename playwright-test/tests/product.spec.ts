@@ -6,9 +6,9 @@ import ProductPage from '../pages/product.page'
 
 dotenv.config({ path: '../.env' })
 
-const url: any = process.env.url
-const email: any = process.env.email
-const password: any = process.env.password
+const url: any = process.env.PLAYWRIGHT_TEST_URL
+const email: any = process.env.PLAYWRIGHT_USER_EMAIL
+const password: any = process.env.PLAYWRIGHT_USER_PASSWORD
 
 test.beforeEach(async ({ page }) => {
   await page.goto(url)

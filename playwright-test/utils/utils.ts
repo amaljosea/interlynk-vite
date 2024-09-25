@@ -10,8 +10,8 @@ export async function waitForSelectorWithMinTime(
 ) {
   const startTime = Date.now()
   await page.waitForLoadState('load')
-  await page.waitForLoadState('domcontentloaded')
-  await page.waitForLoadState('networkidle')
+  // await page.waitForLoadState('domcontentloaded')
+  // await page.waitForLoadState('networkidle')
   await page
     .waitForSelector(selector, { timeout: timeout })
     .then(async () => {

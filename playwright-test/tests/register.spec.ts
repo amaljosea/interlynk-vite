@@ -5,7 +5,7 @@ import RegisterPage from '../pages/register.page'
 
 dotenv.config({ path: '../.env' })
 
-const url: any = process.env.url
+const url: any = process.env.PLAYWRIGHT_TEST_URL
 const name: any = 'demo user'
 const address: any = 'demo@gmail.com'
 const password: any = 'Demo08081994#'
