@@ -259,15 +259,11 @@ const Components = ({ sbomData }) => {
             GetIcon(purl?.split('/')[0], colorMode)
           )
         return (
-          <Grid
-            templateColumns='repeat(7, 1fr)'
-            sx={{ alignItems: 'center', gap: 2, my: 3 }}
-          >
-            <GridItem colSpan={1} width={'50px'}>
+          <Flex sx={{ alignItems: 'center', gap: 2, my: 3 }}>
+            <Box width={'50px'}>
               <IconButton icon={icon} isRound={true} variant='solid' />
-            </GridItem>
-            <GridItem
-              colSpan={6}
+            </Box>
+            <Flex
               flexDirection={'column'}
               sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}
             >
@@ -309,8 +305,8 @@ const Components = ({ sbomData }) => {
                   </Tag>
                 )}
               </Flex>
-            </GridItem>
-          </Grid>
+            </Flex>
+          </Flex>
         )
       },
       width: '30%',
