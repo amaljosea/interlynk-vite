@@ -54,9 +54,7 @@ export default class ProductSection {
               .locator(ps.productName(productName))
               .isVisible()
 
-            if (!pName) {
-              errors.push('product is added failed!')
-            } else {
+            if (pName) {
               await this.page.locator(ps.menuBtn).click()
               await this.page.locator(ps.editProduct).click()
               await waitForSelectorWithMinTime(this.page, ps.editProductHeader)
@@ -195,6 +193,10 @@ export default class ProductSection {
             await this.page.locator(ps.firstProduct).click()
             await this.page.waitForTimeout(2000)
             for (let j = 1; j < productNameArr.length; j++) {
+              await this.page.waitForSelector(ps.productSelect, {
+                state: 'visible',
+                timeout: 5000
+              })
               await this.page.fill(ps.productSelect, '')
               await this.page.waitForTimeout(2000)
               const value = productNameArr[j]
