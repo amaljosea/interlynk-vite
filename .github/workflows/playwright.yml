@@ -27,7 +27,7 @@ jobs:
       run: npx playwright install --with-deps
 
     - name: Run Playwright tests
-      run: npx playwright test --test-dir=playwright-test
+      run: npx playwright test
       env:
         PLAYWRIGHT_TEST_URL: ${{ env.PLAYWRIGHT_TEST_URL }}
         PLAYWRIGHT_USER_EMAIL: ${{ env.PLAYWRIGHT_USER_EMAIL }}
