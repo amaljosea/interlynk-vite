@@ -35,10 +35,15 @@ import { FaPlus } from 'react-icons/fa6'
 import { MdDeleteOutline, MdPolicy } from 'react-icons/md'
 
 const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
-  const [name, setName] = useState('')
-  const [desc, setDesc] = useState('')
-  const [operator, setOperator] = useState('')
-  const [resultType, setResultType] = useState('')
+  const initialState = {
+    name: '',
+    desc: '',
+    operator: '',
+    resultType: '',
+    isPrimary: false,
+    isInternal: false
+  }
+  const [formData, setFormData] = useState(initialState)
   const [error, setError] = useState('')
   const [conditions, setConditions] = useState([
     {
@@ -55,22 +60,21 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
       valError: ''
     }
   ])
-  const [isPrimary, setIsPrimary] = useState(false)
-  const [isInternal, setIsInternal] = useState(false)
   const [deletedRules, setDeletedRules] = useState([])
-  const [isDisabled, setIsDisabled] = useState(false)
 
   const borderColor = useColorModeValue('gray.200', 'gray.600')
 
-  const disableButtonTemporarily = () => {
-    setIsDisabled(true)
-    setTimeout(() => {
-      setIsDisabled(false)
-    }, 3000)
-  }
+  const [createPolicy, { loading: crLoading }] = useMutation(PolicyCreate)
+  const [updatePolicy, { loading: upLoading }] = useMutation(PolicyUpdate)
 
-  const [createPolicy] = useMutation(PolicyCreate)
-  const [updatePolicy] = useMutation(PolicyUpdate)
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }))
+    setError('')
+  }
 
   const sortedData =
     plSubjects &&
@@ -94,26 +98,6 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
     acc[category] = options
     return acc
   }, {})
-
-  const onNameChange = (e) => {
-    setName(e.target.value)
-    setError('')
-  }
-
-  const onDescChange = (e) => {
-    setDesc(e.target.value)
-    setError('')
-  }
-
-  const onOperatorChange = (e) => {
-    setOperator(e.target.value)
-    setError('')
-  }
-
-  const onResultChange = (e) => {
-    setResultType(e.target.value)
-    setError('')
-  }
 
   const hasSimilarRow = (data) => {
     for (let i = 0; i < data.length; i++) {
@@ -166,7 +150,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
     }
   }
 
-  const handleChange = (value, id, field) => {
+  const onChangeRule = (value, id, field) => {
     setError('')
     const newData = conditions.map((item) => {
       if (item.id === id) {
@@ -233,14 +217,11 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
   }
 
   const clearState = () => {
-    setName('')
-    setOperator('')
-    setResultType('')
+    setFormData(initialState)
+    onClose()
   }
 
-  const handleCreate = (e) => {
-    e.preventDefault()
-    disableButtonTemporarily()
+  const handleCreate = () => {
     const rules = []
     if (conditions?.length > 0) {
       conditions?.map((item) =>
@@ -262,13 +243,13 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
     }
     createPolicy({
       variables: {
-        name,
-        desc,
+        name: formData?.name,
+        desc: formData?.desc,
         isEnabled: true,
-        excludeInternalComponent: isInternal,
-        excludePrimaryComponent: isPrimary,
-        operator: operator === '' ? undefined : operator,
-        resultType: resultType === '' ? undefined : resultType,
+        excludeInternalComponent: formData?.isInternal,
+        excludePrimaryComponent: formData?.isPrimary,
+        operator: formData?.operator || undefined,
+        resultType: formData?.resultType || undefined,
         policyRulesAttributes: rules?.length > 0 ? rules : undefined
       }
     }).then((res) => {
@@ -278,7 +259,6 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
       } else {
         setError('')
         clearState()
-        onClose()
       }
     })
   }
@@ -325,71 +305,48 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
     deleteRules?.push({ id: item?.id, _destroy: true })
   )
 
-  const handleUpdate = (e) => {
-    e.preventDefault()
-    disableButtonTemporarily()
+  const inputData = (rules) => {
+    return {
+      id: data?.id,
+      name: formData?.name,
+      desc: formData?.desc,
+      isEnabled: data?.isEnabled,
+      policyRulesAttributes: rules,
+      operator: formData?.operator || undefined,
+      excludePrimaryComponent: formData?.isPrimary,
+      resultType: formData?.resultType || undefined,
+      excludeInternalComponent: formData?.isInternal
+    }
+  }
+
+  const handleUpdate = () => {
     if (prevRules?.length > 0) {
-      updatePolicy({
-        variables: {
-          id: data?.id,
-          name,
-          desc,
-          isEnabled: data?.isEnabled,
-          excludeInternalComponent: isInternal,
-          excludePrimaryComponent: isPrimary,
-          operator: operator === '' ? undefined : operator,
-          resultType: resultType === '' ? undefined : resultType,
-          policyRulesAttributes: prevRules
-        }
-      }).then((res) => {
+      updatePolicy({ variables: inputData(prevRules) }).then((res) => {
         const errors = res?.data?.policyUpdate?.errors
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
           clearState()
-          onClose()
         }
       })
     }
     if (newRules?.length > 0) {
-      updatePolicy({
-        variables: {
-          id: data?.id,
-          name,
-          desc,
-          isEnabled: data?.isEnabled,
-          operator: operator === '' ? undefined : operator,
-          resultType: resultType === '' ? undefined : resultType,
-          policyRulesAttributes: newRules
-        }
-      }).then((res) => {
+      updatePolicy({ variables: inputData(newRules) }).then((res) => {
         const errors = res?.data?.policyUpdate?.errors
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
           clearState()
-          onClose()
         }
       })
     }
     if (deleteRules?.length > 0) {
-      updatePolicy({
-        variables: {
-          id: data?.id,
-          name,
-          desc,
-          isEnabled: data?.isEnabled,
-          operator: operator === '' ? undefined : operator,
-          resultType: resultType === '' ? undefined : resultType,
-          policyRulesAttributes: deleteRules
-        }
-      }).then((res) => {
+      updatePolicy({ variables: inputData(deleteRules) }).then((res) => {
         const errors = res?.data?.policyUpdate?.errors
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
           clearState()
-          onClose()
         }
       })
     }
@@ -430,21 +387,26 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
 
   useEffect(() => {
     if (data && plSubjects) {
-      console.log(data)
-      setName(data?.name || '')
-      setDesc(data?.description || '')
-      setIsInternal(data?.excludeInternalComponent)
-      setIsPrimary(data?.excludePrimaryComponent)
-      setOperator(
-        data?.operator === 'any' ? 'ANY' : data?.operator === 'all' ? 'ALL' : ''
-      )
-      setResultType(
-        data?.resultType === 'warn'
-          ? 'WARN'
-          : data?.resultType === 'inform'
-            ? 'INFORM'
-            : 'FAIL'
-      )
+      const getOperator = (operator) => {
+        const upperOperator = operator?.toUpperCase()
+        return upperOperator === 'ANY' || upperOperator === 'ALL'
+          ? upperOperator
+          : ''
+      }
+      const getResultType = (resultType) => {
+        const upperResultType = resultType?.toUpperCase()
+        return upperResultType === 'WARN' || upperResultType === 'INFORM'
+          ? upperResultType
+          : 'FAIL'
+      }
+      setFormData(() => ({
+        name: data?.name,
+        desc: data?.description,
+        operator: getOperator(data?.operator),
+        isPrimary: data?.excludeInternalComponent,
+        isInternal: data?.excludeInternalComponent,
+        resultType: getResultType(data?.resultType)
+      }))
       const rules = []
       const opList = (item) =>
         plSubjects?.find((op) => op?.subject === item?.subject)
@@ -474,12 +436,13 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
     <>
       <LynkModal
         isOpen={isOpen}
-        onClose={onClose}
-        onSubmit={data ? handleUpdate : handleCreate}
-        title={`${data ? 'Edit' : 'Create'} Policy`}
         Icon={MdPolicy}
-        disabled={errorMessage || error !== '' || isDisabled}
+        onClose={onClose}
         buttonText={data ? 'Update' : 'Save'}
+        disabled={errorMessage || error !== ''}
+        isLoading={data ? upLoading : crLoading}
+        title={`${data ? 'Edit' : 'Create'} Policy`}
+        onSubmit={data ? handleUpdate : handleCreate}
       >
         <Flex
           width={'100%'}
@@ -489,44 +452,43 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
         >
           {/* POLICY NAME */}
           <FormControl isRequired>
-            <FormLabel htmlFor='policyName' fontSize={12}>
+            <FormLabel htmlFor='name' fontSize={12}>
               Name
             </FormLabel>
             <Input
               type='text'
-              name='policyName'
+              name='name'
               fontSize='sm'
               placeholder='Enter name'
-              value={name}
-              onChange={onNameChange}
+              value={formData?.name}
+              onChange={handleChange}
             />
           </FormControl>
           {/* POLICY DESCTIPTION */}
           <FormControl>
-            <FormLabel htmlFor='policyDesc' fontSize={12}>
+            <FormLabel htmlFor='desc' fontSize={12}>
               Description
             </FormLabel>
             <Textarea
               size='sm'
               type='text'
-              name='policyDesc'
+              name='desc'
+              value={formData?.desc}
+              onChange={handleChange}
               placeholder='Enter description'
-              value={desc}
-              onChange={onDescChange}
             />
           </FormControl>
           {/* POLICY RESULT AND TYPE */}
           <FormControl isRequired>
-            <FormLabel htmlFor='policyResult' fontSize={12}>
+            <FormLabel htmlFor='resultType' fontSize={12}>
               Policy Result
             </FormLabel>
             <Select
-              id='policyResult'
-              name='policyResult'
-              value={resultType}
-              onChange={onResultChange}
-              placeholder={'-- select --'}
               fontSize='sm'
+              name='resultType'
+              onChange={handleChange}
+              value={formData?.resultType}
+              placeholder={'-- select --'}
             >
               {['INFORM', 'WARN', 'FAIL'].map((item, index) => (
                 <option
@@ -539,18 +501,16 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
               ))}
             </Select>
           </FormControl>
-
           <FormControl isRequired>
-            <FormLabel htmlFor='policyType' fontSize={12}>
+            <FormLabel htmlFor='operator' fontSize={12}>
               On Conditions
             </FormLabel>
             <Select
-              id='policyType'
-              name='policyType'
-              value={operator}
-              onChange={onOperatorChange}
-              placeholder={'-- select --'}
               fontSize='sm'
+              name='operator'
+              onChange={handleChange}
+              value={formData?.operator}
+              placeholder={'-- select --'}
             >
               {['ANY', 'ALL'].map((item, index) => (
                 <option
@@ -563,7 +523,6 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
               ))}
             </Select>
           </FormControl>
-
           <Divider />
           {/* CONDITIONS */}
           <FormControl isRequired>
@@ -598,7 +557,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                           fontSize='sm'
                           value={item?.subject}
                           onChange={(e) =>
-                            handleChange(e.target.value, item.id, 'subject')
+                            onChangeRule(e.target.value, item.id, 'subject')
                           }
                           placeholder='-- subject --'
                           sx={{ paddingLeft: '34px' }}
@@ -624,7 +583,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                         fontSize='sm'
                         value={item?.operator}
                         onChange={(e) =>
-                          handleChange(e.target.value, item.id, 'operator')
+                          onChangeRule(e.target.value, item.id, 'operator')
                         }
                         placeholder='-- operator --'
                         textTransform={'lowercase'}
@@ -654,7 +613,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                             name='operator'
                             value={item?.value}
                             onChange={(e) =>
-                              handleChange(e.target.value, item.id, 'value')
+                              onChangeRule(e.target.value, item.id, 'value')
                             }
                             textTransform={'capitalize'}
                             fontSize='sm'
@@ -690,7 +649,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                             value={item?.value}
                             fontSize={'sm'}
                             onChange={(e) =>
-                              handleChange(e.target.value, item.id, 'value')
+                              onChangeRule(e.target.value, item.id, 'value')
                             }
                             textTransform={'capitalize'}
                           >
@@ -714,7 +673,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                             name='vulnStatus'
                             value={item?.value}
                             onChange={(e) =>
-                              handleChange(e.target.value, item.id, 'value')
+                              onChangeRule(e.target.value, item.id, 'value')
                             }
                             textTransform={'capitalize'}
                             fontSize='sm'
@@ -750,7 +709,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                               name='statusCompleteness'
                               value={item?.value}
                               onChange={(e) =>
-                                handleChange(e.target.value, item.id, 'value')
+                                onChangeRule(e.target.value, item.id, 'value')
                               }
                               textTransform={'capitalize'}
                               fontSize='sm'
@@ -780,7 +739,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                               name='compType'
                               value={item?.value}
                               onChange={(e) =>
-                                handleChange(e.target.value, item.id, 'value')
+                                onChangeRule(e.target.value, item.id, 'value')
                               }
                               textTransform={'capitalize'}
                               fontSize='sm'
@@ -804,43 +763,35 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                           <Flex alignItems={'center'} gap={2}>
                             <InputGroup>
                               <InputLeftAddon
-                                width={9}
-                                padding={1}
-                                fontSize={'xs'}
+                                sx={{ w: 9, p: 1, fontSize: 'xs' }}
                               >
                                 Min
                               </InputLeftAddon>
                               <Input
-                                width={10}
-                                padding={0}
-                                textAlign={'center'}
+                                sx={{ w: 10, p: 0, textAlign: 'center' }}
                                 type={'number'}
                                 name='min'
                                 value={item?.min}
                                 fontSize='sm'
                                 onChange={(e) =>
-                                  handleChange(e.target.value, item.id, 'min')
+                                  onChangeRule(e.target.value, item.id, 'min')
                                 }
                                 onBlur={() => handleBlur(item)}
                               />
                               {item?.subject === 'VULNERABILITY_EPSS' && (
                                 <InputRightAddon
-                                  width={9}
-                                  padding={1}
-                                  fontSize={'xs'}
                                   display={'flex'}
                                   justifyContent={'center'}
+                                  sx={{ w: 9, p: 1, fontSize: 'xs' }}
                                 >
                                   %
                                 </InputRightAddon>
                               )}
                               {item?.subject === 'VULNERABILITY_STATUS_AGE' && (
                                 <InputRightAddon
-                                  width={9}
-                                  padding={1}
-                                  fontSize={'xs'}
                                   display={'flex'}
                                   justifyContent={'center'}
+                                  sx={{ w: 9, p: 1, fontSize: 'xs' }}
                                 >
                                   Days
                                 </InputRightAddon>
@@ -855,36 +806,30 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                                 Max
                               </InputLeftAddon>
                               <Input
-                                width={10}
-                                padding={0}
-                                textAlign={'center'}
+                                sx={{ w: 10, p: 0, textAlign: 'center' }}
                                 type={'number'}
                                 name='max'
                                 value={item?.max}
                                 fontSize='sm'
                                 onChange={(e) =>
-                                  handleChange(e.target.value, item.id, 'max')
+                                  onChangeRule(e.target.value, item.id, 'max')
                                 }
                                 onBlur={() => handleBlur(item)}
                               />
                               {item?.subject === 'VULNERABILITY_EPSS' && (
                                 <InputRightAddon
-                                  width={9}
-                                  padding={1}
-                                  fontSize={'xs'}
                                   display={'flex'}
                                   justifyContent={'center'}
+                                  sx={{ w: 9, p: 1, fontSize: 'xs' }}
                                 >
                                   %
                                 </InputRightAddon>
                               )}
                               {item?.subject === 'VULNERABILITY_STATUS_AGE' && (
                                 <InputRightAddon
-                                  width={9}
-                                  padding={1}
-                                  fontSize={'xs'}
                                   display={'flex'}
                                   justifyContent={'center'}
+                                  sx={{ w: 9, p: 1, fontSize: 'xs' }}
                                 >
                                   Days
                                 </InputRightAddon>
@@ -909,7 +854,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                               placeholder='Value'
                               value={item?.value}
                               onChange={(e) =>
-                                handleChange(e.target.value, item.id, 'value')
+                                onChangeRule(e.target.value, item.id, 'value')
                               }
                               onKeyDown={blockInvalidChar}
                             />
@@ -930,7 +875,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                               placeholder='Value'
                               value={item?.value}
                               onChange={(e) =>
-                                handleChange(e.target.value, item.id, 'value')
+                                onChangeRule(e.target.value, item.id, 'value')
                               }
                               hidden={
                                 item?.operator === 'EXISTS' ||
@@ -959,7 +904,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                             placeholder='Value'
                             value={item?.value}
                             onChange={(e) =>
-                              handleChange(e.target.value, item.id, 'value')
+                              onChangeRule(e.target.value, item.id, 'value')
                             }
                             minWidth={140}
                           />
@@ -974,9 +919,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                             onClick={() => deleteRow(item)}
                             icon={
                               <Icon
-                                color={'#E53E3E'}
-                                w={6}
-                                h={6}
+                                sx={{ w: 6, h: 6, color: '#E53E3E' }}
                                 as={MdDeleteOutline}
                               />
                             }
@@ -989,7 +932,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                     conditions?.length - 1 !== index && (
                       <Tag mt={1.5} p={1}>
                         <Text fontSize={10} fontWeight={600}>
-                          {operator === 'ALL' ? 'AND' : 'OR'}
+                          {formData?.operator === 'ALL' ? 'AND' : 'OR'}
                         </Text>
                       </Tag>
                     )}
@@ -998,13 +941,11 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
           </FormControl>
           {/* ADD CONDITIONS */}
           <Button
-            fontSize={'sm'}
-            colorScheme='blue'
             variant='link'
-            fontWeight={'medium'}
-            paddingLeft={'2px'}
-            leftIcon={<FaPlus />}
             onClick={addRow}
+            colorScheme='blue'
+            leftIcon={<FaPlus />}
+            sx={{ fontSize: 'sm', fontWeight: 'medium', pl: '2px' }}
           >
             Add condition
           </Button>
@@ -1016,14 +957,16 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
             </FormLabel>
             <Stack spacing={5} mt={3}>
               <Checkbox
-                isChecked={isPrimary}
-                onChange={(e) => setIsPrimary(e.target.checked)}
+                name={'isPrimary'}
+                isChecked={formData?.isPrimary}
+                onChange={handleChange}
               >
                 <Text fontSize={12}>Primary Component</Text>
               </Checkbox>
               <Checkbox
-                isChecked={isInternal}
-                onChange={(e) => setIsInternal(e.target.checked)}
+                name={'isInternal'}
+                onChange={handleChange}
+                isChecked={formData?.isInternal}
               >
                 <Text fontSize={12}>Internal Components</Text>
               </Checkbox>
