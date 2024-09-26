@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { customStyles } from 'utils'
 import { getFullDateAndTime } from 'utils'
 import { timeSince } from 'utils'
+import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 
 import {
@@ -75,6 +76,11 @@ const LegalTable = () => {
     onOpen: onInfoOpen,
     onClose: onInfoClose
   } = useDisclosure()
+  const {
+    isOpen: isArchiveOpen,
+    onOpen: onArchiveOpen,
+    onClose: onArchiveClose
+  } = useDisclosure()
 
   const onCheckMfc = useCallback(() => {
     setInfoHeading(`Manufacturer`)
@@ -103,7 +109,7 @@ const LegalTable = () => {
           description: errors[0],
           status: 'error'
         })
-      }
+      } else onArchiveClose()
     })
   }
 
@@ -290,7 +296,10 @@ const LegalTable = () => {
                 <MenuItem
                   isDisabled={!updateOrg}
                   color={'red.500'}
-                  onClick={() => handleDelete(row?.id)}
+                  onClick={() => {
+                    setActiveRow(row)
+                    onArchiveOpen()
+                  }}
                 >
                   Archive Manufacturer
                 </MenuItem>
@@ -342,6 +351,18 @@ const LegalTable = () => {
           heading={infoHeading}
           body={infoText}
           url={infoUrl}
+        />
+      )}
+
+      {/* ARCHIVE CONFIRMTION MODAL */}
+      {isArchiveOpen && (
+        <ConfirmationModal
+          isOpen={isArchiveOpen}
+          onClose={onArchiveClose}
+          onConfirm={() => handleDelete(activeRow?.id)}
+          name={activeRow?.organizationName}
+          title='Archive Manufacturer'
+          description='This will remove archive this Manufacturer'
         />
       )}
     </>
