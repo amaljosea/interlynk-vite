@@ -45,18 +45,23 @@ import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { SbomPartCreate, SbomPartDelete } from 'graphQL/Mutation'
-import {
-  CheckDeepParts,
-  GetProject,
-  GetProjectGroups,
-  GetSbomParts
-} from 'graphQL/Queries'
+import { CheckDeepParts, GetProject } from 'graphQL/Queries'
+import { GetProjectGroups, GetSbomParts } from 'graphQL/Queries'
 
 import { BiLayerPlus } from 'react-icons/bi'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import { FaEllipsisV } from 'react-icons/fa'
 
 import ConfirmationModal from '../components/ConfirmationModal'
+
+const LynkSelect = ({ name, value, onChange, children }) => {
+  return (
+    <Select name={name} value={value} fontSize={'sm'} onChange={onChange}>
+      <option value={''}>-- Select --</option>
+      {children}
+    </Select>
+  )
+}
 
 const Parts = ({ data }) => {
   const params = useParams()
@@ -146,8 +151,8 @@ const Parts = ({ data }) => {
     (item) => item?.id === sbomId
   )
 
-  const [createSbomPart] = useMutation(SbomPartCreate)
-  const [deleteSbomPart] = useMutation(SbomPartDelete)
+  const [createSbomPart, { loading }] = useMutation(SbomPartCreate)
+  const [deleteSbomPart, { loading: dlLoading }] = useMutation(SbomPartDelete)
 
   const handleCreatePart = async () => {
     await createSbomPart({
@@ -170,11 +175,7 @@ const Parts = ({ data }) => {
   const handleRemove = async () => {
     await deleteSbomPart({
       variables: { id: activeRow.id }
-    })
-      .then((res) => {
-        console.log(res)
-      })
-      .finally(() => onDeleteClose())
+    }).then((res) => res?.data && onDeleteClose())
   }
 
   const [getProduct] = useLazyQuery(GetProject, {
@@ -256,9 +257,7 @@ const Parts = ({ data }) => {
 
   const sbomVersions = getSbomVersions()
 
-  const onSelectPart = () => {
-    partsContext.push()
-  }
+  const onSelectPart = () => partsContext.push()
 
   const onFilterSev = (part, value) => {
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
@@ -302,10 +301,8 @@ const Parts = ({ data }) => {
 
         return (
           <Grid
-            my={3}
-            gap={2}
-            alignItems={'center'}
             templateColumns='repeat(7, 1fr)'
+            sx={{ my: 3, gap: 2, alignItems: 'center' }}
           >
             <GridItem colSpan={1} width={'50px'}>
               <IconButton
@@ -319,8 +316,7 @@ const Parts = ({ data }) => {
               <Stack spacing={1} direction='column'>
                 <Link to={link} replace>
                   <Text
-                    fontSize={14}
-                    color={'blue.500'}
+                    sx={{ fontSize: 14, color: 'blue.500' }}
                     onClick={() => onSelectPart(part)}
                   >
                     {part?.project?.projectGroup?.name}
@@ -358,9 +354,8 @@ const Parts = ({ data }) => {
             <Tag
               size='md'
               variant='subtle'
-              width={16}
               colorScheme={'blue'}
-              cursor={'pointer'}
+              sx={{ w: 16, cursor: 'pointer' }}
             >
               <TagLabel mx={'auto'}>{part.stats.compCount}</TagLabel>
             </Tag>
@@ -487,21 +482,18 @@ const Parts = ({ data }) => {
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex
-        gap={2}
-        width={'100%'}
-        alignItems={'center'}
+        sx={{ w: '100%', gap: 2, alignItems: 'center' }}
         justifyContent={'flex-end'}
       >
         <Tooltip label='Add Part' placement='top'>
           <IconButton
             ref={addBtn}
             variant='solid'
-            fontSize={'sm'}
             onClick={onOpen}
             colorScheme='blue'
-            fontWeight='normal'
             icon={<AddIcon />}
             hidden={isArchived}
+            sx={{ fontSize: 'sm', fontWeight: 'normal' }}
             isDisabled={!updateSboms || signedUrlParams}
           />
         </Tooltip>
@@ -522,46 +514,40 @@ const Parts = ({ data }) => {
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
-          columns={columns}
-          data={sbomParts}
-          customStyles={customStyles(headColor)}
-          persistTableHead
           subHeader
-          progressPending={sbomParts ? false : true}
-          subHeaderComponent={subHeaderComponent}
-          progressComponent={<CustomLoader />}
+          data={sbomParts}
+          persistTableHead
+          columns={columns}
           responsive={true}
+          progressComponent={<CustomLoader />}
+          customStyles={customStyles(headColor)}
+          subHeaderComponent={subHeaderComponent}
+          progressPending={sbomParts ? false : true}
         />
       </Flex>
 
       {isOpen && (
         <LynkModal
           isOpen={isOpen}
-          onClose={onClose}
-          title={'Add Parts'}
           buttonText='Add'
-          disabled={
-            selectedVersion === '' ||
-            isExists === true ||
-            existingNodes === true
-          }
-          onSubmit={handleCreatePart}
+          onClose={onClose}
           Icon={BiLayerPlus}
+          title={'Add Parts'}
+          isLoading={loading}
+          onSubmit={handleCreatePart}
+          disabled={isExists === true || existingNodes === true}
         >
           <Stack spacing={4} direction={'column'} gap={2}>
             {/* PROJECTS */}
-            <FormControl fontSize={'sm'}>
+            <FormControl fontSize={'sm'} isRequired>
               <FormLabel htmlFor='product' fontSize={12}>
                 Project
               </FormLabel>
-              <Select
-                fontSize={'sm'}
+              <LynkSelect
                 name='groups'
-                id='groups'
                 value={selectedGroup}
                 onChange={handleSelectGroup}
               >
-                <option value={''}>-- Select --</option>
                 {allProjects?.organization?.projectGroups?.nodes.map(
                   (item, index) => (
                     <option key={index} value={item.id}>
@@ -569,21 +555,18 @@ const Parts = ({ data }) => {
                     </option>
                   )
                 )}
-              </Select>
+              </LynkSelect>
             </FormControl>
             {/* ENVIRONMENTS */}
-            <FormControl fontSize={'sm'}>
+            <FormControl fontSize={'sm'} isRequired>
               <FormLabel htmlFor='product' fontSize={12}>
                 Environment
               </FormLabel>
-              <Select
-                fontSize={'sm'}
+              <LynkSelect
                 name='product'
-                id='product'
                 value={selectedProd}
                 onChange={handleSelectProduct}
               >
-                <option value={''}>-- Select --</option>
                 {envList?.length > 0 &&
                   envOrderList(envList).map((item, index) => (
                     <option
@@ -598,30 +581,27 @@ const Parts = ({ data }) => {
                       {item.label}
                     </option>
                   ))}
-              </Select>
+              </LynkSelect>
             </FormControl>
             {/* Version */}
-            <FormControl fontSize={'sm'}>
+            <FormControl fontSize={'sm'} isRequired>
               <FormLabel htmlFor='versions' fontSize={12}>
                 Version
               </FormLabel>
               {sbomVersions?.length === 0 ? (
-                <LynkAlert msg='No version available' />
+                <LynkAlert status='info' msg='No version available' />
               ) : (
-                <Select
-                  fontSize={'sm'}
+                <LynkSelect
                   name='versions'
-                  id='versions'
                   value={selectedVersion}
                   onChange={(e) => setSelectedVersion(e.target.value)}
                 >
-                  <option value={''}>-- Select --</option>
                   {sbomVersions.map((item, index) => (
                     <option key={index} value={item.value}>
                       {truncatedValue(item?.label, 30)}
                     </option>
                   ))}
-                </Select>
+                </LynkSelect>
               )}
             </FormControl>
             {(isExists === true || existingNodes) && (
@@ -634,12 +614,13 @@ const Parts = ({ data }) => {
       {/* DISABLED */}
       {isDeleteOpen && (
         <ConfirmationModal
+          title='Delete Part'
+          isLoading={dlLoading}
           isOpen={isDeleteOpen}
           onClose={onDeleteClose}
           onConfirm={handleRemove}
-          name={`${activeRow?.part?.project?.projectGroup?.name} - ${activeRow?.part?.projectVersion}`}
-          title='Delete Part'
           description='Deleting this version will:'
+          name={`${activeRow?.part?.project?.projectGroup?.name} - ${activeRow?.part?.projectVersion}`}
           items={[
             'Remove this versions and its SBOM',
             'Remove access to this version for all users'
