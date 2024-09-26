@@ -13,6 +13,7 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { AddIcon, ViewIcon } from '@chakra-ui/icons'
 import {
   Box,
+  Button,
   Divider,
   Flex,
   Grid,
@@ -77,6 +78,26 @@ const CustomText = styled(Text)`
   letter-spacing: 0.6px;
 `
 
+const ExternalLink = ({ link, ...rest }) => {
+  const { url } = link || ''
+  return (
+    <Tooltip placement='top' label={link?.url}>
+      <Link
+        isExternal
+        href={url?.startsWith('https') ? `${url}` : `https://${url}`}
+      >
+        <IconButton
+          {...rest}
+          size='xs'
+          variant='solid'
+          colorScheme='gray'
+          isDisabled={!link}
+        />
+      </Link>
+    </Tooltip>
+  )
+}
+
 const Components = ({ sbomData }) => {
   const params = useParams()
   const productId = params.productid
@@ -89,6 +110,7 @@ const Components = ({ sbomData }) => {
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const activeColor = useColorModeValue('#3182ce', '#63b3ed')
   const iconColor = useColorModeValue('#2D3748', '#EDF2F7')
 
   const { prodCompState, dispatch } = useGlobalState()
@@ -225,28 +247,11 @@ const Components = ({ sbomData }) => {
       id: 'COMPONENTS_NAME',
       name: 'NAME',
       selector: (row) => {
-        const {
-          purl,
-          cpes,
-          name,
-          primary,
-          internal,
-          externalUrls,
-          sbomId: bomId,
-          sbom
-        } = row
+        const { purl, cpes, name, primary, internal, sbomId: bomId, sbom } = row
         const { projectVersion, project } = sbom || ''
         const { projectGroup } = project || ''
         const isPart = sbomId !== bomId
         const unknown = isUnknown(cpes, purl)
-        const website = externalUrls?.find((item) => item.name === 'website')
-        const distribution = externalUrls?.find(
-          (item) => item.name === 'distribution'
-        )
-        const issueTracker = externalUrls?.find(
-          (item) => item.name === 'issue-tracker'
-        )
-        const vcs = externalUrls?.find((item) => item.name === 'vcs')
         const icon =
           unknown || !purl ? (
             <BsFillPatchQuestionFill fontSize={24} color={iconColor} />
@@ -254,16 +259,17 @@ const Components = ({ sbomData }) => {
             GetIcon(purl?.split('/')[0], colorMode)
           )
         return (
-          <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
+          <Grid
+            templateColumns='repeat(7, 1fr)'
+            sx={{ alignItems: 'center', gap: 2, my: 3 }}
+          >
             <GridItem colSpan={1} width={'50px'}>
               <IconButton icon={icon} isRound={true} variant='solid' />
             </GridItem>
             <GridItem
               colSpan={6}
-              display={'flex'}
-              flexWrap={'wrap'}
               flexDirection={'column'}
-              gap={2}
+              sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}
             >
               {/* COMPONENT NAME */}
               <Text color={textColor} data-tag='allowRowEvents'>
@@ -271,10 +277,8 @@ const Components = ({ sbomData }) => {
               </Text>
               {isPart && (
                 <Text
-                  fontSize={'xs'}
-                  color={textColor}
+                  sx={{ fontSize: 'xs', color: textColor, w: 'fit-content' }}
                   fontWeight={'medium'}
-                  width={'fit-content'}
                 >
                   {projectGroup?.name
                     ? truncatedValue(projectGroup?.name, 10)
@@ -282,61 +286,6 @@ const Components = ({ sbomData }) => {
                   : {projectVersion ? truncatedValue(projectVersion, 10) : ''}
                 </Text>
               )}
-              {/* EXTERNAL REFERENCE */}
-              <Stack direction={'row'} alignItems={'center'}>
-                {/* WEBSITE */}
-                <Tooltip placement='top' label={website?.url}>
-                  <Link href={website?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      isDisabled={!website}
-                      colorScheme='gray'
-                      icon={<FaGlobe color={textColor} fontSize={16} />}
-                    />
-                  </Link>
-                </Tooltip>
-                {/* DISTRIBUTION */}
-                <Tooltip placement='top' label={vcs?.url}>
-                  <Link href={vcs?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      colorScheme='gray'
-                      isDisabled={!vcs}
-                      icon={<FaSitemap color={textColor} fontSize={16} />}
-                    />
-                  </Link>
-                </Tooltip>
-                {/* ADVISORIES */}
-                <Tooltip placement='top' label={issueTracker?.url}>
-                  <Link href={issueTracker?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      colorScheme='gray'
-                      isDisabled={!issueTracker}
-                      icon={<FaHouseUser color={textColor} fontSize={16} />}
-                    />
-                  </Link>
-                </Tooltip>
-                {/* SUPPORT */}
-                <Tooltip placement='top' label={distribution?.url}>
-                  <Link href={distribution?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      isDisabled={!distribution}
-                      colorScheme='gray'
-                      icon={<FaLightbulb color={textColor} fontSize={16} />}
-                    />
-                  </Link>
-                </Tooltip>
-              </Stack>
               {/* COMPONENT TYPE */}
               <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
                 {primary && (
@@ -364,23 +313,18 @@ const Components = ({ sbomData }) => {
           </Grid>
         )
       },
+      width: '30%',
       wrap: true,
-      width: '18%',
       sortable: true
     },
     // VERSION
     {
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
-      selector: (row) => (
-        <Text color={textColor} textAlign='right'>
-          {row?.version}
-        </Text>
-      ),
-      width: '12%',
+      selector: (row) => <Text color={textColor}>{row?.version}</Text>,
       wrap: true,
-      sortable: true,
-      right: 'true'
+      width: '12%',
+      sortable: true
     },
     // COMPONENT HEALTH
     {
@@ -398,41 +342,38 @@ const Components = ({ sbomData }) => {
       width: '12%',
       right: 'true'
     },
-    // PURL
+    // IDENTIFIERS
     {
-      id: 'COMPONENTS_PURL',
-      name: 'PURL',
+      id: 'IDENTIFIERS',
+      name: 'IDENTIFIERS',
       selector: (row) => {
-        const { purl } = row
+        const { purl, cpes } = row
         return (
-          <>
-            {purl !== null && purl !== '' ? (
-              <Text
-                my={3}
-                color={textColor}
-                onClick={() => {
-                  setActiveRow(row)
-                  onPurlOpen()
-                }}
-              >
-                {purl}
-              </Text>
-            ) : (
-              ''
+          <Flex gap={2}>
+            {cpes?.length > 0 && (
+              <Tooltip label={cpes[0]}>
+                <Button size='xs' color={textColor}>
+                  CPE
+                </Button>
+              </Tooltip>
             )}
-          </>
+            {purl && (
+              <Tooltip label={purl}>
+                <Button size='xs' color={textColor}>
+                  PURL
+                </Button>
+              </Tooltip>
+            )}
+          </Flex>
         )
       },
-      sortable: true,
-      width: '20%',
-      wrap: true,
-      grow: 2
+      width: '12%',
+      wrap: true
     },
     // LICENSES
     {
       id: 'COMPONENTS_LICENSES_EXP',
       name: 'LICENSES',
-      width: '14%',
       selector: (row) => {
         const { licenses, licensesExp, licensesCustom } = row
         const totalSpdx = licenses?.length > 1 && licenses.slice(1)
@@ -532,6 +473,7 @@ const Components = ({ sbomData }) => {
           </Flex>
         )
       },
+      width: '13%',
       sortable: true,
       wrap: true
     },
@@ -550,7 +492,7 @@ const Components = ({ sbomData }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      right: 'true',
+      width: '12%',
       wrap: true
     },
     // ACTION
@@ -558,9 +500,38 @@ const Components = ({ sbomData }) => {
       id: 'action',
       name: 'ACTION',
       selector: (row) => {
-        const { status, primary } = row
+        const { status, primary, externalUrls } = row
+        const website = externalUrls?.find((item) => item.name === 'website')
+        const distribution = externalUrls?.find(
+          (item) => item.name === 'distribution'
+        )
+        const issueTracker = externalUrls?.find(
+          (item) => item.name === 'issue-tracker'
+        )
+        const vcs = externalUrls?.find((item) => item.name === 'vcs')
+        const onCheck = (item) => (item ? activeColor : textColor)
         return (
-          <>
+          <Stack direction={'row'} alignItems={'center'}>
+            {/* WEBSITE */}
+            <ExternalLink
+              link={website}
+              icon={<FaGlobe color={onCheck(website)} fontSize={16} />}
+            />
+            {/* DISTRIBUTION */}
+            <ExternalLink
+              link={vcs}
+              icon={<FaSitemap color={onCheck(vcs)} fontSize={16} />}
+            />
+            {/* ADVISORIES */}
+            <ExternalLink
+              link={issueTracker}
+              icon={<FaHouseUser color={onCheck(issueTracker)} fontSize={16} />}
+            />
+            {/* SUPPORT */}
+            <ExternalLink
+              link={distribution}
+              icon={<FaLightbulb color={onCheck(distribution)} fontSize={16} />}
+            />
             {!customerView ? (
               <Menu>
                 <MenuButton
@@ -571,7 +542,7 @@ const Components = ({ sbomData }) => {
                   color='gray.400'
                 />
                 <Portal>
-                  <MenuList size='sm'>
+                  <MenuList fontSize={'sm'}>
                     <MenuItem
                       onClick={() => onEditOpen(row)}
                       isDisabled={status === 'signed' || !updateComponent}
@@ -625,10 +596,9 @@ const Components = ({ sbomData }) => {
                 }}
               />
             )}
-          </>
+          </Stack>
         )
       },
-      width: '10%',
       wrap: true,
       right: 'true',
       omit: isArchived
@@ -687,6 +657,52 @@ const Components = ({ sbomData }) => {
             <Text sx={textStyle} width={'90%'}>
               {description !== null ? description : 'N/A'}
             </Text>
+          </GridItem>
+          <GridItem colSpan={3}>
+            <CustomText>Depends On :</CustomText>
+            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
+              {dependsOn?.length > 0 ? (
+                [...dependsOn]
+                  .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                  .map((comp, index) => (
+                    <Tag
+                      size='sm'
+                      key={index}
+                      variant='subtle'
+                      colorScheme={'blue'}
+                      sx={{ p: 1, workBreak: 'break-all' }}
+                    >
+                      <Text wordBreak={'break-all'}>
+                        {comp.toComp.name}-{comp.toComp.version}
+                      </Text>
+                    </Tag>
+                  ))
+              ) : (
+                <Text sx={textStyle}>N/A</Text>
+              )}
+            </Flex>
+          </GridItem>
+          <GridItem>
+            <CustomText>Dependency Of :</CustomText>
+            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
+              {dependencyOf?.length > 0 ? (
+                dependencyOf?.map((comp, index) => (
+                  <Tag
+                    size='sm'
+                    padding={1}
+                    key={index}
+                    variant='subtle'
+                    colorScheme={'blue'}
+                  >
+                    <Text wordBreak={'break-all'}>
+                      {comp.fromComp.name}-{comp.fromComp.version}
+                    </Text>
+                  </Tag>
+                ))
+              ) : (
+                <Text sx={textStyle}>N/A</Text>
+              )}
+            </Flex>
           </GridItem>
           <GridItem>
             <CustomText>Component :</CustomText>
@@ -757,63 +773,6 @@ const Components = ({ sbomData }) => {
                     {item}
                   </Text>
                 ))}
-            </Flex>
-          </GridItem>
-          <GridItem>
-            <CustomText>Depends On :</CustomText>
-            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-              {dependsOn?.length > 0 ? (
-                [...dependsOn]
-                  .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-                  .map((comp, index) => (
-                    <Tooltip
-                      key={index}
-                      label={comp.toComp.name}
-                      placement='top'
-                    >
-                      <Tag
-                        size='sm'
-                        padding={1}
-                        variant='subtle'
-                        colorScheme={'blue'}
-                        wordBreak={'break-all'}
-                      >
-                        <Text wordBreak={'break-all'}>
-                          {comp.toComp.name}-{comp.toComp.version}
-                        </Text>
-                      </Tag>
-                    </Tooltip>
-                  ))
-              ) : (
-                <Text sx={textStyle}>N/A</Text>
-              )}
-            </Flex>
-          </GridItem>
-          <GridItem>
-            <CustomText>Dependency Of :</CustomText>
-            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-              {dependencyOf?.length > 0 ? (
-                dependencyOf?.map((comp, index) => (
-                  <Tooltip
-                    key={index}
-                    label={comp.fromComp.name}
-                    placement='top'
-                  >
-                    <Tag
-                      size='sm'
-                      padding={1}
-                      variant='subtle'
-                      colorScheme={'blue'}
-                    >
-                      <Text wordBreak={'break-all'}>
-                        {comp.fromComp.name}-{comp.fromComp.version}
-                      </Text>
-                    </Tag>
-                  </Tooltip>
-                ))
-              ) : (
-                <Text sx={textStyle}>N/A</Text>
-              )}
             </Flex>
           </GridItem>
           <GridItem>

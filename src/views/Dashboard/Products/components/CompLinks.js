@@ -262,7 +262,7 @@ const CompLinks = ({ data }) => {
                       <Text>
                         {item?.url ? (
                           <Tooltip label={item.url}>
-                            {truncatedValue(item.url, 50)}
+                            {truncatedValue(item.url, 45)}
                           </Tooltip>
                         ) : null}
                       </Text>
