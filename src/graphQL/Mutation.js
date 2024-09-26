@@ -2105,8 +2105,8 @@ export const UpdateCompSupportOverride = gql`
     $idUri: String
     $name: String
     $version: String
-    $eol: ISO8601Date
-    $eos: ISO8601Date
+    $eol: DateOrEmptyString
+    $eos: DateOrEmptyString
     $outdated: Boolean
     $deprecated: Boolean
     $enabled: Boolean

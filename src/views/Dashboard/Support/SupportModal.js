@@ -24,8 +24,8 @@ import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 
 import {
-  CreateCompSupportOverride,
-  UpdateCompSupportOverride
+  CreateCompSupportOverride as CreateSupport,
+  UpdateCompSupportOverride as UpdateSupport
 } from 'graphQL/Mutation'
 
 import { BsHeartPulse } from 'react-icons/bs'
@@ -33,30 +33,43 @@ import { FaPlus } from 'react-icons/fa'
 import { MdDeleteOutline } from 'react-icons/md'
 
 const SupportModal = ({ supports, data, isOpen, onClose }) => {
-  const [idUri, setIdUri] = useState('')
-  const [productName, setProductName] = useState('')
-  const [productVersion, setProductVersion] = useState('')
-  const [error, setError] = useState('')
-  const [eol, setEol] = useState(null)
-  const [eos, setEos] = useState(null)
-  const [deprecated, setDeprecated] = useState(false)
-  const [outdated, setOutdated] = useState(false)
+  const initialData = {
+    idUri: '',
+    name: '',
+    version: '',
+    eos: null,
+    eol: null,
+    deprecated: false,
+    outdated: false
+  }
+  const [formData, setFormData] = useState(initialData)
   const [IDs, setIDs] = useState([{ id: 1, value: '', error: '' }])
+  const [error, setError] = useState('')
 
+  const { idUri, name, version } = formData || {}
   const borderColor = useColorModeValue('gray.200', 'gray.600')
 
-  const [createSupport] = useMutation(CreateCompSupportOverride)
-  const [updateSupport] = useMutation(UpdateCompSupportOverride)
+  const [createSupport, { loading: crLoading }] = useMutation(CreateSupport)
+  const [updateSupport, { loading: upLoading }] = useMutation(UpdateSupport)
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }))
+    setError('')
+  }
 
   const hasSimilarRow = (data) => {
     for (let i = 0; i < data.length; i++) {
       for (let j = i + 1; j < data.length; j++) {
         if (data[i].value === data[j].value) {
-          return true // Similar row found
+          return true
         }
       }
     }
-    return false // No similar rows found
+    return false
   }
 
   const checkDataValidity = (data) => {
@@ -128,17 +141,17 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
   }
 
   const onUriBlur = () => {
-    if (idUri !== '') {
-      if (idUri?.startsWith(`cpe`)) {
-        const matches = validateCpe(idUri)
+    if (formData?.idUri !== '') {
+      if (formData?.idUri?.startsWith(`cpe`)) {
+        const matches = validateCpe(formData?.idUri)
         if (matches) {
           setError('')
         } else {
           setError('Please enter a valid CPE')
         }
-      } else if (idUri?.startsWith(`pkg`)) {
+      } else if (formData?.idUri?.startsWith(`pkg`)) {
         try {
-          PackageURL.fromString(idUri)
+          PackageURL.fromString(formData?.idUri)
           setError('')
         } catch (ex) {
           setError(`Please enter a valid PURL`)
@@ -147,9 +160,13 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
     }
   }
 
-  const handleDateChange = (setter, newDate) => {
+  const handleDateChange = (type, newDate) => {
     const isValidDate = newDate && !isNaN(newDate)
-    setter(newDate._d)
+    if (type === 'eos') {
+      setFormData((prev) => ({ ...prev, eos: newDate?._d }))
+    } else {
+      setFormData((prev) => ({ ...prev, eol: newDate?._d }))
+    }
     if (newDate && !isValidDate) {
       setError('Please enter a valid date')
     } else {
@@ -158,13 +175,9 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
   }
 
   const isInvalid =
-    idUri === '' ||
-    error !== '' ||
-    idUri === productName ||
-    idUri === productVersion
+    error !== '' || idUri === '' || idUri === name || idUri === version
 
-  const handleCreate = (e) => {
-    e.preventDefault()
+  const handleCreate = () => {
     if (IDs?.length > 0) {
       IDs?.map((item) => {
         if (
@@ -180,14 +193,14 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
           } else {
             createSupport({
               variables: {
-                idUri: item?.value,
-                name: productName,
-                version: productVersion === '' ? undefined : productVersion,
-                eol: eol ? eol : undefined,
-                eos: eos ? eos : undefined,
                 enabled: true,
-                deprecated,
-                outdated
+                idUri: item?.value,
+                name: formData?.name,
+                eol: formData?.eol || '',
+                eos: formData?.eos || '',
+                version: formData?.version,
+                outdated: formData?.outdated,
+                deprecated: formData?.deprecated
               }
             }).then((res) => {
               const errors = res?.data?.componentSupportOverrideCreate?.errors
@@ -207,36 +220,29 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
     }
   }
 
-  const handleUpdate = (e) => {
-    e.preventDefault()
+  const handleUpdate = () => {
     if (
-      idUri !== '' &&
-      (idUri?.startsWith('pkg') || idUri?.startsWith('cpe'))
+      formData?.idUri !== '' &&
+      (formData?.idUri?.startsWith('pkg') || formData?.idUri?.startsWith('cpe'))
     ) {
       updateSupport({
         variables: {
           id: data?.id,
-          idUri,
-          name: productName,
-          version: productVersion === '' ? undefined : productVersion,
-          eol: eol ? eol : undefined,
-          eos: eos ? eos : undefined,
+          name: formData?.name,
           enabled: data?.enabled,
-          deprecated,
-          outdated
+          idUri: formData?.idUri,
+          eol: formData?.eol || '',
+          eos: formData?.eos || '',
+          version: formData?.version,
+          outdated: formData?.outdated,
+          deprecated: formData?.deprecated
         }
       }).then((res) => {
         const errors = res?.data?.componentSupportOverrideUpdate?.errors
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
-          setIdUri('')
-          setProductName('')
-          setProductVersion('')
-          setEol(null)
-          setEos(null)
-          setDeprecated(false)
-          setOutdated(false)
+          setFormData(initialData)
           onClose()
         }
       })
@@ -247,13 +253,15 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
 
   useEffect(() => {
     if (data) {
-      setIdUri(data?.idUri || '')
-      setProductName(data?.productName || '')
-      setProductVersion(data?.productVersion || '')
-      setEos(data?.eos ? new Date(data?.eos) : null)
-      setEol(data?.eol ? new Date(data?.eol) : null)
-      setDeprecated(data?.deprecated)
-      setOutdated(data?.outdated)
+      setFormData(() => ({
+        idUri: data?.idUri,
+        name: data?.productName,
+        outdated: data?.outdated,
+        deprecated: data?.deprecated,
+        version: data?.productVersion,
+        eol: data?.eol ? new Date(data?.eol) : null,
+        eos: data?.eos ? new Date(data?.eos) : null
+      }))
     }
   }, [data])
 
@@ -262,60 +270,66 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
       <LynkModal
         isOpen={isOpen}
         onClose={onClose}
+        Icon={BsHeartPulse}
+        buttonText={data ? 'Update' : 'Save'}
+        isLoading={data ? upLoading : crLoading}
         onSubmit={data ? handleUpdate : handleCreate}
         title={`${data ? 'Edit' : 'Create'} Support`}
-        Icon={BsHeartPulse}
         disabled={data ? isInvalid : errorMessage || error !== ''}
-        buttonText={data ? 'Update' : 'Save'}
       >
         <Flex width={'100%'} direction={'column'} gap={4}>
-          <FormControl isInvalid={productName !== '' && idUri === productName}>
-            <FormLabel fontSize={12}>Product name</FormLabel>
+          <FormControl isInvalid={name !== '' && idUri === name}>
+            <FormLabel htmlFor='name' fontSize={12}>
+              Product name
+            </FormLabel>
             <Input
               type='text'
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-              placeholder='Enter Product Name'
+              name='name'
               fontSize={14}
+              value={formData?.name}
+              onChange={handleChange}
+              placeholder='Enter Product Name'
             />
             <FormErrorMessage>Invalid name</FormErrorMessage>
           </FormControl>
-          <FormControl
-            isInvalid={productVersion !== '' && idUri === productVersion}
-          >
-            <FormLabel fontSize={12}>Product version</FormLabel>
+          <FormControl isInvalid={version !== '' && idUri === version}>
+            <FormLabel htmlFor='version' fontSize={12}>
+              Product version
+            </FormLabel>
             <Input
               type='text'
-              value={productVersion}
-              onChange={(e) => setProductVersion(e.target.value)}
-              placeholder='Enter Product Version'
               fontSize={14}
+              name='version'
+              onChange={handleChange}
+              value={formData?.version}
+              placeholder='Enter Product Version'
             />
             <FormErrorMessage>Invalid version</FormErrorMessage>
           </FormControl>
           <FormControl>
-            <FormLabel mb={1} htmlFor='expire' fontSize={12}>
+            <FormLabel mb={1} htmlFor='eol' fontSize={12}>
               End of life
             </FormLabel>
             <LynkDate
-              value={eol}
-              onChange={(newDate) => handleDateChange(setEol, newDate)}
+              value={formData?.eol}
+              onChange={(newDate) => handleDateChange('eol', newDate)}
             />
           </FormControl>
           <FormControl>
-            <FormLabel mb={1} htmlFor='expire' fontSize={12}>
+            <FormLabel mb={1} htmlFor='eos' fontSize={12}>
               End of service
             </FormLabel>
             <LynkDate
-              value={eos}
-              onChange={(newDate) => handleDateChange(setEos, newDate)}
+              value={formData?.eos}
+              onChange={(newDate) => handleDateChange('eos', newDate)}
             />
           </FormControl>
           <HStack>
             <FormControl>
               <Checkbox
-                isChecked={deprecated}
-                onChange={(e) => setDeprecated(e.target.checked)}
+                name='deprecated'
+                onChange={handleChange}
+                isChecked={formData?.deprecated}
               >
                 <Text fontSize={12} fontWeight={400}>
                   Deprecated
@@ -324,8 +338,9 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
             </FormControl>
             <FormControl>
               <Checkbox
-                isChecked={outdated}
-                onChange={(e) => setOutdated(e.target.checked)}
+                name='outdated'
+                onChange={handleChange}
+                isChecked={formData?.outdated}
               >
                 <Text fontSize={12} fontWeight={400}>
                   Outdated
@@ -339,12 +354,10 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
               {data ? (
                 <Input
                   type='text'
-                  value={idUri}
-                  onChange={(e) => {
-                    setIdUri(e.target.value)
-                    setError('')
-                  }}
+                  name='idUri'
                   onBlur={onUriBlur}
+                  value={formData?.idUri}
+                  onChange={handleChange}
                 />
               ) : (
                 <Flex flexDirection={'column'} gap={2}>
@@ -352,16 +365,14 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
                     IDs?.map((item) => (
                       <Flex
                         key={item?.id}
-                        width={'100%'}
-                        gap={2}
                         justifyContent={'space-between'}
-                        alignItems={'items-start'}
+                        sx={{ w: '100%', gap: 2, alignItems: 'items-start' }}
                       >
                         <Stack width={'100%'}>
                           <Input
                             type='text'
                             fontSize={14}
-                            alue={item?.value}
+                            value={item?.value}
                             onBlur={() => onIdBlur(item)}
                             placeholder='Enter PURL / CPE'
                             onChange={(e) =>
@@ -383,10 +394,8 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
                           display={item?.id === 1 ? 'none' : 'flex'}
                           icon={
                             <Icon
-                              color={'#E53E3E'}
-                              w={6}
-                              h={6}
                               as={MdDeleteOutline}
+                              sx={{ w: 6, h: 6, color: '#E53E3E' }}
                             />
                           }
                         />
@@ -396,13 +405,12 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
               )}
             </FormControl>
             <Button
-              fontSize={'sm'}
-              colorScheme='blue'
-              variant='link'
-              fontWeight={'medium'}
-              leftIcon={<FaPlus />}
-              onClick={addRow}
               hidden={data}
+              variant='link'
+              onClick={addRow}
+              colorScheme='blue'
+              leftIcon={<FaPlus />}
+              sx={{ fontSize: 'sm', fontWeight: 'medium' }}
             >
               Add ID
             </Button>
