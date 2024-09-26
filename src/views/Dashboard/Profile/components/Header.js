@@ -238,7 +238,10 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           })
         }
       })
-      .finally(() => navigate('/vendor/dashboard'))
+      .finally(() => {
+        navigate('/vendor/dashboard')
+        window.location.reload()
+      })
   }
 
   //Function to change tab (org <> personal)
