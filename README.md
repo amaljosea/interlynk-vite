@@ -82,3 +82,60 @@ port 3001
 # Installing VSCode extensions
 
 - Install all the workspace recommended extensions, see `.vscode/extensions.json`
+
+# Playwright Testing - Locally and in CI
+
+Playwright is used for end-to-end (E2E) testing of the Interlynk Dashboard to ensure that key workflows function as expected.
+
+## Prerequisites
+
+1. **Playwright Browsers:** Install Playwright browsers locally.
+
+```cmd
+  npm ci  # To install dependencies
+  npx playwright install --with-deps  # To install browsers and dependencies
+```
+
+2. **Environment Variables:** Ensure you have the correct environment variables configured in your .env
+
+```cmd
+PLAYWRIGHT_TEST_URL=https://staging.interlynk.io/auth
+PLAYWRIGHT_USER_EMAIL=youremail@example.com
+PLAYWRIGHT_USER_PASSWORD=YourSecurePassword
+```
+
+## Running Tests Locally
+
+1. **Run Individual Test:**
+   Navigate to the root folder adn Execute the following command to run an individual test script:
+
+   ```cmd
+   npx playwright test <test_script_name>
+   ```
+
+2. **Parallel Execution:**
+   For parallel execution of tests, use the following command:
+
+   ```cmd
+   npx playwright test
+   ```
+
+3. **To run tests in headed mode (with the browser visible):**
+
+   ```cmd
+   npx playwright test --headed
+   ```
+
+## CI/CD Integration with GitHub Actions
+
+Playwright is configured to run in a CI/CD environment using GitHub Actions.
+To run the Playwright tests in GitHub Actions, you can trigger the workflow by going to the "Actions" tab in your repository.
+If any tests fail, the Playwright report will be uploaded as an artifact for review.
+
+## Additional Notes
+
+- **Test Results:**
+  After execution of tests results will be available in `playwright-report` folder and if we want show the report by using following command
+  ```cmd
+  npx playwright show-report
+  ```
