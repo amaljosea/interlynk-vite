@@ -196,8 +196,8 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
                 enabled: true,
                 idUri: item?.value,
                 name: formData?.name,
-                eol: formData?.eol || '',
-                eos: formData?.eos || '',
+                eol: formData?.eol || undefined,
+                eos: formData?.eos || undefined,
                 version: formData?.version,
                 outdated: formData?.outdated,
                 deprecated: formData?.deprecated
