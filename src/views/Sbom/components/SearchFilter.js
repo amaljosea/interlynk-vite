@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
-
 import { CloseIcon, SearchIcon } from '@chakra-ui/icons'
-import { Box, Input, InputGroup, InputLeftElement } from '@chakra-ui/react'
+import { Box, Input, InputGroup, InputLeftElement, InputRightElement } from '@chakra-ui/react'
 
 const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
   const searchInputRef = useRef()
@@ -42,23 +41,13 @@ const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
             onChange={onChange}
             onKeyDown={onFilter}
           />
+          <InputRightElement hidden={filterText === ''}>
+            <CloseIcon
+              onClick={onClear}
+              sx={{ fontSize: 10, cursor: 'pointer' }}
+            />
+          </InputRightElement>
         </InputGroup>
-        {filterText !== '' && (
-          <CloseIcon
-            w={'18px'}
-            h={'18px'}
-            bg={'blue.500'}
-            color={'white'}
-            p={1}
-            rounded={'full'}
-            position={'absolute'}
-            zIndex={11}
-            right={3}
-            top={'11px'}
-            onClick={onClear}
-            cursor={'pointer'}
-          />
-        )}
       </Box>
     </>
   )

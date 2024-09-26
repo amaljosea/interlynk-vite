@@ -74,6 +74,26 @@ const TeamTable = () => {
   const paddingHeadCell = 0
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
+  const { showToast } = useCustomToast()
+  const SERVER_URL = process.env.REACT_APP_SERVER
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isTeamOpen,
+    onOpen: onTeamOpen,
+    onClose: onTeamClose
+  } = useDisclosure()
+  const {
+    isOpen: isRoleOpen,
+    onOpen: onRoleOpen,
+    onClose: onRoleClose
+  } = useDisclosure()
+  const [activeRow, setActiveRow] = useState(null)
+  const [searchInput, setSearchInput] = useState('')
+  const [filterText, setFilterText] = useState('')
+  const [deleteUser] = useMutation(deleteOrgUser)
+
+  const [inviteUsers] = useMutation(InviteUser)
+
   const { data: orgData } = useQuery(GetCurrentUser, {
     skip: !orgView ? true : activetab === 'users' ? false : true
   })
@@ -83,7 +103,7 @@ const TeamTable = () => {
 
   const { data: userData, loading } = useQuery(GetUsers, {
     skip: !orgView ? true : activetab === 'users' ? false : true,
-    variables: { search: filterText === '' ? undefined : filterText }
+    variables: { search: filterText }
   })
 
   const numberOfUsers = userData?.organization?.users.length
@@ -104,26 +124,6 @@ const TeamTable = () => {
     parentKey: 'view_users',
     childKey: 'remove_user'
   })
-
-  const { showToast } = useCustomToast()
-  const SERVER_URL = process.env.REACT_APP_SERVER
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isTeamOpen,
-    onOpen: onTeamOpen,
-    onClose: onTeamClose
-  } = useDisclosure()
-  const {
-    isOpen: isRoleOpen,
-    onOpen: onRoleOpen,
-    onClose: onRoleClose
-  } = useDisclosure()
-  const [activeRow, setActiveRow] = useState(null)
-  const [searchInput, setSearchInput] = useState('')
-  const [filterText, setFilterText] = useState('')
-  const [deleteUser] = useMutation(deleteOrgUser)
-
-  const [inviteUsers] = useMutation(InviteUser)
 
   // COLUMNS
   const columns = [
