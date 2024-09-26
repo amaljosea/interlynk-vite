@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, linkURl, sevColor } from 'utils'
 import { isCustomerView, timeSince } from 'utils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
@@ -320,6 +320,7 @@ const ExpandedComponent = (props) => {
 
 const Vulnerabilities = ({ sbomData }) => {
   const params = useParams()
+  const navigate = useNavigate()
   const productId = params.productid
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -509,6 +510,11 @@ const Vulnerabilities = ({ sbomData }) => {
     }
   }
 
+  const onGlobalView = (id, vuln) => {
+    localStorage.setItem('activeVuln', vuln)
+    navigate(`/vendor/vulnerabilities?vulnId=${id}`)
+  }
+
   // COLUMNS
   const columns = [
     // CVE ID
@@ -528,14 +534,24 @@ const Vulnerabilities = ({ sbomData }) => {
           : externalUrls?.find((item) => item.name === 'issue-tracker')
         return (
           <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
-            <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
-              <Icon
-                as={ExternalLinkIcon}
-                h={'16px'}
-                w={'16px'}
-                color={'blue.500'}
-              />
-            </Link>
+            <Tooltip label={vuln.source === 'osv' ? 'OSV View' : 'NVD View'}>
+              <Link to={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
+                <Icon
+                  as={ExternalLinkIcon}
+                  sx={{ w: '16px', h: '16px', color: 'blue.500' }}
+                />
+              </Link>
+            </Tooltip>
+            <Tooltip label={'Global Vulnerability View'}>
+              <Stack>
+                <Icon
+                  as={FaEye}
+                  hidden={customerView}
+                  onClick={() => onGlobalView(id, vuln.vulnId)}
+                  sx={{ w: '16px', h: '16px', mt: 0.5, color: textColor }}
+                />
+              </Stack>
+            </Tooltip>
             <Stack direction={'column'} spacing={1.5}>
               <Text fontSize='sm' color={textColor} data-tag='allowRowEvents'>
                 {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
@@ -551,14 +567,7 @@ const Vulnerabilities = ({ sbomData }) => {
                 </Text>
               )}
               <Stack direction={'row'} alignItems={'center'}>
-                {/* info link */}
-                <Link to={`/vendor/vulnerabilities?vulnId=${id}`}>
-                  <LynkIcon
-                    disabled={customerView}
-                    icon={<FaEye color={textColor} fontSize={16} />}
-                  />
-                </Link>
-                {/* issueTracker */}
+                {/* ISSUE TRACKER */}
                 <Tooltip placement='top' label={issueTracker?.url}>
                   <Link href={getUrl(issueTracker?.url)} target='_blank'>
                     <LynkIcon
@@ -842,7 +851,7 @@ const Vulnerabilities = ({ sbomData }) => {
               color='gray.400'
             />
             <Portal>
-              <MenuList size='sm'>
+              <MenuList fontSize='sm'>
                 <MenuItem
                   isDisabled={!editVulns}
                   onClick={() => {
