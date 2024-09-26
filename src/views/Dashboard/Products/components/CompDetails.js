@@ -1,8 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import React, { useContext, useEffect, useState } from 'react'
-import Datetime from 'react-datetime'
-import 'react-datetime/css/react-datetime.css'
 import { isCustomerView } from 'utils'
 import { infoData } from 'variables/general'
 import { componentTypes } from 'variables/general'
@@ -22,12 +20,12 @@ import {
   Textarea,
   Tooltip,
   chakra,
-  useColorMode,
   useDisclosure
 } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkAlert from 'components/LynkAlert'
+import LynkDate from 'components/LynkDate'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -68,9 +66,6 @@ const CompDetails = ({ data, primaryComp }) => {
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
   const [isValidDate, setIsValidDate] = useState(true)
-
-  const { colorMode } = useColorMode()
-  const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
 
   const handleDateChange = (newDate) => {
     const isValidDate = newDate && !isNaN(newDate)
@@ -408,23 +403,7 @@ const CompDetails = ({ data, primaryComp }) => {
               </Tooltip>
             </Flex>
           </FormLabel>
-          <Datetime
-            timeFormat={false}
-            closeOnSelect={true}
-            value={details?.endOfSupport}
-            className={`${react_datatime} endOfSupport`}
-            onChange={handleDateChange}
-            inputProps={{
-              name: 'endOfSupport',
-              placeholder: 'Add support date',
-              onCopy: (e) => e.preventDefault(),
-              onPaste: (e) => e.preventDefault(),
-              style: {
-                background: 'none',
-                fontSize: '14px'
-              }
-            }}
-          />
+          <LynkDate value={details?.endOfSupport} onChange={handleDateChange} />
           {!isValidDate && (
             <FormErrorMessage>Please enter a valid datetime</FormErrorMessage>
           )}

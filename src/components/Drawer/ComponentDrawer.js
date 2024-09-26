@@ -2,8 +2,6 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
 import React, { useContext, useRef, useState } from 'react'
-import Datetime from 'react-datetime'
-import 'react-datetime/css/react-datetime.css'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { isCustomerView } from 'utils'
 import { infoData } from 'variables/general'
@@ -28,12 +26,12 @@ import {
   Textarea,
   Tooltip,
   chakra,
-  useColorMode,
   useDisclosure
 } from '@chakra-ui/react'
 
 import CpeField from 'components/CpeField'
 import LicenseField from 'components/Licenses/LicenseField'
+import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 import CompInfo from 'components/Misc/CompInfo'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
@@ -72,9 +70,6 @@ function ComponentDrawer(props) {
       tab: activeTab
     }
   })
-
-  const { colorMode } = useColorMode()
-  const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
 
   const { isOpen, onClose, data, primaryComp, shortDesc } = props
   const { prodCompState, dispatch } = useGlobalState()
@@ -611,22 +606,9 @@ function ComponentDrawer(props) {
                     </Tooltip>
                   </Flex>
                 </FormLabel>
-                <Datetime
-                  timeFormat={false}
-                  closeOnSelect={true}
+                <LynkDate
                   value={details?.endOfSupport}
-                  className={`${react_datatime} endOfSupport`}
                   onChange={handleDateChange}
-                  inputProps={{
-                    name: 'endOfSupport',
-                    placeholder: 'Add support date',
-                    onCopy: (e) => e.preventDefault(),
-                    onPaste: (e) => e.preventDefault(),
-                    style: {
-                      background: 'none',
-                      fontSize: '14px'
-                    }
-                  }}
                 />
                 {!isValidDate && (
                   <FormErrorMessage>

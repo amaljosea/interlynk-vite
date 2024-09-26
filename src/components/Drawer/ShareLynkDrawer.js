@@ -1,8 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import Datetime from 'react-datetime'
-import 'react-datetime/css/react-datetime.css'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import { getShareLinklUrl } from 'utils/url'
 
@@ -23,13 +21,13 @@ import {
   Text,
   Tooltip,
   useClipboard,
-  useColorMode,
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import LynkAlert from 'components/LynkAlert'
+import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
@@ -42,8 +40,6 @@ import { PiFileSvgDuotone } from 'react-icons/pi'
 const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
   const BACKEND_URL = process.env.REACT_APP_SERVER
   const [createLynk] = useMutation(CreateShareLynk)
-  const { colorMode } = useColorMode()
-  const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
@@ -256,20 +252,7 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
               <FormLabel mb={1} htmlFor='expire'>
                 Expiration Date
               </FormLabel>
-              <Datetime
-                closeOnSelect={true}
-                value={selectedDate}
-                onChange={handleDateChange}
-                className={react_datatime}
-                inputProps={{
-                  placeholder: 'Select Date and Time',
-                  onCopy: (e) => e.preventDefault(),
-                  onPaste: (e) => e.preventDefault(),
-                  style: {
-                    background: 'none'
-                  }
-                }}
-              />
+              <LynkDate value={selectedDate} onChange={handleDateChange} />
               {!isValidDate && (
                 <FormErrorMessage>
                   Please enter a valid expiry date

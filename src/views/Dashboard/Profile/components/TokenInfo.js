@@ -2,8 +2,6 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { isValid } from 'date-fns'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import Datetime from 'react-datetime'
-import 'react-datetime/css/react-datetime.css'
 import { customStyles, getFullDateAndTime, truncatedValue } from 'utils'
 
 import { AddIcon, CopyIcon } from '@chakra-ui/icons'
@@ -27,12 +25,12 @@ import {
   Text,
   Tooltip,
   useClipboard,
-  useColorMode,
   useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -74,9 +72,6 @@ const TokenInfo = () => {
   const { orgView } = useGlobalQueryContext()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const { colorMode } = useColorMode()
-  const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
 
   const headColor = useColorModeValue('#4A5568', '#CBD5E0')
   const paddingCell = 0
@@ -496,21 +491,7 @@ const TokenInfo = () => {
               <FormLabel fontSize={12} htmlFor='expire'>
                 Expiration Date
               </FormLabel>
-              <Datetime
-                value={selectedDate}
-                closeOnSelect={true}
-                className={react_datatime}
-                onChange={handleDateChange}
-                inputProps={{
-                  placeholder: 'Select Date and Time',
-                  disabled: token !== '',
-                  onCopy: (e) => e.preventDefault(),
-                  onPaste: (e) => e.preventDefault(),
-                  style: {
-                    background: 'none'
-                  }
-                }}
-              />
+              <LynkDate value={selectedDate} onChange={handleDateChange} />
               {!isValidDate && (
                 <FormErrorMessage>
                   Please enter a valid datetime

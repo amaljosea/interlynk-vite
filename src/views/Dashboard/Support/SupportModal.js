@@ -1,8 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import { useEffect, useState } from 'react'
-import Datetime from 'react-datetime'
-import 'react-datetime/css/react-datetime.css'
 import { validateCpe } from 'utils'
 
 import {
@@ -18,11 +16,11 @@ import {
   Input,
   Stack,
   Text,
-  useColorMode,
   useColorModeValue
 } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
+import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 
 import {
@@ -46,8 +44,6 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
   const [IDs, setIDs] = useState([{ id: 1, value: '', error: '' }])
 
   const borderColor = useColorModeValue('gray.200', 'gray.600')
-  const { colorMode } = useColorMode()
-  const react_datatime = colorMode === 'light' ? 'light_picker' : 'dark_picker'
 
   const [createSupport] = useMutation(CreateCompSupportOverride)
   const [updateSupport] = useMutation(UpdateCompSupportOverride)
@@ -151,12 +147,14 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
     }
   }
 
-  const handleEolChange = (newDate) => {
-    setEol(newDate._d)
-  }
-
-  const handleEosChange = (newDate) => {
-    setEos(newDate._d)
+  const handleDateChange = (setter, newDate) => {
+    const isValidDate = newDate && !isNaN(newDate)
+    setter(newDate._d)
+    if (newDate && !isValidDate) {
+      setError('Please enter a valid date')
+    } else {
+      setError('')
+    }
   }
 
   const isInvalid =
@@ -299,40 +297,18 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
             <FormLabel mb={1} htmlFor='expire' fontSize={12}>
               End of life
             </FormLabel>
-            <Datetime
+            <LynkDate
               value={eol}
-              timeFormat={false}
-              onChange={handleEolChange}
-              className={react_datatime}
-              inputProps={{
-                onCopy: (e) => e.preventDefault(),
-                onPaste: (e) => e.preventDefault(),
-                style: {
-                  background: 'none',
-                  fontSize: '14px'
-                },
-                placeholder: 'Enter End of Life'
-              }}
+              onChange={(newDate) => handleDateChange(setEol, newDate)}
             />
           </FormControl>
           <FormControl>
             <FormLabel mb={1} htmlFor='expire' fontSize={12}>
               End of service
             </FormLabel>
-            <Datetime
+            <LynkDate
               value={eos}
-              timeFormat={false}
-              onChange={handleEosChange}
-              className={react_datatime}
-              inputProps={{
-                onCopy: (e) => e.preventDefault(),
-                onPaste: (e) => e.preventDefault(),
-                style: {
-                  background: 'none',
-                  fontSize: '14px'
-                },
-                placeholder: 'Enter End of Service'
-              }}
+              onChange={(newDate) => handleDateChange(setEos, newDate)}
             />
           </FormControl>
           <HStack>
@@ -383,14 +359,14 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
                       >
                         <Stack width={'100%'}>
                           <Input
-                            fontSize={12}
-                            placeholder='Enter PURL / CPE'
                             type='text'
+                            fontSize={14}
                             alue={item?.value}
+                            onBlur={() => onIdBlur(item)}
+                            placeholder='Enter PURL / CPE'
                             onChange={(e) =>
                               handleIdChange(e.target.value, item.id)
                             }
-                            onBlur={() => onIdBlur(item)}
                           />
                           {item?.error !== '' && (
                             <Text mt={1} color={'red.500'} fontSize={'sm'}>

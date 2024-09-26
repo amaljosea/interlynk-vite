@@ -111,12 +111,12 @@
   border-radius: 5px;
 }
 
-.endOfSupport > .rdtPicker {
-  bottom: 44px;
+.rdtPicker thead th:hover {
+  background: rgba(0, 0, 0, 0.1) !important;
 }
 
-.endOfSupport > input:focus {
-  outline-color: #3182ce;
+.picker_top > .rdtPicker {
+  bottom: 44px;
 }
 
 .demo-node > circle {
@@ -231,10 +231,6 @@
 
 .dark_picker .rdtPicker {
   background: #2d3748 !important;
-}
-
-.rdtPicker thead tr:first-of-type th:hover {
-  background: rgba(0, 0, 0, 0.1);
 }
 
 td.rdtMonth:hover,
