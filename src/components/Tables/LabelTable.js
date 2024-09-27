@@ -24,6 +24,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LabelDelete } from 'graphQL/Mutation'
 import { GetLabels } from 'graphQL/Queries'
@@ -34,7 +35,7 @@ const LabelTable = ({ isOpen }) => {
   const [disabled, setDisabled] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
   const [deleteItem, setDeleteItem] = useState(null)
-
+  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
   const disableButtonTemporarily = () => {
     setDisabled(true)
     setTimeout(() => {
@@ -144,7 +145,7 @@ const LabelTable = ({ isOpen }) => {
                       <IconButton
                         size='sm'
                         variant='outline'
-                        icon={<DeleteIcon color={'red.500'} />}
+                        icon={<DeleteIcon color={primaryErrorColor} />}
                         onClick={() => setDeleteItem(row)}
                       />
                     </ButtonGroup>

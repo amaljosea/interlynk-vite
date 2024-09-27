@@ -19,8 +19,7 @@ import {
   Select,
   Tag,
   Text,
-  Tooltip,
-  useColorModeValue
+  Tooltip
 } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
@@ -30,6 +29,7 @@ import LynkModal from 'components/LynkModal'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 import { GetComponentData } from 'graphQL/Queries'
@@ -49,8 +49,11 @@ const CheckModal = (props) => {
   const { tabData } = useContext(TabContext)
   const { details } = tabData
 
-  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
-  const hoverColor = useColorModeValue('#EDF2F7', '#2D3748')
+  const { primaryBgColor, secondaryBgColor, primaryBlueText } = useThemeColor([
+    'primaryBgColor',
+    'secondaryBgColor',
+    'primaryBlueText'
+  ])
 
   const { status, component } = activeRow || ''
   const { id: componentId, name, version, kind, licensesExp } = component || ''
@@ -382,8 +385,8 @@ const CheckModal = (props) => {
               width='100%'
               top={10}
               mt='8'
-              bg={bgColor}
-              border={`1px solid ${hoverColor}`}
+              bg={primaryBgColor}
+              border={`1px solid ${secondaryBgColor}`}
               minH={'auto'}
               maxH={'300px'}
               overflowY={'scroll'}
@@ -402,7 +405,7 @@ const CheckModal = (props) => {
                       setComponentList([])
                     }}
                     p='2'
-                    _hover={{ background: hoverColor }}
+                    _hover={{ background: secondaryBgColor }}
                   >
                     <Text>{item.name}</Text>
                   </ListItem>
@@ -433,7 +436,7 @@ const CheckModal = (props) => {
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>Type</Text>
               <Tooltip label='Component Type'>
-                <Icon as={InfoIcon} color={'blue.500'} />
+                <Icon as={InfoIcon} color={primaryBlueText} />
               </Tooltip>
             </Flex>
           </FormLabel>

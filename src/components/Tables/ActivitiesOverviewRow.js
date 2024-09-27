@@ -28,7 +28,7 @@ import { FaArrowsRotate } from 'react-icons/fa6'
 function valueToColor(action, event, orig, updated) {
   if (action == 'updated') {
     if (updated == '[]') {
-      return 'red.500'
+      return 'red.500' //need to review before changing
     } else if (orig == '[]') {
       return 'green.500'
     } else {

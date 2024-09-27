@@ -31,6 +31,8 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { EnvDelete } from 'graphQL/Mutation'
 
 const EnvironmentDrawer = ({
@@ -56,6 +58,8 @@ const EnvironmentDrawer = ({
   const [loading, setLoading] = useState(false)
 
   const [projectDelete] = useMutation(EnvDelete)
+
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const handleDelete = async (id) => {
     setLoading(true)
@@ -113,7 +117,7 @@ const EnvironmentDrawer = ({
             <Text textTransform={isDefaultEnv(name) ? 'capitalize' : 'none'}>
               {name}
             </Text>
-            {id === activeEnv && <CheckCircleIcon color={'blue.500'} />}
+            {id === activeEnv && <CheckCircleIcon color={primaryBlueText} />}
           </Flex>
         )
       },

@@ -13,10 +13,13 @@ import {
 
 import VexInfoDrawer from 'components/Drawer/VexInfoDrawer'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { FaEye } from 'react-icons/fa6'
 
 const VulLinkRow = ({ key, data, vulnId }) => {
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+
   const iconColor = useColorModeValue('#4A5568', '#E2E8F0')
 
   const { changedBy, status, updatedAt } = data || ''
@@ -27,7 +30,7 @@ const VulLinkRow = ({ key, data, vulnId }) => {
     <>
       <Tr key={key} border={'none'}>
         <Td pl={0} py={2.5}>
-          <Text fontSize={'sm'} color={textColor} mb={0.5}>
+          <Text fontSize={'sm'} color={primaryTextColor} mb={0.5}>
             {status}
           </Text>
           <Tooltip label={getFullDateAndTime(updatedAt)}>
@@ -52,7 +55,12 @@ const VulLinkRow = ({ key, data, vulnId }) => {
       </Tr>
 
       {isOpen && (
-        <VexInfoDrawer vulnId={vulnId} data={data} isOpen={isOpen} onClose={onClose} />
+        <VexInfoDrawer
+          vulnId={vulnId}
+          data={data}
+          isOpen={isOpen}
+          onClose={onClose}
+        />
       )}
     </>
   )

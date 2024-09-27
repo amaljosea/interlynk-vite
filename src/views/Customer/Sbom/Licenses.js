@@ -3,14 +3,7 @@ import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
 
-import {
-  Box,
-  Flex,
-  Tag,
-  TagLabel,
-  Text,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Box, Flex, Tag, TagLabel, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
@@ -18,6 +11,7 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetShareLicensesTable } from 'graphQL/Queries'
 
@@ -28,8 +22,10 @@ const Licenses = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const { nodes, loading, error, paginationProps } = usePaginatedQuery(
     GetShareLicensesTable,
@@ -58,7 +54,7 @@ const Licenses = () => {
       wrap: true,
       selector: ({ licenseExpression }) => (
         <Flex direction='row' alignItems={'center'} gap={2}>
-          <Text my={3} fontWeight={'medium'} color={textColor}>
+          <Text my={3} fontWeight={'medium'} color={primaryTextColor}>
             {licenseExpression || 'Not Available'}
           </Text>
         </Flex>
@@ -88,7 +84,7 @@ const Licenses = () => {
                 {sortedComponents[0].name}
               </TagLabel>
             </Tag>
-            <Text color={textColor}>
+            <Text color={primaryTextColor}>
               {sortedComponents.length > 1
                 ? `+${sortedComponents.length - 1} more`
                 : ''}
@@ -124,7 +120,7 @@ const Licenses = () => {
   if (error) {
     return (
       <Card>
-        <Text color={textColor}>Something went wrong</Text>
+        <Text color={primaryTextColor}>Something went wrong</Text>
       </Card>
     )
   }
@@ -135,7 +131,7 @@ const Licenses = () => {
         <DataTable
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           defaultSortAsc={false}
           defaultSortFieldId={'UPDATED_AT'}
           progressPending={loading}

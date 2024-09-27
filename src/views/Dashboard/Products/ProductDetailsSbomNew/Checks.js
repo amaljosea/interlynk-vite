@@ -23,7 +23,6 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -39,6 +38,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   UpdateComponent,
@@ -72,8 +72,10 @@ const Checks = ({ sbomData }) => {
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const { dispatch } = useGlobalState()
   const { prodCompDispatch, sbomDispatch } = dispatch
@@ -486,7 +488,11 @@ const Checks = ({ sbomData }) => {
       name: 'CHECK ID',
       selector: (row) => {
         const { organizationRule } = row
-        return <Text color={textColor}>{organizationRule.rule.friendlyId}</Text>
+        return (
+          <Text color={primaryTextColor}>
+            {organizationRule.rule.friendlyId}
+          </Text>
+        )
       },
       sortable: true,
       width: '10%'
@@ -529,7 +535,7 @@ const Checks = ({ sbomData }) => {
                 <RowComponent content={component} />
               </Box>
             )}
-            <Text color={textColor}>
+            <Text color={primaryTextColor}>
               {organizationRule.rule.longDesc !== null
                 ? `${organizationRule.rule.shortDesc?.substring(0, 300)}${
                     organizationRule.rule.shortDesc.length > 300 ? '...' : ''
@@ -548,7 +554,7 @@ const Checks = ({ sbomData }) => {
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-          <Text color={textColor}>{timeSince(row.updatedAt)}</Text>
+          <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
         </Tooltip>
       ),
       sortable: true,
@@ -664,7 +670,7 @@ const Checks = ({ sbomData }) => {
           onSort={handleSort}
           defaultSortAsc={false}
           progressPending={loading}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
           defaultSortFieldId={checkState?.field}

@@ -13,9 +13,10 @@ import {
   InputRightElement,
   List,
   ListItem,
-  VStack,
-  useColorModeValue
+  VStack
 } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const CpeInput = ({
   name,
@@ -35,8 +36,10 @@ const CpeInput = ({
   const [focusedIndex, setFocusedIndex] = useState(null)
   const listItemsRef = useRef([])
 
-  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
-  const hoverColor = useColorModeValue('#EDF2F7', '#2D3748')
+  const { primaryBgColor, secondaryBgColor } = useThemeColor([
+    'primaryBgColor',
+    'secondaryBgColor'
+  ])
 
   const updatePurl = (field, value) => {
     try {
@@ -218,8 +221,8 @@ const CpeInput = ({
           borderRadius={'md'}
           maxH={'260px'}
           overflowY={'scroll'}
-          bg={bgColor}
-          border={`1px solid ${hoverColor}`}
+          bg={primaryBgColor}
+          border={`1px solid ${secondaryBgColor}`}
         >
           <List>
             {cpeList.map((item, index) => (
@@ -227,8 +230,8 @@ const CpeInput = ({
                 key={index}
                 ref={(el) => (listItemsRef.current[index] = el)}
                 tabIndex='0'
-                bg={index === focusedIndex ? hoverColor : 'transparent'}
-                _hover={{ background: hoverColor }}
+                bg={index === focusedIndex ? secondaryBgColor : 'transparent'}
+                _hover={{ background: secondaryBgColor }}
                 onMouseEnter={() => setFocusedIndex(null)}
                 outline='none'
                 p={2}

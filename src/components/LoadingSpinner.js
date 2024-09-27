@@ -1,6 +1,9 @@
 import { Flex, Spinner } from '@chakra-ui/react'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 const LoadingSpinner = () => {
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   return (
     <Flex
       width='100%'
@@ -9,7 +12,7 @@ const LoadingSpinner = () => {
       justifyContent='center'
       alignItems='center'
     >
-      <Spinner size='md' color='blue.500' />
+      <Spinner size='md' color={primaryBlueText} />
     </Flex>
   )
 }

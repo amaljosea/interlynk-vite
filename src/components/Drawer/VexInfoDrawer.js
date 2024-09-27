@@ -11,9 +11,10 @@ import {
   DrawerOverlay,
   Stack,
   Tag,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const VexInfoDrawer = ({ isOpen, onClose, data, vulnId }) => {
   const {
@@ -27,7 +28,8 @@ const VexInfoDrawer = ({ isOpen, onClose, data, vulnId }) => {
     fixedIn,
     actionStmt
   } = data || ''
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+
   const CustomText = styled(Text)`
     font-size: 13px;
     font-weight: bold;
@@ -36,7 +38,7 @@ const VexInfoDrawer = ({ isOpen, onClose, data, vulnId }) => {
     letter-spacing: 0.6px;
   `
 
-  const style = { color: textColor, mt: 1, fontSize: 14 }
+  const style = { color: primaryTextColor, mt: 1, fontSize: 14 }
 
   return (
     <Drawer size='sm' isOpen={isOpen} placement='right' onClose={onClose}>

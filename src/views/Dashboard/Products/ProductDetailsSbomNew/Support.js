@@ -20,7 +20,6 @@ import {
   Tag,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -33,6 +32,7 @@ import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetSbomSupportTab } from 'graphQL/Queries'
 
@@ -47,8 +47,8 @@ const Support = ({ sbomData }) => {
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor, primaryErrorColor } =
+    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -217,8 +217,12 @@ const Support = ({ sbomData }) => {
       selector: (row) => {
         return (
           <Stack my={4}>
-            <Text color={textColor}>{row?.productName || row?.name}</Text>
-            <Text color={textColor}>{row?.productVersion || row?.version}</Text>
+            <Text color={primaryTextColor}>
+              {row?.productName || row?.name}
+            </Text>
+            <Text color={primaryTextColor}>
+              {row?.productVersion || row?.version}
+            </Text>
           </Stack>
         )
       },
@@ -232,7 +236,7 @@ const Support = ({ sbomData }) => {
       selector: (row) => (
         <Text
           my={4}
-          color={textColor}
+          color={primaryTextColor}
           cursor={'pointer'}
           onClick={() => {
             setActiveRow(row)
@@ -248,7 +252,9 @@ const Support = ({ sbomData }) => {
     {
       id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_VERSION',
       name: 'VERSION',
-      selector: (row) => <Text color={textColor}>{row?.productVersion}</Text>,
+      selector: (row) => (
+        <Text color={primaryTextColor}>{row?.productVersion}</Text>
+      ),
       width: '12%',
       wrap: true,
       sortable: true,
@@ -258,14 +264,15 @@ const Support = ({ sbomData }) => {
       id: 'DEPRECATED',
       name: 'DEPRECATED',
       selector: (row) =>
-        row?.deprecated ? <CheckIcon color={'red.500'} /> : '',
+        row?.deprecated ? <CheckIcon color={primaryErrorColor} /> : '',
       width: '12%',
       wrap: true
     },
     {
       id: 'OUTDATED',
       name: 'OUTDATED',
-      selector: (row) => (row?.outdated ? <CheckIcon color={'red.500'} /> : ''),
+      selector: (row) =>
+        row?.outdated ? <CheckIcon color={primaryErrorColor} /> : '',
       width: '12%',
       wrap: true
     },
@@ -303,7 +310,7 @@ const Support = ({ sbomData }) => {
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
-          <Text color={textColor}>
+          <Text color={primaryTextColor}>
             {row?.updatedAt ? timeSince(row?.updatedAt) : ''}
           </Text>
         </Tooltip>
@@ -367,7 +374,7 @@ const Support = ({ sbomData }) => {
         <DataTable
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           defaultSortFieldId={filters.field}
           defaultSortAsc={false}
           progressPending={loading}

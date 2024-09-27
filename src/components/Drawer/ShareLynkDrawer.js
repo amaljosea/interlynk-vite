@@ -31,6 +31,8 @@ import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { CreateShareLynk } from 'graphQL/Mutation'
 
 import { BiShare } from 'react-icons/bi'
@@ -41,8 +43,11 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
   const BACKEND_URL = process.env.REACT_APP_SERVER
   const [createLynk] = useMutation(CreateShareLynk)
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
+
   const iconColor = useColorModeValue('gray', 'blue')
 
   const defaultDate = new Date()
@@ -164,7 +169,7 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
           <Flex my={2} gap={2} alignItems={'center'}>
             <Input
               size='sm'
-              color={textColor}
+              color={primaryTextColor}
               value={sbomLink.value}
               onChange={(e) => sbomLink.setValue(e.target.value)}
               width={'350px'}
@@ -191,7 +196,7 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
-          <Text color={textColor} textAlign={'right'}>
+          <Text color={primaryTextColor} textAlign={'right'}>
             {timeSince(row?.updatedAt)}
           </Text>
         </Tooltip>
@@ -224,7 +229,7 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
                 responsive={true}
                 columns={columns}
                 data={data?.nodes || []}
-                customStyles={customStyles(headColor)}
+                customStyles={customStyles(headingTextColor)}
                 progressPending={data ? false : true}
                 progressComponent={<CustomLoader />}
                 subHeaderComponent={subHeader}

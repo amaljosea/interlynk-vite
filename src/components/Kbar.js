@@ -14,11 +14,11 @@ import { truncatedValue } from 'utils'
 import { settingActions } from 'variables/general'
 
 import { SearchIcon } from '@chakra-ui/icons'
-import { useColorModeValue } from '@chakra-ui/system'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useThemeActions from 'hooks/useThemeAction'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProjectGroupAndVersionDetails } from 'graphQL/Queries'
 
@@ -37,8 +37,10 @@ const Kbar = () => {
   } = useProductUrlContext()
   const { envName, onChangeEnv } = useGlobalState()
 
-  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
-  const textHoverColor = useColorModeValue('#EDF2F7', '#2D3748')
+  const { primaryBgColor, secondaryBgColor } = useThemeColor([
+    'primaryBgColor',
+    'secondaryBgColor'
+  ])
 
   const { data: productData } = useQuery(GetProjectGroupAndVersionDetails, {
     fetchPolicy: 'network-only',
@@ -204,7 +206,7 @@ const Kbar = () => {
     return (
       <div
         className='kbar_result_item_container'
-        style={{ background: active ? textHoverColor : 'none' }}
+        style={{ background: active ? secondaryBgColor : 'none' }}
       >
         <div className='kbar_result_item'>
           {/* icon */}
@@ -253,7 +255,10 @@ const Kbar = () => {
   return (
     <KBarPortal>
       <KBarPositioner className='kbar_positioner'>
-        <KBarAnimator className='kbar_animator' style={{ background: bgColor }}>
+        <KBarAnimator
+          className='kbar_animator'
+          style={{ background: primaryBgColor }}
+        >
           <div className='kbar_search_container'>
             {/* search icon */}
             <SearchIcon color={'gray.500'} />

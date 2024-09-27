@@ -33,6 +33,7 @@ import RelDeleteModal from 'components/RelDeleteModal'
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
 import {
@@ -85,6 +86,7 @@ const CompRelations = ({ data, compPath }) => {
 
   const { prodCompState } = useGlobalState()
   const { field, direction } = prodCompState
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const compState = {
     projectId: productId,
@@ -398,7 +400,11 @@ const CompRelations = ({ data, compPath }) => {
                     {item?.name} - {truncatedValue(item?.version, 20)}
                   </Tag>
                   {index !== shortestPath.path.length - 1 && (
-                    <ArrowDownIcon width={4} height={4} color={'blue.500'} />
+                    <ArrowDownIcon
+                      width={4}
+                      height={4}
+                      color={primaryBlueText}
+                    />
                   )}
                 </>
               ))

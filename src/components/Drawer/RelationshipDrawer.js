@@ -42,6 +42,7 @@ import RelDeleteModal from 'components/RelDeleteModal'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
 import { AutomationRuleCreate } from 'graphQL/Mutation'
@@ -96,6 +97,7 @@ const RelationshipDrawer = (props) => {
 
   const { prodCompState } = useGlobalState()
   const { field, direction } = prodCompState
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const compState = {
     projectId: productId,
@@ -529,7 +531,7 @@ const RelationshipDrawer = (props) => {
                                 <ArrowDownIcon
                                   width={4}
                                   height={4}
-                                  color={'blue.500'}
+                                  color={primaryBlueText}
                                 />
                               )}
                             </>

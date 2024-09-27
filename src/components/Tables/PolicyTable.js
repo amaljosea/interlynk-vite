@@ -38,7 +38,6 @@ import {
   Thead,
   Tooltip,
   Tr,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -49,6 +48,7 @@ import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
@@ -78,8 +78,10 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
     childKey: 'remove_policy'
   })
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const [activeRow, setActiveRow] = useState(null)
   const [activeRule, setActiveRule] = useState(null)
@@ -200,7 +202,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
       id: 'POLICY',
       name: 'POLICY',
       selector: (row) => (
-        <Text color={textColor} my={4}>
+        <Text color={primaryTextColor} my={4}>
           {row?.name}
         </Text>
       ),
@@ -258,7 +260,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
-          <Text color={textColor}>{timeSince(row?.updatedAt)}</Text>
+          <Text color={primaryTextColor}>{timeSince(row?.updatedAt)}</Text>
         </Tooltip>
       ),
       right: 'true',
@@ -277,7 +279,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
             onChange={() =>
               isExcluded ? handleDeleteExclusion(id) : handleCreateExclusion(id)
             }
-            color={textColor}
+            color={primaryTextColor}
             isDisabled={!editProdPolicies}
             textTransform={'capitalize'}
           >
@@ -395,7 +397,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
             mb={3}
             fontFamily={'inherit'}
             fontSize={'sm'}
-            color={textColor}
+            color={primaryTextColor}
           >
             CONDITIONS
           </Heading>
@@ -420,7 +422,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
                   <Tr key={index}>
                     <Td>
                       <Text
-                        color={textColor}
+                        color={primaryTextColor}
                         fontSize={'sm'}
                         textTransform={'capitalize'}
                       >
@@ -429,7 +431,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
                     </Td>
                     <Td>
                       <Text
-                        color={textColor}
+                        color={primaryTextColor}
                         fontSize={'sm'}
                         textTransform={'lowercase'}
                       >
@@ -438,7 +440,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
                     </Td>
                     <Td isNumeric>
                       <Text
-                        color={textColor}
+                        color={primaryTextColor}
                         fontSize={'sm'}
                         wordBreak={'break-all'}
                         hidden={
@@ -470,7 +472,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
         <DataTable
           columns={columns}
           data={data || []}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader

@@ -22,6 +22,7 @@ import {
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   DownloadSBOM,
@@ -72,7 +73,7 @@ const DownloadModal = ({
   } = useDisclosure()
 
   const textColor = useColorModeValue('#1A202C', '#f6f6f6')
-
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const type = spec === 'cyclonedx' ? 'cdx' : 'spdx'
 
   const downloadJsonFile = (jsonData) => {
@@ -219,7 +220,7 @@ const DownloadModal = ({
               <Text fontWeight={'medium'}>Compliance Checks</Text>
               <Text
                 fontSize={'sm'}
-                color='blue.500'
+                color={primaryBlueText}
                 cursor={'pointer'}
                 fontWeight={'medium'}
                 onClick={onOpenDetails}

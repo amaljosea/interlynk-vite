@@ -23,6 +23,7 @@ import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UploadSbom } from 'graphQL/Mutation'
 
@@ -47,6 +48,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
   const [selectedEnv, setSelectedEnv] = useState(activeEnv || defaultENV?.id)
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedFile, setSelectedFile] = useState(null)
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const handleUpload = async () => {
     if (!selectedFile) {
@@ -183,7 +185,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
             borderStyle='dashed'
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
-            borderColor={isDragActive ? 'blue.500' : borderColor}
+            borderColor={isDragActive ? primaryBlueText : borderColor}
             onClick={() => document.getElementById('fileInput').click()}
           >
             <Input

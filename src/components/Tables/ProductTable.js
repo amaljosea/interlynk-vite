@@ -51,6 +51,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import { GetLabels, GetSharelynks, GetTotalProduct } from 'graphQL/Queries'
@@ -81,17 +82,27 @@ const ProductTable = ({
   })
   const { totalCount } = prodData?.organization?.projectGroups || ''
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#FFFFFF')
+  const {
+    primaryBlueText,
+    headingTextColor,
+    primaryTextColor,
+    grayBorderColor,
+    secondaryBlueBorder
+  } = useThemeColor([
+    'primaryBlueText',
+    'headingTextColor',
+    'primaryTextColor',
+    'grayBorderColor',
+    'secondaryBlueBorder'
+  ])
+
   const bgColor = useColorModeValue('#EDF2F7', '#4D698166')
   const grayColor = useColorModeValue('#1A202C', '#FFFFFF66')
   const iconColor = useColorModeValue('blue.500', 'gray.50')
   const timeColor = useColorModeValue('#1A202C', '#FFFFFF99')
-  const borderColor = useColorModeValue('#3182CE66', '#90cdf499')
-  const envIconColor = useColorModeValue('#3182CE', '#90cdf4')
+
   const dividerColor = useColorModeValue('#0000001f', '#ffffff1A')
   const labelBgColor = useColorModeValue('#fff', '#1f2733')
-  const labelBorderColor = useColorModeValue('#E2E8F0', '#ffffff29')
 
   const { search, field } = filters
   const { totalRows } = paginationProps
@@ -437,7 +448,7 @@ const ProductTable = ({
               <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
                 <Text
                   fontSize={16}
-                  color={envIconColor}
+                  color={primaryBlueText}
                   cursor={'pointer'}
                   width={'fit-content'}
                   onClick={handleClick}
@@ -524,10 +535,10 @@ const ProductTable = ({
               >
                 <Button
                   size='sm'
-                  leftIcon={<FaInbox color={envIconColor} />}
+                  leftIcon={<FaInbox color={primaryBlueText} />}
                   variant='outline'
-                  borderColor={borderColor}
-                  color={textColor}
+                  borderColor={secondaryBlueBorder}
+                  color={primaryTextColor}
                   fontWeight={400}
                   width={'60px'}
                 >
@@ -547,10 +558,10 @@ const ProductTable = ({
               >
                 <Button
                   size='sm'
-                  leftIcon={<FaCode color={envIconColor} />}
+                  leftIcon={<FaCode color={primaryBlueText} />}
                   variant='outline'
-                  borderColor={borderColor}
-                  color={textColor}
+                  borderColor={secondaryBlueBorder}
+                  color={primaryTextColor}
                   fontWeight={400}
                   width={'60px'}
                 >
@@ -570,10 +581,10 @@ const ProductTable = ({
               >
                 <Button
                   size='sm'
-                  leftIcon={<FaDesktop color={envIconColor} />}
+                  leftIcon={<FaDesktop color={primaryBlueText} />}
                   variant='outline'
-                  borderColor={borderColor}
-                  color={textColor}
+                  borderColor={secondaryBlueBorder}
+                  color={primaryTextColor}
                   fontWeight={400}
                   width={'60px'}
                 >
@@ -638,7 +649,7 @@ const ProductTable = ({
                       borderRadius='md'
                       bg={labelBgColor}
                       position='absolute'
-                      border={`1px solid ${labelBorderColor}`}
+                      border={`1px solid ${grayBorderColor}`}
                       onMouseEnter={() => setOpenTagMenu(true)}
                       onMouseLeave={() => setOpenTagMenu(false)}
                     >
@@ -704,7 +715,7 @@ const ProductTable = ({
     columns: columns,
     data: filterMode === 'AND' ? filteredNodes : data,
     onSort: handleSort,
-    customStyles: customStyles(headColor, dividerColor),
+    customStyles: customStyles(headingTextColor, dividerColor),
     defaultSortFieldId: field,
     defaultSortAsc: false,
     subHeader: true,

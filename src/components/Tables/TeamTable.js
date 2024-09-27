@@ -23,7 +23,6 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -35,6 +34,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
 import { GetUsers } from 'graphQL/Queries'
@@ -69,10 +69,12 @@ const TeamTable = () => {
   const activetab = useQueryParam('tab')
   const { orgView, isFreeTier } = useGlobalQueryContext()
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
   const paddingCell = 0
   const paddingHeadCell = 0
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const { showToast } = useCustomToast()
   const SERVER_URL = process.env.REACT_APP_SERVER
@@ -152,7 +154,7 @@ const TeamTable = () => {
               direction={'row'}
               alignItems={'center'}
             >
-              <Text color={textColor} my={2}>
+              <Text color={primaryTextColor} my={2}>
                 {row?.email}
               </Text>
             </Stack>
@@ -172,7 +174,11 @@ const TeamTable = () => {
           direction={'row'}
           align={'center'}
         >
-          <Text color={textColor} width={'fit-content'} fontSize={'14px'}>
+          <Text
+            color={primaryTextColor}
+            width={'fit-content'}
+            fontSize={'14px'}
+          >
             {row.name}
           </Text>
           {row.email === email && (
@@ -196,7 +202,7 @@ const TeamTable = () => {
       id: 'role',
       name: 'ROLE',
       selector: (row) => (
-        <Text color={textColor} textTransform={'capitalize'}>
+        <Text color={primaryTextColor} textTransform={'capitalize'}>
           {row?.role?.name || ''}
         </Text>
       ),
@@ -210,7 +216,7 @@ const TeamTable = () => {
         const timeStart = userTimeStart(row)
         return (
           <Tooltip label={getFullDateAndTime(timeStart)} placement={'top'}>
-            <Text color={textColor} textTransform={'capitalize'}>
+            <Text color={primaryTextColor} textTransform={'capitalize'}>
               {timeStart ? timeSince(timeStart) : ''}
             </Text>
           </Tooltip>
@@ -458,7 +464,7 @@ const TeamTable = () => {
         defaultSortFieldId={'joinedDate'}
         progressComponent={<CustomLoader />}
         customStyles={customStyles(
-          headColor,
+          headingTextColor,
           null,
           paddingCell,
           paddingHeadCell

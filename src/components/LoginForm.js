@@ -27,6 +27,7 @@ import {
 
 import useCustomToast from 'hooks/useCustomToast'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UserResendConfirmationEmail } from 'graphQL/Mutation'
 
@@ -36,6 +37,7 @@ import SocialLogin from './SocialLogin'
 const LoginForm = () => {
   const { showToast } = useCustomToast()
   const emailId = useQueryParam('id')
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
 
@@ -179,7 +181,7 @@ const LoginForm = () => {
             <Link to={'/reset_password'}>
               <FormHelperText
                 textAlign={'right'}
-                _hover={{ color: 'blue.500' }}
+                _hover={{ color: primaryBlueText }}
               >
                 Forgot password ?
               </FormHelperText>
@@ -201,7 +203,7 @@ const LoginForm = () => {
           >
             <Text fontSize={'sm'}>{`Don't have an account ?`}</Text>
             <Link to={`/register`}>
-              <Text fontSize='sm' color='blue.500' fontWeight={'medium'}>
+              <Text fontSize='sm' color={primaryBlueText} fontWeight={'medium'}>
                 Register
               </Text>
             </Link>

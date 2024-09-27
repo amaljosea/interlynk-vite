@@ -32,6 +32,8 @@ import {
 
 import LynkAlert from 'components/LynkAlert'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { ComponentVulnUpdate } from 'graphQL/Mutation'
 import { DispositionByParentUpdate } from 'graphQL/Mutation'
 
@@ -46,6 +48,8 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
 
   const [addUrls] = useMutation(ComponentVulnUpdate)
   const [addPartsUrls] = useMutation(DispositionByParentUpdate)
+
+  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
 
   const containsSpace = /\s/.test(link)
 
@@ -253,7 +257,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
                             <Td pl={0}>
                               <Icon
                                 as={DeleteIcon}
-                                color={'red'}
+                                color={primaryErrorColor}
                                 cursor={'pointer'}
                                 display={isPart ? 'none' : 'block'}
                                 onClick={() => handleLinkRemove(item?.id)}

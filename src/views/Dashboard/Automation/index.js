@@ -21,7 +21,6 @@ import {
   Tag,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -34,6 +33,7 @@ import Pagination from 'components/Pagination'
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { AutomationRuleDelete, AutomationRuleUpdate } from 'graphQL/Mutation'
 import {
@@ -67,8 +67,10 @@ const Automation = ({ projects }) => {
   const filterProjects = projects?.filter((item) => item?.id !== productId)
   const activeProject = projects?.find((item) => item?.id === productId)
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const [activeRow, setActiveRow] = useState(null)
   const [activeEnv, setActiveEnv] = useState(null)
@@ -212,7 +214,7 @@ const Automation = ({ projects }) => {
       name: 'RULE',
       selector: (row) => {
         return (
-          <Text color={textColor} my={3}>
+          <Text color={primaryTextColor} my={3}>
             {row?.name}
           </Text>
         )
@@ -253,7 +255,7 @@ const Automation = ({ projects }) => {
       selector: (row) => {
         const { automationConditions } = row
         return (
-          <List spacing={3} my={3} color={textColor}>
+          <List spacing={3} my={3} color={primaryTextColor}>
             {automationConditions.map((item, index) => (
               <ListItem key={index}>
                 {
@@ -280,7 +282,7 @@ const Automation = ({ projects }) => {
       selector: (row) => {
         const { automationActions } = row
         return (
-          <List spacing={3} my={3} color={textColor}>
+          <List spacing={3} my={3} color={primaryTextColor}>
             {automationActions.map((item, index) => (
               <ListItem key={index}>
                 {
@@ -305,7 +307,7 @@ const Automation = ({ projects }) => {
         const { createdAt } = row
         return (
           <Tooltip label={getFullDateAndTime(createdAt)} placement='top'>
-            <Text color={textColor} textAlign={'right'}>
+            <Text color={primaryTextColor} textAlign={'right'}>
               {timeSince(createdAt)}
             </Text>
           </Tooltip>
@@ -328,7 +330,7 @@ const Automation = ({ projects }) => {
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
-            <Text color={textColor} textAlign={'right'}>
+            <Text color={primaryTextColor} textAlign={'right'}>
               {timeSince(updatedAt)}
             </Text>
           </Tooltip>
@@ -481,9 +483,9 @@ const Automation = ({ projects }) => {
             persistTableHead
             responsive={true}
             columns={columns}
+            customStyles={customStyles(headingTextColor)}
             progressPending={loading}
             progressComponent={<CustomLoader />}
-            customStyles={customStyles(headColor)}
             subHeaderComponent={subHeaderComponent}
           />
           <Pagination {...paginationProps} />

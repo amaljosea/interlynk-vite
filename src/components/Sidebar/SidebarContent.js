@@ -16,6 +16,7 @@ import IconBox from 'components/Icons/IconBox'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const SidebarContent = ({ routes }) => {
   const location = useLocation()
@@ -63,7 +64,7 @@ const SidebarContent = ({ routes }) => {
     )
   }
 
-  const activeBg = useColorModeValue('blue.500', 'blue.500')
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const inActiveBg = useColorModeValue('gray.100', 'gray.700')
 
   const activeRoute = (routeName) => {
@@ -94,8 +95,8 @@ const SidebarContent = ({ routes }) => {
             <IconBox
               h={'40px'}
               w={'40px'}
-              color={isActive ? 'white' : 'blue.500'}
-              bg={isActive ? activeBg : inActiveBg}
+              color={isActive ? 'white' : primaryBlueText}
+              bg={isActive ? primaryBlueText : inActiveBg}
             >
               {icon}
             </IconBox>

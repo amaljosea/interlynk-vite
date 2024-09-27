@@ -4,15 +4,7 @@ import { Link } from 'react-router-dom'
 import { getFullDateAndTime, normalizeSBOMVersion, timeSince } from 'utils'
 import { customStyles } from 'utils'
 
-import {
-  Flex,
-  Heading,
-  Tag,
-  TagLabel,
-  Text,
-  Tooltip,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Flex, Heading, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card'
@@ -22,6 +14,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const ProductsOverview = ({ title, data }) => {
   const { dispatch } = useGlobalState()
@@ -30,8 +23,9 @@ const ProductsOverview = ({ title, data }) => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
+    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
+  )
 
   const handleClick = (prod) => {
     const { id, projectId } = prod
@@ -88,7 +82,7 @@ const ProductsOverview = ({ title, data }) => {
             style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }}
             onClick={() => handleClick(row)}
           >
-            <Text my={1} color={uniqueSbom ? 'blue.500' : 'gray.500'}>
+            <Text my={1} color={uniqueSbom ? primaryBlueText : 'gray.500'}>
               {project?.projectGroup?.name}
             </Text>
           </Link>
@@ -118,7 +112,7 @@ const ProductsOverview = ({ title, data }) => {
           >
             <Text
               my={2}
-              color={uniqueSbom ? 'blue.500' : 'gray.500'}
+              color={uniqueSbom ? primaryBlueText : 'gray.500'}
               textAlign={'right'}
             >
               {projectVersion}
@@ -267,7 +261,7 @@ const ProductsOverview = ({ title, data }) => {
         const { createdAt } = row
         return (
           <Tooltip placement='top' label={getFullDateAndTime(createdAt)}>
-            <Text color={textColor} textAlign={'right'}>
+            <Text color={primaryTextColor} textAlign={'right'}>
               {timeSince(createdAt)}
             </Text>
           </Tooltip>
@@ -288,7 +282,7 @@ const ProductsOverview = ({ title, data }) => {
           persistTableHead
           columns={columns}
           data={data || []}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
         />

@@ -16,7 +16,6 @@ import {
   Stack,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -25,6 +24,7 @@ import ArchiveSbom from 'components/Modal/ArchiveSbom'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetArchivedVersions, GetVersions } from 'graphQL/Queries'
 
@@ -38,7 +38,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
     useProductUrlContext()
   const params = useParams()
   const productId = params?.productid
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const [activeRow, setActiveRow] = useState(null)
 
   const { data: versions } = useQuery(GetVersions, {
@@ -137,7 +137,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
                         <IconButton
                           variant='outline'
                           onClick={() => onView(item)}
-                          icon={<FaEye size={16} color={textColor} />}
+                          icon={<FaEye size={16} color={primaryTextColor} />}
                         />
                       </Tooltip>
                       <Tooltip label='Restore' placement='top'>
@@ -145,7 +145,10 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
                           variant='outline'
                           onClick={() => onRestore(item)}
                           icon={
-                            <MdOutlineUnarchive size={20} color={textColor} />
+                            <MdOutlineUnarchive
+                              size={20}
+                              color={primaryTextColor}
+                            />
                           }
                         />
                       </Tooltip>

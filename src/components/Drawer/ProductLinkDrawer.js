@@ -19,6 +19,8 @@ import {
   Text
 } from '@chakra-ui/react'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 function ProductLinkDrawer(props) {
   const {
     isOpen,
@@ -56,6 +58,8 @@ function ProductLinkDrawer(props) {
   const [emailList, setEmailList] = useState([])
   const [product, setProduct] = useState(productName)
   const [version, setVersion] = useState(versionName)
+
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const handleProductChange = (e) => {
     setProduct(e.target.value)
@@ -204,7 +208,7 @@ function ProductLinkDrawer(props) {
                         fontSize={'sm'}
                         px={4}
                         py={1}
-                        bg={'blue.500'}
+                        bg={primaryBlueText}
                         color={'white'}
                         borderRadius={20}
                       >

@@ -8,6 +8,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetOrgConnections, GetPersonalConnections } from 'graphQL/Queries'
 
@@ -40,7 +41,7 @@ const Connections = ({ org }) => {
   const isGithubConfigSaved = useGithubConfigSaved()
 
   const iconColor = useColorModeValue('#24292f', '#f1f1f1')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const updateCon = useHasPermission({
     parentKey: 'view_connections',
@@ -151,7 +152,7 @@ const Connections = ({ org }) => {
     <>
       <Card p={0} boxShadow='none'>
         <CardHeader mb={'16px'} display={'flex'} flexDirection={'column'}>
-          <Text fontSize='lg' color={textColor} fontWeight='bold'>
+          <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
             Connect Apps
           </Text>
           <Text fontSize={'sm'}>

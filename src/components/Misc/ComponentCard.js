@@ -1,19 +1,21 @@
 import { PackageURL } from 'packageurl-js'
 import { useEffect, useState } from 'react'
 
-import { Divider, Grid, Stack, Text, useColorModeValue } from '@chakra-ui/react'
+import { Divider, Grid, Stack, Text } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { BiLayer } from 'react-icons/bi'
 
 import CustomTag from './CustomTag'
 
 const ListItem = ({ label, value }) => {
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   return (
     <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-      <Text color={textColor} fontSize={'sm'}>
+      <Text color={primaryTextColor} fontSize={'sm'}>
         {label}
       </Text>
       <CustomTag>{value || '-'}</CustomTag>

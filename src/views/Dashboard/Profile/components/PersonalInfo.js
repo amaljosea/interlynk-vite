@@ -29,6 +29,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateUserPassword, updateOrgUser } from 'graphQL/Mutation'
 
@@ -78,7 +79,7 @@ const PersonalInfo = () => {
   const [showConfPass, setShowConfPass] = useState(false)
   const [invalidPassword, setInvalidPassword] = useState(false)
   const [passError, setPassError] = useState('')
-
+  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
   const [updateUser] = useMutation(updateOrgUser)
   const [updatePassword] = useMutation(UpdateUserPassword)
 
@@ -291,7 +292,7 @@ const PersonalInfo = () => {
                   </InputRightElement>
                 </InputGroup>
                 {newPassword !== '' && invalidPassword && (
-                  <FormHelperText color={'red.500'}>
+                  <FormHelperText color={primaryErrorColor}>
                     <Text mb={1}>
                       Your password must be 8-16 characters contain:
                     </Text>
@@ -304,7 +305,7 @@ const PersonalInfo = () => {
                 {oldPassword !== '' &&
                   newPassword !== '' &&
                   oldPassword === newPassword && (
-                    <FormHelperText color={'red.500'}>
+                    <FormHelperText color={primaryErrorColor}>
                       Old password and new password cannot be same
                     </FormHelperText>
                   )}

@@ -5,6 +5,8 @@ import { Divider, Flex, Grid, Stack, Tag, Text } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { FaCircleInfo } from 'react-icons/fa6'
 
 const PurlText = ({ children }) => (
@@ -33,6 +35,11 @@ const PurlCard = ({ value, isOpen, onClose }) => {
       console.log('error', error)
     }
   }
+
+  const { primaryErrorColor, primarySuccessColor } = useThemeColor([
+    'primaryErrorColor',
+    'primarySuccessColor'
+  ])
 
   return (
     <LynkModal
@@ -91,9 +98,9 @@ const PurlCard = ({ value, isOpen, onClose }) => {
             <Text fontSize={'sm'}>Validity</Text>
             <Flex alignItems={'flex-end'} justifyContent={'flex-end'}>
               {purlString() ? (
-                <CheckCircleIcon color={'green.500'} />
+                <CheckCircleIcon color={primarySuccessColor} />
               ) : (
-                <WarningIcon color={'red.500'} />
+                <WarningIcon color={primaryErrorColor} />
               )}
             </Flex>
           </Grid>

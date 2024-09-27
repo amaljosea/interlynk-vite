@@ -28,6 +28,8 @@ import {
   Tr
 } from '@chakra-ui/react'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 const LinksDrawer = ({ isOpen, onClose, component, sbomId }) => {
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
@@ -35,7 +37,7 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId }) => {
   const [error, setError] = useState('')
   const { id, externalUrls } = component
   const [linkError, setLinkError] = useState('')
-
+  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
   const containsSpace = /\s/.test(link)
 
   useEffect(() => {
@@ -214,7 +216,7 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId }) => {
                             <Td pl={0}>
                               <Icon
                                 as={DeleteIcon}
-                                color={'red'}
+                                color={primaryErrorColor}
                                 cursor={'pointer'}
                                 onClick={() => handleLinkRemove(index)}
                               />

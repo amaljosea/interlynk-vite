@@ -22,7 +22,6 @@ import {
   Thead,
   Tooltip,
   Tr,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -34,6 +33,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { SbomPolicyScan } from 'graphQL/Mutation'
 import { PolicyResults } from 'graphQL/Queries'
@@ -51,8 +51,10 @@ const Policies = ({ sbomData }) => {
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const policyRun = useHasPermission({
     parentKey: 'view_policy',
@@ -139,7 +141,7 @@ const Policies = ({ sbomData }) => {
       name: 'POLICY',
       selector: (row) => {
         const { policy } = row
-        return <Text color={textColor}>{policy?.name || ''}</Text>
+        return <Text color={primaryTextColor}>{policy?.name || ''}</Text>
       },
       wrap: true
     },
@@ -184,7 +186,7 @@ const Policies = ({ sbomData }) => {
       name: 'LAST CHECKED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
-          <Text color={textColor}>{timeSince(row?.updatedAt)}</Text>
+          <Text color={primaryTextColor}>{timeSince(row?.updatedAt)}</Text>
         </Tooltip>
       ),
       width: '14%',
@@ -208,7 +210,7 @@ const Policies = ({ sbomData }) => {
     const CustomText = styled(Text)`
       font-size: 12px;
       font-weight: bold;
-      color: ${textColor};
+      color: ${primaryTextColor};
       text-transform: uppercase;
       letter-spacing: 0.6px;
     `
@@ -223,7 +225,7 @@ const Policies = ({ sbomData }) => {
         <Box>
           <CustomText>Description :</CustomText>
           <Text
-            color={textColor}
+            color={primaryTextColor}
             width={'90%'}
             mt={1}
             fontSize={14}
@@ -237,7 +239,7 @@ const Policies = ({ sbomData }) => {
             mb={2}
             fontFamily={'inherit'}
             fontSize={'sm'}
-            color={textColor}
+            color={primaryTextColor}
             textTransform={'uppercase'}
           >
             Results
@@ -251,7 +253,7 @@ const Policies = ({ sbomData }) => {
                       <Th
                         fontFamily={'inherit'}
                         key={index}
-                        color={textColor}
+                        color={primaryTextColor}
                         isNumeric={item === 'action' || item === 'violations'}
                       >
                         {item}
@@ -266,7 +268,7 @@ const Policies = ({ sbomData }) => {
                     <Tr key={index}>
                       <Td>
                         <Text
-                          color={textColor}
+                          color={primaryTextColor}
                           fontSize={'sm'}
                           textTransform={'capitalize'}
                         >
@@ -275,7 +277,7 @@ const Policies = ({ sbomData }) => {
                       </Td>
                       <Td>
                         <Text
-                          color={textColor}
+                          color={primaryTextColor}
                           fontSize={'sm'}
                           textTransform={'lowercase'}
                         >
@@ -284,7 +286,7 @@ const Policies = ({ sbomData }) => {
                       </Td>
                       <Td>
                         <Text
-                          color={textColor}
+                          color={primaryTextColor}
                           fontSize={'sm'}
                           wordBreak={'break-all'}
                         >
@@ -327,7 +329,7 @@ const Policies = ({ sbomData }) => {
         <DataTable
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader

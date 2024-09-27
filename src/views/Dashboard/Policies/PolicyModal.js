@@ -29,6 +29,8 @@ import {
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
 
 import { FaPlus } from 'react-icons/fa6'
@@ -62,6 +64,10 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
   ])
   const [deletedRules, setDeletedRules] = useState([])
 
+  const { primaryErrorColor, primaryBlueText } = useThemeColor([
+    'primaryErrorColor',
+    'primaryBlueText'
+  ])
   const borderColor = useColorModeValue('gray.200', 'gray.600')
 
   const [createPolicy, { loading: crLoading }] = useMutation(PolicyCreate)
@@ -548,7 +554,10 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                           }
                           placement='top'
                         >
-                          <Icon color='blue.500' as={getIcon(item.subject)} />
+                          <Icon
+                            color={primaryBlueText}
+                            as={getIcon(item.subject)}
+                          />
                         </Tooltip>
                       </InputLeftElement>
                       {/* SUBJECT */}
@@ -569,7 +578,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                           ))}
                         </Select>
                         {item?.subError !== '' && (
-                          <Text mt={1} color='red.500' fontSize='sm'>
+                          <Text mt={1} color={primaryErrorColor} fontSize='sm'>
                             {item?.subError}
                           </Text>
                         )}
@@ -599,7 +608,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                         ))}
                       </Select>
                       {item?.opError !== '' && (
-                        <Text mt={1} color={'red.500'} fontSize={'sm'}>
+                        <Text mt={1} color={primaryErrorColor} fontSize={'sm'}>
                           {item?.opError}
                         </Text>
                       )}
@@ -837,7 +846,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                             </InputGroup>
                           </Flex>
                           {item?.valError !== '' && (
-                            <Text color={'red.500'} fontSize={'sm'}>
+                            <Text color={primaryErrorColor} fontSize={'sm'}>
                               {item?.valError}
                             </Text>
                           )}

@@ -14,7 +14,6 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -28,6 +27,7 @@ import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   GetChangeLogs,
@@ -65,8 +65,10 @@ const Changelog = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -218,7 +220,7 @@ const Changelog = () => {
               </Tag>
             )}
 
-            <Text color={textColor}>{event}</Text>
+            <Text color={primaryTextColor}>{event}</Text>
           </Stack>
         )
       },
@@ -240,7 +242,7 @@ const Changelog = () => {
           return (
             <Text
               my={3}
-              color={textColor}
+              color={primaryTextColor}
               cursor={'pointer'}
               onClick={() => {
                 setActiveRow(orig)
@@ -309,7 +311,7 @@ const Changelog = () => {
                     </Flex>
                   ))
                 ) : (
-                  <Text color={textColor} whiteSpace={'wrap'}>
+                  <Text color={primaryTextColor} whiteSpace={'wrap'}>
                     {orig}
                   </Text>
                 )}
@@ -334,7 +336,7 @@ const Changelog = () => {
           return (
             <Text
               my={3}
-              color={textColor}
+              color={primaryTextColor}
               cursor={'pointer'}
               onClick={() => {
                 setActiveRow(updated)
@@ -405,7 +407,7 @@ const Changelog = () => {
                   ))
                 ) : (
                   <Text
-                    color={textColor}
+                    color={primaryTextColor}
                     whiteSpace={'wrap'}
                     cursor={'pointer'}
                     onClick={() => onSelect(row)}
@@ -428,7 +430,7 @@ const Changelog = () => {
         <Tooltip placement='top' label={row.changedBy}>
           <Text
             textAlign={'right'}
-            color={textColor}
+            color={primaryTextColor}
             cursor={'pointer'}
             onClick={() => checkUser(row)}
           >
@@ -448,7 +450,7 @@ const Changelog = () => {
       selector: (row) => (
         <Box width={'fit-content'}>
           <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-            <Text color={textColor} width={'fit-content'}>
+            <Text color={primaryTextColor} width={'fit-content'}>
               {timeSince(row.updatedAt)}
             </Text>
           </Tooltip>
@@ -582,7 +584,7 @@ const Changelog = () => {
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={field}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader

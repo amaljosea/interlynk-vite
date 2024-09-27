@@ -20,7 +20,6 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -32,6 +31,7 @@ import Pagination from 'components/Pagination'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCompVulnData, GetConnectedSbom } from 'graphQL/Queries'
 
@@ -44,8 +44,10 @@ import VulnFilters from './VulnsFilter'
 const VulnProdTable = ({ vulnId, sbomVersions }) => {
   const params = useParams()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const manageFeeds = useHasPermission({
     parentKey: 'view_feeds',
@@ -132,7 +134,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
               />
             </Tooltip>
             <Text
-              color={textColor}
+              color={primaryTextColor}
               cursor={'pointer'}
               onClick={() => {
                 setActiveRow(component)
@@ -154,7 +156,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row?.component?.sbom?.projectVersion} placement='top'>
-          <Text color={textColor} my={2} textAlign={'right'}>
+          <Text color={primaryTextColor} my={2} textAlign={'right'}>
             {row?.component?.sbom?.projectVersion}
           </Text>
         </Tooltip>
@@ -181,8 +183,8 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
               onCardOpen()
             }}
           >
-            <Text color={textColor}>{component?.name || ''}</Text>
-            <Text color={textColor}>{component?.version || ''}</Text>
+            <Text color={primaryTextColor}>{component?.name || ''}</Text>
+            <Text color={primaryTextColor}>{component?.version || ''}</Text>
           </Stack>
         )
       },
@@ -196,7 +198,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
       selector: (row) => {
         const { component } = row
         return (
-          <Text color={textColor} textTransform={'capitalize'}>
+          <Text color={primaryTextColor} textTransform={'capitalize'}>
             {component?.sbom?.project?.name || ''}
           </Text>
         )
@@ -233,7 +235,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
-          <Text color={textColor}>{timeSince(row?.updatedAt)}</Text>
+          <Text color={primaryTextColor}>{timeSince(row?.updatedAt)}</Text>
         </Tooltip>
       ),
       width: '12%',
@@ -389,7 +391,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
           progressComponent={<CustomLoader />}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           subHeaderComponent={subHeaderComponent}
         />
         <Pagination {...paginationProps} />

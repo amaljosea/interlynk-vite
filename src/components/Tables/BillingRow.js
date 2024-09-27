@@ -9,6 +9,8 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { FaPencilAlt, FaTrashAlt } from 'react-icons/fa'
 
 function BillingRow(props) {
@@ -16,7 +18,7 @@ function BillingRow(props) {
   const bgColor = useColorModeValue('#F8F9FA', 'gray.800')
   const nameColor = useColorModeValue('gray.500', 'white')
   const { key, name, company, email, number } = props
-
+  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
   return (
     <Box key={key} p='24px' bg={bgColor} my='22px' borderRadius='12px'>
       <Flex justify='space-between' w='100%'>
@@ -54,7 +56,12 @@ function BillingRow(props) {
             mb={{ sm: '10px', md: '0px' }}
             me={{ md: '12px' }}
           >
-            <Flex color='red.500' cursor='pointer' align='center' p='12px'>
+            <Flex
+              color={primaryErrorColor}
+              cursor='pointer'
+              align='center'
+              p='12px'
+            >
               <Icon as={FaTrashAlt} me='4px' />
               <Text fontSize='sm' fontWeight='semibold'>
                 DELETE

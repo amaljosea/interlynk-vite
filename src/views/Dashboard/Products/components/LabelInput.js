@@ -2,21 +2,17 @@ import { useMutation } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 import { hexToRGBA } from 'utils'
 
-import {
-  Checkbox,
-  Divider,
-  Flex,
-  Tag,
-  Text,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Checkbox, Divider, Flex, Tag, Text } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateProjectGroup } from 'graphQL/Mutation'
 
 const LabelInput = ({ data, setOpen, onOpenLabel, nodes }) => {
   const { id: prodId, name, desc, labels } = data || ''
   const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
-  const labelColor = useColorModeValue('#3182CE', '#90cdf4')
+
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const [selectedLabels, setSelectedLabels] = useState([])
 
@@ -96,7 +92,7 @@ const LabelInput = ({ data, setOpen, onOpenLabel, nodes }) => {
           pl={4}
           fontSize={'sm'}
           cursor={'pointer'}
-          color={labelColor}
+          color={primaryBlueText}
           onClick={() => {
             setOpen(false)
             onOpenLabel()

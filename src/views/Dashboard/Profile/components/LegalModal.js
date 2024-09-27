@@ -19,6 +19,8 @@ import {
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import {
   OrganizationManufacturerCreate,
   OrganizationManufacturerUpdate
@@ -40,6 +42,9 @@ const LegalModal = ({ data, isOpen, onClose }) => {
   const [orgName, setOrgName] = useState('')
   const [contacts, setContacts] = useState([])
   const [isValidUrl, setIsValidUrl] = useState('')
+
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+
   const [deletedContacts, setDeletedContacts] = useState([])
 
   const borderColor = useColorModeValue('gray.200', 'gray.600')

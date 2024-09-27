@@ -38,7 +38,6 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -58,6 +57,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ManualVulnScan } from 'graphQL/Mutation'
 import {
@@ -130,6 +130,7 @@ const ExpandedComponent = (props) => {
     currentExternalUrls,
     externalUrls
   } = data
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const advisories = isPart
     ? currentExternalUrls?.find((item) => item.name === 'advisories')
     : externalUrls?.find((item) => item.name === 'advisories')
@@ -287,7 +288,7 @@ const ExpandedComponent = (props) => {
                     as={ExternalLinkIcon}
                     h={'16px'}
                     w={'16px'}
-                    color={'blue.500'}
+                    color={primaryBlueText}
                   />
                 </Link>
                 <Tooltip label={vuln.nvdAliasId} placement={'top'}>
@@ -322,8 +323,17 @@ const Vulnerabilities = ({ sbomData }) => {
   const params = useParams()
   const navigate = useNavigate()
   const productId = params.productid
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const {
+    headingTextColor,
+    primaryTextColor,
+    primaryErrorColor,
+    primarySuccessColor
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'primaryErrorColor',
+    'primarySuccessColor'
+  ])
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
@@ -421,7 +431,7 @@ const Vulnerabilities = ({ sbomData }) => {
   )
   const componentVulnIds = firstDegreePart?.map((item) => item?.id)
   const sbomIds = firstDegreePart?.map((item) => item?.component?.sbom?.id)
-
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   useQuery(FirstDegreePartVulns, {
     skip:
       firstDegreePart?.length > 0 &&
@@ -538,7 +548,7 @@ const Vulnerabilities = ({ sbomData }) => {
               <Link to={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
                 <Icon
                   as={ExternalLinkIcon}
-                  sx={{ w: '16px', h: '16px', color: 'blue.500' }}
+                  sx={{ w: '16px', h: '16px', color: primaryBlueText }}
                 />
               </Link>
             </Tooltip>
@@ -548,18 +558,27 @@ const Vulnerabilities = ({ sbomData }) => {
                   as={FaEye}
                   hidden={customerView}
                   onClick={() => onGlobalView(id, vuln.vulnId)}
-                  sx={{ w: '16px', h: '16px', mt: 0.5, color: textColor }}
+                  sx={{
+                    w: '16px',
+                    h: '16px',
+                    mt: 0.5,
+                    color: primaryTextColor
+                  }}
                 />
               </Stack>
             </Tooltip>
             <Stack direction={'column'} spacing={1.5}>
-              <Text fontSize='sm' color={textColor} data-tag='allowRowEvents'>
+              <Text
+                fontSize='sm'
+                color={primaryTextColor}
+                data-tag='allowRowEvents'
+              >
                 {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
               </Text>
               {isPart && (
                 <Text
                   fontSize={'xs'}
-                  color={textColor}
+                  color={primaryTextColor}
                   fontWeight={'medium'}
                   width={'fit-content'}
                 >
@@ -567,12 +586,13 @@ const Vulnerabilities = ({ sbomData }) => {
                 </Text>
               )}
               <Stack direction={'row'} alignItems={'center'}>
-                {/* ISSUE TRACKER */}
                 <Tooltip placement='top' label={issueTracker?.url}>
                   <Link href={getUrl(issueTracker?.url)} target='_blank'>
                     <LynkIcon
                       disabled={!issueTracker}
-                      icon={<FaListCheck color={textColor} fontSize={16} />}
+                      icon={
+                        <FaListCheck color={primaryTextColor} fontSize={16} />
+                      }
                     />
                   </Link>
                 </Tooltip>
@@ -611,7 +631,7 @@ const Vulnerabilities = ({ sbomData }) => {
           >
             <RowComponent content={component} />
             <Flex alignItems={'center'} gap={2}>
-              <Text color={textColor}>{version || ''}</Text>
+              <Text color={primaryTextColor}>{version || ''}</Text>
               <Tooltip
                 label={'Fixed In: ' + fixedVersions?.join(', ')}
                 placement='top'
@@ -759,14 +779,14 @@ const Vulnerabilities = ({ sbomData }) => {
                   placement='top'
                   label={`Up from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
                 >
-                  <ChevronUpIcon w={5} h={5} color='green.500' />
+                  <ChevronUpIcon w={5} h={5} color={primarySuccessColor} />
                 </Tooltip>
               ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
                 <Tooltip
                   placement='top'
                   label={`Down from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
                 >
-                  <ChevronDownIcon w={5} h={5} color='red.500' />
+                  <ChevronDownIcon w={5} h={5} color={primaryErrorColor} />
                 </Tooltip>
               ) : null
             ) : null}
@@ -816,7 +836,7 @@ const Vulnerabilities = ({ sbomData }) => {
           placement={'top'}
         >
           <Text
-            color={textColor}
+            color={primaryTextColor}
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}
@@ -1075,7 +1095,7 @@ const Vulnerabilities = ({ sbomData }) => {
           className='data-table-container'
           columns={columns}
           data={nodes}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={field}
@@ -1092,7 +1112,7 @@ const Vulnerabilities = ({ sbomData }) => {
             allCdx,
             setActiveRow,
             onCvssOpen,
-            textColor,
+            primaryTextColor,
             isArchived
           }}
           selectableRows={!signedUrlParams}

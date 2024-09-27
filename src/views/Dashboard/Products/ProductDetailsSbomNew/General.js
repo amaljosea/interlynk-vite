@@ -34,6 +34,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   authorDelete,
@@ -49,6 +50,7 @@ import ConfirmationModal from '../components/ConfirmationModal'
 import ToolModal from '../components/ToolModal'
 
 const General = ({ data, loading, error }) => {
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const { isFreeTier } = useGlobalQueryContext()
   const { showToast } = useCustomToast()
   const params = useParams()
@@ -237,7 +239,7 @@ const General = ({ data, loading, error }) => {
                     onClick={TOOL?.onOpen}
                     leftIcon={<AddIcon />}
                     isDisabled={customerView || !editSboms}
-                    color={tools?.length > 0 ? 'gray.500' : 'blue.500'}
+                    color={tools?.length > 0 ? 'gray.500' : primaryBlueText}
                   >
                     {tools?.length > 0 ? 'Add New' : 'Add Tool'}
                   </Button>
@@ -280,7 +282,7 @@ const General = ({ data, loading, error }) => {
                     onClick={AUTHOR?.onOpen}
                     hidden={isArchived}
                     isDisabled={customerView || !editSboms}
-                    color={authors?.length > 0 ? 'gray.500' : 'blue.500'}
+                    color={authors?.length > 0 ? 'gray.500' : primaryBlueText}
                   >
                     {authors?.length > 0 ? 'Add New' : 'Add Author'}
                   </Button>
@@ -308,7 +310,7 @@ const General = ({ data, loading, error }) => {
                   <Button
                     size='xs'
                     variant='unstyled'
-                    color={'blue.500'}
+                    color={primaryBlueText}
                     hidden={isArchived}
                     onClick={SUPPLIER?.onOpen}
                     leftIcon={<AddIcon />}
@@ -352,7 +354,7 @@ const General = ({ data, loading, error }) => {
                   <Button
                     size='xs'
                     variant='unstyled'
-                    color={'blue.500'}
+                    color={primaryBlueText}
                     hidden={isArchived}
                     leftIcon={<AddIcon />}
                     onClick={onLicenseOpen}

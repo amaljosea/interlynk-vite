@@ -26,6 +26,8 @@ import {
 import { ZoomInIcon } from 'components/Icons/Icons'
 import { ZoomOutIcon } from 'components/Icons/Icons'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { FaFilter } from 'react-icons/fa'
 import { FaChevronDown } from 'react-icons/fa6'
 import { FaCode, FaDesktop, FaInbox } from 'react-icons/fa6'
@@ -51,19 +53,23 @@ const MenuHeading = ({ title, icon: Icon, onClick, active }) => {
   const grayBorder = useColorModeValue('#1A202C29', '#ffffff29')
   const grayText = useColorModeValue('#1A202C', '#60686f')
   const bgActive = useColorModeValue('#EDF2F7', '')
-  const iconColor = useColorModeValue('#3182CE', '#90cdf4')
+
+  const { primaryBlueText, secondaryBgColor } = useThemeColor([
+    'primaryBlueText',
+    'secondaryBgColor'
+  ])
 
   return (
     <MenuButton
       as={Button}
       fontWeight='normal'
       fontSize='sm'
-      leftIcon={<Icon size={14} color={active ? iconColor : '#60686f'} />}
+      leftIcon={<Icon size={14} color={active ? primaryBlueText : '#60686f'} />}
       onClick={onClick}
       variant='outline'
-      borderColor={active ? iconColor : grayBorder}
-      color={active ? iconColor : grayText}
-      backgroundColor={active ? bgActive : 'transparent'}
+      borderColor={active ? primaryBlueText : grayBorder}
+      color={active ? primaryBlueText : grayText}
+      backgroundColor={active ? secondaryBgColor : 'transparent'}
     >
       {title}
     </MenuButton>
@@ -158,7 +164,7 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
   const renderTree = (data, envName) => {
     const envColor = useColorModeValue('#1A202CCC', '#FFFFFF99')
     const grayBorder = useColorModeValue('#1A202C29', '#ffffff12')
-
+    const { primaryBlueText } = useThemeColor(['primaryBlueText'])
     if (
       env.length === 0 ||
       env.includes('all') ||
@@ -176,7 +182,7 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
             <Flex
               h={'24px'}
               w={'24px'}
-              color={'blue.500'}
+              color={primaryBlueText}
               bg={bgColor}
               alignItems={'center'}
               justifyContent={'center'}

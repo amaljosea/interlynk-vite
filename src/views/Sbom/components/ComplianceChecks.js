@@ -28,6 +28,7 @@ import {
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { recheckHealth } from 'graphQL/Mutation'
 
@@ -71,6 +72,7 @@ const ComplianceChecks = ({
   }
 
   const ComplianceReport = ({ key, item, loading }) => {
+    const { primaryBlueText } = useThemeColor(['primaryBlueText'])
     return (
       <Flex
         gap={6}
@@ -84,7 +86,7 @@ const ComplianceChecks = ({
             {item?.category?.replace('Component ', '')}
           </Text>
           <Tooltip label={onCheck(item?.category)}>
-            <InfoIcon fontSize={'sm'} color={'blue.500'} />
+            <InfoIcon fontSize={'sm'} color={primaryBlueText} />
           </Tooltip>
         </Stack>
 
@@ -135,6 +137,7 @@ const ComplianceChecks = ({
   }
 
   const RunAlert = () => {
+    const { primaryBlueText } = useThemeColor(['primaryBlueText'])
     return (
       <Flex
         p={3}
@@ -147,7 +150,7 @@ const ComplianceChecks = ({
         justifyContent={'space-between'}
       >
         <Flex gap={2} alignItems={'center'}>
-          <InfoIcon color={'blue.500'} />
+          <InfoIcon color={primaryBlueText} />
           <Text fontSize={'sm'}>Run checks to see compliance scores</Text>
         </Flex>
         <Text

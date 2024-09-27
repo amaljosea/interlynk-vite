@@ -6,13 +6,7 @@ import { getFullDateAndTime } from 'utils'
 import { timeSince } from 'utils'
 
 import { AddIcon } from '@chakra-ui/icons'
-import {
-  Flex,
-  IconButton,
-  Text,
-  Tooltip,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Flex, IconButton, Text, Tooltip } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import LynkSwitch from 'components/Misc/LynkSwitch'
@@ -22,6 +16,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { updateOrgComp } from 'graphQL/Mutation'
 import { getInternalComponents } from 'graphQL/Queries'
@@ -64,10 +59,12 @@ export const InternalComponents = () => {
     })
   }
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
   const paddingCell = 0
   const paddingHeadCell = 0
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const columns = [
     {
@@ -104,7 +101,7 @@ export const InternalComponents = () => {
       grow: 1.5,
       selector: (row) => {
         return (
-          <Text color={textColor} my={2}>
+          <Text color={primaryTextColor} my={2}>
             {row.ignoreCase ? 'Yes' : 'No'}
           </Text>
         )
@@ -115,7 +112,7 @@ export const InternalComponents = () => {
       name: 'CREATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.createdAt)} placement={'top'}>
-          <Text color={textColor} my={2}>
+          <Text color={primaryTextColor} my={2}>
             {timeSince(row.createdAt)}
           </Text>
         </Tooltip>
@@ -126,7 +123,7 @@ export const InternalComponents = () => {
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-          <Text color={textColor} my={2}>
+          <Text color={primaryTextColor} my={2}>
             {timeSince(row.updatedAt)}
           </Text>
         </Tooltip>
@@ -161,7 +158,7 @@ export const InternalComponents = () => {
         justifyContent={'space-between'}
       >
         <Flex flexDirection={'column'}>
-          <Text fontSize='lg' color={textColor} fontWeight='bold'>
+          <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
             Internal Components
           </Text>
           <Text fontSize={'sm'}>
@@ -182,7 +179,7 @@ export const InternalComponents = () => {
         </Tooltip>
       </Flex>
     )
-  }, [manageListing, textColor])
+  }, [manageListing, primaryTextColor])
 
   return (
     <>
@@ -193,7 +190,7 @@ export const InternalComponents = () => {
         data={data?.organization?.organizationComponents}
         subHeaderComponent={subHeader}
         customStyles={customStyles(
-          headColor,
+          headingTextColor,
           null,
           paddingCell,
           paddingHeadCell

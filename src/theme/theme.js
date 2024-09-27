@@ -15,6 +15,57 @@ import { linkStyles } from './components/link'
 import { breakpoints } from './foundations/breakpoints'
 import { globalStyles } from './styles'
 
+const colors = {
+  headingTextColor: {
+    light: '#4A5568',
+    dark: '#CBD5E0'
+  },
+  primaryTextColor: {
+    light: '#1A202C', // primary gray and light color used for texts
+    dark: '#F7FAFC'
+  },
+  secondaryTextColor: {
+    light: '#A0AEC0',
+    dark: '#718096'
+  },
+  primaryBlueText: {
+    light: '#3182CE', // Primary blue color used for texts
+    dark: '#5BA3DB'
+  },
+  primaryBgColor: {
+    light: '#F7FAFC', //used in KBar, CpeInput, GithubConfigModal etc
+    dark: '#1A202C'
+  },
+  secondaryBgColor: {
+    light: '#EDF2F7',
+    dark: '#2D3748'
+  },
+  inverseSecondaryBgColor: {
+    light: '#2D3748',
+    dark: '#EDF2F7'
+  },
+  grayBorderColor: {
+    light: '#E2E8F0',
+    dark: '#ffffff29'
+  },
+  primaryBlueBorder: {
+    light: '#3182CE',
+    dark: '#90cdf499'
+  },
+  secondaryBlueBorder: {
+    light: '#3182CE66',
+    dark: '#90cdf499'
+  },
+  primaryErrorColor: {
+    light: '#E53E3E',
+    dark: '#F56565'
+  },
+  primarySuccessColor: {
+    light: '#48BB78',
+    dark: '#68D391'
+  }
+}
+
 const config = {
   initialColorMode: 'light',
   useSystemColorMode: false
@@ -33,7 +84,8 @@ export default extendTheme(
           marginBottom: '4px'
         }
       }
-    }
+    },
+    colors
   },
   config,
   globalStyles,

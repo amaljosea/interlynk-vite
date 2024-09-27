@@ -23,6 +23,7 @@ import {
 
 import useCustomToast from 'hooks/useCustomToast'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import LynkAlert from './LynkAlert'
 
@@ -43,7 +44,10 @@ const ResetForm = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
-
+  const { primaryErrorColor, primaryBlueText } = useThemeColor([
+    'primaryErrorColor',
+    'primaryBlueText'
+  ])
   const handlePasswordChange = (e) => {
     const { value } = e.target
     setPassword(value)
@@ -169,7 +173,7 @@ const ResetForm = () => {
         <Text fontSize={'sm'} textAlign={'center'} color={'gray.600'}>
           If you have not received an email in 5 minutes, check your spam or{' '}
           <chakra.span
-            color={'blue.500'}
+            color={primaryBlueText}
             cursor={'pointer'}
             fontWeight={'medium'}
             onClick={handleChange}
@@ -218,7 +222,7 @@ const ResetForm = () => {
                 </InputRightElement>
               </InputGroup>
               {invalidPassword && (
-                <FormHelperText color={'red.500'}>
+                <FormHelperText color={primaryErrorColor}>
                   <Text mb={1}>
                     Your password must be 8-16 characters contain:
                   </Text>

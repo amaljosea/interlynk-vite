@@ -22,6 +22,7 @@ import TeamTable from 'components/Tables/TeamTable'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 
@@ -63,7 +64,7 @@ function Profile() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
-
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const [orgIndex, setOrgIndex] = useState(0)
   const [psIndex, setPsIndex] = useState(0)
 
@@ -137,7 +138,7 @@ function Profile() {
   if (error) {
     return (
       <Flex alignItems={'center'} justifyContent={'center'} gap={2}>
-        <WarningTwoIcon color='blue.500' />
+        <WarningTwoIcon color={primaryBlueText} />
         <Text textAlign={'center'} fontSize={14}>
           {displayErrorMessage(error.networkError?.statusCode, error.message)}
         </Text>

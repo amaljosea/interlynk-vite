@@ -16,7 +16,6 @@ import {
   Spinner,
   Stack,
   Text,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -26,6 +25,7 @@ import { Separator } from 'components/Separator/Separator'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 function SidebarResponsive(props) {
   const { isFreeTier, orgQueryLoading } = useGlobalQueryContext()
@@ -50,11 +50,12 @@ function SidebarResponsive(props) {
     : props.routes
 
   const createLinks = (routes) => {
-    // Chakra Color Mode
-    const activeBg = useColorModeValue('white', 'gray.700')
-    const inactiveBg = useColorModeValue('white', 'gray.700')
-    const activeColor = useColorModeValue('gray.700', 'white')
-    const inactiveColor = useColorModeValue('gray.400', 'gray.400')
+    const { primaryTextColor, secondaryTextColor, secondaryBgColor } =
+      useThemeColor([
+        'primaryTextColor',
+        'secondaryTextColor',
+        'secondaryBgColor'
+      ])
 
     return routes.map((prop, key) => {
       if (prop.redirect) {
@@ -66,7 +67,7 @@ function SidebarResponsive(props) {
         return (
           <div key={prop.name}>
             <Text
-              color={activeColor}
+              color={primaryTextColor}
               fontWeight='bold'
               mb={{
                 xl: '12px'
@@ -101,7 +102,7 @@ function SidebarResponsive(props) {
               boxSize='initial'
               justifyContent='flex-start'
               alignItems='center'
-              bg={activeBg}
+              bg={''}
               mb={{
                 xl: '12px'
               }}
@@ -139,7 +140,7 @@ function SidebarResponsive(props) {
                     {prop.icon}
                   </IconBox>
                 )}
-                <Text color={activeColor} my='auto' fontSize='sm'>
+                <Text color={primaryTextColor} my='auto' fontSize='sm'>
                   {document.documentElement.dir === 'rtl'
                     ? prop.rtlName
                     : prop.name}
@@ -180,7 +181,7 @@ function SidebarResponsive(props) {
                   <Icon>{prop.icon}</Icon>
                 ) : (
                   <IconBox
-                    bg={inactiveBg}
+                    bg={secondaryBgColor}
                     color='blue.300'
                     h='36px'
                     w='36px'
@@ -189,7 +190,7 @@ function SidebarResponsive(props) {
                     {prop.icon}
                   </IconBox>
                 )}
-                <Text color={inactiveColor} my='auto' fontSize='sm'>
+                <Text color={secondaryTextColor} my='auto' fontSize='sm'>
                   {document.documentElement.dir === 'rtl'
                     ? prop.rtlName
                     : prop.name}
@@ -207,7 +208,8 @@ function SidebarResponsive(props) {
   var links = <>{createLinks(routesActual)}</>
   //  BRAND
   //  Chakra Color Mode
-  let hamburgerColor = useColorModeValue('gray.500', 'gray.200')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+  let hamburgerColor = primaryTextColor
   if (props.secondary === true) {
     hamburgerColor = 'white'
   }

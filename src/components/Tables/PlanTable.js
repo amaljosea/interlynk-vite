@@ -19,6 +19,7 @@ import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { EnterpriseUpgradeRequest } from 'graphQL/Mutation'
 
@@ -34,7 +35,17 @@ const PlanTable = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const [sendRequest, { loading }] = useMutation(EnterpriseUpgradeRequest)
-
+  const {
+    primaryBgColor,
+    primaryErrorColor,
+    primarySuccessColor,
+    primaryBlueText
+  } = useThemeColor([
+    'primaryBgColor',
+    'primaryErrorColor',
+    'primarySuccessColor',
+    'primaryBlueText'
+  ])
   const usageData = {
     title: 'Usage',
     features: [
@@ -105,12 +116,8 @@ const PlanTable = () => {
 
   const boxShadow = useColorModeValue(
     '0px 4px 16px rgba(0, 0, 0, 0.1)',
-    '0px 4px 16px rgba(255, 255, 255, 0.15)'
+    '0px 4px 16px rgba(255, 255, 255, 0.1)'
   )
-
-  const titleColor = useColorModeValue('#000', 'blue.500')
-
-  const iconColor = useColorModeValue('white', 'black')
 
   const handleContact = () => {
     sendRequest().then((res) => {
@@ -215,7 +222,7 @@ const PlanTable = () => {
                   mb={1}
                   mt={'20px'}
                   h='30px'
-                  color={titleColor}
+                  color={primaryBlueText}
                 >
                   {featureSet.title}
                 </Text>
@@ -277,8 +284,8 @@ const PlanTable = () => {
                     color={
                       typeof item.val1 === 'boolean'
                         ? item.val1
-                          ? 'green.500'
-                          : 'red.500'
+                          ? primarySuccessColor
+                          : primaryErrorColor
                         : 'inherit'
                     }
                   >
@@ -290,12 +297,12 @@ const PlanTable = () => {
                           display='flex'
                           alignItems='center'
                           justifyContent='center'
-                          bg='red.500'
+                          bg={primaryErrorColor}
                           borderRadius='full'
                           width='16px'
                           height='16px'
                         >
-                          <CloseIcon color={iconColor} boxSize='8px' />
+                          <CloseIcon color={primaryBgColor} boxSize='8px' />
                         </Box>
                       )
                     ) : (
@@ -322,7 +329,7 @@ const PlanTable = () => {
               fontWeight='semibold'
               mb={2}
               h='30px'
-              color={'blue.500'}
+              color={primaryBlueText}
               textTransform={'uppercase'}
             >
               {'Enterprise'}
@@ -349,8 +356,8 @@ const PlanTable = () => {
                     color={
                       typeof item.val2 === 'boolean'
                         ? item.val2
-                          ? 'green.500'
-                          : 'red.500'
+                          ? primarySuccessColor
+                          : primaryErrorColor
                         : 'inherit'
                     }
                   >
@@ -362,12 +369,12 @@ const PlanTable = () => {
                           display='flex'
                           alignItems='center'
                           justifyContent='center'
-                          bg='red.500'
+                          bg={primaryErrorColor}
                           borderRadius='full'
                           width='16px'
                           height='16px'
                         >
-                          <CloseIcon color={iconColor} boxSize='8px' />
+                          <CloseIcon color={primaryBgColor} boxSize='8px' />
                         </Box>
                       )
                     ) : (

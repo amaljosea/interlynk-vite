@@ -38,6 +38,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { OrganizationManufacturerDelete } from 'graphQL/Mutation'
 import { GetOrgManufacturers } from 'graphQL/Queries'
@@ -58,10 +59,19 @@ const LegalTable = () => {
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const {
+    headingTextColor,
+    primaryTextColor,
+    primaryErrorColor,
+    primaryBlueText
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'primaryErrorColor',
+    'primaryBlueText'
+  ])
   const paddingCell = 0
   const paddingHeadCell = 0
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const iconColor = useColorModeValue('#718096', '#F7FAFC')
 
   const { data, loading } = useQuery(GetOrgManufacturers, {
@@ -123,11 +133,11 @@ const LegalTable = () => {
       >
         <Flex flexDirection={'column'}>
           <Stack direction={'row'} alignItems={'center'}>
-            <Text fontSize='lg' color={textColor} fontWeight='bold'>
+            <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
               Manufacturer Identities
             </Text>
             <InfoIcon
-              color={'blue.500'}
+              color={primaryBlueText}
               cursor={'pointer'}
               onClick={onCheckMfc}
             />
@@ -151,7 +161,7 @@ const LegalTable = () => {
         </Tooltip>
       </Flex>
     )
-  }, [updateOrg, onCheckMfc, onOpen, textColor])
+  }, [updateOrg, onCheckMfc, onOpen, primaryTextColor, primaryBlueText])
 
   // COLUMNS
   const columns = [
@@ -160,7 +170,7 @@ const LegalTable = () => {
       id: 'ORG_NAME',
       name: 'ORGANIZATION NAME',
       selector: (row) => (
-        <Text color={textColor} textTransform={'capitalize'}>
+        <Text color={primaryTextColor} textTransform={'capitalize'}>
           {row?.organizationName}
         </Text>
       ),
@@ -183,10 +193,10 @@ const LegalTable = () => {
               as={ExternalLinkIcon}
               h={'16px'}
               w={'16px'}
-              color={'blue.500'}
+              color={primaryBlueText}
             />
           </Link>
-          <Text color={textColor}>{row?.url}</Text>
+          <Text color={primaryTextColor}>{row?.url}</Text>
         </Flex>
       ),
       wrap: true
@@ -208,19 +218,19 @@ const LegalTable = () => {
               <Flex key={index} alignItems={'center'} gap={4}>
                 {item?.email ? (
                   <Tooltip placement='top' label={item?.email}>
-                    <EmailIcon color={'blue.500'} boxSize={4} />
+                    <EmailIcon color={primaryBlueText} boxSize={4} />
                   </Tooltip>
                 ) : (
                   <EmailIcon color={iconColor} boxSize={4} />
                 )}
                 {item?.phone ? (
                   <Tooltip placement='top' label={item?.phone}>
-                    <PhoneIcon color={'blue.500'} boxSize={3} />
+                    <PhoneIcon color={primaryBlueText} boxSize={3} />
                   </Tooltip>
                 ) : (
                   <PhoneIcon color={iconColor} boxSize={3} />
                 )}
-                <Text color={textColor}>{item?.name || ''}</Text>
+                <Text color={primaryTextColor}>{item?.name || ''}</Text>
               </Flex>
             ))}
           </Flex>
@@ -237,7 +247,7 @@ const LegalTable = () => {
         const { createdAt } = row
         return (
           <Tooltip label={getFullDateAndTime(createdAt)} placement='top'>
-            <Text color={textColor}>{timeSince(createdAt)}</Text>
+            <Text color={primaryTextColor}>{timeSince(createdAt)}</Text>
           </Tooltip>
         )
       },
@@ -257,7 +267,7 @@ const LegalTable = () => {
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
-            <Text color={textColor}>{timeSince(updatedAt)}</Text>
+            <Text color={primaryTextColor}>{timeSince(updatedAt)}</Text>
           </Tooltip>
         )
       },
@@ -295,7 +305,7 @@ const LegalTable = () => {
                 </MenuItem>
                 <MenuItem
                   isDisabled={!updateOrg}
-                  color={'red.500'}
+                  color={primaryErrorColor}
                   onClick={() => {
                     setActiveRow(row)
                     onArchiveOpen()
@@ -325,7 +335,7 @@ const LegalTable = () => {
           progressPending={loading}
           subHeaderComponent={subHeader}
           customStyles={customStyles(
-            headColor,
+            headingTextColor,
             null,
             paddingCell,
             paddingHeadCell

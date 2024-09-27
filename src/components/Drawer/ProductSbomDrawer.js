@@ -32,6 +32,7 @@ import {
 import LicenseField from 'components/Licenses/LicenseField'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateComponent, sbomCreate } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
@@ -53,6 +54,10 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
   const [compKind, setCompKind] = useState('')
   const [compScope, setCompScope] = useState('')
   const [isInternal, setIsInternal] = useState(false)
+  const { primaryErrorColor, primaryBlueText } = useThemeColor([
+    'primaryErrorColor',
+    'primaryBlueText'
+  ])
 
   const [createSbom, { loading: sbomLoading }] = useMutation(sbomCreate)
   const [createComponent, { loading: compLoading }] =
@@ -143,12 +148,12 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Name
-                      <chakra.span color={'red.500'} ml={1}>
+                      <chakra.span color={primaryErrorColor} ml={1}>
                         *
                       </chakra.span>
                     </Text>
                     <Tooltip label={onCheck(`Component Name`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -166,7 +171,7 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Description</Text>
                     <Tooltip label={onCheck(`Component Description`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -184,12 +189,12 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Version{' '}
-                      <chakra.span color={'red.500'} ml={1}>
+                      <chakra.span color={primaryErrorColor} ml={1}>
                         *
                       </chakra.span>
                     </Text>
                     <Tooltip label={onCheck(`Component Version`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -211,7 +216,7 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Group</Text>
                     <Tooltip label={onCheck(`Component Group`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -229,12 +234,12 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Type{' '}
-                      <chakra.span color={'red.500'} ml={1}>
+                      <chakra.span color={primaryErrorColor} ml={1}>
                         *
                       </chakra.span>
                     </Text>
                     <Tooltip label={onCheck(`Component Type`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -271,7 +276,7 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Scope</Text>
                     <Tooltip label={onCheck(`Component Scope`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -299,7 +304,7 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
                     Primary component
                   </Checkbox>
                   <Tooltip label={onCheck(`Primary Component`)}>
-                    <InfoIcon fontSize={14} color={'blue.500'} />
+                    <InfoIcon fontSize={14} color={primaryBlueText} />
                   </Tooltip>
                 </Flex>
               </FormControl>
@@ -315,7 +320,7 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
                     Internal component
                   </Checkbox>
                   <Tooltip label={onCheck(`Internal Component`)}>
-                    <InfoIcon fontSize={14} color={'blue.500'} />
+                    <InfoIcon fontSize={14} color={primaryBlueText} />
                   </Tooltip>
                 </Flex>
               </FormControl>

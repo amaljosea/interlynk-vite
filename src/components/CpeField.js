@@ -11,9 +11,10 @@ import {
   InputRightElement,
   List,
   ListItem,
-  VStack,
-  useColorModeValue
+  VStack
 } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
   const { tabData, handleChange } = useContext(TabContext)
@@ -23,9 +24,9 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
 
   const [focusedIndex, setFocusedIndex] = useState(null)
   const listItemsRef = useRef([])
-
-  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
-  const hoverColor = useColorModeValue('#EDF2F7', '#2D3748')
+  const { primaryBgColor, secondaryBgColor, primaryErrorColor } = useThemeColor(
+    ['primaryBgColor', 'secondaryBgColor', 'primaryErrorColor']
+  )
 
   const handleValidate = (value) => {
     const matches = validateCpe(value)
@@ -125,7 +126,7 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
               {identifiers?.isValidCpe ? (
                 <CheckIcon color='green' />
               ) : (
-                <WarningTwoIcon color='red' />
+                <WarningTwoIcon color={primaryErrorColor} />
               )}
             </InputRightElement>
           )}
@@ -137,7 +138,7 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
           width={'100%'}
           left={0}
           right={0}
-          bg={bgColor}
+          bg={primaryBgColor}
           zIndex={111}
           top={8}
           borderRadius={'md'}
@@ -154,9 +155,9 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
                 key={index}
                 ref={(el) => (listItemsRef.current[index] = el)}
                 tabIndex='0'
-                bg={index === focusedIndex ? hoverColor : 'transparent'}
+                bg={index === focusedIndex ? secondaryBgColor : 'transparent'}
                 _hover={{
-                  bg: focusedIndex === null ? hoverColor : 'transparent'
+                  bg: focusedIndex === null ? secondaryBgColor : 'transparent'
                 }}
                 onMouseEnter={() => setFocusedIndex(null)}
                 outline='none'

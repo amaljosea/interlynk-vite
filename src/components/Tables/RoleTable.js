@@ -16,7 +16,6 @@ import {
   Portal,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -26,6 +25,7 @@ import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetRoles } from 'graphQL/Queries'
 
@@ -63,10 +63,10 @@ const RoleTable = () => {
     onOpen: onRoleOpen,
     onClose: onRoleClose
   } = useDisclosure()
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const { headingTextColor, primaryTextColor, primaryErrorColor } =
+    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
   const paddingCell = 0
   const paddingHeadCell = 0
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const columns = [
     // NAME
@@ -74,7 +74,7 @@ const RoleTable = () => {
       id: 'name',
       name: 'NAME',
       selector: (row) => (
-        <Text color={textColor} textTransform={'capitalize'} my={2}>
+        <Text color={primaryTextColor} textTransform={'capitalize'} my={2}>
           {row?.name}
         </Text>
       ),
@@ -86,7 +86,7 @@ const RoleTable = () => {
       name: 'CREATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.createdAt)} placement='top'>
-          <Text color={textColor} textTransform={'lowercase'}>
+          <Text color={primaryTextColor} textTransform={'lowercase'}>
             {timeSince(row?.createdAt)}
           </Text>
         </Tooltip>
@@ -124,7 +124,7 @@ const RoleTable = () => {
                   View Permissions
                 </MenuItem>
                 <MenuItem
-                  color={'red.500'}
+                  color={primaryErrorColor}
                   isDisabled={!editUserRole}
                   onClick={() => {
                     setSelectedRole(row)
@@ -152,7 +152,7 @@ const RoleTable = () => {
         justifyContent={'space-between'}
       >
         <Flex flexDirection={'column'}>
-          <Text fontSize='lg' color={textColor} fontWeight='bold'>
+          <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
             Roles Management
           </Text>
           <Text fontSize={'sm'}>
@@ -171,7 +171,7 @@ const RoleTable = () => {
         </Tooltip>
       </Flex>
     )
-  }, [updateOrgs, onRoleOpen, textColor])
+  }, [updateOrgs, onRoleOpen, primaryTextColor])
 
   return (
     <>
@@ -187,7 +187,7 @@ const RoleTable = () => {
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
           customStyles={customStyles(
-            headColor,
+            headingTextColor,
             null,
             paddingCell,
             paddingHeadCell

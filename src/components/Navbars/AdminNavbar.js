@@ -18,6 +18,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import { useSelect } from 'hooks/useSelect'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetUserPermissions } from 'graphQL/Queries'
 
@@ -58,9 +59,10 @@ export default function AdminNavbar(props) {
 
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
-  let mainText = useColorModeValue('gray.700', 'gray.200')
+  let mainText = inverseSecondaryBgColor
   let secondaryText = useColorModeValue('gray.400', 'gray.200')
 
   const {
@@ -97,7 +99,7 @@ export default function AdminNavbar(props) {
                   ? '/vendor/dashboard'
                   : '/customer/products'
               }
-              color={secondaryText}
+              color={'secondaryText'}
             >
               Interlynk
             </Link>

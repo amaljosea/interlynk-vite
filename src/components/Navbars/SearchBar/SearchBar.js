@@ -9,12 +9,14 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 export function SearchBar(props) {
   // Pass the computed styles into the `__css` prop
   const { variant, children, ...rest } = props
   // Chakra Color Mode
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
   const mainTeal = useColorModeValue('teal.300', 'teal.300')
-  const searchIconColor = useColorModeValue('gray.700', 'gray.200')
   const inputBg = useColorModeValue('white', 'gray.800')
   return (
     <InputGroup
@@ -41,7 +43,9 @@ export function SearchBar(props) {
           _focus={{
             boxShadow: 'none'
           }}
-          icon={<SearchIcon color={searchIconColor} w='15px' h='15px' />}
+          icon={
+            <SearchIcon color={inverseSecondaryBgColor} w='15px' h='15px' />
+          }
         />
       </InputLeftElement>
       <Input

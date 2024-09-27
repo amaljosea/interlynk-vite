@@ -39,6 +39,7 @@ import PrimaryWarning from 'components/Modal/PrimaryWarning'
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateCompRelation, CreateComponent } from 'graphQL/Mutation'
 import { CpeAutoComplete, GetAllComponents, GetAllSboms } from 'graphQL/Queries'
@@ -70,6 +71,11 @@ function ComponentDrawer(props) {
       tab: activeTab
     }
   })
+
+  const { primaryErrorColor, primaryBlueText } = useThemeColor([
+    'primaryErrorColor',
+    'primaryBlueText'
+  ])
 
   const { isOpen, onClose, data, primaryComp, shortDesc } = props
   const { prodCompState, dispatch } = useGlobalState()
@@ -304,12 +310,12 @@ function ComponentDrawer(props) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Name
-                      <chakra.span color={'red.500'} ml={1}>
+                      <chakra.span color={primaryErrorColor} ml={1}>
                         *
                       </chakra.span>
                     </Text>
                     <Tooltip label={onCheck(`Component Name`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -329,7 +335,7 @@ function ComponentDrawer(props) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Description</Text>
                     <Tooltip label={onCheck(`Component Description`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -349,7 +355,7 @@ function ComponentDrawer(props) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Copyright</Text>
                     <Tooltip label={onCheck(`Component Copyright`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -369,12 +375,12 @@ function ComponentDrawer(props) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Version{' '}
-                      <chakra.span color={'red.500'} ml={1}>
+                      <chakra.span color={primaryErrorColor} ml={1}>
                         *
                       </chakra.span>
                     </Text>
                     <Tooltip label={onCheck(`Component Version`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -398,7 +404,7 @@ function ComponentDrawer(props) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Group</Text>
                     <Tooltip label={onCheck(`Component Group`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -418,12 +424,12 @@ function ComponentDrawer(props) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Type{' '}
-                      <chakra.span color={'red.500'} ml={1}>
+                      <chakra.span color={primaryErrorColor} ml={1}>
                         *
                       </chakra.span>
                     </Text>
                     <Tooltip label={onCheck(`Component Type`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -457,13 +463,13 @@ function ComponentDrawer(props) {
               />
               <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                 {shortDesc === 'Component Identifier' && purlString === '' && (
-                  <WarningTwoIcon w={4} h={4} color='red.500' />
+                  <WarningTwoIcon w={4} h={4} color={primaryErrorColor} />
                 )}
                 <Text fontSize={'sm'} fontWeight={'medium'}>
                   Identifiers
                 </Text>
                 <Tooltip label={onCheck(`Component Identifiers`)}>
-                  <InfoIcon color={'blue.500'} />
+                  <InfoIcon color={primaryBlueText} />
                 </Tooltip>
               </Flex>
               {/* PURL INPUI */}
@@ -474,7 +480,7 @@ function ComponentDrawer(props) {
                 <FormLabel fontSize={12} htmlFor='text'>
                   Package URL
                   <Link
-                    color={'blue.500'}
+                    color={primaryBlueText}
                     mx={2}
                     _hover={{ textDecoration: 'underline' }}
                     fontWeight={'medium'}
@@ -503,7 +509,7 @@ function ComponentDrawer(props) {
                       identifiers?.isValidPurl ? (
                         <CheckIcon color='green' />
                       ) : (
-                        <WarningTwoIcon color='red' />
+                        <WarningTwoIcon color={primaryErrorColor} />
                       )
                     ) : null}
                   </InputRightElement>
@@ -514,7 +520,7 @@ function ComponentDrawer(props) {
                 <FormLabel fontSize={12} htmlFor='text'>
                   CPE
                   <Link
-                    color={'blue.500'}
+                    color={primaryBlueText}
                     mx={2}
                     _hover={{ textDecoration: 'underline' }}
                     fontWeight={'medium'}
@@ -539,7 +545,7 @@ function ComponentDrawer(props) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Scope</Text>
                     <Tooltip label={onCheck(`Component Scope`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -566,7 +572,7 @@ function ComponentDrawer(props) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Support Level</Text>
                     <Tooltip label={onCheck(`Support Level`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -602,7 +608,7 @@ function ComponentDrawer(props) {
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>End-Of-Support Date</Text>
                     <Tooltip label={onCheck(`End-of-Support Date`)}>
-                      <InfoIcon color={'blue.500'} />
+                      <InfoIcon color={primaryBlueText} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -629,7 +635,7 @@ function ComponentDrawer(props) {
                     Primary component
                   </Checkbox>
                   <Tooltip label={onCheck(`Primary Component`)}>
-                    <InfoIcon fontSize={14} color={'blue.500'} />
+                    <InfoIcon fontSize={14} color={primaryBlueText} />
                   </Tooltip>
                 </Flex>
               </FormControl>
@@ -648,7 +654,7 @@ function ComponentDrawer(props) {
                     Internal component
                   </Checkbox>
                   <Tooltip label={onCheck(`Internal Component`)}>
-                    <InfoIcon fontSize={14} color={'blue.500'} />
+                    <InfoIcon fontSize={14} color={primaryBlueText} />
                   </Tooltip>
                 </Flex>
               </FormControl>

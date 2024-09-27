@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 function ProductAssembleDrawer(props) {
   const {
@@ -41,7 +42,7 @@ function ProductAssembleDrawer(props) {
   const [selectVersion, setSelectVersion] = useState('')
 
   const { showToast } = useCustomToast()
-
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const handleSave = () => {
     if (productName !== '' && productVersion !== '') {
       // setProductVersionExploded((prev) => [
@@ -171,7 +172,7 @@ function ProductAssembleDrawer(props) {
                       fontSize={'sm'}
                       px={4}
                       py={1}
-                      bg={'blue.500'}
+                      bg={primaryBlueText}
                       color={'white'}
                       borderRadius={20}
                     >

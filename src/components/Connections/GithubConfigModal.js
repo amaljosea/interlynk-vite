@@ -9,13 +9,13 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { IoSettingsOutline } from 'react-icons/io5'
 
@@ -76,7 +76,10 @@ const GithubConfigModal = ({ isOpen, onClose, setGreenCheck, data }) => {
     }, 3000)
   }
 
-  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
+  const { primaryBgColor, primarySuccessColor } = useThemeColor([
+    'primaryBgColor',
+    'primarySuccessColor'
+  ])
 
   const handleToggleVisibility = () => setShowApiToken(!showApiToken)
 
@@ -104,7 +107,7 @@ const GithubConfigModal = ({ isOpen, onClose, setGreenCheck, data }) => {
       hideCancelButton
       leftFooterContent={
         success && (
-          <Text color='green.500' fontSize='sm' mr='auto'>
+          <Text color={primarySuccessColor} fontSize='sm' mr='auto'>
             {'Verified successfully!'}
           </Text>
         )
@@ -155,7 +158,7 @@ const GithubConfigModal = ({ isOpen, onClose, setGreenCheck, data }) => {
           borderColor='gray.200'
           borderRadius='md'
           boxShadow='md'
-          bg={bgColor}
+          bg={primaryBgColor}
         >
           <Text fontWeight='bold' mb={2}>
             Verification Details:

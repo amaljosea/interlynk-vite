@@ -15,13 +15,13 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useColorMode,
-  useColorModeValue
+  useColorMode
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { IntersectingVulns } from 'graphQL/Queries'
 
@@ -48,8 +48,9 @@ const linkURl = (type, id) => {
 }
 
 const StepTwo = ({ sbomId, currentSbomId }) => {
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
+    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
+  )
   const { colorMode } = useColorMode()
   const { prodVulnState, dispatch } = useGlobalState()
   const { selectedVulns } = prodVulnState
@@ -79,10 +80,10 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
                 as={ExternalLinkIcon}
                 h={'16px'}
                 w={'16px'}
-                color={'blue.500'}
+                color={primaryBlueText}
               />
               <Tooltip label={toVuln?.vuln?.vulnId} placement={'top'}>
-                <Text fontSize='sm' color={textColor}>
+                <Text fontSize='sm' color={primaryTextColor}>
                   {toVuln?.vuln?.vulnId || ''}
                 </Text>
               </Tooltip>
@@ -133,8 +134,12 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
             spacing={1}
             my={3}
           >
-            <Text color={textColor}>{toVuln?.component?.name || ''}</Text>
-            <Text color={textColor}>{toVuln?.component?.version || ''}</Text>
+            <Text color={primaryTextColor}>
+              {toVuln?.component?.name || ''}
+            </Text>
+            <Text color={primaryTextColor}>
+              {toVuln?.component?.version || ''}
+            </Text>
           </Stack>
         )
       },
@@ -227,7 +232,7 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
           columns={columns}
           className={tableClassName}
           data={data?.intersectingVulns || []}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeaderComponent={subHeaderComponentMemo}

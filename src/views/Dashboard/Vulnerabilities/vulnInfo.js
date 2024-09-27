@@ -24,6 +24,8 @@ import IconBox from 'components/Icons/IconBox'
 import CvssCard from 'components/Misc/CvssCard'
 import VulnBadge from 'components/Misc/VulnBadge'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { GetGlobalVulnData } from 'graphQL/Queries'
 
 import { FaBug, FaCube, FaCubes } from 'react-icons/fa'
@@ -63,7 +65,7 @@ const VulnInfo = () => {
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
   const { isOpen, onOpen, onClose } = useDisclosure()
-
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const { data } = useQuery(GetGlobalVulnData, {
     skip: vulnId ? false : true,
     variables: {
@@ -107,7 +109,7 @@ const VulnInfo = () => {
                   <Text
                     fontWeight={'semibold'}
                     fontSize={22}
-                    _hover={{ color: 'blue.500' }}
+                    _hover={{ color: primaryBlueText }}
                   >
                     {vuln?.vulnId}
                   </Text>

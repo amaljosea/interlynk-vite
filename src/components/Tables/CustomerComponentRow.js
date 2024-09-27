@@ -37,8 +37,6 @@ function CustomerComponentRow(props) {
   const location = useLocation()
 
   const textColor = useColorModeValue('gray.700', 'white')
-  const bgStatus = useColorModeValue('gray.400', '#1a202c')
-  const colorStatus = useColorModeValue('white', 'gray.400')
 
   const [contains, setcontains] = useState({})
 

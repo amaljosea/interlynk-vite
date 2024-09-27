@@ -23,6 +23,7 @@ import SbomInfo from 'components/SbomInfo'
 import DiffTable from 'components/Tables/DiffTable'
 
 import { useSbomCompare } from 'hooks/useSbomCompare'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const Loader = () => {
   return (
@@ -42,7 +43,7 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
     sbomIdTwo
   })
 
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const sbomOneColor = useColorModeValue('green.100', 'gray.800')
   const sbomTwoColor = useColorModeValue('red.100', 'gray.800')
 
@@ -75,7 +76,7 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
                           <Flex alignItems={'flex-end'} gap={1}>
                             <Heading
                               fontWeight={'semibold'}
-                              color={textColor}
+                              color={primaryTextColor}
                               fontFamily={'inherit'}
                               size='md'
                             >
@@ -111,7 +112,7 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
                         <Stack>
                           <Heading
                             fontWeight={'semibold'}
-                            color={textColor}
+                            color={primaryTextColor}
                             fontFamily={'inherit'}
                             size='md'
                           >

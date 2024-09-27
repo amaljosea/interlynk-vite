@@ -1,13 +1,15 @@
-import { Divider, Grid, Stack, Text, useColorModeValue } from '@chakra-ui/react'
+import { Divider, Grid, Stack, Text } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GoVersions } from 'react-icons/go'
 
 import CustomTag from './CustomTag'
 
 const VersionCard = ({ data, isOpen, onClose }) => {
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const { sbom } = data || ''
   const { project, primaryComponent } = sbom || ''
   return (
@@ -20,21 +22,21 @@ const VersionCard = ({ data, isOpen, onClose }) => {
     >
       <Stack spacing={2} py={3}>
         <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-          <Text color={textColor} fontSize={'sm'}>
+          <Text color={primaryTextColor} fontSize={'sm'}>
             Product
           </Text>
           <CustomTag>{project?.projectGroup?.name || '-'}</CustomTag>
         </Grid>
         <Divider />
         <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-          <Text color={textColor} fontSize={'sm'}>
+          <Text color={primaryTextColor} fontSize={'sm'}>
             Version
           </Text>
           <CustomTag>{primaryComponent?.version || '-'}</CustomTag>
         </Grid>
         <Divider />
         <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-          <Text color={textColor} fontSize={'sm'}>
+          <Text color={primaryTextColor} fontSize={'sm'}>
             SBOM File
           </Text>
           <CustomTag>{primaryComponent?.name || '-'}</CustomTag>

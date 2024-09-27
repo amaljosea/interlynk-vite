@@ -1,5 +1,7 @@
 import { CheckIcon } from '@chakra-ui/icons'
-import { Button, Flex, Text, useColorModeValue } from '@chakra-ui/react'
+import { Button, Flex, Text } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import Card from '../Card/Card'
 
@@ -12,7 +14,11 @@ const ConnectionCard = ({
   description,
   color
 }) => {
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { primaryTextColor, primaryBlueText } = useThemeColor([
+    'primaryTextColor',
+    'primaryBlueText'
+  ])
+
   return (
     <Card
       width='320px'
@@ -39,7 +45,7 @@ const ConnectionCard = ({
             noOfLines={1}
             fontSize='lg'
             fontWeight='500'
-            color={textColor}
+            color={primaryTextColor}
           >
             {name}
           </Text>
@@ -54,14 +60,14 @@ const ConnectionCard = ({
           colorScheme={isConnected ? 'blue' : 'white'}
           size='md'
           width={isConnected ? '150px' : '120px'}
-          color={isConnected ? 'white' : 'blue.500'}
-          bg={isConnected ? 'blue.500' : ''}
+          color={isConnected ? 'white' : primaryBlueText}
+          bg={isConnected ? primaryBlueText : ''}
           leftIcon={
             isConnected ? (
               <CheckIcon
                 w={'20px'}
                 h={'20px'}
-                color='blue.500'
+                color={primaryBlueText}
                 bg='white'
                 borderRadius='full'
                 p={1}

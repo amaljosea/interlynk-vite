@@ -56,6 +56,7 @@ import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   SwitchOrganization,
@@ -127,8 +128,18 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const [isSaveDisabled, setIsSaveDisabled] = useState(false)
   const { showToast } = useCustomToast()
   const navigate = useNavigate()
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-  const iconColor = useColorModeValue('#EDF2F7', '#2D3748')
+  const {
+    primaryTextColor,
+    secondaryBgColor,
+    primaryErrorColor,
+    primaryBlueText
+  } = useThemeColor([
+    'primaryTextColor',
+    'secondaryBgColor',
+    'primaryErrorColor',
+    'primaryBlueText'
+  ])
+
   const switchIconColor = useColorModeValue('gray.500', 'white')
   const switchBgColor = useColorModeValue('white', '#2D3748')
 
@@ -569,7 +580,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     key={index}
                     w='20px'
                     h='20px'
-                    color={iconColor}
+                    color={secondaryBgColor}
                     style={{ marginRight: '8px' }}
                   />
                 ))}
@@ -682,7 +693,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     <Text
                       fontWeight={'semibold'}
                       fontSize={22}
-                      color={textColor}
+                      color={primaryTextColor}
                       ms={{ sm: '8px', md: '0px' }}
                     >
                       {selectedTab === 'ORGANIZATION'
@@ -807,9 +818,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 onChange={handleNameChange}
                 placeholder='Enter your name'
                 value={newUserName}
-                borderColor={nameError ? 'red.500' : 'inherit'}
+                borderColor={nameError ? primaryErrorColor : 'inherit'}
               />
-              {nameError && <Text color='red.500'>{nameError}</Text>}
+              {nameError && <Text color={primaryErrorColor}>{nameError}</Text>}
             </FormControl>
 
             {/* Password Edit */}
@@ -889,7 +900,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   </InputGroup>
 
                   {newPassword !== '' && invalidPassword && (
-                    <Text color='red.500'>
+                    <Text color={primaryErrorColor}>
                       <Text mb={1}>
                         Your password must be 8-16 characters and contain:
                       </Text>
@@ -902,7 +913,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   {oldPassword !== '' &&
                     newPassword !== '' &&
                     oldPassword === newPassword && (
-                      <Text fontSize='sm' color='red.500'>
+                      <Text fontSize='sm' color={primaryErrorColor}>
                         Old password and new password cannot be the same
                       </Text>
                     )}
@@ -933,7 +944,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     </InputRightElement>
                   </InputGroup>
                   {passError !== '' && (
-                    <Text fontSize='sm' color='red.500'>
+                    <Text fontSize='sm' color={primaryErrorColor}>
                       {passError}
                     </Text>
                   )}
@@ -1007,10 +1018,14 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                         variant='subtle'
                         colorScheme='white'
                         textTransform='capitalize'
-                        borderColor='blue.500'
+                        borderColor={primaryBlueText}
                         borderWidth='1px'
                       >
-                        <TagLabel fontSize={'12px'} color='blue.500' mx='auto'>
+                        <TagLabel
+                          fontSize={'12px'}
+                          color={primaryBlueText}
+                          mx='auto'
+                        >
                           {'Active'}
                         </TagLabel>{' '}
                       </Tag>
@@ -1049,9 +1064,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
               leftIcon={<AddIcon />}
               marginTop='10px'
               fontWeight='500'
-              textColor={'blue.500'}
+              textColor={primaryBlueText}
               border='1px'
-              borderColor='blue.500'
+              borderColor={primaryBlueText}
               onClick={onOpen}
             >
               Add Organization

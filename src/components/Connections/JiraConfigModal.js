@@ -12,13 +12,13 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   CreateJiraConnection,
@@ -64,6 +64,13 @@ const JiraConfigModal = ({
       fetchPolicy: 'network-only'
     }
   )
+
+  const { primaryBgColor, primaryErrorColor, primarySuccessColor } =
+    useThemeColor([
+      'primaryBgColor',
+      'primaryErrorColor',
+      'primarySuccessColor'
+    ])
 
   useEffect(() => {
     if (data) {
@@ -199,7 +206,6 @@ const JiraConfigModal = ({
     isValuesChanged && jiraHost && jiraUsername && jiraApiToken
 
   const handleToggleVisibility = () => setShowApiToken(!showApiToken)
-  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
 
   return (
     <LynkModal
@@ -216,7 +222,7 @@ const JiraConfigModal = ({
       leftFooterContent={
         (success || failure) && (
           <Text
-            color={success ? 'green.500' : 'red.500'}
+            color={success ? primarySuccessColor : primaryErrorColor}
             fontSize='sm'
             mr='auto'
           >
@@ -294,7 +300,7 @@ const JiraConfigModal = ({
             borderColor='gray.200'
             borderRadius='md'
             boxShadow='md'
-            bg={bgColor}
+            bg={primaryBgColor}
           >
             <Text fontWeight='bold' mb={2}>
               Verification Details:

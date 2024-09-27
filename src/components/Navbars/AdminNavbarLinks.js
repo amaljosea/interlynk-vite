@@ -29,8 +29,7 @@ import {
   MenuList,
   Stack,
   Text,
-  useColorMode,
-  useColorModeValue
+  useColorMode
 } from '@chakra-ui/react'
 
 // Custom Icons
@@ -41,6 +40,7 @@ import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { AllOrganizations, GetOrgName, MyOrganizations } from 'graphQL/Queries'
 
@@ -110,7 +110,7 @@ export default function HeaderLinks(props) {
   const SERVER_URL = process.env.REACT_APP_SERVER
 
   const { colorMode, toggleColorMode, setColorMode } = useColorMode()
-  const bgColor = useColorModeValue('#EDF2F7', '#2D3748')
+  const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
   const dashboardView = location.pathname === '/vendor/dashboard'
   const productView = location.pathname === '/vendor/products'
   const signedUrlParams = location.pathname.startsWith('/customer')
@@ -241,7 +241,7 @@ export default function HeaderLinks(props) {
         </InputLeftElement>
         <Input
           isReadOnly
-          bg={bgColor}
+          bg={secondaryBgColor}
           border='none'
           borderRadius={6}
           placeholder='Search..'

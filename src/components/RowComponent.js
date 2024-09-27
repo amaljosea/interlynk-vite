@@ -3,16 +3,11 @@ import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { ArrowForwardIcon, ViewIcon } from '@chakra-ui/icons'
-import {
-  Tag,
-  TagLabel,
-  TagRightIcon,
-  useColorModeValue,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Tag, TagLabel, TagRightIcon, useDisclosure } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetComponentData } from 'graphQL/Queries'
 
@@ -27,7 +22,7 @@ const RowComponent = ({ content }) => {
   const { prodCompDispatch } = dispatch
   const [activeRow, setActiveRow] = useState(null)
   const [isHovered, setIsHovered] = useState(false)
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const isChnagelog = typeof content === 'string'
   const data = isChnagelog ? activeRow : content
@@ -95,7 +90,7 @@ const RowComponent = ({ content }) => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <TagLabel textColor={textColor}>{getValue()}</TagLabel>
+        <TagLabel textColor={primaryTextColor}>{getValue()}</TagLabel>
         {isHovered && <TagRightIcon as={ViewIcon} onClick={onView} />}
         {isHovered && <TagRightIcon as={ArrowForwardIcon} onClick={onCheck} />}
       </Tag>

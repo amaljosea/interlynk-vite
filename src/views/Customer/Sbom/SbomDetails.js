@@ -24,6 +24,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetSharPrimartComp, GetShareProductData } from 'graphQL/Queries'
 
@@ -43,7 +44,7 @@ const SbomDetails = () => {
   const sbomId = params.sbomid
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
-
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const setActiveTab = (value) => {
     const link = generateProductVersionDetailPageUrlFromCurrentUrl({
       paramsObj: {
@@ -148,7 +149,7 @@ const SbomDetails = () => {
                     width={'fit-content'}
                     fontWeight={'semibold'}
                     fontSize={18}
-                    color={'blue.500'}
+                    color={primaryBlueText}
                     textDecor={'underline'}
                   >
                     {partsContext.latestPart.projectGroupName}

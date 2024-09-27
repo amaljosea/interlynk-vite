@@ -23,7 +23,6 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -32,6 +31,7 @@ import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   AcceptOrgInvitation,
@@ -48,9 +48,9 @@ const OrgTable = ({ data, activeOrg }) => {
   const { showToast } = useCustomToast()
   const [leaveError, setLeaveError] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
+    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
+  )
 
   const {
     isOpen: isWarningOpen,
@@ -169,7 +169,7 @@ const OrgTable = ({ data, activeOrg }) => {
         const { name, id } = row
         return (
           <Stack direction={'column'} my={3}>
-            <Text color={textColor} fontSize={14}>
+            <Text color={primaryTextColor} fontSize={14}>
               {name}
             </Text>
             {activeOrg === id && (
@@ -195,7 +195,7 @@ const OrgTable = ({ data, activeOrg }) => {
       selector: (row) => {
         const { email } = row
         return (
-          <Text color={textColor} fontSize={14}>
+          <Text color={primaryTextColor} fontSize={14}>
             {email}
           </Text>
         )
@@ -210,8 +210,8 @@ const OrgTable = ({ data, activeOrg }) => {
         return (
           <Link href={url} isExternal>
             <Text
-              color={textColor}
-              _hover={{ color: 'blue.500' }}
+              color={primaryTextColor}
+              _hover={{ color: primaryBlueText }}
               fontSize={14}
             >
               {url}
@@ -267,7 +267,7 @@ const OrgTable = ({ data, activeOrg }) => {
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
-            <Text color={textColor} textTransform={'capitalize'}>
+            <Text color={primaryTextColor} textTransform={'capitalize'}>
               {timeSince(updatedAt)}
             </Text>
           </Tooltip>
@@ -339,7 +339,7 @@ const OrgTable = ({ data, activeOrg }) => {
           columns={columns}
           defaultSortAsc={true}
           defaultSortFieldId={'UPDATED_AT'}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           data={data || []}
           progressComponent={<CustomLoader />}
           progressPending={data ? false : true}

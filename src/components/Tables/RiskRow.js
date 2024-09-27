@@ -17,8 +17,6 @@ import { FaEllipsisV } from 'react-icons/fa'
 function VulnerabilityRow(props) {
   const { type, component, version, description, recommendation, score } = props
   const textColor = useColorModeValue('gray.700', 'white')
-  const bgStatus = useColorModeValue('gray.400', '#1a202c')
-  const colorStatus = useColorModeValue('white', 'gray.400')
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = React.useRef()
   const sevColor =

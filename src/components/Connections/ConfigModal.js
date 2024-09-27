@@ -10,13 +10,13 @@ import {
   Input,
   Select,
   Text,
-  VStack,
-  useColorModeValue
+  VStack
 } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaPlus } from 'react-icons/fa6'
 import { MdDeleteOutline } from 'react-icons/md'
@@ -55,7 +55,9 @@ const ConfigModal = ({
     }
   ])
 
-  const borderColor = useColorModeValue('gray.200', 'gray.600')
+  const { grayBorderColor, primaryErrorColor, primaryBlueText } = useThemeColor(
+    ['grayBorderColor', 'primaryErrorColor', 'primaryBlueText']
+  )
 
   useEffect(() => {
     if (data && !error) {
@@ -314,11 +316,17 @@ const ConfigModal = ({
                 placeholder={addressPlaceholder}
                 value={config.address}
                 onChange={(e) => handleChange(index, 'address', e.target.value)}
-                borderColor={!config.isValid ? 'red.500' : borderColor}
+                borderColor={
+                  !config.isValid ? primaryErrorColor : grayBorderColor
+                }
                 isDisabled={!updateCon}
               />
               {config.error && (
-                <Text color='red.500' fontSize='sm' position={'absolute'}>
+                <Text
+                  color={primaryErrorColor}
+                  fontSize='sm'
+                  position={'absolute'}
+                >
                   {config.error}
                 </Text>
               )}
@@ -346,11 +354,18 @@ const ConfigModal = ({
             {updateCon && (
               <IconButton
                 border='1px solid'
-                borderColor={borderColor}
+                borderColor={grayBorderColor}
                 variant={'ghost'}
                 aria-label='Delete configuration'
                 onClick={() => handleRemoveConfig(index)}
-                icon={<Icon as={MdDeleteOutline} w={5} h={5} color={'red'} />}
+                icon={
+                  <Icon
+                    as={MdDeleteOutline}
+                    w={5}
+                    h={5}
+                    color={primaryErrorColor}
+                  />
+                }
               />
             )}
           </HStack>

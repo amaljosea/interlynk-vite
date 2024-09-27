@@ -29,6 +29,7 @@ import DiffTable from 'components/Tables/DiffTable'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   GetProductData,
@@ -45,7 +46,7 @@ const Compare = ({ selectedSboms }) => {
   const { field, direction } = prodState
   const { toolsDispatch } = dispatch
 
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const sbomOneBg = useColorModeValue('#38A169', '#1C4532')
   const sbomTwoBg = useColorModeValue('#E53E3E', '#63171B')
 
@@ -305,7 +306,7 @@ const Compare = ({ selectedSboms }) => {
         </Flex>
       </Card>
       {/* SBOM SELECTIONS */}
-      <Grid templateColumns='repeat(2, 1fr)' gap={6} color={textColor}>
+      <Grid templateColumns='repeat(2, 1fr)' gap={6} color={primaryTextColor}>
         {/* SBOM ONE */}
         <GridItem w='100%'>
           <Card
@@ -352,7 +353,7 @@ const Compare = ({ selectedSboms }) => {
               )}
               {firstSbomInfo && !selectedSboms && (
                 <IconButton
-                  icon={<FaX color={textColor} />}
+                  icon={<FaX color={primaryTextColor} />}
                   size='sm'
                   onClick={onClearOne}
                 />
@@ -482,7 +483,7 @@ const Compare = ({ selectedSboms }) => {
               )}
               {secondSbomInfo && !selectedSboms && (
                 <IconButton
-                  icon={<FaX color={textColor} />}
+                  icon={<FaX color={primaryTextColor} />}
                   size='sm'
                   onClick={onClearTwo}
                 />

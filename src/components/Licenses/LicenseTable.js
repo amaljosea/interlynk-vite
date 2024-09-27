@@ -17,13 +17,13 @@ import {
   Tag,
   TagLabel,
   Text,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaScaleBalanced } from 'react-icons/fa6'
@@ -34,8 +34,9 @@ import { SubHeaderComponent } from './SubHeaderComponent'
 
 const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
   const [activeRow, setActiveRow] = useState(null)
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
+    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
+  )
 
   const updateLic = useHasPermission({
     parentKey: 'view_license',
@@ -68,7 +69,9 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
                 isRound={true}
                 variant='solid'
                 colorScheme='gray'
-                icon={<FaScaleBalanced color={textColor} fontSize={16} />}
+                icon={
+                  <FaScaleBalanced color={primaryTextColor} fontSize={16} />
+                }
               />
             </GridItem>
             <GridItem
@@ -78,7 +81,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
               flexDirection={'column'}
               gap={2}
             >
-              <Text color={textColor} data-tag='allowRowEvents'>
+              <Text color={primaryTextColor} data-tag='allowRowEvents'>
                 {name}
               </Text>
               <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
@@ -96,7 +99,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
                   <Link
                     href={shortId ? url.replace('.json', '.html') : url}
                     isExternal
-                    color={'blue.500'}
+                    color={primaryBlueText}
                     fontSize={'sm'}
                     fontWeight={'normal'}
                     display={'flex'}
@@ -123,7 +126,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           attribution = 'Not Available'
         }
         return (
-          <Text color={textColor} textTransform='capitalize'>
+          <Text color={primaryTextColor} textTransform='capitalize'>
             {attribution.toLowerCase()}
           </Text>
         )
@@ -140,7 +143,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           copyLeft = 'Not Available'
         }
         return (
-          <Text color={textColor} textTransform='capitalize'>
+          <Text color={primaryTextColor} textTransform='capitalize'>
             {copyLeft.toLowerCase()}
           </Text>
         )
@@ -157,7 +160,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           sourceDistribution = 'Not Available'
         }
         return (
-          <Text color={textColor} textTransform='capitalize'>
+          <Text color={primaryTextColor} textTransform='capitalize'>
             {sourceDistribution.toLowerCase()}
           </Text>
         )
@@ -173,7 +176,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           modifications = 'Not Available'
         }
         return (
-          <Text color={textColor} textTransform='capitalize'>
+          <Text color={primaryTextColor} textTransform='capitalize'>
             {modifications.toLowerCase()}
           </Text>
         )
@@ -252,7 +255,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           subHeaderComponent={subHeaderComponent}
           columns={columns}
           data={licenses}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           defaultSortAsc={false}
           defaultSortFieldId={'UPDATED_AT'}
           progressComponent={<CustomLoader />}

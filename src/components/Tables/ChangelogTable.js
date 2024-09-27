@@ -12,7 +12,6 @@ import {
   Tag,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -21,6 +20,7 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import UserCard from 'components/Misc/UserCard'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProjectLogs } from 'graphQL/Queries'
 
@@ -46,8 +46,10 @@ const setColor = (type) => {
 }
 
 const ChangelogTable = ({ activeEnv }) => {
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const [prodLogState, setProdLogState] = useState({
     field: 'ACTIVITY_LOGS_CREATED_AT',
@@ -114,7 +116,7 @@ const ChangelogTable = ({ activeEnv }) => {
         const { orig } = row
         return (
           <Tooltip label={orig} placement='top'>
-            <Text color={textColor} my={2}>
+            <Text color={primaryTextColor} my={2}>
               {orig !== null
                 ? `${event} / ${orig.substring(0, 400)}${
                     orig.length > 400 ? '...' : ''
@@ -135,7 +137,7 @@ const ChangelogTable = ({ activeEnv }) => {
         const { updated } = row
         return (
           <Tooltip label={updated} placement='top'>
-            <Text color={textColor} overflow={'auto'} my={2}>
+            <Text color={primaryTextColor} overflow={'auto'} my={2}>
               {updated !== null
                 ? `${event} / ${updated.substring(0, 400)}${
                     updated.length > 400 ? '...' : ''
@@ -153,7 +155,7 @@ const ChangelogTable = ({ activeEnv }) => {
       selector: (row) => (
         <Tooltip placement='top' label={row.changedBy}>
           <Text
-            color={textColor}
+            color={primaryTextColor}
             cursor={'pointer'}
             onClick={() => {
               setActiveRow(row)
@@ -174,7 +176,7 @@ const ChangelogTable = ({ activeEnv }) => {
       name: 'CHANGED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-          <Text color={textColor}>{timeSince(row.updatedAt)}</Text>
+          <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
         </Tooltip>
       ),
       sortable: true,
@@ -300,7 +302,7 @@ const ChangelogTable = ({ activeEnv }) => {
           onSort={handleSort}
           defaultSortAsc={false}
           progressPending={loading}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
           defaultSortFieldId={prodLogState?.field}

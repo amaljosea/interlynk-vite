@@ -1,8 +1,13 @@
 import { InfoIcon } from '@chakra-ui/icons'
 import { Icon } from '@chakra-ui/react'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 const Info = (props) => {
-  return <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} {...props} />
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  return (
+    <Icon as={InfoIcon} color={primaryBlueText} cursor={'pointer'} {...props} />
+  )
 }
 
 export default Info

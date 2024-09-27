@@ -35,6 +35,7 @@ import LynkModal from 'components/LynkModal'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 // CSS styling for the date-time picker
 import {
@@ -73,10 +74,14 @@ const TokenInfo = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
+
   const paddingCell = 0
   const paddingHeadCell = 0
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+
   const borderColor = useColorModeValue('gray.200', 'gray.600')
 
   const { data, loading } = useQuery(GetApiKeys, {
@@ -206,7 +211,7 @@ const TokenInfo = () => {
         justifyContent={'space-between'}
       >
         <Flex flexDirection={'column'}>
-          <Text fontSize='lg' color={textColor} fontWeight='bold'>
+          <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
             Security Tokens
           </Text>
           <Text fontSize={'sm'}>
@@ -237,7 +242,7 @@ const TokenInfo = () => {
         </Tooltip>
       </Flex>
     )
-  }, [onOpen, textColor])
+  }, [onOpen, primaryTextColor])
 
   useEffect(() => {
     if (activeRow) {
@@ -256,7 +261,7 @@ const TokenInfo = () => {
       wrap: true,
       selector: (row) => (
         <Tooltip label={row?.tokenName} placement='top'>
-          <Text color={textColor} my={2}>
+          <Text color={primaryTextColor} my={2}>
             {truncatedValue(row?.tokenName, 30)}
           </Text>
         </Tooltip>
@@ -267,7 +272,7 @@ const TokenInfo = () => {
       id: 'tokenMask',
       name: 'TOKEN MASK',
       selector: (row) => (
-        <Text color={textColor} my={2}>
+        <Text color={primaryTextColor} my={2}>
           {row.tokenMask}
         </Text>
       ),
@@ -278,7 +283,9 @@ const TokenInfo = () => {
       id: 'created',
       name: 'CREATED',
       selector: (row) => (
-        <Text color={textColor}>{getFullDateAndTime(row.createdAt)}</Text>
+        <Text color={primaryTextColor}>
+          {getFullDateAndTime(row.createdAt)}
+        </Text>
       ),
       sortable: true,
       sortFunction: (a, b) => {
@@ -294,7 +301,9 @@ const TokenInfo = () => {
       id: 'updated',
       name: 'UPDATED',
       selector: (row) => (
-        <Text color={textColor}>{getFullDateAndTime(row.updatedAt)}</Text>
+        <Text color={primaryTextColor}>
+          {getFullDateAndTime(row.updatedAt)}
+        </Text>
       ),
       sortable: true,
       sortFunction: (a, b) => {
@@ -310,7 +319,7 @@ const TokenInfo = () => {
       id: 'expires',
       name: 'EXPIRES',
       selector: (row) => (
-        <Text color={textColor}>
+        <Text color={primaryTextColor}>
           {row.expiresAt ? getFullDateAndTime(row.expiresAt) : 'No Expiration'}
         </Text>
       ),
@@ -444,7 +453,7 @@ const TokenInfo = () => {
           defaultSortFieldId={'updated'}
           progressComponent={<CustomLoader />}
           customStyles={customStyles(
-            headColor,
+            headingTextColor,
             null,
             paddingCell,
             paddingHeadCell

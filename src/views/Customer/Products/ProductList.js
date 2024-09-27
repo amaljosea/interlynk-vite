@@ -8,6 +8,7 @@ import Card from 'components/Card/Card'
 import ProductTable from 'components/Tables/ProductTable'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ShareLynkProjectGroups } from 'graphQL/Queries'
 
@@ -17,6 +18,7 @@ const ProductList = () => {
     direction: 'DESC',
     enabled: true
   })
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const { nodes, paginationProps, reset, loading, error } = usePaginatedQuery(
     ShareLynkProjectGroups,
@@ -32,7 +34,7 @@ const ProductList = () => {
     return (
       <Card>
         <Flex alignItems={'center'} justifyContent={'center'}>
-          <WarningTwoIcon color='blue.500' />
+          <WarningTwoIcon color={primaryBlueText} />
           <Text textAlign={'center'} fontSize={14}>
             {displayErrorMessage(error.networkError?.statusCode, error.message)}
           </Text>

@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import DataTable from 'react-data-table-component'
 import { customStyles, sevColor } from 'utils'
 
-import { Flex, Select, Text, useColorModeValue } from '@chakra-ui/react'
+import { Flex, Select, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -13,6 +13,7 @@ import LynkSwitch from 'components/Misc/LynkSwitch'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { orgRuleUpdate } from 'graphQL/Mutation'
 import { GetOrgRules } from 'graphQL/Queries'
@@ -21,10 +22,12 @@ const Checks = () => {
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
   const paddingCell = 0
   const paddingHeadCell = 0
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
 
   const updateOrg = useHasPermission({
     parentKey: 'view_organization',
@@ -72,7 +75,9 @@ const Checks = () => {
       id: 'RULES_FRIENDLY_ID',
       name: 'CHECK ID',
       width: '10%',
-      selector: (row) => <Text color={textColor}>{row.rule.friendlyId}</Text>,
+      selector: (row) => (
+        <Text color={primaryTextColor}>{row.rule.friendlyId}</Text>
+      ),
       sortable: true,
       sortFunction: (a, b) => {
         const extractNumber = (str) => str.match(/\d+/) || [-1] // Extracts the number from the string
@@ -89,10 +94,10 @@ const Checks = () => {
         const { rule } = row
         return (
           <Flex direction='column' rowGap={1} my={3}>
-            <Text color={textColor} fontSize={'sm'}>
+            <Text color={primaryTextColor} fontSize={'sm'}>
               {rule.shortDesc}
             </Text>
-            <Text color={textColor} fontSize={'12px'}>
+            <Text color={primaryTextColor} fontSize={'12px'}>
               {rule.longDesc}
             </Text>
           </Flex>
@@ -166,7 +171,7 @@ const Checks = () => {
   return (
     <Card p={0} boxShadow='none'>
       <CardHeader display={'flex'} flexDirection={'column'}>
-        <Text fontSize='lg' color={textColor} fontWeight='bold'>
+        <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
           SBOM Check
         </Text>
         <Text fontSize={'sm'}>
@@ -182,7 +187,7 @@ const Checks = () => {
             defaultSortAsc={true}
             defaultSortFieldId={'RULES_FRIENDLY_ID'}
             customStyles={customStyles(
-              headColor,
+              headingTextColor,
               null,
               paddingCell,
               paddingHeadCell

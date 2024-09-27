@@ -1,10 +1,19 @@
 import { useCallback, useEffect, useRef } from 'react'
+
 import { CloseIcon, SearchIcon } from '@chakra-ui/icons'
-import { Box, Input, InputGroup, InputLeftElement, InputRightElement } from '@chakra-ui/react'
+import {
+  Box,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement
+} from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
   const searchInputRef = useRef()
-
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const focusSearchInput = () => {
     if (searchInputRef?.current) {
       searchInputRef?.current.focus()

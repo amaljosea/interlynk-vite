@@ -20,6 +20,7 @@ import LynkSelect from 'components/LynkSelect'
 
 import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LicenseAutoComplete } from 'graphQL/Queries'
 
@@ -40,6 +41,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
 
   const [searchText, setSearchText] = useState('')
   const debouncedSearchTerm = useDebounce(searchText, 300)
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const formatLicenseString = (str = '') => {
     const matchingWords = ['or', 'and', 'with']
@@ -183,7 +185,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
               <Text>License</Text>
               {!sbomView && (
                 <Tooltip label={onCheck(`Component License`)}>
-                  <InfoIcon color={'blue.500'} />
+                  <InfoIcon color={primaryBlueText} />
                 </Tooltip>
               )}
             </Flex>

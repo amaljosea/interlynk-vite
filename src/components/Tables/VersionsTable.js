@@ -32,6 +32,7 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
 
@@ -59,9 +60,17 @@ const VersionsTable = (props) => {
 
   const currentDate = new Date()
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-  const warningColor = useColorModeValue('#E53E3E', '#F56565')
+  const {
+    headingTextColor,
+    primaryTextColor,
+    primaryErrorColor,
+    primaryBlueText
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'primaryErrorColor',
+    'primaryBlueText'
+  ])
 
   const LIST = useDisclosure()
   const TOOL = useDisclosure()
@@ -186,7 +195,7 @@ const VersionsTable = (props) => {
                   <IconButton
                     size='xs'
                     isRound={true}
-                    color={textColor}
+                    color={primaryTextColor}
                     icon={getType(projectVersion)}
                     background='transparent'
                   />
@@ -199,7 +208,7 @@ const VersionsTable = (props) => {
               sx={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}
             >
               <Link to={link} onClick={onStartTour}>
-                <Text color={'blue.500'} minWidth='100%' fontSize={14}>
+                <Text color={primaryBlueText} minWidth='100%' fontSize={14}>
                   {projectVersion}
                 </Text>
               </Link>
@@ -208,7 +217,7 @@ const VersionsTable = (props) => {
                   <Box>
                     <Icon
                       as={HiOutlineDuplicate}
-                      sx={{ mt: 1, fontSize: 18, color: textColor }}
+                      sx={{ mt: 1, fontSize: 18, color: primaryTextColor }}
                     />
                   </Box>
                 </Tooltip>
@@ -220,7 +229,7 @@ const VersionsTable = (props) => {
                   <IconButton
                     size='xs'
                     icon={<IoMdWarning size={16} />}
-                    sx={{ color: warningColor, bg: 'transparent' }}
+                    sx={{ color: primaryErrorColor, bg: 'transparent' }}
                   />
                 </Tooltip>
               )}
@@ -342,7 +351,7 @@ const VersionsTable = (props) => {
         const { createdAt } = row
         return (
           <Tooltip label={getFullDateAndTime(createdAt)} placement='top'>
-            <Text color={textColor} textAlign={'right'}>
+            <Text color={primaryTextColor} textAlign={'right'}>
               {timeSince(createdAt)}
             </Text>
           </Tooltip>
@@ -360,7 +369,7 @@ const VersionsTable = (props) => {
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
-            <Text color={textColor} textAlign={'right'}>
+            <Text color={primaryTextColor} textAlign={'right'}>
               {timeSince(updatedAt)}
             </Text>
           </Tooltip>
@@ -405,7 +414,7 @@ const VersionsTable = (props) => {
                   Archive
                 </MenuItem>
                 <MenuItem
-                  color={'red.500'}
+                  color={primaryErrorColor}
                   onClick={() => {
                     setActiveRow(row)
                     DELETE_SBOM.onOpen()
@@ -494,12 +503,12 @@ const VersionsTable = (props) => {
             onFilter={handleSearch}
           />
           {selectedSbom?.length === 1 && (
-            <Text color={'red.500'}>
+            <Text color={primaryErrorColor}>
               ** Select one more version to enable comparison
             </Text>
           )}
           {selectedSbom?.length > 2 && (
-            <Text color={'red.500'}>
+            <Text color={primaryErrorColor}>
               ** Comparison is permitted with only two versions
             </Text>
           )}
@@ -564,7 +573,7 @@ const VersionsTable = (props) => {
   const dataTableProps = {
     columns: columns,
     data: nodes || [],
-    customStyles: customStyles(headColor),
+    customStyles: customStyles(headingTextColor),
     onSort: handleSort,
     defaultSortFieldId: filters?.field,
     defaultSortAsc: filters?.direction === 'ASC',

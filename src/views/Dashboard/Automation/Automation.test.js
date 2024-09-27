@@ -17,6 +17,16 @@ jest.mock('react-router-dom', () => ({
   useParams: () => ''
 }))
 
+jest.mock('@chakra-ui/react', () => ({
+  ...jest.requireActual('@chakra-ui/react'),
+  useTheme: () => ({
+    colors: {
+      headingTextColor: { light: '#000', dark: '#fff' }
+    }
+  }),
+  useColorModeValue: (light, dark) => light
+}))
+
 test('Automation page renders correctly', () => {
   render(
     <MockedProvider mocks={[]} addTypename={false}>

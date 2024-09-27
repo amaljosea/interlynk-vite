@@ -13,6 +13,8 @@ import {
 
 import LynkModal from 'components/LynkModal'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { CreateProjectGroup } from 'graphQL/Mutation'
 
 import { FaCodeBranch, FaGithub } from 'react-icons/fa'
@@ -77,7 +79,7 @@ const GithubAddModal = ({ isOpen, onClose }) => {
   const [importOptions, setImportOptions] = useState({})
   const [projectGroupCreate] = useMutation(CreateProjectGroup)
 
-  const headingColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const labelColor = useColorModeValue('#718096', '#A0AEC0')
 
   useEffect(() => {
@@ -206,9 +208,9 @@ const GithubAddModal = ({ isOpen, onClose }) => {
                     <Flex align='center'>
                       <FaCodeBranch
                         style={{ marginRight: '8px' }}
-                        color={headingColor}
+                        color={primaryTextColor}
                       />
-                      <Text fontWeight='semibold' color={headingColor}>
+                      <Text fontWeight='semibold' color={primaryTextColor}>
                         {project.name}
                       </Text>
                     </Flex>

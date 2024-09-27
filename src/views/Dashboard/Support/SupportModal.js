@@ -23,6 +23,8 @@ import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import {
   CreateCompSupportOverride as CreateSupport,
   UpdateCompSupportOverride as UpdateSupport
@@ -60,6 +62,8 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
     }))
     setError('')
   }
+
+  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
 
   const hasSimilarRow = (data) => {
     for (let i = 0; i < data.length; i++) {
@@ -380,7 +384,11 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
                             }
                           />
                           {item?.error !== '' && (
-                            <Text mt={1} color={'red.500'} fontSize={'sm'}>
+                            <Text
+                              mt={1}
+                              color={primaryErrorColor}
+                              fontSize={'sm'}
+                            >
                               {item?.error}
                             </Text>
                           )}

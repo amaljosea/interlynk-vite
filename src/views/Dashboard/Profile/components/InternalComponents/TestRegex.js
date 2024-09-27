@@ -14,6 +14,8 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { FaCircleCheck, FaPlus } from 'react-icons/fa6'
 import { IoIosCloseCircle } from 'react-icons/io'
 import { MdDeleteOutline } from 'react-icons/md'
@@ -33,7 +35,7 @@ const checkIsMatch = ({ ignoreCase, regex, item }) => {
 export const TextRegex = ({ regex, ignoreCase }) => {
   const [items, setItems] = useState([{ id: uuidv4(), value: '' }])
   const borderColor = useColorModeValue('gray.200', 'gray.600')
-
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const handleDelete = (id) => {
     setItems(items.filter((item) => item.id !== id))
   }

@@ -4,19 +4,21 @@ import { customStyles } from 'utils'
 import ToolsFilterMenu from 'views/Dashboard/Tools/Filters'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { Badge, Flex, Tag, Text, useColorModeValue } from '@chakra-ui/react'
+import { Badge, Flex, Tag, Text } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
   const { toolsState, dispatch } = useGlobalState()
   const { searchInput, difference, component } = toolsState
   const { toolsDispatch } = dispatch
-
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const [filterText, setFilterText] = useState(searchInput)
 
@@ -95,7 +97,7 @@ const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
       id: 'NAME',
       name: 'NAME',
       selector: (row) => (
-        <Text color={textColor}>
+        <Text color={primaryTextColor}>
           {row?.subjectComponent?.name || row?.targetComponent?.name || '-'}
         </Text>
       ),
@@ -304,7 +306,7 @@ const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
     <DataTable
       columns={columns}
       data={sbomOne && sbomTwo ? filteredData : []}
-      customStyles={customStyles(headColor)}
+      customStyles={customStyles(headingTextColor)}
       progressPending={isLoading}
       subHeader={sbomOne && sbomTwo && diffs?.sbomDrift ? true : false}
       subHeaderComponent={subHeader}

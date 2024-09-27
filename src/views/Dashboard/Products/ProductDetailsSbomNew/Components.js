@@ -32,7 +32,6 @@ import {
   Tooltip,
   VStack,
   useColorMode,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -52,6 +51,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
 import { GetComponentData, GetComponentPath } from 'graphQL/Queries'
@@ -108,10 +108,19 @@ const Components = ({ sbomData }) => {
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-  const activeColor = useColorModeValue('#3182ce', '#63b3ed')
-  const iconColor = useColorModeValue('#2D3748', '#EDF2F7')
+  const {
+    headingTextColor,
+    primaryTextColor,
+    inverseSecondaryBgColor,
+    primaryBlueText
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'inverseSecondaryBgColor',
+    'primaryBlueText'
+  ])
+
+  /*   const activeColor = useColorModeValue('#3182ce', '#63b3ed') */
 
   const { prodCompState, dispatch } = useGlobalState()
   const {
@@ -254,7 +263,10 @@ const Components = ({ sbomData }) => {
         const unknown = isUnknown(cpes, purl)
         const icon =
           unknown || !purl ? (
-            <BsFillPatchQuestionFill fontSize={24} color={iconColor} />
+            <BsFillPatchQuestionFill
+              fontSize={24}
+              color={inverseSecondaryBgColor}
+            />
           ) : (
             GetIcon(purl?.split('/')[0], colorMode)
           )
@@ -268,12 +280,16 @@ const Components = ({ sbomData }) => {
               sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}
             >
               {/* COMPONENT NAME */}
-              <Text color={textColor} data-tag='allowRowEvents'>
+              <Text color={primaryTextColor} data-tag='allowRowEvents'>
                 {name}
               </Text>
               {isPart && (
                 <Text
-                  sx={{ fontSize: 'xs', color: textColor, w: 'fit-content' }}
+                  sx={{
+                    fontSize: 'xs',
+                    color: primaryTextColor,
+                    w: 'fit-content'
+                  }}
                   fontWeight={'medium'}
                 >
                   {projectGroup?.name
@@ -317,7 +333,7 @@ const Components = ({ sbomData }) => {
     {
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
-      selector: (row) => <Text color={textColor}>{row?.version}</Text>,
+      selector: (row) => <Text color={primaryTextColor}>{row?.version}</Text>,
       wrap: true,
       width: '12%',
       sortable: true
@@ -348,14 +364,14 @@ const Components = ({ sbomData }) => {
           <Flex gap={2}>
             {cpes?.length > 0 && (
               <Tooltip label={cpes[0]}>
-                <Button size='xs' color={textColor}>
+                <Button size='xs' color={primaryTextColor}>
                   CPE
                 </Button>
               </Tooltip>
             )}
             {purl && (
               <Tooltip label={purl}>
-                <Button size='xs' color={textColor}>
+                <Button size='xs' color={primaryTextColor}>
                   PURL
                 </Button>
               </Tooltip>
@@ -479,7 +495,7 @@ const Components = ({ sbomData }) => {
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-          <Text color={textColor}>{timeSince(row.updatedAt)}</Text>
+          <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
         </Tooltip>
       ),
       sortable: true,
@@ -505,7 +521,7 @@ const Components = ({ sbomData }) => {
           (item) => item.name === 'issue-tracker'
         )
         const vcs = externalUrls?.find((item) => item.name === 'vcs')
-        const onCheck = (item) => (item ? activeColor : textColor)
+        const onCheck = (item) => (item ? primaryBlueText : primaryTextColor)
         return (
           <Stack direction={'row'} alignItems={'center'}>
             {/* WEBSITE */}
@@ -635,7 +651,7 @@ const Components = ({ sbomData }) => {
     const openSSF = openSsf?.find((item) => item?.name === purl)
 
     const textStyle = {
-      color: textColor,
+      color: primaryTextColor,
       mt: 1,
       fontSize: 14,
       workBreak: 'break-all'
@@ -985,7 +1001,7 @@ const Components = ({ sbomData }) => {
           onRowClicked={handleRowClick}
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           expandableRowsComponent={ExpandedComponent}
           expandableRowExpanded={(row) => expandedRows?.includes(row?.name)}
         />

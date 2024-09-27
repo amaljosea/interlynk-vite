@@ -34,6 +34,7 @@ import { usePartsContext } from 'hooks/usePartsContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import { useSbomScores } from 'hooks/useSbomScores'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   GetPrimaryComponent,
@@ -130,7 +131,7 @@ const SbomDetails = ({ sbomData }) => {
     skip: !shouldShowDemoFeatures
   })
 
-  const mainText = useColorModeValue('blue.500', 'blue.300')
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const filterText = (item) => {
     return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
@@ -184,7 +185,7 @@ const SbomDetails = ({ sbomData }) => {
                       <BreadcrumbItem
                         isCurrentPage={!!part.url}
                         key={part.url}
-                        color={mainText}
+                        color={primaryBlueText}
                       >
                         <BreadcrumbLink _hover={{ textDecoration: 'none' }}>
                           {filterText(part.projectGroupName)} (

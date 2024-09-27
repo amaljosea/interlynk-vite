@@ -23,15 +23,19 @@ import {
 import Card from 'components/Card/Card'
 
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetSbomQualityScores } from 'graphQL/Queries'
 
 const Compliance = ({ sbomData }) => {
   const params = useParams()
   const tab = useQueryParam('tab')
-  const borderColor = useColorModeValue('#E2E8F0', '#ffffff29')
   const textColor = useColorModeValue('gray.600', 'gray.200')
   const linkColor = useColorModeValue('#3182ce', '#63b3ed')
+  const { grayBorderColor, primaryBlueText } = useThemeColor([
+    'grayBorderColor',
+    'primaryBlueText'
+  ])
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
@@ -103,14 +107,14 @@ const Compliance = ({ sbomData }) => {
     <>
       <SimpleGrid columns={3} spacing={5} mt={2}>
         {data?.map((item, index) => (
-          <Card key={item?.id} gap={6} border={`1px solid ${borderColor}`}>
+          <Card key={item?.id} gap={6} border={`1px solid ${grayBorderColor}`}>
             <Flex gap={4} alignItems={'center'} justifyContent={'flex-start'}>
               <Box>{item?.icon}</Box>
               <Text
                 fontSize={'16px'}
                 cursor={'pointer'}
                 fontWeight={'medium'}
-                _hover={{ color: 'blue.500' }}
+                _hover={{ color: primaryBlueText }}
               >
                 {item?.title}
               </Text>

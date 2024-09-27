@@ -24,6 +24,7 @@ import {
 } from '@chakra-ui/react'
 
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { RegisterUser } from 'graphQL/Mutation'
 
@@ -35,7 +36,12 @@ const RegistrationForm = () => {
   const navigate = useNavigate()
   const emailId = useQueryParam('id')
   const awsToken = useQueryParam('aws_marketplace_token')
-
+  const { primaryBlueText, primaryErrorColor, primarySuccessColor } =
+    useThemeColor([
+      'primaryBlueText',
+      'primaryErrorColor',
+      'primarySuccessColor'
+    ])
   const [name, setName] = useState('')
   const [email, setEmail] = useState(emailId?.replace(/\s+/g, '+') || '')
   const [emailError, setEmailError] = useState('')
@@ -137,7 +143,7 @@ const RegistrationForm = () => {
         alignItems={'center'}
         justifyContent={'center'}
       >
-        <Icon color={'green.500'} boxSize={16} as={CheckCircleIcon} />
+        <Icon color={primarySuccessColor} boxSize={16} as={CheckCircleIcon} />
         <Stack spacing={1}>
           <Text fontSize={'20px'} fontWeight={'semibold'} textAlign={'center'}>
             Registration Successful
@@ -229,7 +235,7 @@ const RegistrationForm = () => {
             </InputRightElement>
           </InputGroup>
           {invalidPassword && (
-            <FormHelperText fontSize={'12px'} color={'red.500'}>
+            <FormHelperText fontSize={'12px'} color={primaryErrorColor}>
               <Text mb={1}>Your password must be 8-16 characters contain:</Text>
               <Text>1. Lower case letters {`(a-z)`}</Text>
               <Text>2. Upper case letters {`(A-Z)`}</Text>
@@ -283,7 +289,7 @@ const RegistrationForm = () => {
         >
           <Text fontSize={'sm'}>{`Already have an account ?`}</Text>
           <Link to={'/auth'}>
-            <Text fontSize='sm' color='blue.500' fontWeight={'medium'}>
+            <Text fontSize='sm' color={primaryBlueText} fontWeight={'medium'}>
               Login
             </Text>
           </Link>

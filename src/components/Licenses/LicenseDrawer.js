@@ -19,6 +19,7 @@ import LynkModal from 'components/LynkModal'
 import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaScaleBalanced } from 'react-icons/fa6'
 
@@ -50,6 +51,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
   const [updateLicense] = useMutation(UpdateLicense)
 
   const [drawerSize, setDrawerSize] = useState('md')
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const handleCreateLicense = async () => {
     await createLicense({
@@ -170,7 +172,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
           <FormLabel fontSize={12} htmlFor='text'>
             License Text
             <Link
-              color={'blue.500'}
+              color={primaryBlueText}
               mx={2}
               _hover={{ textDecoration: 'underline' }}
               fontWeight={'medium'}

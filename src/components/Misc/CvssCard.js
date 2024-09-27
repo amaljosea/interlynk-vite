@@ -1,28 +1,23 @@
 import { useEffect, useState } from 'react'
 
-import {
-  Divider,
-  Grid,
-  Stack,
-  Tag,
-  TagLabel,
-  Text,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Divider, Grid, Stack, Tag, TagLabel, Text } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaCircleInfo } from 'react-icons/fa6'
 
 const CvssText = ({ children }) => {
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+
   return (
     <Text
       c
       fontSize='xs'
       textAlign={'left'}
       fontWeight={'medium'}
-      color={textColor}
+      color={primaryTextColor}
     >
       {children}
     </Text>

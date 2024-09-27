@@ -11,8 +11,10 @@ import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import IconBox from 'components/Icons/IconBox'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 const MiniStatistics = ({ title, amount, icon }) => {
-  const activeBg = useColorModeValue('blue.500', 'blue.500')
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const textColor = useColorModeValue('gray.700', 'white')
   const fontStyle = { fontSize: title === 'Vulnerabilities' ? '12px' : '14px' }
   return (
@@ -47,7 +49,7 @@ const MiniStatistics = ({ title, amount, icon }) => {
               </StatNumber>
             )}
           </Stat>
-          <IconBox h={'45px'} w={'45px'} color={'white'} bg={activeBg}>
+          <IconBox h={'45px'} w={'45px'} color={'white'} bg={primaryBlueText}>
             {icon}
           </IconBox>
         </Flex>

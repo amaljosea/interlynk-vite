@@ -23,7 +23,6 @@ import {
   Text,
   Tooltip,
   VStack,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -37,6 +36,7 @@ import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
 import { ShareComponentData } from 'graphQL/Queries'
@@ -54,8 +54,10 @@ const Components = ({ sbomData }) => {
   const activeTab = queryParams.get('tab')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
   const { prodCompState, dispatch } = useGlobalState()
   const {
     field,
@@ -168,7 +170,7 @@ const Components = ({ sbomData }) => {
             >
               {/* COMPONENT NAME */}
               <Tooltip placement='top' label={name}>
-                <Text color={textColor} data-tag='allowRowEvents'>
+                <Text color={primaryTextColor} data-tag='allowRowEvents'>
                   {name}
                 </Text>
               </Tooltip>
@@ -183,7 +185,7 @@ const Components = ({ sbomData }) => {
                       variant='solid'
                       isDisabled={!website}
                       colorScheme={'gray'}
-                      icon={<FaGlobe color={textColor} fontSize={16} />}
+                      icon={<FaGlobe color={primaryTextColor} fontSize={16} />}
                     />
                   </Link>
                 </Tooltip>
@@ -196,7 +198,9 @@ const Components = ({ sbomData }) => {
                       variant='solid'
                       colorScheme='gray'
                       isDisabled={!vcs}
-                      icon={<FaSitemap color={textColor} fontSize={16} />}
+                      icon={
+                        <FaSitemap color={primaryTextColor} fontSize={16} />
+                      }
                     />
                   </Link>
                 </Tooltip>
@@ -209,7 +213,9 @@ const Components = ({ sbomData }) => {
                       variant='solid'
                       colorScheme='gray'
                       isDisabled={!issueTracker}
-                      icon={<FaHouseUser color={textColor} fontSize={16} />}
+                      icon={
+                        <FaHouseUser color={primaryTextColor} fontSize={16} />
+                      }
                     />
                   </Link>
                 </Tooltip>
@@ -222,7 +228,9 @@ const Components = ({ sbomData }) => {
                       variant='solid'
                       isDisabled={!distribution}
                       colorScheme='gray'
-                      icon={<FaLightbulb color={textColor} fontSize={16} />}
+                      icon={
+                        <FaLightbulb color={primaryTextColor} fontSize={16} />
+                      }
                     />
                   </Link>
                 </Tooltip>
@@ -263,7 +271,9 @@ const Components = ({ sbomData }) => {
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => (
-        <p style={{ textWrap: 'pretty', color: textColor }}>{row.version}</p>
+        <p style={{ textWrap: 'pretty', color: primaryTextColor }}>
+          {row.version}
+        </p>
       ),
       width: '12%',
       wrap: true,
@@ -281,7 +291,7 @@ const Components = ({ sbomData }) => {
             {purl !== null && purl !== '' ? (
               <Text
                 my={3}
-                color={textColor}
+                color={primaryTextColor}
                 onClick={() => {
                   setActiveRow(row)
                   onPurlOpen()
@@ -413,7 +423,7 @@ const Components = ({ sbomData }) => {
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-          <Text color={textColor}>{timeSince(row.updatedAt)}</Text>
+          <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
         </Tooltip>
       ),
       sortable: true,
@@ -433,7 +443,7 @@ const Components = ({ sbomData }) => {
         return (
           <IconButton
             size='sm'
-            color={textColor}
+            color={primaryTextColor}
             icon={<ViewIcon />}
             onClick={() => {
               setActiveRow(row)
@@ -489,7 +499,7 @@ const Components = ({ sbomData }) => {
           <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
             <Text
-              color={textColor}
+              color={primaryTextColor}
               width={'90%'}
               mt={1}
               fontSize={14}
@@ -501,7 +511,7 @@ const Components = ({ sbomData }) => {
           <GridItem>
             <CustomText>Component :</CustomText>
             <Text
-              color={textColor}
+              color={primaryTextColor}
               width={'90%'}
               mt={1}
               fontSize={14}
@@ -513,7 +523,7 @@ const Components = ({ sbomData }) => {
           <GridItem>
             <CustomText>Type :</CustomText>
             <Text
-              color={textColor}
+              color={primaryTextColor}
               mt={1}
               fontSize={14}
               textTransform={'capitalize'}
@@ -524,7 +534,7 @@ const Components = ({ sbomData }) => {
           <GridItem>
             <CustomText>Internal :</CustomText>
             <Text
-              color={textColor}
+              color={primaryTextColor}
               mt={1}
               fontSize={14}
               wordBreak={'break-all'}
@@ -575,7 +585,7 @@ const Components = ({ sbomData }) => {
           <GridItem>
             <CustomText>PURL :</CustomText>
             <Text
-              color={textColor}
+              color={primaryTextColor}
               wordBreak={'break-all'}
               mt={1}
               fontSize={14}
@@ -603,7 +613,7 @@ const Components = ({ sbomData }) => {
                     key={index}
                     fontSize={14}
                     wordBreak={'break-all'}
-                    color={textColor}
+                    color={primaryTextColor}
                     cursor={'pointer'}
                     onClick={() => {
                       setActiveRow(data)
@@ -669,7 +679,7 @@ const Components = ({ sbomData }) => {
           <GridItem>
             <CustomText>Scope :</CustomText>
             <Text
-              color={textColor}
+              color={primaryTextColor}
               mt={1}
               fontSize={14}
               textTransform={'capitalize'}
@@ -812,7 +822,7 @@ const Components = ({ sbomData }) => {
   if (error) {
     return (
       <Card>
-        <Text color={textColor}>Something went wrong</Text>
+        <Text color={primaryTextColor}>Something went wrong</Text>
       </Card>
     )
   }
@@ -824,7 +834,7 @@ const Components = ({ sbomData }) => {
           columns={columns}
           data={components}
           onSort={handleSort}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           defaultSortAsc={false}
           defaultSortFieldId={field}
           progressPending={loading}

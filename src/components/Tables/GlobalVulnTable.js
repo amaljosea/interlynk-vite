@@ -17,14 +17,14 @@ import {
   Tag,
   TagLabel,
   Text,
-  Tooltip,
-  useColorModeValue
+  Tooltip
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import Round from 'components/Misc/Round'
 
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import Pagination from '../Pagination'
 
@@ -39,8 +39,19 @@ const GlobalVulnTable = ({
   const { generateProductVulnerabilityDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const {
+    headingTextColor,
+    primaryTextColor,
+    primaryBlueText,
+    primaryErrorColor,
+    primarySuccessColor
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'primaryBlueText',
+    'primaryErrorColor',
+    'primarySuccessColor'
+  ])
 
   const params = useParams()
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
@@ -84,7 +95,7 @@ const GlobalVulnTable = ({
                   as={ExternalLinkIcon}
                   h={'16px'}
                   w={'16px'}
-                  color={'blue.500'}
+                  color={primaryBlueText}
                 />
               </Link>
               <Stack>
@@ -100,7 +111,7 @@ const GlobalVulnTable = ({
                   }
                   onClick={() => localStorage.setItem('activeVuln', vulnId)}
                 >
-                  <Text fontSize='sm' color={'blue.500'}>
+                  <Text fontSize='sm' color={primaryBlueText}>
                     {vulnId || ''}
                   </Text>
                 </Link>
@@ -233,14 +244,14 @@ const GlobalVulnTable = ({
                   placement='top'
                   label={`Up from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
                 >
-                  <ChevronUpIcon w={5} h={5} color='green.500' />
+                  <ChevronUpIcon w={5} h={5} color={primarySuccessColor} />
                 </Tooltip>
               ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
                 <Tooltip
                   placement='top'
                   label={`Down from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
                 >
-                  <ChevronDownIcon w={5} h={5} color='red.500' />
+                  <ChevronDownIcon w={5} h={5} color={primaryErrorColor} />
                 </Tooltip>
               ) : null
             ) : null}
@@ -294,7 +305,7 @@ const GlobalVulnTable = ({
       name: 'PUBLISHED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.publishedAt)} placement={'top'}>
-          <Text color={textColor} textAlign={'right'}>
+          <Text color={primaryTextColor} textAlign={'right'}>
             {timeSince(row?.publishedAt)}
           </Text>
         </Tooltip>
@@ -317,7 +328,7 @@ const GlobalVulnTable = ({
           label={getFullDateAndTime(row?.lastModifiedAt)}
           placement={'top'}
         >
-          <Text color={textColor} textAlign={'right'}>
+          <Text color={primaryTextColor} textAlign={'right'}>
             {timeSince(row?.lastModifiedAt)}
           </Text>
         </Tooltip>
@@ -357,7 +368,7 @@ const GlobalVulnTable = ({
           data={vulns}
           onSort={handleSort}
           defaultSortFieldId={field}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader

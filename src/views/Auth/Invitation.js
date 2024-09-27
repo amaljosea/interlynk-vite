@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { logoutUser } from 'utils/authUtils'
 
 import { WarningIcon } from '@chakra-ui/icons'
 import { Button, Flex, Icon, Stack, Text } from '@chakra-ui/react'
@@ -9,12 +10,12 @@ import CustomLoader from 'components/CustomLoader'
 
 import useCustomToast from 'hooks/useCustomToast'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { AcceptInvitation, DeclineInvitation } from 'graphQL/Mutation'
 import { OrgUserInvitationInfo } from 'graphQL/Queries'
 
 import { FaTimesCircle } from 'react-icons/fa'
-import { logoutUser } from 'utils/authUtils'
 
 const Invitation = () => {
   const { showToast } = useCustomToast()
@@ -32,6 +33,8 @@ const Invitation = () => {
     skip: !token,
     variables: { token, nonce }
   })
+
+  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
 
   const { organizationName } = data?.organizationUserInvitationInfo || ''
 
@@ -113,7 +116,12 @@ const Invitation = () => {
       justifyContent={'center'}
     >
       {isRejected && (
-        <Icon mb={6} color={'red.500'} boxSize={16} as={FaTimesCircle} />
+        <Icon
+          mb={6}
+          color={primaryErrorColor}
+          boxSize={16}
+          as={FaTimesCircle}
+        />
       )}
       <Text fontSize={'20px'} fontWeight={'semibold'}>
         {isRejected

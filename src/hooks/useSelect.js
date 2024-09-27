@@ -1,10 +1,15 @@
 import { useColorModeValue } from '@chakra-ui/system'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 export const useSelect = (type) => {
   const isBreadcrumb = type === 'breadcrumb'
   const isVersion = type === 'version'
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-  const bgColor = useColorModeValue('#F7FAFC', '#1A202C')
+  const { primaryTextColor, primaryBgColor } = useThemeColor([
+    'primaryTextColor',
+    'primaryBgColor'
+  ])
+
   const optionColor = useColorModeValue('#718096', '#A0AEC0')
   const textHoverColor = useColorModeValue('#EDF2F7', '#4A5568')
   const borderColor = useColorModeValue('#E2E8F0', '#4A5568')
@@ -14,7 +19,7 @@ export const useSelect = (type) => {
   const selectStyles = {
     control: (baseStyles, state) => ({
       ...baseStyles,
-      color: textColor,
+      color: primaryTextColor,
       overflow: 'hidden',
       minHeight: isBreadcrumb ? '6px' : 'inherit',
       maxWidth: isBreadcrumb ? '200px' : 'inherit',
@@ -31,26 +36,26 @@ export const useSelect = (type) => {
     menu: (provided) => ({
       ...provided,
       zIndex: 1111,
-      backgroundColor: bgColor,
+      backgroundColor: primaryBgColor,
       width: isBreadcrumb ? '130px' : '100%'
     }),
     menuList: (provided) => ({
       ...provided,
       zIndex: 1111,
-      backgroundColor: bgColor,
+      backgroundColor: primaryBgColor,
       '&:hover': {
         backgroundColor: 'transparent'
       }
     }),
     input: (provided) => ({
       ...provided,
-      color: textColor,
+      color: primaryTextColor,
       backgroundColor: 'transparent'
     }),
     option: (provided) => ({
       ...provided,
       color: optionColor,
-      backgroundColor: bgColor,
+      backgroundColor: primaryBgColor,
       // textTransform: 'capitalize',
       '&:hover': {
         backgroundColor: textHoverColor
@@ -58,9 +63,9 @@ export const useSelect = (type) => {
     }),
     singleValue: (provided) => ({
       ...provided,
-      color: textColor,
+      color: primaryTextColor,
       '&:hover': {
-        color: textColor
+        color: primaryTextColor
       }
     }),
     multiValueRemove: (provided) => ({

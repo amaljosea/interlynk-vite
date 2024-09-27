@@ -11,8 +11,7 @@ import {
   DrawerOverlay,
   Flex,
   Stack,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -20,13 +19,16 @@ import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { PolicyRuleViolations } from 'graphQL/Queries'
 
 const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
   const { subject, category, name, operatorWording, value } = activeRow || null
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const { nodes, paginationProps, loading } = usePaginatedQuery(
     PolicyRuleViolations,
@@ -61,7 +63,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       selector: (row) => {
         const { violation, component } = row
         return (
-          <Text color={textColor} my={2}>
+          <Text color={primaryTextColor} my={2}>
             {component?.version || violation?.primaryComponent?.version || ''}
           </Text>
         )
@@ -74,7 +76,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       selector: (row) => {
         const { component } = row
         return (
-          <Text color={textColor} my={2}>
+          <Text color={primaryTextColor} my={2}>
             {component?.licensesExp || ''}
           </Text>
         )
@@ -88,7 +90,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       selector: (row) => {
         const { violation } = row
         return (
-          <Text color={textColor} my={2}>
+          <Text color={primaryTextColor} my={2}>
             {violation?.vuln?.vulnId || ''}
           </Text>
         )
@@ -158,7 +160,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
               responsive
               columns={columns}
               data={nodes || []}
-              customStyles={customStyles(headColor)}
+              customStyles={customStyles(headingTextColor)}
               progressPending={loading}
               progressComponent={<CustomLoader />}
               persistTableHead

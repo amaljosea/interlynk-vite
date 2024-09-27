@@ -20,7 +20,6 @@ import {
   Tag,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -32,6 +31,7 @@ import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaPlus } from 'react-icons/fa6'
@@ -56,8 +56,8 @@ const SupportTable = ({
     childKey: 'remove_support'
   })
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor, primaryErrorColor } =
+    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
 
   const { search, field } = filters
 
@@ -223,8 +223,8 @@ const SupportTable = ({
       selector: (row) => {
         return (
           <Stack my={4}>
-            <Text color={textColor}>{row?.productName}</Text>
-            <Text color={textColor}>{row?.productVersion}</Text>
+            <Text color={primaryTextColor}>{row?.productName}</Text>
+            <Text color={primaryTextColor}>{row?.productVersion}</Text>
           </Stack>
         )
       },
@@ -238,7 +238,7 @@ const SupportTable = ({
       selector: (row) => (
         <Text
           my={4}
-          color={textColor}
+          color={primaryTextColor}
           cursor={'pointer'}
           onClick={() => {
             setActiveRow(row)
@@ -254,7 +254,9 @@ const SupportTable = ({
     {
       id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_VERSION',
       name: 'VERSION',
-      selector: (row) => <Text color={textColor}>{row?.productVersion}</Text>,
+      selector: (row) => (
+        <Text color={primaryTextColor}>{row?.productVersion}</Text>
+      ),
       width: '10%',
       wrap: true,
       sortable: true,
@@ -264,14 +266,15 @@ const SupportTable = ({
       id: 'DEPRECATED',
       name: 'DEPRECATED',
       selector: (row) =>
-        row?.deprecated ? <CheckIcon color={'red.500'} /> : '',
+        row?.deprecated ? <CheckIcon color={primaryErrorColor} /> : '',
       width: '10%',
       wrap: true
     },
     {
       id: 'OUTDATED',
       name: 'OUTDATED',
-      selector: (row) => (row?.outdated ? <CheckIcon color={'red.500'} /> : ''),
+      selector: (row) =>
+        row?.outdated ? <CheckIcon color={primaryErrorColor} /> : '',
       width: '9%',
       wrap: true
     },
@@ -309,7 +312,7 @@ const SupportTable = ({
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-          <Text color={textColor}>{timeSince(row.updatedAt)}</Text>
+          <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
         </Tooltip>
       ),
       right: 'true',
@@ -373,7 +376,7 @@ const SupportTable = ({
         <DataTable
           columns={columns}
           data={data || []}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           onSort={handleSort}
           defaultSortFieldId={field}
           defaultSortAsc={false}

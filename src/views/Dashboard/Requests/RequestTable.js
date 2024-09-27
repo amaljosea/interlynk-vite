@@ -16,7 +16,6 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -26,6 +25,7 @@ import SearchFilter from 'components/Licenses/LicenseSearchFilter'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { RequestCancel, RequestResend } from 'graphQL/Mutation'
 
@@ -52,8 +52,10 @@ const RequestTable = ({
     childKey: 'create_request'
   })
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const [resendRequest] = useMutation(RequestResend)
   const [cancelRequest] = useMutation(RequestCancel)
@@ -234,7 +236,7 @@ const RequestTable = ({
     {
       id: 'EMAIL',
       name: 'EMAIL',
-      selector: (row) => <Text color={textColor}>{row?.email}</Text>
+      selector: (row) => <Text color={primaryTextColor}>{row?.email}</Text>
     },
     {
       id: 'PRODUCT',
@@ -242,8 +244,8 @@ const RequestTable = ({
       selector: (row) => {
         return (
           <Stack my={4}>
-            <Text color={textColor}>{row?.productName}</Text>
-            <Text color={textColor}>{row?.productVersion}</Text>
+            <Text color={primaryTextColor}>{row?.productName}</Text>
+            <Text color={primaryTextColor}>{row?.productVersion}</Text>
           </Stack>
         )
       },
@@ -254,7 +256,7 @@ const RequestTable = ({
       name: 'REQUESTED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.requestedAt)} placement={'top'}>
-          <Text color={textColor}>{timeSince(row?.requestedAt)}</Text>
+          <Text color={primaryTextColor}>{timeSince(row?.requestedAt)}</Text>
         </Tooltip>
       ),
       wrap: true
@@ -269,7 +271,7 @@ const RequestTable = ({
             placement={'top'}
             label={getFullDateAndTime(row?.uploadedAt)}
           >
-            <Text color={textColor}>
+            <Text color={primaryTextColor}>
               {uploadedAt ? timeSince(row?.uploadedAt) : ''}
             </Text>
           </Tooltip>
@@ -345,7 +347,7 @@ const RequestTable = ({
         <DataTable
           columns={columns}
           data={data}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           onSort={handleSort}
           defaultSortFieldId={field}
           defaultSortAsc={false}

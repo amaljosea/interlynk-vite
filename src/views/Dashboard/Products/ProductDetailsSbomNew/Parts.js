@@ -27,7 +27,6 @@ import {
   Text,
   Tooltip,
   useColorMode,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -43,6 +42,7 @@ import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { SbomPartCreate, SbomPartDelete } from 'graphQL/Mutation'
 import { CheckDeepParts, GetProject } from 'graphQL/Queries'
@@ -78,9 +78,20 @@ const Parts = ({ data }) => {
   const isArchived = data?.lifecycle === 'archived'
 
   const { totalRows, prodState, dispatch } = useGlobalState()
-  const iconColor = useColorModeValue('#2D3748', '#EDF2F7')
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+
+  const {
+    headingTextColor,
+    primaryTextColor,
+    secondaryTextColor,
+    inverseSecondaryBgColor,
+    primaryBlueText
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'secondaryTextColor',
+    'inverseSecondaryBgColor',
+    'primaryBlueText'
+  ])
 
   const { enabled, field, direction } = prodState
   const { prodVulnDispatch } = dispatch
@@ -294,7 +305,10 @@ const Parts = ({ data }) => {
 
         const icon =
           unknown || !purl ? (
-            <BsFillPatchQuestionFill fontSize={24} color={iconColor} />
+            <BsFillPatchQuestionFill
+              fontSize={24}
+              color={inverseSecondaryBgColor}
+            />
           ) : (
             GetIcon(purl?.split('/')[0], colorMode)
           )
@@ -316,15 +330,15 @@ const Parts = ({ data }) => {
               <Stack spacing={1} direction='column'>
                 <Link to={link} replace>
                   <Text
-                    sx={{ fontSize: 14, color: 'blue.500' }}
+                    sx={{ fontSize: 14, color: primaryBlueText }}
                     onClick={() => onSelectPart(part)}
                   >
                     {part?.project?.projectGroup?.name}
                   </Text>
                 </Link>
-                <Text color={textColor}>{projectVersion}</Text>
+                <Text color={primaryTextColor}>{projectVersion}</Text>
                 {suppliers?.map((item, index) => (
-                  <Text key={index} color={textColor}>
+                  <Text key={index} color={primaryTextColor}>
                     {item?.name}
                   </Text>
                 ))}
@@ -455,7 +469,7 @@ const Parts = ({ data }) => {
               as={IconButton}
               icon={<FaEllipsisV />}
               variant='none'
-              color='gray.400'
+              color={secondaryTextColor}
             />
             <Portal>
               <MenuList size='sm'>
@@ -520,7 +534,7 @@ const Parts = ({ data }) => {
           columns={columns}
           responsive={true}
           progressComponent={<CustomLoader />}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           subHeaderComponent={subHeaderComponent}
           progressPending={sbomParts ? false : true}
         />

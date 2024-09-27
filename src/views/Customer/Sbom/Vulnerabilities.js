@@ -32,7 +32,6 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -44,6 +43,7 @@ import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   FirstDegreePartVulns,
@@ -71,6 +71,7 @@ const statusColor = (status) => {
 
 const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
   const { vuln } = data
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const CustomText = styled(Text)`
     font-size: 13px;
     font-weight: bold;
@@ -163,7 +164,7 @@ const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
                     as={ExternalLinkIcon}
                     h={'16px'}
                     w={'16px'}
-                    color={'blue.500'}
+                    color={primaryBlueText}
                   />
                 </Link>
                 <Tooltip label={vuln.nvdAliasId} placement={'top'}>
@@ -218,8 +219,19 @@ const Vulnerabilities = ({ sbomData }) => {
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const headColor = useColorModeValue('#4A5568', '#CBD5E0')
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const {
+    headingTextColor,
+    primaryTextColor,
+    primaryErrorColor,
+    primarySuccessColor,
+    primaryBlueText
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'primaryErrorColor',
+    'primarySuccessColor',
+    'primaryBlueText'
+  ])
   const [activeRow, setActiveRow] = useState(null)
   const [vulnSearch, setVulnSearch] = useState(searchInput)
 
@@ -346,12 +358,16 @@ const Vulnerabilities = ({ sbomData }) => {
                 as={ExternalLinkIcon}
                 h={'16px'}
                 w={'16px'}
-                color={'blue.500'}
+                color={primaryBlueText}
               />
             </Link>
             <Stack direction={'column'} spacing={1.5}>
               <Tooltip label={vuln.vulnId} placement={'top'}>
-                <Text fontSize='sm' color={textColor} data-tag='allowRowEvents'>
+                <Text
+                  fontSize='sm'
+                  color={primaryTextColor}
+                  data-tag='allowRowEvents'
+                >
                   {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
                 </Text>
               </Tooltip>
@@ -375,7 +391,7 @@ const Vulnerabilities = ({ sbomData }) => {
                       variant='solid'
                       isDisabled={!website}
                       colorScheme='gray'
-                      icon={<FaGlobe color={textColor} fontSize={16} />}
+                      icon={<FaGlobe color={primaryTextColor} fontSize={16} />}
                     />
                   </Link>
                 </Tooltip>
@@ -388,7 +404,9 @@ const Vulnerabilities = ({ sbomData }) => {
                       variant='solid'
                       colorScheme='gray'
                       isDisabled={!vcs}
-                      icon={<FaSitemap color={textColor} fontSize={16} />}
+                      icon={
+                        <FaSitemap color={primaryTextColor} fontSize={16} />
+                      }
                     />
                   </Link>
                 </Tooltip>
@@ -401,7 +419,9 @@ const Vulnerabilities = ({ sbomData }) => {
                       variant='solid'
                       colorScheme='gray'
                       isDisabled={!issueTracker}
-                      icon={<FaHouseUser color={textColor} fontSize={16} />}
+                      icon={
+                        <FaHouseUser color={primaryTextColor} fontSize={16} />
+                      }
                     />
                   </Link>
                 </Tooltip>
@@ -414,7 +434,9 @@ const Vulnerabilities = ({ sbomData }) => {
                       variant='solid'
                       isDisabled={!distribution}
                       colorScheme='gray'
-                      icon={<FaLightbulb color={textColor} fontSize={16} />}
+                      icon={
+                        <FaLightbulb color={primaryTextColor} fontSize={16} />
+                      }
                     />
                   </Link>
                 </Tooltip>
@@ -447,8 +469,8 @@ const Vulnerabilities = ({ sbomData }) => {
               e.currentTarget.parentElement.click()
             }}
           >
-            <Text color={textColor}>{component?.name || ''}</Text>
-            <Text color={textColor}>{component?.version || ''}</Text>
+            <Text color={primaryTextColor}>{component?.name || ''}</Text>
+            <Text color={primaryTextColor}>{component?.version || ''}</Text>
           </Stack>
         )
       },
@@ -589,14 +611,14 @@ const Vulnerabilities = ({ sbomData }) => {
                   placement='top'
                   label={`Up from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
                 >
-                  <ChevronUpIcon w={5} h={5} color='green.500' />
+                  <ChevronUpIcon w={5} h={5} color={primarySuccessColor} />
                 </Tooltip>
               ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
                 <Tooltip
                   placement='top'
                   label={`Down from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
                 >
-                  <ChevronDownIcon w={5} h={5} color='red.500' />
+                  <ChevronDownIcon w={5} h={5} color={primaryErrorColor} />
                 </Tooltip>
               ) : null
             ) : null}
@@ -643,7 +665,7 @@ const Vulnerabilities = ({ sbomData }) => {
           label={getFullDateAndTime(row.vuln.updatedAt)}
           placement={'top'}
         >
-          <Text color={textColor} textAlign={'right'}>
+          <Text color={primaryTextColor} textAlign={'right'}>
             {timeSince(row.vuln.updatedAt)}
           </Text>
         </Tooltip>
@@ -757,7 +779,7 @@ const Vulnerabilities = ({ sbomData }) => {
           className='data-table-container'
           columns={columns}
           data={nodes}
-          customStyles={customStyles(headColor)}
+          customStyles={customStyles(headingTextColor)}
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={field}
@@ -773,7 +795,7 @@ const Vulnerabilities = ({ sbomData }) => {
           expandableRowsComponentProps={{
             setActiveRow,
             onCvssOpen,
-            textColor
+            primaryTextColor
           }}
         />
       </Flex>
