@@ -204,7 +204,7 @@ const ProductTable = ({
   })
   const { nodes } = prodLabels?.labels || ''
 
-  const [deleteProjectGroup] = useMutation(DeleteProjectGroup)
+  const [deleteProjectGroup,{loading: dLLoading }] = useMutation(DeleteProjectGroup)
 
   const onProductDelete = useCallback(async () => {
     await deleteProjectGroup({ variables: { id: activeRow.id } }).then(
@@ -759,10 +759,11 @@ const ProductTable = ({
       {isDeleteOpen && (
         <ConfirmationModal
           isOpen={isDeleteOpen}
+          name={activeRow.name}
+          isLoading={dLLoading}
+          title='Delete Product'
           onClose={onDeleteClose}
           onConfirm={onProductDelete}
-          name={activeRow.name}
-          title='Delete Product'
           description='Deleting this product will:'
           items={[
             'Remove this product, its versions and SBOMs',

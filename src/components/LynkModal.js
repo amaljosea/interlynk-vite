@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  ButtonGroup,
   Divider,
   Flex, // eslint-disable-next-line no-restricted-imports
   Modal,
@@ -10,8 +11,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Spinner,
-  Stack,
   Text
 } from '@chakra-ui/react'
 
@@ -38,25 +37,13 @@ const LynkModal = ({
   const isConfirmationModal = type === 'confirmation'
 
   const colorScheme =
-    title.includes('Restore') || title.includes('Enable')
-      ? 'green'
-      : isConfirmationModal
-        ? 'red'
-        : 'blue'
+    title.includes('Restore') || title.includes('Enable') ? 'green' : isConfirmationModal ? 'red' : 'blue'
 
-  const loadingText = isConfirmationModal
-    ? title.includes('Delete')
-      ? 'Deleting...'
-      : 'Updating...'
-    : buttonText
+  const loadingText = isConfirmationModal ? title.includes('Delete') ? 'Deleting...' : 'Updating...' : buttonText
 
   const isDisabled = disabled || isLoading
 
-  const buttonLabel = isLoading
-    ? loadingText
-    : isConfirmationModal
-      ? 'Yes'
-      : buttonText
+  const buttonLabel = isLoading ? loadingText : isConfirmationModal ? 'Yes' : buttonText
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -67,9 +54,8 @@ const LynkModal = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent
-        maxW={maxW || '600px'}
-        maxH={maxH || ''}
         borderRadius='16px'
+        sx={{maxW: maxW || '600px', maxH: maxH || '' }}
       >
         <form onSubmit={handleSubmit}>
           <ModalHeader paddingInline={'16px'}>
@@ -80,28 +66,20 @@ const LynkModal = ({
           </ModalHeader>
           <ModalCloseButton marginTop={1.5} />
           <Divider />
-          <ModalBody paddingInline={'16px'} marginBlock={4}>
-            {children}
-          </ModalBody>
+          <ModalBody paddingInline={'16px'} marginBlock={4}>{children}</ModalBody>
           <Divider />
           <ModalFooter paddingInline={'16px'} hidden={noFooter}>
             <Flex
-              width={'100%'}
-              alignItems={'center'}
-              justifyContent={isConfirmationModal ? 'space-between' : 'end'}
-              gap={4}
+              sx={{ w:'100%', gap:4, alignItems:'center' }}
+              justifyContent={isConfirmationModal || leftFooterContent ? 'space-between' : 'end'}
             >
-              {leftFooterContent && <Box mr='auto'>{leftFooterContent}</Box>}
-              {isConfirmationModal && (
-                <Stack>{isLoading && <Spinner color={colorScheme} />}</Stack>
-              )}
-              <Stack direction='row' alignItems='center' gap={1}>
+              {leftFooterContent && <Box>{leftFooterContent}</Box>}
+              <ButtonGroup ml={'auto'}>
                 <Button
                   onClick={onClose}
-                  fontWeight={400}
-                  color={'#60686F'}
                   variant='ghost'
                   hidden={hideCancelButton}
+                  sx={{fontWeight:400, color:'#60686F'}}
                 >
                   Cancel
                 </Button>
@@ -116,10 +94,8 @@ const LynkModal = ({
                 >
                   {buttonLabel}
                 </Button>
-                {rightFooterContent && (
-                  <Box mr='auto'>{rightFooterContent}</Box>
-                )}
-              </Stack>
+                {rightFooterContent && <Box>{rightFooterContent}</Box>}
+              </ButtonGroup>
             </Flex>
           </ModalFooter>
         </form>

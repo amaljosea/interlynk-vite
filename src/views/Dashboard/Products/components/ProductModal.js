@@ -13,19 +13,19 @@ import { BiSolidLayerPlus } from 'react-icons/bi'
 
 const ProductModal = ({ isOpen, onClose, data }) => {
   const { id, name, description } = data || ''
-  const [projectGroupCreate] = useMutation(CreateProjectGroup)
-  const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
+  const [projectGroupCreate, { loading: crLoading }] = useMutation(CreateProjectGroup)
+  const [projectGroupUpdate, { loading: upLoading }] = useMutation(UpdateProjectGroup)
 
-  const [productName, setProductName] = useState(name || '')
-  const [productDesc, setProductDesc] = useState(description || '')
+  const initialData = { name: name || '', desc: description || '' }
+  const [formData, setFormData] = useState(initialData)
   const [error, setError] = useState('')
 
   const updateProduct = () => {
     projectGroupUpdate({
       variables: {
         id: id,
-        name: productName,
-        desc: productDesc
+        name: formData?.name,
+        desc: formData?.desc
       }
     }).then((res) => {
       const error = res?.data?.projectGroupUpdate?.errors
@@ -41,8 +41,8 @@ const ProductModal = ({ isOpen, onClose, data }) => {
     projectGroupCreate({
       variables: {
         enabled: true,
-        name: productName,
-        desc: productDesc
+        name: formData?.name,
+        desc: formData?.desc
       }
     }).then((res) => {
       const error = res?.data?.projectGroupCreate?.errors
@@ -54,52 +54,49 @@ const ProductModal = ({ isOpen, onClose, data }) => {
     })
   }
 
-  const onNameChange = (e) => {
-    setProductName(e.target.value)
-    setError('')
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }))
   }
-  const onDescChange = (e) => {
-    setProductDesc(e.target.value)
-    setError('')
-  }
-
-  const isInvalid = productName === '' || error !== ''
 
   return (
-    <>
-      <LynkModal
-        isOpen={isOpen}
-        onClose={onClose}
-        onSubmit={data ? updateProduct : handleSave}
-        title={`${data ? 'Edit' : 'Add'} Product`}
-        Icon={BiSolidLayerPlus}
-        disabled={isInvalid}
-        buttonText={data ? 'Update' : 'Save'}
-      >
-        <Flex width={'100%'} direction={'column'} gap={4}>
-          {error !== '' && <LynkAlert msg={errorMapping[error] || error} />}
-          <FormControl isRequired>
-            <FormLabel fontSize={12}>Name</FormLabel>
-            <Input
-              id='product-name'
-              type='text'
-              value={productName}
-              onChange={onNameChange}
-              placeholder={`Add product name`}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel fontSize={12}>Description</FormLabel>
-            <Textarea
-              rows={5}
-              value={productDesc}
-              onChange={onDescChange}
-              placeholder={`Add product description`}
-            />
-          </FormControl>
-        </Flex>
-      </LynkModal>
-    </>
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      Icon={BiSolidLayerPlus}
+      disabled={error !== ''}
+      buttonText={data ? 'Update' : 'Save'}
+      isLoading={data ? upLoading : crLoading}
+      title={`${data ? 'Edit' : 'Add'} Product`}
+      onSubmit={data ? updateProduct : handleSave}
+    >
+      <Flex width={'100%'} direction={'column'} gap={4}>
+        {error !== '' && <LynkAlert msg={errorMapping[error] || error} />}
+        <FormControl isRequired>
+          <FormLabel fontSize={12}>Name</FormLabel>
+          <Input
+            name='name'
+            type='text'
+            value={formData?.name}
+            onChange={handleChange}
+            placeholder={`Add product name`}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel fontSize={12}>Description</FormLabel>
+          <Textarea
+            rows={5}
+            name='desc'
+            value={formData?.desc}
+            onChange={handleChange}
+            placeholder={`Add product description`}
+          />
+        </FormControl>
+      </Flex>
+    </LynkModal>
   )
 }
 

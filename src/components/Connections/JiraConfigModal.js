@@ -224,7 +224,6 @@ const JiraConfigModal = ({
           <Text
             color={success ? primarySuccessColor : primaryErrorColor}
             fontSize='sm'
-            mr='auto'
           >
             {success ? 'Verified successfully!' : 'Verification failed!'}
           </Text>
