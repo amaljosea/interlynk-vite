@@ -1,44 +1,19 @@
-import { useLazyQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import {
-  customStyles,
-  getFormat,
-  getFullDateAndTime,
-  getLink,
-  getType,
-  timeSince
-} from 'utils'
+import { customStyles, getFormat, getFullDateAndTime } from 'utils'
+import { getLink, getType, timeSince } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import {
-  Box,
-  Divider,
-  Flex,
-  Grid,
-  GridItem,
-  Icon,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Link as Olink,
-  Portal,
-  SimpleGrid,
-  Stack,
-  Tag,
-  TagLabel,
-  Text,
-  Tooltip,
-  useColorModeValue,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Flex, useColorModeValue, useDisclosure } from '@chakra-ui/react'
+import { Link as Olink, Portal, SimpleGrid, Stack } from '@chakra-ui/react'
+import { Divider, Grid, GridItem, Icon, IconButton } from '@chakra-ui/react'
+import { Box, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import ArchivedVersions from 'components/Drawer/ArchivedVersions'
@@ -58,41 +33,22 @@ import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
-import {
-  GetSbomAlternatives,
-  GetShareSbomAlternatives,
-  GetVersionsTable,
-  ShareVersionTable
-} from 'graphQL/Queries'
+import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
 
-import {
-  FaBoxArchive,
-  FaCodeCompare,
-  FaEllipsisVertical,
-  FaScrewdriverWrench
-} from 'react-icons/fa6'
+import { FaBoxArchive, FaCodeCompare } from 'react-icons/fa6'
+import { FaEllipsisVertical, FaScrewdriverWrench } from 'react-icons/fa6'
 import { HiOutlineDuplicate } from 'react-icons/hi'
 import { IoMdWarning } from 'react-icons/io'
 
-const VersionsTable = ({
-  handleSort,
-  projectGroup,
-  retentionTime,
-  filters,
-  setFilters
-}) => {
+const VersionsTable = (props) => {
+  const { handleSort, projectGroup, retentionTime, filters, setFilters } = props
+
   const navigate = useNavigate()
   const params = useParams()
   const productId = params.productid
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const {
-    clearSelect,
-    setClearSelect,
-    selectedSbom,
-    setSelectedSbom,
-    versionState,
-    dispatch
-  } = useGlobalState()
+  const { clearSelect, setClearSelect, selectedSbom } = useGlobalState()
+  const { setSelectedSbom, versionState, dispatch } = useGlobalState()
   const { searchInput } = versionState
   const { prodVulnDispatch, prodCompDispatch } = dispatch
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
@@ -107,9 +63,13 @@ const VersionsTable = ({
   const textColor = useColorModeValue('#1A202C', '#F7FAFC')
   const warningColor = useColorModeValue('#E53E3E', '#F56565')
 
-  const [getAlternatives, { data: sbomAlts }] = useLazyQuery(
-    signedUrlParams ? GetShareSbomAlternatives : GetSbomAlternatives
-  )
+  const LIST = useDisclosure()
+  const TOOL = useDisclosure()
+  const SBOM = useDisclosure()
+  const REPROCESS = useDisclosure()
+  const ARC_VERSIONS = useDisclosure()
+  const DELETE_SBOM = useDisclosure()
+  const ARCHIVE_SBOM = useDisclosure()
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -121,7 +81,7 @@ const VersionsTable = ({
 
   const { nodes, paginationProps, loading, startPolling, stopPolling } =
     usePaginatedQuery(signedUrlParams ? ShareVersionTable : GetVersionsTable, {
-      skip: (tab === VERSIONS || tab === null) && !isToolOpen ? false : true,
+      skip: (tab === VERSIONS || tab === null) && !TOOL.isOpen ? false : true,
       selector: signedUrlParams
         ? 'shareLynkQuery.project.sbomVersions'
         : 'project.sbomVersions',
@@ -147,61 +107,19 @@ const VersionsTable = ({
     childKey: 'archive_sbom'
   })
 
-  const {
-    isOpen: isToolOpen,
-    onOpen: onToolOpen,
-    onClose: onToolClose
-  } = useDisclosure()
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose
-  } = useDisclosure()
-  const {
-    isOpen: isArchiveOpen,
-    onOpen: onArchiveOpen,
-    onClose: onArchiveClose
-  } = useDisclosure()
-  const {
-    isOpen: isListOpen,
-    onOpen: onListOpen,
-    onClose: onListClose
-  } = useDisclosure()
-  const {
-    isOpen: isSbomOpen,
-    onOpen: onSbomOpen,
-    onClose: onSbomClose
-  } = useDisclosure()
-  const {
-    isOpen: isArcOpen,
-    onOpen: onArcOpen,
-    onClose: onArcClose
-  } = useDisclosure()
-  const {
-    isOpen: isRepOpen,
-    onOpen: onRepOpen,
-    onClose: onRepClose
-  } = useDisclosure()
-
   const onFilterSev = async (value) => {
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
     prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
   }
 
   const handleListSbom = (row) => {
-    getAlternatives({
-      variables: {
-        projectId: signedUrlParams ? undefined : productId,
-        sbomId: row?.id
-      }
-    })
     setActiveRow(row)
-    onListOpen()
+    LIST.onOpen()
   }
 
   const handleRepSbom = (row) => {
     setActiveRow(row)
-    onRepOpen()
+    REPROCESS.onOpen()
   }
 
   const onSelectLicenses = (row) => {
@@ -250,12 +168,10 @@ const VersionsTable = ({
         })
         return (
           <Grid
-            my={3}
-            gap={2}
-            alignItems={'center'}
             justifyContent={'center'}
             templateColumns='repeat(7, 1fr)'
             className={index === 0 ? 'versions' : ''}
+            sx={{ my: 3, gap: 2, alignItems: 'center' }}
           >
             <GridItem
               colSpan={1}
@@ -278,11 +194,9 @@ const VersionsTable = ({
               </Tooltip>
             </GridItem>
             <GridItem
-              gap={2}
               colSpan={6}
               display={'flex'}
-              flexDirection={'row'}
-              alignItems={'center'}
+              sx={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}
             >
               <Link to={link} onClick={onStartTour}>
                 <Text color={'blue.500'} minWidth='100%' fontSize={14}>
@@ -293,10 +207,8 @@ const VersionsTable = ({
                 <Tooltip label={ignoreMsg}>
                   <Box>
                     <Icon
-                      mt={1}
-                      fontSize={18}
-                      color={textColor}
                       as={HiOutlineDuplicate}
+                      sx={{ mt: 1, fontSize: 18, color: textColor }}
                     />
                   </Box>
                 </Tooltip>
@@ -307,9 +219,8 @@ const VersionsTable = ({
                 >
                   <IconButton
                     size='xs'
-                    color={warningColor}
                     icon={<IoMdWarning size={16} />}
-                    bg='transparent'
+                    sx={{ color: warningColor, bg: 'transparent' }}
                   />
                 </Tooltip>
               )}
@@ -354,9 +265,8 @@ const VersionsTable = ({
           <Tag
             size='md'
             variant='subtle'
-            width={16}
             colorScheme={'blue'}
-            cursor={'pointer'}
+            sx={{ w: 16, cursor: 'pointer' }}
             onClick={() => onSelectLicenses(row)}
           >
             <TagLabel mx={'auto'}>{stats?.compLicenseCount}</TagLabel>
@@ -474,7 +384,7 @@ const VersionsTable = ({
               color='gray.400'
             />
             <Portal>
-              <MenuList fontSize={16}>
+              <MenuList fontSize={'sm'}>
                 <MenuItem onClick={() => handleListSbom(row)}>
                   List SBOM
                 </MenuItem>
@@ -489,7 +399,7 @@ const VersionsTable = ({
                   isDisabled={!archiveSbom || signedUrlParams}
                   onClick={() => {
                     setActiveRow(row)
-                    onArchiveOpen()
+                    ARCHIVE_SBOM.onOpen()
                   }}
                 >
                   Archive
@@ -498,7 +408,7 @@ const VersionsTable = ({
                   color={'red.500'}
                   onClick={() => {
                     setActiveRow(row)
-                    onDeleteOpen()
+                    DELETE_SBOM.onOpen()
                   }}
                   isDisabled={!archiveSbom || signedUrlParams}
                 >
@@ -515,8 +425,8 @@ const VersionsTable = ({
 
   const onBuildSbom = useCallback(() => {
     prodCompDispatch({ type: 'CLEAR_LICENSES' })
-    onSbomOpen()
-  }, [onSbomOpen, prodCompDispatch])
+    SBOM.onOpen()
+  }, [SBOM, prodCompDispatch])
 
   const handleChange = (state) => {
     setSelectedSbom(state?.selectedRows)
@@ -599,10 +509,10 @@ const VersionsTable = ({
           {selectedSbom?.length === 2 && (
             <Tooltip label='Compare Version'>
               <IconButton
-                onClick={onToolOpen}
+                onClick={TOOL.onOpen}
                 colorScheme='blue'
                 icon={<FaCodeCompare />}
-                isLoading={isToolOpen}
+                isLoading={TOOL.isOpen}
               />
             </Tooltip>
           )}
@@ -612,7 +522,7 @@ const VersionsTable = ({
               isDisabled={!projectGroup?.enabled}
               hidden={signedUrlParams}
               colorScheme='blue'
-              onClick={onArcOpen}
+              onClick={ARC_VERSIONS.onOpen}
               icon={<FaBoxArchive />}
             />
           </Tooltip>
@@ -636,11 +546,10 @@ const VersionsTable = ({
     handleClear,
     handleSearch,
     selectedSbom?.length,
-    onToolOpen,
-    isToolOpen,
+    TOOL,
     projectGroup?.enabled,
     signedUrlParams,
-    onArcOpen,
+    ARC_VERSIONS,
     createSbom,
     onBuildSbom
   ])
@@ -679,70 +588,67 @@ const VersionsTable = ({
       </Flex>
 
       {/* DELETE VERSION */}
-      {isDeleteOpen && (
+      {DELETE_SBOM.isOpen && (
         <DeleteSbom
           data={activeRow}
           projectGroup={projectGroup}
-          isOpen={isDeleteOpen}
-          onClose={onDeleteClose}
+          isOpen={DELETE_SBOM.isOpen}
+          onClose={DELETE_SBOM.onClose}
         />
       )}
 
       {/* ARCHIVE VERSION */}
-      {isArchiveOpen && (
+      {ARCHIVE_SBOM.isOpen && (
         <ArchiveSbom
           data={activeRow}
           projectGroup={projectGroup}
-          isOpen={isArchiveOpen}
-          onClose={onArchiveClose}
+          isOpen={ARCHIVE_SBOM.isOpen}
+          onClose={ARCHIVE_SBOM.onClose}
         />
       )}
 
       {/* REPROCESS VERSION */}
-      {isRepOpen && (
+      {REPROCESS.isOpen && (
         <ReprocessSbom
           data={activeRow}
-          isOpen={isRepOpen}
-          onClose={onRepClose}
+          isOpen={REPROCESS.isOpen}
+          onClose={REPROCESS.onClose}
           projectGroup={projectGroup}
         />
       )}
 
       {/* ARCHIVE VERSION LIST */}
-      {isArcOpen && (
+      {ARC_VERSIONS.isOpen && (
         <ArchivedVersions
-          isOpen={isArcOpen}
-          onClose={onArcClose}
+          isOpen={ARC_VERSIONS.isOpen}
+          onClose={ARC_VERSIONS.onClose}
           projectGroup={projectGroup}
         />
       )}
 
       {/* SBOM LIST */}
-      {isListOpen && nodes && (
+      {LIST.isOpen && (
         <SbomList
-          data={
-            signedUrlParams ? sbomAlts?.shareLynkQuery?.sbom : sbomAlts?.sbom
-          }
-          sboms={nodes}
-          isOpen={isListOpen}
-          onClose={onListClose}
+          isOpen={LIST.isOpen}
+          onClose={LIST.onClose}
+          sbomId={activeRow?.id}
         />
       )}
 
       {/* BUILD SBOM */}
-      {isSbomOpen && projectGroup && (
+      {SBOM.isOpen && projectGroup && (
         <ProductSbomDrawer
           data={projectGroup}
-          isOpen={isSbomOpen}
-          onClose={onSbomClose}
+          isOpen={SBOM.isOpen}
+          onClose={SBOM.onClose}
         />
       )}
 
-      {isToolOpen && (
+      {TOOL.isOpen && (
         <ToolsDrawer
           sbomIdOne={selectedSbom[0]?.id}
           sbomIdTwo={selectedSbom[1]?.id}
-          onClose={onToolClose}
+          onClose={TOOL.onClose}
         />
       )}
     </>

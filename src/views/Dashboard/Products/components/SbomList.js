@@ -1,4 +1,6 @@
-import { getFullDateAndTime, timeSince } from 'utils'
+import { useQuery } from '@apollo/client'
+import { useParams } from 'react-router-dom'
+import { getFullDateAndTime, isCustomerView, timeSince } from 'utils'
 
 import {
   Drawer,
@@ -6,28 +8,40 @@ import {
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay,
-  Stack,
-  Table,
-  Tag,
-  TagLabel,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tooltip,
-  Tr
+  DrawerOverlay
 } from '@chakra-ui/react'
+import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
+import { Stack, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
-const SbomList = ({ isOpen, onClose, data }) => {
+import { GetShareSbomAlternatives } from 'graphQL/Queries'
+import { GetSbomAlternatives } from 'graphQL/Queries'
+
+const SbomList = ({ sbomId, isOpen, onClose }) => {
+  const params = useParams()
+  const customerView = isCustomerView()
   const columns = ['UPLOADED', 'COMPONENTS', 'LICENSES', 'STATUS', 'UPDATED AT']
+
+  const { data: sbomAlts, loading } = useQuery(
+    customerView ? GetShareSbomAlternatives : GetSbomAlternatives,
+    {
+      skip: isOpen ? false : true,
+      variables: {
+        projectId: customerView ? undefined : params?.productid,
+        sbomId: sbomId
+      }
+    }
+  )
+
+  const data = customerView ? sbomAlts?.shareLynkQuery?.sbom : sbomAlts?.sbom
+
+  if (loading) return null
+
   return (
     <Drawer size='xl' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton />
-        <DrawerHeader>
+        <DrawerCloseButton mt={1} />
+        <DrawerHeader borderBottomWidth='1px'>
           {data?.projectVersion?.length > 40
             ? `${data?.projectVersion?.substring(0, 40)}...`
             : data?.projectVersion + ' SBOM List'}
