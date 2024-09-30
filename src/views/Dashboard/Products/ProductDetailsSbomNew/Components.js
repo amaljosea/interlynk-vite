@@ -1,6 +1,7 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
 import styled from '@emotion/styled'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { debounce } from 'lodash'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { GetIcon, customStyles, timeSince, truncatedValue } from 'utils'
@@ -121,6 +122,10 @@ const Components = ({ sbomData }) => {
   const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
     value.includes(allValue) || value.length === 0 ? undefined : value
 
+  const compBtn = useRef(null)
+  const [activeRow, setActiveRow] = useState(null)
+  const [compSearch, setCompSearch] = useState('')
+
   const compData = useMemo(() => {
     return {
       ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
@@ -166,67 +171,44 @@ const Components = ({ sbomData }) => {
     childKey: 'update_sbom_components'
   })
 
-  const compBtn = useRef(null)
-  const [activeRow, setActiveRow] = useState(null)
-  const [compSearch, setCompSearch] = useState(searchInput)
-
   const [getComPath, { data: comPath, loading: comPathLoading }] =
     useLazyQuery(GetComponentPath)
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isDelOpen,
-    onOpen: onDelOpen,
-    onClose: onDelClose
-  } = useDisclosure()
-  const {
-    isOpen: isGraphOpen,
-    onOpen: onGraphOpen,
-    onClose: onGraphClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isMapOpen,
-    onOpen: onMapOpen,
-    onClose: onMapClose
-  } = useDisclosure()
-  const {
-    isOpen: isRelationOpen,
-    onOpen: onRelationOpen,
-    onClose: onRelationClose
-  } = useDisclosure()
-  const {
-    isOpen: isPurlOpen,
-    onOpen: onPurlOpen,
-    onClose: onPurlClose
-  } = useDisclosure()
-  const {
-    isOpen: isCpeOpen,
-    onOpen: onCpeOpen,
-    onClose: onCpeClose
-  } = useDisclosure()
-  const {
-    isOpen: isCompOpen,
-    onOpen: onCompOpen,
-    onClose: onCompClose
-  } = useDisclosure()
+  const MAP = useDisclosure()
+  const CPE = useDisclosure()
+  const EDIT = useDisclosure()
+  const PURL = useDisclosure()
+  const GRAPH = useDisclosure()
+  const DELETE = useDisclosure()
+  const RELATION = useDisclosure()
+  const COMPONENT = useDisclosure()
 
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const onCreateComponent = useCallback(() => {
     setActiveRow(null)
-    onOpen()
-  }, [onOpen])
+    COMPONENT.onOpen()
+  }, [COMPONENT])
 
   const onEditOpen = (row) => {
     setActiveRow(row)
-    onCompOpen()
+    EDIT.onOpen()
   }
 
   const onRelOpen = (row) => {
     setActiveRow(row)
     getComPath({ variables: { compId: row.id, sbomId: sbomId } })
-    onRelationOpen()
+    RELATION.onOpen()
+  }
+
+  const onCheckPurl = (data) => {
+    setActiveRow(data)
+    PURL.onOpen()
+  }
+
+  const onCheckCpe = (data) => {
+    setActiveRow(data)
+    CPE.onOpen()
   }
 
   // COLUMNS
@@ -343,18 +325,22 @@ const Components = ({ sbomData }) => {
         return (
           <Flex gap={2}>
             {cpes?.length > 0 && (
-              <Tooltip label={cpes[0]}>
-                <Button size='xs' color={primaryTextColor}>
-                  CPE
-                </Button>
-              </Tooltip>
+              <Button
+                size='xs'
+                color={primaryTextColor}
+                onClick={() => onCheckCpe(row)}
+              >
+                CPE
+              </Button>
             )}
             {purl && (
-              <Tooltip label={purl}>
-                <Button size='xs' color={primaryTextColor}>
-                  PURL
-                </Button>
-              </Tooltip>
+              <Button
+                size='xs'
+                color={primaryTextColor}
+                onClick={() => onCheckPurl(row)}
+              >
+                PURL
+              </Button>
             )}
           </Flex>
         )
@@ -373,11 +359,8 @@ const Components = ({ sbomData }) => {
           licensesCustom?.length > 1 && licensesCustom.slice(1)
         return (
           <Flex
-            alignItems={'flex-end'}
             justifyContent={'flex-end'}
-            gap={2}
-            flexWrap={'wrap'}
-            my={2}
+            sx={{ my: 2, gap: 2, alignItems: 'flex-end', flexWrap: 'wrap' }}
           >
             {/* SPDX */}
             {licenses && (
@@ -564,7 +547,7 @@ const Components = ({ sbomData }) => {
                         color='red'
                         onClick={() => {
                           setActiveRow(row)
-                          onDelOpen()
+                          DELETE.onOpen()
                         }}
                         isDisabled={
                           status === 'signed' ||
@@ -584,7 +567,7 @@ const Components = ({ sbomData }) => {
                 icon={<ViewIcon />}
                 onClick={() => {
                   setActiveRow(row)
-                  onOpen()
+                  COMPONENT.onOpen()
                 }}
               />
             )}
@@ -599,7 +582,7 @@ const Components = ({ sbomData }) => {
 
   const handleGraphView = (row) => {
     setActiveComp(row)
-    onGraphOpen()
+    GRAPH.onOpen()
   }
   const [deleteSupplier] = useMutation(deleteComSupplier)
 
@@ -735,10 +718,7 @@ const Components = ({ sbomData }) => {
             <Text
               sx={textStyle}
               cursor={'pointer'}
-              onClick={() => {
-                setActiveRow(data)
-                onPurlOpen()
-              }}
+              onClick={() => onCheckPurl(data)}
             >
               {purl !== null && purl !== '' ? purl : 'N/A'}
             </Text>
@@ -747,9 +727,7 @@ const Components = ({ sbomData }) => {
             <CustomText>CPES :</CustomText>
             <Flex
               flexDirection={'column'}
-              alignItems={'flex-start'}
-              gap={1}
-              flexWrap={'wrap'}
+              sx={{ gap: 1, flexWrap: 'wrap', alignItems: 'flex-start' }}
             >
               {cpes?.length > 0 &&
                 cpes.map((item, index) => (
@@ -757,10 +735,7 @@ const Components = ({ sbomData }) => {
                     key={index}
                     sx={textStyle}
                     cursor={'pointer'}
-                    onClick={() => {
-                      setActiveRow(data)
-                      onCpeOpen()
-                    }}
+                    onClick={() => onCheckCpe(data)}
                   >
                     {item}
                   </Text>
@@ -868,22 +843,26 @@ const Components = ({ sbomData }) => {
     [prodCompDispatch, reset]
   )
 
+  const debouncedResults = useMemo(() => {
+    return debounce(onSearchInputChange, 1000)
+  }, [onSearchInputChange])
+
+  useEffect(() => {
+    return () => {
+      debouncedResults.cancel()
+    }
+  })
+
   const restricted = lifecycle === 'signed' || !updateComponent
 
   // HEADER SECTION
   const subHeader = useMemo(() => {
     return (
       <Flex
-        width={'100%'}
-        alignItems={'center'}
+        sx={{ w: '100%', alignItems: 'center' }}
         justifyContent={'space-between'}
       >
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={4}
-          alignItems={'center'}
-        >
+        <Flex sx={{ w: '100%', gap: 4, alignItems: 'center' }}>
           {/* SEARCH COMPONENTS */}
           <SearchFilter
             id='component'
@@ -894,18 +873,13 @@ const Components = ({ sbomData }) => {
           />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           <CompFilters reset={() => reset()} />
-        </Stack>
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={2}
-          justifyContent={'flex-end'}
-        >
+        </Flex>
+        <Flex sx={{ w: '100%', gap: 2, justifyContent: 'flex-end' }}>
           {/* SHOW HEATMAP */}
           <Tooltip label='View Health Map'>
             <IconButton
               colorScheme='blue'
-              onClick={onMapOpen}
+              onClick={MAP.onOpen}
               icon={<RiFundsBoxFill />}
               hidden={!shouldShowDemoFeatures}
             />
@@ -918,14 +892,13 @@ const Components = ({ sbomData }) => {
               icon={<AddIcon />}
               colorScheme='blue'
               variant='solid'
-              fontWeight='normal'
-              fontSize={'sm'}
               isDisabled={restricted}
               hidden={signedUrlParams || isArchived}
+              sx={{ fontSize: 'sm', fontWeight: 'normal' }}
             />
           </Tooltip>
           <RefreshBtn onClick={() => reset()} />
-        </Stack>
+        </Flex>
       </Flex>
     )
   }, [
@@ -934,7 +907,7 @@ const Components = ({ sbomData }) => {
     handleClear,
     onSearchInputChange,
     shouldShowDemoFeatures,
-    onMapOpen,
+    MAP,
     onCreateComponent,
     signedUrlParams,
     restricted,
@@ -990,67 +963,63 @@ const Components = ({ sbomData }) => {
       {/* PAGINATION */}
       <Pagination {...paginationProps} />
 
-      {isGraphOpen && activeComp && (
+      {GRAPH.isOpen && (
         <GraphDrawer
-          isOpen={isGraphOpen}
-          onClose={onGraphClose}
           primaryComp={null}
+          isOpen={GRAPH.isOpen}
+          onClose={GRAPH.onClose}
           activeComp={activeComp}
         />
       )}
 
-      {isOpen && (
+      {COMPONENT.isOpen && (
         <ComponentDrawer
-          data={activeRow}
-          isOpen={isOpen}
-          onClose={onClose}
-          shortDesc={null}
           checkId={null}
+          shortDesc={null}
+          data={activeRow}
+          isOpen={COMPONENT.isOpen}
+          onClose={COMPONENT.onClose}
           primaryComp={primaryComponent}
         />
       )}
 
-      {isDelOpen && (
+      {DELETE.isOpen && (
         <ComponentModal
-          isOpen={isDelOpen}
-          onClose={onDelClose}
           activeRow={activeRow}
+          isOpen={DELETE.isOpen}
+          onClose={DELETE.onClose}
         />
       )}
 
-      {isRelationOpen && (
+      {RELATION.isOpen && (
         <RelationshipDrawer
           activeRow={activeRow}
-          isOpen={isRelationOpen}
-          onClose={onRelationClose}
+          isOpen={RELATION.isOpen}
+          onClose={RELATION.onClose}
           comPathLoading={comPathLoading}
           compPath={comPath?.component?.pathToPrimary}
         />
       )}
 
-      {isPurlOpen && (
-        <PurlCard
-          value={activeRow?.purl}
-          isOpen={isPurlOpen}
-          onClose={onPurlClose}
-        />
-      )}
+      <PurlCard
+        value={activeRow?.purl}
+        isOpen={PURL.isOpen}
+        onClose={PURL.onClose}
+      />
 
-      {isCpeOpen && (
-        <CpeCard
-          value={activeRow?.cpes[0]}
-          isOpen={isCpeOpen}
-          onClose={onCpeClose}
-        />
-      )}
+      <CpeCard
+        value={activeRow?.cpes[0]}
+        isOpen={CPE.isOpen}
+        onClose={CPE.onClose}
+      />
 
-      {isMapOpen && <HealthMap isOpen={isMapOpen} onClose={onMapClose} />}
+      {MAP.isOpen && <HealthMap isOpen={MAP.isOpen} onClose={MAP.onClose} />}
 
-      {isCompOpen && (
+      {EDIT.isOpen && (
         <CompDrawer
           data={activeRow}
-          isOpen={isCompOpen}
-          onClose={onCompClose}
+          isOpen={EDIT.isOpen}
+          onClose={EDIT.onClose}
           primaryComp={primaryComponent}
         />
       )}
