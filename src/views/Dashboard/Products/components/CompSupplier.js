@@ -2,7 +2,6 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
 import { disableButtonTemporarily, validateEmail, validateUrl } from 'utils'
-import { isCustomerView } from 'utils'
 
 import {
   Button,
@@ -26,7 +25,7 @@ import { deleteComSupplier } from 'graphQL/Mutation'
 import ActionButton from './ActionButton'
 
 const GetSupplier = gql`
-  query GetCompUrls($id: Uuid!, $sbomId: Uuid!) {
+  query GetSupplier($id: Uuid!, $sbomId: Uuid!) {
     component(id: $id, sbomId: $sbomId) {
       suppliers {
         id
@@ -41,15 +40,8 @@ const GetSupplier = gql`
 
 const CompSupplier = ({ data }) => {
   const { showToast } = useCustomToast()
-  const customerView = isCustomerView()
 
   const { id, sbomId } = data || ''
-
-  const { data: result } = useQuery(GetSupplier, {
-    skip: customerView,
-    variables: { id, sbomId }
-  })
-  const { suppliers } = result?.component || ''
 
   const {
     tabData,
@@ -58,7 +50,8 @@ const CompSupplier = ({ data }) => {
     saveChanges,
     unsavedChanges,
     alert,
-    setAlert
+    setAlert,
+    tab
   } = useContext(TabContext)
   const { supplier } = tabData
 
@@ -66,6 +59,12 @@ const CompSupplier = ({ data }) => {
   const [nameError, setNameError] = useState('')
   const [emailError, setEmailError] = useState('')
   const [isDisabled, setIsDisabled] = useState(false)
+
+  const { data: result } = useQuery(GetSupplier, {
+    skip: tab === 2 ? false : true,
+    variables: { id, sbomId }
+  })
+  const { suppliers } = result?.component || ''
 
   const containsSpace = /\s/.test(supplier?.url)
 
@@ -271,7 +270,7 @@ const CompSupplier = ({ data }) => {
           />
         </Stack>
       ) : (
-        <ButtonGroup mt={2}>
+        <ButtonGroup>
           <ActionButton
             isDisabled={isInvalid}
             onClick={handleSubmit}

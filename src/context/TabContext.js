@@ -47,9 +47,12 @@ export const TabProvider = ({ children }) => {
     relations: false
   }
 
+  const [tab, setTab] = useState(0)
   const [alert, setAlert] = useState(false)
   const [tabData, setTabData] = useState(initialTabData)
   const [unsavedChanges, setUnsavedChanges] = useState(initialUnsavedChanges)
+
+  const onTabChange = (index) => setTab(index)
 
   const handleChange = (tab, field, value) => {
     setTabData((prevData) => ({
@@ -71,6 +74,7 @@ export const TabProvider = ({ children }) => {
   }
 
   const resetData = () => {
+    setTab(0)
     setAlert(false)
     setTabData(initialTabData)
     setUnsavedChanges(initialUnsavedChanges)
@@ -79,13 +83,16 @@ export const TabProvider = ({ children }) => {
   return (
     <TabContext.Provider
       value={{
+        tab,
+        alert,
         tabData,
+        onTabChange,
         setTabData,
         handleChange,
         unsavedChanges,
         saveChanges,
         resetData,
-        alert,
+
         setAlert
       }}
     >

@@ -42,6 +42,19 @@ import { FaEllipsisVertical, FaScrewdriverWrench } from 'react-icons/fa6'
 import { HiOutlineDuplicate } from 'react-icons/hi'
 import { IoMdWarning } from 'react-icons/io'
 
+// GET ACTIVCE PROJECT GROUP FOR PUBLIC VIEW
+export const GetShareProjectGroup = gql`
+  query GetShareProjectGroup($id: Uuid!) {
+    shareLynkQuery {
+      projectGroup(id: $id) {
+        description
+        enabled
+        name
+      }
+    }
+  }
+`
+
 const GetProjectGroup = gql`
   query GetProjectGroup($id: Uuid!) {
     projectGroup(id: $id) {
@@ -63,8 +76,7 @@ const VersionsTable = (props) => {
   const { setSelectedSbom, versionState, dispatch } = useGlobalState()
   const { searchInput } = versionState
   const { prodVulnDispatch, prodCompDispatch } = dispatch
-  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
-    useProductUrlContext()
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const [filterText, setFilterText] = useState(searchInput)
   const [activeRow, setActiveRow] = useState(null)
@@ -100,10 +112,12 @@ const VersionsTable = (props) => {
   const { VERSIONS } = ProductDetailsTabs
 
   // GET PROJECT DATA
-  const { data } = useQuery(GetProjectGroup, {
+  const { data } = useQuery(signedUrlParams ? GetShareProjectGroup : GetProjectGroup, {
     variables: { id: params?.productgroupid }
   })
-  const { name, enabled } = data?.projectGroup || ''
+  
+  const result = signedUrlParams ? data?.shareLynkQuery?.projectGroup : data?.projectGroup
+  const { name, enabled } = result || ''
 
   const { nodes, paginationProps, loading, startPolling, stopPolling } =
     usePaginatedQuery(signedUrlParams ? ShareVersionTable : GetVersionsTable, {

@@ -48,6 +48,7 @@ const CompDetails = ({ data, primaryComp }) => {
     'primaryBlueText'
   ])
   const {
+    tab,
     unsavedChanges,
     tabData,
     setTabData,
@@ -89,7 +90,7 @@ const CompDetails = ({ data, primaryComp }) => {
   let SBOMs = []
   const { data: allSboms } = useQuery(GetAllSboms, {
     fetchPolicy: 'network-only',
-    skip: customerView,
+    skip: tab === 0 && !customerView ? false : true,
     variables: {
       id: productId
     }

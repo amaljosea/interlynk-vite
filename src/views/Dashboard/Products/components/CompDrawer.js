@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
-import { useContext, useState } from 'react'
+import { useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import { isCustomerView } from 'utils'
 
@@ -39,9 +39,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
     ? ['details', 'identifiers']
     : ['details', 'identifiers', 'suppliers', 'links', 'relationships']
 
-  const { resetData } = useContext(TabContext)
-
-  const [tab, setTab] = useState(0)
+  const { resetData, tab, onTabChange } = useContext(TabContext)
 
   const { sbomId: bomId } = data || ''
   const isPart = sbomId !== bomId
@@ -50,8 +48,6 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
     skip: isOpen && !customerView ? false : true,
     variables: { compId: data?.id, sbomId: isPart ? bomId : sbomId }
   })
-
-  const onTabChange = (index) => setTab(index)
 
   return (
     <Drawer

@@ -2,7 +2,6 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useState } from 'react'
 import { truncatedValue, validateUrl } from 'utils'
-import { isCustomerView } from 'utils'
 
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
@@ -47,9 +46,9 @@ const GetCompUrls = gql`
 const CompLinks = ({ data }) => {
   const { showToast } = useCustomToast()
   const { id, sbomId } = data || ''
-  const customerView = isCustomerView()
 
   const {
+    tab,
     tabData,
     setTabData,
     handleChange,
@@ -61,7 +60,7 @@ const CompLinks = ({ data }) => {
   const { links } = tabData
 
   const { data: compUrls } = useQuery(GetCompUrls, {
-    skip: customerView,
+    skip: tab === 3 ? false : true,
     variables: { id, sbomId }
   })
   const { externalUrls } = compUrls?.component || ''
@@ -247,7 +246,7 @@ const CompLinks = ({ data }) => {
             onClick={handleSubmit}
           />
         )}
-        <Divider my={2} pos={'relative'} left={0} right={0} />
+        <Divider />
         {/* TABLE */}
         <Flex mb={4} width={'100%'} flexDir={'column'}>
           <Text fontWeight={'medium'} color={'gray.500'}>

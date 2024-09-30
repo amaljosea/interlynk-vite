@@ -107,6 +107,7 @@ const RelationshipDrawer = (props) => {
   }
 
   const { data: compData } = useQuery(GetTotalComponents, {
+    skip: isOpen ? false : true,
     fetchPolicy: activeTab === 'components' ? false : true,
     variables: {
       ...compState
@@ -136,6 +137,7 @@ const RelationshipDrawer = (props) => {
   })
   const [removeRelation] = useMutation(DeleteCompRelation)
   const { data: compDependency } = useQuery(GetCompDependency, {
+    skip: isOpen ? false : true,
     variables: { compId: compId || activeRow?.id, sbomId: sbomId }
   })
 

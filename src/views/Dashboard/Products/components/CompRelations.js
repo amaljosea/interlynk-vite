@@ -69,6 +69,7 @@ const CompRelations = ({ data, compPath }) => {
   const { id: productId } = sbom?.project || ''
 
   const {
+    tab,
     tabData,
     setTabData,
     handleChange,
@@ -96,7 +97,7 @@ const CompRelations = ({ data, compPath }) => {
   }
 
   const { data: compData } = useQuery(GetTotalComponents, {
-    skip: customerView,
+    skip: tab === 4 ? false : true,
     fetchPolicy: activeTab === 'components' ? false : true,
     variables: {
       ...compState
@@ -104,7 +105,7 @@ const CompRelations = ({ data, compPath }) => {
   })
 
   const { data: allComponents } = useQuery(GetAllComponents, {
-    skip: compData && !customerView ? false : true,
+    skip: compData ? false : true,
     variables: {
       ...compState,
       first: compData?.sbom?.components?.totalCount
@@ -119,7 +120,7 @@ const CompRelations = ({ data, compPath }) => {
   const [addRelation] = useMutation(CreateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
   const { data: compDependency } = useQuery(GetCompDependency, {
-    skip: customerView,
+    skip: tab === 4 ? false : true,
     variables: { compId: id, sbomId: sbomId }
   })
 
