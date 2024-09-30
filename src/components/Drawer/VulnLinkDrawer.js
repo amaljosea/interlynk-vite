@@ -176,8 +176,8 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
     <Drawer size='sm' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton />
-        <DrawerHeader>Edit Links</DrawerHeader>
+        <DrawerCloseButton mt={1} />
+        <DrawerHeader borderBottomWidth='1px'>Edit Links</DrawerHeader>
         <DrawerBody>
           {data && <Tag colorScheme='blue'>{vuln?.vulnId}</Tag>}
           {error !== '' && <LynkAlert msg={error} />}

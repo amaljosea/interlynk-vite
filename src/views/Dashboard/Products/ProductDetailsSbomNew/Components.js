@@ -19,7 +19,6 @@ import {
   Grid,
   GridItem,
   IconButton,
-  Link,
   Menu,
   MenuButton,
   MenuItem,
@@ -43,6 +42,7 @@ import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import { HealthScore } from 'components/HealthScore'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import CpeCard from 'components/Misc/CpeCard'
+import ExternalLink from 'components/Misc/ExternalLink'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 import SupplierTag from 'components/SupplierTag'
@@ -77,26 +77,6 @@ const CustomText = styled(Text)`
   text-transform: uppercase;
   letter-spacing: 0.6px;
 `
-
-const ExternalLink = ({ link, ...rest }) => {
-  const { url } = link || ''
-  return (
-    <Tooltip placement='top' label={link?.url}>
-      <Link
-        isExternal
-        href={url?.startsWith('https') ? `${url}` : `https://${url}`}
-      >
-        <IconButton
-          {...rest}
-          size='xs'
-          variant='solid'
-          colorScheme='gray'
-          isDisabled={!link}
-        />
-      </Link>
-    </Tooltip>
-  )
-}
 
 const Components = ({ sbomData }) => {
   const params = useParams()

@@ -38,6 +38,7 @@ import {
   TagLabel,
   Text,
   Tooltip,
+  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -47,6 +48,7 @@ import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import { FixedIcon } from 'components/Icons/Icons'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import CvssCard from 'components/Misc/CvssCard'
+import ExternalLink from 'components/Misc/ExternalLink'
 import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
@@ -175,32 +177,20 @@ const ExpandedComponent = (props) => {
             <CustomText>External Links :</CustomText>
             <Stack direction={'row'} alignItems={'center'} mt={1}>
               {/* advisories */}
-              <Tooltip placement='top' label={advisories?.url}>
-                <Link href={getUrl(advisories?.url)} target='_blank'>
-                  <LynkIcon
-                    disabled={!advisories}
-                    icon={<FaBullhorn color={textColor} fontSize={16} />}
-                  />
-                </Link>
-              </Tooltip>
+              <ExternalLink
+                link={advisories}
+                icon={<FaBullhorn color={textColor} fontSize={16} />}
+              />
               {/* documentation */}
-              <Tooltip placement='top' label={documentation?.url}>
-                <Link href={getUrl(documentation?.url)} target='_blank'>
-                  <LynkIcon
-                    disabled={!documentation}
-                    icon={<FaBookOpen color={textColor} fontSize={16} />}
-                  />
-                </Link>
-              </Tooltip>
+              <ExternalLink
+                link={documentation}
+                icon={<FaBookOpen color={textColor} fontSize={16} />}
+              />
               {/* other */}
-              <Tooltip placement='top' label={other?.url}>
-                <Link href={getUrl(other?.url)} target='_blank'>
-                  <LynkIcon
-                    disabled={!other}
-                    icon={<FaLink color={textColor} fontSize={16} />}
-                  />
-                </Link>
-              </Tooltip>
+              <ExternalLink
+                link={other}
+                icon={<FaLink color={textColor} fontSize={16} />}
+              />
             </Stack>
           </Box>
           {/* Published At  */}
@@ -323,6 +313,9 @@ const Vulnerabilities = ({ sbomData }) => {
   const params = useParams()
   const navigate = useNavigate()
   const productId = params.productid
+  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
+  const activeColor = useColorModeValue('#3182ce', '#63b3ed')
+  const onCheck = (item) => (item ? activeColor : textColor)
   const {
     headingTextColor,
     primaryTextColor,
@@ -533,15 +526,11 @@ const Vulnerabilities = ({ sbomData }) => {
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vuln, isPart, component, currentExternalUrls, externalUrls } =
-          row
+        const { vuln, isPart, component, issueTracker } = row
         const { sbom } = component
         const { projectVersion, project } = sbom
         const { id, vulnInfo } = vuln
         const { kev } = vulnInfo ? vulnInfo : ''
-        const issueTracker = isPart
-          ? currentExternalUrls?.find((item) => item.name === 'issue-tracker')
-          : externalUrls?.find((item) => item.name === 'issue-tracker')
         return (
           <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
             <Tooltip label={vuln.source === 'osv' ? 'OSV View' : 'NVD View'}>
@@ -861,67 +850,78 @@ const Vulnerabilities = ({ sbomData }) => {
       id: 'action',
       name: 'ACTION',
       selector: (row) => {
+        const { isPart, currentExternalUrls, externalUrls } = row
+        const issueTracker = isPart
+          ? currentExternalUrls?.find((item) => item.name === 'issue-tracker')
+          : externalUrls?.find((item) => item.name === 'issue-tracker')
         return (
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              aria-label='Options'
-              icon={<FaEllipsisV />}
-              variant='none'
-              color='gray.400'
+          <Flex alignItems={'center'} gap={1}>
+            <ExternalLink
+              link={issueTracker}
+              icon={<FaListCheck color={onCheck(issueTracker)} fontSize={16} />}
             />
-            <Portal>
-              <MenuList fontSize='sm'>
-                <MenuItem
-                  isDisabled={!editVulns}
-                  onClick={() => {
-                    setActiveRow(row)
-                    onLinkOpen()
-                  }}
-                >
-                  Edit Links
-                </MenuItem>
-                {row?.externalUrls?.find(
-                  (externalUrl) => externalUrl.name === 'issue-tracker'
-                ) ? (
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                aria-label='Options'
+                icon={<FaEllipsisV />}
+                variant='none'
+                color='gray.400'
+              />
+              <Portal>
+                <MenuList fontSize='sm'>
                   <MenuItem
-                    hidden={isFreeTier}
-                    isDisabled={!updateCon}
+                    isDisabled={!editVulns}
                     onClick={() => {
-                      window.open(
-                        row.externalUrls.find(
-                          (externalUrl) => externalUrl.name === 'issue-tracker'
-                        ).url,
-                        '_blank'
-                      )
+                      setActiveRow(row)
+                      onLinkOpen()
                     }}
                   >
-                    View Jira Ticket
+                    Edit Links
                   </MenuItem>
-                ) : (
-                  <MenuItem
-                    hidden={isFreeTier}
-                    isDisabled={!updateCon}
-                    onClick={() => {
-                      if (jiraConfigWarning) {
-                        showToast({
-                          title: 'Jira Configuration not set.',
-                          description:
-                            'Please configure Jira connections in the Organization Settings -> Connections.',
-                          status: 'error'
-                        })
-                      } else {
-                        setActiveRow(row)
-                        onJiraOpen()
-                      }
-                    }}
-                  >
-                    Create Jira Ticket
-                  </MenuItem>
-                )}
-              </MenuList>
-            </Portal>
-          </Menu>
+                  {row?.externalUrls?.find(
+                    (externalUrl) => externalUrl.name === 'issue-tracker'
+                  ) ? (
+                    <MenuItem
+                      hidden={isFreeTier}
+                      isDisabled={!updateCon}
+                      onClick={() => {
+                        window.open(
+                          row.externalUrls.find(
+                            (externalUrl) =>
+                              externalUrl.name === 'issue-tracker'
+                          ).url,
+                          '_blank'
+                        )
+                      }}
+                    >
+                      View Jira Ticket
+                    </MenuItem>
+                  ) : (
+                    <MenuItem
+                      hidden={isFreeTier}
+                      isDisabled={!updateCon}
+                      onClick={() => {
+                        if (jiraConfigWarning) {
+                          showToast({
+                            title: 'Jira Configuration not set.',
+                            description:
+                              'Please configure Jira connections in the Organization Settings -> Connections.',
+                            status: 'error'
+                          })
+                        } else {
+                          setActiveRow(row)
+                          onJiraOpen()
+                        }
+                      }}
+                    >
+                      Create Jira Ticket
+                    </MenuItem>
+                  )}
+                </MenuList>
+              </Portal>
+            </Menu>
+          </Flex>
         )
       },
       wrap: true,
