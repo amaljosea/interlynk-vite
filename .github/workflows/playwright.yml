@@ -1,7 +1,9 @@
 name: Playwright Tests
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
+  schedule:
+    - cron: '45 5 * * 1-5'  # Runs every Monday to Friday at 9 AM IST (3:30 AM UTC)
 
 jobs:
   test:
