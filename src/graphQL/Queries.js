@@ -1088,6 +1088,9 @@ export const GetVersionsTable = gql`
           alternatives {
             id
           }
+          sbomParts {
+            id
+          }
           stats {
             compCount
             compLicenseCount

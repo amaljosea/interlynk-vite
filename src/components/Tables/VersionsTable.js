@@ -10,7 +10,7 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { Flex, useColorModeValue, useDisclosure } from '@chakra-ui/react'
+import { Flex, useDisclosure } from '@chakra-ui/react'
 import { Link as Olink, Portal, SimpleGrid, Stack } from '@chakra-ui/react'
 import { Divider, Grid, GridItem, Icon, IconButton } from '@chakra-ui/react'
 import { Box, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
@@ -133,9 +133,12 @@ const VersionsTable = (props) => {
     childKey: 'archive_sbom'
   })
 
-  const onFilterSev = async (value) => {
+  const onFilterSev = async (value, id) => {
+    const selectedSBOM = nodes?.find((item) => item?.id === id)
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-    prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
+    if (selectedSBOM?.sbomParts?.length > 0) {
+      prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
+    }
   }
 
   const handleListSbom = (row) => {
@@ -315,27 +318,27 @@ const VersionsTable = (props) => {
         })
         return (
           <SimpleGrid gap={1} width={'100%'} columns={5}>
-            <Link to={link} onClick={() => onFilterSev(['critical'])}>
+            <Link to={link} onClick={() => onFilterSev(['critical'], id)}>
               <VulnBadge color='red' label='Critical' status={vulnRunStatus}>
                 {stats?.vulnStats?.critical || 0}
               </VulnBadge>
             </Link>
-            <Link to={link} onClick={() => onFilterSev(['high'])}>
+            <Link to={link} onClick={() => onFilterSev(['high'], id)}>
               <VulnBadge color='orange' label='High' status={vulnRunStatus}>
                 {stats?.vulnStats?.high || 0}
               </VulnBadge>
             </Link>
-            <Link to={link} onClick={() => onFilterSev(['medium'])}>
+            <Link to={link} onClick={() => onFilterSev(['medium'], id)}>
               <VulnBadge color='yellow' label='Medium' status={vulnRunStatus}>
                 {stats?.vulnStats?.medium || 0}
               </VulnBadge>
             </Link>
-            <Link to={link} onClick={() => onFilterSev(['low'])}>
+            <Link to={link} onClick={() => onFilterSev(['low'], id)}>
               <VulnBadge color='green' label='Low' status={vulnRunStatus}>
                 {stats?.vulnStats?.low || 0}
               </VulnBadge>
             </Link>
-            <Link to={link} onClick={() => onFilterSev(['unknown'])}>
+            <Link to={link} onClick={() => onFilterSev(['unknown'], id)}>
               <VulnBadge color='gray' label='Unknown' status={vulnRunStatus}>
                 {stats?.vulnStats?.unknown || 0}
               </VulnBadge>

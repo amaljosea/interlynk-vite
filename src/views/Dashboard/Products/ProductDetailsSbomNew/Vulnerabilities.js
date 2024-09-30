@@ -361,20 +361,6 @@ const Vulnerabilities = ({ sbomData }) => {
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  useEffect(() => {
-    if (configs) {
-      if (!configs?.organization?.connections?.nodes[0]?.connection) {
-        setJiraConfigWarning(true)
-      }
-    }
-  }, [configs])
-
-  useEffect(() => {
-    if (sbomData?.sbomParts?.length > 0) {
-      prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
-    }
-  }, [prodVulnDispatch, sbomData])
-
   const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
 
   const range = {
@@ -1086,6 +1072,14 @@ const Vulnerabilities = ({ sbomData }) => {
     })
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+
+  useEffect(() => {
+    if (configs) {
+      if (!configs?.organization?.connections?.nodes[0]?.connection) {
+        setJiraConfigWarning(true)
+      }
+    }
+  }, [configs])
 
   return (
     <>
