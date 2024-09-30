@@ -1,18 +1,7 @@
-import { gql, useQuery } from '@apollo/client'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { displayErrorMessage } from 'utils'
 
-import { WarningTwoIcon } from '@chakra-ui/icons'
-import {
-  Flex,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text
-} from '@chakra-ui/react'
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import LegalTable from 'components/Tables/LegalTable'
@@ -20,9 +9,8 @@ import PlanTable from 'components/Tables/PlanTable'
 import RoleTable from 'components/Tables/RoleTable'
 import TeamTable from 'components/Tables/TeamTable'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 
@@ -33,19 +21,9 @@ import Header from './components/Header'
 import { InternalComponents } from './components/InternalComponents'
 import TokenInfo from './components/TokenInfo'
 
-const GetOrganization = gql`
-  query GetOrganization {
-    organization {
-      id
-      currentUser {
-        superAdmin
-      }
-    }
-  }
-`
-
 function Profile() {
-  const { orgView, isFreeTier } = useGlobalQueryContext()
+  const { organization } = useGlobalState()
+  const isFreeTier = organization?.tier === 'free'
 
   const orgTabs = [
     'users',
@@ -64,7 +42,6 @@ function Profile() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const [orgIndex, setOrgIndex] = useState(0)
   const [psIndex, setPsIndex] = useState(0)
 
@@ -100,12 +77,6 @@ function Profile() {
     childKey: 'manage_listing'
   })
 
-  const { data, error } = useQuery(GetOrganization, {
-    skip: !orgView
-  })
-
-  const { organization } = data || ''
-
   const onOrgTabChange = (index) => {
     navigate(`/vendor/settings?tab=${orgTabs[index]}`)
   }
@@ -135,16 +106,6 @@ function Profile() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activetab, tabs])
 
-  if (error) {
-    return (
-      <Flex alignItems={'center'} justifyContent={'center'} gap={2}>
-        <WarningTwoIcon color={primaryBlueText} />
-        <Text textAlign={'center'} fontSize={14}>
-          {displayErrorMessage(error.networkError?.statusCode, error.message)}
-        </Text>
-      </Flex>
-    )
-  }
 
   return (
     <>
@@ -157,7 +118,7 @@ function Profile() {
 
       {/*  ORGANIZATION */}
       {selectedTab === 'ORGANIZATION' && (
-        <Card display={orgView ? 'flex' : 'none'}>
+        <Card display={organization ? 'flex' : 'none'}>
           <Tabs
             w={'100%'}
             index={orgIndex}
@@ -178,7 +139,7 @@ function Profile() {
             </TabList>
             <TabPanels>
               {/* TEAMS */}
-              <TabPanel display={data ? 'block' : 'none'} px={0}>
+              <TabPanel display={organization ? 'block' : 'none'} px={0}>
                 <TeamTable />
               </TabPanel>
               {/* ROLES */}
@@ -214,7 +175,7 @@ function Profile() {
 
       {/* PERSONAL  */}
       {selectedTab === 'PERSONAL' && (
-        <Card display={orgView ? 'flex' : 'none'}>
+        <Card display={organization ? 'flex' : 'none'}>
           <Tabs
             w={'100%'}
             index={psIndex}

@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
 
@@ -15,7 +15,6 @@ import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import EnvFilter from 'components/Misc/EnvFilter'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -27,40 +26,14 @@ import ActivitiesOverview from './components/ActivitiesOverview'
 import MiniStatistics from './components/MiniStatistics'
 import ProductsOverview from './components/ProductsOverview'
 
-const GetOrganization = gql`
-  query GetOrganization {
-    organization {
-      name
-      currentUser {
-        name
-      }
-    }
-  }
-`
-
 export default function Dashboard() {
-  const product = useQueryParam('id')
   const { setIsOpen } = useTour()
-  const { dispatch, envName } = useGlobalState()
-  const { orgView } = useGlobalQueryContext()
+  const product = useQueryParam('id')
+  const { dispatch, envName, organization } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
-  const { data, loading } = useQuery(GetOrganization, {
-    skip: !orgView,
-    fetchPolicy: 'network-only',
-    onCompleted: (data) => {
-      if (data) {
-        localStorage.setItem('organization', data?.organization?.name)
-        localStorage.setItem(
-          'isSuperAdmin',
-          data?.organization?.currentUser?.superAdmin
-        )
-      }
-    }
-  })
-
   const { data: metrics } = useQuery(GetOrgMetrics, {
-    skip: data?.organization?.name ? false : true,
+    skip: organization ? false : true,
     variables: { env: envName }
   })
 
@@ -75,7 +48,7 @@ export default function Dashboard() {
     }
   }, [prodCompDispatch, prodVulnDispatch, product, setIsOpen])
 
-  if (loading) {
+  if (!organization) {
     return (
       <Flex width={'100%'} flexDirection='column' gap={6}>
         <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
@@ -110,7 +83,7 @@ export default function Dashboard() {
         <Text fontWeight='semibold' fontSize={20}>
           Dashboard
         </Text>
-        {orgView && <EnvFilter />}
+        {organization && <EnvFilter />}
       </Flex>
       <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing={5}>
         <MiniStatistics

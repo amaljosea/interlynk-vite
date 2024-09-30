@@ -167,7 +167,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
           data={activeRow}
           isOpen={isWarnOpen}
           onClose={onWarnClose}
-          projectGroup={projectGroup}
+          projectGroup={{ name: projectGroup?.name }}
         />
       )}
     </>

@@ -1,13 +1,11 @@
-import { gql, useLazyQuery, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useKBar } from 'kbar'
 import PropTypes from 'prop-types'
-import { useEffect } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import { logoutUser } from 'utils/authUtils'
-import { homeSteps } from 'utils/tourUtils'
-import { productSteps } from 'utils/tourUtils'
+import { homeSteps, productSteps } from 'utils/tourUtils'
 
 import { SearchIcon } from '@chakra-ui/icons'
 import {
@@ -37,66 +35,14 @@ import { SettingsIcon } from 'components/Icons/Icons'
 // Custom Components
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { AllOrganizations, GetOrgName, MyOrganizations } from 'graphQL/Queries'
+import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
 
 import { FaBuilding, FaExchangeAlt, FaSignOutAlt } from 'react-icons/fa'
 import { FaLocationArrow, FaMoon, FaSun, FaUser } from 'react-icons/fa6'
-
-// GET PROFILE PHOTO
-export const GetProfilePic = gql`
-  query GetProfilePic {
-    organization {
-      currentUser {
-        name
-        email
-        profileImage {
-          filename
-          url
-        }
-      }
-    }
-  }
-`
-
-export const GetCurrentUser = gql`
-  query GetCurrentUser {
-    organization {
-      currentUser {
-        id
-        name
-        email
-        superAdmin
-        profileImage {
-          filename
-          url
-        }
-      }
-    }
-  }
-`
-
-export const GetOrganization = gql`
-  query GetOrganization {
-    organization {
-      id
-      name
-      tier
-      updatedAt
-      currentUser {
-        superAdmin
-        role {
-          id
-          name
-        }
-      }
-    }
-  }
-`
 
 export default function HeaderLinks(props) {
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
@@ -115,24 +61,9 @@ export default function HeaderLinks(props) {
   const productView = location.pathname === '/vendor/products'
   const signedUrlParams = location.pathname.startsWith('/customer')
 
-  const { userName, setUserName } = useGlobalState()
-  const { orgView } = useGlobalQueryContext()
+  const { organization } = useGlobalState()
 
-  const { data: org } = useQuery(GetProfilePic, {
-    skip: signedUrlParams
-  })
-  const { currentUser } = org?.organization || ''
-  const { profileImage, name, email } = currentUser || ''
-
-  const [fetchOrg, { data }] = useLazyQuery(GetOrgName, {
-    skip: !orgView || signedUrlParams
-  })
-
-  const { data: currentUserData } = useQuery(GetCurrentUser, {
-    skip: !orgView
-  })
-
-  const isSuperAdmin = currentUserData?.organization?.currentUser?.superAdmin
+  const isSuperAdmin = organization?.currentUser?.superAdmin
 
   const { data: allOrgs } = useQuery(AllOrganizations, {
     skip: isSuperAdmin === true ? false : true,
@@ -155,12 +86,6 @@ export default function HeaderLinks(props) {
     organisationList?.length > 1 ? '?tab=security tokens' : '?tab=users'
 
   const { ...rest } = props
-
-  useEffect(() => {
-    if (location.pathname.startsWith('/vendor')) {
-      setUserName(name || '')
-    }
-  }, [location, name, setUserName])
 
   const handleLogout = async () => {
     await logoutUser()
@@ -260,34 +185,34 @@ export default function HeaderLinks(props) {
       />
       {!signedUrlParams && (
         <Menu>
-          <MenuButton onClick={() => (orgView ? fetchOrg() : null)}>
+          <MenuButton>
             <Avatar
               size='sm'
-              name={userName || name}
-              src={`${SERVER_URL}/${profileImage?.url}`}
+              name={organization?.currentUser?.name}
+              src={`${SERVER_URL}/${organization?.currentUser?.profileImage?.url}`}
             />
           </MenuButton>
-          <MenuList>
-            <MenuGroup title=''>
-              <MenuItem hidden={!name}>
+          <MenuList fontSize={'sm'}>
+            <MenuGroup>
+              <MenuItem hidden={!organization?.currentUser}>
                 <Flex flexDirection='row' alignItems={'flex-start'} gap={3}>
                   <Icon as={FaUser} width={2.5} mt={1} />
                   <Stack direction={'column'} spacing={-1}>
-                    <Text>{name}</Text>
+                    <Text>{organization?.currentUser?.name}</Text>
                     <Text fontSize={'sm'} color={'#718096'}>
-                      {email}
+                      {organization?.currentUser?.email}
                     </Text>
                     <Text fontSize={'sm'} color={'#718096'}>
-                      {data?.organization?.name || ''}
+                      {organization?.name || ''}
                     </Text>
                   </Stack>
                 </Flex>
               </MenuItem>
-              <MenuDivider hidden={!name} />
+              <MenuDivider hidden={!organization?.currentUser} />
               <Link to={`/vendor/settings?tab=personal-details`}>
                 <MenuItem
                   icon={<SettingsIcon />}
-                  display={data?.organization ? 'flex' : 'none'}
+                  display={organization ? 'flex' : 'none'}
                 >
                   Settings
                 </MenuItem>
@@ -310,12 +235,12 @@ export default function HeaderLinks(props) {
                       <FaExchangeAlt />
                     )
                   }
-                  display={data?.organization ? 'flex' : 'none'}
+                  display={organization ? 'flex' : 'none'}
                 >
                   Organizations
                 </MenuItem>
               </Link>
-              <MenuDivider hidden={!data?.organization} />
+              <MenuDivider hidden={!organization} />
               <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
                 Logout
               </MenuItem>

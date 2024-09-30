@@ -1,7 +1,6 @@
-import { useMutation } from '@apollo/client'
-import { useState } from 'react'
+import { gql, useMutation, useQuery } from '@apollo/client'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { filterEnvList } from 'utils'
 
 import {
   Box,
@@ -29,23 +28,39 @@ import { UploadSbom } from 'graphQL/Mutation'
 
 import { PiFileArrowUpBold } from 'react-icons/pi'
 
-const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
+const GetProjectGroup = gql`
+  query GetProjectGroup($id: Uuid!) {
+    projectGroup(id: $id) {
+      projects {
+        id
+        name
+      }
+    }
+  }
+`
+
+const UploadModal = ({ isOpen, onClose, group }) => {
   const params = useParams()
+  const { envName } = useGlobalState()
   const { showToast } = useCustomToast()
   const borderColor = useColorModeValue('#A0AEC066', 'gray.600')
   const textColor = useColorModeValue('#1A202C99', 'gray.600')
   const highlightedTextColor = useColorModeValue('blue.600', 'blue.300') // New highlighted text color
-  const { envName } = useGlobalState()
 
-  const { projects, name } = data || ''
-  const environment = envName
-  const defaultENV = data?.projects?.find((item) =>
-    environment ? item?.name === environment : item?.name === 'default'
-  )
+  const { data } = useQuery(GetProjectGroup, {
+    skip: isOpen ? false : true,
+    variables: { id: group?.id }
+  })
+
+  const { projects } = data?.projectGroup || ''
 
   const [sbomUpload, { error, loading }] = useMutation(UploadSbom)
 
-  const [selectedEnv, setSelectedEnv] = useState(activeEnv || defaultENV?.id)
+  const defaultENV = projects?.find((item) =>
+    envName ? item?.name === envName : item?.name === 'default'
+  )
+
+  const [selectedEnv, setSelectedEnv] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedFile, setSelectedFile] = useState(null)
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
@@ -126,6 +141,12 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
     }
   }
 
+  useEffect(() => {
+    if (defaultENV) {
+      setSelectedEnv(defaultENV?.id)
+    }
+  }, [defaultENV])
+
   return (
     <>
       <LynkModal
@@ -140,7 +161,7 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
         {!params?.productgroupid && (
           <Tag colorScheme='blue' mb={4}>
             <Text fontWeight={'medium'} wordBreak={'break-all'}>
-              {name}
+              {group?.name}
             </Text>
           </Tag>
         )}
@@ -151,17 +172,16 @@ const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
             <Select
               id='dataRetention'
               value={selectedEnv}
-              onChange={(e) => setSelectedEnv(e.target.value)}
               textTransform={'capitalize'}
+              onChange={(e) => setSelectedEnv(e.target.value)}
             >
-              {projects?.length > 0 &&
-                filterEnvList(projects).map((item) => (
+              {projects
+                ?.sort((a, b) => a?.name?.localeCompare(b?.name))
+                ?.map((item) => (
                   <option
                     key={item.id}
                     value={item.id}
-                    style={{
-                      textTransform: 'capitalize'
-                    }}
+                    style={{ textTransform: 'capitalize' }}
                   >
                     {item.name}
                   </option>

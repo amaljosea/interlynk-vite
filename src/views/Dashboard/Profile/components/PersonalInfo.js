@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import Cookies from 'js-cookie'
 import React, { useEffect, useState } from 'react'
 import { validPassword, validateEmail } from 'utils'
@@ -26,40 +26,19 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
-import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateUserPassword, updateOrgUser } from 'graphQL/Mutation'
 
-const GetCurrentUser = gql`
-  query GetCurrentUser {
-    organization {
-      currentUser {
-        id
-        name
-        email
-        unconfirmedEmail
-      }
-    }
-  }
-`
-
 const PersonalInfo = () => {
   const { showToast } = useCustomToast()
-  const activetab = useQueryParam('tab')
   const textColor = useColorModeValue('gray.700', 'white')
   const loginType = localStorage.getItem('loginType')
 
-  const { setUserName } = useGlobalState()
-  const { orgView } = useGlobalQueryContext()
+  const { setUserName, organization } = useGlobalState()
 
-  const { data } = useQuery(GetCurrentUser, {
-    skip: !orgView || activetab !== 'personal-details'
-  })
-
-  const { currentUser } = data?.organization || ''
+  const { currentUser } = organization || ''
   const {
     id: userId,
     name: userName,
@@ -69,7 +48,6 @@ const PersonalInfo = () => {
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [message, setMessage] = useState('Update')
   const [error, setError] = useState('')
   const [oldPassword, setOldPassword] = useState('')
   const [showOldPass, setShowOldPass] = useState(false)
@@ -79,8 +57,9 @@ const PersonalInfo = () => {
   const [showConfPass, setShowConfPass] = useState(false)
   const [invalidPassword, setInvalidPassword] = useState(false)
   const [passError, setPassError] = useState('')
+
+  const [updateUser, { loading }] = useMutation(updateOrgUser)
   const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
-  const [updateUser] = useMutation(updateOrgUser)
   const [updatePassword] = useMutation(UpdateUserPassword)
 
   const handleOldPassChange = (e) => {
@@ -145,16 +124,7 @@ const PersonalInfo = () => {
       variables: { id: userId, name: name }
     }).then((res) => {
       if (res.data.userUpdate.errors.length === 0) {
-        setMessage('Saving....')
         setUserName(name)
-        localStorage.setItem('username', name)
-        setTimeout(() => {
-          setMessage('Update')
-          showToast({
-            description: 'User details updated successfully',
-            status: 'success'
-          })
-        }, 2000)
       }
     })
   }
@@ -230,15 +200,11 @@ const PersonalInfo = () => {
               <Button
                 variant='solid'
                 colorScheme='blue'
+                isLoading={loading}
                 onClick={handleUpdate}
-                disabled={
-                  message === 'Saving....' ||
-                  !name ||
-                  !validateEmail(email) ||
-                  error !== ''
-                }
+                disabled={!name || !validateEmail(email) || error !== ''}
               >
-                {message}
+                Update
               </Button>
             </Flex>
           </GridItem>

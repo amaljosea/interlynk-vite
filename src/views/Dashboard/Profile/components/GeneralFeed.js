@@ -1,6 +1,5 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { isCustomerView } from 'utils'
 
 import {
   Button,
@@ -18,19 +17,13 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 
 import { orgUpdate } from 'graphQL/Mutation'
-import { GetOrgName } from 'graphQL/Queries'
 
 const GeneralFeed = () => {
-  const customerView = isCustomerView()
-  const { orgView } = useGlobalQueryContext()
-
-  const { data } = useQuery(GetOrgName, {
-    skip: !orgView || customerView
-  })
+  const { organization } = useGlobalState()
 
   const updateOrgs = useHasPermission({
     parentKey: 'view_organization',
@@ -51,7 +44,6 @@ const GeneralFeed = () => {
       }
     }).then((res) => {
       if (res.data.organizationUpdate.errors.length === 0) {
-        localStorage.setItem('organization', orgName)
         setMessage('Saving....')
         setTimeout(() => {
           setMessage('Update')
@@ -65,10 +57,10 @@ const GeneralFeed = () => {
   }
 
   useEffect(() => {
-    if (data?.organization) {
-      setOrgName(data?.organization?.name)
+    if (organization) {
+      setOrgName(organization?.name)
     }
-  }, [data])
+  }, [organization])
 
   return (
     <Card p={0}>

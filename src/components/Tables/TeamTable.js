@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
@@ -31,7 +31,7 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -52,22 +52,11 @@ function userTimeStart(row) {
   return timeStart
 }
 
-const GetCurrentUser = gql`
-  query GetCurrentUser {
-    organization {
-      currentUser {
-        email
-        role {
-          id
-        }
-      }
-    }
-  }
-`
-
 const TeamTable = () => {
   const activetab = useQueryParam('tab')
-  const { orgView, isFreeTier } = useGlobalQueryContext()
+  const { showToast } = useCustomToast()
+  const { organization } = useGlobalState()
+  const SERVER_URL = process.env.REACT_APP_SERVER
 
   const { headingTextColor, primaryTextColor } = useThemeColor([
     'headingTextColor',
@@ -76,19 +65,14 @@ const TeamTable = () => {
   const paddingCell = 0
   const paddingHeadCell = 0
 
-  const { showToast } = useCustomToast()
-  const SERVER_URL = process.env.REACT_APP_SERVER
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isTeamOpen,
-    onOpen: onTeamOpen,
-    onClose: onTeamClose
-  } = useDisclosure()
-  const {
-    isOpen: isRoleOpen,
-    onOpen: onRoleOpen,
-    onClose: onRoleClose
-  } = useDisclosure()
+  const { tier, currentUser } = organization || ''
+  const { email } = currentUser || ''
+  const isFreeTier = tier === 'free'
+
+  const USER = useDisclosure()
+  const TEAM = useDisclosure()
+  const ROLE = useDisclosure()
+
   const [activeRow, setActiveRow] = useState(null)
   const [searchInput, setSearchInput] = useState('')
   const [filterText, setFilterText] = useState('')
@@ -96,16 +80,9 @@ const TeamTable = () => {
 
   const [inviteUsers] = useMutation(InviteUser)
 
-  const { data: orgData } = useQuery(GetCurrentUser, {
-    skip: !orgView ? true : activetab === 'users' ? false : true
-  })
-
-  const { currentUser } = orgData?.organization || ''
-  const { email } = currentUser || ''
-
   const { data: userData, loading } = useQuery(GetUsers, {
-    skip: !orgView ? true : activetab === 'users' ? false : true,
-    variables: { search: filterText }
+    skip: !organization ? true : activetab === 'users' ? false : true,
+    variables: { search: filterText === '' ? undefined : filterText }
   })
 
   const numberOfUsers = userData?.organization?.users.length
@@ -133,51 +110,34 @@ const TeamTable = () => {
       id: 'email',
       name: 'EMAIL',
       selector: (row) => {
-        const { name, profileImage } = row
+        const { profileImage } = row
         return (
           <Flex
-            width={'100%'}
-            px={0}
-            py='.8rem'
-            direction={'row'}
-            alignItems={'center'}
             justifyContent={'center'}
-            gap={2}
+            sx={{w:'100%', px:0, py:'.8rem', gap:2, alignItems:'center'}}
           >
             <Avatar
+              sx={{w:'30px', h:'30px'}}
               src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
-              w='30px'
-              h='30px'
             />
-            <Stack
-              spacing={name !== '' ? 2 : 0}
-              direction={'row'}
-              alignItems={'center'}
-            >
-              <Text color={primaryTextColor} my={2}>
-                {row?.email}
-              </Text>
-            </Stack>
+            <Text color={primaryTextColor} my={2}>{row?.email}</Text>
           </Flex>
         )
       },
       width: '35%',
       wrap: true
     },
-
     {
       id: 'name',
       name: 'NAME',
       selector: (row) => (
         <Stack
           spacing={row.name !== '' ? 2 : 0}
-          direction={'row'}
-          align={'center'}
+          sx={{direction:'row', alignItems:'center'}}
         >
           <Text
             color={primaryTextColor}
-            width={'fit-content'}
-            fontSize={'14px'}
+            sx={{fontSize:'14px',w:'fit-content'}}
           >
             {row.name}
           </Text>
@@ -185,9 +145,7 @@ const TeamTable = () => {
             <Badge
               variant='outline'
               colorScheme='blue'
-              py={1}
-              px={2}
-              borderRadius={4}
+              sx={{py:1, px:2, borderRadius:4}}
             >
               You
             </Badge>
@@ -197,7 +155,6 @@ const TeamTable = () => {
       width: '21%',
       wrap: true
     },
-
     {
       id: 'role',
       name: 'ROLE',
@@ -208,7 +165,6 @@ const TeamTable = () => {
       ),
       width: '8%'
     },
-
     {
       id: 'joinedDate',
       name: 'JOINED',
@@ -236,7 +192,6 @@ const TeamTable = () => {
       },
       width: '16%'
     },
-
     {
       id: 'status',
       name: 'STATUS',
@@ -244,7 +199,6 @@ const TeamTable = () => {
         const { invitationStatus } = row
         return (
           <Tag
-            width='fit-content'
             variant='subtle'
             colorScheme={
               invitationStatus === 'invited'
@@ -255,7 +209,7 @@ const TeamTable = () => {
                     ? 'red'
                     : 'blue'
             }
-            textTransform={'capitalize'}
+            sx={{w:'fit-content', textTransform:'capitalize'}}
           >
             <TagLabel mx='auto'>
               {invitationStatus?.replace(/_/g, ' ')}
@@ -266,7 +220,6 @@ const TeamTable = () => {
       center: true,
       width: '8%'
     },
-
     {
       id: 'action',
       name: 'ACTION',
@@ -286,7 +239,7 @@ const TeamTable = () => {
                   isDisabled={row.email === email || !editUserRole}
                   onClick={() => {
                     setActiveRow(row)
-                    onRoleOpen()
+                    ROLE.onOpen()
                   }}
                 >
                   Change Role
@@ -295,7 +248,7 @@ const TeamTable = () => {
                   isDisabled={row.email === email || !removeUser}
                   onClick={() => {
                     setActiveRow(row)
-                    onOpen()
+                    USER.onOpen()
                   }}
                 >
                   {invitationStatus === 'declined' ||
@@ -353,61 +306,38 @@ const TeamTable = () => {
   // HEADER SECTION
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
+      <Flex sx={{w:'100%',alignItems:'center',justifyContent:'space-between'}}>
         {/* SEARCH COMPONENTS */}
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={4}
-          alignItems={'flex-start'}
-        >
-          <SearchFilter
-            id='team'
-            filterText={searchInput}
-            onChange={onSearchInputChange}
-            onFilter={handleSearch}
-            onClear={handleClear}
-          />
-        </Stack>
+        <SearchFilter
+          id='team'
+          onClear={handleClear}
+          onFilter={handleSearch}
+          filterText={searchInput}
+          onChange={onSearchInputChange}
+        />
 
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={2}
-          justifyContent={'flex-end'}
-        >
+        <Flex sx={{ gap:2, justifyContent:'flex-end'}}>
           {/* INVITE USER */}
           <Box position='relative'>
             <Tooltip
-              label={
-                isFreeTier && numberOfUsers === 2
-                  ? 'Limit reached for free tier'
-                  : 'Invite User'
-              }
+              label={ isFreeTier && numberOfUsers === 2 ? 'Limit reached for free tier' : 'Invite User' }
               placement='bottom'
               isDisabled={false} // Ensure the tooltip is never disabled
             >
               <Box>
                 <IconButton
-                  onClick={onTeamOpen}
+                  variant='solid'
                   icon={<AddIcon />}
                   colorScheme='blue'
-                  variant='solid'
-                  fontWeight='normal'
-                  fontSize={'sm'}
-                  isDisabled={
-                    !inviteUser || (isFreeTier && numberOfUsers === 2)
-                  }
+                  onClick={TEAM.onOpen}
+                  sx={{fontSize:'sm', fontWeight:'normal'}}
+                  isDisabled={ !inviteUser || (isFreeTier && numberOfUsers === 2) }
                 />
               </Box>
             </Tooltip>
           </Box>
           <RefreshBtn />
-        </Stack>
+        </Flex>
       </Flex>
     )
   }, [
@@ -415,7 +345,7 @@ const TeamTable = () => {
     onSearchInputChange,
     handleSearch,
     handleClear,
-    onTeamOpen,
+    TEAM,
     inviteUser,
     isFreeTier,
     numberOfUsers
@@ -428,7 +358,7 @@ const TeamTable = () => {
       }
     })
       .then((res) => res.data)
-      .finally(() => onClose())
+      .finally(() => USER.onClose())
   }
 
   const onResendInvite = async (row) => {
@@ -473,25 +403,25 @@ const TeamTable = () => {
       />
 
       {/* ADD / UPDATE User */}
-      {isTeamOpen && (
+      {TEAM.isOpen && (
         <TeamModal
           data={currentUser}
-          isOpen={isTeamOpen}
-          onClose={onTeamClose}
+          isOpen={TEAM.isOpen}
+          onClose={TEAM.onClose}
           changeRole={editUserRole}
         />
       )}
 
       {/* UPDATE User ROLE */}
-      {isRoleOpen && (
-        <RoleModal data={activeRow} isOpen={isRoleOpen} onClose={onRoleClose} />
+      {ROLE.isOpen && (
+        <RoleModal data={activeRow} isOpen={ROLE.isOpen} onClose={ROLE.onClose} />
       )}
 
       {/* REMOVE User */}
-      {isOpen && activeRow && (
+      {USER.isOpen && activeRow && (
         <LynkModal
-          isOpen={isOpen}
-          onClose={onClose}
+          isOpen={USER.isOpen}
+          onClose={USER.onClose}
           onSubmit={handleRemove}
           title={'Remove User'}
           Icon={BiTrash}
@@ -499,20 +429,15 @@ const TeamTable = () => {
           buttonColor='red'
         >
           <Stack
-            direction={'column'}
-            gap={2}
             spacing={2}
-            alignItems={'flex-start'}
+            sx={{gap:2, direction:'column', alignItems:'flex-start'}}
           >
             <Text fontWeight={300} fontSize={16} lineHeight={'30px'}>
               Are you sure you want to remove the following user from the
               organization ?
             </Text>
             <Text
-              fontWeight={500}
-              fontSize={16}
-              lineHeight={'30px'}
-              wordBreak={'break-all'}
+              sx={{fontSize:16, fontWeight:500, lineHeight:'30px', wordBreak:'break-all'}}
             >
               {activeRow.name} {`(${activeRow.email})`}
             </Text>

@@ -14,7 +14,7 @@ const RoleModal = ({ isOpen, onClose, data }) => {
   const [role, setRole] = useState(data?.role?.id)
   const [error, setError] = useState('')
 
-  const { data: roles } = useQuery(GetRoles)
+  const { data: roles } = useQuery(GetRoles, { skip: isOpen ? false : true })
 
   const [updateOrgRules] = useMutation(UpdateOrganizationUserRole)
 

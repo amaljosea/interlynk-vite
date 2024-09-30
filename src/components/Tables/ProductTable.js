@@ -204,7 +204,8 @@ const ProductTable = ({
   })
   const { nodes } = prodLabels?.labels || ''
 
-  const [deleteProjectGroup,{loading: dLLoading }] = useMutation(DeleteProjectGroup)
+  const [deleteProjectGroup, { loading: dLLoading }] =
+    useMutation(DeleteProjectGroup)
 
   const onProductDelete = useCallback(async () => {
     await deleteProjectGroup({ variables: { id: activeRow.id } }).then(
@@ -726,6 +727,8 @@ const ProductTable = ({
     persistTableHead: true
   }
 
+  console.log(activeRow)
+
   return (
     <>
       <Card pos={'relative'}>
@@ -738,10 +741,9 @@ const ProductTable = ({
       {/* UPLOAD SBOM */}
       {isOpenUpload && (
         <UploadModal
-          data={activeRow}
           isOpen={isOpenUpload}
           onClose={onCloseUpload}
-          activeEnv={productId}
+          group={{ id: activeRow?.id, name: activeRow?.name, default: activeRow?.defaultProject?.id }}
         />
       )}
 

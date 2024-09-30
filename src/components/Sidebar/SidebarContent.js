@@ -7,7 +7,6 @@ import {
   Divider,
   Flex,
   Img,
-  Spinner,
   Tooltip,
   useColorModeValue
 } from '@chakra-ui/react'
@@ -15,19 +14,17 @@ import {
 import IconBox from 'components/Icons/IconBox'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const SidebarContent = ({ routes }) => {
   const location = useLocation()
-  const activeUser = localStorage.getItem('email')
-  const isSuperAdmin = localStorage.getItem('isSuperAdmin')
   const dashboardView = location.pathname === '/vendor/dashboard'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
 
-  const { orgView, isFreeTier, orgQueryLoading } = useGlobalQueryContext()
+  const { organization } = useGlobalState()
   const [routesActual, setRoutesActual] = useState([])
 
   const handleClick = (prop) => {
@@ -36,33 +33,18 @@ const SidebarContent = ({ routes }) => {
 
   useEffect(() => {
     // Filter routes based on the active user and free tier status
-    const filterRoutes =
-      activeUser === 'sp@interlynk.io' ||
-      activeUser === 'surendra.pathak@interlynk' ||
-      isSuperAdmin === 'true'
-        ? routes
-        : routes.filter((item) => item.name !== 'SAG')
-
+    const isFreeTier = organization?.tier === 'free'
     const updatedRoutes = isFreeTier
-      ? filterRoutes.filter(
+      ? routes.filter(
           (route) =>
             route.name !== 'Requests' &&
             route.name !== 'Licenses' &&
             route.name !== 'Analytics' &&
             route.name !== 'Support'
         )
-      : filterRoutes
-
+      : routes
     setRoutesActual(updatedRoutes)
-  }, [isFreeTier, routes, activeUser, isSuperAdmin])
-
-  if (orgQueryLoading) {
-    return (
-      <Flex align='center' justify='center' h='100vh'>
-        <Spinner />
-      </Flex>
-    )
-  }
+  }, [organization, routes])
 
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const inActiveBg = useColorModeValue('gray.100', 'gray.700')
@@ -87,7 +69,7 @@ const SidebarContent = ({ routes }) => {
             className={dashboardView ? name.toLowerCase() : ''}
             to={
               path === '/settings'
-                ? `${layout}${path}?tab=${!orgView ? 'organization' : 'users'}`
+                ? `${layout}${path}?tab=${!organization ? 'organization' : 'users'}`
                 : layout + path
             }
             onClick={() => handleClick(prop)}

@@ -20,7 +20,7 @@ import Support from './Support'
 import Vulnerabilities from './Vulnerabilities'
 
 const SbomTable = ({ data, loading, error }) => {
-  const { isFreeTier, orgQueryLoading } = useGlobalQueryContext()
+  const { isFreeTier } = useGlobalQueryContext()
 
   const tabs = [
     'general',
@@ -90,11 +90,7 @@ const SbomTable = ({ data, loading, error }) => {
           </TabList>
           <TabPanels>
             <TabPanel px={1}>
-              <General
-                data={data}
-                error={error}
-                loading={loading || orgQueryLoading}
-              />
+              <General data={data} error={error} loading={loading} />
             </TabPanel>
             <TabPanel px={0}>{<Parts data={data} />}</TabPanel>
             <TabPanel px={0}>

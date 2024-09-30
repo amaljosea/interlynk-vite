@@ -1,3 +1,4 @@
+import { useQuery } from '@apollo/client'
 import { TourProvider, useTour } from '@reactour/tour'
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
@@ -26,8 +27,10 @@ import Kbar from 'components/Kbar'
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+
+import { getOrganization } from 'graphQL/Queries'
 
 import { FaArrowLeft, FaArrowRight, FaRegFile } from 'react-icons/fa6'
 
@@ -45,7 +48,7 @@ export default function Admin() {
   const { steps } = useTour()
   const navigate = useNavigate()
   const { colorMode, setColorMode } = useColorMode()
-  const { orgView, orgLoading, error } = useGlobalQueryContext()
+  const { organization, setOrganization } = useGlobalState()
 
   const productId = params.productid
   const sbomId = params.sbomid
@@ -59,7 +62,10 @@ export default function Admin() {
   } = useProductUrlContext()
 
   document.documentElement.dir = 'ltr'
-  // Chakra Color Mode
+
+  const { data, error, loading } = useQuery(getOrganization, {
+    skip: location.pathname.startsWith('/vendor') && authToken ? false : true
+  })
 
   const isTokenExpired = (token) => {
     const decodedToken = jwtDecode(token)
@@ -250,6 +256,12 @@ export default function Admin() {
     }
   }, [])
 
+  useEffect(() => {
+    if (data && data.organization) {
+      setOrganization(data.organization)
+    }
+  }, [data, setOrganization])
+
   if (error) {
     return (
       <Center>
@@ -349,7 +361,7 @@ export default function Admin() {
               />
             </Box>
             <Box my={5} px={6}>
-              {orgView ? <Outlet /> : <OrgRegister loading={orgLoading} />}
+              {organization ? <Outlet /> : <OrgRegister loading={loading} />}
             </Box>
           </Flex>
         </TourProvider>

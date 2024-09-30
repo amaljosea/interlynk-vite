@@ -1,3 +1,4 @@
+import { gql, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useCallback, useMemo, useState } from 'react'
@@ -41,8 +42,18 @@ import { FaEllipsisVertical, FaScrewdriverWrench } from 'react-icons/fa6'
 import { HiOutlineDuplicate } from 'react-icons/hi'
 import { IoMdWarning } from 'react-icons/io'
 
+const GetProjectGroup = gql`
+  query GetProjectGroup($id: Uuid!) {
+    projectGroup(id: $id) {
+      description
+      enabled
+      name
+    }
+  }
+`
+
 const VersionsTable = (props) => {
-  const { handleSort, projectGroup, retentionTime, filters, setFilters } = props
+  const { handleSort, retentionTime, filters, setFilters } = props
 
   const navigate = useNavigate()
   const params = useParams()
@@ -87,6 +98,12 @@ const VersionsTable = (props) => {
   const { setIsOpen } = useTour()
 
   const { VERSIONS } = ProductDetailsTabs
+
+  // GET PROJECT DATA
+  const { data } = useQuery(GetProjectGroup, {
+    variables: { id: params?.productgroupid }
+  })
+  const { name, enabled } = data?.projectGroup || ''
 
   const { nodes, paginationProps, loading, startPolling, stopPolling } =
     usePaginatedQuery(signedUrlParams ? ShareVersionTable : GetVersionsTable, {
@@ -528,7 +545,7 @@ const VersionsTable = (props) => {
           {/* SHOW ARCHIVED VERSION */}
           <Tooltip label='Show Archived Versions'>
             <IconButton
-              isDisabled={!projectGroup?.enabled}
+              isDisabled={!enabled}
               hidden={signedUrlParams}
               colorScheme='blue'
               onClick={ARC_VERSIONS.onOpen}
@@ -538,7 +555,7 @@ const VersionsTable = (props) => {
           {/* BUILD SBOM */}
           <Tooltip label='Build Version'>
             <IconButton
-              isDisabled={!projectGroup?.enabled || !createSbom}
+              isDisabled={!enabled || !createSbom}
               hidden={signedUrlParams}
               colorScheme='blue'
               onClick={onBuildSbom}
@@ -556,7 +573,7 @@ const VersionsTable = (props) => {
     handleSearch,
     selectedSbom?.length,
     TOOL,
-    projectGroup?.enabled,
+    enabled,
     signedUrlParams,
     ARC_VERSIONS,
     createSbom,
@@ -600,7 +617,7 @@ const VersionsTable = (props) => {
       {DELETE_SBOM.isOpen && (
         <DeleteSbom
           data={activeRow}
-          projectGroup={projectGroup}
+          projectGroup={{ name }}
           isOpen={DELETE_SBOM.isOpen}
           onClose={DELETE_SBOM.onClose}
         />
@@ -610,7 +627,7 @@ const VersionsTable = (props) => {
       {ARCHIVE_SBOM.isOpen && (
         <ArchiveSbom
           data={activeRow}
-          projectGroup={projectGroup}
+          projectGroup={{ name }}
           isOpen={ARCHIVE_SBOM.isOpen}
           onClose={ARCHIVE_SBOM.onClose}
         />
@@ -622,7 +639,7 @@ const VersionsTable = (props) => {
           data={activeRow}
           isOpen={REPROCESS.isOpen}
           onClose={REPROCESS.onClose}
-          projectGroup={projectGroup}
+          projectGroup={{ name }}
         />
       )}
 
@@ -631,7 +648,7 @@ const VersionsTable = (props) => {
         <ArchivedVersions
           isOpen={ARC_VERSIONS.isOpen}
           onClose={ARC_VERSIONS.onClose}
-          projectGroup={projectGroup}
+          projectGroup={{ name }}
         />
       )}
 
@@ -645,12 +662,8 @@ const VersionsTable = (props) => {
       )}
 
       {/* BUILD SBOM */}
-      {SBOM.isOpen && projectGroup && (
-        <ProductSbomDrawer
-          data={projectGroup}
-          isOpen={SBOM.isOpen}
-          onClose={SBOM.onClose}
-        />
+      {SBOM.isOpen && (
+        <ProductSbomDrawer isOpen={SBOM.isOpen} onClose={SBOM.onClose} />
       )}
 
       {TOOL.isOpen && (

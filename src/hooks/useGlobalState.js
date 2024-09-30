@@ -15,6 +15,7 @@ const GlobalStateContext = createContext()
 const GlobalStateProvider = ({ children }) => {
   const env = localStorage.getItem('environment')
   const [steps, setSteps] = useState([])
+  const [organization, setOrganization] = useState(null)
   const [userPermissions, setUserPermissions] = useState([])
   const [userName, setUserName] = useState('')
   const [totalRows, setTotalRows] = useState(25)
@@ -148,6 +149,8 @@ const GlobalStateProvider = ({ children }) => {
         steps,
         setSteps,
         totalRows,
+        organization,
+        setOrganization,
         setTotalRows,
         activeCsProdTab,
         setActiveCsProdTab,

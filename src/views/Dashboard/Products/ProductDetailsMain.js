@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useEffect, useState } from 'react'
@@ -48,7 +48,6 @@ import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
   GetGlobalVulns,
   GetOrgMfc,
-  GetProjectGroup,
   GetProjectPolicies,
   GetProjectSettings,
   GetVersionsDate
@@ -75,9 +74,26 @@ import ProductModal from './components/ProductModal'
 import StatusModal from './components/StatusModal'
 import UploadModal from './components/UploadModal'
 
+const GetProjectGroup = gql`
+  query GetProjectGroup($id: Uuid!) {
+    projectGroup(id: $id) {
+      id
+      description
+      enabled
+      name
+      defaultProject {
+        id
+      }
+      projects {
+        id
+        name
+      }
+    }
+  }
+`
+
 const SettingsTag = ({ icon, label, settings }) => {
   const scanColor = useColorModeValue('blackAlpha', 'whiteAlpha')
-
   return (
     <Tooltip label={`${label} ${settings ? 'Enabled' : 'Disabled'}`}>
       <IconButton
@@ -90,7 +106,7 @@ const SettingsTag = ({ icon, label, settings }) => {
 }
 
 const ProductDetailsMain = () => {
-  const { isFreeTier, orgQueryLoading } = useGlobalQueryContext()
+  const { isFreeTier } = useGlobalQueryContext()
   const navigate = useNavigate()
   const params = useParams()
   const productId = params.productid
@@ -114,7 +130,6 @@ const ProductDetailsMain = () => {
         tab: tabs[value]
       }
     })
-
     navigate(link)
   }
 
@@ -141,7 +156,6 @@ const ProductDetailsMain = () => {
   const { dispatch, envName } = useGlobalState()
 
   const { prodVulnDispatch } = dispatch
-  const environment = envName
   const [activeEnv, setActiveEnv] = useState(productId || '')
 
   const updateProduct = useHasPermission({
@@ -164,8 +178,7 @@ const ProductDetailsMain = () => {
     variables: { id: productGroupId }
   })
 
-  const { projectGroup } = data || ''
-  const { name, description, enabled, projects } = projectGroup || ''
+  const { id, name, description, enabled, projects, defaultProject } = data?.projectGroup || ''
 
   const { data: settings, loading: settingsLoading } = useQuery(
     GetProjectSettings,
@@ -262,39 +275,19 @@ const ProductDetailsMain = () => {
 
   const [projectDelete] = useMutation(DeleteProjectGroup)
 
-  const {
-    isOpen: isOpenProduct,
-    onOpen: onOpenProduct,
-    onClose: onCloseProduct
-  } = useDisclosure()
-  const {
-    isOpen: isOpenUpload,
-    onOpen: onOpenUpload,
-    onClose: onCloseUpload
-  } = useDisclosure()
-  const {
-    isOpen: isWarningOpen,
-    onOpen: onWarningOpen,
-    onClose: onWarningClose
-  } = useDisclosure()
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose
-  } = useDisclosure()
-  const { isOpen: isEnvOpen, onClose: onEnvClose } = useDisclosure()
-  const {
-    isOpen: isOpenProductProgress,
-    onOpen: onOpenProductProgress,
-    onClose: onCloseProductProgress
-  } = useDisclosure()
+  const PRODUCT = useDisclosure()
+  const UPLOAD = useDisclosure()
+  const WARNING = useDisclosure()
+  const DELETE = useDisclosure()
+  const PROGRESS = useDisclosure()
+  const ENV = useDisclosure()
 
   // DELETE PRODUCT
   const onProductDelete = async () => {
     await projectDelete({
       variables: { id: productGroupId }
     })
-      .then((res) => res.data && onDeleteClose())
+      .then((res) => res.data && DELETE.onClose())
       .finally(() => navigate('/vendor/products'))
   }
 
@@ -305,13 +298,11 @@ const ProductDetailsMain = () => {
   }, [prodVulnDispatch, sbomId])
 
   useEffect(() => {
-    if (environment && data) {
-      const env = data?.projectGroup?.projects.find(
-        (item) => item.name === environment
-      )
+    if (envName && projects) {
+      const env = projects?.find((item) => item.name === envName)
       setActiveEnv(env?.id)
     }
-  }, [data, environment])
+  }, [projects, envName])
 
   useEffect(() => {
     if (shouldShowDemoFeatures) {
@@ -336,7 +327,7 @@ const ProductDetailsMain = () => {
     }))
   }
 
-  if (loading || orgQueryLoading) {
+  if (loading) {
     return (
       <Card>
         <Flex width={'100%'} gap={4} direction={'row'}>
@@ -460,7 +451,7 @@ const ProductDetailsMain = () => {
                         <IconButton
                           icon={<FaDiagramProject />}
                           colorScheme='blue'
-                          onClick={onOpenProductProgress}
+                          onClick={PROGRESS.onOpen}
                         />
                       </Tooltip>
                     )}
@@ -473,7 +464,7 @@ const ProductDetailsMain = () => {
                           !enabled || !updateProduct || signedUrlParams
                         }
                         colorScheme='blue'
-                        onClick={onOpenProduct}
+                        onClick={PRODUCT.onOpen}
                         icon={<FaPenToSquare />}
                       />
                     </Tooltip>
@@ -484,7 +475,7 @@ const ProductDetailsMain = () => {
                           !enabled || signedUrlParams || !canCreateSBOM
                         }
                         colorScheme='blue'
-                        onClick={onOpenUpload}
+                        onClick={UPLOAD.onOpen}
                         icon={<FaUpload />}
                       />
                     </Tooltip>
@@ -494,7 +485,7 @@ const ProductDetailsMain = () => {
                     >
                       <IconButton
                         colorScheme={'blue'}
-                        onClick={onWarningOpen}
+                        onClick={WARNING.onOpen}
                         isDisabled={signedUrlParams || !updateProduct}
                         icon={enabled ? <FaToggleOff /> : <FaToggleOn />}
                       />
@@ -503,7 +494,7 @@ const ProductDetailsMain = () => {
                     <Tooltip label='Delete Product'>
                       <IconButton
                         colorScheme='red'
-                        onClick={onDeleteOpen}
+                        onClick={DELETE.onOpen}
                         icon={<FaTrash />}
                         isDisabled={!archiveProduct || signedUrlParams}
                       />
@@ -515,7 +506,7 @@ const ProductDetailsMain = () => {
           </CardBody>
         </Card>
         {/* PRODUCT GRAPHS */}
-        <ProductGraphs />
+        {shouldShowDemoFeatures && <ProductGraphs />}
         {/* TAB SECTION */}
         <Card display={data ? 'block' : 'none'}>
           <CardBody>
@@ -550,7 +541,6 @@ const ProductDetailsMain = () => {
                   <VersionsTable
                     handleSort={handleSort}
                     filters={versionFilters}
-                    projectGroup={projectGroup}
                     setFilters={setVersionFilters}
                     retentionTime={dataRetentionDays}
                   />
@@ -589,13 +579,13 @@ const ProductDetailsMain = () => {
                   >
                     Automation is disabled under Product Settings
                   </Tag>
-                  {<Automation projects={projects} />}
+                  {<Automation />}
                 </TabPanel>
                 {/* SETTINGS */}
                 <TabPanel px={0}>
                   <Settings
                     data={projectSetting}
-                    enabled={projectGroup?.enabled}
+                    enabled={enabled}
                     mfc={mfc?.organizationManufacturers}
                   />
                 </TabPanel>
@@ -618,49 +608,48 @@ const ProductDetailsMain = () => {
       </Flex>
 
       {/* CREATE PRODUCT */}
-      {data && isOpenProduct && (
+      {PRODUCT.isOpen && (
         <ProductModal
-          onClose={onCloseProduct}
-          isOpen={isOpenProduct}
-          data={projectGroup}
+          onClose={PRODUCT.onClose}
+          isOpen={PRODUCT.isOpen}
+          data={{ id, name, description }}
         />
       )}
 
       {/* VIEW PRODUCT PROGRESS */}
-      {isOpenProductProgress && (
+      {PROGRESS.isOpen && (
         <ProductProgressModal
-          onClose={onCloseProductProgress}
-          isOpen={isOpenProductProgress}
+          onClose={PROGRESS.onClose}
+          isOpen={PROGRESS.isOpen}
           name={name}
         />
       )}
 
       {/* UPLOAD SBOM */}
-      {isOpenUpload && data && (
+      {UPLOAD.isOpen && (
         <UploadModal
-          data={projectGroup}
-          isOpen={isOpenUpload}
-          onClose={onCloseUpload}
-          activeEnv={activeEnv}
+          isOpen={UPLOAD.isOpen}
+          onClose={UPLOAD.onClose}
+          group={{ id, name, default: defaultProject?.id }}
         />
       )}
 
       {/* DISABLED */}
-      {isWarningOpen && data && (
+      {WARNING.isOpen && (
         <StatusModal
           reset={reset}
-          isOpen={isWarningOpen}
-          onClose={onWarningClose}
-          group={projectGroup}
+          isOpen={WARNING.isOpen}
+          onClose={WARNING.onClose}
+          group={{ id, enabled }}
           grouId={productId}
         />
       )}
 
       {/* DELETE */}
-      {isDeleteOpen && (
+      {DELETE.isOpen && (
         <ConfirmationModal
-          isOpen={isDeleteOpen}
-          onClose={onDeleteClose}
+          isOpen={DELETE.isOpen}
+          onClose={DELETE.onClose}
           onConfirm={onProductDelete}
           name={name}
           title='Delete Product'
@@ -674,10 +663,10 @@ const ProductDetailsMain = () => {
       )}
 
       {/* ENV LIST */}
-      {isEnvOpen && (
+      {ENV.isOpen && (
         <EnvironmentDrawer
-          isOpen={isEnvOpen}
-          onClose={onEnvClose}
+          isOpen={ENV.isOpen}
+          onClose={ENV.onClose}
           data={data}
           activeEnv={activeEnv}
           setActiveEnv={setActiveEnv}

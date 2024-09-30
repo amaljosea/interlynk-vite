@@ -28,12 +28,11 @@ const DeleteRole = ({ isOpen, onClose, activeRole }) => {
   const { data: userData } = useQuery(GetUsers, { skip: !orgView })
   const { users } = userData?.organization || ''
   const filterUsers = users?.filter((user) => user?.role?.id === id)
-  console.log('filterUsers', filterUsers)
 
   const [updateUserRole] = useMutation(OrganizationRoleBulkApply)
   const [deleteRole] = useMutation(OrganizationRoleDelete)
 
-  const { data } = useQuery(GetRoles)
+  const { data } = useQuery(GetRoles, { skip: isOpen ? false : true })
   const { organizationRoles } = data?.organization || ''
 
   const filterRoles = organizationRoles?.filter((item) => item?.name !== name)

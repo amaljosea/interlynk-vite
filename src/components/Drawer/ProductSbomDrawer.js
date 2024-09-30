@@ -37,7 +37,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { CreateComponent, sbomCreate } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
 
-function ProductSbomDrawer({ isOpen, onClose, data }) {
+function ProductSbomDrawer({ isOpen, onClose }) {
   const params = useParams()
   const { showToast } = useCustomToast()
   const customerView = isCustomerView()
@@ -268,7 +268,7 @@ function ProductSbomDrawer({ isOpen, onClose, data }) {
               <LicenseField
                 sbomView={false}
                 isDisabled={customerView}
-                license={data?.licensesExp}
+                license={null}
               />
               {/* SCOPE */}
               <FormControl>

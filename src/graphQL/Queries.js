@@ -1,11 +1,28 @@
 import { gql } from '@apollo/client'
 
 // GET ORG NAME
-export const GetOrgName = gql`
-  query GetOrgName {
+export const getOrganization = gql`
+  query getOrganization {
     organization {
+      id
       name
       tier
+      updatedAt
+      currentUser {
+        id
+        name
+        email
+        superAdmin
+        unconfirmedEmail
+        profileImage {
+          filename
+          url
+        }
+        role {
+          id
+          name
+        }
+      }
     }
   }
 `

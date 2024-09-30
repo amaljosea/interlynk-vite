@@ -1,10 +1,9 @@
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { formatDistanceToNow } from 'date-fns'
 import Cookies from 'js-cookie'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { isCustomerView, validPassword } from 'utils'
-import { displayErrorMessage } from 'utils'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
 import {
@@ -38,7 +37,6 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Skeleton,
   Spinner,
   Tag,
   TagLabel,
@@ -55,62 +53,21 @@ import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import {
-  SwitchOrganization,
-  UpdateUserPassword,
-  UploadProfileImage,
-  updateOrgUser
-} from 'graphQL/Mutation'
-import { orgUpdate } from 'graphQL/Mutation'
-import { AllOrganizations, GetRoles, MyOrganizations } from 'graphQL/Queries'
+import { SwitchOrganization, UpdateUserPassword } from 'graphQL/Mutation'
+import { orgUpdate, UploadProfileImage, updateOrgUser } from 'graphQL/Mutation'
+import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
 
 import { FaExchangeAlt } from 'react-icons/fa'
 import { FaCity } from 'react-icons/fa'
 
-const GetCurrentUser = gql`
-  query GetCurrentUser {
-    organization {
-      currentUser {
-        id
-        name
-        email
-        superAdmin
-        profileImage {
-          filename
-          url
-        }
-      }
-    }
-  }
-`
-
-const GetOrganization = gql`
-  query GetOrganization {
-    organization {
-      id
-      name
-      tier
-      updatedAt
-      currentUser {
-        superAdmin
-        role {
-          id
-          name
-        }
-      }
-    }
-  }
-`
-
 const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const location = useLocation()
   const customerView = isCustomerView()
-  const userName = localStorage.getItem('username')
   const [profileImage, setProfileImage] = useState(null)
-  const [newUserName, setNewUserName] = useState(userName)
+  const [newUserName, setNewUserName] = useState('')
   const [nameError, setNameError] = useState('')
   const [oldPassword, setOldPassword] = useState('')
   const [showOldPass, setShowOldPass] = useState(false)
@@ -121,7 +78,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const [invalidPassword, setInvalidPassword] = useState(false)
   const [passError, setPassError] = useState('')
   const [isPasswordEdit, setIsPasswordEdit] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
   const [orgName, setOrgName] = useState('')
   const [dpLoading, setDpLoading] = useState(false)
@@ -145,27 +101,16 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
   const cityIconColor = useColorModeValue('#3182CE', '#3182CE')
 
-  const [updateOrg] = useMutation(orgUpdate)
+  const [updateOrg, { loading: updateLoading }] = useMutation(orgUpdate)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const { organization: orgData } = useGlobalState()
 
-  const { orgView, error } = useGlobalQueryContext()
-
-  const { data, loading } = useQuery(GetCurrentUser, {
-    skip: !orgView
-  })
-  const isSuperAdmin = data?.organization?.currentUser?.superAdmin
-  const { organization } = data || ''
-  const { id, name, profileImage: dp } = organization?.currentUser || ''
-
-  const { data: org, loading: orgLoading } = useQuery(GetOrganization, {
-    skip: !orgView
-  })
-
-  const userOrganization = org?.organization?.name
-  const activeOrgId = org?.organization?.id
-  const activeOrgTier = org?.organization?.tier
-  const lastUpdated = org?.organization?.updatedAt
+  const isSuperAdmin = orgData?.currentUser?.superAdmin
+  const { id, name, profileImage: dp } =  orgData?.currentUser || ''
+  const activeOrgId = orgData?.id
+  const activeOrgTier = orgData?.tier
+  const lastUpdated = orgData?.updatedAt
   const timeAgo =
     lastUpdated &&
     formatDistanceToNow(new Date(lastUpdated), {
@@ -185,11 +130,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
   const organisationList = isSuperAdmin ? allOrgList : myOrgList
 
-  const { data: roles } = useQuery(GetRoles)
-  const role = roles?.organization?.currentUser?.role?.name
-
-  const [updateUser] = useMutation(updateOrgUser)
-  const [updatePassword] = useMutation(UpdateUserPassword)
+  const [updateUser, { loading: userLoading }] = useMutation(updateOrgUser)
+  const [updatePassword, { loading: passLoading }] =
+    useMutation(UpdateUserPassword)
   const [switchOrg] = useMutation(SwitchOrganization)
   const [uploadProfile] = useMutation(UploadProfileImage)
 
@@ -220,7 +163,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   } = useDisclosure()
 
   const resetStates = () => {
-    setNewUserName(userName)
     setNameError('')
     setIsPasswordEdit(false)
     setOldPassword('')
@@ -352,14 +294,13 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   }
 
   const handleUpdateName = async () => {
-    if (localStorage.getItem('username') === newUserName) {
+    if (orgData?.currentUser?.name === newUserName) {
       return
     }
     await updateUser({
       variables: { id: id, name: newUserName }
     }).then((res) => {
       if (res.data.userUpdate.errors.length === 0) {
-        localStorage.setItem('username', newUserName)
         showToast({
           description: 'User Name updated successfully',
           status: 'success'
@@ -437,20 +378,16 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   }
 
   const handleUpdateOrgName = async () => {
-    if (localStorage.getItem('organization', orgName) === orgName) {
+    if (orgData?.name === orgName) {
       onOrgInfoClose()
       return
     }
-    setIsSaving(true)
     await updateOrg({
       variables: {
         name: orgName
       }
     }).then((res) => {
-      if (res.data.organizationUpdate.errors.length === 0) {
-        localStorage.setItem('organization', orgName)
-
-        setIsSaving(false)
+      if (res?.data?.organizationUpdate?.errors.length === 0) {
         showToast({
           description: 'Organization name updated successfully',
           status: 'success'
@@ -461,12 +398,10 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   }
 
   const handleSave = async () => {
-    setIsSaving(true)
-
     if (
       nameError === '' &&
       newUserName.trim() !== '' &&
-      newUserName !== userName
+      newUserName !== name
     ) {
       // Check if there's a valid change to the name and no errors
       await handleUpdateName()
@@ -483,12 +418,13 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
       await handleUpdatePassword()
     }
 
-    setIsSaving(false)
-
     // Close the modal after saving changes
     onPersonalModalClose()
     resetStates()
   }
+
+  const isOrg =  selectedTab === 'ORGANIZATION'
+  const isPersonal =  selectedTab === 'PERSONAL'
 
   useEffect(() => {
     if (dp) {
@@ -505,16 +441,11 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   }, [SERVER_URL, dp])
 
   useEffect(() => {
-    if (org?.organization) {
-      setOrgName(org?.organization?.name)
+    if(orgData) {
+      setOrgName(orgData?.name)
+      setNewUserName(orgData?.currentUser?.name)
     }
-  }, [org])
-
-  useEffect(() => {
-    if (data) {
-      setNewUserName(name)
-    }
-  }, [data, name])
+  }, [orgData])
 
   useEffect(() => {
     if (location.state?.openOrgListDrawer) {
@@ -545,16 +476,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     confirmPassword
   ])
 
-  if (error) {
-    return (
-      <LynkAlert
-        msg={displayErrorMessage(
-          error?.networkError?.statusCode,
-          error?.message
-        )}
-      />
-    )
-  }
+  if (!orgData) return <LynkAlert msg={'An internal error occured. Please retry later'} />
 
   return (
     <>
@@ -565,11 +487,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
         <Menu>
           <MenuButton
             as={Button}
-            fontSize='sm'
             colorScheme='blue'
-            fontWeight='medium'
-            textTransform='capitalize'
-            display={!organization ? 'none' : 'block'}
+            display={!orgData ? 'none' : 'block'}
+            sx={{fontSize:'sm', fontWeight:'medium',textTransform:'capitalize'}}
           >
             <Flex align='center'>
               {/* Left Icon */}
@@ -622,134 +542,91 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
             textAlign={{ sm: 'center', md: 'start' }}
           >
             {/* PROFILE IMAGE */}
-            {selectedTab === 'PERSONAL' && (
+            {isPersonal && (
               <Box
-                width='80px'
-                height='80px'
-                overflow='hidden'
-                position='relative'
                 borderRadius='full'
+                sx={{w:'80px', h:'80px', overflow:'hidden', position:'relative'}}
               >
-                {dpLoading || loading ? (
+                {dpLoading ? (
                   <Spinner width='80px' height='80px' />
                 ) : (
                   <Avatar
-                    width='80px'
-                    height='80px'
-                    objectFit='cover'
-                    borderRadius='full'
                     me={{ md: '22px' }}
                     src={profileImage}
-                    name={userName}
+                    name={name}
                     ignoreFallback={dp || profileImage ? true : false}
+                    sx={{w:'80px',h:'80px', objectFit:'cover', borderRadius:'full'}}
                   />
                 )}
 
                 <Input
-                  top='0'
-                  left='0'
                   type='file'
-                  opacity='0'
-                  zIndex={-1}
-                  width='80px'
-                  height='80px'
                   ref={inputRef}
                   cursor='pointer'
                   position='absolute'
-                  isDisabled={!organization}
+                  isDisabled={!orgData}
                   onChange={handleFileChange}
                   accept='.jpg,.jpeg,.png,.webp'
+                  sx={{ w: '80px', h: '80px', top: 0, left: 0, opacity: 0, zIndex: -1 }}
                 />
                 <Box
-                  top='0'
-                  left='0'
-                  opacity='0'
-                  width='80px'
-                  height='80px'
-                  cursor='pointer'
                   position='absolute'
                   borderRadius='full'
                   bg='rgba(0,0,0,0.2)'
                   onClick={onProfileClick}
                   transition='opacity 0.3s'
-                  _hover={{ opacity: organization ? 1 : 0 }}
+                  _hover={{ opacity: orgData ? 1 : 0 }}
+                  sx={{ w: '80px', h: '80px', top: 0, left: 0, opacity: 0, cursor: 'pointer' }}
                 />
               </Box>
             )}
             {/*  CityIcon for org page */}
-            {selectedTab === 'ORGANIZATION' && (
-              <FaCity size='80px' style={{ color: cityIconColor }} />
-            )}
+            { isOrg && <FaCity size='80px' style={{ color: cityIconColor }} /> }
 
             <Flex direction='column' maxWidth='100%' my={{ sm: '14px' }}>
-              {orgLoading ? (
-                <>
-                  <Skeleton height='20px' width='150px' mb={2} />
-                  <Skeleton height='20px' width='200px' />
-                </>
-              ) : (
-                <>
-                  <Box display={'flex'} gap={'10px'} alignItems={'center'}>
-                    <Text
-                      fontWeight={'semibold'}
-                      fontSize={22}
-                      color={primaryTextColor}
-                      ms={{ sm: '8px', md: '0px' }}
-                    >
-                      {selectedTab === 'ORGANIZATION'
-                        ? userOrganization
-                        : name || userName}
-                    </Text>
-                    {selectedTab === 'PERSONAL' && (
-                      <Tag
-                        size={'sm'}
-                        variant='solid'
-                        colorScheme='blue'
-                        w={'fit-content'}
-                      >
-                        <TagLabel textTransform={'capitalize'}>{role}</TagLabel>
-                      </Tag>
-                    )}
-                  </Box>
-
-                  <Text
-                    fontSize={'sm'}
-                    wordBreak={'break-all'}
-                    textTransform={'capitalize'}
+              <Box display={'flex'} gap={'10px'} alignItems={'center'}>
+                <Text
+                  ms={{ sm: '8px', md: '0px' }}
+                  sx={{fontWeight:'semibold', fontSize:22, color: primaryTextColor}}
+                >
+                  {isPersonal ? orgData?.currentUser?.name : orgData?.name}
+                </Text>
+                {isPersonal && (
+                  <Tag
+                    size={'sm'}
+                    variant='solid'
+                    colorScheme='blue'
+                    sx={{ w: 'fit-content', pt: 0.8 }}
                   >
-                    {selectedTab === 'ORGANIZATION'
-                      ? `${activeOrgTier} · Updated ${timeAgo}`
-                      : userOrganization}
-                  </Text>
-                </>
-              )}
+                    <TagLabel textTransform={'capitalize'}>
+                      {orgData?.currentUser?.role?.name}
+                    </TagLabel>
+                  </Tag>
+                )}
+              </Box>
+              <Text
+                sx={{ fontSize:'sm', wordBreak:'break-all' }}
+                textTransform={'capitalize'}
+              >
+                {isOrg ? `${activeOrgTier} · Updated ${timeAgo}` : orgData?.name}
+              </Text>
             </Flex>
           </Flex>
           <Flex gap={2}>
             <Tooltip
-              label={
-                selectedTab === 'PERSONAL'
-                  ? 'Switch Organization'
-                  : 'Edit Organization'
-              }
+              label={ isPersonal ? 'Switch Organization' : 'Edit Organization' }
               placement={'left'}
             >
               <IconButton
-                aria-label='Edit'
-                icon={
-                  selectedTab === 'PERSONAL' ? <FaExchangeAlt /> : <EditIcon />
-                }
-                colorScheme='blue'
                 variant='solid'
-                onClick={
-                  selectedTab === 'PERSONAL'
-                    ? switchOrgClick
-                    : handleEditOrgClick
-                }
+                aria-label='Edit'
+                colorScheme='blue'
+                icon={isPersonal ? <FaExchangeAlt /> : <EditIcon />}
+                onClick={isPersonal ? switchOrgClick : handleEditOrgClick}
               />
             </Tooltip>
 
-            {selectedTab === 'PERSONAL' && (
+            {isPersonal && (
               <Tooltip label='Edit Profile'>
                 <IconButton
                   aria-label='Edit'
@@ -788,12 +665,12 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
               Profile picture
             </Text>
             <Flex alignItems='center' mb={4} height={'48px'}>
-              {dpLoading || loading ? (
+              {dpLoading ? (
                 <Spinner />
               ) : (
                 <Avatar
-                  name={userName}
                   ml='10px'
+                  name={name}
                   src={profileImage}
                   ignoreFallback={dp || profileImage ? true : false}
                 />
@@ -861,10 +738,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     />
                     <InputRightElement width='3.1rem'>
                       <IconButton
-                        h='1.75rem'
                         size='sm'
-                        bg='transparent'
                         onClick={onToggleOldPass}
+                        sx={{ h: '1.75rem', bg: 'transparent' }}
                         icon={showOldPass ? <ViewOffIcon /> : <ViewIcon />}
                       />
                     </InputRightElement>
@@ -890,10 +766,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     />
                     <InputRightElement width='3.1rem'>
                       <IconButton
-                        h='1.75rem'
                         size='sm'
-                        bg='transparent'
                         onClick={onToggleNewPass}
+                        sx={{ h: '1.75rem', bg: 'transparent' }}
                         icon={showNewPass ? <ViewOffIcon /> : <ViewIcon />}
                       />
                     </InputRightElement>
@@ -935,10 +810,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     />
                     <InputRightElement width='3.1rem'>
                       <IconButton
-                        h='1.75rem'
                         size='sm'
-                        bg='transparent'
                         onClick={onToggleConfirmPass}
+                        sx={{ h: '1.75rem', bg: 'transparent' }}
                         icon={showConfPass ? <ViewOffIcon /> : <ViewIcon />}
                       />
                     </InputRightElement>
@@ -967,11 +841,12 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 Cancel
               </Button>
               <Button
-                isDisabled={isSaveDisabled}
                 colorScheme='blue'
                 onClick={handleSave}
+                isDisabled={isSaveDisabled}
+                isLoading={userLoading || passLoading}
               >
-                {isSaving ? 'saving...' : 'Save'}
+                Save
               </Button>
             </Flex>
           </DrawerFooter>
@@ -1014,12 +889,10 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     </Text>
                     {org.id === activeOrgId && (
                       <Tag
-                        width='fit-content'
                         variant='subtle'
                         colorScheme='white'
-                        textTransform='capitalize'
                         borderColor={primaryBlueText}
-                        borderWidth='1px'
+                        sx={{w:'fit-content', borderWidth:'1px', textTransform:'capitalize'}}
                       >
                         <TagLabel
                           fontSize={'12px'}
@@ -1034,8 +907,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   {/* Display tier below the name and admin */}
                   <Text
                     textColor={'gray.500'}
-                    textTransform='capitalize'
-                    fontSize={'12px'}
+                    sx={{fontSize:'12px', textTransform:'capitalize'}}
                   >
                     {org.tier}
                   </Text>
@@ -1043,12 +915,10 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 {activeOrgId !== org.id && (
                   <Tooltip placement={'left'} label={`Switch to ${org.name}`}>
                     <IconButton
+                      variant='solid'
                       aria-label='Switch'
                       icon={<FaExchangeAlt color={switchIconColor} />}
-                      border='1px'
-                      borderColor='gray.200'
-                      bg={switchBgColor}
-                      variant='solid'
+                      sx={{border:'1px', borderColor:'gray.200', bg: switchBgColor}}
                       onClick={() => {
                         setActiveRow({ id: org.id, name: org.name })
                         onWarningOpen()
@@ -1059,15 +929,12 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
               </Box>
             ))}
             <Button
-              aria-label='Add Organization'
+              onClick={onOpen}
               colorScheme='white'
               leftIcon={<AddIcon />}
-              marginTop='10px'
-              fontWeight='500'
-              textColor={primaryBlueText}
-              border='1px'
               borderColor={primaryBlueText}
-              onClick={onOpen}
+              aria-label='Add Organization'
+              sx={{ fontWeight:'500', textColor: primaryBlueText, border:'1px', mt:'10px' }}
             >
               Add Organization
             </Button>
@@ -1104,10 +971,10 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
             <Button
               colorScheme='blue'
-              width={'100px'}
+              isLoading={updateLoading}
               onClick={handleUpdateOrgName}
             >
-              {isSaving ? 'Updating...' : 'Update'}
+              Update
             </Button>
           </DrawerBody>
         </DrawerContent>

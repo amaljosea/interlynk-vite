@@ -28,7 +28,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 function SidebarResponsive(props) {
-  const { isFreeTier, orgQueryLoading } = useGlobalQueryContext()
+  const { isFreeTier } = useGlobalQueryContext()
   // to check for active links and opened collapses
   let location = useLocation()
   // this is for the rest of the collapses
@@ -88,13 +88,6 @@ function SidebarResponsive(props) {
         )
       }
 
-      if (orgQueryLoading) {
-        return (
-          <Flex align='center' justify='center' h='100vh'>
-            <Spinner />
-          </Flex>
-        )
-      }
       return (
         <NavLink to={prop.layout + prop.path} key={prop.name}>
           {activeRoute(prop.layout + prop.path) === 'active' ? (
