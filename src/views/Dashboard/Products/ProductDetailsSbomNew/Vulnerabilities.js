@@ -9,11 +9,7 @@ import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  ExternalLinkIcon
-} from '@chakra-ui/icons'
+import { ChevronDownIcon, ChevronUpIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import {
   Badge,
   Box,
@@ -79,7 +75,6 @@ import {
   FaBug,
   FaBullhorn,
   FaCopy,
-  FaEye,
   FaLink,
   FaListCheck,
   FaPen
@@ -101,38 +96,9 @@ const statusColor = (status) => {
   }
 }
 
-const getUrl = (url) => {
-  if (url?.startsWith('http')) {
-    return url
-  } else {
-    return `http://${url}`
-  }
-}
-
-const LynkIcon = ({ icon, disabled }) => {
-  return (
-    <IconButton
-      size='xs'
-      icon={icon}
-      type='button'
-      variant='solid'
-      colorScheme='gray'
-      isDisabled={disabled}
-    />
-  )
-}
-
 const ExpandedComponent = (props) => {
-  const { data, setActiveRow, onCvssOpen, textColor, isArchived } = props
-  const {
-    vuln,
-    isPart,
-    fixedVersions,
-    lastAffectedVersions,
-    currentExternalUrls,
-    externalUrls
-  } = data
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { data, setActiveRow, onCvssOpen, isArchived } = props
+  const { vuln, isPart, fixedVersions, lastAffectedVersions, currentExternalUrls, externalUrls } = data
   const advisories = isPart
     ? currentExternalUrls?.find((item) => item.name === 'advisories')
     : externalUrls?.find((item) => item.name === 'advisories')
@@ -150,6 +116,9 @@ const ExpandedComponent = (props) => {
     text-transform: uppercase;
     letter-spacing: 0.6px;
   `
+  const { primaryBlueText, primaryTextColor } = useThemeColor(['primaryBlueText','primaryTextColor'])
+  const onCheck = (item) => (item ? primaryBlueText : primaryTextColor)
+
   return (
     <Box
       width={'100%'}
@@ -159,16 +128,13 @@ const ExpandedComponent = (props) => {
       <Grid templateColumns='repeat(5, 1fr)' gap={12} py={2}>
         {/* VULN DATA */}
         <GridItem
-          w='100%'
           colSpan={2}
-          display={'flex'}
-          flexDirection={'column'}
-          gap={4}
+          sx={{w:'100%', gap:4, display:'flex', flexDir:'column'}}
         >
           {/* Description */}
           <Box>
             <CustomText>Description :</CustomText>
-            <Text color={textColor} mt={1} fontSize={14}>
+            <Text color={primaryTextColor} mt={1} fontSize={14}>
               {vuln.desc}
             </Text>
           </Box>
@@ -179,31 +145,31 @@ const ExpandedComponent = (props) => {
               {/* advisories */}
               <ExternalLink
                 link={advisories}
-                icon={<FaBullhorn color={textColor} fontSize={16} />}
+                icon={<FaBullhorn color={onCheck(advisories)} fontSize={16} />}
               />
               {/* documentation */}
               <ExternalLink
                 link={documentation}
-                icon={<FaBookOpen color={textColor} fontSize={16} />}
+                icon={<FaBookOpen color={onCheck(documentation)} fontSize={16} />}
               />
               {/* other */}
               <ExternalLink
                 link={other}
-                icon={<FaLink color={textColor} fontSize={16} />}
+                icon={<FaLink color={onCheck(other)} fontSize={16} />}
               />
             </Stack>
           </Box>
           {/* Published At  */}
           <Box>
             <CustomText>Published:</CustomText>
-            <Text color={textColor} mt={1} fontSize={14}>
+            <Text color={primaryTextColor} mt={1} fontSize={14}>
               {getFullDateAndTime(vuln.publishedAt)}
             </Text>
           </Box>
           {/* Last Modified At */}
           <Box>
             <CustomText>Last Modified:</CustomText>
-            <Text color={textColor} mt={1} fontSize={14}>
+            <Text color={primaryTextColor} mt={1} fontSize={14}>
               {getFullDateAndTime(vuln.lastModifiedAt)}
             </Text>
           </Box>
@@ -267,22 +233,22 @@ const ExpandedComponent = (props) => {
             <Box>
               <CustomText>NVD Alias ID:</CustomText>
               <Flex
-                width={'fit-content'}
-                mt={1}
                 direction='row'
-                alignItems={'center'}
-                gap={2}
+                sx={{w:'fit-content', mt:1, gap:2, alignItems:'center'}}
               >
                 <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
                   <Icon
                     as={ExternalLinkIcon}
-                    h={'16px'}
-                    w={'16px'}
+                    sx={{w:'16px', h:'16px'}}
                     color={primaryBlueText}
                   />
                 </Link>
                 <Tooltip label={vuln.nvdAliasId} placement={'top'}>
-                  <Text width={'fit-content'} fontSize='sm' color={textColor}>
+                  <Text
+                    width={'fit-content'}
+                    fontSize='sm'
+                    color={primaryTextColor}
+                  >
                     {vuln.nvdAliasId}
                   </Text>
                 </Tooltip>
@@ -292,7 +258,7 @@ const ExpandedComponent = (props) => {
           {/* EPSS Percentile */}
           <Box>
             <CustomText>EPSS Percentile :</CustomText>
-            <Text color={textColor} mt={1} fontSize={14}>
+            <Text color={primaryTextColor} mt={1} fontSize={14}>
               {vuln?.vulnInfo?.epssPercentile
                 ? (vuln?.vulnInfo?.epssPercentile * 100).toFixed()
                 : 0}{' '}
@@ -428,17 +394,11 @@ const Vulnerabilities = ({ sbomData }) => {
   const [selectedVulns, setSelectedVulns] = useState([])
   const [selectedGroup, setSelectedGroup] = useState('')
 
-  const {
-    isOpen: isLinkOpen,
-    onOpen: onLinkOpen,
-    onClose: onLinkClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isJiraOpen,
-    onOpen: onJiraOpen,
-    onClose: onJiraClose
-  } = useDisclosure()
+  const VEX = useDisclosure()
+  const LINK = useDisclosure()
+  const JIRA = useDisclosure()
+  const CVSS = useDisclosure()
+  const IMPORT = useDisclosure()
 
   // GET VULN FILTER HEADS
   useQuery(signedUrlParams ? ShareVulnFilters : GetVulnFilterData, {
@@ -475,18 +435,6 @@ const Vulnerabilities = ({ sbomData }) => {
     )
   }
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isCvssOpen,
-    onOpen: onCvssOpen,
-    onClose: onCvssClose
-  } = useDisclosure()
-  const {
-    isOpen: isTableOpen,
-    onOpen: onTableOpen,
-    onClose: onTableClose
-  } = useDisclosure()
-
   const cvssColor = (cvss) => {
     if (cvss >= 9.0) {
       return 'red'
@@ -512,7 +460,7 @@ const Vulnerabilities = ({ sbomData }) => {
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vuln, isPart, component, issueTracker } = row
+        const { vuln, isPart, component } = row
         const { sbom } = component
         const { projectVersion, project } = sbom
         const { id, vulnInfo } = vuln
@@ -527,60 +475,28 @@ const Vulnerabilities = ({ sbomData }) => {
                 />
               </Link>
             </Tooltip>
-            <Tooltip label={'Global Vulnerability View'}>
-              <Stack>
-                <Icon
-                  as={FaEye}
-                  hidden={customerView}
-                  onClick={() => onGlobalView(id, vuln.vulnId)}
-                  sx={{
-                    w: '16px',
-                    h: '16px',
-                    mt: 0.5,
-                    color: primaryTextColor
-                  }}
-                />
-              </Stack>
-            </Tooltip>
             <Stack direction={'column'} spacing={1.5}>
               <Text
                 fontSize='sm'
-                color={primaryTextColor}
+                color={primaryBlueText}
                 data-tag='allowRowEvents'
+                onClick={() => onGlobalView(id, vuln.vulnId)}
               >
                 {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
               </Text>
               {isPart && (
                 <Text
-                  fontSize={'xs'}
-                  color={primaryTextColor}
                   fontWeight={'medium'}
-                  width={'fit-content'}
+                  sx={{w:'fit-content', fontSize: 'xs', color: primaryTextColor}}
                 >
                   {project?.projectGroup?.name || ''} : {projectVersion || ''}
                 </Text>
               )}
-              <Stack direction={'row'} alignItems={'center'}>
-                <Tooltip placement='top' label={issueTracker?.url}>
-                  <Link href={getUrl(issueTracker?.url)} target='_blank'>
-                    <LynkIcon
-                      disabled={!issueTracker}
-                      icon={
-                        <FaListCheck color={primaryTextColor} fontSize={16} />
-                      }
-                    />
-                  </Link>
-                </Tooltip>
-                {kev === true && (
-                  <Badge
-                    width={'fit-content'}
-                    variant='subtle'
-                    colorScheme='red'
-                  >
-                    KEV
-                  </Badge>
-                )}
-              </Stack>
+              {kev === true && (
+                <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
+                  KEV
+                </Badge>
+              )}
             </Stack>
           </Flex>
         )
@@ -598,11 +514,8 @@ const Vulnerabilities = ({ sbomData }) => {
         const isExists = fixedVersions?.length > 0
         return (
           <Stack
-            my={3}
             spacing={1}
-            direction='column'
-            cursor={'pointer'}
-            alignItems={'flex-start'}
+            sx={{my:3, cursor:'pointer', alignItems:'flex-start', direction:'column'}}
           >
             <RowComponent content={component} />
             <Flex alignItems={'center'} gap={2}>
@@ -631,9 +544,7 @@ const Vulnerabilities = ({ sbomData }) => {
           <Tag
             size='md'
             variant='subtle'
-            width={'80px'}
-            textColor={sevColor(vuln?.sev).text}
-            bg={sevColor(vuln?.sev).bg}
+            sx={{w:'80px', bg: sevColor(vuln?.sev).bg, color: sevColor(vuln?.sev).text}}
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}
@@ -662,11 +573,9 @@ const Vulnerabilities = ({ sbomData }) => {
             size='sm'
             key='md'
             variant='solid'
-            colorScheme={vuln.source === 'osv' ? 'red' : 'blue'}
             textTransform={'uppercase'}
-            width={'100%'}
-            alignItems={'center'}
-            justifyContent={'center'}
+            colorScheme={vuln.source === 'osv' ? 'red' : 'blue'}
+            sx={{w:'100%', alignItems:'center', justifyContent:'center'}}
           >
             <TagLabel>{vuln.source}</TagLabel>
           </Tag>
@@ -687,9 +596,7 @@ const Vulnerabilities = ({ sbomData }) => {
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}
-            minWidth='max-content'
-            alignItems='center'
-            gap='2'
+            sx={{minW:'max-content',alignItems:'center',gap:'2'}}
           >
             <Tag
               size='md'
@@ -722,29 +629,20 @@ const Vulnerabilities = ({ sbomData }) => {
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}
-            alignItems='center'
-            gap='0'
+            sx={{gap:0, alignItems:'center'}}
           >
             <Tooltip
               placement='top'
-              label={
-                epssScores?.length > 0
-                  ? `${(epssScores[0] * 100).toFixed(3)} %`
-                  : '-'
-              }
+              label={ epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-' }
             >
               <Tag
                 size='md'
                 key='md'
                 variant='subtle'
-                width={'100px'}
-                justifyContent='center'
-                alignItems='center'
+                sx={{w:'100px', alignItems:'center', justifyContent:'center'}}
               >
                 <TagLabel>
-                  {epssScores?.length > 0
-                    ? `${(epssScores[0] * 100).toFixed(3)} %`
-                    : '-'}
+                  {epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-'}
                 </TagLabel>
               </Tag>
             </Tooltip>
@@ -860,7 +758,7 @@ const Vulnerabilities = ({ sbomData }) => {
                     isDisabled={!editVulns}
                     onClick={() => {
                       setActiveRow(row)
-                      onLinkOpen()
+                      LINK.onOpen()
                     }}
                   >
                     Edit Links
@@ -897,7 +795,7 @@ const Vulnerabilities = ({ sbomData }) => {
                           })
                         } else {
                           setActiveRow(row)
-                          onJiraOpen()
+                          JIRA.onOpen()
                         }
                       }}
                     >
@@ -969,29 +867,15 @@ const Vulnerabilities = ({ sbomData }) => {
         }
       }
     })
-  }, [
-    onVulnScan,
-    prodVulnDispatch,
-    reset,
-    sbomData?.vulnRunStatus,
-    sbomId,
-    showToast
-  ])
+  }, [ onVulnScan, prodVulnDispatch, reset, sbomData?.vulnRunStatus, sbomId, showToast ])
 
   const subHeader = useMemo(() => {
     return (
       <Flex
-        width={'100%'}
-        alignItems={'flex-start'}
         justifyContent={'space-between'}
-        gap={2}
+        sx={{w:'100%', gap:2, alignItems:'flex-start'}}
       >
-        <Flex
-          flexDirection={'row'}
-          alignItems={'flex-start'}
-          flexWrap={'wrap'}
-          gap={3}
-        >
+        <Flex sx={{gap:3, flexWrap:'wrap', alignItems:'flex-start'}}>
           {/* SEARCH COMPONENTS */}
           <SearchFilter
             id='vuln'
@@ -1009,7 +893,7 @@ const Vulnerabilities = ({ sbomData }) => {
             <Tooltip label={'Set Status'}>
               <IconButton
                 colorScheme='blue'
-                onClick={onOpen}
+                onClick={VEX.onOpen}
                 isDisabled={!editVulns}
                 hidden={signedUrlParams}
                 icon={<FaPen />}
@@ -1034,7 +918,7 @@ const Vulnerabilities = ({ sbomData }) => {
               fontSize={'sm'}
               onClick={() => {
                 prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
-                onTableOpen()
+                IMPORT.onOpen()
               }}
               hidden={signedUrlParams || isArchived}
               isDisabled={!editVulns}
@@ -1051,10 +935,10 @@ const Vulnerabilities = ({ sbomData }) => {
     handleClear,
     handleScan,
     handleSearch,
-    onOpen,
+    VEX,
     isArchived,
     onSearchInputChange,
-    onTableOpen,
+    IMPORT,
     prodVulnDispatch,
     reset,
     selectedVulns.length,
@@ -1073,6 +957,8 @@ const Vulnerabilities = ({ sbomData }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const onCvssOpen = () => CVSS.onOpen()
+  
   useEffect(() => {
     if (configs) {
       if (!configs?.organization?.connections?.nodes[0]?.connection) {
@@ -1106,7 +992,6 @@ const Vulnerabilities = ({ sbomData }) => {
             allCdx,
             setActiveRow,
             onCvssOpen,
-            primaryTextColor,
             isArchived
           }}
           selectableRows={!signedUrlParams}
@@ -1117,29 +1002,30 @@ const Vulnerabilities = ({ sbomData }) => {
 
       {/* PAGINATION */}
       <Pagination {...paginationProps} />
-      {isLinkOpen && (
+
+      {LINK.isOpen && (
         <VulnLinkDrawer
           data={activeRow}
-          isOpen={isLinkOpen}
-          onClose={onLinkClose}
+          isOpen={LINK.isOpen}
+          onClose={LINK.onClose}
           sbomId={sbomId}
         />
       )}
-      {isJiraOpen && (
+      {JIRA.isOpen && (
         <JiraCreateIssueModal
-          isOpen={isJiraOpen}
-          onClose={onJiraClose}
+          isOpen={JIRA.isOpen}
+          onClose={JIRA.onClose}
           row={activeRow}
           defaultProject={settings?.project?.projectSetting?.jiraProject}
         />
       )}
       {/* COPY DATA TABLE */}
-      {isTableOpen && nodes && (
+      {IMPORT.isOpen && nodes && (
         <Drawer
-          isOpen={isTableOpen}
-          placement='bottom'
           size='full'
-          onClose={onTableClose}
+          placement='bottom'
+          isOpen={IMPORT.isOpen}
+          onClose={IMPORT.onClose}
         >
           <DrawerOverlay />
           <DrawerContent>
@@ -1157,17 +1043,17 @@ const Vulnerabilities = ({ sbomData }) => {
                 variant='circle'
                 currentSbomId={sbomId}
                 currentProductId={productId}
-                onClose={onTableClose}
+                onClose={IMPORT.onClose}
               />
             </DrawerBody>
           </DrawerContent>
         </Drawer>
       )}
 
-      {isOpen && selectedVulns.length > 0 && (
+      {VEX.isOpen && selectedVulns.length > 0 && (
         <VexModal
-          isOpen={isOpen}
-          onClose={onClose}
+          isOpen={VEX.isOpen}
+          onClose={VEX.onClose}
           checkEquals={true}
           selectedGroup={selectedGroup}
           selectedVulns={selectedVulns}
@@ -1177,10 +1063,10 @@ const Vulnerabilities = ({ sbomData }) => {
       )}
 
       {/* CVSS CARD */}
-      {isCvssOpen && (
+      {CVSS.isOpen && (
         <CvssCard
-          isOpen={isCvssOpen}
-          onClose={onCvssClose}
+          isOpen={CVSS.isOpen}
+          onClose={CVSS.onClose}
           value={activeRow?.vuln?.cvssVector}
         />
       )}
