@@ -84,6 +84,7 @@ const OrgRegister = ({ loading }) => {
           'organization',
           res.data.organizationCreate.organization.name
         )
+        onClose()
         onSwitchOrg(orgId, name)
       }
     })
