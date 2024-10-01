@@ -28,13 +28,10 @@ const RowComponent = ({ content }) => {
   const data = isChnagelog ? activeRow : content
   const searchInput = isChnagelog ? content?.split(' ') : ['']
   const { isOpen, onOpen, onClose } = useDisclosure()
-  useQuery(GetComponentData, {
-    skip: !isChnagelog,
-    variables: {
-      sbomId: sbomId,
-      projectId: productId,
-      search: searchInput[0]
-    },
+
+  const { loading } = useQuery(GetComponentData, {
+    skip: isOpen && isChnagelog ? false : true,
+    variables: { sbomId: sbomId, projectId: productId, search: searchInput[0] },
     onCompleted: (data) => {
       if (data) {
         const components = data?.sbom?.components?.nodes
@@ -85,17 +82,16 @@ const RowComponent = ({ content }) => {
   return (
     <>
       <Tag
-        borderRadius='md'
-        cursor={'pointer'}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        sx={{ borderRadius: 'md', cursor: 'pointer' }}
       >
         <TagLabel textColor={primaryTextColor}>{getValue()}</TagLabel>
         {isHovered && <TagRightIcon as={ViewIcon} onClick={onView} />}
         {isHovered && <TagRightIcon as={ArrowForwardIcon} onClick={onCheck} />}
       </Tag>
 
-      <ComponentCard isOpen={isOpen} onClose={onClose} data={data} />
+      <ComponentCard isOpen={isOpen} onClose={onClose} data={data} loading={loading} />
     </>
   )
 }

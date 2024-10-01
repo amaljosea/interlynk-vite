@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 
 import { Divider, Grid, Stack, Text } from '@chakra-ui/react'
 
+import CustomLoader from 'components/CustomLoader'
 import LynkModal from 'components/LynkModal'
 
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -23,10 +24,8 @@ const ListItem = ({ label, value }) => {
   )
 }
 
-const ComponentCard = ({ data, isOpen, onClose }) => {
-  const { name, version, kind, purl, licensesExp, primary, internal } =
-    data || ''
-
+const ComponentCard = ({ data, isOpen, onClose, loading }) => {
+  const { name, version, kind, purl, licensesExp, primary, internal } = data || ''
   const [pkg, setPkg] = useState(null)
 
   useEffect(() => {
@@ -48,21 +47,25 @@ const ComponentCard = ({ data, isOpen, onClose }) => {
       Icon={BiLayer}
       noFooter={true}
     >
-      <Stack spacing={2} py={3}>
-        <ListItem label={'Ecosystem'} value={pkg?.type} />
-        <Divider />
-        <ListItem label={'Name'} value={name} />
-        <Divider />
-        <ListItem label={'Version'} value={version} />
-        <Divider />
-        <ListItem label={'Type'} value={kind} />
-        <Divider />
-        <ListItem label={'License'} value={licensesExp} />
-        <Divider />
-        <ListItem label={'Primary'} value={primary ? 'Yes' : 'No'} />
-        <Divider />
-        <ListItem label={'Internal'} value={internal ? 'Yes' : 'No'} />
-      </Stack>
+      {loading ? (
+        <CustomLoader />
+      ) : (
+        <Stack spacing={2} py={3}>
+          <ListItem label={'Ecosystem'} value={pkg?.type} />
+          <Divider />
+          <ListItem label={'Name'} value={name} />
+          <Divider />
+          <ListItem label={'Version'} value={version} />
+          <Divider />
+          <ListItem label={'Type'} value={kind} />
+          <Divider />
+          <ListItem label={'License'} value={licensesExp} />
+          <Divider />
+          <ListItem label={'Primary'} value={primary ? 'Yes' : 'No'} />
+          <Divider />
+          <ListItem label={'Internal'} value={internal ? 'Yes' : 'No'} />
+        </Stack>
+      )}
     </LynkModal>
   )
 }

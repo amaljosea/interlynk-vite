@@ -29,12 +29,7 @@ import RowComponent from 'components/RowComponent'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import {
-  GetChangeLogs,
-  GetProductData,
-  GetSbomLogFilters,
-  GetVulnData
-} from 'graphQL/Queries'
+import { GetChangeLogs, GetProductData, GetSbomLogFilters, GetVulnData } from 'graphQL/Queries'
 
 import LogFilters from './LogFilters'
 
@@ -65,28 +60,12 @@ const Changelog = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { headingTextColor, primaryTextColor } = useThemeColor([ 'headingTextColor', 'primaryTextColor'])
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isUserOpen,
-    onOpen: onUserOpen,
-    onClose: onUserClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isVCardOpen,
-    onOpen: onVCardOpen,
-    onClose: onVCardClose
-  } = useDisclosure()
-  const {
-    isOpen: isVulnOpen,
-    onOpen: onVulnOpen,
-    onClose: onVulnClose
-  } = useDisclosure()
+  const PURL = useDisclosure()
+  const USER = useDisclosure()
+  const VULN = useDisclosure()
+  const VERSION = useDisclosure()
 
   const [activeRow, setActiveRow] = useState('')
   const [logSearch, setLogSearch] = useState('')
@@ -131,7 +110,7 @@ const Changelog = () => {
             vulns?.length > 0 && setActiveRow(vulns[0])
           }
         })
-        .finally(() => onVulnOpen())
+        .finally(() => VULN.onOpen())
     } else if (loggableType === 'Sbom') {
       getSbom({
         variables: {
@@ -140,7 +119,7 @@ const Changelog = () => {
         }
       })
         .then((res) => res?.data && setActiveRow(res?.data))
-        .finally(() => onVCardOpen())
+        .finally(() => VERSION.onOpen())
     }
   }
 
@@ -162,7 +141,7 @@ const Changelog = () => {
       return null
     } else {
       setActiveRow(row)
-      onUserOpen()
+      USER.onOpen()
     }
   }
 
@@ -208,11 +187,9 @@ const Changelog = () => {
               <RowComponent content={loggablePrefix} />
             ) : (
               <Tag
-                fontSize={'sm'}
                 overflow={'auto'}
-                cursor={'pointer'}
                 fontWeight={'medium'}
-                width={'fit-content'}
+                sx={{w:'fit-content', fontSize:'sm', cursor: 'pointer'}}
               >
                 <TagLabel>
                   {loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}
@@ -241,13 +218,11 @@ const Changelog = () => {
         if (event === 'purl') {
           return (
             <Text
-              my={3}
-              color={primaryTextColor}
-              cursor={'pointer'}
               onClick={() => {
                 setActiveRow(orig)
-                onOpen()
+                PURL.onOpen()
               }}
+              sx={{my:3, cursor:'pointer', color:primaryTextColor}}
             >
               {orig}
             </Text>
@@ -263,17 +238,14 @@ const Changelog = () => {
             >
               <Box textOverflow={'wrap'}>
                 {orig === 'f' ? (
-                  'False'
+                  <Text  color={primaryTextColor}>False</Text>
                 ) : orig === 't' ? (
-                  'True'
+                  <Text  color={primaryTextColor}>True</Text>
                 ) : license?.length > 0 ? (
                   license.map((item, index) => (
                     <Flex
                       key={index}
-                      flexWrap={'wrap'}
-                      gap={2}
-                      my={2}
-                      direction={'column'}
+                      sx={{my:2,gap:2, direction:'column', flexWrap:'wrap'}}
                     >
                       <Tag
                         size={'sm'}
@@ -292,10 +264,7 @@ const Changelog = () => {
                   urls.map((item, index) => (
                     <Flex
                       key={index}
-                      flexWrap={'wrap'}
-                      gap={2}
-                      my={2}
-                      direction={'column'}
+                      sx={{my:2,gap:2, direction:'column', flexWrap:'wrap'}}
                     >
                       <Tag
                         size={'sm'}
@@ -335,13 +304,11 @@ const Changelog = () => {
         if (event === 'purl') {
           return (
             <Text
-              my={3}
-              color={primaryTextColor}
-              cursor={'pointer'}
               onClick={() => {
                 setActiveRow(updated)
-                onOpen()
+                PURL.onOpen()
               }}
+              sx={{my:3, color:primaryTextColor, cursor:'pointer'}}
             >
               {updated}
             </Text>
@@ -358,17 +325,14 @@ const Changelog = () => {
             >
               <Box>
                 {updated === 'f' ? (
-                  'False'
+                  <Text  color={primaryTextColor}>False</Text>
                 ) : updated === 't' ? (
-                  'True'
+                  <Text  color={primaryTextColor}>True</Text>
                 ) : updatedValue?.length > 0 ? (
                   updatedValue.map((item, index) => (
                     <Flex
                       key={index}
-                      flexWrap={'wrap'}
-                      gap={2}
-                      my={2}
-                      direction={'column'}
+                      sx={{my:2,gap:2, direction:'column', flexWrap:'wrap'}}
                     >
                       <Tag
                         size={'sm'}
@@ -387,10 +351,7 @@ const Changelog = () => {
                   urls.map((item, index) => (
                     <Flex
                       key={index}
-                      flexWrap={'wrap'}
-                      gap={2}
-                      my={2}
-                      direction={'column'}
+                      sx={{my:2,gap:2, direction:'column', flexWrap:'wrap'}}
                     >
                       <Tag
                         size={'sm'}
@@ -429,9 +390,7 @@ const Changelog = () => {
       selector: (row) => (
         <Tooltip placement='top' label={row.changedBy}>
           <Text
-            textAlign={'right'}
-            color={primaryTextColor}
-            cursor={'pointer'}
+            sx={{textAlign:'right', color: primaryTextColor, cursor:'pointer'}}
             onClick={() => checkUser(row)}
           >
             {row.changedBy}
@@ -527,16 +486,10 @@ const Changelog = () => {
   const subHeaderComponentMemo = useMemo(() => {
     return (
       <Flex
-        width={'100%'}
-        alignItems={'center'}
+        sx={{w:'100%',alignItems:'center'}}
         justifyContent={'space-between'}
       >
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={3}
-          alignItems={'flex-start'}
-        >
+        <Flex sx={{gap:3, w:'100%',alignItems:'flex-start'}}>
           <SearchFilter
             id='changelog'
             filterText={logSearch}
@@ -552,7 +505,7 @@ const Changelog = () => {
               reset()
             }}
           />
-        </Stack>
+        </Flex>
 
         <RefreshBtn />
       </Flex>
@@ -596,28 +549,28 @@ const Changelog = () => {
         <Pagination {...paginationProps} />
       </Flex>
 
-      {isOpen && (
-        <PurlCard value={activeRow} isOpen={isOpen} onClose={onClose} />
+      {PURL.isOpen && (
+        <PurlCard value={activeRow} isOpen={PURL.isOpen} onClose={PURL.onClose} />
       )}
 
-      {isUserOpen && (
+      {USER.isOpen && (
         <UserCard
           name={activeRow?.changedBy}
-          isOpen={isUserOpen}
-          onClose={onUserClose}
+          isOpen={USER.isOpen}
+          onClose={USER.onClose}
         />
       )}
 
-      {isVCardOpen && (
+      {VERSION.isOpen && (
         <VersionCard
-          isOpen={isVCardOpen}
-          onClose={onVCardClose}
+          isOpen={VERSION.isOpen}
+          onClose={VERSION.onClose}
           data={activeRow}
         />
       )}
 
-      {isVulnOpen && (
-        <VulnCard isOpen={isVulnOpen} onClose={onVulnClose} data={activeRow} />
+      {VULN.isOpen && (
+        <VulnCard isOpen={VULN.isOpen} onClose={VULN.onClose} data={activeRow} />
       )}
     </>
   )
