@@ -131,26 +131,16 @@ const TeamTable = () => {
       id: 'name',
       name: 'NAME',
       selector: (row) => (
-        <Stack
-          spacing={row.name !== '' ? 2 : 0}
-          sx={{direction:'row', alignItems:'center'}}
-        >
-          <Text
-            color={primaryTextColor}
-            sx={{fontSize:'14px',w:'fit-content'}}
-          >
+        <Flex gap={row.name !== '' ? 2 : 0} sx={{ alignItems:'center'}}>
+          <Text color={primaryTextColor} sx={{fontSize:'14px',w:'fit-content'}}>
             {row.name}
           </Text>
           {row.email === email && (
-            <Badge
-              variant='outline'
-              colorScheme='blue'
-              sx={{py:1, px:2, borderRadius:4}}
-            >
+            <Badge variant='outline' colorScheme='blue' sx={{py:1, px:2, borderRadius:4}}>
               You
             </Badge>
           )}
-        </Stack>
+        </Flex>
       ),
       width: '21%',
       wrap: true
