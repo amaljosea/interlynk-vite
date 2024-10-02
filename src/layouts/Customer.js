@@ -1,9 +1,11 @@
+import { gql, useQuery } from '@apollo/client'
 import { TourProvider } from '@reactour/tour'
-import React, { useEffect } from 'react'
+import NotFound from 'assets/svg/not-found.svg'
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { customerRoutes } from 'routes'
+import { displayErrorMessage } from 'utils'
 
-import { Box, Flex, Stack, Text, useColorMode } from '@chakra-ui/react'
+import { Box, Center, Flex, Img, Text, useColorMode } from '@chakra-ui/react'
 
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
@@ -16,6 +18,16 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 // Custom components
 import { getActiveNavbar, getActiveRoute, tourStyles } from '../utils'
 
+export const getSharelynk = gql`
+  query getSharelynk($id: Uuid!) {
+    shareLynkQuery {
+      projectGroup(id: $id) {
+        name
+      }
+    }
+  }
+`
+
 export default function Customer() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -26,8 +38,7 @@ export default function Customer() {
   const tabRes = window.matchMedia('(max-width: 1199px)')
 
   const { colorMode } = useColorMode()
-  const { generateProductVersionDetailPageUrlFromCurrentUrl: genUrl } =
-    useProductUrlContext()
+  const { generateProductVersionDetailPageUrlFromCurrentUrl: genUrl } = useProductUrlContext()
 
   document.documentElement.dir = 'ltr'
 
@@ -258,11 +269,28 @@ export default function Customer() {
     onClickNext(props)
   }
 
-  useEffect(() => {
-    if (signedUrlParams) {
-      sessionStorage.setItem('signedUrlParams', signedUrlParams)
+  const { data, error } = useQuery(getSharelynk, {
+    skip: params.productgroupid && signedUrlParams ? false : true,
+    variables: { id: params.productgroupid },
+    onCompleted: (data) => {
+      if(data?.shareLynkQuery?.productGroup) {
+        sessionStorage.setItem('signedUrlParams', signedUrlParams)
+      }
     }
-  }, [signedUrlParams])
+  })
+
+  if (data?.shareLynkQuery === null || error)
+    return (
+      <Center as={Flex} flexDir={'column'} h={'100vh'}>
+        <Text fontSize='3xl' fontWeight={'semibold'} color={'#3182CE'}>
+          Invalid Request !
+        </Text>
+        <Text fontSize='lg' mt={2}>
+          {displayErrorMessage(error?.networkError?.statusCode, error?.message)}
+        </Text>
+        <Img src={NotFound} width={'36%'} />
+      </Center>
+    )
 
   return (
     <TourProvider
@@ -270,9 +298,7 @@ export default function Customer() {
       styles={tourStyles}
       nextButton={(props) =>
         props?.currentStep === 2 ? null : props?.currentStep === 10 ? (
-          <Text cursor={'pointer'} onClick={() => onClickDone(props)}>
-            Done
-          </Text>
+          <Text cursor={'pointer'} onClick={() => onClickDone(props)}>Done</Text>
         ) : (
           <FaArrowRight cursor={'pointer'} onClick={() => onClickNext(props)} />
         )
@@ -285,21 +311,11 @@ export default function Customer() {
       onClickClose={(value) => onTourUpdate(value)}
       onClickMask={(value) => onTourUpdate(value)}
     >
-      <Stack
-        spacing={0}
-        width={'100%'}
-        direction={'row'}
-        alignItems={'flex-start'}
-        bg='rgba(0,0,0,0.04)'
-      >
-        <Box pos={'sticky'} top={0}>
-          <Sidebar routes={customerRoutes} />
-        </Box>
+      <Flex sx={{w:'100%', bg: 'rgba(0,0,0,0.04)', gap:0, alignItems:'flex-start' }}>
+        <Box pos={'sticky'} top={0}><Sidebar routes={customerRoutes} /></Box>
         <Flex width={'100%'} flexDir={'column'}>
           <Box
-            top={0}
-            zIndex={111}
-            pos={'sticky'}
+            sx={{top:0, zIndex:111, pos:'sticky'}}
             bg={colorMode === 'light' ? 'white' : 'gray.900'}
             borderBottom={`1px solid ${colorMode === 'light' ? '#E2E8F0' : '#1A202C'}`}
           >
@@ -309,11 +325,9 @@ export default function Customer() {
               secondary={getActiveNavbar(customerRoutes)}
             />
           </Box>
-          <Box my={6} px={6}>
-            <Outlet />
-          </Box>
+          <Box sx={{my:6, px:6}}><Outlet /></Box>
         </Flex>
-      </Stack>
+      </Flex>
     </TourProvider>
   )
 }
