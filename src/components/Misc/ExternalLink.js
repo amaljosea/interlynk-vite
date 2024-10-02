@@ -6,7 +6,7 @@ const ExternalLink = ({ link, ...rest }) => {
     <Tooltip placement='top' label={link?.name}>
       <Link
         isExternal
-        href={url?.startsWith('https') ? `${url}` : `https://${url}`}
+        href={url?.startsWith('http') ? `${url}` : `http://${url}`}
       >
         <IconButton
           {...rest}

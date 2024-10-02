@@ -1001,17 +1001,13 @@ const Components = ({ sbomData }) => {
         />
       )}
 
-      <PurlCard
-        value={activeRow?.purl}
-        isOpen={PURL.isOpen}
-        onClose={PURL.onClose}
-      />
+      {PURL.isOpen && (
+        <PurlCard value={activeRow?.purl} isOpen={PURL.isOpen} onClose={PURL.onClose} />
+      )}
 
-      <CpeCard
-        value={activeRow?.cpes[0]}
-        isOpen={CPE.isOpen}
-        onClose={CPE.onClose}
-      />
+      {CPE.isOpen && (
+        <CpeCard value={activeRow?.cpes[0]} isOpen={CPE.isOpen} onClose={CPE.onClose} />
+      )}
 
       {MAP.isOpen && <HealthMap isOpen={MAP.isOpen} onClose={MAP.onClose} />}
 
