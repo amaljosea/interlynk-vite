@@ -5,16 +5,19 @@ import { useThemeColor } from 'hooks/useThemeColors'
 export const useSelect = (type) => {
   const isBreadcrumb = type === 'breadcrumb'
   const isVersion = type === 'version'
-  const { primaryTextColor, primaryBgColor } = useThemeColor([
+  const {
+    primaryTextColor,
+    primaryBgColor,
+    secondaryTextInverse,
+    secondaryBgColor
+  } = useThemeColor([
     'primaryTextColor',
-    'primaryBgColor'
+    'primaryBgColor',
+    'secondaryTextInverse',
+    'secondaryBgColor'
   ])
 
-  const optionColor = useColorModeValue('#718096', '#A0AEC0')
-  const textHoverColor = useColorModeValue('#EDF2F7', '#4A5568')
   const borderColor = useColorModeValue('#E2E8F0', '#4A5568')
-  const btnBgColor = useColorModeValue('#EDF2F7', '#ffffff14')
-  const bgHoverColor = useColorModeValue('#e2e8f0', '#4A5568')
 
   const selectStyles = {
     control: (baseStyles, state) => ({
@@ -25,10 +28,10 @@ export const useSelect = (type) => {
       maxWidth: isBreadcrumb ? '200px' : 'inherit',
       border: isBreadcrumb ? 'none' : 'auto',
       fontSize: '14px',
-      backgroundColor: isBreadcrumb ? btnBgColor : 'transparent',
+      backgroundColor: isBreadcrumb ? secondaryBgColor : 'transparent',
       '&:hover': {
         borderColor: isBreadcrumb ? 'transparent' : borderColor,
-        backgroundColor: isBreadcrumb ? bgHoverColor : 'transparent'
+        backgroundColor: isBreadcrumb ? borderColor : 'transparent'
       },
       boxShadow: state.isFocused ? 'none' : baseStyles?.boxShadow,
       borderColor: isBreadcrumb && state.isFocused ? 'transparent' : borderColor
@@ -54,11 +57,11 @@ export const useSelect = (type) => {
     }),
     option: (provided) => ({
       ...provided,
-      color: optionColor,
+      color: secondaryTextInverse,
       backgroundColor: primaryBgColor,
-      // textTransform: 'capitalize',
+
       '&:hover': {
-        backgroundColor: textHoverColor
+        backgroundColor: secondaryBgColor
       }
     }),
     singleValue: (provided) => ({

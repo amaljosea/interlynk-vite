@@ -2,14 +2,7 @@ import { useQuery } from '@apollo/client'
 import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import {
-  Flex,
-  SimpleGrid,
-  Stat,
-  StatLabel,
-  StatNumber,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Flex, SimpleGrid, Stat, StatLabel, StatNumber } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card.js'
@@ -19,6 +12,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { PolicyResultsType } from 'graphQL/Queries'
 
@@ -26,9 +20,9 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
   const params = useParams()
   const navigate = useNavigate()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const activeBg = useColorModeValue('gray.100', 'gray.800')
-  const iconColor = useColorModeValue('blue.500', 'gray.100')
-  const textColor = useColorModeValue('gray.700', 'white')
+  const { primaryBlueText, secondaryBgColor, primaryTextColor } = useThemeColor(
+    ['primaryBlueText', 'secondaryBgColor', 'primaryTextColor']
+  )
 
   const { data: policies } = useQuery(PolicyResultsType, {
     skip: params?.sbomid ? false : true,
@@ -129,7 +123,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
     <Card width='100%' h={'97px'}>
       <CardBody>
         <Flex width={'100%'} gap={3} align='center'>
-          <IconBox h={12} w={12} color={iconColor} bg={activeBg}>
+          <IconBox h={12} w={12} color={primaryBlueText} bg={secondaryBgColor}>
             {icon}
           </IconBox>
           <Stat>
@@ -206,7 +200,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
                 </VulnBadge>
               </SimpleGrid>
             ) : (
-              <StatNumber fontSize='lg' color={textColor}>
+              <StatNumber fontSize='lg' color={primaryTextColor}>
                 {amount || 0}
               </StatNumber>
             )}

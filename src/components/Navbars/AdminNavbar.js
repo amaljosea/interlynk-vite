@@ -9,8 +9,7 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   Grid,
-  GridItem,
-  useColorModeValue
+  GridItem
 } from '@chakra-ui/react'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -63,7 +62,6 @@ export default function AdminNavbar(props) {
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = inverseSecondaryBgColor
-  let secondaryText = useColorModeValue('gray.400', 'gray.200')
 
   const {
     name: projectGroupName,

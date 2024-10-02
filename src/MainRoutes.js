@@ -24,6 +24,7 @@ import Requests from 'views/Dashboard/Requests/index.js'
 import Support from 'views/Dashboard/Support'
 import Tools from 'views/Dashboard/Tools'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
+import ColorDisplay from 'views/Dashboard/colors/index.js'
 
 import ConditionalRoute from 'components/ConditionalRoute.js'
 import Licenses from 'components/Licenses'
@@ -116,6 +117,7 @@ export const MainRoutes = () => {
             element={<ConditionalRoute element={Requests} />}
           />
           <Route path={`settings`} element={<Profile />} />
+          <Route path={`colors`} element={<ColorDisplay />} />
         </Route>
         <Route path={`login`} element={<LoginLayout />} />
         <Route path={`customer`} element={<CustomerLayout />}>

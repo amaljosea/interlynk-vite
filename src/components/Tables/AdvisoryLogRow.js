@@ -10,9 +10,10 @@ import {
   Td,
   Text,
   Tooltip,
-  Tr,
-  useColorModeValue
+  Tr
 } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaNeos, FaTools } from 'react-icons/fa'
 
@@ -28,8 +29,7 @@ function AdvisoryLogRow(props) {
     affected,
     aliasId
   } = props
-  const textColor = useColorModeValue('gray.700', 'white')
-
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
   // set value of icon based on type
   let icon
   let color
@@ -72,7 +72,11 @@ function AdvisoryLogRow(props) {
             <Flex direction='row' gap={2} alignItems={'flex-start'}>
               <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} me='5px' />
               <Flex flexDirection={'column'} alignItems={'self-start'} gap={2}>
-                <Text fontSize='sm' color={textColor} minWidth='100%'>
+                <Text
+                  fontSize='sm'
+                  color={inverseSecondaryBgColor}
+                  minWidth='100%'
+                >
                   {refId}
                 </Text>
                 <Tooltip label={tooltip} aria-label={tooltip}>
@@ -92,18 +96,18 @@ function AdvisoryLogRow(props) {
       </Td>
       <Td width={{ sm: '500px' }}>{desc.substring(0, 100)}...</Td>
       <Td width={'150px'}>
-        <Text fontSize='sm' color={textColor}>
+        <Text fontSize='sm' color={inverseSecondaryBgColor}>
           {timeSince(publishedAt)}
         </Text>
       </Td>
       <Td width={'150px'}>
-        <Text fontSize='sm' color={textColor}>
+        <Text fontSize='sm' color={inverseSecondaryBgColor}>
           {timeSince(updatedAt)}
         </Text>
       </Td>
       <Td>
         {severity && (
-          <Text fontSize='sm' color={textColor}>
+          <Text fontSize='sm' color={inverseSecondaryBgColor}>
             <Tag size='md' key='md' variant='subtle' colorScheme={sevColor}>
               <TagLabel>{severity}</TagLabel>
             </Tag>

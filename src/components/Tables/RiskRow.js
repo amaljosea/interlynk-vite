@@ -8,15 +8,16 @@ import {
   Td,
   Text,
   Tr,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaEllipsisV } from 'react-icons/fa'
 
 function VulnerabilityRow(props) {
   const { type, component, version, description, recommendation, score } = props
-  const textColor = useColorModeValue('gray.700', 'white')
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = React.useRef()
   const sevColor =
@@ -36,7 +37,7 @@ function VulnerabilityRow(props) {
       </Td>
       <Td>
         <Flex direction='row'>
-          <Text fontSize='sm' color={textColor}>
+          <Text fontSize='sm' color={inverseSecondaryBgColor}>
             {type}
           </Text>
         </Flex>

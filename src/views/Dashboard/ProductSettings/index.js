@@ -24,12 +24,12 @@ import LynkSwitch from 'components/Misc/LynkSwitch'
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
 import { GetJiraProjects } from 'graphQL/Queries'
 
 import ConfirmationModal from '../Products/components/ConfirmationModal'
-import useQueryParam from 'hooks/useQueryParam'
 
 const Settings = ({ enabled, data, mfc }) => {
   const activeTab = useQueryParam('tab')
@@ -48,7 +48,7 @@ const Settings = ({ enabled, data, mfc }) => {
   } = data || ''
 
   const { data: projectOptions } = useQuery(GetJiraProjects, {
-    skip: activeTab !== 'settings',
+    skip: activeTab !== 'settings'
   })
 
   useEffect(() => {
@@ -259,7 +259,11 @@ const Settings = ({ enabled, data, mfc }) => {
                 ))}
               </Select>
             </FormControl>
-            <FormControl mt={4} width={'400px'} hidden={organization?.tier === 'free'}>
+            <FormControl
+              mt={4}
+              width={'400px'}
+              hidden={organization?.tier === 'free'}
+            >
               <FormLabel>
                 Jira Default Project
                 <Info ml={2} onClick={onCheckJira} />

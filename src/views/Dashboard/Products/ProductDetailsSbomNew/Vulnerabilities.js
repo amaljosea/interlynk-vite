@@ -9,7 +9,11 @@ import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { ChevronDownIcon, ChevronUpIcon, ExternalLinkIcon } from '@chakra-ui/icons'
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  ExternalLinkIcon
+} from '@chakra-ui/icons'
 import {
   Badge,
   Box,
@@ -98,7 +102,14 @@ const statusColor = (status) => {
 
 const ExpandedComponent = (props) => {
   const { data, setActiveRow, onCvssOpen, isArchived } = props
-  const { vuln, isPart, fixedVersions, lastAffectedVersions, currentExternalUrls, externalUrls } = data
+  const {
+    vuln,
+    isPart,
+    fixedVersions,
+    lastAffectedVersions,
+    currentExternalUrls,
+    externalUrls
+  } = data
   const advisories = isPart
     ? currentExternalUrls?.find((item) => item.name === 'advisories')
     : externalUrls?.find((item) => item.name === 'advisories')
@@ -116,7 +127,10 @@ const ExpandedComponent = (props) => {
     text-transform: uppercase;
     letter-spacing: 0.6px;
   `
-  const { primaryBlueText, primaryTextColor } = useThemeColor(['primaryBlueText','primaryTextColor'])
+  const { primaryBlueText, primaryTextColor } = useThemeColor([
+    'primaryBlueText',
+    'primaryTextColor'
+  ])
   const onCheck = (item) => (item ? primaryBlueText : primaryTextColor)
 
   return (
@@ -129,7 +143,7 @@ const ExpandedComponent = (props) => {
         {/* VULN DATA */}
         <GridItem
           colSpan={2}
-          sx={{w:'100%', gap:4, display:'flex', flexDir:'column'}}
+          sx={{ w: '100%', gap: 4, display: 'flex', flexDir: 'column' }}
         >
           {/* Description */}
           <Box>
@@ -150,7 +164,9 @@ const ExpandedComponent = (props) => {
               {/* documentation */}
               <ExternalLink
                 link={documentation}
-                icon={<FaBookOpen color={onCheck(documentation)} fontSize={16} />}
+                icon={
+                  <FaBookOpen color={onCheck(documentation)} fontSize={16} />
+                }
               />
               {/* other */}
               <ExternalLink
@@ -234,12 +250,12 @@ const ExpandedComponent = (props) => {
               <CustomText>NVD Alias ID:</CustomText>
               <Flex
                 direction='row'
-                sx={{w:'fit-content', mt:1, gap:2, alignItems:'center'}}
+                sx={{ w: 'fit-content', mt: 1, gap: 2, alignItems: 'center' }}
               >
                 <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
                   <Icon
                     as={ExternalLinkIcon}
-                    sx={{w:'16px', h:'16px'}}
+                    sx={{ w: '16px', h: '16px' }}
                     color={primaryBlueText}
                   />
                 </Link>
@@ -487,7 +503,11 @@ const Vulnerabilities = ({ sbomData }) => {
               {isPart && (
                 <Text
                   fontWeight={'medium'}
-                  sx={{w:'fit-content', fontSize: 'xs', color: primaryTextColor}}
+                  sx={{
+                    w: 'fit-content',
+                    fontSize: 'xs',
+                    color: primaryTextColor
+                  }}
                 >
                   {project?.projectGroup?.name || ''} : {projectVersion || ''}
                 </Text>
@@ -515,7 +535,12 @@ const Vulnerabilities = ({ sbomData }) => {
         return (
           <Stack
             spacing={1}
-            sx={{my:3, cursor:'pointer', alignItems:'flex-start', direction:'column'}}
+            sx={{
+              my: 3,
+              cursor: 'pointer',
+              alignItems: 'flex-start',
+              direction: 'column'
+            }}
           >
             <RowComponent content={component} />
             <Flex alignItems={'center'} gap={2}>
@@ -544,7 +569,11 @@ const Vulnerabilities = ({ sbomData }) => {
           <Tag
             size='md'
             variant='subtle'
-            sx={{w:'80px', bg: sevColor(vuln?.sev).bg, color: sevColor(vuln?.sev).text}}
+            sx={{
+              w: '80px',
+              bg: sevColor(vuln?.sev).bg,
+              color: sevColor(vuln?.sev).text
+            }}
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}
@@ -575,7 +604,7 @@ const Vulnerabilities = ({ sbomData }) => {
             variant='solid'
             textTransform={'uppercase'}
             colorScheme={vuln.source === 'osv' ? 'red' : 'blue'}
-            sx={{w:'100%', alignItems:'center', justifyContent:'center'}}
+            sx={{ w: '100%', alignItems: 'center', justifyContent: 'center' }}
           >
             <TagLabel>{vuln.source}</TagLabel>
           </Tag>
@@ -596,7 +625,7 @@ const Vulnerabilities = ({ sbomData }) => {
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}
-            sx={{minW:'max-content',alignItems:'center',gap:'2'}}
+            sx={{ minW: 'max-content', alignItems: 'center', gap: '2' }}
           >
             <Tag
               size='md'
@@ -629,20 +658,30 @@ const Vulnerabilities = ({ sbomData }) => {
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}
-            sx={{gap:0, alignItems:'center'}}
+            sx={{ gap: 0, alignItems: 'center' }}
           >
             <Tooltip
               placement='top'
-              label={ epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-' }
+              label={
+                epssScores?.length > 0
+                  ? `${(epssScores[0] * 100).toFixed(3)} %`
+                  : '-'
+              }
             >
               <Tag
                 size='md'
                 key='md'
                 variant='subtle'
-                sx={{w:'100px', alignItems:'center', justifyContent:'center'}}
+                sx={{
+                  w: '100px',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
               >
                 <TagLabel>
-                  {epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-'}
+                  {epssScores?.length > 0
+                    ? `${(epssScores[0] * 100).toFixed(3)} %`
+                    : '-'}
                 </TagLabel>
               </Tag>
             </Tooltip>
@@ -867,15 +906,22 @@ const Vulnerabilities = ({ sbomData }) => {
         }
       }
     })
-  }, [ onVulnScan, prodVulnDispatch, reset, sbomData?.vulnRunStatus, sbomId, showToast ])
+  }, [
+    onVulnScan,
+    prodVulnDispatch,
+    reset,
+    sbomData?.vulnRunStatus,
+    sbomId,
+    showToast
+  ])
 
   const subHeader = useMemo(() => {
     return (
       <Flex
         justifyContent={'space-between'}
-        sx={{w:'100%', gap:2, alignItems:'flex-start'}}
+        sx={{ w: '100%', gap: 2, alignItems: 'flex-start' }}
       >
-        <Flex sx={{gap:3, flexWrap:'wrap', alignItems:'flex-start'}}>
+        <Flex sx={{ gap: 3, flexWrap: 'wrap', alignItems: 'flex-start' }}>
           {/* SEARCH COMPONENTS */}
           <SearchFilter
             id='vuln'
@@ -958,7 +1004,7 @@ const Vulnerabilities = ({ sbomData }) => {
   }
 
   const onCvssOpen = () => CVSS.onOpen()
-  
+
   useEffect(() => {
     if (configs) {
       if (!configs?.organization?.connections?.nodes[0]?.connection) {

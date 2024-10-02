@@ -1,16 +1,11 @@
 import React from 'react'
 import { getFullDateAndTime } from 'utils'
 
-import {
-  Box,
-  Flex,
-  Icon,
-  Stack,
-  Text,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Box, Flex, Icon, Stack, Text } from '@chakra-ui/react'
 
 import Tooltip from 'components/Tooltip'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { BsBack } from 'react-icons/bs'
 import {
@@ -134,8 +129,8 @@ function ActivitiesOverviewRow(props) {
     onOpen,
     onCpeOpen
   } = props
-  const eventColor = useColorModeValue('gray.600', 'gray.400')
-  const textColor = useColorModeValue('gray.600', 'gray.200')
+
+  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const handleClick = (event) => {
     if (event === 'purl') {
@@ -179,12 +174,12 @@ function ActivitiesOverviewRow(props) {
         wordBreak={'break-all'}
         onClick={() => handleClick(event)}
       >
-        <Text fontSize='sm' color={eventColor} fontWeight='normal'>
+        <Text fontSize='sm' color={headingTextColor} fontWeight='normal'>
           {event} by {changedBy}
         </Text>
         <Text
           fontSize='sm'
-          color={textColor}
+          color={headingTextColor}
           fontWeight='normal'
           wordBreak={'break-all'}
         >

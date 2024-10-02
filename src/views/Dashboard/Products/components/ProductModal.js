@@ -13,8 +13,10 @@ import { BiSolidLayerPlus } from 'react-icons/bi'
 
 const ProductModal = ({ isOpen, onClose, data }) => {
   const { id, name, description } = data || ''
-  const [projectGroupCreate, { loading: crLoading }] = useMutation(CreateProjectGroup)
-  const [projectGroupUpdate, { loading: upLoading }] = useMutation(UpdateProjectGroup)
+  const [projectGroupCreate, { loading: crLoading }] =
+    useMutation(CreateProjectGroup)
+  const [projectGroupUpdate, { loading: upLoading }] =
+    useMutation(UpdateProjectGroup)
 
   const initialData = { name: name || '', desc: description || '' }
   const [formData, setFormData] = useState(initialData)

@@ -10,8 +10,7 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Tooltip,
-  useColorModeValue
+  Tooltip
 } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -34,8 +33,11 @@ const checkIsMatch = ({ ignoreCase, regex, item }) => {
 
 export const TextRegex = ({ regex, ignoreCase }) => {
   const [items, setItems] = useState([{ id: uuidv4(), value: '' }])
-  const borderColor = useColorModeValue('gray.200', 'gray.600')
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { grayBorderColor, primaryErrorColor } = useThemeColor([
+    'grayBorderColor',
+    'primaryErrorColor'
+  ])
+
   const handleDelete = (id) => {
     setItems(items.filter((item) => item.id !== id))
   }
@@ -87,11 +89,18 @@ export const TextRegex = ({ regex, ignoreCase }) => {
             <IconButton
               border='1px solid'
               colorScheme='white'
-              borderColor={borderColor}
+              borderColor={grayBorderColor}
               aria-label='Remove'
               hidden={items.length === 1}
               onClick={() => handleDelete(item.id)}
-              icon={<Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />}
+              icon={
+                <Icon
+                  color={primaryErrorColor}
+                  w={6}
+                  h={6}
+                  as={MdDeleteOutline}
+                />
+              }
             />
           </Box>
         )

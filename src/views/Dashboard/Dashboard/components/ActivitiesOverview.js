@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { Flex, Text, useColorModeValue, useDisclosure } from '@chakra-ui/react'
+import { Flex, Text, useDisclosure } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card.js'
@@ -9,10 +9,12 @@ import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import ActivitiesOverviewRow from 'components/Tables/ActivitiesOverviewRow'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { FaEye } from 'react-icons/fa'
 
 const ActivitiesOverview = ({ title, data }) => {
-  const textColor = useColorModeValue('gray.700', 'white')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const [activeRow, setActiveRow] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -25,7 +27,7 @@ const ActivitiesOverview = ({ title, data }) => {
     <>
       <Card maxH='100%'>
         <Flex direction='column'>
-          <Text fontSize='lg' color={textColor} fontWeight='bold'>
+          <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
             {title}
           </Text>
         </Flex>

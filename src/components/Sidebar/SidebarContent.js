@@ -3,13 +3,7 @@ import { useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
 import { Link, useLocation } from 'react-router-dom'
 
-import {
-  Divider,
-  Flex,
-  Img,
-  Tooltip,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Divider, Flex, Img, Tooltip } from '@chakra-ui/react'
 
 import IconBox from 'components/Icons/IconBox'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
@@ -46,8 +40,10 @@ const SidebarContent = ({ routes }) => {
     setRoutesActual(updatedRoutes)
   }, [organization, routes])
 
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
-  const inActiveBg = useColorModeValue('gray.100', 'gray.700')
+  const { primaryBlueText, secondaryBgColor } = useThemeColor([
+    'primaryBlueText',
+    'secondaryBgColor'
+  ])
 
   const activeRoute = (routeName) => {
     const parts = routeName.split('/')
@@ -78,7 +74,7 @@ const SidebarContent = ({ routes }) => {
               h={'40px'}
               w={'40px'}
               color={isActive ? 'white' : primaryBlueText}
-              bg={isActive ? primaryBlueText : inActiveBg}
+              bg={isActive ? primaryBlueText : secondaryBgColor}
             >
               {icon}
             </IconBox>

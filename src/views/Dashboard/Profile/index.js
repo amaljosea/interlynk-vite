@@ -106,7 +106,6 @@ function Profile() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activetab, tabs])
 
-
   return (
     <>
       {/*  HEADER */}

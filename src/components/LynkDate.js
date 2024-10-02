@@ -3,18 +3,22 @@ import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
 import { useParams } from 'react-router-dom'
 
-import { useColorMode, useColorModeValue } from '@chakra-ui/system'
+import { useColorMode } from '@chakra-ui/system'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const LynkDate = (props) => {
   const params = useParams()
   const { colorMode } = useColorMode()
   const [focus, setFocus] = useState(false)
-  const borderColor = useColorModeValue('#3182ce', '#63b3ed')
-  const defaultColor = useColorModeValue('#E2E8F0', '#ffffff29')
+  const { primaryBlueBorder, grayBorderColor } = useThemeColor([
+    'primaryBlueBorder',
+    'grayBorderColor'
+  ])
   const react_datatime = `${params?.sbomid && 'picker_top'} ${colorMode === 'light' ? 'light_picker' : 'dark_picker'}`
   const border = focus
-    ? `2px solid ${borderColor}`
-    : `1px solid ${defaultColor}`
+    ? `2px solid ${primaryBlueBorder}`
+    : `1px solid ${grayBorderColor}`
 
   return (
     <Datetime

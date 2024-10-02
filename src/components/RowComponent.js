@@ -91,7 +91,12 @@ const RowComponent = ({ content }) => {
         {isHovered && <TagRightIcon as={ArrowForwardIcon} onClick={onCheck} />}
       </Tag>
 
-      <ComponentCard isOpen={isOpen} onClose={onClose} data={data} loading={loading} />
+      <ComponentCard
+        isOpen={isOpen}
+        onClose={onClose}
+        data={data}
+        loading={loading}
+      />
     </>
   )
 }

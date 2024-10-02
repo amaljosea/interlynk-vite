@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Select, { components } from 'react-select'
 
-import { Divider, Spinner, useColorModeValue } from '@chakra-ui/react'
+import { Divider, Spinner } from '@chakra-ui/react'
 
 import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
@@ -12,6 +12,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProjectGroupDetails } from 'graphQL/Queries'
 
@@ -32,8 +33,7 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
 
   const environment = envName
 
-  const loaderColor = useColorModeValue('#e2e8f0', '#4A5568')
-
+  const { grayBorderColor } = useThemeColor(['grayBorderColor'])
   const viewProds = useHasPermission({
     parentKey: 'view_product_group'
   })
@@ -143,7 +143,7 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
     )
   }
 
-  return <Spinner size='xs' color={loaderColor} />
+  return <Spinner size='xs' color={grayBorderColor} />
 }
 
 export default ProjectGroupBreadcrumb

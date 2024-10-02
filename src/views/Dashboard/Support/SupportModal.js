@@ -15,8 +15,7 @@ import {
   IconButton,
   Input,
   Stack,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
@@ -49,7 +48,6 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
   const [error, setError] = useState('')
 
   const { idUri, name, version } = formData || {}
-  const borderColor = useColorModeValue('gray.200', 'gray.600')
 
   const [createSupport, { loading: crLoading }] = useMutation(CreateSupport)
   const [updateSupport, { loading: upLoading }] = useMutation(UpdateSupport)
@@ -63,7 +61,10 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
     setError('')
   }
 
-  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
+  const { primaryErrorColor, grayBorderColor } = useThemeColor([
+    'primaryErrorColor',
+    'grayBorderColor'
+  ])
 
   const hasSimilarRow = (data) => {
     for (let i = 0; i < data.length; i++) {
@@ -396,14 +397,14 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
                         <IconButton
                           border='1px solid'
                           colorScheme='white'
-                          borderColor={borderColor}
+                          borderColor={grayBorderColor}
                           aria-label='Remove id'
                           onClick={() => deleteRow(item?.id)}
                           display={item?.id === 1 ? 'none' : 'flex'}
                           icon={
                             <Icon
                               as={MdDeleteOutline}
-                              sx={{ w: 6, h: 6, color: '#E53E3E' }}
+                              sx={{ w: 6, h: 6, color: primaryErrorColor }}
                             />
                           }
                         />

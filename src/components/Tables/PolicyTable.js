@@ -388,7 +388,13 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
       >
         <Box>
           <CustomText>Description :</CustomText>
-          <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
+          <Text
+            width={'90%'}
+            mt={1}
+            fontSize={14}
+            wordBreak={'break-all'}
+            color={primaryTextColor}
+          >
             {description || ''}
           </Text>
         </Box>

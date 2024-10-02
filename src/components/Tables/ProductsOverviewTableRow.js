@@ -1,19 +1,12 @@
 import React from 'react'
 
-import {
-  Flex,
-  Icon,
-  Link,
-  Tag,
-  Td,
-  Text,
-  Tr,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Flex, Icon, Link, Tag, Td, Text, Tr } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 function ProductsOverviewTableRow(props) {
   const { logo, name, description, versions, sbom_links, risk_score } = props
-  const textColor = useColorModeValue('gray.600', 'white')
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
   return (
     <Tr>
       <Td minWidth={{ sm: '250px' }} pl='0px'>
@@ -23,13 +16,17 @@ function ProductsOverviewTableRow(props) {
             <Flex direction='column'>
               <Text
                 fontSize='sm'
-                color={textColor}
+                color={inverseSecondaryBgColor}
                 fontWeight='semibold'
                 minWidth='100%'
               >
                 <Link href='#/vendor/products'>{name}</Link>
               </Text>
-              <Text fontSize='xs' color={textColor} minWidth='100%'>
+              <Text
+                fontSize='xs'
+                color={inverseSecondaryBgColor}
+                minWidth='100%'
+              >
                 {description}
               </Text>
             </Flex>
@@ -37,12 +34,12 @@ function ProductsOverviewTableRow(props) {
         </Flex>
       </Td>
       <Td>
-        <Text fontSize='sm' color={textColor}>
+        <Text fontSize='sm' color={inverseSecondaryBgColor}>
           {versions.length}
         </Text>
       </Td>
       <Td>
-        <Text fontSize='sm' color={textColor}>
+        <Text fontSize='sm' color={inverseSecondaryBgColor}>
           {sbom_links}
         </Text>
       </Td>

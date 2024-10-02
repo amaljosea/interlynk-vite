@@ -76,7 +76,8 @@ const VersionsTable = (props) => {
   const { setSelectedSbom, versionState, dispatch } = useGlobalState()
   const { searchInput } = versionState
   const { prodVulnDispatch, prodCompDispatch } = dispatch
-  const { generateProductVersionDetailPageUrlFromCurrentUrl } = useProductUrlContext()
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const [filterText, setFilterText] = useState(searchInput)
   const [activeRow, setActiveRow] = useState(null)
@@ -112,11 +113,16 @@ const VersionsTable = (props) => {
   const { VERSIONS } = ProductDetailsTabs
 
   // GET PROJECT DATA
-  const { data } = useQuery(signedUrlParams ? GetShareProjectGroup : GetProjectGroup, {
-    variables: { id: params?.productgroupid }
-  })
-  
-  const result = signedUrlParams ? data?.shareLynkQuery?.projectGroup : data?.projectGroup
+  const { data } = useQuery(
+    signedUrlParams ? GetShareProjectGroup : GetProjectGroup,
+    {
+      variables: { id: params?.productgroupid }
+    }
+  )
+
+  const result = signedUrlParams
+    ? data?.shareLynkQuery?.projectGroup
+    : data?.projectGroup
   const { name, enabled } = result || ''
 
   const { nodes, paginationProps, loading, startPolling, stopPolling } =
@@ -594,7 +600,8 @@ const VersionsTable = (props) => {
     signedUrlParams,
     ARC_VERSIONS,
     createSbom,
-    onBuildSbom
+    onBuildSbom,
+    primaryErrorColor
   ])
 
   const disableRowCheckBox = (row) => {

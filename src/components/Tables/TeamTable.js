@@ -114,13 +114,15 @@ const TeamTable = () => {
         return (
           <Flex
             justifyContent={'center'}
-            sx={{w:'100%', px:0, py:'.8rem', gap:2, alignItems:'center'}}
+            sx={{ w: '100%', px: 0, py: '.8rem', gap: 2, alignItems: 'center' }}
           >
             <Avatar
-              sx={{w:'30px', h:'30px'}}
+              sx={{ w: '30px', h: '30px' }}
               src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
             />
-            <Text color={primaryTextColor} my={2}>{row?.email}</Text>
+            <Text color={primaryTextColor} my={2}>
+              {row?.email}
+            </Text>
           </Flex>
         )
       },
@@ -199,7 +201,7 @@ const TeamTable = () => {
                     ? 'red'
                     : 'blue'
             }
-            sx={{w:'fit-content', textTransform:'capitalize'}}
+            sx={{ w: 'fit-content', textTransform: 'capitalize' }}
           >
             <TagLabel mx='auto'>
               {invitationStatus?.replace(/_/g, ' ')}
@@ -296,7 +298,13 @@ const TeamTable = () => {
   // HEADER SECTION
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex sx={{w:'100%',alignItems:'center',justifyContent:'space-between'}}>
+      <Flex
+        sx={{
+          w: '100%',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
         {/* SEARCH COMPONENTS */}
         <SearchFilter
           id='team'
@@ -306,11 +314,15 @@ const TeamTable = () => {
           onChange={onSearchInputChange}
         />
 
-        <Flex sx={{ gap:2, justifyContent:'flex-end'}}>
+        <Flex sx={{ gap: 2, justifyContent: 'flex-end' }}>
           {/* INVITE USER */}
           <Box position='relative'>
             <Tooltip
-              label={ isFreeTier && numberOfUsers === 2 ? 'Limit reached for free tier' : 'Invite User' }
+              label={
+                isFreeTier && numberOfUsers === 2
+                  ? 'Limit reached for free tier'
+                  : 'Invite User'
+              }
               placement='bottom'
               isDisabled={false} // Ensure the tooltip is never disabled
             >
@@ -320,8 +332,10 @@ const TeamTable = () => {
                   icon={<AddIcon />}
                   colorScheme='blue'
                   onClick={TEAM.onOpen}
-                  sx={{fontSize:'sm', fontWeight:'normal'}}
-                  isDisabled={ !inviteUser || (isFreeTier && numberOfUsers === 2) }
+                  sx={{ fontSize: 'sm', fontWeight: 'normal' }}
+                  isDisabled={
+                    !inviteUser || (isFreeTier && numberOfUsers === 2)
+                  }
                 />
               </Box>
             </Tooltip>
@@ -404,7 +418,11 @@ const TeamTable = () => {
 
       {/* UPDATE User ROLE */}
       {ROLE.isOpen && (
-        <RoleModal data={activeRow} isOpen={ROLE.isOpen} onClose={ROLE.onClose} />
+        <RoleModal
+          data={activeRow}
+          isOpen={ROLE.isOpen}
+          onClose={ROLE.onClose}
+        />
       )}
 
       {/* REMOVE User */}
@@ -420,14 +438,19 @@ const TeamTable = () => {
         >
           <Stack
             spacing={2}
-            sx={{gap:2, direction:'column', alignItems:'flex-start'}}
+            sx={{ gap: 2, direction: 'column', alignItems: 'flex-start' }}
           >
             <Text fontWeight={300} fontSize={16} lineHeight={'30px'}>
               Are you sure you want to remove the following user from the
               organization ?
             </Text>
             <Text
-              sx={{fontSize:16, fontWeight:500, lineHeight:'30px', wordBreak:'break-all'}}
+              sx={{
+                fontSize: 16,
+                fontWeight: 500,
+                lineHeight: '30px',
+                wordBreak: 'break-all'
+              }}
             >
               {activeRow.name} {`(${activeRow.email})`}
             </Text>

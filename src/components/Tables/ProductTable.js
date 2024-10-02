@@ -33,7 +33,6 @@ import {
   Tag,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -87,22 +86,20 @@ const ProductTable = ({
     headingTextColor,
     primaryTextColor,
     grayBorderColor,
-    secondaryBlueBorder
+    secondaryBlueBorder,
+    secondaryBgColor,
+    semiTransparentBorder,
+    lightAndDarkBgColor
   } = useThemeColor([
     'primaryBlueText',
     'headingTextColor',
     'primaryTextColor',
     'grayBorderColor',
-    'secondaryBlueBorder'
+    'secondaryBlueBorder',
+    'secondaryBgColor',
+    'semiTransparentBorder',
+    'lightAndDarkBgColor'
   ])
-
-  const bgColor = useColorModeValue('#EDF2F7', '#4D698166')
-  const grayColor = useColorModeValue('#1A202C', '#FFFFFF66')
-  const iconColor = useColorModeValue('blue.500', 'gray.50')
-  const timeColor = useColorModeValue('#1A202C', '#FFFFFF99')
-
-  const dividerColor = useColorModeValue('#0000001f', '#ffffff1A')
-  const labelBgColor = useColorModeValue('#fff', '#1f2733')
 
   const { search, field } = filters
   const { totalRows } = paginationProps
@@ -437,8 +434,8 @@ const ProductTable = ({
                 <IconBox
                   h={'40px'}
                   w={'40px'}
-                  bg={bgColor}
-                  color={iconColor}
+                  bg={secondaryBgColor}
+                  color={primaryBlueText}
                   hidden={!shouldShowDemoFeatures}
                 >
                   {getType(name)}
@@ -473,7 +470,7 @@ const ProductTable = ({
                   </Tag>
                 ))}
               </Flex>
-              <Text color={grayColor} pr={32} wordBreak={'break-all'}>
+              <Text color={primaryTextColor} pr={32} wordBreak={'break-all'}>
                 {description}
               </Text>
             </Flex>
@@ -492,7 +489,7 @@ const ProductTable = ({
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
-            <Text color={timeColor}>{timeSince(updatedAt)}</Text>
+            <Text color={primaryTextColor}>{timeSince(updatedAt)}</Text>
           </Tooltip>
         )
       },
@@ -648,7 +645,7 @@ const ProductTable = ({
                       right={226}
                       width='220px'
                       borderRadius='md'
-                      bg={labelBgColor}
+                      bg={lightAndDarkBgColor}
                       position='absolute'
                       border={`1px solid ${grayBorderColor}`}
                       onMouseEnter={() => setOpenTagMenu(true)}
@@ -716,7 +713,7 @@ const ProductTable = ({
     columns: columns,
     data: filterMode === 'AND' ? filteredNodes : data,
     onSort: handleSort,
-    customStyles: customStyles(headingTextColor, dividerColor),
+    customStyles: customStyles(headingTextColor, semiTransparentBorder),
     defaultSortFieldId: field,
     defaultSortAsc: false,
     subHeader: true,
@@ -743,7 +740,11 @@ const ProductTable = ({
         <UploadModal
           isOpen={isOpenUpload}
           onClose={onCloseUpload}
-          group={{ id: activeRow?.id, name: activeRow?.name, default: activeRow?.defaultProject?.id }}
+          group={{
+            id: activeRow?.id,
+            name: activeRow?.name,
+            default: activeRow?.defaultProject?.id
+          }}
         />
       )}
 

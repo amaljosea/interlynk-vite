@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { Flex, Text, useColorModeValue, useDisclosure } from '@chakra-ui/react'
+import { Flex, Text, useDisclosure } from '@chakra-ui/react'
 
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -40,7 +40,6 @@ const Connections = ({ org }) => {
   })
   const isGithubConfigSaved = useGithubConfigSaved()
 
-  const iconColor = useColorModeValue('#24292f', '#f1f1f1')
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const updateCon = useHasPermission({
@@ -167,7 +166,6 @@ const Connections = ({ org }) => {
                 name='Jira'
                 onConfigure={onJiraOpen}
                 isConnected={greenCheck.jira}
-                color='#0070f3'
                 description={
                   'Sync tasks within SBOM compliance, improving issue tracking and management.'
                 }
@@ -179,7 +177,6 @@ const Connections = ({ org }) => {
                 name='Slack'
                 onConfigure={onSlackOpen}
                 isConnected={greenCheck.slack}
-                color='#E01E5A'
                 description={
                   'Get instant SBOM updates in Slack, ensuring real-time compliance monitoring.'
                 }
@@ -191,7 +188,6 @@ const Connections = ({ org }) => {
                 name='Teams'
                 onConfigure={onTeamsOpen}
                 isConnected={greenCheck.teams}
-                color='#6264A7'
                 description={
                   'Track SBOM changes in Teams, boosting collaboration and compliance efficiency'
                 }
@@ -202,7 +198,6 @@ const Connections = ({ org }) => {
               name='Email'
               onConfigure={onEmailOpen}
               isConnected={greenCheck.email}
-              color='#FF4500'
               description={
                 'Receive immediate SBOM alerts via email, staying informed on critical updates.'
               }
@@ -214,7 +209,7 @@ const Connections = ({ org }) => {
                 onConfigure={onGithubOpen}
                 isConnected={greenCheck.github}
                 isDisabled={!updateCon}
-                color={iconColor}
+                color={primaryTextColor}
                 description={
                   'Monitor SBOM directly in GitHub, simplifying compliance checks within repositories'
                 }

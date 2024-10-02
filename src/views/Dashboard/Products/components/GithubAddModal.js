@@ -1,15 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import {
-  Box,
-  Checkbox,
-  Flex,
-  Skeleton,
-  Spinner,
-  Text,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Box, Checkbox, Flex, Skeleton, Spinner, Text } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
@@ -79,8 +71,10 @@ const GithubAddModal = ({ isOpen, onClose }) => {
   const [importOptions, setImportOptions] = useState({})
   const [projectGroupCreate] = useMutation(CreateProjectGroup)
 
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
-  const labelColor = useColorModeValue('#718096', '#A0AEC0')
+  const { primaryTextColor, secondaryTextInverse } = useThemeColor([
+    'primaryTextColor',
+    'secondaryTextInverse'
+  ])
 
   useEffect(() => {
     if (isOpen) {
@@ -220,7 +214,7 @@ const GithubAddModal = ({ isOpen, onClose }) => {
                   {projectLoading[project.name] ? (
                     <Spinner size='sm' />
                   ) : (
-                    <Text fontSize={14} color={labelColor}>
+                    <Text fontSize={14} color={secondaryTextInverse}>
                       {project.label}
                     </Text>
                   )}
@@ -236,7 +230,7 @@ const GithubAddModal = ({ isOpen, onClose }) => {
                     onChange={() => handleImportCheckboxChange(project.name)}
                     size='sm'
                   >
-                    <Text fontSize={14} color={labelColor}>
+                    <Text fontSize={14} color={secondaryTextInverse}>
                       {project.checkboxLabel}
                     </Text>
                   </Checkbox>

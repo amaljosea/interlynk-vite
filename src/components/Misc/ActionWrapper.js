@@ -1,11 +1,12 @@
-import { Flex, useColorModeValue } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const ActionWrapper = (props) => {
-  const { primaryBgColor } = useThemeColor(['primaryBgColor'])
-
-  const borderColor = useColorModeValue('#E2E8F0', '#4A5568')
+  const { primaryBgColor, grayBorderColor } = useThemeColor([
+    'primaryBgColor',
+    'grayBorderColor'
+  ])
 
   return (
     <Flex
@@ -19,7 +20,7 @@ const ActionWrapper = (props) => {
       pos={'fixed'}
       alignItems={'center'}
       justifyContent={'flex-end'}
-      borderTop={`1px solid ${borderColor}`}
+      borderTop={`1px solid ${grayBorderColor}`}
       {...props}
     >
       {props?.children}

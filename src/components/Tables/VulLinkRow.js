@@ -7,7 +7,6 @@ import {
   Text,
   Tooltip,
   Tr,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -18,9 +17,10 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { FaEye } from 'react-icons/fa6'
 
 const VulLinkRow = ({ key, data, vulnId }) => {
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
-
-  const iconColor = useColorModeValue('#4A5568', '#E2E8F0')
+  const { primaryTextColor, headingTextColor } = useThemeColor([
+    'primaryTextColor',
+    'headingTextColor'
+  ])
 
   const { changedBy, status, updatedAt } = data || ''
 
@@ -49,7 +49,7 @@ const VulLinkRow = ({ key, data, vulnId }) => {
             size='sm'
             variant='outline'
             onClick={onOpen}
-            icon={<FaEye color={iconColor} />}
+            icon={<FaEye color={headingTextColor} />}
           />
         </Td>
       </Tr>

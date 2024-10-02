@@ -14,7 +14,6 @@ import {
   Tag,
   TagLabel,
   Text,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -34,22 +33,21 @@ import { FaCodeMerge } from 'react-icons/fa6'
 import VulnProdTable from './components/ProdTable'
 
 const StatsContainer = ({ icon, title, children }) => {
-  const activeBg = useColorModeValue('gray.100', 'gray.800')
-  const iconColor = useColorModeValue('blue.500', 'gray.100')
-  const textColor = useColorModeValue('gray.700', 'white')
-
+  const { primaryBlueText, secondaryBgColor, primaryTextColor } = useThemeColor(
+    ['primaryBlueText', 'secondaryBgColor', 'primaryTextColor']
+  )
   return (
     <Card width='100%' h={'97px'}>
       <CardBody>
         <Flex width={'100%'} gap={3} align='center'>
-          <IconBox h={12} w={12} color={iconColor} bg={activeBg}>
+          <IconBox h={12} w={12} color={primaryBlueText} bg={secondaryBgColor}>
             {icon}
           </IconBox>
           <Stat>
             <StatLabel mb={1} fontSize='md'>
               {title}
             </StatLabel>
-            <StatNumber fontSize='lg' color={textColor}>
+            <StatNumber fontSize='lg' color={primaryTextColor}>
               {children}
             </StatNumber>
           </Stat>

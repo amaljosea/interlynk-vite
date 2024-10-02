@@ -1,14 +1,15 @@
 import React from 'react'
 import { components } from 'react-select'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { FaChevronDown } from 'react-icons/fa6'
-import { useColorModeValue } from '@chakra-ui/system'
 
 const CustomDropdownIndicator = (props) => {
-  const color = useColorModeValue('darkgray','lightgray')
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
   return (
     <components.DropdownIndicator {...props}>
-      <FaChevronDown size={10} color={color} />
+      <FaChevronDown size={10} color={inverseSecondaryBgColor} />
     </components.DropdownIndicator>
   )
 }

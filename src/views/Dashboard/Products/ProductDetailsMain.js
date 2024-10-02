@@ -178,7 +178,8 @@ const ProductDetailsMain = () => {
     variables: { id: productGroupId }
   })
 
-  const { id, name, description, enabled, projects, defaultProject } = data?.projectGroup || ''
+  const { id, name, description, enabled, projects, defaultProject } =
+    data?.projectGroup || ''
 
   const { data: settings, loading: settingsLoading } = useQuery(
     GetProjectSettings,

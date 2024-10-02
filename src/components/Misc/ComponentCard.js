@@ -25,7 +25,8 @@ const ListItem = ({ label, value }) => {
 }
 
 const ComponentCard = ({ data, isOpen, onClose, loading }) => {
-  const { name, version, kind, purl, licensesExp, primary, internal } = data || ''
+  const { name, version, kind, purl, licensesExp, primary, internal } =
+    data || ''
   const [pkg, setPkg] = useState(null)
 
   useEffect(() => {

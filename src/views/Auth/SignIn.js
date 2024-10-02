@@ -1,5 +1,5 @@
 // Assets
-import signInImage from 'assets/img/signInImage.png'
+import signInImage from 'assets/img/dashboard.png'
 import React from 'react'
 
 import {
@@ -11,16 +11,20 @@ import {
   Heading,
   Input,
   Link,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
 
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 function SignIn() {
   // Chakra color mode
-  const titleColor = useColorModeValue('teal.300', 'teal.200')
-  const textColor = useColorModeValue('gray.400', 'white')
+  const { lightTealBorder, secondaryTextColor } = useThemeColor([
+    'lightTealBorder',
+    'secondaryTextColor'
+  ])
+
   return (
     <Flex position='relative' mb='40px'>
       <Flex
@@ -45,13 +49,13 @@ function SignIn() {
             p='48px'
             mt={{ md: '150px', lg: '80px' }}
           >
-            <Heading color={titleColor} fontSize='32px' mb='10px'>
+            <Heading color={lightTealBorder} fontSize='32px' mb='10px'>
               Welcome Back
             </Heading>
             <Text
               mb='36px'
               ms='4px'
-              color={textColor}
+              color={secondaryTextColor}
               fontWeight='bold'
               fontSize='14px'
             >
@@ -113,9 +117,14 @@ function SignIn() {
               maxW='100%'
               mt='0px'
             >
-              <Text color={textColor} fontWeight='medium'>
+              <Text color={secondaryTextColor} fontWeight='medium'>
                 Do not have an account?
-                <Link color={titleColor} as='span' ms='5px' fontWeight='bold'>
+                <Link
+                  color={lightTealBorder}
+                  as='span'
+                  ms='5px'
+                  fontWeight='bold'
+                >
                   Sign Up
                 </Link>
               </Text>

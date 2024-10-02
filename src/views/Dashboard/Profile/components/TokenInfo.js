@@ -25,7 +25,6 @@ import {
   Text,
   Tooltip,
   useClipboard,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -74,15 +73,12 @@ const TokenInfo = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { headingTextColor, primaryTextColor, grayBorderColor } = useThemeColor(
+    ['headingTextColor', 'primaryTextColor', 'grayBorderColor']
+  )
 
   const paddingCell = 0
   const paddingHeadCell = 0
-
-  const borderColor = useColorModeValue('gray.200', 'gray.600')
 
   const { data, loading } = useQuery(GetApiKeys, {
     skip: !orgView || activetab !== 'security tokens'
@@ -532,7 +528,7 @@ const TokenInfo = () => {
               >
                 <IconButton
                   border='1px solid'
-                  borderColor={borderColor}
+                  borderColor={grayBorderColor}
                   onClick={() => key.onCopy()}
                   icon={key.hasCopied ? <BiCheck /> : <CopyIcon />}
                 />

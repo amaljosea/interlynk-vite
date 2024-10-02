@@ -17,8 +17,7 @@ import {
   Tbody,
   Td,
   Text,
-  Tr,
-  useColorModeValue
+  Tr
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -31,11 +30,15 @@ import { GetLabels } from 'graphQL/Queries'
 
 const LabelTable = ({ isOpen }) => {
   const { showToast } = useCustomToast()
-  const borderColor = useColorModeValue('gray.800', 'gray.200')
   const [disabled, setDisabled] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
   const [deleteItem, setDeleteItem] = useState(null)
-  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
+
+  const { primaryErrorColor, primaryTextColor } = useThemeColor([
+    'primaryErrorColor',
+    'primaryTextColor'
+  ])
+
   const disableButtonTemporarily = () => {
     setDisabled(true)
     setTimeout(() => {
@@ -139,7 +142,7 @@ const LabelTable = ({ isOpen }) => {
                       <IconButton
                         size='sm'
                         variant='outline'
-                        icon={<EditIcon color={borderColor} />}
+                        icon={<EditIcon color={primaryTextColor} />}
                         onClick={() => onEdit(row)}
                       />
                       <IconButton

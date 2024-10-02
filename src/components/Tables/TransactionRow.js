@@ -1,9 +1,11 @@
 import React from 'react'
 
-import { Box, Flex, Icon, Text, useColorModeValue } from '@chakra-ui/react'
+import { Box, Flex, Icon, Text } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 function TransactionRow(props) {
-  const textColor = useColorModeValue('gray.700', 'white')
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
   const { key, name, date, logo, price } = props
 
   return (
@@ -31,7 +33,7 @@ function TransactionRow(props) {
         <Flex direction='column'>
           <Text
             fontSize={{ sm: 'md', md: 'lg', lg: 'md' }}
-            color={textColor}
+            color={inverseSecondaryBgColor}
             fontWeight='bold'
           >
             {name}
@@ -51,7 +53,7 @@ function TransactionRow(props) {
             ? 'green.400'
             : price[0] === '-'
               ? 'red.400'
-              : { textColor }
+              : { inverseSecondaryBgColor }
         }
       >
         <Text fontSize={{ sm: 'md', md: 'lg', lg: 'md' }} fontWeight='bold'>

@@ -57,7 +57,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { SwitchOrganization, UpdateUserPassword } from 'graphQL/Mutation'
-import { orgUpdate, UploadProfileImage, updateOrgUser } from 'graphQL/Mutation'
+import { UploadProfileImage, orgUpdate, updateOrgUser } from 'graphQL/Mutation'
 import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
 
 import { FaExchangeAlt } from 'react-icons/fa'
@@ -107,7 +107,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const { organization: orgData } = useGlobalState()
 
   const isSuperAdmin = orgData?.currentUser?.superAdmin
-  const { id, name, profileImage: dp } =  orgData?.currentUser || ''
+  const { id, name, profileImage: dp } = orgData?.currentUser || ''
   const activeOrgId = orgData?.id
   const activeOrgTier = orgData?.tier
   const lastUpdated = orgData?.updatedAt
@@ -398,11 +398,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   }
 
   const handleSave = async () => {
-    if (
-      nameError === '' &&
-      newUserName.trim() !== '' &&
-      newUserName !== name
-    ) {
+    if (nameError === '' && newUserName.trim() !== '' && newUserName !== name) {
       // Check if there's a valid change to the name and no errors
       await handleUpdateName()
     }
@@ -423,8 +419,8 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     resetStates()
   }
 
-  const isOrg =  selectedTab === 'ORGANIZATION'
-  const isPersonal =  selectedTab === 'PERSONAL'
+  const isOrg = selectedTab === 'ORGANIZATION'
+  const isPersonal = selectedTab === 'PERSONAL'
 
   useEffect(() => {
     if (dp) {
@@ -441,7 +437,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   }, [SERVER_URL, dp])
 
   useEffect(() => {
-    if(orgData) {
+    if (orgData) {
       setOrgName(orgData?.name)
       setNewUserName(orgData?.currentUser?.name)
     }
@@ -476,7 +472,8 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     confirmPassword
   ])
 
-  if (!orgData) return <LynkAlert msg={'An internal error occured. Please retry later'} />
+  if (!orgData)
+    return <LynkAlert msg={'An internal error occured. Please retry later'} />
 
   return (
     <>
@@ -489,7 +486,11 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
             as={Button}
             colorScheme='blue'
             display={!orgData ? 'none' : 'block'}
-            sx={{fontSize:'sm', fontWeight:'medium',textTransform:'capitalize'}}
+            sx={{
+              fontSize: 'sm',
+              fontWeight: 'medium',
+              textTransform: 'capitalize'
+            }}
           >
             <Flex align='center'>
               {/* Left Icon */}
@@ -545,7 +546,12 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
             {isPersonal && (
               <Box
                 borderRadius='full'
-                sx={{w:'80px', h:'80px', overflow:'hidden', position:'relative'}}
+                sx={{
+                  w: '80px',
+                  h: '80px',
+                  overflow: 'hidden',
+                  position: 'relative'
+                }}
               >
                 {dpLoading ? (
                   <Spinner width='80px' height='80px' />
@@ -555,7 +561,12 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     src={profileImage}
                     name={name}
                     ignoreFallback={dp || profileImage ? true : false}
-                    sx={{w:'80px',h:'80px', objectFit:'cover', borderRadius:'full'}}
+                    sx={{
+                      w: '80px',
+                      h: '80px',
+                      objectFit: 'cover',
+                      borderRadius: 'full'
+                    }}
                   />
                 )}
 
@@ -567,7 +578,14 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   isDisabled={!orgData}
                   onChange={handleFileChange}
                   accept='.jpg,.jpeg,.png,.webp'
-                  sx={{ w: '80px', h: '80px', top: 0, left: 0, opacity: 0, zIndex: -1 }}
+                  sx={{
+                    w: '80px',
+                    h: '80px',
+                    top: 0,
+                    left: 0,
+                    opacity: 0,
+                    zIndex: -1
+                  }}
                 />
                 <Box
                   position='absolute'
@@ -576,18 +594,29 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   onClick={onProfileClick}
                   transition='opacity 0.3s'
                   _hover={{ opacity: orgData ? 1 : 0 }}
-                  sx={{ w: '80px', h: '80px', top: 0, left: 0, opacity: 0, cursor: 'pointer' }}
+                  sx={{
+                    w: '80px',
+                    h: '80px',
+                    top: 0,
+                    left: 0,
+                    opacity: 0,
+                    cursor: 'pointer'
+                  }}
                 />
               </Box>
             )}
             {/*  CityIcon for org page */}
-            { isOrg && <FaCity size='80px' style={{ color: cityIconColor }} /> }
+            {isOrg && <FaCity size='80px' style={{ color: cityIconColor }} />}
 
             <Flex direction='column' maxWidth='100%' my={{ sm: '14px' }}>
               <Box display={'flex'} gap={orgData?.currentUser?.name ? '10px' : 0} alignItems={'center'}>
                 <Text
                   ms={{ sm: '8px', md: '0px' }}
-                  sx={{fontWeight:'semibold', fontSize:22, color: primaryTextColor}}
+                  sx={{
+                    fontWeight: 'semibold',
+                    fontSize: 22,
+                    color: primaryTextColor
+                  }}
                 >
                   {isPersonal ? orgData?.currentUser?.name : orgData?.name}
                 </Text>
@@ -605,16 +634,18 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 )}
               </Box>
               <Text
-                sx={{ fontSize:'sm', wordBreak:'break-all' }}
+                sx={{ fontSize: 'sm', wordBreak: 'break-all' }}
                 textTransform={'capitalize'}
               >
-                {isOrg ? `${activeOrgTier} · Updated ${timeAgo}` : orgData?.name}
+                {isOrg
+                  ? `${activeOrgTier} · Updated ${timeAgo}`
+                  : orgData?.name}
               </Text>
             </Flex>
           </Flex>
           <Flex gap={2}>
             <Tooltip
-              label={ isPersonal ? 'Switch Organization' : 'Edit Organization' }
+              label={isPersonal ? 'Switch Organization' : 'Edit Organization'}
               placement={'left'}
             >
               <IconButton
@@ -892,7 +923,11 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                         variant='subtle'
                         colorScheme='white'
                         borderColor={primaryBlueText}
-                        sx={{w:'fit-content', borderWidth:'1px', textTransform:'capitalize'}}
+                        sx={{
+                          w: 'fit-content',
+                          borderWidth: '1px',
+                          textTransform: 'capitalize'
+                        }}
                       >
                         <TagLabel
                           fontSize={'12px'}
@@ -907,7 +942,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   {/* Display tier below the name and admin */}
                   <Text
                     textColor={'gray.500'}
-                    sx={{fontSize:'12px', textTransform:'capitalize'}}
+                    sx={{ fontSize: '12px', textTransform: 'capitalize' }}
                   >
                     {org.tier}
                   </Text>
@@ -918,7 +953,11 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                       variant='solid'
                       aria-label='Switch'
                       icon={<FaExchangeAlt color={switchIconColor} />}
-                      sx={{border:'1px', borderColor:'gray.200', bg: switchBgColor}}
+                      sx={{
+                        border: '1px',
+                        borderColor: 'gray.200',
+                        bg: switchBgColor
+                      }}
                       onClick={() => {
                         setActiveRow({ id: org.id, name: org.name })
                         onWarningOpen()
@@ -934,7 +973,12 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
               leftIcon={<AddIcon />}
               borderColor={primaryBlueText}
               aria-label='Add Organization'
-              sx={{ fontWeight:'500', textColor: primaryBlueText, border:'1px', mt:'10px' }}
+              sx={{
+                fontWeight: '500',
+                textColor: primaryBlueText,
+                border: '1px',
+                mt: '10px'
+              }}
             >
               Add Organization
             </Button>

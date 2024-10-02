@@ -1,38 +1,32 @@
 import React from 'react'
 
-import {
-  Button,
-  Flex,
-  Icon,
-  Progress,
-  Td,
-  Text,
-  Tr,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Button, Flex, Icon, Progress, Td, Text, Tr } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaEllipsisV } from 'react-icons/fa'
 
 function DashboardTableRow(props) {
   const { logo, name, status, budget, progression } = props
-  const textColor = useColorModeValue('gray.600', 'white')
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+
   return (
     <Tr>
       <Td minWidth={{ sm: '250px' }} pl='0px'>
         <Flex alignItems='center' py='.8rem' minWidth='100%' flexWrap='nowrap'>
           <Icon as={logo} h={'24px'} w={'24px'} me='18px' />
-          <Text fontSize='md' color={textColor} minWidth='100%'>
+          <Text fontSize='md' color={inverseSecondaryBgColor} minWidth='100%'>
             {name}
           </Text>
         </Flex>
       </Td>
       <Td>
-        <Text fontSize='md' color={textColor} pb='.5rem'>
+        <Text fontSize='md' color={inverseSecondaryBgColor} pb='.5rem'>
           {budget}
         </Text>
       </Td>
       <Td>
-        <Text fontSize='md' color={textColor} pb='.5rem'>
+        <Text fontSize='md' color={inverseSecondaryBgColor} pb='.5rem'>
           {status}
         </Text>
       </Td>

@@ -29,7 +29,12 @@ import RowComponent from 'components/RowComponent'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GetChangeLogs, GetProductData, GetSbomLogFilters, GetVulnData } from 'graphQL/Queries'
+import {
+  GetChangeLogs,
+  GetProductData,
+  GetSbomLogFilters,
+  GetVulnData
+} from 'graphQL/Queries'
 
 import LogFilters from './LogFilters'
 
@@ -60,7 +65,10 @@ const Changelog = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([ 'headingTextColor', 'primaryTextColor'])
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const PURL = useDisclosure()
   const USER = useDisclosure()
@@ -189,7 +197,7 @@ const Changelog = () => {
               <Tag
                 overflow={'auto'}
                 fontWeight={'medium'}
-                sx={{w:'fit-content', fontSize:'sm', cursor: 'pointer'}}
+                sx={{ w: 'fit-content', fontSize: 'sm', cursor: 'pointer' }}
               >
                 <TagLabel>
                   {loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}
@@ -222,7 +230,7 @@ const Changelog = () => {
                 setActiveRow(orig)
                 PURL.onOpen()
               }}
-              sx={{my:3, cursor:'pointer', color:primaryTextColor}}
+              sx={{ my: 3, cursor: 'pointer', color: primaryTextColor }}
             >
               {orig}
             </Text>
@@ -238,14 +246,19 @@ const Changelog = () => {
             >
               <Box textOverflow={'wrap'}>
                 {orig === 'f' ? (
-                  <Text  color={primaryTextColor}>False</Text>
+                  <Text color={primaryTextColor}>False</Text>
                 ) : orig === 't' ? (
-                  <Text  color={primaryTextColor}>True</Text>
+                  <Text color={primaryTextColor}>True</Text>
                 ) : license?.length > 0 ? (
                   license.map((item, index) => (
                     <Flex
                       key={index}
-                      sx={{my:2,gap:2, direction:'column', flexWrap:'wrap'}}
+                      sx={{
+                        my: 2,
+                        gap: 2,
+                        direction: 'column',
+                        flexWrap: 'wrap'
+                      }}
                     >
                       <Tag
                         size={'sm'}
@@ -264,7 +277,12 @@ const Changelog = () => {
                   urls.map((item, index) => (
                     <Flex
                       key={index}
-                      sx={{my:2,gap:2, direction:'column', flexWrap:'wrap'}}
+                      sx={{
+                        my: 2,
+                        gap: 2,
+                        direction: 'column',
+                        flexWrap: 'wrap'
+                      }}
                     >
                       <Tag
                         size={'sm'}
@@ -308,7 +326,7 @@ const Changelog = () => {
                 setActiveRow(updated)
                 PURL.onOpen()
               }}
-              sx={{my:3, color:primaryTextColor, cursor:'pointer'}}
+              sx={{ my: 3, color: primaryTextColor, cursor: 'pointer' }}
             >
               {updated}
             </Text>
@@ -325,14 +343,19 @@ const Changelog = () => {
             >
               <Box>
                 {updated === 'f' ? (
-                  <Text  color={primaryTextColor}>False</Text>
+                  <Text color={primaryTextColor}>False</Text>
                 ) : updated === 't' ? (
-                  <Text  color={primaryTextColor}>True</Text>
+                  <Text color={primaryTextColor}>True</Text>
                 ) : updatedValue?.length > 0 ? (
                   updatedValue.map((item, index) => (
                     <Flex
                       key={index}
-                      sx={{my:2,gap:2, direction:'column', flexWrap:'wrap'}}
+                      sx={{
+                        my: 2,
+                        gap: 2,
+                        direction: 'column',
+                        flexWrap: 'wrap'
+                      }}
                     >
                       <Tag
                         size={'sm'}
@@ -351,7 +374,12 @@ const Changelog = () => {
                   urls.map((item, index) => (
                     <Flex
                       key={index}
-                      sx={{my:2,gap:2, direction:'column', flexWrap:'wrap'}}
+                      sx={{
+                        my: 2,
+                        gap: 2,
+                        direction: 'column',
+                        flexWrap: 'wrap'
+                      }}
                     >
                       <Tag
                         size={'sm'}
@@ -390,7 +418,11 @@ const Changelog = () => {
       selector: (row) => (
         <Tooltip placement='top' label={row.changedBy}>
           <Text
-            sx={{textAlign:'right', color: primaryTextColor, cursor:'pointer'}}
+            sx={{
+              textAlign: 'right',
+              color: primaryTextColor,
+              cursor: 'pointer'
+            }}
             onClick={() => checkUser(row)}
           >
             {row.changedBy}
@@ -486,10 +518,10 @@ const Changelog = () => {
   const subHeaderComponentMemo = useMemo(() => {
     return (
       <Flex
-        sx={{w:'100%',alignItems:'center'}}
+        sx={{ w: '100%', alignItems: 'center' }}
         justifyContent={'space-between'}
       >
-        <Flex sx={{gap:3, w:'100%',alignItems:'flex-start'}}>
+        <Flex sx={{ gap: 3, w: '100%', alignItems: 'flex-start' }}>
           <SearchFilter
             id='changelog'
             filterText={logSearch}
@@ -550,7 +582,11 @@ const Changelog = () => {
       </Flex>
 
       {PURL.isOpen && (
-        <PurlCard value={activeRow} isOpen={PURL.isOpen} onClose={PURL.onClose} />
+        <PurlCard
+          value={activeRow}
+          isOpen={PURL.isOpen}
+          onClose={PURL.onClose}
+        />
       )}
 
       {USER.isOpen && (
@@ -570,7 +606,11 @@ const Changelog = () => {
       )}
 
       {VULN.isOpen && (
-        <VulnCard isOpen={VULN.isOpen} onClose={VULN.onClose} data={activeRow} />
+        <VulnCard
+          isOpen={VULN.isOpen}
+          onClose={VULN.onClose}
+          data={activeRow}
+        />
       )}
     </>
   )

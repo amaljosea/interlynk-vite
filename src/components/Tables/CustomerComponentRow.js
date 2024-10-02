@@ -2,16 +2,9 @@ import React from 'react'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
-import {
-  Button,
-  Flex,
-  Icon,
-  Tag,
-  Td,
-  Text,
-  Tr,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Button, Flex, Icon, Tag, Td, Text, Tr } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaEllipsisV } from 'react-icons/fa'
 
@@ -35,8 +28,7 @@ function CustomerComponentRow(props) {
     redacted
   } = props
   const location = useLocation()
-
-  const textColor = useColorModeValue('gray.700', 'white')
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
 
   const [contains, setcontains] = useState({})
 
@@ -52,7 +44,11 @@ function CustomerComponentRow(props) {
           <Flex direction='row'>
             <Icon as={logo} h={'24px'} w={'24px'} me='18px' />
             <Flex direction='column' gap='5px'>
-              <Text fontSize='sm' color={textColor} minWidth='100%'>
+              <Text
+                fontSize='sm'
+                color={inverseSecondaryBgColor}
+                minWidth='100%'
+              >
                 {contains && contains.redactions && redacted
                   ? 'Redacted-DC...gM='
                   : component}
@@ -73,7 +69,7 @@ function CustomerComponentRow(props) {
       </Td>
       <Td>
         <Flex direction='column'>
-          <Text fontSize='sm' color={textColor}>
+          <Text fontSize='sm' color={inverseSecondaryBgColor}>
             {version}
           </Text>
         </Flex>

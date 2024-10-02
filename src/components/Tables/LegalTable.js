@@ -27,7 +27,6 @@ import {
   Stack,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -72,7 +71,6 @@ const LegalTable = () => {
   ])
   const paddingCell = 0
   const paddingHeadCell = 0
-  const iconColor = useColorModeValue('#718096', '#F7FAFC')
 
   const { data, loading } = useQuery(GetOrgManufacturers, {
     skip: !orgView ? true : activetab === 'legal' ? false : true
@@ -221,14 +219,14 @@ const LegalTable = () => {
                     <EmailIcon color={primaryBlueText} boxSize={4} />
                   </Tooltip>
                 ) : (
-                  <EmailIcon color={iconColor} boxSize={4} />
+                  <EmailIcon color={headingTextColor} boxSize={4} />
                 )}
                 {item?.phone ? (
                   <Tooltip placement='top' label={item?.phone}>
                     <PhoneIcon color={primaryBlueText} boxSize={3} />
                   </Tooltip>
                 ) : (
-                  <PhoneIcon color={iconColor} boxSize={3} />
+                  <PhoneIcon color={headingTextColor} boxSize={3} />
                 )}
                 <Text color={primaryTextColor}>{item?.name || ''}</Text>
               </Flex>

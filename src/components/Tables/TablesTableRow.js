@@ -11,9 +11,11 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 function TablesTableRow(props) {
   const { logo, name, email, subdomain, domain, status, date } = props
-  const textColor = useColorModeValue('gray.700', 'white')
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
   const bgStatus = useColorModeValue('gray.400', '#1a202c')
   const colorStatus = useColorModeValue('white', 'gray.400')
 
@@ -23,7 +25,7 @@ function TablesTableRow(props) {
         <Flex align='center' py='.8rem' minWidth='100%' flexWrap='nowrap'>
           <Avatar src={logo} w='50px' borderRadius='12px' me='18px' />
           <Flex direction='column'>
-            <Text fontSize='md' color={textColor} minWidth='100%'>
+            <Text fontSize='md' color={inverseSecondaryBgColor} minWidth='100%'>
               {name}
             </Text>
             <Text fontSize='sm' color='gray.400' fontWeight='normal'>
@@ -35,7 +37,7 @@ function TablesTableRow(props) {
 
       <Td>
         <Flex direction='column'>
-          <Text fontSize='md' color={textColor} fontWeight='bold'>
+          <Text fontSize='md' color={inverseSecondaryBgColor} fontWeight='bold'>
             {domain}
           </Text>
           <Text fontSize='sm' color='gray.400' fontWeight='normal'>
@@ -55,7 +57,12 @@ function TablesTableRow(props) {
         </Badge>
       </Td>
       <Td>
-        <Text fontSize='md' color={textColor} fontWeight='bold' pb='.5rem'>
+        <Text
+          fontSize='md'
+          color={inverseSecondaryBgColor}
+          fontWeight='bold'
+          pb='.5rem'
+        >
           {date}
         </Text>
       </Td>

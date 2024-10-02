@@ -1,10 +1,12 @@
-import { Box, Text, useColorModeValue } from '@chakra-ui/react'
+import { Box, Text } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
 export const HealthScore = ({ value, isComponent }) => {
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
-  const bgColor = useColorModeValue('gray.100', 'gray.600')
+  const { primaryTextColor, secondaryBgColor } = useThemeColor([
+    'primaryTextColor',
+    'secondaryBgColor'
+  ])
 
   return (
     <Box
@@ -31,7 +33,7 @@ export const HealthScore = ({ value, isComponent }) => {
         right={0}
         pos={'absolute'}
         height={'100%'}
-        bg={bgColor}
+        bg={secondaryBgColor}
         width={value === 0 ? '100%' : `${100 - Math.round(value)}%`}
       />
       <Box

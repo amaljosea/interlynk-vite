@@ -5,7 +5,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { FaFilter } from 'react-icons/fa'
 
 const MenuHeading = ({ title, onClick, active }) => {
-  /* const bgActive = useColorModeValue('#EDF2F7', '') */
   const {
     primaryBlueText,
     primaryTextColor,

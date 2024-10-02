@@ -25,17 +25,24 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { DownloadSBOM, GetSbomQualityScores, SignedSbomDownload } from 'graphQL/Queries'
+import {
+  DownloadSBOM,
+  GetSbomQualityScores,
+  SignedSbomDownload
+} from 'graphQL/Queries'
 
 import ComplianceChecks from './ComplianceChecks'
 
 const DownloadModal = (props) => {
-  const { isOpen, onClose, productId, productName, version, sbomId } = props || ''
+  const { isOpen, onClose, productId, productName, version, sbomId } =
+    props || ''
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
   const activeUser = organization?.currentUser?.email
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const [getData] = useLazyQuery( signedUrlParams ? SignedSbomDownload : DownloadSBOM )
+  const [getData] = useLazyQuery(
+    signedUrlParams ? SignedSbomDownload : DownloadSBOM
+  )
 
   const [spec, setSpec] = useState('cyclonedx')
   const [format, setFormat] = useState('json')

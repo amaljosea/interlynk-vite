@@ -4,12 +4,13 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Select from 'react-select'
 import { isCustomerView } from 'utils'
 
-import { Spinner, useColorModeValue } from '@chakra-ui/react'
+import { Spinner } from '@chakra-ui/react'
 
 import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProjectVersionAndId } from 'graphQL/Queries'
 import { GetArchivedVersions } from 'graphQL/Queries'
@@ -29,8 +30,7 @@ const VersionBreadcrumb = ({ selectStyles }) => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const loaderColor = useColorModeValue('#e2e8f0', '#4A5568')
-
+  const { grayBorderColor } = useThemeColor(['grayBorderColor'])
   const prodID = params.productid
   const sbomId = params.sbomid
 
@@ -112,7 +112,7 @@ const VersionBreadcrumb = ({ selectStyles }) => {
     )
   }
 
-  return <Spinner size='xs' color={loaderColor} />
+  return <Spinner size='xs' color={grayBorderColor} />
 }
 
 export default VersionBreadcrumb

@@ -37,13 +37,25 @@ const LynkModal = ({
   const isConfirmationModal = type === 'confirmation'
 
   const colorScheme =
-    title.includes('Restore') || title.includes('Enable') ? 'green' : isConfirmationModal ? 'red' : 'blue'
+    title.includes('Restore') || title.includes('Enable')
+      ? 'green'
+      : isConfirmationModal
+        ? 'red'
+        : 'blue'
 
-  const loadingText = isConfirmationModal ? title.includes('Delete') ? 'Deleting...' : 'Updating...' : buttonText
+  const loadingText = isConfirmationModal
+    ? title.includes('Delete')
+      ? 'Deleting...'
+      : 'Updating...'
+    : buttonText
 
   const isDisabled = disabled || isLoading
 
-  const buttonLabel = isLoading ? loadingText : isConfirmationModal ? 'Yes' : buttonText
+  const buttonLabel = isLoading
+    ? loadingText
+    : isConfirmationModal
+      ? 'Yes'
+      : buttonText
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -55,7 +67,7 @@ const LynkModal = ({
       <ModalOverlay />
       <ModalContent
         borderRadius='16px'
-        sx={{maxW: maxW || '600px', maxH: maxH || '' }}
+        sx={{ maxW: maxW || '600px', maxH: maxH || '' }}
       >
         <form onSubmit={handleSubmit}>
           <ModalHeader paddingInline={'16px'}>
@@ -66,12 +78,18 @@ const LynkModal = ({
           </ModalHeader>
           <ModalCloseButton marginTop={1.5} />
           <Divider />
-          <ModalBody paddingInline={'16px'} marginBlock={4}>{children}</ModalBody>
+          <ModalBody paddingInline={'16px'} marginBlock={4}>
+            {children}
+          </ModalBody>
           <Divider />
           <ModalFooter paddingInline={'16px'} hidden={noFooter}>
             <Flex
-              sx={{ w:'100%', gap:4, alignItems:'center' }}
-              justifyContent={isConfirmationModal || leftFooterContent ? 'space-between' : 'end'}
+              sx={{ w: '100%', gap: 4, alignItems: 'center' }}
+              justifyContent={
+                isConfirmationModal || leftFooterContent
+                  ? 'space-between'
+                  : 'end'
+              }
             >
               {leftFooterContent && <Box>{leftFooterContent}</Box>}
               <ButtonGroup ml={'auto'}>
@@ -79,7 +97,7 @@ const LynkModal = ({
                   onClick={onClose}
                   variant='ghost'
                   hidden={hideCancelButton}
-                  sx={{fontWeight:400, color:'#60686F'}}
+                  sx={{ fontWeight: 400, color: '#60686F' }}
                 >
                   Cancel
                 </Button>

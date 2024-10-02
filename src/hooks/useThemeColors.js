@@ -5,7 +5,6 @@ export const useThemeColor = (colorKeys) => {
 
   const colors = colorKeys.reduce((acc, colorKey) => {
     const color = theme.colors[colorKey]
-
     if (color) {
       // eslint-disable-next-line
       acc[colorKey] = useColorModeValue(color?.light, color?.dark)
