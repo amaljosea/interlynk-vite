@@ -146,6 +146,14 @@ const ProductDetails = () => {
     }
   }, [productId, projectGroup])
 
+  const handleSort = (column, sortDirection) => {
+    setVersionFilters((oldFilters) => ({
+      ...oldFilters,
+      field: column?.id,
+      direction: sortDirection.toUpperCase()
+    }))
+  }
+
   if (loading) {
     return (
       <Card>
@@ -245,6 +253,7 @@ const ProductDetails = () => {
               {/* VERSIONS */}
               <TabPanel px={0}>
                 <VersionsTable
+                  handleSort={handleSort}
                   retentionTime={null}
                   filters={versionFilters}
                   projectGroup={projectGroup}
