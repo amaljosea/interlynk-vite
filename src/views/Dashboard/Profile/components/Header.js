@@ -584,7 +584,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
             { isOrg && <FaCity size='80px' style={{ color: cityIconColor }} /> }
 
             <Flex direction='column' maxWidth='100%' my={{ sm: '14px' }}>
-              <Box display={'flex'} gap={'10px'} alignItems={'center'}>
+              <Box display={'flex'} gap={orgData?.currentUser?.name ? '10px' : 0} alignItems={'center'}>
                 <Text
                   ms={{ sm: '8px', md: '0px' }}
                   sx={{fontWeight:'semibold', fontSize:22, color: primaryTextColor}}
