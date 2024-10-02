@@ -4099,7 +4099,6 @@ export const PolicyRuleViolations = gql`
             authors {
               email
               name
-              phone
             }
             projectVersion
           }

@@ -25,20 +25,14 @@ import { PolicyRuleViolations } from 'graphQL/Queries'
 
 const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
   const { subject, category, name, operatorWording, value } = activeRow || null
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { headingTextColor, primaryTextColor } = useThemeColor(['headingTextColor','primaryTextColor'])
 
   const { nodes, paginationProps, loading } = usePaginatedQuery(
     PolicyRuleViolations,
     {
       skip: activeRow?.id ? false : true,
       selector: 'policyRuleViolations',
-      variables: {
-        sbomId,
-        policyRuleId: activeRow?.id
-      }
+      variables: { sbomId, policyRuleId: activeRow?.id }
     }
   )
 
@@ -76,9 +70,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       selector: (row) => {
         const { component } = row
         return (
-          <Text color={primaryTextColor} my={2}>
-            {component?.licensesExp || ''}
-          </Text>
+          <Text color={primaryTextColor} my={2}>{component?.licensesExp || ''}</Text>
         )
       },
       omit: category === 'license' ? false : true,
@@ -90,9 +82,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       selector: (row) => {
         const { violation } = row
         return (
-          <Text color={primaryTextColor} my={2}>
-            {violation?.vuln?.vulnId || ''}
-          </Text>
+          <Text color={primaryTextColor} my={2}>{violation?.vuln?.vulnId || ''}</Text>
         )
       },
       wrap: true,
@@ -101,6 +91,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
   ]
 
   const supplierExists = subject === 'SBOM_SUPPLIER' && nodes?.length > 0
+  const authorExists = subject === 'VERSION_AUTHOR' && nodes?.length > 0
 
   return (
     <Drawer size={'lg'} isOpen={isOpen} placement='right' onClose={onClose}>
@@ -118,21 +109,23 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
               <span style={{ textTransform: 'capitalize' }}>{category}</span>{' '}
               {name} {operatorWording} {value}
             </Text>
-            {subject === 'VERSION_AUTHOR' && (
-              <Text>
-                <strong>Value:</strong>{' '}
-                <span style={{ textTransform: 'capitalize' }}>{name}</span> -{' '}
-                {value}
-              </Text>
-            )}
             {supplierExists &&
               nodes?.map((item, index) => (
                 <Flex key={index} gap={2} flexWrap={'wrap'}>
-                  <Text>Value:</Text>
+                  <Text fontWeight={'semibold'}>Value:</Text>
                   {item?.violation?.suppliers?.map((sup, idx) => (
                     <Text key={idx}>
                       {`${sup?.contactName} (${sup?.contactEmail}) - ${sup?.name}`}
                     </Text>
+                  ))}
+                </Flex>
+              ))}
+            {authorExists &&
+              nodes?.map((item, index) => (
+                <Flex key={index} gap={2} flexWrap={'wrap'}>
+                  <Text fontWeight={'semibold'}>Value:</Text>
+                  {item?.violation?.authors?.map((sup, idx) => (
+                    <Text key={idx}>{`${sup?.name} - ${sup?.email}`}</Text>
                   ))}
                 </Flex>
               ))}
@@ -148,9 +141,8 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
                 </Text>
               )}
             <Text
-              fontWeight={'bold'}
-              fontSize={'md'}
               hidden={category === 'version'}
+              sx={{fontSize:'md',fontWeight:'bold'}}
             >
               Violations List
             </Text>
