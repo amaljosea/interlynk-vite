@@ -69,9 +69,9 @@ const CpeInputs = ({ onClose, value, setValue }) => {
     handleChange('identifiers', 'cpe', value)
     const matches = validateCpe(value)
     if (matches) {
-      handleChange('identifiers', 'isValidCpe', true)
+      handleChange('identifiers', 'cpeError', '')
     } else {
-      handleChange('identifiers', 'isValidCpe', false)
+      handleChange('identifiers', 'cpeError', 'Invalid CPE')
     }
     onClose()
   }

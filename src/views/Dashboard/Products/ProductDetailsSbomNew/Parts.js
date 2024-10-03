@@ -3,7 +3,7 @@ import { useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { capitalizeFirstLetter, customStyles, envOrderList } from 'utils'
-import { GetIcon, isDefaultEnv, isUnknown, truncatedValue } from 'utils'
+import { GetIcon, isDefaultEnv, truncatedValue, isValidPurl } from 'utils'
 import { getSignedUrlParams } from 'utils'
 import { ProductGeneralTabs } from 'utils/TabsObjects'
 
@@ -292,8 +292,8 @@ const Parts = ({ data }) => {
       selector: (row) => {
         const { part } = row
         const { primaryComponent, projectVersion, suppliers } = part || ''
-        const { purl, cpes } = primaryComponent || ''
-        const unknown = isUnknown(cpes, purl)
+        const { purl } = primaryComponent || ''
+        const validPurl = isValidPurl(purl)
 
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           productgroupid: part.project.projectGroup.id,
@@ -304,15 +304,14 @@ const Parts = ({ data }) => {
           }
         })
 
-        const icon =
-          unknown || !purl ? (
-            <BsFillPatchQuestionFill
-              fontSize={24}
-              color={inverseSecondaryBgColor}
-            />
-          ) : (
-            GetIcon(purl?.split('/')[0], colorMode)
-          )
+        const icon = validPurl ? (
+          GetIcon(purl?.split('/')[0], colorMode)
+        ) : (
+          <BsFillPatchQuestionFill
+            fontSize={24}
+            color={inverseSecondaryBgColor}
+          />
+        )
 
         return (
           <Grid

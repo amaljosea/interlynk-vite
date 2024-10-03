@@ -3,13 +3,11 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { validateCpe } from 'utils'
 import { getSignedUrlParams } from 'utils'
 
-import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Box,
   FormControl,
+  FormErrorMessage,
   Input,
-  InputGroup,
-  InputRightElement,
   List,
   ListItem,
   VStack
@@ -25,18 +23,21 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
 
   const [focusedIndex, setFocusedIndex] = useState(null)
   const listItemsRef = useRef([])
-  const { primaryBgColor, secondaryBgColor, primaryErrorColor } = useThemeColor(
-    ['primaryBgColor', 'secondaryBgColor', 'primaryErrorColor']
-  )
+  const { primaryBgColor, secondaryBgColor } = useThemeColor([
+    'primaryBgColor',
+    'secondaryBgColor'
+  ])
 
   const handleValidate = (value) => {
     const matches = validateCpe(value)
     if (matches) {
-      handleChange('identifiers', 'isValidCpe', true)
+      handleChange('identifiers', 'cpeError', '')
     } else {
-      handleChange('identifiers', 'isValidCpe', false)
+      handleChange('identifiers', 'cpeError', 'Invalid CPE')
     }
   }
+
+  const onBlur = (e) => handleValidate(e.target.value)
 
   const handleSelect = (value) => {
     handleChange('identifiers', 'cpe', value)
@@ -107,31 +108,22 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
       ref={inputRef}
     >
       <FormControl
-        isInvalid={identifiers?.cpe !== '' && !identifiers?.isValidCpe}
+        isInvalid={identifiers?.cpe !== '' && identifiers?.cpeError !== ''}
       >
-        <InputGroup>
-          <Input
-            id={'cpe'}
-            name={'cpe'}
-            size='md'
-            fontSize={'sm'}
-            placeholder={'CPE'}
-            readOnly={signedUrlParams}
-            value={identifiers?.cpe}
-            onChange={onChange}
-            autoComplete='off'
-            onKeyDown={handleKeyDown}
-          />
-          {identifiers?.cpe && (
-            <InputRightElement align='center' zIndex={-1}>
-              {identifiers?.isValidCpe ? (
-                <CheckIcon color='green' />
-              ) : (
-                <WarningTwoIcon color={primaryErrorColor} />
-              )}
-            </InputRightElement>
-          )}
-        </InputGroup>
+        <Input
+          id={'cpe'}
+          name={'cpe'}
+          size='md'
+          fontSize={'sm'}
+          placeholder={'CPE'}
+          readOnly={signedUrlParams}
+          value={identifiers?.cpe}
+          onChange={onChange}
+          autoComplete='off'
+          onBlur={onBlur}
+          onKeyDown={handleKeyDown}
+        />
+        <FormErrorMessage>{identifiers?.cpeError}</FormErrorMessage>
       </FormControl>
       {identifiers?.cpe !== '' && cpeList?.length > 0 && (
         <Box

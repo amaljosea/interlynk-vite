@@ -7,6 +7,7 @@ import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Box,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
   InputGroup,
@@ -143,12 +144,12 @@ const CpeInput = ({
       if (matches) {
         setTabData((prev) => ({
           ...prev,
-          identifiers: { ...prev?.identifiers, isValidCpe: true }
+          identifiers: { ...prev?.identifiers, cpeError: '' }
         }))
       } else {
         setTabData((prev) => ({
           ...prev,
-          identifiers: { ...prev?.identifiers, isValidCpe: false }
+          identifiers: { ...prev?.identifiers, cpeError: 'Invalid CPE' }
         }))
       }
     }
@@ -178,37 +179,25 @@ const CpeInput = ({
       <FormControl
         isDisabled={isDisabled}
         isInvalid={
-          name === 'cpe' && inputValue !== '' && !identifiers?.isValidCpe
+          name === 'cpe' && inputValue !== '' && identifiers?.cpeError !== ''
         }
       >
         {name !== 'cpe' && (
           <FormLabel textTransform={'capitalize'}>{label}</FormLabel>
         )}
-        <InputGroup>
-          <Input
-            id={name}
-            name={name}
-            size='md'
-            fontSize={'sm'}
-            placeholder={name === 'cpe' ? 'CPE' : `Enter ${name}`}
-            value={inputValue}
-            onChange={onChange}
-            autoComplete='off'
-            onBlur={() => updateString(name, inputValue)}
-            onKeyDown={handleKeyDown}
-          />
-          {validation === true && (
-            <InputRightElement align='center' zIndex={-1}>
-              {inputValue != null && inputValue !== '' ? (
-                identifiers?.isValidCpe ? (
-                  <CheckIcon color='green' />
-                ) : (
-                  <WarningTwoIcon color='red' />
-                )
-              ) : null}
-            </InputRightElement>
-          )}
-        </InputGroup>
+        <Input
+          id={name}
+          name={name}
+          size='md'
+          fontSize={'sm'}
+          placeholder={name === 'cpe' ? 'CPE' : `Enter ${name}`}
+          value={inputValue}
+          onChange={onChange}
+          autoComplete='off'
+          onBlur={() => updateString(name, inputValue)}
+          onKeyDown={handleKeyDown}
+        />
+        <FormErrorMessage>{identifiers?.cpeError}</FormErrorMessage>
       </FormControl>
       {inputValue !== '' && cpeList && cpeList.length > 0 && (
         <Box

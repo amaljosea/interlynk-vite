@@ -81,7 +81,7 @@ const LynkModal = ({
           <ModalBody paddingInline={'16px'} marginBlock={4}>
             {children}
           </ModalBody>
-          <Divider />
+          <Divider hidden={noFooter} />
           <ModalFooter paddingInline={'16px'} hidden={noFooter}>
             <Flex
               sx={{ w: '100%', gap: 4, alignItems: 'center' }}

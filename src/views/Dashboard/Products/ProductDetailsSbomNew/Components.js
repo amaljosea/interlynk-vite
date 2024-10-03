@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { GetIcon, customStyles, timeSince, truncatedValue } from 'utils'
-import { getFullDateAndTime, isCustomerView, isUnknown } from 'utils'
+import { getFullDateAndTime, isCustomerView, isValidPurl } from 'utils'
 import { getSignedUrlParams } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 import { openSsf } from 'variables/general'
@@ -219,20 +219,19 @@ const Components = ({ sbomData }) => {
       id: 'COMPONENTS_NAME',
       name: 'NAME',
       selector: (row) => {
-        const { purl, cpes, name, primary, internal, sbomId: bomId, sbom } = row
+        const { purl, name, primary, internal, sbomId: bomId, sbom } = row
         const { projectVersion, project } = sbom || ''
         const { projectGroup } = project || ''
         const isPart = sbomId !== bomId
-        const unknown = isUnknown(cpes, purl)
-        const icon =
-          unknown || !purl ? (
-            <BsFillPatchQuestionFill
-              fontSize={24}
-              color={inverseSecondaryBgColor}
-            />
-          ) : (
-            GetIcon(purl?.split('/')[0], colorMode)
-          )
+        const validPurl = isValidPurl(purl)
+        const icon = validPurl ? (
+          GetIcon(purl?.split('/')[0], colorMode)
+        ) : (
+          <BsFillPatchQuestionFill
+            fontSize={24}
+            color={inverseSecondaryBgColor}
+          />
+        )
         return (
           <Flex sx={{ alignItems: 'center', gap: 2, my: 3 }}>
             <Box width={'50px'}>
@@ -623,8 +622,7 @@ const Components = ({ sbomData }) => {
 
     return (
       <Box
-        p={5}
-        width={'100%'}
+        sx={{ w: '100%', p: 5 }}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Grid templateColumns='repeat(3, 1fr)' py={2} gap={6}>
@@ -721,7 +719,7 @@ const Components = ({ sbomData }) => {
               cursor={'pointer'}
               onClick={() => onCheckPurl(data)}
             >
-              {purl !== null && purl !== '' ? purl : 'N/A'}
+              {purl !== null && purl !== '' ? decodeURI(purl) : 'N/A'}
             </Text>
           </GridItem>
           <GridItem>

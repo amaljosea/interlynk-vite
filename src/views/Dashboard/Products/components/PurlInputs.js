@@ -21,10 +21,8 @@ import { CpeAutoComplete } from 'graphQL/Queries'
 
 import IdentifierLabel from './IdentifierLabel'
 
-const PurlInputs = ({ value, setValue, onClose, activeComp }) => {
+const PurlInputs = ({ value, setValue, onClose }) => {
   const [getCpe] = useLazyQuery(CpeAutoComplete)
-
-  const { purl } = activeComp || ''
 
   const { handleChange } = useContext(TabContext)
 
@@ -342,17 +340,19 @@ const PurlInputs = ({ value, setValue, onClose, activeComp }) => {
       pkg.namespace = pkg.namespace === 'namespace' ? '' : pkg.namespace
       pkg.version = pkg.version === 'version' ? '' : pkg.version
       handleChange('identifiers', 'purl', pkg.toString())
-      handleChange('identifiers', 'isValidaPurl', true)
+      handleChange('identifiers', 'purlError', '')
+      setValue(pkg.toString())
       onClose()
     } catch (error) {
-      handleChange('identifiers', 'isValidaPurl', false)
+      handleChange('identifiers', 'purlError', error?.message)
     }
   }
 
   useEffect(() => {
-    if (purl) {
-      const data = PackageURL.fromString(purl)
-      setPurlData((prev) => ({
+    if (value) {
+      try {
+        const data = PackageURL.fromString(decodeURI(value))
+        setPurlData((prev) => ({
         ...prev,
         type: data?.type || '',
         namespace: data?.namespace || '',
@@ -363,17 +363,19 @@ const PurlInputs = ({ value, setValue, onClose, activeComp }) => {
               .map(([key, value]) => `${key}=${value}`)
               .join('&')
           : ''
-      }))
+        }))
+      } catch (error) {
+        console.log('Error',error);
+      }
     }
-  }, [purl])
+  }, [value])
 
   return (
     <Flex width={'100%'} direction={'column'} gap={4}>
       {/* Package URL */}
-      <FormControl>
+      <FormControl isReadOnly>
         <IdentifierLabel title={`Package URL (PURL)`} onClose={onClose} />
         <Textarea
-          isReadOnly
           type='text'
           value={value}
           fontSize='sm'
@@ -466,10 +468,9 @@ const PurlInputs = ({ value, setValue, onClose, activeComp }) => {
         <FormControl>
           <FormLabel>Package Name</FormLabel>
           <Input
-            mt={1.5}
             type='text'
-            fontSize={'sm'}
             value={purlData?.name}
+            sx={{mt:1.5, fontSize:'sm'}}
             placeholder='Enter packageName'
             onBlur={(e) => handleInputBlur('name', e.target.value)}
             onChange={(e) => handleInputChange('name', e.target.value)}
@@ -494,12 +495,11 @@ const PurlInputs = ({ value, setValue, onClose, activeComp }) => {
         <FormControl>
           <FormLabel>Version</FormLabel>
           <Input
-            mt={1.5}
             size='md'
             type='text'
-            fontSize={'sm'}
             value={purlData?.version}
             placeholder='Enter version'
+            sx={{mt:1.5, fontSize:'sm'}}
             onBlur={(e) => handleInputBlur('version', e.target.value)}
             onChange={(e) => handleInputChange('version', e.target.value)}
           />

@@ -20,9 +20,9 @@ export const TabProvider = ({ children }) => {
     },
     identifiers: {
       cpe: '',
-      isValidCpe: true,
+      cpeError: '',
       purl: '',
-      isValidPurl: true
+      purlError: ''
     },
     supplier: {
       name: '',

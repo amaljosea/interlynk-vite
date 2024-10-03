@@ -5,16 +5,14 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { isCustomerView, validateCpe } from 'utils'
 
-import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Divider,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Icon,
   Input,
-  InputGroup,
-  InputRightElement,
   Stack,
   Text
 } from '@chakra-ui/react'
@@ -69,22 +67,28 @@ const CompIdentifiers = ({ data }) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
     handleChange('identifiers', 'purl', val)
+    handleChange('identifiers', 'purlError', '')
   }
 
   const purlInputBlur = (e) => {
     if (e.target.value !== '') {
       try {
         PackageURL.fromString(e.target.value)
-        handleChange('identifiers', 'isValidPurl', true)
+        handleChange('identifiers', 'purlError', '')
       } catch (ex) {
-        console.error('ex', ex)
-        handleChange('identifiers', 'isValidPurl', false)
+        console.error('ex', ex.message)
+        handleChange('identifiers', 'purlError', ex.message)
       }
     }
   }
 
   const handlePurlModal = () => {
-    setPurlValue(identifiers?.purl || 'pkg:type/name@version')
+    try {
+      PackageURL.fromString(identifiers?.purl)
+      setPurlValue(identifiers?.purl)
+    } catch (ex) {
+      setPurlValue('pkg:type/name@version')
+    }
     setPurlOpen(true)
   }
 
@@ -97,12 +101,7 @@ const CompIdentifiers = ({ data }) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
     handleChange('identifiers', 'cpe', val)
-    const matches = validateCpe(val)
-    if (matches) {
-      handleChange('identifiers', 'isValidCpe', true)
-    } else {
-      handleChange('identifiers', 'isValidCpe', false)
-    }
+    handleChange('identifiers', 'cpeError', '')
     getCpe({
       variables: {
         input: { idType: 'cpe', ecosystem: 'cpe', search: { idUri: val } }
@@ -116,10 +115,8 @@ const CompIdentifiers = ({ data }) => {
 
   const isInvalid =
     (identifiers?.purl === '' && identifiers?.cpe === '') ||
-    (identifiers?.purl !== '' &&
-      !identifiers.isValidPurl &&
-      identifiers?.cpe !== '' &&
-      !identifiers.isValidCpe)
+    (identifiers?.purl !== '' && identifiers.purlError !== '') ||
+    (identifiers?.cpe !== '' && identifiers.cpeError !== '')
 
   const handleUpdateCom = () => {
     updateComponent({
@@ -162,18 +159,23 @@ const CompIdentifiers = ({ data }) => {
     const { cpes, purl } = data || {}
 
     // HANDLE PURL
-    const updatePurl = (isValidPurl) => {
+    const updatePurl = (msg) => {
       setTabData((prev) => ({
         ...prev,
-        identifiers: { ...prev.identifiers, purl: purl || '', isValidPurl }
+        identifiers: {
+          ...prev.identifiers,
+          purl: purl ? decodeURI(purl) : '',
+          purlError: msg
+        }
       }))
     }
+
     if (purl) {
       try {
-        PackageURL.fromString(purl)
-        updatePurl(true)
+        PackageURL.fromString(decodeURI(purl))
+        updatePurl('')
       } catch (ex) {
-        updatePurl(false)
+        updatePurl(ex?.message)
       }
     } else {
       updatePurl(true)
@@ -181,13 +183,13 @@ const CompIdentifiers = ({ data }) => {
 
     // HANDLE CPE
     const cpe = cpes?.[0] || ''
-    const isValidCpe = cpe && validateCpe(cpe)
+    const isValid = cpe && validateCpe(cpe)
     setTabData((prev) => ({
       ...prev,
       identifiers: {
         ...prev.identifiers,
         cpe,
-        isValidCpe: Boolean(isValidCpe)
+        cpeError: isValid ? '' : 'Invalid CPE'
       }
     }))
   }, [data, setTabData])
@@ -203,7 +205,6 @@ const CompIdentifiers = ({ data }) => {
         {/* PURL INPUI */}
         {purlOpen && (
           <PurlInputs
-            activeComp={data}
             value={purlValue}
             setValue={setPurlValue}
             onClose={() => setPurlOpen(false)}
@@ -212,44 +213,32 @@ const CompIdentifiers = ({ data }) => {
         <FormControl
           hidden={purlOpen}
           isReadOnly={customerView}
-          isInvalid={identifiers?.purl && !identifiers?.isValidPurl}
+          isInvalid={identifiers?.purl !== '' && identifiers?.purlError !== ''}
         >
           <FormLabel htmlFor='purl' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Icon
-                fontSize={12}
-                color={'#718096'}
-                cursor={'pointer'}
                 onClick={handlePurlModal}
                 display={customerView ? 'none' : 'flex'}
                 as={purlOpen ? FaChevronDown : FaChevronRight}
+                sx={{ fontSize: 12, color: '#718096', cursor: 'pointer' }}
               />
               <Text>Package URL {`(PURL)`}</Text>
             </Flex>
           </FormLabel>
-          <InputGroup>
-            <Input
-              type='text'
-              size='md'
-              id='purl'
-              name='purl'
-              fontSize={'sm'}
-              placeholder='PURL'
-              value={identifiers?.purl}
-              autoComplete='off'
-              onBlur={purlInputBlur}
-              onChange={handlePURLInputChange}
-            />
-            <InputRightElement align='center' zIndex={-1}>
-              {identifiers?.purl != null && identifiers?.purl !== '' ? (
-                identifiers?.isValidPurl ? (
-                  <CheckIcon color='green' />
-                ) : (
-                  <WarningTwoIcon color='red' />
-                )
-              ) : null}
-            </InputRightElement>
-          </InputGroup>
+          <Input
+            type='text'
+            size='md'
+            id='purl'
+            name='purl'
+            fontSize={'sm'}
+            placeholder='PURL'
+            value={identifiers?.purl}
+            autoComplete='off'
+            onBlur={purlInputBlur}
+            onChange={handlePURLInputChange}
+          />
+          <FormErrorMessage>{identifiers?.purlError}</FormErrorMessage>
         </FormControl>
         <Divider />
         {/* CPE INPUT */}
@@ -264,12 +253,10 @@ const CompIdentifiers = ({ data }) => {
           <FormLabel htmlFor='cpe' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Icon
-                fontSize={12}
-                color={'#718096'}
-                cursor={'pointer'}
                 onClick={handleCpeModal}
                 display={customerView ? 'none' : 'flex'}
                 as={cpeOpen ? FaChevronDown : FaChevronRight}
+                sx={{ fontSize: 12, color: '#718096', cursor: 'pointer' }}
               />
               <Text>CPE</Text>
             </Flex>

@@ -162,10 +162,10 @@ function ComponentAddModal(props) {
     if (identifiers?.purl !== '') {
       try {
         PackageURL.fromString(identifiers?.purl)
-        handleChange('identifiers', 'isValidPurl', true)
+        handleChange('identifiers', 'purlError', '')
       } catch (ex) {
         console.error('ex', ex)
-        handleChange('identifiers', 'isValidPurl', false)
+        handleChange('identifiers', 'purlError', ex?.message)
       }
     }
   }
@@ -476,7 +476,7 @@ function ComponentAddModal(props) {
               {/* PURL INPUI */}
               <FormControl
                 isReadOnly={customerView}
-                isInvalid={identifiers?.purl && !identifiers?.isValidPurl}
+                isInvalid={identifiers?.purl && identifiers?.purlError !== ''}
               >
                 <FormLabel fontSize={12} htmlFor='text'>
                   Package URL
@@ -492,29 +492,19 @@ function ComponentAddModal(props) {
                     {showPurl ? '(Collapse)' : '(Expand)'}
                   </Link>
                 </FormLabel>
-                <InputGroup>
-                  <Input
-                    type='text'
-                    size='md'
-                    id='purl'
-                    name='purl'
-                    fontSize={'sm'}
-                    placeholder='PURL'
-                    value={identifiers?.purl}
-                    autoComplete='off'
-                    onChange={handlePURLInputChange}
-                    onBlur={purlInputBlur}
-                  />
-                  <InputRightElement align='center' zIndex={-1}>
-                    {identifiers?.purl != null && identifiers?.purl !== '' ? (
-                      identifiers?.isValidPurl ? (
-                        <CheckIcon color='green' />
-                      ) : (
-                        <WarningTwoIcon color={primaryErrorColor} />
-                      )
-                    ) : null}
-                  </InputRightElement>
-                </InputGroup>
+                <Input
+                  type='text'
+                  size='md'
+                  id='purl'
+                  name='purl'
+                  fontSize={'sm'}
+                  placeholder='PURL'
+                  value={identifiers?.purl}
+                  autoComplete='off'
+                  onChange={handlePURLInputChange}
+                  onBlur={purlInputBlur}
+                />
+                <FormErrorMessage>{identifiers?.purlError}</FormErrorMessage>
               </FormControl>
               {/* CPE INPUT */}
               <FormControl>

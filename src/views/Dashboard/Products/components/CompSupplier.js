@@ -276,17 +276,16 @@ const CompSupplier = ({ data }) => {
             onClick={handleSubmit}
             title={suppliers?.length > 0 ? 'Update' : 'Add  Supplier'}
           />
-          <Button
-            variant='ghost'
-            fontSize='14px'
-            fontWeight={400}
-            color={'#60686F'}
-            onClick={handleRemove}
-            isDisabled={isDisabled}
-            hidden={suppliers?.length === 0}
-          >
-            Remove Supplier
-          </Button>
+          {suppliers?.length > 0 && (
+            <Button
+              variant='ghost'
+              onClick={handleRemove}
+              isDisabled={isDisabled}
+              sx={{ fontSize: '14px', fontWeight: 400, color: '#60686F' }}
+            >
+              Remove Supplier
+            </Button>
+          )}
         </ButtonGroup>
       )}
     </Flex>

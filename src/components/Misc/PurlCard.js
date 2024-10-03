@@ -22,19 +22,21 @@ import { FaCheck, FaCircleInfo, FaRegCopy } from 'react-icons/fa6'
 import InfoTag from './InfoTag'
 
 const PurlCard = ({ value, isOpen, onClose }) => {
-  const purl = useClipboard(value)
+  const purl = useClipboard(decodeURI(value))
 
   const purlString = () => {
     try {
-      const data = PackageURL.fromString(value)
+      const data = PackageURL.fromString(decodeURI(value))
       return data
     } catch (error) {
       console.log('error', error)
     }
   }
 
-  const { primaryErrorColor, primarySuccessColor } = useThemeColor([ 'primaryErrorColor', 'primarySuccessColor'])
-
+  const { primaryErrorColor, primarySuccessColor } = useThemeColor([
+    'primaryErrorColor',
+    'primarySuccessColor'
+  ])
 
   return (
     <LynkModal
@@ -45,9 +47,13 @@ const PurlCard = ({ value, isOpen, onClose }) => {
       noFooter
     >
       <Stack spacing={1}>
-        <Tag sx={{ py: 2, mb:1, fontSize: 'sm', wordBreak: 'break-all' }}>
-          <TagLabel>{value}</TagLabel>
-          <TagRightIcon ml={'auto'} cursor={'pointer'} onClick={() => purl.onCopy()}>
+        <Tag sx={{ py: 2, mb: 1, fontSize: 'sm', wordBreak: 'break-all' }}>
+          <TagLabel>{decodeURI(value)}</TagLabel>
+          <TagRightIcon
+            ml={'auto'}
+            cursor={'pointer'}
+            onClick={() => purl.onCopy()}
+          >
             {purl.hasCopied ? <FaCheck size={24} /> : <FaRegCopy size={24} />}
           </TagRightIcon>
         </Tag>
@@ -55,35 +61,29 @@ const PurlCard = ({ value, isOpen, onClose }) => {
         <Stack spacing={2} pt={1}>
           <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
             <Text fontSize={'sm'}>Type</Text>
-            {purlString(value)?.type && (
-              <InfoTag>{purlString(value)?.type}</InfoTag>
-            )}
+            <InfoTag>{purlString(value)?.type || 'N/A'}</InfoTag>
           </Grid>
           <Divider />
           <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
             <Text fontSize={'sm'}>Namespace</Text>
-            {purlString(value)?.namespace && (
-              <InfoTag>{purlString(value)?.namespace}</InfoTag>
-            )}
+            <InfoTag>{purlString(value)?.namespace || 'N/A'}</InfoTag>
           </Grid>
           <Divider />
           <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
             <Text fontSize={'sm'}>Package Name</Text>
-            {purlString()?.name && <InfoTag>{purlString()?.name}</InfoTag>}
+            <InfoTag>{purlString()?.name || 'N/A'}</InfoTag>
           </Grid>
           <Divider />
           <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
             <Text fontSize={'sm'}>Package Version</Text>
-            {purlString()?.version && (
-              <InfoTag>{purlString()?.version}</InfoTag>
-            )}
+            <InfoTag>{purlString()?.version || 'N/A'}</InfoTag>
           </Grid>
           <Divider />
           <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
             <Text fontSize={'sm'}>Qualifiers</Text>
-            {purlString()?.qualifiers && (
-              <InfoTag>{JSON.stringify(purlString()?.qualifiers)}</InfoTag>
-            )}
+            <InfoTag>
+              {purlString()?.qualifiers ? JSON.stringify(purlString()?.qualifiers) : 'N/A'}
+            </InfoTag>
           </Grid>
           <Divider />
           <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
