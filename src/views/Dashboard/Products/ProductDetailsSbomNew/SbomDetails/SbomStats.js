@@ -129,10 +129,9 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
           </IconBox>
           <Stat>
             <StatLabel
-              mb={1}
-              fontSize='md'
-              cursor={'pointer'}
+              w={'fit-content'}
               onClick={() => handleClick(title)}
+              sx={{ mb: 1, fontSize: 'md', cursor: 'pointer' }}
             >
               {title}
             </StatLabel>
