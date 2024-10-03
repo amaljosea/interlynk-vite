@@ -38,7 +38,8 @@ export default function Customer() {
   const tabRes = window.matchMedia('(max-width: 1199px)')
 
   const { colorMode } = useColorMode()
-  const { generateProductVersionDetailPageUrlFromCurrentUrl: genUrl } = useProductUrlContext()
+  const { generateProductVersionDetailPageUrlFromCurrentUrl: genUrl } =
+    useProductUrlContext()
 
   document.documentElement.dir = 'ltr'
 
@@ -273,7 +274,7 @@ export default function Customer() {
     skip: params.productgroupid && signedUrlParams ? false : true,
     variables: { id: params.productgroupid },
     onCompleted: (data) => {
-      if(data?.shareLynkQuery?.productGroup) {
+      if (data?.shareLynkQuery?.productGroup) {
         sessionStorage.setItem('signedUrlParams', signedUrlParams)
       }
     }
@@ -298,7 +299,9 @@ export default function Customer() {
       styles={tourStyles}
       nextButton={(props) =>
         props?.currentStep === 2 ? null : props?.currentStep === 10 ? (
-          <Text cursor={'pointer'} onClick={() => onClickDone(props)}>Done</Text>
+          <Text cursor={'pointer'} onClick={() => onClickDone(props)}>
+            Done
+          </Text>
         ) : (
           <FaArrowRight cursor={'pointer'} onClick={() => onClickNext(props)} />
         )
@@ -311,11 +314,20 @@ export default function Customer() {
       onClickClose={(value) => onTourUpdate(value)}
       onClickMask={(value) => onTourUpdate(value)}
     >
-      <Flex sx={{w:'100%', bg: 'rgba(0,0,0,0.04)', gap:0, alignItems:'flex-start' }}>
-        <Box pos={'sticky'} top={0}><Sidebar routes={customerRoutes} /></Box>
+      <Flex
+        sx={{
+          w: '100%',
+          bg: 'rgba(0,0,0,0.04)',
+          gap: 0,
+          alignItems: 'flex-start'
+        }}
+      >
+        <Box pos={'sticky'} top={0}>
+          <Sidebar routes={customerRoutes} />
+        </Box>
         <Flex width={'100%'} flexDir={'column'}>
           <Box
-            sx={{top:0, zIndex:111, pos:'sticky'}}
+            sx={{ top: 0, zIndex: 111, pos: 'sticky' }}
             bg={colorMode === 'light' ? 'white' : 'gray.900'}
             borderBottom={`1px solid ${colorMode === 'light' ? '#E2E8F0' : '#1A202C'}`}
           >
@@ -325,7 +337,9 @@ export default function Customer() {
               secondary={getActiveNavbar(customerRoutes)}
             />
           </Box>
-          <Box sx={{my:6, px:6}}><Outlet /></Box>
+          <Box sx={{ my: 6, px: 6 }}>
+            <Outlet />
+          </Box>
         </Flex>
       </Flex>
     </TourProvider>

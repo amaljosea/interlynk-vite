@@ -65,7 +65,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
         <DrawerCloseButton mt={3} onClick={resetData} />
         <DrawerHeader borderBottomWidth='1px'>
           <Text mb={1} fontWeight={'medium'}>
-            {data ? 'Edit' : 'Add'} Component
+            {signedUrlParams ? 'Component' : 'Edit Component'}
           </Text>
           {data && <CompInfo data={data} />}
         </DrawerHeader>

@@ -47,7 +47,7 @@ import { CpeAutoComplete, GetAllComponents, GetAllSboms } from 'graphQL/Queries'
 
 import { BiLayer } from 'react-icons/bi'
 
-function ComponentDrawer(props) {
+function ComponentAddModal(props) {
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -282,7 +282,7 @@ function ComponentDrawer(props) {
         isLoading={loading}
         disabled={showPurl || showCpe ? false : isInvalid}
         hidden={signedUrlParams}
-        title={signedUrlParams ? 'Component' : 'Add Component'}
+        title='Add Component'
         Icon={BiLayer}
         buttonText={showPurl || showCpe ? 'Back' : 'Save'}
         noFooter={showPurl || showCpe}
@@ -730,4 +730,4 @@ function ComponentDrawer(props) {
   )
 }
 
-export default ComponentDrawer
+export default ComponentAddModal

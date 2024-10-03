@@ -38,7 +38,6 @@ import {
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
-import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import GraphDrawer from 'components/Drawer/GraphDrawer'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import { HealthScore } from 'components/HealthScore'
@@ -46,6 +45,7 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import CpeCard from 'components/Misc/CpeCard'
 import ExternalLink from 'components/Misc/ExternalLink'
 import PurlCard from 'components/Misc/PurlCard'
+import ComponentAddModal from 'components/Modal/ComponentAddModal'
 import Pagination from 'components/Pagination'
 import SupplierTag from 'components/SupplierTag'
 
@@ -974,7 +974,7 @@ const Components = ({ sbomData }) => {
       )}
 
       {COMPONENT.isOpen && (
-        <ComponentDrawer
+        <ComponentAddModal
           checkId={null}
           shortDesc={null}
           data={activeRow}

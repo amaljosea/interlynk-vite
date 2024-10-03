@@ -5,7 +5,6 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { ShareLynkProjectGroup } from 'graphQL/Queries'
 
-
 function Index() {
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const navigate = useNavigate()
@@ -17,7 +16,11 @@ function Index() {
     variables: { id: productGroupId },
     onCompleted: (data) => {
       if (data?.shareLynkQuery?.productGroup) {
-        navigate( generateProductDetailPageUrlFromCurrentUrl({ productgroupid: productGroupId }))
+        navigate(
+          generateProductDetailPageUrlFromCurrentUrl({
+            productgroupid: productGroupId
+          })
+        )
       }
     }
   })
