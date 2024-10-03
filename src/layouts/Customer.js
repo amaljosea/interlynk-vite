@@ -284,10 +284,14 @@ export default function Customer() {
     return (
       <Center as={Flex} flexDir={'column'} h={'100vh'}>
         <Text fontSize='3xl' fontWeight={'semibold'} color={'#3182CE'}>
-          Invalid Request !
+          Invalid Request
         </Text>
-        <Text fontSize='lg' mt={2}>
-          {displayErrorMessage(error?.networkError?.statusCode, error?.message)}
+        <Text mt={2}>
+          This looks like an Interlynk Share Lynk address but does not match any
+          shared product.
+        </Text>
+        <Text>
+          Please recheck or ask the sender to re-share the link address.
         </Text>
         <Img src={NotFound} width={'36%'} />
       </Center>
