@@ -10,6 +10,7 @@ import {
   sevColor,
   timeSince
 } from 'utils'
+import { getSignedUrlParams } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
@@ -276,7 +277,7 @@ const Vulnerabilities = ({ sbomData }) => {
     }
   )
 
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const firstDegreePart = nodes?.filter(
     (item) => item.isFirstDegreePart === true
   )

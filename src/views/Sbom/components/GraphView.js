@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client'
 import React, { useCallback, useEffect, useState } from 'react'
 import Tree from 'react-d3-tree'
 import { useParams } from 'react-router-dom'
+import { getSignedUrlParams } from 'utils'
 
 import {
   Box,
@@ -108,7 +109,7 @@ const CustomNode = ({
 const GraphView = ({ data, activeComp }) => {
   const params = useParams()
   const sbomId = params.sbomid
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
 
   const bgColor = useColorModeValue('gray.100', 'gray.800')
   const textColor = useColorModeValue('blue.500', 'gray.100')

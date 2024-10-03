@@ -4,6 +4,7 @@ import { PackageURL } from 'packageurl-js'
 import React, { useContext, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { isCustomerView } from 'utils'
+import { getSignedUrlParams } from 'utils'
 import { infoData } from 'variables/general'
 import { componentTypes } from 'variables/general'
 import CpeInputs from 'views/Dashboard/Products/components/CpeInputs'
@@ -55,7 +56,7 @@ function ComponentDrawer(props) {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const customerView = isCustomerView()
 
   const { tabData, handleChange, resetData, setTabData } =

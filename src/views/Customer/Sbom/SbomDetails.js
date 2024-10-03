@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
 import { truncatedValue } from 'utils'
+import { getSignedUrlParams } from 'utils'
 
 import {
   Flex,
@@ -73,7 +74,7 @@ const SbomDetails = () => {
 
   const { field, direction } = prodCompState
 
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 

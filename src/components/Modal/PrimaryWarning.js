@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext } from 'react'
 import { useParams } from 'react-router-dom'
+import { getSignedUrlParams } from 'utils'
 
 import { QuestionIcon } from '@chakra-ui/icons'
 import { Tag, Text } from '@chakra-ui/react'
@@ -12,7 +13,7 @@ import { GetAllSboms } from 'graphQL/Queries'
 
 const PrimaryWarning = ({ isOpen, onClose, primaryComp }) => {
   const params = useParams()
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
 
   const { tabData, setTabData } = useContext(TabContext)
   const { details } = tabData

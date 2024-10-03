@@ -2,6 +2,7 @@ import { useLazyQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { components } from 'react-select'
+import { getSignedUrlParams } from 'utils'
 import { infoData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -25,7 +26,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { LicenseAutoComplete } from 'graphQL/Queries'
 
 const LicenseField = ({ resolved, sbomView, license }) => {
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const { tabData, setTabData, handleChange } = useContext(TabContext)
   const { details } = tabData
   const { dispatch, sbomState } = useGlobalState()

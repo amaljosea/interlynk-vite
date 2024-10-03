@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
+import { getSignedUrlParams } from 'utils'
 import SBOM from 'views/Customer/Sbom'
 
 import {
@@ -34,7 +35,7 @@ const ProductDetails = () => {
   const productId = params.productid
   const productGroupId = params.productgroupid
   const sbomId = params.sbomid
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const [activeEnv, setActiveEnv] = useState(productId || '')
 
   const tabs = [

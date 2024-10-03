@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client'
 import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { getSignedUrlParams } from 'utils'
 
 import { Flex, SimpleGrid, Stat, StatLabel, StatNumber } from '@chakra-ui/react'
 
@@ -19,7 +20,7 @@ import { PolicyResultsType } from 'graphQL/Queries'
 const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
   const params = useParams()
   const navigate = useNavigate()
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const { primaryBlueText, secondaryBgColor, primaryTextColor } = useThemeColor(
     ['primaryBlueText', 'secondaryBgColor', 'primaryTextColor']
   )

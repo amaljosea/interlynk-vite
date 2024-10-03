@@ -1,5 +1,6 @@
 import { gql, useQuery } from '@apollo/client'
 import { useMemo } from 'react'
+import { getSignedUrlParams } from 'utils'
 
 import { calculateHealthScore } from './useSbomScores'
 
@@ -18,7 +19,7 @@ const QUERY = gql`
     }
   }
 `
-const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+const signedUrlParams = getSignedUrlParams()
 
 export const useSingleHealthScore = ({ projectId, sbomId }) => {
   const { data, loading, error } = useQuery(QUERY, {

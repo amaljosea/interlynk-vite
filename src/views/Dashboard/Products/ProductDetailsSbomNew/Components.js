@@ -6,6 +6,7 @@ import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { GetIcon, customStyles, timeSince, truncatedValue } from 'utils'
 import { getFullDateAndTime, isCustomerView, isUnknown } from 'utils'
+import { getSignedUrlParams } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 import { openSsf } from 'variables/general'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -84,7 +85,7 @@ const Components = ({ sbomData }) => {
   const productId = params.productid
   const sbomId = params.sbomid
   const customerView = isCustomerView()
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const { colorMode } = useColorMode()
 
   const isArchived = sbomData?.lifecycle === 'archived'
@@ -1002,11 +1003,19 @@ const Components = ({ sbomData }) => {
       )}
 
       {PURL.isOpen && (
-        <PurlCard value={activeRow?.purl} isOpen={PURL.isOpen} onClose={PURL.onClose} />
+        <PurlCard
+          value={activeRow?.purl}
+          isOpen={PURL.isOpen}
+          onClose={PURL.onClose}
+        />
       )}
 
       {CPE.isOpen && (
-        <CpeCard value={activeRow?.cpes[0]} isOpen={CPE.isOpen} onClose={CPE.onClose} />
+        <CpeCard
+          value={activeRow?.cpes[0]}
+          isOpen={CPE.isOpen}
+          onClose={CPE.onClose}
+        />
       )}
 
       {MAP.isOpen && <HealthMap isOpen={MAP.isOpen} onClose={MAP.onClose} />}

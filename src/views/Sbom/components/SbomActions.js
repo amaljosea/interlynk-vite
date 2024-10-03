@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import ReactSelect from 'react-select'
+import { getSignedUrlParams } from 'utils'
 import CompDrawer from 'views/Dashboard/Products/components/CompDrawer'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
@@ -32,7 +33,7 @@ import DownloadModal from './DownloadModal'
 import SigningModal from './SigningModal'
 
 const SbomActions = ({ sbom }) => {
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl

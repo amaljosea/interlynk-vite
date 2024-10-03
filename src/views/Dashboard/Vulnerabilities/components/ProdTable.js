@@ -9,6 +9,7 @@ import {
   statusColor,
   timeSince
 } from 'utils'
+import { getSignedUrlParams } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
@@ -43,7 +44,7 @@ import VulnFilters from './VulnsFilter'
 
 const VulnProdTable = ({ vulnId, sbomVersions }) => {
   const params = useParams()
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const { headingTextColor, primaryTextColor } = useThemeColor([
     'headingTextColor',
     'primaryTextColor'

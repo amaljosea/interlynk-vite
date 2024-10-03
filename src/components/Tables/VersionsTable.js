@@ -6,6 +6,7 @@ import DataTable from 'react-data-table-component'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFormat, getFullDateAndTime } from 'utils'
 import { getLink, getType, timeSince } from 'utils'
+import { getSignedUrlParams } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -71,7 +72,7 @@ const VersionsTable = (props) => {
   const navigate = useNavigate()
   const params = useParams()
   const productId = params.productid
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const { clearSelect, setClearSelect, selectedSbom } = useGlobalState()
   const { setSelectedSbom, versionState, dispatch } = useGlobalState()
   const { searchInput } = versionState

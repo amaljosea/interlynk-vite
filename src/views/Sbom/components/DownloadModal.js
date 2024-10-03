@@ -1,6 +1,7 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { truncatedValue } from 'utils'
+import { getSignedUrlParams } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
 import {
@@ -39,7 +40,7 @@ const DownloadModal = (props) => {
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
   const activeUser = organization?.currentUser?.email
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const [getData] = useLazyQuery(
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
   )

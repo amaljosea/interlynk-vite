@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { capitalizeFirstLetter, customStyles, envOrderList } from 'utils'
 import { GetIcon, isDefaultEnv, isUnknown, truncatedValue } from 'utils'
+import { getSignedUrlParams } from 'utils'
 import { ProductGeneralTabs } from 'utils/TabsObjects'
 
 import { AddIcon } from '@chakra-ui/icons'
@@ -111,7 +112,7 @@ const Parts = ({ data }) => {
 
   const { sbomParts } = sbomData?.sbom || ''
 
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
 
   const updateSboms = useHasPermission({
     parentKey: 'view_sbom',

@@ -5,6 +5,7 @@ import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, linkURl, sevColor } from 'utils'
 import { isCustomerView, timeSince } from 'utils'
+import { getSignedUrlParams } from 'utils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -386,7 +387,7 @@ const Vulnerabilities = ({ sbomData }) => {
     }
   )
 
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const firstDegreePart = nodes?.filter(
     (item) => item.isFirstDegreePart === true
   )

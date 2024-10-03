@@ -65,6 +65,10 @@ export const isCustomerView = () => {
   return window.location.pathname.startsWith('/customer')
 }
 
+export const getSignedUrlParams = () => {
+  return sessionStorage.getItem('signedUrlParams')
+}
+
 export const getLink = (name) => {
   const result = sbomOrigin?.find((item) => item.value === name)
   const { link } = result || ''

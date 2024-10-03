@@ -1,9 +1,10 @@
 import { useQuery } from '@apollo/client'
+import { getSignedUrlParams } from 'utils'
 
 import { GetSbomName, GetSharedSbomData } from 'graphQL/Queries'
 
 export const useSbom = ({ projectId, sbomId, skip = false }) => {
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
 
   const { data } = useQuery(signedUrlParams ? GetSharedSbomData : GetSbomName, {
     skip,

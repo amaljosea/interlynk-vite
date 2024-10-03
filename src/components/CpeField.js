@@ -1,6 +1,7 @@
 import { TabContext } from 'context/TabContext'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { validateCpe } from 'utils'
+import { getSignedUrlParams } from 'utils'
 
 import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
@@ -20,7 +21,7 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
   const { tabData, handleChange } = useContext(TabContext)
   const { identifiers } = tabData || ''
 
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
 
   const [focusedIndex, setFocusedIndex] = useState(null)
   const listItemsRef = useRef([])

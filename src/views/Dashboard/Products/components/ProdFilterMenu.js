@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { hexToRGBA } from 'utils'
+import { getSignedUrlParams } from 'utils'
 
 import {
   Box,
@@ -41,7 +42,7 @@ const ProdFilterMenu = ({
   const { enabled, labelIds } = filters || ''
   const { orgView } = useGlobalQueryContext()
   const iconColor = useColorModeValue('#444', '#f3f3f3')
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const bgColor = useColorModeValue('#fff', '#1A202C')
   const borderColor = useColorModeValue('#E2E8F0', '#2D3748')
 

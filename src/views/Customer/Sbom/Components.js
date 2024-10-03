@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { GetIcon, customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { getSignedUrlParams } from 'utils'
 import { openSsf } from 'variables/general'
 import CompDrawer from 'views/Dashboard/Products/components/CompDrawer'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -52,7 +53,7 @@ const Components = ({ sbomData }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
 
   const { headingTextColor, primaryTextColor } = useThemeColor([
     'headingTextColor',

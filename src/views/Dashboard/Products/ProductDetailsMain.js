@@ -4,6 +4,7 @@ import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
+import { getSignedUrlParams } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { Search2Icon } from '@chakra-ui/icons'
@@ -113,7 +114,7 @@ const ProductDetailsMain = () => {
   const productGroupId = params.productgroupid
   const sbomId = params.sbomid
   const { setIsOpen, setCurrentStep } = useTour()
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const activeTour = localStorage.getItem('activeTour')
 
   const warningColor = useColorModeValue('#E53E3E', '#F56565')

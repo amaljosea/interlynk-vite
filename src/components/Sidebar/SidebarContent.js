@@ -2,6 +2,7 @@ import InterlynkLogo from 'assets/img/logo.png'
 import { useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
 import { Link, useLocation } from 'react-router-dom'
+import { getSignedUrlParams } from 'utils'
 
 import { Divider, Flex, Img, Tooltip } from '@chakra-ui/react'
 
@@ -14,7 +15,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 const SidebarContent = ({ routes }) => {
   const location = useLocation()
   const dashboardView = location.pathname === '/vendor/dashboard'
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
 

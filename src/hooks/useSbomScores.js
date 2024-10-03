@@ -1,6 +1,7 @@
 import { gql, useQuery } from '@apollo/client'
 import { round } from 'lodash'
 import { useMemo } from 'react'
+import { getSignedUrlParams } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 
 const QUERY = gql`
@@ -23,7 +24,7 @@ const QUERY = gql`
     }
   }
 `
-const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+const signedUrlParams = getSignedUrlParams()
 
 export const calculateHealthScore = (sbom) => {
   if (!sbom) {

@@ -6,6 +6,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, hexToRGBA, timeSince } from 'utils'
 import { customStyles, getFormat, getLink, getType } from 'utils'
 import { truncatedValue } from 'utils'
+import { getSignedUrlParams } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
 import LabelInput from 'views/Dashboard/Products/components/LabelInput'
@@ -73,7 +74,7 @@ const ProductTable = ({
   const { orgView, isFreeTier } = useGlobalQueryContext()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
 
   const { data: prodData } = useQuery(GetTotalProduct, {
     skip: !orgView,
