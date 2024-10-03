@@ -149,12 +149,7 @@ const VulnFilters = ({ reset }) => {
               fontSize='sm'
             >
               {vulnCompNames?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>
               ))}
