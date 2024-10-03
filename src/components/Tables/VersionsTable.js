@@ -435,7 +435,10 @@ const VersionsTable = (props) => {
             />
             <Portal>
               <MenuList fontSize={'sm'}>
-                <MenuItem onClick={() => handleListSbom(row)}>
+                <MenuItem
+                  hidden={signedUrlParams}
+                  onClick={() => handleListSbom(row)}
+                >
                   List SBOM
                 </MenuItem>
                 <MenuItem

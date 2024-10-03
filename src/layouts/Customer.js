@@ -1,9 +1,9 @@
 import { gql, useQuery } from '@apollo/client'
 import { TourProvider } from '@reactour/tour'
 import NotFound from 'assets/svg/not-found.svg'
+import { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { customerRoutes } from 'routes'
-import { displayErrorMessage } from 'utils'
 
 import { Box, Center, Flex, Img, Text, useColorMode } from '@chakra-ui/react'
 
@@ -271,14 +271,15 @@ export default function Customer() {
   }
 
   const { data, error } = useQuery(getSharelynk, {
-    skip: params.productgroupid && signedUrlParams ? false : true,
-    variables: { id: params.productgroupid },
-    onCompleted: (data) => {
-      if (data?.shareLynkQuery?.productGroup) {
-        sessionStorage.setItem('signedUrlParams', signedUrlParams)
-      }
-    }
+    skip: params.productgroupid ? false : true,
+    variables: { id: params.productgroupid }
   })
+
+  useEffect(() => {
+    if (signedUrlParams) {
+      sessionStorage.setItem('signedUrlParams', signedUrlParams)
+    }
+  }, [signedUrlParams])
 
   if (data?.shareLynkQuery === null || error)
     return (
