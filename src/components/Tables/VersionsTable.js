@@ -531,8 +531,7 @@ const VersionsTable = (props) => {
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex
-        width={'100%'}
-        alignItems={'center'}
+        sx={{ w: '100%', alignItems: 'center' }}
         justifyContent={'space-between'}
       >
         <Stack direction={'row'} alignItems={'center'} spacing={3}>
@@ -562,7 +561,6 @@ const VersionsTable = (props) => {
                 onClick={TOOL.onOpen}
                 colorScheme='blue'
                 icon={<FaCodeCompare />}
-                isLoading={TOOL.isOpen}
               />
             </Tooltip>
           )}
@@ -596,10 +594,11 @@ const VersionsTable = (props) => {
     handleClear,
     handleSearch,
     selectedSbom?.length,
-    TOOL,
+    primaryErrorColor,
+    TOOL.onOpen,
     enabled,
     signedUrlParams,
-    ARC_VERSIONS,
+    ARC_VERSIONS.onOpen,
     createSbom,
     onBuildSbom,
     primaryErrorColor
@@ -618,7 +617,7 @@ const VersionsTable = (props) => {
     customStyles: customStyles(headingTextColor),
     onSort: handleSort,
     defaultSortFieldId: filters?.field,
-    defaultSortAsc: filters?.direction === 'ASC',
+    defaultSortAsc: false,
     subHeader: true,
     subHeaderComponent: subHeaderComponent,
     progressPending: loading,
