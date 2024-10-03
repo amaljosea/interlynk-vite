@@ -125,7 +125,7 @@ const Components = ({ sbomData }) => {
 
   const compBtn = useRef(null)
   const [activeRow, setActiveRow] = useState(null)
-  const [compSearch, setCompSearch] = useState('')
+  const [compSearch, setCompSearch] = useState(searchInput || '')
 
   const compData = useMemo(() => {
     return {

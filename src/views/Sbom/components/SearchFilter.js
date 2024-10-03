@@ -9,11 +9,8 @@ import {
   InputRightElement
 } from '@chakra-ui/react'
 
-import { useThemeColor } from 'hooks/useThemeColors'
-
 const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
   const searchInputRef = useRef()
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const focusSearchInput = () => {
     if (searchInputRef?.current) {
       searchInputRef?.current.focus()
@@ -44,6 +41,7 @@ const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
             id={id}
             name={id}
             type='text'
+            fontSize='sm'
             placeholder='Search'
             ref={searchInputRef}
             value={filterText}
