@@ -70,6 +70,7 @@ const SidebarContent = ({ routes }) => {
                 : layout + path
             }
             onClick={() => handleClick(prop)}
+            target={name === 'Documentation' ? '_blank' : '_self'}
           >
             <IconBox
               h={'40px'}

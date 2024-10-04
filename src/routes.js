@@ -17,7 +17,7 @@ import {
   FaRegSun,
   FaWindowMaximize
 } from 'react-icons/fa'
-import { FaFileImport, FaToolbox } from 'react-icons/fa6'
+import { FaFileImport, FaFileLines, FaToolbox } from 'react-icons/fa6'
 import { IoMdAnalytics } from 'react-icons/io'
 import { MdPolicy } from 'react-icons/md'
 
@@ -43,10 +43,6 @@ export const dashRoutes = [
     component: () => 'Requests',
     layout: '/vendor'
   },
-  /*
-  { path: '/SAG', name: 'SAG', icon: <FaHandshakeSimple color='inherit' size={18} />, component: Products, layout: '/vendor'
-  },
-  */
   {
     path: '/vulnerabilities',
     name: 'Vulnerabilities',
@@ -61,20 +57,6 @@ export const dashRoutes = [
     component: Licenses,
     layout: '/vendor'
   },
-  // {
-  //   path: '/sharelynk',
-  //   name: 'ShareLynk',
-  //   icon: <BsFillFolderSymlinkFill color='inherit' size={18} />,
-  //   component: Sharelynk,
-  //   layout: '/vendor'
-  // },
-  // {
-  //   path: '/feed',
-  //   name: 'Feed',
-  //   icon: <FaBullhorn color='inherit' />,
-  //   component: Feed,
-  //   layout: '/vendor'
-  // },
   {
     path: '/analytics',
     name: 'Analytics',
@@ -109,6 +91,13 @@ export const dashRoutes = [
     icon: <FaRegSun color='inherit' />,
     component: Profile,
     layout: '/vendor'
+  },
+  {
+    path: 'http://docs.interlynk.io/',
+    name: 'Documentation',
+    icon: <FaFileLines color='inherit' />,
+    component: () => null,
+    layout: ''
   }
 ]
 
