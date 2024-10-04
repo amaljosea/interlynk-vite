@@ -62,6 +62,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
       ...prev,
       [name]: value
     }))
+    setError('')
   }
 
   return (
