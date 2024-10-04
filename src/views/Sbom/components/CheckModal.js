@@ -471,11 +471,7 @@ const CheckModal = (props) => {
       )}
 
       {isComponentLicense && (
-        <LicenseField
-          sbomView={false}
-          resolved={resolved}
-          license={licensesExp || ''}
-        />
+        <LicenseField sbomView={false} resolved={resolved} license={null} />
       )}
     </LynkModal>
   )

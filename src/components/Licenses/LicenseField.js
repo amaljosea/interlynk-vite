@@ -128,22 +128,20 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   const licenseString = sbomView ? sbomState.licenseString : details?.licenses
 
   useEffect(() => {
-    if (license) {
-      const payload = {
-        value: license,
-        label: license
-      }
-      if (sbomView) {
-        sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: payload })
-      } else {
-        setTabData((prev) => ({
-          ...prev,
-          details: {
-            ...prev.details,
-            licenses: [payload]
-          }
-        }))
-      }
+    const payload = license ? [{ value: license, label: license }] : []
+    if (sbomView) {
+      sbomDispatch({
+        type: 'SET_LICENSE_FIELD',
+        payload: payload.length ? payload[0] : ''
+      })
+    } else {
+      setTabData((prev) => ({
+        ...prev,
+        details: {
+          ...prev.details,
+          licenses: payload
+        }
+      }))
     }
   }, [license, setTabData, sbomDispatch, sbomView])
 
