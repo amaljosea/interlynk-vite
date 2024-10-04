@@ -113,11 +113,6 @@ const CompIdentifiers = ({ data }) => {
     })
   }
 
-  const isInvalid =
-    (identifiers?.purl === '' && identifiers?.cpe === '') ||
-    (identifiers?.purl !== '' && identifiers.purlError !== '') ||
-    (identifiers?.cpe !== '' && identifiers.cpeError !== '')
-
   const handleUpdateCom = () => {
     updateComponent({
       variables: {
@@ -279,14 +274,14 @@ const CompIdentifiers = ({ data }) => {
               title={'Save Identifiers'}
               onClick={handleUpdateCom}
               hidden={purlOpen || cpeOpen}
-              isDisabled={loading || isInvalid}
+              isDisabled={loading}
             />
           </Stack>
         ) : (
           <ActionButton
             title={'Save'}
             onClick={handleSubmit}
-            isDisabled={loading || isInvalid}
+            isDisabled={loading}
             hidden={purlOpen || cpeOpen || customerView}
           />
         )}
