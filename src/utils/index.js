@@ -1068,3 +1068,17 @@ export const tourStyles = {
     }
   })
 }
+
+export const detectOS = () => {
+  const { userAgent } = window.navigator
+  if (/Windows NT 10.0/.test(userAgent)) return 'Windows 10'
+  if (/Windows NT 6.2/.test(userAgent)) return 'Windows 8'
+  if (/Windows NT 6.1/.test(userAgent)) return 'Windows 7'
+  if (/Windows NT 6.0/.test(userAgent)) return 'Windows Vista'
+  if (/Windows NT 5.1/.test(userAgent)) return 'Windows XP'
+  if (/Mac OS X 10[._]\d+/.test(userAgent)) return 'Mac OS X'
+  if (/Linux/.test(userAgent)) return 'Linux'
+  if (/Android/.test(userAgent)) return 'Android'
+  if (/iPhone|iPad|iPod/.test(userAgent)) return 'iOS'
+  return 'Unknown'
+}

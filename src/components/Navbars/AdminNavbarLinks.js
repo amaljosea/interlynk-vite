@@ -1,113 +1,36 @@
-import { useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { useKBar } from 'kbar'
 import PropTypes from 'prop-types'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
+import { getSignedUrlParams } from 'utils'
 import { logoutUser } from 'utils/authUtils'
-import { homeSteps, productSteps } from 'utils/tourUtils'
 
-import { SearchIcon } from '@chakra-ui/icons'
-import {
-  Avatar,
-  Box,
-  Button,
-  Flex,
-  Icon,
-  IconButton,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Kbd,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuGroup,
-  MenuItem,
-  MenuList,
-  Stack,
-  Text,
-  useColorMode
-} from '@chakra-ui/react'
+import { Button, Flex, IconButton, useColorMode } from '@chakra-ui/react'
 
-// Custom Icons
-import { SettingsIcon } from 'components/Icons/Icons'
 // Custom Components
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
-import { useGlobalState } from 'hooks/useGlobalState'
-import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
-import { useThemeColor } from 'hooks/useThemeColors'
+import { FaMoon, FaSun } from 'react-icons/fa6'
 
-import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
+import { SearchBar } from './SearchBar'
+import { UserMenu } from './UserMenu'
 
-import { FaBuilding, FaExchangeAlt, FaSignOutAlt } from 'react-icons/fa'
-import { FaLocationArrow, FaMoon, FaSun, FaUser } from 'react-icons/fa6'
+const REACT_APP_DOMAIN = process.env.REACT_APP_DOMAIN
 
-export default function HeaderLinks(props) {
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
-  const location = useLocation()
+export default function AdminNavbarLinks(props) {
   const navigate = useNavigate()
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
-  const { query } = useKBar()
-
-  const SERVER_URL = process.env.REACT_APP_SERVER
-
   const { colorMode, toggleColorMode, setColorMode } = useColorMode()
-  const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
-  const dashboardView = location.pathname === '/vendor/dashboard'
-  const productView = location.pathname === '/vendor/products'
-  const signedUrlParams = location.pathname.startsWith('/customer')
 
-  const { organization } = useGlobalState()
-
-  const isSuperAdmin = organization?.currentUser?.superAdmin
-
-  const { data: allOrgs } = useQuery(AllOrganizations, {
-    skip: isSuperAdmin === true ? false : true,
-    variables: { first: 100, status: 'approved' }
-  })
-  const { data: myOrgs } = useQuery(MyOrganizations, {
-    skip: isSuperAdmin === true || signedUrlParams ? true : false,
-    variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
-  })
-
-  const { nodes: allOrgList } = allOrgs?.allOrganizations || ''
-  const { nodes: myOrgList } = myOrgs?.myOrganizations || ''
-
-  const organisationList = isSuperAdmin ? allOrgList : myOrgList
-
-  const linkState =
-    organisationList?.length > 1 ? { openOrgListDrawer: true } : undefined
-
-  const searchParams =
-    organisationList?.length > 1 ? '?tab=security tokens' : '?tab=users'
-
-  const { ...rest } = props
+  const signedUrlParams = getSignedUrlParams()
 
   const handleLogout = async () => {
     await logoutUser()
     setColorMode('light')
     navigate('/auth')
   }
-
-  const detectOS = () => {
-    const { userAgent } = window.navigator
-    if (/Windows NT 10.0/.test(userAgent)) return 'Windows 10'
-    if (/Windows NT 6.2/.test(userAgent)) return 'Windows 8'
-    if (/Windows NT 6.1/.test(userAgent)) return 'Windows 7'
-    if (/Windows NT 6.0/.test(userAgent)) return 'Windows Vista'
-    if (/Windows NT 5.1/.test(userAgent)) return 'Windows XP'
-    if (/Mac OS X 10[._]\d+/.test(userAgent)) return 'Mac OS X'
-    if (/Linux/.test(userAgent)) return 'Linux'
-    if (/Android/.test(userAgent)) return 'Android'
-    if (/iPhone|iPad|iPod/.test(userAgent)) return 'iOS'
-    return 'Unknown'
-  }
-
-  const os = detectOS()
 
   const { setIsOpen, setCurrentStep, setSteps } = useTour()
 
@@ -122,23 +45,6 @@ export default function HeaderLinks(props) {
     setIsOpen(true)
   }
 
-  const updateTour = (steps, name) => {
-    localStorage.setItem('activeTour', name)
-    setSteps(steps)
-  }
-
-  const onStartDashTour = () => {
-    document?.body?.classList.add('no-scroll')
-    if (dashboardView) {
-      updateTour(homeSteps, 'dashboard')
-    }
-    if (productView) {
-      updateTour(productSteps, 'products')
-    }
-    setCurrentStep(0)
-    setIsOpen(true)
-  }
-
   return (
     <Flex gap={3} alignItems='center' flexDirection='row'>
       {/* JOIN WAITLIST */}
@@ -147,118 +53,38 @@ export default function HeaderLinks(props) {
           <Button size='sm' onClick={onStartTour} hidden={!productId}>
             Start Tour
           </Button>
-          <Link to='https://app.interlynk.io/register' target='_blank'>
+          <Link to={`${REACT_APP_DOMAIN}/register`} target='_blank'>
             <Button className='signup' colorScheme='blue' size='sm'>
               Sign up
             </Button>
           </Link>
         </Flex>
       )}
+
       {/* SEARCH */}
-      <InputGroup
-        size='sm'
-        width={'250px'}
-        pos={'relative'}
-        display={signedUrlParams ? 'none' : 'block'}
-      >
-        <InputLeftElement>
-          <SearchIcon color={'gray.400'} />
-        </InputLeftElement>
-        <Input
-          isReadOnly
-          bg={secondaryBgColor}
-          border='none'
-          borderRadius={6}
-          placeholder='Search..'
-          onClick={query?.toggle}
-          display={signedUrlParams ? 'none' : 'block'}
-        />
-        <Box pos={'absolute'} top={'0.2rem'} right={1.5}>
-          <Kbd>{os?.startsWith('Windows') ? 'Ctrl' : 'Cmd'} + K</Kbd>
-        </Box>
-      </InputGroup>
+      <SearchBar />
+
       {/* DARK MODE */}
       <IconButton
         size='sm'
         onClick={toggleColorMode}
         icon={colorMode === 'light' ? <FaMoon /> : <FaSun />}
       />
-      {!signedUrlParams && (
-        <Menu>
-          <MenuButton>
-            <Avatar
-              size='sm'
-              name={organization?.currentUser?.name}
-              src={`${SERVER_URL}/${organization?.currentUser?.profileImage?.url}`}
-            />
-          </MenuButton>
-          <MenuList fontSize={'sm'}>
-            <MenuGroup>
-              <MenuItem hidden={!organization?.currentUser}>
-                <Flex flexDirection='row' alignItems={'flex-start'} gap={3}>
-                  <Icon as={FaUser} width={2.5} mt={1} />
-                  <Stack direction={'column'} spacing={-1}>
-                    <Text>{organization?.currentUser?.name}</Text>
-                    <Text fontSize={'sm'} color={'#718096'}>
-                      {organization?.currentUser?.email}
-                    </Text>
-                    <Text fontSize={'sm'} color={'#718096'}>
-                      {organization?.name || ''}
-                    </Text>
-                  </Stack>
-                </Flex>
-              </MenuItem>
-              <MenuDivider hidden={!organization?.currentUser} />
-              <Link to={`/vendor/settings?tab=personal-details`}>
-                <MenuItem
-                  icon={<SettingsIcon />}
-                  display={organization ? 'flex' : 'none'}
-                >
-                  Settings
-                </MenuItem>
-              </Link>
-              {(dashboardView || productView) && (
-                <MenuItem
-                  onClick={onStartDashTour}
-                  icon={<FaLocationArrow />}
-                  hidden={!shouldShowDemoFeatures || productId}
-                >
-                  Start {productView ? 'Product' : ''} Tour
-                </MenuItem>
-              )}
-              <Link to={`/vendor/settings/${searchParams}`} state={linkState}>
-                <MenuItem
-                  icon={
-                    organisationList?.length <= 1 ? (
-                      <FaBuilding />
-                    ) : (
-                      <FaExchangeAlt />
-                    )
-                  }
-                  display={organization ? 'flex' : 'none'}
-                >
-                  Organizations
-                </MenuItem>
-              </Link>
-              <MenuDivider hidden={!organization} />
-              <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
-                Logout
-              </MenuItem>
-            </MenuGroup>
-          </MenuList>
-        </Menu>
-      )}
+
+      {/* USER MENU */}
+      {!signedUrlParams && <UserMenu handleLogout={handleLogout} />}
+
       <SidebarResponsive
         logoText={props.logoText}
         secondary={props.secondary}
         routes={dashRoutes}
-        {...rest}
+        {...props}
       />
     </Flex>
   )
 }
 
-HeaderLinks.propTypes = {
+AdminNavbarLinks.propTypes = {
   variant: PropTypes.string,
   fixed: PropTypes.bool,
   secondary: PropTypes.bool,
