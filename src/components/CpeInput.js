@@ -3,15 +3,12 @@ import { PackageURL } from 'packageurl-js'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { validateCpe } from 'utils'
 
-import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Box,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Input,
-  InputGroup,
-  InputRightElement,
   List,
   ListItem,
   VStack
@@ -69,20 +66,18 @@ const CpeInput = ({
   const label = nameMapping[name] || name
 
   const updateString = (name, value) => {
-    if (value !== '') {
-      if (name === 'vendor') {
-        updateCpe(3, value)
-      } else if (name === 'product') {
-        updateCpe(4, value)
-      } else if (name === 'cpeVersion') {
-        updateCpe(5, value)
-      } else if (name === 'namespace') {
-        updatePurl('namespace', value)
-      } else if (name === 'name') {
-        updatePurl('name', value)
-      } else if (name === 'version') {
-        updatePurl('version', value)
-      }
+    if (name === 'vendor') {
+      updateCpe(3, value)
+    } else if (name === 'product') {
+      updateCpe(4, value)
+    } else if (name === 'cpeVersion') {
+      updateCpe(5, value)
+    } else if (name === 'namespace') {
+      updatePurl('namespace', value === '' ? 'namespace' : value)
+    } else if (name === 'name') {
+      updatePurl('name', value === '' ? 'name' : value)
+    } else if (name === 'version') {
+      updatePurl('version', value === '' ? 'version' : value)
     }
   }
 

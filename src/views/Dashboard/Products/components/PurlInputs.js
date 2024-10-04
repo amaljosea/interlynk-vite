@@ -353,19 +353,19 @@ const PurlInputs = ({ value, setValue, onClose }) => {
       try {
         const data = PackageURL.fromString(decodeURI(value))
         setPurlData((prev) => ({
-        ...prev,
-        type: data?.type || '',
-        namespace: data?.namespace || '',
-        name: data?.name || '',
-        version: data?.version || '',
-        qualifiers: data?.qualifiers
-          ? Object.entries(data.qualifiers)
-              .map(([key, value]) => `${key}=${value}`)
-              .join('&')
-          : ''
+          ...prev,
+          type: data?.type === 'type' ? '' : data?.type,
+          namespace: data?.namespace === 'namespace' ? '' : data?.namespace,
+          name: data?.name === 'name' ? '' : data?.name,
+          version: data?.version === 'version' ? '' : data?.version,
+          qualifiers: data?.qualifiers
+            ? Object.entries(data.qualifiers)
+                .map(([key, value]) => `${key}=${value}`)
+                .join('&')
+            : ''
         }))
       } catch (error) {
-        console.log('Error',error);
+        console.log('Error', error)
       }
     }
   }, [value])
@@ -470,7 +470,7 @@ const PurlInputs = ({ value, setValue, onClose }) => {
           <Input
             type='text'
             value={purlData?.name}
-            sx={{mt:1.5, fontSize:'sm'}}
+            sx={{ mt: 1.5, fontSize: 'sm' }}
             placeholder='Enter packageName'
             onBlur={(e) => handleInputBlur('name', e.target.value)}
             onChange={(e) => handleInputChange('name', e.target.value)}
@@ -499,7 +499,7 @@ const PurlInputs = ({ value, setValue, onClose }) => {
             type='text'
             value={purlData?.version}
             placeholder='Enter version'
-            sx={{mt:1.5, fontSize:'sm'}}
+            sx={{ mt: 1.5, fontSize: 'sm' }}
             onBlur={(e) => handleInputBlur('version', e.target.value)}
             onChange={(e) => handleInputChange('version', e.target.value)}
           />
