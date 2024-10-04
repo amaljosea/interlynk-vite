@@ -53,7 +53,7 @@ export default function AdminNavbarLinks(props) {
           <Button size='sm' onClick={onStartTour} hidden={!productId}>
             Start Tour
           </Button>
-          <Link to={`${REACT_APP_DOMAIN}/register`} target='_blank'>
+          <Link to={`https://app.interlynk.io/register`} target='_blank'>
             <Button className='signup' colorScheme='blue' size='sm'>
               Sign up
             </Button>
