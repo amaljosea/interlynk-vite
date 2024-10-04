@@ -82,8 +82,16 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   }, [currentExternalUrls])
 
   const handleTypeChange = (e) => {
-    setType(e.target.value)
-    setError('')
+    const { value } = e.target
+    setType(value)
+    const isExists =
+      externalData?.length > 0 &&
+      externalData?.find((item) => item.name === value)
+    if (isExists) {
+      setError('Link type already exists!')
+    } else {
+      setError('')
+    }
   }
 
   const handleCheckUrl = () => {
@@ -176,10 +184,12 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
     <Drawer size='sm' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton mt={1} />
-        <DrawerHeader borderBottomWidth='1px'>Edit Links</DrawerHeader>
-        <DrawerBody>
+        <DrawerCloseButton mt={2} />
+        <DrawerHeader borderBottomWidth='1px'>
+          <Text>Edit Links</Text>
           {data && <Tag colorScheme='blue'>{vuln?.vulnId}</Tag>}
+        </DrawerHeader>
+        <DrawerBody>
           {error !== '' && <LynkAlert msg={error} />}
           <form onSubmit={handleLinkAdd}>
             <Flex mt={4} direction={'column'} alignItems={'flex-start'} gap={3}>
