@@ -89,7 +89,7 @@ export const UserMenu = ({ handleLogout }) => {
             </Flex>
           </MenuItem>
           <MenuDivider hidden={!currentUser} />
-          <Link to={`/vendor/settings?tab=personal-details`}>
+          <Link to={`/vendor/settings?tab=security tokens`}>
             <MenuItem
               icon={<SettingsIcon />}
               display={organization ? 'flex' : 'none'}
