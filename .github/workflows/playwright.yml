@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     timeout-minutes: 60
-    runs-on: windows-latest  # Changed to Windows
+    runs-on: ubuntu-latest  # Switched to Linux (Ubuntu)
 
     # Define environment variables (use secrets for sensitive info)
     env:
