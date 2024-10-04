@@ -253,7 +253,7 @@ const ExpandedComponent = (props) => {
                 direction='row'
                 sx={{ w: 'fit-content', mt: 1, gap: 2, alignItems: 'center' }}
               >
-                <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
+                <Link to={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
                   <Icon
                     as={ExternalLinkIcon}
                     sx={{ w: '16px', h: '16px' }}
