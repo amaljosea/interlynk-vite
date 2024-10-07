@@ -325,22 +325,26 @@ const Components = ({ sbomData }) => {
         return (
           <Flex gap={2}>
             {cpes?.length > 0 && (
-              <Button
-                size='xs'
-                color={primaryTextColor}
-                onClick={() => onCheckCpe(row)}
-              >
-                CPE
-              </Button>
+              <Tooltip label={cpes[0]}>
+                <Button
+                  size='xs'
+                  color={primaryTextColor}
+                  onClick={() => onCheckCpe(row)}
+                >
+                  CPE
+                </Button>
+              </Tooltip>
             )}
             {purl && (
-              <Button
-                size='xs'
-                color={primaryTextColor}
-                onClick={() => onCheckPurl(row)}
-              >
-                PURL
-              </Button>
+              <Tooltip label={purl}>
+                <Button
+                  size='xs'
+                  color={primaryTextColor}
+                  onClick={() => onCheckPurl(row)}
+                >
+                  PURL
+                </Button>
+              </Tooltip>
             )}
           </Flex>
         )
