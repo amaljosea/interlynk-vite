@@ -6,7 +6,14 @@ const InfoTag = ({ children }) => {
       size='sm'
       variant='subtle'
       justifyContent={'center'}
-      sx={{width:'200px', ml:'auto', py:1, textAlign:'center', alignItems:'center', wordBreak: 'break-all'}}
+      sx={{
+        width: '200px',
+        ml: 'auto',
+        py: 1,
+        textAlign: 'center',
+        alignItems: 'center',
+        wordBreak: 'break-all'
+      }}
     >
       {children}
     </Tag>

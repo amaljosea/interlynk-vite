@@ -82,7 +82,9 @@ const PurlCard = ({ value, isOpen, onClose }) => {
           <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
             <Text fontSize={'sm'}>Qualifiers</Text>
             <InfoTag>
-              {purlString()?.qualifiers ? JSON.stringify(purlString()?.qualifiers) : 'N/A'}
+              {purlString()?.qualifiers
+                ? JSON.stringify(purlString()?.qualifiers)
+                : 'N/A'}
             </InfoTag>
           </Grid>
           <Divider />

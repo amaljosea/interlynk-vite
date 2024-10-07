@@ -69,6 +69,7 @@ import {
 import { RiFundsBoxFill } from 'react-icons/ri'
 
 import CompDrawer from '../components/CompDrawer'
+import CompInsights from '../components/CompInsights'
 import HealthMap from '../components/HealthMap'
 import CompFilters from './CompFilters'
 
@@ -183,6 +184,7 @@ const Components = ({ sbomData }) => {
   const DELETE = useDisclosure()
   const RELATION = useDisclosure()
   const COMPONENT = useDisclosure()
+  const INSIGHTS = useDisclosure()
 
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
@@ -210,6 +212,11 @@ const Components = ({ sbomData }) => {
   const onCheckCpe = (data) => {
     setActiveRow(data)
     CPE.onOpen()
+  }
+
+  const hanldeAnalysis = (data) => {
+    setActiveRow(data)
+    INSIGHTS.onOpen()
   }
 
   // COLUMNS
@@ -544,6 +551,12 @@ const Components = ({ sbomData }) => {
                       }
                     >
                       View Relationships
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => hanldeAnalysis(row)}
+                      isDisabled={status === 'signed'}
+                    >
+                      Insights
                     </MenuItem>
                     <Divider />
                     {primary === false && (
@@ -1028,6 +1041,14 @@ const Components = ({ sbomData }) => {
           isOpen={EDIT.isOpen}
           onClose={EDIT.onClose}
           primaryComp={primaryComponent}
+        />
+      )}
+
+      {INSIGHTS.isOpen && (
+        <CompInsights
+          isOpen={INSIGHTS.isOpen}
+          onClose={INSIGHTS.onClose}
+          id={activeRow?.id}
         />
       )}
     </>

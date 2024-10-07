@@ -7,7 +7,7 @@ const CompInfo = ({ data }) => {
   return (
     <Flex width={'90%'} columnGap={2} flexWrap={'wrap'} alignContent={'center'}>
       <Text fontSize='sm' fontWeight={'normal'} wordBreak={'break-all'}>
-        {truncatedValue(name, 20)}
+        {truncatedValue(name, 25)}
       </Text>
       <Tag size='sm' colorScheme='blue' hidden={!version}>
         {truncatedValue(version, 20)}

@@ -1,8 +1,18 @@
-import { Divider, Grid, Stack, Tag, TagLabel, TagRightIcon, Text, useClipboard } from '@chakra-ui/react'
+import {
+  Divider,
+  Grid,
+  Stack,
+  Tag,
+  TagLabel,
+  TagRightIcon,
+  Text,
+  useClipboard
+} from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
 import { FaCheck, FaCircleInfo, FaRegCopy } from 'react-icons/fa6'
+
 import InfoTag from './InfoTag'
 
 const CpeCard = ({ value, isOpen, onClose }) => {
@@ -34,9 +44,13 @@ const CpeCard = ({ value, isOpen, onClose }) => {
       noFooter
     >
       <Stack spacing={1}>
-        <Tag sx={{ py: 2, mb:1, fontSize: 'sm', wordBreak: 'break-all' }}>
+        <Tag sx={{ py: 2, mb: 1, fontSize: 'sm', wordBreak: 'break-all' }}>
           <TagLabel>{value}</TagLabel>
-          <TagRightIcon ml={'auto'} cursor={'pointer'} onClick={() => cpe.onCopy()}>
+          <TagRightIcon
+            ml={'auto'}
+            cursor={'pointer'}
+            onClick={() => cpe.onCopy()}
+          >
             {cpe.hasCopied ? <FaCheck size={24} /> : <FaRegCopy size={24} />}
           </TagRightIcon>
         </Tag>

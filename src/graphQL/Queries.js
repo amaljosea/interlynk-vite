@@ -4909,3 +4909,57 @@ export const GetLabels = gql`
     }
   }
 `
+
+export const GetEnrichedData = gql`
+  query GetEnrichedData($id: Uuid!, $sbomId: Uuid!) {
+    component(id: $id, sbomId: $sbomId) {
+      name
+      version
+      enrichedContent {
+        package {
+          purl
+          name
+          ecosystem
+          description
+          website
+          isDeprecated
+          updatedAt
+        }
+        packageVersion {
+          purl
+          version
+          isArchived
+          isOutdated
+          isPreRelease
+          isDeprecated
+          license
+          copyright
+          maintainers
+          website
+          issueTrackerUrl
+          repositoryUrl
+          publishedAt
+          updatedAt
+        }
+        repository {
+          url
+          name
+          owner
+          description
+          ecosystem
+          forksCount
+          starsCount
+          watchersCount
+          isArchived
+          isForked
+          contributorCount
+          releases
+          issues
+          license
+          scorecardScore
+          updatedAt
+        }
+      }
+    }
+  }
+`

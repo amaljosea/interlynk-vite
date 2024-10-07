@@ -25,7 +25,10 @@ import { PolicyRuleViolations } from 'graphQL/Queries'
 
 const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
   const { subject, category, name, operatorWording, value } = activeRow || null
-  const { headingTextColor, primaryTextColor } = useThemeColor(['headingTextColor','primaryTextColor'])
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const { nodes, paginationProps, loading } = usePaginatedQuery(
     PolicyRuleViolations,
@@ -70,7 +73,9 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       selector: (row) => {
         const { component } = row
         return (
-          <Text color={primaryTextColor} my={2}>{component?.licensesExp || ''}</Text>
+          <Text color={primaryTextColor} my={2}>
+            {component?.licensesExp || ''}
+          </Text>
         )
       },
       omit: category === 'license' ? false : true,
@@ -82,7 +87,9 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       selector: (row) => {
         const { violation } = row
         return (
-          <Text color={primaryTextColor} my={2}>{violation?.vuln?.vulnId || ''}</Text>
+          <Text color={primaryTextColor} my={2}>
+            {violation?.vuln?.vulnId || ''}
+          </Text>
         )
       },
       wrap: true,
@@ -142,7 +149,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
               )}
             <Text
               hidden={category === 'version'}
-              sx={{fontSize:'md',fontWeight:'bold'}}
+              sx={{ fontSize: 'md', fontWeight: 'bold' }}
             >
               Violations List
             </Text>

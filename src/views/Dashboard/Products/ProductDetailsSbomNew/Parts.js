@@ -3,7 +3,7 @@ import { useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { capitalizeFirstLetter, customStyles, envOrderList } from 'utils'
-import { GetIcon, isDefaultEnv, truncatedValue, isValidPurl } from 'utils'
+import { GetIcon, isDefaultEnv, isValidPurl, truncatedValue } from 'utils'
 import { getSignedUrlParams } from 'utils'
 import { ProductGeneralTabs } from 'utils/TabsObjects'
 
