@@ -17,8 +17,7 @@ import {
   Select,
   Stack,
   Tag,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
@@ -46,9 +45,12 @@ const Compare = ({ selectedSboms }) => {
   const { field, direction } = prodState
   const { toolsDispatch } = dispatch
 
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
-  const sbomOneBg = useColorModeValue('#38A169', '#1C4532')
-  const sbomTwoBg = useColorModeValue('#E53E3E', '#63171B')
+  const { primaryTextColor, primaryRedBorder, primaryGreenBorder } =
+    useThemeColor([
+      'primaryTextColor',
+      'primaryRedBorder',
+      'primaryGreenBorder'
+    ])
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -310,7 +312,7 @@ const Compare = ({ selectedSboms }) => {
         {/* SBOM ONE */}
         <GridItem w='100%'>
           <Card
-            border={`2px solid ${sbomOneBg}`}
+            border={`2px solid ${primaryGreenBorder}`}
             p={8}
             h='450px'
             overflowY='scroll'
@@ -444,7 +446,7 @@ const Compare = ({ selectedSboms }) => {
         {/* SBOM TWO */}
         <GridItem w='100%'>
           <Card
-            border={`2px solid ${sbomTwoBg}`}
+            border={`2px solid ${primaryRedBorder}`}
             p={8}
             h='450px'
             overflowY='scroll'

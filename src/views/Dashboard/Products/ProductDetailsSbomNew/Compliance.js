@@ -16,7 +16,6 @@ import {
   Spinner,
   Text,
   chakra,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -30,11 +29,11 @@ import { GetSbomQualityScores } from 'graphQL/Queries'
 const Compliance = ({ sbomData }) => {
   const params = useParams()
   const tab = useQueryParam('tab')
-  const textColor = useColorModeValue('gray.600', 'gray.200')
-  const linkColor = useColorModeValue('#3182ce', '#63b3ed')
-  const { grayBorderColor, primaryBlueText } = useThemeColor([
+
+  const { grayBorderColor, primaryBlueText, headingTextColor } = useThemeColor([
     'grayBorderColor',
-    'primaryBlueText'
+    'primaryBlueText',
+    'headingTextColor'
   ])
 
   const isArchived = sbomData?.lifecycle === 'archived'
@@ -121,18 +120,18 @@ const Compliance = ({ sbomData }) => {
             </Flex>
             <Text
               height={28}
-              color={textColor}
+              color={headingTextColor}
               fontSize={'14px'}
               fontWeight={'light'}
               pt={item?.description === 'Coming soon...' ? 5 : 0}
             >
               {item?.description}
               <chakra.span
-                color={textColor}
+                color={headingTextColor}
                 fontSize={'14px'}
                 fontWeight={'light'}
               >
-                <Link href={item?.url} isExternal color={linkColor}>
+                <Link href={item?.url} isExternal color={primaryBlueText}>
                   {' '}
                   Read more
                 </Link>{' '}

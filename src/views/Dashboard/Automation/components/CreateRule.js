@@ -20,25 +20,27 @@ import {
   Select,
   Tag,
   Text,
-  Tooltip,
-  useColorModeValue
+  Tooltip
 } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { AutomationRuleCreate, AutomationRuleUpdate } from 'graphQL/Mutation'
 
-import { FaPlus, FaTrash } from 'react-icons/fa6'
+import { FaPlus } from 'react-icons/fa6'
 import { MdDeleteOutline } from 'react-icons/md'
-import LynkAlert from 'components/LynkAlert'
 
 const SubjectIcon = ({ subject, isSystem = { isSystem } }) => {
+  const { headingTextSecondary } = useThemeColor(['headingTextSecondary'])
   return (
     <Box hidden={subject === ''} mt={2}>
       <Tooltip label={getLabel(subject)} placement='top'>
         <Box>
           <Icon
-            color={isSystem ? 'gray.300' : 'blue.500'}
+            color={isSystem ? headingTextSecondary : 'blue.500'}
             as={getIcon(subject)}
           />
         </Box>
@@ -50,7 +52,10 @@ const SubjectIcon = ({ subject, isSystem = { isSystem } }) => {
 const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
   const params = useParams()
   const projectId = params?.productid
-  const borderColor = useColorModeValue('gray.200', 'gray.600')
+  const { grayBorderColor, primaryErrorColor } = useThemeColor([
+    'grayBorderColor',
+    'primaryErrorColor'
+  ])
 
   const { automationConditionSubjectFieldMapping } = subOperators || []
 
@@ -615,12 +620,12 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
                       <IconButton
                         border='1px solid'
                         colorScheme='white'
-                        borderColor={borderColor}
+                        borderColor={grayBorderColor}
                         aria-label='Remove condition'
                         onClick={() => onDeleteCondtion(item)}
                         icon={
                           <Icon
-                            color={'#E53E3E'}
+                            color={primaryErrorColor}
                             w={6}
                             h={6}
                             as={MdDeleteOutline}
@@ -748,7 +753,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
                         <IconButton
                           border='1px solid'
                           colorScheme='white'
-                          borderColor={borderColor}
+                          borderColor={grayBorderColor}
                           aria-label='Remove action'
                           onClick={() => onDeleteAction(item)}
                           display={
@@ -758,7 +763,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
                           }
                           icon={
                             <Icon
-                              color={'#E53E3E'}
+                              color={primaryErrorColor}
                               w={6}
                               h={6}
                               as={MdDeleteOutline}

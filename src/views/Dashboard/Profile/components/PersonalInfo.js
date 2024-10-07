@@ -20,7 +20,6 @@ import {
   InputRightElement,
   Text
 } from '@chakra-ui/react'
-import { useColorModeValue } from '@chakra-ui/system'
 
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
@@ -33,7 +32,12 @@ import { UpdateUserPassword, updateOrgUser } from 'graphQL/Mutation'
 
 const PersonalInfo = () => {
   const { showToast } = useCustomToast()
-  const textColor = useColorModeValue('gray.700', 'white')
+
+  const { primaryErrorColor, inverseSecondaryBgColor } = useThemeColor([
+    'primaryErrorColor',
+    'inverseSecondaryBgColor'
+  ])
+
   const loginType = localStorage.getItem('loginType')
 
   const { setUserName, organization } = useGlobalState()
@@ -59,7 +63,7 @@ const PersonalInfo = () => {
   const [passError, setPassError] = useState('')
 
   const [updateUser, { loading }] = useMutation(updateOrgUser)
-  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
+
   const [updatePassword] = useMutation(UpdateUserPassword)
 
   const handleOldPassChange = (e) => {
@@ -164,7 +168,7 @@ const PersonalInfo = () => {
   return (
     <Box px={0} mx={0}>
       <CardHeader p='12px 0' mb='12px'>
-        <Text fontSize='lg' color={textColor} fontWeight='bold'>
+        <Text fontSize='lg' color={inverseSecondaryBgColor} fontWeight='bold'>
           Personal Details
         </Text>
       </CardHeader>

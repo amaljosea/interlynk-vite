@@ -21,10 +21,19 @@ const colors = {
     light: '#4A5568', // gray.600
     dark: '#E2E8F0' // gray.200
   },
+  headingTextSecondary: {
+    light: '#CBD5E0', // gray.300
+    dark: '#4A5568' // gray.600
+  },
   primaryTextColor: {
     light: '#1A202C', // gray.800
     dark: '#F7FAFC' // gray.50
   },
+  primaryTextColorWithOpacity: {
+    light: '#1A202C', // gray.800
+    dark: '#FFFFFF99' // white with 60% opacity
+  },
+
   secondaryTextColor: {
     light: '#A0AEC0', // gray.400
     dark: '#718096' // gray.500
@@ -37,7 +46,10 @@ const colors = {
     light: '#3182CE', // blue.500
     dark: '#5BA3DB' // slightly lighter than blue.400
   },
-
+  contrastTextColor: {
+    light: '#030303', // very dark gray/black for light mode
+    dark: '#FFFFFFCC' // white with 80% opacity for dark mode
+  },
   // Background Colors
   primaryBgColor: {
     light: '#F7FAFC', // gray.50
@@ -54,6 +66,10 @@ const colors = {
   lightAndDarkBgColor: {
     light: '#fff', // white for light mode
     dark: '#1f2733' // dark muted blue-gray
+  },
+  lightBlueBg: {
+    light: '#ebf8ff', // blue.50
+    dark: '#1A202C' // gray.800
   },
 
   // Border Colors
@@ -77,25 +93,40 @@ const colors = {
     light: '#0000001f', //  black with 12% opacity
     dark: '#ffffff1A' // white with 10% opacity
   },
-
+  mutedBorder: {
+    light: '#1A202C29', // dark gray with 16% opacity
+    dark: '#ffffff12' // white with 7% opacity
+  },
+  vibrantBlue: {
+    light: '#0D0CEE', // vibrant blue for light mode
+    dark: '#009bff' //  vibrant blue for dark mode
+  },
+  primaryRedBorder: {
+    light: '#E53E3E', // red.500
+    dark: '#63171B' // red.900
+  },
+  primaryGreenBorder: {
+    light: '#38A169', // green.500
+    dark: '#1C4532' // green.900
+  },
+  secondaryRedBorder: {
+    light: '#FED7D7', // red.100
+    dark: '#1A202C' // gray.800
+  },
+  secondaryGreenBorder: {
+    light: '#C6F6D5', //green.100
+    dark: '#1A202C' //gray.800
+  },
   // Error Colors
   primaryErrorColor: {
     light: '#E53E3E', // red.500
     dark: '#F56565' // red.400
-  },
-  secondaryErrorColor: {
-    light: '#FFF5F5', // red.100
-    dark: '#4A1F1F' // custom dark red for night mode
   },
 
   // Success Colors
   primarySuccessColor: {
     light: '#48BB78', // green.400
     dark: '#68D391' // green.300
-  },
-  secondarySuccessColor: {
-    light: '#F0FFF4', // green.100
-    dark: '#1F4032' // custom dark green for night mode
   }
 }
 

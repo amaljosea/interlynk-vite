@@ -39,7 +39,6 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -128,9 +127,10 @@ const ExpandedComponent = (props) => {
     text-transform: uppercase;
     letter-spacing: 0.6px;
   `
-  const { primaryBlueText, primaryTextColor } = useThemeColor([
+  const { primaryBlueText, primaryTextColor, primaryBgColor } = useThemeColor([
     'primaryBlueText',
-    'primaryTextColor'
+    'primaryTextColor',
+    'primaryBgColor'
   ])
   const onCheck = (item) => (item ? primaryBlueText : primaryTextColor)
 
@@ -217,7 +217,7 @@ const ExpandedComponent = (props) => {
             <CustomText>CVSS Vector :</CustomText>
             {vuln?.cvssVector ? (
               <Tooltip
-                bg='gray.50'
+                bg={primaryBgColor}
                 label={<CvssCard value={vuln?.cvssVector} />}
                 placement='top'
               >
@@ -296,20 +296,21 @@ const Vulnerabilities = ({ sbomData }) => {
   const params = useParams()
   const navigate = useNavigate()
   const productId = params.productid
-  const textColor = useColorModeValue('#1A202C', '#F7FAFC')
-  const activeColor = useColorModeValue('#3182ce', '#63b3ed')
-  const onCheck = (item) => (item ? activeColor : textColor)
   const {
     headingTextColor,
     primaryTextColor,
     primaryErrorColor,
-    primarySuccessColor
+    primarySuccessColor,
+    secondaryTextColor
   } = useThemeColor([
     'headingTextColor',
     'primaryTextColor',
     'primaryErrorColor',
-    'primarySuccessColor'
+    'primarySuccessColor',
+    'secondaryTextColor'
   ])
+
+  const onCheck = (item) => (item ? primaryBlueText : primaryTextColor)
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
@@ -790,7 +791,7 @@ const Vulnerabilities = ({ sbomData }) => {
                 aria-label='Options'
                 icon={<FaEllipsisV />}
                 variant='none'
-                color='gray.400'
+                color={secondaryTextColor}
               />
               <Portal>
                 <MenuList fontSize='sm'>

@@ -71,9 +71,18 @@ const GithubAddModal = ({ isOpen, onClose }) => {
   const [importOptions, setImportOptions] = useState({})
   const [projectGroupCreate] = useMutation(CreateProjectGroup)
 
-  const { primaryTextColor, secondaryTextInverse } = useThemeColor([
+  const {
+    primaryTextColor,
+    secondaryTextInverse,
+    primaryBgColor,
+    secondaryBgColor,
+    grayBorderColor
+  } = useThemeColor([
     'primaryTextColor',
-    'secondaryTextInverse'
+    'secondaryTextInverse',
+    'primaryBgColor',
+    'secondaryBgColor',
+    'grayBorderColor'
   ])
 
   useEffect(() => {
@@ -185,12 +194,10 @@ const GithubAddModal = ({ isOpen, onClose }) => {
               mb={2}
               p={4}
               border='1px'
-              borderColor='gray.200'
+              borderColor={grayBorderColor}
               borderRadius='md'
-              _hover={{ backgroundColor: 'gray.50' }}
-              backgroundColor={
-                selectedProjects[project.name] ? 'gray.100' : 'white'
-              }
+              _hover={{ backgroundColor: secondaryBgColor }}
+              backgroundColor={primaryBgColor}
             >
               <Flex justify='space-between' align='center'>
                 <Flex direction='column' flex={1}>

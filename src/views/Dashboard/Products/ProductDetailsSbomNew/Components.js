@@ -94,15 +94,15 @@ const Components = ({ sbomData }) => {
     headingTextColor,
     primaryTextColor,
     inverseSecondaryBgColor,
-    primaryBlueText
+    primaryBlueText,
+    secondaryTextColor
   } = useThemeColor([
     'headingTextColor',
     'primaryTextColor',
     'inverseSecondaryBgColor',
-    'primaryBlueText'
+    'primaryBlueText',
+    'secondaryTextColor'
   ])
-
-  /*   const activeColor = useColorModeValue('#3182ce', '#63b3ed') */
 
   const { prodCompState, dispatch } = useGlobalState()
   const {
@@ -514,7 +514,7 @@ const Components = ({ sbomData }) => {
                   aria-label='Options'
                   icon={<FaEllipsisV />}
                   variant='none'
-                  color='gray.400'
+                  color={secondaryTextColor}
                 />
                 <Portal>
                   <MenuList fontSize={'sm'}>

@@ -22,8 +22,7 @@ import {
   Tag,
   Text,
   Textarea,
-  Tooltip,
-  useColorModeValue
+  Tooltip
 } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
@@ -64,11 +63,9 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
   ])
   const [deletedRules, setDeletedRules] = useState([])
 
-  const { primaryErrorColor, primaryBlueText } = useThemeColor([
-    'primaryErrorColor',
-    'primaryBlueText'
-  ])
-  const borderColor = useColorModeValue('gray.200', 'gray.600')
+  const { primaryErrorColor, primaryBlueText, grayBorderColor } = useThemeColor(
+    ['primaryErrorColor', 'primaryBlueText', 'grayBorderColor']
+  )
 
   const [createPolicy, { loading: crLoading }] = useMutation(PolicyCreate)
   const [updatePolicy, { loading: upLoading }] = useMutation(PolicyUpdate)
@@ -923,12 +920,12 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                           <IconButton
                             border='1px solid'
                             colorScheme='white'
-                            borderColor={borderColor}
+                            borderColor={grayBorderColor}
                             aria-label='Remove condition'
                             onClick={() => deleteRow(item)}
                             icon={
                               <Icon
-                                sx={{ w: 6, h: 6, color: '#E53E3E' }}
+                                sx={{ w: 6, h: 6, color: primaryErrorColor }}
                                 as={MdDeleteOutline}
                               />
                             }

@@ -76,10 +76,8 @@ const GithubConfigModal = ({ isOpen, onClose, setGreenCheck, data }) => {
     }, 3000)
   }
 
-  const { primaryBgColor, primarySuccessColor } = useThemeColor([
-    'primaryBgColor',
-    'primarySuccessColor'
-  ])
+  const { primaryBgColor, primarySuccessColor, grayBorderColor } =
+    useThemeColor(['primaryBgColor', 'primarySuccessColor', 'grayBorderColor'])
 
   const handleToggleVisibility = () => setShowApiToken(!showApiToken)
 
@@ -155,7 +153,7 @@ const GithubConfigModal = ({ isOpen, onClose, setGreenCheck, data }) => {
           mt={4}
           p={4}
           border='1px'
-          borderColor='gray.200'
+          borderColor={grayBorderColor}
           borderRadius='md'
           boxShadow='md'
           bg={primaryBgColor}

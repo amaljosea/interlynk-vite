@@ -1,11 +1,12 @@
 import { gql, useQuery } from '@apollo/client'
 import React from 'react'
 
-import { Center, Icon, SimpleGrid, useColorModeValue } from '@chakra-ui/react'
+import { Center, Icon, SimpleGrid } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { TfiBarChart } from 'react-icons/tfi'
 
@@ -46,7 +47,7 @@ const DAILY_METRICS_QUERY = gql`
 export const Graphs = ({ filters }) => {
   const { orgView } = useGlobalQueryContext()
   const { startDate, endDate } = filters?.duration || {}
-  const bgColor = useColorModeValue('gray.300', 'gray.600')
+  const { headingTextSecondary } = useThemeColor(['headingTextSecondary'])
 
   const { data, loading, error } = useQuery(DAILY_METRICS_QUERY, {
     variables: {
@@ -64,7 +65,7 @@ export const Graphs = ({ filters }) => {
       <SimpleGrid width={'100%'} columns={2} spacing={24}>
         {[1, 2, 3, 4].map((_, index) => (
           <Center key={index}>
-            <Icon as={TfiBarChart} boxSize={44} color={bgColor} />
+            <Icon as={TfiBarChart} boxSize={44} color={headingTextSecondary} />
           </Center>
         ))}
       </SimpleGrid>

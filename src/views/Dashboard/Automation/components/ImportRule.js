@@ -10,13 +10,13 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaFileImport } from 'react-icons/fa6'
 
@@ -43,9 +43,8 @@ const ImportRule = (props) => {
 
   const params = useParams()
   const { showToast } = useCustomToast()
-  const borderColor = useColorModeValue('#A0AEC066', 'gray.600')
-  const textColor = useColorModeValue('#1A202C99', 'gray.600')
-  const highlightedTextColor = useColorModeValue('blue.600', 'blue.300')
+  const { grayBorderColor, primaryBlueText, secondaryTextColor } =
+    useThemeColor(['grayBorderColor', 'primaryBlueText', 'secondaryTextColor'])
 
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedFile, setSelectedFile] = useState(null)
@@ -150,7 +149,7 @@ const ImportRule = (props) => {
             borderStyle='dashed'
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
-            borderColor={isDragActive ? 'blue.500' : borderColor}
+            borderColor={isDragActive ? primaryBlueText : grayBorderColor}
             onClick={() => document.getElementById('fileInput').click()}
           >
             <Input
@@ -163,7 +162,7 @@ const ImportRule = (props) => {
             <Flex alignItems={'center'} justifyContent={'center'}>
               <Text
                 hidden={loading}
-                color={selectedFile ? highlightedTextColor : textColor}
+                color={selectedFile ? primaryBlueText : secondaryTextColor}
                 fontWeight={500}
               >
                 {isDragActive

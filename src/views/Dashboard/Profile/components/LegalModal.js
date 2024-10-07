@@ -12,8 +12,7 @@ import {
   Icon,
   IconButton,
   Input,
-  Stack,
-  useColorModeValue
+  Stack
 } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
@@ -43,11 +42,12 @@ const LegalModal = ({ data, isOpen, onClose }) => {
   const [contacts, setContacts] = useState([])
   const [isValidUrl, setIsValidUrl] = useState('')
 
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { grayBorderColor, primaryErrorColor } = useThemeColor([
+    'grayBorderColor',
+    'primaryErrorColor'
+  ])
 
   const [deletedContacts, setDeletedContacts] = useState([])
-
-  const borderColor = useColorModeValue('gray.200', 'gray.600')
 
   const [createMfc, { loading: crLoading }] = useMutation(
     OrganizationManufacturerCreate
@@ -375,11 +375,16 @@ const LegalModal = ({ data, isOpen, onClose }) => {
                 <IconButton
                   border='1px solid'
                   colorScheme='white'
-                  borderColor={borderColor}
+                  borderColor={grayBorderColor}
                   aria-label='Remove config'
                   onClick={() => deleteRow(item)}
                   icon={
-                    <Icon color={'#E53E3E'} w={6} h={6} as={MdDeleteOutline} />
+                    <Icon
+                      color={primaryErrorColor}
+                      w={6}
+                      h={6}
+                      as={MdDeleteOutline}
+                    />
                   }
                 />
               </Flex>

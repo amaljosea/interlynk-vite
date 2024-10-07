@@ -130,7 +130,8 @@ function ActivitiesOverviewRow(props) {
     onCpeOpen
   } = props
 
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
+  const { headingTextColor, grayBorderColor, secondaryTextColor } =
+    useThemeColor(['headingTextColor', 'grayBorderColor', 'secondaryTextColor'])
 
   const handleClick = (event) => {
     if (event === 'purl') {
@@ -162,7 +163,7 @@ function ActivitiesOverviewRow(props) {
         </Tooltip>
         <Box
           w='2px'
-          bg='gray.200'
+          bg={grayBorderColor}
           h={index === arrLength - 1 ? '15px' : '100%'}
         ></Box>
       </Flex>
@@ -185,7 +186,7 @@ function ActivitiesOverviewRow(props) {
         >
           {valueToText(action, event, orig, updated)}
         </Text>
-        <Text fontSize='xs' color='gray.400' fontWeight='normal'>
+        <Text fontSize='xs' color={secondaryTextColor} fontWeight='normal'>
           {getFullDateAndTime(date)}
         </Text>
       </Stack>

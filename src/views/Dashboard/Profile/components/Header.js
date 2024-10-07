@@ -43,7 +43,6 @@ import {
   Text,
   Tooltip,
   VStack,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -88,18 +87,17 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     primaryTextColor,
     secondaryBgColor,
     primaryErrorColor,
-    primaryBlueText
+    primaryBlueText,
+    headingTextColor,
+    grayBorderColor
   } = useThemeColor([
     'primaryTextColor',
     'secondaryBgColor',
     'primaryErrorColor',
-    'primaryBlueText'
+    'primaryBlueText',
+    'headingTextColor',
+    'grayBorderColor'
   ])
-
-  const switchIconColor = useColorModeValue('gray.500', 'white')
-  const switchBgColor = useColorModeValue('white', '#2D3748')
-
-  const cityIconColor = useColorModeValue('#3182CE', '#3182CE')
 
   const [updateOrg, { loading: updateLoading }] = useMutation(orgUpdate)
 
@@ -606,10 +604,15 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
               </Box>
             )}
             {/*  CityIcon for org page */}
-            {isOrg && <FaCity size='80px' style={{ color: cityIconColor }} />}
+
+            {isOrg && <FaCity size='80px' style={{ color: primaryBlueText }} />}
 
             <Flex direction='column' maxWidth='100%' my={{ sm: '14px' }}>
-              <Box display={'flex'} gap={orgData?.currentUser?.name ? '10px' : 0} alignItems={'center'}>
+              <Box
+                display={'flex'}
+                gap={orgData?.currentUser?.name ? '10px' : 0}
+                alignItems={'center'}
+              >
                 <Text
                   ms={{ sm: '8px', md: '0px' }}
                   sx={{
@@ -952,11 +955,11 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     <IconButton
                       variant='solid'
                       aria-label='Switch'
-                      icon={<FaExchangeAlt color={switchIconColor} />}
+                      icon={<FaExchangeAlt color={headingTextColor} />}
                       sx={{
                         border: '1px',
-                        borderColor: 'gray.200',
-                        bg: switchBgColor
+                        borderColor: grayBorderColor,
+                        bg: secondaryBgColor
                       }}
                       onClick={() => {
                         setActiveRow({ id: org.id, name: org.name })

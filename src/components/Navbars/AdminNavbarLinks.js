@@ -62,6 +62,7 @@ export default function AdminNavbarLinks(props) {
       )}
 
       {/* SEARCH */}
+
       <SearchBar />
 
       {/* DARK MODE */}

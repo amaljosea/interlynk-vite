@@ -2,16 +2,25 @@ import * as d3 from 'd3'
 import bugIcon from 'assets/svg/bug.svg'
 import { useEffect, useRef } from 'react'
 
-import { useColorModeValue } from '@chakra-ui/system'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const Tree = ({ data, targetComponent, targetVulnerability }) => {
   const svgRef = useRef()
-  const textColor = useColorModeValue('#030303', '#FFFFFFCC')
-  const vulnerabilityColor = useColorModeValue('#0D0CEE', '#009bff')
-  const componentColor = useColorModeValue('#E53E3E', '#ff3c3c')
-  const strokeColor = useColorModeValue('#A0AEC0', '#A0AEC066')
-  const nodeColor = useColorModeValue('#3182ce', '#009bff')
-  const whiteNodeColor = useColorModeValue('#FFFFFF', '#121212')
+  const {
+    contrastTextColor,
+    vibrantBlue,
+    primaryErrorColor,
+    secondaryTextColor,
+    primaryBlueText,
+    primaryBgColor
+  } = useThemeColor([
+    'contrastTextColor',
+    'vibrantBlue',
+    'primaryErrorColor',
+    'secondaryTextColor',
+    'primaryBlueText',
+    'primaryBgColor'
+  ])
 
   useEffect(() => {
     function collapsibleIndent(
@@ -35,15 +44,15 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
       } = options
 
       let plus = {
-        shapeFill: nodeColor,
-        shapeStroke: nodeColor,
-        textFill: whiteNodeColor,
+        shapeFill: primaryBlueText,
+        shapeStroke: primaryBlueText,
+        textFill: primaryBgColor,
         text: '+'
       }
       let minus = {
-        shapeFill: whiteNodeColor,
-        shapeStroke: nodeColor,
-        textFill: nodeColor,
+        shapeFill: primaryBgColor,
+        shapeStroke: primaryBlueText,
+        textFill: primaryBlueText,
         text: '−'
       }
 
@@ -195,7 +204,7 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
                 : plus.shapeFill
               : 'none'
           )
-          .attr('stroke', (d) => (d._children ? nodeColor : 'none'))
+          .attr('stroke', (d) => (d._children ? primaryBlueText : 'none'))
           .attr('stroke-width', 0.9)
           .attr('rx', 1)
           .attr('ry', 1)
@@ -217,9 +226,9 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
           .attr('dy', '0.32em')
           .attr('font-size', '14px')
           .attr('fill', (d) => {
-            if (d.data.name === targetComponent) return componentColor
-            if (d.data.name === targetVulnerability) return vulnerabilityColor
-            return textColor
+            if (d.data.name === targetComponent) return primaryErrorColor
+            if (d.data.name === targetVulnerability) return vibrantBlue
+            return contrastTextColor
           })
           .attr('font-weight', (d) => {
             if (d.depth === 0) return '500'
@@ -287,9 +296,9 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
             pathsToTargets.some((path) => path.includes(d.target)) ||
             pathsToVulnerabilities.some((path) => path.includes(d.target))
               ? pathsToTargets.some((path) => path.includes(d.target))
-                ? componentColor
-                : vulnerabilityColor
-              : strokeColor
+                ? primaryErrorColor
+                : vibrantBlue
+              : secondaryTextColor
           ) // stroke color for paths to targets and vulnerabilities
           .attr('stroke-width', (d) =>
             pathsToTargets.some((path) => path.includes(d.target)) ||
@@ -342,8 +351,8 @@ const Tree = ({ data, targetComponent, targetVulnerability }) => {
           .attr('stroke-opacity', 1)
           .attr('stroke', (d) =>
             pathsToTargets.some((path) => path.includes(d.target))
-              ? componentColor
-              : vulnerabilityColor
+              ? primaryErrorColor
+              : vibrantBlue
           )
           .attr('stroke-width', '1.2px')
           .attr(

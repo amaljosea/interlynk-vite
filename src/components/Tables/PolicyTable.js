@@ -78,10 +78,12 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
     childKey: 'remove_policy'
   })
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { headingTextColor, primaryTextColor, secondaryTextColor } =
+    useThemeColor([
+      'headingTextColor',
+      'primaryTextColor',
+      'secondaryTextColor'
+    ])
 
   const [activeRow, setActiveRow] = useState(null)
   const [activeRule, setActiveRule] = useState(null)
@@ -308,7 +310,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
               as={IconButton}
               icon={<FaEllipsisV />}
               variant='none'
-              color='gray.400'
+              color={secondaryTextColor}
             />
             <Portal>
               <MenuList fontSize={'sm'}>

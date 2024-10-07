@@ -7,8 +7,7 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
 
 // Custom components
@@ -19,6 +18,7 @@ import CardHeader from 'components/Card/CardHeader'
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { orgUpdate } from 'graphQL/Mutation'
 
@@ -31,7 +31,8 @@ const GeneralFeed = () => {
   })
 
   const { showToast } = useCustomToast()
-  const textColor = useColorModeValue('gray.700', 'white')
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+
   const [orgName, setOrgName] = useState('')
   const [message, setMessage] = useState('Update')
 
@@ -65,7 +66,7 @@ const GeneralFeed = () => {
   return (
     <Card p={0}>
       <CardHeader p='12px 0' mb='12px'>
-        <Text fontSize='lg' color={textColor} fontWeight='bold'>
+        <Text fontSize='lg' color={inverseSecondaryBgColor} fontWeight='bold'>
           Organization
         </Text>
       </CardHeader>

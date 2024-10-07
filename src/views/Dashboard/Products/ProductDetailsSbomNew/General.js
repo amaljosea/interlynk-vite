@@ -19,7 +19,6 @@ import {
   Td,
   Text,
   Tr,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -50,7 +49,10 @@ import ConfirmationModal from '../components/ConfirmationModal'
 import ToolModal from '../components/ToolModal'
 
 const General = ({ data, loading, error }) => {
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { primaryBlueText, inverseSecondaryBgColor } = useThemeColor([
+    'primaryBlueText',
+    'inverseSecondaryBgColor'
+  ])
   const { isFreeTier } = useGlobalQueryContext()
   const { showToast } = useCustomToast()
   const params = useParams()
@@ -75,7 +77,6 @@ const General = ({ data, loading, error }) => {
     childKey: 'update_sbom'
   })
 
-  const textColor = useColorModeValue('gray.700', 'white')
   const customerView = isCustomerView()
   const [activeTool, setActiveTool] = useState(null)
 
@@ -186,7 +187,7 @@ const General = ({ data, loading, error }) => {
         <Table
           __css={{ tableLayout: 'fixed', width: 'full' }}
           variant='simple'
-          color={textColor}
+          color={inverseSecondaryBgColor}
         >
           <Tbody w={'100%'}>
             {/* CREATED AT */}

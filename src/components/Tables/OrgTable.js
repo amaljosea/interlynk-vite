@@ -41,16 +41,24 @@ import {
 } from 'graphQL/Mutation'
 
 import { BiExit } from 'react-icons/bi'
-import { FaEllipsisVertical } from 'react-icons/fa6'
+import { FaEllipsisV } from 'react-icons/fa'
 
 const OrgTable = ({ data, activeOrg }) => {
   const navigate = useNavigate()
   const { showToast } = useCustomToast()
   const [leaveError, setLeaveError] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
-    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
-  )
+  const {
+    headingTextColor,
+    primaryTextColor,
+    primaryBlueText,
+    secondaryTextColor
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'primaryBlueText',
+    'secondaryTextColor'
+  ])
 
   const {
     isOpen: isWarningOpen,
@@ -292,9 +300,9 @@ const OrgTable = ({ data, activeOrg }) => {
             <MenuButton
               as={IconButton}
               aria-label='Options'
-              icon={<FaEllipsisVertical />}
+              icon={<FaEllipsisV />}
               variant='none'
-              color='gray.400'
+              color={secondaryTextColor}
             />
             <Portal>
               {invitationStatus === 'invited' ? (

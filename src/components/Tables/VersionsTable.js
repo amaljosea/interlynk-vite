@@ -38,8 +38,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
 
+import { FaEllipsisV } from 'react-icons/fa'
 import { FaBoxArchive, FaCodeCompare } from 'react-icons/fa6'
-import { FaEllipsisVertical, FaScrewdriverWrench } from 'react-icons/fa6'
+import { FaScrewdriverWrench } from 'react-icons/fa6'
 import { HiOutlineDuplicate } from 'react-icons/hi'
 import { IoMdWarning } from 'react-icons/io'
 
@@ -89,12 +90,14 @@ const VersionsTable = (props) => {
     headingTextColor,
     primaryTextColor,
     primaryErrorColor,
-    primaryBlueText
+    primaryBlueText,
+    secondaryTextColor
   } = useThemeColor([
     'headingTextColor',
     'primaryTextColor',
     'primaryErrorColor',
-    'primaryBlueText'
+    'primaryBlueText',
+    'secondaryTextColor'
   ])
 
   const LIST = useDisclosure()
@@ -429,9 +432,9 @@ const VersionsTable = (props) => {
           <Menu>
             <MenuButton
               as={IconButton}
-              icon={<FaEllipsisVertical />}
+              icon={<FaEllipsisV />}
               variant='none'
-              color='gray.400'
+              color={secondaryTextColor}
             />
             <Portal>
               <MenuList fontSize={'sm'}>

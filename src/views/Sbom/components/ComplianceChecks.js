@@ -23,8 +23,7 @@ import {
   Tabs,
   Tag,
   Text,
-  Tooltip,
-  useColorModeValue
+  Tooltip
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -46,8 +45,12 @@ const ComplianceChecks = ({
 }) => {
   const params = useParams()
   const { showToast } = useCustomToast()
-  const bgColor = useColorModeValue('white', 'gray.700')
-  const alertBg = useColorModeValue('blue.50', 'gray.800')
+  const { secondaryBgColor, lightBlueBg, primaryBlueText } = useThemeColor([
+    'secondaryBgColor',
+    'lightBlueBg',
+    'primaryBlueText'
+  ])
+
   const tabs = ['NTIA', 'FDA', 'BSI']
   const [tab, setTab] = useState(activeTab || 0)
   const onTabChange = (value) => setTab(value)
@@ -137,13 +140,12 @@ const ComplianceChecks = ({
   }
 
   const RunAlert = () => {
-    const { primaryBlueText } = useThemeColor(['primaryBlueText'])
     return (
       <Flex
         p={3}
         mt={2}
         gap={3}
-        bg={alertBg}
+        bg={lightBlueBg}
         width={'100%'}
         borderRadius={5}
         alignItems={'center'}
@@ -238,7 +240,7 @@ const ComplianceChecks = ({
           <Tabs index={tab} onChange={onTabChange}>
             <TabList
               position={'fixed'}
-              bg={bgColor}
+              bg={secondaryBgColor}
               zIndex={1}
               left={0}
               right={0}

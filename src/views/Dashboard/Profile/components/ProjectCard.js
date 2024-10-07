@@ -7,13 +7,14 @@ import {
   Button,
   Flex,
   Image,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const ProjectCard = ({ image, name, category, avatars, description }) => {
   // Chakra color mode
-  const textColor = useColorModeValue('gray.700', 'white')
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
 
   return (
     <Flex direction='column'>
@@ -32,7 +33,12 @@ const ProjectCard = ({ image, name, category, avatars, description }) => {
         <Text fontSize='md' color='gray.500' fontWeight='600' mb='10px'>
           {name}
         </Text>
-        <Text fontSize='xl' color={textColor} fontWeight='bold' mb='10px'>
+        <Text
+          fontSize='xl'
+          color={inverseSecondaryBgColor}
+          fontWeight='bold'
+          mb='10px'
+        >
           {category}
         </Text>
         <Text fontSize='md' color='gray.500' fontWeight='400' mb='20px'>

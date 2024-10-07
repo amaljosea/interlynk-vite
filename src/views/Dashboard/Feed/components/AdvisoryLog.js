@@ -8,14 +8,15 @@ import {
   Td,
   Th,
   Thead,
-  Tr,
-  useColorModeValue
+  Tr
 } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import AdvisoryLogRow from 'components/Tables/AdvisoryLogRow.js'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const AdvisoryLog = ({
   captions,
@@ -24,7 +25,7 @@ const AdvisoryLog = ({
   onPreviousPage,
   onNextPage
 }) => {
-  const textColor = useColorModeValue('gray.700', 'white')
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
 
   return (
     <Card my='14px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
@@ -32,7 +33,7 @@ const AdvisoryLog = ({
         <Table
           __css={{ tableLayout: 'fixed', width: 'full' }}
           variant='simple'
-          color={textColor}
+          color={inverseSecondaryBgColor}
           size='sm'
         >
           <Thead>

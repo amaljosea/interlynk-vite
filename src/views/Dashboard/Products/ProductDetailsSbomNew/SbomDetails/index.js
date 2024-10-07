@@ -7,6 +7,7 @@ import SbomActions from 'views/Sbom/components/SbomActions'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
 import {
+  Box,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
@@ -20,7 +21,6 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -46,15 +46,18 @@ import {
 import { FaBug, FaCubes, FaLongArrowAltRight, FaRobot } from 'react-icons/fa'
 import { FaCircleCheck, FaTag } from 'react-icons/fa6'
 
-const SettingsTag = ({ icon, label, color }) => {
+const SettingsTag = ({ icon, label, color, isDisabled }) => {
   return (
     <Tooltip label={label}>
-      <IconButton
-        borderRadius={'full'}
-        size='xs'
-        icon={icon}
-        colorScheme={color}
-      />
+      <Box>
+        <IconButton
+          borderRadius={'full'}
+          size='xs'
+          icon={icon}
+          colorScheme={color}
+          disabled={isDisabled}
+        />
+      </Box>
     </Tooltip>
   )
 }
@@ -80,8 +83,7 @@ const SbomDetails = ({ sbomData }) => {
   const { prodCompState } = useGlobalState()
   const { field, direction } = prodCompState
 
-  const signedUrlParams = getSignedUrlParams()
-  const scanColor = useColorModeValue('blackAlpha', 'whiteAlpha')
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -276,33 +278,38 @@ const SbomDetails = ({ sbomData }) => {
                     />
                     <Divider width={3} borderColor={'gray.500'} />
                     <SettingsTag
-                      color={checksEnabled ? 'blue' : scanColor}
+                      color={'blue'}
                       label={'Checks'}
                       icon={<Search2Icon />}
+                      isDisabled={!checksEnabled}
                     />
                     <Divider width={3} borderColor={'gray.500'} />
                     <SettingsTag
-                      color={internalComp ? 'blue' : scanColor}
+                      color={'blue'}
                       label={'Internal Labeling'}
                       icon={<FaTag />}
+                      isDisabled={!internalComp}
                     />
                     <Divider width={3} borderColor={'gray.500'} />
                     <SettingsTag
-                      color={automatedFixesEnabled ? 'blue' : scanColor}
+                      color={'blue'}
                       label={'Automation'}
                       icon={<FaRobot />}
+                      isDisabled={!automatedFixesEnabled}
                     />
                     <Divider width={3} borderColor={'gray.500'} />
                     <SettingsTag
-                      color={hasFinished && vulnScan ? 'blue' : scanColor}
+                      color={'blue'}
                       label={'Vulnerability Scan'}
                       icon={<FaBug />}
+                      isDisabled={!hasFinished || !vulnScan}
                     />
                     <Divider width={3} borderColor={'gray.500'} />
                     <SettingsTag
                       label={'Ready'}
-                      color={hasFinished ? 'blue' : scanColor}
+                      color={'blue'}
                       icon={<FaCircleCheck />}
+                      isDisabled={!hasFinished}
                     />
                   </Flex>
                 </CardBody>

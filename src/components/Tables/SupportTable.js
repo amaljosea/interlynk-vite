@@ -46,6 +46,8 @@ const SupportTable = ({
   const params = useParams()
   const sbomId = params.sbomid
 
+  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
+
   const editSup = useHasPermission({
     parentKey: 'view_support',
     childKey: 'create_update_support'
@@ -335,7 +337,7 @@ const SupportTable = ({
               as={IconButton}
               icon={<FaEllipsisV />}
               variant='none'
-              color='gray.400'
+              color={secondaryTextColor}
             />
             <Portal>
               <MenuList fontSize={'sm'}>

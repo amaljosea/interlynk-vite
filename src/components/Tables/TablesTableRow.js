@@ -1,23 +1,17 @@
 import React from 'react'
 
-import {
-  Avatar,
-  Badge,
-  Button,
-  Flex,
-  Td,
-  Text,
-  Tr,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Avatar, Badge, Button, Flex, Td, Text, Tr } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
 function TablesTableRow(props) {
   const { logo, name, email, subdomain, domain, status, date } = props
-  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
-  const bgStatus = useColorModeValue('gray.400', '#1a202c')
-  const colorStatus = useColorModeValue('white', 'gray.400')
+  const { inverseSecondaryBgColor, secondaryTextColor, primaryBgColor } =
+    useThemeColor([
+      'inverseSecondaryBgColor',
+      'secondaryTextColor',
+      'primaryBgColor'
+    ])
 
   return (
     <Tr>
@@ -28,7 +22,7 @@ function TablesTableRow(props) {
             <Text fontSize='md' color={inverseSecondaryBgColor} minWidth='100%'>
               {name}
             </Text>
-            <Text fontSize='sm' color='gray.400' fontWeight='normal'>
+            <Text fontSize='sm' color={secondaryTextColor} fontWeight='normal'>
               {email}
             </Text>
           </Flex>
@@ -40,15 +34,15 @@ function TablesTableRow(props) {
           <Text fontSize='md' color={inverseSecondaryBgColor} fontWeight='bold'>
             {domain}
           </Text>
-          <Text fontSize='sm' color='gray.400' fontWeight='normal'>
+          <Text fontSize='sm' color={secondaryTextColor} fontWeight='normal'>
             {subdomain}
           </Text>
         </Flex>
       </Td>
       <Td>
         <Badge
-          bg={status === 'Online' ? 'green.400' : bgStatus}
-          color={status === 'Online' ? 'white' : colorStatus}
+          bg={status === 'Online' ? 'green.400' : secondaryTextColor}
+          color={status === 'Online' ? 'white' : primaryBgColor}
           fontSize='16px'
           p='3px 10px'
           borderRadius='8px'
@@ -70,7 +64,7 @@ function TablesTableRow(props) {
         <Button p='0px' bg='transparent' variant='no-hover'>
           <Text
             fontSize='md'
-            color='gray.400'
+            color={secondaryTextColor}
             fontWeight='bold'
             cursor='pointer'
           >

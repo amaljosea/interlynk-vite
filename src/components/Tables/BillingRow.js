@@ -7,12 +7,17 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { FaPencilAlt, FaTrashAlt } from 'react-icons/fa'
 
 function BillingRow(props) {
-  const { primaryErrorColor, inverseSecondaryBgColor, primaryBgColor } =
-    useThemeColor([
-      'primaryErrorColor',
-      'inverseSecondaryBgColor',
-      'primaryBgColor'
-    ])
+  const {
+    primaryErrorColor,
+    inverseSecondaryBgColor,
+    primaryBgColor,
+    secondaryTextColor
+  } = useThemeColor([
+    'primaryErrorColor',
+    'inverseSecondaryBgColor',
+    'primaryBgColor',
+    'secondaryTextColor'
+  ])
 
   const { key, name, company, email, number } = props
 
@@ -28,19 +33,19 @@ function BillingRow(props) {
           >
             {name}
           </Text>
-          <Text color='gray.400' fontSize='sm' fontWeight='semibold'>
+          <Text color={secondaryTextColor} fontSize='sm' fontWeight='semibold'>
             Company Name:{' '}
             <Text as='span' color='gray.500'>
               {company}
             </Text>
           </Text>
-          <Text color='gray.400' fontSize='sm' fontWeight='semibold'>
+          <Text color={secondaryTextColor} fontSize='sm' fontWeight='semibold'>
             Email Address:{' '}
             <Text as='span' color='gray.500'>
               {email}
             </Text>
           </Text>
-          <Text color='gray.400' fontSize='sm' fontWeight='semibold'>
+          <Text color={secondaryTextColor} fontSize='sm' fontWeight='semibold'>
             VAT Number:{' '}
             <Text as='span' color='gray.500'>
               {number}

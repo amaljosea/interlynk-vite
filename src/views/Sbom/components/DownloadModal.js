@@ -16,7 +16,6 @@ import {
   Stack,
   Tag,
   Text,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -68,8 +67,9 @@ const DownloadModal = (props) => {
     onClose: onCloseDetails
   } = useDisclosure()
 
-  const textColor = useColorModeValue('#1A202C', '#f6f6f6')
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { primaryBlueText, primaryTextColor } = useThemeColor([
+    'primaryBlueText'
+  ])
   const type = spec === 'cyclonedx' ? 'cdx' : 'spdx'
 
   const downloadJsonFile = (jsonData) => {
@@ -232,7 +232,7 @@ const DownloadModal = (props) => {
                   alignItems='center'
                   justifyContent={'space-between'}
                 >
-                  <Text fontSize={'sm'} color={textColor}>
+                  <Text fontSize={'sm'} color={primaryTextColor}>
                     {item?.name}
                   </Text>
                   <Button

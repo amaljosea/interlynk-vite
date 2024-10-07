@@ -12,14 +12,14 @@ import {
   MenuOptionGroup,
   Stack,
   Tag,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetLabels } from 'graphQL/Queries'
 
@@ -41,10 +41,15 @@ const ProdFilterMenu = ({
 }) => {
   const { enabled, labelIds } = filters || ''
   const { orgView } = useGlobalQueryContext()
-  const iconColor = useColorModeValue('#444', '#f3f3f3')
-  const signedUrlParams = getSignedUrlParams()
-  const bgColor = useColorModeValue('#fff', '#1A202C')
-  const borderColor = useColorModeValue('#E2E8F0', '#2D3748')
+
+  const { primaryBgColor, grayBorderColor, inverseSecondaryBgColor } =
+    useThemeColor([
+      'primaryBgColor',
+      'grayBorderColor',
+      'inverseSecondaryBgColor'
+    ])
+
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const onFilterActive = (value) => {
     setFilters((oldFilter) => ({
@@ -131,17 +136,24 @@ const ProdFilterMenu = ({
                 <MenuItemOption
                   key={index}
                   fontSize={'sm'}
-                  value={item?.id}
+                  value={(item?.id, 1)}
                   wordBreak={'break-all'}
                   onClick={(e) => handleMenuClick(e, item?.name)}
                   icon={
                     filterMode === 'AND' ? (
                       <ItemCheck
-                        icon={<RxDotFilled size={16} color={iconColor} />}
+                        icon={
+                          <RxDotFilled
+                            size={16}
+                            color={inverseSecondaryBgColor}
+                          />
+                        }
                       />
                     ) : (
                       <ItemCheck
-                        icon={<FaCheck size={14} color={iconColor} />}
+                        icon={
+                          <FaCheck size={14} color={inverseSecondaryBgColor} />
+                        }
                       />
                     )
                   }
@@ -162,10 +174,10 @@ const ProdFilterMenu = ({
               left={0}
               right={0}
               bottom={-8}
-              bg={bgColor}
+              bg={primaryBgColor}
               pos='absolute'
               borderBottomRadius={5}
-              border={`1px solid ${borderColor}`}
+              border={`1px solid ${grayBorderColor}`}
             >
               <Text fontSize={'xs'}>
                 Use <Kbd>⇧</Kbd> + <Kbd>click/return</Kbd> for logical AND

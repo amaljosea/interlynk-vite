@@ -17,7 +17,10 @@ import { FaEllipsisV } from 'react-icons/fa'
 
 function VulnerabilityRow(props) {
   const { type, component, version, description, recommendation, score } = props
-  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+  const { inverseSecondaryBgColor, secondaryTextColor } = useThemeColor([
+    'inverseSecondaryBgColor',
+    'secondaryTextColor'
+  ])
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = React.useRef()
   const sevColor =
@@ -48,7 +51,7 @@ function VulnerabilityRow(props) {
       <Td>{recommendation}</Td>
       <Td>
         <Button p='0px' bg='transparent' ref={btnRef} onClick={onOpen}>
-          <Icon as={FaEllipsisV} color='gray.400' cursor='pointer' />
+          <Icon as={FaEllipsisV} color={secondaryTextColor} cursor='pointer' />
         </Button>
       </Td>
     </Tr>

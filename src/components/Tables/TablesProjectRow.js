@@ -8,7 +8,10 @@ import { FaEllipsisV } from 'react-icons/fa'
 
 function DashboardTableRow(props) {
   const { logo, name, status, budget, progression } = props
-  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+  const { inverseSecondaryBgColor, secondaryTextColor } = useThemeColor([
+    'inverseSecondaryBgColor',
+    'secondaryTextColor'
+  ])
 
   return (
     <Tr>
@@ -48,7 +51,7 @@ function DashboardTableRow(props) {
       </Td>
       <Td>
         <Button p='0px' bg='transparent'>
-          <Icon as={FaEllipsisV} color='gray.400' cursor='pointer' />
+          <Icon as={FaEllipsisV} color={secondaryTextColor} cursor='pointer' />
         </Button>
       </Td>
     </Tr>

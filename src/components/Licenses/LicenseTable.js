@@ -34,9 +34,17 @@ import { SubHeaderComponent } from './SubHeaderComponent'
 
 const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
   const [activeRow, setActiveRow] = useState(null)
-  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
-    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
-  )
+  const {
+    headingTextColor,
+    primaryTextColor,
+    primaryBlueText,
+    secondaryTextColor
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'primaryBlueText',
+    'secondaryTextColor'
+  ])
 
   const updateLic = useHasPermission({
     parentKey: 'view_license',
@@ -225,7 +233,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
               as={IconButton}
               icon={<FaEllipsisV />}
               variant='none'
-              color='gray.400'
+              color={secondaryTextColor}
             />
             <Portal>
               <MenuList fontSize={'sm'}>

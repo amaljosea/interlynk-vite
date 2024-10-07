@@ -1,23 +1,21 @@
 import React from 'react'
 
-import {
-  Button,
-  Flex,
-  Icon,
-  Spacer,
-  Text,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Button, Flex, Icon, Spacer, Text } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 // react icons
 import { BsArrowRight } from 'react-icons/bs'
 
 const BuiltByDevelopers = ({ title, name, description, image }) => {
-  const textColor = useColorModeValue('gray.700', 'white')
+  const { inverseSecondaryBgColor, secondaryTextColor } = useThemeColor([
+    'inverseSecondaryBgColor',
+    'secondaryTextColor'
+  ])
 
   return (
     <Card minHeight='290.5px' p='1.2rem'>
@@ -29,13 +27,18 @@ const BuiltByDevelopers = ({ title, name, description, image }) => {
             lineHeight='1.6'
             width={{ lg: '45%' }}
           >
-            <Text fontSize='sm' color='gray.400' fontWeight='bold'>
+            <Text fontSize='sm' color={secondaryTextColor} fontWeight='bold'>
               {title}
             </Text>
-            <Text fontSize='lg' color={textColor} fontWeight='bold' pb='.5rem'>
+            <Text
+              fontSize='lg'
+              color={inverseSecondaryBgColor}
+              fontWeight='bold'
+              pb='.5rem'
+            >
               {name}
             </Text>
-            <Text fontSize='sm' color='gray.400' fontWeight='normal'>
+            <Text fontSize='sm' color={secondaryTextColor} fontWeight='normal'>
               {description}
             </Text>
             <Spacer />
@@ -48,7 +51,7 @@ const BuiltByDevelopers = ({ title, name, description, image }) => {
               >
                 <Text
                   fontSize='sm'
-                  color={textColor}
+                  color={inverseSecondaryBgColor}
                   fontWeight='bold'
                   cursor='pointer'
                   transition='all .5s ease'

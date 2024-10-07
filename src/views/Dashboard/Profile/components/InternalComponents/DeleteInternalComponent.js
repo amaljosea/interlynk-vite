@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { deleteOrgComp } from 'graphQL/Mutation'
 import { getInternalComponents } from 'graphQL/Queries'
@@ -27,6 +28,8 @@ export const DeleteInternalComponent = ({
   const [isConfirming, setIsConfirming] = useState(false)
   const [untag, setUntag] = useState(false)
   const { showToast } = useCustomToast()
+
+  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
   const onCancel = () => setIsConfirming(false)
 
@@ -56,7 +59,7 @@ export const DeleteInternalComponent = ({
           as={IconButton}
           icon={<FaEllipsisV />}
           variant='none'
-          color='gray.400'
+          color={secondaryTextColor}
         />
         <Portal>
           <MenuList fontSize={'sm'}>

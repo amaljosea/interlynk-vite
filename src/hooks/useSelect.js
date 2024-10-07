@@ -1,5 +1,3 @@
-import { useColorModeValue } from '@chakra-ui/system'
-
 import { useThemeColor } from 'hooks/useThemeColors'
 
 export const useSelect = (type) => {
@@ -9,15 +7,15 @@ export const useSelect = (type) => {
     primaryTextColor,
     primaryBgColor,
     secondaryTextInverse,
-    secondaryBgColor
+    secondaryBgColor,
+    grayBorderColor
   } = useThemeColor([
     'primaryTextColor',
     'primaryBgColor',
     'secondaryTextInverse',
-    'secondaryBgColor'
+    'secondaryBgColor',
+    'grayBorderColor'
   ])
-
-  const borderColor = useColorModeValue('#E2E8F0', '#4A5568')
 
   const selectStyles = {
     control: (baseStyles, state) => ({
@@ -30,11 +28,12 @@ export const useSelect = (type) => {
       fontSize: '14px',
       backgroundColor: isBreadcrumb ? secondaryBgColor : 'transparent',
       '&:hover': {
-        borderColor: isBreadcrumb ? 'transparent' : borderColor,
-        backgroundColor: isBreadcrumb ? borderColor : 'transparent'
+        borderColor: isBreadcrumb ? 'transparent' : grayBorderColor,
+        backgroundColor: isBreadcrumb ? grayBorderColor : 'transparent'
       },
       boxShadow: state.isFocused ? 'none' : baseStyles?.boxShadow,
-      borderColor: isBreadcrumb && state.isFocused ? 'transparent' : borderColor
+      borderColor:
+        isBreadcrumb && state.isFocused ? 'transparent' : grayBorderColor
     }),
     menu: (provided) => ({
       ...provided,

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useColorModeValue, useTheme } from '@chakra-ui/react'
 
 export const useThemeColor = (colorKeys) => {

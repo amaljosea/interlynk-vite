@@ -90,7 +90,8 @@ const ProductTable = ({
     secondaryBlueBorder,
     secondaryBgColor,
     semiTransparentBorder,
-    lightAndDarkBgColor
+    lightAndDarkBgColor,
+    secondaryTextColor
   } = useThemeColor([
     'primaryBlueText',
     'headingTextColor',
@@ -99,7 +100,8 @@ const ProductTable = ({
     'secondaryBlueBorder',
     'secondaryBgColor',
     'semiTransparentBorder',
-    'lightAndDarkBgColor'
+    'lightAndDarkBgColor',
+    'secondaryTextColor'
   ])
 
   const { search, field } = filters
@@ -609,7 +611,7 @@ const ProductTable = ({
               variant='none'
               as={IconButton}
               aria-label={`Dropdown menu for ${name}`}
-              color='gray.400'
+              color={secondaryTextColor}
               icon={<FaEllipsisV />}
               onClick={() => setOpenTagMenu(false)}
             />

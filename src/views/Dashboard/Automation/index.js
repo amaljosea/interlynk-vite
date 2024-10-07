@@ -67,10 +67,12 @@ const Automation = ({ projects }) => {
   const filterProjects = projects?.filter((item) => item?.id !== productId)
   const activeProject = projects?.find((item) => item?.id === productId)
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { headingTextColor, primaryTextColor, secondaryTextColor } =
+    useThemeColor([
+      'headingTextColor',
+      'primaryTextColor',
+      'secondaryTextColor'
+    ])
 
   const [activeRow, setActiveRow] = useState(null)
   const [activeEnv, setActiveEnv] = useState(null)
@@ -359,7 +361,7 @@ const Automation = ({ projects }) => {
               as={IconButton}
               icon={<FaEllipsisV />}
               variant='none'
-              color='gray.400'
+              color={secondaryTextColor}
             />
             <Portal>
               <MenuList fontSize={'sm'}>

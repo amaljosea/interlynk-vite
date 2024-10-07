@@ -47,8 +47,17 @@ const Support = ({ sbomData }) => {
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
-  const { headingTextColor, primaryTextColor, primaryErrorColor } =
-    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
+  const {
+    headingTextColor,
+    primaryTextColor,
+    primaryErrorColor,
+    secondaryTextColor
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'primaryErrorColor',
+    'secondaryTextColor'
+  ])
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -334,7 +343,7 @@ const Support = ({ sbomData }) => {
               as={IconButton}
               icon={<FaEllipsisV />}
               variant='none'
-              color='gray.400'
+              color={secondaryTextColor}
             />
             <Portal>
               <MenuList fontSize={'sm'}>

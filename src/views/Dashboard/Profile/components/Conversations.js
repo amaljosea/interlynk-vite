@@ -6,21 +6,23 @@ import avatar5 from 'assets/img/avatars/avatar5.png'
 import avatar6 from 'assets/img/avatars/avatar6.png'
 import React from 'react'
 
-import { Avatar, Button, Flex, Text, useColorModeValue } from '@chakra-ui/react'
+import { Avatar, Button, Flex, Text } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 const Conversations = ({ title }) => {
   // Chakra color mode
-  const textColor = useColorModeValue('gray.700', 'white')
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
 
   return (
     <Card p='16px'>
       <CardHeader p='12px 5px' mb='12px'>
-        <Text fontSize='lg' color={textColor} fontWeight='bold'>
+        <Text fontSize='lg' color={inverseSecondaryBgColor} fontWeight='bold'>
           {title}
         </Text>
       </CardHeader>
@@ -36,7 +38,11 @@ const Conversations = ({ title }) => {
                 me='10px'
               />
               <Flex direction='column'>
-                <Text fontSize='sm' color={textColor} fontWeight='bold'>
+                <Text
+                  fontSize='sm'
+                  color={inverseSecondaryBgColor}
+                  fontWeight='bold'
+                >
                   Sophie B.{' '}
                 </Text>
                 <Text fontSize='xs' color='gray.500' fontWeight='400'>
@@ -65,7 +71,11 @@ const Conversations = ({ title }) => {
                 me='10px'
               />
               <Flex direction='column'>
-                <Text fontSize='sm' color={textColor} fontWeight='bold'>
+                <Text
+                  fontSize='sm'
+                  color={inverseSecondaryBgColor}
+                  fontWeight='bold'
+                >
                   Sophie B.{' '}
                 </Text>
                 <Text fontSize='xs' color='gray.500' fontWeight='400'>
@@ -94,7 +104,11 @@ const Conversations = ({ title }) => {
                 me='10px'
               />
               <Flex direction='column'>
-                <Text fontSize='sm' color={textColor} fontWeight='bold'>
+                <Text
+                  fontSize='sm'
+                  color={inverseSecondaryBgColor}
+                  fontWeight='bold'
+                >
                   Sophie B.{' '}
                 </Text>
                 <Text fontSize='xs' color='gray.500' fontWeight='400'>
@@ -123,7 +137,11 @@ const Conversations = ({ title }) => {
                 me='10px'
               />
               <Flex direction='column'>
-                <Text fontSize='sm' color={textColor} fontWeight='bold'>
+                <Text
+                  fontSize='sm'
+                  color={inverseSecondaryBgColor}
+                  fontWeight='bold'
+                >
                   Sophie B.{' '}
                 </Text>
                 <Text fontSize='xs' color='gray.500' fontWeight='400'>
@@ -152,7 +170,11 @@ const Conversations = ({ title }) => {
                 me='10px'
               />
               <Flex direction='column'>
-                <Text fontSize='sm' color={textColor} fontWeight='bold'>
+                <Text
+                  fontSize='sm'
+                  color={inverseSecondaryBgColor}
+                  fontWeight='bold'
+                >
                   Sophie B.{' '}
                 </Text>
                 <Text fontSize='xs' color='gray.500' fontWeight='400'>

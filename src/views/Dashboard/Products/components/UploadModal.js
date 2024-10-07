@@ -13,8 +13,7 @@ import {
   Select,
   Stack,
   Tag,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
@@ -43,9 +42,9 @@ const UploadModal = ({ isOpen, onClose, group }) => {
   const params = useParams()
   const { envName } = useGlobalState()
   const { showToast } = useCustomToast()
-  const borderColor = useColorModeValue('#A0AEC066', 'gray.600')
-  const textColor = useColorModeValue('#1A202C99', 'gray.600')
-  const highlightedTextColor = useColorModeValue('blue.600', 'blue.300') // New highlighted text color
+
+  const { primaryBlueText, grayBorderColor, secondaryTextColor } =
+    useThemeColor(['primaryBlueText', 'grayBorderColor', 'secondaryTextColor'])
 
   const { data } = useQuery(GetProjectGroup, {
     skip: isOpen ? false : true,
@@ -63,7 +62,6 @@ const UploadModal = ({ isOpen, onClose, group }) => {
   const [selectedEnv, setSelectedEnv] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedFile, setSelectedFile] = useState(null)
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const handleUpload = async () => {
     if (!selectedFile) {
@@ -187,7 +185,7 @@ const UploadModal = ({ isOpen, onClose, group }) => {
                   </option>
                 ))}
             </Select>
-            <FormHelperText color={textColor} fontSize={12}>
+            <FormHelperText color={secondaryTextColor} fontSize={12}>
               Interlynk supports importing CycloneDX versions 1.2-1.5 in JSON
               and XML formats and SPDX 2.2 and 2.3 in JSON format.{' '}
             </FormHelperText>
@@ -205,7 +203,7 @@ const UploadModal = ({ isOpen, onClose, group }) => {
             borderStyle='dashed'
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
-            borderColor={isDragActive ? primaryBlueText : borderColor}
+            borderColor={isDragActive ? primaryBlueText : grayBorderColor}
             onClick={() => document.getElementById('fileInput').click()}
           >
             <Input
@@ -218,7 +216,7 @@ const UploadModal = ({ isOpen, onClose, group }) => {
             <Flex alignItems={'center'} justifyContent={'center'}>
               <Text
                 hidden={loading}
-                color={selectedFile ? highlightedTextColor : textColor}
+                color={selectedFile ? primaryBlueText : secondaryTextColor}
                 fontWeight={500}
               >
                 {isDragActive

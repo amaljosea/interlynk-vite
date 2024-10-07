@@ -17,11 +17,12 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
 
 import CompInfo from 'components/Misc/CompInfo'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetComponentPath } from 'graphQL/Queries'
 
@@ -34,7 +35,7 @@ import CompSupplier from './CompSupplier'
 const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   const params = useParams()
   const sbomId = params.sbomid
-  const bgColor = useColorModeValue('white', 'gray.700')
+  const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
   const customerView = isCustomerView()
   const signedUrlParams = getSignedUrlParams()
 
@@ -73,7 +74,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
           <Tabs isFitted index={tab} onChange={onTabChange}>
             <TabList
               position={'fixed'}
-              bg={bgColor}
+              bg={secondaryBgColor}
               zIndex={11}
               left={0}
               right={0}

@@ -28,7 +28,10 @@ function CustomerComponentRow(props) {
     redacted
   } = props
   const location = useLocation()
-  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+  const { inverseSecondaryBgColor, secondaryTextColor } = useThemeColor([
+    'inverseSecondaryBgColor',
+    'secondaryTextColor'
+  ])
 
   const [contains, setcontains] = useState({})
 
@@ -113,7 +116,7 @@ function CustomerComponentRow(props) {
       <Td>{updated}</Td> */}
       <Td>
         <Button p='0px' bg='transparent'>
-          <Icon as={FaEllipsisV} color='gray.400' cursor='pointer' />
+          <Icon as={FaEllipsisV} color={secondaryTextColor} cursor='pointer' />
         </Button>
       </Td>
     </Tr>

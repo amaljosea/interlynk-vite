@@ -14,8 +14,7 @@ import {
   SimpleGrid,
   Skeleton,
   Stack,
-  Tag,
-  useColorModeValue
+  Tag
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
@@ -43,9 +42,12 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
     sbomIdTwo
   })
 
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
-  const sbomOneColor = useColorModeValue('green.100', 'gray.800')
-  const sbomTwoColor = useColorModeValue('red.100', 'gray.800')
+  const { primaryTextColor, secondaryRedBorder, secondaryGreenBorder } =
+    useThemeColor([
+      'primaryTextColor',
+      'secondaryRedBorder',
+      'secondaryGreenBorder'
+    ])
 
   return (
     <Drawer size='full' isOpen={true} placement='bottom' onClose={onClose}>
@@ -64,7 +66,7 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
                 <GridItem w='100%'>
                   <Card
                     width='100%'
-                    bg={sbomOneColor}
+                    bg={secondaryGreenBorder}
                     px={6}
                     h='450px'
                     overflowY='scroll'
@@ -101,7 +103,12 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
                 </GridItem>
                 {/* SBOM TWO */}
                 <GridItem w='100%'>
-                  <Card bg={sbomTwoColor} px={6} h='450px' overflowY='scroll'>
+                  <Card
+                    bg={secondaryRedBorder}
+                    px={6}
+                    h='450px'
+                    overflowY='scroll'
+                  >
                     {sbomTwo && (
                       <Flex
                         width='100%'

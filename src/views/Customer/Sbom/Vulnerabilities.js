@@ -72,7 +72,10 @@ const statusColor = (status) => {
 
 const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
   const { vuln } = data
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { primaryBlueText, primaryBgColor } = useThemeColor([
+    'primaryBlueText',
+    'primaryBgColor'
+  ])
   const CustomText = styled(Text)`
     font-size: 13px;
     font-weight: bold;
@@ -121,7 +124,7 @@ const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
             <CustomText>CVSS Vector :</CustomText>
             {vuln?.cvssVector ? (
               <Tooltip
-                bg='gray.50'
+                bg={primaryBgColor}
                 label={<CvssCard value={vuln?.cvssVector} />}
                 placement='top'
               >

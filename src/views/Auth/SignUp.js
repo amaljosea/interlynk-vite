@@ -1,5 +1,5 @@
 // Assets
-import BgSignUp from 'assets/img/BgSignUp.png'
+import BgSignUp from 'assets/img/dashboard.png'
 import React from 'react'
 
 import {
@@ -12,19 +12,28 @@ import {
   Icon,
   Input,
   Link,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
 
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { FaApple, FaFacebook, FaGoogle } from 'react-icons/fa'
 
 function SignUp() {
-  const titleColor = useColorModeValue('teal.300', 'teal.200')
-  const textColor = useColorModeValue('gray.700', 'white')
-  const bgColor = useColorModeValue('white', 'gray.700')
-  const bgIcons = useColorModeValue('teal.200', 'rgba(255, 255, 255, 0.5)')
+  const {
+    lightTealBorder,
+    inverseSecondaryBgColor,
+    secondaryBgColor,
+    secondaryTextColor
+  } = useThemeColor([
+    'lightTealBorder',
+    'inverseSecondaryBgColor',
+    'secondaryBgColor',
+    'secondaryTextColor'
+  ])
+
   return (
     <Flex
       direction='column'
@@ -79,12 +88,12 @@ function SignUp() {
           borderRadius='15px'
           p='40px'
           mx={{ base: '100px' }}
-          bg={bgColor}
+          bg={secondaryBgColor}
           boxShadow='0 20px 27px 0 rgb(0 0 0 / 5%)'
         >
           <Text
             fontSize='xl'
-            color={textColor}
+            color={inverseSecondaryBgColor}
             fontWeight='bold'
             textAlign='center'
             mb='22px'
@@ -101,14 +110,18 @@ function SignUp() {
               border='1px solid lightgray'
               cursor='pointer'
               transition='all .25s ease'
-              _hover={{ filter: 'brightness(120%)', bg: bgIcons }}
+              _hover={{ filter: 'brightness(120%)', bg: lightTealBorder }}
+              role='group'
             >
               <Link href='#'>
                 <Icon
                   as={FaFacebook}
                   w='30px'
                   h='30px'
-                  _hover={{ filter: 'brightness(120%)' }}
+                  _groupHover={{
+                    filter: 'brightness(120%)',
+                    color: secondaryBgColor
+                  }}
                 />
               </Link>
             </Flex>
@@ -121,14 +134,18 @@ function SignUp() {
               border='1px solid lightgray'
               cursor='pointer'
               transition='all .25s ease'
-              _hover={{ filter: 'brightness(120%)', bg: bgIcons }}
+              _hover={{ filter: 'brightness(120%)', bg: lightTealBorder }}
+              role='group'
             >
               <Link href='#'>
                 <Icon
                   as={FaApple}
                   w='30px'
                   h='30px'
-                  _hover={{ filter: 'brightness(120%)' }}
+                  _groupHover={{
+                    filter: 'brightness(120%)',
+                    color: secondaryBgColor
+                  }}
                 />
               </Link>
             </Flex>
@@ -141,21 +158,25 @@ function SignUp() {
               border='1px solid lightgray'
               cursor='pointer'
               transition='all .25s ease'
-              _hover={{ filter: 'brightness(120%)', bg: bgIcons }}
+              _hover={{ filter: 'brightness(120%)', bg: lightTealBorder }}
+              role='group'
             >
               <Link href='#'>
                 <Icon
                   as={FaGoogle}
                   w='30px'
                   h='30px'
-                  _hover={{ filter: 'brightness(120%)' }}
+                  _groupHover={{
+                    filter: 'brightness(120%)',
+                    color: secondaryBgColor
+                  }}
                 />
               </Link>
             </Flex>
           </HStack>
           <Text
             fontSize='lg'
-            color='gray.400'
+            color={secondaryTextColor}
             fontWeight='bold'
             textAlign='center'
             mb='22px'
@@ -227,10 +248,10 @@ function SignUp() {
             maxW='100%'
             mt='0px'
           >
-            <Text color={textColor} fontWeight='medium'>
+            <Text color={inverseSecondaryBgColor} fontWeight='medium'>
               Already have an account?
               <Link
-                color={titleColor}
+                color={lightTealBorder}
                 as='span'
                 ms='5px'
                 href='#'

@@ -1,11 +1,4 @@
-import {
-  Flex,
-  Stat,
-  StatLabel,
-  StatNumber,
-  Tag,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Flex, Stat, StatLabel, StatNumber, Tag } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
@@ -14,8 +7,11 @@ import IconBox from 'components/Icons/IconBox'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const MiniStatistics = ({ title, amount, icon }) => {
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
-  const textColor = useColorModeValue('gray.700', 'white')
+  const { primaryBlueText, inverseSecondaryBgColor } = useThemeColor([
+    'primaryBlueText',
+    'inverseSecondaryBgColor'
+  ])
+
   const fontStyle = { fontSize: title === 'Vulnerabilities' ? '12px' : '14px' }
   return (
     <Card px={4}>
@@ -44,7 +40,7 @@ const MiniStatistics = ({ title, amount, icon }) => {
                 </Tag>
               </Flex>
             ) : (
-              <StatNumber fontSize='lg' color={textColor}>
+              <StatNumber fontSize='lg' color={inverseSecondaryBgColor}>
                 {amount || 0}
               </StatNumber>
             )}

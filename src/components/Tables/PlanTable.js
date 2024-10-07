@@ -13,6 +13,8 @@ import {
   Text,
   useDisclosure
 } from '@chakra-ui/react'
+
+/* eslint-disable */
 import { useColorModeValue } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'

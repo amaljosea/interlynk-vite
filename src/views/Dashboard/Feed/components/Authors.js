@@ -11,7 +11,10 @@ import TablesTableRow from 'components/Tables/TablesTableRow'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const Authors = ({ title, captions, data }) => {
-  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+  const { inverseSecondaryBgColor, secondaryTextColor } = useThemeColor([
+    'inverseSecondaryBgColor',
+    'secondaryTextColor'
+  ])
   return (
     <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
       <CardHeader p='6px 0px 22px 0px'>
@@ -22,10 +25,14 @@ const Authors = ({ title, captions, data }) => {
       <CardBody>
         <Table variant='simple' color={inverseSecondaryBgColor}>
           <Thead>
-            <Tr my='.8rem' pl='0px' color='gray.400'>
+            <Tr my='.8rem' pl='0px' color={secondaryTextColor}>
               {captions.map((caption, idx) => {
                 return (
-                  <Th color='gray.400' key={idx} ps={idx === 0 ? '0px' : null}>
+                  <Th
+                    color={secondaryTextColor}
+                    key={idx}
+                    ps={idx === 0 ? '0px' : null}
+                  >
                     {caption}
                   </Th>
                 )

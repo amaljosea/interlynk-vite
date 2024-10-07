@@ -3,7 +3,10 @@ import React from 'react'
 
 import { Flex, Grid, GridItem, Heading, Img, Text } from '@chakra-ui/react'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 const AuthContainer = ({ children }) => {
+  const { primaryBgColor } = useThemeColor(['primaryBgColor'])
   return (
     <Grid width={'100%'} height={'100vh'} templateColumns='repeat(12, 1fr)'>
       <GridItem
@@ -23,7 +26,7 @@ const AuthContainer = ({ children }) => {
             src={InterlynkLogo}
             filter={'brightness(0) invert(1)'}
           />
-          <Text fontSize={'3xl'} color={'gray.50'} fontWeight={600}>
+          <Text fontSize={'3xl'} color={primaryBgColor} fontWeight={600}>
             Interlynk
           </Text>
         </Flex>

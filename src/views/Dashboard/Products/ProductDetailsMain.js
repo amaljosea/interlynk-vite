@@ -9,6 +9,7 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { Search2Icon } from '@chakra-ui/icons'
 import {
+  Box,
   Flex,
   Grid,
   GridItem,
@@ -24,7 +25,6 @@ import {
   Tag,
   Text,
   Tooltip,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -44,6 +44,7 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
@@ -94,14 +95,19 @@ const GetProjectGroup = gql`
 `
 
 const SettingsTag = ({ icon, label, settings }) => {
-  const scanColor = useColorModeValue('blackAlpha', 'whiteAlpha')
   return (
-    <Tooltip label={`${label} ${settings ? 'Enabled' : 'Disabled'}`}>
-      <IconButton
-        size='xs'
-        icon={icon}
-        colorScheme={settings ? 'blue' : scanColor}
-      />
+    <Tooltip
+      label={`${label} ${settings ? 'Enabled' : 'Disabled'}`}
+      shouldWrapChildren
+    >
+      <Box>
+        <IconButton
+          size='xs'
+          icon={icon}
+          isDisabled={!settings}
+          colorScheme={'blue'}
+        />
+      </Box>
     </Tooltip>
   )
 }
@@ -116,8 +122,7 @@ const ProductDetailsMain = () => {
   const { setIsOpen, setCurrentStep } = useTour()
   const signedUrlParams = getSignedUrlParams()
   const activeTour = localStorage.getItem('activeTour')
-
-  const warningColor = useColorModeValue('#E53E3E', '#F56565')
+  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
 
   const [warning, setWarning] = useState(false)
   const [exceedingCount, setExceedingCount] = useState(0)
@@ -423,7 +428,7 @@ const ProductDetailsMain = () => {
                         >
                           <IconButton
                             size='xs'
-                            color={warningColor}
+                            color={primaryErrorColor}
                             icon={<IoMdWarning size={16} />}
                             onClick={() =>
                               handleSort({ id: 'SBOMS_CREATED_AT' }, 'desc')

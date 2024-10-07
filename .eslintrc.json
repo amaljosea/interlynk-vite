@@ -46,6 +46,11 @@
             "name": "@chakra-ui/react",
             "importNames": ["Modal"],
             "message": "Please use 'LynkModal' instead."
+          },
+          {
+            "name": "@chakra-ui/react",
+            "importNames": ["useColorModeValue"],
+            "message": "Please use 'useThemeColor' hook and values from 'theme' instead."
           }
         ]
       }

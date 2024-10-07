@@ -21,7 +21,6 @@ import {
   Text,
   Tooltip,
   useClipboard,
-  useColorModeValue,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -47,8 +46,6 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
     'headingTextColor',
     'primaryTextColor'
   ])
-
-  const iconColor = useColorModeValue('gray', 'blue')
 
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
@@ -181,7 +178,7 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
               isDisabled={!enabled}
               size='sm'
               onClick={() => sbomLink.onCopy()}
-              colorScheme={sbomLink?.hasCopied ? 'whatsapp' : iconColor}
+              colorScheme={sbomLink?.hasCopied ? 'whatsapp' : 'blue'}
               icon={sbomLink?.hasCopied ? <FaCheck /> : <FaRegCopy />}
             />
           </Flex>

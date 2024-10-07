@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 
-import { Flex, Tag, Text, useColorModeValue } from '@chakra-ui/react'
+import { Flex, Tag, Text } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card'
@@ -8,10 +8,12 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { OrgSettingCreate, OrgSettingUpdate } from 'graphQL/Mutation'
 
 const AdvisoryFeeds = ({ data, manageFeeds }) => {
-  const textColor = useColorModeValue('gray.700', 'white')
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
   const [organizationSettingCreate] = useMutation(OrgSettingCreate)
   const [organizationSettingUpdate] = useMutation(OrgSettingUpdate)
 
@@ -40,7 +42,7 @@ const AdvisoryFeeds = ({ data, manageFeeds }) => {
   return (
     <Card p={0} boxShadow='none'>
       <CardHeader mb='12px'>
-        <Text fontSize='lg' color={textColor} fontWeight='bold'>
+        <Text fontSize='lg' color={inverseSecondaryBgColor} fontWeight='bold'>
           Advisory Feeds
         </Text>
       </CardHeader>

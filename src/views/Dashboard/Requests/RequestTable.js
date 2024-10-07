@@ -52,10 +52,12 @@ const RequestTable = ({
     childKey: 'create_request'
   })
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { headingTextColor, primaryTextColor, secondaryTextColor } =
+    useThemeColor([
+      'headingTextColor',
+      'primaryTextColor',
+      'secondaryTextColor'
+    ])
 
   const [resendRequest] = useMutation(RequestResend)
   const [cancelRequest] = useMutation(RequestCancel)
@@ -301,7 +303,7 @@ const RequestTable = ({
               as={IconButton}
               icon={<FaEllipsisV />}
               variant='none'
-              color='gray.400'
+              color={secondaryTextColor}
             />
             <Portal>
               <MenuList fontSize={'sm'}>

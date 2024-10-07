@@ -23,17 +23,20 @@ import {
 } from '@chakra-ui/react'
 
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
+import LynkSwitch from 'components/Misc/LynkSwitch'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateShareLynk } from 'graphQL/Mutation'
 import { DeleteShareLynk } from 'graphQL/Mutation'
 
 import { FaEllipsisV } from 'react-icons/fa'
-import LynkSwitch from 'components/Misc/LynkSwitch'
 
 function SBOMLinkRow(props) {
   const { id, signedUrlParams, updatedAt, contents, shareUsers, enabled } =
     props
 
+  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const btnRef = useRef()
@@ -159,7 +162,7 @@ function SBOMLinkRow(props) {
             aria-label='Options'
             icon={<FaEllipsisV />}
             variant='none'
-            color='gray.400'
+            color={secondaryTextColor}
           />
           <Portal>
             <MenuList>

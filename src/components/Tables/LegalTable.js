@@ -42,7 +42,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { OrganizationManufacturerDelete } from 'graphQL/Mutation'
 import { GetOrgManufacturers } from 'graphQL/Queries'
 
-import { FaEllipsisVertical } from 'react-icons/fa6'
+import { FaEllipsisV } from 'react-icons/fa'
 
 const LegalTable = () => {
   const { showToast } = useCustomToast()
@@ -62,12 +62,14 @@ const LegalTable = () => {
     headingTextColor,
     primaryTextColor,
     primaryErrorColor,
-    primaryBlueText
+    primaryBlueText,
+    secondaryTextColor
   } = useThemeColor([
     'headingTextColor',
     'primaryTextColor',
     'primaryErrorColor',
-    'primaryBlueText'
+    'primaryBlueText',
+    'secondaryTextColor'
   ])
   const paddingCell = 0
   const paddingHeadCell = 0
@@ -286,9 +288,9 @@ const LegalTable = () => {
           <Menu>
             <MenuButton
               as={IconButton}
-              icon={<FaEllipsisVertical />}
+              icon={<FaEllipsisV />}
               variant='none'
-              color='gray.400'
+              color={secondaryTextColor}
             />
             <Portal>
               <MenuList fontSize={'sm'}>

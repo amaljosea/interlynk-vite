@@ -5,7 +5,10 @@ import { Box, Button, Flex, Icon, Spacer, Text } from '@chakra-ui/react'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 function InvoicesRow(props) {
-  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+  const { inverseSecondaryBgColor, secondaryTextColor } = useThemeColor([
+    'inverseSecondaryBgColor',
+    'secondaryTextColor'
+  ])
   const { key, date, code, price, format, logo } = props
 
   return (
@@ -14,13 +17,18 @@ function InvoicesRow(props) {
         <Text fontSize='md' color={inverseSecondaryBgColor} fontWeight='bold'>
           {date}
         </Text>
-        <Text fontSize='sm' color='gray.400' fontWeight='semibold' me='16px'>
+        <Text
+          fontSize='sm'
+          color={secondaryTextColor}
+          fontWeight='semibold'
+          me='16px'
+        >
           {code}
         </Text>
       </Flex>
       <Spacer />
       <Box me='12px'>
-        <Text fontSize='md' color='gray.400' fontWeight='semibold'>
+        <Text fontSize='md' color={secondaryTextColor} fontWeight='semibold'>
           {price}
         </Text>
       </Box>

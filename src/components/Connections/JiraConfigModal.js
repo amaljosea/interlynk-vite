@@ -65,12 +65,17 @@ const JiraConfigModal = ({
     }
   )
 
-  const { primaryBgColor, primaryErrorColor, primarySuccessColor } =
-    useThemeColor([
-      'primaryBgColor',
-      'primaryErrorColor',
-      'primarySuccessColor'
-    ])
+  const {
+    primaryBgColor,
+    primaryErrorColor,
+    primarySuccessColor,
+    grayBorderColor
+  } = useThemeColor([
+    'primaryBgColor',
+    'primaryErrorColor',
+    'primarySuccessColor',
+    'grayBorderColor'
+  ])
 
   useEffect(() => {
     if (data) {
@@ -296,7 +301,7 @@ const JiraConfigModal = ({
             mt={4}
             p={4}
             border='1px'
-            borderColor='gray.200'
+            borderColor={grayBorderColor}
             borderRadius='md'
             boxShadow='md'
             bg={primaryBgColor}

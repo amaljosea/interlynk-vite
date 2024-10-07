@@ -58,10 +58,12 @@ const TeamTable = () => {
   const { organization } = useGlobalState()
   const SERVER_URL = process.env.REACT_APP_SERVER
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { headingTextColor, primaryTextColor, secondaryTextColor } =
+    useThemeColor([
+      'headingTextColor',
+      'primaryTextColor',
+      'secondaryTextColor'
+    ])
   const paddingCell = 0
   const paddingHeadCell = 0
 
@@ -133,12 +135,19 @@ const TeamTable = () => {
       id: 'name',
       name: 'NAME',
       selector: (row) => (
-        <Flex gap={row.name !== '' ? 2 : 0} sx={{ alignItems:'center'}}>
-          <Text color={primaryTextColor} sx={{fontSize:'14px',w:'fit-content'}}>
+        <Flex gap={row.name !== '' ? 2 : 0} sx={{ alignItems: 'center' }}>
+          <Text
+            color={primaryTextColor}
+            sx={{ fontSize: '14px', w: 'fit-content' }}
+          >
             {row.name}
           </Text>
           {row.email === email && (
-            <Badge variant='outline' colorScheme='blue' sx={{py:1, px:2, borderRadius:4}}>
+            <Badge
+              variant='outline'
+              colorScheme='blue'
+              sx={{ py: 1, px: 2, borderRadius: 4 }}
+            >
               You
             </Badge>
           )}
@@ -223,7 +232,7 @@ const TeamTable = () => {
               as={IconButton}
               icon={<FaEllipsisV />}
               variant='none'
-              color='gray.400'
+              color={secondaryTextColor}
             />
             <Portal>
               <MenuList size='sm'>

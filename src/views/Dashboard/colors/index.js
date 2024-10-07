@@ -1,28 +1,44 @@
 import React, { useEffect, useState } from 'react'
 
-import { Box, Flex, Text, VStack, useColorMode } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  Icon,
+  Text,
+  Tooltip,
+  VStack,
+  useColorMode
+} from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const colorKeys = [
   'headingTextColor',
+  'headingTextSecondary',
   'primaryTextColor',
+  'primaryTextColorWithOpacity',
   'secondaryTextColor',
   'secondaryTextInverse',
   'primaryBlueText',
+  'contrastTextColor',
   'primaryBgColor',
   'secondaryBgColor',
   'inverseSecondaryBgColor',
   'lightAndDarkBgColor',
+  'lightBlueBg',
   'grayBorderColor',
   'primaryBlueBorder',
   'secondaryBlueBorder',
   'lightTealBorder',
   'semiTransparentBorder',
+  'mutedBorder',
+  'vibrantBlue',
+  'primaryRedBorder',
+  'primaryGreenBorder',
+  'secondaryRedBorder',
+  'secondaryGreenBorder',
   'primaryErrorColor',
-  'secondaryErrorColor',
-  'primarySuccessColor',
-  'secondarySuccessColor'
+  'primarySuccessColor'
 ]
 
 const ColorDisplay = () => {
@@ -65,6 +81,26 @@ const ColorDisplay = () => {
             >{`Dark: #E2E8F0 | gray.200`}</Text>
           </VStack>
         </Box>
+        {/* headingTextSecondary */}
+        <Box
+          p={8}
+          bg={themeColors.headingTextSecondary}
+          borderRadius='md'
+          boxShadow='md'
+          width='300px'
+        >
+          <VStack align='start'>
+            <Text fontWeight='bold' color={isDark ? 'black' : 'white'}>
+              {'headingTextSecondary'}
+            </Text>
+            <Text
+              color={isDark ? 'black' : 'white'}
+            >{`Light: #CBD5E0 | gray.300`}</Text>
+            <Text
+              color={isDark ? 'black' : 'white'}
+            >{`Dark: #4A5568 | gray.600`}</Text>
+          </VStack>
+        </Box>
 
         {/* Primary Text Color */}
         <Box
@@ -84,6 +120,26 @@ const ColorDisplay = () => {
             <Text
               color={isDark ? 'black' : 'white'}
             >{`Dark: #F7FAFC | gray.50`}</Text>
+          </VStack>
+        </Box>
+        {/* primaryTextColorWithOpacity */}
+        <Box
+          p={8}
+          bg={themeColors.primaryTextColorWithOpacity}
+          borderRadius='md'
+          boxShadow='md'
+          width='300px'
+        >
+          <VStack align='start'>
+            <Text color={isDark ? 'black' : 'white'} fontWeight='bold'>
+              {'primaryTextColorWithOpacity'}
+            </Text>
+            <Text
+              color={isDark ? 'black' : 'white'}
+            >{`Light: #1A202C | gray.800`}</Text>
+            <Text
+              color={isDark ? 'black' : 'white'}
+            >{`Dark: #FFFFFF99 |  white with 60% opacity`}</Text>
           </VStack>
         </Box>
 
@@ -128,6 +184,20 @@ const ColorDisplay = () => {
             <Text fontWeight='bold'>{'primaryBlueText'}</Text>
             <Text>{`Light: #3182CE | blue.500`}</Text>
             <Text>{`Dark: #5BA3DB | slightly lighter than blue.400`}</Text>
+          </VStack>
+        </Box>
+        {/* contrastTextColor */}
+        <Box
+          p={8}
+          bg={themeColors.contrastTextColor}
+          borderRadius='md'
+          boxShadow='md'
+          width='300px'
+        >
+          <VStack align='start'>
+            <Text fontWeight='bold'>{'contrastTextColor'}</Text>
+            <Text>{`Light: #030303 | very dark gray/black for light mode`}</Text>
+            <Text>{`Dark: ##FFFFFFCC | white with 80% opacity for dark mode`}</Text>
           </VStack>
         </Box>
 
@@ -201,6 +271,26 @@ const ColorDisplay = () => {
             >{`Dark: #1f2733 |  dark muted blue-gray`}</Text>
           </VStack>
         </Box>
+        {/* lightBlueBg */}
+        <Box
+          p={8}
+          bg={themeColors.lightBlueBg}
+          borderRadius='md'
+          boxShadow='md'
+          width='300px'
+        >
+          <VStack align='start'>
+            <Text fontWeight='bold' color={isDark ? 'white' : 'black'}>
+              {'lightBlueBg'}
+            </Text>
+            <Text
+              color={isDark ? 'white' : 'black'}
+            >{`Light: #ebf8ff |  blue.50`}</Text>
+            <Text
+              color={isDark ? 'white' : 'black'}
+            >{`Dark: #1A202C |  gray.100`}</Text>
+          </VStack>
+        </Box>
 
         {/* Gray Border Color */}
         <Box
@@ -260,6 +350,90 @@ const ColorDisplay = () => {
             <Text>{`Dark: #ffffff1A | white with 10% opacity`}</Text>
           </VStack>
         </Box>
+        {/* mutedBorder */}
+        <Box
+          p={8}
+          bg={themeColors.mutedBorder}
+          borderRadius='md'
+          boxShadow='md'
+          width='300px'
+        >
+          <VStack align='start'>
+            <Text fontWeight='bold'>{'mutedBorder'}</Text>
+            <Text>{`Light: #1A202C29 | dark gray with 16% opacity`}</Text>
+            <Text>{`Dark: #ffffff12 |  white with 7% opacity`}</Text>
+          </VStack>
+        </Box>
+        {/* vibrantBlue */}
+        <Box
+          p={8}
+          bg={themeColors.vibrantBlue}
+          borderRadius='md'
+          boxShadow='md'
+          width='300px'
+        >
+          <VStack align='start'>
+            <Text fontWeight='bold'>{'vibrantBlue'}</Text>
+            <Text>{`Light: #0D0CEE | vibrant blue for light mode`}</Text>
+            <Text>{`Dark: #009bff |  vibrant blue for dark mode`}</Text>
+          </VStack>
+        </Box>
+        {/* primaryRedBorder */}
+        <Box
+          p={8}
+          bg={themeColors.primaryRedBorder}
+          borderRadius='md'
+          boxShadow='md'
+          width='300px'
+        >
+          <VStack align='start'>
+            <Text fontWeight='bold'>{'primaryRedBorder'}</Text>
+            <Text>{`Light: #E53E3E | red.500`}</Text>
+            <Text>{`Dark: #63171B |  red.900`}</Text>
+          </VStack>
+        </Box>
+        {/* primaryGreenBorder */}
+        <Box
+          p={8}
+          bg={themeColors.primaryGreenBorder}
+          borderRadius='md'
+          boxShadow='md'
+          width='300px'
+        >
+          <VStack align='start'>
+            <Text fontWeight='bold'>{'primaryGreenBorder'}</Text>
+            <Text>{`Light: #38A169 | green.500`}</Text>
+            <Text>{`Dark: #1C4532 |  green.900`}</Text>
+          </VStack>
+        </Box>
+        {/* secondaryRedBorder */}
+        <Box
+          p={8}
+          bg={themeColors.secondaryRedBorder}
+          borderRadius='md'
+          boxShadow='md'
+          width='300px'
+        >
+          <VStack align='start'>
+            <Text fontWeight='bold'>{'secondaryRedBorder'}</Text>
+            <Text>{`Light: #FED7D7 | red.100`}</Text>
+            <Text>{`Dark: #1A202C |  gray.800`}</Text>
+          </VStack>
+        </Box>
+        {/* secondaryGreenBorder */}
+        <Box
+          p={8}
+          bg={themeColors.secondaryGreenBorder}
+          borderRadius='md'
+          boxShadow='md'
+          width='300px'
+        >
+          <VStack align='start'>
+            <Text fontWeight='bold'>{'secondaryGreenBorder'}</Text>
+            <Text>{`Light: #C6F6D5 | green.100`}</Text>
+            <Text>{`Dark: #1A202C |  gray.800`}</Text>
+          </VStack>
+        </Box>
         {/* Light Teal Border */}
         <Box
           p={8}
@@ -290,21 +464,6 @@ const ColorDisplay = () => {
           </VStack>
         </Box>
 
-        {/* Secondary Error Color */}
-        <Box
-          p={8}
-          bg={themeColors.secondaryErrorColor}
-          borderRadius='md'
-          boxShadow='md'
-          width='300px'
-        >
-          <VStack align='start'>
-            <Text fontWeight='bold'>{'secondaryErrorColor'}</Text>
-            <Text>{`Light: #FFF5F5 | red.100`}</Text>
-            <Text>{`Dark: #4A1F1F | custom dark red for night mode`}</Text>
-          </VStack>
-        </Box>
-
         {/* Primary Success Color */}
         <Box
           p={8}
@@ -317,21 +476,6 @@ const ColorDisplay = () => {
             <Text fontWeight='bold'>{'primarySuccessColor'}</Text>
             <Text>{`Light: #48BB78 | green.400`}</Text>
             <Text>{`Dark: #68D391 | green.300`}</Text>
-          </VStack>
-        </Box>
-
-        {/* Secondary Success Color */}
-        <Box
-          p={8}
-          bg={themeColors.secondarySuccessColor}
-          borderRadius='md'
-          boxShadow='md'
-          width='300px'
-        >
-          <VStack align='start'>
-            <Text fontWeight='bold'>{'secondarySuccessColor'}</Text>
-            <Text>{`Light: #F0FFF4 | green.100`}</Text>
-            <Text>{`Dark: #1F4032 | custom dark green for night mode`}</Text>
           </VStack>
         </Box>
       </Flex>

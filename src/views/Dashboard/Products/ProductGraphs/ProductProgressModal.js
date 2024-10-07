@@ -12,24 +12,18 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
-  IconButton,
   Menu,
   MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
   Tag,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
-
-import { ZoomInIcon } from 'components/Icons/Icons'
-import { ZoomOutIcon } from 'components/Icons/Icons'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaFilter } from 'react-icons/fa'
-import { FaChevronDown } from 'react-icons/fa6'
 import { FaCode, FaDesktop, FaInbox } from 'react-icons/fa6'
 
 import { defaultData } from './ProductProgressData'
@@ -38,11 +32,14 @@ import { productionData } from './ProductProgressData'
 import Tree from './Tree'
 
 const LegendItem = ({ color, label }) => {
-  const textColor = useColorModeValue('#030303', '#FFFFFFCC')
+  const { primaryTextColorWithOpacity } = useThemeColor([
+    'primaryTextColorWithOpacity'
+  ])
+
   return (
     <Flex gap={2} alignItems={'center'}>
       <Box height={'1.75px'} width={'40px'} backgroundColor={color} />
-      <Text fontSize={12} fontWeight={400} color={textColor}>
+      <Text fontSize={12} fontWeight={400} color={primaryTextColorWithOpacity}>
         {label}
       </Text>
     </Flex>
@@ -50,13 +47,16 @@ const LegendItem = ({ color, label }) => {
 }
 
 const MenuHeading = ({ title, icon: Icon, onClick, active }) => {
-  const grayBorder = useColorModeValue('#1A202C29', '#ffffff29')
-  const grayText = useColorModeValue('#1A202C', '#60686f')
-  const bgActive = useColorModeValue('#EDF2F7', '')
-
-  const { primaryBlueText, secondaryBgColor } = useThemeColor([
+  const {
+    primaryBlueText,
+    secondaryBgColor,
+    grayBorderColor,
+    primaryTextColorWithOpacity
+  } = useThemeColor([
     'primaryBlueText',
-    'secondaryBgColor'
+    'secondaryBgColor',
+    'grayBorderColor',
+    'primaryTextColorWithOpacity'
   ])
 
   return (
@@ -64,11 +64,16 @@ const MenuHeading = ({ title, icon: Icon, onClick, active }) => {
       as={Button}
       fontWeight='normal'
       fontSize='sm'
-      leftIcon={<Icon size={14} color={active ? primaryBlueText : '#60686f'} />}
+      leftIcon={
+        <Icon
+          size={14}
+          color={active ? primaryBlueText : primaryTextColorWithOpacity}
+        />
+      }
       onClick={onClick}
       variant='outline'
-      borderColor={active ? primaryBlueText : grayBorder}
-      color={active ? primaryBlueText : grayText}
+      borderColor={active ? primaryBlueText : grayBorderColor}
+      color={active ? primaryBlueText : primaryTextColorWithOpacity}
       backgroundColor={active ? secondaryBgColor : 'transparent'}
     >
       {title}
@@ -114,10 +119,23 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
   const [targetVulnerability, setTargetVulnerability] = useState('')
   const [env, setEnv] = useState([])
 
-  const bgColor = useColorModeValue('#EDF2F7', '#4D698166')
-  const componentColor = useColorModeValue('#E53E3E', '#ff3c3c')
-  const vulnerabilityColor = useColorModeValue('#0D0CEE', '#009bff')
-  const strokeColor = useColorModeValue('#A0AEC0', '#A0AEC066')
+  const {
+    primaryBlueText,
+    secondaryBgColor,
+    secondaryTextColor,
+    primaryTextColorWithOpacity,
+    mutedBorder,
+    primaryErrorColor,
+    vibrantBlue
+  } = useThemeColor([
+    'primaryBlueText',
+    'secondaryBgColor',
+    'secondaryTextColor',
+    'primaryTextColorWithOpacity',
+    'mutedBorder',
+    'primaryErrorColor',
+    'vibrantBlue'
+  ])
 
   const allComponents = [
     ...new Set([
@@ -162,9 +180,6 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
   }
 
   const renderTree = (data, envName) => {
-    const envColor = useColorModeValue('#1A202CCC', '#FFFFFF99')
-    const grayBorder = useColorModeValue('#1A202C29', '#ffffff12')
-    const { primaryBlueText } = useThemeColor(['primaryBlueText'])
     if (
       env.length === 0 ||
       env.includes('all') ||
@@ -173,7 +188,7 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
       return (
         <Box
           border={'0.6px solid'}
-          borderColor={grayBorder}
+          borderColor={mutedBorder}
           borderRadius={4}
           padding={3}
           maxWidth={'300px'}
@@ -183,14 +198,18 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
               h={'24px'}
               w={'24px'}
               color={primaryBlueText}
-              bg={bgColor}
+              bg={secondaryBgColor}
               alignItems={'center'}
               justifyContent={'center'}
               borderRadius={4}
             >
               {envIcon(envName)}
             </Flex>
-            <Text textTransform={'capitalize'} fontSize={14} color={envColor}>
+            <Text
+              textTransform={'capitalize'}
+              fontSize={14}
+              color={primaryTextColorWithOpacity}
+            >
               {envName}
             </Text>
           </Flex>
@@ -275,12 +294,12 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
         </DrawerBody>
         <DrawerFooter justifyContent={'flex-start'}>
           <Flex gap={12}>
-            <LegendItem color={strokeColor} label={'Path'} />
+            <LegendItem color={secondaryTextColor} label={'Path'} />
             {targetComponent && (
-              <LegendItem color={componentColor} label={'Components'} />
+              <LegendItem color={primaryErrorColor} label={'Components'} />
             )}
             {targetVulnerability && (
-              <LegendItem color={vulnerabilityColor} label={'Vulnerability'} />
+              <LegendItem color={vibrantBlue} label={'Vulnerability'} />
             )}
           </Flex>
         </DrawerFooter>

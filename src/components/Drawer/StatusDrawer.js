@@ -30,6 +30,7 @@ import {
 import VulLinkRow from 'components/Tables/VulLinkRow'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { VexVulnCreate } from 'graphQL/Mutation'
 import {
@@ -52,6 +53,7 @@ const StatusDrawer = ({
   setVulData
 }) => {
   const { showToast } = useCustomToast()
+  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
@@ -339,11 +341,11 @@ const StatusDrawer = ({
                     <Table variant='simple' color={textColor} size='sm' mt={4}>
                       <Thead>
                         <Tr my='.8rem' pl='0px'>
-                          <Th color='gray.400'>Username</Th>
-                          <Th color='gray.400'>Status</Th>
-                          <Th color='gray.400'>Justification</Th>
-                          <Th color='gray.400'>Timestamp</Th>
-                          <Th color='gray.400'>Note</Th>
+                          <Th color={secondaryTextColor}>Username</Th>
+                          <Th color={secondaryTextColor}>Status</Th>
+                          <Th color={secondaryTextColor}>Justification</Th>
+                          <Th color={secondaryTextColor}>Timestamp</Th>
+                          <Th color={secondaryTextColor}>Note</Th>
                         </Tr>
                       </Thead>
                       <Tbody>

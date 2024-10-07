@@ -4,17 +4,11 @@ import Tree from 'react-d3-tree'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 
-import {
-  Box,
-  Flex,
-  IconButton,
-  Stack,
-  Text,
-  Tooltip,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Box, Flex, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCompDependency } from 'graphQL/Queries'
 import { GetShareCompDependency } from 'graphQL/Queries'
@@ -109,10 +103,12 @@ const CustomNode = ({
 const GraphView = ({ data, activeComp }) => {
   const params = useParams()
   const sbomId = params.sbomid
-  const signedUrlParams = getSignedUrlParams()
 
-  const bgColor = useColorModeValue('gray.100', 'gray.800')
-  const textColor = useColorModeValue('blue.500', 'gray.100')
+  const signedUrlParams = getSignedUrlParams()
+  const { primaryBgColor, primaryBlueText } = useThemeColor([
+    'primaryBgColor',
+    'primaryBlueText'
+  ])
 
   const [treeView, setTreeView] = useState(null)
   const [filterText, setFilterText] = useState('')
@@ -262,8 +258,8 @@ const GraphView = ({ data, activeComp }) => {
                     rd3tProps?.nodeDatum,
                     rd3tProps?.depth
                   )}
-                  bgColor={bgColor}
-                  textColor={textColor}
+                  bgColor={primaryBgColor}
+                  textColor={primaryBlueText}
                   activeComp={activeComp}
                   foreignObjectProps={foreignObjectProps}
                 />

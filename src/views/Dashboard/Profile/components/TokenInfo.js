@@ -73,9 +73,17 @@ const TokenInfo = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { headingTextColor, primaryTextColor, grayBorderColor } = useThemeColor(
-    ['headingTextColor', 'primaryTextColor', 'grayBorderColor']
-  )
+  const {
+    headingTextColor,
+    primaryTextColor,
+    grayBorderColor,
+    secondaryTextColor
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'grayBorderColor',
+    'secondaryTextColor'
+  ])
 
   const paddingCell = 0
   const paddingHeadCell = 0
@@ -376,7 +384,7 @@ const TokenInfo = () => {
               as={IconButton}
               icon={<FaEllipsisV />}
               variant='none'
-              color='gray.400'
+              color={secondaryTextColor}
             />
             <Portal>
               <MenuList size='sm'>

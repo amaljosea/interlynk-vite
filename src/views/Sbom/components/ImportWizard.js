@@ -3,9 +3,10 @@ import { Step, Steps, useSteps } from 'chakra-ui-steps'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Box, Button, Flex, useColorModeValue } from '@chakra-ui/react'
+import { Box, Button, Flex } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ComponentVulnVexImport } from 'graphQL/Mutation'
 
@@ -21,7 +22,7 @@ const ImportWizard = ({
 }) => {
   const params = useParams()
   const groupId = params.productgroupid
-  const bgColor = useColorModeValue('gray.50', 'gray.700')
+  const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
 
   const [compVexImport] = useMutation(ComponentVulnVexImport)
 
@@ -116,7 +117,7 @@ const ImportWizard = ({
         width='100%'
         justify='flex-end'
         gap={4}
-        bg={bgColor}
+        bg={secondaryBgColor}
         pos={'absolute'}
         bottom={0}
         right={0}

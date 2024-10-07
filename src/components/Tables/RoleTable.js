@@ -63,8 +63,17 @@ const RoleTable = () => {
     onOpen: onRoleOpen,
     onClose: onRoleClose
   } = useDisclosure()
-  const { headingTextColor, primaryTextColor, primaryErrorColor } =
-    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
+  const {
+    headingTextColor,
+    primaryTextColor,
+    primaryErrorColor,
+    secondaryTextColor
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'primaryErrorColor',
+    'secondaryTextColor'
+  ])
   const paddingCell = 0
   const paddingHeadCell = 0
 
@@ -111,7 +120,7 @@ const RoleTable = () => {
               as={IconButton}
               icon={<FaEllipsisV />}
               variant='none'
-              color='gray.400'
+              color={secondaryTextColor}
             />
             <Portal>
               <MenuList size='sm'>
