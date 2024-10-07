@@ -779,6 +779,7 @@ const Vulnerabilities = ({ sbomData }) => {
         const issueTracker = isPart
           ? currentExternalUrls?.find((item) => item.name === 'issue-tracker')
           : externalUrls?.find((item) => item.name === 'issue-tracker')
+        const url = issueTracker?.url
         return (
           <Flex alignItems={'center'} gap={1}>
             <ExternalLink
@@ -812,10 +813,7 @@ const Vulnerabilities = ({ sbomData }) => {
                       isDisabled={!updateCon}
                       onClick={() => {
                         window.open(
-                          row.externalUrls.find(
-                            (externalUrl) =>
-                              externalUrl.name === 'issue-tracker'
-                          ).url,
+                          url?.startsWith('http') ? `${url}` : `http://${url}`,
                           '_blank'
                         )
                       }}
