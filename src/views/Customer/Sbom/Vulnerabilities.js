@@ -40,7 +40,6 @@ import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import CvssCard from 'components/Misc/CvssCard'
 import Pagination from 'components/Pagination'
-import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
@@ -72,10 +71,8 @@ const statusColor = (status) => {
 
 const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
   const { vuln } = data
-  const { primaryBlueText, primaryBgColor } = useThemeColor([
-    'primaryBlueText',
-    'primaryBgColor'
-  ])
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+
   const CustomText = styled(Text)`
     font-size: 13px;
     font-weight: bold;
@@ -89,110 +86,97 @@ const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
       p={5}
       boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
     >
-      <Grid templateColumns='repeat(5, 1fr)' gap={12}>
-        {/* VULN DATA */}
-        <GridItem
-          w='100%'
-          colSpan={2}
-          display={'flex'}
-          flexDirection={'column'}
-          gap={4}
-        >
-          {/* Description */}
-          <Box>
-            <CustomText>Description :</CustomText>
-            <Text mt={1} fontSize={14} color={textColor}>
-              {vuln.desc}
-            </Text>
-          </Box>
-          {/* Published At  */}
-          <Box>
-            <CustomText>Published:</CustomText>
-            <Text mt={1} fontSize={14} color={textColor}>
-              {getFullDateAndTime(vuln.publishedAt)}
-            </Text>
-          </Box>
-          {/* Last Modified At */}
-          <Box>
-            <CustomText>Last Modified:</CustomText>
-            <Text mt={1} fontSize={14} color={textColor}>
-              {getFullDateAndTime(vuln.lastModifiedAt)}
-            </Text>
-          </Box>
-          {/* CVSS Vector */}
-          <Box>
-            <CustomText>CVSS Vector :</CustomText>
-            {vuln?.cvssVector ? (
-              <Tooltip
-                bg={primaryBgColor}
-                label={<CvssCard value={vuln?.cvssVector} />}
-                placement='top'
-              >
-                <Tag
-                  variant='subtle'
-                  width={'fit-content'}
-                  colorScheme={'cyan'}
-                  cursor={'pointer'}
-                  onClick={() => {
-                    setActiveRow(data)
-                    onCvssOpen()
-                  }}
-                >
-                  {vuln?.cvssVector || '-'}
-                </Tag>
-              </Tooltip>
-            ) : (
+      <Grid templateColumns='repeat(3, 1fr)' gap={12}>
+        {/* Description */}
+        <GridItem>
+          <CustomText>Description :</CustomText>
+          <Text mt={1} fontSize={14} color={textColor}>
+            {vuln.desc}
+          </Text>
+        </GridItem>
+        {/* Published At  */}
+        <GridItem>
+          <CustomText>Published:</CustomText>
+          <Text mt={1} fontSize={14} color={textColor}>
+            {getFullDateAndTime(vuln.publishedAt)}
+          </Text>
+        </GridItem>
+        {/* Last Modified At */}
+        <GridItem>
+          <CustomText>Last Modified:</CustomText>
+          <Text mt={1} fontSize={14} color={textColor}>
+            {getFullDateAndTime(vuln.lastModifiedAt)}
+          </Text>
+        </GridItem>
+        {/* CVSS Vector */}
+        <GridItem>
+          <CustomText>CVSS Vector :</CustomText>
+          {vuln?.cvssVector ? (
+            <Tooltip
+              bg='gray.50'
+              label={<CvssCard value={vuln?.cvssVector} />}
+              placement='top'
+            >
               <Tag
                 variant='subtle'
                 width={'fit-content'}
                 colorScheme={'cyan'}
                 cursor={'pointer'}
+                onClick={() => {
+                  setActiveRow(data)
+                  onCvssOpen()
+                }}
               >
                 {vuln?.cvssVector || '-'}
               </Tag>
-            )}
-          </Box>
-          {/* NVD ALIAS ID */}
-          {vuln.nvdAliasId ? (
-            <Box>
-              <CustomText>NVD Alias ID:</CustomText>
-              <Flex
-                width={'fit-content'}
-                mt={1}
-                direction='row'
-                alignItems={'center'}
-                gap={2}
-              >
-                <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
-                  <Icon
-                    as={ExternalLinkIcon}
-                    h={'16px'}
-                    w={'16px'}
-                    color={primaryBlueText}
-                  />
-                </Link>
-                <Tooltip label={vuln.nvdAliasId} placement={'top'}>
-                  <Text width={'fit-content'} fontSize='sm' color={textColor}>
-                    {vuln.nvdAliasId}
-                  </Text>
-                </Tooltip>
-              </Flex>
-            </Box>
-          ) : null}
-          {/* EPSS Percentile */}
-          <Box>
-            <CustomText>EPSS Percentile :</CustomText>
-            <Text mt={1} fontSize={14} color={textColor}>
-              {vuln?.vulnInfo?.epssPercentile
-                ? (vuln?.vulnInfo?.epssPercentile * 100).toFixed()
-                : 0}{' '}
-              %
-            </Text>
-          </Box>
+            </Tooltip>
+          ) : (
+            <Tag
+              variant='subtle'
+              width={'fit-content'}
+              colorScheme={'cyan'}
+              cursor={'pointer'}
+            >
+              {vuln?.cvssVector || '-'}
+            </Tag>
+          )}
         </GridItem>
-        {/* STATUS UPDATE */}
-        <GridItem w='90%' ml='auto' colSpan={3}>
-          {data && <VexStatusComponent data={data} />}
+        {/* NVD ALIAS ID */}
+        {vuln.nvdAliasId ? (
+          <GridItem>
+            <CustomText>NVD Alias ID:</CustomText>
+            <Flex
+              width={'fit-content'}
+              mt={1}
+              direction='row'
+              alignItems={'center'}
+              gap={2}
+            >
+              <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
+                <Icon
+                  as={ExternalLinkIcon}
+                  h={'16px'}
+                  w={'16px'}
+                  color={primaryBlueText}
+                />
+              </Link>
+              <Tooltip label={vuln.nvdAliasId} placement={'top'}>
+                <Text width={'fit-content'} fontSize='sm' color={textColor}>
+                  {vuln.nvdAliasId}
+                </Text>
+              </Tooltip>
+            </Flex>
+          </GridItem>
+        ) : null}
+        {/* EPSS Percentile */}
+        <GridItem>
+          <CustomText>EPSS Percentile :</CustomText>
+          <Text mt={1} fontSize={14} color={textColor}>
+            {vuln?.vulnInfo?.epssPercentile
+              ? (vuln?.vulnInfo?.epssPercentile * 100).toFixed()
+              : 0}{' '}
+            %
+          </Text>
         </GridItem>
       </Grid>
     </Box>

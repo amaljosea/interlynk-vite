@@ -46,7 +46,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   const [error, setError] = useState('')
   const [linkError, setLinkError] = useState('')
 
-  const [addUrls] = useMutation(ComponentVulnUpdate)
+  const [addUrls, { loading }] = useMutation(ComponentVulnUpdate)
   const [addPartsUrls] = useMutation(DispositionByParentUpdate)
 
   const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
@@ -315,7 +315,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
           <Button variant='outline' mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button colorScheme='blue' onClick={handleSave}>
+          <Button colorScheme='blue' onClick={handleSave} isLoading={loading}>
             Save
           </Button>
         </DrawerFooter>

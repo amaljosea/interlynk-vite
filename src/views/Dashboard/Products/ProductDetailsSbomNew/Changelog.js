@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
@@ -29,12 +29,7 @@ import RowComponent from 'components/RowComponent'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import {
-  GetChangeLogs,
-  GetProductData,
-  GetSbomLogFilters,
-  GetVulnData
-} from 'graphQL/Queries'
+import { GetChangeLogs, GetSbomLogFilters } from 'graphQL/Queries'
 
 import LogFilters from './LogFilters'
 
@@ -65,10 +60,9 @@ const Changelog = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
+    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
+  )
 
   const PURL = useDisclosure()
   const USER = useDisclosure()
@@ -77,6 +71,7 @@ const Changelog = () => {
 
   const [activeRow, setActiveRow] = useState('')
   const [logSearch, setLogSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [logState, setLogState] = useState({
     field: 'ACTIVITY_LOGS_CREATED_AT',
     direction: 'DESC'
@@ -96,38 +91,14 @@ const Changelog = () => {
     }
   )
 
-  const [getSbom] = useLazyQuery(GetProductData)
-  const [getVuln] = useLazyQuery(GetVulnData)
-
   const onSelect = (row) => {
     const { loggableType, loggablePrefix } = row
-    const searchInput = loggablePrefix.split(' ')
+    const result = loggablePrefix.split(' ')
     if (loggableType === 'ComponentVuln') {
-      getVuln({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          search: searchInput[0],
-          field: 'COMPONENT_VULNS_UPDATED_AT',
-          direction: 'DESC'
-        }
-      })
-        .then((res) => {
-          if (res?.data) {
-            const vulns = res?.data?.sbom?.vulns?.nodes
-            vulns?.length > 0 && setActiveRow(vulns[0])
-          }
-        })
-        .finally(() => VULN.onOpen())
+      setSearchInput(result?.length > 0 ? result[0] : '')
+      VULN.onOpen()
     } else if (loggableType === 'Sbom') {
-      getSbom({
-        variables: {
-          sbomId: sbomId,
-          projectId: productId
-        }
-      })
-        .then((res) => res?.data && setActiveRow(res?.data))
-        .finally(() => VERSION.onOpen())
+      VERSION.onOpen()
     }
   }
 
@@ -148,7 +119,7 @@ const Changelog = () => {
     if (row?.changedBy === 'Sharelynk user') {
       return null
     } else {
-      setActiveRow(row)
+      setSearchInput(row?.changedBy)
       USER.onOpen()
     }
   }
@@ -175,7 +146,7 @@ const Changelog = () => {
       },
       sortable: true,
       wrap: true,
-      width: '8%'
+      width: '6%'
     },
     // CHANGED OBJECT
     {
@@ -185,30 +156,22 @@ const Changelog = () => {
         const { event, loggablePrefix, loggableType } = row
         const isComponent = loggableType === 'Component'
         return (
-          <Stack
-            my={2}
-            spacing={0}
-            direction={'column'}
-            onClick={() => onSelect(row)}
-          >
+          <Stack my={3} spacing={1} direction={'column'}>
             {isComponent ? (
               <RowComponent content={loggablePrefix} />
             ) : (
-              <Tag
-                overflow={'auto'}
-                fontWeight={'medium'}
-                sx={{ w: 'fit-content', fontSize: 'sm', cursor: 'pointer' }}
+              <Text
+                onClick={() => onSelect(row)}
+                sx={{ cursor: 'pointer', color: primaryBlueText }}
               >
-                <TagLabel>
-                  {loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}
-                </TagLabel>
-              </Tag>
+                {loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}
+              </Text>
             )}
-
             <Text color={primaryTextColor}>{event}</Text>
           </Stack>
         )
       },
+      width: '25%',
       wrap: true,
       sortable: true
     },
@@ -591,7 +554,7 @@ const Changelog = () => {
 
       {USER.isOpen && (
         <UserCard
-          name={activeRow?.changedBy}
+          name={searchInput}
           isOpen={USER.isOpen}
           onClose={USER.onClose}
         />
@@ -609,7 +572,7 @@ const Changelog = () => {
         <VulnCard
           isOpen={VULN.isOpen}
           onClose={VULN.onClose}
-          data={activeRow}
+          value={searchInput}
         />
       )}
     </>

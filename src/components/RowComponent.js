@@ -1,46 +1,26 @@
-import { useQuery } from '@apollo/client'
-import React, { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { truncatedValue } from 'utils'
 
-import { ArrowForwardIcon, ViewIcon } from '@chakra-ui/icons'
-import { Tag, TagLabel, TagRightIcon, useDisclosure } from '@chakra-ui/react'
+import { ExternalLinkIcon } from '@chakra-ui/icons'
+import { Flex, Icon, Text, useDisclosure } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GetComponentData } from 'graphQL/Queries'
-
 import ComponentCard from './Misc/ComponentCard'
 
 const RowComponent = ({ content }) => {
+  console.log('content', content)
+
   const navigate = useNavigate()
-  const params = useParams()
-  const productId = params.productid
-  const sbomId = params.sbomid
   const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
-  const [activeRow, setActiveRow] = useState(null)
-  const [isHovered, setIsHovered] = useState(false)
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
-
-  const isChnagelog = typeof content === 'string'
-  const data = isChnagelog ? activeRow : content
-  const searchInput = isChnagelog ? content?.split(' ') : ['']
-  const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const { loading } = useQuery(GetComponentData, {
-    skip: isOpen && isChnagelog ? false : true,
-    variables: { sbomId: sbomId, projectId: productId, search: searchInput[0] },
-    onCompleted: (data) => {
-      if (data) {
-        const components = data?.sbom?.components?.nodes
-        setActiveRow(components?.length > 0 ? components[0] : '')
-      }
-    }
-  })
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const { name } = content || ''
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
@@ -57,9 +37,12 @@ const RowComponent = ({ content }) => {
     if (typeof content === 'string') {
       prodCompDispatch({
         type: 'CHANGE_SEARCH_INPUT',
-        payload: activeRow?.name
+        payload: content?.split(' ')[0] || ''
       })
-      prodCompDispatch({ type: 'SET_EXPAND', payload: activeRow?.name })
+      prodCompDispatch({
+        type: 'SET_EXPAND',
+        payload: content?.split(' ')[0] || ''
+      })
       navigate(link)
     } else {
       prodCompDispatch({
@@ -73,30 +56,26 @@ const RowComponent = ({ content }) => {
 
   const getValue = () => {
     if (typeof content === 'string') {
-      return content
+      return truncatedValue(content, 40)
     } else {
-      return name
+      return truncatedValue(name, 40)
     }
   }
 
   return (
     <>
-      <Tag
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        sx={{ borderRadius: 'md', cursor: 'pointer' }}
-      >
-        <TagLabel textColor={primaryTextColor}>{getValue()}</TagLabel>
-        {isHovered && <TagRightIcon as={ViewIcon} onClick={onView} />}
-        {isHovered && <TagRightIcon as={ArrowForwardIcon} onClick={onCheck} />}
-      </Tag>
+      <Flex sx={{ gap: 2, alignItems: 'center', cursor: 'pointer' }}>
+        <Icon
+          as={ExternalLinkIcon}
+          onClick={onCheck}
+          sx={{ w: '16px', h: '16px', color: primaryBlueText }}
+        />
+        <Text fontSize={14} textColor={primaryBlueText} onClick={onView}>
+          {getValue()}
+        </Text>
+      </Flex>
 
-      <ComponentCard
-        isOpen={isOpen}
-        onClose={onClose}
-        data={data}
-        loading={loading}
-      />
+      <ComponentCard value={content} isOpen={isOpen} onClose={onClose} />
     </>
   )
 }

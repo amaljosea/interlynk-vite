@@ -2263,6 +2263,7 @@ export const GetVulnData = gql`
     }
   }
 `
+
 // SHARE VULNERABILITIES DATA
 export const ShareVulnData = gql`
   query ShareVulnData(

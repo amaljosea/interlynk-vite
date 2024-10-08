@@ -1,13 +1,5 @@
-import {
-  Divider,
-  Grid,
-  Stack,
-  Tag,
-  TagLabel,
-  TagRightIcon,
-  Text,
-  useClipboard
-} from '@chakra-ui/react'
+import { Divider, Grid, Stack, Text, useClipboard } from '@chakra-ui/react'
+import { Tag, TagLabel, TagRightIcon } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
@@ -37,6 +29,7 @@ const CpeCard = ({ value, isOpen, onClose }) => {
 
   return (
     <LynkModal
+      maxW='500px'
       isOpen={isOpen}
       onClose={onClose}
       title={'CPE Details'}

@@ -45,12 +45,12 @@ import {
 import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
 import CustomLoader from 'components/CustomLoader'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
-import { FixedIcon } from 'components/Icons/Icons'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import CvssCard from 'components/Misc/CvssCard'
 import ExternalLink from 'components/Misc/ExternalLink'
 import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
+import StatusHistory from 'components/VulnerabilityVex/StatusHistory'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -101,24 +101,8 @@ const statusColor = (status) => {
 }
 
 const ExpandedComponent = (props) => {
-  const { data, setActiveRow, onCvssOpen, isArchived } = props
-  const {
-    vuln,
-    isPart,
-    fixedVersions,
-    lastAffectedVersions,
-    currentExternalUrls,
-    externalUrls
-  } = data
-  const advisories = isPart
-    ? currentExternalUrls?.find((item) => item.name === 'advisories')
-    : externalUrls?.find((item) => item.name === 'advisories')
-  const documentation = isPart
-    ? currentExternalUrls?.find((item) => item.name === 'documentation')
-    : externalUrls?.find((item) => item.name === 'documentation')
-  const other = isPart
-    ? currentExternalUrls?.find((item) => item.name === 'other')
-    : externalUrls?.find((item) => item.name === 'other')
+  const { data, setActiveRow, onCvssOpen } = props
+  const { vuln, fixedVersions, component, lastAffectedVersions } = data
 
   const CustomText = styled(Text)`
     font-size: 13px;
@@ -132,7 +116,6 @@ const ExpandedComponent = (props) => {
     'primaryTextColor',
     'primaryBgColor'
   ])
-  const onCheck = (item) => (item ? primaryBlueText : primaryTextColor)
 
   return (
     <Box
@@ -140,12 +123,9 @@ const ExpandedComponent = (props) => {
       p={5}
       boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
     >
-      <Grid templateColumns='repeat(5, 1fr)' gap={12} py={2}>
-        {/* VULN DATA */}
-        <GridItem
-          colSpan={2}
-          sx={{ w: '100%', gap: 4, display: 'flex', flexDir: 'column' }}
-        >
+      {/* VULN DATA */}
+      <Grid templateColumns='repeat(2, 1fr)' gap={8} py={2}>
+        <GridItem display={'flex'} flexDirection={'column'} gap={4}>
           {/* Description */}
           <Box>
             <CustomText>Description :</CustomText>
@@ -153,28 +133,17 @@ const ExpandedComponent = (props) => {
               {vuln.desc}
             </Text>
           </Box>
-          {/* EXTERNAL LINKS */}
+          {/* COMPONENT NAME */}
           <Box>
-            <CustomText>External Links :</CustomText>
-            <Stack direction={'row'} alignItems={'center'} mt={1}>
-              {/* advisories */}
-              <ExternalLink
-                link={advisories}
-                icon={<FaBullhorn color={onCheck(advisories)} fontSize={16} />}
-              />
-              {/* documentation */}
-              <ExternalLink
-                link={documentation}
-                icon={
-                  <FaBookOpen color={onCheck(documentation)} fontSize={16} />
-                }
-              />
-              {/* other */}
-              <ExternalLink
-                link={other}
-                icon={<FaLink color={onCheck(other)} fontSize={16} />}
-              />
-            </Stack>
+            <CustomText>Component Name :</CustomText>
+            <RowComponent content={component} />
+          </Box>
+          {/* COMPONENT VERSION */}
+          <Box>
+            <CustomText>Component Version :</CustomText>
+            <Text color={primaryTextColor} mt={1} fontSize={14}>
+              {component?.version}
+            </Text>
           </Box>
           {/* Published At  */}
           <Box>
@@ -202,7 +171,7 @@ const ExpandedComponent = (props) => {
             </Flex>
           </Box>
           {/* Last Affected Versions */}
-          <Box>
+          <Box hidden={lastAffectedVersions?.length === 0}>
             <CustomText>Last Affected Version:</CustomText>
             <Flex mt={1} flexWrap={'wrap'} alignItems={'center'} gap={2}>
               {lastAffectedVersions?.map((item, index) => (
@@ -246,9 +215,9 @@ const ExpandedComponent = (props) => {
             )}
           </Box>
           {/* NVD ALIAS ID */}
-          {vuln.nvdAliasId ? (
-            <Box>
-              <CustomText>NVD Alias ID:</CustomText>
+          <Box>
+            <CustomText>NVD Alias ID:</CustomText>
+            {vuln.nvdAliasId ? (
               <Flex
                 direction='row'
                 sx={{ w: 'fit-content', mt: 1, gap: 2, alignItems: 'center' }}
@@ -270,8 +239,8 @@ const ExpandedComponent = (props) => {
                   </Text>
                 </Tooltip>
               </Flex>
-            </Box>
-          ) : null}
+            ) : null}
+          </Box>
           {/* EPSS Percentile */}
           <Box>
             <CustomText>EPSS Percentile :</CustomText>
@@ -283,9 +252,8 @@ const ExpandedComponent = (props) => {
             </Text>
           </Box>
         </GridItem>
-        {/* STATUS UPDATE */}
-        <GridItem w='90%' ml={'auto'} colSpan={3}>
-          {data && <VexStatusComponent data={data} isArchived={isArchived} />}
+        <GridItem>
+          <VexStatusComponent data={data} />
         </GridItem>
       </Grid>
     </Box>
@@ -417,6 +385,8 @@ const Vulnerabilities = ({ sbomData }) => {
   const JIRA = useDisclosure()
   const CVSS = useDisclosure()
   const IMPORT = useDisclosure()
+  const STATUS = useDisclosure()
+  const HISTORY = useDisclosure()
 
   // GET VULN FILTER HEADS
   useQuery(signedUrlParams ? ShareVulnFilters : GetVulnFilterData, {
@@ -523,42 +493,7 @@ const Vulnerabilities = ({ sbomData }) => {
           </Flex>
         )
       },
-      width: '15%',
-      sortable: true
-    },
-    // COMPONENT
-    {
-      id: 'COMPONENTS_NAME',
-      name: 'COMPONENT',
-      selector: (row) => {
-        const { component, fixedVersions } = row
-        const { version } = component || ''
-        const isExists = fixedVersions?.length > 0
-        return (
-          <Stack
-            spacing={1}
-            sx={{
-              my: 3,
-              cursor: 'pointer',
-              alignItems: 'flex-start',
-              direction: 'column'
-            }}
-          >
-            <RowComponent content={component} />
-            <Flex alignItems={'center'} gap={2}>
-              <Text color={primaryTextColor}>{version || ''}</Text>
-              <Tooltip
-                label={'Fixed In: ' + fixedVersions?.join(', ')}
-                placement='top'
-              >
-                <Icon as={FixedIcon} display={isExists ? 'flex' : 'none'} />
-              </Tooltip>
-            </Flex>
-          </Stack>
-        )
-      },
-      wrap: true,
-      width: '12%',
+      width: '20%',
       sortable: true
     },
     // SEVERITY
@@ -719,12 +654,12 @@ const Vulnerabilities = ({ sbomData }) => {
         const { vexStatus, isComplete } = row
         return (
           <Tag
-            onClick={(e) => {
-              e.currentTarget.parentElement.click()
-            }}
             size='md'
             variant='solid'
             width={'160px'}
+            onClick={(e) => {
+              e.currentTarget.parentElement.click()
+            }}
             colorScheme={statusColor(
               vexStatus ? vexStatus.name : 'Unspecified'
             )}
@@ -776,12 +711,37 @@ const Vulnerabilities = ({ sbomData }) => {
       name: 'ACTION',
       selector: (row) => {
         const { isPart, currentExternalUrls, externalUrls } = row
+        const advisories = isPart
+          ? currentExternalUrls?.find((item) => item.name === 'advisories')
+          : externalUrls?.find((item) => item.name === 'advisories')
+        const documentation = isPart
+          ? currentExternalUrls?.find((item) => item.name === 'documentation')
+          : externalUrls?.find((item) => item.name === 'documentation')
+        const other = isPart
+          ? currentExternalUrls?.find((item) => item.name === 'other')
+          : externalUrls?.find((item) => item.name === 'other')
         const issueTracker = isPart
           ? currentExternalUrls?.find((item) => item.name === 'issue-tracker')
           : externalUrls?.find((item) => item.name === 'issue-tracker')
+        const onCheck = (item) => (item ? primaryBlueText : primaryTextColor)
         const url = issueTracker?.url
         return (
-          <Flex alignItems={'center'} gap={1}>
+          <Flex alignItems={'center'} gap={2}>
+            {/* advisories */}
+            <ExternalLink
+              link={advisories}
+              icon={<FaBullhorn color={onCheck(advisories)} fontSize={16} />}
+            />
+            {/* documentation */}
+            <ExternalLink
+              link={documentation}
+              icon={<FaBookOpen color={onCheck(documentation)} fontSize={16} />}
+            />
+            {/* other */}
+            <ExternalLink
+              link={other}
+              icon={<FaLink color={onCheck(other)} fontSize={16} />}
+            />
             <ExternalLink
               link={issueTracker}
               icon={<FaListCheck color={onCheck(issueTracker)} fontSize={16} />}
@@ -804,6 +764,15 @@ const Vulnerabilities = ({ sbomData }) => {
                     }}
                   >
                     Edit Links
+                  </MenuItem>
+                  <MenuItem
+                    isDisabled={!editVulns}
+                    onClick={() => {
+                      setActiveRow(row)
+                      HISTORY.onOpen()
+                    }}
+                  >
+                    Status History
                   </MenuItem>
                   {row?.externalUrls?.find(
                     (externalUrl) => externalUrl.name === 'issue-tracker'
@@ -1114,6 +1083,26 @@ const Vulnerabilities = ({ sbomData }) => {
           isOpen={CVSS.isOpen}
           onClose={CVSS.onClose}
           value={activeRow?.vuln?.cvssVector}
+        />
+      )}
+
+      {STATUS.isOpen && selectedVulns?.length > 0 && (
+        <VexModal
+          checkEquals={true}
+          isOpen={STATUS.isOpen}
+          onClose={STATUS.onClose}
+          selectedVulns={selectedVulns}
+          selectedGroup={params.productgroupid}
+          setSelectedVulns={setSelectedVulns}
+          setToggleClear={setToggleClear}
+        />
+      )}
+
+      {HISTORY.isOpen && (
+        <StatusHistory
+          isOpen={HISTORY.isOpen}
+          onClose={HISTORY.onClose}
+          data={{ id: activeRow?.id, vulnId: activeRow?.vuln?.vulnId }}
         />
       )}
     </>

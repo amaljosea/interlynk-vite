@@ -5,15 +5,8 @@ const InfoTag = ({ children }) => {
     <Tag
       size='sm'
       variant='subtle'
-      justifyContent={'center'}
-      sx={{
-        width: '200px',
-        ml: 'auto',
-        py: 1,
-        textAlign: 'center',
-        alignItems: 'center',
-        wordBreak: 'break-all'
-      }}
+      colorScheme='blue'
+      sx={{ ml: 'auto', py: 1, textAlign: 'right', wordBreak: 'break-all' }}
     >
       {children}
     </Tag>
