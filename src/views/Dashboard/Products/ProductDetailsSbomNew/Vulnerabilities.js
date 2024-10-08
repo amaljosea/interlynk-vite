@@ -124,7 +124,7 @@ const ExpandedComponent = (props) => {
       boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
     >
       {/* VULN DATA */}
-      <Grid templateColumns='repeat(2, 1fr)' gap={8} py={2}>
+      <Grid templateColumns='repeat(2, 1fr)' gap={14} py={2}>
         <GridItem display={'flex'} flexDirection={'column'} gap={4}>
           {/* Description */}
           <Box>

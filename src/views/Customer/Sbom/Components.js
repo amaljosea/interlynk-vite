@@ -1,10 +1,9 @@
-import { useMutation } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { GetIcon, customStyles, getFullDateAndTime, timeSince } from 'utils'
-import { getSignedUrlParams } from 'utils'
+import { isValidPurl, truncatedValue } from 'utils'
 import { openSsf } from 'variables/general'
 import CompDrawer from 'views/Dashboard/Products/components/CompDrawer'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -12,18 +11,18 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { ViewIcon } from '@chakra-ui/icons'
 import {
   Box,
+  Button,
   Flex,
   Grid,
   GridItem,
   IconButton,
-  Link,
   Stack,
   Tag,
-  TagCloseButton,
   TagLabel,
   Text,
   Tooltip,
   VStack,
+  useColorMode,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -31,14 +30,15 @@ import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import CpeCard from 'components/Misc/CpeCard'
+import ExternalLink from 'components/Misc/ExternalLink'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
+import SupplierTag from 'components/SupplierTag'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { deleteComSupplier } from 'graphQL/Mutation'
 import { ShareComponentData } from 'graphQL/Queries'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -46,18 +46,34 @@ import { FaGlobe, FaHouseUser, FaLightbulb, FaSitemap } from 'react-icons/fa'
 
 import CompFilters from './CompFilters'
 
+const CustomText = styled(Text)`
+  font-size: 13px;
+  font-weight: bold;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+`
+
 const Components = ({ sbomData }) => {
   const params = useParams()
   const sbomId = params.sbomid
   const location = useLocation()
+  const { colorMode } = useColorMode()
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
-  const signedUrlParams = getSignedUrlParams()
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
+  const {
+    headingTextColor,
+    primaryTextColor,
+    inverseSecondaryBgColor,
+    primaryBlueText
+  } = useThemeColor([
     'headingTextColor',
-    'primaryTextColor'
+    'primaryTextColor',
+    'inverseSecondaryBgColor',
+    'primaryBlueText'
   ])
+
   const { prodCompState, dispatch } = useGlobalState()
   const {
     field,
@@ -68,7 +84,6 @@ const Components = ({ sbomData }) => {
     licenses,
     suppliers,
     scope,
-    filters,
     direct
   } = prodCompState
   const { prodCompDispatch } = dispatch
@@ -113,16 +128,18 @@ const Components = ({ sbomData }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const {
-    isOpen: isPurlOpen,
-    onOpen: onPurlOpen,
-    onClose: onPurlClose
-  } = useDisclosure()
-  const {
-    isOpen: isCpeOpen,
-    onOpen: onCpeOpen,
-    onClose: onCpeClose
-  } = useDisclosure()
+  const PURL = useDisclosure()
+  const CPE = useDisclosure()
+
+  const onCheckPurl = (data) => {
+    setActiveRow(data)
+    PURL.onOpen()
+  }
+
+  const onCheckCpe = (data) => {
+    setActiveRow(data)
+    CPE.onOpen()
+  }
 
   // COLUMNS
   const columns = [
@@ -131,110 +148,43 @@ const Components = ({ sbomData }) => {
       id: 'COMPONENTS_NAME',
       name: 'NAME',
       selector: (row) => {
-        const { purl, name, primary, internal, externalUrls } = row
-        const website = externalUrls?.find((item) => item.name === 'website')
-        const distribution = externalUrls?.find(
-          (item) => item.name === 'distribution'
+        const { purl, name, primary, internal, sbomId: bomId, sbom } = row
+        const { projectVersion, project } = sbom || ''
+        const { projectGroup } = project || ''
+        const isPart = sbomId !== bomId
+        const validPurl = isValidPurl(purl)
+        const icon = validPurl ? (
+          GetIcon(purl?.split('/')[0], colorMode)
+        ) : (
+          <BsFillPatchQuestionFill
+            fontSize={24}
+            color={inverseSecondaryBgColor}
+          />
         )
-        const issueTracker = externalUrls?.find(
-          (item) => item.name === 'issue-tracker'
-        )
-        const vcs = externalUrls?.find((item) => item.name === 'vcs')
         return (
-          <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
-            <GridItem colSpan={1} width={'50px'}>
-              {purl !== null && purl !== '' ? (
-                <IconButton
-                  isRound={true}
-                  variant='solid'
-                  colorScheme='gray'
-                  icon={GetIcon(purl.split('/')[0])}
-                />
-              ) : (
-                <IconButton
-                  isRound={true}
-                  variant='solid'
-                  colorScheme='gray'
-                  icon={
-                    <BsFillPatchQuestionFill color='#4299E1' fontSize={24} />
-                  }
-                />
-              )}
-            </GridItem>
-            <GridItem
-              colSpan={6}
-              display={'flex'}
-              flexWrap={'wrap'}
+          <Flex sx={{ alignItems: 'center', gap: 2, my: 3 }}>
+            <Box width={'50px'}>
+              <IconButton icon={icon} isRound={true} variant='solid' />
+            </Box>
+            <Flex
               flexDirection={'column'}
-              gap={2}
+              sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}
             >
               {/* COMPONENT NAME */}
-              <Tooltip placement='top' label={name}>
-                <Text color={primaryTextColor} data-tag='allowRowEvents'>
-                  {name}
+              <Text color={primaryTextColor} data-tag='allowRowEvents'>
+                {name}
+              </Text>
+              {isPart && (
+                <Text
+                  fontSize={'xs'}
+                  w={'fit-content'}
+                  fontWeight={'medium'}
+                  color={primaryTextColor}
+                >
+                  {projectGroup?.name && truncatedValue(projectGroup?.name, 10)}
+                  {projectVersion && `: ${truncatedValue(projectVersion, 10)}`}
                 </Text>
-              </Tooltip>
-              {/* EXTERNAL REFERENCE */}
-              <Stack direction={'row'} alignItems={'center'}>
-                {/* WEBSITE */}
-                <Tooltip placement='top' label={website?.url}>
-                  <Link href={website?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      isDisabled={!website}
-                      colorScheme={'gray'}
-                      icon={<FaGlobe color={primaryTextColor} fontSize={16} />}
-                    />
-                  </Link>
-                </Tooltip>
-                {/* DISTRIBUTION */}
-                <Tooltip placement='top' label={vcs?.url}>
-                  <Link href={vcs?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      colorScheme='gray'
-                      isDisabled={!vcs}
-                      icon={
-                        <FaSitemap color={primaryTextColor} fontSize={16} />
-                      }
-                    />
-                  </Link>
-                </Tooltip>
-                {/* ADVISORIES */}
-                <Tooltip placement='top' label={issueTracker?.url}>
-                  <Link href={issueTracker?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      colorScheme='gray'
-                      isDisabled={!issueTracker}
-                      icon={
-                        <FaHouseUser color={primaryTextColor} fontSize={16} />
-                      }
-                    />
-                  </Link>
-                </Tooltip>
-                {/* SUPPORT */}
-                <Tooltip placement='top' label={distribution?.url}>
-                  <Link href={distribution?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      isDisabled={!distribution}
-                      colorScheme='gray'
-                      icon={
-                        <FaLightbulb color={primaryTextColor} fontSize={16} />
-                      }
-                    />
-                  </Link>
-                </Tooltip>
-              </Stack>
+              )}
               {/* COMPONENT TYPE */}
               <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
                 {primary && (
@@ -258,63 +208,59 @@ const Components = ({ sbomData }) => {
                   </Tag>
                 )}
               </Flex>
-            </GridItem>
-          </Grid>
+            </Flex>
+          </Flex>
         )
       },
+      width: '30%',
       wrap: true,
-      width: '18%',
       sortable: true
     },
     // VERSION
     {
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
-      selector: (row) => (
-        <p style={{ textWrap: 'pretty', color: primaryTextColor }}>
-          {row.version}
-        </p>
-      ),
-      width: '12%',
+      selector: (row) => <Text color={primaryTextColor}>{row?.version}</Text>,
       wrap: true,
-      sortable: true,
-      right: 'true'
+      width: '12%',
+      sortable: true
     },
-    // PURL
+    // IDENTIFIERS
     {
-      id: 'COMPONENTS_PURL',
-      name: 'PURL',
+      id: 'IDENTIFIERS',
+      name: 'IDENTIFIERS',
       selector: (row) => {
-        const { purl } = row
+        const { purl, cpes } = row
         return (
-          <>
-            {purl !== null && purl !== '' ? (
-              <Text
-                my={3}
+          <Flex gap={2}>
+            {cpes?.length > 0 && (
+              <Button
+                size='xs'
                 color={primaryTextColor}
-                onClick={() => {
-                  setActiveRow(row)
-                  onPurlOpen()
-                }}
+                onClick={() => onCheckCpe(row)}
               >
-                {purl}
-              </Text>
-            ) : (
-              ''
+                CPE
+              </Button>
             )}
-          </>
+            {purl && (
+              <Button
+                size='xs'
+                color={primaryTextColor}
+                onClick={() => onCheckPurl(row)}
+              >
+                PURL
+              </Button>
+            )}
+          </Flex>
         )
       },
-      sortable: true,
-      width: '20%',
-      wrap: true,
-      grow: 2
+      width: '12%',
+      wrap: true
     },
     // LICENSES
     {
       id: 'COMPONENTS_LICENSES_EXP',
       name: 'LICENSES',
-      width: '14%',
       selector: (row) => {
         const { licenses, licensesExp, licensesCustom } = row
         const totalSpdx = licenses?.length > 1 && licenses.slice(1)
@@ -322,11 +268,8 @@ const Components = ({ sbomData }) => {
           licensesCustom?.length > 1 && licensesCustom.slice(1)
         return (
           <Flex
-            alignItems={'flex-end'}
             justifyContent={'flex-end'}
-            gap={2}
-            flexWrap={'wrap'}
-            my={2}
+            sx={{ my: 2, gap: 2, alignItems: 'flex-end', flexWrap: 'wrap' }}
           >
             {/* SPDX */}
             {licenses && (
@@ -414,6 +357,7 @@ const Components = ({ sbomData }) => {
           </Flex>
         )
       },
+      width: '13%',
       sortable: true,
       wrap: true
     },
@@ -432,37 +376,63 @@ const Components = ({ sbomData }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      right: 'true',
+      width: '12%',
       wrap: true
     },
     // ACTION
     {
-      id: 'action',
+      id: 'ACTION',
       name: 'ACTION',
       selector: (row) => {
+        const { externalUrls } = row
+        const website = externalUrls?.find((item) => item.name === 'website')
+        const distribution = externalUrls?.find(
+          (item) => item.name === 'distribution'
+        )
+        const issueTracker = externalUrls?.find(
+          (item) => item.name === 'issue-tracker'
+        )
+        const vcs = externalUrls?.find((item) => item.name === 'vcs')
+        const onCheck = (item) => (item ? primaryBlueText : primaryTextColor)
+
         return (
-          <IconButton
-            size='sm'
-            color={primaryTextColor}
-            icon={<ViewIcon />}
-            onClick={() => {
-              setActiveRow(row)
-              onOpen()
-            }}
-          />
+          <Stack direction={'row'} alignItems={'center'}>
+            {/* WEBSITE */}
+            <ExternalLink
+              link={website}
+              icon={<FaGlobe color={onCheck(website)} fontSize={16} />}
+            />
+            {/* DISTRIBUTION */}
+            <ExternalLink
+              link={vcs}
+              icon={<FaSitemap color={onCheck(vcs)} fontSize={16} />}
+            />
+            {/* ADVISORIES */}
+            <ExternalLink
+              link={issueTracker}
+              icon={<FaHouseUser color={onCheck(issueTracker)} fontSize={16} />}
+            />
+            {/* SUPPORT */}
+            <ExternalLink
+              link={distribution}
+              icon={<FaLightbulb color={onCheck(distribution)} fontSize={16} />}
+            />
+            <IconButton
+              size='sm'
+              sx={{ ml: 2, color: primaryTextColor }}
+              icon={<ViewIcon />}
+              onClick={() => {
+                setActiveRow(row)
+                onOpen()
+              }}
+            />
+          </Stack>
         )
       },
       wrap: true,
-      right: 'true',
-      width: '10%'
+      right: 'true'
     }
   ]
-
-  const [deleteSupplier] = useMutation(deleteComSupplier)
-
-  const handleSupRemove = async (id) => {
-    await deleteSupplier({ variables: { id: id } }).then((res) => res.data)
-  }
 
   // EXPAND SECTION
   const ExpandedComponent = ({ data }) => {
@@ -479,146 +449,128 @@ const Components = ({ sbomData }) => {
       licensesExp,
       licensesCustom,
       dependencyOf,
-      dependsOn
+      dependsOn,
+      supportLevel,
+      endOfSupport
     } = data
     const openSSF = openSsf?.find((item) => item?.name === purl)
-    const CustomText = styled(Text)`
-      font-size: 13px;
-      font-weight: bold;
-      color: #718096;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-    `
+
+    const textStyle = {
+      color: primaryTextColor,
+      mt: 1,
+      fontSize: 14,
+      workBreak: 'break-all'
+    }
+
     return (
       <Box
-        width={'100%'}
-        p={5}
+        sx={{ w: '100%', p: 5 }}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        <Grid templateColumns='repeat(3, 1fr)' gap={6}>
+        <Grid templateColumns='repeat(3, 1fr)' py={2} gap={6}>
           <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
-            <Text
-              color={primaryTextColor}
-              width={'90%'}
-              mt={1}
-              fontSize={14}
-              wordBreak={'break-all'}
-            >
-              {description !== null ? description : ''}
+            <Text sx={textStyle} width={'90%'}>
+              {description !== null ? description : 'N/A'}
             </Text>
+          </GridItem>
+          <GridItem colSpan={3}>
+            <CustomText>Depends On :</CustomText>
+            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
+              {dependsOn?.length > 0 ? (
+                [...dependsOn]
+                  .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                  .map((comp, index) => (
+                    <Tag
+                      size='sm'
+                      key={index}
+                      variant='subtle'
+                      colorScheme={'blue'}
+                      sx={{ p: 1, workBreak: 'break-all' }}
+                    >
+                      <Text wordBreak={'break-all'}>
+                        {comp.toComp.name}-{comp.toComp.version}
+                      </Text>
+                    </Tag>
+                  ))
+              ) : (
+                <Text sx={textStyle}>N/A</Text>
+              )}
+            </Flex>
+          </GridItem>
+          <GridItem>
+            <CustomText>Dependency Of :</CustomText>
+            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
+              {dependencyOf?.length > 0 ? (
+                dependencyOf?.map((comp, index) => (
+                  <Tag
+                    size='sm'
+                    padding={1}
+                    key={index}
+                    variant='subtle'
+                    colorScheme={'blue'}
+                  >
+                    <Text wordBreak={'break-all'}>
+                      {comp.fromComp.name}-{comp.fromComp.version}
+                    </Text>
+                  </Tag>
+                ))
+              ) : (
+                <Text sx={textStyle}>N/A</Text>
+              )}
+            </Flex>
           </GridItem>
           <GridItem>
             <CustomText>Component :</CustomText>
-            <Text
-              color={primaryTextColor}
-              width={'90%'}
-              mt={1}
-              fontSize={14}
-              wordBreak={'break-all'}
-            >
-              {name}
+            <Text sx={textStyle} width={'90%'}>
+              {name || 'N/A'}
             </Text>
           </GridItem>
           <GridItem>
             <CustomText>Type :</CustomText>
-            <Text
-              color={primaryTextColor}
-              mt={1}
-              fontSize={14}
-              textTransform={'capitalize'}
-            >
-              {kind}
-            </Text>
+            <Text sx={textStyle}>{kind || 'N/A'}</Text>
           </GridItem>
           <GridItem>
             <CustomText>Internal :</CustomText>
-            <Text
-              color={primaryTextColor}
-              mt={1}
-              fontSize={14}
-              wordBreak={'break-all'}
-            >
-              {internal ? 'True' : 'False'}
-            </Text>
+            <Text sx={textStyle}>{internal ? 'True' : 'False'}</Text>
           </GridItem>
           <GridItem>
             <CustomText>Supplier :</CustomText>
             <VStack spacing={4} mt={1} alignItems={'left'}>
-              {suppliers &&
-                suppliers.map((item, index) => (
-                  <Tag
-                    size={'md'}
-                    key={index}
-                    variant='subtle'
-                    colorScheme='orange'
-                    width={'fit-content'}
-                  >
-                    <Text wordBreak={'break-all'}>
-                      {item?.contactName}
-                      {item?.contactEmail && ` (${item?.contactEmail})`}
-                      {item?.url ? (
-                        <Link
-                          href={
-                            item?.url?.startsWith(`https://`) === true
-                              ? item?.url
-                              : `https://${item?.url}`
-                          }
-                          isExternal
-                        >
-                          {' '}
-                          {item.name}
-                        </Link>
-                      ) : (
-                        ` ${item.name}`
-                      )}
-                    </Text>
-                    {!signedUrlParams && (
-                      <TagCloseButton
-                        onClick={() => handleSupRemove(item.id)}
-                      />
-                    )}
-                  </Tag>
-                ))}
+              {suppliers?.length > 0 ? (
+                <>
+                  {suppliers.map((item, index) => (
+                    <SupplierTag key={index} item={item} editable={false} />
+                  ))}
+                </>
+              ) : (
+                <Text sx={textStyle}>N/A</Text>
+              )}
             </VStack>
           </GridItem>
           <GridItem>
             <CustomText>PURL :</CustomText>
             <Text
-              color={primaryTextColor}
-              wordBreak={'break-all'}
-              mt={1}
-              fontSize={14}
+              sx={textStyle}
               cursor={'pointer'}
-              onClick={() => {
-                setActiveRow(data)
-                onPurlOpen()
-              }}
+              onClick={() => onCheckPurl(data)}
             >
-              {purl !== null && purl !== '' ? purl : ''}
+              {purl !== null && purl !== '' ? decodeURI(purl) : 'N/A'}
             </Text>
           </GridItem>
           <GridItem>
             <CustomText>CPES :</CustomText>
             <Flex
-              mt={1}
               flexDirection={'column'}
-              alignItems={'flex-start'}
-              gap={1}
-              flexWrap={'wrap'}
+              sx={{ gap: 1, flexWrap: 'wrap', alignItems: 'flex-start' }}
             >
               {cpes?.length > 0 &&
                 cpes.map((item, index) => (
                   <Text
                     key={index}
-                    fontSize={14}
-                    wordBreak={'break-all'}
-                    color={primaryTextColor}
+                    sx={textStyle}
                     cursor={'pointer'}
-                    onClick={() => {
-                      setActiveRow(data)
-                      onCpeOpen()
-                    }}
+                    onClick={() => onCheckCpe(data)}
                   >
                     {item}
                   </Text>
@@ -626,65 +578,9 @@ const Components = ({ sbomData }) => {
             </Flex>
           </GridItem>
           <GridItem>
-            <CustomText>Depends On :</CustomText>
-            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-              {dependsOn?.length > 0 &&
-                [...dependsOn]
-                  .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-                  .map((comp, index) => (
-                    <Tooltip
-                      key={index}
-                      label={comp.toComp.name}
-                      placement='top'
-                    >
-                      <Tag
-                        size='sm'
-                        padding={1}
-                        variant='subtle'
-                        colorScheme={'blue'}
-                        wordBreak={'break-all'}
-                      >
-                        <Text wordBreak={'break-all'}>
-                          {comp.toComp.name}-{comp.toComp.version}
-                        </Text>
-                      </Tag>
-                    </Tooltip>
-                  ))}
-            </Flex>
-          </GridItem>
-          <GridItem>
-            <CustomText>Dependency Of :</CustomText>
-            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-              {dependencyOf?.length > 0 &&
-                dependencyOf?.map((comp, index) => (
-                  <Tooltip
-                    key={index}
-                    label={comp.fromComp.name}
-                    placement='top'
-                  >
-                    <Tag
-                      size='sm'
-                      padding={1}
-                      variant='subtle'
-                      colorScheme={'blue'}
-                    >
-                      <Text wordBreak={'break-all'}>
-                        {comp.fromComp.name}-{comp.fromComp.version}
-                      </Text>
-                    </Tag>
-                  </Tooltip>
-                ))}
-            </Flex>
-          </GridItem>
-          <GridItem>
             <CustomText>Scope :</CustomText>
-            <Text
-              color={primaryTextColor}
-              mt={1}
-              fontSize={14}
-              textTransform={'capitalize'}
-            >
-              {scope}
+            <Text sx={textStyle} textTransform={'capitalize'}>
+              {scope || 'N/A'}
             </Text>
           </GridItem>
           <GridItem>
@@ -732,8 +628,18 @@ const Components = ({ sbomData }) => {
           <GridItem>
             <CustomText>OpenSSF Scorecard :</CustomText>
             <Tag mt={1.5} variant='subtle' colorScheme={'blue'}>
-              {openSSF?.score || '-'}
+              {openSSF?.score || 'N/A'}
             </Tag>
+          </GridItem>
+          <GridItem>
+            <CustomText>Support Level :</CustomText>
+            <Text sx={textStyle}>{supportLevel || 'N/A'}</Text>
+          </GridItem>
+          <GridItem>
+            <CustomText>End-of-Support Date :</CustomText>
+            <Text sx={textStyle}>
+              {endOfSupport ? getFullDateAndTime(endOfSupport) : 'N/A'}
+            </Text>
           </GridItem>
         </Grid>
       </Box>
@@ -795,19 +701,12 @@ const Components = ({ sbomData }) => {
             onChange={onSearchInputChange}
           />
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && <CompFilters />}
+          <CompFilters reset={() => reset()} />
         </Stack>
         <RefreshBtn onClick={() => reset()} />
       </Flex>
     )
-  }, [
-    compSearch,
-    handleSearch,
-    handleClear,
-    onSearchInputChange,
-    filters,
-    reset
-  ])
+  }, [compSearch, handleSearch, handleClear, onSearchInputChange, reset])
 
   const handleSort = async (column, sortDirection) => {
     prodCompDispatch({
@@ -861,19 +760,19 @@ const Components = ({ sbomData }) => {
         />
       )}
 
-      {isPurlOpen && (
+      {PURL.isOpen && (
         <PurlCard
           value={activeRow?.purl}
-          isOpen={isPurlOpen}
-          onClose={onPurlClose}
+          isOpen={PURL.isOpen}
+          onClose={PURL.onClose}
         />
       )}
 
-      {isCpeOpen && (
+      {CPE.isOpen && (
         <CpeCard
           value={activeRow?.cpes[0]}
-          isOpen={isCpeOpen}
-          onClose={onCpeClose}
+          isOpen={CPE.isOpen}
+          onClose={CPE.onClose}
         />
       )}
     </>

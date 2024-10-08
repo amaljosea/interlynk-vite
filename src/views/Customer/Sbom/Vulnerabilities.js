@@ -69,9 +69,12 @@ const statusColor = (status) => {
   }
 }
 
-const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
-  const { vuln } = data
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+const ExpandedComponent = ({ data, setActiveRow, onCvssOpen }) => {
+  const { vuln, component } = data
+  const { primaryTextColor, primaryBlueText } = useThemeColor([
+    'primaryTextColor',
+    'primaryBlueText'
+  ])
 
   const CustomText = styled(Text)`
     font-size: 13px;
@@ -82,29 +85,42 @@ const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
   `
   return (
     <Box
-      width={'100%'}
-      p={5}
+      sx={{ w: '100%', p: 5 }}
       boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
     >
       <Grid templateColumns='repeat(3, 1fr)' gap={12}>
         {/* Description */}
         <GridItem>
           <CustomText>Description :</CustomText>
-          <Text mt={1} fontSize={14} color={textColor}>
+          <Text mt={1} fontSize={14} color={primaryTextColor}>
             {vuln.desc}
+          </Text>
+        </GridItem>
+        {/* COMPONENT NAME */}
+        <GridItem>
+          <CustomText>Component Name :</CustomText>
+          <Text mt={1} fontSize={14} color={primaryTextColor}>
+            {component?.name}
+          </Text>
+        </GridItem>
+        {/* COMPONENT VERSION */}
+        <GridItem>
+          <CustomText>Component Version :</CustomText>
+          <Text mt={1} fontSize={14} color={primaryTextColor}>
+            {component?.version}
           </Text>
         </GridItem>
         {/* Published At  */}
         <GridItem>
           <CustomText>Published:</CustomText>
-          <Text mt={1} fontSize={14} color={textColor}>
+          <Text mt={1} fontSize={14} color={primaryTextColor}>
             {getFullDateAndTime(vuln.publishedAt)}
           </Text>
         </GridItem>
         {/* Last Modified At */}
         <GridItem>
           <CustomText>Last Modified:</CustomText>
-          <Text mt={1} fontSize={14} color={textColor}>
+          <Text mt={1} fontSize={14} color={primaryTextColor}>
             {getFullDateAndTime(vuln.lastModifiedAt)}
           </Text>
         </GridItem>
@@ -146,22 +162,20 @@ const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
           <GridItem>
             <CustomText>NVD Alias ID:</CustomText>
             <Flex
-              width={'fit-content'}
-              mt={1}
-              direction='row'
-              alignItems={'center'}
-              gap={2}
+              sx={{ w: 'fit-content', mt: 1, gap: 2, alignItems: 'center' }}
             >
               <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
                 <Icon
                   as={ExternalLinkIcon}
-                  h={'16px'}
-                  w={'16px'}
                   color={primaryBlueText}
+                  sx={{ w: '16px', h: '16px' }}
                 />
               </Link>
               <Tooltip label={vuln.nvdAliasId} placement={'top'}>
-                <Text width={'fit-content'} fontSize='sm' color={textColor}>
+                <Text
+                  sx={{ w: 'fit-content', fontSize: 'sm' }}
+                  color={primaryTextColor}
+                >
                   {vuln.nvdAliasId}
                 </Text>
               </Tooltip>
@@ -171,7 +185,7 @@ const ExpandedComponent = ({ data, setActiveRow, onCvssOpen, textColor }) => {
         {/* EPSS Percentile */}
         <GridItem>
           <CustomText>EPSS Percentile :</CustomText>
-          <Text mt={1} fontSize={14} color={textColor}>
+          <Text mt={1} fontSize={14} color={primaryTextColor}>
             {vuln?.vulnInfo?.epssPercentile
               ? (vuln?.vulnInfo?.epssPercentile * 100).toFixed()
               : 0}{' '}
@@ -321,20 +335,7 @@ const Vulnerabilities = ({ sbomData }) => {
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vuln, isPart, component, externalUrls, currentExternalUrls } =
-          row
-        const website =
-          externalUrls?.find((item) => item.name === 'website') ||
-          currentExternalUrls?.find((item) => item.name === 'website')
-        const distribution =
-          externalUrls?.find((item) => item.name === 'distribution') ||
-          currentExternalUrls?.find((item) => item.name === 'distribution')
-        const issueTracker =
-          externalUrls?.find((item) => item.name === 'issue-tracker') ||
-          currentExternalUrls?.find((item) => item.name === 'issue-tracker')
-        const vcs =
-          externalUrls?.find((item) => item.name === 'vcs') ||
-          currentExternalUrls?.find((item) => item.name === 'vcs')
+        const { vuln, isPart, component } = row
         const { sbom } = component
         const { projectVersion, project } = sbom
         const { vulnInfo } = vuln
@@ -368,67 +369,6 @@ const Vulnerabilities = ({ sbomData }) => {
                   {project?.projectGroup?.name || ''} : {projectVersion || ''}
                 </Text>
               )}
-              {/* EXTERNAL REFERENCE */}
-              <Stack direction={'row'} alignItems={'center'}>
-                {/* WEBSITE */}
-                <Tooltip placement='top' label={website?.url}>
-                  <Link href={website?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      isDisabled={!website}
-                      colorScheme='gray'
-                      icon={<FaGlobe color={primaryTextColor} fontSize={16} />}
-                    />
-                  </Link>
-                </Tooltip>
-                {/* DISTRIBUTION */}
-                <Tooltip placement='top' label={vcs?.url}>
-                  <Link href={vcs?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      colorScheme='gray'
-                      isDisabled={!vcs}
-                      icon={
-                        <FaSitemap color={primaryTextColor} fontSize={16} />
-                      }
-                    />
-                  </Link>
-                </Tooltip>
-                {/* ADVISORIES */}
-                <Tooltip placement='top' label={issueTracker?.url}>
-                  <Link href={issueTracker?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      colorScheme='gray'
-                      isDisabled={!issueTracker}
-                      icon={
-                        <FaHouseUser color={primaryTextColor} fontSize={16} />
-                      }
-                    />
-                  </Link>
-                </Tooltip>
-                {/* SUPPORT */}
-                <Tooltip placement='top' label={distribution?.url}>
-                  <Link href={distribution?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      isDisabled={!distribution}
-                      colorScheme='gray'
-                      icon={
-                        <FaLightbulb color={primaryTextColor} fontSize={16} />
-                      }
-                    />
-                  </Link>
-                </Tooltip>
-              </Stack>
               {kev === true && (
                 <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
                   KEV
@@ -438,32 +378,7 @@ const Vulnerabilities = ({ sbomData }) => {
           </Flex>
         )
       },
-      width: '15%',
-      sortable: true
-    },
-    // COMPONENT
-    {
-      id: 'COMPONENTS_NAME',
-      name: 'COMPONENT',
-      selector: (row) => {
-        const { component } = row
-        return (
-          <Stack
-            direction='column'
-            alignItems={'flex-start'}
-            spacing={1}
-            my={3}
-            onClick={(e) => {
-              e.currentTarget.parentElement.click()
-            }}
-          >
-            <Text color={primaryTextColor}>{component?.name || ''}</Text>
-            <Text color={primaryTextColor}>{component?.version || ''}</Text>
-          </Stack>
-        )
-      },
-      wrap: true,
-      width: '12%',
+      width: '20%',
       sortable: true
     },
     // SEVERITY
@@ -667,6 +582,83 @@ const Vulnerabilities = ({ sbomData }) => {
       width: '10%',
       wrap: true,
       right: 'true'
+    },
+    {
+      id: '',
+      name: '',
+      right: true,
+      selector: (row) => {
+        const { externalUrls, currentExternalUrls } = row
+        const website =
+          externalUrls?.find((item) => item.name === 'website') ||
+          currentExternalUrls?.find((item) => item.name === 'website')
+        const distribution =
+          externalUrls?.find((item) => item.name === 'distribution') ||
+          currentExternalUrls?.find((item) => item.name === 'distribution')
+        const issueTracker =
+          externalUrls?.find((item) => item.name === 'issue-tracker') ||
+          currentExternalUrls?.find((item) => item.name === 'issue-tracker')
+        const vcs =
+          externalUrls?.find((item) => item.name === 'vcs') ||
+          currentExternalUrls?.find((item) => item.name === 'vcs')
+
+        return (
+          <Stack direction={'row'} alignItems={'center'}>
+            {/* WEBSITE */}
+            <Tooltip placement='top' label={website?.url}>
+              <Link href={website?.url} isExternal>
+                <IconButton
+                  type='button'
+                  size='xs'
+                  variant='solid'
+                  isDisabled={!website}
+                  colorScheme='gray'
+                  icon={<FaGlobe color={primaryTextColor} fontSize={16} />}
+                />
+              </Link>
+            </Tooltip>
+            {/* DISTRIBUTION */}
+            <Tooltip placement='top' label={vcs?.url}>
+              <Link href={vcs?.url} isExternal>
+                <IconButton
+                  type='button'
+                  size='xs'
+                  variant='solid'
+                  colorScheme='gray'
+                  isDisabled={!vcs}
+                  icon={<FaSitemap color={primaryTextColor} fontSize={16} />}
+                />
+              </Link>
+            </Tooltip>
+            {/* ADVISORIES */}
+            <Tooltip placement='top' label={issueTracker?.url}>
+              <Link href={issueTracker?.url} isExternal>
+                <IconButton
+                  type='button'
+                  size='xs'
+                  variant='solid'
+                  colorScheme='gray'
+                  isDisabled={!issueTracker}
+                  icon={<FaHouseUser color={primaryTextColor} fontSize={16} />}
+                />
+              </Link>
+            </Tooltip>
+            {/* SUPPORT */}
+            <Tooltip placement='top' label={distribution?.url}>
+              <Link href={distribution?.url} isExternal>
+                <IconButton
+                  type='button'
+                  size='xs'
+                  variant='solid'
+                  isDisabled={!distribution}
+                  colorScheme='gray'
+                  icon={<FaLightbulb color={primaryTextColor} fontSize={16} />}
+                />
+              </Link>
+            </Tooltip>
+          </Stack>
+        )
+      }
     }
   ]
 
@@ -782,8 +774,7 @@ const Vulnerabilities = ({ sbomData }) => {
           expandableRowsComponent={ExpandedComponent}
           expandableRowsComponentProps={{
             setActiveRow,
-            onCvssOpen,
-            primaryTextColor
+            onCvssOpen
           }}
         />
       </Flex>

@@ -2104,22 +2104,6 @@ export const AllShareComponents = gql`
   }
 `
 
-// GET SHARE COMPONENT FILTER DATA =
-export const ShareCompFilters = gql`
-  query ShareCompFilters($sbomId: Uuid!) {
-    shareLynkQuery {
-      sbom(id: $sbomId) {
-        filters {
-          ecosystems
-          supplierNames
-          kinds
-          licenses
-        }
-      }
-    }
-  }
-`
-
 // PRODUCT VULNERABILITIES DATA
 export const GetVulnData = gql`
   query GetVulnData(
@@ -3214,25 +3198,6 @@ export const GetSignedComponentData = gql`
             updatedAt
           }
         }
-      }
-    }
-  }
-`
-
-// GET COMPONENT FILTER DATA
-export const GetSignedCompFilterData = gql`
-  query GetSignedCompFilterData(
-    $projectId: Uuid!
-    $sbomId: Uuid!
-    $signedParams: String!
-  ) {
-    sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
-      id
-      filters {
-        ecosystems
-        supplierNames
-        kinds
-        licenses
       }
     }
   }
