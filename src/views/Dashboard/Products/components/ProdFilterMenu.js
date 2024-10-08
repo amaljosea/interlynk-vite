@@ -136,7 +136,7 @@ const ProdFilterMenu = ({
                 <MenuItemOption
                   key={index}
                   fontSize={'sm'}
-                  value={(item?.id, 1)}
+                  value={item?.id}
                   wordBreak={'break-all'}
                   onClick={(e) => handleMenuClick(e, item?.name)}
                   icon={
