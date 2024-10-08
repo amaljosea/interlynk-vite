@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     timeout-minutes: 60
-    runs-on: ubuntu-latest  # Switched to Linux (Ubuntu)
+    runs-on: ubuntu-latest  # Using Linux (Ubuntu)
 
     # Define environment variables (use secrets for sensitive info)
     env:
@@ -34,6 +34,14 @@ jobs:
         PLAYWRIGHT_TEST_URL: ${{ env.PLAYWRIGHT_TEST_URL }}
         PLAYWRIGHT_USER_EMAIL: ${{ env.PLAYWRIGHT_USER_EMAIL }}
         PLAYWRIGHT_USER_PASSWORD: ${{ env.PLAYWRIGHT_USER_PASSWORD }}
+
+   # Notify Slack on Failure
+    - name: Notify Slack on Failure
+      if: failure()
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{"text":"E2E Playwright Tests have failed! Check the GitHub Actions logs for more details."}' \
+        https://hooks.slack.com/services/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
 
     - uses: actions/upload-artifact@v4
       if: always()
