@@ -35,9 +35,9 @@ jobs:
         PLAYWRIGHT_USER_EMAIL: ${{ env.PLAYWRIGHT_USER_EMAIL }}
         PLAYWRIGHT_USER_PASSWORD: ${{ env.PLAYWRIGHT_USER_PASSWORD }}
 
-   # Notify Slack on Failure
-    - name: Notify Slack on Failure
-      if: failure()
+    # Notify Slack on Failure
+    - name: Notify Slack on Failure (Scheduled Runs Only)
+      if: failure() && github.event_name == 'schedule' 
       run: |
         curl -X POST -H 'Content-type: application/json' \
         --data '{"text":"E2E Playwright Tests have failed! Check the GitHub Actions logs for more details."}' \
