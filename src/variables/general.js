@@ -777,6 +777,99 @@ export const infoData = [
   }
 ]
 
+export const pkgData = [
+  {
+    title: `Deprecated`,
+    desc: `If the entire package has been marked deprecated by the package manager`
+  },
+  {
+    title: `Last Updated`,
+    desc: `The date and time of the last update made on this package in the package manager`
+  }
+]
+
+export const pkgVersionData = [
+  {
+    title: `License`,
+    desc: `License declaration associated with the package version`
+  },
+  {
+    title: `Deprecated`,
+    desc: `If this version of the package has been marked deprecated by the package owner`
+  },
+  {
+    title: `Archived`,
+    desc: `If this version of the package has been marked archived by the package owner`
+  },
+  {
+    title: `Pre-release`,
+    desc: `If this version of the package has been marked pre-released by the package owner`
+  },
+  {
+    title: `Outdated`,
+    desc: `If a newer version of the package exists`
+  },
+  {
+    title: `Most Recent Version`,
+    desc: `The most recent version of this package is available at the package manager`
+  },
+  {
+    title: `Last Updated`,
+    desc: `The date and time of the last update made on this version of the package`
+  }
+]
+
+export const repositoryData = [
+  {
+    title: `Owner`,
+    desc: `The owner associated with the code repository`
+  },
+  {
+    title: `Description`,
+    desc: `The description text associated with the code repository`
+  },
+  {
+    title: `Source Archived`,
+    desc: `If the source code repository is archived`
+  },
+  {
+    title: `Stars`,
+    desc: `Count of stars on the code repository`
+  },
+  {
+    title: `Forks`,
+    desc: `Count of forks on the code repository`
+  },
+  {
+    title: `Watchers`,
+    desc: `Count of watchers on the code repository`
+  },
+  {
+    title: `Contibutors`,
+    desc: `Count of contributors to the code repository`
+  },
+  {
+    title: `Relases`,
+    desc: `Number of releases associated with the code repository`
+  },
+  {
+    title: `Issues`,
+    desc: `Number of issues associated with the code repository`
+  },
+  {
+    title: `OpenSSF Scorecard`,
+    desc: `OpenSSF Scorecard is an automated tool that assesses a number of important heuristics associated with software security`
+  },
+  {
+    title: `License`,
+    desc: `License declaration associated with the code repository`
+  },
+  {
+    title: `Last Updated`,
+    desc: `The date and time of the last update associated with the code repository`
+  }
+]
+
 export const complianceData = [
   {
     title: `Timestamp`,

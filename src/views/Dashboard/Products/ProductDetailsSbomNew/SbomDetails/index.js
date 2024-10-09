@@ -2,7 +2,6 @@ import { useLazyQuery, useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince, truncatedValue } from 'utils'
-import { getSignedUrlParams } from 'utils'
 import SbomActions from 'views/Sbom/components/SbomActions'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
@@ -76,7 +75,8 @@ const SbomDetails = ({ sbomData }) => {
     primaryComponent,
     vulnRunStatus,
     updatedAt,
-    lifecycle
+    lifecycle,
+    healthScore
   } = sbomData || ''
   const { name, version, description } = primaryComponent || ''
 
@@ -124,11 +124,7 @@ const SbomDetails = ({ sbomData }) => {
     partsContext.pop()
   }
 
-  const {
-    qualityScore,
-    healthScore,
-    loading: scoreLoading
-  } = useSbomScores({
+  const { qualityScore, loading: scoreLoading } = useSbomScores({
     sbomId,
     projectId: projectId,
     skip: !shouldShowDemoFeatures
@@ -315,22 +311,20 @@ const SbomDetails = ({ sbomData }) => {
                 </CardBody>
               </Card>
             </GridItem>
-            <GridItem colSpan={shouldShowDemoFeatures ? 4 : 8}>
+            <GridItem colSpan={4}>
               <ProgressBar
                 value={qualityScore}
                 loading={scoreLoading}
                 text='SBOM Quality Score'
               />
             </GridItem>
-            {shouldShowDemoFeatures && (
-              <GridItem colSpan={4}>
-                <ProgressBar
-                  value={healthScore}
-                  loading={scoreLoading}
-                  text='Version Health Score'
-                />
-              </GridItem>
-            )}
+            <GridItem colSpan={4}>
+              <ProgressBar
+                value={healthScore}
+                loading={scoreLoading}
+                text='Version Health Score'
+              />
+            </GridItem>
           </Grid>
         </Flex>
       </Flex>

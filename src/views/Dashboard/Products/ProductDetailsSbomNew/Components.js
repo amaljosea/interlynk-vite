@@ -249,9 +249,11 @@ const Components = ({ sbomData }) => {
               sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}
             >
               {/* COMPONENT NAME */}
-              <Text color={primaryTextColor} data-tag='allowRowEvents'>
-                {name}
-              </Text>
+              <Tooltip label={name}>
+                <Text color={primaryTextColor} data-tag='allowRowEvents'>
+                  {truncatedValue(name, 30)}
+                </Text>
+              </Tooltip>
               {isPart && (
                 <Text
                   sx={{
@@ -294,7 +296,7 @@ const Components = ({ sbomData }) => {
           </Flex>
         )
       },
-      width: '30%',
+      width: '25%',
       wrap: true,
       sortable: true
     },
@@ -304,24 +306,18 @@ const Components = ({ sbomData }) => {
       name: 'VERSION',
       selector: (row) => <Text color={primaryTextColor}>{row?.version}</Text>,
       wrap: true,
-      width: '12%',
+      width: '10%',
       sortable: true
     },
     // COMPONENT HEALTH
     {
       id: 'COMPONENTS_HEALTH',
       name: 'HEALTH',
-      omit: !shouldShowDemoFeatures,
       selector: (row) => {
-        const { name, version } = row
-        const score = getComponentHealthScoreFromLocalData({
-          componentName: name,
-          componentVersion: version
-        }).healthScore
-        return <HealthScore isComponent value={score} />
+        const { healthScore } = row
+        return <HealthScore isComponent value={healthScore} />
       },
-      width: '12%',
-      right: 'true'
+      width: '10%'
     },
     // IDENTIFIERS
     {

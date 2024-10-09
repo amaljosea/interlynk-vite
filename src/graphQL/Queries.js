@@ -1475,6 +1475,7 @@ export const GetProductData = gql`
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
       updatedAt
+      healthScore
       vulnRunStatus
       projectVersion
       sbomParts {
@@ -1708,6 +1709,7 @@ export const GetComponentData = gql`
           licensesExp
           group
           scope
+          healthScore
           endOfSupport
           supportLevel
           externalUrls {
@@ -4881,6 +4883,7 @@ export const GetEnrichedData = gql`
     component(id: $id, sbomId: $sbomId) {
       name
       version
+      healthScore
       enrichedContent {
         package {
           purl
