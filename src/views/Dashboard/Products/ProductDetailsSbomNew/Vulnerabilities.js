@@ -785,6 +785,15 @@ const Vulnerabilities = ({ sbomData }) => {
                     Edit Links
                   </MenuItem>
                   <MenuItem
+                    isDisabled={!editVulns}
+                    onClick={() => {
+                      setActiveRow(row)
+                      HISTORY.onOpen()
+                    }}
+                  >
+                    Status History
+                  </MenuItem>
+                  <MenuItem
                     hidden={isFreeTier}
                     isDisabled={!updateCon}
                     onClick={() => handleJiraTicket(row)}
