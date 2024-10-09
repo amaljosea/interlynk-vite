@@ -771,7 +771,7 @@ const Components = ({ sbomData }) => {
                     size={'md'}
                     variant='subtle'
                     colorScheme='green'
-                    width={'fit-content'}
+                    sx={{ py: 1, w: 'fit-content' }}
                   >
                     <Text wordBreak={'break-all'}>{item}</Text>
                   </Tag>
@@ -782,7 +782,7 @@ const Components = ({ sbomData }) => {
                   size={'md'}
                   variant='subtle'
                   colorScheme='green'
-                  width={'fit-content'}
+                  sx={{ py: 1, w: 'fit-content' }}
                 >
                   <Text wordBreak={'break-all'}>{licensesExp}</Text>
                 </Tag>
@@ -795,7 +795,7 @@ const Components = ({ sbomData }) => {
                     size={'md'}
                     variant='subtle'
                     colorScheme='green'
-                    width={'fit-content'}
+                    sx={{ py: 1, w: 'fit-content' }}
                   >
                     <Text wordBreak={'break-all'}>{item}</Text>
                   </Tag>
