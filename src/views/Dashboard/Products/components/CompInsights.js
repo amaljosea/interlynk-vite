@@ -4,8 +4,8 @@ import { useParams } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import { pkgData, pkgVersionData, repositoryData } from 'variables/general'
 
-import { Divider, Flex, Skeleton, Stack, Tooltip } from '@chakra-ui/react'
-import { Tag, TagLabel, Text } from '@chakra-ui/react'
+import { Divider, Flex, Skeleton, Spacer, Stack } from '@chakra-ui/react'
+import { Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 import {
   Drawer,
   DrawerBody,
@@ -68,9 +68,14 @@ const CompInsights = ({ isOpen, onClose, id }) => {
     }
   }
 
-  const sbomLicense = packageVersion?.license
-    ? JSON.parse(packageVersion?.license)
-    : []
+  const getLicense = (item) => {
+    const result = JSON.parse(item)
+    if (result?.length > 0) {
+      return result[0]?.name
+    } else {
+      return ''
+    }
+  }
 
   return (
     <Drawer size='md' isOpen={isOpen} placement='right' onClose={onClose}>
@@ -88,7 +93,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
             </Flex>
           )}
         </DrawerHeader>
-        <DrawerBody>
+        <DrawerBody pb={5}>
           {loading ? (
             <CustomLoader />
           ) : (
@@ -126,7 +131,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                     </Tooltip>
                     <Tag colorScheme='blue' maxW={'300px'}>
                       <TagLabel fontSize={'xs'}>
-                        {sbomLicense?.length > 0 ? sbomLicense[0].name : ''}
+                        {getLicense(packageVersion?.license)}
                       </TagLabel>
                     </Tag>
                   </Container>
@@ -193,7 +198,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                     <Tooltip label={onCheck('repository', 'Description')}>
                       <Label>Description</Label>
                     </Tooltip>
-                    <Text>{repository?.description}</Text>
+                    <Text textAlign={'right'}>{repository?.description}</Text>
                   </Container>
                   <Container>
                     <Tooltip label={onCheck('repository', 'Source Archived')}>
@@ -229,13 +234,13 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                     <Tooltip label={onCheck('repository', 'Relases')}>
                       <Label>Relases</Label>
                     </Tooltip>
-                    <Text>{repository?.releases}</Text>
+                    <Text>{JSON.stringify(repository?.releases)}</Text>
                   </Container>
                   <Container>
                     <Tooltip label={onCheck('repository', 'Issues')}>
                       <Label>Issues</Label>
                     </Tooltip>
-                    <Text>{repository?.issues}</Text>
+                    <Text>{JSON.stringify(repository?.issues)}</Text>
                   </Container>
                   <Container>
                     <Tooltip label={onCheck('repository', 'OpenSSF Scorecard')}>
@@ -247,7 +252,11 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                     <Tooltip label={onCheck('repository', 'License')}>
                       <Label>License</Label>
                     </Tooltip>
-                    <Text>{repository?.license}</Text>
+                    <Tag colorScheme='blue' maxW={'300px'}>
+                      <TagLabel fontSize={'xs'}>
+                        {getLicense(repository?.license)}
+                      </TagLabel>
+                    </Tag>
                   </Container>
                   <Container>
                     <Tooltip label={onCheck('repository', 'Last Updated')}>
@@ -261,6 +270,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
               )}
             </Flex>
           )}
+          <Spacer mt={4} />
         </DrawerBody>
       </DrawerContent>
     </Drawer>
