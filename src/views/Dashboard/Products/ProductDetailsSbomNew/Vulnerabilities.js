@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, linkURl, sevColor } from 'utils'
@@ -65,7 +65,6 @@ import { ManualVulnScan } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
   GetCdxResponses,
-  GetDefaultJiraProduct,
   GetOrgConnections,
   GetVulnData,
   GetVulnFilterData,
@@ -286,11 +285,9 @@ const Vulnerabilities = ({ sbomData }) => {
     fetchPolicy: 'network-only'
   })
 
-  const { data: settings } = useQuery(GetDefaultJiraProduct, {
-    variables: { id: productId }
-  })
-
-  const [jiraConfigWarning, setJiraConfigWarning] = useState(false)
+  const jiraConnection = configs?.organization?.connections?.nodes?.find(
+    (item) => item?.connection?.__typename === 'JiraConnection'
+  )
 
   const { showToast } = useCustomToast()
   const sbomId = params.sbomid
@@ -438,6 +435,30 @@ const Vulnerabilities = ({ sbomData }) => {
   const onGlobalView = (id, vuln) => {
     localStorage.setItem('activeVuln', vuln)
     navigate(`/vendor/vulnerabilities?vulnId=${id}`)
+  }
+
+  const handleJiraTicket = (row) => {
+    const issueTracker = row?.externalUrls?.some(
+      (item) => item?.name === 'issue-tracker' && item?.url !== ''
+    )
+    if (issueTracker) {
+      showToast({
+        status: 'error',
+        title: 'Issue already exists'
+      })
+    } else {
+      if (jiraConnection?.enabled === true) {
+        setActiveRow(row)
+        JIRA.onOpen()
+      } else {
+        showToast({
+          status: 'error',
+          title: 'Jira Configuration not set.',
+          description:
+            'Please configure Jira connections in the Organization Settings -> Connections.'
+        })
+      }
+    }
   }
 
   // COLUMNS
@@ -723,8 +744,6 @@ const Vulnerabilities = ({ sbomData }) => {
         const issueTracker = isPart
           ? currentExternalUrls?.find((item) => item.name === 'issue-tracker')
           : externalUrls?.find((item) => item.name === 'issue-tracker')
-        const onCheck = (item) => (item ? primaryBlueText : primaryTextColor)
-        const url = issueTracker?.url
         return (
           <Flex alignItems={'center'} gap={2}>
             {/* advisories */}
@@ -766,50 +785,12 @@ const Vulnerabilities = ({ sbomData }) => {
                     Edit Links
                   </MenuItem>
                   <MenuItem
-                    isDisabled={!editVulns}
-                    onClick={() => {
-                      setActiveRow(row)
-                      HISTORY.onOpen()
-                    }}
+                    hidden={isFreeTier}
+                    isDisabled={!updateCon}
+                    onClick={() => handleJiraTicket(row)}
                   >
-                    Status History
+                    Create Jira Ticket
                   </MenuItem>
-                  {row?.externalUrls?.find(
-                    (externalUrl) => externalUrl.name === 'issue-tracker'
-                  ) ? (
-                    <MenuItem
-                      hidden={isFreeTier}
-                      isDisabled={!updateCon}
-                      onClick={() => {
-                        window.open(
-                          url?.startsWith('http') ? `${url}` : `http://${url}`,
-                          '_blank'
-                        )
-                      }}
-                    >
-                      View Jira Ticket
-                    </MenuItem>
-                  ) : (
-                    <MenuItem
-                      hidden={isFreeTier}
-                      isDisabled={!updateCon}
-                      onClick={() => {
-                        if (jiraConfigWarning) {
-                          showToast({
-                            title: 'Jira Configuration not set.',
-                            description:
-                              'Please configure Jira connections in the Organization Settings -> Connections.',
-                            status: 'error'
-                          })
-                        } else {
-                          setActiveRow(row)
-                          JIRA.onOpen()
-                        }
-                      }}
-                    >
-                      Create Jira Ticket
-                    </MenuItem>
-                  )}
                 </MenuList>
               </Portal>
             </Menu>
@@ -974,14 +955,6 @@ const Vulnerabilities = ({ sbomData }) => {
 
   const onCvssOpen = () => CVSS.onOpen()
 
-  useEffect(() => {
-    if (configs) {
-      if (!configs?.organization?.connections?.nodes[0]?.connection) {
-        setJiraConfigWarning(true)
-      }
-    }
-  }, [configs])
-
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
@@ -1031,7 +1004,6 @@ const Vulnerabilities = ({ sbomData }) => {
           isOpen={JIRA.isOpen}
           onClose={JIRA.onClose}
           row={activeRow}
-          defaultProject={settings?.project?.projectSetting?.jiraProject}
         />
       )}
       {/* COPY DATA TABLE */}

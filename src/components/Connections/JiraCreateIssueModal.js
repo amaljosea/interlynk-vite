@@ -1,5 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 import { FormControl, FormLabel, Grid, Input, Textarea } from '@chakra-ui/react'
 
@@ -7,25 +8,33 @@ import LynkModal from 'components/LynkModal'
 import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 
 import { CreateJiraIssue } from 'graphQL/Mutation'
 import { GetJiraOptions, GetJiraProjects } from 'graphQL/Queries'
+import { GetDefaultJiraProduct } from 'graphQL/Queries'
 
 import { FaJira } from 'react-icons/fa6'
 
-const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
-  const { orgView } = useGlobalQueryContext()
+const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
+  const params = useParams()
+
   const { data: projectOptions } = useQuery(GetJiraProjects, {
-    skip: !orgView,
+    skip: isOpen ? false : true,
     fetchPolicy: 'network-only'
   })
+
+  const { data: settings } = useQuery(GetDefaultJiraProduct, {
+    skip: isOpen ? false : true,
+    variables: { id: params.productid }
+  })
+
+  const { jiraProject } = settings?.project?.projectSetting || ''
 
   const [getOptions, { data: options }] = useLazyQuery(GetJiraOptions, {
     fetchPolicy: 'network-only'
   })
 
-  const [createJiraIssue] = useMutation(CreateJiraIssue)
+  const [createJiraIssue, { loading }] = useMutation(CreateJiraIssue)
 
   const { showToast } = useCustomToast()
 
@@ -104,14 +113,14 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
     setSummary(`[Vulnerability]: ${vulnId}`)
 
     setProject({
-      value: defaultProject,
-      label: defaultProject
+      value: jiraProject,
+      label: jiraProject
     })
 
-    if (defaultProject) {
-      getOptions({ variables: { pKey: defaultProject } })
+    if (jiraProject) {
+      getOptions({ variables: { pKey: jiraProject } })
     }
-  }, [defaultProject, getOptions, row])
+  }, [jiraProject, getOptions, row])
 
   useEffect(() => {
     if (summary && project && issueType && reporter && assignee) {
@@ -161,12 +170,12 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
       variables: {
         summary,
         componentVulnId: row?.id,
-        projectKey: project.value,
-        issueTypeId: issueType.value,
-        assignee: assignee.value,
-        reporter: reporter.value,
-        labels: label?.map((l) => l.value),
-        priority: priority.value,
+        projectKey: project?.value,
+        issueTypeId: issueType?.value,
+        assignee: assignee?.value,
+        reporter: reporter?.value,
+        labels: label?.map((l) => l?.value),
+        priority: priority?.value,
         description
       }
     }).then((res) => {
@@ -190,13 +199,14 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row, defaultProject }) => {
 
   return (
     <LynkModal
+      Icon={FaJira}
       isOpen={isOpen}
       onClose={onClose}
+      isLoading={loading}
+      buttonText={'Create'}
       onSubmit={handleCreate}
       title={'Create Jira Issue'}
-      Icon={FaJira}
       disabled={isCreateDisabled}
-      buttonText={'Create'}
     >
       <FormControl isRequired>
         <FormLabel>Summary</FormLabel>
