@@ -15,8 +15,6 @@ import { FaMoon, FaSun } from 'react-icons/fa6'
 import { SearchBar } from './SearchBar'
 import { UserMenu } from './UserMenu'
 
-const REACT_APP_DOMAIN = process.env.REACT_APP_DOMAIN
-
 export default function AdminNavbarLinks(props) {
   const navigate = useNavigate()
   const params = useParams()
@@ -53,7 +51,7 @@ export default function AdminNavbarLinks(props) {
           <Button size='sm' onClick={onStartTour} hidden={!productId}>
             Start Tour
           </Button>
-          <Link to={`https://app.interlynk.io/register`} target='_blank'>
+          <Link to={`/register`} target='_blank'>
             <Button className='signup' colorScheme='blue' size='sm'>
               Sign up
             </Button>
