@@ -4,7 +4,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaFilter } from 'react-icons/fa'
 
-const MenuHeading = ({ title, onClick, active }) => {
+const MenuHeading = ({ title, onClick, active, name }) => {
   const {
     primaryBlueText,
     primaryTextColor,
@@ -35,6 +35,7 @@ const MenuHeading = ({ title, onClick, active }) => {
           color={active ? primaryBlueText : primaryTextColor}
         />
       }
+      name={name}
     >
       {title}
     </MenuButton>

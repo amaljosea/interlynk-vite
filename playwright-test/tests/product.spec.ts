@@ -30,6 +30,14 @@ test('TC_008 Products And Version Switching Test', async ({ page }) => {
   await pp.productsAndVersionSwitchingFunctionality()
 })
 
+test('TC_009 Products Disable and Enable Test', async ({ page }) => {
+  test.setTimeout(120000)
+  const lp = new LoginPage(page)
+  await lp.appLoginCommonFunctionality(email, password)
+  const pp = new ProductPage(page)
+  await pp.productsDisableAndEnableFunctionality()
+})
+
 test.afterEach(async ({ page }) => {
   await page.close()
 })

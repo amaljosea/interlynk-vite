@@ -314,4 +314,193 @@ export default class ProductSection {
       throw error
     }
   }
+
+  public async productsDisableEnable() {
+    try {
+      const productLink = await this.page.locator(ps.productLink).isVisible()
+
+      if (productLink) {
+        await this.page.locator(ps.productLink).click()
+        await waitForSelectorWithMinTime(this.page, ps.productsHeader)
+
+        const productsHeader = await this.page
+          .locator(ps.productsHeader)
+          .isVisible()
+
+        if (productsHeader) {
+          const addProductButton = await this.page
+            .locator(ps.addProductButton)
+            .isVisible()
+
+          if (addProductButton) {
+            await this.page.locator(ps.addProductButton).click()
+            await waitForSelectorWithMinTime(this.page, ps.popup)
+
+            const uniqueId = generateUniqueId()
+
+            const productName = `demo product - ${uniqueId}`
+            await this.page.fill(ps.addProductName, productName)
+            await this.page.fill(
+              ps.addProductDescription,
+              'this is a sample demo product description'
+            )
+            await this.page.locator(ps.saveBtn).click()
+            await waitForSelectorWithMinTime(this.page, ps.productSearch)
+            await this.page.fill(ps.productSearch, productName)
+            await this.page.press(ps.productSearch, 'Enter')
+            await this.page.waitForTimeout(2000)
+
+            const pName = await this.page
+              .locator(ps.productName(productName))
+              .isVisible()
+
+            if (pName) {
+              await this.page.locator(ps.firstProduct).click()
+              await this.page.waitForTimeout(2000)
+              await this.page.locator(ps.statusChangeBtn).click()
+              await this.page.waitForTimeout(2000)
+
+              const disablePoupup = await this.page
+                .locator(ps.popup)
+                .isVisible()
+
+              if (disablePoupup) {
+                const disableProductHeader = await this.page
+                  .locator(ps.disableProductHeader)
+                  .isVisible()
+
+                if (disableProductHeader) {
+                  await this.page.locator(ps.yesBtn).click()
+
+                  const productHeaderText = await this.page
+                    .locator(ps.productNameHeader)
+                    .textContent()
+
+                  if (productHeaderText) {
+                    await this.page.locator(ps.productLink).click()
+                    await waitForSelectorWithMinTime(
+                      this.page,
+                      ps.productsHeader
+                    )
+
+                    const productsHeader = await this.page
+                      .locator(ps.productsHeader)
+                      .isVisible()
+
+                    if (productsHeader) {
+                      await waitForSelectorWithMinTime(
+                        this.page,
+                        ps.productSearch
+                      )
+                      await this.page.fill(ps.productSearch, productName)
+                      await this.page.press(ps.productSearch, 'Enter')
+                      await this.page.waitForTimeout(2000)
+
+                      const noRecordMsg = await this.page
+                        .locator(ps.noRecordMsg)
+                        .isVisible()
+
+                      if (!noRecordMsg) {
+                        errors.push('product disabling failed!')
+                      }
+                      await this.page.locator(ps.activeFilter).click()
+                      await this.page.waitForTimeout(1000)
+
+                      await this.page.locator(ps.activeNoBtn).click()
+                      await this.page.waitForTimeout(1000)
+
+                      const pName = await this.page
+                        .locator(ps.productName(productName))
+                        .isVisible()
+
+                      if (pName) {
+                        await this.page.locator(ps.firstProduct).click()
+                        await this.page.waitForTimeout(2000)
+                        await this.page.locator(ps.statusChangeBtn).click()
+                        await this.page.waitForTimeout(2000)
+
+                        const enablePoupup = await this.page
+                          .locator(ps.popup)
+                          .isVisible()
+
+                        if (enablePoupup) {
+                          const enableProductHeader = await this.page
+                            .locator(ps.enableProductHeader)
+                            .isVisible()
+
+                          if (enableProductHeader) {
+                            await this.page.locator(ps.yesBtn).click()
+
+                            const productHeaderText = await this.page
+                              .locator(ps.productNameHeader)
+                              .textContent()
+
+                            if (productHeaderText) {
+                              await this.page.locator(ps.productLink).click()
+                              await waitForSelectorWithMinTime(
+                                this.page,
+                                ps.productsHeader
+                              )
+
+                              const productsHeader = await this.page
+                                .locator(ps.productsHeader)
+                                .isVisible()
+
+                              if (productsHeader) {
+                                await waitForSelectorWithMinTime(
+                                  this.page,
+                                  ps.productSearch
+                                )
+                                await this.page.fill(
+                                  ps.productSearch,
+                                  productName
+                                )
+                                await this.page.press(ps.productSearch, 'Enter')
+                                await this.page.waitForTimeout(2000)
+
+                                await this.page
+                                  .locator(ps.productName(productName))
+                                  .isVisible()
+
+                                await this.page.locator(ps.activeFilter).click()
+                                await this.page.waitForTimeout(1000)
+
+                                await this.page.locator(ps.activeNoBtn).click()
+                                await this.page.waitForTimeout(1000)
+
+                                const pName = await this.page
+                                  .locator(ps.productName(productName))
+                                  .isVisible()
+
+                                if (pName) {
+                                  errors.push('product enabling failed!')
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          } else {
+            errors.push('add products button not visible!')
+          }
+        } else {
+          errors.push('products header verification failed')
+        }
+      } else {
+        errors.push('product link is not visible properly!')
+      }
+
+      if (errors.length > 0) {
+        throw new Error(`Errors encountered:\n${errors.join('\n')}`)
+      }
+      expect(errors.length).toBe(0)
+    } catch (error) {
+      throw error
+    }
+  }
 }

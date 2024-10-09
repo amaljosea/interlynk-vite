@@ -491,6 +491,7 @@ const ProductDetailsMain = () => {
                       label={enabled ? 'Disable Product' : 'Enable Product'}
                     >
                       <IconButton
+                        name='change_status'
                         colorScheme={'blue'}
                         onClick={WARNING.onOpen}
                         isDisabled={signedUrlParams || !updateProduct}

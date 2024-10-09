@@ -103,7 +103,11 @@ const ProdFilterMenu = ({
       {/* ACTIVE */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
-          <MenuHeading title={'Active'} active={enabled !== undefined} />
+          <MenuHeading
+            title={'Active'}
+            active={enabled !== undefined}
+            name='active_filter'
+          />
           <CustomList
             type='radio'
             onChange={onFilterActive}

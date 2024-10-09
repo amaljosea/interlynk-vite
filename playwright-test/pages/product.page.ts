@@ -17,4 +17,8 @@ export default class ProductPage {
   public async productsAndVersionSwitchingFunctionality() {
     await this.productSection.productsAndVersionSwitching()
   }
+
+  public async productsDisableAndEnableFunctionality() {
+    await this.productSection.productsDisableEnable()
+  }
 }

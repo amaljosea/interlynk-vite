@@ -32,6 +32,7 @@ const CustomList = ({ type, options, value, onChange, loading }) => {
               fontSize={'sm'}
               wordBreak={'break-all'}
               textTransform={'capitalize'}
+              name={item}
             >
               {item?.replace(/_/g, ' ')}
             </MenuItemOption>

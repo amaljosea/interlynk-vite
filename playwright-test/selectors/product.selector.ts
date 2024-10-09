@@ -50,5 +50,10 @@ class ProductSelectors {
   public static versionSelect =
     "(//input[@type='text' and @role='combobox'])[2]"
   public static versionNameElement = "(//p[contains(@class,'chakra-text')])[6]"
+  public static statusChangeBtn = "button[name='change_status']"
+  public static disableProductHeader = "//p[text()='Disable Product']"
+  public static enableProductHeader = "//p[text()='Enable Product']"
+  public static activeFilter = "button[name='active_filter']"
+  public static activeNoBtn = "button[name='no']"
 }
 export { ProductSelectors }
