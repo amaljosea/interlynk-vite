@@ -1,5 +1,5 @@
 /*eslint-disable*/
-import React from 'react'
+import React, { useRef } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 
 import { HamburgerIcon } from '@chakra-ui/icons'
@@ -13,7 +13,6 @@ import {
   DrawerOverlay,
   Flex,
   Link,
-  Spinner,
   Stack,
   Text,
   useDisclosure
@@ -28,55 +27,99 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 function SidebarResponsive(props) {
+  const { logoText, routes, secondary } = props
+
   const { isFreeTier } = useGlobalQueryContext()
-  // to check for active links and opened collapses
-  let location = useLocation()
-  // this is for the rest of the collapses
-  const [state, setState] = React.useState({})
-  const mainPanel = React.useRef()
-  // verifies if routeName is the one active (in browser input)
-  const activeRoute = (routeName) => {
-    return location.pathname === routeName ? 'active' : ''
+  const location = useLocation()
+  const category = location.pathname.split('/')[2]
+
+  const mainPanel = useRef()
+  const { primaryTextColor, secondaryTextColor, secondaryBgColor } =
+    useThemeColor([
+      'primaryTextColor',
+      'secondaryTextColor',
+      'secondaryBgColor'
+    ])
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const btnRef = useRef()
+
+  // function to check if a route is active
+  const isActiveRoute = (routeName) => {
+    const name = routeName.split('/')[2]
+    return location.pathname === routeName || name?.includes(category)
+      ? 'active'
+      : ''
   }
 
-  const routesActual = isFreeTier
-    ? props.routes.filter(
-        (route) =>
-          route.name !== 'Requests' &&
-          route.name !== 'Licenses' &&
-          route.name !== 'Analytics' &&
-          route.name !== 'Support'
+  // Filter routes based on tier status
+  const filteredRoutes = isFreeTier
+    ? routes.filter(
+        ({ name }) =>
+          !['Requests', 'Licenses', 'Analytics', 'Support'].includes(name)
       )
-    : props.routes
+    : routes
+
+  // Generate navigation links
+  const createLinkButton = (prop, isActive) => {
+    const buttonColor = isActive ? primaryTextColor : secondaryTextColor
+    const iconColor = isActive ? 'white' : 'blue.300'
+
+    return (
+      <Button
+        boxSize='initial'
+        justifyContent='flex-start'
+        alignItems='center'
+        bg={isActive ? '' : 'transparent'}
+        mb={{ xl: '12px' }}
+        mx={{ xl: 'auto' }}
+        py='12px'
+        ps={{ sm: '10px', xl: '16px' }}
+        borderRadius='15px'
+        _hover='none'
+        w='100%'
+        _active={{
+          bg: 'inherit',
+          transform: 'none',
+          borderColor: 'transparent'
+        }}
+        _focus={{ boxShadow: 'none' }}
+      >
+        <Flex>
+          {typeof prop.icon === 'string' ? (
+            <Icon>{prop.icon}</Icon>
+          ) : (
+            <IconBox
+              bg={isActive ? 'blue.300' : secondaryBgColor}
+              color={iconColor}
+              h='36px'
+              w='36px'
+              me='12px'
+            >
+              {prop.icon}
+            </IconBox>
+          )}
+          <Text color={buttonColor} my='auto' fontSize='sm'>
+            {document.documentElement.dir === 'rtl' ? prop.rtlName : prop.name}
+          </Text>
+        </Flex>
+      </Button>
+    )
+  }
 
   const createLinks = (routes) => {
-    const { primaryTextColor, secondaryTextColor, secondaryBgColor } =
-      useThemeColor([
-        'primaryTextColor',
-        'secondaryTextColor',
-        'secondaryBgColor'
-      ])
+    return routes.map((prop) => {
+      if (prop.redirect) return null
 
-    return routes.map((prop, key) => {
-      if (prop.redirect) {
-        return null
-      }
       if (prop.category) {
-        var st = {}
-        st[prop['state']] = !state[prop.state]
         return (
           <div key={prop.name}>
             <Text
               color={primaryTextColor}
               fontWeight='bold'
-              mb={{
-                xl: '12px'
-              }}
+              mb={{ xl: '12px' }}
               mx='auto'
-              ps={{
-                sm: '10px',
-                xl: '16px'
-              }}
+              ps={{ sm: '10px', xl: '16px' }}
               py='12px'
             >
               {document.documentElement.dir === 'rtl'
@@ -88,126 +131,23 @@ function SidebarResponsive(props) {
         )
       }
 
+      const routePath = prop.layout + prop.path
+      const isActive = isActiveRoute(routePath) === 'active'
+
       return (
-        <NavLink to={prop.layout + prop.path} key={prop.name}>
-          {activeRoute(prop.layout + prop.path) === 'active' ? (
-            <Button
-              boxSize='initial'
-              justifyContent='flex-start'
-              alignItems='center'
-              bg={''}
-              mb={{
-                xl: '12px'
-              }}
-              mx={{
-                xl: 'auto'
-              }}
-              ps={{
-                sm: '10px',
-                xl: '16px'
-              }}
-              py='12px'
-              borderRadius='15px'
-              _hover='none'
-              w='100%'
-              _active={{
-                bg: 'inherit',
-                transform: 'none',
-                borderColor: 'transparent'
-              }}
-              _focus={{
-                boxShadow: 'none'
-              }}
-            >
-              <Flex>
-                {typeof prop.icon === 'string' ? (
-                  <Icon>{prop.icon}</Icon>
-                ) : (
-                  <IconBox
-                    bg='blue.300'
-                    color='white'
-                    h='36px'
-                    w='36px'
-                    me='12px'
-                  >
-                    {prop.icon}
-                  </IconBox>
-                )}
-                <Text color={primaryTextColor} my='auto' fontSize='sm'>
-                  {document.documentElement.dir === 'rtl'
-                    ? prop.rtlName
-                    : prop.name}
-                </Text>
-              </Flex>
-            </Button>
-          ) : (
-            <Button
-              boxSize='initial'
-              justifyContent='flex-start'
-              alignItems='center'
-              bg='transparent'
-              mb={{
-                xl: '12px'
-              }}
-              mx={{
-                xl: 'auto'
-              }}
-              py='12px'
-              ps={{
-                sm: '10px',
-                xl: '16px'
-              }}
-              borderRadius='15px'
-              _hover='none'
-              w='100%'
-              _active={{
-                bg: 'inherit',
-                transform: 'none',
-                borderColor: 'transparent'
-              }}
-              _focus={{
-                boxShadow: 'none'
-              }}
-            >
-              <Flex>
-                {typeof prop.icon === 'string' ? (
-                  <Icon>{prop.icon}</Icon>
-                ) : (
-                  <IconBox
-                    bg={secondaryBgColor}
-                    color='blue.300'
-                    h='36px'
-                    w='36px'
-                    me='12px'
-                  >
-                    {prop.icon}
-                  </IconBox>
-                )}
-                <Text color={secondaryTextColor} my='auto' fontSize='sm'>
-                  {document.documentElement.dir === 'rtl'
-                    ? prop.rtlName
-                    : prop.name}
-                </Text>
-              </Flex>
-            </Button>
-          )}
+        <NavLink
+          to={routePath}
+          key={prop.name}
+          target={prop.name === 'Documentation' ? '_blank' : '_self'}
+        >
+          {createLinkButton(prop, isActive)}
         </NavLink>
       )
     })
   }
 
-  const { logoText, routes, ...rest } = props
-
-  var links = <>{createLinks(routesActual)}</>
-  //  BRAND
-  //  Chakra Color Mode
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
-  let hamburgerColor = primaryTextColor
-  if (props.secondary === true) {
-    hamburgerColor = 'white'
-  }
-  var brand = (
-    <Box pt={'35px'} mb='8px'>
+  const brand = (
+    <Box pt='35px' mb='8px'>
       <Link
         href={`${process.env.PUBLIC_URL}/#/`}
         target='_blank'
@@ -224,14 +164,12 @@ function SidebarResponsive(props) {
           {logoText}
         </Text>
       </Link>
-      <Separator></Separator>
+      <Separator />
     </Box>
   )
 
-  // SIDEBAR
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const btnRef = React.useRef()
-  // Color variables
+  const hamburgerColor = secondary ? 'white' : primaryTextColor
+
   return (
     <Flex
       display={{ sm: 'flex', xl: 'none' }}
@@ -255,12 +193,8 @@ function SidebarResponsive(props) {
         <DrawerContent
           w='250px'
           maxW='250px'
-          ms={{
-            sm: '16px'
-          }}
-          my={{
-            sm: '16px'
-          }}
+          ms={{ sm: '16px' }}
+          my={{ sm: '16px' }}
           borderRadius='16px'
         >
           <DrawerCloseButton
@@ -271,9 +205,9 @@ function SidebarResponsive(props) {
             <Box maxW='100%' h='100vh'>
               <Box>{brand}</Box>
               <Stack direction='column' mb='40px'>
-                <Box>{links}</Box>
+                <Box>{createLinks(filteredRoutes)}</Box>
               </Stack>
-              <SidebarHelp></SidebarHelp>
+              <SidebarHelp />
             </Box>
           </DrawerBody>
         </DrawerContent>

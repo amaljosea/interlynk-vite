@@ -1,6 +1,7 @@
 import { useTour } from '@reactour/tour'
 import PropTypes from 'prop-types'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { customerRoutes } from 'routes'
 import { dashRoutes } from 'routes.js'
 import { getSignedUrlParams } from 'utils'
 import { logoutUser } from 'utils/authUtils'
@@ -76,7 +77,7 @@ export default function AdminNavbarLinks(props) {
       <SidebarResponsive
         logoText={props.logoText}
         secondary={props.secondary}
-        routes={dashRoutes}
+        routes={signedUrlParams ? customerRoutes : dashRoutes}
         {...props}
       />
     </Flex>

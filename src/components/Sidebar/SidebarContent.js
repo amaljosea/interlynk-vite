@@ -16,15 +16,14 @@ const SidebarContent = ({ routes }) => {
   const location = useLocation()
   const dashboardView = location.pathname === '/vendor/dashboard'
   const signedUrlParams = getSignedUrlParams()
-  const urlParts = location.pathname.split('/')
-  const category = urlParts[2]
-
+  const category = location.pathname.split('/')[2]
   const { organization } = useGlobalState()
-  const [routesActual, setRoutesActual] = useState([])
+  const [filteredRoutes, setFilteredRoutes] = useState([])
 
-  const handleClick = (prop) => {
-    ReactGA.send({ hitType: 'pageview', page: prop.path, title: prop.name })
-  }
+  const { primaryBlueText, secondaryBgColor } = useThemeColor([
+    'primaryBlueText',
+    'secondaryBgColor'
+  ])
 
   useEffect(() => {
     // Filter routes based on the active user and free tier status
@@ -32,61 +31,53 @@ const SidebarContent = ({ routes }) => {
     const updatedRoutes = isFreeTier
       ? routes.filter(
           (route) =>
-            route.name !== 'Requests' &&
-            route.name !== 'Licenses' &&
-            route.name !== 'Analytics' &&
-            route.name !== 'Support'
+            !['Requests', 'Licenses', 'Analytics', 'Support'].includes(
+              route.name
+            )
         )
       : routes
-    setRoutesActual(updatedRoutes)
+    setFilteredRoutes(updatedRoutes)
   }, [organization, routes])
 
-  const { primaryBlueText, secondaryBgColor } = useThemeColor([
-    'primaryBlueText',
-    'secondaryBgColor'
-  ])
-
-  const activeRoute = (routeName) => {
-    const parts = routeName.split('/')
-    const name = parts[2]
-    if (routeName === '/customer/') {
-      return 'active'
-    } else if (name?.includes(category)) {
-      return 'active'
-    }
+  const handleClick = (route) => {
+    ReactGA.send({ hitType: 'pageview', page: route.path, title: route.name })
   }
 
-  const createLinks = (routes) => {
-    return routes.map((prop) => {
-      const { name, path, layout, icon } = prop || ''
-      const isActive = activeRoute(layout + path) === 'active'
-      return (
-        <Tooltip key={name} label={name} placement='right'>
-          <Link
-            className={dashboardView ? name.toLowerCase() : ''}
-            to={
-              path === '/settings'
-                ? `${layout}${path}?tab=${!organization ? 'organization' : 'users'}`
-                : layout + path
-            }
-            onClick={() => handleClick(prop)}
-            target={name === 'Documentation' ? '_blank' : '_self'}
+  const isActiveRoute = (routeName) => {
+    const name = routeName.split('/')[2]
+    return routeName === '/customer/' || name?.includes(category)
+      ? 'active'
+      : ''
+  }
+
+  const renderLink = (route) => {
+    const { name, path, layout, icon } = route
+    const isActive = isActiveRoute(layout + path) === 'active'
+    const toPath =
+      path === '/settings'
+        ? `${layout}${path}?tab=${!organization ? 'organization' : 'users'}`
+        : layout + path
+
+    return (
+      <Tooltip key={name} label={name} placement='right'>
+        <Link
+          className={dashboardView ? name.toLowerCase() : ''}
+          to={toPath}
+          onClick={() => handleClick(route)}
+          target={name === 'Documentation' ? '_blank' : '_self'}
+        >
+          <IconBox
+            h={'40px'}
+            w={'40px'}
+            color={isActive ? 'white' : primaryBlueText}
+            bg={isActive ? primaryBlueText : secondaryBgColor}
           >
-            <IconBox
-              h={'40px'}
-              w={'40px'}
-              color={isActive ? 'white' : primaryBlueText}
-              bg={isActive ? primaryBlueText : secondaryBgColor}
-            >
-              {icon}
-            </IconBox>
-          </Link>
-        </Tooltip>
-      )
-    })
+            {icon}
+          </IconBox>
+        </Link>
+      </Tooltip>
+    )
   }
-
-  const links = createLinks(routesActual)
 
   return (
     <Flex gap={4} py={5} flexDirection={'column'} alignItems={'center'}>
@@ -100,7 +91,7 @@ const SidebarContent = ({ routes }) => {
         flexDirection={'column'}
         justifyContent={'center'}
       >
-        {links}
+        {filteredRoutes.map(renderLink)}
       </Flex>
       <SidebarHelp />
     </Flex>
