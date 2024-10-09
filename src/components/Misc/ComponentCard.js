@@ -72,8 +72,8 @@ const ComponentCard = ({ value, isOpen, onClose }) => {
   useEffect(() => {
     if (purl) {
       try {
-        PackageURL.fromString(purl)
-        setPkg(true)
+        const result = PackageURL.fromString(purl)
+        setPkg(result)
       } catch (ex) {
         console.error('ex', ex)
       }
