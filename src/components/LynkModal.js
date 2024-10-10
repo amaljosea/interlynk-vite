@@ -103,7 +103,6 @@ const LynkModal = ({
                 </Button>
                 <Button
                   type='submit'
-                  aria-label='submit'
                   minWidth={!isLoading && 93}
                   isDisabled={isDisabled}
                   colorScheme={buttonColor ?? colorScheme}

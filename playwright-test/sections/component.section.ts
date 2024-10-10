@@ -46,7 +46,7 @@ export default class ComponentSection {
           await this.page
             .getByPlaceholder('Add product description')
             .fill('for testing')
-          await this.page.locator("button[aria-label='submit']").click()
+          await this.page.locator("button[type='submit']").click()
         }
       } else {
         errors.push('Product menu not found')
@@ -90,7 +90,7 @@ export default class ComponentSection {
           const jsonFiles = getFileNamesFromResource('.json')
           const filePath = path.resolve(__dirname, '../resources', jsonFiles[0])
           this.page.locator("//input[@id='fileInput']").setInputFiles(filePath)
-          await this.page.locator("button[aria-label='submit']").click()
+          await this.page.locator("button[type='submit']").click()
           await this.page
             .locator("(//button[@aria-label='refresh'])[1]")
             .click()
