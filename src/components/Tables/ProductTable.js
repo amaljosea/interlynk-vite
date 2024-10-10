@@ -453,6 +453,7 @@ const ProductTable = ({
                   cursor={'pointer'}
                   width={'fit-content'}
                   onClick={handleClick}
+                  aria-label='product_name'
                 >
                   {name?.length > 54 ? (
                     <Tooltip label={name}>{truncatedValue(name, 54)}</Tooltip>

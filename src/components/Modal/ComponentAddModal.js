@@ -436,8 +436,9 @@ function ComponentAddModal(props) {
                 </FormLabel>
                 <Select
                   name='kind'
-                  value={details?.kind}
+                  aria-label='kind'
                   sx={inputStyle}
+                  value={details?.kind}
                   isDisabled={customerView}
                   textTransform={'capitalize'}
                   onChange={(e) =>

@@ -14,6 +14,7 @@ const RefreshBtn = ({ onClick }) => {
             onClick()
           }
         }}
+        aria-label='refresh'
         colorScheme='blue'
         icon={<RepeatIcon />}
       ></IconButton>

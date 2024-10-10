@@ -27,6 +27,7 @@ const LynkDate = (props) => {
       closeOnSelect={true}
       className={react_datatime}
       inputProps={{
+        name: props?.name,
         placeholder: 'Select Date',
         onBlur: () => setFocus(false),
         onFocus: () => setFocus(true),

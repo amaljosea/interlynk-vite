@@ -191,6 +191,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
           </FormLabel>
           {/* LICENSE */}
           <LynkSelect
+            name='license'
             isClearable={resolved ? false : true}
             isSearchable={resolved ? false : true}
             isDisabled={signedUrlParams}

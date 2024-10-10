@@ -1,14 +1,9 @@
 import * as dotenv from 'dotenv'
 import { Page, expect } from '@playwright/test'
-import { cp } from 'fs'
 
 import { LabelSelectors as ls } from '../selectors/label.selector'
 import { ProductSelectors as ps } from '../selectors/product.selector'
-import {
-  generateUniqueId,
-  getRandomNumberBetween,
-  waitForSelectorWithMinTime
-} from '../utils/utils'
+import { generateUniqueId, waitForSelectorWithMinTime } from '../utils/utils'
 
 dotenv.config({ path: '.env' })
 

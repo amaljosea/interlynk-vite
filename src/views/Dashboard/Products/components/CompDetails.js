@@ -372,7 +372,7 @@ const CompDetails = ({ data, primaryComp }) => {
         </FormControl>
         {/* SUPPRT LEVEL */}
         <FormControl hidden={customerView}>
-          <FormLabel htmlFor='compScope'>
+          <FormLabel htmlFor='supportLevel'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>Support Level</Text>
               <Tooltip label={onCheck(`Support Level`)}>
@@ -408,7 +408,11 @@ const CompDetails = ({ data, primaryComp }) => {
               </Tooltip>
             </Flex>
           </FormLabel>
-          <LynkDate value={details?.endOfSupport} onChange={handleDateChange} />
+          <LynkDate
+            name='endOfSupport'
+            value={details?.endOfSupport}
+            onChange={handleDateChange}
+          />
           {!isValidDate && (
             <FormErrorMessage>Please enter a valid datetime</FormErrorMessage>
           )}

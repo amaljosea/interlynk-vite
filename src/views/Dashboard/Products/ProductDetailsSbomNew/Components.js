@@ -518,14 +518,15 @@ const Components = ({ sbomData }) => {
               <Menu>
                 <MenuButton
                   as={IconButton}
-                  aria-label='Options'
                   icon={<FaEllipsisV />}
                   variant='none'
                   color={secondaryTextColor}
+                  data-testid='component-actions'
                 />
                 <Portal>
                   <MenuList fontSize={'sm'}>
                     <MenuItem
+                      className='edit_component'
                       onClick={() => onEditOpen(row)}
                       isDisabled={status === 'signed' || !updateComponent}
                     >
@@ -567,6 +568,7 @@ const Components = ({ sbomData }) => {
                           !updateComponent ||
                           totalComp?.length === 1
                         }
+                        className='delete_component'
                       >
                         Delete
                       </MenuItem>
@@ -904,6 +906,7 @@ const Components = ({ sbomData }) => {
               icon={<AddIcon />}
               colorScheme='blue'
               variant='solid'
+              name='add_component'
               isDisabled={restricted}
               hidden={signedUrlParams || isArchived}
               sx={{ fontSize: 'sm', fontWeight: 'normal' }}

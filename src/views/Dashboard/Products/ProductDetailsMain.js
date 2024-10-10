@@ -484,6 +484,7 @@ const ProductDetailsMain = () => {
                         colorScheme='blue'
                         onClick={UPLOAD.onOpen}
                         icon={<FaUpload />}
+                        data-testid='upload_sbom'
                       />
                     </Tooltip>
                     {/* UPDATE PRODUCT STATUS */}

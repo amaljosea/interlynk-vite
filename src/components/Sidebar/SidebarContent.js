@@ -61,14 +61,14 @@ const SidebarContent = ({ routes }) => {
     return (
       <Tooltip key={name} label={name} placement='right'>
         <Link
-          className={dashboardView ? name.toLowerCase() : ''}
           to={toPath}
+          aria-label={name.toLowerCase()}
           onClick={() => handleClick(route)}
+          className={dashboardView ? name.toLowerCase() : ''}
           target={name === 'Documentation' ? '_blank' : '_self'}
         >
           <IconBox
-            h={'40px'}
-            w={'40px'}
+            sx={{ w: '40px', h: '40px' }}
             color={isActive ? 'white' : primaryBlueText}
             bg={isActive ? primaryBlueText : secondaryBgColor}
           >

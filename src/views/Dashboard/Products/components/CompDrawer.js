@@ -84,6 +84,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
                   py={3.5}
                   key={index}
                   fontSize={'sm'}
+                  name={item}
                   textTransform={'capitalize'}
                   _focus={{ outline: 'none', bg: 'none' }}
                 >
