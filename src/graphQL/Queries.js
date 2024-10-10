@@ -2796,19 +2796,44 @@ export const DownloadSBOM = gql`
     $projectId: Uuid!
     $sbomId: Uuid!
     $includeVulns: Boolean
+    $spec: SbomSpec
+    $original: Boolean
+    $package: Boolean
+    $lite: Boolean
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
-      download(sbomId: $sbomId, includeVulns: $includeVulns)
+      download(
+        sbomId: $sbomId
+        includeVulns: $includeVulns
+        spec: $spec
+        original: $original
+        dontPackageSbom: $package
+        lite: $lite
+      )
     }
   }
 `
 
 // DOWNLOAD SBOM FROM PUBLIC SITE
 export const SignedSbomDownload = gql`
-  query SignedSbomDownload($sbomId: Uuid!, $includeVulns: Boolean) {
+  query SignedSbomDownload(
+    $sbomId: Uuid!
+    $includeVulns: Boolean
+    $spec: SbomSpec
+    $original: Boolean
+    $package: Boolean
+    $lite: Boolean
+  ) {
     shareLynkQuery {
       sbom(id: $sbomId) {
-        download(sbomId: $sbomId, includeVulns: $includeVulns)
+        download(
+          sbomId: $sbomId
+          includeVulns: $includeVulns
+          spec: $spec
+          original: $original
+          dontPackageSbom: $package
+          lite: $lite
+        )
       }
     }
   }

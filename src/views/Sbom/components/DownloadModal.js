@@ -1,7 +1,6 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useState } from 'react'
-import { truncatedValue } from 'utils'
-import { getSignedUrlParams } from 'utils'
+import { getSignedUrlParams, truncatedValue } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
 import {
@@ -25,11 +24,8 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import {
-  DownloadSBOM,
-  GetSbomQualityScores,
-  SignedSbomDownload
-} from 'graphQL/Queries'
+import { GetSbomQualityScores, SignedSbomDownload } from 'graphQL/Queries'
+import { DownloadSBOM } from 'graphQL/Queries'
 
 import ComplianceChecks from './ComplianceChecks'
 
@@ -38,15 +34,17 @@ const DownloadModal = (props) => {
     props || ''
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
-  const activeUser = organization?.currentUser?.email
+  const { superAdmin } = organization?.currentUser || ''
   const signedUrlParams = getSignedUrlParams()
   const [getData] = useLazyQuery(
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
   )
 
-  const [spec, setSpec] = useState('cyclonedx')
+  const [spec, setSpec] = useState('CycloneDX')
   const [format, setFormat] = useState('json')
   const [includeVulns, setIncludeVulns] = useState(false)
+  const [original, setOriginal] = useState(false)
+  const [encoded, setEncoded] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const { data: ntia, loading: ntiaLoading } = useQuery(GetSbomQualityScores, {
@@ -61,16 +59,21 @@ const DownloadModal = (props) => {
   const { nodes: ntiaData } = ntia?.complianceReports || ''
   const { nodes: fdaData } = fda?.complianceReports || ''
 
-  const {
-    isOpen: isOpenDetails,
-    onOpen: onOpenDetails,
-    onClose: onCloseDetails
-  } = useDisclosure()
+  const DETAILS = useDisclosure()
+
+  const onCheckOrigin = (e) => {
+    const { checked } = e.target
+    setOriginal((prev) => !prev)
+    setSpec(checked ? '' : 'CycloneDX')
+    setFormat(checked ? 'xml' : 'json')
+    setIncludeVulns(false)
+    setEncoded(false)
+  }
 
   const { primaryBlueText, primaryTextColor } = useThemeColor([
     'primaryBlueText'
   ])
-  const type = spec === 'cyclonedx' ? 'cdx' : 'spdx'
+  const type = spec === 'CycloneDX' ? 'cdx' : 'spdx'
 
   const downloadJsonFile = (jsonData) => {
     if (jsonData) {
@@ -103,23 +106,39 @@ const DownloadModal = (props) => {
     try {
       await getData({
         variables: {
-          projectId: signedUrlParams ? undefined : productId,
+          includeVulns,
           sbomId: sbomId,
-          includeVulns
+          package: encoded,
+          original: original,
+          lite: spec === 'SPDX-Lite' ? true : false,
+          spec: original ? undefined : spec === 'SPDX-Lite' ? 'SPDX' : spec,
+          projectId: signedUrlParams ? undefined : productId
         }
       })
         .then((res) => {
           console.log(`res`, res)
-          if (res.called) {
+          const { called, variables } = res || ''
+          if (called) {
             setIsLoading(false)
-            const decodedData = signedUrlParams
-              ? window.atob(res?.data?.shareLynkQuery?.sbom?.download)
-              : window.atob(res?.data?.sbom?.download)
-            const parsedJson = JSON.parse(decodedData)
-            if (format === 'json') {
-              downloadJsonFile(parsedJson)
+            if (variables?.package === true) {
+              const parsedJson = signedUrlParams
+                ? JSON.parse(res?.data?.shareLynkQuery?.sbom?.download)
+                : JSON.parse(res?.data?.sbom?.download)
+              if (format === 'json') {
+                downloadJsonFile(parsedJson)
+              } else {
+                downloadXmlFile(res?.data?.sbom?.download)
+              }
             } else {
-              downloadXmlFile(decodedData)
+              const decodedData = signedUrlParams
+                ? window.atob(res?.data?.shareLynkQuery?.sbom?.download)
+                : window.atob(res?.data?.sbom?.download)
+              const parsedJson = JSON.parse(decodedData)
+              if (format === 'json') {
+                downloadJsonFile(parsedJson)
+              } else {
+                downloadXmlFile(decodedData)
+              }
             }
           }
         })
@@ -151,7 +170,10 @@ const DownloadModal = (props) => {
     }
   ]
 
-  const fileName = `${truncatedValue(productName, 14)}-${version}.${type}.xml`
+  const fileName =
+    spec === ''
+      ? `${truncatedValue(productName, 14)}-${version}.${format}`
+      : `${truncatedValue(productName, 14)}-${version}.${type}.${format}`
 
   return (
     <>
@@ -166,27 +188,33 @@ const DownloadModal = (props) => {
       >
         <Flex flexDirection={'column'} gap={4}>
           <Tag
-            fontSize={'xs'}
-            w={'fit-content'}
             colorScheme='blue'
             textAlign={'right'}
-            wordBreak={'break-all'}
+            sx={{ w: 'fit-content', fontSize: 'xs', wordBreak: 'break-all' }}
           >
             {fileName}
           </Tag>
           <FormControl>
             <FormLabel>Specification</FormLabel>
-            <RadioGroup value={spec} onChange={(value) => setSpec(value)}>
+            <RadioGroup
+              value={spec}
+              isDisabled={original}
+              onChange={(value) => setSpec(value)}
+            >
               <Stack spacing={4} direction='row'>
-                {(activeUser === 'sp@interlynk.io' ||
-                  activeUser === 'surendra.pathak@interlynk') && (
-                  <Radio value='spdx'>SPDX</Radio>
-                )}
-                <Radio value='cyclonedx'>CycloneDX</Radio>
+                <Radio value='CycloneDX'>CycloneDX</Radio>
+                <Radio value='SPDX'>SPDX</Radio>
+                <Radio value='SPDX-Lite'>
+                  SPDX-Lite
+                  <Tag size='sm' mt={0.5} ml={2} fontSize='12'>
+                    Coming soon
+                  </Tag>
+                </Radio>
               </Stack>
             </RadioGroup>
           </FormControl>
-          <FormControl>
+          <Divider />
+          <FormControl isDisabled={original}>
             <FormLabel>File Format</FormLabel>
             <RadioGroup value={format} onChange={(value) => setFormat(value)}>
               <Stack spacing={4} direction='row'>
@@ -195,31 +223,40 @@ const DownloadModal = (props) => {
               </Stack>
             </RadioGroup>
           </FormControl>
+          <Divider />
           <Checkbox
             isChecked={includeVulns}
             onChange={() => setIncludeVulns(!includeVulns)}
-            isDisabled={spec === 'spdx'}
+            isDisabled={spec === 'SPDX' || original}
           >
             Include Vulnerabilities
           </Checkbox>
+          <Checkbox
+            isChecked={original}
+            onChange={onCheckOrigin}
+            isDisabled={spec === 'SPDX'}
+          >
+            Original SBOM
+          </Checkbox>
+          <Checkbox
+            hidden={!superAdmin}
+            isChecked={encoded}
+            onChange={() => setEncoded(!encoded)}
+            isDisabled={spec === 'SPDX' || original}
+          >
+            Base64 Unencoded
+          </Checkbox>
           <Divider />
           <Flex
-            flexDir={'column'}
-            gap={4}
+            sx={{ flexDir: 'column', gap: 4 }}
             display={!signedUrlParams ? 'flex' : 'none'}
           >
-            <Flex
-              flexDir={'row'}
-              alignItems='center'
-              justifyContent='space-between'
-            >
+            <Flex alignItems='center' justifyContent='space-between'>
               <Text fontWeight={'medium'}>Compliance Checks</Text>
               <Text
-                fontSize={'sm'}
                 color={primaryBlueText}
-                cursor={'pointer'}
-                fontWeight={'medium'}
-                onClick={onOpenDetails}
+                onClick={DETAILS.onOpen}
+                sx={{ fontSize: 'sm', cursor: 'pointer', fontWeight: 'medium' }}
               >
                 View Details
               </Text>
@@ -227,10 +264,9 @@ const DownloadModal = (props) => {
             <Flex gap={4} flexDir={'column'} alignItems='flex-start'>
               {checklists.map((item, index) => (
                 <Flex
-                  w={'100%'}
                   key={index}
-                  alignItems='center'
                   justifyContent={'space-between'}
+                  sx={{ w: '100%', alignItems: 'center' }}
                 >
                   <Text fontSize={'sm'} color={primaryTextColor}>
                     {item?.name}
@@ -251,12 +287,12 @@ const DownloadModal = (props) => {
         </Flex>
       </LynkModal>
 
-      {isOpenDetails && (
+      {DETAILS.isOpen && (
         <ComplianceChecks
           name={fileName}
-          isOpen={isOpenDetails}
+          isOpen={DETAILS.isOpen}
           fdaLoading={fdaLoading}
-          onClose={onCloseDetails}
+          onClose={DETAILS.onClose}
           ntiaLoading={ntiaLoading}
           fda={fdaData?.length > 0 ? fdaData[0] : []}
           ntia={ntiaData?.length > 0 ? ntiaData[0] : []}
