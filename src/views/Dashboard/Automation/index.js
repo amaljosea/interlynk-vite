@@ -506,7 +506,7 @@ const Automation = ({ projects }) => {
       {RULE_DELETE.isOpen && (
         <DeleteWarning
           isOpen={RULE_DELETE.isOpen}
-          onClose={RULE_DELETE.onCLose}
+          onClose={RULE_DELETE.onClose}
           onDelete={handleDelete}
         />
       )}
