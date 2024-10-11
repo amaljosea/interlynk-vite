@@ -3,7 +3,7 @@ name: Playwright Tests
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 3 * * 1-5'  # Runs every Monday to Friday at 9 AM IST (3:30 AM UTC)
+    - cron: '30 3 * * *'  # Runs every day at 9 AM IST (3:30 AM UTC)
 
 jobs:
   test:
@@ -43,7 +43,19 @@ jobs:
       run: |
         curl -X POST -H 'Content-type: application/json' \
         --data '{
-          "text": "🚨 E2E Playwright Tests have failed! <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Click here> to view the logs."
+          "text": "🚨 E2E Playwright Tests failed! <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Click here> to view the logs."
+        }' \
+        $SLACK_WEBHOOK_URL
+
+    # Notify Slack on Success (Scheduled Runs Only)
+    - name: Notify Slack on Success (Scheduled Runs Only)
+      if: success() && github.event_name == 'schedule'
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{
+          "text": "✅ E2E Playwright Tests passed! <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Click here> to view the logs."
         }' \
         $SLACK_WEBHOOK_URL
 
