@@ -4016,6 +4016,9 @@ export const PolicyResults = gql`
         result
         resultType
         resultWording
+        sbom {
+          policyRunStatus
+        }
         policy {
           name
           description

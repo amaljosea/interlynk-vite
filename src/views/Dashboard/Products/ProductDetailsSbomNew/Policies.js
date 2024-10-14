@@ -165,8 +165,13 @@ const Policies = ({ sbomData }) => {
       id: 'VIOLATIONS',
       name: 'VIOLATIONS',
       selector: (row) => {
-        const { resultType, violationsCount } = row
-        if (isInitialized) return <Spinner size='xs' mt={0.5} />
+        const {
+          resultType,
+          violationsCount,
+          sbom: { policyRunStatus }
+        } = row
+        if (isInitialized || policyRunStatus !== 'FINISHED')
+          return <Spinner size='xs' mt={0.5} />
         const vColor = violationsCount === 0 ? 'green' : getColor(resultType)
         return (
           <Tag width={'60px'} colorScheme={vColor}>
