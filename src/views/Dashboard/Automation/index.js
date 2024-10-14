@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { capitalizeFirstLetter, customStyles, getFullDateAndTime } from 'utils'
 import { timeSince, updatedValue } from 'utils'
+import { getFileName } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { AddIcon } from '@chakra-ui/icons'
@@ -66,6 +67,7 @@ const Automation = ({ projects }) => {
 
   const filterProjects = projects?.filter((item) => item?.id !== productId)
   const activeProject = projects?.find((item) => item?.id === productId)
+  const { name, projectGroup } = activeProject || ''
 
   const { headingTextColor, primaryTextColor, secondaryTextColor } =
     useThemeColor([
@@ -418,13 +420,13 @@ const Automation = ({ projects }) => {
         type: 'application/json'
       })
       const link = document.createElement('a')
-      link.download = `${activeProject?.projectGroup?.name}-${activeProject?.name}.json`
+      link.download = getFileName(`${projectGroup?.name}-${name}`, `json`)
       link.href = window.URL.createObjectURL(blob)
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
     },
-    [activeProject]
+    [name, projectGroup?.name]
   )
 
   const handleExport = useCallback(() => {

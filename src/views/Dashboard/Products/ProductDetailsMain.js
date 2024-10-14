@@ -89,6 +89,9 @@ const GetProjectGroup = gql`
       projects {
         id
         name
+        projectGroup {
+          name
+        }
       }
     }
   }
@@ -588,7 +591,7 @@ const ProductDetailsMain = () => {
                   >
                     Automation is disabled under Product Settings
                   </Tag>
-                  {<Automation />}
+                  {<Automation projects={projects} />}
                 </TabPanel>
                 {/* SETTINGS */}
                 <TabPanel px={0}>
