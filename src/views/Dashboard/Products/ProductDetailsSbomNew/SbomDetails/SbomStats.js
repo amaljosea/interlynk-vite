@@ -12,6 +12,7 @@ import IconBox from 'components/Icons/IconBox'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -25,7 +26,11 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
     ['primaryBlueText', 'secondaryBgColor', 'primaryTextColor']
   )
 
-  const { data: policies } = useQuery(PolicyResultsType, {
+  const {
+    data: policies,
+    startPolling,
+    stopPolling
+  } = useQuery(PolicyResultsType, {
     skip: params?.sbomid ? false : true,
     variables: { sbomId: params?.sbomid, first: 100 }
   })
@@ -33,6 +38,8 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
   const { nodes } = policies?.policyResults || ''
   const isInitialized = nodes?.some((item) => item?.result === 'initialized')
   const policyStatus = isInitialized ? 'IN_PROGRESS' : 'COMPLETED'
+
+  useGradualPolling({ shouldPoll: isInitialized, startPolling, stopPolling })
 
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
