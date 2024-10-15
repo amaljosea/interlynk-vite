@@ -64,7 +64,7 @@ const SettingsTag = ({ icon, label, color, isDisabled }) => {
 const SbomDetails = ({ sbomData }) => {
   const params = useParams()
   const partsContext = usePartsContext()
-  const { sbomHookData } = useGlobalQueryContext()
+  const { sbomHookData, isFreeTier } = useGlobalQueryContext()
   const projectId = params.productid
   const sbomId = params.sbomid
 
@@ -318,7 +318,7 @@ const SbomDetails = ({ sbomData }) => {
                 text='SBOM Quality Score'
               />
             </GridItem>
-            <GridItem colSpan={4}>
+            <GridItem colSpan={4} hidden={isFreeTier}>
               <ProgressBar
                 value={healthScore}
                 loading={scoreLoading}
