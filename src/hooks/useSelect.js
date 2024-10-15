@@ -25,7 +25,7 @@ export const useSelect = (type) => {
       overflow: 'hidden',
       maxWidth: isBreadcrumb ? '200px' : 'inherit',
       minWidth: isBreadcrumb ? '120px' : 'inherit',
-      maxHeight: isBreadcrumb ? '100px' : 'inherit',
+      minHeight: isBreadcrumb ? '6px' : 'inherit',
       border: isBreadcrumb ? 'none' : 'auto',
       fontSize: '14px',
       backgroundColor: isBreadcrumb ? secondaryBgColor : 'transparent',
@@ -49,8 +49,7 @@ export const useSelect = (type) => {
       backgroundColor: primaryBgColor,
       '&:hover': {
         backgroundColor: 'transparent'
-      },
-      maxHeight: '150px'
+      }
     }),
     input: (provided) => ({
       ...provided,
