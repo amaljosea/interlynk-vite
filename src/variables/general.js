@@ -821,6 +821,10 @@ export const pkgVersionData = [
 
 export const repositoryData = [
   {
+    title: `Name`,
+    desc: `The name specified at the code repository`
+  },
+  {
     title: `Owner`,
     desc: `The owner associated with the code repository`
   },

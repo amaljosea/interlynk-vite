@@ -4,7 +4,18 @@ import { useParams } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import { pkgData, pkgVersionData, repositoryData } from 'variables/general'
 
-import { Divider, Flex, Skeleton, Spacer, Stack } from '@chakra-ui/react'
+import {
+  Flex,
+  SimpleGrid,
+  Skeleton,
+  Spacer,
+  Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs
+} from '@chakra-ui/react'
 import { Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 import {
   Drawer,
@@ -19,22 +30,25 @@ import CustomLoader from 'components/CustomLoader'
 import { HealthScore } from 'components/HealthScore'
 import CompInfo from 'components/Misc/CompInfo'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { GetEnrichedData } from 'graphQL/Queries'
 
 const Container = ({ children }) => {
   return (
-    <Flex
-      justifyContent={'space-between'}
-      sx={{ w: '100%', gap: 6, alignItems: 'center', fontSize: 'sm' }}
-    >
+    <SimpleGrid columns={2} spacing={4} fontSize={'sm'}>
       {children}
-    </Flex>
+    </SimpleGrid>
   )
 }
 
 const LynkTag = ({ value }) => {
   return (
-    <Tag size='sm' colorScheme={value ? 'red' : 'green'} pt={1}>
+    <Tag
+      size='sm'
+      sx={{ w: 'fit-content', pt: 1 }}
+      colorScheme={value ? 'red' : 'green'}
+    >
       {value ? 'Yes' : 'No'}
     </Tag>
   )
@@ -46,6 +60,7 @@ const Label = styled(Text)`
 
 const CompInsights = ({ isOpen, onClose, id }) => {
   const params = useParams()
+  const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
 
   const { data, loading } = useQuery(GetEnrichedData, {
     skip: isOpen ? false : true,
@@ -71,11 +86,13 @@ const CompInsights = ({ isOpen, onClose, id }) => {
   const getLicense = (item) => {
     const result = JSON.parse(item)
     if (result?.length > 0) {
-      return result[0]?.name
+      return result[0]?.name !== '' ? result[0]?.name : 'N/A'
     } else {
-      return ''
+      return 'N/A'
     }
   }
+
+  const tabs = ['Package', 'Version', 'Source Code']
 
   return (
     <Drawer size='md' isOpen={isOpen} placement='right' onClose={onClose}>
@@ -93,182 +110,210 @@ const CompInsights = ({ isOpen, onClose, id }) => {
             </Flex>
           )}
         </DrawerHeader>
-        <DrawerBody pb={5}>
+        <DrawerBody p={loading ? 3 : 0}>
           {loading ? (
             <CustomLoader />
           ) : (
-            <Flex gap={4} mt={2} flexDir={'column'}>
-              {/* PACKAGE */}
-              <Text fontWeight={'semibold'}>Package</Text>
-              {enrichedContent?.package ? (
-                <Stack spacing={2}>
-                  <Container>
-                    <Tooltip label={onCheck('package', 'Deprecated')}>
-                      <Label>Deprecated</Label>
-                    </Tooltip>
-                    <LynkTag value={enrichedContent?.package?.isDeprecated} />
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('package', 'Last Updated')}>
-                      <Label>Last Updated</Label>
-                    </Tooltip>
-                    <Text>
-                      {getFullDateAndTime(enrichedContent?.package?.updatedAt)}
-                    </Text>
-                  </Container>
-                </Stack>
-              ) : (
-                <Text color={'gray.500'}>Not available</Text>
-              )}
-              <Divider />
-              {/* PACKAGE VERSION */}
-              <Text fontWeight={'semibold'}>Package Version</Text>
-              {packageVersion ? (
-                <Stack spacing={2}>
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'License')}>
-                      <Label>License</Label>
-                    </Tooltip>
-                    <Tag colorScheme='blue' maxW={'300px'}>
-                      <TagLabel fontSize={'xs'}>
-                        {getLicense(packageVersion?.license)}
-                      </TagLabel>
-                    </Tag>
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'Deprecated')}>
-                      <Label>Deprecated</Label>
-                    </Tooltip>
-                    <LynkTag value={packageVersion?.isDeprecated} />
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'Archived')}>
-                      <Label>Archived</Label>
-                    </Tooltip>
-                    <LynkTag value={packageVersion?.isArchived} />
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'Pre-release')}>
-                      <Label>Pre-release</Label>
-                    </Tooltip>
-                    <LynkTag value={packageVersion?.isPreRelease} />
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'Outdated')}>
-                      <Label>Outdated</Label>
-                    </Tooltip>
-                    <LynkTag value={packageVersion?.isOutdated} />
-                  </Container>
-                  <Container>
-                    <Tooltip
-                      label={onCheck('packageVersion', 'Most Recent Version')}
-                    >
-                      <Label>Most Recent Version</Label>
-                    </Tooltip>
-                    <Text>{packageVersion?.version}</Text>
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'Last Updated')}>
-                      <Label>Last Updated</Label>
-                    </Tooltip>
-                    <Text>{getFullDateAndTime(packageVersion?.updatedAt)}</Text>
-                  </Container>
-                </Stack>
-              ) : (
-                <Text color={'gray.500'}>Not available</Text>
-              )}
-              <Divider />
-              {/* PACKAGE SOURCE */}
-              <Text fontWeight={'semibold'}>Package Source Code</Text>
-              {repository ? (
-                <Stack spacing={2}>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Name')}>
-                      <Text>Name</Text>
-                    </Tooltip>
-                    <Text>{repository?.name}</Text>
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Owner')}>
-                      <Label>Owner</Label>
-                    </Tooltip>
-                    <Text>{repository?.owner}</Text>
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Description')}>
-                      <Label>Description</Label>
-                    </Tooltip>
-                    <Text textAlign={'right'}>{repository?.description}</Text>
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Source Archived')}>
-                      <Label>Source Archived</Label>
-                    </Tooltip>
-                    <LynkTag value={repository?.isArchived} />
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Stars')}>
-                      <Label>Stars</Label>
-                    </Tooltip>
-                    <Text>{repository?.starsCount}</Text>
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Forks')}>
-                      <Label>Forks</Label>
-                    </Tooltip>
-                    <Text>{repository?.forksCount}</Text>
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Watchers')}>
-                      <Label>Watchers</Label>
-                    </Tooltip>
-                    <Text>{repository?.watchersCount}</Text>
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Contibutors')}>
-                      <Label>Contibutors</Label>
-                    </Tooltip>
-                    <Text>{repository?.contributorCount}</Text>
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Relases')}>
-                      <Label>Relases</Label>
-                    </Tooltip>
-                    <Text>{JSON.stringify(repository?.releases)}</Text>
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Issues')}>
-                      <Label>Issues</Label>
-                    </Tooltip>
-                    <Text>{JSON.stringify(repository?.issues)}</Text>
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'OpenSSF Scorecard')}>
-                      <Label>OpenSSF Scorecard</Label>
-                    </Tooltip>
-                    <Text>{repository?.scorecardScore}</Text>
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'License')}>
-                      <Label>License</Label>
-                    </Tooltip>
-                    <Tag colorScheme='blue' maxW={'300px'}>
-                      <TagLabel fontSize={'xs'}>
-                        {getLicense(repository?.license)}
-                      </TagLabel>
-                    </Tag>
-                  </Container>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Last Updated')}>
-                      <Label>Last Updated</Label>
-                    </Tooltip>
-                    <Text>{getFullDateAndTime(repository?.updatedAt)}</Text>
-                  </Container>
-                </Stack>
-              ) : (
-                <Text color={'gray.500'}>Not available</Text>
-              )}
-            </Flex>
+            <Tabs isFitted>
+              <TabList bg={secondaryBgColor} zIndex={11}>
+                {tabs.map((item, index) => (
+                  <Tab
+                    py={3.5}
+                    key={index}
+                    fontSize={'sm'}
+                    textTransform={'capitalize'}
+                    _focus={{ outline: 'none', bg: 'none' }}
+                  >
+                    {item}
+                  </Tab>
+                ))}
+              </TabList>
+              <TabPanels px={2}>
+                <TabPanel>
+                  {enrichedContent?.package ? (
+                    <Stack spacing={3}>
+                      <Container>
+                        <Tooltip label={onCheck('package', 'Deprecated')}>
+                          <Label>Deprecated</Label>
+                        </Tooltip>
+                        <LynkTag
+                          value={enrichedContent?.package?.isDeprecated}
+                        />
+                      </Container>
+                      <Container>
+                        <Tooltip label={onCheck('package', 'Last Updated')}>
+                          <Label>Last Updated</Label>
+                        </Tooltip>
+                        <Text>
+                          {getFullDateAndTime(
+                            enrichedContent?.package?.updatedAt
+                          )}
+                        </Text>
+                      </Container>
+                    </Stack>
+                  ) : (
+                    <Text color={'gray.500'}>Not available</Text>
+                  )}
+                </TabPanel>
+                <TabPanel>
+                  {packageVersion ? (
+                    <Stack spacing={3}>
+                      <Container>
+                        <Tooltip label={onCheck('packageVersion', 'License')}>
+                          <Label>License</Label>
+                        </Tooltip>
+                        <Text>{getLicense(packageVersion?.license)}</Text>
+                      </Container>
+                      <Container>
+                        <Tooltip
+                          label={onCheck('packageVersion', 'Deprecated')}
+                        >
+                          <Label>Deprecated</Label>
+                        </Tooltip>
+                        <LynkTag value={packageVersion?.isDeprecated} />
+                      </Container>
+                      <Container>
+                        <Tooltip label={onCheck('packageVersion', 'Archived')}>
+                          <Label>Archived</Label>
+                        </Tooltip>
+                        <LynkTag value={packageVersion?.isArchived} />
+                      </Container>
+                      <Container>
+                        <Tooltip
+                          label={onCheck('packageVersion', 'Pre-release')}
+                        >
+                          <Label>Pre-release</Label>
+                        </Tooltip>
+                        <LynkTag value={packageVersion?.isPreRelease} />
+                      </Container>
+                      <Container>
+                        <Tooltip label={onCheck('packageVersion', 'Outdated')}>
+                          <Label>Outdated</Label>
+                        </Tooltip>
+                        <LynkTag value={packageVersion?.isOutdated} />
+                      </Container>
+                      <Container>
+                        <Tooltip
+                          label={onCheck(
+                            'packageVersion',
+                            'Most Recent Version'
+                          )}
+                        >
+                          <Label>Most Recent Version</Label>
+                        </Tooltip>
+                        <Text>{packageVersion?.version}</Text>
+                      </Container>
+                      <Container>
+                        <Tooltip
+                          label={onCheck('packageVersion', 'Last Updated')}
+                        >
+                          <Label>Last Updated</Label>
+                        </Tooltip>
+                        <Text>
+                          {getFullDateAndTime(packageVersion?.updatedAt)}
+                        </Text>
+                      </Container>
+                    </Stack>
+                  ) : (
+                    <Text color={'gray.500'}>Not available</Text>
+                  )}
+                </TabPanel>
+                <TabPanel>
+                  {repository ? (
+                    <Stack spacing={3}>
+                      <Container>
+                        <Tooltip label={onCheck('repository', 'Name')}>
+                          <Label>Name</Label>
+                        </Tooltip>
+                        <Text>{repository?.name}</Text>
+                      </Container>
+                      <Container>
+                        <Tooltip label={onCheck('repository', 'Owner')}>
+                          <Label>Owner</Label>
+                        </Tooltip>
+                        <Text>{repository?.owner}</Text>
+                      </Container>
+                      <Container>
+                        <Tooltip label={onCheck('repository', 'Description')}>
+                          <Label>Description</Label>
+                        </Tooltip>
+                        <Text>{repository?.description}</Text>
+                      </Container>
+                      <Container>
+                        <Tooltip
+                          label={onCheck('repository', 'Source Archived')}
+                        >
+                          <Label>Source Archived</Label>
+                        </Tooltip>
+                        <LynkTag value={repository?.isArchived} />
+                      </Container>
+                      <Container>
+                        <Tooltip label={onCheck('repository', 'Stars')}>
+                          <Label>Stars</Label>
+                        </Tooltip>
+                        <Text>{repository?.starsCount}</Text>
+                      </Container>
+                      <Container>
+                        <Tooltip label={onCheck('repository', 'Forks')}>
+                          <Label>Forks</Label>
+                        </Tooltip>
+                        <Text>{repository?.forksCount}</Text>
+                      </Container>
+                      <Container>
+                        <Tooltip label={onCheck('repository', 'Watchers')}>
+                          <Label>Watchers</Label>
+                        </Tooltip>
+                        <Text>{repository?.watchersCount}</Text>
+                      </Container>
+                      <Container>
+                        <Tooltip label={onCheck('repository', 'Contibutors')}>
+                          <Label>Contibutors</Label>
+                        </Tooltip>
+                        <Text>{repository?.contributorCount}</Text>
+                      </Container>
+                      <Container>
+                        <Tooltip label={onCheck('repository', 'Relases')}>
+                          <Label>Relases</Label>
+                        </Tooltip>
+                        <Text>{JSON.stringify(repository?.releases)}</Text>
+                      </Container>
+                      <Container>
+                        <Tooltip label={onCheck('repository', 'Issues')}>
+                          <Label>Issues</Label>
+                        </Tooltip>
+                        <Text>{JSON.stringify(repository?.issues)}</Text>
+                      </Container>
+                      <Container>
+                        <Tooltip
+                          label={onCheck('repository', 'OpenSSF Scorecard')}
+                        >
+                          <Label>OpenSSF Scorecard</Label>
+                        </Tooltip>
+                        <Text>{repository?.scorecardScore}</Text>
+                      </Container>
+                      <Container>
+                        <Tooltip label={onCheck('repository', 'License')}>
+                          <Label>License</Label>
+                        </Tooltip>
+                        <Tag colorScheme='blue' w='fit-content'>
+                          <TagLabel fontSize={'xs'}>
+                            {getLicense(repository?.license)}
+                          </TagLabel>
+                        </Tag>
+                      </Container>
+                      <Container>
+                        <Tooltip label={onCheck('repository', 'Last Updated')}>
+                          <Label>Last Updated</Label>
+                        </Tooltip>
+                        <Text>{getFullDateAndTime(repository?.updatedAt)}</Text>
+                      </Container>
+                    </Stack>
+                  ) : (
+                    <Text color={'gray.500'}>Not available</Text>
+                  )}
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
           )}
           <Spacer mt={4} />
         </DrawerBody>

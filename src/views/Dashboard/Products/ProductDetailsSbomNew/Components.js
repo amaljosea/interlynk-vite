@@ -17,23 +17,17 @@ import {
   Button,
   Divider,
   Flex,
-  Grid,
-  GridItem,
   IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Portal,
   Stack,
-  Tag,
-  TagLabel,
   Text,
   Tooltip,
-  VStack,
-  useColorMode,
-  useDisclosure
+  VStack
 } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { useColorMode, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
@@ -48,6 +42,7 @@ import ComponentAddModal from 'components/Modal/ComponentAddModal'
 import Pagination from 'components/Pagination'
 import SupplierTag from 'components/SupplierTag'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
@@ -84,9 +79,11 @@ const Components = ({ sbomData }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
+  const { colorMode } = useColorMode()
   const customerView = isCustomerView()
   const signedUrlParams = getSignedUrlParams()
-  const { colorMode } = useColorMode()
+  const { isFreeTier } = useGlobalQueryContext()
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
@@ -184,8 +181,6 @@ const Components = ({ sbomData }) => {
   const RELATION = useDisclosure()
   const COMPONENT = useDisclosure()
   const INSIGHTS = useDisclosure()
-
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const onCreateComponent = useCallback(() => {
     setActiveRow(null)
@@ -316,7 +311,8 @@ const Components = ({ sbomData }) => {
         const { healthScore } = row
         return <HealthScore isComponent value={healthScore} />
       },
-      width: '10%'
+      width: '10%',
+      omit: isFreeTier
     },
     // IDENTIFIERS
     {
@@ -551,6 +547,7 @@ const Components = ({ sbomData }) => {
                     <MenuItem
                       onClick={() => hanldeAnalysis(row)}
                       isDisabled={status === 'signed'}
+                      hidden={isFreeTier}
                     >
                       Insights
                     </MenuItem>
