@@ -1,29 +1,27 @@
-import { useQuery } from '@apollo/client'
-import React, { useCallback, useEffect, useRef } from 'react'
-import { useState } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import Select, { components } from 'react-select'
+import React, { useCallback } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import AsyncSelect from 'react-select/async'
 
-import { Divider, Spinner } from '@chakra-ui/react'
+import { Spinner } from '@chakra-ui/react'
 
 import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useLazyDropDown } from 'hooks/useLazyDropDown'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GetProjectGroupDetails } from 'graphQL/Queries'
+import { GetProjectGroupLazyDropdownQuery } from 'graphQL/Queries'
 
-import { customFilter } from './customFilter'
-
-const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
+const ProjectGroupBreadcrumb = ({
+  projectGroupName,
+  selectStyles,
+  defaultFirstOption
+}) => {
   const navigate = useNavigate()
-  const params = useParams()
-  const [value, setValue] = useState(null)
 
-  const productGroupId = params.productgroupid
   const location = useLocation()
   const { envName } = useGlobalState()
 
@@ -34,35 +32,13 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
   const environment = envName
 
   const { grayBorderColor } = useThemeColor(['grayBorderColor'])
+
   const viewProds = useHasPermission({
     parentKey: 'view_product_group'
   })
 
-  const { data: productsData, loading } = useQuery(GetProjectGroupDetails, {
-    skip: !orgView || viewProds === false,
-    variables: {
-      field: 'PROJECT_GROUPS_NAME',
-      direction: 'ASC',
-      first: 999999999
-    }
-  })
-
-  useEffect(() => {
-    const product = productsData?.organization?.projectGroups?.nodes?.find(
-      (i) => i.id === productGroupId
-    )
-    setValue(product)
-  }, [productGroupId, setValue, productsData])
-
-  const products = productsData?.organization?.projectGroups?.nodes
-  const totalCount = productsData?.organization?.allProjectGroups?.totalCount
-  const selectedProduct = products?.find(
-    (product) => product.id === productGroupId
-  )
-
   const handleProductClick = useCallback(
     (product) => {
-      setValue(product)
       const envProject = product?.projects?.find(
         (proj) => proj.name === environment
       )
@@ -75,28 +51,32 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
     [generateProductDetailPageUrlFromCurrentUrl, navigate, environment]
   )
 
+  const { lazyDropDownProps } = useLazyDropDown(
+    GetProjectGroupLazyDropdownQuery,
+    {
+      skip: !orgView || viewProds === false,
+      selector: 'organization.projectGroups',
+      variables: {
+        field: 'PROJECT_GROUPS_NAME',
+        direction: 'ASC',
+        first: 5
+      },
+      selectorForActualCount: 'organization.allProjectGroups',
+      selectedItem: projectGroupName,
+      styles: selectStyles,
+      onChange: handleProductClick,
+      components: {
+        IndicatorSeparator: () => null,
+        DropdownIndicator: CustomDropdownIndicator
+      },
+      defaultFirstOption
+    }
+  )
+
+  const { nodes, totalCountActual } = lazyDropDownProps
+
   const filterText = (item) => {
     return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
-  }
-
-  const options = selectedProduct
-    ? [selectedProduct, ...products.filter((p) => p.id !== selectedProduct.id)]
-    : products
-
-  const selectRef = useRef()
-  const CustomMenuList = (props) => {
-    const childrenArray = React.Children.toArray(props.children)
-
-    return (
-      <components.MenuList {...props}>
-        {childrenArray.map((child, index) => (
-          <React.Fragment key={index}>
-            {index === 1 && <Divider />}
-            {child}
-          </React.Fragment>
-        ))}
-      </components.MenuList>
-    )
   }
 
   if (path === 'customer' && projectGroupName) {
@@ -105,37 +85,9 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, selectStyles }) => {
         {filterText(projectGroupName)}
       </Link>
     )
-  } else if (products && totalCount > 1) {
-    return (
-      <div
-        onMouseEnter={() => {
-          if (selectRef.current) {
-            // selectRef.current.focus()
-          }
-        }}
-      >
-        <Select
-          ref={selectRef}
-          options={options}
-          styles={selectStyles}
-          isSearchable
-          getOptionLabel={(product) => product.name}
-          getOptionValue={(product) => product.id}
-          onChange={(product) => handleProductClick(product)}
-          value={value}
-          components={{
-            MenuList: CustomMenuList,
-            IndicatorSeparator: () => null,
-            DropdownIndicator: CustomDropdownIndicator
-          }}
-          filterOption={customFilter}
-          isLoading={loading}
-          openMenuOnFocus
-          blurInputOnSelect
-        />
-      </div>
-    )
-  } else if (products && totalCount === 1) {
+  } else if (nodes && totalCountActual > 1) {
+    return <AsyncSelect {...lazyDropDownProps} />
+  } else if (nodes && totalCountActual === 1) {
     return (
       <Link to={generateProductDetailPageUrlFromCurrentUrl()}>
         {filterText(projectGroupName)}

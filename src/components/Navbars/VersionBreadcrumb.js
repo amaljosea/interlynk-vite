@@ -1,7 +1,6 @@
 import { useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import Select from 'react-select'
+import AsyncSelect from 'react-select/async'
 import { isCustomerView } from 'utils'
 
 import { Spinner } from '@chakra-ui/react'
@@ -9,13 +8,15 @@ import { Spinner } from '@chakra-ui/react'
 import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useLazyDropDown } from 'hooks/useLazyDropDown'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GetProjectVersionAndId } from 'graphQL/Queries'
+import {
+  GetProjectVersionLazyDropdownQuery,
+  GetVersionName
+} from 'graphQL/Queries'
 import { GetArchivedVersions } from 'graphQL/Queries'
-
-import { customFilter } from './customFilter'
 
 const VersionBreadcrumb = ({ selectStyles }) => {
   const navigate = useNavigate()
@@ -23,7 +24,6 @@ const VersionBreadcrumb = ({ selectStyles }) => {
   const { sbomHookData, orgView } = useGlobalQueryContext()
   const params = useParams()
   const location = useLocation()
-  const [value, setValue] = useState(null)
 
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
@@ -41,31 +41,18 @@ const VersionBreadcrumb = ({ selectStyles }) => {
   const { sbomArchived } = archiveData?.project || ''
   const archivedVersion = sbomArchived?.find((item) => item?.id === sbomId)
 
-  const { data: versionData, loading } = useQuery(GetProjectVersionAndId, {
+  const { data: versionName, loading } = useQuery(GetVersionName, {
+    skip: customerView,
     variables: {
-      id: prodID,
-      field: 'SBOMS_PROJECT_VERSION',
-      direction: 'ASC'
-    },
-    skip: !prodID || !orgView
+      projectId: prodID,
+      sbomId: sbomId
+    }
   })
 
-  useEffect(() => {
-    const sbom = versionData?.project?.sbomVersions?.nodes?.find(
-      (i) => i.id === sbomId
-    )
-    setValue(sbom)
-  }, [sbomId, setValue, versionData])
-
-  const versions = versionData?.project?.sbomVersions?.nodes
-  const totalCount = versionData?.project?.allSbomVersions?.totalCount
-
-  const filterText = (item) => {
-    return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
-  }
+  const selectedVersionName = versionName?.sbom?.projectVersion
+  const selectedVersionId = versionName?.sbom?.id
 
   const handleVersionClick = (version) => {
-    setValue(version)
     const link = generateProductVersionDetailPageUrlFromCurrentUrl({
       sbomid: version.id,
       paramsObj: {
@@ -73,6 +60,41 @@ const VersionBreadcrumb = ({ selectStyles }) => {
       }
     })
     navigate(link)
+  }
+
+  const defaultFirstOption = {
+    id: selectedVersionId,
+    projectVersion: selectedVersionName
+  }
+
+  const { lazyDropDownProps } = useLazyDropDown(
+    GetProjectVersionLazyDropdownQuery,
+    {
+      skip: !prodID || !orgView,
+      selector: 'project.sbomVersions',
+      variables: {
+        id: prodID,
+        field: 'SBOMS_PROJECT_VERSION',
+        direction: 'ASC',
+        first: 5
+      },
+      selectorForActualCount: 'project.allSbomVersions',
+      selectedItem: selectedVersionName,
+      styles: selectStyles,
+      onChange: handleVersionClick,
+      components: {
+        IndicatorSeparator: () => null,
+        DropdownIndicator: CustomDropdownIndicator
+      },
+      optionLabel: 'projectVersion',
+      defaultFirstOption
+    }
+  )
+
+  const { nodes, totalCountActual } = lazyDropDownProps
+
+  const filterText = (item) => {
+    return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
   }
 
   if (archivedVersion?.id)
@@ -85,26 +107,9 @@ const VersionBreadcrumb = ({ selectStyles }) => {
       </Link>
     )
   }
-  if (versions && totalCount > 1) {
-    return (
-      <Select
-        styles={selectStyles}
-        isSearchable
-        value={value}
-        options={versions}
-        getOptionLabel={(version) => version.projectVersion}
-        getOptionValue={(version) => version.id}
-        onChange={(version) => handleVersionClick(version)}
-        components={{
-          IndicatorSeparator: () => null,
-          DropdownIndicator: CustomDropdownIndicator
-        }}
-        hideSelectedOptions
-        isLoading={loading}
-        filterOption={customFilter}
-      />
-    )
-  } else if (versions && totalCount === 1) {
+  if (nodes && totalCountActual > 1 && !loading) {
+    return <AsyncSelect {...lazyDropDownProps} />
+  } else if (nodes && totalCountActual === 1) {
     return (
       <Link to={generateProductVersionDetailPageUrlFromCurrentUrl()}>
         {filterText(sbomHookData.versionName)}

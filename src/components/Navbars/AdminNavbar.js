@@ -64,6 +64,7 @@ export default function AdminNavbar(props) {
   let mainText = inverseSecondaryBgColor
 
   const {
+    id,
     name: projectGroupName,
     projects,
     loading
@@ -143,6 +144,10 @@ export default function AdminNavbar(props) {
               <ProjectGroupBreadcrumb
                 projectGroupName={projectGroupName}
                 selectStyles={style}
+                defaultFirstOption={{
+                  id,
+                  name: projectGroupName
+                }}
               />
             </BreadcrumbItem>
           )}

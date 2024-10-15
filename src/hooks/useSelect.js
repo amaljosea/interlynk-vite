@@ -3,6 +3,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 export const useSelect = (type) => {
   const isBreadcrumb = type === 'breadcrumb'
   const isVersion = type === 'version'
+
   const {
     primaryTextColor,
     primaryBgColor,
@@ -22,8 +23,9 @@ export const useSelect = (type) => {
       ...baseStyles,
       color: primaryTextColor,
       overflow: 'hidden',
-      minHeight: isBreadcrumb ? '6px' : 'inherit',
       maxWidth: isBreadcrumb ? '200px' : 'inherit',
+      minWidth: isBreadcrumb ? '120px' : 'inherit',
+      maxHeight: isBreadcrumb ? '100px' : 'inherit',
       border: isBreadcrumb ? 'none' : 'auto',
       fontSize: '14px',
       backgroundColor: isBreadcrumb ? secondaryBgColor : 'transparent',
@@ -39,7 +41,7 @@ export const useSelect = (type) => {
       ...provided,
       zIndex: 1111,
       backgroundColor: primaryBgColor,
-      width: isBreadcrumb ? '130px' : '100%'
+      width: '100%'
     }),
     menuList: (provided) => ({
       ...provided,
@@ -47,7 +49,8 @@ export const useSelect = (type) => {
       backgroundColor: primaryBgColor,
       '&:hover': {
         backgroundColor: 'transparent'
-      }
+      },
+      maxHeight: '150px'
     }),
     input: (provided) => ({
       ...provided,
@@ -56,16 +59,21 @@ export const useSelect = (type) => {
     }),
     option: (provided) => ({
       ...provided,
-      color: secondaryTextInverse,
+      color: isBreadcrumb ? primaryTextColor : secondaryTextInverse,
       backgroundColor: primaryBgColor,
-
+      textOverflow: 'ellipsis',
+      // textTransform: 'capitalize',
       '&:hover': {
         backgroundColor: secondaryBgColor
       }
     }),
+
     singleValue: (provided) => ({
       ...provided,
       color: primaryTextColor,
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
       '&:hover': {
         color: primaryTextColor
       }

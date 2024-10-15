@@ -4719,8 +4719,8 @@ export const GetSbomQualityScores = gql`
 `
 
 // GET PROJECT VERSION AND ID
-export const GetProjectVersionAndId = gql`
-  query GetProjectVersionAndId(
+export const GetProjectVersionLazyDropdownQuery = gql`
+  query GetProjectVersionLazyDropdownQuery(
     $id: Uuid!
     $search: String
     $first: Int
@@ -4744,6 +4744,12 @@ export const GetProjectVersionAndId = gql`
         orderBy: { field: $field, direction: $direction }
       ) {
         totalCount
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
         nodes {
           id
           projectVersion
@@ -4752,8 +4758,8 @@ export const GetProjectVersionAndId = gql`
     }
   }
 `
-export const GetProjectGroupDetails = gql`
-  query GetProjectGroupDetails(
+export const GetProjectGroupLazyDropdownQuery = gql`
+  query GetProjectGroupLazyDropdownQuery(
     $search: String
     $enabled: Boolean
     $first: Int
@@ -4775,6 +4781,12 @@ export const GetProjectGroupDetails = gql`
         orderBy: { field: $field, direction: $direction }
       ) {
         totalCount
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
         nodes {
           id
           name
