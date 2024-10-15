@@ -8,20 +8,11 @@ import { Outlet, redirect, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Box,
-  Button,
-  Center,
-  Flex,
-  Stack,
-  Text,
-  useColorMode
-} from '@chakra-ui/react'
+import { Alert, Box, Button, Center, Flex, Stack, Text } from '@chakra-ui/react'
+import { AlertDescription, AlertIcon, AlertTitle } from '@chakra-ui/react'
+import { useColorMode, useMediaQuery } from '@chakra-ui/react'
 
+import DeviceWarning from 'components/DeviceWarning'
 import Kbar from 'components/Kbar'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
@@ -49,6 +40,7 @@ export default function Admin() {
   const navigate = useNavigate()
   const { colorMode, setColorMode } = useColorMode()
   const { organization, setOrganization } = useGlobalState()
+  const [isDesktop] = useMediaQuery('(min-width: 1024px)')
 
   const productId = params.productid
   const sbomId = params.sbomid
@@ -288,6 +280,8 @@ export default function Admin() {
       </Center>
     )
   }
+
+  if (!isDesktop) return <DeviceWarning />
 
   return (
     <KBarProvider actions={actions} options={{ enableHistory: true }}>
