@@ -30,53 +30,27 @@ import TeamsConfigModal from './TeamsConfigModal'
 
 const Connections = ({ org }) => {
   const activetab = useQueryParam('tab')
-  const { orgView, isFreeTier } = useGlobalQueryContext()
-  const { data } = useQuery(org ? GetOrgConnections : GetPersonalConnections, {
-    skip: !orgView
-      ? true
-      : activetab === 'integrations' || activetab === 'integrations-org'
-        ? false
-        : true
-  })
   const isGithubConfigSaved = useGithubConfigSaved()
-
+  const { orgView, isFreeTier } = useGlobalQueryContext()
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const updateCon = useHasPermission({
     parentKey: 'view_connections',
     childKey: 'create_update_connection'
   })
-  const {
-    isOpen: isJiraOpen,
-    onOpen: onJiraOpen,
-    onClose: onJiraClose
-  } = useDisclosure()
 
-  const {
-    isOpen: isSlackOpen,
-    onOpen: onSlackOpen,
-    onClose: onSlackClose
-  } = useDisclosure()
+  const isIntegration =
+    activetab === 'integrations' || activetab === 'integrations-org'
+  const { data } = useQuery(org ? GetOrgConnections : GetPersonalConnections, {
+    skip: !orgView ? true : isIntegration ? false : true
+  })
 
-  const {
-    isOpen: isTeamsOpen,
-    onOpen: onTeamsOpen,
-    onClose: onTeamsClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isEmailOpen,
-    onOpen: onEmailOpen,
-    onClose: onEmailClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isGithubOpen,
-    onOpen: onGithubOpen,
-    onClose: onGithubClose
-  } = useDisclosure()
-
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
+  const JIRA = useDisclosure()
+  const SLACK = useDisclosure()
+  const TEAM = useDisclosure()
+  const EMAIL = useDisclosure()
+  const GITHUB = useDisclosure()
 
   const [greenCheck, setGreenCheck] = useState({
     jira: false,
@@ -86,7 +60,6 @@ const Connections = ({ org }) => {
   })
 
   const [hostId, setHostId] = useState(null)
-
   const [jiraData, setJiraData] = useState(null)
   const [slackData, setSlackData] = useState([])
   const [teamsData, setTeamsData] = useState([])
@@ -164,7 +137,7 @@ const Connections = ({ org }) => {
               <ConnectionCard
                 iconSrc={jiraPng}
                 name='Jira'
-                onConfigure={onJiraOpen}
+                onConfigure={JIRA.onOpen}
                 isConnected={greenCheck.jira}
                 description={
                   'Sync tasks within SBOM compliance, improving issue tracking and management.'
@@ -175,7 +148,7 @@ const Connections = ({ org }) => {
               <ConnectionCard
                 iconSrc={slackPng}
                 name='Slack'
-                onConfigure={onSlackOpen}
+                onConfigure={SLACK.onOpen}
                 isConnected={greenCheck.slack}
                 description={
                   'Get instant SBOM updates in Slack, ensuring real-time compliance monitoring.'
@@ -186,7 +159,7 @@ const Connections = ({ org }) => {
               <ConnectionCard
                 iconSrc={teamsPng}
                 name='Teams'
-                onConfigure={onTeamsOpen}
+                onConfigure={TEAM.onOpen}
                 isConnected={greenCheck.teams}
                 description={
                   'Track SBOM changes in Teams, boosting collaboration and compliance efficiency'
@@ -196,7 +169,7 @@ const Connections = ({ org }) => {
             <ConnectionCard
               iconSrc={mailPng}
               name='Email'
-              onConfigure={onEmailOpen}
+              onConfigure={EMAIL.onOpen}
               isConnected={greenCheck.email}
               description={
                 'Receive immediate SBOM alerts via email, staying informed on critical updates.'
@@ -206,7 +179,7 @@ const Connections = ({ org }) => {
               <ConnectionCard
                 icon={FaGithub}
                 name='Github'
-                onConfigure={onGithubOpen}
+                onConfigure={GITHUB.onOpen}
                 isConnected={greenCheck.github}
                 isDisabled={!updateCon}
                 color={primaryTextColor}
@@ -219,58 +192,58 @@ const Connections = ({ org }) => {
         </CardBody>
       </Card>
 
-      {isJiraOpen && (
+      {JIRA.isOpen && (
         <JiraConfigModal
           org={org}
           data={jiraData}
-          isOpen={isJiraOpen}
-          onClose={onJiraClose}
+          isOpen={JIRA.isOpen}
+          onClose={JIRA.onClose}
           updateCon={updateCon}
           setGreenCheck={setGreenCheck}
         />
       )}
 
-      {isSlackOpen && (
+      {SLACK.isOpen && (
         <SlackConfigModal
           org={org}
           data={slackData}
-          isOpen={isSlackOpen}
+          isOpen={SLACK.isOpen}
           updateCon={updateCon}
-          onClose={onSlackClose}
+          onClose={SLACK.onClose}
           setGreenCheck={setGreenCheck}
           hostId={hostId}
         />
       )}
 
-      {isTeamsOpen && (
+      {TEAM.isOpen && (
         <TeamsConfigModal
           org={org}
           data={teamsData}
-          isOpen={isTeamsOpen}
+          isOpen={TEAM.isOpen}
           updateCon={updateCon}
-          onClose={onTeamsClose}
+          onClose={TEAM.onClose}
           setGreenCheck={setGreenCheck}
           hostId={hostId}
         />
       )}
 
-      {isEmailOpen && (
+      {EMAIL.isOpen && (
         <EmailConfigModal
           org={org}
           data={emailData}
-          isOpen={isEmailOpen}
+          isOpen={EMAIL.isOpen}
           updateCon={updateCon}
-          onClose={onEmailClose}
+          onClose={EMAIL.onClose}
           setGreenCheck={setGreenCheck}
           hostId={hostId}
         />
       )}
 
-      {isGithubOpen && (
+      {GITHUB.isOpen && (
         <GithubConfigModal
           org={org}
-          isOpen={isGithubOpen}
-          onClose={onGithubClose}
+          isOpen={GITHUB.isOpen}
+          onClose={GITHUB.onClose}
           data={githubData}
           setGreenCheck={setGreenCheck}
         />
