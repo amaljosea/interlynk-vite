@@ -53,13 +53,8 @@ import { deleteComSupplier } from 'graphQL/Mutation'
 import { GetComponentData, GetComponentPath } from 'graphQL/Queries'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
-import {
-  FaEllipsisV,
-  FaGlobe,
-  FaHouseUser,
-  FaLightbulb,
-  FaSitemap
-} from 'react-icons/fa'
+import { FaEllipsisV, FaGlobe, FaLightbulb, FaSitemap } from 'react-icons/fa'
+import { FaListCheck } from 'react-icons/fa6'
 import { RiFundsBoxFill } from 'react-icons/ri'
 
 import CompDrawer from '../components/CompDrawer'
@@ -502,7 +497,7 @@ const Components = ({ sbomData }) => {
             {/* ADVISORIES */}
             <ExternalLink
               link={issueTracker}
-              icon={<FaHouseUser color={onCheck(issueTracker)} fontSize={16} />}
+              icon={<FaListCheck color={onCheck(issueTracker)} fontSize={16} />}
             />
             {/* SUPPORT */}
             <ExternalLink
