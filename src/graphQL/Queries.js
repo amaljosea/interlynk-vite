@@ -2897,18 +2897,14 @@ export const ShareLynkProjectGroups = gql`
           id
           name
           enabled
+          sbomsCount
           defaultProject {
             id
           }
           projects {
             id
             name
-            description
-            updatedAt
-            enabled
-            sboms {
-              id
-            }
+            sbomsCount
           }
           description
           enabled
