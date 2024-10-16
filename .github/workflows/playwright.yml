@@ -29,7 +29,7 @@ jobs:
       run: npx playwright install --with-deps
 
     - name: Run Playwright tests
-      run: PLAYWRIGHT_JSON_OUTPUT_NAME=results.json npx playwright test --reporter=json
+      run: PLAYWRIGHT_JSON_OUTPUT_NAME=results.json npx playwright test --reporter=json,html
       env:
         PLAYWRIGHT_TEST_URL: ${{ env.PLAYWRIGHT_TEST_URL }}
         PLAYWRIGHT_USER_EMAIL: ${{ env.PLAYWRIGHT_USER_EMAIL }}

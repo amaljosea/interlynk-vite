@@ -7,3 +7,7 @@ build
 # Sentry Config File
 .sentryclirc
 .env
+
+# Playwright reports
+test-results/
+playwright-report/
