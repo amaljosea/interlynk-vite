@@ -16,7 +16,6 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { deleteOrgComp } from 'graphQL/Mutation'
-import { getInternalComponents } from 'graphQL/Queries'
 
 import { FaEllipsisV } from 'react-icons/fa'
 
@@ -60,6 +59,7 @@ export const DeleteInternalComponent = ({
           icon={<FaEllipsisV />}
           variant='none'
           color={secondaryTextColor}
+          data-testid='tag-actions'
         />
         <Portal>
           <MenuList fontSize={'sm'}>
