@@ -10,6 +10,7 @@ import {
   timeSince
 } from 'utils'
 import { getSignedUrlParams } from 'utils'
+import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
@@ -317,19 +318,27 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
             }}
           />
         </Stack>
-        {/* UPDATE STATUES */}
-        {selectedVulns.length > 0 && (
-          <Button
-            variant='solid'
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            onClick={onOpen}
-            isDisabled={signedUrlParams || !manageFeeds}
-          >
-            Set Status
-          </Button>
-        )}
+        <Stack spacing={2} alignItems={'center'} direction={'row'}>
+          {/* EXPORT CSV */}
+          <ExportCsv
+            tableData={nodes}
+            tableType={'Global Vulnerability Detail View'}
+          />
+
+          {/* UPDATE STATUES */}
+          {selectedVulns.length > 0 && (
+            <Button
+              variant='solid'
+              colorScheme='blue'
+              fontWeight='normal'
+              fontSize={'sm'}
+              onClick={onOpen}
+              isDisabled={signedUrlParams || !manageFeeds}
+            >
+              Set Status
+            </Button>
+          )}
+        </Stack>
       </Flex>
     )
   }, [

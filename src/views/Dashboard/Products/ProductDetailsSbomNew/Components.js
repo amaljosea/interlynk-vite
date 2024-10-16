@@ -59,6 +59,7 @@ import { RiFundsBoxFill } from 'react-icons/ri'
 
 import CompDrawer from '../components/CompDrawer'
 import CompInsights from '../components/CompInsights'
+import ExportCsv from '../components/ExportCsv'
 import HealthMap from '../components/HealthMap'
 import CompFilters from './CompFilters'
 
@@ -903,6 +904,8 @@ const Components = ({ sbomData }) => {
               sx={{ fontSize: 'sm', fontWeight: 'normal' }}
             />
           </Tooltip>
+          {/* EXPORT CSV */}
+          <ExportCsv tableData={nodes} tableType={'SBOM Components View'} />
           <RefreshBtn onClick={() => reset()} />
         </Flex>
       </Flex>

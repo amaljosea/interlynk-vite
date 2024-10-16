@@ -1025,3 +1025,78 @@ export const complianceData = [
     )
   }
 ]
+
+export const exportCsvTableConfig = {
+  'Global Vulnerability Detail View': {
+    defaultSelectedColumns: [
+      'Product',
+      'Version',
+      'Component Name',
+      'Component Version',
+      'Environment',
+      'Status'
+    ],
+    additionalColumns: [],
+    mapDataForExport: (data) =>
+      data.map((row) => ({
+        Product: row?.component?.sbom?.project?.projectGroup?.name || '',
+        Version: row?.component?.sbom?.projectVersion || '',
+        'Component Name': row?.component?.name || '',
+        'Component Version': row?.component?.version || '',
+        Environment: row?.component?.sbom?.project?.name || '',
+        Status: row?.vexStatus?.name || 'Unspecified'
+      }))
+  },
+  'SBOM Components View': {
+    defaultSelectedColumns: [
+      'Ecosystem',
+      'Component Name',
+      'Component Version',
+      'PURL',
+      'Licenses',
+      'Updated'
+    ],
+    additionalColumns: [
+      'Description',
+      'Group',
+      'Type',
+      'Internal',
+      'Supplier Organization Name',
+      'Supplier URL',
+      'Supplier Contact Name',
+      'Supplier Contact Email',
+      'CPES',
+      'Scope',
+      'Support Level',
+      'End-Of-Support Date',
+      'Primary',
+      'Links'
+    ],
+    mapDataForExport: (data) =>
+      data.map((row) => ({
+        Ecosystem: row?.purl?.split('/')[0] || '',
+        'Component Name': row?.name || 'N/A',
+        'Component Version': row?.version || '',
+        PURL: row?.purl || '',
+        Licenses: row?.licensesExp || '',
+        Updated: row?.updatedAt || '',
+        Description: `"${row?.description || 'N/A'}"`,
+        Group: row?.group || '',
+        Type: row?.kind || 'N/A',
+        Internal: row?.internal ? 'True' : 'False',
+        'Supplier Organization Name': row?.suppliers[0]?.name || 'N/A',
+        'Supplier URL': row?.suppliers[0]?.url || 'N/A',
+        'Supplier Contact Name': row?.suppliers[0]?.contactName || 'N/A',
+        'Supplier Contact Email': row?.suppliers[0]?.contactEmail || 'N/A',
+        CPES: row?.cpes.map((item) => item) || '',
+        Scope: row?.scope || 'N/A',
+        'Support Level': row?.supportLevel || 'N/A',
+        'End-Of-Support Date': row?.endOfSupport || 'N/A',
+        Primary: row?.primary ? 'True' : 'False',
+        Links:
+          row?.externalUrls
+            ?.map((link) => `${link.name}: ${link.url}`)
+            .join('; ') || ''
+      }))
+  }
+}
