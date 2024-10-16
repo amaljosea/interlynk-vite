@@ -31,7 +31,7 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
-import EnvFilter from 'components/Misc/EnvFilter'
+import EnvList from 'components/Misc/EnvList'
 import NotificationMenuBell from 'components/Notifications/NotificationMenuBell'
 import ChangelogTable from 'components/Tables/ChangelogTable'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
@@ -89,6 +89,7 @@ const GetProjectGroup = gql`
       projects {
         id
         name
+        sbomsCount
         projectGroup {
           name
         }
@@ -447,7 +448,7 @@ const ProductDetailsMain = () => {
               {/* PRODUCT ACTIONS */}
               <GridItem colSpan={4}>
                 <Flex alignItems={'flex-end'} flexDir={'column'} gap={3}>
-                  <EnvFilter />
+                  <EnvList data={data?.projectGroup} />
                   <Flex
                     direction={'row'}
                     gap={2}

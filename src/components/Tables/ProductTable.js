@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { getFullDateAndTime, hexToRGBA, timeSince } from 'utils'
 import { customStyles, getFormat, getLink, getType } from 'utils'
 import { truncatedValue } from 'utils'
@@ -19,7 +19,6 @@ import ProductSearchFilter from 'views/Sbom/components/ProductSearchFilter'
 import { AddIcon } from '@chakra-ui/icons'
 import {
   Box,
-  Button,
   Divider,
   Fade,
   Flex,
@@ -43,6 +42,7 @@ import LabelDrawer from 'components/Drawer/LabelDrawer'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 import IconBox from 'components/Icons/IconBox'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import EnvList from 'components/Misc/EnvList'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
@@ -57,7 +57,7 @@ import { DeleteProjectGroup } from 'graphQL/Mutation'
 import { GetLabels, GetSharelynks, GetTotalProduct } from 'graphQL/Queries'
 
 import { FaEllipsisV, FaGithub } from 'react-icons/fa'
-import { FaCode, FaDesktop, FaInbox, FaTag } from 'react-icons/fa6'
+import { FaTag } from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
 
@@ -87,7 +87,6 @@ const ProductTable = ({
     headingTextColor,
     primaryTextColor,
     grayBorderColor,
-    secondaryBlueBorder,
     secondaryBgColor,
     semiTransparentBorder,
     lightAndDarkBgColor,
@@ -97,7 +96,6 @@ const ProductTable = ({
     'headingTextColor',
     'primaryTextColor',
     'grayBorderColor',
-    'secondaryBlueBorder',
     'secondaryBgColor',
     'semiTransparentBorder',
     'lightAndDarkBgColor',
@@ -107,17 +105,8 @@ const ProductTable = ({
   const { search, field } = filters
   const { totalRows } = paginationProps
 
-  const params = useParams()
-  const productId = params.productid
-
-  const {
-    setEnvName,
-    setClearSelect,
-    setSelectedSbom,
-    dispatch,
-    envName,
-    onChangeEnv
-  } = useGlobalState()
+  const { setEnvName, setClearSelect, setSelectedSbom, dispatch, envName } =
+    useGlobalState()
 
   const environment = envName
 
@@ -509,94 +498,7 @@ const ProductTable = ({
     {
       id: 'ENVIRONMENTS',
       name: 'ENVIRONMENTS',
-      selector: (row) => {
-        const { projects } = row
-        const handleClick = (value) => {
-          const env = projects?.find((item) => item.name === value)
-          onChangeEnv(env?.name)
-          prodDispatch({
-            type: 'SET_CURRENT_PRODUCT',
-            payload: { id: env?.id }
-          })
-        }
-
-        const getProjectSbomsCount = (name) => {
-          const project = projects?.find((item) => item.name === name)
-          return project ? project.sbomsCount : 0
-        }
-
-        return (
-          <Stack direction={'row'} spacing={2} alignItems={'center'}>
-            <Tooltip label='Default'>
-              <Link
-                to={generateProductDetailPageUrlFromCurrentUrl({
-                  productgroupid: row.id,
-                  productid: row.defaultProject.id
-                })}
-                onClick={() => handleClick('default')}
-              >
-                <Button
-                  size='sm'
-                  leftIcon={<FaInbox color={primaryBlueText} />}
-                  variant='outline'
-                  borderColor={secondaryBlueBorder}
-                  color={primaryTextColor}
-                  fontWeight={400}
-                  width={'60px'}
-                >
-                  {getProjectSbomsCount('default')}
-                </Button>
-              </Link>
-            </Tooltip>
-            <Tooltip label='Development'>
-              <Link
-                to={generateProductDetailPageUrlFromCurrentUrl({
-                  productgroupid: row.id,
-                  productid: projects?.find(
-                    (item) => item.name === 'development'
-                  ).id
-                })}
-                onClick={() => handleClick('development')}
-              >
-                <Button
-                  size='sm'
-                  leftIcon={<FaCode color={primaryBlueText} />}
-                  variant='outline'
-                  borderColor={secondaryBlueBorder}
-                  color={primaryTextColor}
-                  fontWeight={400}
-                  width={'60px'}
-                >
-                  {getProjectSbomsCount('development')}
-                </Button>
-              </Link>
-            </Tooltip>
-            <Tooltip label='Production'>
-              <Link
-                to={generateProductDetailPageUrlFromCurrentUrl({
-                  productgroupid: row.id,
-                  productid: projects?.find(
-                    (item) => item.name === 'production'
-                  ).id
-                })}
-                onClick={() => handleClick('production')}
-              >
-                <Button
-                  size='sm'
-                  leftIcon={<FaDesktop color={primaryBlueText} />}
-                  variant='outline'
-                  borderColor={secondaryBlueBorder}
-                  color={primaryTextColor}
-                  fontWeight={400}
-                  width={'60px'}
-                >
-                  {getProjectSbomsCount('production')}
-                </Button>
-              </Link>
-            </Tooltip>
-          </Stack>
-        )
-      },
+      selector: (row) => <EnvList data={row} />,
       width: '20%',
       wrap: true
     },
