@@ -2,6 +2,7 @@ import { GlobalQueryContextWrapper } from 'context/GlobalQueryContext.js'
 import { PartsContextWrapper } from 'context/PartsContext.js'
 import { ProductUrlContextWrapper } from 'context/ProductUrlContext.js'
 import Cookies from 'js-cookie'
+import Auth from 'layouts/Auth.js'
 import Callback from 'layouts/Callback.js'
 import Reset from 'layouts/Reset'
 import Success from 'layouts/Success'
@@ -31,11 +32,11 @@ import Licenses from 'components/Licenses'
 import { SentryTest } from 'components/SentryTest.js'
 
 import AdminLayout from './layouts/Admin.js'
-import AuthLayout from './layouts/Auth.js'
 import CustomerLayout from './layouts/Customer.js'
-import LoginLayout from './layouts/Login.js'
+import Login from './layouts/Login.js'
 import Register from './layouts/Register.js'
 import RequestSbomUpload from './layouts/RequestSbomUpload'
+import LoginLayout from './layouts/UserLogin.js'
 import './main.css'
 
 const authToken = Cookies.get('authToken')
@@ -48,26 +49,21 @@ const MainWrapper = () => (
   </ProductUrlContextWrapper>
 )
 
+const URL = authToken ? '/vendor/dashboard' : '/auth'
+
 export const MainRoutes = () => {
   return (
     <Routes>
       <Route path={`/`} element={<MainWrapper />}>
-        <Route
-          path=''
-          element={
-            authToken ? (
-              <Navigate replace to='/vendor/dashboard' />
-            ) : (
-              <Navigate replace to='/auth' />
-            )
-          }
-        />
-        <Route path={`auth`} element={<AuthLayout />} />
-        <Route path={`reset_password`} element={<Reset />} />
-        <Route path={`register`} element={<Register />} />
-        <Route path={`accept-user-invitation`} element={<Success />} />
-        <Route path={`confirmation`} element={<Success />} />
-        <Route path={`oauth_callback`} element={<Callback />} />
+        <Route path='' element={<Auth />}>
+          <Route path='' element={<Navigate replace to={URL} />} />
+          <Route path={`auth`} element={<Login />} />
+          <Route path={`reset_password`} element={<Reset />} />
+          <Route path={`register`} element={<Register />} />
+          <Route path={`accept-user-invitation`} element={<Success />} />
+          <Route path={`confirmation`} element={<Success />} />
+          <Route path={`oauth_callback`} element={<Callback />} />
+        </Route>
         <Route
           path={`vendor`}
           element={

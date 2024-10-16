@@ -128,7 +128,7 @@ const TeamTable = () => {
           </Flex>
         )
       },
-      width: '35%',
+      width: '32%',
       wrap: true
     },
     {
@@ -219,7 +219,7 @@ const TeamTable = () => {
         )
       },
       center: true,
-      width: '8%'
+      width: '10%'
     },
     {
       id: 'action',
@@ -272,8 +272,7 @@ const TeamTable = () => {
           </Menu>
         )
       },
-      right: 'true',
-      width: '12%'
+      right: 'true'
     }
   ]
 
