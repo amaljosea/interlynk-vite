@@ -4,8 +4,7 @@ import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, linkURl, sevColor } from 'utils'
-import { isCustomerView, timeSince } from 'utils'
-import { getSignedUrlParams } from 'utils'
+import { getSignedUrlParams, isCustomerView, timeSince } from 'utils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -18,28 +17,24 @@ import {
 import {
   Badge,
   Box,
+  Flex,
+  Portal,
+  Stack,
+  Text,
+  Tooltip,
+  useDisclosure
+} from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
+import { Icon, IconButton } from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import {
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  Grid,
-  GridItem,
-  Icon,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-  Tag,
-  TagLabel,
-  Text,
-  Tooltip,
-  useDisclosure
+  DrawerOverlay
 } from '@chakra-ui/react'
 
 import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
@@ -50,7 +45,6 @@ import CvssCard from 'components/Misc/CvssCard'
 import ExternalLink from 'components/Misc/ExternalLink'
 import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
-import StatusHistory from 'components/VulnerabilityVex/StatusHistory'
 import VexStatusComponent from 'components/VulnerabilityVex/VexStatusComponent'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -360,6 +354,7 @@ const Vulnerabilities = ({ sbomData }) => {
   const componentVulnIds = firstDegreePart?.map((item) => item?.id)
   const sbomIds = firstDegreePart?.map((item) => item?.component?.sbom?.id)
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+
   useQuery(FirstDegreePartVulns, {
     skip:
       firstDegreePart?.length > 0 &&
@@ -383,7 +378,6 @@ const Vulnerabilities = ({ sbomData }) => {
   const CVSS = useDisclosure()
   const IMPORT = useDisclosure()
   const STATUS = useDisclosure()
-  const HISTORY = useDisclosure()
 
   // GET VULN FILTER HEADS
   useQuery(signedUrlParams ? ShareVulnFilters : GetVulnFilterData, {
@@ -784,15 +778,7 @@ const Vulnerabilities = ({ sbomData }) => {
                   >
                     Edit Links
                   </MenuItem>
-                  <MenuItem
-                    isDisabled={!editVulns}
-                    onClick={() => {
-                      setActiveRow(row)
-                      HISTORY.onOpen()
-                    }}
-                  >
-                    Status History
-                  </MenuItem>
+
                   <MenuItem
                     hidden={isFreeTier}
                     isDisabled={!updateCon}
@@ -1076,14 +1062,6 @@ const Vulnerabilities = ({ sbomData }) => {
           selectedGroup={params.productgroupid}
           setSelectedVulns={setSelectedVulns}
           setToggleClear={setToggleClear}
-        />
-      )}
-
-      {HISTORY.isOpen && (
-        <StatusHistory
-          isOpen={HISTORY.isOpen}
-          onClose={HISTORY.onClose}
-          data={{ id: activeRow?.id, vulnId: activeRow?.vuln?.vulnId }}
         />
       )}
     </>
