@@ -461,6 +461,7 @@ const VersionsTable = (props) => {
                   Archive
                 </MenuItem>
                 <MenuItem
+                  data-testid='sbom-delete-button'
                   color={primaryErrorColor}
                   onClick={() => {
                     setActiveRow(row)

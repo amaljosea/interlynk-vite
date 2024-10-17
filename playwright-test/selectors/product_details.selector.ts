@@ -34,8 +34,7 @@ class ProductDetailsSelectors {
   public static getMenu(index: number) {
     return `(//div[@data-tag='allowRowEvents']//button[@aria-haspopup='menu'])[${index}]`
   }
-  public static deleteBtn =
-    "(//div[contains(@class,'chakra-menu__menu-list')])[10]//button[text()='Delete']"
+  public static deleteBtn = '[data-testid="sbom-delete-button"]'
   public static deletePopup =
     "//section[contains(@class,'chakra-modal__content')]//form"
   public static yesBtn = "//button[text()='Yes']"
