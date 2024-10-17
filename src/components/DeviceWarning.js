@@ -1,29 +1,51 @@
-import { Button, Flex, Text } from '@chakra-ui/react'
+import InterlynkLogo from 'assets/img/logo.png'
+
+import { Box, Button, Flex, Heading, Img, Text } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const DeviceWarning = () => {
+  const { primaryBgColor } = useThemeColor(['primaryBgColor'])
+
   return (
-    <Flex
-      justifyContent='center'
-      sx={{ p: 8, height: '100vh', alignItems: 'center', flexDir: 'column' }}
-    >
-      <Text
-        textAlign='center'
-        sx={{ fontSize: '2xl', fontWeight: 'bold', color: 'red.500' }}
+    <Box w='100%' h='100vh' bgGradient='linear(to-br, #4299e1, #1A365D)'>
+      <Flex width={'100%'} gap={1} alignItems={'center'} p={5}>
+        <Img
+          src={InterlynkLogo}
+          sx={{ w: '40px', h: '40px' }}
+          filter={'brightness(0) invert(1)'}
+        />
+        <Text fontSize={'2xl'} color={primaryBgColor} fontWeight={600}>
+          Interlynk
+        </Text>
+      </Flex>
+      <Flex
+        justifyContent='center'
+        sx={{ mt: 52, p: 8, alignItems: 'center', flexDir: 'column' }}
       >
-        This page is best viewed on Desktop
-      </Text>
-      <Text fontSize='md' mt={4} textAlign='center'>
-        Please switch to a larger screen or enable {'Desktop View'} in your
-        browser settings.
-      </Text>
-      <Button
-        mt={6}
-        colorScheme='blue'
-        onClick={() => window.location.reload()}
-      >
-        Retry
-      </Button>
-    </Flex>
+        <Heading
+          textAlign='center'
+          sx={{ fontSize: '3xl', opacity:0.9,  color: 'gray.200' }}
+        >
+          This page is best viewed on Desktop
+        </Heading>
+        <Text
+          fontSize='md'
+          textAlign='center'
+          sx={{ mt: 6, color: 'blue.200', opacity: 0.9 }}
+        >
+          Please switch to a larger screen or enable desktop view in your
+          browser settings.
+        </Text>
+        <Button
+          colorScheme='gray'
+          sx={{ fontSize: 14, mt: 8 }}
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </Button>
+      </Flex>
+    </Box>
   )
 }
 
