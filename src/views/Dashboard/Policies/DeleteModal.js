@@ -31,12 +31,12 @@ const DeleteModal = ({ isOpen, onClose, data }) => {
       onClose={onClose}
       onConfirm={onDeletePolicy}
       name={name}
-      title='Archive Policy'
-      description='Archiving this policy will:'
+      title='Delete Policy'
+      description='Deleting this policy will:'
       items={[
         `Disable the execution of this policy on products`,
-        `Remove results of this policy's execution from existing products`,
-        `Remove this policy from the list of available policies`
+        `Delete results of this policy's execution from existing products`,
+        `Delete this policy from the list of available policies`
       ]}
     />
   )

@@ -346,7 +346,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
                   }}
                   hidden={productId}
                 >
-                  Archive Policy
+                  Delete Policy
                 </MenuItem>
               </MenuList>
             </Portal>
