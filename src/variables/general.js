@@ -1,3 +1,5 @@
+import { getFullDateAndTime } from 'utils'
+
 import { Stack, Text } from '@chakra-ui/react'
 
 export const componentTypes = [
@@ -1088,7 +1090,7 @@ export const exportCsvTableConfig = {
         'Supplier URL': row?.suppliers[0]?.url || 'N/A',
         'Supplier Contact Name': row?.suppliers[0]?.contactName || 'N/A',
         'Supplier Contact Email': row?.suppliers[0]?.contactEmail || 'N/A',
-        CPES: row?.cpes.map((item) => item) || '',
+        CPES: row?.cpes?.map((item) => item) || '',
         Scope: row?.scope || 'N/A',
         'Support Level': row?.supportLevel || 'N/A',
         'End-Of-Support Date': row?.endOfSupport || 'N/A',
@@ -1097,6 +1099,87 @@ export const exportCsvTableConfig = {
           row?.externalUrls
             ?.map((link) => `${link.name}: ${link.url}`)
             .join('; ') || ''
+      }))
+  },
+  'SBOM Vulnerability View': {
+    defaultSelectedColumns: [
+      'ID',
+      'Component Name',
+      'Component Version',
+      'Severity',
+      'Source',
+      'CVSS',
+      'EPSS',
+      'Status',
+      'Updated'
+    ],
+    additionalColumns: [
+      'Description',
+      'Published',
+      'Last Modified',
+      'Fixed Versions',
+      'Last Affected Version',
+      'CVSS Vector',
+      'NVD Alias ID',
+      'EPSS Percentile',
+      'Status History',
+      'Links'
+    ],
+    mapDataForExport: (data) =>
+      data.map((row) => ({
+        ID: row?.vuln?.vulnId || '',
+        'Component Name': row?.component?.name || '',
+        'Component Version': row?.component?.version || '',
+        Severity: row?.vuln?.sev || '',
+        Source: row?.vuln?.source || '',
+        CVSS: row?.vuln?.cvssScore || '',
+        EPSS:
+          row?.vuln?.vulnInfo?.epssScores?.length > 0
+            ? `${(row?.vuln?.vulnInfo?.epssScores[0] * 100).toFixed(3)} %`
+            : '-',
+        Status: row?.vexStatus?.name || 'Unspecified',
+        Updated: row?.vuln?.updatedAt || '',
+        Description: row?.vuln?.desc || '',
+        Published: `"${getFullDateAndTime(row?.vuln?.publishedAt)}"` || '',
+        'Last Modified':
+          `"${getFullDateAndTime(row?.vuln?.lastModifiedAt)}"` || '',
+        'Fixed Versions': `"${row?.fixedVersions}"` || '',
+        'Last Affected Version': `"${row?.lastAffectedVersions}"` || 'N/A',
+        'CVSS Vector': row?.vuln?.cvssVector || '',
+        'NVD Alias ID': row?.vuln?.nvdAliasId || '',
+        'EPSS Percentile': row?.vuln?.vulnInfo?.epssPercentile
+          ? `${(row?.vuln?.vulnInfo?.epssPercentile * 100).toFixed()} %`
+          : '0 %',
+        'Status History': row?.statusHistory || '',
+        Links: (() => {
+          const advisories = row?.isPart
+            ? row?.currentExternalUrls?.find(
+                (item) => item.name === 'advisories'
+              )
+            : row?.externalUrls?.find((item) => item.name === 'advisories')
+          const documentation = row?.isPart
+            ? row?.currentExternalUrls?.find(
+                (item) => item.name === 'documentation'
+              )
+            : row?.externalUrls?.find((item) => item.name === 'documentation')
+          const other = row?.isPart
+            ? row?.currentExternalUrls?.find((item) => item.name === 'other')
+            : row?.externalUrls?.find((item) => item.name === 'other')
+          const issueTracker = row?.isPart
+            ? row?.currentExternalUrls?.find(
+                (item) => item.name === 'issue-tracker'
+              )
+            : row?.externalUrls?.find((item) => item.name === 'issue-tracker')
+
+          const linksArray = [
+            advisories?.url,
+            documentation?.url,
+            other?.url,
+            issueTracker?.url
+          ].filter(Boolean)
+
+          return linksArray.length > 0 ? linksArray.join('; ') : ''
+        })()
       }))
   }
 }

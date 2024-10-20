@@ -1121,3 +1121,27 @@ export const downloadCSV = (csvContent, filename) => {
   a.click()
   document.body.removeChild(a)
 }
+
+export const generateCsvFileName = ({
+  tableType,
+  rowsToExport,
+  applyFilters,
+  product,
+  version,
+  vulnId
+}) => {
+  const filterStatus = applyFilters ? 'Filtered' : 'Unfiltered'
+  const rowCount = rowsToExport === '200' ? 'All' : rowsToExport
+
+  let fileName = ''
+
+  if (tableType === 'SBOM Components View') {
+    fileName = `${product}-${version}-Components-${filterStatus}-${rowCount}.csv`
+  } else if (tableType === 'Global Vulnerability Detail View') {
+    fileName = `Vulnerabilities-${vulnId}-Products-${filterStatus}-${rowCount}.csv`
+  } else if (tableType === 'SBOM Vulnerability View') {
+    fileName = `${product}-${version}-Vulnerabilities-${filterStatus}-${rowCount}.csv`
+  }
+
+  return fileName
+}

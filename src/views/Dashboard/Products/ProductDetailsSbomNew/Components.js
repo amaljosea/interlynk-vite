@@ -905,7 +905,16 @@ const Components = ({ sbomData }) => {
             />
           </Tooltip>
           {/* EXPORT CSV */}
-          <ExportCsv tableData={nodes} tableType={'SBOM Components View'} />
+          <ExportCsv
+            tableType='SBOM Components View'
+            filters={{
+              ...compData,
+              orderBy: searchInput === '' ? orderBy : undefined,
+              search: searchInput !== '' ? searchInput : undefined,
+              includeParts: sbomData?.sbomParts?.length > 0
+            }}
+          />
+
           <RefreshBtn onClick={() => reset()} />
         </Flex>
       </Flex>

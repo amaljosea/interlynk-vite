@@ -77,6 +77,7 @@ import {
   FaPen
 } from 'react-icons/fa6'
 
+import ExportCsv from '../components/ExportCsv'
 import VulnFilters from './VulnFilters'
 
 const statusColor = (status) => {
@@ -916,6 +917,28 @@ const Vulnerabilities = ({ sbomData }) => {
               icon={<FaCopy size={18} />}
             />
           </Tooltip>
+          {/* EXPORT CSV */}
+          <ExportCsv
+            tableType='SBOM Vulnerability View'
+            filters={{
+              search: searchInput !== '' ? searchInput : undefined,
+              severity: severities.length > 0 ? severities : undefined,
+              source: include.includes('parts') ? undefined : 'COMPONENT',
+              componentName: components.length > 0 ? components : undefined,
+              status: statues.length > 0 ? statues : undefined,
+              kev:
+                kev === 'all' || kev === ''
+                  ? undefined
+                  : kev === 'yes'
+                    ? true
+                    : false,
+              epss: epss !== '' && epss !== 'all' ? range : undefined,
+              direct: direct === 'direct only' ? true : undefined,
+              includeRetracted: include.includes('retracted') ? true : false,
+              vexComplete: vexComplete === 'all' ? undefined : false,
+              orderBy: searchInput === '' ? orderBy : undefined
+            }}
+          />
           {/* REFRESH */}
           <RefreshBtn onClick={() => reset()} />
         </Stack>
