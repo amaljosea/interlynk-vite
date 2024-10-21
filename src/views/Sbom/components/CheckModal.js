@@ -6,21 +6,9 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { componentTypes } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Icon,
-  Input,
-  List,
-  ListItem,
-  Select,
-  Tag,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
+import { List, ListItem } from '@chakra-ui/react'
+import { Box, Button, Flex, Icon, Tag, Text, Tooltip } from '@chakra-ui/react'
+import { FormControl, FormLabel, Input, Select } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkAlert from 'components/LynkAlert'
@@ -471,7 +459,11 @@ const CheckModal = (props) => {
       )}
 
       {isComponentLicense && (
-        <LicenseField sbomView={false} resolved={resolved} license={null} />
+        <LicenseField
+          sbomView={false}
+          resolved={resolved}
+          license={licensesExp}
+        />
       )}
     </LynkModal>
   )
