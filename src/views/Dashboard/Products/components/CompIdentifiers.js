@@ -119,7 +119,7 @@ const CompIdentifiers = ({ data }) => {
         id: data?.id,
         sbomId: sbomId,
         purl: identifiers?.purl,
-        cpes: identifiers?.cpe !== '' ? [identifiers?.cpe] : undefined
+        cpes: identifiers?.cpe !== '' ? [identifiers?.cpe] : []
       }
     }).then((res) => {
       const { errors } = res?.data?.componentUpdate || ''
