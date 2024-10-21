@@ -11,8 +11,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import ComponentCard from './Misc/ComponentCard'
 
 const RowComponent = ({ content }) => {
-  console.log('content', content)
-
   const navigate = useNavigate()
   const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
@@ -65,11 +63,13 @@ const RowComponent = ({ content }) => {
   return (
     <>
       <Flex sx={{ gap: 2, alignItems: 'center', cursor: 'pointer' }}>
-        <Icon
-          as={ExternalLinkIcon}
-          onClick={onCheck}
-          sx={{ w: '16px', h: '16px', color: primaryBlueText }}
-        />
+        {content && (
+          <Icon
+            as={ExternalLinkIcon}
+            onClick={onCheck}
+            sx={{ w: '16px', h: '16px', color: primaryBlueText }}
+          />
+        )}
         <Text fontSize={14} textColor={primaryBlueText} onClick={onView}>
           {getValue()}
         </Text>
