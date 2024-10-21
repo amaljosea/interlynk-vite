@@ -919,19 +919,7 @@ const Components = ({ sbomData }) => {
         </Flex>
       </Flex>
     )
-  }, [
-    compSearch,
-    handleSearch,
-    handleClear,
-    onSearchInputChange,
-    shouldShowDemoFeatures,
-    MAP,
-    onCreateComponent,
-    signedUrlParams,
-    restricted,
-    isArchived,
-    reset
-  ])
+  }, [compSearch, handleSearch, handleClear, onSearchInputChange, MAP.onOpen, shouldShowDemoFeatures, onCreateComponent, restricted, signedUrlParams, isArchived, nodes, reset])
 
   const handleSort = async (column, sortDirection) => {
     prodCompDispatch({

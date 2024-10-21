@@ -157,7 +157,7 @@ const Changelog = () => {
         const isComponent = loggableType === 'Component'
         return (
           <Stack my={3} spacing={1} direction={'column'}>
-            {isComponent ? (
+            {isComponent && loggablePrefix ? (
               <RowComponent content={loggablePrefix} />
             ) : (
               <Text
