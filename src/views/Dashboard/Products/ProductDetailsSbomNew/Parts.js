@@ -555,7 +555,7 @@ const Parts = ({ data }) => {
             {/* PROJECTS */}
             <FormControl fontSize={'sm'} isRequired>
               <FormLabel htmlFor='product' fontSize={12}>
-                Project
+                Product
               </FormLabel>
               <LynkSelect
                 name='groups'
