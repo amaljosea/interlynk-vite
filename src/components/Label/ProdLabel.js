@@ -6,11 +6,12 @@ const ProdLabel = ({ item }) => {
   return (
     <Tag
       size='sm'
+      w='fit-content'
       rounded={'full'}
-      bg={hexToRGBA(item?.color, 0.1)}
       borderWidth={'thin'}
-      borderColor={item?.color}
-      sx={{ py: 1, w: 'fit-content', dropShadow: 'inner', color: item?.color }}
+      bg={hexToRGBA(item?.color, 0.1)}
+      borderColor={hexToRGBA(item?.color, 0.4)}
+      sx={{ h: '20px', pt: 0.4, dropShadow: 'inner', color: item?.color }}
     >
       {item?.name}
     </Tag>
