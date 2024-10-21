@@ -190,7 +190,9 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             value={text}
             placeholder='Add text'
             onChange={(e) => setText(e.target.value)}
-            disabled={data || !updateLic}
+            disabled={
+              data?.content?.__typename !== 'LicenseCustom' || !updateLic
+            }
             resize={'none'}
           />
         </FormControl>
