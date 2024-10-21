@@ -608,6 +608,7 @@ export const ShareLynkProjectGroup = gql`
           enabled
           id
           name
+          sbomsCount
           projectGroupId
           updatedAt
         }

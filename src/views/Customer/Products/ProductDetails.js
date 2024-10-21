@@ -2,22 +2,10 @@ import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
-import { getSignedUrlParams } from 'utils'
 import SBOM from 'views/Customer/Sbom'
 
-import {
-  Flex,
-  Grid,
-  GridItem,
-  Icon,
-  Skeleton,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text
-} from '@chakra-ui/react'
+import { Flex, Grid, GridItem, Icon, Skeleton, Text } from '@chakra-ui/react'
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -26,17 +14,14 @@ import VersionsTable from 'components/Tables/VersionsTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { ShareLynkProjectGroup, ShareVulnData } from 'graphQL/Queries'
+import { ShareLynkProjectGroup } from 'graphQL/Queries'
 
 import { FaLock, FaWindowMaximize } from 'react-icons/fa6'
 
 const ProductDetails = () => {
   const params = useParams()
-  const productId = params.productid
   const productGroupId = params.productgroupid
   const sbomId = params.sbomid
-  const signedUrlParams = getSignedUrlParams()
-  const [activeEnv, setActiveEnv] = useState(productId || '')
 
   const tabs = [
     'versions',
@@ -47,30 +32,8 @@ const ProductDetails = () => {
     'change log'
   ]
 
-  const {
-    totalRows,
-    activeCsProdTab,
-    setActiveCsProdTab,
-    prodVulnState,
-    dispatch,
-    envName,
-    onChangeEnv
-  } = useGlobalState()
+  const { activeCsProdTab, setActiveCsProdTab, dispatch } = useGlobalState()
 
-  const environment = envName
-
-  const {
-    field,
-    direction,
-    searchInput,
-    severities,
-    components,
-    statues,
-    include,
-    kev,
-    epss,
-    direct
-  } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
   const { data, loading, error } = useQuery(ShareLynkProjectGroup, {
@@ -88,38 +51,6 @@ const ProductDetails = () => {
     setActiveCsProdTab(value)
   }
 
-  const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
-
-  const range = {
-    min: parseFloat(vulnEpss[0]) / 100,
-    max: parseFloat(vulnEpss[1]) / 100
-  }
-
-  // GET VULN DATA
-  const { data: vulnData } = useQuery(ShareVulnData, {
-    skip: sbomId ? false : true,
-    variables: {
-      projectId: signedUrlParams ? undefined : productId || activeEnv,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      search: searchInput !== '' ? searchInput : undefined,
-      severity: severities.length > 0 ? severities : undefined,
-      source: include.includes('parts') ? undefined : 'COMPONENT',
-      includeRetracted: include.includes('retracted') ? true : false,
-      componentName: components.length > 0 ? components : undefined,
-      status: statues.length > 0 ? statues : undefined,
-      kev:
-        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
-      epss: epss !== '' && epss !== 'all' ? range : undefined,
-      direct: direct === true ? true : undefined,
-      field,
-      direction
-    }
-  })
-
   const [versionFilters, setVersionFilters] = useState({
     field: 'SBOMS_CREATED_AT',
     direction: 'DESC'
@@ -130,22 +61,6 @@ const ProductDetails = () => {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
   }, [prodVulnDispatch, sbomId])
-
-  useEffect(() => {
-    if (environment && data) {
-      const env = data?.shareLynkQuery?.projectGroup?.projects.find(
-        (item) => item.name === environment
-      )
-      setActiveEnv(env?.id)
-    }
-  }, [data, environment])
-
-  useEffect(() => {
-    if (productId && projectGroup) {
-      const env = projectGroup.projects.find((item) => item.id === productId)
-      onChangeEnv(env?.name)
-    }
-  }, [productId, projectGroup])
 
   const handleSort = (column, sortDirection) => {
     setVersionFilters((oldFilters) => ({
@@ -221,7 +136,7 @@ const ProductDetails = () => {
             </GridItem>
             {/* PRODUCT ACTIONS */}
             <GridItem colSpan={2} ml={'auto'}>
-              <EnvFilter />
+              <EnvFilter data={projectGroup} />
             </GridItem>
           </Grid>
         </CardBody>

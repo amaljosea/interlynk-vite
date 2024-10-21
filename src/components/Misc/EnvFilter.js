@@ -1,11 +1,7 @@
-import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { ChevronDownIcon } from '@chakra-ui/icons'
 import {
-  Button,
   Menu,
-  MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup
@@ -16,20 +12,9 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import useQueryParam from 'hooks/useQueryParam'
 
-import { FaCode, FaInbox, FaSquareArrowUpRight } from 'react-icons/fa6'
+import EnvList from './EnvList'
 
-const envIcon = (env) => {
-  switch (env) {
-    case 'default':
-      return <FaInbox />
-    case 'development':
-      return <FaCode />
-    case 'production':
-      return <FaSquareArrowUpRight />
-  }
-}
-
-const EnvFilter = () => {
+const EnvFilter = ({ data }) => {
   const params = useParams()
   const navigate = useNavigate()
   const activeTab = useQueryParam('tab')
@@ -59,18 +44,7 @@ const EnvFilter = () => {
 
   return (
     <Menu closeOnSelect={true}>
-      <MenuButton
-        as={Button}
-        fontSize='sm'
-        colorScheme='blue'
-        fontWeight='medium'
-        className='environments'
-        textTransform='capitalize'
-        leftIcon={envIcon(envName)}
-        rightIcon={<ChevronDownIcon />}
-      >
-        {envName || 'Default'}
-      </MenuButton>
+      <EnvList data={data} />
       <MenuList width={'200px'}>
         <MenuOptionGroup
           value={envName}

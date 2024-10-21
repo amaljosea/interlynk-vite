@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { customerRoutes } from 'routes'
 
-import { Box, Center, Flex, Img, Text, useColorMode } from '@chakra-ui/react'
+import { Box, Center, Flex, Img, Text, useColorMode, useMediaQuery } from '@chakra-ui/react'
 
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
@@ -17,6 +17,7 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 
 // Custom components
 import { getActiveNavbar, getActiveRoute, tourStyles } from '../utils'
+import DeviceWarning from 'components/DeviceWarning'
 
 export const getSharelynk = gql`
   query getSharelynk($id: Uuid!) {
@@ -36,6 +37,7 @@ export default function Customer() {
   const queryParams = new URLSearchParams(location.search)
   const signedUrlParams = queryParams.get('signed_url_params')
   const tabRes = window.matchMedia('(max-width: 1199px)')
+  const [isDesktop] = useMediaQuery('(min-width: 1024px)')
 
   const { colorMode } = useColorMode()
   const { generateProductVersionDetailPageUrlFromCurrentUrl: genUrl } =
@@ -297,6 +299,8 @@ export default function Customer() {
         <Img src={NotFound} width={'36%'} />
       </Center>
     )
+
+  if (!isDesktop) return <DeviceWarning />
 
   return (
     <TourProvider
