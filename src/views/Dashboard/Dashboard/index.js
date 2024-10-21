@@ -25,6 +25,7 @@ import { FaBug, FaCube, FaLayerGroup, FaWindowMaximize } from 'react-icons/fa'
 import ActivitiesOverview from './components/ActivitiesOverview'
 import MiniStatistics from './components/MiniStatistics'
 import ProductsOverview from './components/ProductsOverview'
+import GlobalEnvFilter from 'components/Misc/GlobalEnvFilter'
 
 export default function Dashboard() {
   const { setIsOpen } = useTour()
@@ -83,7 +84,7 @@ export default function Dashboard() {
         <Text fontWeight='semibold' fontSize={20}>
           Dashboard
         </Text>
-        {organization && <EnvFilter />}
+        {organization && <GlobalEnvFilter />}
       </Flex>
       <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing={5}>
         <MiniStatistics
