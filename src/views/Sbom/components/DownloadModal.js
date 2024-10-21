@@ -3,20 +3,9 @@ import { useState } from 'react'
 import { getSignedUrlParams, truncatedValue } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
-import {
-  Button,
-  Checkbox,
-  Divider,
-  Flex,
-  FormControl,
-  FormLabel,
-  Radio,
-  RadioGroup,
-  Stack,
-  Tag,
-  Text,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Button, Divider, Flex, Stack, Tag, Text } from '@chakra-ui/react'
+import { Checkbox, FormControl, FormLabel } from '@chakra-ui/react'
+import { Radio, RadioGroup, useDisclosure } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
@@ -46,6 +35,7 @@ const DownloadModal = (props) => {
   const [original, setOriginal] = useState(false)
   const [encoded, setEncoded] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [excludeParts, setExcludeParts] = useState(false)
 
   const { data: ntia, loading: ntiaLoading } = useQuery(GetSbomQualityScores, {
     skip: isOpen && !signedUrlParams ? false : true,
@@ -111,8 +101,9 @@ const DownloadModal = (props) => {
           package: encoded,
           original: original,
           lite: spec === 'SPDX-Lite' ? true : false,
-          spec: original ? undefined : spec === 'SPDX-Lite' ? 'SPDX' : spec,
-          projectId: signedUrlParams ? undefined : productId
+          projectId: signedUrlParams ? undefined : productId,
+          excludeParts: signedUrlParams ? undefined : excludeParts,
+          spec: original ? undefined : spec === 'SPDX-Lite' ? 'SPDX' : spec
         }
       })
         .then((res) => {
@@ -225,6 +216,14 @@ const DownloadModal = (props) => {
           </FormControl>
           <Divider />
           <Checkbox
+            hidden={signedUrlParams}
+            isChecked={excludeParts}
+            onChange={() => setExcludeParts(!excludeParts)}
+            isDisabled={spec === 'SPDX' || original}
+          >
+            Exclude Parts
+          </Checkbox>
+          <Checkbox
             isChecked={includeVulns}
             onChange={() => setIncludeVulns(!includeVulns)}
             isDisabled={spec === 'SPDX' || original}
@@ -246,7 +245,7 @@ const DownloadModal = (props) => {
           >
             Base64 Unencoded
           </Checkbox>
-          <Divider />
+          <Divider hidden={signedUrlParams} />
           <Flex
             sx={{ flexDir: 'column', gap: 4 }}
             display={!signedUrlParams ? 'flex' : 'none'}
