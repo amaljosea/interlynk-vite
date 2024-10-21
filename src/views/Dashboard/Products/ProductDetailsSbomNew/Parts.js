@@ -269,6 +269,21 @@ const Parts = ({ data }) => {
 
   const sbomVersions = getSbomVersions()
 
+  //Function to find the array to be displayed for versions option, filters out already added version from current env
+  function getActualVersion(versions = [], parts = []) {
+    if (!Array.isArray(versions) || !Array.isArray(parts)) {
+      return []
+    }
+    const partIds = parts.map((part) => part.partId)
+
+    const actualVersions = versions.filter(
+      (version) => !partIds.includes(version.value)
+    )
+    return actualVersions
+  }
+
+  const versionsActual = getActualVersion(sbomVersions, sbomParts)
+
   const onSelectPart = () => partsContext.push()
 
   const onFilterSev = (part, value) => {
@@ -549,7 +564,12 @@ const Parts = ({ data }) => {
           title={'Add Parts'}
           isLoading={loading}
           onSubmit={handleCreatePart}
-          disabled={isExists === true || existingNodes === true}
+          disabled={
+            isExists === true ||
+            existingNodes === true ||
+            versionsActual?.length === 0 ||
+            sbomVersions?.length === 0
+          }
         >
           <Stack spacing={4} direction={'column'} gap={2}>
             {/* PROJECTS */}
@@ -602,15 +622,20 @@ const Parts = ({ data }) => {
               <FormLabel htmlFor='versions' fontSize={12}>
                 Version
               </FormLabel>
-              {sbomVersions?.length === 0 ? (
-                <LynkAlert status='info' msg='No version available' />
+              {versionsActual?.length === 0 && sbomVersions.length > 0 ? (
+                <LynkAlert
+                  status='info'
+                  msg='All available versions from this project have already been added.'
+                />
+              ) : sbomVersions?.length === 0 ? (
+                <LynkAlert status='info' msg='No versions available.' />
               ) : (
                 <LynkSelect
                   name='versions'
                   value={selectedVersion}
                   onChange={(e) => setSelectedVersion(e.target.value)}
                 >
-                  {sbomVersions.map((item, index) => (
+                  {versionsActual.map((item, index) => (
                     <option key={index} value={item.value}>
                       {truncatedValue(item?.label, 30)}
                     </option>
