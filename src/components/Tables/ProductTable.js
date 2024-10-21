@@ -3,10 +3,9 @@ import { useTour } from '@reactour/tour'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
-import { getFullDateAndTime, hexToRGBA, timeSince } from 'utils'
+import { getFullDateAndTime, timeSince } from 'utils'
 import { customStyles, getFormat, getLink, getType } from 'utils'
-import { truncatedValue } from 'utils'
-import { getSignedUrlParams } from 'utils'
+import { getSignedUrlParams, truncatedValue } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
 import LabelInput from 'views/Dashboard/Products/components/LabelInput'
@@ -23,25 +22,22 @@ import {
   Fade,
   Flex,
   IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Link as Olink,
   Portal,
   Stack,
-  Tag,
   Text,
   Tooltip,
   useDisclosure
 } from '@chakra-ui/react'
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
-import LabelDrawer from 'components/Drawer/LabelDrawer'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
+import TagDrawer from 'components/Drawer/TagDrawer'
 import IconBox from 'components/Icons/IconBox'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import ProdLabel from 'components/Label/ProdLabel'
 import EnvList from 'components/Misc/EnvList'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
@@ -450,17 +446,8 @@ const ProductTable = ({
                     name
                   )}
                 </Text>
-                {labels?.map((item) => (
-                  <Tag
-                    py={1}
-                    size='sm'
-                    key={item?.id}
-                    width={'fit-content'}
-                    borderColor={item?.color}
-                    bg={hexToRGBA(item?.color, 0.5)}
-                  >
-                    {item?.name}
-                  </Tag>
+                {labels?.map((item, index) => (
+                  <ProdLabel key={index} item={item} />
                 ))}
               </Flex>
               <Text color={primaryTextColor} pr={32} wordBreak={'break-all'}>
@@ -704,9 +691,7 @@ const ProductTable = ({
       )}
 
       {/* Labels */}
-      {isOpenLabel && (
-        <LabelDrawer isOpen={isOpenLabel} onClose={onCloseLabel} />
-      )}
+      {isOpenLabel && <TagDrawer isOpen={isOpenLabel} onClose={onCloseLabel} />}
     </>
   )
 }

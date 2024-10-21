@@ -1,8 +1,9 @@
 import { useMutation } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
-import { hexToRGBA } from 'utils'
 
-import { Checkbox, Divider, Flex, Tag, Text } from '@chakra-ui/react'
+import { Checkbox, Divider, Flex, Text } from '@chakra-ui/react'
+
+import ProdLabel from 'components/Label/ProdLabel'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -30,7 +31,7 @@ const LabelInput = ({ data, setOpen, onOpenLabel, nodes }) => {
         id: prodId,
         name,
         desc,
-        labelIds: result
+        labelIds: result?.length > 0 ? result : ''
       }
     }).then((res) => {
       const error = res?.data?.projectGroupUpdate?.errors
@@ -69,16 +70,7 @@ const LabelInput = ({ data, setOpen, onOpenLabel, nodes }) => {
               isChecked={selectedLabels?.includes(row?.id)}
               onChange={() => addLabels(row?.id)}
             />
-            <Tag
-              py={1}
-              size='sm'
-              width={'full'}
-              wordBreak={'break-all'}
-              borderColor={row?.color}
-              bg={hexToRGBA(row?.color, 0.5)}
-            >
-              {row?.name}
-            </Tag>
+            <ProdLabel item={row} />
           </Flex>
         ))}
       </Flex>

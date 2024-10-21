@@ -1,6 +1,4 @@
 import { useQuery } from '@apollo/client'
-import { hexToRGBA } from 'utils'
-import { getSignedUrlParams } from 'utils'
 
 import {
   Box,
@@ -11,10 +9,10 @@ import {
   MenuList,
   MenuOptionGroup,
   Stack,
-  Tag,
   Text
 } from '@chakra-ui/react'
 
+import ProdLabel from 'components/Label/ProdLabel'
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
@@ -71,7 +69,7 @@ const ProdFilterMenu = ({
   })
   const { nodes } = data?.labels || ''
 
-  const prodLabels = [{ id: 'all', name: 'All', color: '#CBD5E0' }]
+  const prodLabels = [{ id: 'all', name: 'All', color: '#abb8c3' }]
   if (nodes?.length > 0) {
     nodes?.map((item) =>
       prodLabels?.push({ id: item?.id, name: item?.name, color: item?.color })
@@ -162,13 +160,7 @@ const ProdFilterMenu = ({
                     )
                   }
                 >
-                  <Tag
-                    width={'fit-content'}
-                    borderColor={item?.color}
-                    bg={hexToRGBA(item?.color, 0.5)}
-                  >
-                    {item?.name}
-                  </Tag>
+                  <ProdLabel item={item} />
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>

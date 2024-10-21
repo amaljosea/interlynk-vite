@@ -1,0 +1,149 @@
+import React, { useState } from 'react'
+import { generateRandomColor, hexToRGBA } from 'utils'
+
+import {
+  CheckIcon,
+  CloseIcon,
+  DeleteIcon,
+  EditIcon,
+  RepeatIcon
+} from '@chakra-ui/icons'
+import {
+  Divider,
+  Flex,
+  IconButton,
+  Spacer,
+  Stack,
+  Text
+} from '@chakra-ui/react'
+import { Input, InputGroup, InputRightAddon } from '@chakra-ui/react'
+
+import CustomLoader from 'components/CustomLoader'
+
+import ProdLabel from './ProdLabel'
+
+const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
+  const [editingId, setEditingId] = useState(null)
+  const [editName, setEditName] = useState('')
+  const [editColor, setEditColor] = useState('')
+
+  const startEditing = (label) => {
+    setEditingId(label.id)
+    setEditName(label.name)
+    setEditColor(label.color)
+  }
+
+  const cancelEditing = () => {
+    setEditingId(null)
+  }
+
+  const saveEdit = (id) => {
+    onEditLabel({ id, name: editName, color: editColor })
+    setEditingId(null)
+  }
+
+  const handleNewColor = () => {
+    setEditColor(generateRandomColor())
+  }
+
+  const sortedLabels = [...labels].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
+
+  if (loading) return <CustomLoader />
+
+  return (
+    <Stack>
+      <Text fontSize={'sm'} color={'gray.500'}>{labels?.length} Labels</Text>
+      <Stack pt={4} spacing={3}>
+        {sortedLabels?.map((label, index) => (
+          <Flex flexDir={'column'} key={label.id}>
+            <Flex
+              sx={{
+                gap: 2,
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              {editingId === label.id ? (
+                <Flex
+                  sx={{ w: '100%', gap: 2, justifyContent: 'space-between' }}
+                >
+                  <InputGroup size='sm'>
+                    <Input
+                      w={'fit-content'}
+                      type='text'
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                    />
+                    <InputRightAddon bg={hexToRGBA(editColor, 0.2)}>
+                      {editColor}
+                    </InputRightAddon>
+                  </InputGroup>
+
+                  <Flex gap={2}>
+                    <IconButton
+                      size='sm'
+                      colorScheme='blue'
+                      onClick={handleNewColor}
+                      title='Generate new color'
+                      icon={<RepeatIcon size={18} />}
+                    />
+
+                    <IconButton
+                      size='sm'
+                      colorScheme='green'
+                      title='Save changes'
+                      icon={<CheckIcon size={18} />}
+                      onClick={() => saveEdit(label.id)}
+                    />
+
+                    <IconButton
+                      size='sm'
+                      colorScheme='red'
+                      title='Cancel editing'
+                      onClick={cancelEditing}
+                      icon={<CloseIcon fontSize={12} />}
+                      className='text-red-500 hover:text-red-700 focus:outline-none'
+                    />
+                  </Flex>
+                </Flex>
+              ) : (
+                <Flex
+                  sx={{
+                    w: '100%',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}
+                >
+                  <ProdLabel item={label} />
+                  <Flex gap={2} alignItems={'center'}>
+                    <IconButton
+                      size='sm'
+                      icon={<EditIcon size={18} />}
+                      onClick={() => startEditing(label)}
+                      className='text-blue-500 hover:text-blue-700 focus:outline-none mr-2'
+                      title='Edit label'
+                    />
+
+                    <IconButton
+                      size='sm'
+                      icon={<DeleteIcon size={18} color={'red.500'} />}
+                      onClick={() => onDeleteLabel(label.id)}
+                      className='text-red-500 hover:text-red-700 focus:outline-none'
+                      title='Delete label'
+                    />
+                  </Flex>
+                </Flex>
+              )}
+            </Flex>
+            <Divider mt={3} hidden={index + 1 === labels?.length} />
+          </Flex>
+        ))}
+      </Stack>
+      <Spacer />
+    </Stack>
+  )
+}
+
+export default LabelList

@@ -1017,12 +1017,13 @@ export const isValidPurl = (purl) => {
   }
 }
 
-export const getRandomColor = () => {
-  const getLightValue = () => Math.floor(Math.random() * 128) + 128
-  const r = getLightValue().toString(16).padStart(2, '0')
-  const g = getLightValue().toString(16).padStart(2, '0')
-  const b = getLightValue().toString(16).padStart(2, '0')
-  return `#${r}${g}${b}`
+export const generateRandomColor = () => {
+  return (
+    '#' +
+    Math.floor(Math.random() * 16777215)
+      .toString(16)
+      .padStart(6, '0')
+  )
 }
 
 export const hexToRGBA = (hex, opacity) => {
