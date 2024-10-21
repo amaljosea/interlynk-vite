@@ -321,7 +321,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
           {/* EXPORT CSV */}
           <ExportCsv
-            tableType={'Global Vulnerability Detail View'}
+            tableType={'Vulnerability Detail View'}
             filters={{ ...vulnState }}
           />
 

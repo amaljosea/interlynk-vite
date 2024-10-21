@@ -14,6 +14,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetSbomLicensesTable } from 'graphQL/Queries'
 
+import ExportCsv from '../components/ExportCsv'
+
 const Licenses = () => {
   const location = useLocation()
   const params = useParams()
@@ -39,7 +41,8 @@ const Licenses = () => {
     }
   )
 
-  const subHeaderComponent = () => {
+  // HEADER SECTION
+  const subHeaderComponent = useMemo(() => {
     return (
       <Flex
         width={'100%'}
@@ -47,10 +50,14 @@ const Licenses = () => {
         justifyContent='flex-end'
         gap={3}
       >
+        {/* EXPORT CSV */}
+        <ExportCsv tableType='SBOM License View' />
+
+        {/* REFETCH BUTTON */}
         <RefreshBtn />
       </Flex>
     )
-  }
+  }, [])
 
   // COLUMNS
   const columns = [

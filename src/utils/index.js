@@ -1129,20 +1129,21 @@ export const generateCsvFileName = ({
   applyFilters,
   product,
   version,
-  vulnId
+  vulnId,
+  projectGroupName
 }) => {
   const filterStatus = applyFilters ? 'Filtered' : 'Unfiltered'
   const rowCount = rowsToExport === '200' ? 'All' : rowsToExport
 
-  let fileName = ''
-
-  if (tableType === 'SBOM Components View') {
-    fileName = `${product}-${version}-Components-${filterStatus}-${rowCount}.csv`
-  } else if (tableType === 'Global Vulnerability Detail View') {
-    fileName = `Vulnerabilities-${vulnId}-Products-${filterStatus}-${rowCount}.csv`
-  } else if (tableType === 'SBOM Vulnerability View') {
-    fileName = `${product}-${version}-Vulnerabilities-${filterStatus}-${rowCount}.csv`
+  const fileNameTemplates = {
+    'SBOM Components View': `${product}-${version}-Components-${filterStatus}-${rowCount}.csv`,
+    'Vulnerability Detail View': `Vulnerabilities-${vulnId}-Products-${filterStatus}-${rowCount}.csv`,
+    'SBOM Vulnerability View': `${product}-${version}-Vulnerabilities-${filterStatus}-${rowCount}.csv`,
+    'SBOM License View': `${product}-${version}-Licenses-${filterStatus}-${rowCount}.csv`,
+    'Vulnerability View': projectGroupName
+      ? `${projectGroupName}-Vulnerabilities-${filterStatus}-${rowCount}.csv`
+      : `Vulnerabilities-${filterStatus}-${rowCount}.csv`
   }
 
-  return fileName
+  return fileNameTemplates[tableType] || ''
 }

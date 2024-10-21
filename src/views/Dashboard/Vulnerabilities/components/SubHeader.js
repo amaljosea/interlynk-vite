@@ -1,4 +1,5 @@
 import React from 'react'
+import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 
 import { Flex, Stack } from '@chakra-ui/react'
 
@@ -13,7 +14,11 @@ const SubHeader = ({ filters, setFilters }) => {
       <Stack spacing={isVuln ? 3 : 1} direction={'row'}>
         <Filters filters={filters} setFilters={setFilters} />
       </Stack>
-      <RefreshBtn />
+      <Flex gap={3}>
+        {/* EXPORT CSV */}
+        <ExportCsv tableType='Vulnerability View' filters={{ ...filters }} />
+        <RefreshBtn />
+      </Flex>
     </Flex>
   )
 }

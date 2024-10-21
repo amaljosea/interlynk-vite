@@ -1,5 +1,6 @@
 import { client } from 'context/ApolloWrapper'
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { convertToCSV, downloadCSV, generateCsvFileName } from 'utils'
 import { exportCsvTableConfig } from 'variables/general'
 
@@ -24,15 +25,18 @@ import LynkModal from 'components/LynkModal'
 import useCustomToast from 'hooks/useCustomToast'
 import useExportCsvQueryInfo from 'hooks/useExportCsvQueryInfo'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useProjectGroup } from 'hooks/useProjectGroup'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaFileCsv } from 'react-icons/fa6'
 
-const queryParams = new URLSearchParams(location.search)
-const vulnId = queryParams.get('vulnId')
-
 const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   const { showToast } = useCustomToast()
+  const params = useParams()
+
+  const queryParams = new URLSearchParams(location.search)
+  const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
+
   const { primaryTextColor, secondaryBgColor } = useThemeColor([
     'primaryTextColor',
     'secondaryBgColor'
@@ -53,6 +57,9 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   )
 
   const { sbomHookData } = useGlobalQueryContext()
+  const { name: projectGroupName } = useProjectGroup({
+    projectGroupId: params.productgroupid
+  })
 
   useEffect(() => {
     const config = exportCsvTableConfig[tableType]
@@ -73,7 +80,8 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
     applyFilters,
     product: sbomHookData.projectGroupName,
     version: sbomHookData.versionName,
-    vulnId
+    vulnId,
+    projectGroupName
   })
 
   const handleExport = async () => {

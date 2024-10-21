@@ -1029,7 +1029,7 @@ export const complianceData = [
 ]
 
 export const exportCsvTableConfig = {
-  'Global Vulnerability Detail View': {
+  'Vulnerability Detail View': {
     defaultSelectedColumns: [
       'Product',
       'Version',
@@ -1122,7 +1122,6 @@ export const exportCsvTableConfig = {
       'CVSS Vector',
       'NVD Alias ID',
       'EPSS Percentile',
-      'Status History',
       'Links'
     ],
     mapDataForExport: (data) =>
@@ -1150,7 +1149,6 @@ export const exportCsvTableConfig = {
         'EPSS Percentile': row?.vuln?.vulnInfo?.epssPercentile
           ? `${(row?.vuln?.vulnInfo?.epssPercentile * 100).toFixed()} %`
           : '0 %',
-        'Status History': row?.statusHistory || '',
         Links: (() => {
           const advisories = row?.isPart
             ? row?.currentExternalUrls?.find(
@@ -1181,5 +1179,58 @@ export const exportCsvTableConfig = {
           return linksArray.length > 0 ? linksArray.join('; ') : ''
         })()
       }))
+  },
+  'SBOM License View': {
+    defaultSelectedColumns: ['License Expression', 'Components', 'Status'],
+    additionalColumns: [],
+    mapDataForExport: (data) => {
+      return data.map((row) => {
+        const sortedComponents = row?.components
+          ? [...row.components].sort((a, b) => a?.name?.localeCompare(b?.name))
+          : []
+
+        return {
+          'License Expression': row?.licenseExpression || '',
+          Components:
+            sortedComponents.length > 0
+              ? sortedComponents.map((item) => item?.name).join('; ')
+              : 'No Components Available',
+          Status: row?.derivedState || 'Not Available'
+        }
+      })
+    }
+  },
+  'Vulnerability View': {
+    defaultSelectedColumns: [
+      'ID',
+      'Severity',
+      'Source',
+      'CVSS',
+      'EPSS',
+      'Statuses',
+      'Published',
+      'Modified'
+    ],
+    additionalColumns: [],
+    mapDataForExport: (data) => {
+      return data.map((row) => {
+        const formattedStatuses = row?.metrics
+          ? `Affected: ${row.metrics.affectedCount}; Fixed: ${row.metrics.fixedCount}; In Triage: ${row.metrics.inTriageCount}; Not Affected: ${row.metrics.notAffectedCount}; Unspecified: ${row.metrics.unspecifiedCount}`
+          : 'No Statuses Available'
+        return {
+          ID: row?.vulnId,
+          Severity: row?.sev,
+          Source: row?.source,
+          CVSS: row?.cvssScore,
+          EPSS:
+            row?.vulnInfo?.epssScores?.length > 0
+              ? `${(row?.vulnInfo?.epssScores[0] * 100).toFixed(3)} %`
+              : '-',
+          Statuses: formattedStatuses,
+          Published: `"${getFullDateAndTime(row?.publishedAt)}"`,
+          Modified: `"${getFullDateAndTime(row?.lastModifiedAt)}"`
+        }
+      })
+    }
   }
 }
