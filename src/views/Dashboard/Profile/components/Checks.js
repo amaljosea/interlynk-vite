@@ -2,7 +2,16 @@ import { useMutation, useQuery } from '@apollo/client'
 import DataTable from 'react-data-table-component'
 import { customStyles, sevColor } from 'utils'
 
-import { Flex, Select, Text } from '@chakra-ui/react'
+import { ChevronDownIcon } from '@chakra-ui/icons'
+import {
+  Button,
+  Flex,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text
+} from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -113,28 +122,39 @@ const Checks = () => {
       selector: (row) => {
         const { severity, id } = row
         return (
-          <Select
-            size='sm'
-            name={id}
-            id={id}
-            value={severity}
-            color={sevColor(severity.toLowerCase()).text}
-            isDisabled={!updateOrg}
-            onChange={(e) => handleStatusChange(id, e.target.value)}
-            bg={sevColor(severity.toLowerCase()).bg}
-            borderRadius={'6px'}
-            border='none'
-            focusBorderColor='transparent'
-            _focus={{
-              boxShadow: 'none'
-            }}
-          >
-            {options.map((itm, index) => (
-              <option key={index} value={itm.value}>
-                {itm.label}
-              </option>
-            ))}
-          </Select>
+          <Menu>
+            <MenuButton
+              width={'100px'}
+              as={Button}
+              size='sm'
+              bg={sevColor(severity.toLowerCase()).bg}
+              textColor={sevColor(severity.toLowerCase()).text}
+              borderRadius='6px'
+              border='none'
+              fontWeight='normal'
+              padding='0'
+              paddingLeft='4px'
+              paddingRight='8px'
+              rightIcon={<ChevronDownIcon boxSize={5} />}
+              _hover={{ bg: sevColor(severity.toLowerCase()).bg }}
+              _focus={{ boxShadow: 'none' }}
+              _active={{ bg: sevColor(severity.toLowerCase()).bg }}
+            >
+              {options.find((option) => option.value === severity)?.label ||
+                'Select option'}
+            </MenuButton>
+            <MenuList w='100px' minW='50px'>
+              {options.map((itm, index) => (
+                <MenuItem
+                  key={index}
+                  textColor={primaryTextColor}
+                  onClick={() => handleStatusChange(id, itm.value)}
+                >
+                  {itm.label}
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Menu>
         )
       },
       sortable: true,
