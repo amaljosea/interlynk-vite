@@ -229,8 +229,8 @@ const General = ({ data, loading, error }) => {
                       </Tag>
                     ))}
                   <ActiveBtn
-                    editable={true}
                     onClick={PHASES?.onOpen}
+                    editable={phaseExists ? true : false}
                     color={phaseExists ? 'gray.500' : primaryBlueText}
                   >
                     {phaseExists ? 'Update' : 'Add Phase'}
