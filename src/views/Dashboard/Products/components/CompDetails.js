@@ -174,15 +174,15 @@ const CompDetails = ({ data, primaryComp }) => {
         ...prev,
         details: {
           ...prev.details,
-          name: data?.name,
-          kind: data?.kind,
-          scope: data?.scope,
-          group: data?.group,
+          name: data?.name || '',
+          kind: data?.kind || '',
+          scope: data?.scope || '',
+          group: data?.group || '',
           primary: data?.primary,
-          version: data?.version,
+          version: data?.version || '',
           internal: data?.internal,
-          description: data?.description,
-          copyright: data?.copyright,
+          description: data?.description || '',
+          copyright: data?.copyright || '',
           supportLevel: supportLevel?.replaceAll(' ', '_').toUpperCase() || '',
           licenses: licensesExp
             ? [{ value: licensesExp, label: licensesExp }]
