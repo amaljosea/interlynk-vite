@@ -14,18 +14,22 @@ import { truncatedValue } from 'utils'
 import { settingActions } from 'variables/general'
 
 import { SearchIcon } from '@chakra-ui/icons'
+import { useColorMode } from '@chakra-ui/system'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import useThemeActions from 'hooks/useThemeAction'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProjectGroupAndVersionDetails } from 'graphQL/Queries'
 
 import { FaRegWindowMaximize } from 'react-icons/fa'
-import { FaRegFile, FaScrewdriverWrench } from 'react-icons/fa6'
+import { FaDisplay, FaMoon, FaSun } from 'react-icons/fa6'
+import { FaRegFile } from 'react-icons/fa6'
+import { FaScrewdriverWrench } from 'react-icons/fa6'
 
 const Kbar = () => {
+  const { isFreeTier } = useGlobalQueryContext()
   const { results, rootActionId } = useMatches()
   const navigate = useNavigate()
   const params = useParams()
@@ -58,8 +62,98 @@ const Kbar = () => {
       .find((item) => item.name === value)
     onChangeEnv(env?.name)
   }
+  const { setColorMode } = useColorMode()
 
-  let data = []
+  const allDefaultActions = [
+    {
+      id: 'home',
+      name: 'Home',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/dashboard')
+    },
+    {
+      id: 'products',
+      name: 'Products',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/products')
+    },
+    {
+      id: 'requests',
+      name: 'Requests',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/requests')
+    },
+    {
+      id: 'vulnerabilities',
+      name: 'Vulnerabilities',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/vulnerabilities')
+    },
+    {
+      id: 'licenses',
+      name: 'Licenses',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/licenses')
+    },
+    {
+      id: 'analytics',
+      name: 'Analytics',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/analytics')
+    },
+    {
+      id: 'tools',
+      name: 'Tools',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/tools')
+    },
+    {
+      id: 'support',
+      name: 'Support',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/support')
+    },
+    {
+      id: 'policies',
+      name: 'Policies',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/policies')
+    },
+    {
+      id: 'settings',
+      name: 'Settings',
+      section: 'navigation',
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate('/vendor/settings?tab=users')
+    }
+  ]
+
+  const getFreeTierActions = (...ids) => {
+    return allDefaultActions.filter((action) => ids.includes(action.id))
+  }
+
+  const freeTierActions = getFreeTierActions(
+    'home',
+    'products',
+    'vulnerabilities',
+    'tools',
+    'policies',
+    'settings'
+  )
+
+  const actions = isFreeTier ? freeTierActions : allDefaultActions
+
+  let data = [...actions]
+
   if (productData?.organization?.projectGroups?.nodes?.length > 0) {
     productData.organization.projectGroups.nodes.forEach((item) => {
       const envProject = item?.projects?.find((proj) => proj.name === envName)
@@ -186,9 +280,34 @@ const Kbar = () => {
       }
     }
   })
-
-  useThemeActions()
   useRegisterActions(data, [productData, envName, params])
+
+  data.push(
+    {
+      id: 'theme',
+      name: 'Change Theme',
+      section: 'Preferences',
+      icon: <FaDisplay color='#718096' />
+    },
+    {
+      id: 'darkTheme',
+      name: 'Dark Mode',
+      keywords: 'dark theme',
+      section: 'Theme',
+      icon: <FaMoon color='#718096' />,
+      perform: () => setColorMode('dark'),
+      parent: 'theme'
+    },
+    {
+      id: 'lightTheme',
+      name: 'Light Mode',
+      keywords: 'light theme',
+      section: 'Theme',
+      icon: <FaSun color='#718096' />,
+      perform: () => setColorMode('light'),
+      parent: 'theme'
+    }
+  )
 
   const ResultItem = ({ item, active, currentRootActionId }) => {
     const ancestors = useMemo(() => {

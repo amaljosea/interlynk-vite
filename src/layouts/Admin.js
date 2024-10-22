@@ -23,7 +23,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { getOrganization } from 'graphQL/Queries'
 
-import { FaArrowLeft, FaArrowRight, FaRegFile } from 'react-icons/fa6'
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 
 import {
   displayErrorMessage,
@@ -67,79 +67,6 @@ export default function Admin() {
     const currentTime = Date.now() / 1000
     return decodedToken.exp < currentTime
   }
-
-  const actions = [
-    {
-      id: 'home',
-      name: 'Home',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/dashboard')
-    },
-    {
-      id: 'products',
-      name: 'Products',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/products')
-    },
-    {
-      id: 'requests',
-      name: 'Requests',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/requests')
-    },
-    {
-      id: 'vulnerabilities',
-      name: 'Vulnerabilities',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/vulnerabilities')
-    },
-    {
-      id: 'licenses',
-      name: 'Licenses',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/licenses')
-    },
-    {
-      id: 'analytics',
-      name: 'Analytics',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/analytics')
-    },
-    {
-      id: 'tools',
-      name: 'Tools',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/tools')
-    },
-    {
-      id: 'support',
-      name: 'Support',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/support')
-    },
-    {
-      id: 'policies',
-      name: 'Policies',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/policies')
-    },
-    {
-      id: 'settings',
-      name: 'Settings',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/settings?tab=users')
-    }
-  ]
 
   const onTourUpdate = (value) => {
     document?.body?.classList.remove('no-scroll')
@@ -284,7 +211,7 @@ export default function Admin() {
   if (!isDesktop) return <DeviceWarning />
 
   return (
-    <KBarProvider actions={actions} options={{ enableHistory: true }}>
+    <KBarProvider options={{ enableHistory: true }}>
       <Kbar />
       <Stack
         spacing={0}
