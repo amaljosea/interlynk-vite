@@ -1,22 +1,16 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { generateRandomColor } from 'utils'
 import { tagColors } from 'variables/general'
 
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
+import { Box, Button, Flex, IconButton, SimpleGrid } from '@chakra-ui/react'
+import { FormControl, FormLabel, Input } from '@chakra-ui/react'
 import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  IconButton,
-  Input,
   Popover,
   PopoverBody,
   PopoverContent,
   PopoverHeader,
   PopoverTrigger,
-  SimpleGrid,
   usePopoverContext
 } from '@chakra-ui/react'
 
@@ -58,7 +52,7 @@ const LabelCreator = ({ onAddLabel }) => {
               value={name}
               name='name'
               fontSize='sm'
-              maxLength={'32'}
+              maxLength={'20'}
               onChange={(e) => setName(e.target.value)}
             />
           </FormControl>

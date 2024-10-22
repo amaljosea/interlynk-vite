@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { generateRandomColor, hexToRGBA } from 'utils'
 
 import {
@@ -54,16 +54,15 @@ const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
 
   return (
     <Stack>
-      <Text fontSize={'sm'} color={'gray.500'}>{labels?.length} Labels</Text>
+      <Text fontSize={'sm'} color={'gray.500'}>
+        {labels?.length} Labels
+      </Text>
       <Stack pt={4} spacing={3}>
         {sortedLabels?.map((label, index) => (
           <Flex flexDir={'column'} key={label.id}>
             <Flex
-              sx={{
-                gap: 2,
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}
+              justifyContent='space-between'
+              sx={{ gap: 2, alignItems: 'center' }}
             >
               {editingId === label.id ? (
                 <Flex
@@ -71,9 +70,10 @@ const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
                 >
                   <InputGroup size='sm'>
                     <Input
-                      w={'fit-content'}
                       type='text'
+                      w={'fit-content'}
                       value={editName}
+                      maxLength={'20'}
                       onChange={(e) => setEditName(e.target.value)}
                     />
                     <InputRightAddon bg={hexToRGBA(editColor, 0.2)}>
