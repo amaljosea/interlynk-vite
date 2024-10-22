@@ -2,21 +2,19 @@ import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { validateEmail, validateUrl } from 'utils'
 
-import {
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input
-} from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
+import { Flex, Input } from '@chakra-ui/react'
 
 import { RegisterOrganizationIcon } from 'components/Icons/Icons'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
+import useCustomToast from 'hooks/useCustomToast'
+
 import { RegisterOrganization } from 'graphQL/Mutation'
 
-const OrgModal = ({ isOpen, onClose, org, onSwitch }) => {
+const OrgModal = ({ isOpen, onClose }) => {
+  const { showToast } = useCustomToast()
   const [error, setError] = useState('')
   const [name, setName] = useState('')
   const [url, setUrl] = useState('')
@@ -64,12 +62,11 @@ const OrgModal = ({ isOpen, onClose, org, onSwitch }) => {
       if (errors?.length > 0) {
         setError(errors[0])
       } else {
-        if (org) {
-          onClose()
-        } else {
-          const orgId = res?.data?.organizationCreate?.organization?.id
-          onSwitch(orgId, name)
-        }
+        showToast({
+          description: `Organization added successfully`,
+          status: 'success'
+        })
+        onClose()
       }
     })
   }
@@ -99,6 +96,7 @@ const OrgModal = ({ isOpen, onClose, org, onSwitch }) => {
           <Input
             type='text'
             fontSize={14}
+            maxLength={'20'}
             value={name}
             onChange={(e) => {
               setName(e.target.value)

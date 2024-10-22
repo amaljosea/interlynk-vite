@@ -281,7 +281,7 @@ export default function Admin() {
                 secondary={getActiveNavbar(dashRoutes)}
               />
             </Box>
-            <Box my={5} px={6}>
+            <Box my={4} px={5}>
               {organization ? <Outlet /> : <OrgRegister loading={loading} />}
             </Box>
           </Flex>

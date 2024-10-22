@@ -14,6 +14,7 @@ import {
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import EnvFilter from 'components/Misc/EnvFilter'
+import GlobalEnvFilter from 'components/Misc/GlobalEnvFilter'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
@@ -25,7 +26,6 @@ import { FaBug, FaCube, FaLayerGroup, FaWindowMaximize } from 'react-icons/fa'
 import ActivitiesOverview from './components/ActivitiesOverview'
 import MiniStatistics from './components/MiniStatistics'
 import ProductsOverview from './components/ProductsOverview'
-import GlobalEnvFilter from 'components/Misc/GlobalEnvFilter'
 
 export default function Dashboard() {
   const { setIsOpen } = useTour()
@@ -80,12 +80,7 @@ export default function Dashboard() {
   return (
     <Flex width={'100%'} flexDirection='column' gap={5}>
       {/* STATS */}
-      <Flex width='100%' alignItems={'center'} justifyContent={'space-between'}>
-        <Text fontWeight='semibold' fontSize={20}>
-          Dashboard
-        </Text>
-        {organization && <GlobalEnvFilter />}
-      </Flex>
+      <Flex width='100%'>{organization && <GlobalEnvFilter />}</Flex>
       <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing={5}>
         <MiniStatistics
           title={'Products'}

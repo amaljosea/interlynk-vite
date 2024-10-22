@@ -8,6 +8,7 @@ import { logoutUser } from 'utils/authUtils'
 
 import { Button, Flex, IconButton, useColorMode } from '@chakra-ui/react'
 
+import Organizations from 'components/Organizations'
 // Custom Components
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
@@ -31,7 +32,7 @@ export default function AdminNavbarLinks(props) {
     navigate('/auth')
   }
 
-  const { setIsOpen, setCurrentStep, setSteps } = useTour()
+  const { setIsOpen, setCurrentStep } = useTour()
 
   const onStartTour = () => {
     localStorage.setItem('tourCompleted', false)
@@ -70,6 +71,9 @@ export default function AdminNavbarLinks(props) {
         onClick={toggleColorMode}
         icon={colorMode === 'light' ? <FaMoon /> : <FaSun />}
       />
+
+      {/* ORGANIZATIONS */}
+      {!signedUrlParams && <Organizations />}
 
       {/* USER MENU */}
       {!signedUrlParams && <UserMenu handleLogout={handleLogout} />}

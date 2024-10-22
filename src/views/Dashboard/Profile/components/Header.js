@@ -1,13 +1,11 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { formatDistanceToNow } from 'date-fns'
 import Cookies from 'js-cookie'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { isCustomerView, validPassword } from 'utils'
-import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { validPassword } from 'utils'
 
 import {
-  AddIcon,
   ChevronDownIcon,
   EditIcon,
   ViewIcon,
@@ -42,29 +40,23 @@ import {
   TagLabel,
   Text,
   Tooltip,
-  VStack,
   useDisclosure
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import LynkAlert from 'components/LynkAlert'
-import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { SwitchOrganization, UpdateUserPassword } from 'graphQL/Mutation'
+import { UpdateUserPassword } from 'graphQL/Mutation'
 import { UploadProfileImage, orgUpdate, updateOrgUser } from 'graphQL/Mutation'
-import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
 
-import { FaExchangeAlt } from 'react-icons/fa'
 import { FaCity } from 'react-icons/fa'
 
 const Header = ({ selectedTab, setSelectedTab, tabs }) => {
-  const location = useLocation()
-  const customerView = isCustomerView()
   const [profileImage, setProfileImage] = useState(null)
   const [newUserName, setNewUserName] = useState('')
   const [nameError, setNameError] = useState('')
@@ -77,7 +69,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const [invalidPassword, setInvalidPassword] = useState(false)
   const [passError, setPassError] = useState('')
   const [isPasswordEdit, setIsPasswordEdit] = useState(false)
-  const [activeRow, setActiveRow] = useState(null)
   const [orgName, setOrgName] = useState('')
   const [dpLoading, setDpLoading] = useState(false)
   const [isSaveDisabled, setIsSaveDisabled] = useState(false)
@@ -87,26 +78,18 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     primaryTextColor,
     secondaryBgColor,
     primaryErrorColor,
-    primaryBlueText,
-    headingTextColor,
-    grayBorderColor
+    primaryBlueText
   } = useThemeColor([
     'primaryTextColor',
     'secondaryBgColor',
     'primaryErrorColor',
-    'primaryBlueText',
-    'headingTextColor',
-    'grayBorderColor'
+    'primaryBlueText'
   ])
 
   const [updateOrg, { loading: updateLoading }] = useMutation(orgUpdate)
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
   const { organization: orgData } = useGlobalState()
-
-  const isSuperAdmin = orgData?.currentUser?.superAdmin
   const { id, name, profileImage: dp } = orgData?.currentUser || ''
-  const activeOrgId = orgData?.id
   const activeOrgTier = orgData?.tier
   const lastUpdated = orgData?.updatedAt
   const timeAgo =
@@ -115,23 +98,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
       addSuffix: true
     })
 
-  const { data: allOrgs } = useQuery(AllOrganizations, {
-    skip: isSuperAdmin === true ? false : true,
-    variables: { first: 100, status: 'approved' }
-  })
-  const { data: myOrgs } = useQuery(MyOrganizations, {
-    skip: isSuperAdmin === true || customerView ? true : false,
-    variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
-  })
-  const { nodes: allOrgList } = allOrgs?.allOrganizations || ''
-  const { nodes: myOrgList } = myOrgs?.myOrganizations || ''
-
-  const organisationList = isSuperAdmin ? allOrgList : myOrgList
-
   const [updateUser, { loading: userLoading }] = useMutation(updateOrgUser)
   const [updatePassword, { loading: passLoading }] =
     useMutation(UpdateUserPassword)
-  const [switchOrg] = useMutation(SwitchOrganization)
   const [uploadProfile] = useMutation(UploadProfileImage)
 
   const inputRef = useRef(null)
@@ -141,17 +110,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     isOpen: isPersonalModalOpen,
     onOpen: onPersonalModalOpen,
     onClose: onPersonalModalClose
-  } = useDisclosure()
-  const {
-    isOpen: isOrgModalOpen,
-    onOpen: onOrgModalOpen,
-    onClose: onOrgModalClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isWarningOpen,
-    onOpen: onWarningOpen,
-    onClose: onWarningClose
   } = useDisclosure()
 
   const {
@@ -171,28 +129,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     setShowConfPass(false)
     setPassError('')
     setIsSaveDisabled(false)
-  }
-
-  //Function to switch organization
-  const onSwitchOrg = async (id, name) => {
-    await switchOrg({
-      variables: {
-        orgId: id
-      }
-    })
-      .then((res) => {
-        if (res.data) {
-          Cookies.set('authToken', res.data.organizationSwitch.token)
-          showToast({
-            description: `Logged into ${name} successfully`,
-            status: 'success'
-          })
-        }
-      })
-      .finally(() => {
-        navigate('/vendor/dashboard')
-        window.location.reload()
-      })
   }
 
   //Function to change tab (org <> personal)
@@ -314,10 +250,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const handleEditOrgClick = () => {
     onOrgInfoOpen()
   }
-
-  const switchOrgClick = useCallback(() => {
-    onOrgModalOpen()
-  }, [onOrgModalOpen]) // Include onOrgModalOpen in the dependencies array
 
   const isValidFileType = (file) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
@@ -442,12 +374,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   }, [orgData])
 
   useEffect(() => {
-    if (location.state?.openOrgListDrawer) {
-      switchOrgClick()
-    }
-  }, [location.state, switchOrgClick])
-
-  useEffect(() => {
     if (isPasswordEdit) {
       if (
         newPassword &&
@@ -475,61 +401,56 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
   return (
     <>
-      <Flex justify='space-between' align='center' mb={5}>
-        <Text fontWeight='semibold' fontSize={20}>
-          Settings
-        </Text>
-        <Menu>
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            display={!orgData ? 'none' : 'block'}
-            sx={{
-              fontSize: 'sm',
-              fontWeight: 'medium',
-              textTransform: 'capitalize'
-            }}
-          >
-            <Flex align='center'>
-              {/* Left Icon */}
-              {tabs
-                .filter((tab) => tab.name === selectedTab)
-                .map((tab, index) => (
-                  <tab.icon
-                    key={index}
-                    w='20px'
-                    h='20px'
-                    color={secondaryBgColor}
-                    style={{ marginRight: '8px' }}
-                  />
-                ))}
+      <Menu>
+        <MenuButton
+          as={Button}
+          colorScheme='blue'
+          display={!orgData ? 'none' : 'block'}
+          sx={{
+            fontSize: 'sm',
+            fontWeight: 'medium',
+            textTransform: 'capitalize'
+          }}
+        >
+          <Flex align='center'>
+            {/* Left Icon */}
+            {tabs
+              .filter((tab) => tab.name === selectedTab)
+              .map((tab, index) => (
+                <tab.icon
+                  key={index}
+                  w='20px'
+                  h='20px'
+                  color={secondaryBgColor}
+                  style={{ marginRight: '8px' }}
+                />
+              ))}
 
-              {/* Text */}
-              <Text fontSize='sm'>{selectedTab.toLowerCase()}</Text>
-              {/* Right Icon */}
-              <ChevronDownIcon ml='4px' boxSize='20px' />
-            </Flex>
-          </MenuButton>
-          <MenuList>
-            {tabs.map((tab, index) => (
-              <MenuOptionGroup key={index} value={selectedTab} type='radio'>
-                <MenuItemOption
-                  value={tab.name}
-                  onClick={() => {
-                    setSelectedTab(tab.name)
-                    handleTabChange(tab.name)
-                  }}
-                  fontSize='sm'
-                  textTransform={'capitalize'}
-                >
-                  {tab.name.toLowerCase()}
-                </MenuItemOption>
-              </MenuOptionGroup>
-            ))}
-          </MenuList>
-        </Menu>
-      </Flex>
-      <Card mb={5}>
+            {/* Text */}
+            <Text fontSize='sm'>{selectedTab.toLowerCase()}</Text>
+            {/* Right Icon */}
+            <ChevronDownIcon ml='4px' boxSize='20px' />
+          </Flex>
+        </MenuButton>
+        <MenuList>
+          {tabs.map((tab, index) => (
+            <MenuOptionGroup key={index} value={selectedTab} type='radio'>
+              <MenuItemOption
+                value={tab.name}
+                onClick={() => {
+                  setSelectedTab(tab.name)
+                  handleTabChange(tab.name)
+                }}
+                fontSize='sm'
+                textTransform={'capitalize'}
+              >
+                {tab.name.toLowerCase()}
+              </MenuItemOption>
+            </MenuOptionGroup>
+          ))}
+        </MenuList>
+      </Menu>
+      <Card my={5}>
         <CardBody>
           {/* USER INFO */}
           <Flex
@@ -647,20 +568,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
             </Flex>
           </Flex>
           <Flex gap={2}>
-            <Tooltip
-              label={isPersonal ? 'Switch Organization' : 'Edit Organization'}
-              placement={'left'}
-            >
-              <IconButton
-                variant='solid'
-                aria-label='Edit'
-                colorScheme='blue'
-                icon={isPersonal ? <FaExchangeAlt /> : <EditIcon />}
-                onClick={isPersonal ? switchOrgClick : handleEditOrgClick}
-              />
-            </Tooltip>
-
-            {isPersonal && (
+            {isPersonal ? (
               <Tooltip label='Edit Profile'>
                 <IconButton
                   aria-label='Edit'
@@ -668,6 +576,16 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   colorScheme='blue'
                   variant='solid'
                   onClick={handleEditProfileClick}
+                />
+              </Tooltip>
+            ) : (
+              <Tooltip label={'Edit Organization'} placement={'left'}>
+                <IconButton
+                  variant='solid'
+                  aria-label='Edit'
+                  colorScheme='blue'
+                  icon={<EditIcon />}
+                  onClick={handleEditOrgClick}
                 />
               </Tooltip>
             )}
@@ -887,108 +805,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
         </DrawerContent>
       </Drawer>
 
-      {/* Org Drawer */}
-      <Drawer
-        isOpen={isOrgModalOpen}
-        placement='right'
-        onClose={onOrgModalClose}
-        size='md'
-        closeOnOverlayClick={false}
-      >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton mt={1} />
-          <DrawerHeader fontWeight='500' borderBottomWidth='1px'>
-            Organization
-          </DrawerHeader>
-
-          <DrawerBody>
-            <Text fontSize='16px' mb='20px' textColor={'gray.500'}>
-              My organization
-            </Text>
-
-            {organisationList?.map((org, index) => (
-              <Box
-                key={index}
-                mb={4}
-                display={'flex'}
-                alignItems={'center'}
-                justifyContent={'space-between'}
-              >
-                <VStack align='start' spacing={0}>
-                  {/* Display name and admin on the same row */}
-                  <Box display={'flex'} alignItems={'center'} gap={1}>
-                    <Text fontSize={'14px'} display='inline' mr={2}>
-                      {org.name}
-                    </Text>
-                    {org.id === activeOrgId && (
-                      <Tag
-                        variant='subtle'
-                        colorScheme='white'
-                        borderColor={primaryBlueText}
-                        sx={{
-                          w: 'fit-content',
-                          borderWidth: '1px',
-                          textTransform: 'capitalize'
-                        }}
-                      >
-                        <TagLabel
-                          fontSize={'12px'}
-                          color={primaryBlueText}
-                          mx='auto'
-                        >
-                          {'Active'}
-                        </TagLabel>{' '}
-                      </Tag>
-                    )}
-                  </Box>
-                  {/* Display tier below the name and admin */}
-                  <Text
-                    textColor={'gray.500'}
-                    sx={{ fontSize: '12px', textTransform: 'capitalize' }}
-                  >
-                    {org.tier}
-                  </Text>
-                </VStack>
-                {activeOrgId !== org.id && (
-                  <Tooltip placement={'left'} label={`Switch to ${org.name}`}>
-                    <IconButton
-                      variant='solid'
-                      aria-label='Switch'
-                      icon={<FaExchangeAlt color={headingTextColor} />}
-                      sx={{
-                        border: '1px',
-                        borderColor: grayBorderColor,
-                        bg: secondaryBgColor
-                      }}
-                      onClick={() => {
-                        setActiveRow({ id: org.id, name: org.name })
-                        onWarningOpen()
-                      }}
-                    />
-                  </Tooltip>
-                )}
-              </Box>
-            ))}
-            <Button
-              onClick={onOpen}
-              colorScheme='white'
-              leftIcon={<AddIcon />}
-              borderColor={primaryBlueText}
-              aria-label='Add Organization'
-              sx={{
-                fontWeight: '500',
-                textColor: primaryBlueText,
-                border: '1px',
-                mt: '10px'
-              }}
-            >
-              Add Organization
-            </Button>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
-
       {/* Edit organisation Drawer */}
       <Drawer
         isOpen={isOrgInfoOpen}
@@ -1026,32 +842,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
           </DrawerBody>
         </DrawerContent>
       </Drawer>
-
-      {isOpen && (
-        <OrgModal
-          isOpen={isOpen}
-          onClose={onClose}
-          org={activeOrgId}
-          onSwitch={onSwitchOrg}
-        />
-      )}
-
-      {isWarningOpen && (
-        <LynkModal
-          isOpen={isWarningOpen}
-          onClose={onWarningClose}
-          onSubmit={() => onSwitchOrg(activeRow.id, activeRow.name)}
-          title={'Switch Organization'}
-          Icon={FaExchangeAlt}
-          buttonText='Continue'
-        >
-          <Text>
-            You are about to swich to Organization:{' '}
-            <strong>{activeRow.name}</strong>
-          </Text>
-          <Text mt={6}>Click Continue to confirm</Text>
-        </LynkModal>
-      )}
     </>
   )
 }

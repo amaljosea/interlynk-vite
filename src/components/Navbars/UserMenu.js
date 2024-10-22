@@ -2,27 +2,22 @@ import { useTour } from '@reactour/tour'
 import { Link, useParams } from 'react-router-dom'
 import { homeSteps, productSteps } from 'utils/tourUtils'
 
+import { Avatar, Flex, Icon, Stack, Text } from '@chakra-ui/react'
 import {
-  Avatar,
-  Flex,
-  Icon,
   Menu,
   MenuButton,
   MenuDivider,
   MenuGroup,
   MenuItem,
-  MenuList,
-  Stack,
-  Text
+  MenuList
 } from '@chakra-ui/react'
 
 import { SettingsIcon } from 'components/Icons/Icons'
 
-import { useFetchOrganizationsCount } from 'hooks/useFetchOrganizationsCount'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
-import { FaBuilding, FaExchangeAlt, FaSignOutAlt } from 'react-icons/fa'
+import { FaBuilding, FaSignOutAlt } from 'react-icons/fa'
 import { FaLocationArrow, FaUser } from 'react-icons/fa6'
 
 const SERVER_URL = process.env.REACT_APP_SERVER
@@ -30,7 +25,6 @@ const SERVER_URL = process.env.REACT_APP_SERVER
 export const UserMenu = ({ handleLogout }) => {
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const { organization } = useGlobalState()
-  const organisationCount = useFetchOrganizationsCount()
   const params = useParams()
   const { setIsOpen, setCurrentStep, setSteps } = useTour()
 
@@ -39,12 +33,6 @@ export const UserMenu = ({ handleLogout }) => {
   const productView = location.pathname === '/vendor/products'
 
   const currentUser = organization?.currentUser
-
-  const linkState =
-    organisationCount > 1 ? { openOrgListDrawer: true } : undefined
-
-  const queryParams =
-    organisationCount > 1 ? '?tab=security tokens' : '?tab=users'
 
   const updateTour = (steps, name) => {
     localStorage.setItem('activeTour', name)
@@ -82,9 +70,6 @@ export const UserMenu = ({ handleLogout }) => {
                 <Text fontSize='sm' color='#718096'>
                   {currentUser?.email}
                 </Text>
-                <Text fontSize='sm' color='#718096'>
-                  {organization?.name || ''}
-                </Text>
               </Stack>
             </Flex>
           </MenuItem>
@@ -106,9 +91,9 @@ export const UserMenu = ({ handleLogout }) => {
               Start {productView ? 'Product' : ''} Tour
             </MenuItem>
           )}
-          <Link to={`/vendor/settings/${queryParams}`} state={linkState}>
+          <Link to={`/vendor/settings?tab=users`}>
             <MenuItem
-              icon={organisationCount <= 1 ? <FaBuilding /> : <FaExchangeAlt />}
+              icon={<FaBuilding />}
               display={organization ? 'flex' : 'none'}
             >
               Organizations
