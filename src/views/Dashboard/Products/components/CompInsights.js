@@ -1,22 +1,12 @@
 import { useQuery } from '@apollo/client'
 import styled from '@emotion/styled'
 import { useParams } from 'react-router-dom'
-import { getFullDateAndTime } from 'utils'
+import { getFullDateAndTime, truncatedValue } from 'utils'
 import { pkgData, pkgVersionData, repositoryData } from 'variables/general'
 
-import {
-  Flex,
-  SimpleGrid,
-  Skeleton,
-  Spacer,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs
-} from '@chakra-ui/react'
-import { Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
+import { Flex, SimpleGrid, Skeleton, Spacer, Stack } from '@chakra-ui/react'
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
+import { Box, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 import {
   Drawer,
   DrawerBody,
@@ -28,7 +18,6 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import { HealthScore } from 'components/HealthScore'
-import CompInfo from 'components/Misc/CompInfo'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -105,24 +94,28 @@ const CompInsights = ({ isOpen, onClose, id }) => {
             <Skeleton mt={2} w={'50%'} h={3} />
           ) : (
             <Flex alignItems={'center'} gap={2} justifyContent={'flex-start'}>
-              <CompInfo data={data?.component} />
+              <Text fontWeight={'normal'} fontSize={'sm'}>
+                {truncatedValue(data?.component?.name, 15)} -{' '}
+                {truncatedValue(data?.component?.version, 15)}
+              </Text>
               <HealthScore isComponent value={healthScore} />
             </Flex>
           )}
         </DrawerHeader>
-        <DrawerBody p={loading ? 3 : 0}>
+        <DrawerBody p={0}>
           {loading ? (
-            <CustomLoader />
+            <Box px={5}>
+              <CustomLoader />
+            </Box>
           ) : (
             <Tabs isFitted>
               <TabList bg={secondaryBgColor} zIndex={11}>
                 {tabs.map((item, index) => (
                   <Tab
-                    py={3.5}
                     key={index}
                     fontSize={'sm'}
-                    textTransform={'capitalize'}
                     _focus={{ outline: 'none', bg: 'none' }}
+                    sx={{ py: 3.5, textTransform: 'capitalize' }}
                   >
                     {item}
                   </Tab>
