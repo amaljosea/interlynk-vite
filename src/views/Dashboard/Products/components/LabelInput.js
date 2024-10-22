@@ -67,6 +67,7 @@ const LabelInput = ({ data, setOpen, onOpenLabel, nodes }) => {
           <Flex alignItems={'center'} gap={2} key={index}>
             <Checkbox
               ml={1}
+              data-testid='label_item'
               isChecked={selectedLabels?.includes(row?.id)}
               onChange={() => addLabels(row?.id)}
             />

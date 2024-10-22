@@ -66,6 +66,7 @@ const GlobalEnvFilter = () => {
         className='environments'
         textTransform='capitalize'
         leftIcon={envIcon(envName)}
+        data-testid='global_env_filter'
         rightIcon={<ChevronDownIcon />}
       >
         {envName || 'Default'}

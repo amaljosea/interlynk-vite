@@ -35,6 +35,7 @@ const MenuHeading = ({ title, onClick, active, name }) => {
           color={active ? primaryBlueText : primaryTextColor}
         />
       }
+      data-testid={`filter_${title}`}
       name={name}
     >
       {title}

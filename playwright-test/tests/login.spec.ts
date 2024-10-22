@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv'
-import { expect, test } from '@playwright/test'
+import { test } from '@playwright/test'
 
 import LoginPage from '../pages/login.page'
 
@@ -16,7 +16,12 @@ test.beforeEach(async ({ page }) => {
 test('TC_001 Login with Email ID Test', async ({ page }) => {
   test.setTimeout(120000)
   const lp = new LoginPage(page)
-  await lp.appLoginFunctionality(email, password)
+  try {
+    await lp.appLoginFunctionality(email, password)
+  } catch (error) {
+    console.error('Login test failed:', error)
+    throw error
+  }
 })
 
 test.afterEach(async ({ page }) => {

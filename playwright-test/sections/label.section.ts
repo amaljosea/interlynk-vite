@@ -18,243 +18,231 @@ export default class LabelSection {
 
   public async label() {
     try {
-      const productLink = await this.page.locator(ls.productLink).isVisible()
+      await this.page.locator("//a[@aria-label='products']").click()
 
-      if (productLink) {
-        await this.page.locator(ls.productLink).click()
-        await waitForSelectorWithMinTime(this.page, ls.productsHeader)
+      const productsHeader = await this.page
+        .locator(ps.productsHeader)
+        .isVisible()
 
-        const productsHeader = await this.page
-          .locator(ps.productsHeader)
+      if (productsHeader) {
+        const addProductButton = await this.page
+          .locator(ps.addProductButton)
           .isVisible()
 
-        if (productsHeader) {
-          const addProductButton = await this.page
-            .locator(ps.addProductButton)
+        if (addProductButton) {
+          await this.page.locator(ps.addProductButton).click()
+          await waitForSelectorWithMinTime(this.page, ps.popup)
+
+          const uniqueId = generateUniqueId()
+
+          const productName = `demo product - ${uniqueId}`
+          await this.page.fill(ps.addProductName, productName)
+          await this.page.fill(
+            ps.addProductDescription,
+            'this is a sample demo product description'
+          )
+          await this.page.locator(ps.saveBtn).click()
+          await waitForSelectorWithMinTime(this.page, ps.productSearch)
+          await this.page.fill(ps.productSearch, productName)
+          await this.page.press(ps.productSearch, 'Enter')
+          await this.page.waitForTimeout(2000)
+
+          const pName = await this.page
+            .locator(ps.productName(productName))
             .isVisible()
 
-          if (addProductButton) {
-            await this.page.locator(ps.addProductButton).click()
-            await waitForSelectorWithMinTime(this.page, ps.popup)
-
-            const uniqueId = generateUniqueId()
-
-            const productName = `demo product - ${uniqueId}`
-            await this.page.fill(ps.addProductName, productName)
-            await this.page.fill(
-              ps.addProductDescription,
-              'this is a sample demo product description'
-            )
-            await this.page.locator(ps.saveBtn).click()
-            await waitForSelectorWithMinTime(this.page, ps.productSearch)
-            await this.page.fill(ps.productSearch, productName)
-            await this.page.press(ps.productSearch, 'Enter')
-            await this.page.waitForTimeout(2000)
-
-            const pName = await this.page
-              .locator(ps.productName(productName))
+          if (pName) {
+            const addLabelButton = await this.page
+              .locator(ls.addLabelButton)
               .isVisible()
 
-            if (pName) {
-              const addLabelButton = await this.page
-                .locator(ls.addLabelButton)
+            if (addLabelButton) {
+              await this.page.locator(ls.addLabelButton).click()
+              await waitForSelectorWithMinTime(this.page, ls.labelPopup)
+
+              const labelPopup = await this.page
+                .locator(ls.labelPopup)
                 .isVisible()
 
-              if (addLabelButton) {
-                await this.page.locator(ls.addLabelButton).click()
-                await waitForSelectorWithMinTime(this.page, ls.labelPopup)
+              if (labelPopup) {
+                const uniqueId = generateUniqueId()
 
-                const labelPopup = await this.page
-                  .locator(ls.labelPopup)
+                const labelName = `${uniqueId}`
+
+                await this.page.fill(ls.labelInput, labelName)
+                await this.page.locator(ls.addLabel).click()
+                await this.page.waitForSelector(ls.labelAddSuccessMsg, {
+                  state: 'visible'
+                })
+
+                const labelAddSuccessMsg = await this.page
+                  .locator(ls.labelAddSuccessMsg)
                   .isVisible()
 
-                if (labelPopup) {
-                  const uniqueId = generateUniqueId()
+                if (!labelAddSuccessMsg) {
+                  errors.push('label added success message verified failed!')
+                } else {
+                  const label = this.page.getByTestId('product_label').first()
+                  await waitForSelectorWithMinTime(this.page, label)
 
-                  const labelName = `${uniqueId}`
+                  const lableSpanLength = await this.page
+                    .getByTestId('product_label')
+                    .count()
 
-                  await this.page.fill(ls.labelInput, labelName)
-                  await this.page.locator(ls.addLabel).click()
-                  await this.page.waitForSelector(ls.labelAddSuccessMsg, {
-                    state: 'visible'
-                  })
+                  const labelArr: string[] = []
+                  let lName: any
 
-                  const labelAddSuccessMsg = await this.page
-                    .locator(ls.labelAddSuccessMsg)
-                    .isVisible()
-
-                  if (!labelAddSuccessMsg) {
-                    errors.push('label added success message verified failed!')
-                  } else {
-                    const label = this.page.getByTestId('product_label').first()
-                    await waitForSelectorWithMinTime(this.page, label)
-
-                    const lableSpanLength = await this.page
+                  for (let i = 0; i < lableSpanLength; i++) {
+                    lName = await this.page
                       .getByTestId('product_label')
-                      .count()
+                      .first()
+                      .textContent()
 
-                    const labelArr: string[] = []
-                    let lName: any
+                    labelArr.push(lName)
+                  }
 
-                    for (let i = 0; i < lableSpanLength; i++) {
-                      lName = await this.page
+                  if (!labelArr.includes(lName)) {
+                    errors.push('label added failed!')
+                  } else {
+                    const index = labelArr.indexOf(lName)
+
+                    if (index >= 0) {
+                      const color = await this.page
                         .getByTestId('product_label')
                         .first()
-                        .textContent()
+                        .evaluate((element) => {
+                          const style = window.getComputedStyle(element)
+                          return style.color
+                        })
 
-                      labelArr.push(lName)
-                    }
+                      if (color == null || color == undefined) {
+                        errors.push('label color verification failed!')
+                      }
 
-                    if (!labelArr.includes(lName)) {
-                      errors.push('label added failed!')
-                    } else {
-                      const index = labelArr.indexOf(lName)
+                      await this.page.reload()
+                      // await waitForSelectorWithMinTime(
+                      //   this.page,
+                      //   ls.productsHeader
+                      // )
+                      await waitForSelectorWithMinTime(
+                        this.page,
+                        ps.productSearch
+                      )
+                      await this.page.fill(ps.productSearch, productName)
+                      await this.page.press(ps.productSearch, 'Enter')
+                      await this.page.waitForTimeout(2000)
 
-                      if (index >= 0) {
-                        const color = await this.page
-                          .getByTestId('product_label')
+                      await this.page.locator(ls.menuBtn).click()
+                      await waitForSelectorWithMinTime(
+                        this.page,
+                        ls.addLabelBtn
+                      )
+                      await this.page.locator(ls.addLabelBtn).click()
+
+                      const labelListLength = (
+                        await this.page.$$(ls.labelLists)
+                      ).length
+
+                      if (labelListLength >= 1) {
+                        const lName: any = await this.page
+                          .locator(ls.getLabelName(1))
+                          .textContent()
+
+                        await this.page
+                          .getByTestId('label_item')
                           .first()
-                          .evaluate((element) => {
-                            const style = window.getComputedStyle(element)
-                            return style.color
-                          })
+                          .click()
 
-                        if (color == null || color == undefined) {
-                          errors.push('label color verification failed!')
-                        }
-
-                        await this.page.reload()
-                        // await waitForSelectorWithMinTime(
-                        //   this.page,
-                        //   ls.productsHeader
-                        // )
-                        await waitForSelectorWithMinTime(
-                          this.page,
-                          ps.productSearch
-                        )
-                        await this.page.fill(ps.productSearch, productName)
-                        await this.page.press(ps.productSearch, 'Enter')
+                        await this.page.locator(ls.productsHeader).click()
                         await this.page.waitForTimeout(2000)
+                        await this.page.getByTestId('filter_Labels').click()
 
-                        await this.page.locator(ls.menuBtn).click()
-                        await waitForSelectorWithMinTime(
-                          this.page,
-                          ls.addLabelBtn
-                        )
-                        await this.page.locator(ls.addLabelBtn).click()
-
-                        const labelListLength = (
+                        const labelListItemLength = (
                           await this.page.$$(ls.labelLists)
                         ).length
 
-                        if (labelListLength >= 1) {
-                          const lName: any = await this.page
-                            .locator(ls.getLabelName(1))
+                        const labelLisItemtArr: string[] = []
+
+                        for (let i = 0; i < labelListItemLength; i++) {
+                          const labelListItemName: any = await this.page
+                            .locator(ls.getLabelList(i + 1))
                             .textContent()
+                          labelLisItemtArr.push(labelListItemName)
+                        }
 
-                          await this.page
-                            .locator(ls.getLabelCheckBox(1))
-                            .click()
+                        const indexOfLabel = labelLisItemtArr.indexOf(lName)
 
-                          await this.page.locator(ls.productsHeader).click()
-                          await this.page.waitForTimeout(2000)
-                          await this.page.locator(ls.labelFilterBtn).click()
+                        await this.page
+                          .locator(ls.getLabelList(indexOfLabel))
+                          .click()
+                        await this.page.locator(ls.productsHeader).click()
+                        await this.page.waitForTimeout(2000)
+                        const productWithLabelName = await this.page
+                          .locator(ls.productWithLabelName(lName))
+                          .isVisible()
 
-                          const labelListItemLength = (
-                            await this.page.$$(ls.labelLists)
-                          ).length
-
-                          const labelLisItemtArr: string[] = []
-
-                          for (let i = 0; i < labelListItemLength; i++) {
-                            const labelListItemName: any = await this.page
-                              .locator(ls.getLabelList(i + 1))
-                              .textContent()
-                            labelLisItemtArr.push(labelListItemName)
-                          }
-
-                          const indexOfLabel = labelLisItemtArr.indexOf(lName)
-
-                          await this.page
-                            .locator(ls.getLabelList(indexOfLabel))
-                            .click()
-                          await this.page.locator(ls.productsHeader).click()
-                          await this.page.waitForTimeout(2000)
-                          const productWithLabelName = await this.page
-                            .locator(ls.productWithLabelName(lName))
-                            .isVisible()
-
-                          if (!productWithLabelName) {
-                            errors.push(
-                              `label filter failed for label name '${lName}'`
-                            )
-                          }
-
-                          await this.page.locator(ps.menuBtn).click()
-                          await waitForSelectorWithMinTime(
-                            this.page,
-                            ps.deleteBtn
+                        if (!productWithLabelName) {
+                          errors.push(
+                            `label filter failed for label name '${lName}'`
                           )
-                          await this.page.locator(ps.deleteBtn).click()
+                        }
 
-                          const deletePoupup = await this.page
-                            .locator(ps.popup)
+                        await this.page.locator(ps.menuBtn).click()
+                        await waitForSelectorWithMinTime(
+                          this.page,
+                          ps.deleteBtn
+                        )
+                        await this.page.locator(ps.deleteBtn).click()
+
+                        const deletePoupup = await this.page
+                          .locator(ps.popup)
+                          .isVisible()
+
+                        if (deletePoupup) {
+                          const deleteProductHeader = await this.page
+                            .locator(ps.deleteProductHeader)
                             .isVisible()
 
-                          if (deletePoupup) {
-                            const deleteProductHeader = await this.page
-                              .locator(ps.deleteProductHeader)
+                          if (deleteProductHeader) {
+                            await this.page.locator(ps.yesBtn).click()
+                            await waitForSelectorWithMinTime(
+                              this.page,
+                              ps.productSearch
+                            )
+
+                            await this.page.locator(ps.productSearch).clear()
+                            await this.page.waitForTimeout(2000)
+                            await this.page.fill(ps.productSearch, productName)
+                            await this.page.press(ps.productSearch, 'Enter')
+                            await this.page.waitForTimeout(2000)
+
+                            const noRecordMsg = await this.page
+                              .locator(ps.noRecordMsg)
                               .isVisible()
 
-                            if (deleteProductHeader) {
-                              await this.page.locator(ps.yesBtn).click()
-                              await waitForSelectorWithMinTime(
-                                this.page,
-                                ps.productSearch
-                              )
-
-                              await this.page.locator(ps.productSearch).clear()
-                              await this.page.waitForTimeout(2000)
-                              await this.page.fill(
-                                ps.productSearch,
-                                productName
-                              )
-                              await this.page.press(ps.productSearch, 'Enter')
-                              await this.page.waitForTimeout(2000)
-
-                              const noRecordMsg = await this.page
-                                .locator(ps.noRecordMsg)
-                                .isVisible()
-
-                              if (!noRecordMsg) {
-                                errors.push('product deleted failed!')
-                              }
-                            } else {
-                              errors.push(
-                                'delete product header is not visible!'
-                              )
+                            if (!noRecordMsg) {
+                              errors.push('product deleted failed!')
                             }
+                          } else {
+                            errors.push('delete product header is not visible!')
                           }
                         }
                       }
                     }
                   }
-                } else {
-                  errors.push('label popup is not visible!')
                 }
               } else {
-                errors.push('add label button is not visible!')
+                errors.push('label popup is not visible!')
               }
+            } else {
+              errors.push('add label button is not visible!')
             }
           }
         }
       } else {
-        errors.push('product link is not visible properly!')
+        errors.push('product header not visible properly!')
       }
 
-      if (errors.length > 0) {
-        throw new Error(`Errors encountered:\n${errors.join('\n')}`)
-      }
       expect(errors.length).toBe(0)
     } catch (error) {
       throw error

@@ -21,7 +21,7 @@ test('Check internal component CRUD feature', async ({ page }) => {
   try {
     await page.getByLabel('settings').click()
     await page.getByRole('tab', { name: 'lists' }).click()
-    await page.getByLabel('lists').getByRole('button').click()
+    await page.getByLabel('lists').getByRole('button').first().click()
 
     const orgNameField = page.getByPlaceholder('Org name')
     await orgNameField.press('CapsLock')

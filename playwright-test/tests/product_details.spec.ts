@@ -12,14 +12,19 @@ const password: any = process.env.PLAYWRIGHT_USER_PASSWORD
 
 test.beforeEach(async ({ page }) => {
   await page.goto(url)
+  const lp = new LoginPage(page)
+  await lp.appLoginCommonFunctionality(email, password)
 })
 
 test('TC_006 Sbom Upload And Delete Test', async ({ page }) => {
   test.setTimeout(120000)
-  const lp = new LoginPage(page)
-  await lp.appLoginCommonFunctionality(email, password)
   const dp = new ProductDetailsPage(page)
-  await dp.productUploadDeleteFunctionality()
+  try {
+    await dp.productUploadDeleteFunctionality()
+  } catch (error) {
+    console.error('Product details test failed:', error)
+    throw error
+  }
 })
 
 test.afterEach(async ({ page }) => {

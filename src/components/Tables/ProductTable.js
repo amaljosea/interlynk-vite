@@ -525,6 +525,7 @@ const ProductTable = ({
                     setOpenTagMenu(true)
                     setActiveRow(row)
                   }}
+                  aria-label={`add_label`}
                   onMouseLeave={() => setOpenTagMenu(false)}
                   isDisabled={!enabled || !canEditProduct}
                 >
