@@ -5,23 +5,11 @@ import { getFullDateAndTime, timeSince, truncatedValue } from 'utils'
 import SbomActions from 'views/Sbom/components/SbomActions'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
-import {
-  Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  Divider,
-  Flex,
-  Grid,
-  GridItem,
-  Icon,
-  IconButton,
-  Tag,
-  TagLabel,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Box, Divider, Flex, Text, Tooltip } from '@chakra-ui/react'
+import { Tag, TagLabel, useDisclosure } from '@chakra-ui/react'
+import { Icon, IconButton } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -152,11 +140,9 @@ const SbomDetails = ({ sbomData }) => {
       <Flex direction={'row'} alignItems={'flex-start'} gap={5} width={'100%'}>
         <Icon
           as={FaCubes}
-          h={'64px'}
-          w={'64px'}
-          color='blue.300'
-          onClick={handleRelationView}
           cursor={'pointer'}
+          onClick={handleRelationView}
+          sx={{ w: '64px', h: '64px', color: 'blue.300' }}
         />
         <Flex width={'100%'} flexDir={'column'} gap={5}>
           <Grid
@@ -195,11 +181,8 @@ const SbomDetails = ({ sbomData }) => {
                   })}
               </Breadcrumb>
               <Flex
-                gap={1}
-                flexDir={'row'}
-                flexWrap={'wrap'}
                 alignItems={'center'}
-                fontWeight={'semibold'}
+                sx={{ gap: 1, fontWeight: 'semibold', flexWrap: 'wrap' }}
               >
                 {name && (
                   <Text fontSize={22} wordBreak={'break-all'}>
@@ -224,12 +207,9 @@ const SbomDetails = ({ sbomData }) => {
                 </Tooltip>
               </Flex>
               <Text
-                mb={1}
-                width={'90%'}
-                mr={'auto'}
-                fontSize={'sm'}
                 wordBreak={'break-all'}
                 hidden={description === ''}
+                sx={{ w: '90%', mb: 1, mr: 'auto', fontSize: 'sm' }}
               >
                 {description}
               </Text>
@@ -244,7 +224,7 @@ const SbomDetails = ({ sbomData }) => {
             alignItems={'flex-end'}
             templateColumns='repeat(12, 1fr)'
           >
-            <GridItem colSpan={4}>
+            <GridItem colSpan={isFreeTier ? 6 : 4}>
               <Card px={0} shadow='none' py={0}>
                 <CardBody px={0} flexDir='column' gap={1}>
                   {/* UPDATED AT */}
@@ -311,18 +291,20 @@ const SbomDetails = ({ sbomData }) => {
                 </CardBody>
               </Card>
             </GridItem>
-            <GridItem colSpan={4}>
+            {!isFreeTier && (
+              <GridItem colSpan={4}>
+                <ProgressBar
+                  value={healthScore}
+                  loading={scoreLoading}
+                  text='Version Health Score'
+                />
+              </GridItem>
+            )}
+            <GridItem colSpan={isFreeTier ? 6 : 4}>
               <ProgressBar
                 value={qualityScore}
                 loading={scoreLoading}
                 text='SBOM Quality Score'
-              />
-            </GridItem>
-            <GridItem colSpan={4} hidden={isFreeTier}>
-              <ProgressBar
-                value={healthScore}
-                loading={scoreLoading}
-                text='Version Health Score'
               />
             </GridItem>
           </Grid>
