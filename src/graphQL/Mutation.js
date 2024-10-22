@@ -1242,12 +1242,14 @@ export const sbomCreate = gql`
     $spec: String!
     $specVersion: String
     $format: String
+    $phases: [PhaseInput!]
     $licenses: LicenseInput
   ) {
     sbomCreate(
       input: {
         projectId: $projectId
         spec: $spec
+        phases: $phases
         specVersion: $specVersion
         format: $format
         licenses: $licenses
@@ -1258,9 +1260,7 @@ export const sbomCreate = gql`
         id
         creationAt
         lifecycle
-        project {
-          name
-        }
+        phases
         spec
         specVersion
         updatedAt

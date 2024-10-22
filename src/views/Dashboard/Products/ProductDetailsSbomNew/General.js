@@ -6,21 +6,9 @@ import { infoData } from 'variables/general'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 
 import { AddIcon } from '@chakra-ui/icons'
-import {
-  Button,
-  Flex,
-  Skeleton,
-  Table,
-  Tag,
-  TagCloseButton,
-  TagLabel,
-  TagRightIcon,
-  Tbody,
-  Td,
-  Text,
-  Tr,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Button, Flex, Skeleton, Text, useDisclosure } from '@chakra-ui/react'
+import { Tag, TagCloseButton, TagLabel, TagRightIcon } from '@chakra-ui/react'
+import { Table, Tbody, Td, Tr } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -46,6 +34,7 @@ import { FaPen, FaScaleBalanced } from 'react-icons/fa6'
 
 import AuthorModal from '../components/AuthorModal'
 import ConfirmationModal from '../components/ConfirmationModal'
+import PhaseModal from '../components/PhaseModal'
 import ToolModal from '../components/ToolModal'
 
 const General = ({ data, loading, error }) => {
@@ -60,6 +49,8 @@ const General = ({ data, loading, error }) => {
 
   const { id, spec, suppliers, licensesExp, authors, creationAt, tools } =
     data || ''
+
+  const phaseExists = data?.phases?.length > 0
 
   const isArchived = data?.lifecycle === 'archived'
 
@@ -81,6 +72,7 @@ const General = ({ data, loading, error }) => {
   const [activeTool, setActiveTool] = useState(null)
 
   const TOOL = useDisclosure()
+  const PHASES = useDisclosure()
   const DELETE_TOOL = useDisclosure()
   const AUTHOR = useDisclosure()
   const DELETE_AUTHOR = useDisclosure()
@@ -155,6 +147,22 @@ const General = ({ data, loading, error }) => {
     return result?.desc
   }
 
+  const ActiveBtn = ({ children, color, onClick }) => {
+    return (
+      <Button
+        size='xs'
+        color={color}
+        onClick={onClick}
+        variant='unstyled'
+        hidden={isArchived}
+        leftIcon={<AddIcon />}
+        isDisabled={customerView || !editSboms}
+      >
+        {children}
+      </Button>
+    )
+  }
+
   // KEYBOARD EVENT LISTNER FOR SBOM DRAWER
   useEffect(() => {
     window.addEventListener('keydown', handleSBMDown)
@@ -202,6 +210,33 @@ const General = ({ data, loading, error }) => {
                 {creationAt ? getFullDateAndTime(creationAt) : ''}
               </Td>
             </Tr>
+            {/* PHASES */}
+            <Tr minH={'64px'}>
+              <Td p={0} fontWeight={'medium'} width={'15%'}>
+                <InfoLabel title={`Phases`} onCheck={onCheck('SBOM Phases')} />
+              </Td>
+              <Td width={'85%'}>
+                <Flex alignItems={'center'} flexWrap={'wrap'} gap={2}>
+                  {phaseExists &&
+                    data?.phases?.map((item, index) => (
+                      <Tag
+                        key={index}
+                        height={7}
+                        variant='subtle'
+                        colorScheme='orange'
+                      >
+                        <TagLabel textTransform='capitalize'>{item}</TagLabel>
+                      </Tag>
+                    ))}
+                  <ActiveBtn
+                    onClick={PHASES?.onOpen}
+                    color={phaseExists ? 'gray.500' : primaryBlueText}
+                  >
+                    {phaseExists ? 'Update' : 'Add Phase'}
+                  </ActiveBtn>
+                </Flex>
+              </Td>
+            </Tr>
             {/* CREATION TOOLS */}
             <Tr minH={'64px'}>
               <Td pl={0} fontWeight={'medium'} width={'15%'}>
@@ -233,17 +268,12 @@ const General = ({ data, loading, error }) => {
                       )}
                     </Tag>
                   ))}
-                  <Button
-                    size='xs'
-                    variant='unstyled'
-                    hidden={isArchived}
+                  <ActiveBtn
                     onClick={TOOL?.onOpen}
-                    leftIcon={<AddIcon />}
-                    isDisabled={customerView || !editSboms}
                     color={tools?.length > 0 ? 'gray.500' : primaryBlueText}
                   >
                     {tools?.length > 0 ? 'Add New' : 'Add Tool'}
-                  </Button>
+                  </ActiveBtn>
                 </Flex>
               </Td>
             </Tr>
@@ -276,17 +306,12 @@ const General = ({ data, loading, error }) => {
                       )}
                     </Tag>
                   ))}
-                  <Button
-                    size='xs'
-                    variant='unstyled'
-                    leftIcon={<AddIcon />}
+                  <ActiveBtn
                     onClick={AUTHOR?.onOpen}
-                    hidden={isArchived}
-                    isDisabled={customerView || !editSboms}
                     color={authors?.length > 0 ? 'gray.500' : primaryBlueText}
                   >
                     {authors?.length > 0 ? 'Add New' : 'Add Author'}
-                  </Button>
+                  </ActiveBtn>
                 </Flex>
               </Td>
             </Tr>
@@ -308,17 +333,9 @@ const General = ({ data, loading, error }) => {
                     />
                   ))
                 ) : (
-                  <Button
-                    size='xs'
-                    variant='unstyled'
-                    color={primaryBlueText}
-                    hidden={isArchived}
-                    onClick={SUPPLIER?.onOpen}
-                    leftIcon={<AddIcon />}
-                    isDisabled={customerView || !editSboms}
-                  >
+                  <ActiveBtn onClick={SUPPLIER?.onOpen} color={primaryBlueText}>
                     Add Supplier
-                  </Button>
+                  </ActiveBtn>
                 )}
               </Td>
             </Tr>
@@ -352,17 +369,9 @@ const General = ({ data, loading, error }) => {
                     />
                   </Tag>
                 ) : (
-                  <Button
-                    size='xs'
-                    variant='unstyled'
-                    color={primaryBlueText}
-                    hidden={isArchived}
-                    leftIcon={<AddIcon />}
-                    onClick={onLicenseOpen}
-                    isDisabled={customerView || !editSboms}
-                  >
+                  <ActiveBtn onClick={onLicenseOpen} color={primaryBlueText}>
                     Add License
-                  </Button>
+                  </ActiveBtn>
                 )}
               </Td>
             </Tr>
@@ -439,6 +448,12 @@ const General = ({ data, loading, error }) => {
       <ToolModal isOpen={TOOL?.isOpen} onClose={TOOL?.onClose} />
       {/* AUTHOR MODAL */}
       <AuthorModal isOpen={AUTHOR?.isOpen} onClose={AUTHOR?.onClose} />
+      {/* PHASE MODAL */}
+      <PhaseModal
+        data={data?.phases}
+        isOpen={PHASES?.isOpen}
+        onClose={PHASES?.onClose}
+      />
     </>
   )
 }

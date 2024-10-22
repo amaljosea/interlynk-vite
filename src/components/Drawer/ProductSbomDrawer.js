@@ -3,33 +3,23 @@ import { TabContext } from 'context/TabContext'
 import React, { useContext, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { isCustomerView } from 'utils'
-import { infoData } from 'variables/general'
-import { componentTypes } from 'variables/general'
+import { componentTypes, infoData, sbomPhases } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
-  Button,
-  Checkbox,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Select,
-  Stack,
-  Text,
-  Textarea,
-  Tooltip,
-  chakra
+  DrawerOverlay
 } from '@chakra-ui/react'
+import { Button, Flex, Stack, Text, Tooltip, chakra } from '@chakra-ui/react'
+import { Checkbox, Input, Select, Textarea } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -47,6 +37,7 @@ function ProductSbomDrawer({ isOpen, onClose }) {
 
   const productId = params.productid
 
+  const [phases, setPhases] = useState([])
   const [groupInfo, setGroupInfo] = useState('')
   const [compName, setCompName] = useState('')
   const [compDesc, setCompDesc] = useState('')
@@ -63,7 +54,12 @@ function ProductSbomDrawer({ isOpen, onClose }) {
   const [createComponent, { loading: compLoading }] =
     useMutation(CreateComponent)
 
+  const onPhaseChange = (value) => {
+    setPhases(value)
+  }
+
   const license = details?.licenses?.length > 0 ? details.licenses[0].value : ''
+
   const handleCreateComp = async (id) => {
     await createComponent({
       variables: {
@@ -91,12 +87,16 @@ function ProductSbomDrawer({ isOpen, onClose }) {
   }
 
   const onCreateSBOM = () => {
+    const lifecycles =
+      phases?.length > 0 ? phases?.map((item) => ({ name: item?.value })) : []
+
     createSbom({
       variables: {
         projectId: productId,
         spec: 'cyclonedx',
         specVersion: '1.4',
-        format: 'json'
+        format: 'json',
+        phases: lifecycles
       }
     }).then((res) => {
       if (res.data.sbomCreate.errors.length === 0) {
@@ -263,6 +263,27 @@ function ProductSbomDrawer({ isOpen, onClose }) {
                     </option>
                   ))}
                 </Select>
+              </FormControl>
+              {/* PHASES */}
+              <FormControl hidden={customerView}>
+                <FormLabel htmlFor='compPhases' fontSize={'sm'}>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                    <Text>Phases</Text>
+                    <Tooltip label={onCheck(`SBOM Phases`)}>
+                      <InfoIcon color={primaryBlueText} />
+                    </Tooltip>
+                  </Flex>
+                </FormLabel>
+                <LynkSelect
+                  isMulti={true}
+                  value={phases}
+                  name='compPhases'
+                  isClearable={true}
+                  isSearchable={true}
+                  options={sbomPhases}
+                  onChange={onPhaseChange}
+                  placeholder={'Add phase'}
+                />
               </FormControl>
               {/* LICENSES */}
               <LicenseField

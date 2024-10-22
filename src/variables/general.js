@@ -2,6 +2,15 @@ import { getFullDateAndTime } from 'utils'
 
 import { Stack, Text } from '@chakra-ui/react'
 
+export const sbomPhases = [
+  { label: 'Design', value: 'design' },
+  { label: 'Source', value: 'source' },
+  { label: 'Build', value: 'build' },
+  { label: 'Analyzed', value: 'analyzed' },
+  { label: 'Deployed', value: 'deployed' },
+  { label: 'Runtime', value: 'runtime' }
+]
+
 export const componentTypes = [
   'application',
   'container',

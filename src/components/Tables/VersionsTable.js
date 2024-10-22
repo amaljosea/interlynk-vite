@@ -607,8 +607,7 @@ const VersionsTable = (props) => {
     signedUrlParams,
     ARC_VERSIONS.onOpen,
     createSbom,
-    onBuildSbom,
-    primaryErrorColor
+    onBuildSbom
   ])
 
   const disableRowCheckBox = (row) => {

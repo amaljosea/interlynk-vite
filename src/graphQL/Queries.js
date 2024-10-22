@@ -1475,6 +1475,7 @@ export const GetProductData = gql`
   query GetProductData($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
+      phases
       updatedAt
       healthScore
       vulnRunStatus
