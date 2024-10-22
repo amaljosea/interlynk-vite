@@ -147,15 +147,15 @@ const General = ({ data, loading, error }) => {
     return result?.desc
   }
 
-  const ActiveBtn = ({ children, color, onClick }) => {
+  const ActiveBtn = ({ children, color, onClick, editable }) => {
     return (
       <Button
         size='xs'
-        color={color}
         onClick={onClick}
         variant='unstyled'
         hidden={isArchived}
-        leftIcon={<AddIcon />}
+        sx={{ color: color, ml: editable ? 1 : 0 }}
+        leftIcon={editable ? <FaPen /> : <AddIcon />}
         isDisabled={customerView || !editSboms}
       >
         {children}
@@ -221,14 +221,15 @@ const General = ({ data, loading, error }) => {
                     data?.phases?.map((item, index) => (
                       <Tag
                         key={index}
-                        height={7}
                         variant='subtle'
                         colorScheme='orange'
+                        sx={{ w: 'fit-content', h: 7 }}
                       >
                         <TagLabel textTransform='capitalize'>{item}</TagLabel>
                       </Tag>
                     ))}
                   <ActiveBtn
+                    editable={true}
                     onClick={PHASES?.onOpen}
                     color={phaseExists ? 'gray.500' : primaryBlueText}
                   >
@@ -250,9 +251,9 @@ const General = ({ data, loading, error }) => {
                   {tools?.map((item, index) => (
                     <Tag
                       key={index}
-                      height={7}
                       variant='subtle'
                       colorScheme='teal'
+                      sx={{ w: 'fit-content', h: 7 }}
                     >
                       <TagLabel>
                         {item.name} - {item.version}
@@ -286,11 +287,10 @@ const General = ({ data, loading, error }) => {
                 <Flex alignItems={'center'} flexWrap={'wrap'} gap={2}>
                   {authors?.map((item, index) => (
                     <Tag
-                      height={7}
                       key={index}
                       variant='subtle'
                       colorScheme='blue'
-                      width={'fit-content'}
+                      sx={{ w: 'fit-content', h: 7 }}
                     >
                       <TagLabel>
                         {item.name} - {item.email}
@@ -347,21 +347,17 @@ const General = ({ data, loading, error }) => {
               <Td w={'85%'} py={0}>
                 {licensesExp && licensesExp !== '' ? (
                   <Tag
-                    my={2}
-                    height={7}
                     variant='subtle'
                     colorScheme='green'
-                    width={'fit-content'}
+                    sx={{ w: 'fit-content', my: 2, h: 7 }}
                   >
                     <TagLabel>{licensesExp}</TagLabel>
                     <TagRightIcon
-                      fontSize={12}
                       as={FaPen}
-                      opacity={0.5}
-                      cursor={'pointer'}
                       _hover={{ opacity: 1 }}
                       onClick={onLicenseOpen}
                       hidden={!updateComponent || isArchived}
+                      sx={{ fontSize: 12, cursor: 'pointer', opacity: 0.5 }}
                     />
                     <TagCloseButton
                       onClick={DELETE_LICENSE?.onOpen}
