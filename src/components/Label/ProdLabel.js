@@ -9,6 +9,7 @@ const ProdLabel = ({ item }) => {
       w='fit-content'
       rounded={'full'}
       borderWidth={'thin'}
+      data-testid='product_label'
       bg={hexToRGBA(item?.color, 0.1)}
       borderColor={hexToRGBA(item?.color, 0.4)}
       sx={{ h: '20px', pt: 0.4, dropShadow: 'inner', color: item?.color }}

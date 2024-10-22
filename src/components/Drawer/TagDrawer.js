@@ -42,6 +42,11 @@ const TagDrawer = ({ isOpen, onClose }) => {
       const { errors } = res?.data?.labelCreate || ''
       if (errors?.length > 0) {
         showToast({ description: errors[0], status: 'error' })
+      } else {
+        showToast({
+          description: 'Label added successfully',
+          status: 'success'
+        })
       }
     })
   }

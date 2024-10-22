@@ -71,7 +71,7 @@ export default class LabelSection {
                 if (labelPopup) {
                   const uniqueId = generateUniqueId()
 
-                  const labelName = `dummy label - ${uniqueId}`
+                  const labelName = `${uniqueId}`
 
                   await this.page.fill(ls.labelInput, labelName)
                   await this.page.locator(ls.addLabel).click()
@@ -86,18 +86,22 @@ export default class LabelSection {
                   if (!labelAddSuccessMsg) {
                     errors.push('label added success message verified failed!')
                   } else {
-                    await waitForSelectorWithMinTime(this.page, ls.getLables(1))
+                    const label = this.page.getByTestId('product_label').first()
+                    await waitForSelectorWithMinTime(this.page, label)
 
-                    const lableSpanLength = (await this.page.$$(ls.labels))
-                      .length
+                    const lableSpanLength = await this.page
+                      .getByTestId('product_label')
+                      .count()
 
                     const labelArr: string[] = []
                     let lName: any
 
                     for (let i = 0; i < lableSpanLength; i++) {
                       lName = await this.page
-                        .locator(ls.getLables(i + 1))
+                        .getByTestId('product_label')
+                        .first()
                         .textContent()
+
                       labelArr.push(lName)
                     }
 
@@ -108,7 +112,8 @@ export default class LabelSection {
 
                       if (index >= 0) {
                         const color = await this.page
-                          .locator(ls.getLables(index + 1))
+                          .getByTestId('product_label')
+                          .first()
                           .evaluate((element) => {
                             const style = window.getComputedStyle(element)
                             return style.color
