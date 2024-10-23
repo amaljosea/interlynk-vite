@@ -210,6 +210,7 @@ const CpeInputs = ({ onClose, value, setValue }) => {
           <Select
             size='md'
             name='part'
+            id='part'
             fontSize={'sm'}
             value={cpeData?.part}
             onBlur={(e) => handleInputBlur(2, e.target.value)}

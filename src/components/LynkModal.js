@@ -73,7 +73,11 @@ const LynkModal = ({
           <ModalHeader paddingInline={'16px'}>
             <Flex alignItems='center' gap={3}>
               {Icon && <Icon color='#60686F' />}
-              {title && <Text fontWeight={600}>{title}</Text>}
+              {title && (
+                <Text fontWeight={600} aria-label='modal_header'>
+                  {title}
+                </Text>
+              )}
             </Flex>
           </ModalHeader>
           <ModalCloseButton marginTop={1.5} />

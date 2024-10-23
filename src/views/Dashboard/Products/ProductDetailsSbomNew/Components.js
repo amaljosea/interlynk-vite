@@ -132,7 +132,9 @@ const Components = ({ sbomData }) => {
     }
   }, [direct, ecosystems, kinds, licenses, scope, suppliers])
 
-  const orderBy = { field, direction }
+  const orderBy = useMemo(() => {
+    field, direction
+  }, [direction, field])
 
   // GET COMPONENT DATA
   const { nodes, error, paginationProps, reset, loading } = usePaginatedQuery(
@@ -240,7 +242,11 @@ const Components = ({ sbomData }) => {
             >
               {/* COMPONENT NAME */}
               <Tooltip label={name}>
-                <Text color={primaryTextColor} data-tag='allowRowEvents'>
+                <Text
+                  color={primaryTextColor}
+                  aria-label='component_name'
+                  data-tag='allowRowEvents'
+                >
                   {truncatedValue(name, 30)}
                 </Text>
               </Tooltip>
@@ -517,7 +523,7 @@ const Components = ({ sbomData }) => {
                 <Portal>
                   <MenuList fontSize={'sm'}>
                     <MenuItem
-                      className='edit_component'
+                      data-testid='edit_component'
                       onClick={() => onEditOpen(row)}
                       isDisabled={status === 'signed' || !updateComponent}
                     >
@@ -531,6 +537,7 @@ const Components = ({ sbomData }) => {
                       Edit Relationships
                     </MenuItem>
                     <MenuItem
+                      data-testid='view_relation'
                       onClick={() => handleGraphView(row)}
                       isDisabled={
                         status === 'signed' ||
@@ -541,6 +548,7 @@ const Components = ({ sbomData }) => {
                       View Relationships
                     </MenuItem>
                     <MenuItem
+                      data-testid='view_insights'
                       onClick={() => hanldeAnalysis(row)}
                       isDisabled={status === 'signed'}
                       hidden={isFreeTier}
@@ -560,7 +568,7 @@ const Components = ({ sbomData }) => {
                           !updateComponent ||
                           totalComp?.length === 1
                         }
-                        className='delete_component'
+                        data-testid='delete_component'
                       >
                         Delete
                       </MenuItem>
@@ -919,7 +927,23 @@ const Components = ({ sbomData }) => {
         </Flex>
       </Flex>
     )
-  }, [compSearch, handleSearch, handleClear, onSearchInputChange, MAP.onOpen, shouldShowDemoFeatures, onCreateComponent, restricted, signedUrlParams, isArchived, nodes, reset])
+  }, [
+    compSearch,
+    handleSearch,
+    handleClear,
+    onSearchInputChange,
+    MAP.onOpen,
+    shouldShowDemoFeatures,
+    onCreateComponent,
+    restricted,
+    signedUrlParams,
+    isArchived,
+    compData,
+    searchInput,
+    orderBy,
+    sbomData?.sbomParts?.length,
+    reset
+  ])
 
   const handleSort = async (column, sortDirection) => {
     prodCompDispatch({

@@ -9,6 +9,7 @@ const ActionButton = ({ title, onClick, isDisabled, hidden, props }) => {
       colorScheme='blue'
       width={'fit-content'}
       isDisabled={isDisabled}
+      data-testid={title}
       {...props}
     >
       {title}

@@ -189,6 +189,7 @@ const CpeInput = ({
           value={inputValue}
           onChange={onChange}
           autoComplete='off'
+          data-testid={name}
           onBlur={() => updateString(name, inputValue)}
           onKeyDown={handleKeyDown}
         />

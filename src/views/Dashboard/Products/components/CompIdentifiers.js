@@ -137,6 +137,7 @@ const CompIdentifiers = ({ data }) => {
   }
 
   const checkData = () => {
+    // eslint-disable-next-line no-unused-vars
     const { identifiers, ...rest } = unsavedChanges
     return Object.values(rest).some((value) => value === true)
   }
@@ -213,6 +214,7 @@ const CompIdentifiers = ({ data }) => {
           <FormLabel htmlFor='purl' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Icon
+                data-testid='purl_expand'
                 onClick={handlePurlModal}
                 display={customerView ? 'none' : 'flex'}
                 as={purlOpen ? FaChevronDown : FaChevronRight}
@@ -248,6 +250,7 @@ const CompIdentifiers = ({ data }) => {
           <FormLabel htmlFor='cpe' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Icon
+                data-testid='cpe_expand'
                 onClick={handleCpeModal}
                 display={customerView ? 'none' : 'flex'}
                 as={cpeOpen ? FaChevronDown : FaChevronRight}

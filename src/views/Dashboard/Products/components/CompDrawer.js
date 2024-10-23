@@ -63,7 +63,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
     >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton mt={3} onClick={resetData} />
+        <DrawerCloseButton mt={3} onClick={resetData} aria-label='comp_close' />
         <DrawerHeader borderBottomWidth='1px'>
           <Text mb={1} fontWeight={'medium'}>
             {signedUrlParams ? 'Component' : 'Edit Component'}

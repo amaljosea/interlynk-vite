@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv'
-import { expect, test } from '@playwright/test'
+import { test } from '@playwright/test'
 
 import ComponentPage from '../pages/component.page'
 import LoginPage from '../pages/login.page'
@@ -10,57 +10,39 @@ const url: any = process.env.PLAYWRIGHT_TEST_URL
 const email: any = process.env.PLAYWRIGHT_USER_EMAIL
 const password: any = process.env.PLAYWRIGHT_USER_PASSWORD
 
-let productExists = false
-let versionExists = false
-let isCreated = false
-let isEdited = false
-
 test.beforeEach(async ({ page }) => {
   await page.goto(url)
   const lp = new LoginPage(page)
   await lp.appLoginCommonFunctionality(email, password)
 })
 
-test('Atleast 1 product should be available', async ({ page }) => {
-  test.setTimeout(120000)
-  const pp = new ComponentPage(page)
-  try {
-    await pp.checkProduct()
-    productExists = true
-  } catch (error) {
-    console.error('Product test failed:', error)
-    throw error
-  }
-})
-
-test('Atleast 1 version should be available', async ({ page }) => {
-  test.setTimeout(120000)
-
-  if (!productExists) {
-    test.skip(true, 'Skipping because product test failed')
-  }
-
-  const pp = new ComponentPage(page)
-  try {
-    await pp.checkVersion()
-    versionExists = true
-  } catch (error) {
-    console.error('Version test failed:', error)
-    throw error
-  }
-})
-
 test('Component create functionality', async ({ page }) => {
-  test.setTimeout(120000)
-
-  if (!versionExists) {
-    test.skip(true, 'Skipping because version test failed')
-  }
-
+  test.setTimeout(200000)
   const pp = new ComponentPage(page)
   try {
     await pp.createComponent()
-    isCreated = true
+  } catch (error) {
+    console.error('Component create test failed:', error)
+    throw error
+  }
+})
+
+test('Component visibility filter', async ({ page }) => {
+  test.setTimeout(120000)
+  const pp = new ComponentPage(page)
+  try {
+    await pp.checkVisibility()
+  } catch (error) {
+    console.error('Component visibility filter test failed:', error)
+    throw error
+  }
+})
+
+test('Component search functionality', async ({ page }) => {
+  test.setTimeout(120000)
+  const pp = new ComponentPage(page)
+  try {
+    await pp.searchComponent()
   } catch (error) {
     console.error('Component create test failed:', error)
     throw error
@@ -69,33 +51,99 @@ test('Component create functionality', async ({ page }) => {
 
 test('Component edit functionality', async ({ page }) => {
   test.setTimeout(120000)
-
-  if (!isCreated) {
-    test.skip(true, 'Skipping because component create test failed')
-  }
-
   const pp = new ComponentPage(page)
   try {
     await pp.editComponent()
-    isEdited = true
   } catch (error) {
     console.error('Component edit test failed:', error)
     throw error
   }
 })
 
+test('Link CURD functionality', async ({ page }) => {
+  test.setTimeout(120000)
+  const pp = new ComponentPage(page)
+  try {
+    await pp.componentLinks()
+  } catch (error) {
+    console.error('Link test failed:', error)
+    throw error
+  }
+})
+
+test('Relationship CURD functionality', async ({ page }) => {
+  test.setTimeout(120000)
+  const pp = new ComponentPage(page)
+  try {
+    await pp.componentRelations()
+  } catch (error) {
+    console.error('Relationship CURD test failed:', error)
+    throw error
+  }
+})
+
 test('Component delete functionality', async ({ page }) => {
   test.setTimeout(120000)
-
-  if (!isEdited) {
-    test.skip(true, 'Skipping because component edit test failed')
-  }
-
   const pp = new ComponentPage(page)
   try {
     await pp.deleteComponent()
   } catch (error) {
     console.error('Component delete test failed:', error)
+    throw error
+  }
+})
+
+test('Primary component change functionality', async ({ page }) => {
+  test.setTimeout(120000)
+  const pp = new ComponentPage(page)
+  try {
+    await pp.changePrimaryComponent()
+  } catch (error) {
+    console.error('Primary component test failed:', error)
+    throw error
+  }
+})
+
+test('Component PURL editor', async ({ page }) => {
+  test.setTimeout(120000)
+  const pp = new ComponentPage(page)
+  try {
+    await pp.editPURL()
+  } catch (error) {
+    console.error('PURL editor test failed:', error)
+    throw error
+  }
+})
+
+test('Component CPE editor', async ({ page }) => {
+  test.setTimeout(120000)
+  const pp = new ComponentPage(page)
+  try {
+    await pp.editCPE()
+  } catch (error) {
+    console.error('CPE editor test failed:', error)
+    throw error
+  }
+})
+
+test('Component relationship should render correctly', async ({ page }) => {
+  test.setTimeout(120000)
+  const pp = new ComponentPage(page)
+  try {
+    await pp.checkRelations()
+  } catch (error) {
+    console.error('Component relationship test failed:', error)
+    throw error
+  }
+})
+
+test('Component insights should render correctly', async ({ page }) => {
+  test.setTimeout(120000)
+  const pp = new ComponentPage(page)
+  try {
+    await pp.checkInsights()
+  } catch (error) {
+    console.error('Component insights test failed:', error)
     throw error
   }
 })

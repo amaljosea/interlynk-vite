@@ -79,6 +79,7 @@ const CustomNode = ({
                 fontWeight={'semibold'}
                 wordBreak={'break-all'}
                 lineHeight={1.3}
+                aria-label='parent_comp'
               >
                 {nodeDatum?.name}
               </Text>

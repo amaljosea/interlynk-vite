@@ -6,7 +6,10 @@ const CompInfo = ({ data }) => {
   const { name, version } = data || ''
   return (
     <Flex columnGap={2} flexWrap={'wrap'} alignContent={'center'}>
-      <Text fontSize='sm' fontWeight={'normal'} wordBreak={'break-all'}>
+      <Text
+        aria-label='comp_name'
+        sx={{ fontSize: 'sm', fontWeight: 'normal', wordBreak: 'break-all' }}
+      >
         {truncatedValue(name, 20)}
       </Text>
       <Tag size='sm' colorScheme='blue' hidden={!version}>

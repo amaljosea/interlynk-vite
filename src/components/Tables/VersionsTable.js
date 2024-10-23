@@ -251,7 +251,7 @@ const VersionsTable = (props) => {
               display={'flex'}
               sx={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}
             >
-              <Link to={link} onClick={onStartTour} aria-label='version'>
+              <Link to={link} onClick={onStartTour} data-testid={`version`}>
                 <Text color={primaryBlueText} minWidth='100%' fontSize={14}>
                   {projectVersion}
                 </Text>

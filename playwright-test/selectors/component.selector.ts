@@ -1,8 +1,6 @@
 class ComponentSelector {
   public static menuBtn =
     "(//div[@data-tag='allowRowEvents']//button[@aria-haspopup='menu'])[1]"
-  public static deleteBtn = '.delete_component'
-  public static editBtn = '.edit_component'
   public static activeTab = 'role=tab[aria-selected="true"]'
 }
 

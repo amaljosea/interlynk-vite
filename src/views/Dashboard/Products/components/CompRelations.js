@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
-import { isCustomerView, truncatedValue } from 'utils'
+import { truncatedValue } from 'utils'
 
 import { AddIcon, ArrowDownIcon } from '@chakra-ui/icons'
 import {
@@ -63,7 +63,6 @@ const findShortestPath = (pathArray, currentShortestPath = []) => {
 const CompRelations = ({ data, compPath }) => {
   const { showToast } = useCustomToast()
   const activeTab = useQueryParam('tab')
-  const customerView = isCustomerView()
 
   const { id, name, version, sbomId, sbom } = data || ''
   const { id: productId } = sbom?.project || ''
@@ -164,6 +163,7 @@ const CompRelations = ({ data, compPath }) => {
   }
 
   const checkData = () => {
+    // eslint-disable-next-line no-unused-vars
     const { relations, ...rest } = unsavedChanges
     return Object.values(rest).some((value) => value === true)
   }
@@ -212,7 +212,7 @@ const CompRelations = ({ data, compPath }) => {
             </FormLabel>
             <Select
               fontSize='sm'
-              name='relType'
+              name='relationType'
               value={relations?.relType}
               onChange={(e) =>
                 handleChange('relations', 'relType', e.target.value)
@@ -235,7 +235,7 @@ const CompRelations = ({ data, compPath }) => {
               </FormLabel>
               <Select
                 fontSize='sm'
-                name='to'
+                name='relationTo'
                 value={relations?.to}
                 onChange={(e) =>
                   handleChange('relations', 'to', e.target.value)
@@ -350,6 +350,7 @@ const CompRelations = ({ data, compPath }) => {
                             {truncatedValue(comp?.toComp?.version, 20)}
                           </TagLabel>
                           <TagCloseButton
+                            data-testid='delete_depends_on'
                             onClick={() => {
                               setActiveComp(comp)
                               onDelOpen()

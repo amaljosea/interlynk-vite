@@ -503,6 +503,7 @@ const ProductTable = ({
               aria-label={`Dropdown menu for ${name}`}
               color={secondaryTextColor}
               icon={<FaEllipsisV />}
+              data-testid='product-actions'
               onClick={() => setOpenTagMenu(false)}
             />
             <Portal>
@@ -556,6 +557,7 @@ const ProductTable = ({
                 )}
                 {/* UPLOAD SBOM */}
                 <MenuItem
+                  aria-label='upload_sbom'
                   onClick={() => {
                     setActiveRow(row)
                     onOpenUpload()
@@ -574,6 +576,7 @@ const ProductTable = ({
                 <Divider />
                 {/* ARCHIVE PRODUCT GROUP */}
                 <MenuItem
+                  data-testid='delete_product'
                   aria-label={`Delete product ${name}`}
                   color='red'
                   onClick={() => {

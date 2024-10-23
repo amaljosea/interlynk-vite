@@ -206,7 +206,9 @@ const CompLinks = ({ data }) => {
               </option>
             ))}
           </Select>
-          <FormErrorMessage>{error}</FormErrorMessage>
+          <FormErrorMessage data-testid='link_type_error'>
+            {error}
+          </FormErrorMessage>
         </FormControl>
         {/* URL */}
         <FormControl
@@ -286,6 +288,7 @@ const CompLinks = ({ data }) => {
                             variant='outline'
                             colorScheme='red'
                             isDisabled={loading}
+                            data-testid='confirm_delete_comp_link'
                             onClick={handleLinkRemove}
                           >
                             Yes
@@ -298,6 +301,7 @@ const CompLinks = ({ data }) => {
                           variant='outline'
                           cursor={'pointer'}
                           icon={<DeleteIcon />}
+                          data-testid='delete_comp_link'
                           onClick={() => onDelete(item)}
                         />
                       )}

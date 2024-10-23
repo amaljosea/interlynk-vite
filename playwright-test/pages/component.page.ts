@@ -11,16 +11,20 @@ export default class ComponentPage {
     this.componentSection = new ComponentSection(this.page)
   }
 
-  public async checkProduct() {
-    await this.componentSection.checkProduct()
-  }
-
-  public async checkVersion() {
-    await this.componentSection.checkVersion()
-  }
-
   public async createComponent() {
     await this.componentSection.create()
+  }
+
+  public async searchComponent() {
+    await this.componentSection.search()
+  }
+
+  public async changePrimaryComponent() {
+    await this.componentSection.primary()
+  }
+
+  public async checkVisibility() {
+    await this.componentSection.visibility()
   }
 
   public async deleteComponent() {
@@ -29,5 +33,29 @@ export default class ComponentPage {
 
   public async editComponent() {
     await this.componentSection.edit()
+  }
+
+  public async componentLinks() {
+    await this.componentSection.updateLinks()
+  }
+
+  public async componentRelations() {
+    await this.componentSection.updateRelations()
+  }
+
+  public async editPURL() {
+    await this.componentSection.purlEditor()
+  }
+
+  public async editCPE() {
+    await this.componentSection.cpeEditor()
+  }
+
+  public async checkRelations() {
+    await this.componentSection.relationship()
+  }
+
+  public async checkInsights() {
+    await this.componentSection.insights()
   }
 }
