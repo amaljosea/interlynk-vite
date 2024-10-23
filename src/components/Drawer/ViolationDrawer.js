@@ -2,17 +2,14 @@ import DataTable from 'react-data-table-component'
 import { customStyles, truncatedValue } from 'utils'
 
 import {
-  Box,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  Stack,
-  Text
+  DrawerOverlay
 } from '@chakra-ui/react'
+import { Box, Stack, Text } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
@@ -118,23 +115,26 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
             </Text>
             {supplierExists &&
               nodes?.map((item, index) => (
-                <Flex key={index} gap={2} flexWrap={'wrap'}>
+                <Stack key={index} spacing={2}>
                   <Text fontWeight={'semibold'}>Value:</Text>
-                  {item?.violation?.suppliers?.map((sup, idx) => (
+                  {item?.violation?.suppliers?.map((item, idx) => (
                     <Text key={idx}>
-                      {`${sup?.contactName} (${sup?.contactEmail}) - ${sup?.name}`}
+                      {idx + 1}:{' '}
+                      {`${item?.contactName || ''} (${item?.contactEmail || ''}) - ${item?.name || ''}`}
                     </Text>
                   ))}
-                </Flex>
+                </Stack>
               ))}
             {authorExists &&
               nodes?.map((item, index) => (
-                <Flex key={index} gap={2} flexWrap={'wrap'}>
+                <Stack key={index} spacing={2}>
                   <Text fontWeight={'semibold'}>Value:</Text>
-                  {item?.violation?.authors?.map((sup, idx) => (
-                    <Text key={idx}>{`${sup?.name} - ${sup?.email}`}</Text>
+                  {item?.violation?.authors?.map((item, idx) => (
+                    <Text key={idx}>
+                      {idx + 1}: {`${item?.name || ''} ${item?.email || ''}`}
+                    </Text>
                   ))}
-                </Flex>
+                </Stack>
               ))}
             {(subject === 'VERSION_PRIMARY' ||
               subject === 'SBOM_PRIMARY_COMPONENT_RELATIONSHIPS') &&
