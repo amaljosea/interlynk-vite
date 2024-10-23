@@ -4,24 +4,11 @@ import { useParams } from 'react-router-dom'
 import { getIcon, getLabel, updatedValue } from 'utils'
 
 import { EditIcon } from '@chakra-ui/icons'
-import {
-  Box,
-  Button,
-  Divider,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Icon,
-  IconButton,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Select,
-  Tag,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
+import { Box, Button, Flex, Tag, Text } from '@chakra-ui/react'
+import { Divider, Tooltip } from '@chakra-ui/react'
+import { Icon, IconButton } from '@chakra-ui/react'
+import { Input, InputGroup, InputLeftElement, Select } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
@@ -346,6 +333,14 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
     setActions(newData)
   }
 
+  const getValue = (item) => {
+    if (item?.operator === 'exists' || item?.operator === 'not_exists') {
+      return undefined
+    } else {
+      return item?.value
+    }
+  }
+
   const conditionsAttributes = []
   const actionsAttributes = []
   conditions?.length > 0 &&
@@ -355,10 +350,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
         subject: item?.category,
         operator: item?.operator,
         field: item?.subject,
-        value:
-          item?.operator === 'exists' || item?.operator === 'not_exists'
-            ? undefined
-            : item?.value
+        value: getValue(item)
       })
     )
   actions?.length > 0 &&
@@ -370,9 +362,6 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
         value: item?.value
       })
     )
-
-  // console.log('conditionsAttributes', conditionsAttributes)
-  // console.log('actionsAttributes', actionsAttributes)
 
   const handleRuleCreate = () => {
     if (hasSimilarConditions(conditions)) {
@@ -500,11 +489,10 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
           <Input
             type='text'
             name='ruleName'
-            fontSize={'sm'}
-            placeholder='Enter rule name'
             value={ruleName}
             onChange={onNameChange}
-            pointerEvents={isSystem ? 'none' : 'auto'}
+            placeholder='Enter rule name'
+            sx={{ fontSize: 'sm', pointerEvents: isSystem ? 'none' : 'auto' }}
           />
         </FormControl>
         {/* CONDITIONS */}
@@ -516,15 +504,11 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
             conditions?.map((item, index) => (
               <Box key={index}>
                 <Flex
-                  gap={2}
-                  mt={1.5}
                   key={index}
-                  width={'100%'}
-                  alignItems={'flex-start'}
                   justifyContent={'space-bewteen'}
+                  sx={{ w: '100%', gap: 2, mt: 1.5, alignItems: 'flex-start' }}
                 >
                   {/* ICON */}
-
                   <InputGroup>
                     <InputLeftElement pointerEvents='none'>
                       <SubjectIcon
@@ -535,17 +519,16 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
                     {/* SUBJECT */}
                     <FormControl isInvalid={item?.subError !== ''}>
                       <Select
+                        isDisabled={isSystem}
                         value={item?.subject}
                         onChange={(e) =>
                           onCondtionChange(e.target.value, item.id, 'subject')
                         }
                         onBlur={() => onSubjectBlur(item)}
                         placeholder='-- Subject --'
-                        fontSize='sm'
                         onBlurCapture={() => onSubjectBlur(item)}
                         textTransform={'capitalize'}
-                        isDisabled={isSystem}
-                        sx={{ paddingLeft: '34px' }}
+                        sx={{ paddingLeft: '34px', fontSize: 'sm' }}
                       >
                         {conditions?.length > 1 &&
                         conditions?.some(
@@ -601,20 +584,32 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
                     <FormErrorMessage>{item?.opError}</FormErrorMessage>
                   </FormControl>
                   {item?.operator !== 'exists' &&
-                    item?.operator !== 'not_exists' && (
-                      <Flex alignItems={'center'} gap={4}>
-                        <Input
-                          type={'text'}
-                          fontSize='sm'
-                          placeholder='Value'
-                          value={item?.value}
-                          onChange={(e) =>
-                            onCondtionChange(e.target.value, item.id, 'value')
-                          }
-                          minWidth={140}
-                        />
-                      </Flex>
+                    item?.operator !== 'not_exists' &&
+                    item?.operator !== 'boolean_is' && (
+                      <Input
+                        type={'text'}
+                        placeholder='Value'
+                        value={item?.value}
+                        onChange={(e) =>
+                          onCondtionChange(e.target.value, item.id, 'value')
+                        }
+                        sx={{ minW: 140, fontSize: 'sm' }}
+                      />
                     )}
+                  {item?.operator === 'boolean_is' && (
+                    <Select
+                      type={'text'}
+                      value={item?.value}
+                      onChange={(e) =>
+                        onCondtionChange(e.target.value, item.id, 'value')
+                      }
+                      sx={{ minW: 140, fontSize: 'sm' }}
+                    >
+                      <option value=''>-- Select --</option>
+                      <option value={'true'}>Yes</option>
+                      <option value={'false'}>No</option>
+                    </Select>
+                  )}
                   <Flex gap={4} justifyContent={'space-between'}>
                     {conditions?.length > 1 && (
                       <IconButton
@@ -666,12 +661,9 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
             actions?.map((item, index) => (
               <Box key={index}>
                 <Flex
-                  gap={2}
-                  mt={1.5}
                   key={index}
-                  width={'100%'}
-                  alignItems={'flex-start'}
                   justifyContent={'space-bewteen'}
+                  sx={{ w: '100%', gap: 2, mt: 1.5, alignItems: 'flex-start' }}
                 >
                   {/* ICON */}
                   <InputGroup>
@@ -689,14 +681,13 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
                           onActionChange(e.target.value, item.id, 'field')
                         }
                         placeholder='-- Subject --'
-                        fontSize='sm'
                         textTransform={'capitalize'}
                         isDisabled={
                           conditionErrorMessage ||
                           conditions?.length === 0 ||
                           isSystem
                         }
-                        sx={{ paddingLeft: '34px' }}
+                        sx={{ paddingLeft: '34px', fontSize: 'sm' }}
                       >
                         {conditions?.some(
                           (item) => item?.category === 'component'
@@ -720,59 +711,69 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
                   </InputGroup>
                   {/* OPERATOR */}
                   <Input
-                    width='130px'
-                    fontSize={'sm'}
                     textTransform={'capitalize'}
                     defaultValue={item?.operator}
-                    pointerEvents={'none'}
                     isDisabled={
                       conditionErrorMessage ||
                       conditions?.length === 0 ||
                       isSystem
                     }
+                    sx={{ w: '130px', fontSize: 'sm', pointerEvents: 'none' }}
                   />
                   {/* VALUE */}
-                  <FormControl as={Flex} alignItems='center' gap={2}>
-                    <Input
+                  {item?.field === 'component_internal' ? (
+                    <Select
                       type={'text'}
-                      fontSize='sm'
-                      placeholder={'Add value'}
-                      value={item.value}
+                      value={item?.value}
                       onChange={(e) =>
                         onActionChange(e.target.value, item.id, 'value')
                       }
-                      isDisabled={
-                        conditionErrorMessage ||
-                        conditions?.length === 0 ||
-                        isSystem
-                      }
-                      minWidth={140}
-                    />
-                    <Flex gap={4} justifyContent={'space-between'}>
-                      {actions?.length > 1 && (
-                        <IconButton
-                          border='1px solid'
-                          colorScheme='white'
-                          borderColor={grayBorderColor}
-                          aria-label='Remove action'
-                          onClick={() => onDeleteAction(item)}
-                          display={
-                            conditionErrorMessage || conditions?.length === 0
-                              ? 'none'
-                              : 'flex'
-                          }
-                          icon={
-                            <Icon
-                              color={primaryErrorColor}
-                              w={6}
-                              h={6}
-                              as={MdDeleteOutline}
-                            />
-                          }
-                        />
-                      )}
-                    </Flex>
-                  </FormControl>
+                      sx={{ minW: 140, fontSize: 'sm' }}
+                    >
+                      <option value=''>-- Select --</option>
+                      <option value={'true'}>Yes</option>
+                      <option value={'false'}>No</option>
+                    </Select>
+                  ) : (
+                    <FormControl as={Flex} alignItems='center' gap={2}>
+                      <Input
+                        type={'text'}
+                        placeholder={'Add value'}
+                        value={item.value}
+                        onChange={(e) =>
+                          onActionChange(e.target.value, item.id, 'value')
+                        }
+                        isDisabled={
+                          conditionErrorMessage ||
+                          conditions?.length === 0 ||
+                          isSystem
+                        }
+                        sx={{ minW: 140, fontSize: 'sm' }}
+                      />
+                      <Flex gap={4} justifyContent={'space-between'}>
+                        {actions?.length > 1 && (
+                          <IconButton
+                            border='1px solid'
+                            colorScheme='white'
+                            borderColor={grayBorderColor}
+                            aria-label='Remove action'
+                            onClick={() => onDeleteAction(item)}
+                            display={
+                              conditionErrorMessage || conditions?.length === 0
+                                ? 'none'
+                                : 'flex'
+                            }
+                            icon={
+                              <Icon
+                                as={MdDeleteOutline}
+                                sx={{ w: 6, h: 6, color: primaryErrorColor }}
+                              />
+                            }
+                          />
+                        )}
+                      </Flex>
+                    </FormControl>
+                  )}
                 </Flex>
                 {actions?.length > 1 && actions?.length - 1 !== index && (
                   <Tag mt={1.5}>
@@ -785,13 +786,12 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
             ))}
         </FormControl>
         <Button
-          fontSize={'sm'}
-          colorScheme='blue'
           variant='link'
-          fontWeight={'medium'}
+          colorScheme='blue'
           leftIcon={<FaPlus />}
           onClick={onAddAction}
           isDisabled={isSystem}
+          sx={{ fontSize: 'sm', fontWeight: 'medium' }}
         >
           Add action
         </Button>
