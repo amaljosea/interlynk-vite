@@ -59,6 +59,69 @@ export const namespaceOptions = {
   pypi: []
 }
 
+export const allDefaultActions = [
+  {
+    id: 'home',
+    name: 'Home',
+    section: 'navigation',
+    path: '/vendor/dashboard'
+  },
+  {
+    id: 'products',
+    name: 'Products',
+    section: 'navigation',
+    path: '/vendor/products'
+  },
+  {
+    id: 'requests',
+    name: 'Requests',
+    section: 'navigation',
+    path: '/vendor/requests'
+  },
+  {
+    id: 'vulnerabilities',
+    name: 'Vulnerabilities',
+    section: 'navigation',
+    path: '/vendor/vulnerabilities'
+  },
+  {
+    id: 'licenses',
+    name: 'Licenses',
+    section: 'navigation',
+    path: '/vendor/licenses'
+  },
+  {
+    id: 'analytics',
+    name: 'Analytics',
+    section: 'navigation',
+    path: '/vendor/analytics'
+  },
+  {
+    id: 'tools',
+    name: 'Tools',
+    section: 'navigation',
+    path: '/vendor/tools'
+  },
+  {
+    id: 'support',
+    name: 'Support',
+    section: 'navigation',
+    path: '/vendor/support'
+  },
+  {
+    id: 'policies',
+    name: 'Policies',
+    section: 'navigation',
+    path: '/vendor/policies'
+  },
+  {
+    id: 'settings',
+    name: 'Settings',
+    section: 'navigation',
+    path: '/vendor/settings?tab=users'
+  }
+]
+
 export const settingActions = [
   {
     id: 'users',

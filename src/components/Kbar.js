@@ -11,7 +11,7 @@ import {
 import { Fragment, useMemo } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
-import { settingActions } from 'variables/general'
+import { allDefaultActions, settingActions } from 'variables/general'
 
 import { SearchIcon } from '@chakra-ui/icons'
 import { useColorMode } from '@chakra-ui/system'
@@ -64,84 +64,12 @@ const Kbar = () => {
   }
   const { setColorMode } = useColorMode()
 
-  const allDefaultActions = [
-    {
-      id: 'home',
-      name: 'Home',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/dashboard')
-    },
-    {
-      id: 'products',
-      name: 'Products',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/products')
-    },
-    {
-      id: 'requests',
-      name: 'Requests',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/requests')
-    },
-    {
-      id: 'vulnerabilities',
-      name: 'Vulnerabilities',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/vulnerabilities')
-    },
-    {
-      id: 'licenses',
-      name: 'Licenses',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/licenses')
-    },
-    {
-      id: 'analytics',
-      name: 'Analytics',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/analytics')
-    },
-    {
-      id: 'tools',
-      name: 'Tools',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/tools')
-    },
-    {
-      id: 'support',
-      name: 'Support',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/support')
-    },
-    {
-      id: 'policies',
-      name: 'Policies',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/policies')
-    },
-    {
-      id: 'settings',
-      name: 'Settings',
-      section: 'navigation',
-      icon: <FaRegFile color='#718096' />,
-      perform: () => navigate('/vendor/settings?tab=users')
-    }
-  ]
-
-  const getFreeTierActions = (...ids) => {
-    return allDefaultActions.filter((action) => ids.includes(action.id))
+  const getFreeTierActions = (actions, ...ids) => {
+    return actions.filter((action) => ids.includes(action.id))
   }
 
   const freeTierActions = getFreeTierActions(
+    allDefaultActions,
     'home',
     'products',
     'vulnerabilities',
@@ -150,9 +78,35 @@ const Kbar = () => {
     'settings'
   )
 
+  const freeTierSettingsActions = getFreeTierActions(
+    settingActions,
+    'users',
+    'feeds',
+    'checks',
+    'lists',
+    'legal',
+    'integrations-org',
+    'plan',
+    'integrations'
+  )
+
   const actions = isFreeTier ? freeTierActions : allDefaultActions
 
-  let data = [...actions]
+  const settingsActionsActual = isFreeTier
+    ? freeTierSettingsActions
+    : settingActions
+
+  let data = []
+
+  actions?.map((item) =>
+    data?.push({
+      id: item?.name,
+      name: item?.name,
+      section: `${item?.section}`,
+      icon: <FaRegFile color='#718096' />,
+      perform: () => navigate(item?.path)
+    })
+  )
 
   if (productData?.organization?.projectGroups?.nodes?.length > 0) {
     productData.organization.projectGroups.nodes.forEach((item) => {
@@ -199,11 +153,11 @@ const Kbar = () => {
         }
       })
 
-      settingActions?.map((item) =>
+      settingsActionsActual?.map((item) =>
         data?.push({
           id: item?.name,
           name: item?.name,
-          section: item?.section,
+          section: `${item?.section}`,
           icon: <FaRegFile color='#718096' />,
           perform: () => navigate(item?.path)
         })
