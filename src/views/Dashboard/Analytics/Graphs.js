@@ -20,25 +20,46 @@ const DAILY_METRICS_QUERY = gql`
     $sbomIds: [Uuid!]
     $startDate: ISO8601Date
     $endDate: ISO8601Date
+    $level: OrganizationMetricLevelEnum
   ) {
-    dailyMetrics(
-      startDate: $startDate
-      endDate: $endDate
-      sbomIds: $sbomIds
-      projectNames: $projectNames
-      projectGroupIds: $projectGroupIds
-    ) {
-      nodes {
-        licensesCount
-        componentsCount
-        vulnerabilityCriticalCount
-        vulnerabilityHighCount
-        vulnerabilityMediumCount
-        vulnerabilityLowCount
-        vulnerabilityUnknownSevCount
-        vulnerabilityCount
-        averageVulnerabilityDuration
-        date
+    dailyMetrics {
+      sbomMetrics(
+        level: $level
+        projectNames: $projectNames
+        projectGroupIds: $projectGroupIds
+        sbomIds: $sbomIds
+        startDate: $startDate
+        endDate: $endDate
+      ) {
+        nodes {
+          componentsCount
+          date
+          licensesCount
+          policiesCount
+          policyResultDetectedCount
+          policyResultErrorCount
+          policyResultNotDetectedCount
+          policyResultPassedCount
+          policyRuleViolationFailCount
+          policyRuleViolationInformCount
+          policyRuleViolationPassCount
+          policyRuleViolationWarnCount
+          policyViolationsCount
+          vulnerabilityAffectedCount
+          vulnerabilityCount
+          vulnerabilityCriticalCount
+          vulnerabilityFixedCount
+          vulnerabilityHighCount
+          vulnerabilityInTriageCount
+          vulnerabilityLowCount
+          vulnerabilityMediumCount
+          vulnerabilityNotAffectedCount
+          vulnerabilityUnknownSevCount
+          vulnerabilityUnspecifiedCount
+          averageVulnerabilityDuration
+          aggregator
+          policyResultSkippedCount
+        }
       }
     }
   }
@@ -72,7 +93,7 @@ export const Graphs = ({ filters }) => {
     )
   }
 
-  const nodes = data?.dailyMetrics?.nodes || []
+  const nodes = data?.dailyMetrics?.sbomMetrics?.nodes || []
 
   const { dates } = getDays({
     startDate,
