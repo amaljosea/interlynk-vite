@@ -12,48 +12,47 @@ const VexInfo = ({ data }) => {
     font-size: 13px;
     font-weight: bold;
     color: #718096;
-    text-transform: uppercase;
     letter-spacing: 0.6px;
   `
 
   const style = { color: primaryTextColor, mt: 1, fontSize: 14 }
 
   return (
-    <Stack spacing={5}>
+    <Stack spacing={4} pt={2} px={4}>
       <Box>
-        <CustomText>STATUS</CustomText>
+        <CustomText>Status</CustomText>
         <Text sx={style}>{data?.status || 'N/A'}</Text>
       </Box>
       <Box>
-        <CustomText>JUSTIFICATION</CustomText>
+        <CustomText>Justification</CustomText>
         <Text sx={style}>{data?.justification || 'N/A'}</Text>
       </Box>
       <Box>
-        <CustomText>IMPACT STATEMENT</CustomText>
+        <CustomText>Impact Statement</CustomText>
         <Text sx={style}>{data?.impact || 'N/A'}</Text>
       </Box>
       <Box>
-        <CustomText>INTERNAL NOTES</CustomText>
+        <CustomText>Internal Notes</CustomText>
         <Text sx={style}>{data?.note || 'N/A'}</Text>
       </Box>
       <Box>
-        <CustomText>ACTION STATEMENT</CustomText>
+        <CustomText>Action Statement</CustomText>
         <Text sx={style}>{data?.actionStmt || 'N/A'}</Text>
       </Box>
       <Box>
-        <CustomText>FIXED VERSION</CustomText>
+        <CustomText>Fixed Version</CustomText>
         <Text sx={style}>{data?.fixedIn || 'N/A'}</Text>
       </Box>
       <Box>
-        <CustomText>DETAIL</CustomText>
+        <CustomText>Details</CustomText>
         <Text sx={style}>{data?.detail || 'N/A'}</Text>
       </Box>
       <Box>
-        <CustomText>CREATED BY</CustomText>
+        <CustomText>Created By</CustomText>
         <Text sx={style}>{data?.changedBy || 'N/A'}</Text>
       </Box>
       <Box>
-        <CustomText>CREATED ON</CustomText>
+        <CustomText>Created On</CustomText>
         <Text sx={style}>
           {data?.updatedAt ? timeSince(data?.updatedAt) : 'N/A'}
         </Text>
