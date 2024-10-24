@@ -1,19 +1,36 @@
 import ReactSelect, { components } from 'react-select'
 import CreatableSelect from 'react-select/creatable'
 
+import useQueryParam from 'hooks/useQueryParam'
 import { useSelect } from 'hooks/useSelect'
 
 import { FaTimes } from 'react-icons/fa'
+import { FaChevronDown } from 'react-icons/fa6'
 
 const LynkSelect = (props) => {
   const { style } = useSelect('field')
+  const activeTab = useQueryParam('tab')
+  const isGeneral = activeTab === 'general'
 
   const ClearIndicator = (props) => {
+    if (isGeneral) return null
+
     return (
       <components.ClearIndicator {...props}>
-        <FaTimes color='gray.800' />
+        <FaTimes color='darkgray' />
       </components.ClearIndicator>
     )
+  }
+
+  const DropdownIndicator = (props) => {
+    if (isGeneral) {
+      return (
+        <components.DropdownIndicator {...props}>
+          <FaChevronDown size={12} color='darkgray' />
+        </components.DropdownIndicator>
+      )
+    }
+    return null
   }
 
   return props.isCreatable ? (
@@ -23,7 +40,7 @@ const LynkSelect = (props) => {
       {...props}
       components={{
         ClearIndicator,
-        DropdownIndicator: () => null,
+        DropdownIndicator,
         IndicatorSeparator: () => null
       }}
     />
@@ -34,7 +51,7 @@ const LynkSelect = (props) => {
       {...props}
       components={{
         ClearIndicator,
-        DropdownIndicator: () => null,
+        DropdownIndicator,
         IndicatorSeparator: () => null
       }}
     />

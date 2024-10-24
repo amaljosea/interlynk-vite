@@ -11,7 +11,7 @@ import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 
-import { FaRecycle } from 'react-icons/fa6'
+import { FaWrench } from 'react-icons/fa6'
 
 const UpdatePhases = gql`
   mutation UpdatePhases($id: Uuid!, $phases: [PhaseInput!]) {
@@ -64,7 +64,7 @@ const PhaseModal = ({ data, isOpen, onClose }) => {
   return (
     <LynkModal
       isOpen={isOpen}
-      Icon={FaRecycle}
+      Icon={FaWrench}
       onClose={onClose}
       isLoading={loading}
       buttonText={'Save'}

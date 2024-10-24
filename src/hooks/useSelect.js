@@ -66,7 +66,6 @@ export const useSelect = (type) => {
         backgroundColor: secondaryBgColor
       }
     }),
-
     singleValue: (provided) => ({
       ...provided,
       color: primaryTextColor,
@@ -77,12 +76,18 @@ export const useSelect = (type) => {
         color: primaryTextColor
       }
     }),
+    multiValue: (provided) => ({
+      ...provided,
+      backgroundColor: '#EDF2F7',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden'
+    }),
     multiValueRemove: (provided) => ({
       ...provided,
-      color: 'red',
+      color: '#A0AEC0',
+      backgroundColor: 'transparent',
       ':hover': {
-        backgroundColor: 'red',
-        color: 'white'
+        color: '#A0AEC0'
       }
     }),
     dropdownIndicator: (provided) => {
@@ -97,7 +102,15 @@ export const useSelect = (type) => {
         height: isBreadcrumb ? '32px' : '39px',
         paddingLeft: isVersion ? '36px' : 'auto'
       }
-    }
+    },
+    clearIndicator: (provided, state) => ({
+      ...provided,
+      cursor: 'pointer',
+      color: state.isFocused ? 'lightgray' : 'lightgray',
+      '&:hover': {
+        color: '#4299e1'
+      }
+    })
   }
 
   return { style: selectStyles }
