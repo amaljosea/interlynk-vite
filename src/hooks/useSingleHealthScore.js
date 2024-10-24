@@ -31,7 +31,9 @@ export const useSingleHealthScore = ({ projectId, sbomId }) => {
   })
 
   const { healthScore } = useMemo(() => {
-    const { healthScore = 0 } = calculateHealthScore(data?.sbom)
+    const { healthScore = 0 } = data
+      ? calculateHealthScore(data.sbom)
+      : { healthScore: 0 }
 
     return {
       healthScore
