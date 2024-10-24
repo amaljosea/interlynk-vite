@@ -8,14 +8,8 @@ import {
   EditIcon,
   RepeatIcon
 } from '@chakra-ui/icons'
-import {
-  Divider,
-  Flex,
-  IconButton,
-  Spacer,
-  Stack,
-  Text
-} from '@chakra-ui/react'
+import { Flex, IconButton, Stack, Text } from '@chakra-ui/react'
+import { Divider, Spacer } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightAddon } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -68,7 +62,7 @@ const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
                 <Flex
                   sx={{ w: '100%', gap: 2, justifyContent: 'space-between' }}
                 >
-                  <InputGroup size='sm'>
+                  <InputGroup size='sm' borderRadius={'4px'}>
                     <Input
                       type='text'
                       w={'fit-content'}
