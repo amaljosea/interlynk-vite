@@ -293,7 +293,7 @@ const CompIdentifiers = ({ data }) => {
           </Stack>
         ) : (
           <ActionButton
-            title={'Save'}
+            title={'Save Identifiers'}
             onClick={handleSubmit}
             isDisabled={loading}
             hidden={purlOpen || cpeOpen || customerView}

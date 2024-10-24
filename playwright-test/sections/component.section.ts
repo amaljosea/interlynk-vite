@@ -29,7 +29,9 @@ export default class ComponentSection {
 
       await this.page.waitForTimeout(3000)
 
-      await this.page.getByLabel('Dropdown menu for Test').click()
+      await this.page
+        .locator(`//button[@aria-label='Dropdown menu for Test']`)
+        .click()
       await this.page.getByRole('menuitem', { name: 'upload_sbom' }).click()
 
       const jsonFiles = getFileNamesFromResource('.json')
@@ -147,10 +149,10 @@ export default class ComponentSection {
       await this.page
         .getByPlaceholder('CPE')
         .fill('cpe:2.3:a:byonepress:social_locker:2.0.2:*:*:*:*:wordpress:*:*')
-      const IdtSave = this.page.getByRole('button', { name: 'Save' })
+      await this.page.getByTestId('cpe_list').first().click()
+      await this.page.waitForTimeout(1000)
 
-      await IdtSave.click()
-
+      await this.page.getByTestId('Save Identifiers').click()
       await this.page.waitForTimeout(2000)
 
       await this.page.getByRole('tab', { name: 'suppliers' }).click()

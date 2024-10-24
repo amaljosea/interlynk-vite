@@ -1,17 +1,9 @@
 import { TabContext } from 'context/TabContext'
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import { validateCpe } from 'utils'
-import { getSignedUrlParams } from 'utils'
+import { getSignedUrlParams, validateCpe } from 'utils'
 
-import {
-  Box,
-  FormControl,
-  FormErrorMessage,
-  Input,
-  List,
-  ListItem,
-  VStack
-} from '@chakra-ui/react'
+import { Box, Input, List, ListItem, VStack } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -101,11 +93,10 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
 
   return (
     <VStack
-      width={'100%'}
       spacing={4}
       align='stretch'
-      pos={'relative'}
       ref={inputRef}
+      sx={{ w: '100%', pos: 'relative' }}
     >
       <FormControl
         isInvalid={identifiers?.cpe !== '' && identifiers?.cpeError !== ''}
@@ -127,17 +118,13 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
       </FormControl>
       {identifiers?.cpe !== '' && cpeList?.length > 0 && (
         <Box
-          pos={'absolute'}
-          width={'100%'}
-          left={0}
-          right={0}
-          bg={primaryBgColor}
           zIndex={111}
-          top={8}
+          pos={'absolute'}
+          bg={primaryBgColor}
           borderRadius={'md'}
-          border={'1px solid #CBD5E0'}
-          maxH={'260px'}
           overflowY={'scroll'}
+          border={'1px solid #CBD5E0'}
+          sx={{ w: '100%', maxH: '260px', left: 0, right: 0, top: 8 }}
         >
           <List>
             {cpeList.map((item, index) => (
@@ -154,10 +141,9 @@ const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
                 }}
                 onMouseEnter={() => setFocusedIndex(null)}
                 outline='none'
-                fontSize={'sm'}
-                width={'100%'}
-                cursor={'pointer'}
+                data-testid='cpe_list'
                 onClick={() => handleSelect(item)}
+                sx={{ w: '100%', fontSize: 'sm', cursor: 'pointer' }}
               >
                 {item}
               </ListItem>
