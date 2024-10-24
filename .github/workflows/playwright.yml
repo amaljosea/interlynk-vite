@@ -35,7 +35,7 @@ jobs:
         PLAYWRIGHT_USER_EMAIL: ${{ env.PLAYWRIGHT_USER_EMAIL }}
         PLAYWRIGHT_USER_PASSWORD: ${{ env.PLAYWRIGHT_USER_PASSWORD }}
 
-    # Parse the Playwright JSON report to get pass/failure count
+    # Parse the Playwright JSON report to get pass/failure count and duration
     - name: Get test results
       if: always()  # runs regardless of success or failure
       id: test_results
@@ -43,9 +43,17 @@ jobs:
         passed_tests=$(jq '.stats.expected' results.json)
         failed_tests=$(jq '.stats.unexpected' results.json)
         total_tests=$((passed_tests + failed_tests))
+        duration_ms=$(jq '.stats.duration' results.json)
+
+        # Convert milliseconds to minutes and seconds
+        minutes=$(echo "$duration_ms/60000" | bc)
+        seconds=$(echo "($duration_ms%60000)/1000" | bc)
+        duration_formatted="${minutes}m ${seconds}s"
+
         echo "total_tests=$total_tests" >> $GITHUB_ENV
         echo "failed_tests=$failed_tests" >> $GITHUB_ENV
         echo "passed_tests=$passed_tests" >> $GITHUB_ENV
+        echo "test_duration=$duration_formatted" >> $GITHUB_ENV
 
     # Notify Slack on Failure (Scheduled Runs Only)
     - name: Notify Slack on Failure (Scheduled Runs Only)
@@ -55,7 +63,7 @@ jobs:
       run: |
         curl -X POST -H 'Content-type: application/json' \
         --data '{
-          "text": "🚨 E2E Playwright Tests failed! ${{ env.passed_tests }} out of ${{ env.total_tests }} tests passed. <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Click here> to view the logs."
+          "text": "🚨 E2E Playwright Tests failed! ${{ env.passed_tests }} out of ${{ env.total_tests }} tests passed. Test duration: ${{ env.test_duration }}. <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Click here> to view the logs."
         }' \
         $SLACK_WEBHOOK_URL
 
@@ -67,7 +75,7 @@ jobs:
       run: |
         curl -X POST -H 'Content-type: application/json' \
         --data '{
-          "text": "✅ E2E Playwright Tests passed! ${{ env.passed_tests }} out of ${{ env.total_tests }} tests passed. <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Click here> to view the logs."
+          "text": "✅ E2E Playwright Tests passed! ${{ env.passed_tests }} out of ${{ env.total_tests }} tests passed. Test duration: ${{ env.test_duration }}. <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Click here> to view the logs."
         }' \
         $SLACK_WEBHOOK_URL
 
