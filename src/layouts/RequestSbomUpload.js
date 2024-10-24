@@ -1,22 +1,24 @@
-import DashboardBg from 'assets/img/dashboard.png'
-import { useRef } from 'react'
+import { useEffect } from 'react'
 import SbomUpload from 'views/Requests/SbomUpload'
 
-import { Box, Image } from '@chakra-ui/react'
+import { useMediaQuery } from '@chakra-ui/react'
+import { useColorMode } from '@chakra-ui/system'
+
+import AuthContainer from 'components/AuthContainer'
+import DeviceWarning from 'components/DeviceWarning'
 
 const RequestSbomUpload = () => {
-  const navRef = useRef()
+  const [isDesktop] = useMediaQuery('(min-width: 1024px)')
+  const { colorMode, setColorMode } = useColorMode()
 
+  useEffect(() => {
+    if (colorMode === 'dark') setColorMode('light')
+  }, [colorMode, setColorMode])
+  if (!isDesktop) return <DeviceWarning />
   return (
-    <Box ref={navRef} w='100%' height={'100vh'} position={'relative'}>
-      <Image
-        src={DashboardBg}
-        width={'100%'}
-        height={'100%'}
-        pos={'absolute'}
-      />
+    <AuthContainer>
       <SbomUpload />
-    </Box>
+    </AuthContainer>
   )
 }
 

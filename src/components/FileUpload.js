@@ -1,129 +1,146 @@
-import { useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import React, { useState } from 'react'
 
 import {
   Box,
   Flex,
-  FormControl,
   FormLabel,
-  IconButton,
   Input,
   Progress,
-  useDisclosure
+  Stack,
+  Text
 } from '@chakra-ui/react'
-import { Button } from '@chakra-ui/react'
 
-import { FaUpload } from 'react-icons/fa'
+import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
-import LynkModal from './LynkModal'
-
-const FileUpload = () => {
+const FileUpload = ({
+  selectedFile,
+  setSelectedFile,
+  isLoading = false,
+  errorMessage,
+  setErrorMessage,
+  error,
+  label = 'Upload File',
+  accept = '.json,application/json,application/xml,text/xml'
+}) => {
+  const { showToast } = useCustomToast()
+  const [isDragActive, setIsDragActive] = useState(false)
   const {
-    isOpen: isUploadOpen,
-    onOpen: onUploadOpen,
-    onClose: onUploadClose
-  } = useDisclosure()
+    primaryBlueText,
+    grayBorderColor,
+    secondaryTextColor,
+    primaryErrorColor
+  } = useThemeColor([
+    'primaryBlueText',
+    'grayBorderColor',
+    'secondaryTextColor',
+    'primaryErrorColor'
+  ])
 
-  const location = useLocation()
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragActive(true)
+  }
 
-  const [file, setFile] = useState(null)
-  const [progress, setProgress] = useState(0)
-  const [fileName, setFileName] = useState('')
+  const handleDragLeave = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragActive(false)
+  }
+
+  const handleDrop = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragActive(false)
+    const droppedFiles = Array.from(e.dataTransfer.files)
+    if (droppedFiles?.length > 0) {
+      const validExtensions = ['xml', 'json']
+      const fileExtension = droppedFiles[0].name.split('.').pop().toLowerCase()
+      if (validExtensions.includes(fileExtension)) {
+        setErrorMessage('')
+        setSelectedFile(droppedFiles[0])
+      } else {
+        setErrorMessage(
+          'Invalid file type, only .xml and .json files are allowed.'
+        )
+      }
+    }
+  }
 
   const handleFileChange = (event) => {
-    setFile(event.target.files[0])
-    const uploadTask = setInterval(() => {
-      setProgress((prevProgress) => {
-        if (prevProgress >= 100) {
-          clearInterval(uploadTask)
-          return 100
-        }
-        return prevProgress + 10
-      })
-    }, 1000)
+    const file = event.target.files[0]
+    if (file) {
+      const validExtensions = ['xml', 'json']
+      const fileExtension = file.name.split('.').pop().toLowerCase()
+      if (validExtensions.includes(fileExtension)) {
+        setErrorMessage('')
+        setSelectedFile(file)
+      } else {
+        showToast({
+          description:
+            'Invalid file type, only .xml and .json files are allowed.',
+          status: 'error'
+        })
+        setErrorMessage(
+          'Invalid file type, only .xml and .json files are allowed.'
+        )
+      }
+    }
   }
-
-  const handleSubmit = () => {
-    setFile(null)
-    onUploadClose()
-  }
-
-  // useEffect(() => {
-  //   console.log('progress', progress)
-  // }, [progress])
 
   return (
-    <>
-      {location.pathname.startsWith('/customer') ? (
-        <IconButton
-          aria-label='Download SBOM'
-          icon={<FaUpload />}
-          onClick={onUploadOpen}
-          size='md'
-          colorScheme='blue'
-        />
-      ) : (
-        <Button
-          onClick={onUploadOpen}
-          leftIcon={<FaUpload />}
-          colorScheme='green'
-          size='sm'
-          variant='solid'
-          borderRadius='6px'
-        >
-          Upload
-        </Button>
-      )}
-      <LynkModal
-        isOpen={isUploadOpen}
-        onClose={onUploadClose}
-        buttonText='Submit'
-        onSubmit={handleSubmit}
-        title={'Upload SBOM'}
-        Icon={FaUpload}
-        hideCancelButton
-      >
-        <Box>
-          <FormLabel htmlFor='file'>
+    <Box>
+      <Stack spacing={6}>
+        <Stack spacing={0}>
+          <FormLabel fontSize={'12px'}>{label}</FormLabel>
+          <Flex
+            p={5}
+            height={'110px'}
+            justifyContent={'center'}
+            borderWidth={2}
+            borderRadius='md'
+            textAlign='center'
+            overflow={'hidden'}
+            onDrop={handleDrop}
+            borderStyle='dashed'
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            borderColor={isDragActive ? primaryBlueText : grayBorderColor}
+            onClick={() => document.getElementById('fileInput').click()}
+          >
             <Input
+              id='fileInput'
               type='file'
-              id='file'
               style={{ display: 'none' }}
               onChange={handleFileChange}
+              accept={accept}
             />
-            <Flex
-              p={10}
-              border={'1px dotted lightgray'}
-              borderWidth={'3px'}
-              rounded={'lg'}
-              alignItems={'center'}
-              justifyContent={'center'}
-            >
-              <FaUpload color='darkgray' size={32} />
+            <Flex alignItems={'center'} justifyContent={'center'}>
+              <Text
+                hidden={isLoading}
+                color={selectedFile ? primaryBlueText : secondaryTextColor}
+                fontWeight={500}
+              >
+                {isDragActive
+                  ? 'Drop the file here'
+                  : selectedFile
+                    ? selectedFile.name
+                    : 'Drop SBOM here, or click to select a file'}
+              </Text>
+              <Text hidden={!isLoading}>Uploading...</Text>
             </Flex>
-          </FormLabel>
-        </Box>
-        <Box mt={4}>
-          {file && (
-            <Flex direction={'column'} gap={4}>
-              <p>Uploading: {file.name}</p>
-              <Progress value={progress} />
-            </Flex>
-          )}
-        </Box>
-        {progress === 100 && (
-          <FormControl isRequired mt={4}>
-            <Input
-              type='email'
-              size='lg'
-              value={fileName}
-              onChange={(e) => setFileName(e.target.value)}
-              placeholder='Enter file name'
-            />
-          </FormControl>
+          </Flex>
+        </Stack>
+        {isLoading && <Progress size='xs' isIndeterminate />}
+        {errorMessage && <Text color={primaryErrorColor}>{errorMessage}</Text>}
+        {error && (
+          <Box mb={4}>
+            <Text>Something went wrong!!</Text>
+          </Box>
         )}
-      </LynkModal>
-    </>
+      </Stack>
+    </Box>
   )
 }
 

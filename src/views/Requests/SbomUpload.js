@@ -1,21 +1,14 @@
 import { useMutation } from '@apollo/client'
-import { useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
-import {
-  Box,
-  Button,
-  Flex,
-  HStack,
-  Icon, // eslint-disable-next-line no-restricted-imports
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalOverlay,
-  Text
-} from '@chakra-ui/react'
+import { CheckCircleIcon, CloseIcon } from '@chakra-ui/icons'
+import { Button, Flex, Icon, Stack, Text } from '@chakra-ui/react'
+
+import FileUpload from 'components/FileUpload'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   RequestDecline,
@@ -23,9 +16,28 @@ import {
   RequestValidate
 } from 'graphQL/Mutation'
 
-import { FaUpload } from 'react-icons/fa'
-
 const SbomUpload = () => {
+  const [uploadSuccessView, setAUploadSuccessView] = useState(false)
+  const [uploadFailureView, setUploadFailureView] = useState(false)
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [requestData, setRequestData] = useState(null)
+
+  const navigate = useNavigate()
+
+  const {
+    primaryTextColor,
+    secondaryTextColor,
+    primaryBlueText,
+    primarySuccessColor,
+    primaryErrorColor
+  } = useThemeColor([
+    'primaryTextColor',
+    'secondaryTextColor',
+    'primaryBlueText',
+    'primarySuccessColor',
+    'primaryErrorColor'
+  ])
   const { showToast } = useCustomToast()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -33,23 +45,23 @@ const SbomUpload = () => {
   const id = queryParams.get('id')
 
   const [declineRequest] = useMutation(RequestDecline)
-  const [uploadSbom] = useMutation(RequestUploadSbom)
+  const [uploadSbom, { error, loading }] = useMutation(RequestUploadSbom)
   const [validateRequest] = useMutation(RequestValidate)
-
-  const [isUploadVisible, setIsUploadVisible] = useState(true)
 
   useEffect(() => {
     validateRequest({ variables: { id, token } }).then((res) => {
       if (res.data?.requestValidate?.errors?.length > 0) {
-        setIsUploadVisible(false)
         showToast({
           description: res.data?.requestValidate.errors[0],
           status: 'error'
         })
+        setUploadFailureView(true)
+      } else {
+        setRequestData(res.data?.requestValidate?.request)
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, token])
+  }, [id, token, validateRequest])
 
   const onDecline = () => {
     declineRequest({
@@ -63,17 +75,17 @@ const SbomUpload = () => {
           title: 'Request Declined',
           status: 'success'
         })
-
-        setIsUploadVisible(false)
+        setUploadFailureView(true)
       }
     })
   }
 
   const handleUploadRequestSbom = async (file) => {
-    await uploadSbom({ variables: { file: file, id: id, token: token } })
-      .then((res) => {
+    await uploadSbom({ variables: { file: file, id: id, token: token } }).then(
+      (res) => {
         if (res?.data?.requestUploadSbom.errors?.length > 0) {
           showToast({
+            title: 'SBOM upload failed',
             description: res?.data?.requestUploadSbom.errors[0],
             status: 'error'
           })
@@ -83,93 +95,115 @@ const SbomUpload = () => {
             description: 'This SBOM will be sent to the requester shortly.',
             status: 'success'
           })
+          setAUploadSuccessView(true)
         }
-      })
-      .finally(() => setIsUploadVisible(false))
-  }
-
-  const handleFileChange = async (event) => {
-    const selectedFile = event.target.files[0]
-    if (selectedFile) {
-      const validExtensions = ['xml', 'json']
-      const fileExtension = selectedFile.name.split('.').pop().toLowerCase()
-      if (validExtensions.includes(fileExtension)) {
-        await handleUploadRequestSbom(selectedFile)
-      } else {
-        showToast({
-          description:
-            'Invalid file type, only .xml and .json files are allowed.',
-          status: 'error'
-        })
       }
-    }
-  }
-
-  const fileInputRef = useRef(null)
-
-  const handleIconClick = () => {
-    fileInputRef.current.click()
+    )
   }
 
   return (
-    <Modal isCentered size={'3xl'} isOpen={true}>
-      <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(4px)' />
-      <ModalContent>
-        <ModalBody py={12}>
-          <Box
-            textAlign={'center'}
-            as={Flex}
-            alignItems={'center'}
-            justifyContent={'center'}
-            flexDir={'column'}
-          >
-            {isUploadVisible ? (
-              <>
-                <input
-                  type='file'
-                  ref={fileInputRef}
-                  style={{ display: 'none' }}
-                  accept='.xml,.json'
-                  onChange={handleFileChange}
-                />
-                <Icon
-                  color='blue.400'
-                  boxSize={20}
-                  as={FaUpload}
-                  cursor='pointer'
-                  onClick={handleIconClick}
-                />
-                <Text my={6} fontSize={20}>
-                  Click on the above button to upload your SBOM file
-                </Text>
-
-                <HStack spacing={2}>
-                  <Button
-                    variant='outline'
-                    colorScheme='red'
-                    onClick={onDecline}
-                  >
-                    Decline
-                  </Button>
-
-                  <Button
-                    variant='solid'
-                    colorScheme='blue'
-                    onClick={() => setIsUploadVisible(false)}
-                  >
-                    Close
-                  </Button>
-                </HStack>
-              </>
-            ) : (
-              <Text my={6} fontSize={20}>
-                You may please close this window
+    <Flex alignItems='center' justifyContent='center'>
+      {!uploadSuccessView && !uploadFailureView && (
+        <Flex alignItems='center' justifyContent='center'>
+          <Stack textAlign='center' gap={'20px'} width={'392px'}>
+            <Stack>
+              <Text
+                fontSize='20px'
+                fontWeight='600'
+                textColor={primaryTextColor}
+              >
+                Upload SBOM
               </Text>
-            )}
-          </Box>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+              <Text
+                fontSize='14px'
+                fontWeight='400'
+                textColor={secondaryTextColor}
+              >
+                An SBOM has been requested for Product -{' '}
+                {requestData?.productName} and Version -{' '}
+                {requestData?.productVersion}.
+              </Text>
+            </Stack>
+            <Stack minHeight='165px'>
+              <FileUpload
+                selectedFile={selectedFile}
+                setSelectedFile={setSelectedFile}
+                isLoading={loading}
+                error={error}
+                errorMessage={errorMessage}
+                setErrorMessage={setErrorMessage}
+              />
+            </Stack>
+
+            <Stack>
+              <Button
+                isDisabled={selectedFile === null || errorMessage !== ''}
+                onClick={() => handleUploadRequestSbom(selectedFile)}
+                colorScheme={'blue'}
+              >
+                Upload
+              </Button>
+              <Button
+                onClick={() => {
+                  onDecline()
+                }}
+                colorScheme={'white'}
+                textColor={primaryBlueText}
+              >
+                Decline
+              </Button>
+            </Stack>
+          </Stack>
+        </Flex>
+      )}
+
+      {(uploadSuccessView || uploadFailureView) && (
+        <Flex alignItems='center' justifyContent='center'>
+          <Stack textAlign='center' gap={'20px'} alignItems='center'>
+            <Icon
+              as={uploadSuccessView ? CheckCircleIcon : CloseIcon}
+              color={uploadSuccessView ? primarySuccessColor : 'white'}
+              boxSize='64px'
+              bg={uploadSuccessView ? 'white' : primaryErrorColor}
+              borderRadius='full'
+              padding={uploadFailureView && 2}
+            />
+            <Stack spacing={1}>
+              <Text
+                fontSize='20px'
+                fontWeight='600'
+                textColor={primaryTextColor}
+              >
+                {uploadSuccessView
+                  ? ' Upload Successful'
+                  : 'Upload request Declined'}
+              </Text>
+              <Text
+                fontSize='14px'
+                fontWeight='400'
+                textColor={secondaryTextColor}
+              >
+                {uploadSuccessView
+                  ? 'You may close this window or login to dasboard'
+                  : 'You may close this window'}
+              </Text>
+            </Stack>
+
+            <Stack>
+              <Text
+                fontSize='12px'
+                fontWeight='500'
+                textColor={primaryBlueText}
+                cursor={'pointer'}
+                onClick={() => navigate('/auth')}
+              >
+                Login to Interlynk
+              </Text>
+            </Stack>
+          </Stack>
+        </Flex>
+      )}
+    </Flex>
   )
 }
 
