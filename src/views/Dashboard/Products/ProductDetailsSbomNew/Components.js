@@ -132,10 +132,6 @@ const Components = ({ sbomData }) => {
     }
   }, [direct, ecosystems, kinds, licenses, scope, suppliers])
 
-  const orderBy = useMemo(() => {
-    field, direction
-  }, [direction, field])
-
   // GET COMPONENT DATA
   const { nodes, error, paginationProps, reset, loading } = usePaginatedQuery(
     GetComponentData,
@@ -145,7 +141,7 @@ const Components = ({ sbomData }) => {
         ...compData,
         sbomId: sbomId,
         projectId: productId,
-        orderBy: searchInput === '' ? orderBy : undefined,
+        orderBy: searchInput === '' ? { field, direction } : undefined,
         search: searchInput !== '' ? searchInput : undefined,
         includeParts: sbomData?.sbomParts?.length > 0 ? true : false
       },
@@ -917,7 +913,7 @@ const Components = ({ sbomData }) => {
             tableType='SBOM Components View'
             filters={{
               ...compData,
-              orderBy: searchInput === '' ? orderBy : undefined,
+              orderBy: searchInput === '' ? { field, direction } : undefined,
               search: searchInput !== '' ? searchInput : undefined,
               includeParts: sbomData?.sbomParts?.length > 0
             }}
@@ -940,7 +936,8 @@ const Components = ({ sbomData }) => {
     isArchived,
     compData,
     searchInput,
-    orderBy,
+    field,
+    direction,
     sbomData?.sbomParts?.length,
     reset
   ])
