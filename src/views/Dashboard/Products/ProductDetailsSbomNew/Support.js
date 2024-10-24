@@ -1,32 +1,15 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { customStyles } from 'utils'
 import DeleteModal from 'views/Dashboard/Support/DeleteModal'
 import StatusModal from 'views/Dashboard/Support/StatusModal'
 import SupportModal from 'views/Dashboard/Support/SupportModal'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { CheckIcon } from '@chakra-ui/icons'
-import {
-  Flex,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-  Tag,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
-import RefreshBtn from 'components/Icons/RefreshBtn'
 import CpeCard from 'components/Misc/CpeCard'
-import LynkSwitch from 'components/Misc/LynkSwitch'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
@@ -36,8 +19,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetSbomSupportTab } from 'graphQL/Queries'
 
-import { FaEllipsisV } from 'react-icons/fa'
-import { FaPlus } from 'react-icons/fa6'
+import SupportColumns from './Components/tableColumns/SupportColumns'
+import SupportSubHeader from './Components/tableSubHeaders/SupportSubHeader'
 
 const Support = ({ sbomData }) => {
   const params = useParams()
@@ -47,17 +30,7 @@ const Support = ({ sbomData }) => {
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
-  const {
-    headingTextColor,
-    primaryTextColor,
-    primaryErrorColor,
-    secondaryTextColor
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'primaryErrorColor',
-    'secondaryTextColor'
-  ])
+  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -142,240 +115,27 @@ const Support = ({ sbomData }) => {
   )
 
   // SUB HEADER
-  const subHeader = useMemo(() => {
-    return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        {/* SEARCH COMPONENTS */}
-        <SearchFilter
-          id='support'
-          filterText={filterText}
-          onChange={onSearchInputChange}
-          onClear={handleClear}
-          onFilter={handleSearch}
-        />
-        <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          {!sbomId && (
-            <Tooltip label='Create Support'>
-              <IconButton
-                colorScheme='blue'
-                onClick={() => {
-                  setActiveRow(null)
-                  onOpen()
-                }}
-                icon={<FaPlus />}
-              />
-            </Tooltip>
-          )}
-          <RefreshBtn onClick={() => reset()} />
-        </Stack>
-      </Flex>
-    )
-  }, [
+  const subHeader = SupportSubHeader(
     filterText,
     onSearchInputChange,
     handleClear,
     handleSearch,
     sbomId,
     onOpen,
-    reset
-  ])
-
-  const getColor = (eolDate) => {
-    const currentDate = new Date()
-    const sixMonthsFromToday = new Date()
-    sixMonthsFromToday.setMonth(sixMonthsFromToday.getMonth() + 6)
-
-    if (new Date(eolDate) <= currentDate) {
-      return 'red'
-    } else if (new Date(eolDate) <= sixMonthsFromToday) {
-      return 'orange'
-    } else {
-      return 'green'
-    }
-  }
+    reset,
+    setActiveRow
+  )
 
   // COLUMNS
-  const columns = [
-    {
-      id: 'COMPONENT_SUPPORT_OVERRIDES_ENABLED',
-      name: 'ACTIVE',
-      selector: (row) => {
-        const { enabled } = row
-        return (
-          <LynkSwitch
-            size='md'
-            isChecked={enabled}
-            onChange={() => {
-              setActiveRow(row)
-              onActiveOpen()
-            }}
-          />
-        )
-      },
-      width: '8%',
-      omit: sbomId ? true : false,
-      sortable: true
-    },
-    {
-      id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_NAME',
-      name: 'PRODUCT',
-      selector: (row) => {
-        return (
-          <Stack my={4}>
-            <Text color={primaryTextColor}>
-              {row?.productName || row?.name}
-            </Text>
-            <Text color={primaryTextColor}>
-              {row?.productVersion || row?.version}
-            </Text>
-          </Stack>
-        )
-      },
-      wrap: true,
-      width: '20%',
-      sortable: true
-    },
-    {
-      id: 'IDS',
-      name: 'IDS',
-      selector: (row) => (
-        <Text
-          my={4}
-          color={primaryTextColor}
-          cursor={'pointer'}
-          onClick={() => {
-            setActiveRow(row)
-            onCardOpen()
-          }}
-        >
-          {row?.idUri}
-        </Text>
-      ),
-      wrap: true,
-      width: '20%'
-    },
-    {
-      id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_VERSION',
-      name: 'VERSION',
-      selector: (row) => (
-        <Text color={primaryTextColor}>{row?.productVersion}</Text>
-      ),
-      width: '12%',
-      wrap: true,
-      sortable: true,
-      omit: true
-    },
-    {
-      id: 'DEPRECATED',
-      name: 'DEPRECATED',
-      selector: (row) =>
-        row?.deprecated ? <CheckIcon color={primaryErrorColor} /> : '',
-      width: '12%',
-      wrap: true
-    },
-    {
-      id: 'OUTDATED',
-      name: 'OUTDATED',
-      selector: (row) =>
-        row?.outdated ? <CheckIcon color={primaryErrorColor} /> : '',
-      width: '12%',
-      wrap: true
-    },
-    {
-      id: 'EOL_INFOS_EOL_DATE',
-      name: 'END-OF-LIFE',
-      selector: (row) => {
-        const { eol } = row
-        return (
-          <Tag variant='solid' colorScheme={getColor(eol)} hidden={!eol}>
-            {eol}
-          </Tag>
-        )
-      },
-      width: '12%',
-      wrap: true
-    },
-    {
-      id: 'EOL_INFOS_EOL_SUPPORT',
-      name: 'END-OF-SERVICE',
-      selector: (row) => {
-        const { eos } = row
-        return (
-          <Tag variant='solid' colorScheme={getColor(eos)} hidden={!eos}>
-            {eos}
-          </Tag>
-        )
-      },
-      width: '12%',
-      wrap: true
-    },
-    // UPDATED AT
-    {
-      id: 'COMPONENT_SUPPORT_OVERRIDES_UPDATED_AT',
-      name: 'UPDATED',
-      selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
-          <Text color={primaryTextColor}>
-            {row?.updatedAt ? timeSince(row?.updatedAt) : ''}
-          </Text>
-        </Tooltip>
-      ),
-      right: 'true',
-      wrap: true,
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
-        return dateA - dateB
-      }
-    },
-    {
-      id: 'ACTION',
-      name: 'ACTION',
-      selector: (row) => {
-        return (
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color={secondaryTextColor}
-            />
-            <Portal>
-              <MenuList fontSize={'sm'}>
-                {/* EDIT SUPPORT */}
-                <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    onOpen()
-                  }}
-                >
-                  Edit Support
-                </MenuItem>
-                {/* DELETE SUPPORT  */}
-                <MenuItem
-                  color={primaryErrorColor}
-                  onClick={() => {
-                    setActiveRow(row)
-                    onDeleteOpen()
-                  }}
-                >
-                  Delete Support
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        )
-      },
-      width: '8%',
-      right: 'true',
-      omit: sbomId || isArchived ? true : false
-    }
-  ]
+  const columns = SupportColumns(
+    isArchived,
+    setActiveRow,
+    onActiveOpen,
+    onCardOpen,
+    onOpen,
+    onDeleteOpen,
+    sbomId
+  )
 
   return (
     <>

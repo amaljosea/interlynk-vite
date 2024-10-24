@@ -281,6 +281,21 @@ export const statusColor = (status) => {
   }
 }
 
+export const getEolStatusColor = (eolDate) => {
+  const currentDate = new Date()
+  const sixMonthsFromToday = new Date()
+
+  sixMonthsFromToday.setMonth(sixMonthsFromToday.getMonth() + 6)
+
+  if (new Date(eolDate) <= currentDate) {
+    return 'red'
+  } else if (new Date(eolDate) <= sixMonthsFromToday) {
+    return 'orange'
+  } else {
+    return 'green'
+  }
+}
+
 export const displayPic = (email) => {
   switch (email) {
     case 'abhisek@interlynk.io':
