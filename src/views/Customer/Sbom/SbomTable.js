@@ -7,6 +7,7 @@ import Card from 'components/Card/Card.js'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaLock } from 'react-icons/fa6'
 
@@ -50,6 +51,8 @@ const SbomTable = ({ data, loading, error }) => {
     return conditions[item] ? 'none' : 'flex'
   }
 
+  const { secondaryTextInverse } = useThemeColor(['secondaryTextInverse'])
+
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const tab = queryParams.get('tab')
@@ -87,7 +90,10 @@ const SbomTable = ({ data, loading, error }) => {
                   item === 'changelog' ||
                   item === 'support' ||
                   item === 'policies') && (
-                  <FaLock color='darkgray' style={{ marginRight: '6px' }} />
+                  <FaLock
+                    color={secondaryTextInverse}
+                    style={{ marginRight: '6px' }}
+                  />
                 )}
                 {item}
               </Tab>

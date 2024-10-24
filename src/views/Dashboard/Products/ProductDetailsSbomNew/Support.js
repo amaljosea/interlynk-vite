@@ -358,7 +358,7 @@ const Support = ({ sbomData }) => {
                 </MenuItem>
                 {/* DELETE SUPPORT  */}
                 <MenuItem
-                  color='red'
+                  color={primaryErrorColor}
                   onClick={() => {
                     setActiveRow(row)
                     onDeleteOpen()

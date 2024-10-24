@@ -78,12 +78,14 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     primaryTextColor,
     secondaryBgColor,
     primaryErrorColor,
-    primaryBlueText
+    primaryBlueText,
+    secondaryTextInverse
   } = useThemeColor([
     'primaryTextColor',
     'secondaryBgColor',
     'primaryErrorColor',
-    'primaryBlueText'
+    'primaryBlueText',
+    'secondaryTextInverse'
   ])
 
   const [updateOrg, { loading: updateLoading }] = useMutation(orgUpdate)
@@ -613,7 +615,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
           <DrawerBody overflowX={'hidden'} padding={'20px'}>
             {/* Modal Body Content */}
-            <Text fontSize='12px' mb='12px' textColor={'gray.500'}>
+            <Text fontSize='12px' mb='12px' textColor={secondaryTextInverse}>
               Profile picture
             </Text>
             <Flex alignItems='center' mb={4} height={'48px'}>
@@ -783,7 +785,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
             <Flex gap={1}>
               <Button
                 fontWeight={400}
-                color={'#60686F'}
+                color={secondaryTextInverse}
                 variant='ghost'
                 onClick={() => {
                   onPersonalModalClose()
@@ -822,7 +824,11 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
           <DrawerBody>
             <FormControl mb={4}>
-              <FormLabel fontSize='16px' mb='8px' textColor={'gray.500'}>
+              <FormLabel
+                fontSize='16px'
+                mb='8px'
+                textColor={secondaryTextInverse}
+              >
                 Name
               </FormLabel>
               <Input

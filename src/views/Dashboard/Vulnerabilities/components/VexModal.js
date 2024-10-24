@@ -18,10 +18,12 @@ import {
   Textarea
 } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { updateBulkCompVex } from 'graphQL/Mutation'
 import {
@@ -33,7 +35,6 @@ import {
 
 import { FaTimes } from 'react-icons/fa'
 import { FaPenToSquare } from 'react-icons/fa6'
-import LynkAlert from 'components/LynkAlert'
 
 const VexModal = ({
   selectedGroup,
@@ -65,6 +66,8 @@ const VexModal = ({
   const [stagOne, setStagOne] = useState('')
   const [stagTwo, setStagTwo] = useState('')
   const [stagThree, setStagThree] = useState('')
+
+  const { headingTextSecondary } = useThemeColor(['headingTextSecondary'])
 
   const { data: allVexStatus } = useQuery(getVexStatuses)
   const { data: allVexJustify } = useQuery(getVexJustifications)
@@ -233,7 +236,7 @@ const VexModal = ({
               icon={<CheckIcon />}
               isRound={true}
             />
-            <Box w={'1px'} h={10} bg={'lightgray'} />
+            <Box w={'1px'} h={10} bg={headingTextSecondary} />
             <IconButton
               size='xs'
               isRound={true}
@@ -243,7 +246,7 @@ const VexModal = ({
             <Box
               w={'1px'}
               h={stagTwoHeight}
-              bg={'lightgray'}
+              bg={headingTextSecondary}
               hidden={!statusTitle || statusName === 'Fixed'}
             />
             <IconButton

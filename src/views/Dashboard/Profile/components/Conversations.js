@@ -17,7 +17,12 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 const Conversations = ({ title }) => {
   // Chakra color mode
-  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+  const { inverseSecondaryBgColor, secondaryTextInverse, lightTealBorder } =
+    useThemeColor([
+      'inverseSecondaryBgColor',
+      'secondaryTextInverse',
+      'lightTealBorder'
+    ])
 
   return (
     <Card p='16px'>
@@ -45,7 +50,11 @@ const Conversations = ({ title }) => {
                 >
                   Sophie B.{' '}
                 </Text>
-                <Text fontSize='xs' color='gray.500' fontWeight='400'>
+                <Text
+                  fontSize='xs'
+                  color={secondaryTextInverse}
+                  fontWeight='400'
+                >
                   Hi! I need more information...
                 </Text>
               </Flex>
@@ -54,7 +63,7 @@ const Conversations = ({ title }) => {
               <Text
                 fontSize='sm'
                 fontWeight='600'
-                color='teal.300'
+                color={lightTealBorder}
                 alignSelf='center'
               >
                 REPLY
@@ -78,7 +87,11 @@ const Conversations = ({ title }) => {
                 >
                   Sophie B.{' '}
                 </Text>
-                <Text fontSize='xs' color='gray.500' fontWeight='400'>
+                <Text
+                  fontSize='xs'
+                  color={secondaryTextInverse}
+                  fontWeight='400'
+                >
                   Awesome work, can you change...
                 </Text>
               </Flex>
@@ -87,7 +100,7 @@ const Conversations = ({ title }) => {
               <Text
                 fontSize='sm'
                 fontWeight='600'
-                color='teal.300'
+                color={lightTealBorder}
                 alignSelf='center'
               >
                 REPLY
@@ -111,7 +124,11 @@ const Conversations = ({ title }) => {
                 >
                   Sophie B.{' '}
                 </Text>
-                <Text fontSize='xs' color='gray.500' fontWeight='400'>
+                <Text
+                  fontSize='xs'
+                  color={secondaryTextInverse}
+                  fontWeight='400'
+                >
                   Have a great afternoon...
                 </Text>
               </Flex>
@@ -120,7 +137,7 @@ const Conversations = ({ title }) => {
               <Text
                 fontSize='sm'
                 fontWeight='600'
-                color='teal.300'
+                color={lightTealBorder}
                 alignSelf='center'
               >
                 REPLY
@@ -144,7 +161,11 @@ const Conversations = ({ title }) => {
                 >
                   Sophie B.{' '}
                 </Text>
-                <Text fontSize='xs' color='gray.500' fontWeight='400'>
+                <Text
+                  fontSize='xs'
+                  color={secondaryTextInverse}
+                  fontWeight='400'
+                >
                   About files I can...
                 </Text>
               </Flex>
@@ -153,7 +174,7 @@ const Conversations = ({ title }) => {
               <Text
                 fontSize='sm'
                 fontWeight='600'
-                color='teal.300'
+                color={lightTealBorder}
                 alignSelf='center'
               >
                 REPLY
@@ -177,7 +198,11 @@ const Conversations = ({ title }) => {
                 >
                   Sophie B.{' '}
                 </Text>
-                <Text fontSize='xs' color='gray.500' fontWeight='400'>
+                <Text
+                  fontSize='xs'
+                  color={secondaryTextInverse}
+                  fontWeight='400'
+                >
                   About files I can...
                 </Text>
               </Flex>
@@ -186,7 +211,7 @@ const Conversations = ({ title }) => {
               <Text
                 fontSize='sm'
                 fontWeight='600'
-                color='teal.300'
+                color={lightTealBorder}
                 alignSelf='center'
               >
                 REPLY

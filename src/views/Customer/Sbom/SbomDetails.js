@@ -45,7 +45,12 @@ const SbomDetails = () => {
   const sbomId = params.sbomid
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { primaryBlueText, secondaryBlueText, secondaryTextInverse } =
+    useThemeColor([
+      'primaryBlueText',
+      'secondaryBlueText',
+      'secondaryTextInverse'
+    ])
   const setActiveTab = (value) => {
     const link = generateProductVersionDetailPageUrlFromCurrentUrl({
       paramsObj: {
@@ -135,7 +140,7 @@ const SbomDetails = () => {
           as={FaCubes}
           h={'64px'}
           w={'64px'}
-          color='blue.300'
+          color={secondaryBlueText}
           onClick={handleRelationView}
           cursor={'pointer'}
         />
@@ -145,7 +150,7 @@ const SbomDetails = () => {
             {projectId && partsContext.latestPart && (
               <Link to={partsContext.latestPart.url} onClick={handlePart}>
                 <HStack>
-                  <FaAngleLeft size={18} color='#3182CE' />
+                  <FaAngleLeft size={18} color={primaryBlueText} />
                   <Text
                     width={'fit-content'}
                     fontWeight={'semibold'}
@@ -199,7 +204,13 @@ const SbomDetails = () => {
           <Flex flexDir={'row'} alignItems={'center'} gap={8} mt={5}>
             {/* COMPONENTS */}
             <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
-              <Icon h={4} w={4} mt={1} color='#777' as={FaCube} />
+              <Icon
+                h={4}
+                w={4}
+                mt={1}
+                color={secondaryTextInverse}
+                as={FaCube}
+              />
               <Flex flexDir={'column'} alignItems={'center'}>
                 <Tag
                   size='md'
@@ -228,7 +239,7 @@ const SbomDetails = () => {
                 mt={1}
                 h={'20px'}
                 w={'20px'}
-                color='#777'
+                color={secondaryTextInverse}
                 as={FaBalanceScale}
               />
               <Flex flexDir={'column'} alignItems={'center'}>
@@ -255,7 +266,13 @@ const SbomDetails = () => {
             </Stack>
             {/* VULNERABILITIES */}
             <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
-              <Icon mt={1} h={4} w={4} color='#777' as={FaBug} />
+              <Icon
+                mt={1}
+                h={4}
+                w={4}
+                color={secondaryTextInverse}
+                as={FaBug}
+              />
               <Flex flexDir={'column'} alignItems={'center'}>
                 <Stack fontWeight={'medium'} direction={'row'}>
                   <VulnBadge

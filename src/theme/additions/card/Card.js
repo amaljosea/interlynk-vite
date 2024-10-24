@@ -11,6 +11,7 @@ const Card = {
   },
   variants: {
     panel: (props) => ({
+      // eslint-disable-next-line
       bg: props.colorMode === 'dark' ? 'gray.700' : 'white',
       width: '100%',
       boxShadow: '0px 3.5px 5.5px rgba(0, 0, 0, 0.02)',

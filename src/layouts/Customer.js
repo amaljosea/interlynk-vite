@@ -5,19 +5,20 @@ import { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { customerRoutes } from 'routes'
 
-import { Box, Center, Flex, Img, Text, useColorMode, useMediaQuery } from '@chakra-ui/react'
+import { Box, Center, Flex, Img, Text, useMediaQuery } from '@chakra-ui/react'
 
+import DeviceWarning from 'components/DeviceWarning'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 
 // Custom components
 import { getActiveNavbar, getActiveRoute, tourStyles } from '../utils'
-import DeviceWarning from 'components/DeviceWarning'
 
 export const getSharelynk = gql`
   query getSharelynk($id: Uuid!) {
@@ -39,9 +40,12 @@ export default function Customer() {
   const tabRes = window.matchMedia('(max-width: 1199px)')
   const [isDesktop] = useMediaQuery('(min-width: 1024px)')
 
-  const { colorMode } = useColorMode()
   const { generateProductVersionDetailPageUrlFromCurrentUrl: genUrl } =
     useProductUrlContext()
+
+  const { mainContrastBgColor, primaryBlueText, neutralBorder } = useThemeColor(
+    ['mainContrastBgColor', 'primaryBlueText', 'neutralBorder']
+  )
 
   document.documentElement.dir = 'ltr'
 
@@ -286,7 +290,7 @@ export default function Customer() {
   if (data?.shareLynkQuery === null || error)
     return (
       <Center as={Flex} flexDir={'column'} h={'100vh'}>
-        <Text fontSize='3xl' fontWeight={'semibold'} color={'#3182CE'}>
+        <Text fontSize='3xl' fontWeight={'semibold'} color={primaryBlueText}>
           Invalid Request
         </Text>
         <Text mt={2}>
@@ -337,8 +341,8 @@ export default function Customer() {
         <Flex width={'100%'} flexDir={'column'}>
           <Box
             sx={{ top: 0, zIndex: 111, pos: 'sticky' }}
-            bg={colorMode === 'light' ? 'white' : 'gray.900'}
-            borderBottom={`1px solid ${colorMode === 'light' ? '#E2E8F0' : '#1A202C'}`}
+            bg={mainContrastBgColor}
+            borderBottom={`1px solid ${neutralBorder}`}
           >
             <AdminNavbar
               tabRes={tabRes}

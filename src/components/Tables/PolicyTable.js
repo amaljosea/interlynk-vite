@@ -78,12 +78,19 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
     childKey: 'remove_policy'
   })
 
-  const { headingTextColor, primaryTextColor, secondaryTextColor } =
-    useThemeColor([
-      'headingTextColor',
-      'primaryTextColor',
-      'secondaryTextColor'
-    ])
+  const {
+    headingTextColor,
+    primaryTextColor,
+    secondaryTextColor,
+    secondaryTextInverse,
+    primaryErrorColor
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'secondaryTextColor',
+    'secondaryTextInverse',
+    'primaryErrorColor'
+  ])
 
   const [activeRow, setActiveRow] = useState(null)
   const [activeRule, setActiveRule] = useState(null)
@@ -338,7 +345,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
                 </MenuItem>
                 {/* DELETE POLICY  */}
                 <MenuItem
-                  color='red'
+                  color={primaryErrorColor}
                   isDisabled={!removePolicy}
                   onClick={() => {
                     setActiveRow(row)
@@ -363,7 +370,9 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
     {
       when: (row) => row.isExcluded === true,
       style: {
+        // eslint-disable-next-line
         backgroundColor: '#f2f2f2',
+        // eslint-disable-next-line
         color: '#111',
         '&:hover': { cursor: 'pointer' }
       }
@@ -376,7 +385,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
     const CustomText = styled(Text)`
       font-size: 13px;
       font-weight: bold;
-      color: #718096;
+      color: ${secondaryTextInverse};
       text-transform: uppercase;
       letter-spacing: 0.6px;
     `
@@ -417,7 +426,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
                     <Th
                       fontFamily={'inherit'}
                       key={index}
-                      color={'#718096'}
+                      color={secondaryTextInverse}
                       isNumeric={item === 'value'}
                     >
                       {item}

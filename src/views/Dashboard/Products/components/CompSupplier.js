@@ -18,6 +18,7 @@ import {
 import LynkAlert from 'components/LynkAlert'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { addComSupplier, updateComSupplier } from 'graphQL/Mutation'
 import { deleteComSupplier } from 'graphQL/Mutation'
@@ -40,7 +41,7 @@ const GetSupplier = gql`
 
 const CompSupplier = ({ data }) => {
   const { showToast } = useCustomToast()
-
+  const { secondaryTextInverse } = useThemeColor(['secondaryTextInverse'])
   const { id, sbomId } = data || ''
 
   const {
@@ -281,7 +282,11 @@ const CompSupplier = ({ data }) => {
               variant='ghost'
               onClick={handleRemove}
               isDisabled={isDisabled}
-              sx={{ fontSize: '14px', fontWeight: 400, color: '#60686F' }}
+              sx={{
+                fontSize: '14px',
+                fontWeight: 400,
+                color: secondaryTextInverse
+              }}
             >
               Remove Supplier
             </Button>

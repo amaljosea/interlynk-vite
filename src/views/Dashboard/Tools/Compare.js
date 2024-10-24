@@ -45,12 +45,17 @@ const Compare = ({ selectedSboms }) => {
   const { field, direction } = prodState
   const { toolsDispatch } = dispatch
 
-  const { primaryTextColor, primaryRedBorder, primaryGreenBorder } =
-    useThemeColor([
-      'primaryTextColor',
-      'primaryRedBorder',
-      'primaryGreenBorder'
-    ])
+  const {
+    primaryTextColor,
+    primaryRedBorder,
+    primaryGreenBorder,
+    secondaryBlueText
+  } = useThemeColor([
+    'primaryTextColor',
+    'primaryRedBorder',
+    'primaryGreenBorder',
+    'secondaryBlueText'
+  ])
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -292,7 +297,7 @@ const Compare = ({ selectedSboms }) => {
               as={FaScaleUnbalanced}
               h={'64px'}
               w={'64px'}
-              color='blue.300'
+              color={secondaryBlueText}
             />
             <Stack spacing={0}>
               <Text fontWeight={'semibold'} fontSize={24}>

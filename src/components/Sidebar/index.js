@@ -1,16 +1,20 @@
-import { Box, useColorMode } from '@chakra-ui/react'
+import { Box } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import SidebarContent from './SidebarContent'
 
 const Sidebar = ({ routes }) => {
-  const { colorMode } = useColorMode()
+  const { mainContrastBgColor, neutralBorder } = useThemeColor([
+    'mainContrastBgColor'
+  ])
 
   return (
     <Box
       px={3.5}
       height={'100vh'}
-      bg={colorMode === 'light' ? 'white' : 'gray.900'}
-      borderRight={`-.5px solid ${colorMode === 'light' ? '#E2E8F0' : '#1A202C'}`}
+      bg={mainContrastBgColor}
+      borderRight={`-.5px solid ${neutralBorder}`}
     >
       <SidebarContent routes={routes} />
     </Box>

@@ -15,6 +15,7 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useSelect } from 'hooks/useSelect'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { recheckHealth, sbomDelete } from 'graphQL/Mutation'
 import {
@@ -43,6 +44,8 @@ const SbomActions = ({ sbom }) => {
 
   const { dispatch } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch, sbomDispatch } = dispatch
+
+  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
   const archiveSboms = useHasPermission({
     parentKey: 'view_sbom',
@@ -251,7 +254,7 @@ const SbomActions = ({ sbom }) => {
           top={3}
           left={3}
           zIndex={111}
-          color='#60686F'
+          color={secondaryTextColor}
           pos={'absolute'}
         />
         <ReactSelect

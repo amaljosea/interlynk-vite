@@ -22,6 +22,7 @@ import LynkAlert from 'components/LynkAlert'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateComponent } from 'graphQL/Mutation'
 import { CpeAutoComplete } from 'graphQL/Queries'
@@ -55,6 +56,8 @@ const CompIdentifiers = ({ data }) => {
   const { prodCompDispatch } = dispatch
 
   const [updateComponent, { loading }] = useMutation(UpdateComponent)
+
+  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
 
   const cpeRef = useRef()
   const [purlValue, setPurlValue] = useState('')
@@ -218,7 +221,11 @@ const CompIdentifiers = ({ data }) => {
                 onClick={handlePurlModal}
                 display={customerView ? 'none' : 'flex'}
                 as={purlOpen ? FaChevronDown : FaChevronRight}
-                sx={{ fontSize: 12, color: '#718096', cursor: 'pointer' }}
+                sx={{
+                  fontSize: 12,
+                  color: sameSecondaryText,
+                  cursor: 'pointer'
+                }}
               />
               <Text>Package URL {`(PURL)`}</Text>
             </Flex>
@@ -254,7 +261,11 @@ const CompIdentifiers = ({ data }) => {
                 onClick={handleCpeModal}
                 display={customerView ? 'none' : 'flex'}
                 as={cpeOpen ? FaChevronDown : FaChevronRight}
-                sx={{ fontSize: 12, color: '#718096', cursor: 'pointer' }}
+                sx={{
+                  fontSize: 12,
+                  color: sameSecondaryText,
+                  cursor: 'pointer'
+                }}
               />
               <Text>CPE</Text>
             </Flex>

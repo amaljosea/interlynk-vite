@@ -97,7 +97,10 @@ const RelationshipDrawer = (props) => {
 
   const { prodCompState } = useGlobalState()
   const { field, direction } = prodCompState
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { primaryBlueText, headingTextColor } = useThemeColor([
+    'primaryBlueText',
+    'headingTextColor'
+  ])
 
   const compState = {
     projectId: productId,
@@ -312,7 +315,7 @@ const RelationshipDrawer = (props) => {
                       alignItems={'flex-start'}
                     >
                       <FormControl>
-                        <FormLabel htmlFor='relation' color='gray.600'>
+                        <FormLabel htmlFor='relation' color={headingTextColor}>
                           Type
                         </FormLabel>
                         <Select
@@ -333,7 +336,10 @@ const RelationshipDrawer = (props) => {
                       </FormControl>
                       {allComponents && (
                         <FormControl isInvalid={list.length > 0}>
-                          <FormLabel htmlFor='component' color='gray.600'>
+                          <FormLabel
+                            htmlFor='component'
+                            color={headingTextColor}
+                          >
                             Component
                           </FormLabel>
                           <Select

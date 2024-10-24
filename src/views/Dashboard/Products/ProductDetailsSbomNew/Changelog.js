@@ -518,6 +518,7 @@ const Changelog = () => {
     {
       when: (row) => row?.copiedFromId !== null,
       style: {
+        // eslint-disable-next-line
         backgroundColor: '#EDF2F7'
       }
     }

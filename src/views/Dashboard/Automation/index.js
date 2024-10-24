@@ -79,6 +79,7 @@ const Automation = ({ projects }) => {
   )
 
   // COLUMNS
+
   const columns = useMemo(
     () =>
       useAutomationColumns({

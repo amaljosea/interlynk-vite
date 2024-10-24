@@ -44,10 +44,10 @@ const ResetForm = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
-  const { primaryErrorColor, primaryBlueText } = useThemeColor([
-    'primaryErrorColor',
-    'primaryBlueText'
-  ])
+
+  const { primaryErrorColor, primaryBlueText, headingTextColor } =
+    useThemeColor(['primaryErrorColor', 'primaryBlueText', 'headingTextColor'])
+
   const handlePasswordChange = (e) => {
     const { value } = e.target
     setPassword(value)
@@ -165,12 +165,12 @@ const ResetForm = () => {
         <Text fontSize={'xl'} textAlign={'center'} fontWeight={'medium'}>
           Check your email
         </Text>
-        <Text fontSize={'sm'} textAlign={'center'} color={'gray.600'}>
+        <Text fontSize={'sm'} textAlign={'center'} color={headingTextColor}>
           Thanks! If <chakra.span fontWeight={'medium'}>{email}</chakra.span>{' '}
           matches an email we have on file, then we have sent you an email
           containing further instructions for resetting your password.
         </Text>
-        <Text fontSize={'sm'} textAlign={'center'} color={'gray.600'}>
+        <Text fontSize={'sm'} textAlign={'center'} color={headingTextColor}>
           If you have not received an email in 5 minutes, check your spam or{' '}
           <chakra.span
             color={primaryBlueText}
@@ -291,7 +291,7 @@ const ResetForm = () => {
       <Text fontSize={'20px'} fontWeight={'semibold'}>
         Reset your password
       </Text>
-      <Text fontSize={'sm'} color={'#555'}>
+      <Text fontSize={'sm'} color={headingTextColor}>
         Enter the email address associated with your account and we will send
         you a link to reset your password.
       </Text>
@@ -327,7 +327,7 @@ const ResetForm = () => {
           </Button>
           <Text fontSize='sm' fontWeight={'medium'} textAlign={'center'}>
             Return to
-            <Link to={'/auth'} style={{ color: '#3182ce' }}>
+            <Link to={'/auth'} style={{ color: primaryBlueText }}>
               {' '}
               Login
             </Link>

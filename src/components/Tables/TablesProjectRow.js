@@ -8,10 +8,12 @@ import { FaEllipsisV } from 'react-icons/fa'
 
 function DashboardTableRow(props) {
   const { logo, name, status, budget, progression } = props
-  const { inverseSecondaryBgColor, secondaryTextColor } = useThemeColor([
-    'inverseSecondaryBgColor',
-    'secondaryTextColor'
-  ])
+  const { inverseSecondaryBgColor, secondaryTextColor, lightTealBorder } =
+    useThemeColor([
+      'inverseSecondaryBgColor',
+      'secondaryTextColor',
+      'lightTealBorder'
+    ])
 
   return (
     <Tr>
@@ -37,7 +39,7 @@ function DashboardTableRow(props) {
         <Flex direction='column'>
           <Text
             fontSize='md'
-            color='teal.300'
+            color={lightTealBorder}
             fontWeight='bold'
             pb='.2rem'
           >{`${progression}%`}</Text>

@@ -1,8 +1,11 @@
 import { Box, Heading, Stack } from '@chakra-ui/react'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { FaCheckCircle } from 'react-icons/fa'
 
 const StepThree = () => {
+  const { primarySuccessColor } = useThemeColor(['primarySuccessColor'])
   return (
     <Box width={'50%'} mx={'auto'}>
       <Stack
@@ -13,7 +16,7 @@ const StepThree = () => {
         textAlign={'center'}
         mt={32}
       >
-        <FaCheckCircle color='#48BB78' size={96} />
+        <FaCheckCircle color={primarySuccessColor} size={96} />
         <Heading fontWeight={'medium'} fontSize={20} fontFamily={'inherit'}>
           {/* {selectedVulns.length} out of {mergeData.length}  */}
           Vulnerability status updated successfully.

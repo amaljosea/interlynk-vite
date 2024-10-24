@@ -13,7 +13,9 @@ const ProductSearchFilter = ({
   onClear
 }) => {
   const searchInputRef = useRef()
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { primaryBlueText, secondaryTextColor, primaryBgColor } = useThemeColor(
+    ['primaryBlueText', 'secondaryTextColor', 'primaryBgColor']
+  )
   const focusSearchInput = () => {
     if (searchInputRef?.current) {
       searchInputRef?.current.focus()
@@ -38,14 +40,14 @@ const ProductSearchFilter = ({
       <Box pos={'relative'} width={'300px'}>
         <InputGroup>
           <InputLeftElement pointerEvents='none'>
-            <SearchIcon color='#60686F' />
+            <SearchIcon color={secondaryTextColor} />
           </InputLeftElement>
           <Input
             id={id}
             name={id}
             type='text'
             placeholder='Search...'
-            _placeholder={{ color: '#60686F' }}
+            _placeholder={{ color: secondaryTextColor }}
             ref={searchInputRef}
             value={filterText}
             onChange={onChange}
@@ -57,7 +59,7 @@ const ProductSearchFilter = ({
             w={'18px'}
             h={'18px'}
             bg={primaryBlueText}
-            color={'white'}
+            color={primaryBgColor}
             p={1}
             rounded={'full'}
             position={'absolute'}

@@ -86,7 +86,8 @@ const ProductTable = ({
     secondaryBgColor,
     semiTransparentBorder,
     lightAndDarkBgColor,
-    secondaryTextColor
+    secondaryTextColor,
+    primaryErrorColor
   } = useThemeColor([
     'primaryBlueText',
     'headingTextColor',
@@ -95,7 +96,8 @@ const ProductTable = ({
     'secondaryBgColor',
     'semiTransparentBorder',
     'lightAndDarkBgColor',
-    'secondaryTextColor'
+    'secondaryTextColor',
+    'primaryErrorColor'
   ])
 
   const { search, field } = filters
@@ -578,7 +580,7 @@ const ProductTable = ({
                 <MenuItem
                   data-testid='delete_product'
                   aria-label={`Delete product ${name}`}
-                  color='red'
+                  color={primaryErrorColor}
                   onClick={() => {
                     setActiveRow(row)
                     onDeleteOpen()

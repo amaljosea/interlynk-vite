@@ -7,6 +7,7 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ScoreGraphs } from './ScoreGraphs'
 import {
@@ -22,7 +23,7 @@ export const ProductGraphs = () => {
   const params = useParams()
   const productId = params.productid
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
-
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const { data, loading, error } = useQuery(SBOM_LIST_WITH_DATA_QUERY, {
     variables: {
       projectId: productId
@@ -62,13 +63,13 @@ export const ProductGraphs = () => {
   return (
     <SimpleGrid spacing={5} width={'100%'} columns={totlaColumns}>
       <SimpleBarChat
-        color='#3182ce'
+        color={primaryBlueText}
         label={'Component'}
         dataKey='stats.compCount'
         data={graphData}
       />
       <SimpleBarChat
-        color='#3182ce'
+        color={primaryBlueText}
         label={'License'}
         dataKey='stats.compLicenseCount'
         data={graphData}

@@ -116,6 +116,7 @@ const FileUpload = ({
               onChange={handleFileChange}
               accept={accept}
             />
+
             <Flex alignItems={'center'} justifyContent={'center'}>
               <Text
                 hidden={isLoading}

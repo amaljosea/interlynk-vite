@@ -86,7 +86,10 @@ const CompRelations = ({ data, compPath }) => {
 
   const { prodCompState } = useGlobalState()
   const { field, direction } = prodCompState
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { primaryBlueText, headingTextColor } = useThemeColor([
+    'primaryBlueText',
+    'headingTextColor'
+  ])
 
   const compState = {
     projectId: productId,
@@ -207,7 +210,7 @@ const CompRelations = ({ data, compPath }) => {
           alignItems={'flex-start'}
         >
           <FormControl>
-            <FormLabel htmlFor='relType' color='gray.600'>
+            <FormLabel htmlFor='relType' color={headingTextColor}>
               Type
             </FormLabel>
             <Select
@@ -230,7 +233,7 @@ const CompRelations = ({ data, compPath }) => {
           </FormControl>
           {allComponents && (
             <FormControl isInvalid={list.length > 0}>
-              <FormLabel htmlFor='to' color='gray.600'>
+              <FormLabel htmlFor='to' color={headingTextColor}>
                 Component
               </FormLabel>
               <Select

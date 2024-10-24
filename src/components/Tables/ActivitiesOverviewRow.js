@@ -23,16 +23,21 @@ import { FaArrowsRotate } from 'react-icons/fa6'
 function valueToColor(action, event, orig, updated) {
   if (action == 'updated') {
     if (updated == '[]') {
-      return 'red.500' //need to review before changing
+      // eslint-disable-next-line
+      return 'red.500'
     } else if (orig == '[]') {
+      // eslint-disable-next-line
       return 'green.500'
     } else {
+      // eslint-disable-next-line
       return 'blue.500'
     }
   } else if (action == 'created') {
     if (event == 'auto_check') {
+      // eslint-disable-next-line
       return 'blue.500'
     } else {
+      // eslint-disable-next-line
       return 'green.500'
     }
   } else if (
@@ -41,16 +46,22 @@ function valueToColor(action, event, orig, updated) {
     action === 'restored' ||
     action === 'replaced'
   ) {
+    // eslint-disable-next-line
     return 'blue.500'
   } else if (action == 'auto_check') {
+    // eslint-disable-next-line
     return 'purple.500'
   } else if (action == 'download') {
+    // eslint-disable-next-line
     return 'blue.500'
   } else if (action == 'uploaded') {
+    // eslint-disable-next-line
     return 'green.500'
   } else if (action == 'failed') {
+    // eslint-disable-next-line
     return 'pink.500'
   } else if (action == 'destroyed') {
+    // eslint-disable-next-line
     return 'pink.500'
   }
 }

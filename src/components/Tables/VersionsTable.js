@@ -642,7 +642,6 @@ const VersionsTable = (props) => {
         <DataTable {...dataTableProps} />
         <Pagination {...paginationProps} />
       </Flex>
-
       {/* DELETE VERSION */}
       {DELETE_SBOM.isOpen && (
         <DeleteSbom
@@ -652,7 +651,6 @@ const VersionsTable = (props) => {
           onClose={DELETE_SBOM.onClose}
         />
       )}
-
       {/* ARCHIVE VERSION */}
       {ARCHIVE_SBOM.isOpen && (
         <ArchiveSbom
@@ -662,7 +660,6 @@ const VersionsTable = (props) => {
           onClose={ARCHIVE_SBOM.onClose}
         />
       )}
-
       {/* REPROCESS VERSION */}
       {REPROCESS.isOpen && (
         <ReprocessSbom
@@ -672,7 +669,6 @@ const VersionsTable = (props) => {
           projectGroup={{ name }}
         />
       )}
-
       {/* ARCHIVE VERSION LIST */}
       {ARC_VERSIONS.isOpen && (
         <ArchivedVersions
@@ -690,12 +686,10 @@ const VersionsTable = (props) => {
           sbomId={activeRow?.id}
         />
       )}
-
       {/* BUILD SBOM */}
       {SBOM.isOpen && (
         <ProductSbomDrawer isOpen={SBOM.isOpen} onClose={SBOM.onClose} />
       )}
-
       {TOOL.isOpen && (
         <ToolsDrawer
           sbomIdOne={selectedSbom[0]?.id}

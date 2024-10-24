@@ -14,12 +14,19 @@ import { Input, InputGroup, InputRightAddon } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import ProdLabel from './ProdLabel'
 
 const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
   const [editingId, setEditingId] = useState(null)
   const [editName, setEditName] = useState('')
   const [editColor, setEditColor] = useState('')
+
+  const { sameSecondaryText, primaryErrorColor } = useThemeColor([
+    'sameSecondaryText',
+    'primaryErrorColor'
+  ])
 
   const startEditing = (label) => {
     setEditingId(label.id)
@@ -48,7 +55,7 @@ const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
 
   return (
     <Stack>
-      <Text fontSize={'sm'} color={'gray.500'}>
+      <Text fontSize={'sm'} color={sameSecondaryText}>
         {labels?.length} Labels
       </Text>
       <Stack pt={4} spacing={3}>
@@ -122,7 +129,7 @@ const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
 
                     <IconButton
                       size='sm'
-                      icon={<DeleteIcon size={18} color={'red.500'} />}
+                      icon={<DeleteIcon size={18} color={primaryErrorColor} />}
                       onClick={() => onDeleteLabel(label.id)}
                       className='text-red-500 hover:text-red-700 focus:outline-none'
                       title='Delete label'

@@ -14,6 +14,8 @@ import {
   Text
 } from '@chakra-ui/react'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 const LynkModal = ({
   isOpen,
   onClose,
@@ -34,6 +36,12 @@ const LynkModal = ({
   noFooter = false,
   hideCancelButton = false
 }) => {
+  const { headingTextColor, primaryTextColor, secondaryTextInverse } =
+    useThemeColor([
+      'headingTextColor',
+      'primaryTextColor',
+      'secondaryTextInverse'
+    ])
   const isConfirmationModal = type === 'confirmation'
 
   const colorScheme =
@@ -72,15 +80,15 @@ const LynkModal = ({
         <form onSubmit={handleSubmit}>
           <ModalHeader paddingInline={'16px'}>
             <Flex alignItems='center' gap={3}>
-              {Icon && <Icon color='#60686F' />}
+              {Icon && <Icon color={headingTextColor} />}
               {title && (
-                <Text fontWeight={600} aria-label='modal_header'>
+                <Text color={primaryTextColor} fontWeight={600}>
                   {title}
                 </Text>
               )}
             </Flex>
           </ModalHeader>
-          <ModalCloseButton marginTop={1.5} />
+          <ModalCloseButton color={primaryTextColor} marginTop={1.5} />
           <Divider />
           <ModalBody paddingInline={'16px'} marginBlock={4}>
             {children}
@@ -101,7 +109,7 @@ const LynkModal = ({
                   onClick={onClose}
                   variant='ghost'
                   hidden={hideCancelButton}
-                  sx={{ fontWeight: 400, color: '#60686F' }}
+                  sx={{ fontWeight: 400, color: secondaryTextInverse }}
                 >
                   Cancel
                 </Button>

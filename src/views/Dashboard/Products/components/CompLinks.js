@@ -27,6 +27,7 @@ import {
 import LynkAlert from 'components/LynkAlert'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateCompLinks } from 'graphQL/Mutation'
 
@@ -69,6 +70,13 @@ const CompLinks = ({ data }) => {
     name: item?.name,
     url: item?.url || ''
   }))
+
+  const { secondaryTextInverse, sameSecondaryText, primaryErrorColor } =
+    useThemeColor([
+      'secondaryTextInverse',
+      'sameSecondaryText',
+      'primaryErrorColor'
+    ])
 
   const [error, setError] = useState('')
   const [activeLink, setActiveLink] = useState(null)
@@ -171,7 +179,7 @@ const CompLinks = ({ data }) => {
     <>
       <Flex px={6} gap={4} direction={'column'} alignItems={'flex-start'}>
         {/* HEADING */}
-        <Text color={'gray.500'} fontWeight={'medium'}>
+        <Text color={secondaryTextInverse} fontWeight={'medium'}>
           Add Link
         </Text>
         {/* NAME */}
@@ -251,7 +259,7 @@ const CompLinks = ({ data }) => {
         <Divider />
         {/* TABLE */}
         <Flex mb={4} width={'100%'} flexDir={'column'}>
-          <Text fontWeight={'medium'} color={'gray.500'}>
+          <Text fontWeight={'medium'} color={secondaryTextInverse}>
             Existing Links
           </Text>
           {externalUrls?.length > 0 ? (
@@ -267,7 +275,7 @@ const CompLinks = ({ data }) => {
                           </Tooltip>
                         ) : null}
                       </Text>
-                      <Text mt={2} color={'gray.500'}>
+                      <Text mt={2} color={sameSecondaryText}>
                         {item?.name}
                       </Text>
                     </Td>
@@ -297,7 +305,7 @@ const CompLinks = ({ data }) => {
                       ) : (
                         <IconButton
                           size='sm'
-                          color={'red'}
+                          color={primaryErrorColor}
                           variant='outline'
                           cursor={'pointer'}
                           icon={<DeleteIcon />}
@@ -311,7 +319,7 @@ const CompLinks = ({ data }) => {
               </Tbody>
             </Table>
           ) : (
-            <Text mt={4} color={'darkgrey'}>
+            <Text mt={4} color={secondaryTextInverse}>
               No existing links
             </Text>
           )}

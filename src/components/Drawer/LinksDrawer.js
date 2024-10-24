@@ -37,7 +37,10 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId }) => {
   const [error, setError] = useState('')
   const { id, externalUrls } = component
   const [linkError, setLinkError] = useState('')
-  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
+  const { primaryErrorColor, secondaryTextInverse } = useThemeColor([
+    'primaryErrorColor',
+    'secondaryTextInverse'
+  ])
   const containsSpace = /\s/.test(link)
 
   useEffect(() => {
@@ -226,7 +229,7 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId }) => {
                       </Tbody>
                     </Table>
                   ) : (
-                    <Text mt={4} color={'darkgrey'}>
+                    <Text mt={4} color={secondaryTextInverse}>
                       No existing links
                     </Text>
                   )}

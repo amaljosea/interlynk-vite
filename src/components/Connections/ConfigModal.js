@@ -55,9 +55,10 @@ const ConfigModal = ({
     }
   ])
 
-  const { grayBorderColor, primaryErrorColor, primaryBlueText } = useThemeColor(
-    ['grayBorderColor', 'primaryErrorColor', 'primaryBlueText']
-  )
+  const { grayBorderColor, primaryErrorColor } = useThemeColor([
+    'grayBorderColor',
+    'primaryErrorColor'
+  ])
 
   useEffect(() => {
     if (data && !error) {

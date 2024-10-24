@@ -118,7 +118,17 @@ const SbomDetails = ({ sbomData }) => {
     skip: !shouldShowDemoFeatures
   })
 
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const {
+    primaryBlueText,
+    sameSecondaryText,
+    secondaryBlueText,
+    secondaryTextInverse
+  } = useThemeColor([
+    'primaryBlueText',
+    'sameSecondaryText',
+    'secondaryBlueText',
+    'secondaryTextInverse'
+  ])
 
   const filterText = (item) => {
     return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
@@ -142,7 +152,7 @@ const SbomDetails = ({ sbomData }) => {
           as={FaCubes}
           cursor={'pointer'}
           onClick={handleRelationView}
-          sx={{ w: '64px', h: '64px', color: 'blue.300' }}
+          sx={{ w: '64px', h: '64px', color: secondaryBlueText }}
         />
         <Flex width={'100%'} flexDir={'column'} gap={5}>
           <Grid
@@ -154,7 +164,7 @@ const SbomDetails = ({ sbomData }) => {
             <GridItem colSpan={8}>
               <Breadcrumb
                 fontSize={'sm'}
-                separator={<FaLongArrowAltRight color='darkgray' />}
+                separator={<FaLongArrowAltRight color={secondaryTextInverse} />}
               >
                 {!loading &&
                   partsContext.isParts &&
@@ -252,35 +262,35 @@ const SbomDetails = ({ sbomData }) => {
                       label={'Imported'}
                       icon={<DownloadIcon />}
                     />
-                    <Divider width={3} borderColor={'gray.500'} />
+                    <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
                       color={'blue'}
                       label={'Checks'}
                       icon={<Search2Icon />}
                       isDisabled={!checksEnabled}
                     />
-                    <Divider width={3} borderColor={'gray.500'} />
+                    <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
                       color={'blue'}
                       label={'Internal Labeling'}
                       icon={<FaTag />}
                       isDisabled={!internalComp}
                     />
-                    <Divider width={3} borderColor={'gray.500'} />
+                    <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
                       color={'blue'}
                       label={'Automation'}
                       icon={<FaRobot />}
                       isDisabled={!automatedFixesEnabled}
                     />
-                    <Divider width={3} borderColor={'gray.500'} />
+                    <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
                       color={'blue'}
                       label={'Vulnerability Scan'}
                       icon={<FaBug />}
                       isDisabled={!hasFinished || !vulnScan}
                     />
-                    <Divider width={3} borderColor={'gray.500'} />
+                    <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
                       label={'Ready'}
                       color={'blue'}

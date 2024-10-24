@@ -97,19 +97,27 @@ const statusColor = (status) => {
 const ExpandedComponent = (props) => {
   const { data, setActiveRow, onCvssOpen } = props
   const { vuln, fixedVersions, component, lastAffectedVersions } = data
+  const {
+    primaryBlueText,
+    primaryTextColor,
+    primaryBgColor,
+    secondaryTextInverse
+  } = useThemeColor([
+    'primaryBlueText',
+    'primaryTextColor',
+    'primaryBgColor',
+    'secondaryTextInverse'
+  ])
 
   const CustomText = styled(Text)`
     font-size: 13px;
     font-weight: bold;
-    color: #718096;
+    color: ${secondaryTextInverse};
     text-transform: uppercase;
     letter-spacing: 0.6px;
   `
-  const { primaryBlueText, primaryTextColor, primaryBgColor } = useThemeColor([
-    'primaryBlueText',
-    'primaryTextColor',
-    'primaryBgColor'
-  ])
+
+  const onCheck = (item) => (item ? primaryBlueText : primaryTextColor)
 
   return (
     <Box
@@ -1017,6 +1025,7 @@ const Vulnerabilities = ({ sbomData }) => {
           sbomId={sbomId}
         />
       )}
+
       {JIRA.isOpen && (
         <JiraCreateIssueModal
           isOpen={JIRA.isOpen}

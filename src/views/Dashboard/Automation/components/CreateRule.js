@@ -21,13 +21,16 @@ import { FaPlus } from 'react-icons/fa6'
 import { MdDeleteOutline } from 'react-icons/md'
 
 const SubjectIcon = ({ subject, isSystem = { isSystem } }) => {
-  const { headingTextSecondary } = useThemeColor(['headingTextSecondary'])
+  const { headingTextSecondary, primaryBlueText } = useThemeColor([
+    'headingTextSecondary',
+    'primaryBlueText'
+  ])
   return (
     <Box hidden={subject === ''} mt={2}>
       <Tooltip label={getLabel(subject)} placement='top'>
         <Box>
           <Icon
-            color={isSystem ? headingTextSecondary : 'blue.500'}
+            color={isSystem ? headingTextSecondary : primaryBlueText}
             as={getIcon(subject)}
           />
         </Box>

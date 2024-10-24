@@ -12,7 +12,10 @@ export const SearchBar = () => {
   const { query } = useKBar()
 
   const signedUrlParams = getSignedUrlParams()
-  const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
+  const { secondaryBgColor, secondaryTextColor } = useThemeColor([
+    'secondaryBgColor',
+    'secondaryTextColor'
+  ])
 
   const os = detectOS()
 
@@ -24,7 +27,7 @@ export const SearchBar = () => {
       display={signedUrlParams ? 'none' : 'block'}
     >
       <InputLeftElement>
-        <SearchIcon color='gray.400' />
+        <SearchIcon color={secondaryTextColor} />
       </InputLeftElement>
       <Input
         isReadOnly

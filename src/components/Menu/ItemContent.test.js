@@ -8,6 +8,7 @@ jest.mock('@chakra-ui/react', () => ({
   ...jest.requireActual('@chakra-ui/react'),
   useTheme: () => ({
     colors: {
+      // eslint-disable-next-line
       inverseSecondaryBgColor: { light: '#f0f0f0', dark: '#1a1a1a' }
     }
   }),

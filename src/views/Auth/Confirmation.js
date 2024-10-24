@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UserEmailConfirmation } from 'graphQL/Mutation'
 
@@ -27,6 +28,11 @@ const Confirmation = () => {
   const [error, setError] = useState([])
 
   const [emailConfirmation] = useMutation(UserEmailConfirmation)
+
+  const { primaryErrorColor, blurBackground } = useThemeColor([
+    'primaryErrorColor',
+    'blurBackground'
+  ])
 
   useEffect(() => {
     emailConfirmation({
@@ -49,7 +55,7 @@ const Confirmation = () => {
   if (error?.length > 0) {
     return (
       <Modal isCentered size={'3xl'} isOpen={true}>
-        <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(4px)' />
+        <ModalOverlay bg={blurBackground} backdropFilter='blur(4px)' />
         <ModalContent>
           <ModalBody py={12}>
             {error.length > 0 && (
@@ -60,7 +66,7 @@ const Confirmation = () => {
                 justifyContent={'center'}
                 flexDir={'column'}
               >
-                <Icon color={'red.400'} boxSize={20} as={WarningIcon} />
+                <Icon color={primaryErrorColor} boxSize={20} as={WarningIcon} />
                 <Text my={6}>{error[0]}</Text>
               </Box>
             )}

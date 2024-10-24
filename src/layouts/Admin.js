@@ -20,6 +20,7 @@ import Sidebar from 'components/Sidebar'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { getOrganization } from 'graphQL/Queries'
 
@@ -38,7 +39,7 @@ export default function Admin() {
 
   const { steps } = useTour()
   const navigate = useNavigate()
-  const { colorMode, setColorMode } = useColorMode()
+  const { setColorMode } = useColorMode()
   const { organization, setOrganization } = useGlobalState()
   const [isDesktop] = useMediaQuery('(min-width: 1024px)')
 
@@ -52,6 +53,11 @@ export default function Admin() {
     generateProductDetailPageUrlFromCurrentUrl: genProdUrl,
     generateProductVersionDetailPageUrlFromCurrentUrl: getSbomUrl
   } = useProductUrlContext()
+
+  const { mainContrastBgColor, neutralBorder } = useThemeColor([
+    'mainContrastBgColor',
+    'neutralBorder'
+  ])
 
   document.documentElement.dir = 'ltr'
 
@@ -272,8 +278,8 @@ export default function Admin() {
               top={0}
               zIndex={111}
               pos={'sticky'}
-              bg={colorMode === 'light' ? 'white' : 'gray.900'}
-              borderBottom={`1px solid ${colorMode === 'light' ? '#E2E8F0' : '#1A202C'}`}
+              bg={mainContrastBgColor}
+              borderBottom={`1px solid ${neutralBorder}`}
             >
               <AdminNavbar
                 tabRes={tabRes}

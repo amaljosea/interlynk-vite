@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { StepsStyleConfig as Steps } from 'chakra-ui-steps'
 
 import { extendTheme } from '@chakra-ui/react'
@@ -16,7 +17,7 @@ import { breakpoints } from './foundations/breakpoints'
 import { globalStyles } from './styles'
 
 const colors = {
-  // Text Colors
+  // Text Colors(used as background in soome places also)
   headingTextColor: {
     light: '#4A5568', // gray.600
     dark: '#E2E8F0' // gray.200
@@ -42,10 +43,19 @@ const colors = {
     light: '#718096', // gray.500
     dark: '#A0AEC0' // gray.400
   },
+  sameSecondaryText: {
+    light: '#718096', // gray.500
+    dark: '#718096' // gray.500
+  },
   primaryBlueText: {
     light: '#3182CE', // blue.500
     dark: '#5BA3DB' // slightly lighter than blue.400
   },
+  secondaryBlueText: {
+    light: '#63b3ed', // blue.300
+    dark: '#5a9fdc' //intermediate shade between blue.300 and blue.400
+  },
+
   contrastTextColor: {
     light: '#030303', // very dark gray/black for light mode
     dark: '#FFFFFFCC' // white with 80% opacity for dark mode
@@ -67,12 +77,33 @@ const colors = {
     light: '#fff', // white for light mode
     dark: '#1f2733' // dark muted blue-gray
   },
+  mainContrastBgColor: {
+    light: '#fff', // white for light mode
+    dark: '#171923' // gray.900
+  },
+
   lightBlueBg: {
     light: '#ebf8ff', // blue.50
     dark: '#1A202C' // gray.800
   },
+  blurBackground: {
+    light: '#00000029', // blackAlpha 300
+    dark: '#00000029' // blackAlpha 300
+  },
+  customLightBlue: {
+    light: '#BEE3F8', // Light blue
+    dark: '#2B6CB0' // Darker blue for dark mode
+  },
+  customDarkBlue: {
+    light: '#2A4365', // Light blue-gray
+    dark: '#B7C9D9' // Dark blue
+  },
 
   // Border Colors
+  neutralBorder: {
+    light: '#E2E8F0', // light gray.200
+    dark: '#1A202C' // dark gray.800
+  },
   grayBorderColor: {
     light: '#E2E8F0', // gray.200
     dark: '#ffffff29' // custom semi-transparent white
@@ -82,7 +113,7 @@ const colors = {
     dark: '#90cdf499' // blue.400 with transparency
   },
   secondaryBlueBorder: {
-    light: '#3182CE66', // blue.600 with transparency
+    light: '#3182CE66', // blue.500 with transparency
     dark: '#90cdf499' // blue.400 with transparency
   },
   lightTealBorder: {
@@ -120,7 +151,7 @@ const colors = {
   // Error Colors
   primaryErrorColor: {
     light: '#E53E3E', // red.500
-    dark: '#F56565' // red.400
+    dark: '#EC4C4C' // slightly lighter than red.500
   },
 
   // Success Colors

@@ -49,7 +49,10 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   const [addUrls, { loading }] = useMutation(ComponentVulnUpdate)
   const [addPartsUrls] = useMutation(DispositionByParentUpdate)
 
-  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
+  const { primaryErrorColor, secondaryTextInverse } = useThemeColor([
+    'primaryErrorColor',
+    'secondaryTextInverse'
+  ])
 
   const containsSpace = /\s/.test(link)
 
@@ -293,7 +296,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
                             <Td pl={0}>
                               <Icon
                                 as={DeleteIcon}
-                                color={'red'}
+                                color={primaryErrorColor}
                                 cursor={'pointer'}
                                 onClick={() => handleLinkRemove(item?.id)}
                               />
@@ -303,7 +306,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
                     </Tbody>
                   </Table>
                 ) : (
-                  <Text mt={4} color={'darkgrey'}>
+                  <Text mt={4} color={secondaryTextInverse}>
                     No existing links
                   </Text>
                 )}

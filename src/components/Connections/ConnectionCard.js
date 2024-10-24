@@ -14,9 +14,16 @@ const ConnectionCard = ({
   description,
   color
 }) => {
-  const { primaryTextColor, primaryBlueText } = useThemeColor([
+  const {
+    primaryTextColor,
+    primaryBlueText,
+    secondaryTextInverse,
+    lightAndDarkBgColor
+  } = useThemeColor([
     'primaryTextColor',
-    'primaryBlueText'
+    'primaryBlueText',
+    'secondaryTextInverse',
+    'lightAndDarkBgColor'
   ])
 
   return (
@@ -51,7 +58,7 @@ const ConnectionCard = ({
           </Text>
         </Flex>
 
-        <Text fontSize={'12px'} color='gray.500'>
+        <Text fontSize={'12px'} color={secondaryTextInverse}>
           {description}
         </Text>
 
@@ -60,7 +67,7 @@ const ConnectionCard = ({
           colorScheme={isConnected ? 'blue' : 'white'}
           size='md'
           width={isConnected ? '150px' : '120px'}
-          color={isConnected ? 'white' : primaryBlueText}
+          color={isConnected ? lightAndDarkBgColor : primaryBlueText}
           bg={isConnected ? primaryBlueText : ''}
           leftIcon={
             isConnected ? (
@@ -68,7 +75,7 @@ const ConnectionCard = ({
                 w={'20px'}
                 h={'20px'}
                 color={primaryBlueText}
-                bg='white'
+                bg={lightAndDarkBgColor}
                 borderRadius='full'
                 p={1}
               />

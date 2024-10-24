@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 
-import { useColorMode } from '@chakra-ui/system'
 import { useMediaQuery } from '@chakra-ui/react'
+import { useColorMode } from '@chakra-ui/system'
+
 import DeviceWarning from 'components/DeviceWarning'
 
 const Auth = () => {

@@ -5,6 +5,8 @@ import { Center } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { SimpleBarChat } from './utils'
 
 const QUERY_QUALITY_SCORE = gql`
@@ -24,6 +26,8 @@ export const QualityScoreGraph = ({ sbomIds }) => {
     }
   })
 
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+
   // console.log({ error })
 
   if (error) {
@@ -39,7 +43,7 @@ export const QualityScoreGraph = ({ sbomIds }) => {
   return (
     <>
       <SimpleBarChat
-        color='#3182ce'
+        color={primaryBlueText}
         label={'Quality Score'}
         dataKey='score'
         data={nodesBReversed}

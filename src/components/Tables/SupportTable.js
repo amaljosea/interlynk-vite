@@ -353,7 +353,7 @@ const SupportTable = ({
                 </MenuItem>
                 {/* DELETE SUPPORT  */}
                 <MenuItem
-                  color='red'
+                  color={primaryErrorColor}
                   isDisabled={!archiveSup}
                   onClick={() => {
                     setActiveRow(row)

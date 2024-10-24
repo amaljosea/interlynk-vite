@@ -185,6 +185,8 @@ export const settingActions = [
   }
 ]
 
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-inline-comments */
 export const tagColors = [
   '#ff6900',
   '#fcb900',
@@ -201,6 +203,8 @@ export const tagColors = [
   '#3f51b5',
   '#009688'
 ]
+/* eslint-enable no-restricted-syntax */
+/* eslint-enable no-inline-comments */
 
 export const sbomOrigin = [
   {

@@ -58,7 +58,12 @@ export default function AdminNavbar(props) {
 
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
-  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+  const { inverseSecondaryBgColor, sameSecondaryText, mainContrastBgColor } =
+    useThemeColor([
+      'inverseSecondaryBgColor',
+      'sameSecondaryText',
+      'mainContrastBgColor'
+    ])
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = inverseSecondaryBgColor
@@ -78,6 +83,7 @@ export default function AdminNavbar(props) {
 
   return (
     <Grid
+      bg={mainContrastBgColor}
       px={6}
       py={4}
       width={'100%'}
@@ -88,7 +94,7 @@ export default function AdminNavbar(props) {
     >
       <GridItem colSpan={7}>
         <Breadcrumb
-          separator={<ChevronRightIcon color='gray.500' />}
+          separator={<ChevronRightIcon color={sameSecondaryText} />}
           fontSize={'sm'}
         >
           <BreadcrumbItem color={mainText}>

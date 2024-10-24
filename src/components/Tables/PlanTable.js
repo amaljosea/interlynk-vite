@@ -28,7 +28,8 @@ import { EnterpriseUpgradeRequest } from 'graphQL/Mutation'
 import { GiScales } from 'react-icons/gi'
 
 const BalanceIconComponent = () => {
-  return <Icon as={GiScales} boxSize={6} color='gray.500' />
+  const { secondaryTextInverse } = useThemeColor(['secondaryTextInverse'])
+  return <Icon as={GiScales} boxSize={6} color={secondaryTextInverse} />
 }
 
 const PlanTable = () => {
@@ -41,12 +42,14 @@ const PlanTable = () => {
     primaryBgColor,
     primaryErrorColor,
     primarySuccessColor,
-    primaryBlueText
+    primaryBlueText,
+    secondaryTextInverse
   } = useThemeColor([
     'primaryBgColor',
     'primaryErrorColor',
     'primarySuccessColor',
-    'primaryBlueText'
+    'primaryBlueText',
+    'secondaryTextInverse'
   ])
   const usageData = {
     title: 'Usage',
@@ -118,7 +121,7 @@ const PlanTable = () => {
 
   const boxShadow = useColorModeValue(
     '0px 4px 16px rgba(0, 0, 0, 0.1)',
-    '0px 4px 16px rgba(255, 255, 255, 0.1)'
+    '0px 2px 8px rgba(0, 0, 0, 0.3)'
   )
 
   const handleContact = () => {
@@ -210,7 +213,6 @@ const PlanTable = () => {
               fontWeight='semibold'
               mb={2}
               h='30px'
-              color={'gray.500'}
               textTransform={'uppercase'}
             >
               {''}
@@ -259,7 +261,7 @@ const PlanTable = () => {
               fontWeight='normal'
               mb={2}
               h='30px'
-              color={'gray.500'}
+              color={secondaryTextInverse}
               textTransform={'uppercase'}
             >
               {'Free'}

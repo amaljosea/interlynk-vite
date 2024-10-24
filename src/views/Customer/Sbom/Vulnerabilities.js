@@ -71,15 +71,17 @@ const statusColor = (status) => {
 
 const ExpandedComponent = ({ data, setActiveRow, onCvssOpen }) => {
   const { vuln, component } = data
-  const { primaryTextColor, primaryBlueText } = useThemeColor([
-    'primaryTextColor',
-    'primaryBlueText'
-  ])
+  const { primaryTextColor, primaryBlueText, secondaryTextInverse } =
+    useThemeColor([
+      'primaryTextColor',
+      'primaryBlueText',
+      'secondaryTextInverse'
+    ])
 
   const CustomText = styled(Text)`
     font-size: 13px;
     font-weight: bold;
-    color: #718096;
+    color: ${secondaryTextInverse};
     text-transform: uppercase;
     letter-spacing: 0.6px;
   `

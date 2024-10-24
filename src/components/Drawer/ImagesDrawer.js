@@ -29,6 +29,8 @@ import {
   Text
 } from '@chakra-ui/react'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 function ImagesDrawer({ isOpen, onClose, activeImageId }) {
   const [hasEmail, setHasEmail] = useState(true)
   const [hasTerms, setHasTerms] = useState(true)
@@ -44,6 +46,11 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
 
   const [email, setEmail] = useState('')
   const [emailList, setEmailList] = useState([])
+
+  const { sameSecondaryText, headingTextColor } = useThemeColor([
+    'sameSecondaryText',
+    'headingTextColor'
+  ])
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
@@ -70,10 +77,14 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
         <DrawerBody>
           <Stack spacing='20px'>
             <Box>
-              <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
+              <FormLabel
+                htmlFor='product'
+                fontSize='sm'
+                color={headingTextColor}
+              >
                 Image name
               </FormLabel>
-              <Select id='product' size='sm' color='gray.500'>
+              <Select id='product' size='sm' color={sameSecondaryText}>
                 {/* {uniqProjects
                   .sort((a, b) => a.localeCompare(b))
                   .map((p) => (
@@ -84,10 +95,14 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
               </Select>
             </Box>
             <Box>
-              <FormLabel htmlFor='version' fontSize='sm' color='gray.600'>
+              <FormLabel
+                htmlFor='version'
+                fontSize='sm'
+                color={headingTextColor}
+              >
                 Tag
               </FormLabel>
-              <Select id='version' size='sm' color='gray.500'>
+              <Select id='version' size='sm' color={sameSecondaryText}>
                 {activeImageId === 1
                   ? sbomqsVersions.map((p) => (
                       <option key={p} value={p}>
@@ -108,23 +123,48 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
               </Select>
             </Box>
             <Box>
-              <FormLabel htmlFor='scanners' color='gray.600'>
+              <FormLabel htmlFor='scanners' color={headingTextColor}>
                 Scanners
               </FormLabel>
               <Flex direction={'row'} gap={4}>
-                <Checkbox mt={1} size='sm' colorScheme='blue' color='gray.500'>
+                <Checkbox
+                  mt={1}
+                  size='sm'
+                  colorScheme='blue'
+                  color={sameSecondaryText}
+                >
                   Grype
                 </Checkbox>
-                <Checkbox mt={1} size='sm' colorScheme='blue' color='gray.500'>
+                <Checkbox
+                  mt={1}
+                  size='sm'
+                  colorScheme='blue'
+                  color={sameSecondaryText}
+                >
                   Trivy
                 </Checkbox>
-                <Checkbox mt={1} size='sm' colorScheme='blue' color='gray.500'>
+                <Checkbox
+                  mt={1}
+                  size='sm'
+                  colorScheme='blue'
+                  color={sameSecondaryText}
+                >
                   Scout
                 </Checkbox>
-                <Checkbox mt={1} size='sm' colorScheme='blue' color='gray.500'>
+                <Checkbox
+                  mt={1}
+                  size='sm'
+                  colorScheme='blue'
+                  color={sameSecondaryText}
+                >
                   Snyk
                 </Checkbox>
-                <Checkbox mt={1} size='sm' colorScheme='blue' color='gray.500'>
+                <Checkbox
+                  mt={1}
+                  size='sm'
+                  colorScheme='blue'
+                  color={sameSecondaryText}
+                >
                   Custom
                 </Checkbox>
               </Flex>
@@ -137,7 +177,7 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
 
               <Stack spacing='12px' mt={'12px'}>
                 <Text fontSize='sm'>SBOM Access</Text>
-                <Text fontSize='xs' color='gray.500'>
+                <Text fontSize='xs' color={sameSecondaryText}>
                   Control access of SBOM with this link
                 </Text>
                 <Checkbox
@@ -147,7 +187,7 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
                   mt='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Requires email confirmation
                 </Checkbox>
@@ -157,7 +197,7 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Requires agreeing to terms
                 </Checkbox>
@@ -167,7 +207,7 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Apply redactions
                 </Checkbox>
@@ -180,7 +220,7 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Set as public
                 </Checkbox>
@@ -193,7 +233,7 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Limit access to:{' '}
                 </Checkbox>
@@ -227,7 +267,7 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
                 <Text fontSize='sm' mt='30px'>
                   SBOM Content
                 </Text>
-                <Text fontSize='xs' color='gray.500'>
+                <Text fontSize='xs' color={sameSecondaryText}>
                   Select SBOM content that is required for this link
                 </Text>
                 <Checkbox
@@ -237,7 +277,7 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Components
                 </Checkbox>
@@ -247,7 +287,7 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Licenses
                 </Checkbox>
@@ -257,7 +297,7 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Vulnerabilities
                 </Checkbox>
@@ -280,7 +320,7 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
                   <AccordionPanel pb={4}>
                     <Stack spacing='12px' mt={'12px'}>
                       <Text fontSize='sm'>SBOM Format</Text>
-                      <Text fontSize='xs' color='gray.500'>
+                      <Text fontSize='xs' color={sameSecondaryText}>
                         Select SBOM format supported by this link
                       </Text>
                       <Checkbox
@@ -290,7 +330,7 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
                         mt='10px'
                         size='sm'
                         colorScheme='blue'
-                        color='gray.500'
+                        color={sameSecondaryText}
                       >
                         CycloneDX
                       </Checkbox>
@@ -300,7 +340,7 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
                         px='10px'
                         size='sm'
                         colorScheme='blue'
-                        color='gray.500'
+                        color={sameSecondaryText}
                       >
                         SPDX
                       </Checkbox>

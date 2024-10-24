@@ -33,6 +33,7 @@ const AuthContainer = ({ children }) => {
         <Heading
           opacity={0.8}
           fontSize={'5xl'}
+          // eslint-disable-next-line
           color={'blue.200'}
           fontFamily={'inherit'}
         >

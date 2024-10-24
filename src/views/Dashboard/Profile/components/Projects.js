@@ -21,7 +21,10 @@ import { FaPlus } from 'react-icons/fa'
 import ProjectCard from './ProjectCard'
 
 const Projects = ({ title, description }) => {
-  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+  const { inverseSecondaryBgColor, sameSecondaryText } = useThemeColor([
+    'inverseSecondaryBgColor',
+    'sameSecondaryText'
+  ])
 
   return (
     <Card p='16px' my='24px'>
@@ -30,7 +33,7 @@ const Projects = ({ title, description }) => {
           <Text fontSize='lg' color={inverseSecondaryBgColor} fontWeight='bold'>
             {title}
           </Text>
-          <Text fontSize='sm' color='gray.500' fontWeight='400'>
+          <Text fontSize='sm' color={sameSecondaryText} fontWeight='400'>
             {description}
           </Text>
         </Flex>
@@ -71,7 +74,7 @@ const Projects = ({ title, description }) => {
           <Button
             p='0px'
             bg='transparent'
-            color='gray.500'
+            color={sameSecondaryText}
             border='1px solid lightgray'
             borderRadius='15px'
             minHeight={{ sm: '200px', md: '100%' }}

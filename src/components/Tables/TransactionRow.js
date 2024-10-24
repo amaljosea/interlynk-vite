@@ -5,9 +5,16 @@ import { Box, Flex, Icon, Text } from '@chakra-ui/react'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 function TransactionRow(props) {
-  const { inverseSecondaryBgColor, secondaryTextColor } = useThemeColor([
+  const {
+    inverseSecondaryBgColor,
+    secondaryTextColor,
+    primaryErrorColor,
+    primarySuccessColor
+  } = useThemeColor([
     'inverseSecondaryBgColor',
-    'secondaryTextColor'
+    'secondaryTextColor',
+    'primaryErrorColor',
+    'primarySuccessColor'
   ])
   const { key, name, date, logo, price } = props
 
@@ -19,9 +26,9 @@ function TransactionRow(props) {
           borderRadius='50%'
           color={
             price[0] === '+'
-              ? 'green.400'
+              ? primarySuccessColor
               : price[0] === '-'
-                ? 'red.400'
+                ? primaryErrorColor
                 : secondaryTextColor
           }
           border='1px solid'
@@ -53,10 +60,10 @@ function TransactionRow(props) {
       <Box
         color={
           price[0] === '+'
-            ? 'green.400'
+            ? primarySuccessColor
             : price[0] === '-'
-              ? 'red.400'
-              : { inverseSecondaryBgColor }
+              ? primaryErrorColor
+              : inverseSecondaryBgColor
         }
       >
         <Text fontSize={{ sm: 'md', md: 'lg', lg: 'md' }} fontWeight='bold'>

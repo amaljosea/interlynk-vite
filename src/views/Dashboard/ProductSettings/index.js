@@ -25,6 +25,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
 import { GetJiraProjects } from 'graphQL/Queries'
@@ -69,6 +70,8 @@ const Settings = ({ enabled, data, mfc }) => {
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
   const [projects, setProjects] = useState([])
+
+  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
 
   const {
     isOpen: isInfoOpen,
@@ -146,7 +149,7 @@ const Settings = ({ enabled, data, mfc }) => {
                   onChange={(e) => onUpdate(e.target.checked, 'vulnScan')}
                   isDisabled={!enabled || !editControls}
                 />
-                <Text noOfLines={1} color='gray.500' fontWeight='400'>
+                <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
                   Vulnerability Scan
                   <Info ml={2} onClick={onCheckVulnScan} />
                 </Text>
@@ -164,7 +167,7 @@ const Settings = ({ enabled, data, mfc }) => {
                   }
                   isDisabled={!enabled || !editControls}
                 />
-                <Text noOfLines={1} color='gray.500' fontWeight='400'>
+                <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
                   Retain Vulnerability Status
                   <Info ml={2} onClick={onCheckVulnStatus} />
                 </Text>
@@ -180,7 +183,7 @@ const Settings = ({ enabled, data, mfc }) => {
                   onChange={(e) => onUpdate(e.target.checked, 'checks')}
                   isDisabled={!enabled || !editControls}
                 />
-                <Text noOfLines={1} color='gray.500' fontWeight='400'>
+                <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
                   Checks
                   <Info ml={2} onClick={onCheckHealth} />
                 </Text>
@@ -196,7 +199,7 @@ const Settings = ({ enabled, data, mfc }) => {
                   onChange={(e) => onUpdate(e.target.checked, 'automation')}
                   isDisabled={!enabled || !editControls}
                 />
-                <Text noOfLines={1} color='gray.500' fontWeight='400'>
+                <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
                   Automation
                   <Info ml={2} onClick={onCheckAutomation} />
                 </Text>
@@ -212,7 +215,7 @@ const Settings = ({ enabled, data, mfc }) => {
                   onChange={(e) => onUpdate(e.target.checked, 'internalComp')}
                   isDisabled={!enabled || !editControls}
                 />
-                <Text noOfLines={1} color='gray.500' fontWeight='400'>
+                <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
                   Internal Component Labeling
                   <Info ml={2} onClick={onCheckComponent} />
                 </Text>

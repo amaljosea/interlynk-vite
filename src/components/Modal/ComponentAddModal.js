@@ -73,10 +73,8 @@ function ComponentAddModal(props) {
     }
   })
 
-  const { primaryErrorColor, primaryBlueText } = useThemeColor([
-    'primaryErrorColor',
-    'primaryBlueText'
-  ])
+  const { primaryErrorColor, primaryBlueText, headingTextColor } =
+    useThemeColor(['primaryErrorColor', 'primaryBlueText', 'headingTextColor'])
 
   const { isOpen, onClose, data, primaryComp, shortDesc } = props
   const { prodCompState, dispatch } = useGlobalState()
@@ -659,7 +657,7 @@ function ComponentAddModal(props) {
                 Relationships
               </Text>
               <FormControl hidden={signedUrlParams}>
-                <FormLabel htmlFor='relation' color='gray.600'>
+                <FormLabel htmlFor='relation' color={headingTextColor}>
                   Type
                 </FormLabel>
                 <Select
@@ -682,7 +680,7 @@ function ComponentAddModal(props) {
                 </Select>
               </FormControl>
               <FormControl hidden={signedUrlParams}>
-                <FormLabel htmlFor='component' color='gray.600'>
+                <FormLabel htmlFor='component' color={headingTextColor}>
                   Component
                 </FormLabel>
                 <Select

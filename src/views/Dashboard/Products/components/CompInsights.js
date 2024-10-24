@@ -48,6 +48,7 @@ const Label = styled(Text)`
 `
 
 const CompInsights = ({ isOpen, onClose, id }) => {
+  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
   const params = useParams()
   const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
 
@@ -145,7 +146,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                       </Container>
                     </Stack>
                   ) : (
-                    <Text color={'gray.500'}>Not available</Text>
+                    <Text color={sameSecondaryText}>Not available</Text>
                   )}
                 </TabPanel>
                 <TabPanel>
@@ -208,7 +209,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                       </Container>
                     </Stack>
                   ) : (
-                    <Text color={'gray.500'}>Not available</Text>
+                    <Text color={sameSecondaryText}>Not available</Text>
                   )}
                 </TabPanel>
                 <TabPanel>
@@ -302,7 +303,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                       </Container>
                     </Stack>
                   ) : (
-                    <Text color={'gray.500'}>Not available</Text>
+                    <Text color={sameSecondaryText}>Not available</Text>
                   )}
                 </TabPanel>
               </TabPanels>

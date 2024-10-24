@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useThemeColor } from 'hooks/useThemeColors'
 
 export const useSelect = (type) => {

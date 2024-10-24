@@ -40,12 +40,17 @@ const ProdFilterMenu = ({
   const { enabled, labelIds } = filters || ''
   const { orgView } = useGlobalQueryContext()
 
-  const { primaryBgColor, grayBorderColor, inverseSecondaryBgColor } =
-    useThemeColor([
-      'primaryBgColor',
-      'grayBorderColor',
-      'inverseSecondaryBgColor'
-    ])
+  const {
+    primaryBgColor,
+    grayBorderColor,
+    inverseSecondaryBgColor,
+    secondaryTextColor
+  } = useThemeColor([
+    'primaryBgColor',
+    'grayBorderColor',
+    'inverseSecondaryBgColor',
+    'secondaryTextColor'
+  ])
 
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
@@ -69,7 +74,8 @@ const ProdFilterMenu = ({
   })
   const { nodes } = data?.labels || ''
 
-  const prodLabels = [{ id: 'all', name: 'All', color: '#abb8c3' }]
+  const prodLabels = [{ id: 'all', name: 'All', color: secondaryTextColor }]
+
   if (nodes?.length > 0) {
     nodes?.map((item) =>
       prodLabels?.push({ id: item?.id, name: item?.name, color: item?.color })

@@ -12,10 +12,12 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { BsArrowRight } from 'react-icons/bs'
 
 const BuiltByDevelopers = ({ title, name, description, image }) => {
-  const { inverseSecondaryBgColor, secondaryTextColor } = useThemeColor([
-    'inverseSecondaryBgColor',
-    'secondaryTextColor'
-  ])
+  const { inverseSecondaryBgColor, secondaryTextColor, lightTealBorder } =
+    useThemeColor([
+      'inverseSecondaryBgColor',
+      'secondaryTextColor',
+      'lightTealBorder'
+    ])
 
   return (
     <Card minHeight='290.5px' p='1.2rem'>
@@ -76,7 +78,7 @@ const BuiltByDevelopers = ({ title, name, description, image }) => {
           </Flex>
           <Spacer />
           <Flex
-            bg='teal.300'
+            bg={lightTealBorder}
             align='center'
             justify='center'
             borderRadius='15px'

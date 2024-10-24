@@ -59,7 +59,17 @@ function ProductLinkDrawer(props) {
   const [product, setProduct] = useState(productName)
   const [version, setVersion] = useState(versionName)
 
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const {
+    primaryBlueText,
+    sameSecondaryText,
+    headingTextColor,
+    primaryBgColor
+  } = useThemeColor([
+    'primaryBlueText',
+    'sameSecondaryText',
+    'headingTextColor',
+    'primaryBgColor'
+  ])
 
   const handleProductChange = (e) => {
     setProduct(e.target.value)
@@ -85,14 +95,14 @@ function ProductLinkDrawer(props) {
                 py='4px'
                 htmlFor='product'
                 fontSize='sm'
-                color='gray.600'
+                color={headingTextColor}
               >
                 Product
               </FormLabel>
               <Input
                 id='product'
                 size='sm'
-                color='gray.500'
+                color={sameSecondaryText}
                 value={product}
                 onChange={handleProductChange}
               />
@@ -100,14 +110,14 @@ function ProductLinkDrawer(props) {
                 py='4px'
                 htmlFor='product'
                 fontSize='sm'
-                color='gray.600'
+                color={headingTextColor}
               >
                 Version
               </FormLabel>
               <Input
                 id='version'
                 size='sm'
-                color='gray.500'
+                color={sameSecondaryText}
                 value={version}
                 onChange={(e) => setVersion(e.target.value)}
               />
@@ -120,7 +130,7 @@ function ProductLinkDrawer(props) {
                 <Text fontSize='sm' mt='20px'>
                   SBOM Access
                 </Text>
-                <Text fontSize='xs' color='gray.500'>
+                <Text fontSize='xs' color={sameSecondaryText}>
                   Control access of SBOM with this link
                 </Text>
                 <Checkbox
@@ -130,7 +140,7 @@ function ProductLinkDrawer(props) {
                   mt='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Requires email confirmation
                 </Checkbox>
@@ -140,7 +150,7 @@ function ProductLinkDrawer(props) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Requires agreeing to terms
                 </Checkbox>
@@ -150,7 +160,7 @@ function ProductLinkDrawer(props) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Apply redactions
                 </Checkbox>
@@ -163,7 +173,7 @@ function ProductLinkDrawer(props) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Set as public
                 </Checkbox>
@@ -176,7 +186,7 @@ function ProductLinkDrawer(props) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Limit access to:{' '}
                 </Checkbox>
@@ -209,7 +219,7 @@ function ProductLinkDrawer(props) {
                         px={4}
                         py={1}
                         bg={primaryBlueText}
-                        color={'white'}
+                        color={primaryBgColor}
                         borderRadius={20}
                       >
                         {item}
@@ -221,7 +231,7 @@ function ProductLinkDrawer(props) {
                 <Text fontSize='sm' mt='30px'>
                   SBOM Content
                 </Text>
-                <Text fontSize='xs' color='gray.500'>
+                <Text fontSize='xs' color={sameSecondaryText}>
                   Select SBOM content that is required for this link
                 </Text>
                 <Checkbox
@@ -230,7 +240,7 @@ function ProductLinkDrawer(props) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Components
                 </Checkbox>
@@ -240,7 +250,7 @@ function ProductLinkDrawer(props) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Licenses
                 </Checkbox>
@@ -250,7 +260,7 @@ function ProductLinkDrawer(props) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Vulnerabilities
                 </Checkbox>
@@ -263,7 +273,7 @@ function ProductLinkDrawer(props) {
                 <Text fontSize='sm' mt='20px'>
                   SBOM Format
                 </Text>
-                <Text fontSize='xs' color='gray.500'>
+                <Text fontSize='xs' color={sameSecondaryText}>
                   Select SBOM format supported by this link
                 </Text>
                 <Checkbox
@@ -273,7 +283,7 @@ function ProductLinkDrawer(props) {
                   mt='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   CycloneDX
                 </Checkbox>
@@ -283,7 +293,7 @@ function ProductLinkDrawer(props) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   SPDX
                 </Checkbox>

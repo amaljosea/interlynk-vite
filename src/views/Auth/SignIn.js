@@ -98,13 +98,15 @@ function SignIn() {
               <Button
                 fontSize='10px'
                 type='submit'
-                bg='teal.300'
+                bg={lightTealBorder}
                 w='100%'
                 h='45'
                 mb='20px'
                 color='white'
                 mt='20px'
+                // eslint-disable-next-line
                 _hover={{ bg: 'teal.200' }}
+                // eslint-disable-next-line
                 _active={{ bg: 'teal.400' }}
               >
                 SIGN IN

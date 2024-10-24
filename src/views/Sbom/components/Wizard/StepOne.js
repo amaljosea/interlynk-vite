@@ -15,6 +15,7 @@ import {
 import LynkAlert from 'components/LynkAlert'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProject, GetProjectGroups } from 'graphQL/Queries'
 
@@ -34,7 +35,7 @@ const StepOne = ({
 }) => {
   const { totalRows, prodState } = useGlobalState()
   const { enabled, field, direction } = prodState
-
+  const { headingTextColor } = useThemeColor(['headingTextColor'])
   const { data } = useQuery(GetProjectGroups, {
     variables: {
       first: totalRows,
@@ -136,7 +137,11 @@ const StepOne = ({
             {/* PROJECT GROUPS */}
             {data?.organization?.projectGroups?.nodes?.length > 0 && (
               <FormControl fontSize={'sm'}>
-                <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+                <FormLabel
+                  htmlFor='product'
+                  fontSize='md'
+                  color={headingTextColor}
+                >
                   Product
                 </FormLabel>
                 <Select
@@ -157,7 +162,11 @@ const StepOne = ({
             )}
             {/* ENVIRONMENT */}
             <FormControl fontSize={'sm'}>
-              <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+              <FormLabel
+                htmlFor='product'
+                fontSize='md'
+                color={headingTextColor}
+              >
                 Environment
               </FormLabel>
               <Select
@@ -182,7 +191,11 @@ const StepOne = ({
             </FormControl>
             {/* Version */}
             <FormControl fontSize={'sm'}>
-              <FormLabel htmlFor='versions' fontSize='md' color='gray.600'>
+              <FormLabel
+                htmlFor='versions'
+                fontSize='md'
+                color={headingTextColor}
+              >
                 Version
               </FormLabel>
               {uniqVersions.length > 0 ? (

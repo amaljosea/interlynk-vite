@@ -63,7 +63,10 @@ const VulnInfo = () => {
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { primaryBlueText, secondaryBlueText } = useThemeColor([
+    'primaryBlueText',
+    'secondaryBlueText'
+  ])
   const { data } = useQuery(GetGlobalVulnData, {
     skip: vulnId ? false : true,
     variables: {
@@ -100,7 +103,12 @@ const VulnInfo = () => {
               width={'100%'}
               pb={2}
             >
-              <Icon as={FaBug} h={'64px'} w={'64px'} color='blue.300' />
+              <Icon
+                as={FaBug}
+                h={'64px'}
+                w={'64px'}
+                color={secondaryBlueText}
+              />
               <Flex width={'100%'} direction={'column'} gap={0.5}>
                 {/* PRODUCT TITLE */}
                 <Link to={linkURl(source, vuln?.vulnId)} target={'_blank'}>

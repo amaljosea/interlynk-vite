@@ -1,3 +1,4 @@
+/* eslint-disable */
 // USER IMAGES
 import userOne from 'assets/img/abhi.png'
 import custom from 'assets/img/custom.png'
@@ -247,15 +248,19 @@ export const sevColor = (severity) => {
   switch (toLower(severity)) {
     case 'critical':
     case 'super critical':
+      // eslint-disable-next-line
       return { bg: '#FED7D7', text: '#822727' }
     case 'high':
     case 'super high':
+      // eslint-disable-next-line
       return { bg: '#FEEBC8', text: '#7B341E' }
     case 'medium':
+      // eslint-disable-next-line
       return { bg: '#FEFCBF', text: '#744210' }
     case 'low':
     case 'super low':
     case 'negligible':
+      // eslint-disable-next-line
       return { bg: '#C6F6D5', text: '#22543D' }
     default:
       return { bg: 'gray', text: 'black' }

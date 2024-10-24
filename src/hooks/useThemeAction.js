@@ -4,22 +4,25 @@ import { useColorMode } from '@chakra-ui/system'
 
 import { FaDisplay, FaMoon, FaSun } from 'react-icons/fa6'
 
+import { useThemeColor } from './useThemeColors'
+
 export default function useThemeActions() {
   const { setColorMode } = useColorMode()
+  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
 
   useRegisterActions([
     {
       id: 'theme',
       name: 'Change Theme',
       section: 'Preferences',
-      icon: <FaDisplay color='#718096' />
+      icon: <FaDisplay color={sameSecondaryText} />
     },
     {
       id: 'darkTheme',
       name: 'Dark Mode',
       keywords: 'dark theme',
       section: 'Theme',
-      icon: <FaMoon color='#718096' />,
+      icon: <FaMoon color={sameSecondaryText} />,
       perform: () => setColorMode('dark'),
       parent: 'theme'
     },
@@ -28,7 +31,7 @@ export default function useThemeActions() {
       name: 'Light Mode',
       keywords: 'light theme',
       section: 'Theme',
-      icon: <FaSun color='#718096' />,
+      icon: <FaSun color={sameSecondaryText} />,
       perform: () => setColorMode('light'),
       parent: 'theme'
     }

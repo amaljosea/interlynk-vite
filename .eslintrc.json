@@ -64,6 +64,14 @@
       {
         "selector": "VariableDeclarator[init.callee.name='useLazyQuery'] > ArrayPattern > ObjectPattern > Property[key.name='refetch']",
         "message": "Avoid using 'refetch'. Apollo client is configured to refetch all active queries after mutations. If refetch is still required, consider using 'refetchActiveQueries' or the 'RefreshBtn' component."
+      },
+      {
+        "selector": "Literal[value=/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/]",
+        "message": "Avoid using hex color values directly. Please use a theme variable or 'useThemeColor' hook instead."
+      },
+      {
+        "selector": "Literal[value=/^(gray|red|blue|green|yellow|orange|purple|pink|teal|cyan|blackAlpha|whiteAlpha).[0-9]{3}$/]",
+        "message": "Avoid using Chakra UI color values directly (e.g., 'gray.100', 'red.500'). Please use a theme variable or 'useThemeColor' hook instead."
       }
     ]
   }

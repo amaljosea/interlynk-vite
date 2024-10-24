@@ -63,14 +63,6 @@ import ExportCsv from '../components/ExportCsv'
 import HealthMap from '../components/HealthMap'
 import CompFilters from './CompFilters'
 
-const CustomText = styled(Text)`
-  font-size: 13px;
-  font-weight: bold;
-  color: #718096;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-`
-
 const Components = ({ sbomData }) => {
   const params = useParams()
   const productId = params.productid
@@ -88,14 +80,26 @@ const Components = ({ sbomData }) => {
     primaryTextColor,
     inverseSecondaryBgColor,
     primaryBlueText,
-    secondaryTextColor
+    secondaryTextColor,
+    secondaryTextInverse,
+    primaryErrorColor
   } = useThemeColor([
     'headingTextColor',
     'primaryTextColor',
     'inverseSecondaryBgColor',
     'primaryBlueText',
-    'secondaryTextColor'
+    'secondaryTextColor',
+    'secondaryTextInverse',
+    'primaryErrorColor'
   ])
+
+  const CustomText = styled(Text)`
+    font-size: 13px;
+    font-weight: bold;
+    color: ${secondaryTextInverse};
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  `
 
   const { prodCompState, dispatch } = useGlobalState()
   const {
@@ -554,7 +558,7 @@ const Components = ({ sbomData }) => {
                     <Divider />
                     {primary === false && (
                       <MenuItem
-                        color='red'
+                        color={primaryErrorColor}
                         onClick={() => {
                           setActiveRow(row)
                           DELETE.onOpen()

@@ -16,6 +16,7 @@ import { SettingsIcon } from 'components/Icons/Icons'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaBuilding, FaSignOutAlt } from 'react-icons/fa'
 import { FaLocationArrow, FaUser } from 'react-icons/fa6'
@@ -27,6 +28,8 @@ export const UserMenu = ({ handleLogout }) => {
   const { organization } = useGlobalState()
   const params = useParams()
   const { setIsOpen, setCurrentStep, setSteps } = useTour()
+
+  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
 
   const productId = params.productid
   const dashboardView = location.pathname === '/vendor/dashboard'
@@ -67,7 +70,7 @@ export const UserMenu = ({ handleLogout }) => {
               <Icon as={FaUser} width={2.5} mt={1} />
               <Stack direction='column' spacing={-1}>
                 <Text>{currentUser?.name}</Text>
-                <Text fontSize='sm' color='#718096'>
+                <Text fontSize='sm' color={sameSecondaryText}>
                   {currentUser?.email}
                 </Text>
               </Stack>

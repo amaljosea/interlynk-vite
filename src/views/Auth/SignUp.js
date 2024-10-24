@@ -228,14 +228,16 @@ function SignUp() {
             </FormControl>
             <Button
               type='submit'
-              bg='teal.300'
+              bg={lightTealBorder}
               fontSize='10px'
               color='white'
               fontWeight='bold'
               w='100%'
               h='45'
               mb='24px'
+              // eslint-disable-next-line
               _hover={{ bg: 'teal.200' }}
+              // eslint-disable-next-line
               _active={{ bg: 'teal.400' }}
             >
               SIGN UP

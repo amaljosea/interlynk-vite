@@ -34,7 +34,10 @@ const Invitation = () => {
     variables: { token, nonce }
   })
 
-  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
+  const { primaryErrorColor, sameSecondaryText } = useThemeColor([
+    'primaryErrorColor',
+    'sameSecondaryText'
+  ])
 
   const { organizationName } = data?.organizationUserInvitationInfo || ''
 
@@ -92,7 +95,7 @@ const Invitation = () => {
         alignItems={'center'}
         justifyContent={'center'}
       >
-        <Icon color={'red.400'} boxSize={20} as={WarningIcon} />
+        <Icon color={primaryErrorColor} boxSize={20} as={WarningIcon} />
         <Text my={6}>
           That did not work because of the following error:
           <br />
@@ -128,7 +131,7 @@ const Invitation = () => {
           ? 'Invitation Rejected'
           : `Invitation to join ${organizationName}`}
       </Text>
-      <Text fontSize={'sm'} textAlign={'center'} color={'#718096'}>
+      <Text fontSize={'sm'} textAlign={'center'} color={sameSecondaryText}>
         {isRejected
           ? `You have declined an invitation to join ${organizationName}`
           : `You are invited to join ${organizationName} at Interlynk`}

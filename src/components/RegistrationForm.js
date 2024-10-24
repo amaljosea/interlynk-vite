@@ -36,12 +36,19 @@ const RegistrationForm = () => {
   const navigate = useNavigate()
   const emailId = useQueryParam('id')
   const awsToken = useQueryParam('aws_marketplace_token')
-  const { primaryBlueText, primaryErrorColor, primarySuccessColor } =
-    useThemeColor([
-      'primaryBlueText',
-      'primaryErrorColor',
-      'primarySuccessColor'
-    ])
+  const {
+    primaryBlueText,
+    primaryErrorColor,
+    primarySuccessColor,
+    headingTextColor,
+    secondaryTextColor
+  } = useThemeColor([
+    'primaryBlueText',
+    'primaryErrorColor',
+    'primarySuccessColor',
+    'headingTextColor',
+    'secondaryTextColor'
+  ])
   const [name, setName] = useState('')
   const [email, setEmail] = useState(emailId?.replace(/\s+/g, '+') || '')
   const [emailError, setEmailError] = useState('')
@@ -148,13 +155,13 @@ const RegistrationForm = () => {
           <Text fontSize={'20px'} fontWeight={'semibold'} textAlign={'center'}>
             Registration Successful
           </Text>
-          <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
+          <Text fontSize={'sm'} textAlign={'center'} color={headingTextColor}>
             Please check your email to confirm your account
           </Text>
         </Stack>
         <Text fontSize='sm' fontWeight={'medium'} textAlign={'center'}>
           Return to{' '}
-          <Link to={'/auth'} style={{ color: '#3182ce' }}>
+          <Link to={'/auth'} style={{ color: primaryBlueText }}>
             Login
           </Link>
         </Text>
@@ -172,7 +179,7 @@ const RegistrationForm = () => {
       <Text fontSize={'20px'} fontWeight={'semibold'} textAlign={'center'}>
         Welcome
       </Text>
-      <Text fontSize={'sm'} color={'#555'}>
+      <Text fontSize={'sm'} color={headingTextColor}>
         Register to continue to the dashboard.
       </Text>
       {error !== '' && (
@@ -300,7 +307,7 @@ const RegistrationForm = () => {
             px='2'
             bg={'white'}
             fontSize={'xs'}
-            color={'darkgray'}
+            color={secondaryTextColor}
           >
             Or Register With
           </AbsoluteCenter>

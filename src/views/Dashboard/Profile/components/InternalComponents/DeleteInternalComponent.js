@@ -28,7 +28,10 @@ export const DeleteInternalComponent = ({
   const [untag, setUntag] = useState(false)
   const { showToast } = useCustomToast()
 
-  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
+  const { secondaryTextColor, primaryErrorColor } = useThemeColor([
+    'secondaryTextColor',
+    'primaryErrorColor'
+  ])
 
   const onCancel = () => setIsConfirming(false)
 
@@ -64,7 +67,7 @@ export const DeleteInternalComponent = ({
         <Portal>
           <MenuList fontSize={'sm'}>
             <MenuItem
-              color='red'
+              color={primaryErrorColor}
               isDisabled={!manageListing}
               onClick={() => setIsConfirming(true)}
             >

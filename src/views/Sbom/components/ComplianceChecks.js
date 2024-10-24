@@ -45,11 +45,13 @@ const ComplianceChecks = ({
 }) => {
   const params = useParams()
   const { showToast } = useCustomToast()
-  const { secondaryBgColor, lightBlueBg, primaryBlueText } = useThemeColor([
-    'secondaryBgColor',
-    'lightBlueBg',
-    'primaryBlueText'
-  ])
+  const { secondaryBgColor, lightBlueBg, primaryBlueText, sameSecondaryText } =
+    useThemeColor([
+      'secondaryBgColor',
+      'lightBlueBg',
+      'primaryBlueText',
+      'sameSecondaryText'
+    ])
 
   const tabs = ['NTIA', 'FDA', 'BSI']
   const [tab, setTab] = useState(activeTab || 0)
@@ -61,10 +63,13 @@ const ComplianceChecks = ({
 
   const getBgColor = (score) => {
     if (score === 0) {
+      // eslint-disable-next-line
       return '#FED7D7'
     } else if (score === 100) {
+      // eslint-disable-next-line
       return '#C6F6D5'
     } else {
+      // eslint-disable-next-line
       return '#FEEBC8'
     }
   }
@@ -105,6 +110,7 @@ const ComplianceChecks = ({
           ) : (
             <Button
               size='xs'
+              // eslint-disable-next-line
               color={'#000'}
               width={'60px'}
               isLoading={loading}
@@ -157,7 +163,7 @@ const ComplianceChecks = ({
         </Flex>
         <Text
           fontSize={'sm'}
-          color='blue.600'
+          color={primaryBlueText}
           cursor={'pointer'}
           onClick={handleSave}
           fontWeight={'medium'}
@@ -266,7 +272,7 @@ const ComplianceChecks = ({
               </TabPanel>
               <TabPanel>
                 <Flex alignItems={'center'} justifyContent={'center'}>
-                  <Text py={24} color={'gray.500'}>
+                  <Text py={24} color={sameSecondaryText}>
                     Coming Soon...
                   </Text>
                 </Flex>

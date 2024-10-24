@@ -17,10 +17,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { FaEye } from 'react-icons/fa6'
 
 const VulLinkRow = ({ key, data, vulnId }) => {
-  const { primaryTextColor, headingTextColor } = useThemeColor([
-    'primaryTextColor',
-    'headingTextColor'
-  ])
+  const { primaryTextColor, headingTextColor, sameSecondaryText } =
+    useThemeColor(['primaryTextColor', 'headingTextColor', 'sameSecondaryText'])
 
   const { changedBy, status, updatedAt } = data || ''
 
@@ -34,13 +32,13 @@ const VulLinkRow = ({ key, data, vulnId }) => {
             {status}
           </Text>
           <Tooltip label={getFullDateAndTime(updatedAt)}>
-            <Text fontSize={'xs'} color={'gray.500'}>
+            <Text fontSize={'xs'} color={sameSecondaryText}>
               {timeSince(updatedAt)}
             </Text>
           </Tooltip>
         </Td>
         <Td py={2.5}>
-          <Text fontSize={13} color={'gray.500'}>
+          <Text fontSize={13} color={sameSecondaryText}>
             {changedBy}
           </Text>
         </Td>

@@ -41,9 +41,16 @@ const Kbar = () => {
   } = useProductUrlContext()
   const { envName, onChangeEnv } = useGlobalState()
 
-  const { primaryBgColor, secondaryBgColor } = useThemeColor([
+  const {
+    primaryBgColor,
+    secondaryBgColor,
+    sameSecondaryText,
+    secondaryTextInverse
+  } = useThemeColor([
     'primaryBgColor',
-    'secondaryBgColor'
+    'secondaryBgColor',
+    'sameSecondaryText',
+    'secondaryTextInverse'
   ])
 
   const { data: productData } = useQuery(GetProjectGroupAndVersionDetails, {
@@ -103,7 +110,7 @@ const Kbar = () => {
       id: item?.name,
       name: item?.name,
       section: `${item?.section}`,
-      icon: <FaRegFile color='#718096' />,
+      icon: <FaRegFile color={sameSecondaryText} />,
       perform: () => navigate(item?.path)
     })
   )
@@ -116,7 +123,7 @@ const Kbar = () => {
         id: item?.name,
         name: truncatedValue(item?.name, 30),
         section: 'products',
-        icon: <FaRegWindowMaximize color='#718096' />,
+        icon: <FaRegWindowMaximize color={sameSecondaryText} />,
         perform: () => {
           const link = generateProductDetailPageUrlFromCurrentUrl({
             productgroupid: item?.id,
@@ -135,7 +142,7 @@ const Kbar = () => {
                 id: version?.id,
                 name: `${truncatedValue(item?.name, 20)} - ${version.projectVersion} (${project?.name})`,
                 section: 'product versions',
-                icon: <FaScrewdriverWrench color='#718096' />,
+                icon: <FaScrewdriverWrench color={sameSecondaryText} />,
                 perform: () => {
                   const link =
                     generateProductVersionDetailPageUrlFromCurrentUrl({
@@ -157,8 +164,8 @@ const Kbar = () => {
         data?.push({
           id: item?.name,
           name: item?.name,
-          section: `${item?.section}`,
-          icon: <FaRegFile color='#718096' />,
+          section: item?.section,
+          icon: <FaRegFile color={sameSecondaryText} />,
           perform: () => navigate(item?.path)
         })
       )
@@ -171,7 +178,7 @@ const Kbar = () => {
     id: '..',
     name: '..  Go back a level',
     section: 'shortcuts',
-    icon: <FaRegFile color='#718096' />,
+    icon: <FaRegFile color={sameSecondaryText} />,
     perform: () => {
       const isVulnerabilityDetailsPage =
         location.pathname.includes('products') &&
@@ -216,7 +223,7 @@ const Kbar = () => {
     id: '/',
     name: '/  Go Back to first level',
     section: 'shortcuts',
-    icon: <FaRegFile color='#718096' />,
+    icon: <FaRegFile color={sameSecondaryText} />,
     perform: () => {
       const isVulnerabilityRelatedPage =
         location.pathname.includes('vulnerabilities')
@@ -241,14 +248,14 @@ const Kbar = () => {
       id: 'theme',
       name: 'Change Theme',
       section: 'Preferences',
-      icon: <FaDisplay color='#718096' />
+      icon: <FaDisplay color={secondaryTextInverse} />
     },
     {
       id: 'darkTheme',
       name: 'Dark Mode',
       keywords: 'dark theme',
       section: 'Theme',
-      icon: <FaMoon color='#718096' />,
+      icon: <FaMoon color={secondaryTextInverse} />,
       perform: () => setColorMode('dark'),
       parent: 'theme'
     },
@@ -257,7 +264,7 @@ const Kbar = () => {
       name: 'Light Mode',
       keywords: 'light theme',
       section: 'Theme',
-      icon: <FaSun color='#718096' />,
+      icon: <FaSun color={secondaryTextInverse} />,
       perform: () => setColorMode('light'),
       parent: 'theme'
     }
@@ -334,7 +341,7 @@ const Kbar = () => {
         >
           <div className='kbar_search_container'>
             {/* search icon */}
-            <SearchIcon color={'gray.500'} />
+            <SearchIcon color={sameSecondaryText} />
             {/* search input */}
             <KBarSearch className='kbar_search' />
           </div>

@@ -23,9 +23,17 @@ const ProductsOverview = ({ title, data }) => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
-    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
-  )
+  const {
+    headingTextColor,
+    primaryTextColor,
+    primaryBlueText,
+    secondaryTextInverse
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'primaryBlueText',
+    'secondaryTextInverse'
+  ])
 
   const handleClick = (prod) => {
     const { id, projectId } = prod
@@ -82,7 +90,10 @@ const ProductsOverview = ({ title, data }) => {
             style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }}
             onClick={() => handleClick(row)}
           >
-            <Text my={1} color={uniqueSbom ? primaryBlueText : 'gray.500'}>
+            <Text
+              my={1}
+              color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
+            >
               {project?.projectGroup?.name}
             </Text>
           </Link>
@@ -112,7 +123,7 @@ const ProductsOverview = ({ title, data }) => {
           >
             <Text
               my={2}
-              color={uniqueSbom ? primaryBlueText : 'gray.500'}
+              color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
               textAlign={'right'}
             >
               {projectVersion}

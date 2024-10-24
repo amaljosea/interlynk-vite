@@ -9,7 +9,10 @@ import {
   InputRightElement
 } from '@chakra-ui/react'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
+  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
   const searchInputRef = useRef()
   const focusSearchInput = () => {
     if (searchInputRef?.current) {
@@ -35,7 +38,7 @@ const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
       <Box pos={'relative'} width={'300px'}>
         <InputGroup>
           <InputLeftElement pointerEvents='none'>
-            <SearchIcon color='#60686F' />
+            <SearchIcon color={secondaryTextColor} />
           </InputLeftElement>
           <Input
             id={id}

@@ -37,7 +37,17 @@ import SocialLogin from './SocialLogin'
 const LoginForm = () => {
   const { showToast } = useCustomToast()
   const emailId = useQueryParam('id')
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const {
+    primaryBlueText,
+    headingTextColor,
+    primaryTextColor,
+    secondaryTextColor
+  } = useThemeColor([
+    'primaryBlueText',
+    'headingTextColor',
+    'primaryTextColor',
+    'secondaryTextColor'
+  ])
 
   const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
 
@@ -104,10 +114,15 @@ const LoginForm = () => {
       direction={'column'}
       alignItems={'flex-start'}
     >
-      <Text fontSize={'20px'} fontWeight={'semibold'} textAlign={'center'}>
+      <Text
+        color={primaryTextColor}
+        fontSize={'20px'}
+        fontWeight={'semibold'}
+        textAlign={'center'}
+      >
         Welcome
       </Text>
-      <Text fontSize={'sm'} color={'#555'}>
+      <Text fontSize={'sm'} color={headingTextColor}>
         Log in to continue to the dashboard
       </Text>
       {error !== '' && (
@@ -124,7 +139,7 @@ const LoginForm = () => {
                     style={{
                       cursor: 'pointer',
                       fontWeight: 500,
-                      color: '#3182CE'
+                      color: primaryBlueText
                     }}
                     onClick={onResendEmail}
                   >
@@ -212,7 +227,7 @@ const LoginForm = () => {
               px='2'
               bg={'white'}
               fontSize={'xs'}
-              color={'darkgray'}
+              color={secondaryTextColor}
             >
               Or Login With
             </AbsoluteCenter>

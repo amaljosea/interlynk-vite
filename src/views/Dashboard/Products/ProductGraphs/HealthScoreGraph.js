@@ -5,10 +5,12 @@ import { Center } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 
 import { useSingleHealthScore } from 'hooks/useSingleHealthScore'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { SimpleBarChat } from './utils'
 
 export const HealthScoreGraph = ({ sbomIds }) => {
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const params = useParams()
   const productId = params.productid
   const {
@@ -85,7 +87,7 @@ export const HealthScoreGraph = ({ sbomIds }) => {
 
   return (
     <SimpleBarChat
-      color='#3182ce'
+      color={primaryBlueText}
       label={'Health Score'}
       dataKey='score'
       data={combinedDataFiltered}

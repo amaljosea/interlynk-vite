@@ -40,6 +40,7 @@ const CustomNode = ({
   bgColor,
   textColor
 }) => {
+  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
   return (
     <g transform='translate(-56,-50)' onClick={toggleNode}>
       <svg xmlns='http://www.w3.org/2000/svg'>
@@ -84,7 +85,7 @@ const CustomNode = ({
                 {nodeDatum?.name}
               </Text>
               {activeComp === null && !nodeDatum?.attributes?.version && (
-                <Text color={'gray.500'} width={'fit-content'}>
+                <Text color={sameSecondaryText} width={'fit-content'}>
                   Primary
                 </Text>
               )}

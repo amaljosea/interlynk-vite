@@ -7,6 +7,7 @@ import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateNotificationChannel } from 'graphQL/Mutation'
 import {
@@ -18,6 +19,7 @@ import Card from '../Card/Card'
 import CardHeader from '../Card/CardHeader'
 
 const NotificationChannels = () => {
+  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
 
@@ -87,7 +89,11 @@ const NotificationChannels = () => {
             me='20px'
             onChange={() => handleSwitchChange(id)}
           />
-          <Text color='gray.500' fontWeight='400' textTransform={'capitalize'}>
+          <Text
+            color={sameSecondaryText}
+            fontWeight='400'
+            textTransform={'capitalize'}
+          >
             {id}
           </Text>
         </Flex>

@@ -6,7 +6,19 @@ import { useColorMode } from '@chakra-ui/react'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const DeviceWarning = () => {
-  const { primaryBgColor } = useThemeColor(['primaryBgColor'])
+  const {
+    primaryBgColor,
+    secondaryBgColor,
+    grayBorderColor,
+    headingTextColor,
+    secondaryBlueText
+  } = useThemeColor([
+    'primaryBgColor',
+    'secondaryBgColor',
+    'grayBorderColor',
+    'headingTextColor',
+    'secondaryBlueText'
+  ])
   const { colorMode } = useColorMode()
   const isDark = colorMode === 'dark'
 
@@ -20,7 +32,7 @@ const DeviceWarning = () => {
         />
         <Text
           sx={{ fontSize: '2xl', fontWeight: 600 }}
-          color={isDark ? 'gray.100' : primaryBgColor}
+          color={isDark ? secondaryBgColor : primaryBgColor}
         >
           Interlynk
         </Text>
@@ -31,14 +43,16 @@ const DeviceWarning = () => {
       >
         <Heading
           textAlign='center'
-          sx={{ fontSize: '3xl', opacity: 0.9, color: 'gray.200' }}
+          sx={{ fontSize: '3xl', opacity: 0.9 }}
+          color={isDark ? headingTextColor : grayBorderColor}
         >
           This page is best viewed on Desktop
         </Heading>
         <Text
           fontSize='md'
           textAlign='center'
-          sx={{ mt: 6, color: 'blue.200', opacity: 0.9 }}
+          sx={{ mt: 6, color: secondaryBlueText }}
+          /* sx={{ mt: 6, color: 'blue.200', opacity: 0.9 }} */
         >
           Please switch to a larger screen or enable desktop view in your
           browser settings.

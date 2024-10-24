@@ -30,6 +30,7 @@ import {
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateShareLynk } from 'graphQL/Mutation'
 import { UpdateShareLynk } from 'graphQL/Mutation'
@@ -59,6 +60,12 @@ function SBOMDrawer(props) {
   const [selectedProd, setSelectedProd] = useState([])
   const [productIds, setProductIds] = useState([])
 
+  const { sameSecondaryText, headingTextColor, headingTextSecondary } =
+    useThemeColor([
+      'sameSecondaryText',
+      'headingTextColor',
+      'headingTextSecondary'
+    ])
   useEffect(() => {
     if (shareUsers.length > 0 && id) {
       setEmailList(shareUsers)
@@ -178,7 +185,7 @@ function SBOMDrawer(props) {
         <DrawerHeader borderBottomWidth='1px'>Share Lynk</DrawerHeader>
         <DrawerBody>
           <FormControl fontSize={'sm'}>
-            <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
+            <FormLabel htmlFor='product' fontSize='sm' color={headingTextColor}>
               Product
             </FormLabel>
             <MultiSelect
@@ -187,7 +194,7 @@ function SBOMDrawer(props) {
                   ...baseStyles,
                   borderColor: state.isFocused ? 'inherit' : 'inherit',
                   '&:hover': {
-                    borderColor: '#CBD5E0'
+                    borderColor: headingTextSecondary
                   }
                 })
               }}
@@ -203,7 +210,7 @@ function SBOMDrawer(props) {
           </Box>
           <Stack spacing='12px'>
             <Text fontSize='sm'>SBOM Access</Text>
-            <Text fontSize='xs' color='gray.500'>
+            <Text fontSize='xs' color={sameSecondaryText}>
               Control access of SBOM with this link
             </Text>
             <Checkbox
@@ -212,7 +219,7 @@ function SBOMDrawer(props) {
               mt='10px'
               size='sm'
               colorScheme='blue'
-              color='gray.500'
+              color={sameSecondaryText}
             >
               Requires email confirmation
             </Checkbox>
@@ -221,7 +228,7 @@ function SBOMDrawer(props) {
               onChange={(e) => setHasTerms(e.target.checked)}
               size='sm'
               colorScheme='blue'
-              color='gray.500'
+              color={sameSecondaryText}
             >
               Requires agreeing to terms
             </Checkbox>
@@ -230,7 +237,7 @@ function SBOMDrawer(props) {
               onChange={(e) => setHasLimitAccess(e.target.checked)}
               size='sm'
               colorScheme='blue'
-              color='gray.500'
+              color={sameSecondaryText}
             >
               Limit access to:{' '}
             </Checkbox>

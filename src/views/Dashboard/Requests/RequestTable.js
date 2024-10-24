@@ -52,12 +52,17 @@ const RequestTable = ({
     childKey: 'create_request'
   })
 
-  const { headingTextColor, primaryTextColor, secondaryTextColor } =
-    useThemeColor([
-      'headingTextColor',
-      'primaryTextColor',
-      'secondaryTextColor'
-    ])
+  const {
+    headingTextColor,
+    primaryTextColor,
+    secondaryTextColor,
+    primaryErrorColor
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'secondaryTextColor',
+    'primaryErrorColor'
+  ])
 
   const [resendRequest] = useMutation(RequestResend)
   const [cancelRequest] = useMutation(RequestCancel)
@@ -326,7 +331,7 @@ const RequestTable = ({
                     row.status === 'Canceled' ||
                     row.status === 'Declined'
                   }
-                  color='red'
+                  color={primaryErrorColor}
                   onClick={() => {
                     onWarningOpen()
                     setActiveRow(row)

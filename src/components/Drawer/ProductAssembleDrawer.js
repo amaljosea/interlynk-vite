@@ -42,7 +42,17 @@ function ProductAssembleDrawer(props) {
   const [selectVersion, setSelectVersion] = useState('')
 
   const { showToast } = useCustomToast()
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const {
+    primaryBlueText,
+    sameSecondaryText,
+    headingTextColor,
+    primaryBgColor
+  } = useThemeColor([
+    'primaryBlueText',
+    'sameSecondaryText',
+    'headingTextColor',
+    'primaryBgColor'
+  ])
   const handleSave = () => {
     if (productName !== '' && productVersion !== '') {
       // setProductVersionExploded((prev) => [
@@ -95,7 +105,11 @@ function ProductAssembleDrawer(props) {
         <DrawerBody>
           <Stack spacing='24px'>
             <Box>
-              <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
+              <FormLabel
+                htmlFor='product'
+                fontSize='sm'
+                color={headingTextColor}
+              >
                 Product Name
               </FormLabel>
               <Input
@@ -105,7 +119,11 @@ function ProductAssembleDrawer(props) {
                 onChange={(e) => setProductName(e.target.value)}
               />
 
-              <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
+              <FormLabel
+                htmlFor='product'
+                fontSize='sm'
+                color={headingTextColor}
+              >
                 Product Version
               </FormLabel>
               <Input
@@ -120,7 +138,11 @@ function ProductAssembleDrawer(props) {
               </Text>
               <Divider mb='20px' />
               <Flex direction='column' alignItems='left'>
-                <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
+                <FormLabel
+                  htmlFor='product'
+                  fontSize='sm'
+                  color={headingTextColor}
+                >
                   Product
                 </FormLabel>
                 <Select
@@ -128,13 +150,17 @@ function ProductAssembleDrawer(props) {
                   value={selectProduct}
                   onChange={(e) => setSelectProduct(e.target.value)}
                   size='sm'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   {uniqProjects.map((p) => (
                     <option key={p}>{p}</option>
                   ))}
                 </Select>
-                <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
+                <FormLabel
+                  htmlFor='product'
+                  fontSize='sm'
+                  color={headingTextColor}
+                >
                   Version
                 </FormLabel>
                 <Select
@@ -143,7 +169,7 @@ function ProductAssembleDrawer(props) {
                   onChange={(e) => setSelectVersion(e.target.value)}
                   size='sm'
                   mb='10px'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   {uniqVersions.map((p) => (
                     <option key={p}>{p}</option>
@@ -173,7 +199,7 @@ function ProductAssembleDrawer(props) {
                       px={4}
                       py={1}
                       bg={primaryBlueText}
-                      color={'white'}
+                      color={primaryBgColor}
                       borderRadius={20}
                     >
                       {item.product} - {item.version}
@@ -196,7 +222,7 @@ function ProductAssembleDrawer(props) {
                   mt='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Duplicate components
                 </Checkbox>
@@ -206,7 +232,7 @@ function ProductAssembleDrawer(props) {
                   px='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
+                  color={sameSecondaryText}
                 >
                   Relationships
                 </Checkbox>

@@ -13,6 +13,7 @@ import EnvFilter from 'components/Misc/EnvFilter'
 import VersionsTable from 'components/Tables/VersionsTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ShareLynkProjectGroup } from 'graphQL/Queries'
 
@@ -22,6 +23,11 @@ const ProductDetails = () => {
   const params = useParams()
   const productGroupId = params.productgroupid
   const sbomId = params.sbomid
+
+  const { secondaryBlueText, secondaryTextInverse } = useThemeColor([
+    'secondaryBlueText',
+    'secondaryTextInverse'
+  ])
 
   const tabs = [
     'versions',
@@ -115,7 +121,7 @@ const ProductDetails = () => {
                 <Icon
                   h={'64px'}
                   w={'64px'}
-                  color='blue.300'
+                  color={secondaryBlueText}
                   as={FaWindowMaximize}
                 />
                 <Flex gap={0.5} direction={'column'}>
@@ -159,7 +165,10 @@ const ProductDetails = () => {
                   isDisabled={item === 'versions' ? false : true}
                 >
                   {item !== 'versions' && (
-                    <FaLock color='darkgray' style={{ marginRight: '6px' }} />
+                    <FaLock
+                      color={secondaryTextInverse}
+                      style={{ marginRight: '6px' }}
+                    />
                   )}
                   {item}
                 </Tab>

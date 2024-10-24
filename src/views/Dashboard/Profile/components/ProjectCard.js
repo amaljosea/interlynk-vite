@@ -14,7 +14,10 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 const ProjectCard = ({ image, name, category, avatars, description }) => {
   // Chakra color mode
-  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+  const { inverseSecondaryBgColor, sameSecondaryText } = useThemeColor([
+    'inverseSecondaryBgColor',
+    'sameSecondaryText'
+  ])
 
   return (
     <Flex direction='column'>
@@ -30,7 +33,12 @@ const ProjectCard = ({ image, name, category, avatars, description }) => {
         ></Box>
       </Box>
       <Flex direction='column'>
-        <Text fontSize='md' color='gray.500' fontWeight='600' mb='10px'>
+        <Text
+          fontSize='md'
+          color={sameSecondaryText}
+          fontWeight='600'
+          mb='10px'
+        >
           {name}
         </Text>
         <Text
@@ -41,7 +49,12 @@ const ProjectCard = ({ image, name, category, avatars, description }) => {
         >
           {category}
         </Text>
-        <Text fontSize='md' color='gray.500' fontWeight='400' mb='20px'>
+        <Text
+          fontSize='md'
+          color={sameSecondaryText}
+          fontWeight='400'
+          mb='20px'
+        >
           {description}
         </Text>
         <Flex justifyContent='space-between'>

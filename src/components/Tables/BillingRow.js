@@ -35,19 +35,19 @@ function BillingRow(props) {
           </Text>
           <Text color={secondaryTextColor} fontSize='sm' fontWeight='semibold'>
             Company Name:{' '}
-            <Text as='span' color='gray.500'>
+            <Text as='span' color={secondaryTextColor}>
               {company}
             </Text>
           </Text>
           <Text color={secondaryTextColor} fontSize='sm' fontWeight='semibold'>
             Email Address:{' '}
-            <Text as='span' color='gray.500'>
+            <Text as='span' color={secondaryTextColor}>
               {email}
             </Text>
           </Text>
           <Text color={secondaryTextColor} fontSize='sm' fontWeight='semibold'>
             VAT Number:{' '}
-            <Text as='span' color='gray.500'>
+            <Text as='span' color={secondaryTextColor}>
               {number}
             </Text>
           </Text>

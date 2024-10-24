@@ -3,12 +3,14 @@ import CreatableSelect from 'react-select/creatable'
 
 import useQueryParam from 'hooks/useQueryParam'
 import { useSelect } from 'hooks/useSelect'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaTimes } from 'react-icons/fa'
 import { FaChevronDown } from 'react-icons/fa6'
 
 const LynkSelect = (props) => {
   const { style } = useSelect('field')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const activeTab = useQueryParam('tab')
   const isGeneral = activeTab === 'general'
 
@@ -17,7 +19,7 @@ const LynkSelect = (props) => {
 
     return (
       <components.ClearIndicator {...props}>
-        <FaTimes color='darkgray' />
+        <FaTimes color={primaryTextColor} />
       </components.ClearIndicator>
     )
   }

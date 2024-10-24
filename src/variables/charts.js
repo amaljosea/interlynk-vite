@@ -1,3 +1,4 @@
+/* eslint-disable */
 export const barChartData = [
   {
     name: 'Activities',

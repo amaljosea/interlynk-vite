@@ -50,6 +50,7 @@ export const GraphUi = ({ dataForGraph }) => {
           {
             dataKey: 'vulnerabilityMediumCount',
             name: 'Medium',
+            // eslint-disable-next-line
             stroke: '#cbbb08'
           },
           {

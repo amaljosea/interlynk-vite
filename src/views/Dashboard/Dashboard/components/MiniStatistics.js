@@ -7,10 +7,12 @@ import IconBox from 'components/Icons/IconBox'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const MiniStatistics = ({ title, amount, icon }) => {
-  const { primaryBlueText, inverseSecondaryBgColor } = useThemeColor([
-    'primaryBlueText',
-    'inverseSecondaryBgColor'
-  ])
+  const { primaryBlueText, inverseSecondaryBgColor, primaryBgColor } =
+    useThemeColor([
+      'primaryBlueText',
+      'inverseSecondaryBgColor',
+      'primaryBgColor'
+    ])
 
   const fontStyle = { fontSize: title === 'Vulnerabilities' ? '12px' : '14px' }
   return (
@@ -45,7 +47,12 @@ const MiniStatistics = ({ title, amount, icon }) => {
               </StatNumber>
             )}
           </Stat>
-          <IconBox h={'45px'} w={'45px'} color={'white'} bg={primaryBlueText}>
+          <IconBox
+            h={'45px'}
+            w={'45px'}
+            color={primaryBgColor}
+            bg={primaryBlueText}
+          >
             {icon}
           </IconBox>
         </Flex>

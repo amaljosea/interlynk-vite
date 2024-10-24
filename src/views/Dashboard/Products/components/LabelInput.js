@@ -13,7 +13,10 @@ const LabelInput = ({ data, setOpen, onOpenLabel, nodes }) => {
   const { id: prodId, name, desc, labels } = data || ''
   const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
 
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { primaryBlueText, sameSecondaryText } = useThemeColor([
+    'primaryBlueText',
+    'sameSecondaryText'
+  ])
 
   const [selectedLabels, setSelectedLabels] = useState([])
 
@@ -76,7 +79,7 @@ const LabelInput = ({ data, setOpen, onOpenLabel, nodes }) => {
         ))}
       </Flex>
       <Flex width={'100%'} flexDir={'column'} hidden={nodes?.length > 0}>
-        <Text fontSize={'sm'} p={4} color={'gray.500'}>
+        <Text fontSize={'sm'} p={4} color={sameSecondaryText}>
           No Labels Present
         </Text>
         <Divider />

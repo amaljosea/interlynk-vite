@@ -21,6 +21,7 @@ jest.mock('@chakra-ui/react', () => ({
   ...jest.requireActual('@chakra-ui/react'),
   useTheme: () => ({
     colors: {
+      // eslint-disable-next-line
       headingTextColor: { light: '#000', dark: '#fff' }
     }
   }),

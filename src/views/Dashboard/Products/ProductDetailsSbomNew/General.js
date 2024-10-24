@@ -38,10 +38,12 @@ import PhaseModal from '../components/PhaseModal'
 import ToolModal from '../components/ToolModal'
 
 const General = ({ data, loading, error }) => {
-  const { primaryBlueText, inverseSecondaryBgColor } = useThemeColor([
-    'primaryBlueText',
-    'inverseSecondaryBgColor'
-  ])
+  const { primaryBlueText, inverseSecondaryBgColor, sameSecondaryText } =
+    useThemeColor([
+      'primaryBlueText',
+      'inverseSecondaryBgColor',
+      'sameSecondaryText'
+    ])
   const { isFreeTier } = useGlobalQueryContext()
   const { showToast } = useCustomToast()
   const params = useParams()
@@ -206,7 +208,7 @@ const General = ({ data, loading, error }) => {
                   onCheck={onCheck('Created At')}
                 />
               </Td>
-              <Td fontSize={'sm'} color={'gray.500'} width={'85%'}>
+              <Td fontSize={'sm'} color={sameSecondaryText} width={'85%'}>
                 {creationAt ? getFullDateAndTime(creationAt) : ''}
               </Td>
             </Tr>
@@ -231,7 +233,7 @@ const General = ({ data, loading, error }) => {
                   <ActiveBtn
                     onClick={PHASES?.onOpen}
                     editable={phaseExists ? true : false}
-                    color={phaseExists ? 'gray.500' : primaryBlueText}
+                    color={phaseExists ? sameSecondaryText : primaryBlueText}
                   >
                     {phaseExists ? 'Update' : 'Add Phase'}
                   </ActiveBtn>
@@ -271,7 +273,9 @@ const General = ({ data, loading, error }) => {
                   ))}
                   <ActiveBtn
                     onClick={TOOL?.onOpen}
-                    color={tools?.length > 0 ? 'gray.500' : primaryBlueText}
+                    color={
+                      tools?.length > 0 ? sameSecondaryText : primaryBlueText
+                    }
                   >
                     {tools?.length > 0 ? 'Add New' : 'Add Tool'}
                   </ActiveBtn>
@@ -308,7 +312,9 @@ const General = ({ data, loading, error }) => {
                   ))}
                   <ActiveBtn
                     onClick={AUTHOR?.onOpen}
-                    color={authors?.length > 0 ? 'gray.500' : primaryBlueText}
+                    color={
+                      authors?.length > 0 ? sameSecondaryText : primaryBlueText
+                    }
                   >
                     {authors?.length > 0 ? 'Add New' : 'Add Author'}
                   </ActiveBtn>

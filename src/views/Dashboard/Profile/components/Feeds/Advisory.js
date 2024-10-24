@@ -13,7 +13,10 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { OrgSettingCreate, OrgSettingUpdate } from 'graphQL/Mutation'
 
 const AdvisoryFeeds = ({ data, manageFeeds }) => {
-  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+  const { inverseSecondaryBgColor, sameSecondaryText } = useThemeColor([
+    'inverseSecondaryBgColor',
+    'sameSecondaryText'
+  ])
   const [organizationSettingCreate] = useMutation(OrgSettingCreate)
   const [organizationSettingUpdate] = useMutation(OrgSettingUpdate)
 
@@ -70,7 +73,7 @@ const AdvisoryFeeds = ({ data, manageFeeds }) => {
                     <Text
                       mr={2}
                       noOfLines={1}
-                      color='gray.500'
+                      color={sameSecondaryText}
                       fontWeight='400'
                       htmlFor={feed.friendlyName}
                     >

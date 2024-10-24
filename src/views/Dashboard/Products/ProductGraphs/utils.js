@@ -39,6 +39,7 @@ export const SBOM_LIST_WITH_DATA_QUERY = gql`
 const tooltipCustom = (
   <Tooltip
     position={{ x: 0, y: 70 }}
+    // eslint-disable-next-line
     labelStyle={{ color: '#4A5568', fontWeight: 600 }}
     wrapperStyle={{
       zIndex: 9999,
@@ -120,6 +121,7 @@ export const vulnConfig = [
     id: 3,
     name: 'Medium',
     dataKey: 'stats.vulnStats.medium',
+    // eslint-disable-next-line
     stroke: '#cbbb08'
   },
   {
@@ -147,6 +149,7 @@ export const policyConfig = [
     id: 2,
     name: 'Warn',
     dataKey: 'policyResultMetrics.warnCount',
+    // eslint-disable-next-line
     stroke: '#cbbb08'
   },
   {

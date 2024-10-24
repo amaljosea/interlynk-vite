@@ -126,7 +126,10 @@ const ProductDetailsMain = () => {
   const { setIsOpen, setCurrentStep } = useTour()
   const signedUrlParams = getSignedUrlParams()
   const activeTour = localStorage.getItem('activeTour')
-  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
+  const { primaryErrorColor, secondaryBlueText } = useThemeColor([
+    'primaryErrorColor',
+    'secondaryBlueText'
+  ])
 
   const [warning, setWarning] = useState(false)
   const [exceedingCount, setExceedingCount] = useState(0)
@@ -385,7 +388,7 @@ const ProductDetailsMain = () => {
                     as={FaWindowMaximize}
                     h={'64px'}
                     w={'64px'}
-                    color='blue.300'
+                    color={secondaryBlueText}
                   />
                   <Flex gap={1} direction={'column'} alignItems={'flex-start'}>
                     {/* PRODUCT TITLE */}

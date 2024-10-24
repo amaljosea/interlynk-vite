@@ -12,6 +12,8 @@ import {
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 
 const SigningModal = ({
@@ -37,6 +39,11 @@ const SigningModal = ({
       setCycloneDxSign(signedData.cycloneDxSign)
     }
   }, [signedData])
+
+  const { lightAndDarkBgColor, primaryBlueText } = useThemeColor([
+    'lightAndDarkBgColor',
+    'primaryBlueText'
+  ])
 
   // const [sbomSign] = useMutation(signSbom)
 
@@ -89,10 +96,10 @@ const SigningModal = ({
       >
         <Flex width={'100%'} direction={'column'} gap={4}>
           <Box
-            bg='blue.600'
+            bg={primaryBlueText}
             w='100%'
             p={2}
-            color='white'
+            color={lightAndDarkBgColor}
             fontWeight='medium'
             fontSize='16px'
             align='center'

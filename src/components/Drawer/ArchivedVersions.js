@@ -38,7 +38,10 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
     useProductUrlContext()
   const params = useParams()
   const productId = params?.productid
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+  const { primaryTextColor, sameSecondaryText } = useThemeColor([
+    'primaryTextColor',
+    'sameSecondaryText'
+  ])
   const [activeRow, setActiveRow] = useState(null)
 
   const { data: versions } = useQuery(GetVersions, {
@@ -127,7 +130,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
                         label={getFullDateAndTime(item?.createdAt)}
                         placement='top'
                       >
-                        <Text color={'gray.500'} fontSize={'sm'}>
+                        <Text color={sameSecondaryText} fontSize={'sm'}>
                           Last updated {timeSince(item?.createdAt)}
                         </Text>
                       </Tooltip>

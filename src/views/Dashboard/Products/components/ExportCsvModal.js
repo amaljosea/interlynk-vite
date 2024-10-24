@@ -37,9 +37,19 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
 
-  const { primaryTextColor, secondaryBgColor } = useThemeColor([
+  const {
+    primaryTextColor,
+    secondaryBgColor,
+    sameSecondaryText,
+    customLightBlue,
+    customDarkBlue
+  } = useThemeColor([
     'primaryTextColor',
-    'secondaryBgColor'
+    'secondaryBgColor',
+    'sameSecondaryText',
+    'lightBlueBg',
+    'customLightBlue',
+    'customDarkBlue'
   ])
 
   const [rowsToExport, setRowsToExport] = useState('200')
@@ -226,7 +236,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
                 padding='10px'
               >
                 {selectedColumns.length === 0 && (
-                  <Text color='gray.500' fontSize='sm'>
+                  <Text color={sameSecondaryText} fontSize='sm'>
                     No columns selected
                   </Text>
                 )}
@@ -236,11 +246,11 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
                     key={index}
                     borderRadius='4px'
                     variant='solid'
-                    bg='#BEE3F8'
+                    bg={customLightBlue}
                   >
-                    <TagLabel color='#2A4365'>{column}</TagLabel>
+                    <TagLabel color={customDarkBlue}>{column}</TagLabel>
                     <TagCloseButton
-                      color='#2A4365'
+                      color={customDarkBlue}
                       fontWeight='500'
                       onClick={() => removeColumn(column)}
                     />
