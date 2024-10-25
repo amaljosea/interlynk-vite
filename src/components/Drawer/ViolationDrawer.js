@@ -104,18 +104,22 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
         <DrawerCloseButton mt={1} />
         <DrawerHeader borderBottomWidth='1px'>Violations</DrawerHeader>
         <DrawerBody py={4}>
-          <Stack spacing={2} direction={'column'}>
-            <Text>
-              <strong>Policy:</strong> {truncatedValue(policy, 30)}
-            </Text>
-            <Text>
-              <strong>Condition:</strong>{' '}
-              <span style={{ textTransform: 'capitalize' }}>{category}</span>{' '}
-              {name} {operatorWording} {value}
-            </Text>
+          <Stack spacing={3} direction={'column'}>
+            <Stack spacing={0}>
+              <Text fontWeight={'semibold'}>Policy:</Text>
+              <Text textTransform={'capitalize'}>
+                {truncatedValue(policy, 30)}
+              </Text>
+            </Stack>
+            <Stack spacing={0}>
+              <Text fontWeight={'semibold'}>Condition:</Text>
+              <Text textTransform={'capitalize'}>
+                {category} {name} {operatorWording} {value}
+              </Text>
+            </Stack>
             {supplierExists &&
               nodes?.map((item, index) => (
-                <Stack key={index} spacing={2}>
+                <Stack key={index} spacing={0}>
                   <Text fontWeight={'semibold'}>Value:</Text>
                   {item?.violation?.suppliers?.map((item, idx) => (
                     <Text key={idx}>
@@ -127,7 +131,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
               ))}
             {authorExists &&
               nodes?.map((item, index) => (
-                <Stack key={index} spacing={2}>
+                <Stack key={index} spacing={0}>
                   <Text fontWeight={'semibold'}>Value:</Text>
                   {item?.violation?.authors?.map((item, idx) => (
                     <Text key={idx}>
@@ -139,13 +143,13 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
             {(subject === 'VERSION_PRIMARY' ||
               subject === 'SBOM_PRIMARY_COMPONENT_RELATIONSHIPS') &&
               nodes?.length > 0 && (
-                <Text>
-                  <strong>Value:</strong>{' '}
-                  <span style={{ textTransform: 'capitalize' }}>
-                    {nodes[0].violation?.primaryComponent?.name}
-                  </span>{' '}
-                  - {nodes[0].violation?.primaryComponent?.version}
-                </Text>
+                <Stack spacing={0}>
+                  <Text fontWeight={'semibold'}>Value:</Text>
+                  <Text style={{ textTransform: 'capitalize' }}>
+                    {nodes[0].violation?.primaryComponent?.name}-{' '}
+                    {nodes[0].violation?.primaryComponent?.version}
+                  </Text>
+                </Stack>
               )}
             <Text
               hidden={category === 'version'}
