@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import { Flex, Text, useDisclosure } from '@chakra-ui/react'
 
-// Custom components
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
+import CustomLoader from 'components/CustomLoader'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import ActivitiesOverviewRow from 'components/Tables/ActivitiesOverviewRow'
@@ -13,15 +13,12 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaEye } from 'react-icons/fa'
 
-const ActivitiesOverview = ({ title, data }) => {
+const ActivitiesOverview = ({ loading, title, data }) => {
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const [activeRow, setActiveRow] = useState('')
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isCpeOpen,
-    onOpen: onCpeOpen,
-    onClose: onCpeClose
-  } = useDisclosure()
+
+  const PURL = useDisclosure()
+  const CPE = useDisclosure()
 
   return (
     <>
@@ -31,39 +28,47 @@ const ActivitiesOverview = ({ title, data }) => {
             {title}
           </Text>
         </Flex>
-        <CardBody mt={8} ps='20px' pe='0px' position='relative'>
-          <Flex direction='column'>
-            {data?.length > 0 &&
-              data?.map((row, index) => {
-                return (
-                  <ActivitiesOverviewRow
-                    key={index}
-                    logo={FaEye}
-                    event={row.event}
-                    orig={row.orig}
-                    updated={row.updated}
-                    changedBy={row.changedBy}
-                    date={row.updatedAt}
-                    color={'gray'}
-                    index={index}
-                    arrLength={data?.length}
-                    action={row.action}
-                    onOpen={onOpen}
-                    onCpeOpen={onCpeOpen}
-                    setActiveRow={setActiveRow}
-                  />
-                )
-              })}
-          </Flex>
-        </CardBody>
+        {loading ? (
+          <CustomLoader />
+        ) : (
+          <CardBody mt={8} ps='20px' pe='0px' position='relative'>
+            <Flex direction='column'>
+              {data?.length > 0 &&
+                data?.map((row, index) => {
+                  return (
+                    <ActivitiesOverviewRow
+                      key={index}
+                      logo={FaEye}
+                      event={row.event}
+                      orig={row.orig}
+                      updated={row.updated}
+                      changedBy={row.changedBy}
+                      date={row.updatedAt}
+                      color={'gray'}
+                      index={index}
+                      arrLength={data?.length}
+                      action={row.action}
+                      onOpen={PURL.onOpen}
+                      onCpeOpen={CPE.onOpen}
+                      setActiveRow={setActiveRow}
+                    />
+                  )
+                })}
+            </Flex>
+          </CardBody>
+        )}
       </Card>
 
-      {isOpen && (
-        <PurlCard value={activeRow} isOpen={isOpen} onClose={onClose} />
+      {PURL.isOpen && (
+        <PurlCard
+          value={activeRow}
+          isOpen={PURL.isOpen}
+          onClose={PURL.onClose}
+        />
       )}
 
-      {isCpeOpen && (
-        <CpeCard value={activeRow} isOpen={isCpeOpen} onClose={onCpeClose} />
+      {CPE.isOpen && (
+        <CpeCard value={activeRow} isOpen={CPE.isOpen} onClose={CPE.onClose} />
       )}
     </>
   )

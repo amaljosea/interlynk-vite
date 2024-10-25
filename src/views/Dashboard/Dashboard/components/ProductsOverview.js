@@ -16,7 +16,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const ProductsOverview = ({ title, data }) => {
+const ProductsOverview = ({ loading, title, data }) => {
   const { dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
@@ -294,7 +294,7 @@ const ProductsOverview = ({ title, data }) => {
           columns={columns}
           data={data || []}
           customStyles={customStyles(headingTextColor)}
-          progressPending={data ? false : true}
+          progressPending={loading}
           progressComponent={<CustomLoader />}
         />
       </CardBody>

@@ -2,18 +2,10 @@ import { useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
 
-import {
-  Flex,
-  Grid,
-  GridItem,
-  SimpleGrid,
-  Skeleton,
-  Text
-} from '@chakra-ui/react'
+import { Flex, Grid, GridItem, SimpleGrid, Skeleton } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
-import EnvFilter from 'components/Misc/EnvFilter'
 import GlobalEnvFilter from 'components/Misc/GlobalEnvFilter'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -33,7 +25,7 @@ export default function Dashboard() {
   const { dispatch, envName, organization } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
-  const { data: metrics } = useQuery(GetOrgMetrics, {
+  const { data: metrics, loading } = useQuery(GetOrgMetrics, {
     skip: organization ? false : true,
     variables: { env: envName }
   })
@@ -108,6 +100,7 @@ export default function Dashboard() {
         {/* RECENT IMPORTS */}
         <GridItem colSpan={8} w='100%'>
           <ProductsOverview
+            loading={loading}
             title={'Recent Imports'}
             data={metrics?.organizationMetric?.latestVersions}
           />
@@ -115,6 +108,7 @@ export default function Dashboard() {
         {/* LATEST ACTIVITIES */}
         <GridItem colSpan={4} w='100%'>
           <ActivitiesOverview
+            loading={loading}
             title={'Recent Activities'}
             amount={metrics?.organizationMetric?.latestActivity?.length}
             data={metrics?.organizationMetric?.latestActivity}
