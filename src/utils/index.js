@@ -296,6 +296,23 @@ export const getEolStatusColor = (eolDate) => {
   }
 }
 
+export const getColor = (result) => {
+  switch (result) {
+    case 'inform':
+      return 'blue'
+    case 'pass':
+      return 'green'
+    case 'warn':
+      return 'yellow'
+    case 'fail':
+      return 'red'
+    case 'skipped':
+      return 'orange'
+    case 'error':
+      return 'gray'
+  }
+}
+
 export const displayPic = (email) => {
   switch (email) {
     case 'abhisek@interlynk.io':
