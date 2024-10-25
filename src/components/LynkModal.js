@@ -82,7 +82,10 @@ const LynkModal = ({
             <Flex alignItems='center' gap={3}>
               {Icon && <Icon color={headingTextColor} />}
               {title && (
-                <Text color={primaryTextColor} fontWeight={600}>
+                <Text
+                  aria-label='modal_header'
+                  sx={{ fontWeight: 600, color: primaryTextColor }}
+                >
                   {title}
                 </Text>
               )}
