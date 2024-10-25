@@ -84,7 +84,11 @@ const Organizations = () => {
         >
           {truncatedValue(organization?.name, 20)}
         </MenuButton>
-        <MenuList>
+        <MenuList maxHeight='300px' overflowY='auto'>
+          <MenuItem fontSize='sm' icon={<AddIcon />} onClick={onOpen}>
+            Add organization
+          </MenuItem>
+          <MenuDivider />
           {options?.map((item, index) => (
             <MenuOptionGroup
               key={index}
@@ -100,10 +104,6 @@ const Organizations = () => {
               </MenuItemOption>
             </MenuOptionGroup>
           ))}
-          <MenuDivider />
-          <MenuItem fontSize='sm' icon={<AddIcon />} onClick={onOpen}>
-            Add organization
-          </MenuItem>
         </MenuList>
       </Menu>
 
