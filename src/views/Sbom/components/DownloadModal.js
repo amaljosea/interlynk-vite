@@ -195,12 +195,7 @@ const DownloadModal = (props) => {
               <Stack spacing={4} direction='row'>
                 <Radio value='CycloneDX'>CycloneDX</Radio>
                 <Radio value='SPDX'>SPDX</Radio>
-                <Radio value='SPDX-Lite'>
-                  SPDX-Lite
-                  <Tag size='sm' mt={0.5} ml={2} fontSize='12'>
-                    Coming soon
-                  </Tag>
-                </Radio>
+                <Radio value='SPDX-Lite'>SPDX-Lite</Radio>
               </Stack>
             </RadioGroup>
           </FormControl>
