@@ -36,7 +36,12 @@ const EnvList = ({ data }) => {
   }
 
   return (
-    <Stack direction={'row'} spacing={2} alignItems={'center'}>
+    <Stack
+      direction={'row'}
+      spacing={0}
+      border={`1px solid ${secondaryBlueBorder}`}
+      sx={{ borderRadius: '6px', alignItems: 'center' }}
+    >
       <Tooltip label='Default'>
         <Link
           to={generateProductDetailPageUrlFromCurrentUrl({
@@ -47,11 +52,11 @@ const EnvList = ({ data }) => {
         >
           <Button
             size='sm'
-            colorScheme='blue'
             leftIcon={<FaInbox />}
             borderColor={secondaryBlueBorder}
             sx={{ w: '60px', fontWeight: 400 }}
-            variant={name === 'default' ? 'solid' : 'outline'}
+            variant={name === 'default' ? 'solid' : 'ghost'}
+            colorScheme={name === 'default' ? 'blue' : 'gray'}
           >
             {getProjectSbomsCount('default')}
           </Button>
@@ -67,11 +72,11 @@ const EnvList = ({ data }) => {
         >
           <Button
             size='sm'
-            colorScheme='blue'
             leftIcon={<FaCode />}
             borderColor={secondaryBlueBorder}
             sx={{ w: '60px', fontWeight: 400 }}
-            variant={name === 'development' ? 'solid' : 'outline'}
+            colorScheme={name === 'development' ? 'blue' : 'gray'}
+            variant={name === 'development' ? 'solid' : 'ghost'}
           >
             {getProjectSbomsCount('development')}
           </Button>
@@ -87,11 +92,11 @@ const EnvList = ({ data }) => {
         >
           <Button
             size='sm'
-            colorScheme='blue'
             leftIcon={<FaDesktop />}
             borderColor={secondaryBlueBorder}
             sx={{ w: '60px', fontWeight: 400 }}
-            variant={name === 'production' ? 'solid' : 'outline'}
+            colorScheme={name === 'production' ? 'blue' : 'gray'}
+            variant={name === 'production' ? 'solid' : 'ghost'}
           >
             {getProjectSbomsCount('production')}
           </Button>
