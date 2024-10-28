@@ -1,42 +1,27 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { useMemo, useRef, useState } from 'react'
+import { useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { capitalizeFirstLetter, customStyles, envOrderList } from 'utils'
-import { GetIcon, isDefaultEnv, isValidPurl, truncatedValue } from 'utils'
+import { isDefaultEnv, truncatedValue } from 'utils'
 import { getSignedUrlParams } from 'utils'
 import { ProductGeneralTabs } from 'utils/TabsObjects'
 
-import { AddIcon } from '@chakra-ui/icons'
 import {
   Flex,
   FormControl,
   FormLabel,
-  Grid,
-  GridItem,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
   Select,
-  SimpleGrid,
   Stack,
-  Tag,
-  TagLabel,
   Text,
-  Tooltip,
   useColorMode,
   useDisclosure
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
-import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
-import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useGradualPolling } from 'hooks/useGradualPolling'
@@ -50,10 +35,10 @@ import { CheckDeepParts, GetProject } from 'graphQL/Queries'
 import { GetProjectGroups, GetSbomParts } from 'graphQL/Queries'
 
 import { BiLayerPlus } from 'react-icons/bi'
-import { BsFillPatchQuestionFill } from 'react-icons/bs'
-import { FaEllipsisV } from 'react-icons/fa'
 
 import ConfirmationModal from '../components/ConfirmationModal'
+import PartsColumns from './Components/tableColumns/PartsColumns'
+import PartsSubHeader from './Components/tableSubHeaders/PartsSubHeader'
 
 const LynkSelect = ({ name, value, onChange, children }) => {
   return (
@@ -80,19 +65,7 @@ const Parts = ({ data }) => {
 
   const { totalRows, prodState, dispatch } = useGlobalState()
 
-  const {
-    headingTextColor,
-    primaryTextColor,
-    secondaryTextColor,
-    inverseSecondaryBgColor,
-    primaryBlueText
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'secondaryTextColor',
-    'inverseSecondaryBgColor',
-    'primaryBlueText'
-  ])
+  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const { enabled, field, direction } = prodState
   const { prodVulnDispatch } = dispatch
@@ -126,7 +99,6 @@ const Parts = ({ data }) => {
     onClose: onDeleteClose
   } = useDisclosure()
 
-  const addBtn = useRef()
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
   const [activeRow, setActiveRow] = useState(null)
@@ -299,237 +271,26 @@ const Parts = ({ data }) => {
 
   useGradualPolling({ shouldPoll, startPolling, stopPolling })
 
-  // COLUMNS
-  const columns = [
-    {
-      id: 'NAME',
-      name: 'NAME',
-      selector: (row) => {
-        const { part } = row
-        const { primaryComponent, projectVersion, suppliers } = part || ''
-        const { purl } = primaryComponent || ''
-        const validPurl = isValidPurl(purl)
-
-        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-          productgroupid: part.project.projectGroup.id,
-          productid: part.project.id,
-          sbomid: part.id,
-          paramsObj: {
-            parts: true
-          }
-        })
-
-        const icon = validPurl ? (
-          GetIcon(purl?.split('/')[0], colorMode)
-        ) : (
-          <BsFillPatchQuestionFill
-            fontSize={24}
-            color={inverseSecondaryBgColor}
-          />
-        )
-
-        return (
-          <Grid
-            templateColumns='repeat(7, 1fr)'
-            sx={{ my: 3, gap: 2, alignItems: 'center' }}
-          >
-            <GridItem colSpan={1} width={'50px'}>
-              <IconButton
-                isRound={true}
-                variant='solid'
-                colorScheme='gray'
-                icon={icon}
-              />
-            </GridItem>
-            <GridItem colSpan={6}>
-              <Stack spacing={1} direction='column'>
-                <Link to={link} replace>
-                  <Text
-                    sx={{ fontSize: 14, color: primaryBlueText }}
-                    onClick={() => onSelectPart(part)}
-                  >
-                    {part?.project?.projectGroup?.name}
-                  </Text>
-                </Link>
-                <Text color={primaryTextColor}>{projectVersion}</Text>
-                {suppliers?.map((item, index) => (
-                  <Text key={index} color={primaryTextColor}>
-                    {item?.name}
-                  </Text>
-                ))}
-              </Stack>
-            </GridItem>
-          </Grid>
-        )
-      },
-      width: '20%',
-      wrap: true
-    },
-    {
-      id: 'COMPONENTS',
-      name: 'COMPONENTS',
-      selector: (row) => {
-        const { part } = row
-        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-          productid: part?.project?.id,
-          sbomid: part?.id,
-          paramsObj: {
-            tab: 'components',
-            parts: true
-          }
-        })
-        return (
-          <Link to={link} onClick={() => onSelectPart(part)}>
-            <Tag
-              size='md'
-              variant='subtle'
-              colorScheme={'blue'}
-              sx={{ w: 16, cursor: 'pointer' }}
-            >
-              <TagLabel mx={'auto'}>{part.stats.compCount}</TagLabel>
-            </Tag>
-          </Link>
-        )
-      },
-      width: '11%'
-    },
-    {
-      id: 'LICENSES',
-      name: 'LICENSES',
-      selector: (row) => {
-        const { part } = row
-        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-          productid: part?.project?.id,
-          sbomid: part?.id,
-          paramsObj: {
-            tab: 'licenses',
-            parts: true
-          }
-        })
-        return (
-          <Link to={link} onClick={() => onSelectPart(part)}>
-            <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
-              <TagLabel mx={'auto'}>{part.stats.compLicenseCount}</TagLabel>
-            </Tag>
-          </Link>
-        )
-      },
-      width: '8%'
-    },
-    {
-      id: 'VULNERABILITIES',
-      name: 'VULNERABILITIES',
-      selector: (row) => {
-        const { part, vulnRunStatus } = row
-        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-          productgroupid: part?.project?.projectGroup?.id,
-          productid: part?.project?.id,
-          sbomid: part?.id,
-          paramsObj: {
-            tab: 'vulnerabilities',
-            parts: true
-          }
-        })
-        return (
-          <SimpleGrid gap={1} width={'100%'} columns={5}>
-            <Link to={link} onClick={() => onFilterSev(part, ['critical'])}>
-              <VulnBadge color='red' label='Critical' status={vulnRunStatus}>
-                {part?.stats?.vulnStats?.critical || 0}
-              </VulnBadge>
-            </Link>
-            <Link to={link} onClick={() => onFilterSev(part, ['high'])}>
-              <VulnBadge color='orange' label='High' status={vulnRunStatus}>
-                {part?.stats?.vulnStats?.high || 0}
-              </VulnBadge>
-            </Link>
-            <Link to={link} onClick={() => onFilterSev(part, ['medium'])}>
-              <VulnBadge color='yellow' label='Medium' status={vulnRunStatus}>
-                {part?.stats?.vulnStats?.medium || 0}
-              </VulnBadge>
-            </Link>
-            <Link to={link} onClick={() => onFilterSev(part, ['low'])}>
-              <VulnBadge color='green' label='Low' status={vulnRunStatus}>
-                {part?.stats?.vulnStats?.low || 0}
-              </VulnBadge>
-            </Link>
-            <Link to={link} onClick={() => onFilterSev(part, ['unknown'])}>
-              <VulnBadge color='gray' label='Unknown' status={vulnRunStatus}>
-                {part?.stats?.vulnStats?.unknown || 0}
-              </VulnBadge>
-            </Link>
-          </SimpleGrid>
-        )
-      },
-      width: '26.8%'
-    },
-    {
-      id: 'STATUS',
-      name: 'STATUS',
-      selector: (row) => {
-        const { part } = row
-        return (
-          <Tag width={24} colorScheme='cyan' textTransform={'capitalize'}>
-            <TagLabel mx={'auto'}>{part.lifecycle}</TagLabel>
-          </Tag>
-        )
-      }
-    },
-    {
-      id: 'ACTION',
-      name: 'ACTION',
-      selector: (row) => {
-        return (
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color={secondaryTextColor}
-            />
-            <Portal>
-              <MenuList size='sm'>
-                <MenuItem
-                  isDisabled={!updateSboms || signedUrlParams}
-                  onClick={() => {
-                    setActiveRow(row)
-                    onDeleteOpen()
-                  }}
-                >
-                  Remove
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        )
-      },
-      right: 'true',
-      omit: isArchived
-    }
-  ]
-
   // SUB HEADER
-  const subHeaderComponent = useMemo(() => {
-    return (
-      <Flex
-        sx={{ w: '100%', gap: 2, alignItems: 'center' }}
-        justifyContent={'flex-end'}
-      >
-        <Tooltip label='Add Part' placement='top'>
-          <IconButton
-            ref={addBtn}
-            variant='solid'
-            onClick={onOpen}
-            colorScheme='blue'
-            icon={<AddIcon />}
-            hidden={isArchived}
-            sx={{ fontSize: 'sm', fontWeight: 'normal' }}
-            isDisabled={!updateSboms || signedUrlParams}
-          />
-        </Tooltip>
-        <RefreshBtn />
-      </Flex>
-    )
-  }, [isArchived, onOpen, signedUrlParams, updateSboms])
+  const subHeader = PartsSubHeader(
+    isArchived,
+    onOpen,
+    signedUrlParams,
+    updateSboms
+  )
+
+  // COLUMNS
+  const columns = PartsColumns(
+    onFilterSev,
+    colorMode,
+    updateSboms,
+    signedUrlParams,
+    onDeleteOpen,
+    isArchived,
+    setActiveRow,
+    onSelectPart,
+    generateProductVersionDetailPageUrlFromCurrentUrl
+  )
 
   if (error) {
     return (
@@ -550,7 +311,7 @@ const Parts = ({ data }) => {
           responsive={true}
           progressComponent={<CustomLoader />}
           customStyles={customStyles(headingTextColor)}
-          subHeaderComponent={subHeaderComponent}
+          subHeaderComponent={subHeader}
           progressPending={sbomParts ? false : true}
         />
       </Flex>
