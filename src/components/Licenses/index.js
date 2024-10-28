@@ -14,7 +14,7 @@ const Licenses = () => {
 
   const [filters, setFilters] = useState({
     search: '',
-    orderBy: { field: 'ORGANIZATION_LICENSES_STATE', direction: 'ASC' }
+    orderBy: { field: 'ORGANIZATION_LICENSES_STATE', direction: 'DESC' }
   })
 
   const { nodes, paginationProps, reset, loading } = usePaginatedQuery(

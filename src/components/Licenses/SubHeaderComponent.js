@@ -20,16 +20,16 @@ export const SubHeaderComponent = ({
       {/* ADD LICNESE */}
       <Tooltip label='Add License'>
         <IconButton
+          variant='solid'
+          icon={<AddIcon />}
+          colorScheme='blue'
           isDisabled={!createLic}
           onClick={() => {
             setActiveRow(null)
             onOpen()
           }}
-          icon={<AddIcon />}
-          colorScheme='blue'
-          variant='solid'
-          fontWeight='normal'
-          fontSize={'sm'}
+          aria-label='add_license'
+          sx={{ fontSize: 'sm', fontWeight: 'normal' }}
         />
       </Tooltip>
       <RefreshBtn />

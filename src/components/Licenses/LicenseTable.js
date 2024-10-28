@@ -234,6 +234,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
               icon={<FaEllipsisV />}
               variant='none'
               color={secondaryTextColor}
+              aria-label={`license action ${row?.content?.name}`}
             />
             <Portal>
               <MenuList fontSize={'sm'}>
@@ -243,6 +244,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
                     setActiveRow(row)
                     onOpen()
                   }}
+                  aria-label={`license edit ${row?.content?.name}`}
                 >
                   {!updateLic ? 'View' : 'Edit'} License
                 </MenuItem>

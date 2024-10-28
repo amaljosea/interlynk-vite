@@ -162,6 +162,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             id='name'
             fontSize={'sm'}
             value={name}
+            aria-label='license_name'
             placeholder='Add name'
             onChange={(e) => setName(e.target.value)}
             disabled={data}
@@ -284,6 +285,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                 Attribution
               </FormLabel>
               <Select
+                aria-label='license_attr'
                 onChange={(e) => setAttribution(e.target.value)}
                 value={attribution}
                 fontSize={'sm'}
@@ -399,6 +401,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
                 fontSize={'sm'}
                 name='state'
                 value={state}
+                aria-label='license_status'
                 onChange={(e) => setState(e.target.value)}
               >
                 <option value='APPROVED'>Approved</option>

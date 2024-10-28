@@ -78,6 +78,55 @@ export const getFileNamesFromResource = (
   }
 }
 
+export const randomLicenseName = () => {
+  const prefixes = [
+    'Professional',
+    'Standard',
+    'Enterprise',
+    'Basic',
+    'Advanced',
+    'Ultimate',
+    'Essential',
+    'Pro',
+    'Cloud',
+    'Unlimited',
+    'Personal',
+    'Team'
+  ]
+
+  const words = [
+    'Access',
+    'Suite',
+    'Package',
+    'Edition',
+    'License',
+    'Version',
+    'Toolkit',
+    'Platform',
+    'Solution',
+    'Plan',
+    'Bundle',
+    'Service'
+  ]
+
+  const suffixes = [
+    'Plus',
+    'Premium',
+    'Lite',
+    'Standard',
+    '2024',
+    'X',
+    'One',
+    'Pro'
+  ]
+
+  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)]
+  const word = words[Math.floor(Math.random() * words.length)]
+  const suffix = suffixes[Math.floor(Math.random() * suffixes.length)]
+
+  return `${prefix} ${word} ${suffix}`
+}
+
 export const generateRandomEmail = () => {
   const characters = 'abcdefghijklmnopqrstuvwxyz0123456789'
   const domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com']
