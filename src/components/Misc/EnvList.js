@@ -10,6 +10,7 @@ import { FaCode, FaDesktop, FaInbox } from 'react-icons/fa6'
 
 const EnvList = ({ data }) => {
   const params = useParams()
+  const productId = params.productid
   const { id, projects, defaultProject } = data || ''
   const { onChangeEnv, dispatch } = useGlobalState()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
@@ -19,7 +20,10 @@ const EnvList = ({ data }) => {
   const activeEnv = projects?.find((item) => item?.id === params?.productid)
   const { name } = activeEnv || ''
 
-  const { secondaryBlueBorder } = useThemeColor(['secondaryBlueBorder'])
+  const { primaryBlueBorder, secondaryBlueBorder } = useThemeColor([
+    'primaryBlueBorder',
+    'secondaryBlueBorder'
+  ])
 
   const handleClick = (value) => {
     const env = projects?.find((item) => item.name === value)
@@ -35,12 +39,18 @@ const EnvList = ({ data }) => {
     return project ? project.sbomsCount : 0
   }
 
+  const borderColor = productId ? secondaryBlueBorder : primaryBlueBorder
+  const variant = (env) =>
+    name === env ? 'solid' : productId ? 'ghost' : 'outline'
+  const colorScheme = (env) =>
+    name === env ? 'blue' : productId ? 'gray' : 'blue'
+
   return (
     <Stack
       direction={'row'}
-      spacing={0}
-      border={`1px solid ${secondaryBlueBorder}`}
-      sx={{ borderRadius: '6px', alignItems: 'center' }}
+      spacing={productId ? 0 : 2}
+      sx={{ borderRadius: productId ? '6px' : 0, alignItems: 'center' }}
+      border={productId ? `1px solid ${secondaryBlueBorder}` : 'none'}
     >
       <Tooltip label='Default'>
         <Link
@@ -53,10 +63,10 @@ const EnvList = ({ data }) => {
           <Button
             size='sm'
             leftIcon={<FaInbox />}
-            borderColor={secondaryBlueBorder}
+            borderColor={borderColor}
+            variant={variant('default')}
+            colorScheme={colorScheme('default')}
             sx={{ w: '60px', fontWeight: 400 }}
-            variant={name === 'default' ? 'solid' : 'ghost'}
-            colorScheme={name === 'default' ? 'blue' : 'gray'}
           >
             {getProjectSbomsCount('default')}
           </Button>
@@ -73,10 +83,10 @@ const EnvList = ({ data }) => {
           <Button
             size='sm'
             leftIcon={<FaCode />}
-            borderColor={secondaryBlueBorder}
+            borderColor={borderColor}
+            variant={variant('development')}
+            colorScheme={colorScheme('development')}
             sx={{ w: '60px', fontWeight: 400 }}
-            colorScheme={name === 'development' ? 'blue' : 'gray'}
-            variant={name === 'development' ? 'solid' : 'ghost'}
           >
             {getProjectSbomsCount('development')}
           </Button>
@@ -93,10 +103,10 @@ const EnvList = ({ data }) => {
           <Button
             size='sm'
             leftIcon={<FaDesktop />}
-            borderColor={secondaryBlueBorder}
+            borderColor={borderColor}
+            variant={variant('production')}
+            colorScheme={colorScheme('production')}
             sx={{ w: '60px', fontWeight: 400 }}
-            colorScheme={name === 'production' ? 'blue' : 'gray'}
-            variant={name === 'production' ? 'solid' : 'ghost'}
           >
             {getProjectSbomsCount('production')}
           </Button>
