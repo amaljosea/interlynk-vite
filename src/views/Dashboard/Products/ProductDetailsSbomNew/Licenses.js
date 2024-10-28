@@ -1,12 +1,10 @@
-import { useMemo } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
 
-import { Box, Flex, Tag, TagLabel, Text } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
-import RefreshBtn from 'components/Icons/RefreshBtn'
 import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
@@ -14,7 +12,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetSbomLicensesTable } from 'graphQL/Queries'
 
-import ExportCsv from '../components/ExportCsv'
+import LicenseColumns from './Components/tableColumns/LicenseColumns'
+import ExpandedRow from './Components/tableExpanded/LicensesExpanded'
+import LicensesSubHeader from './Components/tableSubHeaders/LicensesSubHeader'
 
 const Licenses = () => {
   const location = useLocation()
@@ -24,10 +24,7 @@ const Licenses = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const { nodes, paginationProps, loading } = usePaginatedQuery(
     GetSbomLicensesTable,
@@ -41,128 +38,11 @@ const Licenses = () => {
     }
   )
 
-  // HEADER SECTION
-  const subHeaderComponent = useMemo(() => {
-    return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent='flex-end'
-        gap={3}
-      >
-        {/* EXPORT CSV */}
-        <ExportCsv tableType='SBOM License View' />
-
-        {/* REFETCH BUTTON */}
-        <RefreshBtn />
-      </Flex>
-    )
-  }, [])
-
   // COLUMNS
-  const columns = [
-    // LICENSE EXPRESSION
-    {
-      id: 'LICENSE_EXPRESSION',
-      name: 'LICENSE EXPRESSION',
-      width: '20%',
-      wrap: true,
-      selector: ({ licenseExpression }) => {
-        return (
-          <Flex direction='row' alignItems={'center'} gap={2}>
-            <Text color={primaryTextColor} my={3} fontWeight={'medium'}>
-              {licenseExpression || 'Not Available'}
-            </Text>
-          </Flex>
-        )
-      }
-    },
-    // COMPONENTS
-    {
-      id: 'COMPONENTS',
-      name: 'COMPONENTS',
-      width: '50%',
-      wrap: true,
-      selector: ({ components }) => {
-        let sortedComponents = [...components]
-        sortedComponents.sort((a, b) => a.name.localeCompare(b.name))
+  const columns = LicenseColumns()
 
-        return (
-          <Flex
-            direction='row'
-            py={5}
-            alignItems={'center'}
-            wrap='wrap'
-            gap={2}
-            onClick={(e) => {
-              e.currentTarget.parentElement.click()
-            }}
-          >
-            <Tag variant='subtle'>
-              <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
-                {sortedComponents[0].name}
-              </TagLabel>
-            </Tag>
-            <Text color={primaryTextColor}>
-              {sortedComponents.length > 1
-                ? `+${sortedComponents.length - 1} more`
-                : ''}
-            </Text>
-          </Flex>
-        )
-      }
-    },
-    // STATUS
-    {
-      id: 'STATUS',
-      name: 'STATUS',
-      wrap: true,
-      sortable: true,
-      selector: ({ derivedState }) => {
-        derivedState = derivedState?.toLowerCase() || 'Not Available'
-        return (
-          <Tag
-            size='md'
-            variant='subtle'
-            colorScheme={
-              derivedState === 'approved'
-                ? 'green'
-                : derivedState === 'rejected'
-                  ? 'red'
-                  : derivedState === 'unspecified'
-                    ? 'orange'
-                    : 'blue'
-            }
-            width={'110px'}
-          >
-            <TagLabel mx={'auto'} textTransform={'capitalize'}>
-              {derivedState}
-            </TagLabel>
-          </Tag>
-        )
-      },
-      right: 'true'
-    }
-  ]
-
-  const ExpandedRow = ({ data: { components } }) => {
-    let sortedComponents = [...components]
-    sortedComponents.sort((a, b) => a.name.localeCompare(b.name))
-
-    return (
-      <Box
-        p={5}
-        width={'100%'}
-        boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
-      >
-        <Flex direction='row' py={5} alignItems={'center'} wrap='wrap' gap={2}>
-          {sortedComponents?.map((component, index) => (
-            <Tag key={index}>{component?.name}</Tag>
-          ))}
-        </Flex>
-      </Box>
-    )
-  }
+  // HEADER SECTION
+  const subHeader = LicensesSubHeader()
 
   return (
     <>
@@ -176,7 +56,7 @@ const Licenses = () => {
           progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader
-          subHeaderComponent={subHeaderComponent}
+          subHeaderComponent={subHeader}
           responsive
           persistTableHead
           expandableRows
