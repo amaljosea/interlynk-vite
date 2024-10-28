@@ -262,8 +262,6 @@ export const sevColor = (severity) => {
     case 'negligible':
       // eslint-disable-next-line
       return { bg: '#C6F6D5', text: '#22543D' }
-    default:
-      return { bg: 'gray', text: 'black' }
   }
 }
 

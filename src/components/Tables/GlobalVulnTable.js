@@ -8,17 +8,9 @@ import {
   ChevronUpIcon,
   ExternalLinkIcon
 } from '@chakra-ui/icons'
-import {
-  Badge,
-  Divider,
-  Flex,
-  Icon,
-  Stack,
-  Tag,
-  TagLabel,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
+import { Badge, Flex, Icon, Stack, Text } from '@chakra-ui/react'
+import { Divider, Tooltip } from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import Round from 'components/Misc/Round'
@@ -28,13 +20,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import Pagination from '../Pagination'
 
-const GlobalVulnTable = ({
-  vulns,
-  loading,
-  paginationProps,
-  filters,
-  setFilters
-}) => {
+const GlobalVulnTable = (props) => {
+  const { vulns, loading, paginationProps, filters, setFilters } = props
+
   const { field } = filters
   const { generateProductVulnerabilityDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
@@ -138,14 +126,13 @@ const GlobalVulnTable = ({
       name: 'SEVERITY',
       selector: (row) => {
         const { sev } = row
-
         return (
           <Tag
             size='md'
             variant='subtle'
             width={'80px'}
-            bg={sevColor(sev).bg}
-            textColor={sevColor(sev).text}
+            bg={sev && sevColor(sev).bg}
+            textColor={sev && sevColor(sev).text}
           >
             <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
               {sev || '-'}
@@ -268,30 +255,23 @@ const GlobalVulnTable = ({
       name: 'STATUSES',
       selector: (row) => {
         const { metrics } = row
-        const {
-          affectedCount,
-          fixedCount,
-          inTriageCount,
-          notAffectedCount,
-          unspecifiedCount
-        } = metrics
         return (
           <Stack fontWeight={'medium'} direction={'row'} my={2}>
             <Round bg='gray' label='Unspecified'>
-              {unspecifiedCount}
+              {metrics?.unspecifiedCount}
             </Round>
             <Round bg='blue' label='In Triage'>
-              {inTriageCount}
+              {metrics?.inTriageCount}
             </Round>
             <Round bg='red' label='Affected'>
-              {affectedCount}
+              {metrics?.affectedCount}
             </Round>
             <Divider orientation='vertical' colorScheme={'gray'} height={10} />
             <Round bg='orange' label='Fixed'>
-              {fixedCount}
+              {metrics?.fixedCount}
             </Round>
             <Round bg='green' label='Not Affected'>
-              {notAffectedCount}
+              {metrics?.notAffectedCount}
             </Round>
           </Stack>
         )
