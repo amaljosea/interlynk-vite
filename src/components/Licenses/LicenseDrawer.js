@@ -192,7 +192,8 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             placeholder='Add text'
             onChange={(e) => setText(e.target.value)}
             disabled={
-              data?.content?.__typename !== 'LicenseCustom' || !updateLic
+              (data && data?.content?.__typename !== 'LicenseCustom') ||
+              !updateLic
             }
             resize={'none'}
           />
