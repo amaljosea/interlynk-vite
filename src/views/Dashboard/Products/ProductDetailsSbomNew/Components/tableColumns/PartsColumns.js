@@ -2,22 +2,10 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GetIcon, isValidPurl } from 'utils'
 
-import {
-  Grid,
-  GridItem,
-  IconButton,
-  Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  SimpleGrid,
-  Stack,
-  Tag,
-  TagLabel,
-  Text
-} from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
+import { IconButton, Link, Portal, Stack, Text } from '@chakra-ui/react'
+import { Grid, GridItem, SimpleGrid } from '@chakra-ui/react'
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import VulnBadge from 'components/Misc/VulnBadge'
 
@@ -94,6 +82,7 @@ const PartsColumns = (
                 <Stack spacing={1} direction='column'>
                   <Link to={link} replace>
                     <Text
+                      data-testid={`sbom_part`}
                       sx={{ fontSize: 14, color: primaryBlueText }}
                       onClick={() => {
                         onSelectPart(part)
@@ -269,11 +258,13 @@ const PartsColumns = (
                 as={IconButton}
                 icon={<FaEllipsisV />}
                 variant='none'
+                data-testid='part-actions'
                 color={secondaryTextColor}
               />
               <Portal>
                 <MenuList size='sm'>
                   <MenuItem
+                    data-testid='delete_part'
                     isDisabled={!updateSboms || signedUrlParams}
                     onClick={() => {
                       setActiveRow(row)

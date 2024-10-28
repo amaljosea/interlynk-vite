@@ -22,6 +22,7 @@ const PartsSubHeader = (isArchived, onOpen, signedUrlParams, updateSboms) => {
             colorScheme='blue'
             icon={<AddIcon />}
             hidden={isArchived}
+            aria-label='add_part'
             sx={{ fontSize: 'sm', fontWeight: 'normal' }}
             isDisabled={!updateSboms || signedUrlParams}
           />

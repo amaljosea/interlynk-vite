@@ -3,20 +3,12 @@ import { useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { capitalizeFirstLetter, customStyles, envOrderList } from 'utils'
-import { isDefaultEnv, truncatedValue } from 'utils'
-import { getSignedUrlParams } from 'utils'
+import { getSignedUrlParams, isDefaultEnv, truncatedValue } from 'utils'
 import { ProductGeneralTabs } from 'utils/TabsObjects'
 
-import {
-  Flex,
-  FormControl,
-  FormLabel,
-  Select,
-  Stack,
-  Text,
-  useColorMode,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Flex, Stack, Text } from '@chakra-ui/react'
+import { useColorMode, useDisclosure } from '@chakra-ui/react'
+import { FormControl, FormLabel, Select } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
@@ -42,7 +34,13 @@ import PartsSubHeader from './Components/tableSubHeaders/PartsSubHeader'
 
 const LynkSelect = ({ name, value, onChange, children }) => {
   return (
-    <Select name={name} value={value} fontSize={'sm'} onChange={onChange}>
+    <Select
+      name={name}
+      value={value}
+      fontSize={'sm'}
+      onChange={onChange}
+      data-testid={`part_${name}`}
+    >
       <option value={''}>-- Select --</option>
       {children}
     </Select>
@@ -335,7 +333,7 @@ const Parts = ({ data }) => {
           <Stack spacing={4} direction={'column'} gap={2}>
             {/* PROJECTS */}
             <FormControl fontSize={'sm'} isRequired>
-              <FormLabel htmlFor='product' fontSize={12}>
+              <FormLabel htmlFor='groups' fontSize={12}>
                 Product
               </FormLabel>
               <LynkSelect
@@ -354,11 +352,11 @@ const Parts = ({ data }) => {
             </FormControl>
             {/* ENVIRONMENTS */}
             <FormControl fontSize={'sm'} isRequired>
-              <FormLabel htmlFor='product' fontSize={12}>
+              <FormLabel htmlFor='products' fontSize={12}>
                 Environment
               </FormLabel>
               <LynkSelect
-                name='product'
+                name='products'
                 value={selectedProd}
                 onChange={handleSelectProduct}
               >
