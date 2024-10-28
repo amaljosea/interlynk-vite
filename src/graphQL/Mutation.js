@@ -2316,6 +2316,7 @@ export const RequestUploadSbom = gql`
 export const RequestValidate = gql`
   mutation RequestValidate($id: Uuid!, $token: String!) {
     requestValidate(input: { id: $id, token: $token }) {
+      errors
       request {
         id
         email
@@ -2323,8 +2324,15 @@ export const RequestValidate = gql`
         productVersion
         requestedAt
         status
+        organization {
+          email
+          name
+        }
+        requester {
+          email
+          name
+        }
       }
-      errors
     }
   }
 `

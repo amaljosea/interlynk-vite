@@ -105,7 +105,7 @@ const SbomUpload = () => {
     <Flex alignItems='center' justifyContent='center'>
       {!uploadSuccessView && !uploadFailureView && (
         <Flex alignItems='center' justifyContent='center'>
-          <Stack textAlign='center' gap={'20px'} width={'392px'}>
+          <Stack textAlign='center' gap={'20px'}>
             <Stack>
               <Text
                 fontSize='20px'
@@ -119,8 +119,9 @@ const SbomUpload = () => {
                 fontWeight='400'
                 textColor={secondaryTextColor}
               >
-                An SBOM has been requested for Product -{' '}
-                {requestData?.productName} and Version -{' '}
+                {requestData?.requester?.name} at{' '}
+                {requestData?.organization?.name} has requested an SBOM for
+                Product - {requestData?.productName} and Version -{' '}
                 {requestData?.productVersion}.
               </Text>
             </Stack>
