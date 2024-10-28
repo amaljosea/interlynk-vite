@@ -158,6 +158,7 @@ const SupportTable = ({
             <Tooltip label='Create Support'>
               <IconButton
                 colorScheme='blue'
+                aria-label='add_support'
                 isDisabled={!editSup}
                 onClick={() => {
                   setActiveRow(null)
@@ -206,6 +207,7 @@ const SupportTable = ({
         return (
           <LynkSwitch
             size='md'
+            name={`support active ${row?.productName}`}
             isDisabled={!editSup}
             isChecked={enabled}
             onChange={() => {
@@ -338,11 +340,13 @@ const SupportTable = ({
               icon={<FaEllipsisV />}
               variant='none'
               color={secondaryTextColor}
+              aria-label={`support action ${row?.productName}`}
             />
             <Portal>
               <MenuList fontSize={'sm'}>
                 {/* EDIT SUPPORT */}
                 <MenuItem
+                  aria-label={`support edit ${row?.productName}`}
                   isDisabled={!editSup}
                   onClick={() => {
                     setActiveRow(row)
@@ -353,6 +357,7 @@ const SupportTable = ({
                 </MenuItem>
                 {/* DELETE SUPPORT  */}
                 <MenuItem
+                  aria-label={`support delete ${row?.productName}`}
                   color={primaryErrorColor}
                   isDisabled={!archiveSup}
                   onClick={() => {
