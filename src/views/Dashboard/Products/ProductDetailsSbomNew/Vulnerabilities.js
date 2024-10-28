@@ -549,11 +549,9 @@ const Vulnerabilities = ({ sbomData }) => {
           <Tag
             size='md'
             variant='subtle'
-            sx={{
-              w: '80px',
-              bg: sevColor(vuln?.sev).bg,
-              color: sevColor(vuln?.sev).text
-            }}
+            w='80px'
+            bg={vuln?.sev && sevColor(vuln?.sev).bg}
+            color={vuln?.sev && sevColor(vuln?.sev).text}
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}
