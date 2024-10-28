@@ -149,13 +149,14 @@ const General = ({ data, loading, error }) => {
     return result?.desc
   }
 
-  const ActiveBtn = ({ children, color, onClick, editable }) => {
+  const ActiveBtn = ({ children, label, color, onClick, editable }) => {
     return (
       <Button
         size='xs'
         onClick={onClick}
         variant='unstyled'
         hidden={isArchived}
+        aria-label={label}
         sx={{ color: color, ml: editable ? 1 : 0 }}
         leftIcon={editable ? <FaPen /> : <AddIcon />}
         isDisabled={customerView || !editSboms}
@@ -272,6 +273,7 @@ const General = ({ data, loading, error }) => {
                     </Tag>
                   ))}
                   <ActiveBtn
+                    label={'add_tool'}
                     onClick={TOOL?.onOpen}
                     color={
                       tools?.length > 0 ? sameSecondaryText : primaryBlueText
@@ -311,6 +313,7 @@ const General = ({ data, loading, error }) => {
                     </Tag>
                   ))}
                   <ActiveBtn
+                    label={'add_author'}
                     onClick={AUTHOR?.onOpen}
                     color={
                       authors?.length > 0 ? sameSecondaryText : primaryBlueText
@@ -362,10 +365,12 @@ const General = ({ data, loading, error }) => {
                       as={FaPen}
                       _hover={{ opacity: 1 }}
                       onClick={onLicenseOpen}
+                      data-testid='edit_license'
                       hidden={!updateComponent || isArchived}
                       sx={{ fontSize: 12, cursor: 'pointer', opacity: 0.5 }}
                     />
                     <TagCloseButton
+                      data-testid='delete_license'
                       onClick={DELETE_LICENSE?.onOpen}
                       hidden={!updateComponent || isArchived}
                     />

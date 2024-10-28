@@ -1,0 +1,248 @@
+import * as dotenv from 'dotenv'
+import * as path from 'path'
+import { Page, expect } from '@playwright/test'
+
+import { getFileNamesFromResource } from '../utils/utils'
+
+dotenv.config({ path: '.env' })
+
+const errors: string[] = []
+
+export default class GeneralSection {
+  page: Page
+
+  constructor(page: Page) {
+    this.page = page
+  }
+
+  // TOOLS
+  public async tools() {
+    try {
+      await this.page.locator("//a[@aria-label='products']").click()
+
+      await this.page.locator("//button[@aria-label='Add product']").click()
+      await this.page.getByPlaceholder('Add product name').fill('Test')
+      await this.page
+        .getByPlaceholder('Add product description')
+        .fill('for testing')
+      await this.page.locator("button[type='submit']").click()
+
+      await this.page.waitForTimeout(3000)
+
+      const product = this.page
+        .locator(`//p[@aria-label='product_name']`)
+        .nth(0)
+
+      if (product.isVisible()) {
+        await this.page.getByLabel('Dropdown menu for Test').click()
+        await this.page.getByRole('menuitem', { name: 'upload_sbom' }).click()
+
+        const jsonFiles = getFileNamesFromResource('.json')
+
+        const sbom = path.resolve(__dirname, '../resources', jsonFiles[0])
+        await this.page.locator("//input[@id='fileInput']").setInputFiles(sbom)
+        await this.page.waitForTimeout(2000)
+
+        await this.page.locator("button[type='submit']").click()
+        await this.page.waitForTimeout(2000)
+
+        await product.click()
+        await this.page.waitForTimeout(2000)
+
+        const version = this.page.getByTestId('version').nth(0)
+
+        if (version.isVisible()) {
+          await version.click()
+          await this.page.waitForTimeout(2000)
+
+          await this.page.locator(`//button[@aria-label='add_tool']`).click()
+          await this.page.getByPlaceholder('Add vendor').fill('SPDX')
+          await this.page.getByPlaceholder('Add name').fill('Maven')
+          await this.page.getByPlaceholder('Add version').fill('4.5.6')
+          await this.page.getByRole('button', { name: 'Save' }).click()
+          await this.page.waitForTimeout(3000)
+
+          await this.page.getByLabel('close').nth(1).click()
+          await this.page.waitForTimeout(3000)
+
+          await this.page.getByRole('button', { name: 'Yes' }).click()
+          await this.page.waitForTimeout(3000)
+        } else {
+          errors.push('Version not found')
+        }
+      } else {
+        errors.push('Product not found')
+      }
+
+      await this.page.waitForTimeout(2000)
+      expect(errors.length).toBe(0)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  // AUTHOR
+  public async author() {
+    try {
+      await this.page.locator("//a[@aria-label='products']").click()
+
+      const product = this.page
+        .locator(`//p[@aria-label='product_name']`)
+        .nth(0)
+
+      if (product.isVisible()) {
+        await product.click()
+        await this.page.waitForTimeout(2000)
+
+        const version = this.page.getByTestId('version').nth(0)
+
+        if (version.isVisible()) {
+          await version.click()
+          await this.page.waitForTimeout(2000)
+
+          await this.page.locator(`//button[@aria-label='add_author']`).click()
+          await this.page.getByPlaceholder('Add name').fill('Abhisek Paul')
+          await this.page
+            .getByPlaceholder('Add email address')
+            .fill('abhisek@sofueled.com')
+          await this.page.getByRole('button', { name: 'Save' }).click()
+          await this.page.waitForTimeout(3000)
+
+          await this.page
+            .getByRole('row', { name: 'Authors Abhisek Paul -' })
+            .getByLabel('close')
+            .click()
+          await this.page.getByRole('button', { name: 'Yes' }).click()
+          await this.page.waitForTimeout(3000)
+        } else {
+          errors.push('Version not found')
+        }
+      } else {
+        errors.push('Product not found')
+      }
+
+      await this.page.waitForTimeout(2000)
+      expect(errors.length).toBe(0)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  // SUPPLIER
+  public async supplier() {
+    try {
+      await this.page.locator("//a[@aria-label='products']").click()
+
+      const product = this.page
+        .locator(`//p[@aria-label='product_name']`)
+        .nth(0)
+
+      if (product.isVisible()) {
+        await product.click()
+        await this.page.waitForTimeout(2000)
+
+        const version = this.page.getByTestId('version').nth(0)
+
+        if (version.isVisible()) {
+          await version.click()
+          await this.page.waitForTimeout(2000)
+
+          await this.page.getByRole('button', { name: 'Add Supplier' }).click()
+          await this.page
+            .getByPlaceholder('Enter organization name')
+            .fill('Micorosft')
+          await this.page.getByRole('button', { name: 'Save' }).click()
+          await this.page.waitForTimeout(3000)
+
+          await this.page
+            .getByRole('gridcell', { name: 'Micorosft close' })
+            .locator('path')
+            .first()
+            .click()
+          await this.page
+            .getByPlaceholder('Enter URL')
+            .fill('https://microsoft.com')
+          await this.page.getByRole('button', { name: 'Update' }).click()
+          await this.page.waitForTimeout(3000)
+
+          await this.page
+            .getByRole('gridcell', { name: 'Micorosft close' })
+            .getByLabel('close')
+            .click()
+          await this.page.getByRole('button', { name: 'Yes' }).click()
+          await this.page.waitForTimeout(3000)
+        } else {
+          errors.push('Version not found')
+        }
+      } else {
+        errors.push('Product not found')
+      }
+
+      await this.page.waitForTimeout(2000)
+      expect(errors.length).toBe(0)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  // LICENSE
+  public async license() {
+    try {
+      await this.page.locator("//a[@aria-label='products']").click()
+
+      const product = this.page
+        .locator(`//p[@aria-label='product_name']`)
+        .nth(0)
+
+      if (product.isVisible()) {
+        await product.click()
+        await this.page.waitForTimeout(2000)
+
+        const version = this.page.getByTestId('version').nth(0)
+
+        if (version.isVisible()) {
+          await version.click()
+          await this.page.waitForTimeout(2000)
+
+          await this.page.getByRole('button', { name: 'Add License' }).click()
+          await this.page.getByRole('combobox').fill('ap')
+          await this.page.waitForTimeout(3000)
+          await this.page.keyboard.press('Enter')
+          await this.page.waitForTimeout(3000)
+
+          await this.page.locator("button[type='submit']").click()
+          await this.page.waitForTimeout(3000)
+
+          await this.page.getByTestId('edit_license').click()
+          await this.page.getByRole('combobox').fill('mit')
+          await this.page.waitForTimeout(3000)
+          await this.page.keyboard.press('Enter')
+
+          await this.page.locator("button[type='submit']").click()
+          await this.page.waitForTimeout(3000)
+
+          await this.page.getByTestId('delete_license').click()
+          await this.page.locator("button[type='submit']").click()
+          await this.page.waitForTimeout(3000)
+
+          await this.page.locator("//a[@aria-label='products']").click()
+          await this.page.getByTestId('product-actions').first().click()
+
+          await this.page.waitForTimeout(2000)
+
+          await this.page.getByTestId('delete_product').first().click()
+          await this.page.locator("button[type='submit']").click()
+        } else {
+          errors.push('Version not found')
+        }
+      } else {
+        errors.push('Product not found')
+      }
+
+      await this.page.waitForTimeout(2000)
+      expect(errors.length).toBe(0)
+    } catch (error) {
+      throw error
+    }
+  }
+}
