@@ -4,21 +4,9 @@ import { useParams } from 'react-router-dom'
 import { convertToCSV, downloadCSV, generateCsvFileName } from 'utils'
 import { exportCsvTableConfig } from 'variables/general'
 
-import {
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  Flex,
-  Radio,
-  RadioGroup,
-  Stack,
-  Tag,
-  TagCloseButton,
-  TagLabel,
-  Text,
-  Wrap
-} from '@chakra-ui/react'
+import { Box, Button, Divider, Flex, Stack, Text, Wrap } from '@chakra-ui/react'
+import { Checkbox, Radio, RadioGroup } from '@chakra-ui/react'
+import { Tag, TagCloseButton, TagLabel } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
@@ -42,14 +30,16 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
     secondaryBgColor,
     sameSecondaryText,
     customLightBlue,
-    customDarkBlue
+    customDarkBlue,
+    grayBorderColor
   } = useThemeColor([
     'primaryTextColor',
     'secondaryBgColor',
     'sameSecondaryText',
     'lightBlueBg',
     'customLightBlue',
-    'customDarkBlue'
+    'customDarkBlue',
+    'grayBorderColor'
   ])
 
   const [rowsToExport, setRowsToExport] = useState('200')
@@ -175,106 +165,91 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   }
 
   return (
-    <>
-      {isOpen && (
-        <LynkModal
-          isOpen={isOpen}
-          onClose={onClose}
-          buttonText='Download'
-          onSubmit={handleExport}
-          title='Export CSV'
-          Icon={FaFileCsv}
-          isLoading={isLoading}
+    <LynkModal
+      isOpen={isOpen}
+      onClose={onClose}
+      buttonText='Download'
+      onSubmit={handleExport}
+      title='Export CSV'
+      Icon={FaFileCsv}
+      isLoading={isLoading}
+    >
+      <Flex direction='column' gap={4}>
+        {tableType && (
+          <Box>
+            <Tag colorScheme='cyan'>{tableType}</Tag>
+          </Box>
+        )}
+        <Checkbox
+          mt={1}
+          size='md'
+          colorScheme='blue'
+          isChecked={applyFilters}
+          onChange={() => setApplyFilters(!applyFilters)}
         >
-          <Flex direction='column' gap={4}>
-            {tableType && (
-              <Box>
-                <Tag colorScheme='cyan'>{tableType}</Tag>
-              </Box>
+          <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
+            Apply search and filters
+          </Text>
+        </Checkbox>
+        <Box>
+          <Text fontSize='14px' fontWeight='500' mb={2}>
+            Rows To Export
+          </Text>
+          <RadioGroup onChange={setRowsToExport} value={rowsToExport}>
+            <Stack direction='row' spacing={8}>
+              {['200', '25', '50', '100'].map((item, index) => (
+                <Radio key={index} value={item} colorScheme='blue'>
+                  {item === '200' ? 'All' : item}
+                </Radio>
+              ))}
+            </Stack>
+          </RadioGroup>
+        </Box>
+        <Divider />
+        <Box>
+          <Text fontSize='14px' fontWeight='500' mb={2}>
+            Columns To Export
+          </Text>
+          <Wrap
+            border={`1px solid ${grayBorderColor}`}
+            sx={{ mb: 4, p: '10px', borderRadius: '10px' }}
+          >
+            {selectedColumns.length === 0 && (
+              <Text color={sameSecondaryText} fontSize='sm'>
+                No columns selected
+              </Text>
             )}
-            <Checkbox
-              mt={1}
-              size='md'
-              colorScheme='blue'
-              isChecked={applyFilters}
-              onChange={() => setApplyFilters(!applyFilters)}
-            >
-              <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
-                Apply search and filters
-              </Text>
-            </Checkbox>
-            <Box>
-              <Text fontSize='14px' fontWeight='500' mb={2}>
-                Rows To Export
-              </Text>
-              <RadioGroup onChange={setRowsToExport} value={rowsToExport}>
-                <Stack direction='row' spacing={8}>
-                  <Radio value='200' colorScheme='blue'>
-                    All
-                  </Radio>
-                  <Radio value='25' colorScheme='blue'>
-                    25
-                  </Radio>
-                  <Radio value='50' colorScheme='blue'>
-                    50
-                  </Radio>
-                  <Radio value='100' colorScheme='blue'>
-                    100
-                  </Radio>
-                </Stack>
-              </RadioGroup>
-            </Box>
-            <Divider />
-            <Box>
-              <Text fontSize='14px' fontWeight='500' mb={2}>
-                Columns To Export
-              </Text>
-              <Wrap
-                mb={4}
-                border='1px solid #DDE3EC'
-                borderRadius='4px'
-                padding='10px'
+            {selectedColumns.map((column, index) => (
+              <Tag
+                size='sm'
+                key={index}
+                variant='solid'
+                sx={{ borderRadius: '4px', bg: customLightBlue }}
               >
-                {selectedColumns.length === 0 && (
-                  <Text color={sameSecondaryText} fontSize='sm'>
-                    No columns selected
-                  </Text>
-                )}
-                {selectedColumns.map((column, index) => (
-                  <Tag
-                    size='sm'
-                    key={index}
-                    borderRadius='4px'
-                    variant='solid'
-                    bg={customLightBlue}
-                  >
-                    <TagLabel color={customDarkBlue}>{column}</TagLabel>
-                    <TagCloseButton
-                      color={customDarkBlue}
-                      fontWeight='500'
-                      onClick={() => removeColumn(column)}
-                    />
-                  </Tag>
-                ))}
-              </Wrap>
-              <Wrap spacing={3}>
-                {availableColumns.map((column, index) => (
-                  <Button
-                    key={index}
-                    size='xs'
-                    colorScheme='gray'
-                    onClick={() => addColumn(column)}
-                    bg={secondaryBgColor}
-                  >
-                    + {column}
-                  </Button>
-                ))}
-              </Wrap>
-            </Box>
-          </Flex>
-        </LynkModal>
-      )}
-    </>
+                <TagLabel color={customDarkBlue}>{column}</TagLabel>
+                <TagCloseButton
+                  sx={{ fontWeight: '500', color: customDarkBlue }}
+                  onClick={() => removeColumn(column)}
+                />
+              </Tag>
+            ))}
+          </Wrap>
+          <Wrap spacing={3}>
+            {availableColumns.map((column, index) => (
+              <Button
+                key={index}
+                size='xs'
+                colorScheme='gray'
+                onClick={() => addColumn(column)}
+                bg={secondaryBgColor}
+              >
+                + {column}
+              </Button>
+            ))}
+          </Wrap>
+        </Box>
+      </Flex>
+    </LynkModal>
   )
 }
 
