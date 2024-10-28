@@ -77,3 +77,56 @@ export const getFileNamesFromResource = (
     return []
   }
 }
+
+export const generateRandomEmail = () => {
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  const domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com']
+
+  const usernameLength = Math.floor(Math.random() * 8) + 5
+  let username = ''
+  for (let i = 0; i < usernameLength; i++) {
+    username += characters.charAt(Math.floor(Math.random() * characters.length))
+  }
+
+  const domain = domains[Math.floor(Math.random() * domains.length)]
+
+  return `${username}@${domain}`
+}
+
+export const randomProductName = () => {
+  const adjectives = [
+    'Sleek',
+    'Compact',
+    'Portable',
+    'Ultimate',
+    'Advanced',
+    'Premium',
+    'Eco',
+    'Smart',
+    'Efficient',
+    'Robust',
+    'Versatile',
+    'Dynamic',
+    'Modern'
+  ]
+
+  const nouns = [
+    'Gadget',
+    'Device',
+    'Tool',
+    'Machine',
+    'System',
+    'Appliance',
+    'Solution',
+    'Gear',
+    'Instrument',
+    'Platform',
+    'Accessory',
+    'Utility',
+    'Item'
+  ]
+
+  const adjective = adjectives[Math.floor(Math.random() * adjectives.length)]
+  const noun = nouns[Math.floor(Math.random() * nouns.length)]
+  return `${adjective} ${noun}`
+}

@@ -167,6 +167,7 @@ const RequestTable = ({
                 setActiveRow(null)
                 onOpen()
               }}
+              aria-label='request_sbom'
               icon={<FaPlus />}
             />
           </Tooltip>
@@ -243,7 +244,11 @@ const RequestTable = ({
     {
       id: 'EMAIL',
       name: 'EMAIL',
-      selector: (row) => <Text color={primaryTextColor}>{row?.email}</Text>
+      selector: (row) => (
+        <Text color={primaryTextColor} data-testid='request_id'>
+          {row?.email}
+        </Text>
+      )
     },
     {
       id: 'PRODUCT',
@@ -309,6 +314,7 @@ const RequestTable = ({
               icon={<FaEllipsisV />}
               variant='none'
               color={secondaryTextColor}
+              aria-label={`req action for ${row?.email}`}
             />
             <Portal>
               <MenuList fontSize={'sm'}>
@@ -320,6 +326,7 @@ const RequestTable = ({
                 </MenuItem>
                 <MenuItem
                   isDisabled={!addReq}
+                  aria-label={`resend req ${row?.email}`}
                   onClick={() => handleResend(row)}
                 >
                   Resend
@@ -331,6 +338,7 @@ const RequestTable = ({
                     row.status === 'Canceled' ||
                     row.status === 'Declined'
                   }
+                  aria-label={`cancel req ${row?.email}`}
                   color={primaryErrorColor}
                   onClick={() => {
                     onWarningOpen()
