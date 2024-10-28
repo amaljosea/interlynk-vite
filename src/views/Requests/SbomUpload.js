@@ -138,7 +138,9 @@ const SbomUpload = () => {
 
             <Stack>
               <Button
-                isDisabled={selectedFile === null || errorMessage !== ''}
+                isDisabled={
+                  selectedFile === null || errorMessage !== '' || loading
+                }
                 onClick={() => handleUploadRequestSbom(selectedFile)}
                 colorScheme={'blue'}
               >
