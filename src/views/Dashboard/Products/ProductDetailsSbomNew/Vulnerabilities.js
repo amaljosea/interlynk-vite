@@ -313,18 +313,42 @@ const Vulnerabilities = ({ sbomData }) => {
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
-
-  const range = {
-    min: parseFloat(vulnEpss[0]) / 100,
-    max: parseFloat(vulnEpss[1]) / 100
-  }
-
   const { data: allCdx } = useQuery(GetCdxResponses)
 
-  const orderBy = {
-    field: prodVulnState?.field,
-    direction: prodVulnState?.direction
+  const setKEV = (kev) => {
+    if (kev === 'all' || kev === '') {
+      return undefined
+    } else if (kev === 'yes') {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  const setOrder = useMemo(
+    () => (value) => {
+      if (value === '') {
+        return {
+          field: prodVulnState?.field,
+          direction: prodVulnState?.direction
+        }
+      } else {
+        return undefined
+      }
+    },
+    [prodVulnState?.direction, prodVulnState?.field]
+  )
+
+  const setEPSS = (epss) => {
+    const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
+    if (epss !== '' && epss !== 'all') {
+      return {
+        min: parseFloat(vulnEpss[0]) / 100,
+        max: parseFloat(vulnEpss[1]) / 100
+      }
+    } else {
+      return undefined
+    }
   }
 
   const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
@@ -341,17 +365,12 @@ const Vulnerabilities = ({ sbomData }) => {
         source: include.includes('parts') ? undefined : 'COMPONENT',
         componentName: components.length > 0 ? components : undefined,
         status: statues.length > 0 ? statues : undefined,
-        kev:
-          kev === 'all' || kev === ''
-            ? undefined
-            : kev === 'yes'
-              ? true
-              : false,
-        epss: epss !== '' && epss !== 'all' ? range : undefined,
+        kev: setKEV(kev),
+        epss: setEPSS(epss),
         direct: direct === 'direct only' ? true : undefined,
         includeRetracted: include.includes('retracted') ? true : false,
         vexComplete: vexComplete === 'all' ? undefined : false,
-        orderBy: searchInput === '' ? orderBy : undefined
+        orderBy: setOrder(searchInput)
       }
     }
   )
@@ -684,6 +703,7 @@ const Vulnerabilities = ({ sbomData }) => {
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}
+            data-testid='vexStatus'
             colorScheme={statusColor(
               vexStatus ? vexStatus.name : 'Unspecified'
             )}
@@ -774,11 +794,13 @@ const Vulnerabilities = ({ sbomData }) => {
                 aria-label='Options'
                 icon={<FaEllipsisV />}
                 variant='none'
+                data-testid='vuln-actions'
                 color={secondaryTextColor}
               />
               <Portal>
                 <MenuList fontSize='sm'>
                   <MenuItem
+                    data-testid='edit_vuln_links'
                     isDisabled={!editVulns}
                     onClick={() => {
                       setActiveRow(row)
@@ -920,6 +942,7 @@ const Vulnerabilities = ({ sbomData }) => {
                 prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
                 IMPORT.onOpen()
               }}
+              aria-label='import_status'
               hidden={signedUrlParams || isArchived}
               isDisabled={!editVulns}
               icon={<FaCopy size={18} />}
@@ -934,17 +957,12 @@ const Vulnerabilities = ({ sbomData }) => {
               source: include.includes('parts') ? undefined : 'COMPONENT',
               componentName: components.length > 0 ? components : undefined,
               status: statues.length > 0 ? statues : undefined,
-              kev:
-                kev === 'all' || kev === ''
-                  ? undefined
-                  : kev === 'yes'
-                    ? true
-                    : false,
-              epss: epss !== '' && epss !== 'all' ? range : undefined,
+              kev: setKEV(kev),
+              epss: setEPSS(epss),
               direct: direct === 'direct only' ? true : undefined,
               includeRetracted: include.includes('retracted') ? true : false,
               vexComplete: vexComplete === 'all' ? undefined : false,
-              orderBy: searchInput === '' ? orderBy : undefined
+              orderBy: setOrder(searchInput)
             }}
           />
           {/* REFRESH */}
@@ -953,19 +971,29 @@ const Vulnerabilities = ({ sbomData }) => {
       </Flex>
     )
   }, [
-    editVulns,
-    handleClear,
-    handleScan,
-    handleSearch,
-    VEX,
-    isArchived,
+    vulnSearch,
     onSearchInputChange,
-    IMPORT,
-    prodVulnDispatch,
-    reset,
+    handleSearch,
+    handleClear,
     selectedVulns.length,
+    VEX.onOpen,
+    editVulns,
     signedUrlParams,
-    vulnSearch
+    handleScan,
+    isArchived,
+    searchInput,
+    severities,
+    include,
+    components,
+    statues,
+    kev,
+    epss,
+    direct,
+    vexComplete,
+    setOrder,
+    reset,
+    prodVulnDispatch,
+    IMPORT
   ])
 
   const handleSort = (column, sortDirection) => {

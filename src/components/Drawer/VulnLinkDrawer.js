@@ -30,8 +30,6 @@ import {
   Tr
 } from '@chakra-ui/react'
 
-import LynkAlert from 'components/LynkAlert'
-
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ComponentVulnUpdate } from 'graphQL/Mutation'
@@ -193,11 +191,13 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
           {data && <Tag colorScheme='blue'>{vuln?.vulnId}</Tag>}
         </DrawerHeader>
         <DrawerBody>
-          {error !== '' && <LynkAlert msg={error} />}
           <form onSubmit={handleLinkAdd}>
-            <Flex mt={4} direction={'column'} alignItems={'flex-start'} gap={3}>
+            <Flex
+              alignItems={'flex-start'}
+              sx={{ mt: 4, gap: 3, flexDir: 'column' }}
+            >
               {/* NAME */}
-              <FormControl isRequired>
+              <FormControl isRequired isInvalid={error !== ''}>
                 <FormLabel>Type</FormLabel>
                 <Select value={type} onChange={handleTypeChange}>
                   <option value=''>-- Select --</option>
@@ -212,6 +212,9 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
                     </option>
                   ))}
                 </Select>
+                <FormErrorMessage data-testid='vuln_link_error'>
+                  {error}
+                </FormErrorMessage>
               </FormControl>
               {/* URL */}
               <FormControl
@@ -272,6 +275,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
                                 as={DeleteIcon}
                                 color={primaryErrorColor}
                                 cursor={'pointer'}
+                                data-testid='delete_vuln_link'
                                 display={isPart ? 'none' : 'block'}
                                 onClick={() => handleLinkRemove(item?.id)}
                               />
@@ -298,6 +302,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
                                 as={DeleteIcon}
                                 color={primaryErrorColor}
                                 cursor={'pointer'}
+                                data-testid='delete_vuln_link'
                                 onClick={() => handleLinkRemove(item?.id)}
                               />
                             </Td>
@@ -318,7 +323,12 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
           <Button variant='outline' mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button colorScheme='blue' onClick={handleSave} isLoading={loading}>
+          <Button
+            colorScheme='blue'
+            onClick={handleSave}
+            isLoading={loading}
+            aria-label='save_vuln_links'
+          >
             Save
           </Button>
         </DrawerFooter>
