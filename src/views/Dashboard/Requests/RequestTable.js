@@ -3,21 +3,10 @@ import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 
-import {
-  Flex,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-  Tag,
-  TagLabel,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Flex, IconButton, Menu, Portal, Stack, Text } from '@chakra-ui/react'
+import { Tooltip, useDisclosure } from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
+import { MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
@@ -38,13 +27,9 @@ import Filters from './Filters'
 import RequestAcceptModal from './RequestAcceptModal'
 import RequestModal from './RequestModal'
 
-const RequestTable = ({
-  data,
-  loading,
-  filters,
-  setFilters,
-  paginationProps
-}) => {
+const RequestTable = (props) => {
+  const { data, loading, filters, setFilters, paginationProps } = props
+  
   const { showToast } = useCustomToast()
 
   const addReq = useHasPermission({
@@ -156,7 +141,7 @@ const RequestTable = ({
             onFilter={handleSearch}
           />
           {/* FILTERS */}
-          <Filters setFilters={setFilters} data={data} />
+          <Filters setFilters={setFilters} />
         </Stack>
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
           <Tooltip label='Request SBOM'>
@@ -177,7 +162,6 @@ const RequestTable = ({
       </Flex>
     )
   }, [
-    data,
     addReq,
     filterText,
     handleClear,

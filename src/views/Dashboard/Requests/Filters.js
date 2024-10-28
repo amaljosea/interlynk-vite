@@ -1,21 +1,40 @@
+import { gql, useQuery } from '@apollo/client'
 import { useState } from 'react'
 
-import {
-  Box,
-  Menu,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
-  Stack
-} from '@chakra-ui/react'
+import { Box, Menu, Stack } from '@chakra-ui/react'
+import { MenuItemOption, MenuList, MenuOptionGroup } from '@chakra-ui/react'
 
-import CheckMark from 'components/Misc/CheckMark'
 import MenuHeading from 'components/Misc/MenuHeading'
 
-const Filters = ({ setFilters, data }) => {
-  const emailList = [...new Set(data?.map((item) => item.email))]
-  const productList = [...new Set(data?.map((item) => item.productName))]
-  const statusList = [...new Set(data?.map((item) => item.status))]
+export const GetAllRequests = gql`
+  query GetAllRequests(
+    $first: Int
+    $field: RequestOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    requests(first: $first, orderBy: { field: $field, direction: $direction }) {
+      nodes {
+        email
+        productName
+        status
+      }
+    }
+  }
+`
+
+const Filters = ({ setFilters }) => {
+  const { data } = useQuery(GetAllRequests, {
+    variables: {
+      first: 500,
+      field: 'REQUESTS_REQUESTED_AT',
+      direction: 'DESC'
+    }
+  })
+
+  const { nodes } = data?.requests || ''
+  const emailList = [...new Set(nodes?.map((item) => item?.email))]
+  const productList = [...new Set(nodes?.map((item) => item?.productName))]
+  const statusList = [...new Set(nodes?.map((item) => item?.status))]
 
   const [email, setEmail] = useState([])
   const [product, setProduct] = useState([])
@@ -50,13 +69,14 @@ const Filters = ({ setFilters, data }) => {
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* EMAILS */}
       <Box
-        width={'fit-content'}
-        position={'relative'}
         hidden={emailList?.length === 0}
+        sx={{ w: 'fit-content', pos: 'relative' }}
       >
         <Menu closeOnSelect={false}>
-          {email.length !== 0 && !email.includes('all') && <CheckMark />}
-          <MenuHeading title={'Email'} />
+          <MenuHeading
+            title={'Email'}
+            active={email.length !== 0 && !email.includes('all')}
+          />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
@@ -74,13 +94,14 @@ const Filters = ({ setFilters, data }) => {
       </Box>
       {/* PRODUCTS */}
       <Box
-        width={'fit-content'}
-        position={'relative'}
         hidden={productList?.length === 0}
+        sx={{ w: 'fit-content', pos: 'relative' }}
       >
         <Menu closeOnSelect={false}>
-          {product.length !== 0 && !product.includes('all') && <CheckMark />}
-          <MenuHeading title={'Product'} />
+          <MenuHeading
+            title={'Product'}
+            active={product.length !== 0 && !product.includes('all')}
+          />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
@@ -98,13 +119,14 @@ const Filters = ({ setFilters, data }) => {
       </Box>
       {/* STATUS */}
       <Box
-        width={'fit-content'}
-        position={'relative'}
         hidden={statusList?.length === 0}
+        sx={{ w: 'fit-content', pos: 'relative' }}
       >
         <Menu closeOnSelect={false}>
-          {status.length !== 0 && !status.includes('all') && <CheckMark />}
-          <MenuHeading title={'Status'} />
+          <MenuHeading
+            title={'Status'}
+            active={status.length !== 0 && !status.includes('all')}
+          />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
