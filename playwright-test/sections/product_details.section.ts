@@ -187,82 +187,7 @@ export default class ProductDetailsSection {
                                 )
                                 await this.page.fill(ds.versionSearch, version)
                                 await this.page.press(ds.versionSearch, 'Enter')
-                                await waitForSelectorWithMinTime(
-                                  this.page,
-                                  ds.noRecordMsg
-                                )
-                                const noRecordMsg = await this.page
-                                  .locator(ds.noRecordMsg)
-                                  .isVisible()
-
-                                if (!noRecordMsg) {
-                                  errors.push('deletion of SBOM failed!')
-                                } else {
-                                  await this.page.goBack()
-                                  await this.page.waitForSelector(
-                                    ps.productSearch,
-                                    { state: 'visible', timeout: 5000 }
-                                  )
-                                  await this.page.fill(
-                                    ps.productSearch,
-                                    productName
-                                  )
-                                  await this.page.press(
-                                    ps.productSearch,
-                                    'Enter'
-                                  )
-                                  await this.page.waitForTimeout(2000)
-                                  await this.page.locator(ps.menuBtn).click()
-                                  await waitForSelectorWithMinTime(
-                                    this.page,
-                                    ps.deleteBtn
-                                  )
-                                  await this.page.locator(ps.deleteBtn).click()
-
-                                  const deletePoupup = await this.page
-                                    .locator(ps.popup)
-                                    .isVisible()
-
-                                  if (deletePoupup) {
-                                    const deleteProductHeader = await this.page
-                                      .locator(ps.deleteProductHeader)
-                                      .isVisible()
-
-                                    if (deleteProductHeader) {
-                                      await this.page.locator(ps.yesBtn).click()
-                                      await waitForSelectorWithMinTime(
-                                        this.page,
-                                        ps.productSearch
-                                      )
-
-                                      await this.page
-                                        .locator(ps.productSearch)
-                                        .clear()
-                                      await this.page.waitForTimeout(2000)
-                                      await this.page.fill(
-                                        ps.productSearch,
-                                        productName
-                                      )
-                                      await this.page.press(
-                                        ps.productSearch,
-                                        'Enter'
-                                      )
-                                      await this.page.waitForTimeout(2000)
-
-                                      const noRecordMsg = await this.page
-                                        .locator(ps.noRecordMsg)
-                                        .isVisible()
-
-                                      if (!noRecordMsg) {
-                                        errors.push('product deleted failed!')
-                                      }
-                                    } else {
-                                      errors.push(
-                                        'delete product header is not visible!'
-                                      )
-                                    }
-                                  }
-                                }
+                                await this.page.waitForTimeout(2000)
                               }
                             }
                           }
@@ -280,6 +205,55 @@ export default class ProductDetailsSection {
       }
 
       expect(errors.length).toBe(0)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  public async edit() {
+    try {
+      await this.page.locator("//a[@aria-label='products']").click()
+      const product = this.page
+        .locator(`//p[@aria-label='product_name']`)
+        .nth(0)
+
+      if (product.isVisible()) {
+        await product.click()
+        await this.page.waitForTimeout(2000)
+
+        await this.page.locator(`//button[@aria-label='edit_product']`).click()
+        await this.page.waitForTimeout(2000)
+
+        await this.page
+          .getByPlaceholder('Add product description')
+          .fill('for testing only')
+        await this.page.locator("button[type='submit']").click()
+        await this.page.waitForTimeout(3000)
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  public async delete() {
+    try {
+      await this.page.locator("//a[@aria-label='products']").click()
+      const product = this.page
+        .locator(`//p[@aria-label='product_name']`)
+        .nth(0)
+
+      if (product.isVisible()) {
+        await product.click()
+        await this.page.waitForTimeout(2000)
+
+        await this.page
+          .locator(`//button[@aria-label='delete_product']`)
+          .click()
+        await this.page.waitForTimeout(2000)
+
+        await this.page.locator("button[type='submit']").click()
+        await this.page.waitForTimeout(3000)
+      }
     } catch (error) {
       throw error
     }

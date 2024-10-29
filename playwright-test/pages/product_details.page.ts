@@ -10,7 +10,16 @@ export default class ProductDetailsPage {
     this.page = page
     this.productDetailsSection = new ProductDetailsSection(this.page)
   }
+
   public async productUploadDeleteFunctionality() {
     await this.productDetailsSection.productUplaodDelete()
+  }
+
+  public async editProduct() {
+    await this.productDetailsSection.edit()
+  }
+
+  public async deleteProduct() {
+    await this.productDetailsSection.delete()
   }
 }

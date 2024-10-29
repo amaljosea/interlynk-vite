@@ -478,6 +478,7 @@ const ProductDetailsMain = () => {
                           !enabled || !updateProduct || signedUrlParams
                         }
                         colorScheme='blue'
+                        aria-label='edit_product'
                         onClick={PRODUCT.onOpen}
                         icon={<FaPenToSquare />}
                       />
@@ -509,6 +510,7 @@ const ProductDetailsMain = () => {
                     <Tooltip label='Delete Product'>
                       <IconButton
                         colorScheme='red'
+                        aria-label='delete_product'
                         onClick={DELETE.onOpen}
                         icon={<FaTrash />}
                         isDisabled={!archiveProduct || signedUrlParams}
