@@ -9,7 +9,7 @@ import ConfirmationModal from '../Products/components/ConfirmationModal'
 const DeleteModal = ({ isOpen, onClose, data }) => {
   const { showToast } = useCustomToast()
   const { id, name } = data
-  const [deletePolicy] = useMutation(PolicyDelete)
+  const [deletePolicy, { loading }] = useMutation(PolicyDelete)
 
   const onDeletePolicy = async () => {
     await deletePolicy({ variables: { id } }).then((res) => {
@@ -31,6 +31,7 @@ const DeleteModal = ({ isOpen, onClose, data }) => {
       onClose={onClose}
       onConfirm={onDeletePolicy}
       name={name}
+      isLoading={loading}
       title='Delete Policy'
       description='Deleting this policy will:'
       items={[

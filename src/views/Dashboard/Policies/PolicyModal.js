@@ -492,6 +492,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
               onChange={handleChange}
               value={formData?.resultType}
               placeholder={'-- select --'}
+              data-testid='policy_result_type'
             >
               {['INFORM', 'WARN', 'FAIL'].map((item, index) => (
                 <option
@@ -514,6 +515,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
               onChange={handleChange}
               value={formData?.operator}
               placeholder={'-- select --'}
+              data-testid='policy_result_condition'
             >
               {['ANY', 'ALL'].map((item, index) => (
                 <option
@@ -567,6 +569,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                           }
                           placeholder='-- subject --'
                           sx={{ paddingLeft: '34px' }}
+                          data-testid={`condition_subject_${index}`}
                         >
                           {categories.map((category) => (
                             <optgroup key={category} label={category}>
@@ -593,6 +596,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                         }
                         placeholder='-- operator --'
                         textTransform={'lowercase'}
+                        data-testid={`condition_operator_${index}`}
                       >
                         {item?.list?.map((option) => (
                           <option
@@ -951,6 +955,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
             onClick={addRow}
             colorScheme='blue'
             leftIcon={<FaPlus />}
+            data-testid='add_policy_condition'
             sx={{ fontSize: 'sm', fontWeight: 'medium', pl: '2px' }}
           >
             Add condition

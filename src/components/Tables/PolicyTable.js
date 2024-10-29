@@ -171,6 +171,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
             <IconButton
               hidden={productId}
               colorScheme='blue'
+              aria-label='add_policy'
               isDisabled={!updatePolicy}
               onClick={() => {
                 setActiveRow(null)
@@ -210,8 +211,8 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
     {
       id: 'POLICY',
       name: 'POLICY',
-      selector: (row) => (
-        <Text color={primaryTextColor} my={4}>
+      selector: (row, index) => (
+        <Text color={primaryTextColor} my={4} data-testid={`policy_${index}`}>
           {row?.name}
         </Text>
       ),
@@ -310,13 +311,14 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
     {
       id: 'ACTION',
       name: 'ACTION',
-      selector: (row) => {
+      selector: (row, index) => {
         return (
           <Menu>
             <MenuButton
               as={IconButton}
               icon={<FaEllipsisV />}
               variant='none'
+              data-testid={`policy_actions_${index}`}
               color={secondaryTextColor}
             />
             <Portal>
@@ -329,6 +331,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
                     setActiveRow(row)
                     onOpen()
                   }}
+                  data-testid={`policy_edit_${index}`}
                 >
                   Edit Policy
                 </MenuItem>
@@ -352,6 +355,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
                     onDeleteOpen()
                   }}
                   hidden={productId}
+                  data-testid={`policy_delete_${index}`}
                 >
                   Delete Policy
                 </MenuItem>
