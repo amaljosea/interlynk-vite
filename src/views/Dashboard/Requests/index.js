@@ -12,18 +12,21 @@ const Requests = () => {
     direction: 'DESC'
   })
 
-  const { nodes, paginationProps, reset } = usePaginatedQuery(GetRequests, {
-    selector: 'requests',
-    variables: {
-      ...filters
+  const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
+    GetRequests,
+    {
+      selector: 'requests',
+      variables: {
+        ...filters
+      }
     }
-  })
+  )
 
   return (
     <Card>
       <RequestTable
         data={nodes}
-        loading={false}
+        loading={loading}
         paginationProps={paginationProps}
         filters={filters}
         setFilters={(newFilters) => {

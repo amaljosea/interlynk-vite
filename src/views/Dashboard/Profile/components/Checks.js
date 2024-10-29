@@ -43,7 +43,7 @@ const Checks = () => {
     childKey: 'update_organization'
   })
 
-  const { data } = useQuery(GetOrgRules, {
+  const { data, loading } = useQuery(GetOrgRules, {
     skip: !orgView ? true : activetab === 'checks' ? false : true,
     variables: {
       field: 'RULES_FRIENDLY_ID',
@@ -212,7 +212,7 @@ const Checks = () => {
               paddingCell,
               paddingHeadCell
             )}
-            progressPending={data ? false : true}
+            progressPending={loading}
             progressComponent={<CustomLoader />}
             responsive={true}
           />
