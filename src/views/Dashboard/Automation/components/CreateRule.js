@@ -532,6 +532,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
                         onBlurCapture={() => onSubjectBlur(item)}
                         textTransform={'capitalize'}
                         sx={{ paddingLeft: '34px', fontSize: 'sm' }}
+                        data-testid={`auto_conditon_subject_${index}`}
                       >
                         {conditions?.length > 1 &&
                         conditions?.some(
@@ -577,6 +578,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
                       placeholder='-- Operator --'
                       onBlur={() => onOperatorBlur(item)}
                       isDisabled={isSystem}
+                      data-testid={`auto_conditon_operator_${index}`}
                     >
                       {item?.list?.map((option) => (
                         <option value={option} key={option}>
@@ -691,6 +693,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
                           isSystem
                         }
                         sx={{ paddingLeft: '34px', fontSize: 'sm' }}
+                        data-testid={`auto_action_subject_${index}`}
                       >
                         {conditions?.some(
                           (item) => item?.category === 'component'

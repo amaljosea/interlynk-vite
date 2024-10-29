@@ -80,6 +80,7 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
               }}
               colorScheme='blue'
               icon={<AddIcon />}
+              aria-label='add_automation_rule'
             />
           </Tooltip>
           <RefreshBtn />

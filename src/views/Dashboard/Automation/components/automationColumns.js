@@ -259,7 +259,7 @@ export const useAutomationColumns = ({
       id: 'actions',
       name: 'ACTIONS',
       selector: (row) => {
-        const { isSystem } = row
+        const { isSystem, name } = row
         return (
           <Menu>
             <MenuButton
@@ -268,11 +268,13 @@ export const useAutomationColumns = ({
               icon={<FaEllipsisV />}
               variant='none'
               color={secondaryTextColor}
+              data-testid={`automation_actions_${name}`}
             />
             <Portal>
               <MenuList fontSize={'sm'}>
                 {/* EDIT POLICY */}
                 <MenuItem
+                  data-testid={`automation_edit_${name}`}
                   isDisabled={!editAutomations}
                   onClick={() => {
                     setActiveRow(row)
@@ -305,6 +307,7 @@ export const useAutomationColumns = ({
                   }}
                   isDisabled={!editAutomations}
                   hidden={isSystem}
+                  data-testid={`automation_delete_${name}`}
                 >
                   Archive Rule
                 </MenuItem>
