@@ -1,37 +1,21 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { TabContext } from 'context/TabContext'
-import React, { useCallback, useContext, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
+import { customStyles } from 'utils'
 import { isCustomerView } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckModal from 'views/Sbom/components/CheckModal'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 
-import { CheckIcon } from '@chakra-ui/icons'
-import {
-  Box,
-  Button,
-  Flex,
-  IconButton,
-  Stack,
-  Tag,
-  TagLabel,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
-import RefreshBtn from 'components/Icons/RefreshBtn'
 import LicenseModal from 'components/LicenseModal'
 import Pagination from 'components/Pagination'
-import RowComponent from 'components/RowComponent'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -54,13 +38,10 @@ import {
 } from 'graphQL/Queries'
 import { GetComponentPath } from 'graphQL/Queries'
 
-import { BiSolidWrench } from 'react-icons/bi'
-import { FaCheckDouble } from 'react-icons/fa'
-import { GoSkip } from 'react-icons/go'
-
 import AuthorModal from '../components/AuthorModal'
 import FixedModal from '../components/FixedModal'
-import CheckFilters from './CheckFilters'
+import ChecksColumns from './Components/tableColumns/ChecksColumns'
+import ChecksSubHeader from './Components/tableSubHeaders/ChecksSubHeader'
 
 const Checks = ({ sbomData }) => {
   const { showToast } = useCustomToast()
@@ -72,10 +53,7 @@ const Checks = ({ sbomData }) => {
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const { dispatch } = useGlobalState()
   const { prodCompDispatch, sbomDispatch } = dispatch
@@ -232,70 +210,6 @@ const Checks = ({ sbomData }) => {
     },
     [setSearchFilter]
   )
-
-  // SUB HEADER
-  const subHeader = useMemo(() => {
-    return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={3}
-          alignItems={'flex-start'}
-        >
-          {/* SEARCH COMPONENTS */}
-          <SearchFilter
-            id='healthcheck'
-            filterText={checkSearch}
-            onChange={onSearchInputChange}
-            onFilter={handleSearch}
-            onClear={handleClear}
-          />
-
-          {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filterHead && (
-            <CheckFilters
-              filters={filterHead?.sbom?.filters}
-              setCheckState={(newFilters) => {
-                setCheckState(newFilters)
-                reset()
-              }}
-            />
-          )}
-        </Stack>
-
-        <Stack spacing={3} direction={'row'}>
-          <Tooltip label='Re-Check'>
-            <IconButton
-              fontSize={'sm'}
-              variant='solid'
-              colorScheme='blue'
-              fontWeight='normal'
-              onClick={handleReCheck}
-              hidden={isArchived}
-              isDisabled={!editChecks}
-              icon={<FaCheckDouble size={16} />}
-            />
-          </Tooltip>
-          <RefreshBtn />
-        </Stack>
-      </Flex>
-    )
-  }, [
-    isArchived,
-    checkSearch,
-    onSearchInputChange,
-    handleSearch,
-    handleClear,
-    filterHead,
-    handleReCheck,
-    editChecks,
-    reset
-  ])
 
   const handleOpenLicense = () => {
     prodCompDispatch({ type: 'CLEAR_LICENSES' })
@@ -481,173 +395,32 @@ const Checks = ({ sbomData }) => {
   }
 
   // COLUMNS
-  const columns = [
-    // HEALTH CHECK ID
-    {
-      id: 'RULES_FRIENDLY_ID',
-      name: 'CHECK ID',
-      selector: (row) => {
-        const { organizationRule } = row
-        return (
-          <Text color={primaryTextColor}>
-            {organizationRule.rule.friendlyId}
-          </Text>
-        )
-      },
-      sortable: true,
-      width: '10%'
-    },
-    // SEVERITY
-    {
-      id: 'ORGANIZATION_RULES_SEVERITY',
-      name: 'SEVERITY',
-      selector: (row) => {
-        const { organizationRule } = row
-        return (
-          <Tag
-            size='md'
-            variant='subtle'
-            bg={sevColor(organizationRule.severity).bg}
-            textColor={sevColor(organizationRule.severity).text}
-            textTransform={'capitalize'}
-            width={'80px'}
-          >
-            <TagLabel mx={'auto'}>{organizationRule.severity}</TagLabel>
-          </Tag>
-        )
-      },
-      width: '10%',
-      sortable: true
-    },
-    // LONG DESCRIPTION
-    {
-      id: 'COMPONENTS_NAME',
-      name: 'DESCRIPTION',
-      selector: (row) => {
-        const { organizationRule, component } = row
-        return (
-          <Stack spacing={2} my={3}>
-            {component !== null && (
-              <Box
-                width={'fit-content'}
-                onClick={() => setActiveRow(component)}
-              >
-                <RowComponent content={component} />
-              </Box>
-            )}
-            <Text color={primaryTextColor}>
-              {organizationRule.rule.longDesc !== null
-                ? `${organizationRule.rule.shortDesc?.substring(0, 300)}${
-                    organizationRule.rule.shortDesc.length > 300 ? '...' : ''
-                  }`
-                : ''}
-            </Text>
-          </Stack>
-        )
-      },
-      sortable: true,
-      wrap: true
-    },
-    // UPDATED AT
-    {
-      id: 'CHECK_RESULTS_UPDATED_AT',
-      name: 'UPDATED',
-      selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-          <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
-        </Tooltip>
-      ),
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
-        return dateA - dateB // Sort in descending order
-      },
-      right: 'true'
-    },
-    // ACTION
-    {
-      id: 'RESOLUTION',
-      name: 'RESOLUTION',
-      selector: (row) => {
-        const { status, id, componentId } = row
-        const { friendlyId } = row?.organizationRule?.rule || ''
-        const fixedIDs = ['SB-HC-4', 'SB-HC-5', 'SB-HC-6', 'SB-HC-16']
-        const fixedByDefault = fixedIDs.includes(friendlyId)
-        const isPrimary = friendlyId === 'SB-HC-10'
-        const isEditable = componentId ? updateComp : editChecks
-        return (
-          <>
-            {status === 'unresolved' && !fixedByDefault && (
-              <Stack direction={'row'} alignItems={'center'} spacing={2}>
-                <Tooltip label='Fix'>
-                  <IconButton
-                    size='sm'
-                    variant='solid'
-                    colorScheme='blue'
-                    fontWeight='normal'
-                    icon={<BiSolidWrench size={18} />}
-                    onClick={() => onCheckOpen(row)}
-                    disabled={customerView || !isEditable || isArchived}
-                  />
-                </Tooltip>
+  const columns = ChecksColumns(
+    setActiveRow,
+    updateComp,
+    editChecks,
+    onCheckOpen,
+    customerView,
+    isArchived,
+    activeRow,
+    loadingRules,
+    FIXED,
+    updateIssue
+  )
 
-                <Tooltip label='Ignore'>
-                  <IconButton
-                    size='sm'
-                    variant='solid'
-                    colorScheme='blue'
-                    fontWeight='normal'
-                    icon={<GoSkip size={18} />}
-                    onClick={() => updateIssue(id)}
-                    disabled={customerView || !editChecks || isArchived}
-                  />
-                </Tooltip>
-              </Stack>
-            )}
-
-            {fixedByDefault && (
-              <Button
-                size='sm'
-                variant='solid'
-                fontSize={'xs'}
-                fontWeight='normal'
-                colorScheme='whatsapp'
-                leftIcon={<CheckIcon />}
-                onClick={() => (isPrimary ? null : FIXED.onOpen())}
-                disabled={customerView || !editChecks || isArchived}
-              >
-                {isPrimary ? 'Fixed' : 'View'}
-              </Button>
-            )}
-
-            {!fixedByDefault && status === 'resolved' && (
-              <Button
-                size='sm'
-                fontSize={'xs'}
-                variant='solid'
-                colorScheme='whatsapp'
-                isDisabled={isArchived}
-                leftIcon={<CheckIcon />}
-                onClick={() => (isPrimary ? null : onCheckOpen(row))}
-                isLoading={activeRow?.id === id && loadingRules}
-              >
-                {isPrimary ? 'Fixed' : 'View'}
-              </Button>
-            )}
-
-            {status === 'ignored' && (
-              <Button size='sm' width={'74px'} fontSize={'xs'} variant='solid'>
-                Ignored
-              </Button>
-            )}
-          </>
-        )
-      },
-      width: '12%',
-      right: 'true'
-    }
-  ]
+  // SUB HEADER
+  const subHeader = ChecksSubHeader(
+    checkSearch,
+    onSearchInputChange,
+    handleSearch,
+    handleClear,
+    filterHead,
+    setCheckState,
+    reset,
+    handleReCheck,
+    isArchived,
+    editChecks
+  )
 
   // SORTING
   const handleSort = (column, sortDirection) => {
