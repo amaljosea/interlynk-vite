@@ -48,7 +48,9 @@ export default class VulnsSection {
         await this.page.locator("button[type='submit']").click()
         await this.page.waitForTimeout(2000)
 
-        await this.page.getByLabel('Dropdown menu for Test').click()
+        await this.page
+          .locator(`//button[@aria-label='Dropdown menu for Test']`)
+          .click()
         await this.page.getByRole('menuitem', { name: 'upload_sbom' }).click()
 
         const sbomTwo = path.resolve(__dirname, '../resources', jsonFiles[1])
@@ -145,49 +147,68 @@ export default class VulnsSection {
   public async vulnLinks() {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
-      await this.page.locator("//p[@aria-label='product_name']").first().click()
-      await this.page.getByTestId('version').first().click()
 
-      await this.page.getByRole('tab', { name: 'vulnerabilities' }).click()
+      const product = this.page
+        .locator(`//p[@aria-label='product_name']`)
+        .nth(0)
 
-      await this.page.getByTestId('vuln-actions').first().click()
-      await this.page.getByTestId('edit_vuln_links').first().click()
+      if (product.isVisible()) {
+        await product.click()
+        await this.page.waitForTimeout(2000)
 
-      await this.page.getByLabel('Type*').selectOption('issue-tracker')
-      await this.page.getByPlaceholder('Add URL').fill('google.com')
-      await this.page.waitForTimeout(2000)
+        const version = this.page.getByTestId('version').nth(0)
 
-      await this.page.locator("button[type='submit']").click()
+        if (version.isVisible()) {
+          await version.click()
+          await this.page.waitForTimeout(2000)
 
-      await this.page.waitForTimeout(4000)
+          await this.page.getByRole('tab', { name: 'vulnerabilities' }).click()
 
-      await this.page.getByLabel('Type*').selectOption('issue-tracker')
-      const errMsg = await this.page.getByTestId('vuln_link_error').isVisible()
-      await this.page.waitForTimeout(2000)
+          await this.page.getByTestId('vuln-actions').first().click()
+          await this.page.getByTestId('edit_vuln_links').first().click()
 
-      if (errMsg === false) {
-        errors?.push('Link validation not working')
+          await this.page.getByLabel('Type*').selectOption('issue-tracker')
+          await this.page.getByPlaceholder('Add URL').fill('google.com')
+          await this.page.waitForTimeout(2000)
+
+          await this.page.locator("button[type='submit']").click()
+
+          await this.page.waitForTimeout(4000)
+
+          await this.page.getByLabel('Type*').selectOption('issue-tracker')
+          const errMsg = await this.page
+            .getByTestId('vuln_link_error')
+            .isVisible()
+          await this.page.waitForTimeout(2000)
+
+          if (errMsg === false) {
+            errors?.push('Link validation not working')
+          } else {
+            await this.page.getByTestId('delete_vuln_link').first().click()
+
+            await this.page.waitForTimeout(4000)
+            await this.page
+              .locator("//button[@aria-label='save_vuln_links']")
+              .click()
+
+            await this.page.waitForTimeout(2000)
+
+            await this.page.locator("//a[@aria-label='products']").click()
+            await this.page.getByTestId('product-actions').first().click()
+
+            await this.page.waitForTimeout(2000)
+
+            await this.page.getByTestId('delete_product').first().click()
+            await this.page.locator("button[type='submit']").click()
+
+            await this.page.waitForTimeout(2000)
+          }
+        } else {
+          errors.push(`Version not found`)
+        }
       } else {
-        await this.page.getByTestId('delete_vuln_link').first().click()
-
-        await this.page.waitForTimeout(4000)
-        await this.page
-          .locator("//button[@aria-label='save_vuln_links']")
-          .click()
-
-        await this.page.waitForTimeout(2000)
-
-        await this.page.locator("//a[@aria-label='products']").click()
-        await this.page.getByTestId('product-actions').first().click()
-
-        await this.page.waitForTimeout(2000)
-
-        await this.page.getByTestId('delete_product').first().click()
-        await this.page.locator("button[type='submit']").click()
-
-        await this.page.waitForTimeout(2000)
+        errors.push(`Product not found`)
       }
-
       expect(errors.length).toBe(0)
     } catch (error) {
       throw error
@@ -198,45 +219,57 @@ export default class VulnsSection {
   public async importStatus() {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
-      await this.page.locator("//p[@aria-label='product_name']").first().click()
+      const product = this.page
+        .locator(`//p[@aria-label='product_name']`)
+        .nth(0)
 
-      const version = this.page.getByTestId('version').nth(1)
-
-      if (version.isVisible()) {
-        await version.click()
-        await this.page.waitForTimeout(2000)
-        await this.page.getByRole('tab', { name: 'vulnerabilities' }).click()
-
-        await this.page.locator(`//button[@aria-label='import_status']`).click()
+      if (product.isVisible()) {
+        await product.click()
         await this.page.waitForTimeout(2000)
 
-        await this.page.getByLabel('Environment').selectOption({ index: 1 })
-        await this.page.getByLabel('Version').selectOption({ index: 1 })
-        await this.page.waitForTimeout(2000)
+        const version = this.page.getByTestId('version').nth(1)
 
-        await this.page
-          .getByLabel('Import Vulnerability Status')
-          .getByRole('button', { name: 'Next' })
-          .click()
+        if (version.isVisible()) {
+          await version.click()
+          await this.page.waitForTimeout(2000)
+          
+          await this.page.getByRole('tab', { name: 'vulnerabilities' }).click()
 
-        const vulnOne = this.page
-          .locator(`//input[@aria-label='select-row-undefined']`)
-          .nth(0)
-
-        if (vulnOne.isVisible()) {
-          await vulnOne.check()
+          await this.page
+            .locator(`//button[@aria-label='import_status']`)
+            .click()
           await this.page.waitForTimeout(2000)
 
-          await this.page.getByRole('button', { name: 'Submit' }).click()
+          await this.page.getByLabel('Environment').selectOption({ index: 1 })
+          await this.page.getByLabel('Version').selectOption({ index: 1 })
           await this.page.waitForTimeout(2000)
 
-          await this.page.getByRole('button', { name: 'Done' }).click()
-          await this.page.waitForTimeout(2000)
+          await this.page
+            .getByLabel('Import Vulnerability Status')
+            .getByRole('button', { name: 'Next' })
+            .click()
+
+          const vulnOne = this.page
+            .locator(`//input[@aria-label='select-row-undefined']`)
+            .nth(0)
+
+          if (vulnOne.isVisible()) {
+            await vulnOne.check()
+            await this.page.waitForTimeout(2000)
+
+            await this.page.getByRole('button', { name: 'Submit' }).click()
+            await this.page.waitForTimeout(2000)
+
+            await this.page.getByRole('button', { name: 'Done' }).click()
+            await this.page.waitForTimeout(2000)
+          } else {
+            errors.push('Vuln not found')
+          }
         } else {
-          errors.push('Vuln not found')
+          errors.push('Version not found')
         }
       } else {
-        errors.push('Version not found')
+        errors.push('Product not found')
       }
 
       await this.page.waitForTimeout(2000)
