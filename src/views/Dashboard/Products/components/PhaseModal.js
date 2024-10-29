@@ -1,7 +1,6 @@
 import { gql, useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { capitalizeFirstLetter } from 'utils'
 import { sbomPhases } from 'variables/general'
 
 import { Flex, FormControl, FormLabel } from '@chakra-ui/react'
@@ -38,6 +37,13 @@ const PhaseModal = ({ data, isOpen, onClose }) => {
     setPhases(value)
   }
 
+  const phaseOptions =
+    data?.length > 0
+      ? sbomPhases?.filter(
+          (item) => !data?.some((phase) => phase === item.value)
+        )
+      : sbomPhases
+
   const handleSubmit = () => {
     const lifecycles =
       phases?.length > 0 ? phases?.map((item) => ({ name: item?.value })) : []
@@ -60,8 +66,8 @@ const PhaseModal = ({ data, isOpen, onClose }) => {
     if (data?.length > 0) {
       setPhases(() =>
         data?.map((item) => ({
-          label: capitalizeFirstLetter(item),
-          value: capitalizeFirstLetter(item)
+          label: item,
+          value: item
         }))
       )
     }
@@ -75,7 +81,6 @@ const PhaseModal = ({ data, isOpen, onClose }) => {
       isLoading={loading}
       buttonText={'Save'}
       onSubmit={handleSubmit}
-      // disabled={phases?.length === 0}
       title={`${data?.length > 0 ? 'Update' : 'Add'} Phase`}
     >
       <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
@@ -90,7 +95,7 @@ const PhaseModal = ({ data, isOpen, onClose }) => {
             name='compPhases'
             isClearable={true}
             isSearchable={true}
-            options={sbomPhases}
+            options={phaseOptions}
             onChange={onPhaseChange}
             placeholder={'Add phase'}
           />

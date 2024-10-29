@@ -81,7 +81,8 @@ export const useSelect = (type) => {
       ...provided,
       backgroundColor: '#EDF2F7',
       whiteSpace: 'nowrap',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      textTransform: 'capitalize'
     }),
     multiValueRemove: (provided) => ({
       ...provided,
