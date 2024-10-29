@@ -348,6 +348,7 @@ const SbomActions = ({ sbom }) => {
           sbomId={sbomId}
           productName={sbom?.project?.projectGroup?.name}
           version={sbom?.projectVersion}
+          sbom={sbom}
         />
       )}
 

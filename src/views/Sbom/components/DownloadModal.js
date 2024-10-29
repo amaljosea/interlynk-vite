@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { getSignedUrlParams, truncatedValue } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
-import { Button, Divider, Flex, Stack, Tag, Text } from '@chakra-ui/react'
+import { Box, Button, Divider, Flex, Stack, Tag, Text } from '@chakra-ui/react'
 import { Checkbox, FormControl, FormLabel } from '@chakra-ui/react'
 import { Radio, RadioGroup, useDisclosure } from '@chakra-ui/react'
 
@@ -15,12 +15,16 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetSbomQualityScores, SignedSbomDownload } from 'graphQL/Queries'
 import { DownloadSBOM } from 'graphQL/Queries'
+import { GetComponentData, GetVulnData } from 'graphQL/Queries'
 
 import ComplianceChecks from './ComplianceChecks'
+import { downloadSbomPdf } from './SbomPdf'
+import { authorsList } from './SbomPdf'
 
 const DownloadModal = (props) => {
-  const { isOpen, onClose, productId, productName, version, sbomId } =
+  const { isOpen, onClose, productId, productName, version, sbomId, sbom } =
     props || ''
+
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
   const { superAdmin } = organization?.currentUser || ''
@@ -29,8 +33,15 @@ const DownloadModal = (props) => {
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
   )
 
+  const { primaryComponent } = sbom || ''
+  const { description, purl } = primaryComponent || ''
+
+  const authors =
+    sbom?.authors.length > 0 ? authorsList(sbom?.authors) : undefined
+
   const [spec, setSpec] = useState('CycloneDX')
   const [format, setFormat] = useState('json')
+  const [itemsPerPage, setItemsPerPage] = useState('25')
   const [includeVulns, setIncludeVulns] = useState(false)
   const [original, setOriginal] = useState(false)
   const [encoded, setEncoded] = useState(false)
@@ -48,6 +59,27 @@ const DownloadModal = (props) => {
 
   const { nodes: ntiaData } = ntia?.complianceReports || ''
   const { nodes: fdaData } = fda?.complianceReports || ''
+
+  const { data: components, loading } = useQuery(GetComponentData, {
+    skip: format === 'json',
+    variables: {
+      projectId: productId,
+      sbomId,
+      first: Number(itemsPerPage)
+    }
+  })
+
+  const { data: VulnData, loading: vulnLoading } = useQuery(GetVulnData, {
+    skip: format === 'json',
+    variables: {
+      projectId: productId,
+      sbomId,
+      first: Number(itemsPerPage)
+    }
+  })
+
+  const componentsActual = components?.sbom.components.nodes
+  const vulnActual = VulnData?.sbom.vulns.nodes
 
   const DETAILS = useDisclosure()
 
@@ -94,6 +126,21 @@ const DownloadModal = (props) => {
   const handleDownload = async () => {
     setIsLoading(true)
     try {
+      if (format === 'pdf') {
+        downloadSbomPdf(
+          productName,
+          version,
+          description,
+          purl,
+          authors,
+          sbom,
+          componentsActual,
+          vulnActual
+        )
+        setIsLoading(false)
+        onClose()
+        return
+      }
       await getData({
         variables: {
           includeVulns,
@@ -174,7 +221,7 @@ const DownloadModal = (props) => {
         onSubmit={handleDownload}
         title={'Download SBOM'}
         Icon={DownloadIcon}
-        isLoading={isLoading}
+        isLoading={isLoading || loading || vulnLoading}
         buttonText={'Download'}
       >
         <Flex flexDirection={'column'} gap={4}>
@@ -185,62 +232,96 @@ const DownloadModal = (props) => {
           >
             {fileName}
           </Tag>
-          <FormControl>
-            <FormLabel>Specification</FormLabel>
-            <RadioGroup
-              value={spec}
-              isDisabled={original}
-              onChange={(value) => setSpec(value)}
-            >
-              <Stack spacing={4} direction='row'>
-                <Radio value='CycloneDX'>CycloneDX</Radio>
-                <Radio value='SPDX'>SPDX</Radio>
-                <Radio value='SPDX-Lite'>SPDX-Lite</Radio>
-              </Stack>
-            </RadioGroup>
-          </FormControl>
+          {format !== 'pdf' && (
+            <FormControl>
+              <FormLabel>Specification</FormLabel>
+              <RadioGroup
+                value={spec}
+                isDisabled={original}
+                onChange={(value) => setSpec(value)}
+              >
+                <Stack spacing={4} direction='row'>
+                  <Radio value='CycloneDX'>CycloneDX</Radio>
+                  <Radio value='SPDX'>SPDX</Radio>
+                  <Radio value='SPDX-Lite'>SPDX-Lite</Radio>
+                </Stack>
+              </RadioGroup>
+            </FormControl>
+          )}
           <Divider />
           <FormControl isDisabled={original}>
             <FormLabel>File Format</FormLabel>
             <RadioGroup value={format} onChange={(value) => setFormat(value)}>
               <Stack spacing={4} direction='row'>
                 <Radio value='json'>JSON</Radio>
+                <Radio value='pdf'>PDF</Radio>
                 {/* <Radio value='xml'>XML</Radio> */}
               </Stack>
             </RadioGroup>
           </FormControl>
           <Divider />
-          <Checkbox
-            hidden={signedUrlParams}
-            isChecked={excludeParts}
-            onChange={() => setExcludeParts(!excludeParts)}
-            isDisabled={spec === 'SPDX' || original}
-          >
-            Exclude Parts
-          </Checkbox>
-          <Checkbox
-            isChecked={includeVulns}
-            onChange={() => setIncludeVulns(!includeVulns)}
-            isDisabled={spec === 'SPDX' || original}
-          >
-            Include Vulnerabilities
-          </Checkbox>
-          <Checkbox
-            isChecked={original}
-            onChange={onCheckOrigin}
-            isDisabled={spec === 'SPDX'}
-          >
-            Original SBOM
-          </Checkbox>
-          <Checkbox
-            hidden={!superAdmin}
-            isChecked={encoded}
-            onChange={() => setEncoded(!encoded)}
-            isDisabled={spec === 'SPDX' || original}
-          >
-            Base64 Unencoded
-          </Checkbox>
-          <Divider hidden={signedUrlParams} />
+          {format === 'pdf' && (
+            <>
+              <Box>
+                <Text fontSize='14px' fontWeight='500' mb={2}>
+                  Rows To Export
+                </Text>
+                <RadioGroup onChange={setItemsPerPage} value={itemsPerPage}>
+                  <Stack direction='row' spacing={8}>
+                    <Radio value='25' colorScheme='blue'>
+                      25
+                    </Radio>
+                    <Radio value='50' colorScheme='blue'>
+                      50
+                    </Radio>
+                    <Radio value='100' colorScheme='blue'>
+                      100
+                    </Radio>
+                    <Radio value='200' colorScheme='blue'>
+                      All
+                    </Radio>
+                  </Stack>
+                </RadioGroup>
+              </Box>
+              <Divider />
+            </>
+          )}
+          {format !== 'pdf' && (
+            <>
+              <Checkbox
+                hidden={signedUrlParams}
+                isChecked={excludeParts}
+                onChange={() => setExcludeParts(!excludeParts)}
+                isDisabled={spec === 'SPDX' || original}
+              >
+                Exclude Parts
+              </Checkbox>
+              <Checkbox
+                isChecked={includeVulns}
+                onChange={() => setIncludeVulns(!includeVulns)}
+                isDisabled={spec === 'SPDX' || original}
+              >
+                Include Vulnerabilities
+              </Checkbox>
+              <Checkbox
+                isChecked={original}
+                onChange={onCheckOrigin}
+                isDisabled={spec === 'SPDX'}
+              >
+                Original SBOM
+              </Checkbox>
+              <Checkbox
+                hidden={!superAdmin}
+                isChecked={encoded}
+                onChange={() => setEncoded(!encoded)}
+                isDisabled={spec === 'SPDX' || original}
+              >
+                Base64 Unencoded
+              </Checkbox>
+            </>
+          )}
+
+          <Divider hidden={signedUrlParams || format === 'pdf'} />
           <Flex
             sx={{ flexDir: 'column', gap: 4 }}
             display={!signedUrlParams ? 'flex' : 'none'}
