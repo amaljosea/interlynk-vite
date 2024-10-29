@@ -34,7 +34,7 @@ export const HealthScore = ({ value, isComponent }) => {
         pos={'absolute'}
         height={'100%'}
         bg={secondaryBgColor}
-        width={value === 0 ? '100%' : `${100 - Math.round(value)}%`}
+        width={value ? `${100 - Math.round(value)}%` : `100%`}
       />
       <Box
         top='0'
@@ -49,7 +49,7 @@ export const HealthScore = ({ value, isComponent }) => {
         justifyContent='center'
       >
         <Text color={primaryTextColor}>
-          {value === 0 ? 'N/A' : `${Math.round(value)} %`}
+          {value ? `${Math.round(value)} %` : `N/A`}
         </Text>
       </Box>
     </Box>
