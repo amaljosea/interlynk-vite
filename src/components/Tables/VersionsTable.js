@@ -435,16 +435,19 @@ const VersionsTable = (props) => {
               icon={<FaEllipsisV />}
               variant='none'
               color={secondaryTextColor}
+              aria-label={`sbom-${row?.projectVersion}-actions`}
             />
             <Portal>
               <MenuList fontSize={'sm'}>
                 <MenuItem
                   hidden={signedUrlParams}
                   onClick={() => handleListSbom(row)}
+                  aria-label={`sbom-${row?.projectVersion}-list`}
                 >
                   List SBOM
                 </MenuItem>
                 <MenuItem
+                  aria-label={`sbom-${row?.projectVersion}-reprocess`}
                   onClick={() => handleRepSbom(row)}
                   hidden={signedUrlParams}
                 >
@@ -452,6 +455,7 @@ const VersionsTable = (props) => {
                 </MenuItem>
                 <Divider />
                 <MenuItem
+                  aria-label={`sbom-${row?.projectVersion}-archive`}
                   isDisabled={!archiveSbom || signedUrlParams}
                   onClick={() => {
                     setActiveRow(row)
@@ -462,6 +466,7 @@ const VersionsTable = (props) => {
                 </MenuItem>
                 <MenuItem
                   data-testid='sbom-delete-button'
+                  aria-label={`sbom-${row?.projectVersion}-delete`}
                   color={primaryErrorColor}
                   onClick={() => {
                     setActiveRow(row)
@@ -577,6 +582,7 @@ const VersionsTable = (props) => {
               isDisabled={!enabled}
               hidden={signedUrlParams}
               colorScheme='blue'
+              aria-label='show_archive_sboms'
               onClick={ARC_VERSIONS.onOpen}
               icon={<FaBoxArchive />}
             />
@@ -588,6 +594,7 @@ const VersionsTable = (props) => {
               hidden={signedUrlParams}
               colorScheme='blue'
               onClick={onBuildSbom}
+              aria-label='build_sbom'
               icon={<FaScrewdriverWrench />}
             />
           </Tooltip>

@@ -146,6 +146,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
                       <Tooltip label='Restore' placement='top'>
                         <IconButton
                           variant='outline'
+                          aria-label={`sbom-${item?.projectVersion}-restore`}
                           onClick={() => onRestore(item)}
                           icon={
                             <MdOutlineUnarchive
