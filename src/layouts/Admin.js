@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { TourProvider, useTour } from '@reactour/tour'
+import NotFound from 'assets/svg/not-found.svg'
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
 import { KBarProvider } from 'kbar'
@@ -8,8 +9,7 @@ import { Outlet, redirect, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
-import { Alert, Box, Button, Center, Flex, Stack, Text } from '@chakra-ui/react'
-import { AlertDescription, AlertIcon, AlertTitle } from '@chakra-ui/react'
+import { Box, Button, Center, Flex, Img, Stack, Text } from '@chakra-ui/react'
 import { useColorMode, useMediaQuery } from '@chakra-ui/react'
 
 import DeviceWarning from 'components/DeviceWarning'
@@ -54,10 +54,9 @@ export default function Admin() {
     generateProductVersionDetailPageUrlFromCurrentUrl: getSbomUrl
   } = useProductUrlContext()
 
-  const { mainContrastBgColor, neutralBorder } = useThemeColor([
-    'mainContrastBgColor',
-    'neutralBorder'
-  ])
+  const { mainContrastBgColor, neutralBorder, primaryBlueText } = useThemeColor(
+    ['mainContrastBgColor', 'neutralBorder', 'primaryBlueText']
+  )
 
   document.documentElement.dir = 'ltr'
 
@@ -189,27 +188,17 @@ export default function Admin() {
 
   if (error) {
     return (
-      <Center>
-        <Alert
-          status='error'
-          variant='subtle'
-          flexDirection='column'
-          alignItems='center'
-          justifyContent='center'
-          textAlign='center'
-          height='240px'
-        >
-          <AlertIcon boxSize='40px' mr={0} />
-          <AlertTitle mt={4} mb={1} fontSize='lg'>
-            {displayErrorMessage(
-              error?.networkError?.statusCode,
-              error?.message
-            )}
-          </AlertTitle>
-          <AlertDescription mt={4} maxWidth='sm'>
-            <Button onClick={handleLogout}>Logout</Button>
-          </AlertDescription>
-        </Alert>
+      <Center as={Flex} flexDir={'column'} h={'100vh'}>
+        <Text fontSize='3xl' fontWeight={'semibold'} color={primaryBlueText}>
+          Something went wrong
+        </Text>
+        <Text mt={2}>
+          {displayErrorMessage(error?.networkError?.statusCode, error?.message)}
+        </Text>
+        <Button colorScheme='blue' mt={4} onClick={handleLogout}>
+          Logout
+        </Button>
+        <Img src={NotFound} width={'36%'} />
       </Center>
     )
   }

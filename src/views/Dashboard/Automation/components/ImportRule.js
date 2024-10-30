@@ -2,17 +2,9 @@ import { gql, useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import {
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  Flex,
-  FormControl,
-  FormLabel,
-  Input,
-  Text
-} from '@chakra-ui/react'
+import { Flex, FormControl, FormLabel, Input, Text } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -127,14 +119,7 @@ const ImportRule = (props) => {
       disabled={!selectedFile || loading}
     >
       <Flex flexDir={'column'} gap={3} alignItems={'flex-start'}>
-        {errorMessage !== '' && (
-          <Alert status='error' mb={4} borderRadius={5}>
-            <AlertIcon />
-            <AlertTitle fontSize={'sm'} fontWeight={'medium'}>
-              {errorMessage}
-            </AlertTitle>
-          </Alert>
-        )}
+        {errorMessage !== '' && <LynkAlert msg={errorMessage} />}
         <FormControl>
           <FormLabel fontSize={12}>Upload JSON File</FormLabel>
           <Flex

@@ -7,9 +7,6 @@ import { Link } from 'react-router-dom'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
   AbsoluteCenter,
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Box,
   Button,
   Divider,
@@ -31,6 +28,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UserResendConfirmationEmail } from 'graphQL/Mutation'
 
+import LynkAlert from './LynkAlert'
 import PolicyTerms from './PolicyTerms'
 import SocialLogin from './SocialLogin'
 
@@ -107,6 +105,29 @@ const LoginForm = () => {
     })
   }
 
+  const alertStyle = {
+    cursor: 'pointer',
+    fontWeight: 500,
+    color: primaryBlueText
+  }
+
+  const ErrorMsg = () => {
+    return (
+      <>
+        {error}
+        {error ===
+          'You have to confirm your email address before continuing.' && (
+          <p>
+            Lost invitation link ?{' '}
+            <strong style={alertStyle} onClick={onResendEmail}>
+              Resend
+            </strong>
+          </p>
+        )}
+      </>
+    )
+  }
+
   return (
     <Flex
       height={'100%'}
@@ -127,28 +148,7 @@ const LoginForm = () => {
       </Text>
       {error !== '' && (
         <Box mt={4} width={'100%'}>
-          <Alert status='error' borderRadius={4}>
-            <AlertIcon />
-            <AlertDescription fontSize='sm'>
-              {error}
-              {error ===
-                'You have to confirm your email address before continuing.' && (
-                <p>
-                  Lost invitation link ?{' '}
-                  <strong
-                    style={{
-                      cursor: 'pointer',
-                      fontWeight: 500,
-                      color: primaryBlueText
-                    }}
-                    onClick={onResendEmail}
-                  >
-                    Resend
-                  </strong>
-                </p>
-              )}
-            </AlertDescription>
-          </Alert>
+          <LynkAlert msg={<ErrorMsg />} />
         </Box>
       )}
       <form style={{ width: '100%' }} onSubmit={handleSubmit}>

@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
+import LynkAlert from 'components/LynkAlert'
 
 const {
   Button,
@@ -95,14 +96,9 @@ const Login = () => {
                   <Box mt={6}>
                     {error === true && (
                       <Box mb={5} width={'100%'}>
-                        <Alert status='error' borderRadius={4}>
-                          <AlertIcon />
-                          <AlertDescription fontSize={'sm'}>
-                            The entered email is not in the list of
-                            reciepient(s). Plese retry or contact the person who
-                            shared this link with you.
-                          </AlertDescription>
-                        </Alert>
+                        <LynkAlert
+                          msg={`The entered email is not in the list of reciepient(s). Plese retry or contact the person who shared this link with you.`}
+                        />
                       </Box>
                     )}
                     <FormControl isRequired>

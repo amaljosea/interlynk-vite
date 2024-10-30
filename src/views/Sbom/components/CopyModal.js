@@ -13,6 +13,7 @@ import {
   Text
 } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 const CopyModal = ({ isOpen, onClose, product, version }) => {
@@ -42,6 +43,15 @@ const CopyModal = ({ isOpen, onClose, product, version }) => {
   const handleSubmit = (e) => {
     e.preventDefault()
     onClose()
+  }
+
+  const Message = () => {
+    return (
+      <Stack direction={'column'} gap={2}>
+        <Text fontSize={'sm'}>{message}</Text>
+        <Text fontSize={'sm'}>Are you sure you want to continue ?</Text>
+      </Stack>
+    )
   }
 
   return (
@@ -89,14 +99,7 @@ const CopyModal = ({ isOpen, onClose, product, version }) => {
           />
         </FormControl>
 
-        {message !== '' && (
-          <Alert status='info'>
-            <Stack direction={'column'} gap={2}>
-              <Text fontSize={'sm'}>{message}</Text>
-              <Text fontSize={'sm'}>Are you sure you want to continue ?</Text>
-            </Stack>
-          </Alert>
-        )}
+        {message !== '' && <LynkAlert msg={<Message />} />}
       </Flex>
     </LynkModal>
   )
