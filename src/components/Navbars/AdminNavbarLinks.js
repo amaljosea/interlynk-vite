@@ -12,6 +12,8 @@ import Organizations from 'components/Organizations'
 // Custom Components
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { FaMoon, FaSun } from 'react-icons/fa6'
 
 import { SearchBar } from './SearchBar'
@@ -22,6 +24,7 @@ export default function AdminNavbarLinks(props) {
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
+  const { organization } = useGlobalState()
   const { colorMode, toggleColorMode, setColorMode } = useColorMode()
 
   const signedUrlParams = getSignedUrlParams()
@@ -73,7 +76,7 @@ export default function AdminNavbarLinks(props) {
       />
 
       {/* ORGANIZATIONS */}
-      {!signedUrlParams && <Organizations />}
+      {!signedUrlParams && organization && <Organizations />}
 
       {/* USER MENU */}
       {!signedUrlParams && <UserMenu handleLogout={handleLogout} />}
