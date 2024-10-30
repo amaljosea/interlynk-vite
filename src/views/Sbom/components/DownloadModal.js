@@ -1,5 +1,5 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getSignedUrlParams, truncatedValue } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
@@ -42,6 +42,7 @@ const DownloadModal = (props) => {
   const [spec, setSpec] = useState('CycloneDX')
   const [format, setFormat] = useState('json')
   const [itemsPerPage, setItemsPerPage] = useState('25')
+  const [shouldFetch, setShouldFetch] = useState(false)
   const [includeVulns, setIncludeVulns] = useState(false)
   const [original, setOriginal] = useState(false)
   const [encoded, setEncoded] = useState(false)
@@ -61,7 +62,7 @@ const DownloadModal = (props) => {
   const { nodes: fdaData } = fda?.complianceReports || ''
 
   const { data: components, loading } = useQuery(GetComponentData, {
-    skip: format === 'json',
+    skip: format === 'json' || !shouldFetch,
     variables: {
       projectId: productId,
       sbomId,
@@ -70,16 +71,13 @@ const DownloadModal = (props) => {
   })
 
   const { data: VulnData, loading: vulnLoading } = useQuery(GetVulnData, {
-    skip: format === 'json',
+    skip: format === 'json' || !shouldFetch,
     variables: {
       projectId: productId,
       sbomId,
       first: Number(itemsPerPage)
     }
   })
-
-  const componentsActual = components?.sbom.components.nodes
-  const vulnActual = VulnData?.sbom.vulns.nodes
 
   const DETAILS = useDisclosure()
 
@@ -123,22 +121,45 @@ const DownloadModal = (props) => {
     }
   }
 
+  useEffect(() => {
+    if (!loading && !vulnLoading && shouldFetch) {
+      const componentsActual = components?.sbom?.components?.nodes || []
+      const vulnActual = VulnData?.sbom?.vulns?.nodes || []
+      downloadSbomPdf(
+        productName,
+        version,
+        description,
+        purl,
+        authors,
+        sbom,
+        componentsActual,
+        vulnActual
+      )
+
+      setIsLoading(false)
+      setShouldFetch(false)
+      onClose()
+    }
+  }, [
+    loading,
+    vulnLoading,
+    components,
+    VulnData,
+    shouldFetch,
+    authors,
+    description,
+    onClose,
+    productName,
+    purl,
+    sbom,
+    version
+  ])
+
   const handleDownload = async () => {
     setIsLoading(true)
     try {
       if (format === 'pdf') {
-        downloadSbomPdf(
-          productName,
-          version,
-          description,
-          purl,
-          authors,
-          sbom,
-          componentsActual,
-          vulnActual
-        )
-        setIsLoading(false)
-        onClose()
+        setShouldFetch(true)
         return
       }
       await getData({
@@ -213,6 +234,8 @@ const DownloadModal = (props) => {
       ? `${truncatedValue(productName, 14)}-${version}.${format}`
       : `${truncatedValue(productName, 14)}-${version}.${type}.${format}`
 
+  const pdfFileName = `${truncatedValue(productName, 14)}-${version}.${format}`
+
   return (
     <>
       <LynkModal
@@ -230,7 +253,7 @@ const DownloadModal = (props) => {
             textAlign={'right'}
             sx={{ w: 'fit-content', fontSize: 'xs', wordBreak: 'break-all' }}
           >
-            {fileName}
+            {format === 'json' ? fileName : pdfFileName}
           </Tag>
           {format !== 'pdf' && (
             <FormControl>
