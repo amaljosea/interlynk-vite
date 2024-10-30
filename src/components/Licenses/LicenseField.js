@@ -1,7 +1,7 @@
 import { useLazyQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useCallback, useContext, useEffect, useState } from 'react'
-import { components } from 'react-select'
+import ReactSelect, { components } from 'react-select'
 import { getSignedUrlParams } from 'utils'
 import { infoData } from 'variables/general'
 
@@ -17,15 +17,15 @@ import {
   VStack
 } from '@chakra-ui/react'
 
-import LynkSelect from 'components/LynkSelect'
-
 import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LicenseAutoComplete } from 'graphQL/Queries'
 
 const LicenseField = ({ resolved, sbomView, license }) => {
+  const { style } = useSelect('field')
   const signedUrlParams = getSignedUrlParams()
   const { tabData, setTabData, handleChange } = useContext(TabContext)
   const { details } = tabData
@@ -190,8 +190,10 @@ const LicenseField = ({ resolved, sbomView, license }) => {
             </Flex>
           </FormLabel>
           {/* LICENSE */}
-          <LynkSelect
+          <ReactSelect
             name='license'
+            styles={style}
+            className='react-select'
             isClearable={resolved ? false : true}
             isSearchable={resolved ? false : true}
             isDisabled={signedUrlParams}
@@ -201,6 +203,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
             }
             components={{
               DropdownIndicator: () => null,
+              IndicatorSeparator: () => null,
               Menu,
               MenuList,
               Option
@@ -210,6 +213,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
             onChange={onLicenseChange}
             onInputChange={setSearchText}
             placeholder={'Search for a License'}
+            filterOption={null}
           />
           {licenseType && (
             <Flex justifyContent='flex-end'>
