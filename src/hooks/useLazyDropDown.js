@@ -104,7 +104,7 @@ export const useLazyDropDown = (
 
   const defaultOptions = defaultFirstOption
     ? [defaultFirstOption, ...(filteredNodes || [])]
-    : nodes || []
+    : filteredNodes || []
 
   return {
     lazyDropDownProps: {

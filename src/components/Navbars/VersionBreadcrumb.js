@@ -50,7 +50,6 @@ const VersionBreadcrumb = ({ selectStyles }) => {
   })
 
   const selectedVersionName = versionName?.sbom?.projectVersion
-  const selectedVersionId = versionName?.sbom?.id
 
   const handleVersionClick = (version) => {
     const link = generateProductVersionDetailPageUrlFromCurrentUrl({
@@ -62,11 +61,6 @@ const VersionBreadcrumb = ({ selectStyles }) => {
     navigate(link)
   }
 
-  const defaultFirstOption = {
-    id: selectedVersionId,
-    projectVersion: selectedVersionName
-  }
-
   const { lazyDropDownProps } = useLazyDropDown(
     GetProjectVersionLazyDropdownQuery,
     {
@@ -74,8 +68,8 @@ const VersionBreadcrumb = ({ selectStyles }) => {
       selector: 'project.sbomVersions',
       variables: {
         id: prodID,
-        field: 'SBOMS_PROJECT_VERSION',
-        direction: 'ASC',
+        field: 'SBOMS_CREATED_AT',
+        direction: 'DESC',
         first: 5
       },
       selectorForActualCount: 'project.allSbomVersions',
@@ -86,8 +80,7 @@ const VersionBreadcrumb = ({ selectStyles }) => {
         IndicatorSeparator: () => null,
         DropdownIndicator: CustomDropdownIndicator
       },
-      optionLabel: 'projectVersion',
-      defaultFirstOption
+      optionLabel: 'projectVersion'
     }
   )
 
