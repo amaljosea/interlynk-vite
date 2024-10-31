@@ -2325,11 +2325,9 @@ export const RequestValidate = gql`
         requestedAt
         status
         organization {
-          email
           name
         }
         requester {
-          email
           name
         }
       }
