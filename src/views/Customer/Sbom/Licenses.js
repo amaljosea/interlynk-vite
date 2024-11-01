@@ -1,13 +1,14 @@
-import { useMemo } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
+import LicenseColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/LicenseColumns'
+import ExpandedRow from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/LicensesExpanded'
+import LicensesSubHeader from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableSubHeaders/LicensesSubHeader'
 
-import { Box, Flex, Tag, TagLabel, Text } from '@chakra-ui/react'
+import { Flex, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
-import RefreshBtn from 'components/Icons/RefreshBtn'
 import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
@@ -36,86 +37,11 @@ const Licenses = () => {
     }
   )
 
-  const subHeaderComponent = useMemo(() => (
-    <Flex
-      width={'100%'}
-      alignItems={'center'}
-      justifyContent='flex-end'
-      gap={3}
-    >
-      <RefreshBtn />
-    </Flex>
-  ))
+  //Subheader
+  const subHeader = LicensesSubHeader()
 
-  const columns = [
-    {
-      id: 'LICENSE_EXPRESSION',
-      name: 'LICENSE EXPRESSION',
-      wrap: true,
-      selector: ({ licenseExpression }) => (
-        <Flex direction='row' alignItems={'center'} gap={2}>
-          <Text my={3} fontWeight={'medium'} color={primaryTextColor}>
-            {licenseExpression || 'Not Available'}
-          </Text>
-        </Flex>
-      )
-    },
-    {
-      id: 'COMPONENTS',
-      name: 'COMPONENTS',
-      wrap: true,
-      selector: ({ components }) => {
-        let sortedComponents = [...components]
-        sortedComponents.sort((a, b) => a.name.localeCompare(b.name))
-
-        return (
-          <Flex
-            direction='row'
-            py={5}
-            alignItems={'center'}
-            wrap='wrap'
-            gap={2}
-            onClick={(e) => {
-              e.currentTarget.parentElement.click()
-            }}
-          >
-            <Tag variant='subtle'>
-              <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
-                {sortedComponents[0].name}
-              </TagLabel>
-            </Tag>
-            <Text color={primaryTextColor}>
-              {sortedComponents.length > 1
-                ? `+${sortedComponents.length - 1} more`
-                : ''}
-            </Text>
-          </Flex>
-        )
-      }
-    }
-  ]
-
-  const ExpandedRow = ({ data: { components } }) => {
-    let sortedComponents = [...components]
-    sortedComponents.sort((a, b) => a.name.localeCompare(b.name))
-    return (
-      <Box
-        width={'100%'}
-        p={5}
-        boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
-      >
-        <Flex direction='row' py={5} alignItems={'center'} wrap='wrap' gap={2}>
-          {sortedComponents?.map((component, index) => (
-            <Tag variant='subtle' key={index}>
-              <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
-                {component.name}
-              </TagLabel>
-            </Tag>
-          ))}
-        </Flex>
-      </Box>
-    )
-  }
+  //Columns
+  const columns = LicenseColumns()
 
   if (error) {
     return (
@@ -137,7 +63,7 @@ const Licenses = () => {
           progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader
-          subHeaderComponent={subHeaderComponent}
+          subHeaderComponent={subHeader}
           responsive
           persistTableHead
           expandableRows
