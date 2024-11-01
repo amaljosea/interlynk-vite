@@ -1,10 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link } from 'react-router-dom'
-import { customStyles } from 'utils'
-import { getFullDateAndTime } from 'utils'
-import { timeSince } from 'utils'
+import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 
@@ -31,7 +29,6 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
-import InfoModal from 'components/InfoModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -48,16 +45,6 @@ const LegalTable = () => {
   const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
-
-  const updateOrg = useHasPermission({
-    parentKey: 'view_organization',
-    childKey: 'update_organization'
-  })
-
-  const [activeRow, setActiveRow] = useState(null)
-  const [infoHeading, setInfoHeading] = useState('')
-  const [infoText, setInfoText] = useState('')
-  const [infoUrl, setInfoUrl] = useState('')
   const {
     headingTextColor,
     primaryTextColor,
@@ -71,6 +58,14 @@ const LegalTable = () => {
     'primaryBlueText',
     'secondaryTextColor'
   ])
+
+  const updateOrg = useHasPermission({
+    parentKey: 'view_organization',
+    childKey: 'update_organization'
+  })
+
+  const [activeRow, setActiveRow] = useState(null)
+
   const paddingCell = 0
   const paddingHeadCell = 0
 
@@ -80,26 +75,8 @@ const LegalTable = () => {
 
   const { nodes } = data?.organizationManufacturers || ''
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isInfoOpen,
-    onOpen: onInfoOpen,
-    onClose: onInfoClose
-  } = useDisclosure()
-  const {
-    isOpen: isArchiveOpen,
-    onOpen: onArchiveOpen,
-    onClose: onArchiveClose
-  } = useDisclosure()
-
-  const onCheckMfc = useCallback(() => {
-    setInfoHeading(`Manufacturer`)
-    setInfoText(
-      `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries.`
-    )
-    setInfoUrl(``)
-    onInfoOpen()
-  }, [onInfoOpen])
+  const EDIT = useDisclosure()
+  const ARCHIVE = useDisclosure()
 
   const existingData = data?.nodes?.map((item) =>
     item?.organizationName?.toLowerCase()
@@ -119,12 +96,16 @@ const LegalTable = () => {
           description: errors[0],
           status: 'error'
         })
-      } else onArchiveClose()
+      } else {
+        ARCHIVE.onClose()
+      }
     })
   }
 
   // SUB HEADER
   const subHeader = useMemo(() => {
+    const info = `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries.`
+
     return (
       <Flex
         width={'100%'}
@@ -136,11 +117,9 @@ const LegalTable = () => {
             <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
               Manufacturer Identities
             </Text>
-            <InfoIcon
-              color={primaryBlueText}
-              cursor={'pointer'}
-              onClick={onCheckMfc}
-            />
+            <Tooltip label={info}>
+              <InfoIcon cursor={'pointer'} color={primaryBlueText} />
+            </Tooltip>
           </Stack>
           <Text fontSize={'sm'}>
             View and manage the identities of manufacturers, ensuring
@@ -154,14 +133,14 @@ const LegalTable = () => {
             colorScheme='blue'
             onClick={() => {
               setActiveRow(null)
-              onOpen()
+              EDIT.onOpen()
             }}
             icon={<AddIcon />}
           />
         </Tooltip>
       </Flex>
     )
-  }, [updateOrg, onCheckMfc, onOpen, primaryTextColor, primaryBlueText])
+  }, [primaryTextColor, primaryBlueText, updateOrg, EDIT])
 
   // COLUMNS
   const columns = [
@@ -298,7 +277,7 @@ const LegalTable = () => {
                   isDisabled={!updateOrg}
                   onClick={() => {
                     setActiveRow(row)
-                    onOpen()
+                    EDIT.onOpen()
                   }}
                 >
                   Update Manufacturer
@@ -308,7 +287,7 @@ const LegalTable = () => {
                   color={primaryErrorColor}
                   onClick={() => {
                     setActiveRow(row)
-                    onArchiveOpen()
+                    ARCHIVE.onOpen()
                   }}
                 >
                   Archive Manufacturer
@@ -344,31 +323,20 @@ const LegalTable = () => {
         />
       </Flex>
 
-      {isOpen && (
+      {EDIT.isOpen && (
         <LegalModal
           data={activeRow}
-          isOpen={isOpen}
-          onClose={onClose}
+          isOpen={EDIT.isOpen}
+          onClose={EDIT.onClose}
           orgs={existingData}
         />
       )}
 
-      {/* INFO MODAL */}
-      {isInfoOpen && (
-        <InfoModal
-          isOpen={isInfoOpen}
-          onClose={onInfoClose}
-          heading={infoHeading}
-          body={infoText}
-          url={infoUrl}
-        />
-      )}
-
       {/* ARCHIVE CONFIRMTION MODAL */}
-      {isArchiveOpen && (
+      {ARCHIVE.isOpen && (
         <ConfirmationModal
-          isOpen={isArchiveOpen}
-          onClose={onArchiveClose}
+          isOpen={ARCHIVE.isOpen}
+          onClose={ARCHIVE.onClose}
           onConfirm={() => handleDelete(activeRow?.id)}
           name={activeRow?.organizationName}
           title='Archive Manufacturer'
