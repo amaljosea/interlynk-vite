@@ -61,30 +61,34 @@ const GlobalVulnsFilters = ({ setFilters }) => {
   const [envs, setEnvs] = useState([])
   const onFilterEnv = (value) => {
     const filterValue = value?.includes('all') ? undefined : value
+    const allUnselected = value.length === 0
     setEnvs(value?.includes('all') ? [] : value)
     setFilters((oldFilters) => ({
       ...oldFilters,
-      projectNames: filterValue
+      projectNames: allUnselected ? undefined : filterValue
     }))
   }
+
   // FILTER BY PRODUCT
   const [products, setProducts] = useState([])
   const onFilterProduct = (value) => {
     const filterValue = value?.includes('all') ? undefined : value
+    const allUnselected = value.length === 0
     setProducts(value?.includes('all') ? [] : value)
     setFilters((oldFilters) => ({
       ...oldFilters,
-      projectGroupIds: filterValue
+      projectGroupIds: allUnselected ? undefined : filterValue
     }))
   }
   // FILTER BY SEVERITY
   const [severities, setSeverities] = useState([])
   const onFilterSeverity = (value) => {
     const filterValue = value?.includes('all') ? undefined : value
+    const allUnselected = value.length === 0
     setSeverities(value?.includes('all') ? [] : value)
     setFilters((oldFilters) => ({
       ...oldFilters,
-      severity: filterValue
+      severity: allUnselected ? undefined : filterValue
     }))
   }
   // FILTER BY STATUS
