@@ -50,6 +50,7 @@ const Organizations = () => {
   const organisationList = isSuperAdmin ? allOrgList : myOrgList
 
   const onChange = async (item) => {
+    if (organization.name === item.name) return
     await switchOrg({ variables: { orgId: item?.id } })
       .then((res) => {
         if (res?.data) {
@@ -60,7 +61,7 @@ const Organizations = () => {
         setTimeout(() => {
           navigate('/vendor/dashboard')
           window.location.reload()
-        }, 500)
+        }, 100)
       })
   }
 
