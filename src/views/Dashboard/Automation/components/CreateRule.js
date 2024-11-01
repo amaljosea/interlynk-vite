@@ -1,51 +1,30 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getIcon, getLabel, updatedValue } from 'utils'
 
 import { EditIcon } from '@chakra-ui/icons'
-import { Box, Button, Flex, Tag, Text } from '@chakra-ui/react'
-import { Divider, Tooltip } from '@chakra-ui/react'
-import { Icon, IconButton } from '@chakra-ui/react'
-import { Input, InputGroup, InputLeftElement, Select } from '@chakra-ui/react'
-import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
+import {
+  Button,
+  Divider,
+  Flex,
+  FormControl,
+  FormLabel,
+  Input
+} from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
-import { useThemeColor } from 'hooks/useThemeColors'
-
 import { AutomationRuleCreate, AutomationRuleUpdate } from 'graphQL/Mutation'
 
 import { FaPlus } from 'react-icons/fa6'
-import { MdDeleteOutline } from 'react-icons/md'
 
-const SubjectIcon = ({ subject, isSystem = { isSystem } }) => {
-  const { headingTextSecondary, primaryBlueText } = useThemeColor([
-    'headingTextSecondary',
-    'primaryBlueText'
-  ])
-  return (
-    <Box hidden={subject === ''} mt={2}>
-      <Tooltip label={getLabel(subject)} placement='top'>
-        <Box>
-          <Icon
-            color={isSystem ? headingTextSecondary : primaryBlueText}
-            as={getIcon(subject)}
-          />
-        </Box>
-      </Tooltip>
-    </Box>
-  )
-}
+import RuleActions from './RuleActions'
+import RuleConditions from './RuleConditions'
 
 const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
   const params = useParams()
   const projectId = params?.productid
-  const { grayBorderColor, primaryErrorColor } = useThemeColor([
-    'grayBorderColor',
-    'primaryErrorColor'
-  ])
 
   const { automationConditionSubjectFieldMapping } = subOperators || []
 
@@ -227,114 +206,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
     }
   }
 
-  const onDeleteCondtion = (rule) => {
-    setError('')
-    const newData = conditions?.filter((item) => item.id !== rule?.id)
-    setConditions(newData)
-    if (rule?.status === 'ADDED') {
-      setDeletedCondition((prev) => [...prev, rule])
-    }
-  }
-
-  const onDeleteAction = (action) => {
-    setError('')
-    const newData = actions?.filter((item) => item.id !== action?.id)
-    setActions(newData)
-    if (action?.status === 'ADDED') {
-      setDeleteAction((prev) => [...prev, action])
-    }
-  }
-
   const onNameChange = (e) => setRuleName(e.target.value)
-
-  const onSubjectBlur = (rule) => {
-    const newData = conditions.map((item) => {
-      if (item.id === rule?.id) {
-        if (rule?.subject === '') {
-          return { ...item, subError: 'Select any subject' }
-        } else {
-          return { ...item, subError: '' }
-        }
-      }
-      return item
-    })
-    setConditions(newData)
-  }
-
-  const onOperatorBlur = (rule) => {
-    const newData = conditions.map((item) => {
-      if (item.id === rule?.id) {
-        if (rule?.operator === '') {
-          return { ...item, opError: 'Select any operator' }
-        } else {
-          return { ...item, opError: '' }
-        }
-      }
-      return item
-    })
-    setConditions(newData)
-  }
-
-  const onCondtionChange = (value, id, field) => {
-    setError('')
-    const newData = conditions.map((item) => {
-      if (item.id === id) {
-        if (field === 'subject' && value === '') {
-          return {
-            ...item,
-            [field]: value,
-            subError: 'Select any subject'
-          }
-        } else if (field === 'subject' && value !== '') {
-          const result = automationConditionSubjectFieldMapping?.find(
-            (item) => item?.key === value
-          )
-          return {
-            ...item,
-            [field]: value,
-            subError: '',
-            category: result?.subject,
-            list: result?.operators
-          }
-        } else if (field === 'operator' && value === '') {
-          return {
-            ...item,
-            [field]: value,
-            opError: 'Select any operator'
-          }
-        } else if (field === 'operator' && value !== '') {
-          return {
-            ...item,
-            [field]: value,
-            opError: ''
-          }
-        } else {
-          return { ...item, [field]: value }
-        }
-      }
-      return item
-    })
-    setConditions(newData)
-  }
-
-  const onActionChange = (value, id, field) => {
-    setError('')
-    const newData = actions.map((item) => {
-      if (item.id === id) {
-        if (field === 'field' && value !== '') {
-          return {
-            ...item,
-            [field]: value,
-            subject: isComponent ? 'component' : 'version'
-          }
-        } else {
-          return { ...item, [field]: value }
-        }
-      }
-      return item
-    })
-    setActions(newData)
-  }
 
   const getValue = (item) => {
     if (item?.operator === 'exists' || item?.operator === 'not_exists') {
@@ -503,147 +375,19 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
           <FormLabel fontSize={12} htmlFor='conditions'>
             Conditions
           </FormLabel>
-          {conditions?.length > 0 &&
-            conditions?.map((item, index) => (
-              <Box key={index}>
-                <Flex
-                  key={index}
-                  justifyContent={'space-bewteen'}
-                  sx={{ w: '100%', gap: 2, mt: 1.5, alignItems: 'flex-start' }}
-                >
-                  {/* ICON */}
-                  <InputGroup>
-                    <InputLeftElement pointerEvents='none'>
-                      <SubjectIcon
-                        subject={item?.subject}
-                        isSystem={isSystem}
-                      />
-                    </InputLeftElement>
-                    {/* SUBJECT */}
-                    <FormControl isInvalid={item?.subError !== ''}>
-                      <Select
-                        isDisabled={isSystem}
-                        value={item?.subject}
-                        onChange={(e) =>
-                          onCondtionChange(e.target.value, item.id, 'subject')
-                        }
-                        onBlur={() => onSubjectBlur(item)}
-                        placeholder='-- Subject --'
-                        onBlurCapture={() => onSubjectBlur(item)}
-                        textTransform={'capitalize'}
-                        sx={{ paddingLeft: '34px', fontSize: 'sm' }}
-                        data-testid={`auto_conditon_subject_${index}`}
-                      >
-                        {conditions?.length > 1 &&
-                        conditions?.some(
-                          (item) => item?.category === 'component'
-                        )
-                          ? [...categories]
-                              ?.filter((item) => item !== 'version')
-                              .map((category) => (
-                                <optgroup key={category} label={category}>
-                                  {optionsByCategory[category]}
-                                </optgroup>
-                              ))
-                          : conditions?.length > 1 &&
-                              conditions?.some(
-                                (item) => item?.category === 'version'
-                              )
-                            ? [...categories]
-                                ?.filter((item) => item !== 'component')
-                                .map((category) => (
-                                  <optgroup key={category} label={category}>
-                                    {optionsByCategory[category]}
-                                  </optgroup>
-                                ))
-                            : categories.map((category) => (
-                                <optgroup key={category} label={category}>
-                                  {optionsByCategory[category]}
-                                </optgroup>
-                              ))}
-                      </Select>
-                      <FormErrorMessage>{item?.subError}</FormErrorMessage>
-                    </FormControl>
-                  </InputGroup>
-                  {/* OPERATOR */}
-                  <FormControl isInvalid={item?.opError !== ''}>
-                    <Select
-                      id='operator'
-                      name='operator'
-                      value={item?.operator}
-                      onChange={(e) =>
-                        onCondtionChange(e.target.value, item.id, 'operator')
-                      }
-                      fontSize='sm'
-                      placeholder='-- Operator --'
-                      onBlur={() => onOperatorBlur(item)}
-                      isDisabled={isSystem}
-                      data-testid={`auto_conditon_operator_${index}`}
-                    >
-                      {item?.list?.map((option) => (
-                        <option value={option} key={option}>
-                          {updatedValue(option)}
-                        </option>
-                      ))}
-                    </Select>
-                    <FormErrorMessage>{item?.opError}</FormErrorMessage>
-                  </FormControl>
-                  {item?.operator !== 'exists' &&
-                    item?.operator !== 'not_exists' &&
-                    item?.operator !== 'boolean_is' && (
-                      <Input
-                        type={'text'}
-                        placeholder='Value'
-                        value={item?.value}
-                        onChange={(e) =>
-                          onCondtionChange(e.target.value, item.id, 'value')
-                        }
-                        sx={{ minW: 140, fontSize: 'sm' }}
-                      />
-                    )}
-                  {item?.operator === 'boolean_is' && (
-                    <Select
-                      type={'text'}
-                      value={item?.value}
-                      onChange={(e) =>
-                        onCondtionChange(e.target.value, item.id, 'value')
-                      }
-                      sx={{ minW: 140, fontSize: 'sm' }}
-                    >
-                      <option value=''>-- Select --</option>
-                      <option value={'true'}>Yes</option>
-                      <option value={'false'}>No</option>
-                    </Select>
-                  )}
-                  <Flex gap={4} justifyContent={'space-between'}>
-                    {conditions?.length > 1 && (
-                      <IconButton
-                        border='1px solid'
-                        colorScheme='white'
-                        borderColor={grayBorderColor}
-                        aria-label='Remove condition'
-                        onClick={() => onDeleteCondtion(item)}
-                        icon={
-                          <Icon
-                            color={primaryErrorColor}
-                            w={6}
-                            h={6}
-                            as={MdDeleteOutline}
-                          />
-                        }
-                      />
-                    )}
-                  </Flex>
-                </Flex>
-                {conditions?.length > 1 && conditions?.length - 1 !== index && (
-                  <Tag mt={1.5}>
-                    <Text fontSize={10} fontWeight={600}>
-                      AND
-                    </Text>
-                  </Tag>
-                )}
-              </Box>
-            ))}
+          <RuleConditions
+            conditions={conditions}
+            setConditions={setConditions}
+            isSystem={isSystem}
+            setError={setError}
+            automationConditionSubjectFieldMapping={
+              automationConditionSubjectFieldMapping
+            }
+            categories={categories}
+            optionsByCategory={optionsByCategory}
+            setDeletedCondition={setDeletedCondition}
+            setDeleteAction={setDeleteAction}
+          />
         </FormControl>
         <Button
           fontSize={'sm'}
@@ -662,134 +406,16 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
           <FormLabel fontSize={12} htmlFor='actions'>
             Actions
           </FormLabel>
-          {actions?.length > 0 &&
-            actions?.map((item, index) => (
-              <Box key={index}>
-                <Flex
-                  key={index}
-                  justifyContent={'space-bewteen'}
-                  sx={{ w: '100%', gap: 2, mt: 1.5, alignItems: 'flex-start' }}
-                >
-                  {/* ICON */}
-                  <InputGroup>
-                    <InputLeftElement pointerEvents='none'>
-                      <SubjectIcon
-                        subject={item?.subject}
-                        isSystem={isSystem}
-                      />
-                    </InputLeftElement>
-                    {/* SUBJECT */}
-                    <FormControl as={Flex} alignItems='center'>
-                      <Select
-                        value={item?.field}
-                        onChange={(e) =>
-                          onActionChange(e.target.value, item.id, 'field')
-                        }
-                        placeholder='-- Subject --'
-                        textTransform={'capitalize'}
-                        isDisabled={
-                          conditionErrorMessage ||
-                          conditions?.length === 0 ||
-                          isSystem
-                        }
-                        sx={{ paddingLeft: '34px', fontSize: 'sm' }}
-                        data-testid={`auto_action_subject_${index}`}
-                      >
-                        {conditions?.some(
-                          (item) => item?.category === 'component'
-                        )
-                          ? [...categories]
-                              ?.filter((item) => item !== 'version')
-                              .map((category) => (
-                                <optgroup key={category} label={category}>
-                                  {optionsByCategory[category]}
-                                </optgroup>
-                              ))
-                          : [...categories]
-                              ?.filter((item) => item !== 'component')
-                              .map((category) => (
-                                <optgroup key={category} label={category}>
-                                  {optionsByCategory[category]}
-                                </optgroup>
-                              ))}
-                      </Select>
-                    </FormControl>
-                  </InputGroup>
-                  {/* OPERATOR */}
-                  <Input
-                    textTransform={'capitalize'}
-                    defaultValue={item?.operator}
-                    isDisabled={
-                      conditionErrorMessage ||
-                      conditions?.length === 0 ||
-                      isSystem
-                    }
-                    sx={{ w: '130px', fontSize: 'sm', pointerEvents: 'none' }}
-                  />
-                  {/* VALUE */}
-                  {item?.field === 'component_internal' ? (
-                    <Select
-                      type={'text'}
-                      value={item?.value}
-                      onChange={(e) =>
-                        onActionChange(e.target.value, item.id, 'value')
-                      }
-                      sx={{ minW: 140, fontSize: 'sm' }}
-                    >
-                      <option value=''>-- Select --</option>
-                      <option value={'true'}>Yes</option>
-                      <option value={'false'}>No</option>
-                    </Select>
-                  ) : (
-                    <FormControl as={Flex} alignItems='center' gap={2}>
-                      <Input
-                        type={'text'}
-                        placeholder={'Add value'}
-                        value={item.value}
-                        onChange={(e) =>
-                          onActionChange(e.target.value, item.id, 'value')
-                        }
-                        isDisabled={
-                          conditionErrorMessage ||
-                          conditions?.length === 0 ||
-                          isSystem
-                        }
-                        sx={{ minW: 140, fontSize: 'sm' }}
-                      />
-                      <Flex gap={4} justifyContent={'space-between'}>
-                        {actions?.length > 1 && (
-                          <IconButton
-                            border='1px solid'
-                            colorScheme='white'
-                            borderColor={grayBorderColor}
-                            aria-label='Remove action'
-                            onClick={() => onDeleteAction(item)}
-                            display={
-                              conditionErrorMessage || conditions?.length === 0
-                                ? 'none'
-                                : 'flex'
-                            }
-                            icon={
-                              <Icon
-                                as={MdDeleteOutline}
-                                sx={{ w: 6, h: 6, color: primaryErrorColor }}
-                              />
-                            }
-                          />
-                        )}
-                      </Flex>
-                    </FormControl>
-                  )}
-                </Flex>
-                {actions?.length > 1 && actions?.length - 1 !== index && (
-                  <Tag mt={1.5}>
-                    <Text fontSize={10} fontWeight={600}>
-                      AND
-                    </Text>
-                  </Tag>
-                )}
-              </Box>
-            ))}
+          <RuleActions
+            actions={actions}
+            setActions={setActions}
+            conditions={conditions}
+            isSystem={isSystem}
+            setError={setError}
+            conditionErrorMessage={conditionErrorMessage}
+            categories={categories}
+            optionsByCategory={optionsByCategory}
+          />
         </FormControl>
         <Button
           variant='link'
