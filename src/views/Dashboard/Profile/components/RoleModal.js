@@ -16,7 +16,7 @@ const RoleModal = ({ isOpen, onClose, data }) => {
 
   const { data: roles } = useQuery(GetRoles, { skip: isOpen ? false : true })
 
-  const [updateOrgRules] = useMutation(UpdateOrganizationUserRole)
+  const [updateOrgRules, { loading }] = useMutation(UpdateOrganizationUserRole)
 
   const updateRole = async () => {
     await updateOrgRules({
@@ -48,13 +48,14 @@ const RoleModal = ({ isOpen, onClose, data }) => {
       Icon={ChangeRoleIcon}
       disabled={role === ''}
       buttonText='Update'
+      isLoading={loading}
     >
       <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
         {error !== '' && <LynkAlert msg={error} />}
         {/* NAME */}
-        <FormControl>
+        <FormControl hidden={!data?.name}>
           <FormLabel fontSize={12}>Name</FormLabel>
-          <Input type='text' defaultValue={data?.name || ''} isReadOnly />
+          <Input type='text' defaultValue={data?.name || ''} disabled />
         </FormControl>
         {/* ROLES */}
         {roles && (
