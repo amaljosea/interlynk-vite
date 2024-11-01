@@ -112,18 +112,12 @@ const ChangelogTable = ({ activeEnv }) => {
       name: 'PREVIOUS VALUE',
       wrap: true,
       selector: (row) => {
-        const { event } = row
-        const { orig } = row
+        const { event, orig } = row
+        const content = orig ? `${event} / ${orig}` : ''
         return (
-          <Tooltip label={orig} placement='top'>
-            <Text color={primaryTextColor} my={2}>
-              {orig !== null
-                ? `${event} / ${orig.substring(0, 400)}${
-                    orig.length > 400 ? '...' : ''
-                  }`
-                : ''}
-            </Text>
-          </Tooltip>
+          <Text color={primaryTextColor} my={2}>
+            {content}
+          </Text>
         )
       }
     },
@@ -133,18 +127,12 @@ const ChangelogTable = ({ activeEnv }) => {
       name: 'UPDATED VALUE',
       wrap: true,
       selector: (row) => {
-        const { event } = row
-        const { updated } = row
+        const { event, updated } = row
+        const content = updated ? `${event} / ${updated}` : ''
         return (
-          <Tooltip label={updated} placement='top'>
-            <Text color={primaryTextColor} overflow={'auto'} my={2}>
-              {updated !== null
-                ? `${event} / ${updated.substring(0, 400)}${
-                    updated.length > 400 ? '...' : ''
-                  }`
-                : ''}
-            </Text>
-          </Tooltip>
+          <Text color={primaryTextColor} overflow={'auto'} my={2}>
+            {content}
+          </Text>
         )
       }
     },
