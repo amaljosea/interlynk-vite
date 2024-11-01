@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { CheckCircleIcon, CloseIcon } from '@chakra-ui/icons'
 import { Button, Flex, Icon, Stack, Text } from '@chakra-ui/react'
 
+import CustomLoader from 'components/CustomLoader'
 import FileUpload from 'components/FileUpload'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -46,7 +47,7 @@ const SbomUpload = () => {
 
   const [declineRequest] = useMutation(RequestDecline)
   const [uploadSbom, { error, loading }] = useMutation(RequestUploadSbom)
-  const [validateRequest] = useMutation(RequestValidate)
+  const [validateRequest, { loading: vrLoading }] = useMutation(RequestValidate)
 
   useEffect(() => {
     validateRequest({ variables: { id, token } }).then((res) => {
@@ -101,11 +102,13 @@ const SbomUpload = () => {
     )
   }
 
+  if (vrLoading) return <CustomLoader />
+
   return (
     <Flex alignItems='center' justifyContent='center'>
       {!uploadSuccessView && !uploadFailureView && (
         <Flex alignItems='center' justifyContent='center'>
-          <Stack textAlign='center' gap={'20px'}>
+          <Stack w={'100%'} textAlign='center' gap={'20px'}>
             <Stack>
               <Text
                 fontSize='20px'
