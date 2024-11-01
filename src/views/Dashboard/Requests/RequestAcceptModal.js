@@ -24,29 +24,26 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
   const [productName, setProductName] = useState('')
   const [projectIds, setProjectIds] = useState([])
 
-  const handleAccept = async (e) => {
-    e.preventDefault()
-
-    const res = await acceptRequest({
+  const handleAccept = async () => {
+    await acceptRequest({
       variables: {
         id: data?.id,
         projectId: projectId
       }
+    }).then((res) => {
+      if (res?.data?.requestAccept?.errors?.length === 0) {
+        showToast({
+          description: `SBOM copied into Product ${productName}`,
+          status: 'success'
+        })
+        onClose()
+      } else {
+        showToast({
+          description: "Couldn't accept request",
+          status: 'error'
+        })
+      }
     })
-
-    if (!res?.data?.requestAccept?.errors?.length > 0) {
-      showToast({
-        description: `SBOM copied into Product ${productName}`,
-        status: 'success'
-      })
-      onClose()
-    } else {
-      showToast({
-        title: 'Error',
-        description: "Couldn't accept request",
-        status: 'error'
-      })
-    }
   }
 
   const handleProductChange = (e) => {
@@ -102,11 +99,13 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
             textTransform={'capitalize'}
           >
             <option value=''>Select Environment</option>
-            {projectIds.map((item, index) => (
-              <option key={index} value={item.id}>
-                {truncatedValue(item.name, 24)}
-              </option>
-            ))}
+            {projectIds
+              ?.sort((a, b) => a?.name?.localeCompare(b?.name))
+              ?.map((item, index) => (
+                <option key={index} value={item.id}>
+                  {truncatedValue(item.name, 24)}
+                </option>
+              ))}
           </Select>
         </FormControl>
       </Flex>
