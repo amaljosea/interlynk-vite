@@ -1,5 +1,6 @@
 import InterlynkLogo from 'assets/img/logo.png'
 import jsPDF from 'jspdf'
+import { truncatedValue } from 'utils'
 
 export const authorsList = (authors) => {
   let authorsString = ''
@@ -442,5 +443,5 @@ export const downloadSbomPdf = (
     currentY += 15
   })
 
-  doc.save(`${productName}.pdf`)
+  doc.save(`${truncatedValue(productName, 14)}-${version}.pdf`)
 }

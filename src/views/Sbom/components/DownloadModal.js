@@ -1,5 +1,6 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { client } from 'context/ApolloWrapper'
+import { useState } from 'react'
 import { getSignedUrlParams, truncatedValue } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
@@ -42,7 +43,6 @@ const DownloadModal = (props) => {
   const [spec, setSpec] = useState('CycloneDX')
   const [format, setFormat] = useState('json')
   const [itemsPerPage, setItemsPerPage] = useState('25')
-  const [shouldFetch, setShouldFetch] = useState(false)
   const [includeVulns, setIncludeVulns] = useState(false)
   const [original, setOriginal] = useState(false)
   const [encoded, setEncoded] = useState(false)
@@ -60,24 +60,6 @@ const DownloadModal = (props) => {
 
   const { nodes: ntiaData } = ntia?.complianceReports || ''
   const { nodes: fdaData } = fda?.complianceReports || ''
-
-  const { data: components, loading } = useQuery(GetComponentData, {
-    skip: format === 'json' || !shouldFetch,
-    variables: {
-      projectId: productId,
-      sbomId,
-      first: Number(itemsPerPage)
-    }
-  })
-
-  const { data: VulnData, loading: vulnLoading } = useQuery(GetVulnData, {
-    skip: format === 'json' || !shouldFetch,
-    variables: {
-      projectId: productId,
-      sbomId,
-      first: Number(itemsPerPage)
-    }
-  })
 
   const DETAILS = useDisclosure()
 
@@ -121,45 +103,136 @@ const DownloadModal = (props) => {
     }
   }
 
-  useEffect(() => {
-    if (!loading && !vulnLoading && shouldFetch) {
-      const componentsActual = components?.sbom?.components?.nodes || []
-      const vulnActual = VulnData?.sbom?.vulns?.nodes || []
-      downloadSbomPdf(
-        productName,
-        version,
-        description,
-        purl,
-        authors,
-        sbom,
-        componentsActual,
-        vulnActual
-      )
+  const handleDownloadPdf = async () => {
+    setIsLoading(true)
+    // Check if itemsPerPage is less than 200
+    if (itemsPerPage !== '200') {
+      try {
+        const componentsRes = await client.query({
+          query: GetComponentData,
+          variables: {
+            projectId: productId,
+            sbomId,
+            first: Number(itemsPerPage)
+          },
+          fetchPolicy: 'no-cache'
+        })
 
-      setIsLoading(false)
-      setShouldFetch(false)
-      onClose()
+        const vulnRes = await client.query({
+          query: GetVulnData,
+          variables: {
+            projectId: productId,
+            sbomId,
+            first: Number(itemsPerPage)
+          },
+          fetchPolicy: 'no-cache'
+        })
+
+        const componentsActual =
+          componentsRes?.data?.sbom?.components?.nodes || []
+        const vulnActual = vulnRes?.data?.sbom?.vulns?.nodes || []
+
+        downloadSbomPdf(
+          productName,
+          version,
+          description,
+          purl,
+          authors,
+          sbom,
+          componentsActual,
+          vulnActual
+        )
+
+        setIsLoading(false)
+        onClose()
+      } catch (error) {
+        setIsLoading(false)
+        showToast({
+          description: 'Error downloading SBOM PDF. Please try again later.',
+          status: 'error'
+        })
+      }
+    } else {
+      let allComponents = []
+      let allVulns = []
+      let componentsHasNextPage = true
+      let vulnsHasNextPage = true
+      let componentsEndCursor = null
+      let vulnsEndCursor = null
+
+      try {
+        while (componentsHasNextPage || vulnsHasNextPage) {
+          if (componentsHasNextPage) {
+            const componentsRes = await client.query({
+              query: GetComponentData,
+              variables: {
+                projectId: productId,
+                sbomId,
+                first: 200,
+                after: componentsEndCursor || undefined
+              },
+              fetchPolicy: 'no-cache'
+            })
+
+            const fetchedComponents =
+              componentsRes?.data?.sbom?.components?.nodes || []
+            const pageInfo = componentsRes?.data?.sbom?.components?.pageInfo
+
+            allComponents.push(...fetchedComponents)
+            componentsEndCursor = pageInfo?.endCursor
+            componentsHasNextPage = pageInfo?.hasNextPage
+          }
+
+          if (vulnsHasNextPage) {
+            const vulnRes = await client.query({
+              query: GetVulnData,
+              variables: {
+                projectId: productId,
+                sbomId,
+                first: 100,
+                after: vulnsEndCursor || undefined
+              },
+              fetchPolicy: 'no-cache'
+            })
+
+            const fetchedVulns = vulnRes?.data?.sbom?.vulns?.nodes || []
+            const pageInfo = vulnRes?.data?.sbom?.vulns?.pageInfo
+
+            allVulns.push(...fetchedVulns)
+            vulnsEndCursor = pageInfo?.endCursor
+            vulnsHasNextPage = pageInfo?.hasNextPage
+          }
+        }
+
+        downloadSbomPdf(
+          productName,
+          version,
+          description,
+          purl,
+          authors,
+          sbom,
+          allComponents,
+          allVulns
+        )
+
+        setIsLoading(false)
+        onClose()
+      } catch (error) {
+        setIsLoading(false)
+        showToast({
+          description:
+            'Error downloading SBOM PDF with all data. Please try again later.',
+          status: 'error'
+        })
+      }
     }
-  }, [
-    loading,
-    vulnLoading,
-    components,
-    VulnData,
-    shouldFetch,
-    authors,
-    description,
-    onClose,
-    productName,
-    purl,
-    sbom,
-    version
-  ])
+  }
 
   const handleDownload = async () => {
     setIsLoading(true)
     try {
       if (format === 'pdf') {
-        setShouldFetch(true)
+        handleDownloadPdf()
         return
       }
       await getData({
@@ -208,6 +281,7 @@ const DownloadModal = (props) => {
         description: `Internal error during SBOM download. Please try again in a few minutes.`,
         status: 'error'
       })
+      setIsLoading(false)
     }
   }
 
@@ -244,7 +318,7 @@ const DownloadModal = (props) => {
         onSubmit={handleDownload}
         title={'Download SBOM'}
         Icon={DownloadIcon}
-        isLoading={isLoading || loading || vulnLoading}
+        isLoading={isLoading}
         buttonText={'Download'}
       >
         <Flex flexDirection={'column'} gap={4}>
