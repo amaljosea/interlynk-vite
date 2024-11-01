@@ -244,6 +244,18 @@ export const sevIcon = (severity) => {
   }
 }
 
+export const cvssColor = (cvss) => {
+  if (cvss >= 9.0) {
+    return 'red'
+  } else if (cvss >= 7.0) {
+    return 'orange'
+  } else if (cvss >= 6.0) {
+    return 'yellow'
+  } else {
+    return 'gray'
+  }
+}
+
 export const sevColor = (severity) => {
   switch (toLower(severity)) {
     case 'critical':
