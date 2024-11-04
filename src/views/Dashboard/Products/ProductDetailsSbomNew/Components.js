@@ -134,7 +134,7 @@ const Components = ({ sbomData }) => {
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
       direct: direct === true ? true : undefined,
-      includeParts: include === 'parts' ? true : undefined
+      includeParts: include?.includes('parts') ? true : undefined
     }
   }, [direct, ecosystems, include, kinds, licenses, scope, suppliers])
 

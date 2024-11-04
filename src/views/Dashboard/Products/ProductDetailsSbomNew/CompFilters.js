@@ -2,7 +2,16 @@ import { gql, useLazyQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Box, Flex, Menu, Stack, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  Menu,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
+  Stack,
+  Text
+} from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
 import LynkMenuList from 'components/Misc/LynkMenuList'
@@ -242,16 +251,25 @@ const CompFilters = ({ reset }) => {
       {/* INCLUDE */}
       <Box width={'fit-content'}>
         <Menu closeOnSelect={false}>
-          <MenuHeading
-            title={'Include'}
-            active={include !== '' && include !== 'all'}
-          />
-          <CustomList
-            type='radio'
-            options={['parts']}
-            value={include}
-            onChange={onFilterInclude}
-          />
+          <MenuHeading title={'Include'} active={include.length !== 0} />
+          <MenuList>
+            <MenuOptionGroup
+              type='checkbox'
+              value={include}
+              onChange={onFilterInclude}
+            >
+              {['parts'].map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
         </Menu>
       </Box>
       {/* DIRECT */}

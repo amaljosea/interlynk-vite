@@ -2,7 +2,16 @@ import { gql, useLazyQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Box, Flex, Menu, Stack, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  Menu,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
+  Stack,
+  Text
+} from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
 import LynkMenuList from 'components/Misc/LynkMenuList'
@@ -63,7 +72,7 @@ const CompFilters = ({ reset }) => {
   const params = useParams()
   const sbomId = params?.sbomid
   const { prodCompState, dispatch } = useGlobalState()
-  const { ecosystems, kinds, licenses, suppliers, scope, direct } =
+  const { ecosystems, kinds, licenses, suppliers, scope, direct, include } =
     prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -87,6 +96,11 @@ const CompFilters = ({ reset }) => {
 
   const onFilterDirect = (e) => {
     prodCompDispatch({ type: 'FILTER_DIRECT', payload: e.target.checked })
+    reset()
+  }
+
+  const onFilterInclude = (value) => {
+    prodCompDispatch({ type: 'FILTER_INCLUDE', payload: value })
     reset()
   }
 
@@ -240,6 +254,30 @@ const CompFilters = ({ reset }) => {
             value={scope}
             onChange={onFilterType}
           />
+        </Menu>
+      </Box>
+      {/* INCLUDE */}
+      <Box width={'fit-content'}>
+        <Menu closeOnSelect={false}>
+          <MenuHeading title={'Include'} active={include.length !== 0} />
+          <MenuList>
+            <MenuOptionGroup
+              type='checkbox'
+              value={include}
+              onChange={onFilterInclude}
+            >
+              {['parts'].map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
         </Menu>
       </Box>
       {/* DIRECT */}

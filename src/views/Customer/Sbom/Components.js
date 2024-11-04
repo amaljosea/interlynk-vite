@@ -84,7 +84,8 @@ const Components = ({ sbomData }) => {
     licenses,
     suppliers,
     scope,
-    direct
+    direct,
+    include
   } = prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -99,9 +100,10 @@ const Components = ({ sbomData }) => {
       supplierName: getUndefinedIfEmptyOrAll(suppliers),
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true : undefined
+      direct: direct === true ? true : undefined,
+      includeParts: include?.includes('parts') ? true : undefined
     }
-  }, [direct, ecosystems, kinds, licenses, scope, suppliers])
+  }, [direct, ecosystems, kinds, licenses, scope, include, suppliers])
 
   const {
     nodes: components,

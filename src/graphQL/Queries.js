@@ -1850,6 +1850,7 @@ export const ShareComponentData = gql`
     $internal: Boolean
     $primary: Boolean
     $direct: Boolean
+    $includeParts: Boolean
     $field: ComponentOrderByFields!
     $direction: OrderByDirection!
   ) {
@@ -1869,6 +1870,7 @@ export const ShareComponentData = gql`
           internal: $internal
           primary: $primary
           direct: $direct
+          includeParts: $includeParts
           orderBy: { field: $field, direction: $direction }
         ) {
           totalCount

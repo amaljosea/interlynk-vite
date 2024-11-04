@@ -129,7 +129,7 @@ const prodCompReducer = (state, action) => {
     case 'FILTER_INCLUDE':
       return {
         ...state,
-        include: payload,
+        include: [...payload]?.includes('all') ? [] : payload,
         pageIndex: 1,
         after: '',
         before: ''
