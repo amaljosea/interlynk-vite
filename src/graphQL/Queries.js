@@ -1101,6 +1101,7 @@ export const GetVersionsTable = gql`
           createdAt
           updatedAt
           lifecycle
+          isReprocess
           projectVersion
           vulnRunStatus
           alternatives {

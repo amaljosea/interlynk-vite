@@ -203,7 +203,7 @@ const VersionsTable = (props) => {
       id: 'SBOMS_PROJECT_VERSION',
       name: 'VERSION',
       selector: (row, index) => {
-        const { projectVersion, createdAt, alternatives } = row
+        const { projectVersion, createdAt, alternatives, isReprocess } = row
         const createdTime = new Date(createdAt)
         const currentTime = new Date()
         const timeDifference = currentTime - createdTime
@@ -219,6 +219,9 @@ const VersionsTable = (props) => {
             tab: 'general'
           }
         })
+        const showIcon =
+          alternatives?.length > 0 && timeDifferenceInSeconds <= 60
+
         return (
           <Grid
             justifyContent={'center'}
@@ -256,7 +259,7 @@ const VersionsTable = (props) => {
                   {projectVersion}
                 </Text>
               </Link>
-              {alternatives?.length > 0 && timeDifferenceInSeconds <= 60 && (
+              {!isReprocess && showIcon && (
                 <Tooltip label={ignoreMsg}>
                   <Box>
                     <Icon
