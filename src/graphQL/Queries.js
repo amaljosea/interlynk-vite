@@ -13,6 +13,7 @@ export const getOrganization = gql`
         name
         email
         superAdmin
+        isPasswordSet
         unconfirmedEmail
         profileImage {
           filename

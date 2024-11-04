@@ -666,6 +666,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   />
                   <Tooltip label='Edit Password'>
                     <IconButton
+                      isDisabled={!orgData?.currentUser?.isPasswordSet}
                       onClick={() => setIsPasswordEdit(true)}
                       icon={<EditIcon />}
                       aria-label='Edit Password'
