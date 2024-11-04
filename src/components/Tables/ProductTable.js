@@ -441,6 +441,7 @@ const ProductTable = ({
                   width={'fit-content'}
                   onClick={handleClick}
                   aria-label='product_name'
+                  data-testid={`product_${name}`}
                 >
                   {name?.length > 54 ? (
                     <Tooltip label={name}>{truncatedValue(name, 54)}</Tooltip>
@@ -502,7 +503,7 @@ const ProductTable = ({
             <MenuButton
               variant='none'
               as={IconButton}
-              aria-label={`Dropdown menu for ${name}`}
+              aria-label={`dropdown menu for ${name}`}
               color={secondaryTextColor}
               icon={<FaEllipsisV />}
               data-testid='product-actions'
@@ -559,7 +560,7 @@ const ProductTable = ({
                 )}
                 {/* UPLOAD SBOM */}
                 <MenuItem
-                  aria-label='upload_sbom'
+                  aria-label={`upload sbom for ${name}`}
                   onClick={() => {
                     setActiveRow(row)
                     onOpenUpload()

@@ -34,8 +34,12 @@ export default class VulnsSection {
         .nth(0)
 
       if (product.isVisible()) {
-        await this.page.getByLabel('Dropdown menu for Test').click()
-        await this.page.getByRole('menuitem', { name: 'upload_sbom' }).click()
+        await this.page
+          .locator(`//button[@aria-label='dropdown menu for Test']`)
+          .click()
+        await this.page
+          .locator(`//button[@aria-label='upload sbom for Test']`)
+          .click()
 
         const jsonFiles = getFileNamesFromResource('.json')
 
@@ -46,12 +50,14 @@ export default class VulnsSection {
         await this.page.waitForTimeout(2000)
 
         await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(3000)
 
         await this.page
-          .locator(`//button[@aria-label='Dropdown menu for Test']`)
+          .locator(`//button[@aria-label='dropdown menu for Test']`)
           .click()
-        await this.page.getByRole('menuitem', { name: 'upload_sbom' }).click()
+        await this.page
+          .locator(`//button[@aria-label='upload sbom for Test']`)
+          .click()
 
         const sbomTwo = path.resolve(__dirname, '../resources', jsonFiles[1])
         await this.page
@@ -65,7 +71,8 @@ export default class VulnsSection {
         await product.click()
 
         await this.page.reload()
-        await this.page.waitForTimeout(5000)
+        await this.page.waitForTimeout(20000)
+        await this.page.reload()
 
         const version = this.page.getByTestId('version').nth(0)
 
@@ -156,6 +163,9 @@ export default class VulnsSection {
         await product.click()
         await this.page.waitForTimeout(2000)
 
+        await this.page.reload()
+        await this.page.waitForTimeout(2000)
+
         const version = this.page.getByTestId('version').nth(0)
 
         if (version.isVisible()) {
@@ -194,11 +204,14 @@ export default class VulnsSection {
             await this.page.waitForTimeout(2000)
 
             await this.page.locator("//a[@aria-label='products']").click()
-            await this.page.getByTestId('product-actions').first().click()
-
+            await this.page
+              .locator(`//button[@aria-label='dropdown menu for Test']`)
+              .click()
             await this.page.waitForTimeout(2000)
 
-            await this.page.getByTestId('delete_product').first().click()
+            await this.page
+              .locator(`//button[@aria-label='Delete product Test']`)
+              .click()
             await this.page.locator("button[type='submit']").click()
 
             await this.page.waitForTimeout(2000)
@@ -225,14 +238,17 @@ export default class VulnsSection {
 
       if (product.isVisible()) {
         await product.click()
-        await this.page.waitForTimeout(2000)
+
+        await this.page.reload()
+        await this.page.waitForTimeout(20000)
+        await this.page.reload()
 
         const version = this.page.getByTestId('version').nth(1)
 
         if (version.isVisible()) {
           await version.click()
           await this.page.waitForTimeout(2000)
-          
+
           await this.page.getByRole('tab', { name: 'vulnerabilities' }).click()
 
           await this.page

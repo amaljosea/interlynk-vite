@@ -33,8 +33,13 @@ export default class ChecksSection {
         .nth(0)
 
       if (product.isVisible()) {
-        await this.page.getByLabel('Dropdown menu for Test').click()
-        await this.page.getByRole('menuitem', { name: 'upload_sbom' }).click()
+        const actions = this.page.locator(
+          `//button[@aria-label='dropdown menu for Test']`
+        )
+        await actions.click()
+        await this.page
+          .locator(`//button[@aria-label='upload sbom for Test']`)
+          .click()
 
         const jsonFiles = getFileNamesFromResource('.json')
 
@@ -103,7 +108,7 @@ export default class ChecksSection {
           await this.page.locator("//a[@aria-label='products']").click()
           await this.page.waitForTimeout(2000)
 
-          await this.page.getByLabel('Dropdown menu for Test').click()
+          await actions.click()
           await this.page
             .locator(`//button[@aria-label='Delete product Test']`)
             .click()

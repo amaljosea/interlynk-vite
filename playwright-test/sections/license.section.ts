@@ -27,12 +27,12 @@ export default class LicenseSection {
       await this.page.locator("button[type='submit']").click()
       await this.page.waitForTimeout(2000)
 
-      const licenseMenu = this.page.locator(
-        `//button[@aria-label='license action ${name}']`
-      )
+      const license = this.page.getByTestId(`license_${name}`)
 
-      if (licenseMenu.isVisible()) {
-        await licenseMenu.click()
+      if (license.isVisible()) {
+        await this.page
+          .locator(`//button[@aria-label='license action ${name}']`)
+          .click()
         this.page
           .locator(`//button[@aria-label='license edit ${name}']`)
           .click()

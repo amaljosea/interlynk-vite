@@ -34,8 +34,12 @@ export default class GeneralSection {
         .nth(0)
 
       if (product.isVisible()) {
-        await this.page.getByLabel('Dropdown menu for Test').click()
-        await this.page.getByRole('menuitem', { name: 'upload_sbom' }).click()
+        await this.page
+          .locator(`//button[@aria-label='dropdown menu for Test']`)
+          .click()
+        await this.page
+          .locator(`//button[@aria-label='upload sbom for Test']`)
+          .click()
 
         const jsonFiles = getFileNamesFromResource('.json')
 
@@ -226,11 +230,14 @@ export default class GeneralSection {
           await this.page.waitForTimeout(3000)
 
           await this.page.locator("//a[@aria-label='products']").click()
-          await this.page.getByTestId('product-actions').first().click()
-
+          await this.page
+            .locator(`//button[@aria-label='dropdown menu for Test']`)
+            .click()
           await this.page.waitForTimeout(2000)
 
-          await this.page.getByTestId('delete_product').first().click()
+          await this.page
+            .locator(`//button[@aria-label='Delete product Test']`)
+            .click()
           await this.page.locator("button[type='submit']").click()
         } else {
           errors.push('Version not found')

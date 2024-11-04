@@ -89,7 +89,11 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
               flexDirection={'column'}
               gap={2}
             >
-              <Text color={primaryTextColor} data-tag='allowRowEvents'>
+              <Text
+                color={primaryTextColor}
+                data-tag='allowRowEvents'
+                data-testid={`license_${name}`}
+              >
                 {name}
               </Text>
               <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>

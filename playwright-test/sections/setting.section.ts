@@ -24,9 +24,7 @@ export default class SettingSection {
       await this.page.locator("button[type='submit']").click()
       await this.page.waitForTimeout(3000)
 
-      const product = this.page
-        .locator(`//p[@aria-label='product_name']`)
-        .nth(0)
+      const product = this.page.getByTestId(`product_Test`)
 
       if (product.isVisible()) {
         await product.click()

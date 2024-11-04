@@ -40,8 +40,12 @@ export default class PartsSection {
       const productTwo = this.page.locator(`//p[normalize-space()='TestTwo']`)
 
       if (productOne.isVisible()) {
-        await this.page.getByLabel('Dropdown menu for TestOne').click()
-        await this.page.getByRole('menuitem', { name: 'upload_sbom' }).click()
+        await this.page
+          .locator(`//button[@aria-label='dropdown menu for TestOne']`)
+          .click()
+        await this.page
+          .locator(`//button[@aria-label='upload sbom for TestOne']`)
+          .click()
 
         const jsonFiles = getFileNamesFromResource('.json')
 
@@ -56,8 +60,12 @@ export default class PartsSection {
       }
 
       if (productTwo.isVisible()) {
-        await this.page.getByLabel('Dropdown menu for TestTwo').click()
-        await this.page.getByRole('menuitem', { name: 'upload_sbom' }).click()
+        await this.page
+          .locator(`//button[@aria-label='dropdown menu for TestTwo']`)
+          .click()
+        await this.page
+          .locator(`//button[@aria-label='upload sbom for TestTwo']`)
+          .click()
 
         const jsonFiles = getFileNamesFromResource('.json')
 
@@ -197,14 +205,20 @@ export default class PartsSection {
           await this.page.locator("//a[@aria-label='products']").click()
           await this.page.waitForTimeout(2000)
 
-          await this.page.getByLabel('Dropdown menu for TestOne').click()
+          await this.page
+            .locator(`//button[@aria-label='dropdown menu for TestOne']`)
+            .click()
+          await this.page.waitForTimeout(2000)
           await this.page
             .locator(`//button[@aria-label='Delete product TestOne']`)
             .click()
           await this.page.locator("button[type='submit']").click()
           await this.page.waitForTimeout(3000)
 
-          await this.page.getByLabel('Dropdown menu for TestTwo').click()
+          await this.page
+            .locator(`//button[@aria-label='dropdown menu for TestTwo']`)
+            .click()
+          await this.page.waitForTimeout(2000)
           await this.page
             .locator(`//button[@aria-label='Delete product TestTwo']`)
             .click()
