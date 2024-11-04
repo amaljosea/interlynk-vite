@@ -1,7 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import {
+  customStyles,
+  getChangelogColor,
+  getFullDateAndTime,
+  timeSince
+} from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -25,25 +30,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetProjectLogs } from 'graphQL/Queries'
 
 import Pagination from '../Pagination'
-
-const setColor = (type) => {
-  switch (type) {
-    case 'create':
-      return 'green'
-    case 'created':
-      return 'green'
-    case 'update':
-      return 'blue'
-    case 'updated':
-      return 'blue'
-    case 'modified':
-      return 'pink'
-    case 'destroyed':
-      return 'red'
-    case 'rerun':
-      return 'purple'
-  }
-}
 
 const ChangelogTable = ({ activeEnv }) => {
   const { headingTextColor, primaryTextColor } = useThemeColor([
@@ -95,7 +81,7 @@ const ChangelogTable = ({ activeEnv }) => {
           <Tooltip placement='top' label={action} textTransform={'capitalize'}>
             <Tag
               variant='solid'
-              colorScheme={setColor(action)}
+              colorScheme={getChangelogColor(action)}
               textTransform={'capitalize'}
             >
               {action.slice(0, 1)}

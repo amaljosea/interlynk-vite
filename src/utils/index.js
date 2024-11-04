@@ -323,6 +323,25 @@ export const getColor = (result) => {
   }
 }
 
+export const getChangelogColor = (type) => {
+  switch (type) {
+    case 'create':
+      return 'green'
+    case 'created':
+      return 'green'
+    case 'update':
+      return 'blue'
+    case 'updated':
+      return 'blue'
+    case 'modified':
+      return 'pink'
+    case 'destroyed':
+      return 'red'
+    case 'rerun':
+      return 'purple'
+  }
+}
+
 export const displayPic = (email) => {
   switch (email) {
     case 'abhisek@interlynk.io':

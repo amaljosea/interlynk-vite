@@ -1,5 +1,10 @@
 import { useMemo } from 'react'
-import { getFullDateAndTime, timeSince, truncatedValue } from 'utils'
+import {
+  getChangelogColor,
+  getFullDateAndTime,
+  timeSince,
+  truncatedValue
+} from 'utils'
 
 import {
   Box,
@@ -21,25 +26,6 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
     'primaryBlueText'
   ])
 
-  const setColor = (type) => {
-    switch (type) {
-      case 'create':
-        return 'green'
-      case 'created':
-        return 'green'
-      case 'update':
-        return 'blue'
-      case 'updated':
-        return 'blue'
-      case 'modified':
-        return 'pink'
-      case 'destroyed':
-        return 'red'
-      case 'rerun':
-        return 'purple'
-    }
-  }
-
   return useMemo(() => {
     const columns = [
       // CHANGE TYPE
@@ -56,7 +42,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
             >
               <Tag
                 variant='solid'
-                colorScheme={setColor(action)}
+                colorScheme={getChangelogColor(action)}
                 textTransform={'capitalize'}
               >
                 {action.slice(0, 1)}
