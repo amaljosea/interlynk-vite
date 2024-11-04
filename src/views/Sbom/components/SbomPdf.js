@@ -1,4 +1,5 @@
 import InterlynkLogo from 'assets/img/logo.png'
+import { format } from 'date-fns'
 import jsPDF from 'jspdf'
 import { truncatedValue } from 'utils'
 
@@ -24,7 +25,8 @@ export const downloadSbomPdf = (
   authors,
   sbom,
   componentsActual,
-  vulnActual
+  vulnActual,
+  exportedBy
 ) => {
   const doc = new jsPDF()
   const pageWidth = doc.internal.pageSize.getWidth()
@@ -58,24 +60,37 @@ export const downloadSbomPdf = (
     }
   }
 
+  function formatDate(date, dateFormat = 'MMMM dd, yyyy hh:mm a') {
+    if (!date) return '' // Return an empty string if the date is null or undefined
+    return format(new Date(date), dateFormat)
+  }
+
+  const currentDateTime = (dateFormat = 'MMMM dd, yyyy hh:mm a') => {
+    return format(new Date(), dateFormat)
+  }
+
   //Colors
-  const blueColor = [49, 130, 206]
+  const blueColor = [61, 113, 238]
   const grayColor = [128, 128, 128]
   const darkGrayColor = [50, 50, 50]
   const blackColor = [0, 0, 0]
 
-  const iconWidth = 25
-  const iconHeight = 25
-  const iconX = 5
-  const iconY = 5
+  const iconWidth = 12
+  const iconHeight = 12
+  const iconX = 9
+  const iconY = 12
 
   doc.setTextColor(...blueColor)
   doc.setFontSize(24)
   doc.addImage(productIcon, 'JPEG', iconX, iconY, iconWidth, iconHeight)
-  doc.text('Interlync', 30, 20)
+  doc.text('Interlynk', 22, 21)
+
+  const sbomSubText = 'Software Bill of Materials (SBOM)'
+  const sbomSubTextWidth = doc.getTextWidth(sbomSubText)
+  const rightAlignedX = pageWidth - sbomSubTextWidth - leftMargin
 
   doc.setFontSize(14)
-  doc.text('Software Bill of Materials (SBOM)', leftMargin + 55, 20)
+  doc.text(sbomSubText, rightAlignedX + 45, 21)
 
   doc.setFontSize(24)
   doc.text(productName, leftMargin, 45)
@@ -166,7 +181,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      sbom.createdAt || 'NA',
+      formatDate(sbom.createdAt) || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -174,7 +189,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      sbom.updatedAt || 'NA',
+      formatDate(sbom.updatedAt) || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -182,8 +197,22 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
-    formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
-    formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin)
+    formatValue(
+      exportedBy || 'NA',
+      doc,
+      pageWidth,
+      rightMargin,
+      contentGap,
+      leftMargin
+    ),
+    formatValue(
+      currentDateTime() || 'NA',
+      doc,
+      pageWidth,
+      rightMargin,
+      contentGap,
+      leftMargin
+    )
   ]
 
   // Set gray color for section labels on the left side
@@ -198,15 +227,14 @@ export const downloadSbomPdf = (
     // Set dark gray color for the corresponding value on the right
     doc.setTextColor(...darkGrayColor)
 
-    // Calculate the X position for the value, leaving a small gap from the label
-    const valueXPosition = leftMargin + 40
-
     // Add wrapped value below the label
     const valueLines = values[index]
     valueLines.forEach((line, lineIndex) => {
+      const lineWidth = doc.getTextWidth(line)
+      const rightAlignedX = pageWidth - rightMargin - lineWidth
       doc.text(
         line,
-        valueXPosition,
+        rightAlignedX,
         currentY + lineIndex * 10 // Increment Y position for wrapped lines
       )
     })
@@ -331,7 +359,13 @@ export const downloadSbomPdf = (
         componentValues[index],
         availableWidth
       )
-      doc.text(wrappedText, leftMargin + 110, currentY)
+      const rightAlignedX =
+        pageWidth - rightMargin - doc.getTextWidth(wrappedText.join(''))
+      if (wrappedText.length > 1) {
+        doc.text(wrappedText, leftMargin + 110, currentY)
+      } else {
+        doc.text(wrappedText, rightAlignedX, currentY)
+      }
 
       currentY += wrappedText.length > 1 ? wrappedText.length * 5 : 10
       checkPageHeight()
@@ -361,7 +395,8 @@ export const downloadSbomPdf = (
     'Source',
     'EPSS Percentile',
     'EPSS Probability',
-    'Known Exploitable Vulnerability'
+    'Known Exploitable Vulnerability',
+    'Status'
   ]
 
   const getVulnValues = (vulnerability) => [
@@ -406,7 +441,15 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
-    formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin)
+    formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
+    formatValue(
+      vulnerability.vexStatus?.name || 'Unspeacified',
+      doc,
+      pageWidth,
+      rightMargin,
+      contentGap,
+      leftMargin
+    )
   ]
 
   doc.setTextColor(...grayColor)
@@ -432,7 +475,16 @@ export const downloadSbomPdf = (
       doc.text(label, leftMargin + 40, currentY)
       doc.setTextColor(50, 50, 50) // Dark gray for values
       const wrappedText = doc.splitTextToSize(vulnValues[index], availableWidth)
-      doc.text(wrappedText, leftMargin + 110, currentY)
+      const rightAlignedX =
+        pageWidth - rightMargin - doc.getTextWidth(wrappedText.join(''))
+      /* doc.text(wrappedText, leftMargin + 110, currentY) */
+      if (wrappedText.length > 1) {
+        // If wrappedText has more than one line, place it at the left position
+        doc.text(wrappedText, leftMargin + 110, currentY)
+      } else {
+        // If wrappedText has exactly one line, place it right-aligned
+        doc.text(wrappedText, rightAlignedX, currentY)
+      }
 
       currentY += wrappedText.length > 1 ? wrappedText.length * 5 : 10
       checkPageHeight()

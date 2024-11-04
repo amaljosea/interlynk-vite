@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { getSignedUrlParams, truncatedValue } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
-import { Box, Button, Divider, Flex, Stack, Tag, Text } from '@chakra-ui/react'
+import { Button, Divider, Flex, Stack, Tag, Text } from '@chakra-ui/react'
 import { Checkbox, FormControl, FormLabel } from '@chakra-ui/react'
 import { Radio, RadioGroup, useDisclosure } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -42,7 +43,6 @@ const DownloadModal = (props) => {
 
   const [spec, setSpec] = useState('CycloneDX')
   const [format, setFormat] = useState('json')
-  const [itemsPerPage, setItemsPerPage] = useState('25')
   const [includeVulns, setIncludeVulns] = useState(false)
   const [original, setOriginal] = useState(false)
   const [encoded, setEncoded] = useState(false)
@@ -105,128 +105,81 @@ const DownloadModal = (props) => {
 
   const handleDownloadPdf = async () => {
     setIsLoading(true)
-    // Check if itemsPerPage is less than 200
-    if (itemsPerPage !== '200') {
-      try {
-        const componentsRes = await client.query({
-          query: GetComponentData,
-          variables: {
-            projectId: productId,
-            sbomId,
-            first: Number(itemsPerPage)
-          },
-          fetchPolicy: 'no-cache'
-        })
+    let allComponents = []
+    let allVulns = []
+    let componentsHasNextPage = true
+    let vulnsHasNextPage = true
+    let componentsEndCursor = null
+    let vulnsEndCursor = null
 
-        const vulnRes = await client.query({
-          query: GetVulnData,
-          variables: {
-            projectId: productId,
-            sbomId,
-            first: Number(itemsPerPage)
-          },
-          fetchPolicy: 'no-cache'
-        })
+    try {
+      while (componentsHasNextPage || vulnsHasNextPage) {
+        if (componentsHasNextPage) {
+          const componentsRes = await client.query({
+            query: GetComponentData,
+            variables: {
+              projectId: productId,
+              sbomId,
+              first: 200,
+              after: componentsEndCursor || undefined
+            },
+            fetchPolicy: 'no-cache'
+          })
 
-        const componentsActual =
-          componentsRes?.data?.sbom?.components?.nodes || []
-        const vulnActual = vulnRes?.data?.sbom?.vulns?.nodes || []
+          const fetchedComponents =
+            componentsRes?.data?.sbom?.components?.nodes || []
+          const pageInfo = componentsRes?.data?.sbom?.components?.pageInfo
 
-        downloadSbomPdf(
-          productName,
-          version,
-          description,
-          purl,
-          authors,
-          sbom,
-          componentsActual,
-          vulnActual
-        )
-
-        setIsLoading(false)
-        onClose()
-      } catch (error) {
-        setIsLoading(false)
-        showToast({
-          description: 'Error downloading SBOM PDF. Please try again later.',
-          status: 'error'
-        })
-      }
-    } else {
-      let allComponents = []
-      let allVulns = []
-      let componentsHasNextPage = true
-      let vulnsHasNextPage = true
-      let componentsEndCursor = null
-      let vulnsEndCursor = null
-
-      try {
-        while (componentsHasNextPage || vulnsHasNextPage) {
-          if (componentsHasNextPage) {
-            const componentsRes = await client.query({
-              query: GetComponentData,
-              variables: {
-                projectId: productId,
-                sbomId,
-                first: 200,
-                after: componentsEndCursor || undefined
-              },
-              fetchPolicy: 'no-cache'
-            })
-
-            const fetchedComponents =
-              componentsRes?.data?.sbom?.components?.nodes || []
-            const pageInfo = componentsRes?.data?.sbom?.components?.pageInfo
-
-            allComponents.push(...fetchedComponents)
-            componentsEndCursor = pageInfo?.endCursor
-            componentsHasNextPage = pageInfo?.hasNextPage
-          }
-
-          if (vulnsHasNextPage) {
-            const vulnRes = await client.query({
-              query: GetVulnData,
-              variables: {
-                projectId: productId,
-                sbomId,
-                first: 100,
-                after: vulnsEndCursor || undefined
-              },
-              fetchPolicy: 'no-cache'
-            })
-
-            const fetchedVulns = vulnRes?.data?.sbom?.vulns?.nodes || []
-            const pageInfo = vulnRes?.data?.sbom?.vulns?.pageInfo
-
-            allVulns.push(...fetchedVulns)
-            vulnsEndCursor = pageInfo?.endCursor
-            vulnsHasNextPage = pageInfo?.hasNextPage
-          }
+          allComponents.push(...fetchedComponents)
+          componentsEndCursor = pageInfo?.endCursor
+          componentsHasNextPage = pageInfo?.hasNextPage
         }
 
-        downloadSbomPdf(
-          productName,
-          version,
-          description,
-          purl,
-          authors,
-          sbom,
-          allComponents,
-          allVulns
-        )
+        if (vulnsHasNextPage) {
+          const vulnRes = await client.query({
+            query: GetVulnData,
+            variables: {
+              projectId: productId,
+              sbomId,
+              first: 200,
+              after: vulnsEndCursor || undefined
+            },
+            fetchPolicy: 'no-cache'
+          })
 
-        setIsLoading(false)
-        onClose()
-      } catch (error) {
-        setIsLoading(false)
-        showToast({
-          description:
-            'Error downloading SBOM PDF with all data. Please try again later.',
-          status: 'error'
-        })
+          const fetchedVulns = vulnRes?.data?.sbom?.vulns?.nodes || []
+          const pageInfo = vulnRes?.data?.sbom?.vulns?.pageInfo
+
+          allVulns.push(...fetchedVulns)
+          vulnsEndCursor = pageInfo?.endCursor
+          vulnsHasNextPage = pageInfo?.hasNextPage
+        }
       }
+
+      downloadSbomPdf(
+        productName,
+        version,
+        description,
+        purl,
+        authors,
+        sbom,
+        allComponents,
+        allVulns,
+        organization?.currentUser.name
+      )
+
+      setIsLoading(false)
+      onClose()
+    } catch (error) {
+      setIsLoading(false)
+      showToast({
+        description: 'Error downloading SBOM PDF. Please try again later.',
+        status: 'error'
+      })
     }
   }
+
+  const { isFreeTier } = useGlobalQueryContext()
 
   const handleDownload = async () => {
     setIsLoading(true)
@@ -351,38 +304,15 @@ const DownloadModal = (props) => {
             <RadioGroup value={format} onChange={(value) => setFormat(value)}>
               <Stack spacing={4} direction='row'>
                 <Radio value='json'>JSON</Radio>
-                <Radio value='pdf'>PDF</Radio>
+                <Radio isDisabled={isFreeTier} value='pdf'>
+                  PDF
+                </Radio>
                 {/* <Radio value='xml'>XML</Radio> */}
               </Stack>
             </RadioGroup>
           </FormControl>
           <Divider />
-          {format === 'pdf' && (
-            <>
-              <Box>
-                <Text fontSize='14px' fontWeight='500' mb={2}>
-                  Rows To Export
-                </Text>
-                <RadioGroup onChange={setItemsPerPage} value={itemsPerPage}>
-                  <Stack direction='row' spacing={8}>
-                    <Radio value='25' colorScheme='blue'>
-                      25
-                    </Radio>
-                    <Radio value='50' colorScheme='blue'>
-                      50
-                    </Radio>
-                    <Radio value='100' colorScheme='blue'>
-                      100
-                    </Radio>
-                    <Radio value='200' colorScheme='blue'>
-                      All
-                    </Radio>
-                  </Stack>
-                </RadioGroup>
-              </Box>
-              <Divider />
-            </>
-          )}
+
           {format !== 'pdf' && (
             <>
               <Checkbox
