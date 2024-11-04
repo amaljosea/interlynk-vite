@@ -258,16 +258,9 @@ const CompFilters = ({ reset }) => {
               value={include}
               onChange={onFilterInclude}
             >
-              {['parts'].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
+              <MenuItemOption value={'parts'} fontSize={'sm'}>
+                Parts
+              </MenuItemOption>
             </MenuOptionGroup>
           </MenuList>
         </Menu>

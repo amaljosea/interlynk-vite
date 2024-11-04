@@ -37,7 +37,7 @@ const prodCompReducer = (state, action) => {
         cpeString: '',
         isCpeValid: true,
         purlString: '',
-        include: ''
+        include: []
       }
     case 'CHANGE_SEARCH_INPUT':
       return {
@@ -129,7 +129,7 @@ const prodCompReducer = (state, action) => {
     case 'FILTER_INCLUDE':
       return {
         ...state,
-        include: [...payload]?.includes('all') ? [] : payload,
+        include: payload,
         pageIndex: 1,
         after: '',
         before: ''
