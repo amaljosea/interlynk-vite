@@ -56,7 +56,7 @@ const CompFilters = ({ reset }) => {
   const productId = params?.productid
   const sbomId = params?.sbomid
   const { prodCompState, dispatch } = useGlobalState()
-  const { ecosystems, kinds, licenses, suppliers, scope, direct } =
+  const { ecosystems, kinds, licenses, suppliers, scope, direct, include } =
     prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -83,6 +83,11 @@ const CompFilters = ({ reset }) => {
 
   const onFilterDirect = (e) => {
     prodCompDispatch({ type: 'FILTER_DIRECT', payload: e.target.checked })
+    reset()
+  }
+
+  const onFilterInclude = (value) => {
+    prodCompDispatch({ type: 'FILTER_INCLUDE', payload: value })
     reset()
   }
 
@@ -231,6 +236,21 @@ const CompFilters = ({ reset }) => {
             options={['primary', 'internal']}
             value={scope}
             onChange={onFilterType}
+          />
+        </Menu>
+      </Box>
+      {/* INCLUDE */}
+      <Box width={'fit-content'}>
+        <Menu closeOnSelect={false}>
+          <MenuHeading
+            title={'Include'}
+            active={include !== '' && include !== 'all'}
+          />
+          <CustomList
+            type='radio'
+            options={['parts']}
+            value={include}
+            onChange={onFilterInclude}
           />
         </Menu>
       </Box>

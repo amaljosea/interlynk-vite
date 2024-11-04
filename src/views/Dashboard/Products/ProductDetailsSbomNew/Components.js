@@ -113,7 +113,8 @@ const Components = ({ sbomData }) => {
     scope,
     direct,
     totalComp,
-    expandedRows
+    expandedRows,
+    include
   } = prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -132,9 +133,10 @@ const Components = ({ sbomData }) => {
       supplierName: getUndefinedIfEmptyOrAll(suppliers),
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true : undefined
+      direct: direct === true ? true : undefined,
+      includeParts: include === 'parts' ? true : undefined
     }
-  }, [direct, ecosystems, kinds, licenses, scope, suppliers])
+  }, [direct, ecosystems, include, kinds, licenses, scope, suppliers])
 
   // GET COMPONENT DATA
   const { nodes, error, paginationProps, reset, loading } = usePaginatedQuery(
@@ -146,8 +148,7 @@ const Components = ({ sbomData }) => {
         sbomId: sbomId,
         projectId: productId,
         orderBy: searchInput === '' ? { field, direction } : undefined,
-        search: searchInput !== '' ? searchInput : undefined,
-        includeParts: sbomData?.sbomParts?.length > 0 ? true : false
+        search: searchInput !== '' ? searchInput : undefined
       },
       onCompleted: (data) => {
         prodCompDispatch({

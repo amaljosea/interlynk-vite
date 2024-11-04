@@ -83,7 +83,8 @@ const GlobalStateProvider = ({ children }) => {
     cpeString: '',
     isCpeValid: true,
     expandedRows: [],
-    purlString: ''
+    purlString: '',
+    include: ''
   })
   const [prodVulnState, prodVulnDispatch] = useReducer(prodVulnReducer, {
     field: 'COMPONENT_VULNS_UPDATED_AT',
