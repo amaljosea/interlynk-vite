@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useMemo } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, sevColor } from 'utils'
+import { customStyles, linkURl, sevColor, statusColor } from 'utils'
 
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 import {
@@ -24,28 +24,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { IntersectingVulns } from 'graphQL/Queries'
-
-const statusColor = (status) => {
-  if (status && status === 'Fixed') {
-    return 'blue'
-  } else if (status && status === 'Not Affected') {
-    return 'green'
-  } else if (status && status === 'Affected') {
-    return 'red'
-  } else if (status && status === 'In Triage') {
-    return 'cyan'
-  } else {
-    return 'gray'
-  }
-}
-
-const linkURl = (type, id) => {
-  if (type === 'osv') {
-    return `https://osv.dev/vulnerability/${id}`
-  } else {
-    return `https://nvd.nist.gov/vuln/detail/${id}`
-  }
-}
 
 const StepTwo = ({ sbomId, currentSbomId }) => {
   const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(

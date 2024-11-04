@@ -5,12 +5,14 @@ import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import {
   customStyles,
+  cvssColor,
   getFullDateAndTime,
+  getSignedUrlParams,
   linkURl,
   sevColor,
+  statusColor,
   timeSince
 } from 'utils'
-import { getSignedUrlParams } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
@@ -54,20 +56,6 @@ import {
 import { FaGlobe, FaHouseUser, FaLightbulb, FaSitemap } from 'react-icons/fa'
 
 import VulnFilters from './VulnFilters'
-
-const statusColor = (status) => {
-  if (status && status === 'Fixed') {
-    return 'blue'
-  } else if (status && status === 'Not Affected') {
-    return 'green'
-  } else if (status && status === 'Affected') {
-    return 'red'
-  } else if (status && status === 'In Triage') {
-    return 'cyan'
-  } else {
-    return 'gray'
-  }
-}
 
 const ExpandedComponent = ({ data, setActiveRow, onCvssOpen }) => {
   const { vuln, component } = data
@@ -316,18 +304,6 @@ const Vulnerabilities = ({ sbomData }) => {
     onOpen: onCvssOpen,
     onClose: onCvssClose
   } = useDisclosure()
-
-  const cvssColor = (cvss) => {
-    if (cvss >= 9.0) {
-      return 'red'
-    } else if (cvss >= 7.0) {
-      return 'orange'
-    } else if (cvss >= 6.0) {
-      return 'yellow'
-    } else {
-      return 'gray'
-    }
-  }
 
   // COLUMNS
   const columns = [

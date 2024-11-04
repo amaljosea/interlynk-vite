@@ -251,8 +251,10 @@ export const cvssColor = (cvss) => {
     return 'orange'
   } else if (cvss >= 6.0) {
     return 'yellow'
-  } else {
+  } else if (cvss === '') {
     return 'gray'
+  } else {
+    return 'green'
   }
 }
 

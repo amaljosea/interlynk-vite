@@ -1,6 +1,13 @@
 import DataTable from 'react-data-table-component'
 import { Link, useParams } from 'react-router-dom'
-import { customStyles, getFullDateAndTime, sevColor, timeSince } from 'utils'
+import {
+  customStyles,
+  cvssColor,
+  getFullDateAndTime,
+  linkURl,
+  sevColor,
+  timeSince
+} from 'utils'
 import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
 import {
@@ -43,28 +50,6 @@ const GlobalVulnTable = (props) => {
 
   const params = useParams()
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
-
-  const cvssColor = (cvss) => {
-    if (cvss >= 9.0) {
-      return 'red'
-    } else if (cvss >= 7.0) {
-      return 'orange'
-    } else if (cvss >= 6.0) {
-      return 'yellow'
-    } else if (cvss === '') {
-      return 'gray'
-    } else {
-      return 'green'
-    }
-  }
-
-  const linkURl = (type, id) => {
-    if (type === 'osv') {
-      return `https://osv.dev/vulnerability/${id}`
-    } else {
-      return `https://nvd.nist.gov/vuln/detail/${id}`
-    }
-  }
 
   // COLUMNS
   const columns = [
