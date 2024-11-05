@@ -23,6 +23,7 @@ import {
   Text
 } from '@chakra-ui/react'
 
+import useCustomToast from 'hooks/useCustomToast'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -35,6 +36,7 @@ import SocialLogin from './SocialLogin'
 const RegistrationForm = () => {
   const navigate = useNavigate()
   const emailId = useQueryParam('id')
+  const { showToast } = useCustomToast()
   const awsToken = useQueryParam('aws_marketplace_token')
   const {
     primaryBlueText,
@@ -130,6 +132,10 @@ const RegistrationForm = () => {
           awsToken && sessionStorage.setItem('awsToken', awsToken)
           setIsSuccess(false)
         } else {
+          showToast({
+            status: 'success',
+            description: `Registration successful`
+          })
           if (res.data.userRegistration.confirmationNeeded) {
             setIsSuccess(true)
           } else {
