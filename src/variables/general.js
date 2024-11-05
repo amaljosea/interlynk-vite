@@ -762,6 +762,10 @@ export const infoData = [
     desc: `Creatat At is the date and time that the SBOM describing this version was produced. This can be different than when the SBOM was imported into the Interlynk system.`
   },
   {
+    title: `SBOM Phases`,
+    desc: `Phases identify the product lifecycle phase(s) that this SBOM represents.`
+  },
+  {
     title: `Creation Tool`,
     desc: `Creation Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools.`
   },
