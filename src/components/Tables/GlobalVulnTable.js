@@ -115,9 +115,9 @@ const GlobalVulnTable = (props) => {
           <Tag
             size='md'
             variant='subtle'
-            width={'80px'}
-            bg={sev && sevColor(sev).bg}
-            textColor={sev && sevColor(sev).text}
+            width={'120px'}
+            bg={sev ? sevColor(sev)?.bg : 'inherit'}
+            textColor={sev ? sevColor(sev)?.text : 'inherit'}
           >
             <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
               {sev || '-'}
