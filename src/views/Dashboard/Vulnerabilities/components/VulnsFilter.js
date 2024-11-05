@@ -39,7 +39,7 @@ const VulnFilters = ({ setFilter, sbomVersions }) => {
     setIsComplete(e.target.checked)
     setFilter((oldFilters) => ({
       ...oldFilters,
-      vexComplete: e?.target?.checked
+      vexComplete: e?.target?.checked ? false : undefined
     }))
   }
 
@@ -108,7 +108,7 @@ const VulnFilters = ({ setFilter, sbomVersions }) => {
           isChecked={isComplete}
           onChange={onFilterComplete}
         />
-        <Text>Completed</Text>
+        <Text>Incomplete Only</Text>
       </Flex>
     </Stack>
   )

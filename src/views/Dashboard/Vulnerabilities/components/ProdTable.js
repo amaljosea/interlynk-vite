@@ -57,7 +57,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
   })
 
   const [vulnState, setVulnState] = useState({
-    vexComplete: false
+    vexComplete: undefined
   })
 
   const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
@@ -342,15 +342,16 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
       </Flex>
     )
   }, [
-    manageFeeds,
     filterInput,
     handleSearch,
     handleClear,
     onSearchInputChange,
     sbomVersions,
+    vulnState,
     selectedVulns.length,
     onOpen,
     signedUrlParams,
+    manageFeeds,
     reset
   ])
 
