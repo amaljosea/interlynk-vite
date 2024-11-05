@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { validPassword } from 'utils'
 
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
@@ -8,17 +8,17 @@ import {
   Box,
   Button,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormHelperText,
-  FormLabel,
   IconButton,
-  Input,
-  InputGroup,
-  InputRightElement,
   Stack,
   Text,
   chakra
+} from '@chakra-ui/react'
+import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
+import {
+  FormControl,
+  FormErrorMessage,
+  FormHelperText,
+  FormLabel
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -28,6 +28,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import LynkAlert from './LynkAlert'
 
 const ResetForm = () => {
+  const navigate = useNavigate()
   const { showToast } = useCustomToast()
   const emailId = useQueryParam('id')
   const token = useQueryParam('reset_password_token')
@@ -135,6 +136,7 @@ const ResetForm = () => {
             description: 'Password changed successfully 👍',
             status: 'success'
           })
+          navigate('/auth')
         }
       })
       .catch((error) => {
