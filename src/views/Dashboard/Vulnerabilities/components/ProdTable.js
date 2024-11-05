@@ -2,14 +2,8 @@ import { useLazyQuery } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import {
-  areArraysEqual,
-  customStyles,
-  getFullDateAndTime,
-  statusColor,
-  timeSince
-} from 'utils'
-import { getSignedUrlParams } from 'utils'
+import { areArraysEqual, customStyles, getFullDateAndTime } from 'utils'
+import { getSignedUrlParams, statusColor, timeSince } from 'utils'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -74,24 +68,10 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
 
   const [getSboms, { data: connectedSboms }] = useLazyQuery(GetConnectedSbom)
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isSbomOpen,
-    onOpen: onSbomOpen,
-    onClose: onSbomClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isCardOpen,
-    onOpen: onCardOpen,
-    onClose: onCardClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isVCardOpen,
-    onOpen: onVCardOpen,
-    onClose: onVCardClose
-  } = useDisclosure()
+  const STATUS = useDisclosure()
+  const SBOM = useDisclosure()
+  const COMPONENT = useDisclosure()
+  const VULN = useDisclosure()
 
   const [statusResults, setStatusResults] = useState([])
   const [selectedVulns, setSelectedVulns] = useState([])
@@ -112,7 +92,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
       }
     }).then((res) => {
       console.log(res?.data)
-      onSbomOpen()
+      SBOM.onOpen()
     })
   }
 
@@ -140,7 +120,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
               cursor={'pointer'}
               onClick={() => {
                 setActiveRow(component)
-                onVCardOpen()
+                VULN.onOpen()
               }}
             >
               {component?.sbom?.project?.projectGroup?.name || ''}
@@ -182,7 +162,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
             alignItems={'flex-start'}
             onClick={() => {
               setActiveRow(component)
-              onCardOpen()
+              COMPONENT.onOpen()
             }}
           >
             <Text color={primaryTextColor}>{component?.name || ''}</Text>
@@ -332,7 +312,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
               colorScheme='blue'
               fontWeight='normal'
               fontSize={'sm'}
-              onClick={onOpen}
+              onClick={STATUS.onOpen}
               isDisabled={signedUrlParams || !manageFeeds}
             >
               Set Status
@@ -349,7 +329,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
     sbomVersions,
     vulnState,
     selectedVulns.length,
-    onOpen,
+    STATUS.onOpen,
     signedUrlParams,
     manageFeeds,
     reset
@@ -408,18 +388,18 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
         <Pagination {...paginationProps} />
       </Flex>
 
-      {isSbomOpen && connectedSboms && (
+      {SBOM.isOpen && connectedSboms && (
         <ConnectedSbomDrawer
           data={connectedSboms?.sbom}
-          isOpen={isSbomOpen}
-          onClose={onSbomClose}
+          isOpen={SBOM.isOpen}
+          onClose={SBOM.onClose}
         />
       )}
 
-      {isOpen && selectedVulns.length > 0 && (
+      {STATUS.isOpen && selectedVulns.length > 0 && (
         <VexModal
-          isOpen={isOpen}
-          onClose={onClose}
+          isOpen={STATUS.isOpen}
+          onClose={STATUS.onClose}
           checkEquals={checkEquals}
           selectedGroup={selectedGroup}
           selectedVulns={selectedVulns}
@@ -428,19 +408,19 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
         />
       )}
 
-      {isCardOpen && (
+      {COMPONENT.isOpen && (
         <ComponentCard
-          isOpen={isCardOpen}
-          onClose={onCardClose}
           data={activeRow}
+          isOpen={COMPONENT.isOpen}
+          onClose={COMPONENT.onClose}
         />
       )}
 
-      {isVCardOpen && (
+      {VULN.isOpen && (
         <VersionCard
-          isOpen={isVCardOpen}
-          onClose={onVCardClose}
           data={activeRow}
+          isOpen={VULN.isOpen}
+          onClose={VULN.onClose}
         />
       )}
     </>
