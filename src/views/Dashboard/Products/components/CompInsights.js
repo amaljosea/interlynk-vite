@@ -58,7 +58,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
   })
 
   const { enrichedContent, healthScore } = data?.component || ''
-  const { packageVersion, repository } = enrichedContent || ''
+  const { latestPackageVersion, repository } = enrichedContent || ''
 
   const onCheck = (category, title) => {
     if (category === 'package') {
@@ -150,13 +150,13 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                   )}
                 </TabPanel>
                 <TabPanel>
-                  {packageVersion ? (
+                  {latestPackageVersion ? (
                     <Stack spacing={3}>
                       <Container>
                         <Tooltip label={onCheck('packageVersion', 'License')}>
                           <Label>License</Label>
                         </Tooltip>
-                        <Text>{getLicense(packageVersion?.license)}</Text>
+                        <Text>{getLicense(latestPackageVersion?.license)}</Text>
                       </Container>
                       <Container>
                         <Tooltip
@@ -164,13 +164,13 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                         >
                           <Label>Deprecated</Label>
                         </Tooltip>
-                        <LynkTag value={packageVersion?.isDeprecated} />
+                        <LynkTag value={latestPackageVersion?.isDeprecated} />
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('packageVersion', 'Archived')}>
                           <Label>Archived</Label>
                         </Tooltip>
-                        <LynkTag value={packageVersion?.isArchived} />
+                        <LynkTag value={latestPackageVersion?.isArchived} />
                       </Container>
                       <Container>
                         <Tooltip
@@ -178,13 +178,13 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                         >
                           <Label>Pre-release</Label>
                         </Tooltip>
-                        <LynkTag value={packageVersion?.isPreRelease} />
+                        <LynkTag value={latestPackageVersion?.isPreRelease} />
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('packageVersion', 'Outdated')}>
                           <Label>Outdated</Label>
                         </Tooltip>
-                        <LynkTag value={packageVersion?.isOutdated} />
+                        <LynkTag value={latestPackageVersion?.isOutdated} />
                       </Container>
                       <Container>
                         <Tooltip
@@ -195,7 +195,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                         >
                           <Label>Most Recent Version</Label>
                         </Tooltip>
-                        <Text>{packageVersion?.version}</Text>
+                        <Text>{latestPackageVersion?.version}</Text>
                       </Container>
                       <Container>
                         <Tooltip
@@ -204,7 +204,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                           <Label>Last Updated</Label>
                         </Tooltip>
                         <Text>
-                          {getFullDateAndTime(packageVersion?.updatedAt)}
+                          {getFullDateAndTime(latestPackageVersion?.updatedAt)}
                         </Text>
                       </Container>
                     </Stack>

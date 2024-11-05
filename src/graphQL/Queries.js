@@ -4938,7 +4938,7 @@ export const GetEnrichedData = gql`
           isDeprecated
           updatedAt
         }
-        packageVersion {
+        latestPackageVersion {
           purl
           version
           isArchived
