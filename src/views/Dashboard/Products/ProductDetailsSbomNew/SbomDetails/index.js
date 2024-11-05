@@ -13,8 +13,8 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import GraphDrawer from 'components/Drawer/GraphDrawer'
 import { ProgressBar } from 'components/ProgressBar'
+import TreeView from 'components/TreeView'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -82,6 +82,8 @@ const SbomDetails = ({ sbomData }) => {
       fetchPolicy: 'network-only'
     }
   )
+
+  const { nodes } = primaryComp?.sbom?.components || ''
 
   const { data: settings } = useQuery(GetProjectSettings, {
     variables: { id: projectId }
@@ -322,15 +324,10 @@ const SbomDetails = ({ sbomData }) => {
       </Flex>
 
       {isOpen && primaryComp && (
-        <GraphDrawer
+        <TreeView
           isOpen={isOpen}
           onClose={onClose}
-          primaryComp={
-            signedUrlParams
-              ? primaryComp?.shareLynkQuery?.sbom?.components
-              : primaryComp?.sbom?.components
-          }
-          activeComp={null}
+          compId={nodes?.length > 0 ? nodes[0].id : null}
         />
       )}
     </>

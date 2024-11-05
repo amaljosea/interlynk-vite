@@ -31,7 +31,6 @@ import { useColorMode, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
-import GraphDrawer from 'components/Drawer/GraphDrawer'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import { HealthScore } from 'components/HealthScore'
 import RefreshBtn from 'components/Icons/RefreshBtn'
@@ -41,6 +40,7 @@ import PurlCard from 'components/Misc/PurlCard'
 import ComponentAddModal from 'components/Modal/ComponentAddModal'
 import Pagination from 'components/Pagination'
 import SupplierTag from 'components/SupplierTag'
+import TreeView from 'components/TreeView'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -600,6 +600,7 @@ const Components = ({ sbomData }) => {
     setActiveComp(row)
     GRAPH.onOpen()
   }
+
   const [deleteSupplier] = useMutation(deleteComSupplier)
 
   const handleSupRemove = async (item) => {
@@ -996,11 +997,10 @@ const Components = ({ sbomData }) => {
       <Pagination {...paginationProps} />
 
       {GRAPH.isOpen && (
-        <GraphDrawer
-          primaryComp={null}
+        <TreeView
           isOpen={GRAPH.isOpen}
           onClose={GRAPH.onClose}
-          activeComp={activeComp}
+          compId={activeComp ? activeComp?.id : null}
         />
       )}
 

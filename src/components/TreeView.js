@@ -1,0 +1,316 @@
+import { useLazyQuery } from '@apollo/client'
+import { useCallback, useEffect, useState } from 'react'
+import Tree from 'react-d3-tree'
+import { useParams } from 'react-router-dom'
+import { v4 as uuidv4 } from 'uuid'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
+
+import { InfoIcon } from '@chakra-ui/icons'
+import { Box, Flex, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
+import {
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay
+} from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
+
+import { GetCompDependency } from 'graphQL/Queries'
+
+import { BiZoomIn, BiZoomOut } from 'react-icons/bi'
+
+const InteractionsTooltip = () => (
+  <Tooltip
+    label={
+      <Stack mt={1} spacing={1} p={1}>
+        <Text>User Interaction Keys:</Text>
+        <Text>
+          <strong>Click & Drag: </strong> Pan the tree.
+        </Text>
+        <Text>
+          <strong>Scroll: </strong> Zoom in and out of the tree.
+        </Text>
+      </Stack>
+    }
+    placement='bottom'
+    hasArrow
+  >
+    <IconButton
+      size='sm'
+      colorScheme='blue'
+      icon={<InfoIcon />}
+      aria-label='Tree Interactions Info'
+      variant='ghost'
+    />
+  </Tooltip>
+)
+
+const updateTreeData = (treeData, nodeId, newData) => {
+  const updateNode = (node) => {
+    if (node.id === nodeId) {
+      if (newData?.length === 0) {
+        return { ...node, children: [] }
+      } else {
+        return { ...node, children: [...(node.children || []), ...newData] }
+      }
+    }
+    if (node.children) {
+      return { ...node, children: node.children.map(updateNode) }
+    }
+    return node
+  }
+
+  if (Array.isArray(treeData)) {
+    return treeData.map(updateNode)
+  }
+  return updateNode(treeData)
+}
+
+const CustomNode = ({ nodeDatum, click, foreignObjectProps }) => {
+  const { primaryBgColor, primaryBlueText, secondaryTextColor } = useThemeColor(
+    ['primaryBgColor', 'primaryBlueText', 'secondaryTextColor']
+  )
+
+  if (nodeDatum?.name) {
+    return (
+      <g transform='translate(-40,-30)' onClick={() => click(nodeDatum)}>
+        <svg xmlns='http://www.w3.org/2000/svg'>
+          <circle
+            cx='30'
+            cy='30'
+            r='15'
+            fill='dodgerBlue'
+            stroke='transparent'
+          />
+        </svg>
+        <foreignObject {...foreignObjectProps} x={10} y={15}>
+          <Flex
+            flexDirection={'column'}
+            alignItems={'flex-start'}
+            maxW={'300px'}
+          >
+            <Box
+              colorScheme='blue'
+              position={'relative'}
+              fontWeight={'medium'}
+              wordBreak={'break-all'}
+              bg={primaryBgColor}
+              color={primaryBlueText}
+              border={`1px solid rgba(0,0,0,0.09)`}
+              sx={{ p: 3, left: 12, borderRadius: 5, minW: 'fit-content' }}
+            >
+              <Stack direction={'column'}>
+                <Text
+                  wordBreak={'break-all'}
+                  sx={{ fontSize: 16, fontWeight: 'medium', lineHeight: 1.3 }}
+                >
+                  {nodeDatum?.name}
+                </Text>
+              </Stack>
+              {nodeDatum?.version && (
+                <Text
+                  color={secondaryTextColor}
+                  sx={{ mt: 1, fontSize: 14, opacity: 0.8 }}
+                >
+                  {nodeDatum?.version}
+                </Text>
+              )}
+            </Box>
+          </Flex>
+        </foreignObject>
+      </g>
+    )
+  }
+
+  return null
+}
+
+const TreeView = ({ isOpen, onClose, compId }) => {
+  const params = useParams()
+
+  const [getData] = useLazyQuery(GetCompDependency)
+
+  const [tree, setTree] = useState({})
+  const [filterText, setFilterText] = useState('')
+  const [zoom, setZoom] = useState(Number(0.8))
+
+  const handleZoomIn = () => setZoom(zoom + Number(0.1))
+  const handleZoomOut = () => setZoom(zoom - Number(0.1))
+
+  const getRelations = useCallback(() => {
+    getData({
+      variables: {
+        compId: compId,
+        sbomId: params?.sbomid
+      }
+    }).then((res) => {
+      const { dependsOn, id, name, version } = res?.data?.component || ''
+      const dependsOnNodes = dependsOn?.map((relation) => {
+        return {
+          id: uuidv4(),
+          compId: relation?.toComp?.id,
+          name: relation?.toComp?.name,
+          version: relation?.toComp?.version,
+          children: []
+        }
+      })
+      setTree({
+        id,
+        compId,
+        name,
+        version,
+        children: dependsOnNodes
+      })
+    })
+  }, [compId, getData, params?.sbomid])
+
+  const handleNodeClick = (datum) => {
+    getData({
+      variables: {
+        compId: datum?.compId,
+        sbomId: params?.sbomid
+      }
+    }).then((res) => {
+      const { dependsOn } = res?.data?.component || ''
+      if (datum?.children?.length === 0 && dependsOn?.length > 0) {
+        const newData = dependsOn?.map((relation) => {
+          return {
+            id: uuidv4(),
+            compId: relation?.toComp?.id,
+            name: relation?.toComp?.name,
+            version: relation?.toComp?.version,
+            children: []
+          }
+        })
+        const updatedTree = updateTreeData(tree, datum.id, newData)
+        setTree(updatedTree)
+      } else {
+        const updatedTree = updateTreeData(tree, datum.id, [])
+        setTree(updatedTree)
+      }
+    })
+  }
+
+  // CLEAR SERACH
+  const handleClear = () => {
+    setFilterText('')
+    getRelations()
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      setFilterText(value)
+    }
+  }
+
+  // SEARCH COMPONENT
+  const handleSearch = (event) => {
+    const { value } = event.target
+    if (event.key === 'Enter' && value !== '') {
+      const result = tree?.children?.filter((item) =>
+        item?.name?.includes(value)
+      )
+      setTree((prev) => ({ ...prev, children: [...result] }))
+    }
+  }
+
+  console.log('tree', tree)
+
+  const nodeSize = { x: 1000, y: 500 }
+  const foreignObjectProps = {
+    width: nodeSize.x,
+    height: nodeSize.y,
+    x: -10,
+    y: 12
+  }
+
+  useEffect(() => {
+    if (isOpen && compId) {
+      getRelations()
+    }
+  }, [compId, getRelations, isOpen, params])
+
+  return (
+    <Drawer size='2xl' isOpen={isOpen} placement='right' onClose={onClose}>
+      <DrawerOverlay />
+      <DrawerContent>
+        <DrawerCloseButton mt={2} />
+        <DrawerHeader>
+          <Flex alignItems={'center'} gap={2}>
+            <Text>Relationships</Text>
+            <InteractionsTooltip />
+          </Flex>
+        </DrawerHeader>
+        <DrawerBody>
+          <Box h={'100vh'}>
+            {compId ? (
+              <Stack height={'100%'} spacing={4}>
+                <Flex
+                  gap={2}
+                  width={'100%'}
+                  alignItems={'center'}
+                  justifyContent={'space-between'}
+                >
+                  <SearchFilter
+                    id='relationship'
+                    filterText={filterText}
+                    onFilter={handleSearch}
+                    onClear={handleClear}
+                    onChange={onSearchInputChange}
+                  />
+                  <Flex gap={2}>
+                    <Tooltip label='Zoom In'>
+                      <IconButton
+                        variant='outline'
+                        onClick={handleZoomIn}
+                        isDisabled={zoom > 0.8}
+                        icon={<BiZoomIn size={20} />}
+                      />
+                    </Tooltip>
+                    <Tooltip label='Zoom Out'>
+                      <IconButton
+                        variant='outline'
+                        onClick={handleZoomOut}
+                        isDisabled={zoom < 0.2}
+                        icon={<BiZoomOut size={20} />}
+                      />
+                    </Tooltip>
+                  </Flex>
+                </Flex>
+                <Tree
+                  draggable
+                  data={tree}
+                  zoom={Number(zoom)}
+                  pathFunc={'diagonal'}
+                  depthFactor={450}
+                  renderCustomNodeElement={(rd3tProps) => (
+                    <CustomNode
+                      {...rd3tProps}
+                      click={handleNodeClick}
+                      foreignObjectProps={foreignObjectProps}
+                    />
+                  )}
+                  translate={{
+                    x: 30,
+                    y: 300
+                  }}
+                />
+              </Stack>
+            ) : (
+              <Text>Relationship not found</Text>
+            )}
+          </Box>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+  )
+}
+
+export default TreeView
