@@ -1,23 +1,20 @@
 import { useRef } from 'react'
 
+import { Button, Flex, Stack, useDisclosure } from '@chakra-ui/react'
 import {
-  Box,
-  Button,
-  Flex,
   Input,
   InputGroup,
   InputLeftAddon,
-  InputRightAddon,
+  InputRightAddon
+} from '@chakra-ui/react'
+import {
   Menu,
   MenuDivider,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup,
-  Stack,
-  useDisclosure
+  MenuOptionGroup
 } from '@chakra-ui/react'
 
-import CheckMark from 'components/Misc/CheckMark'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -43,7 +40,7 @@ const VulnFilters = ({ reset }) => {
   const maxRef = useRef()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const { vulnCompNames, vulnStatuses } = filters
+  const { vulnCompNames } = filters
 
   const onMinKeyDown = (e) => {
     if (e.key === 'ArrowRight') {
@@ -108,317 +105,129 @@ const VulnFilters = ({ reset }) => {
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* COMPONENT */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false}>
-          {(direct !== 'all' || components?.length > 0) && <CheckMark />}
-          <MenuHeading title={'Component'} />
-          <MenuList
-            minH={'auto'}
-            maxH={'400px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
+      <Menu closeOnSelect={false}>
+        <MenuHeading
+          title={'Component'}
+          active={direct !== 'all' || components?.length > 0}
+        />
+        <MenuList
+          minH={'auto'}
+          maxH={'350px'}
+          overflow={'hidden'}
+          overflowY={'scroll'}
+        >
+          <MenuOptionGroup
+            title='Dependency'
+            type='radio'
+            value={direct}
+            onChange={onFilterDirect}
+            textAlign={'left'}
           >
-            <MenuOptionGroup
-              title='Dependency'
-              type='radio'
-              value={direct}
-              onChange={onFilterDirect}
-              textAlign={'left'}
-            >
-              {['all', 'direct only'].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  textTransform={'capitalize'}
-                  fontSize={'sm'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-            <MenuDivider />
-            <MenuOptionGroup
-              title='Name'
-              type='checkbox'
-              textAlign={'left'}
-              value={components}
-              onChange={onFilterCompName}
-              fontSize='sm'
-            >
-              {vulnCompNames?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* STATUS */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false}>
-          {(vexComplete !== 'all' || statues?.length > 0) && <CheckMark />}
-          <MenuHeading title={'Status'} />
-          <MenuList
-            minH={'auto'}
-            maxH={'400px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              title='Completeness'
-              value={vexComplete}
-              onChange={onFilterComplete}
-              type='radio'
-              textAlign={'left'}
-            >
-              {['all', 'incomplete only'].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  textTransform={'capitalize'}
-                  fontSize={'sm'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-            <MenuDivider />
-            <MenuOptionGroup
-              title='Values'
-              type='checkbox'
-              textAlign={'left'}
-              value={statues}
-              onChange={onFilterStatus}
-              fontSize={'sm'}
-            >
-              {[
-                'Unspecified',
-                'In Triage',
-                'Not Affected',
-                'Affected',
-                'Fixed'
-              ].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* SEVERITY */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false}>
-          {severities.length !== 0 && <CheckMark />}
-          <MenuHeading title={'Severity'} />
-          <MenuList>
-            <MenuOptionGroup
-              type='checkbox'
-              value={severities}
-              onChange={onFilterSeverity}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {['critical', 'high', 'medium', 'low', 'unknown']?.map(
-                (item, index) => (
-                  <MenuItemOption
-                    key={index}
-                    value={item}
-                    fontSize={'sm'}
-                    textTransform={'capitalize'}
-                  >
-                    {item}
-                  </MenuItemOption>
-                )
-              )}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* COMPONENT NAME */}
-      <Box width={'fit-content'} position={'relative'} hidden>
-        <Menu closeOnSelect={false}>
-          {components.length !== 0 && <CheckMark />}
-          <MenuHeading title={'Component'} />
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
-              value={components}
-              onChange={onFilterCompName}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {vulnCompNames?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* STATUS */}
-      <Box width={'fit-content'} position={'relative'} hidden>
-        <Menu closeOnSelect={false}>
-          {statues.length !== 0 && <CheckMark />}
-          <MenuHeading title={'Status'} />
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
-              value={statues}
-              onChange={onFilterStatus}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {vulnStatuses?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* KEV */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false}>
-          {kev !== 'all' && kev !== '' && <CheckMark />}
-          <MenuHeading title={'KEV'} />
-          <MenuList>
-            <MenuOptionGroup type='radio' value={kev} onChange={onFilterKev}>
-              {['all', 'yes', 'no'].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* EPSS */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false} isOpen={isOpen} onClose={onClose}>
-          {epss !== '' && epss !== 'all' && <CheckMark />}
-          <MenuHeading title={'EPSS'} onClick={onOpen} />
-          <MenuList>
-            <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {['0-0.1', '0.1-1', '1-10', '10-100'].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                >{`${item} %`}</MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-            <MenuDivider />
-            <Flex flexDirection={'column'} alignItems={'flex-start'}>
-              <Stack direction={'column'} alignItems={'center'} pl={8}>
-                <InputGroup size='sm'>
-                  <InputLeftAddon width={14}>Min</InputLeftAddon>
-                  <Input
-                    type='number'
-                    width={'64px'}
-                    id='minValue'
-                    name='minValue'
-                    value={minEpss}
-                    ref={minRef}
-                    onKeyDown={onMinKeyDown}
-                    onChange={(e) =>
-                      prodVulnDispatch({
-                        type: 'SET_MIN_EPSS',
-                        payload: e.target.value
-                      })
-                    }
-                  />
-                  <InputRightAddon>%</InputRightAddon>
-                </InputGroup>
-                <InputGroup size='sm'>
-                  <InputLeftAddon width={14}>Max</InputLeftAddon>
-                  <Input
-                    type='number'
-                    width={'64px'}
-                    id='maxValue'
-                    name='maxValue'
-                    value={maxEpss}
-                    ref={maxRef}
-                    onKeyDown={onMaxKeyDown}
-                    onChange={(e) =>
-                      prodVulnDispatch({
-                        type: 'SET_MAX_EPSS',
-                        payload: e.target.value
-                      })
-                    }
-                  />
-                  <InputRightAddon>%</InputRightAddon>
-                </InputGroup>
-              </Stack>
-              <Button
-                ml={8}
-                my={3}
-                size='sm'
-                onClick={handleSubmit}
-                isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}
+            {['all', 'direct only'].map((item, index) => (
+              <MenuItemOption
+                key={index}
+                value={item}
+                textTransform={'capitalize'}
+                fontSize={'sm'}
               >
-                Submit
-              </Button>
-            </Flex>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* INCLUDE */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false}>
-          {include.length !== 0 && <CheckMark />}
-          <MenuHeading title={'Include'} />
-          <MenuList>
-            <MenuOptionGroup
-              type='checkbox'
-              value={include}
-              onChange={onFilterInclude}
-            >
-              {['parts', 'retracted'].map((item, index) => (
+                {item}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+          <MenuDivider />
+          <MenuOptionGroup
+            title='Name'
+            type='checkbox'
+            textAlign={'left'}
+            value={components}
+            onChange={onFilterCompName}
+            fontSize='sm'
+          >
+            {vulnCompNames?.map((item, index) => (
+              <MenuItemOption
+                key={index}
+                value={item}
+                fontSize={'sm'}
+                textTransform={'capitalize'}
+              >
+                {item}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
+      {/* STATUS */}
+      <Menu closeOnSelect={false}>
+        <MenuHeading
+          title={'Status'}
+          active={vexComplete !== 'all' || statues?.length > 0}
+        />
+        <MenuList
+          minH={'auto'}
+          maxH={'400px'}
+          overflow={'hidden'}
+          overflowY={'scroll'}
+        >
+          <MenuOptionGroup
+            title='Completeness'
+            value={vexComplete}
+            onChange={onFilterComplete}
+            type='radio'
+            textAlign={'left'}
+          >
+            {['all', 'incomplete only'].map((item, index) => (
+              <MenuItemOption
+                key={index}
+                value={item}
+                textTransform={'capitalize'}
+                fontSize={'sm'}
+              >
+                {item}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+          <MenuDivider />
+          <MenuOptionGroup
+            title='Values'
+            type='checkbox'
+            textAlign={'left'}
+            value={statues}
+            onChange={onFilterStatus}
+            fontSize={'sm'}
+          >
+            {[
+              'Unspecified',
+              'In Triage',
+              'Not Affected',
+              'Affected',
+              'Fixed'
+            ].map((item, index) => (
+              <MenuItemOption
+                key={index}
+                value={item}
+                fontSize={'sm'}
+                textTransform={'capitalize'}
+              >
+                {item}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
+      {/* SEVERITY */}
+      <Menu closeOnSelect={false}>
+        <MenuHeading title={'Severity'} active={severities.length !== 0} />
+        <MenuList>
+          <MenuOptionGroup
+            type='checkbox'
+            value={severities}
+            onChange={onFilterSeverity}
+          >
+            <MenuItemOption value={'all'} fontSize={'sm'}>
+              All
+            </MenuItemOption>
+            {['critical', 'high', 'medium', 'low', 'unknown']?.map(
+              (item, index) => (
                 <MenuItemOption
                   key={index}
                   value={item}
@@ -427,11 +236,125 @@ const VulnFilters = ({ reset }) => {
                 >
                   {item}
                 </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
+              )
+            )}
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
+      {/* KEV */}
+      <Menu closeOnSelect={false}>
+        <MenuHeading title={'KEV'} active={kev !== 'all' && kev !== ''} />
+        <MenuList>
+          <MenuOptionGroup type='radio' value={kev} onChange={onFilterKev}>
+            {['all', 'yes', 'no'].map((item, index) => (
+              <MenuItemOption
+                key={index}
+                value={item}
+                fontSize={'sm'}
+                textTransform={'capitalize'}
+              >
+                {item}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
+      {/* EPSS */}
+      <Menu closeOnSelect={false} isOpen={isOpen} onClose={onClose}>
+        <MenuHeading
+          title={'EPSS'}
+          onClick={onOpen}
+          active={epss !== '' && epss !== 'all'}
+        />
+        <MenuList>
+          <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
+            <MenuItemOption value={'all'} fontSize={'sm'}>
+              All
+            </MenuItemOption>
+            {['0-0.1', '0.1-1', '1-10', '10-100'].map((item, index) => (
+              <MenuItemOption
+                key={index}
+                value={item}
+                fontSize={'sm'}
+              >{`${item} %`}</MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+          <MenuDivider />
+          <Flex flexDirection={'column'} alignItems={'flex-start'}>
+            <Stack direction={'column'} alignItems={'center'} pl={8}>
+              <InputGroup size='sm'>
+                <InputLeftAddon width={14}>Min</InputLeftAddon>
+                <Input
+                  type='number'
+                  width={'64px'}
+                  id='minValue'
+                  name='minValue'
+                  value={minEpss}
+                  ref={minRef}
+                  onKeyDown={onMinKeyDown}
+                  onChange={(e) =>
+                    prodVulnDispatch({
+                      type: 'SET_MIN_EPSS',
+                      payload: e.target.value
+                    })
+                  }
+                />
+                <InputRightAddon>%</InputRightAddon>
+              </InputGroup>
+              <InputGroup size='sm'>
+                <InputLeftAddon width={14}>Max</InputLeftAddon>
+                <Input
+                  type='number'
+                  width={'64px'}
+                  id='maxValue'
+                  name='maxValue'
+                  value={maxEpss}
+                  ref={maxRef}
+                  onKeyDown={onMaxKeyDown}
+                  onChange={(e) =>
+                    prodVulnDispatch({
+                      type: 'SET_MAX_EPSS',
+                      payload: e.target.value
+                    })
+                  }
+                />
+                <InputRightAddon>%</InputRightAddon>
+              </InputGroup>
+            </Stack>
+            <Button
+              ml={8}
+              my={3}
+              size='sm'
+              onClick={handleSubmit}
+              isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}
+            >
+              Submit
+            </Button>
+          </Flex>
+        </MenuList>
+      </Menu>
+      {/* INCLUDE */}
+      <Menu closeOnSelect={false}>
+        <MenuHeading title={'Include'} active={include.length !== 0} />
+        <MenuList>
+          <MenuOptionGroup
+            type='checkbox'
+            value={include}
+            onChange={onFilterInclude}
+          >
+            {['parts', 'retracted'].map((item, index) => (
+              <MenuItemOption
+                key={index}
+                value={item}
+                fontSize={'sm'}
+                textTransform={'capitalize'}
+              >
+                {item}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
     </Stack>
   )
 }
