@@ -369,9 +369,9 @@ const Vulnerabilities = ({ sbomData }) => {
           <Tag
             size='md'
             variant='subtle'
-            width={'80px'}
-            bg={vuln?.sev && sevColor(vuln?.sev).bg}
-            color={vuln?.sev && sevColor(vuln?.sev).text}
+            width={'120px'}
+            bg={vuln?.sev ? sevColor(vuln?.sev)?.bg : 'inherit'}
+            color={vuln?.sev ? sevColor(vuln?.sev)?.text : 'inherit'}
             onClick={(e) => {
               e.currentTarget.parentElement.click()
             }}
@@ -382,7 +382,7 @@ const Vulnerabilities = ({ sbomData }) => {
           </Tag>
         )
       },
-      width: '9%',
+      width: '10%',
       sortable: true,
       wrap: true
     },
