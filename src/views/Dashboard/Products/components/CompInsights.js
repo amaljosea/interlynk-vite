@@ -58,7 +58,8 @@ const CompInsights = ({ isOpen, onClose, id }) => {
   })
 
   const { enrichedContent, healthScore } = data?.component || ''
-  const { latestPackageVersion, repository } = enrichedContent || ''
+  const { packageVersion, latestPackageVersion, repository } =
+    enrichedContent || ''
 
   const onCheck = (category, title) => {
     if (category === 'package') {
@@ -83,6 +84,8 @@ const CompInsights = ({ isOpen, onClose, id }) => {
   }
 
   const tabs = ['Package', 'Version', 'Source Code']
+
+  const isOutdated = latestPackageVersion?.version !== packageVersion?.version
 
   return (
     <Drawer size='md' isOpen={isOpen} placement='right' onClose={onClose}>
@@ -184,7 +187,13 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                         <Tooltip label={onCheck('packageVersion', 'Outdated')}>
                           <Label>Outdated</Label>
                         </Tooltip>
-                        <LynkTag value={latestPackageVersion?.isOutdated} />
+                        <LynkTag
+                          value={
+                            isOutdated
+                              ? 'Yes'
+                              : latestPackageVersion?.isOutdated
+                          }
+                        />
                       </Container>
                       <Container>
                         <Tooltip
