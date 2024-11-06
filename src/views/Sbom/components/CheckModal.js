@@ -2,6 +2,7 @@ import { useLazyQuery, useMutation } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { disableButtonTemporarily } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { componentTypes } from 'variables/general'
 
@@ -71,13 +72,6 @@ const CheckModal = (props) => {
   const [isDisabled, setIsDisabled] = useState(false)
   const [error, setError] = useState('')
 
-  const disableButtonTemporarily = () => {
-    setIsDisabled(true)
-    setTimeout(() => {
-      setIsDisabled(false)
-    }, 3000)
-  }
-
   const isPrimary = shortDesc === 'Document has a primary component'
   const isComponentType = shortDesc === 'Component has a type'
   const isComponentVersion = shortDesc === 'Component has a version'
@@ -97,7 +91,7 @@ const CheckModal = (props) => {
   })
 
   const handleComUpdate = () => {
-    disableButtonTemporarily()
+    disableButtonTemporarily(setIsDisabled)
     if (resolved) {
       onClose()
     } else {
@@ -247,7 +241,7 @@ const CheckModal = (props) => {
     if (ruleExists) {
       navigate(link)
     } else {
-      disableButtonTemporarily()
+      disableButtonTemporarily(setIsDisabled)
       createRule({
         variables: {
           active: true,

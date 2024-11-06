@@ -1,6 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { disableButtonTemporarily } from 'utils'
 
 import { EditIcon } from '@chakra-ui/icons'
 import {
@@ -77,13 +78,6 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
   const [isDisabled, setIsDisabled] = useState(false)
 
   const isSystem = actions?.some((item) => item?.operator === 'copy')
-
-  const disableButtonTemporarily = () => {
-    setIsDisabled(true)
-    setTimeout(() => {
-      setIsDisabled(false)
-    }, 3000)
-  }
 
   const isComponent = conditions?.some((item) => item?.category === 'component')
   // const isVersion = conditions?.some((item) => item?.category === 'version')
@@ -248,7 +242,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
         `A row with the empty or same values already exists. Please update or remove it before continue.`
       )
     } else {
-      disableButtonTemporarily()
+      disableButtonTemporarily(setIsDisabled)
       createRule({
         variables: {
           name: ruleName,
@@ -288,7 +282,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
         `A row with the empty or same values already exists. Please update or remove it before continue.`
       )
     } else {
-      disableButtonTemporarily()
+      disableButtonTemporarily(setIsDisabled)
       updateRule({
         variables: {
           id: data?.id,

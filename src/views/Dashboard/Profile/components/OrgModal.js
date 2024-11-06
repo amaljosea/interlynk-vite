@@ -1,6 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { validateEmail, validateUrl } from 'utils'
+import { disableButtonTemporarily } from 'utils'
 
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, Input } from '@chakra-ui/react'
@@ -24,13 +25,6 @@ const OrgModal = ({ isOpen, onClose }) => {
   const [isDisabled, setIsDisabled] = useState(false)
   const awsToken = sessionStorage.getItem('awsToken')
 
-  const disableButtonTemporarily = () => {
-    setIsDisabled(true)
-    setTimeout(() => {
-      setIsDisabled(false)
-    }, 3000)
-  }
-
   const containsSpace = /\s/.test(url)
 
   const [registerOrg, { loading: regLoading }] =
@@ -49,7 +43,7 @@ const OrgModal = ({ isOpen, onClose }) => {
   }
 
   const handleCreate = () => {
-    disableButtonTemporarily()
+    disableButtonTemporarily(setIsDisabled)
     registerOrg({
       variables: {
         name,

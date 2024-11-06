@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
-import { capitalizeFirstLetter } from 'utils'
+import { capitalizeFirstLetter, disableButtonTemporarily } from 'utils'
 
 import { CopyIcon } from '@chakra-ui/icons'
 import { Text, chakra } from '@chakra-ui/react'
@@ -32,13 +32,6 @@ const CopyRule = ({ isOpen, onClose, env, data }) => {
   const [error, setError] = useState('')
   const [isDisabled, setIsDisabled] = useState(false)
 
-  const disableButtonTemporarily = () => {
-    setIsDisabled(true)
-    setTimeout(() => {
-      setIsDisabled(false)
-    }, 3000)
-  }
-
   const conditionsAttributes = []
   const actionsAttributes = []
   automationConditions?.map((item) =>
@@ -58,7 +51,7 @@ const CopyRule = ({ isOpen, onClose, env, data }) => {
   )
 
   const onSubmit = () => {
-    disableButtonTemporarily()
+    disableButtonTemporarily(setIsDisabled)
     const existingRules = nodes?.filter((item) => item?.name === ruleName)
     if (existingRules?.length > 0) {
       setError(
