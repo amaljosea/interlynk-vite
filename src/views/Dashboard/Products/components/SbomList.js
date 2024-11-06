@@ -81,9 +81,7 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
                             width={16}
                             colorScheme={'blue'}
                           >
-                            <TagLabel mx={'auto'}>
-                              {stats?.compLicenseCount}
-                            </TagLabel>
+                            <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
                           </Tag>
                         </Td>
                         <Td px={0} fontSize={'sm'} width='130px'>
@@ -94,7 +92,9 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
                             colorScheme={'blue'}
                             mx={'auto'}
                           >
-                            <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
+                            <TagLabel mx={'auto'}>
+                              {stats?.compLicenseCount}
+                            </TagLabel>
                           </Tag>
                         </Td>
                         <Td px={0} fontSize={'sm'} width='150px'>
