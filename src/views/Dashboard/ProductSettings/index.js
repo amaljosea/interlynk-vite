@@ -53,8 +53,8 @@ const Settings = ({ enabled, data, mfc }) => {
   })
 
   useEffect(() => {
-    if (projectOptions) {
-      setProjects(
+    if (projectOptions?.jira) {
+      setOptions(
         projectOptions.jira?.projects?.map((project) => ({
           value: project.key,
           label: project.name
@@ -63,13 +63,22 @@ const Settings = ({ enabled, data, mfc }) => {
     }
   }, [projectOptions])
 
+  useEffect(() => {
+    if (jiraProject) {
+      setProject({ value: jiraProject, label: jiraProject })
+    } else {
+      setProject(null)
+    }
+  }, [jiraProject])
+
   const { showToast } = useCustomToast()
   const [checks, setChecks] = useState(false)
   const [internalComp, setInternalComp] = useState(false)
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
-  const [projects, setProjects] = useState([])
+  const [options, setOptions] = useState([])
+  const [project, setProject] = useState(null)
 
   const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
 
@@ -90,19 +99,21 @@ const Settings = ({ enabled, data, mfc }) => {
 
   const { isOpen: isCompOpen, onClose: onCompClose } = useDisclosure()
 
-  const onUpdate = async (value, field) => {
+  const onUpdate = async (val, field) => {
+    if (field === 'jira') {
+      setProject(val)
+    }
     await updateSettings({
       variables: {
         id,
-        checks: field === 'checks' ? value : undefined,
-        intcomp: field === 'internalComp' ? value : undefined,
-        autofix: field === 'automation' ? value : undefined,
-        vulnscan: field === 'vulnScan' ? value : undefined,
-        copyVexFromPrevious:
-          field === 'copyVexFromPrevious' ? value : undefined,
-        days: field === 'dataRetention' ? Number(value) : undefined,
-        mfcId: field === 'manufacturer' ? value : undefined,
-        jiraProject: field === 'jira' ? value : undefined
+        checks: field === 'checks' ? val : undefined,
+        intcomp: field === 'internalComp' ? val : undefined,
+        autofix: field === 'automation' ? val : undefined,
+        vulnscan: field === 'vulnScan' ? val : undefined,
+        copyVexFromPrevious: field === 'copyVexFromPrevious' ? val : undefined,
+        days: field === 'dataRetention' ? Number(val) : undefined,
+        mfcId: field === 'manufacturer' ? val : undefined,
+        jiraProject: field === 'jira' && val ? val?.value : undefined
       }
     })
       .then((res) => res.data)
@@ -232,6 +243,7 @@ const Settings = ({ enabled, data, mfc }) => {
               <Select
                 width={'400px'}
                 id='dataRetention'
+                fontSize={'sm'}
                 value={Number(dataRetentionDays) || 0}
                 onChange={(e) => onUpdate(e.target.value, 'dataRetention')}
                 isDisabled={!enabled || !editControls}
@@ -250,6 +262,7 @@ const Settings = ({ enabled, data, mfc }) => {
               </FormLabel>
               <Select
                 width={'400px'}
+                fontSize={'sm'}
                 value={organizationManufacturer?.id || ''}
                 onChange={(e) => onUpdate(e.target.value, 'manufacturer')}
                 isDisabled={!enabled || !editControls}
@@ -272,11 +285,12 @@ const Settings = ({ enabled, data, mfc }) => {
                 <Info ml={2} onClick={onCheckJira} />
               </FormLabel>
               <LynkSelect
-                options={projects}
+                options={options}
+                isClearable={true}
                 placeholder='Project'
                 isDisabled={!editControls}
-                onChange={(e) => onUpdate(e.value, 'jira')}
-                value={{ value: jiraProject || '', label: jiraProject || '' }}
+                onChange={(value) => onUpdate(value, 'jira')}
+                value={project}
               />
             </FormControl>
           </GridItem>

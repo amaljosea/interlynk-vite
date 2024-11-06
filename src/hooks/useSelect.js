@@ -104,15 +104,7 @@ export const useSelect = (type) => {
         height: isBreadcrumb ? '32px' : '39px',
         paddingLeft: isVersion ? '36px' : 'auto'
       }
-    },
-    clearIndicator: (provided, state) => ({
-      ...provided,
-      cursor: 'pointer',
-      color: state.isFocused ? 'lightgray' : 'lightgray',
-      '&:hover': {
-        color: '#4299e1'
-      }
-    })
+    }
   }
 
   return { style: selectStyles }

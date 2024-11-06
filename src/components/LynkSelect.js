@@ -5,8 +5,8 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaTimes } from 'react-icons/fa'
 import { FaChevronDown } from 'react-icons/fa6'
+import { MdClose } from 'react-icons/md'
 
 const LynkSelect = (props) => {
   const { style } = useSelect('field')
@@ -19,7 +19,7 @@ const LynkSelect = (props) => {
 
     return (
       <components.ClearIndicator {...props}>
-        <FaTimes color={primaryTextColor} />
+        <MdClose fontSize={16} color={primaryTextColor} />
       </components.ClearIndicator>
     )
   }
