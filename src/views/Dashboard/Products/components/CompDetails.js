@@ -120,18 +120,18 @@ const CompDetails = ({ data, primaryComp }) => {
       variables: {
         id: data?.id,
         sbomId: sbomId,
-        kind: details?.kind,
-        name: details?.name,
-        scope: details?.scope,
-        group: details?.group,
-        primary: details?.primary,
-        internal: details?.internal,
-        version: details?.version,
-        description: details?.description,
-        copyright: details?.copyright,
+        kind: details?.kind || undefined,
+        name: details?.name || undefined,
+        scope: details?.scope || undefined,
+        group: details?.group || undefined,
+        primary: details?.primary || undefined,
+        internal: details?.internal || undefined,
+        version: details?.version || undefined,
+        description: details?.description || undefined,
+        copyright: details?.copyright || undefined,
         supportLevel: details?.supportLevel || 'NONE',
         endOfSupport: details?.endOfSupport || '',
-        licenses: { licensesExp: license }
+        licenses: license ? { licensesExp: license } : undefined
       }
     }).then((res) => {
       const { errors } = res?.data?.componentUpdate || ''
