@@ -2,18 +2,9 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { validateEmail } from 'utils'
 
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Heading,
-  Icon,
-  IconButton,
-  Input,
-  Stack
-} from '@chakra-ui/react'
+import { Icon, IconButton } from '@chakra-ui/react'
+import { Button, Flex, Heading, Input, Stack } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
@@ -282,11 +273,12 @@ const LegalModal = ({ data, isOpen, onClose }) => {
       title={`${data ? 'Edit' : 'Add'} Manufacturer`}
       disabled={errorMessage || (url !== '' && isValidUrl !== '')}
     >
-      <Flex width={'100%'} direction={'column'} gap={4}>
+      <Stack w={'100%'} spacing={5}>
         <FormControl isRequired>
           <FormLabel fontSize={12}>Organization Name</FormLabel>
           <Input
             type='text'
+            fontSize={14}
             value={orgName}
             onChange={(e) => {
               setOrgName(e.target.value)
@@ -300,25 +292,16 @@ const LegalModal = ({ data, isOpen, onClose }) => {
           <Input
             type='text'
             value={url}
+            fontSize={14}
             onChange={onChangeUrl}
             placeholder='Add URL'
-            fontSize={14}
           />
           <FormErrorMessage>{isValidUrl}</FormErrorMessage>
         </FormControl>
-        <Flex direction='column' gap={2}>
-          <Flex
-            width={'100%'}
-            my={2}
-            justifyContent={'space-between'}
-            alignItems={'center'}
-          >
-            <Stack spacing={0} alignItems={'flex-start'}>
-              <Heading fontWeight={500} fontFamily={'inherit'} fontSize={12}>
-                Contacts
-              </Heading>
-            </Stack>
-          </Flex>
+        <Stack spacing={2}>
+          <Heading fontWeight={500} fontFamily={'inherit'} fontSize={12}>
+            Contacts
+          </Heading>
           {contacts?.length > 0 &&
             contacts?.map((item, index) => (
               <Flex key={index} alignItems={'flex-start'} gap={2}>
@@ -389,22 +372,22 @@ const LegalModal = ({ data, isOpen, onClose }) => {
                 />
               </Flex>
             ))}
-        </Flex>
-      </Flex>
-      <Button
-        my={3}
-        aria-label='Add config'
-        onClick={addRow}
-        colorScheme='blue'
-        leftIcon={<FaPlus />}
-        fontWeight={'medium'}
-        paddingLeft={'2px'}
-        fontSize={'sm'}
-        variant='link'
-      >
-        Add New
-      </Button>
-      {error !== '' && <LynkAlert msg={error} />}
+        </Stack>
+        <Button
+          aria-label='Add config'
+          w={'fit-content'}
+          onClick={addRow}
+          colorScheme='blue'
+          leftIcon={<FaPlus />}
+          fontWeight={'medium'}
+          paddingLeft={'2px'}
+          fontSize={'sm'}
+          variant='link'
+        >
+          Add New
+        </Button>
+        {error !== '' && <LynkAlert msg={error} />}
+      </Stack>
     </LynkModal>
   )
 }
