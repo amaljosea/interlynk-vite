@@ -4,6 +4,7 @@ import ReactSelect from 'react-select'
 
 import { FormControl, FormLabel, Input, Stack } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import { useSelect } from 'hooks/useSelect'
@@ -12,7 +13,6 @@ import { OrgRoleCreate } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
 
 import { BiUserPlus } from 'react-icons/bi'
-import LynkAlert from 'components/LynkAlert'
 
 const CreateRole = ({ isOpen, onClose }) => {
   const [roleName, setRoleName] = useState('')

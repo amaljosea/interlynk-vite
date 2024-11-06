@@ -78,36 +78,31 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
     const actionStmt = row.actionStmt || 'N/A'
     const impact = row.impact || 'N/A'
     const justification = row.vexJustification?.name || 'N/A'
+    const note = row?.note || 'N/A'
 
     setDescription(
-      `**Subject**: [${vulnId}]: ${desc}\n
-      **Body**:\n
-      Summary:\n${desc || 'N/A'}\n
-      **Issue Type**:\n
-      Vulnerability\n
-      **Affected Product**:\n
-      ${row.component.sbom.project.projectGroup.name}\n
-      **Affected Version (Environment)**:\n
-      ${row.component.sbom.project.projectGroup.name} (${row.component.sbom.project.name})\n
-      **Affected Components**:\n
-      ${component}: ${row.component.version}\nPURL: ${row.component.purl}\n
-      **Description**:\n
-      ${desc}\n
-      **Additional Details:**\n
-      | Key                        | Value                |\n
-      | :------------------------- | :-------------------- |\n
-      | NVD ID                     | ${nvdAliasId}\n       |\n
-      | Severity                   | ${sev}\n             |\n
-      | CVSS Score                 | ${cvssScore}\n       |\n
-      | CVSS Vector                | ${cvssVector}\n       |\n
-      | EPSS Percentile            | ${epssPercentile}\n  |\n
-      | EPSS Score                 | ${epssScore}\n       |\n
-      | Vulnerability Status       | ${vexStatus}\n       |\n
-      | KEV                        | ${kev}\n             |\n
-      | Vulnerability Action Statement | ${actionStmt}\n    |\n
-      | Vulnerability Impact       | ${impact}\n          |\n
-      | Vulnerability Justification | ${justification}\n  |\n
-      | Vulnerability Notes        | N/A\n            |\n
+      `Subject: [${vulnId}]: ${desc}\n
+Body:\n
+Summary: ${desc || 'N/A'}\n
+Issue Type:\n
+Vulnerability\n
+Affected Product: ${row.component.sbom.project.projectGroup.name}\n
+Affected Version (Environment): ${row.component.sbom.project.projectGroup.name} (${row.component.sbom.project.name})\n
+Affected Components: ${component}: ${row.component.version}\nPURL: ${row.component.purl}\n
+Description: ${desc}\n
+Additional Details:\n
+NVD ID: ${nvdAliasId}\n
+Severity: ${sev}\n
+CVSS Score: ${cvssScore}\n
+CVSS Vector: ${cvssVector}\n
+EPSS Percentile: ${epssPercentile}\n
+EPSS Score: ${epssScore}\n
+Vulnerability Status: ${vexStatus}\n
+KEV: ${kev}\n
+Vulnerability Action Statement: ${actionStmt}\n
+Vulnerability Impact: ${impact}\n
+Vulnerability Justification: ${justification}\n
+Vulnerability Notes: ${note}\n
       `
     )
     setSummary(`[Vulnerability]: ${vulnId}`)
