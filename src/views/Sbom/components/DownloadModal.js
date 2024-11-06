@@ -35,9 +35,6 @@ const DownloadModal = (props) => {
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
   )
 
-  const { primaryComponent } = sbom || ''
-  const { description, purl } = primaryComponent || ''
-
   const authors =
     sbom?.authors.length > 0 ? authorsList(sbom?.authors) : undefined
 
@@ -159,8 +156,6 @@ const DownloadModal = (props) => {
       downloadSbomPdf(
         productName,
         version,
-        description,
-        purl,
         authors,
         sbom,
         allComponents,

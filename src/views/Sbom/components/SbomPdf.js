@@ -20,8 +20,6 @@ export const authorsList = (authors) => {
 export const downloadSbomPdf = (
   productName,
   version,
-  description,
-  purl,
   authors,
   sbom,
   componentsActual,
@@ -30,12 +28,10 @@ export const downloadSbomPdf = (
 ) => {
   const doc = new jsPDF()
   const pageWidth = doc.internal.pageSize.getWidth()
-  const pageHeight = doc.internal.pageSize.getHeight()
   const leftMargin = 10
   const rightMargin = 20
   const contentGap = 20
-  let currentY = 90
-  const bottomMargin = 20
+  let currentY
   const productIcon = InterlynkLogo
 
   const formatValue = (
@@ -51,13 +47,6 @@ export const downloadSbomPdf = (
       value,
       pageWidth - rightMargin - contentGap - leftMargin - padding
     )
-  }
-
-  const checkPageHeight = () => {
-    if (currentY > pageHeight - bottomMargin) {
-      doc.addPage()
-      currentY = 10
-    }
   }
 
   function formatDate(date, dateFormat = 'MMMM dd, yyyy hh:mm a') {
@@ -80,6 +69,64 @@ export const downloadSbomPdf = (
   const iconX = 9
   const iconY = 12
 
+  doc.page = 1
+
+  function footer() {
+    doc.setLineWidth(6)
+    doc.setDrawColor(...blueColor)
+
+    // Draw the line at the footer
+    doc.line(leftMargin, 285, pageWidth - rightMargin, 285)
+    doc.setTextColor(...darkGrayColor)
+    doc.setFontSize(10)
+    doc.text(180, 295, 'page ' + doc.page)
+    doc.page++
+  }
+
+  const checkPageHeight = () => {
+    if (currentY > 240) {
+      doc.addPage()
+      footer()
+
+      // Set color and font for header
+      doc.setTextColor(...blueColor)
+      doc.setFontSize(24)
+
+      // Add Interlynk icon and title at the top
+      doc.addImage(productIcon, 'JPEG', iconX, iconY, iconWidth, iconHeight)
+      doc.text('Interlynk', 22, 21)
+
+      const availableWidth = pageWidth - leftMargin - rightMargin - 100
+      const sbomSubText = `${productName}: ${version}`
+      let wrappedText = doc.splitTextToSize(sbomSubText, availableWidth)
+      if (wrappedText.length > 3) {
+        wrappedText = [
+          wrappedText[0],
+          `${wrappedText[1]}...`,
+          wrappedText[wrappedText.length - 1]
+        ]
+      }
+
+      let yPosition = 20
+      doc.setFontSize(14)
+      wrappedText.forEach((line, index) => {
+        if (index === wrappedText.length - 1 && index !== 0) {
+          yPosition += 5
+        } else {
+          yPosition += index * 5
+        }
+        doc.text(line, 155, yPosition)
+      })
+
+      // Reset vertical position for the new page content
+      currentY = yPosition + 20
+      doc.setFontSize(10)
+      doc.setTextColor(...grayColor)
+    }
+  }
+
+  doc.setFontSize(10)
+  footer()
   doc.setTextColor(...blueColor)
   doc.setFontSize(24)
   doc.addImage(productIcon, 'JPEG', iconX, iconY, iconWidth, iconHeight)
@@ -92,18 +139,40 @@ export const downloadSbomPdf = (
   doc.setFontSize(14)
   doc.text(sbomSubText, rightAlignedX + 45, 21)
 
-  doc.setFontSize(24)
-  doc.text(productName, leftMargin, 45)
-  doc.setFontSize(16)
-  doc.text(version, leftMargin, 55)
+  const availableWidthForProductName = pageWidth - leftMargin - rightMargin - 20
+  const wrappedProductName = doc.splitTextToSize(
+    productName,
+    availableWidthForProductName
+  )
+  currentY = 45
+  wrappedProductName.forEach((line, index) => {
+    doc.setFontSize(24)
+    currentY += index * 10
+    doc.text(line, leftMargin, currentY)
+  })
+  currentY += 10
+  const wrappedVersionName = doc.splitTextToSize(
+    version,
+    availableWidthForProductName
+  )
+
+  wrappedVersionName.forEach((line, index) => {
+    doc.setFontSize(16)
+    currentY += index * 10
+    doc.text(line, leftMargin, currentY)
+  })
+
+  currentY += 5
 
   doc.setLineWidth(0.1)
   doc.setDrawColor(...blackColor)
-  doc.line(leftMargin, 60, pageWidth - rightMargin, 60)
+  doc.line(leftMargin, currentY, pageWidth - rightMargin, currentY)
+
+  currentY += 20
 
   doc.setTextColor(...blueColor)
   doc.setFontSize(14)
-  doc.text('General', leftMargin, 80) // General title after underline
+  doc.text('General', leftMargin, currentY)
 
   const labels = [
     'Product Name',
@@ -218,6 +287,7 @@ export const downloadSbomPdf = (
   // Set gray color for section labels on the left side
   doc.setTextColor(...grayColor)
   doc.setFontSize(10)
+  currentY += 10
 
   // Iterate over the labels and values, dynamically adjusting the Y-position
   labels.forEach((label, index) => {
@@ -340,7 +410,7 @@ export const downloadSbomPdf = (
       80,
       leftMargin
     )
-
+    doc.setTextColor(...grayColor)
     doc.text(componentName, leftMargin, currentY)
     let initialY = currentY
     currentY += componentName.length > 1 ? componentName.length * 5 : 5
@@ -351,10 +421,10 @@ export const downloadSbomPdf = (
     const componentValues = getComponentValues(component)
 
     componentLabels.forEach((label, index) => {
-      doc.setTextColor(128, 128, 128)
+      doc.setTextColor(...grayColor)
       doc.text(label, leftMargin + 40, currentY)
 
-      doc.setTextColor(50, 50, 50)
+      doc.setTextColor(...darkGrayColor)
       const wrappedText = doc.splitTextToSize(
         componentValues[index],
         availableWidth
@@ -370,13 +440,16 @@ export const downloadSbomPdf = (
       currentY += wrappedText.length > 1 ? wrappedText.length * 5 : 10
       checkPageHeight()
     })
+    checkPageHeight()
 
     // Divider between components
-    doc.setLineWidth(4)
-    doc.setDrawColor(211, 211, 211)
+    doc.setLineWidth(6)
+    doc.setDrawColor(225, 225, 225)
+
     doc.line(leftMargin, currentY, pageWidth - rightMargin, currentY)
     currentY += 15
   })
+  checkPageHeight()
 
   //Vulnerabilities section
   doc.setTextColor(...blueColor)
@@ -385,6 +458,7 @@ export const downloadSbomPdf = (
   if (vulnActual.length > 0) {
     doc.text('Vulnerabilities', leftMargin, currentY)
   }
+  checkPageHeight()
 
   currentY += 10
 
@@ -464,6 +538,7 @@ export const downloadSbomPdf = (
       80,
       leftMargin
     )
+    doc.setTextColor(...grayColor)
     doc.text(vulnId, leftMargin, currentY)
     let initialY = currentY
     currentY += vulnId.length > 1 ? vulnId.length * 10 : 5
@@ -471,9 +546,9 @@ export const downloadSbomPdf = (
 
     const vulnValues = getVulnValues(vuln)
     VulnLabels.forEach((label, index) => {
-      doc.setTextColor(128, 128, 128) // Gray color
+      doc.setTextColor(...grayColor) // Gray color
       doc.text(label, leftMargin + 40, currentY)
-      doc.setTextColor(50, 50, 50) // Dark gray for values
+      doc.setTextColor(...darkGrayColor) // Dark gray for values
       const wrappedText = doc.splitTextToSize(vulnValues[index], availableWidth)
       const rightAlignedX =
         pageWidth - rightMargin - doc.getTextWidth(wrappedText.join(''))
@@ -489,8 +564,12 @@ export const downloadSbomPdf = (
       currentY += wrappedText.length > 1 ? wrappedText.length * 5 : 10
       checkPageHeight()
     })
-    doc.setLineWidth(4)
-    doc.setDrawColor(211, 211, 211) // Light gray color
+    checkPageHeight()
+    doc.setLineWidth(6)
+    doc.setDrawColor(225, 225, 225)
+    checkPageHeight()
+
+    // Light gray color
     doc.line(leftMargin, currentY, pageWidth - rightMargin, currentY)
     currentY += 15
   })
