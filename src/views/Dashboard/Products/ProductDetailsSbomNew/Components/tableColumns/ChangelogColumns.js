@@ -216,40 +216,24 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                   ) : updated === 't' ? (
                     <Text color={primaryTextColor}>True</Text>
                   ) : updatedValue?.length > 0 ? (
-                    updatedValue.map((item, index) => (
-                      <Flex
-                        key={index}
-                        sx={{
-                          my: 2,
-                          gap: 2,
-                          direction: 'column',
-                          flexWrap: 'wrap'
-                        }}
-                      >
+                    <Flex my={2} gap={2} flexDir={'column'} flexWrap={'wrap'}>
+                      {updatedValue.map((item, index) => (
                         <Tag
-                          size={'sm'}
                           key={index}
+                          size={'sm'}
                           variant='subtle'
                           colorScheme='green'
                           width={'fit-content'}
                         >
-                          <TagLabel pt={1}>{item}</TagLabel>
+                          <TagLabel>{item}</TagLabel>
                         </Tag>
-                      </Flex>
-                    ))
+                      ))}
+                    </Flex>
                   ) : updatedValue?.length === 0 ? (
                     ''
                   ) : urls && urls.length > 0 ? (
-                    urls.map((item, index) => (
-                      <Flex
-                        key={index}
-                        sx={{
-                          my: 2,
-                          gap: 2,
-                          direction: 'column',
-                          flexWrap: 'wrap'
-                        }}
-                      >
+                    <Flex my={2} gap={2} flexDir={'column'} flexWrap={'wrap'}>
+                      {urls.map((item, index) => (
                         <Tag
                           size={'sm'}
                           key={index}
@@ -257,12 +241,12 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                           colorScheme='green'
                           width={'fit-content'}
                         >
-                          <TagLabel pt={1}>
+                          <TagLabel>
                             {item.name} - {truncatedValue(item.url, 15)}
                           </TagLabel>
                         </Tag>
-                      </Flex>
-                    ))
+                      ))}
+                    </Flex>
                   ) : (
                     <Text
                       color={primaryTextColor}
