@@ -29,7 +29,10 @@ const Changelog = () => {
   const queryParams = new URLSearchParams(location.search)
   const activeTab = queryParams.get('tab')
 
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
+  const { headingTextColor, secondaryBgColor } = useThemeColor([
+    'headingTextColor',
+    'secondaryBgColor'
+  ])
 
   const PURL = useDisclosure()
   const USER = useDisclosure()
@@ -153,10 +156,7 @@ const Changelog = () => {
   const rowStyles = [
     {
       when: (row) => row?.copiedFromId !== null,
-      style: {
-        // eslint-disable-next-line
-        backgroundColor: '#EDF2F7'
-      }
+      style: { backgroundColor: secondaryBgColor }
     }
   ]
 
