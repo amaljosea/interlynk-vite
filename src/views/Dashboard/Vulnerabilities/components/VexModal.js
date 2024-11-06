@@ -15,6 +15,7 @@ import {
   Select,
   Stack,
   Tag,
+  Text,
   Textarea
 } from '@chakra-ui/react'
 
@@ -67,7 +68,10 @@ const VexModal = ({
   const [stagTwo, setStagTwo] = useState('')
   const [stagThree, setStagThree] = useState('')
 
-  const { headingTextSecondary } = useThemeColor(['headingTextSecondary'])
+  const { headingTextSecondary, headingTextColor } = useThemeColor([
+    'headingTextSecondary',
+    'headingTextColor'
+  ])
 
   const { data: allVexStatus } = useQuery(getVexStatuses)
   const { data: allVexJustify } = useQuery(getVexJustifications)
@@ -106,8 +110,12 @@ const VexModal = ({
           break
         case 'Affected':
           setStagOne('green')
-          if (!response && !actionStatement) {
+          if (!actionStatement && !response) {
             setStagTwo('red')
+          } else if (responseTitle == 'Update' && !selectedTag) {
+            setStagTwo('red')
+          } else if (response && !actionStatement) {
+            setStagTwo('gray')
           } else {
             setStagTwo('green')
           }
@@ -129,7 +137,16 @@ const VexModal = ({
           break
       }
     },
-    [actionStatement, details, impactData, justification, notes, response]
+    [
+      actionStatement,
+      details,
+      impactData,
+      justification,
+      notes,
+      response,
+      responseTitle,
+      selectedTag
+    ]
   )
 
   const handleStatusChange = (e) => {
@@ -200,7 +217,7 @@ const VexModal = ({
     } else if (statusName === 'Affected' && responseTitle !== 'Update') {
       return '156px'
     } else if (statusName === 'Not Affected') {
-      return '138px'
+      return '174px'
     } else {
       return 14
     }
@@ -285,7 +302,7 @@ const VexModal = ({
           </FormControl>
           {/* JUSTIFICATION */}
           {statusName === 'Not Affected' && (
-            <FormControl>
+            <FormControl isRequired>
               <FormLabel htmlFor='justification' fontSize='sm'>
                 Justification
               </FormLabel>
@@ -307,6 +324,58 @@ const VexModal = ({
                   <option value={''}>No data found</option>
                 )}
               </Select>
+            </FormControl>
+          )}
+          <Text
+            fontSize='sm'
+            fontWeight={'medium'}
+            color={headingTextColor}
+            hidden={statusName !== 'Not Affected'}
+          >
+            AND / OR
+          </Text>
+          {/* IMPACT STATEMENT */}
+          {statusName === 'Not Affected' && (
+            <FormControl isRequired>
+              <FormLabel htmlFor='impactStatement' fontSize='sm'>
+                Impact Statement
+              </FormLabel>
+              <Textarea
+                type='text'
+                name='impactStatement'
+                rows={2}
+                id='impactStatement'
+                placeholder='Add impact statement'
+                value={impactData}
+                onChange={(e) => setImpactData(e.target.value)}
+                fontSize='sm'
+              />
+            </FormControl>
+          )}
+          {statusName === 'Affected' &&
+            responseTitle === 'Update' &&
+            !groups && (
+              <LynkAlert
+                msg={
+                  'Product versions are different. Please select same version.'
+                }
+              />
+            )}
+          {/* ACTION STATEMENT */}
+          {statusName === 'Affected' && (
+            <FormControl isRequired>
+              <FormLabel htmlFor='actionStatement' fontSize='sm'>
+                Action Statement
+              </FormLabel>
+              <Textarea
+                rows={3}
+                name='actionStatement'
+                id='actionStatement'
+                fontSize='sm'
+                value={actionStatement}
+                onChange={(e) => setActionStatement(e.target.value)}
+                placeholder='Example: This vulnerability can be mitigate by running the application with ENV_PROTECTED enabled or turning off Notifications under settings.'
+              />
             </FormControl>
           )}
           {/* RESPONSE */}
@@ -336,7 +405,7 @@ const VexModal = ({
           )}
           {/* FIXED VERSION */}
           {responseTitle === 'Update' && (
-            <FormControl width={'100%'}>
+            <FormControl width={'100%'} isRequired>
               <FormLabel htmlFor='fixedVersion' fontSize='sm'>
                 Fixed Version
               </FormLabel>
@@ -359,50 +428,6 @@ const VexModal = ({
                   <option value=''>-- --</option>
                 )}
               </Select>
-            </FormControl>
-          )}
-          {statusName === 'Affected' &&
-            responseTitle === 'Update' &&
-            !groups && (
-              <LynkAlert
-                msg={
-                  'Product versions are different. Please select same version.'
-                }
-              />
-            )}
-          {/* IMPACT STATEMENT */}
-          {statusName === 'Not Affected' && (
-            <FormControl>
-              <FormLabel htmlFor='impactStatement' fontSize='sm'>
-                Impact Statement
-              </FormLabel>
-              <Textarea
-                type='text'
-                name='impactStatement'
-                rows={2}
-                id='impactStatement'
-                placeholder='Add impact statement'
-                value={impactData}
-                onChange={(e) => setImpactData(e.target.value)}
-                fontSize='sm'
-              />
-            </FormControl>
-          )}
-          {/* ACTION STATEMENT */}
-          {statusName === 'Affected' && (
-            <FormControl>
-              <FormLabel htmlFor='actionStatement' fontSize='sm'>
-                Action Statement
-              </FormLabel>
-              <Textarea
-                rows={3}
-                name='actionStatement'
-                id='actionStatement'
-                fontSize='sm'
-                value={actionStatement}
-                onChange={(e) => setActionStatement(e.target.value)}
-                placeholder='Example: This vulnerability can be mitigate by running the application with ENV_PROTECTED enabled or turning off Notifications under settings.'
-              />
             </FormControl>
           )}
           {/* DETAILS */}
