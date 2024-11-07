@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import ReactSelect from 'react-select'
+import { capitalizeFirstLetter } from 'utils'
 
 import { FormControl, FormLabel, Input, Stack } from '@chakra-ui/react'
 
@@ -36,7 +37,10 @@ const CreateRole = ({ isOpen, onClose }) => {
       const allPs = item?.permissionsMap
         ?.filter((ps) => ps?.value === true)
         ?.map((item) => item?.key)
-      psOptions?.push({ value: allPs, label: item?.name })
+      psOptions?.push({
+        value: allPs,
+        label: capitalizeFirstLetter(item?.name)
+      })
     })
 
   const onNameChange = (e) => {
