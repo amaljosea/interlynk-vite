@@ -920,8 +920,7 @@ const Components = ({ sbomData }) => {
             filters={{
               ...compData,
               orderBy: searchInput === '' ? { field, direction } : undefined,
-              search: searchInput !== '' ? searchInput : undefined,
-              includeParts: sbomData?.sbomParts?.length > 0
+              search: searchInput !== '' ? searchInput : undefined
             }}
           />
 
