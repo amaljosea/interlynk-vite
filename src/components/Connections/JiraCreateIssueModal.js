@@ -85,7 +85,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
 Body:\n
 Summary: ${desc || 'N/A'}\n
 Issue Type:\n
-Vulnerability\n
+Vulnerability:\n
 Affected Product: ${row.component.sbom.project.projectGroup.name}\n
 Affected Version (Environment): ${row.component.sbom.project.projectGroup.name} (${row.component.sbom.project.name})\n
 Affected Components: ${component}: ${row.component.version}\nPURL: ${row.component.purl}\n
@@ -212,7 +212,7 @@ Vulnerability Notes: ${note}\n
         />
       </FormControl>
 
-      <Grid pt='15px' pb='15px' templateColumns='repeat(2, 1fr)' gap={6}>
+      <Grid pt='15px' pb='15px' templateColumns='repeat(2, 1fr)' gap={4}>
         <FormControl isRequired>
           <FormLabel>Project (Default Selected)</FormLabel>
           <LynkSelect
@@ -257,18 +257,16 @@ Vulnerability Notes: ${note}\n
         </FormControl>
       </Grid>
 
-      <FormControl pt='15px'>
+      <FormControl mt={1} isReadOnly>
         <FormLabel>Description</FormLabel>
         <Textarea
-          height='200px'
-          name='text'
-          id='text'
+          rows={'12'}
           fontSize={'sm'}
+          id='description'
+          name='description'
           value={description}
           placeholder='Description'
           onChange={(e) => setDescription(e.target.value)}
-          disabled={false}
-          resize={'none'}
         />
       </FormControl>
     </LynkModal>
