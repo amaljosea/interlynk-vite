@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import AsyncSelect from 'react-select/async'
+import { truncatedValue } from 'utils'
 
 import { Spinner } from '@chakra-ui/react'
 
@@ -75,14 +76,10 @@ const ProjectGroupBreadcrumb = ({
 
   const { nodes, totalCountActual } = lazyDropDownProps
 
-  const filterText = (item) => {
-    return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
-  }
-
   if (path === 'customer' && projectGroupName) {
     return (
       <Link to={generateProductDetailPageUrlFromCurrentUrl()}>
-        {filterText(projectGroupName)}
+        {truncatedValue(projectGroupName)}
       </Link>
     )
   } else if (nodes && totalCountActual > 1) {
@@ -90,7 +87,7 @@ const ProjectGroupBreadcrumb = ({
   } else if (nodes && totalCountActual === 1) {
     return (
       <Link to={generateProductDetailPageUrlFromCurrentUrl()}>
-        {filterText(projectGroupName)}
+        {truncatedValue(projectGroupName)}
       </Link>
     )
   }

@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 import { getFullDateAndTime, isCustomerView, timeSince } from 'utils'
+import { truncatedValue } from 'utils'
 
 import {
   Drawer,
@@ -42,9 +43,7 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
       <DrawerContent>
         <DrawerCloseButton mt={1} />
         <DrawerHeader borderBottomWidth='1px'>
-          {data?.projectVersion?.length > 40
-            ? `${data?.projectVersion?.substring(0, 40)}...`
-            : data?.projectVersion + ' SBOM List'}
+          {truncatedValue(data?.projectVersion, 40) + ' SBOM List'}
         </DrawerHeader>
         <DrawerBody>
           <Table variant='simple' m={0} p={0}>

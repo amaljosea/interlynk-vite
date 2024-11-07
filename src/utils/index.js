@@ -997,12 +997,8 @@ export const sortByUpdatedAt = (data) => {
   return sortedData
 }
 
-export const truncatedValue = (name, length) => {
-  if (name !== '') {
-    return name?.length > length ? `${name?.substring(0, length)}...` : name
-  } else {
-    return name
-  }
+export const truncatedValue = (name = '', length = 10) => {
+  return name.length > length ? `${name.substring(0, length)}...` : name
 }
 
 export const parseJSONSafely = (str) => {

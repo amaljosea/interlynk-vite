@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { validateUrl } from 'utils'
+import { truncatedValue } from 'utils'
 
 import { DeleteIcon } from '@chakra-ui/icons'
 import {
@@ -207,9 +208,7 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId }) => {
                             >
                               {item.url ? (
                                 <Tooltip label={item.url}>
-                                  {item.url.length > 35
-                                    ? `${item.url.substring(0, 35)}...`
-                                    : item.url}
+                                  {truncatedValue(item.url, 35)}
                                 </Tooltip>
                               ) : null}
                             </Td>

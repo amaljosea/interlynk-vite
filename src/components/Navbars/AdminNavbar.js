@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { permissionList } from 'utils'
+import { truncatedValue } from 'utils'
 
 import { ChevronRightIcon } from '@chakra-ui/icons'
 import {
@@ -77,10 +78,6 @@ export default function AdminNavbar(props) {
     projectGroupId: params.productgroupid
   })
 
-  const filterText = (item) => {
-    return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
-  }
-
   return (
     <Grid
       bg={mainContrastBgColor}
@@ -136,8 +133,8 @@ export default function AdminNavbar(props) {
                       }
                     }}
                   >
-                    {filterText(part.projectGroupName)} (
-                    {filterText(part.versionName)})
+                    {truncatedValue(part.projectGroupName)} (
+                    {truncatedValue(part.versionName)})
                   </BreadcrumbLink>
                 </BreadcrumbItem>
               )

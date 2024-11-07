@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import AsyncSelect from 'react-select/async'
 import { isCustomerView } from 'utils'
+import { truncatedValue } from 'utils'
 
 import { Spinner } from '@chakra-ui/react'
 
@@ -86,17 +87,13 @@ const VersionBreadcrumb = ({ selectStyles }) => {
 
   const { nodes, totalCountActual } = lazyDropDownProps
 
-  const filterText = (item) => {
-    return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
-  }
-
   if (archivedVersion?.id)
     return <Link to={'#'}>{archivedVersion?.projectVersion}</Link>
 
   if (path === 'customer' && sbomHookData.versionName) {
     return (
       <Link to={generateProductVersionDetailPageUrlFromCurrentUrl()}>
-        {filterText(sbomHookData.versionName)}
+        {truncatedValue(sbomHookData.versionName)}
       </Link>
     )
   }
@@ -105,7 +102,7 @@ const VersionBreadcrumb = ({ selectStyles }) => {
   } else if (nodes && totalCountActual === 1) {
     return (
       <Link to={generateProductVersionDetailPageUrlFromCurrentUrl()}>
-        {filterText(sbomHookData.versionName)}
+        {truncatedValue(sbomHookData.versionName)}
       </Link>
     )
   }

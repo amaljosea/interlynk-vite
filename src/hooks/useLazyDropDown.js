@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { get } from 'lodash'
+import { truncatedValue } from 'utils'
 
 export const useLazyDropDown = (
   QUERY,
@@ -96,11 +97,7 @@ export const useLazyDropDown = (
     ? (item) => item[optionLabel]
     : (item) => item?.name
 
-  const filterText = (item) => {
-    return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
-  }
-
-  const placeholder = filterText(selectedItem)
+  const placeholder = truncatedValue(selectedItem)
 
   const defaultOptions = defaultFirstOption
     ? [defaultFirstOption, ...(filteredNodes || [])]

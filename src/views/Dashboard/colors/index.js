@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { useState } from 'react'
+import { truncatedValue } from 'utils'
 
 import {
   Box,
@@ -112,10 +113,6 @@ const ColorDisplay = () => {
     setSelectedColors([])
   }
 
-  const filterText = (item) => {
-    return item?.length > 15 ? `${item?.substring(0, 15)}...` : item
-  }
-
   return (
     <Box p={5}>
       <Flex alignItems={'center'} justifyContent={'space-between'} mb={4}>
@@ -209,7 +206,7 @@ const ColorDisplay = () => {
                   overflowWrap='break-word'
                   textAlign='left'
                 >
-                  {filterText(colorKey)}
+                  {truncatedValue(colorKey, 15)}
                 </Text>
 
                 {/* Theme Color Value */}

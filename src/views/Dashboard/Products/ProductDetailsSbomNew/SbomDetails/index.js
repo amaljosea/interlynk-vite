@@ -132,10 +132,6 @@ const SbomDetails = ({ sbomData }) => {
     'secondaryTextInverse'
   ])
 
-  const filterText = (item) => {
-    return item?.length > 10 ? `${item?.substring(0, 10)}...` : item
-  }
-
   const { name: projectGroupName, loading } = useProjectGroup({
     projectGroupId: params.productgroupid
   })
@@ -185,8 +181,8 @@ const SbomDetails = ({ sbomData }) => {
                         color={primaryBlueText}
                       >
                         <BreadcrumbLink _hover={{ textDecoration: 'none' }}>
-                          {filterText(part.projectGroupName)} (
-                          {filterText(part.versionName)})
+                          {truncatedValue(part.projectGroupName)} (
+                          {truncatedValue(part.versionName)})
                         </BreadcrumbLink>
                       </BreadcrumbItem>
                     )
