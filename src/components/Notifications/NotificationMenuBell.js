@@ -18,6 +18,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { UpdateNotificationPreference } from 'graphQL/Mutation'
 import {
   GetOrgConnections,
+  GetPersonalConnections,
   GetUserNotificationChannels,
   GetUserNotificationPreferences
 } from 'graphQL/Queries'
@@ -32,12 +33,11 @@ const NotificationMenuBell = () => {
   const productId = params.productid
   const [updatePreference] = useMutation(UpdateNotificationPreference)
   const { data } = useQuery(GetUserNotificationPreferences, {
-    variables: {
-      envId: productId
-    }
+    variables: { envId: productId }
   })
   const [getChannelsInfo] = useLazyQuery(GetUserNotificationChannels)
   const [getOrgConnections] = useLazyQuery(GetOrgConnections)
+  const [getPersonalConnections] = useLazyQuery(GetPersonalConnections)
 
   useEffect(() => {
     if (data) {
@@ -53,34 +53,40 @@ const NotificationMenuBell = () => {
     Licenses: 'licenses',
     Policies: 'policies'
   }
+
   const handlePreferenceChange = (newPreference) => {
     if (newPreference.includes('none') || newPreference.includes('all')) {
       newPreference = [newPreference[newPreference.length - 1]] // only allow one status at a time
     }
     //API call to update user's notification preferences
     updatePreference({
-      variables: {
-        notificationPreferences: newPreference,
-        envId: productId
-      }
+      variables: { notificationPreferences: newPreference, envId: productId }
     }).then(() => {
       setPreference(newPreference)
       let enabledChannelCount = 0
 
-      Promise.all([getChannelsInfo(), getOrgConnections()]).then((values) => {
+      Promise.all([
+        getChannelsInfo(),
+        getOrgConnections(),
+        getPersonalConnections()
+      ]).then((values) => {
         const channelsData = values[0].data.notificationChannels
-        const connectionsData = values[1].data.organization.connections.nodes
+        const orgConnectionsData = values[1].data.organization.connections.nodes
+        const personalConnectionsData =
+          values[2].data.organizationUser.connections.nodes
 
         enabledChannelCount = Object.values(channelsData).filter(
           (value) => value === true
         ).length
 
-        const connectionsCount = connectionsData.filter(
+        const orgConnectionsCount = orgConnectionsData.filter(
           (node) => node.connection.__typename !== 'JiraConnection'
         ).length
-        enabledChannelCount += connectionsCount
+        const personalConnectionsCount = personalConnectionsData.filter(
+          (node) => node.connection.__typename !== 'JiraConnection'
+        ).length
 
-        console.log(enabledChannelCount)
+        enabledChannelCount += orgConnectionsCount + personalConnectionsCount
 
         if (enabledChannelCount === 0 && !newPreference.includes('none')) {
           showToast({
@@ -105,7 +111,7 @@ const NotificationMenuBell = () => {
   return (
     <Box width={'fit-content'} position={'relative'}>
       <Menu closeOnSelect={false}>
-        {preference[0] != 'none' && <CheckMark zIndex={1} />}
+        {preference[0] !== 'none' && <CheckMark zIndex={1} />}
         <MenuButton as={IconButton} colorScheme='blue'>
           <Icon as={FaBell} mt={1} />
         </MenuButton>
