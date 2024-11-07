@@ -13,11 +13,7 @@ import {
 } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  ExternalLinkIcon
-} from '@chakra-ui/icons'
+import { ExternalLinkIcon } from '@chakra-ui/icons'
 import {
   Badge,
   Box,
@@ -40,6 +36,7 @@ import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import CvssCard from 'components/Misc/CvssCard'
 import CvssTag from 'components/Misc/CvssTag'
+import EpssTag from 'components/Misc/EpssTag'
 import SeverityTag from 'components/Misc/SeverityTag'
 import Pagination from 'components/Pagination'
 
@@ -211,19 +208,9 @@ const Vulnerabilities = ({ sbomData }) => {
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const {
-    headingTextColor,
-    primaryTextColor,
-    primaryErrorColor,
-    primarySuccessColor,
-    primaryBlueText
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'primaryErrorColor',
-    'primarySuccessColor',
-    'primaryBlueText'
-  ])
+  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
+    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
+  )
   const [activeRow, setActiveRow] = useState(null)
   const [vulnSearch, setVulnSearch] = useState(searchInput)
 
@@ -413,56 +400,7 @@ const Vulnerabilities = ({ sbomData }) => {
         const { vuln } = row
         const { vulnInfo } = vuln
         const { epssScores } = vulnInfo ? vulnInfo : ''
-        return (
-          <Flex
-            onClick={(e) => {
-              e.currentTarget.parentElement.click()
-            }}
-            alignItems='center'
-            gap='0'
-          >
-            <Tooltip
-              placement='top'
-              label={
-                epssScores?.length > 0
-                  ? `${(epssScores[0] * 100).toFixed(3)} %`
-                  : '-'
-              }
-            >
-              <Tag
-                size='md'
-                key='md'
-                variant='subtle'
-                width={'100px'}
-                justifyContent='center'
-                alignItems='center'
-              >
-                <TagLabel>
-                  {epssScores?.length > 0
-                    ? `${(epssScores[0] * 100).toFixed(3)} %`
-                    : '-'}
-                </TagLabel>
-              </Tag>
-            </Tooltip>
-            {epssScores && epssScores.length > 1 ? (
-              epssScores[0] > epssScores[epssScores.length - 1] ? (
-                <Tooltip
-                  placement='top'
-                  label={`Up from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
-                >
-                  <ChevronUpIcon w={5} h={5} color={primarySuccessColor} />
-                </Tooltip>
-              ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
-                <Tooltip
-                  placement='top'
-                  label={`Down from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
-                >
-                  <ChevronDownIcon w={5} h={5} color={primaryErrorColor} />
-                </Tooltip>
-              ) : null
-            ) : null}
-          </Flex>
-        )
+        return <EpssTag value={epssScores} />
       },
       width: '10%',
       sortable: true,

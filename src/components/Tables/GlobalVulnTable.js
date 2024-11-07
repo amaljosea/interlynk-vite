@@ -3,17 +3,14 @@ import { Link, useParams } from 'react-router-dom'
 import { customStyles, getFullDateAndTime, linkURl, timeSince } from 'utils'
 import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  ExternalLinkIcon
-} from '@chakra-ui/icons'
+import { ExternalLinkIcon } from '@chakra-ui/icons'
 import { Badge, Flex, Icon, Stack, Text } from '@chakra-ui/react'
 import { Divider, Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import CvssTag from 'components/Misc/CvssTag'
+import EpssTag from 'components/Misc/EpssTag'
 import Round from 'components/Misc/Round'
 import SeverityTag from 'components/Misc/SeverityTag'
 
@@ -29,19 +26,9 @@ const GlobalVulnTable = (props) => {
   const { generateProductVulnerabilityDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const {
-    headingTextColor,
-    primaryTextColor,
-    primaryBlueText,
-    primaryErrorColor,
-    primarySuccessColor
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'primaryBlueText',
-    'primaryErrorColor',
-    'primarySuccessColor'
-  ])
+  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
+    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
+  )
 
   const params = useParams()
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
@@ -150,50 +137,7 @@ const GlobalVulnTable = (props) => {
       selector: (row) => {
         const { vulnInfo } = row
         const { epssScores } = vulnInfo || ''
-        return (
-          <Flex alignItems='center' gap='0'>
-            <Tooltip
-              placement='top'
-              label={
-                epssScores?.length > 0
-                  ? `${(epssScores[0] * 100).toFixed(3)} %`
-                  : '-'
-              }
-            >
-              <Tag
-                size='md'
-                key='md'
-                variant='subtle'
-                width={'100px'}
-                justifyContent='center'
-                alignItems='center'
-              >
-                <TagLabel>
-                  {epssScores?.length > 0
-                    ? `${(epssScores[0] * 100).toFixed(3)} %`
-                    : '-'}
-                </TagLabel>
-              </Tag>
-            </Tooltip>
-            {epssScores && epssScores.length > 1 ? (
-              epssScores[0] > epssScores[epssScores.length - 1] ? (
-                <Tooltip
-                  placement='top'
-                  label={`Up from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
-                >
-                  <ChevronUpIcon w={5} h={5} color={primarySuccessColor} />
-                </Tooltip>
-              ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
-                <Tooltip
-                  placement='top'
-                  label={`Down from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
-                >
-                  <ChevronDownIcon w={5} h={5} color={primaryErrorColor} />
-                </Tooltip>
-              ) : null
-            ) : null}
-          </Flex>
-        )
+        return <EpssTag value={epssScores} />
       },
       sortable: true,
       width: '12%',
