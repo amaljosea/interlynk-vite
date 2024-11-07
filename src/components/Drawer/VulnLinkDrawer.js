@@ -1,35 +1,29 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { validateUrl } from 'utils'
-import { truncatedValue } from 'utils'
+import { truncatedValue, validateUrl } from 'utils'
 
 import { DeleteIcon } from '@chakra-ui/icons'
 import {
   Button,
+  Flex,
+  IconButton,
+  Input,
+  Select,
+  Tag,
+  Text,
+  Tooltip
+} from '@chakra-ui/react'
+import { Table, Tbody, Td, Tr } from '@chakra-ui/react'
+import {
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Icon,
-  Input,
-  Select,
-  Table,
-  Tag,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tooltip,
-  Tr
+  DrawerOverlay
 } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -48,40 +42,14 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   const [addUrls, { loading }] = useMutation(ComponentVulnUpdate)
   const [addPartsUrls] = useMutation(DispositionByParentUpdate)
 
-  const { primaryErrorColor, secondaryTextInverse } = useThemeColor([
-    'primaryErrorColor',
-    'secondaryTextInverse'
-  ])
+  const { primaryErrorColor, secondaryTextInverse, sameSecondaryText } =
+    useThemeColor([
+      'primaryErrorColor',
+      'secondaryTextInverse',
+      'sameSecondaryText'
+    ])
 
   const containsSpace = /\s/.test(link)
-
-  useEffect(() => {
-    if (externalUrls?.length > 0) {
-      const urls = []
-      externalUrls?.map((item, index) => {
-        urls.push({
-          id: index + 1,
-          name: item.name,
-          url: item.url
-        })
-      })
-      setExternalData(urls)
-    }
-  }, [externalUrls])
-
-  useEffect(() => {
-    if (currentExternalUrls?.length > 0) {
-      const urls = []
-      currentExternalUrls?.map((item, index) => {
-        urls.push({
-          id: index + 1,
-          name: item.name,
-          url: item.url
-        })
-      })
-      setCurrentData(urls)
-    }
-  }, [currentExternalUrls])
 
   const handleTypeChange = (e) => {
     const { value } = e.target
@@ -182,6 +150,47 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
     })
   }
 
+  const DeleteAction = ({ id }) => (
+    <IconButton
+      size='sm'
+      hidden={isPart}
+      variant='outline'
+      cursor={'pointer'}
+      icon={<DeleteIcon />}
+      color={primaryErrorColor}
+      data-testid='delete_vuln_link'
+      onClick={() => handleLinkRemove(id)}
+    />
+  )
+
+  useEffect(() => {
+    if (externalUrls?.length > 0) {
+      const urls = []
+      externalUrls?.map((item, index) => {
+        urls.push({
+          id: index + 1,
+          name: item.name,
+          url: item.url
+        })
+      })
+      setExternalData(urls)
+    }
+  }, [externalUrls])
+
+  useEffect(() => {
+    if (currentExternalUrls?.length > 0) {
+      const urls = []
+      currentExternalUrls?.map((item, index) => {
+        urls.push({
+          id: index + 1,
+          name: item.name,
+          url: item.url
+        })
+      })
+      setCurrentData(urls)
+    }
+  }, [currentExternalUrls])
+
   return (
     <Drawer size='sm' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
@@ -200,7 +209,11 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
               {/* NAME */}
               <FormControl isRequired isInvalid={error !== ''}>
                 <FormLabel>Type</FormLabel>
-                <Select value={type} onChange={handleTypeChange}>
+                <Select
+                  value={type}
+                  fontSize={'sm'}
+                  onChange={handleTypeChange}
+                >
                   <option value=''>-- Select --</option>
                   {[
                     'issue-tracker',
@@ -226,8 +239,9 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
               >
                 <FormLabel>Link</FormLabel>
                 <Input
-                  placeholder='Add URL'
                   value={link}
+                  fontSize={'sm'}
+                  placeholder='Add URL'
                   onBlur={handleCheckUrl}
                   onChange={handleLinkChange}
                 />
@@ -248,60 +262,44 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
                 </Text>
                 {externalData?.length > 0 || currentData?.length > 0 ? (
                   <Table variant='simple' size='sm' mt={4}>
-                    <Thead>
-                      <Tr my='.8rem'>
-                        <Th pl={0}>Link</Th>
-                        <Th pl={0}>Type</Th>
-                        <Th pl={0}></Th>
-                      </Tr>
-                    </Thead>
                     <Tbody>
                       {externalData?.length > 0 &&
                         externalData?.map((item, index) => (
                           <Tr key={index}>
-                            <Td pl={0} fontSize={'xs'} wordBreak={'break-all'}>
-                              {item.url ? (
-                                <Tooltip label={item.url}>
-                                  {truncatedValue(item.url, 35)}
-                                </Tooltip>
-                              ) : null}
+                            <Td pl={0} wordBreak={'break-all'}>
+                              <Text>
+                                {item?.url ? (
+                                  <Tooltip label={item.url}>
+                                    {truncatedValue(item.url, 45)}
+                                  </Tooltip>
+                                ) : null}
+                              </Text>
+                              <Text mt={2} color={sameSecondaryText}>
+                                {item?.name}
+                              </Text>
                             </Td>
-                            <Td pl={0} fontSize={'xs'}>
-                              {item.name}
-                            </Td>
-                            <Td pl={0}>
-                              <Icon
-                                as={DeleteIcon}
-                                color={primaryErrorColor}
-                                cursor={'pointer'}
-                                data-testid='delete_vuln_link'
-                                display={isPart ? 'none' : 'block'}
-                                onClick={() => handleLinkRemove(item?.id)}
-                              />
+                            <Td pr={0} isNumeric>
+                              <DeleteAction id={item?.id} />
                             </Td>
                           </Tr>
                         ))}
                       {currentData?.length > 0 &&
                         currentData?.map((item, index) => (
                           <Tr key={index}>
-                            <Td pl={0} fontSize={'xs'} wordBreak={'break-all'}>
-                              {item.url ? (
-                                <Tooltip label={item.url}>
-                                  {truncatedValue(item.url, 35)}
-                                </Tooltip>
-                              ) : null}
+                            <Td pl={0} wordBreak={'break-all'}>
+                              <Text>
+                                {item?.url ? (
+                                  <Tooltip label={item.url}>
+                                    {truncatedValue(item.url, 45)}
+                                  </Tooltip>
+                                ) : null}
+                              </Text>
+                              <Text mt={2} color={sameSecondaryText}>
+                                {item?.name}
+                              </Text>
                             </Td>
-                            <Td pl={0} fontSize={'xs'}>
-                              {item.name}
-                            </Td>
-                            <Td pl={0}>
-                              <Icon
-                                as={DeleteIcon}
-                                color={primaryErrorColor}
-                                cursor={'pointer'}
-                                data-testid='delete_vuln_link'
-                                onClick={() => handleLinkRemove(item?.id)}
-                              />
+                            <Td pr={0} isNumeric>
+                              <DeleteAction id={item?.id} />
                             </Td>
                           </Tr>
                         ))}
