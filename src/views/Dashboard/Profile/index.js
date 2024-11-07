@@ -200,7 +200,7 @@ function Profile() {
             <TabPanels>
               <TabPanel px={0}>{<TokenInfo />}</TabPanel>
               <TabPanel px={0}>
-                <Connections />
+                <Connections org={false} />
               </TabPanel>
             </TabPanels>
           </Tabs>

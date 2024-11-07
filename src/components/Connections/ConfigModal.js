@@ -218,7 +218,7 @@ const ConfigModal = ({
     try {
       const res = await createConn({
         variables: {
-          org: !!org,
+          org: org,
           configs: configsForMutation
         }
       })
