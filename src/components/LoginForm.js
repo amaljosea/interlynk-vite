@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/client'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
@@ -11,16 +11,12 @@ import {
   Button,
   Divider,
   Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
   IconButton,
-  Input,
-  InputGroup,
-  InputRightElement,
   Stack,
   Text
 } from '@chakra-ui/react'
+import { FormControl, FormHelperText, FormLabel } from '@chakra-ui/react'
+import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
 import useQueryParam from 'hooks/useQueryParam'
@@ -33,6 +29,7 @@ import PolicyTerms from './PolicyTerms'
 import SocialLogin from './SocialLogin'
 
 const LoginForm = () => {
+  const navigate = useNavigate()
   const { showToast } = useCustomToast()
   const emailId = useQueryParam('id')
   const {
@@ -69,7 +66,7 @@ const LoginForm = () => {
         const { status } = response.data
         if (status.code === 200) {
           Cookies.set('authToken', response.headers.authorization)
-          window.location.href = '/vendor/dashboard'
+          navigate('/vendor/dashboard')
         }
       })
       .catch((error) => {
@@ -223,12 +220,7 @@ const LoginForm = () => {
           </Stack>
           <Box position='relative' py={1}>
             <Divider />
-            <AbsoluteCenter
-              px='2'
-              bg={'white'}
-              fontSize={'xs'}
-              color={secondaryTextColor}
-            >
+            <AbsoluteCenter px='2' fontSize={'xs'} color={secondaryTextColor}>
               Or Login With
             </AbsoluteCenter>
           </Box>

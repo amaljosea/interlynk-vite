@@ -5,7 +5,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactGA from 'react-ga4'
 import { BrowserRouter } from 'react-router-dom'
-import theme from 'theme/theme.js'
+import theme, { config } from 'theme/theme.js'
 
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
 
@@ -42,7 +42,7 @@ ReactDOM.render(
     <BrowserRouter>
       <GlobalStateProvider>
         <ChakraProvider theme={theme} resetCSS={true}>
-          <ColorModeScript initialColorMode={theme?.config?.initialColorMode} />
+          <ColorModeScript initialColorMode={config?.initialColorMode} />
           <ChatbotPreview />
           <ScrollToTop />
           <ApolloWrapper>

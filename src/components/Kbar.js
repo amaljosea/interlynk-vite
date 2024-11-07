@@ -11,6 +11,7 @@ import {
 import { Fragment, useMemo } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
+import { removeItem } from 'utils/localStorageUtils'
 import { allDefaultActions, settingActions } from 'variables/general'
 
 import { SearchIcon } from '@chakra-ui/icons'
@@ -24,7 +25,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetProjectGroupAndVersionDetails } from 'graphQL/Queries'
 
 import { FaRegWindowMaximize } from 'react-icons/fa'
-import { FaDisplay, FaMoon, FaSun } from 'react-icons/fa6'
+import { FaDesktop, FaDisplay, FaMoon, FaSun } from 'react-icons/fa6'
 import { FaRegFile } from 'react-icons/fa6'
 import { FaScrewdriverWrench } from 'react-icons/fa6'
 
@@ -252,7 +253,7 @@ const Kbar = () => {
     },
     {
       id: 'darkTheme',
-      name: 'Dark Mode',
+      name: 'Dark',
       keywords: 'dark theme',
       section: 'Theme',
       icon: <FaMoon color={secondaryTextInverse} />,
@@ -261,11 +262,28 @@ const Kbar = () => {
     },
     {
       id: 'lightTheme',
-      name: 'Light Mode',
+      name: 'Light',
       keywords: 'light theme',
       section: 'Theme',
       icon: <FaSun color={secondaryTextInverse} />,
       perform: () => setColorMode('light'),
+      parent: 'theme'
+    },
+    {
+      id: 'systemTheme',
+      name: 'System',
+      keywords: 'system theme',
+      section: 'Theme',
+      icon: <FaDesktop color={secondaryTextInverse} />,
+      perform: () => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+        const systemThemeChange = () =>
+          setColorMode(mediaQuery?.matches ? 'dark' : 'light')
+        systemThemeChange()
+        removeItem('chakra-ui-color-mode')
+        mediaQuery?.addListener(systemThemeChange)
+        return () => mediaQuery?.removeListener(systemThemeChange)
+      },
       parent: 'theme'
     }
   )

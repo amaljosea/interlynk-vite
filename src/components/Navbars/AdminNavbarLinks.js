@@ -1,12 +1,15 @@
 import { useTour } from '@reactour/tour'
 import PropTypes from 'prop-types'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { customerRoutes } from 'routes'
 import { dashRoutes } from 'routes.js'
 import { getSignedUrlParams } from 'utils'
 import { logoutUser } from 'utils/authUtils'
+import { getItem, removeItem, setItem } from 'utils/localStorageUtils'
 
-import { Button, Flex, IconButton, useColorMode } from '@chakra-ui/react'
+import { Button, Flex, useColorMode } from '@chakra-ui/react'
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import Organizations from 'components/Organizations'
 // Custom Components
@@ -14,26 +17,23 @@ import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { FaMoon, FaSun } from 'react-icons/fa6'
+import { FaDesktop, FaMoon, FaSun } from 'react-icons/fa6'
 
 import { SearchBar } from './SearchBar'
 import { UserMenu } from './UserMenu'
 
 export default function AdminNavbarLinks(props) {
-  const navigate = useNavigate()
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
   const { organization } = useGlobalState()
-  const { colorMode, toggleColorMode, setColorMode } = useColorMode()
+  const { setColorMode } = useColorMode()
+  const mode = getItem('chakra-ui-color-mode')
+  const [currentMode, setCurrentMode] = useState(mode || 'system')
 
   const signedUrlParams = getSignedUrlParams()
 
-  const handleLogout = async () => {
-    await logoutUser()
-    setColorMode('light')
-    navigate('/auth')
-  }
+  const handleLogout = async () => await logoutUser()
 
   const { setIsOpen, setCurrentStep } = useTour()
 
@@ -47,6 +47,28 @@ export default function AdminNavbarLinks(props) {
     }
     setIsOpen(true)
   }
+
+  const onThemeChange = (mode) => {
+    setCurrentMode(mode)
+    if (mode === 'system') {
+      removeItem('chakra-ui-color-mode')
+    } else {
+      setColorMode(mode)
+      setItem('chakra-ui-color-mode', mode)
+    }
+  }
+
+  useEffect(() => {
+    if (currentMode === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+      const systemThemeChange = () =>
+        setColorMode(mediaQuery?.matches ? 'dark' : 'light')
+      systemThemeChange()
+      removeItem('chakra-ui-color-mode')
+      mediaQuery?.addListener(systemThemeChange)
+      return () => mediaQuery?.removeListener(systemThemeChange)
+    }
+  }, [currentMode, setColorMode])
 
   return (
     <Flex gap={3} alignItems='center' flexDirection='row'>
@@ -65,15 +87,34 @@ export default function AdminNavbarLinks(props) {
       )}
 
       {/* SEARCH */}
-
       <SearchBar />
 
-      {/* DARK MODE */}
-      <IconButton
-        size='sm'
-        onClick={toggleColorMode}
-        icon={colorMode === 'light' ? <FaMoon /> : <FaSun />}
-      />
+      {/* THEME */}
+      <Menu>
+        <MenuButton size={'sm'} as={Button}>
+          {currentMode === 'light' ? (
+            <FaSun />
+          ) : currentMode === 'dark' ? (
+            <FaMoon />
+          ) : (
+            <FaDesktop />
+          )}
+        </MenuButton>
+        <MenuList fontSize='sm'>
+          <MenuItem icon={<FaSun />} onClick={() => onThemeChange('light')}>
+            Light
+          </MenuItem>
+          <MenuItem icon={<FaMoon />} onClick={() => onThemeChange('dark')}>
+            Dark
+          </MenuItem>
+          <MenuItem
+            icon={<FaDesktop />}
+            onClick={() => onThemeChange('system')}
+          >
+            System
+          </MenuItem>
+        </MenuList>
+      </Menu>
 
       {/* ORGANIZATIONS */}
       {!signedUrlParams && organization && <Organizations />}

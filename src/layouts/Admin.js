@@ -10,7 +10,7 @@ import { dashRoutes } from 'routes.js'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import { Box, Button, Center, Flex, Img, Stack, Text } from '@chakra-ui/react'
-import { useColorMode, useMediaQuery } from '@chakra-ui/react'
+import { useMediaQuery } from '@chakra-ui/react'
 
 import DeviceWarning from 'components/DeviceWarning'
 import Kbar from 'components/Kbar'
@@ -39,7 +39,6 @@ export default function Admin() {
 
   const { steps } = useTour()
   const navigate = useNavigate()
-  const { setColorMode } = useColorMode()
   const { organization, setOrganization } = useGlobalState()
   const [isDesktop] = useMediaQuery('(min-width: 1024px)')
 
@@ -148,7 +147,6 @@ export default function Admin() {
 
   const handleLogout = async () => {
     await logoutUser()
-    setColorMode('light')
     navigate('/auth')
   }
 

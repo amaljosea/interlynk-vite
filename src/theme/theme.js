@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { StepsStyleConfig as Steps } from 'chakra-ui-steps'
+import { getItem } from 'utils/localStorageUtils'
 
 import { extendTheme } from '@chakra-ui/react'
 
@@ -161,14 +162,15 @@ const colors = {
   }
 }
 
-const config = {
-  initialColorMode: 'light',
-  useSystemColorMode: false
+const colorMode = getItem('chakra-ui-color-mode')
+
+export const config = {
+  initialColorMode: colorMode ? colorMode : 'system',
+  useSystemColorMode: colorMode ? false : true
 }
 
 // import { mode } from "@chakra-ui/theme-tools";
 export default extendTheme(
-  // Breakpoints
   {
     breakpoints,
     components: {
@@ -180,9 +182,9 @@ export default extendTheme(
         }
       }
     },
-    colors
+    colors,
+    config: config
   },
-  config,
   globalStyles,
   buttonStyles, // Button styles
   badgeStyles, // Badge styles

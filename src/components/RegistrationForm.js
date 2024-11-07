@@ -309,12 +309,7 @@ const RegistrationForm = () => {
         </Stack>
         <Box position='relative' py={1}>
           <Divider />
-          <AbsoluteCenter
-            px='2'
-            bg={'white'}
-            fontSize={'xs'}
-            color={secondaryTextColor}
-          >
+          <AbsoluteCenter px='2' fontSize={'xs'} color={secondaryTextColor}>
             Or Register With
           </AbsoluteCenter>
         </Box>

@@ -26,7 +26,7 @@ const AuthContainer = ({ children }) => {
             src={InterlynkLogo}
             filter={'brightness(0) invert(1)'}
           />
-          <Text fontSize={'3xl'} color={primaryBgColor} fontWeight={600}>
+          <Text fontSize={'3xl'} color={'white'} fontWeight={600}>
             Interlynk
           </Text>
         </Flex>
@@ -44,10 +44,10 @@ const AuthContainer = ({ children }) => {
       <GridItem
         p={10}
         colSpan={4}
-        bg={'white'}
         height={'100%'}
         display={'flex'}
         flexDir={'column'}
+        bg={primaryBgColor}
         overflowY={'scroll'}
         alignItems={'center'}
         justifyContent={'center'}

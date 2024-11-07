@@ -2,8 +2,14 @@ import axios from 'axios'
 import { client } from 'context/ApolloWrapper'
 import Cookies from 'js-cookie'
 
+const navigate = (path) => {
+  window.history.pushState({}, '', path)
+  const navEvent = new PopStateEvent('popstate')
+  window.dispatchEvent(navEvent)
+}
+
 export const logoutUser = async () => {
-  await logError() // Added for debugging random logouts
+  logError() // Added for debugging random logouts
 
   const logoutURL = process.env.REACT_APP_VENDOR_LOGOUT_URL
   const authToken = Cookies.get('authToken')
@@ -19,14 +25,12 @@ export const logoutUser = async () => {
   } catch (error) {
     console.error('Logout failed')
   } finally {
-    // Clear client-side storage and cookies regardless of server response
-    localStorage.clear()
+    client.clearStore()
     sessionStorage.clear()
     Cookies.remove('authToken')
     Cookies.remove('signedParamId')
     Cookies.remove('userToken')
-    client.clearStore()
-    window.location.href === '/auth'
+    navigate('/auth')
   }
 }
 
