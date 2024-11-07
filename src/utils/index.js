@@ -281,6 +281,8 @@ export const sevColor = (severity) => {
     case 'negligible':
       // eslint-disable-next-line
       return { bg: '#C6F6D5', text: '#22543D' }
+    case 'unknown':
+      return { bg: '#EDF2F7', text: '#1A202C' }
   }
 }
 

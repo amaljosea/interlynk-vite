@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useMemo } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, linkURl, sevColor, statusColor } from 'utils'
+import { customStyles, linkURl, statusColor } from 'utils'
 
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 import {
@@ -19,6 +19,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import SeverityTag from 'components/Misc/SeverityTag'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -76,28 +77,7 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
     {
       id: 'serverity',
       name: 'SEVERITY',
-      selector: (row) => {
-        const { toVuln } = row
-        return (
-          <>
-            {toVuln?.vuln?.sev !== null ? (
-              <Tag
-                size='md'
-                variant='subtle'
-                width={'80px'}
-                color={sevColor(`${toVuln?.vuln?.sev}`).text}
-                bg={sevColor(`${toVuln?.vuln?.sev}`).bg}
-              >
-                <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-                  {toVuln?.vuln?.sev}
-                </TagLabel>
-              </Tag>
-            ) : (
-              ''
-            )}
-          </>
-        )
-      }
+      selector: (row) => <SeverityTag value={row?.toVuln?.vuln?.sev} />
     },
     // COMPONENT
     {

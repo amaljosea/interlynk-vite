@@ -1,18 +1,10 @@
 import { useMemo } from 'react'
-import { getFullDateAndTime, sevColor, timeSince } from 'utils'
+import { getFullDateAndTime, timeSince } from 'utils'
 
 import { CheckIcon } from '@chakra-ui/icons'
-import {
-  Box,
-  Button,
-  IconButton,
-  Stack,
-  Tag,
-  TagLabel,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
+import { Box, Button, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
 
+import SeverityTag from 'components/Misc/SeverityTag'
 import RowComponent from 'components/RowComponent'
 
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -57,21 +49,9 @@ const ChecksColumns = (
       {
         id: 'ORGANIZATION_RULES_SEVERITY',
         name: 'SEVERITY',
-        selector: (row) => {
-          const { organizationRule } = row
-          return (
-            <Tag
-              size='md'
-              variant='subtle'
-              bg={sevColor(organizationRule.severity).bg}
-              textColor={sevColor(organizationRule.severity).text}
-              textTransform={'capitalize'}
-              width={'80px'}
-            >
-              <TagLabel mx={'auto'}>{organizationRule.severity}</TagLabel>
-            </Tag>
-          )
-        },
+        selector: (row) => (
+          <SeverityTag value={row?.organizationRule?.severity} />
+        ),
         width: '10%',
         sortable: true
       },

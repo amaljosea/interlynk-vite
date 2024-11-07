@@ -9,7 +9,6 @@ import {
   getFullDateAndTime,
   getSignedUrlParams,
   linkURl,
-  sevColor,
   statusColor,
   timeSince
 } from 'utils'
@@ -41,6 +40,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import CvssCard from 'components/Misc/CvssCard'
+import SeverityTag from 'components/Misc/SeverityTag'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -363,25 +363,7 @@ const Vulnerabilities = ({ sbomData }) => {
     {
       id: 'VULNS_SEV',
       name: 'SEVERITY',
-      selector: (row) => {
-        const { vuln } = row
-        return (
-          <Tag
-            size='md'
-            variant='subtle'
-            width={'120px'}
-            bg={vuln?.sev ? sevColor(vuln?.sev)?.bg : 'inherit'}
-            color={vuln?.sev ? sevColor(vuln?.sev)?.text : 'inherit'}
-            onClick={(e) => {
-              e.currentTarget.parentElement.click()
-            }}
-          >
-            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-              {vuln?.sev || '-'}
-            </TagLabel>
-          </Tag>
-        )
-      },
+      selector: (row) => <SeverityTag value={row?.vuln?.sev} />,
       width: '10%',
       sortable: true,
       wrap: true

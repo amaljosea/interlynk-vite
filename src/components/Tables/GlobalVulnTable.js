@@ -5,7 +5,6 @@ import {
   cvssColor,
   getFullDateAndTime,
   linkURl,
-  sevColor,
   timeSince
 } from 'utils'
 import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
@@ -21,6 +20,7 @@ import { Tag, TagLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import Round from 'components/Misc/Round'
+import SeverityTag from 'components/Misc/SeverityTag'
 
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -109,22 +109,7 @@ const GlobalVulnTable = (props) => {
     {
       id: 'VULNS_SEV',
       name: 'SEVERITY',
-      selector: (row) => {
-        const { sev } = row
-        return (
-          <Tag
-            size='md'
-            variant='subtle'
-            width={'120px'}
-            bg={sev ? sevColor(sev)?.bg : 'inherit'}
-            textColor={sev ? sevColor(sev)?.text : 'inherit'}
-          >
-            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-              {sev || '-'}
-            </TagLabel>
-          </Tag>
-        )
-      },
+      selector: (row) => <SeverityTag value={row?.sev} />,
       sortable: true,
       width: '10%',
       wrap: true
