@@ -1,12 +1,6 @@
 import DataTable from 'react-data-table-component'
 import { Link, useParams } from 'react-router-dom'
-import {
-  customStyles,
-  cvssColor,
-  getFullDateAndTime,
-  linkURl,
-  timeSince
-} from 'utils'
+import { customStyles, getFullDateAndTime, linkURl, timeSince } from 'utils'
 import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
 import {
@@ -19,6 +13,7 @@ import { Divider, Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import CvssTag from 'components/Misc/CvssTag'
 import Round from 'components/Misc/Round'
 import SeverityTag from 'components/Misc/SeverityTag'
 
@@ -143,22 +138,7 @@ const GlobalVulnTable = (props) => {
     {
       id: 'VULNS_CVSS_SCORE',
       name: 'CVSS',
-      selector: (row) => {
-        const { cvssScore } = row
-        return (
-          <Flex minWidth='max-content' alignItems='center' gap='2'>
-            <Tag
-              size='md'
-              key='md'
-              variant='subtle'
-              width={'50px'}
-              colorScheme={cvssColor(cvssScore || '')}
-            >
-              <TagLabel mx={'auto'}>{cvssScore || '-'}</TagLabel>
-            </Tag>
-          </Flex>
-        )
-      },
+      selector: (row) => <CvssTag value={row?.cvssScore} />,
       width: '7%',
       wrap: true,
       sortable: true

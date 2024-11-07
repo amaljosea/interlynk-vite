@@ -5,7 +5,6 @@ import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import {
   customStyles,
-  cvssColor,
   getFullDateAndTime,
   getSignedUrlParams,
   linkURl,
@@ -40,6 +39,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import CvssCard from 'components/Misc/CvssCard'
+import CvssTag from 'components/Misc/CvssTag'
 import SeverityTag from 'components/Misc/SeverityTag'
 import Pagination from 'components/Pagination'
 
@@ -400,31 +400,7 @@ const Vulnerabilities = ({ sbomData }) => {
     {
       id: 'VULNS_CVSS_SCORE',
       name: 'CVSS',
-      selector: (row) => {
-        const { vuln } = row
-        return (
-          <Flex
-            onClick={(e) => {
-              e.currentTarget.parentElement.click()
-            }}
-            minWidth='max-content'
-            alignItems='center'
-            gap='2'
-          >
-            <Tag
-              size='md'
-              key='md'
-              variant='subtle'
-              width={'50px'}
-              colorScheme={cvssColor(vuln.cvssScore)}
-            >
-              <TagLabel mx={'auto'}>
-                {vuln.cvssScore ? vuln.cvssScore : '-'}
-              </TagLabel>
-            </Tag>
-          </Flex>
-        )
-      },
+      selector: (row) => <CvssTag value={row?.vuln?.cvssScore} />,
       width: '7%',
       sortable: true,
       wrap: true
