@@ -54,11 +54,16 @@ import { LetterLIcon } from 'components/Icons/Icons'
 import { FaBalanceScale, FaBox, FaBug, FaCube, FaCubes } from 'react-icons/fa'
 import {
   FaA,
+  FaArrowRotateRight,
+  FaBan,
   FaFileImport,
   FaGithub,
   FaScrewdriverWrench,
+  FaToggleOff,
+  FaToggleOn,
   FaUserAstronaut
 } from 'react-icons/fa6'
+import { MdDelete, MdOutlineArchive, MdOutlineUnarchive } from 'react-icons/md'
 
 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
@@ -389,6 +394,11 @@ const formatTime = (timeDifference) => {
   } else {
     return `${seconds} ${seconds === 1 ? 'second' : 'seconds'} ago`
   }
+}
+
+// Checks if the given URL contains any whitespace.
+export const hasWhiteSpace = (url) => {
+  return /\s/.test(url)
 }
 
 export const timeSince = (inputDate) => {
@@ -875,6 +885,12 @@ export const validateEmail = (email) => {
   return emailRegex.test(email) && !hasConsecutiveDots
 }
 
+export const validatePhoneNumber = (phone) => {
+  const phoneRegex =
+    /^(\+\d{1,3}\s?)?(\(\d{1,4}\)|\d{1,4})[-\s]?\d{1,4}[-\s]?\d{1,4}$/
+  return phoneRegex.test(phone)
+}
+
 export const toast_error_message_duration = 300
 
 export const displayErrorMessage = (status_code, message) => {
@@ -1023,6 +1039,18 @@ export const getIcon = (subject) => {
   if (sub.startsWith('COMPONENT')) return FaCube
   if (sub.startsWith('SBOM') || sub.startsWith('VERSION')) return FaCubes
   return FaBox
+}
+
+//Icon for confirmationModal
+export const getConfirmatonModalIcon = (title) => {
+  if (title.includes('Archive')) return MdOutlineArchive
+  if (title.includes('Restore')) return MdOutlineUnarchive
+  if (title.includes('Disable')) return FaToggleOff
+  if (title.includes('Enable')) return FaToggleOn
+  if (title.includes('Delete') || title.includes('Remove')) return MdDelete
+  if (title.includes('Reprocess')) return FaArrowRotateRight
+  if (title.includes('Cancel')) return FaBan
+  return null
 }
 
 export const getLabel = (subject) => {

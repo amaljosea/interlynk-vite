@@ -340,7 +340,7 @@ const LegalTable = () => {
           onConfirm={() => handleDelete(activeRow?.id)}
           name={activeRow?.organizationName}
           title='Archive Manufacturer'
-          description='This will remove archive this Manufacturer'
+          description='This action will archive this Manufacturer'
         />
       )}
     </>

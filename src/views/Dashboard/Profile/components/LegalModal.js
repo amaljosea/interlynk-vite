@@ -1,6 +1,11 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { validateEmail } from 'utils'
+import {
+  hasWhiteSpace,
+  validateEmail,
+  validatePhoneNumber,
+  validateUrl
+} from 'utils'
 
 import { Icon, IconButton } from '@chakra-ui/react'
 import { Button, Flex, Heading, Input, Stack } from '@chakra-ui/react'
@@ -19,12 +24,6 @@ import {
 import { BsGear } from 'react-icons/bs'
 import { FaPlus } from 'react-icons/fa6'
 import { MdDeleteOutline } from 'react-icons/md'
-
-const validateUrl = (url) => {
-  const urlRegex =
-    /^https?:\/\/(?:www\.)?([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,})(\/[^?#]*\/?)?(?:\?[^#]*)?(?:#.*)?$/
-  return urlRegex.test(url)
-}
 
 const LegalModal = ({ data, isOpen, onClose }) => {
   const [url, setUrl] = useState('')
@@ -47,7 +46,7 @@ const LegalModal = ({ data, isOpen, onClose }) => {
     OrganizationManufacturerUpdate
   )
 
-  const containsSpace = /\s/.test(url)
+  const containsSpace = hasWhiteSpace(url)
   const checkDataValidity = (data) => {
     for (let i = 0; i < data.length; i++) {
       const { email, phone, emailError, phError } = data[i]
@@ -77,7 +76,13 @@ const LegalModal = ({ data, isOpen, onClose }) => {
 
   const handleCreate = () => {
     if (url !== '' && !validateUrl(url)) {
-      setIsValidUrl('Please enter a valid URL including http:// or https://')
+      if (containsSpace) {
+        setIsValidUrl('URL should not contain white spaces')
+        return
+      }
+      setIsValidUrl(
+        'URL must start with http:// or https:// and end with a domain (e.g., .com)'
+      )
     } else {
       createMfc({
         variables: {
@@ -126,7 +131,13 @@ const LegalModal = ({ data, isOpen, onClose }) => {
       mergedArray.push(...existingData)
     }
     if (url !== '' && !validateUrl(url)) {
-      setIsValidUrl('Please enter a valid URL')
+      if (containsSpace) {
+        setIsValidUrl('URL should not contain white spaces')
+        return
+      }
+      setIsValidUrl(
+        'URL must start with http:// or https:// and end with a domain (e.g., .com)'
+      )
     } else {
       updateMfc({
         variables: {
@@ -229,10 +240,7 @@ const LegalModal = ({ data, isOpen, onClose }) => {
     e.preventDefault()
     const newData = contacts.map((item) => {
       if (item.id === cn?.id) {
-        const isValidPhoneNumber =
-          /^(\+\d{1,3}\s?)?(\(\d{1,4}\)|\d{1,4})[-\s]?\d{1,4}[-\s]?\d{1,4}$/.test(
-            cn.phone
-          )
+        const isValidPhoneNumber = validatePhoneNumber(cn?.phone)
         if (cn?.phone !== '' && !isValidPhoneNumber) {
           return { ...item, phError: 'Please enter a valid phone number' }
         } else {
@@ -271,7 +279,9 @@ const LegalModal = ({ data, isOpen, onClose }) => {
       buttonText={data ? 'Update' : 'Save'}
       onSubmit={data ? handleUpdate : handleCreate}
       title={`${data ? 'Edit' : 'Add'} Manufacturer`}
-      disabled={errorMessage || (url !== '' && isValidUrl !== '')}
+      disabled={
+        errorMessage || (url !== '' && isValidUrl !== '') || orgName === ''
+      }
     >
       <Stack w={'100%'} spacing={5}>
         <FormControl isRequired>
