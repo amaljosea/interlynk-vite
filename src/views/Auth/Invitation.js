@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { logoutUser } from 'utils/authUtils'
+import { clearData } from 'utils/authUtils'
 
 import { WarningIcon } from '@chakra-ui/icons'
 import { Button, Flex, Icon, Stack, Text } from '@chakra-ui/react'
@@ -52,7 +52,7 @@ const Invitation = () => {
         setError(res.data.organizationUserInvitationAccept.errors)
       } else {
         setError([])
-        logoutUser()
+        clearData()
         if (res.data.organizationUserInvitationAccept.userType === 'new_user') {
           navigate(
             `/register?id=${res.data.organizationUserInvitationAccept.user.email}`

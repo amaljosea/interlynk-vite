@@ -8,6 +8,14 @@ const navigate = (path) => {
   window.dispatchEvent(navEvent)
 }
 
+export const clearData = () => {
+  client.clearStore()
+  sessionStorage.clear()
+  Cookies.remove('authToken')
+  Cookies.remove('signedParamId')
+  Cookies.remove('userToken')
+}
+
 export const logoutUser = async () => {
   logError() // Added for debugging random logouts
 
@@ -25,11 +33,7 @@ export const logoutUser = async () => {
   } catch (error) {
     console.error('Logout failed')
   } finally {
-    client.clearStore()
-    sessionStorage.clear()
-    Cookies.remove('authToken')
-    Cookies.remove('signedParamId')
-    Cookies.remove('userToken')
+    clearData()
     navigate('/auth')
   }
 }
