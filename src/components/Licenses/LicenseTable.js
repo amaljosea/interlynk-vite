@@ -1,24 +1,20 @@
 import { useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles } from 'utils'
+import { customStyles, truncatedValue } from 'utils'
 
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 import {
   Flex,
-  Grid,
-  GridItem,
   IconButton,
   Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Portal,
-  Tag,
-  TagLabel,
   Text,
+  Tooltip,
   useDisclosure
 } from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
@@ -90,6 +86,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
               gap={2}
             >
               <Text
+                wordBreak={'break-all'}
                 color={primaryTextColor}
                 data-tag='allowRowEvents'
                 data-testid={`license_${name}`}
@@ -98,14 +95,18 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
               </Text>
               <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
                 {(shortId || spdxId) && (
-                  <Tag
-                    width={'fit-content'}
-                    size='sm'
-                    variant='subtle'
-                    colorScheme='blue'
-                  >
-                    <TagLabel>{shortId || spdxId}</TagLabel>
-                  </Tag>
+                  <Tooltip label={shortId || spdxId}>
+                    <Tag
+                      width={'fit-content'}
+                      size='sm'
+                      variant='subtle'
+                      colorScheme='blue'
+                    >
+                      <TagLabel>
+                        {truncatedValue(shortId || spdxId, 45)}
+                      </TagLabel>
+                    </Tag>
+                  </Tooltip>
                 )}
                 {url && (
                   <Link
