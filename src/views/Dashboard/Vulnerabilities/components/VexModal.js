@@ -112,10 +112,8 @@ const VexModal = ({
           setStagOne('green')
           if (!actionStatement && !response) {
             setStagTwo('red')
-          } else if (responseTitle == 'Update' && !selectedTag) {
-            setStagTwo('red')
           } else if (response && !actionStatement) {
-            setStagTwo('gray')
+            setStagTwo('red')
           } else {
             setStagTwo('green')
           }
@@ -137,16 +135,7 @@ const VexModal = ({
           break
       }
     },
-    [
-      actionStatement,
-      details,
-      impactData,
-      justification,
-      notes,
-      response,
-      responseTitle,
-      selectedTag
-    ]
+    [actionStatement, details, impactData, justification, notes, response]
   )
 
   const handleStatusChange = (e) => {
