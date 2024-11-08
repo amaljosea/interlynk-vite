@@ -38,7 +38,7 @@ export const useLazyDropDown = (
   const resource = get(data || previousData, selector)
   const totalCountObject = get(data || previousData, selectorForActualCount)
   const totalCountActual = totalCountObject?.totalCount
-  const nodes = resource?.nodes
+  const nodes = resource?.nodes || []
 
   const { hasNextPage, endCursor } = resource?.pageInfo || {}
 

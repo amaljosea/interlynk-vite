@@ -60,7 +60,8 @@ const ProjectGroupBreadcrumb = ({
       variables: {
         field: 'PROJECT_GROUPS_NAME',
         direction: 'ASC',
-        first: 5
+        first: 5,
+        enabled: true
       },
       selectorForActualCount: 'organization.allProjectGroups',
       selectedItem: projectGroupName,
