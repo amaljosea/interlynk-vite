@@ -219,7 +219,7 @@ const TeamTable = () => {
         )
       },
       center: true,
-      width: '10%'
+      width: '13%'
     },
     {
       id: 'action',
