@@ -237,6 +237,7 @@ const TokenInfo = () => {
               setIsValidDate(true)
               onOpen()
             }}
+            data-testid='new_token'
             icon={<AddIcon />}
             colorScheme='blue'
             variant='solid'
@@ -375,7 +376,7 @@ const TokenInfo = () => {
     {
       id: 'actions',
       name: 'ACTIONS',
-      selector: (row) => {
+      selector: (row, index) => {
         const { revoked } = row
 
         return (
@@ -385,15 +386,20 @@ const TokenInfo = () => {
               icon={<FaEllipsisV />}
               variant='none'
               color={secondaryTextColor}
+              data-testid={`token_actions_${index}`}
             />
             <Portal>
               <MenuList size='sm'>
                 {row.revoked === false && (
-                  <MenuItem onClick={() => handleRevoked(row.id)}>
+                  <MenuItem
+                    onClick={() => handleRevoked(row.id)}
+                    data-testid={`token_revoke_${index}`}
+                  >
                     Revoke Token
                   </MenuItem>
                 )}
                 <MenuItem
+                  data-testid={`token_edit_${index}`}
                   isDisabled={revoked}
                   onClick={() => {
                     setToken('')
@@ -405,7 +411,12 @@ const TokenInfo = () => {
                 >
                   Edit Expiration
                 </MenuItem>
-                <MenuItem onClick={() => handleDelete(row.id)}>Delete</MenuItem>
+                <MenuItem
+                  onClick={() => handleDelete(row.id)}
+                  data-testid={`token_delete_${index}`}
+                >
+                  Delete
+                </MenuItem>
               </MenuList>
             </Portal>
           </Menu>
