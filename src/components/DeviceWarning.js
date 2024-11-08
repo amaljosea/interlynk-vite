@@ -6,19 +6,8 @@ import { useColorMode } from '@chakra-ui/react'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const DeviceWarning = () => {
-  const {
-    primaryBgColor,
-    secondaryBgColor,
-    grayBorderColor,
-    headingTextColor,
-    secondaryBlueText
-  } = useThemeColor([
-    'primaryBgColor',
-    'secondaryBgColor',
-    'grayBorderColor',
-    'headingTextColor',
-    'secondaryBlueText'
-  ])
+  const { grayBorderColor, headingTextColor, secondaryBlueText } =
+    useThemeColor(['grayBorderColor', 'headingTextColor', 'secondaryBlueText'])
   const { colorMode } = useColorMode()
   const isDark = colorMode === 'dark'
 
@@ -30,10 +19,7 @@ const DeviceWarning = () => {
           sx={{ w: '40px', h: '40px' }}
           filter={'brightness(0) invert(1)'}
         />
-        <Text
-          sx={{ fontSize: '2xl', fontWeight: 600 }}
-          color={isDark ? secondaryBgColor : primaryBgColor}
-        >
+        <Text sx={{ fontSize: '2xl', fontWeight: 600 }} color={'white'}>
           Interlynk
         </Text>
       </Flex>

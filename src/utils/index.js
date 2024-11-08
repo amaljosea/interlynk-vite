@@ -67,6 +67,13 @@ import { MdDelete, MdOutlineArchive, MdOutlineUnarchive } from 'react-icons/md'
 
 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
+export const isMobileOrTablet = () => {
+  const userAgent = navigator.userAgent.toLowerCase()
+  return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/.test(
+    userAgent
+  )
+}
+
 export const getFileName = (name, type) => {
   const now = new Date()
   const year = now.getFullYear()

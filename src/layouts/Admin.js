@@ -10,7 +10,6 @@ import { dashRoutes } from 'routes.js'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import { Box, Button, Center, Flex, Img, Stack, Text } from '@chakra-ui/react'
-import { useMediaQuery } from '@chakra-ui/react'
 
 import DeviceWarning from 'components/DeviceWarning'
 import Kbar from 'components/Kbar'
@@ -30,6 +29,7 @@ import {
   displayErrorMessage,
   getActiveNavbar,
   getActiveRoute,
+  isMobileOrTablet,
   tourStyles
 } from '../utils'
 import { logoutUser } from '../utils/authUtils'
@@ -40,7 +40,7 @@ export default function Admin() {
   const { steps } = useTour()
   const navigate = useNavigate()
   const { organization, setOrganization } = useGlobalState()
-  const [isDesktop] = useMediaQuery('(min-width: 1024px)')
+  const isMobile = isMobileOrTablet()
 
   const productId = params.productid
   const sbomId = params.sbomid
@@ -201,7 +201,7 @@ export default function Admin() {
     )
   }
 
-  if (!isDesktop) return <DeviceWarning />
+  if (isMobile) return <DeviceWarning />
 
   return (
     <KBarProvider options={{ enableHistory: true }}>

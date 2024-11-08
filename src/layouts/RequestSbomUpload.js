@@ -1,14 +1,14 @@
+import { isMobileOrTablet } from 'utils'
 import SbomUpload from 'views/Requests/SbomUpload'
-
-import { useMediaQuery } from '@chakra-ui/react'
 
 import AuthContainer from 'components/AuthContainer'
 import DeviceWarning from 'components/DeviceWarning'
 
 const RequestSbomUpload = () => {
-  const [isDesktop] = useMediaQuery('(min-width: 1024px)')
+  const isMobile = isMobileOrTablet()
 
-  if (!isDesktop) return <DeviceWarning />
+  if (isMobile) return <DeviceWarning />
+
   return (
     <AuthContainer>
       <SbomUpload />

@@ -1,13 +1,12 @@
 import { Outlet } from 'react-router-dom'
-
-import { useMediaQuery } from '@chakra-ui/react'
+import { isMobileOrTablet } from 'utils'
 
 import DeviceWarning from 'components/DeviceWarning'
 
 const Auth = () => {
-  const [isDesktop] = useMediaQuery('(min-width: 1024px)')
+  const isMobile = isMobileOrTablet()
 
-  if (!isDesktop) return <DeviceWarning />
+  if (isMobile) return <DeviceWarning />
 
   return <Outlet />
 }
