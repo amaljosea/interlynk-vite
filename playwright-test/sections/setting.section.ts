@@ -68,7 +68,6 @@ export default class SettingSection {
         await this.page.waitForTimeout(2000)
 
         await this.page.reload()
-
         await this.page
           .locator('div')
           .filter({ hasText: /^Vulnerability Scan$/ })
@@ -112,7 +111,9 @@ export default class SettingSection {
         await this.page.locator("//a[@aria-label='products']").click()
         await this.page.waitForTimeout(2000)
 
-        await this.page.getByLabel('Dropdown menu for Test').click()
+        await this.page
+          .locator(`//button[@aria-label='dropdown menu for Test']`)
+          .click()
         await this.page
           .locator(`//button[@aria-label='Delete product Test']`)
           .click()

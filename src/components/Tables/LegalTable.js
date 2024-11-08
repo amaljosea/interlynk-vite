@@ -135,6 +135,7 @@ const LegalTable = () => {
               setActiveRow(null)
               EDIT.onOpen()
             }}
+            aria-label='add_manufacturer'
             icon={<AddIcon />}
           />
         </Tooltip>

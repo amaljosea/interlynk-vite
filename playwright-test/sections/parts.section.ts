@@ -172,9 +172,7 @@ export default class PartsSection {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
 
-      const product = this.page
-        .locator(`//p[@aria-label='product_name']`)
-        .nth(0)
+      const product = this.page.getByTestId(`product_TestTwo`)
 
       if (product.isVisible()) {
         await product.click()

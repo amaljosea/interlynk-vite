@@ -16,7 +16,7 @@ export class SettingsPage {
   }
 
   async openLegalSection() {
-    await this.page.getByLabel('legal').getByRole('button').click()
+    await this.page.locator(`//button[@aria-label='add_manufacturer']`).click()
   }
 
   async addOrganizationName(name: string) {
