@@ -470,6 +470,12 @@ const Components = ({ sbomData }) => {
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Grid templateColumns='repeat(3, 1fr)' py={2} gap={6}>
+          <GridItem>
+            <CustomText>Name :</CustomText>
+            <Text sx={textStyle} width={'90%'}>
+              {name || 'N/A'}
+            </Text>
+          </GridItem>
           <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
             <Text sx={textStyle} width={'90%'}>
@@ -521,12 +527,6 @@ const Components = ({ sbomData }) => {
                 <Text sx={textStyle}>N/A</Text>
               )}
             </Flex>
-          </GridItem>
-          <GridItem>
-            <CustomText>Component :</CustomText>
-            <Text sx={textStyle} width={'90%'}>
-              {name || 'N/A'}
-            </Text>
           </GridItem>
           <GridItem>
             <CustomText>Type :</CustomText>
