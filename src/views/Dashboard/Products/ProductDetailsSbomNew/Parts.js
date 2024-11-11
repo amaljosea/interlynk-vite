@@ -20,6 +20,7 @@ import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { SbomPartCreate, SbomPartDelete } from 'graphQL/Mutation'
@@ -54,8 +55,7 @@ const Parts = ({ data }) => {
   const partsContext = usePartsContext()
   const sbomId = params.sbomid
   const prodId = params.productid
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
+  const activeTab = useQueryParam('tab')
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 

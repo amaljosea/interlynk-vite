@@ -18,6 +18,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
+import useQueryParam from 'hooks/useQueryParam'
 import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -35,11 +36,10 @@ export default function AdminNavbar(props) {
 
   const location = useLocation()
   const params = useParams()
-  const queryParams = new URLSearchParams(location.search)
   const prodID = params.productid
   const sbomId = params.sbomid
-  const parts = queryParams.get('parts')
-  const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
+  const parts = useQueryParam('parts')
+  const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const { style } = useSelect('breadcrumb')

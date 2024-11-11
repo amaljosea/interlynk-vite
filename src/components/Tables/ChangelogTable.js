@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation } from 'react-router-dom'
 import {
   customStyles,
   getChangelogColor,
@@ -25,6 +24,7 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import UserCard from 'components/Misc/UserCard'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProjectLogs } from 'graphQL/Queries'
@@ -50,9 +50,7 @@ const ChangelogTable = ({ activeEnv }) => {
     onClose: onUserClose
   } = useDisclosure()
 
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const tab = queryParams.get('tab')
+  const tab = useQueryParam('tab')
 
   const { CHANGE_LOG } = ProductDetailsTabs
 

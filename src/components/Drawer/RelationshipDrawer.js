@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { ArrowDownIcon } from '@chakra-ui/icons'
 import {
@@ -42,6 +42,7 @@ import RelDeleteModal from 'components/RelDeleteModal'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
@@ -74,11 +75,9 @@ const RelationshipDrawer = (props) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const location = useLocation()
   const navigate = useNavigate()
   const { isFreeTier } = useGlobalQueryContext()
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
+  const activeTab = useQueryParam('tab')
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const { status, component: comp } = activeRow || ''

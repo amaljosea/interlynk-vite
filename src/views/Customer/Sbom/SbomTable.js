@@ -7,6 +7,7 @@ import Card from 'components/Card/Card.js'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaLock } from 'react-icons/fa6'
@@ -53,9 +54,7 @@ const SbomTable = ({ data, loading, error }) => {
 
   const { secondaryTextInverse } = useThemeColor(['secondaryTextInverse'])
 
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const tab = queryParams.get('tab')
+  const tab = useQueryParam('tab')
   const activeTabNumber = Math.max(tabs.indexOf(tab), 0)
 
   return (

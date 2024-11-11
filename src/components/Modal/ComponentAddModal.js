@@ -2,7 +2,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
 import React, { useContext, useRef, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { isCustomerView } from 'utils'
 import { getSignedUrlParams } from 'utils'
 import { infoData } from 'variables/general'
@@ -10,7 +10,7 @@ import { componentTypes } from 'variables/general'
 import CpeInputs from 'views/Dashboard/Products/components/CpeInputs'
 import PurlInputs from 'views/Dashboard/Products/components/PurlInputs'
 
-import { CheckIcon, InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
+import { InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Checkbox,
   Flex,
@@ -18,8 +18,6 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  InputGroup,
-  InputRightElement,
   Link,
   Select,
   Stack,
@@ -40,6 +38,7 @@ import PrimaryWarning from 'components/Modal/PrimaryWarning'
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateCompRelation, CreateComponent } from 'graphQL/Mutation'
@@ -49,9 +48,7 @@ import { BiLayer } from 'react-icons/bi'
 
 function ComponentAddModal(props) {
   const navigate = useNavigate()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
+  const activeTab = useQueryParam('tab')
   const { showToast } = useCustomToast()
   const params = useParams()
   const productId = params.productid

@@ -1,5 +1,5 @@
 import DataTable from 'react-data-table-component'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
 import LicenseColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/LicenseColumns'
 import ExpandedRow from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/LicensesExpanded'
@@ -12,16 +12,15 @@ import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetShareLicensesTable } from 'graphQL/Queries'
 
 const Licenses = () => {
-  const location = useLocation()
   const params = useParams()
   const sbomId = params.sbomid
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
+  const activeTab = useQueryParam('tab')
 
   const { headingTextColor, primaryTextColor } = useThemeColor([
     'headingTextColor',

@@ -6,6 +6,7 @@ import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { GetGlobalVulns } from 'graphQL/Queries'
 
@@ -13,9 +14,7 @@ import VulnInfo from './vulnInfo'
 
 const Vulnerabilities = () => {
   const params = useParams()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
+  const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
 
   const [filters, setFilters] = useState({
     field: 'VULNS_VULN_ID',

@@ -48,6 +48,7 @@ import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
@@ -60,8 +61,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
   const location = useLocation()
   const params = useParams()
   const productId = params.productid
-  const queryParams = new URLSearchParams(location.search)
-  const tab = queryParams.get('tab')
+  const tab = useQueryParam('tab')
 
   const editProdPolicies = useHasPermission({
     parentKey: 'view_product_group',

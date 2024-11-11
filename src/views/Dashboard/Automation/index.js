@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
@@ -12,6 +12,7 @@ import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
@@ -36,9 +37,7 @@ const Automation = ({ projects }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [activeEnv, setActiveEnv] = useState(null)
 
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const tab = queryParams.get('tab')
+  const tab = useQueryParam('tab')
 
   const { AUTOMATION_RULES } = ProductDetailsTabs
 

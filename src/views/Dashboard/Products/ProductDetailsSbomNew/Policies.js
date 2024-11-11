@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
@@ -14,6 +14,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { SbomPolicyScan } from 'graphQL/Mutation'
@@ -27,9 +28,7 @@ const Policies = ({ sbomData }) => {
   const { showToast } = useCustomToast()
   const params = useParams()
   const sbomId = params.sbomid
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
+  const activeTab = useQueryParam('tab')
 
   const isArchived = sbomData?.lifecycle === 'archived'
 

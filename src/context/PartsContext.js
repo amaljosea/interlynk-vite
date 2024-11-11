@@ -1,8 +1,8 @@
-import { useLocation } from 'react-router-dom'
 import createPersistedState from 'use-persisted-state'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import useQueryParam from 'hooks/useQueryParam'
 
 const usePartsState = createPersistedState('parts')
 const { createContext, useEffect } = require('react')
@@ -11,10 +11,8 @@ export const useProductParts = () => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
   const [parts, setParts] = usePartsState([])
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
+  const partsQueryParam = useQueryParam('parts')
 
-  const partsQueryParam = queryParams.get('parts')
   const isParts = partsQueryParam === 'true'
 
   const { sbomHookData } = useGlobalQueryContext()

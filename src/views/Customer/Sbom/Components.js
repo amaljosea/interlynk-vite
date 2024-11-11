@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { GetIcon, customStyles, getFullDateAndTime, timeSince } from 'utils'
 import { isValidPurl, truncatedValue } from 'utils'
 import { openSsf } from 'variables/general'
@@ -37,6 +37,7 @@ import SupplierTag from 'components/SupplierTag'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ShareComponentData } from 'graphQL/Queries'
@@ -56,11 +57,10 @@ const CustomText = styled(Text)`
 
 const Components = ({ sbomData }) => {
   const params = useParams()
-  const sbomId = params.sbomid
-  const location = useLocation()
+  const activeTab = useQueryParam('tab')
   const { colorMode } = useColorMode()
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
+
+  const sbomId = params.sbomid
 
   const {
     headingTextColor,

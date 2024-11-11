@@ -14,6 +14,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import useExportCsvQueryInfo from 'hooks/useExportCsvQueryInfo'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaFileCsv } from 'react-icons/fa6'
@@ -22,8 +23,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   const { showToast } = useCustomToast()
   const params = useParams()
 
-  const queryParams = new URLSearchParams(location.search)
-  const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
+  const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
 
   const {
     primaryTextColor,

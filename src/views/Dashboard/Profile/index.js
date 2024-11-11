@@ -11,6 +11,7 @@ import TeamTable from 'components/Tables/TeamTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 
@@ -41,22 +42,20 @@ function Profile() {
   const psTabs = ['security tokens', 'integrations']
 
   const navigate = useNavigate()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const activetab = queryParams.get('tab')
+  const activeTab = useQueryParam('tab')
   const [orgIndex, setOrgIndex] = useState(0)
   const [psIndex, setPsIndex] = useState(0)
 
   useEffect(() => {
-    if (activetab) {
-      if (orgTabs?.includes(activetab)) {
-        setOrgIndex(Math.max(orgTabs.indexOf(activetab), 0))
+    if (activeTab) {
+      if (orgTabs?.includes(activeTab)) {
+        setOrgIndex(Math.max(orgTabs.indexOf(activeTab), 0))
       } else {
-        setPsIndex(Math.max(psTabs.indexOf(activetab), 0))
+        setPsIndex(Math.max(psTabs.indexOf(activeTab), 0))
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activetab])
+  }, [activeTab])
 
   const tabs = useMemo(() => {
     return [
@@ -99,14 +98,14 @@ function Profile() {
   }
 
   useEffect(() => {
-    const isOrgActive = orgTabs?.includes(activetab)
+    const isOrgActive = orgTabs?.includes(activeTab)
     if (isOrgActive) {
       setSelectedTab(tabs[1].name)
     } else {
       setSelectedTab(tabs[0].name)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activetab, tabs])
+  }, [activeTab, tabs])
 
   return (
     <>

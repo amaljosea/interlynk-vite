@@ -1,11 +1,13 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import LynkAlert from 'components/LynkAlert'
+
+import useQueryParam from 'hooks/useQueryParam'
 
 const {
   Button,
@@ -16,20 +18,15 @@ const {
   Checkbox,
   Flex,
   Box,
-  Alert,
-  AlertIcon,
-  AlertDescription,
   Image
 } = require('@chakra-ui/react')
 
 const Login = () => {
   const userLoginURL = process.env.REACT_APP_USER_LOGIN_URL
 
-  const location = useLocation()
   const navigate = useNavigate()
 
-  const queryParams = new URLSearchParams(location.search)
-  const paramId = queryParams.get('signed_url_params')
+  const paramId = useQueryParam('signed_url_params')
 
   const [userEmail, setUserEmail] = useState('')
   const [error, setError] = useState(false)

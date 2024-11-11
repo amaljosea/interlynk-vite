@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { CheckCircleIcon, CloseIcon } from '@chakra-ui/icons'
 import { Button, Flex, Icon, Stack, Text } from '@chakra-ui/react'
@@ -9,6 +9,7 @@ import CustomLoader from 'components/CustomLoader'
 import FileUpload from 'components/FileUpload'
 
 import useCustomToast from 'hooks/useCustomToast'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
@@ -40,10 +41,8 @@ const SbomUpload = () => {
     'primaryErrorColor'
   ])
   const { showToast } = useCustomToast()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const token = queryParams.get('token')
-  const id = queryParams.get('id')
+  const token = useQueryParam('token')
+  const id = useQueryParam('id')
 
   const [declineRequest] = useMutation(RequestDecline)
   const [uploadSbom, { error, loading }] = useMutation(RequestUploadSbom)

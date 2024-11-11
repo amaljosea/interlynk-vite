@@ -1,5 +1,5 @@
 import DataTable from 'react-data-table-component'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
 
 import { Flex } from '@chakra-ui/react'
@@ -8,6 +8,7 @@ import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetSbomLicensesTable } from 'graphQL/Queries'
@@ -17,12 +18,10 @@ import ExpandedRow from './Components/tableExpanded/LicensesExpanded'
 import LicensesSubHeader from './Components/tableSubHeaders/LicensesSubHeader'
 
 const Licenses = () => {
-  const location = useLocation()
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
+  const activeTab = useQueryParam('tab')
 
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 

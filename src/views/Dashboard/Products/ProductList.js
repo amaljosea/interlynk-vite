@@ -1,6 +1,5 @@
 import { useTour } from '@reactour/tour'
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
 
 import LynkAlert from 'components/LynkAlert'
@@ -9,6 +8,7 @@ import ProductTable from 'components/Tables/ProductTable'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { GetProductTable } from 'graphQL/Queries'
 
@@ -17,9 +17,7 @@ function ProductList() {
   const { dispatch } = useGlobalState()
   const { prodDispatch, prodCompDispatch, prodVulnDispatch } = dispatch
 
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const product = queryParams.get('id')
+  const product = useQueryParam('id')
 
   const productPermissions = useHasPermission({
     parentKey: 'view_product_group'

@@ -1,21 +1,21 @@
 import { useMemo } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import { GetCompVulnData, GetComponentData } from 'graphQL/Queries'
 import { GetVulnData } from 'graphQL/Queries'
 import { GetSbomLicensesTable } from 'graphQL/Queries'
 import { GetGlobalVulns } from 'graphQL/Queries'
 
+import useQueryParam from './useQueryParam'
+
 const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
   const params = useParams()
-  const location = useLocation()
 
   const productId = params.productid
   const sbomId = params.sbomid
   const productGroupId = params.productgroupid
 
-  const queryParams = new URLSearchParams(location.search)
-  const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
+  const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
 
   const queryInfo = useMemo(() => {
     switch (tableType) {

@@ -33,6 +33,7 @@ import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -108,9 +109,7 @@ const VersionsTable = (props) => {
   const DELETE_SBOM = useDisclosure()
   const ARCHIVE_SBOM = useDisclosure()
 
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const tab = queryParams.get('tab')
+  const tab = useQueryParam('tab')
 
   const { setIsOpen } = useTour()
 

@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import React, { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
@@ -14,6 +14,7 @@ import VulnCard from 'components/Misc/VulnCard'
 import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetChangeLogs, GetSbomLogFilters } from 'graphQL/Queries'
@@ -25,9 +26,7 @@ const Changelog = () => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
+  const activeTab = useQueryParam('tab')
 
   const { headingTextColor, secondaryBgColor } = useThemeColor([
     'headingTextColor',

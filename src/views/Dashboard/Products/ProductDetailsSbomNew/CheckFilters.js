@@ -1,6 +1,5 @@
 import { useQuery } from '@apollo/client'
 import { useState } from 'react'
-import { useLocation } from 'react-router-dom'
 
 import {
   Box,
@@ -14,12 +13,12 @@ import {
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
+import useQueryParam from 'hooks/useQueryParam'
+
 import { GetOrgRules } from 'graphQL/Queries'
 
 const CheckFilters = ({ filters, setCheckState }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const activeTab = queryParams.get('tab')
+  const activeTab = useQueryParam('tab')
 
   const { data } = useQuery(GetOrgRules, {
     skip: activeTab === 'checks' ? false : true,

@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { getFullDateAndTime, linkURl } from 'utils'
 
 import {
@@ -23,6 +23,7 @@ import IconBox from 'components/Icons/IconBox'
 import CvssCard from 'components/Misc/CvssCard'
 import VulnBadge from 'components/Misc/VulnBadge'
 
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetGlobalVulnData } from 'graphQL/Queries'
@@ -58,10 +59,9 @@ const StatsContainer = ({ icon, title, children }) => {
 }
 
 const VulnInfo = () => {
-  const location = useLocation()
   const params = useParams()
-  const queryParams = new URLSearchParams(location.search)
-  const vulnId = queryParams.get('vulnId') || params.vulnerabilityid
+  const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
+
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { primaryBlueText, secondaryBlueText } = useThemeColor([
     'primaryBlueText',

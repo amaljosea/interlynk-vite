@@ -2,7 +2,7 @@ import { gql, useQuery } from '@apollo/client'
 import { TourProvider } from '@reactour/tour'
 import NotFound from 'assets/svg/not-found.svg'
 import { useEffect } from 'react'
-import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Outlet, useNavigate, useParams } from 'react-router-dom'
 import { customerRoutes } from 'routes'
 
 import { Box, Center, Flex, Img, Text } from '@chakra-ui/react'
@@ -13,6 +13,7 @@ import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
@@ -37,11 +38,9 @@ export const getSharelynk = gql`
 
 export default function Customer() {
   const navigate = useNavigate()
-  const location = useLocation()
   const params = useParams()
   const sbomId = params.sbomid
-  const queryParams = new URLSearchParams(location.search)
-  const signedUrlParams = queryParams.get('signed_url_params')
+  const signedUrlParams = useQueryParam('signed_url_params')
   const tabRes = window.matchMedia('(max-width: 1199px)')
   const isMobile = isMobileOrTablet()
 

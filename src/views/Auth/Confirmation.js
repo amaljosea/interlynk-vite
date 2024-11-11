@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 
 import { WarningIcon } from '@chakra-ui/icons'
 import {
@@ -15,15 +15,14 @@ import {
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UserEmailConfirmation } from 'graphQL/Mutation'
 
 const Confirmation = () => {
   const { showToast } = useCustomToast()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const token = queryParams.get('confirmation_token')
+  const token = useQueryParam('confirmation_token')
 
   const [error, setError] = useState([])
 
