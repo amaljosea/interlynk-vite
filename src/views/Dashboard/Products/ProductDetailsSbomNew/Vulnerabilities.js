@@ -263,7 +263,7 @@ const Vulnerabilities = ({ sbomData }) => {
     showToast
   ])
 
-  const subHeader = VulnerabilitySubHeader(
+  const subHeader = VulnerabilitySubHeader({
     editVulns,
     handleClear,
     handleScan,
@@ -277,7 +277,7 @@ const Vulnerabilities = ({ sbomData }) => {
     selectedVulns,
     signedUrlParams,
     vulnSearch
-  )
+  })
 
   const handleSort = (column, sortDirection) => {
     prodVulnDispatch({

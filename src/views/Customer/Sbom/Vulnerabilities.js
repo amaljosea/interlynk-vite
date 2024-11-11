@@ -1,43 +1,16 @@
 import { useQuery } from '@apollo/client'
-import styled from '@emotion/styled'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
-import {
-  customStyles,
-  getFullDateAndTime,
-  getSignedUrlParams,
-  linkURl,
-  statusColor,
-  timeSince
-} from 'utils'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
+import { customStyles, getSignedUrlParams } from 'utils'
+import VulnerabilityColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/VulnerabilityColumns'
+import ExpandedComponent from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/VulnerabilityExpanded'
+import VulnerabilitySubHeader from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableSubHeaders/VulnerabilitySubHeader'
 
-import { ExternalLinkIcon } from '@chakra-ui/icons'
-import {
-  Badge,
-  Box,
-  Flex,
-  Grid,
-  GridItem,
-  Icon,
-  IconButton,
-  Link,
-  Skeleton,
-  Stack,
-  Tag,
-  TagLabel,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
-import RefreshBtn from 'components/Icons/RefreshBtn'
 import CvssCard from 'components/Misc/CvssCard'
-import CvssTag from 'components/Misc/CvssTag'
-import EpssTag from 'components/Misc/EpssTag'
-import SeverityTag from 'components/Misc/SeverityTag'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -49,140 +22,6 @@ import {
   ShareVulnData,
   ShareVulnFilters
 } from 'graphQL/Queries'
-
-import { FaGlobe, FaHouseUser, FaLightbulb, FaSitemap } from 'react-icons/fa'
-
-import VulnFilters from './VulnFilters'
-
-const ExpandedComponent = ({ data, setActiveRow, onCvssOpen }) => {
-  const { vuln, component } = data
-  const { primaryTextColor, primaryBlueText, secondaryTextInverse } =
-    useThemeColor([
-      'primaryTextColor',
-      'primaryBlueText',
-      'secondaryTextInverse'
-    ])
-
-  const CustomText = styled(Text)`
-    font-size: 13px;
-    font-weight: bold;
-    color: ${secondaryTextInverse};
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-  `
-  return (
-    <Box
-      sx={{ w: '100%', p: 5 }}
-      boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
-    >
-      <Grid templateColumns='repeat(3, 1fr)' gap={12}>
-        {/* Description */}
-        <GridItem>
-          <CustomText>Description :</CustomText>
-          <Text mt={1} fontSize={14} color={primaryTextColor}>
-            {vuln.desc}
-          </Text>
-        </GridItem>
-        {/* COMPONENT NAME */}
-        <GridItem>
-          <CustomText>Component Name :</CustomText>
-          <Text mt={1} fontSize={14} color={primaryTextColor}>
-            {component?.name}
-          </Text>
-        </GridItem>
-        {/* COMPONENT VERSION */}
-        <GridItem>
-          <CustomText>Component Version :</CustomText>
-          <Text mt={1} fontSize={14} color={primaryTextColor}>
-            {component?.version}
-          </Text>
-        </GridItem>
-        {/* Published At  */}
-        <GridItem>
-          <CustomText>Published:</CustomText>
-          <Text mt={1} fontSize={14} color={primaryTextColor}>
-            {getFullDateAndTime(vuln.publishedAt)}
-          </Text>
-        </GridItem>
-        {/* Last Modified At */}
-        <GridItem>
-          <CustomText>Last Modified:</CustomText>
-          <Text mt={1} fontSize={14} color={primaryTextColor}>
-            {getFullDateAndTime(vuln.lastModifiedAt)}
-          </Text>
-        </GridItem>
-        {/* CVSS Vector */}
-        <GridItem>
-          <CustomText>CVSS Vector :</CustomText>
-          {vuln?.cvssVector ? (
-            <Tooltip
-              bg='gray.50'
-              label={<CvssCard value={vuln?.cvssVector} />}
-              placement='top'
-            >
-              <Tag
-                variant='subtle'
-                width={'fit-content'}
-                colorScheme={'cyan'}
-                cursor={'pointer'}
-                onClick={() => {
-                  setActiveRow(data)
-                  onCvssOpen()
-                }}
-              >
-                {vuln?.cvssVector || '-'}
-              </Tag>
-            </Tooltip>
-          ) : (
-            <Tag
-              variant='subtle'
-              width={'fit-content'}
-              colorScheme={'cyan'}
-              cursor={'pointer'}
-            >
-              {vuln?.cvssVector || '-'}
-            </Tag>
-          )}
-        </GridItem>
-        {/* NVD ALIAS ID */}
-        {vuln.nvdAliasId ? (
-          <GridItem>
-            <CustomText>NVD Alias ID:</CustomText>
-            <Flex
-              sx={{ w: 'fit-content', mt: 1, gap: 2, alignItems: 'center' }}
-            >
-              <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
-                <Icon
-                  as={ExternalLinkIcon}
-                  color={primaryBlueText}
-                  sx={{ w: '16px', h: '16px' }}
-                />
-              </Link>
-              <Tooltip label={vuln.nvdAliasId} placement={'top'}>
-                <Text
-                  sx={{ w: 'fit-content', fontSize: 'sm' }}
-                  color={primaryTextColor}
-                >
-                  {vuln.nvdAliasId}
-                </Text>
-              </Tooltip>
-            </Flex>
-          </GridItem>
-        ) : null}
-        {/* EPSS Percentile */}
-        <GridItem>
-          <CustomText>EPSS Percentile :</CustomText>
-          <Text mt={1} fontSize={14} color={primaryTextColor}>
-            {vuln?.vulnInfo?.epssPercentile
-              ? (vuln?.vulnInfo?.epssPercentile * 100).toFixed()
-              : 0}{' '}
-            %
-          </Text>
-        </GridItem>
-      </Grid>
-    </Box>
-  )
-}
 
 const Vulnerabilities = ({ sbomData }) => {
   const params = useParams()
@@ -208,9 +47,7 @@ const Vulnerabilities = ({ sbomData }) => {
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
-    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
-  )
+  const { headingTextColor } = useThemeColor(['headingTextColor'])
   const [activeRow, setActiveRow] = useState(null)
   const [vulnSearch, setVulnSearch] = useState(searchInput)
 
@@ -293,248 +130,7 @@ const Vulnerabilities = ({ sbomData }) => {
   } = useDisclosure()
 
   // COLUMNS
-  const columns = [
-    // CVE ID
-    {
-      id: 'VULNS_VULN_ID',
-      name: 'ID',
-      wrap: true,
-      selector: (row) => {
-        const { vuln, isPart, component } = row
-        const { sbom } = component
-        const { projectVersion, project } = sbom
-        const { vulnInfo } = vuln
-        const { kev } = vulnInfo ? vulnInfo : ''
-        return (
-          <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
-            <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
-              <Icon
-                as={ExternalLinkIcon}
-                h={'16px'}
-                w={'16px'}
-                color={primaryBlueText}
-              />
-            </Link>
-            <Stack direction={'column'} spacing={1.5}>
-              <Tooltip label={vuln.vulnId} placement={'top'}>
-                <Text
-                  fontSize='sm'
-                  color={primaryTextColor}
-                  data-tag='allowRowEvents'
-                >
-                  {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
-                </Text>
-              </Tooltip>
-              {isPart && (
-                <Text
-                  fontSize={'xs'}
-                  fontWeight={'medium'}
-                  width={'fit-content'}
-                >
-                  {project?.projectGroup?.name || ''} : {projectVersion || ''}
-                </Text>
-              )}
-              {kev === true && (
-                <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
-                  KEV
-                </Badge>
-              )}
-            </Stack>
-          </Flex>
-        )
-      },
-      width: '20%',
-      sortable: true
-    },
-    // SEVERITY
-    {
-      id: 'VULNS_SEV',
-      name: 'SEVERITY',
-      selector: (row) => <SeverityTag value={row?.vuln?.sev} />,
-      width: '10%',
-      sortable: true,
-      wrap: true
-    },
-    // SOURCE
-    {
-      id: 'VULNS_SOURCE',
-      name: 'SOURCE',
-      selector: (row) => {
-        const { vuln } = row
-        return (
-          <Tag
-            onClick={(e) => {
-              e.currentTarget.parentElement.click()
-            }}
-            size='sm'
-            key='md'
-            variant='solid'
-            colorScheme={vuln.source === 'osv' ? 'red' : 'blue'}
-            textTransform={'uppercase'}
-            width={'100%'}
-            alignItems={'center'}
-            justifyContent={'center'}
-          >
-            <TagLabel>{vuln.source}</TagLabel>
-          </Tag>
-        )
-      },
-      width: '9%',
-      sortable: true,
-      wrap: true
-    },
-    // CVSS
-    {
-      id: 'VULNS_CVSS_SCORE',
-      name: 'CVSS',
-      selector: (row) => <CvssTag value={row?.vuln?.cvssScore} />,
-      width: '7%',
-      sortable: true,
-      wrap: true
-    },
-    // EPSS
-    {
-      id: 'VULN_INFOS_EPSS_SCORES',
-      name: 'EPSS',
-      selector: (row) => {
-        const { vuln } = row
-        const { vulnInfo } = vuln
-        const { epssScores } = vulnInfo ? vulnInfo : ''
-        return <EpssTag value={epssScores} />
-      },
-      width: '10%',
-      sortable: true,
-      wrap: true
-    },
-    // STATUS
-    {
-      id: 'VEX_STATUSES_NAME',
-      name: 'STATUS',
-      selector: (row) => {
-        const { vexStatus } = row
-        return (
-          <Tag
-            onClick={(e) => {
-              e.currentTarget.parentElement.click()
-            }}
-            size='md'
-            variant='solid'
-            width={'130px'}
-            colorScheme={statusColor(
-              vexStatus ? vexStatus.name : 'Unspecified'
-            )}
-          >
-            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-              {vexStatus !== null ? vexStatus.name : 'Unspecified'}
-            </TagLabel>
-          </Tag>
-        )
-      },
-      wrap: true,
-      sortable: true
-    },
-    // UPDATED AT
-    {
-      id: 'COMPONENT_VULNS_UPDATED_AT',
-      name: 'UPDATED',
-      selector: (row) => (
-        <Tooltip
-          label={getFullDateAndTime(row.vuln.updatedAt)}
-          placement={'top'}
-        >
-          <Text color={primaryTextColor} textAlign={'right'}>
-            {timeSince(row.vuln.updatedAt)}
-          </Text>
-        </Tooltip>
-      ),
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.vuln.updatedAt)
-        const dateB = new Date(b.vuln.updatedAt)
-        return dateA - dateB // Sort in descending order
-      },
-      width: '10%',
-      wrap: true,
-      right: 'true'
-    },
-    {
-      id: '',
-      name: '',
-      right: true,
-      selector: (row) => {
-        const { externalUrls, currentExternalUrls } = row
-        const website =
-          externalUrls?.find((item) => item.name === 'website') ||
-          currentExternalUrls?.find((item) => item.name === 'website')
-        const distribution =
-          externalUrls?.find((item) => item.name === 'distribution') ||
-          currentExternalUrls?.find((item) => item.name === 'distribution')
-        const issueTracker =
-          externalUrls?.find((item) => item.name === 'issue-tracker') ||
-          currentExternalUrls?.find((item) => item.name === 'issue-tracker')
-        const vcs =
-          externalUrls?.find((item) => item.name === 'vcs') ||
-          currentExternalUrls?.find((item) => item.name === 'vcs')
-
-        return (
-          <Stack direction={'row'} alignItems={'center'}>
-            {/* WEBSITE */}
-            <Tooltip placement='top' label={website?.url}>
-              <Link href={website?.url} isExternal>
-                <IconButton
-                  type='button'
-                  size='xs'
-                  variant='solid'
-                  isDisabled={!website}
-                  colorScheme='gray'
-                  icon={<FaGlobe color={primaryTextColor} fontSize={16} />}
-                />
-              </Link>
-            </Tooltip>
-            {/* DISTRIBUTION */}
-            <Tooltip placement='top' label={vcs?.url}>
-              <Link href={vcs?.url} isExternal>
-                <IconButton
-                  type='button'
-                  size='xs'
-                  variant='solid'
-                  colorScheme='gray'
-                  isDisabled={!vcs}
-                  icon={<FaSitemap color={primaryTextColor} fontSize={16} />}
-                />
-              </Link>
-            </Tooltip>
-            {/* ADVISORIES */}
-            <Tooltip placement='top' label={issueTracker?.url}>
-              <Link href={issueTracker?.url} isExternal>
-                <IconButton
-                  type='button'
-                  size='xs'
-                  variant='solid'
-                  colorScheme='gray'
-                  isDisabled={!issueTracker}
-                  icon={<FaHouseUser color={primaryTextColor} fontSize={16} />}
-                />
-              </Link>
-            </Tooltip>
-            {/* SUPPORT */}
-            <Tooltip placement='top' label={distribution?.url}>
-              <Link href={distribution?.url} isExternal>
-                <IconButton
-                  type='button'
-                  size='xs'
-                  variant='solid'
-                  isDisabled={!distribution}
-                  colorScheme='gray'
-                  icon={<FaLightbulb color={primaryTextColor} fontSize={16} />}
-                />
-              </Link>
-            </Tooltip>
-          </Stack>
-        )
-      }
-    }
-  ]
+  const columns = VulnerabilityColumns()
 
   // CLEAR SERACH
   const handleClear = useCallback(() => {
@@ -568,51 +164,17 @@ const Vulnerabilities = ({ sbomData }) => {
     [prodVulnDispatch, reset]
   )
 
-  const subHeader = useMemo(() => {
-    return (
-      <Flex
-        width={'100%'}
-        alignItems={'flex-start'}
-        justifyContent={'space-between'}
-        gap={2}
-      >
-        <Flex
-          flexDirection={'row'}
-          alignItems={'flex-start'}
-          flexWrap={'wrap'}
-          gap={3}
-        >
-          {/* SEARCH COMPONENTS */}
-          <SearchFilter
-            id='vuln'
-            filterText={vulnSearch}
-            onChange={onSearchInputChange}
-            onFilter={handleSearch}
-            onClear={handleClear}
-          />
-          {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters ? (
-            <VulnFilters reset={() => reset()} />
-          ) : (
-            <Stack direction='row' spacing={4}>
-              {[1, 2, 3, 4].map((_, index) => (
-                <Skeleton key={index} width={'100px'} height={'38px'} />
-              ))}
-            </Stack>
-          )}
-        </Flex>
-        {/* REFRESH */}
-        <RefreshBtn onClick={() => reset()} />
-      </Flex>
-    )
-  }, [
-    filters,
+  //Subheader
+  const subHeader = VulnerabilitySubHeader({
     handleClear,
     handleSearch,
     onSearchInputChange,
+    prodVulnDispatch,
     reset,
-    vulnSearch
-  ])
+    signedUrlParams,
+    vulnSearch,
+    filters
+  })
 
   const handleSort = (column, sortDirection) => {
     prodVulnDispatch({
