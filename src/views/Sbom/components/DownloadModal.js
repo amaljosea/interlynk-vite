@@ -318,7 +318,7 @@ const DownloadModal = (props) => {
                 hidden={signedUrlParams}
                 isChecked={excludeParts}
                 onChange={() => setExcludeParts(!excludeParts)}
-                isDisabled={spec === 'SPDX' || original}
+                isDisabled={isFreeTier || spec === 'SPDX' || original}
               >
                 Exclude Parts
               </Checkbox>
