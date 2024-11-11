@@ -4,15 +4,17 @@ import { useEffect, useState } from 'react'
 import {
   Box,
   Button,
+  FormControl,
+  FormErrorMessage,
   HStack,
   Icon,
   IconButton,
   Input,
   Select,
-  Text,
   VStack
 } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -41,6 +43,7 @@ const ConfigModal = ({
 }) => {
   const { showToast } = useCustomToast()
   const [error, setError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const [updateConn] = useMutation(updateConnection)
   const [createConn] = useMutation(createConnection)
@@ -84,7 +87,7 @@ const ConfigModal = ({
       })
 
       const responseData = res?.data
-      console.log(responseData)
+
       const connectionKey = Object.keys(responseData)?.[0] // Get the first key
       const errors = responseData?.[connectionKey]?.errors
 
@@ -96,19 +99,16 @@ const ConfigModal = ({
           description: `Your ${title} has been successfully deleted.`,
           status: 'success'
         })
+        setErrorMessage(
+          `Deletion failed. An error occurred: ${errors.join(', ')}`
+        )
       } else {
-        showToast({
-          title: 'Deletion failed.',
-          description: `An error occurred: ${errors.join(', ')}`,
-          status: 'error'
-        })
+        setErrorMessage(
+          `Deletion failed. An error occurred: ${errors.join(', ')}`
+        )
       }
     } catch (error) {
-      showToast({
-        title: 'Deletion failed.',
-        description: `Unexpected error: ${error.message}`,
-        status: 'error'
-      })
+      setErrorMessage(`Deletion failed. Unexpected error: ${error.message}`)
     }
   }
 
@@ -129,11 +129,7 @@ const ConfigModal = ({
     }
 
     if (hasDuplicates(validConfigs)) {
-      showToast({
-        title: 'Saving failed.',
-        description: 'Duplicate address is not allowed.',
-        status: 'error'
-      })
+      setErrorMessage('Duplicate address is not allowed.')
       return
     }
 
@@ -141,7 +137,6 @@ const ConfigModal = ({
       // eslint-disable-next-line no-unused-vars
       ({ isValid, error, ...rest }) => rest
     )
-    console.log(configsForMutation)
     try {
       const res = await updateConn({
         variables: {
@@ -167,18 +162,12 @@ const ConfigModal = ({
         })
       } else {
         setError(true)
-        showToast({
-          title: 'Saving failed.',
-          description: `An error occurred: ${errors.join(', ')}`,
-          status: 'error'
-        })
+        setErrorMessage(
+          `Saving failed. An error occurred: ${errors.join(', ')}`
+        )
       }
     } catch (error) {
-      showToast({
-        title: 'Saving failed.',
-        description: `Unexpected error: ${error.message}`,
-        status: 'error'
-      })
+      setErrorMessage(`Saving failed. Unexpected error: ${error.message}`)
     }
   }
 
@@ -193,20 +182,14 @@ const ConfigModal = ({
     }
 
     if (validConfigs.length === 0) {
-      showToast({
-        title: 'Missing configuration',
-        description: 'Please enter a valid configuration.',
-        status: 'warning'
-      })
+      setErrorMessage(
+        'Missing configuration. Please enter a valid configuration.'
+      )
       return
     }
 
     if (hasDuplicates(validConfigs)) {
-      showToast({
-        title: 'Saving failed.',
-        description: 'Duplicate address is not allowed.',
-        status: 'error'
-      })
+      setErrorMessage(`Duplicate address is not allowed.`)
       return
     }
 
@@ -238,22 +221,17 @@ const ConfigModal = ({
         })
       } else {
         setError(true)
-        showToast({
-          title: 'Saving failed.',
-          description: `An error occurred: ${errors.join(', ')}`,
-          status: 'error'
-        })
+        setErrorMessage(
+          `Saving failed. An error occurred: ${errors.join(', ')}`
+        )
       }
     } catch (error) {
-      showToast({
-        title: 'Saving failed.',
-        description: `Unexpected error: ${error.message}`,
-        status: 'error'
-      })
+      setErrorMessage(`Saving failed. Unexpected error: ${error.message}}`)
     }
   }
 
   const handleChange = (index, field, value) => {
+    setErrorMessage('')
     const newConfigs = [...configs]
     newConfigs[index][field] = value
     if (field === 'address') {
@@ -268,19 +246,42 @@ const ConfigModal = ({
     setConfigs(newConfigs)
   }
 
-  const handleAddConfig = () => {
-    setConfigs([
-      ...configs,
-      {
-        address: '',
-        notificationType: 'All',
-        frequency: 'Instant',
-        isValid: true
+  const hasSimilarRow = (data) => {
+    for (let i = 0; i < data.length; i++) {
+      for (let j = i + 1; j < data.length; j++) {
+        if (
+          data[i].address === data[j].address &&
+          data[i].frequency === data[j].frequency &&
+          data[i].notificationType === data[j].notificationType
+        ) {
+          return true // Similar row found
+        }
       }
-    ])
+    }
+    return false // No similar rows found
+  }
+
+  const handleAddConfig = () => {
+    if (hasSimilarRow(configs)) {
+      setErrorMessage(
+        `A row with the empty or same values already exists. Please update or remove it before continue.`
+      )
+    } else {
+      setErrorMessage('')
+      setConfigs([
+        ...configs,
+        {
+          address: '',
+          notificationType: 'All',
+          frequency: 'Instant',
+          isValid: true
+        }
+      ])
+    }
   }
 
   const handleRemoveConfig = (index) => {
+    setErrorMessage('')
     if (configs.length === 1) {
       setConfigs([
         {
@@ -310,28 +311,31 @@ const ConfigModal = ({
     >
       <VStack>
         {configs.map((config, index) => (
-          <HStack key={index} width='100%' pb={2}>
-            <Box position={'relative'}>
-              <Input
-                w={'270px'}
-                placeholder={addressPlaceholder}
-                value={config.address}
-                onChange={(e) => handleChange(index, 'address', e.target.value)}
-                borderColor={
-                  !config.isValid ? primaryErrorColor : grayBorderColor
-                }
-                isDisabled={!updateCon}
-              />
-              {config.error && (
-                <Text
+          <HStack key={index} width='100%' pb={2} alignItems='start'>
+            <FormControl isInvalid={config.address !== '' && config.error}>
+              <Box position='relative'>
+                <Input
+                  w='270px'
+                  placeholder={addressPlaceholder}
+                  value={config.address}
+                  onChange={(e) =>
+                    handleChange(index, 'address', e.target.value)
+                  }
+                  borderColor={
+                    !config.isValid ? primaryErrorColor : grayBorderColor
+                  }
+                  isDisabled={!updateCon}
+                />
+                <FormErrorMessage
                   color={primaryErrorColor}
                   fontSize='sm'
-                  position={'absolute'}
+                  minHeight='20px'
                 >
-                  {config.error}
-                </Text>
-              )}
-            </Box>
+                  {config.error || ' '}
+                </FormErrorMessage>
+              </Box>
+            </FormControl>
+
             <Select
               value={config.notificationType}
               onChange={(e) =>
@@ -345,6 +349,7 @@ const ConfigModal = ({
                 </option>
               ))}
             </Select>
+
             <Select
               value={config.frequency}
               onChange={(e) => handleChange(index, 'frequency', e.target.value)}
@@ -352,11 +357,12 @@ const ConfigModal = ({
             >
               <option value='Instant'>Instant</option>
             </Select>
+
             {updateCon && (
               <IconButton
                 border='1px solid'
                 borderColor={grayBorderColor}
-                variant={'ghost'}
+                variant='ghost'
                 aria-label='Delete configuration'
                 onClick={() => handleRemoveConfig(index)}
                 icon={
@@ -385,6 +391,7 @@ const ConfigModal = ({
             Add New
           </Button>
         )}
+        {errorMessage !== '' && <LynkAlert msg={errorMessage} />}
       </VStack>
     </LynkModal>
   )
