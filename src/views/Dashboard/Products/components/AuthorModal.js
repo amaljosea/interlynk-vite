@@ -44,16 +44,6 @@ const AuthorModal = ({ isOpen, onClose }) => {
     useMutation(AutomationRuleCreate)
   const [createAuthor, { loading }] = useMutation(authorCreate)
 
-  const { data } = useQuery(GetExistingRules, {
-    skip: isOpen ? false : true,
-    variables: {
-      id: params?.productid,
-      checkIdentifier: friendlyId
-    }
-  })
-
-  const ruleExists = data?.project?.automationRules?.nodes?.length > 0
-
   const { nodes } = usePaginatedQuery(GetCheckResults, {
     skip: activeTab === 'checks' ? false : true,
     selector: 'sbom.checkResults',
@@ -75,6 +65,16 @@ const AuthorModal = ({ isOpen, onClose }) => {
       tab: AUTOMATION_RULES
     }
   })
+
+  const { data } = useQuery(GetExistingRules, {
+    skip: isOpen ? false : true,
+    variables: {
+      id: params?.productid,
+      checkIdentifier: friendlyId
+    }
+  })
+
+  const ruleExists = data?.project?.automationRules?.nodes?.length > 0
 
   const initialData = {
     name: '',
@@ -191,10 +191,12 @@ const AuthorModal = ({ isOpen, onClose }) => {
         !isFreeTier && (
           <Button
             fontSize={'sm'}
+            variant='ghost'
             onClick={handleRuleCreate}
             isLoading={ruleLoading}
             hidden={friendlyId ? false : true}
             colorScheme={ruleExists ? 'green' : 'blue'}
+            isDisabled={!authorData?.name || !authorData?.email}
           >
             {ruleExists ? 'View' : 'Save as'} Rule
           </Button>

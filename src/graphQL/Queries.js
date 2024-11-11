@@ -2656,8 +2656,8 @@ export const ShareProject = gql`
 `
 
 // GET PROJECT AUTOMATIONS
-export const GetProjectCheck = gql`
-  query GetProjectCheck(
+export const GetProjectAutomations = gql`
+  query GetProjectAutomations(
     $id: Uuid!
     $after: String
     $before: String

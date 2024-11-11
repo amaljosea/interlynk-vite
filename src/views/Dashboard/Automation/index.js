@@ -16,7 +16,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   AutomationConditionSubjectFieldMapping,
-  GetProjectCheck
+  GetProjectAutomations
 } from 'graphQL/Queries'
 
 import AutomationSubHeader from './components/AutomationSubHeader'
@@ -50,7 +50,7 @@ const Automation = ({ projects }) => {
   )
 
   const { nodes, paginationProps, loading } = usePaginatedQuery(
-    GetProjectCheck,
+    GetProjectAutomations,
     {
       skip: tab === AUTOMATION_RULES ? false : true,
       selector: 'project.automationRules',
