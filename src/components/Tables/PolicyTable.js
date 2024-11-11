@@ -15,31 +15,30 @@ import PolicyModal from 'views/Dashboard/Policies/PolicyModal'
 import RuleModal from 'views/Dashboard/Policies/RuleModal'
 import WarnModal from 'views/Dashboard/Policies/WarnModal'
 
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
   Heading,
   IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Portal,
   Select,
   Stack,
-  Table,
-  TableContainer,
-  Tag,
-  TagLabel,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
   Tooltip,
-  Tr,
   useDisclosure
 } from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
+import {
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr
+} from '@chakra-ui/react'
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
@@ -54,7 +53,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
 
-import { FaEllipsisV, FaPlus } from 'react-icons/fa'
+import { FaEllipsisV } from 'react-icons/fa'
 
 const PolicyTable = ({ data, loading, paginationProps }) => {
   const { showToast } = useCustomToast()
@@ -93,7 +92,6 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
   ])
 
   const [activeRow, setActiveRow] = useState(null)
-  const [activeRule, setActiveRule] = useState(null)
 
   const { POLICIES } = ProductDetailsTabs
 
@@ -116,22 +114,10 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
   const [createExclusion] = useMutation(PolicyExclusionCreate)
   const [deleteExclusion] = useMutation(DeletePolicyExclusion)
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isWarningOpen,
-    onOpen: onWarningOpen,
-    onClose: onWarningClose
-  } = useDisclosure()
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose
-  } = useDisclosure()
-  const {
-    isOpen: isRuleOpen,
-    onOpen: onRuleOpen,
-    onClose: onRuleClose
-  } = useDisclosure()
+  const UPDATE = useDisclosure()
+  const WARNING = useDisclosure()
+  const DELETE = useDisclosure()
+  const RULE = useDisclosure()
 
   const handleCreateExclusion = async (id) => {
     await createExclusion({
@@ -175,16 +161,16 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
               isDisabled={!updatePolicy}
               onClick={() => {
                 setActiveRow(null)
-                onOpen()
+                UPDATE.onOpen()
               }}
-              icon={<FaPlus />}
+              icon={<AddIcon />}
             />
           </Tooltip>
           <RefreshBtn />
         </Stack>
       </Flex>
     )
-  }, [onOpen, productId, updatePolicy])
+  }, [UPDATE, productId, updatePolicy])
 
   // COLUMNS
   const columns = [
@@ -200,7 +186,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
             isChecked={isEnabled}
             onChange={() => {
               setActiveRow(row)
-              onWarningOpen()
+              WARNING.onOpen()
             }}
           />
         )
@@ -329,7 +315,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
                   hidden={productId}
                   onClick={() => {
                     setActiveRow(row)
-                    onOpen()
+                    UPDATE.onOpen()
                   }}
                   data-testid={`policy_edit_${index}`}
                 >
@@ -340,8 +326,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
                   hidden
                   onClick={() => {
                     setActiveRow(row)
-                    setActiveRule(null)
-                    onRuleOpen()
+                    RULE.onOpen()
                   }}
                 >
                   Add Policy Rule
@@ -352,7 +337,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
                   isDisabled={!removePolicy}
                   onClick={() => {
                     setActiveRow(row)
-                    onDeleteOpen()
+                    DELETE.onOpen()
                   }}
                   hidden={productId}
                   data-testid={`policy_delete_${index}`}
@@ -510,35 +495,35 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
         {<Pagination {...paginationProps} />}
       </Flex>
 
-      {isOpen && (
+      {UPDATE.isOpen && (
         <PolicyModal
           data={activeRow}
-          isOpen={isOpen}
-          onClose={onClose}
+          isOpen={UPDATE.isOpen}
+          onClose={UPDATE.onClose}
           plSubjects={subOperators?.policySubjectOperatorMapping || []}
         />
       )}
 
-      {isRuleOpen && (
+      {RULE.isOpen && (
         <RuleModal
           activeRow={activeRow}
           data={activeRow.policyRules[0]}
-          isOpen={isRuleOpen}
-          onClose={onRuleClose}
+          isOpen={RULE.isOpen}
+          onClose={RULE.onClose}
         />
       )}
 
-      {isWarningOpen && (
+      {WARNING.isOpen && (
         <WarnModal
-          isOpen={isWarningOpen}
-          onClose={onWarningClose}
+          isOpen={WARNING.isOpen}
+          onClose={WARNING.onClose}
           data={activeRow}
         />
       )}
-      {isDeleteOpen && (
+      {DELETE.isOpen && (
         <DeleteModal
-          isOpen={isDeleteOpen}
-          onClose={onDeleteClose}
+          isOpen={DELETE.isOpen}
+          onClose={DELETE.onClose}
           data={activeRow}
         />
       )}
