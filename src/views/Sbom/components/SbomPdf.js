@@ -1,31 +1,20 @@
 import InterlynkLogo from 'assets/img/logo.png'
 import { format } from 'date-fns'
 import jsPDF from 'jspdf'
-import { truncatedValue } from 'utils'
-
-export const authorsList = (authors) => {
-  let authorsString = ''
-  authors.map((author, index) => {
-    if (index === 0) {
-      authorsString += `${author?.name}, `
-    } else if (index === authorsList.length - 1) {
-      authorsString += ` ${author?.name} `
-    } else {
-      authorsString += ` ${author?.name}, `
-    }
-  })
-  return authorsString
-}
+import { listItemsForDoc, truncatedValue } from 'utils'
 
 export const downloadSbomPdf = (
   productName,
   version,
-  authors,
   sbom,
   componentsActual,
   vulnActual,
-  exportedBy
+  exportedBy,
+  manufacturerData
 ) => {
+  const authors = listItemsForDoc(sbom?.authors, 'name')
+  const tools = listItemsForDoc(sbom?.tools, 'name')
+
   const doc = new jsPDF()
   const pageWidth = doc.internal.pageSize.getWidth()
   const leftMargin = 10
@@ -50,7 +39,7 @@ export const downloadSbomPdf = (
   }
 
   function formatDate(date, dateFormat = 'MMMM dd, yyyy hh:mm a') {
-    if (!date) return '' // Return an empty string if the date is null or undefined
+    if (!date) return ''
     return format(new Date(date), dateFormat)
   }
 
@@ -84,7 +73,7 @@ export const downloadSbomPdf = (
   }
 
   const checkPageHeight = () => {
-    if (currentY > 240) {
+    if (currentY > 260) {
       doc.addPage()
       footer()
 
@@ -190,6 +179,21 @@ export const downloadSbomPdf = (
     'Exported By',
     'Exported At'
   ]
+  const organizationContactsArray =
+    manufacturerData?.project?.projectSetting?.organizationManufacturer
+      ?.organizationContacts || []
+  const manufacturerContacts = organizationContactsArray.map((item) => {
+    let manuString = ''
+
+    if (item.name) manuString += `Name: ${item.name}`
+    if (item.phone)
+      manuString += (manuString ? ', ' : '') + `Phone: ${item.phone}`
+    if (item.email)
+      manuString += (manuString ? ', ' : '') + `Email: ${item.email}`
+
+    return manuString
+  })
+
   const values = [
     formatValue(
       productName || 'NA',
@@ -224,7 +228,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      sbom.suppliers[0]?.contactName || 'NA',
+      sbom.suppliers[0]?.name || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -239,10 +243,25 @@ export const downloadSbomPdf = (
       contentGap,
       leftMargin
     ),
-    formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
-    formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
     formatValue(
-      sbom.tools[0]?.name || 'NA',
+      manufacturerData?.project?.projectSetting?.organizationManufacturer
+        ?.organizationName || 'NA',
+      doc,
+      pageWidth,
+      rightMargin,
+      contentGap,
+      leftMargin
+    ),
+    formatValue(
+      manufacturerContacts,
+      doc,
+      pageWidth,
+      rightMargin,
+      contentGap,
+      leftMargin
+    ),
+    formatValue(
+      tools || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -265,7 +284,14 @@ export const downloadSbomPdf = (
       contentGap,
       leftMargin
     ),
-    formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
+    formatValue(
+      formatDate(sbom.updatedAt) || 'NA',
+      doc,
+      pageWidth,
+      rightMargin,
+      contentGap,
+      leftMargin
+    ),
     formatValue(
       exportedBy || 'NA',
       doc,
@@ -331,7 +357,8 @@ export const downloadSbomPdf = (
     'Supplier',
     'Common Platform Enumeration (CPE)',
     'Package URL (PURL)',
-    'Unique ID',
+    'Hash',
+    'Relationship Type',
     'License',
     'Hashes'
   ]
@@ -369,6 +396,8 @@ export const downloadSbomPdf = (
       contentGap,
       leftMargin
     ),
+    formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
+
     formatValue(
       component.uniqueId || 'NA',
       doc,
@@ -470,7 +499,13 @@ export const downloadSbomPdf = (
     'EPSS Percentile',
     'EPSS Probability',
     'Known Exploitable Vulnerability',
-    'Status'
+    'Status',
+    'Justification',
+    'Impact Statement',
+    'Action Statement',
+    'Internal Notes',
+    'Created By',
+    'Created On'
   ]
 
   const getVulnValues = (vulnerability) => [
@@ -507,7 +542,65 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      vulnerability.vuln?.vulnInfo?.epssPercentile || 'NA',
+      (vulnerability.vuln?.vulnInfo?.epssPercentile * 100).toFixed() + '%' ||
+        'NA',
+      doc,
+      pageWidth,
+      rightMargin,
+      contentGap,
+      leftMargin
+    ),
+    formatValue(
+      (vulnerability.vuln?.vulnInfo?.epssScores[0] * 100).toFixed(3) + '%' ||
+        'NA',
+      doc,
+      pageWidth,
+      rightMargin,
+      contentGap,
+      leftMargin
+    ),
+    formatValue(
+      vulnerability.vuln?.vulnInfo?.kev === true ? 'Yes' : 'No' || 'NA',
+      doc,
+      pageWidth,
+      rightMargin,
+      contentGap,
+      leftMargin
+    ),
+    formatValue(
+      vulnerability.vexStatus?.name || 'Unspeacified',
+      doc,
+      pageWidth,
+      rightMargin,
+      contentGap,
+      leftMargin
+    ),
+    formatValue(
+      vulnerability.vexJustification || 'NA',
+      doc,
+      pageWidth,
+      rightMargin,
+      contentGap,
+      leftMargin
+    ),
+    formatValue(
+      vulnerability.impact || 'NA',
+      doc,
+      pageWidth,
+      rightMargin,
+      contentGap,
+      leftMargin
+    ),
+    formatValue(
+      vulnerability.actionStmt || 'NA',
+      doc,
+      pageWidth,
+      rightMargin,
+      contentGap,
+      leftMargin
+    ),
+    formatValue(
+      vulnerability.note || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -515,9 +608,8 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
-    formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
     formatValue(
-      vulnerability.vexStatus?.name || 'Unspeacified',
+      formatDate(vulnerability.vuln?.publishedAt) || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -531,7 +623,7 @@ export const downloadSbomPdf = (
 
   vulnActual.forEach((vuln) => {
     const vulnId = formatValue(
-      vuln.id || 'NA',
+      vuln.vuln?.vulnId || 'NA',
       doc,
       pageWidth,
       80,

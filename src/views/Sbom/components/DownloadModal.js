@@ -15,13 +15,16 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GetSbomQualityScores, SignedSbomDownload } from 'graphQL/Queries'
+import {
+  GetProductManufacturer,
+  GetSbomQualityScores,
+  SignedSbomDownload
+} from 'graphQL/Queries'
 import { DownloadSBOM } from 'graphQL/Queries'
 import { GetComponentData, GetVulnData } from 'graphQL/Queries'
 
 import ComplianceChecks from './ComplianceChecks'
 import { downloadSbomPdf } from './SbomPdf'
-import { authorsList } from './SbomPdf'
 
 const DownloadModal = (props) => {
   const { isOpen, onClose, productId, productName, version, sbomId, sbom } =
@@ -34,9 +37,6 @@ const DownloadModal = (props) => {
   const [getData] = useLazyQuery(
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
   )
-
-  const authors =
-    sbom?.authors.length > 0 ? authorsList(sbom?.authors) : undefined
 
   const [spec, setSpec] = useState('CycloneDX')
   const [format, setFormat] = useState('json')
@@ -53,6 +53,10 @@ const DownloadModal = (props) => {
   const { data: fda, loading: fdaLoading } = useQuery(GetSbomQualityScores, {
     skip: isOpen && !signedUrlParams ? false : true,
     variables: { sbomIds: [sbomId], reportFormat: 'FDA' }
+  })
+
+  const { data: manufacturerData } = useQuery(GetProductManufacturer, {
+    variables: { id: productId }
   })
 
   const { nodes: ntiaData } = ntia?.complianceReports || ''
@@ -156,11 +160,11 @@ const DownloadModal = (props) => {
       downloadSbomPdf(
         productName,
         version,
-        authors,
         sbom,
         allComponents,
         allVulns,
-        organization?.currentUser.name
+        organization?.currentUser.name,
+        manufacturerData
       )
 
       setIsLoading(false)

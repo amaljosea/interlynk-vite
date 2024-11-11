@@ -523,6 +523,26 @@ export const GetProjectSettings = gql`
   }
 `
 
+// GET MANUFACTURER NAME AND CONTACTS FOR A PRODUCT
+export const GetProductManufacturer = gql`
+  query GetProductManufacturer($id: Uuid!) {
+    project(id: $id) {
+      projectSetting {
+        organizationManufacturer {
+          id
+          organizationName
+          organizationContacts {
+            id
+            name
+            phone
+            email
+          }
+        }
+      }
+    }
+  }
+`
+
 export const GetDefaultJiraProduct = gql`
   query GetProjectSettings($id: Uuid!) {
     project(id: $id) {
