@@ -2193,6 +2193,11 @@ export const GetVulnData = gql`
           detail
           actionStmt
           fixedIn
+          componentVulnCustomFields {
+            id
+            componentVulnCustomFieldDefinitionId
+            value
+          }
           externalUrls {
             name
             url
@@ -4983,6 +4988,25 @@ export const GetEnrichedData = gql`
           scorecardScore
           updatedAt
         }
+      }
+    }
+  }
+`
+
+export const GetCustomFields = gql`
+  query GetCustomFields {
+    componentVulnCustomFieldDefinitions {
+      totalCount
+      nodes {
+        createdAt
+        displayName
+        fieldType
+        id
+        internalName
+        maxValue
+        minValue
+        organizationId
+        updatedAt
       }
     }
   }

@@ -16,6 +16,7 @@ import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 
 import Connections from '../../../components/Connections/Connections'
 import Checks from './components/Checks'
+import CustomFields from './components/CustomFields'
 import Feeds from './components/Feeds'
 import Header from './components/Header'
 import { InternalComponents } from './components/InternalComponents'
@@ -33,7 +34,8 @@ function Profile() {
     'lists',
     'legal',
     'integrations-org',
-    'plan'
+    'plan',
+    'custom-fields'
   ]
 
   const psTabs = ['security tokens', 'integrations']
@@ -132,7 +134,7 @@ function Profile() {
                   textTransform={'capitalize'}
                   _focus={{ outline: 'none' }}
                 >
-                  {item.replace(/-org/g, '')}
+                  {item.replace(/-/g, ' ')}
                 </Tab>
               ))}
             </TabList>
@@ -166,6 +168,9 @@ function Profile() {
               </TabPanel>
               <TabPanel px={0}>
                 <PlanTable />
+              </TabPanel>
+              <TabPanel px={0}>
+                <CustomFields />
               </TabPanel>
             </TabPanels>
           </Tabs>

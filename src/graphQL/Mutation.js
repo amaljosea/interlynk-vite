@@ -1439,6 +1439,7 @@ export const updateCompVulnVex = gql`
     $detail: String
     $action: String
     $fixedIn: String
+    $componentVulnCustomFieldAttributes: [ComponentVulnCustomFieldAttributesInput!]
   ) {
     componentVexUpdate(
       input: {
@@ -1453,6 +1454,7 @@ export const updateCompVulnVex = gql`
         detail: $detail
         action: $action
         fixedIn: $fixedIn
+        componentVulnCustomFieldAttributes: $componentVulnCustomFieldAttributes
       }
     ) {
       componentVuln {
