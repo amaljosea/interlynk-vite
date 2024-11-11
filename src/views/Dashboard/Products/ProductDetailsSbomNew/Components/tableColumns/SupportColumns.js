@@ -1,19 +1,10 @@
 import { useMemo } from 'react'
+import { useParams } from 'react-router-dom'
 import { getEolStatusColor, getFullDateAndTime, timeSince } from 'utils'
 
 import { CheckIcon } from '@chakra-ui/icons'
-import {
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-  Tag,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
+import { IconButton, Portal, Stack, Tag, Text, Tooltip } from '@chakra-ui/react'
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
@@ -22,14 +13,14 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { FaEllipsisV } from 'react-icons/fa'
 
 const SupportColumns = (
-  isArchived,
   setActiveRow,
-  onActiveOpen,
   onCardOpen,
   onOpen,
+  onActiveOpen,
   onDeleteOpen,
-  sbomId
+  isArchived
 ) => {
+  const params = useParams()
   const { primaryTextColor, primaryErrorColor, secondaryTextColor } =
     useThemeColor([
       'primaryTextColor',
@@ -56,7 +47,7 @@ const SupportColumns = (
           )
         },
         width: '8%',
-        omit: sbomId ? true : false,
+        omit: params?.sbomid ? true : false,
         sortable: true
       },
       {
@@ -78,7 +69,6 @@ const SupportColumns = (
         width: '20%',
         sortable: true
       },
-
       {
         id: 'IDS',
         name: 'IDS',
@@ -161,7 +151,6 @@ const SupportColumns = (
         width: '12%',
         wrap: true
       },
-      // UPDATED AT
       {
         id: 'COMPONENT_SUPPORT_OVERRIDES_UPDATED_AT',
         name: 'UPDATED',
@@ -221,20 +210,20 @@ const SupportColumns = (
         },
         width: '8%',
         right: 'true',
-        omit: sbomId || isArchived ? true : false
+        omit: params.sbomid || isArchived ? true : false
       }
     ]
 
     return columns
   }, [
-    primaryTextColor,
-    primaryErrorColor,
-    secondaryTextColor,
-    sbomId,
+    params.sbomid,
     isArchived,
     setActiveRow,
     onActiveOpen,
+    primaryTextColor,
     onCardOpen,
+    primaryErrorColor,
+    secondaryTextColor,
     onOpen,
     onDeleteOpen
   ])

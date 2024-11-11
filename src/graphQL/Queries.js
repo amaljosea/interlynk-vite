@@ -3736,47 +3736,35 @@ export const GetProductsForSbomDrift = gql`
 
 // GET SBOM SUPPORT INFO
 export const GetSbomSupportTab = gql`
-  query GetSbomSupportTab($projectId: Uuid!, $sbomId: Uuid!) {
+  query GetSbomSupportTab(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
-      supports {
+      supports(first: $first, last: $last, after: $after, before: $before) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
         nodes {
-          ... on ComponentSupport {
-            createdAt
-            deprecated
-            eol
-            eos
-            id
-            idUri
-            outdated
-            productName
-            productVersion
-            updatedAt
-          }
-          ... on ComponentSupportOverride {
-            createdAt
-            deprecated
-            enabled
-            eol
-            eos
-            id
-            idUri
-            organizationId
-            outdated
-            productName
-            productVersion
-            updatedAt
-          }
-          ... on SbomComponent {
-            id
-            productName: name
-            productVersion: version
-            idUri
-            deprecated
-            outdated
-            eos
-            eol
-            updatedAt
-          }
+          createdAt
+          deprecated
+          eol
+          eos
+          id
+          idUri
+          outdated
+          productName
+          productVersion
+          recordType
+          updatedAt
         }
       }
     }

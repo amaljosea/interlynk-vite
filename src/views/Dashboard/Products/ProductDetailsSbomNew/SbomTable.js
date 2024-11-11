@@ -98,7 +98,9 @@ const SbomTable = ({ data, loading, error }) => {
               <Policies sbomData={data} />
             </TabPanel>
             {!isFreeTier && (
-              <TabPanel px={0}>{<Support sbomData={data} />}</TabPanel>
+              <TabPanel px={0}>
+                <Support />
+              </TabPanel>
             )}
             <TabPanel px={0}>
               <Checks sbomData={data} />

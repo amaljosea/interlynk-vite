@@ -1,39 +1,40 @@
 import { useMemo } from 'react'
+import { useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
 
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
-import { FaPlus } from 'react-icons/fa'
+import { FaPlus } from 'react-icons/fa6'
 
 const SupportSubHeader = (
+  reset,
   filterText,
   onSearchInputChange,
   handleClear,
   handleSearch,
-  sbomId,
   onOpen,
-  reset,
   setActiveRow
 ) => {
+  const params = useParams()
+
   const subHeader = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        {/* SEARCH COMPONENTS */}
-        <SearchFilter
-          id='support'
-          filterText={filterText}
-          onChange={onSearchInputChange}
-          onClear={handleClear}
-          onFilter={handleSearch}
-        />
+      <Flex w={'100%'} alignItems={'center'} justifyContent={'space-between'}>
+        {params?.sbomid ? (
+          <div></div>
+        ) : (
+          <SearchFilter
+            id='support'
+            filterText={filterText}
+            onChange={onSearchInputChange}
+            onClear={handleClear}
+            onFilter={handleSearch}
+          />
+        )}
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          {!sbomId && (
+          {!params?.sbomid && (
             <Tooltip label='Create Support'>
               <IconButton
                 colorScheme='blue'
@@ -51,11 +52,11 @@ const SupportSubHeader = (
     )
   }, [
     filterText,
-    onSearchInputChange,
     handleClear,
     handleSearch,
-    sbomId,
     onOpen,
+    onSearchInputChange,
+    params?.sbomid,
     reset,
     setActiveRow
   ])
