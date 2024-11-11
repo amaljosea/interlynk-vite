@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { getSignedUrlParams } from 'utils'
+import { isCustomerView } from 'utils'
 
 import {
   AllOrganizationsTotalCount,
@@ -19,10 +20,7 @@ export const useFetchOrganizationsCount = () => {
     variables: { first: 100, status: 'approved' }
   })
   const { data: myOrgsCount } = useQuery(MyOrganizationsTotalCount, {
-    skip:
-      isSuperAdmin ||
-      signedUrlParams ||
-      location.pathname.startsWith('/customer'),
+    skip: isSuperAdmin || signedUrlParams || isCustomerView(),
     variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
   })
 

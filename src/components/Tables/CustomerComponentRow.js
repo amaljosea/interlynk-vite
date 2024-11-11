@@ -1,6 +1,7 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import { isCustomerView } from 'utils'
 
 import { Button, Flex, Icon, Tag, Td, Text, Tr } from '@chakra-ui/react'
 
@@ -79,7 +80,7 @@ function CustomerComponentRow(props) {
       </Td>
       <Td>{dependsOn}</Td>
       <Td>{license}</Td>
-      {location.pathname.startsWith('/customer') ? (
+      {isCustomerView() ? (
         ''
       ) : (
         <Td>

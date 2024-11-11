@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client'
+import { getSignedUrlParams } from 'utils'
 
 import {
   Box,
@@ -52,7 +53,7 @@ const ProdFilterMenu = ({
     'secondaryTextColor'
   ])
 
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
 
   const onFilterActive = (value) => {
     setFilters((oldFilter) => ({

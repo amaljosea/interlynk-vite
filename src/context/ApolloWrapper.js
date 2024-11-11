@@ -10,6 +10,7 @@ import { createUploadLink } from 'apollo-upload-client'
 import Cookies from 'js-cookie'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getSignedUrlParams } from 'utils'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -27,8 +28,7 @@ const authLink = setContext((_, { headers }) => {
   const queryParams = new URLSearchParams(location.search)
 
   const signedUrlParams =
-    queryParams.get('signed_url_params') ||
-    sessionStorage.getItem('signedUrlParams')
+    queryParams.get('signed_url_params') || getSignedUrlParams()
 
   let authHeaders
 

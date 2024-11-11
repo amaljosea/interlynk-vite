@@ -2,6 +2,7 @@ import { useLazyQuery, useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince, truncatedValue } from 'utils'
+import { getSignedUrlParams } from 'utils'
 import SbomActions from 'views/Sbom/components/SbomActions'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
@@ -71,7 +72,7 @@ const SbomDetails = ({ sbomData }) => {
   const { prodCompState } = useGlobalState()
   const { field, direction } = prodCompState
 
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const signedUrlParams = getSignedUrlParams()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 

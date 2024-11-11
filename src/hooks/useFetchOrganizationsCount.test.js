@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { renderHook } from '@testing-library/react-hooks'
-import { getSignedUrlParams } from 'utils'
+import { getSignedUrlParams, isCustomerView } from 'utils'
 
 import {
   AllOrganizationsTotalCount,
@@ -17,7 +17,8 @@ jest.mock('@apollo/client', () => ({
 }))
 
 jest.mock('utils', () => ({
-  getSignedUrlParams: jest.fn()
+  getSignedUrlParams: jest.fn(),
+  isCustomerView: jest.fn()
 }))
 
 jest.mock('./useGlobalState', () => ({
@@ -34,6 +35,9 @@ describe('useFetchOrganizationsCount', () => {
       organization: { currentUser: { superAdmin: true } }
     })
 
+    getSignedUrlParams.mockReturnValue(null)
+    isCustomerView.mockReturnValue(false)
+
     useQuery.mockImplementation((query) => {
       if (query === AllOrganizationsTotalCount) {
         return { data: { allOrganizations: { totalCount: 10 } } }
@@ -42,7 +46,6 @@ describe('useFetchOrganizationsCount', () => {
     })
 
     const { result } = renderHook(() => useFetchOrganizationsCount())
-
     expect(result.current).toBe(10)
   })
 
@@ -50,6 +53,9 @@ describe('useFetchOrganizationsCount', () => {
     useGlobalState.mockReturnValue({
       organization: { currentUser: { superAdmin: false } }
     })
+
+    getSignedUrlParams.mockReturnValue(null)
+    isCustomerView.mockReturnValue(false)
 
     useQuery.mockImplementation((query) => {
       if (query === MyOrganizationsTotalCount) {
@@ -59,7 +65,6 @@ describe('useFetchOrganizationsCount', () => {
     })
 
     const { result } = renderHook(() => useFetchOrganizationsCount())
-
     expect(result.current).toBe(5)
   })
 
@@ -67,6 +72,9 @@ describe('useFetchOrganizationsCount', () => {
     useGlobalState.mockReturnValue({
       organization: { currentUser: { superAdmin: false } }
     })
+
+    getSignedUrlParams.mockReturnValue(null)
+    isCustomerView.mockReturnValue(false)
 
     useQuery.mockImplementation((query) => {
       if (query === MyOrganizationsTotalCount) {

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { permissionList } from 'utils'
 import { truncatedValue } from 'utils'
+import { isCustomerView } from 'utils'
 
 import { ChevronRightIcon } from '@chakra-ui/icons'
 import {
@@ -97,9 +98,7 @@ export default function AdminNavbar(props) {
           <BreadcrumbItem color={mainText}>
             <Link
               to={
-                !location.pathname.startsWith('/customer')
-                  ? '/vendor/dashboard'
-                  : '/customer/products'
+                !isCustomerView() ? '/vendor/dashboard' : '/customer/products'
               }
               color={'secondaryText'}
             >
