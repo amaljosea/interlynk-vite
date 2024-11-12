@@ -133,7 +133,9 @@ function Profile() {
                   textTransform={'capitalize'}
                   _focus={{ outline: 'none' }}
                 >
-                  {item.replace(/-/g, ' ')}
+                  {item === 'integrations-org'
+                    ? 'Integrations'
+                    : item.replace(/-/g, ' ')}
                 </Tab>
               ))}
             </TabList>
