@@ -13,6 +13,8 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
+
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaCircleCheck, FaPlus } from 'react-icons/fa6'
@@ -33,12 +35,29 @@ const checkIsMatch = ({ ignoreCase, regex, item }) => {
 
 export const TextRegex = ({ regex, ignoreCase }) => {
   const [items, setItems] = useState([{ id: uuidv4(), value: '' }])
+  const [error, setError] = useState('')
   const { grayBorderColor, primaryErrorColor } = useThemeColor([
     'grayBorderColor',
     'primaryErrorColor'
   ])
 
+  const hasSimilarRow = (data) => {
+    const emptyValues = data.filter((item) => item.value === '')
+    return emptyValues.length >= 2
+  }
+
+  const addMoreTest = () => {
+    if (hasSimilarRow(items)) {
+      setError(
+        `A row with empty values already exists. Please update or remove it before continuing.`
+      )
+    } else {
+      setItems([...items, { id: uuidv4(), value: '' }])
+    }
+  }
+
   const handleDelete = (id) => {
+    setError('')
     setItems(items.filter((item) => item.id !== id))
   }
 
@@ -56,6 +75,7 @@ export const TextRegex = ({ regex, ignoreCase }) => {
                 my={1}
                 fontSize={12}
                 onChange={(e) => {
+                  setError('')
                   const newItems = items.map((oldItem) =>
                     oldItem.id === item.id
                       ? {
@@ -107,9 +127,7 @@ export const TextRegex = ({ regex, ignoreCase }) => {
       })}
 
       <Button
-        onClick={() => {
-          setItems([...items, { id: uuidv4(), value: '' }])
-        }}
+        onClick={addMoreTest}
         aria-label='Add config'
         colorScheme='blue'
         leftIcon={<FaPlus />}
@@ -121,6 +139,7 @@ export const TextRegex = ({ regex, ignoreCase }) => {
       >
         Add more test
       </Button>
+      {error !== '' && <LynkAlert msg={error} />}
     </div>
   )
 }
