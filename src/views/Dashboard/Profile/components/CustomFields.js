@@ -10,6 +10,8 @@ import { useDisclosure } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCustomFields } from 'graphQL/Queries'
@@ -20,7 +22,10 @@ import FieldModal from './FieldModal'
 import FieldWarning from './FieldWarning'
 
 const CustomFields = () => {
+  const { organization } = useGlobalState()
+  const { isFreeTier } = useGlobalQueryContext()
   const { data, loading } = useQuery(GetCustomFields)
+  const isSuperAdmin = organization?.currentUser?.superAdmin
 
   const { componentVulnCustomFieldDefinitions } = data || ''
   const { nodes } = componentVulnCustomFieldDefinitions || ''
@@ -64,7 +69,9 @@ const CustomFields = () => {
     {
       id: 'INTERNAL_NAME',
       name: 'INTERNAL NAME',
-      selector: (row) => <Text sx={textStyle}>{row?.internalName}</Text>,
+      selector: (row) => (
+        <Text color={primaryTextColor}>{row?.internalName}</Text>
+      ),
       wrap: true
     },
     {
@@ -139,7 +146,8 @@ const CustomFields = () => {
           </Menu>
         )
       },
-      right: 'true'
+      right: 'true',
+      omit: isFreeTier || !isSuperAdmin
     }
   ]
 
@@ -148,6 +156,8 @@ const CustomFields = () => {
       setActiveRow(null)
       FIELD.onOpen()
     }
+
+    const disabled = nodes?.length === 2 || isFreeTier || !isSuperAdmin
 
     return (
       <Flex
@@ -165,12 +175,12 @@ const CustomFields = () => {
             colorScheme='blue'
             icon={<AddIcon />}
             onClick={onCreate}
-            isDisabled={nodes?.length === 2}
+            isDisabled={disabled}
           />
         </Tooltip>
       </Flex>
     )
-  }, [nodes, FIELD])
+  }, [nodes?.length, isFreeTier, isSuperAdmin, FIELD])
 
   return (
     <>
