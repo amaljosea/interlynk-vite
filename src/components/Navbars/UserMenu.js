@@ -12,8 +12,6 @@ import {
   MenuList
 } from '@chakra-ui/react'
 
-import { SettingsIcon } from 'components/Icons/Icons'
-
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -66,25 +64,19 @@ export const UserMenu = ({ handleLogout }) => {
       <MenuList fontSize='sm'>
         <MenuGroup>
           <MenuItem hidden={!currentUser}>
-            <Flex flexDirection='row' alignItems='flex-start' gap={3}>
-              <Icon as={FaUser} width={2.5} mt={1} />
-              <Stack direction='column' spacing={-1}>
-                <Text>{currentUser?.name}</Text>
-                <Text fontSize='sm' color={sameSecondaryText}>
-                  {currentUser?.email}
-                </Text>
-              </Stack>
-            </Flex>
+            <Link to={`/vendor/settings?tab=security tokens`}>
+              <Flex flexDirection='row' alignItems='flex-start' gap={3}>
+                <Icon as={FaUser} width={2.5} mt={1} />
+                <Stack direction='column' spacing={-1}>
+                  <Text>{currentUser?.name}</Text>
+                  <Text fontSize='sm' color={sameSecondaryText}>
+                    {currentUser?.email}
+                  </Text>
+                </Stack>
+              </Flex>
+            </Link>
           </MenuItem>
           <MenuDivider hidden={!currentUser} />
-          <Link to={`/vendor/settings?tab=security tokens`}>
-            <MenuItem
-              icon={<SettingsIcon />}
-              display={organization ? 'flex' : 'none'}
-            >
-              Settings
-            </MenuItem>
-          </Link>
           {(dashboardView || productView) && (
             <MenuItem
               onClick={onStartDashTour}

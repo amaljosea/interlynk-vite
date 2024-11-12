@@ -78,16 +78,15 @@ const Organizations = () => {
           size='sm'
           as={Button}
           fontSize='sm'
-          colorScheme='blue'
           isLoading={!organization?.name}
           leftIcon={<FaBuilding />}
           rightIcon={<ChevronDownIcon />}
         >
           {truncatedValue(organization?.name, 20)}
         </MenuButton>
-        <MenuList maxHeight='300px' overflowY='auto'>
+        <MenuList maxHeight='400px' overflowY='auto'>
           <MenuItem fontSize='sm' icon={<AddIcon />} onClick={onOpen}>
-            Add organization
+            Add Organization
           </MenuItem>
           <MenuDivider />
           {options?.map((item, index) => (
@@ -101,7 +100,7 @@ const Organizations = () => {
                 value={item.name}
                 onClick={() => onChange(item)}
               >
-                {item.name}
+                {item?.name}
               </MenuItemOption>
             </MenuOptionGroup>
           ))}
