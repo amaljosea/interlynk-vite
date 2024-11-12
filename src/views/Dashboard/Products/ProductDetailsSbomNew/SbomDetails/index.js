@@ -1,6 +1,7 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { getFullDateAndTime, timeSince, truncatedValue } from 'utils'
 import { getSignedUrlParams } from 'utils'
 import SbomActions from 'views/Sbom/components/SbomActions'
@@ -182,8 +183,10 @@ const SbomDetails = ({ sbomData }) => {
                         color={primaryBlueText}
                       >
                         <BreadcrumbLink _hover={{ textDecoration: 'none' }}>
-                          {truncatedValue(part.projectGroupName)} (
-                          {truncatedValue(part.versionName)})
+                          <Link to={part.url}>
+                            {truncatedValue(part.projectGroupName)} (
+                            {truncatedValue(part.versionName)})
+                          </Link>
                         </BreadcrumbLink>
                       </BreadcrumbItem>
                     )
