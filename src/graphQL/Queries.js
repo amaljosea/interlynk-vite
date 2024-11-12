@@ -2510,6 +2510,8 @@ export const GetCheckResults = gql`
             kind
             purl
             cpes
+            endOfSupport
+            supportLevel
             suppliers {
               id
               name

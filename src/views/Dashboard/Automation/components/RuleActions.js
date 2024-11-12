@@ -1,17 +1,8 @@
-import {
-  Box,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  Icon,
-  IconButton,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Select,
-  Tag,
-  Text
-} from '@chakra-ui/react'
+import { Box, Flex, FormControl, Select, Tag, Text } from '@chakra-ui/react'
+import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react'
+import { Icon, IconButton } from '@chakra-ui/react'
+
+import LynkDate from 'components/LynkDate'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -61,6 +52,16 @@ const RuleActions = ({
     setActions(newData)
     if (action?.status === 'ADDED') {
       setDeleteAction((prev) => [...prev, action])
+    }
+  }
+
+  const handleDateChange = (newDate, id) => {
+    const isValidDate = newDate && !isNaN(newDate)
+    onActionChange(newDate?._d, id, 'value')
+    if (isValidDate) {
+      setError('')
+    } else {
+      setError('Invalid date')
     }
   }
 
@@ -137,6 +138,31 @@ const RuleActions = ({
                   <option value={'true'}>Yes</option>
                   <option value={'false'}>No</option>
                 </Select>
+              ) : item?.field === 'component_support_level' ? (
+                <Select
+                  type={'text'}
+                  value={item?.value}
+                  onChange={(e) =>
+                    onActionChange(e.target.value, item.id, 'value')
+                  }
+                  sx={{ minW: 140, fontSize: 'sm' }}
+                >
+                  <option value=''>-- Select --</option>
+                  <option value='UNSPECIFIED'>Unspecified</option>
+                  <option value='ACTIVELY_MAINTAINED'>
+                    Actively Maintained
+                  </option>
+                  <option value='NO_LONGER_MAINTAINED'>
+                    No Longer Maintained
+                  </option>
+                  <option value='ABANDONED'>Abandoned</option>
+                </Select>
+              ) : item?.field === 'component_end_of_support' ? (
+                <LynkDate
+                  name='endOfSupport'
+                  value={item?.value ? new Date(item?.value) : ''}
+                  onChange={(value) => handleDateChange(value, item?.id)}
+                />
               ) : (
                 <FormControl as={Flex} alignItems='center' gap={2}>
                   <Input

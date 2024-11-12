@@ -142,6 +142,7 @@ const Checks = ({ sbomData }) => {
   const COMP_PURL = useDisclosure()
   const COMP_CPE = useDisclosure()
   const FIXED = useDisclosure()
+  const COMP_SUPPORT = useDisclosure()
 
   const handleReCheck = useCallback(async () => {
     showToast({
@@ -353,6 +354,11 @@ const Checks = ({ sbomData }) => {
     ) {
       return handleOpenLicense()
     }
+
+    // COMPONENT SUPPORT LEVEL
+    if (shortDesc === 'Component has support level') {
+      return COMP_SUPPORT.onOpen()
+    }
   }
 
   const onCheckOpen = (row) => {
@@ -485,6 +491,17 @@ const Checks = ({ sbomData }) => {
               recheck={handleRecheck}
               isOpen={COMP_VERSION.isOpen}
               onClose={COMP_VERSION.onClose}
+            />
+          )}
+
+          {/* COMPONENT SUPPORT MODAL */}
+          {COMP_SUPPORT.isOpen && (
+            <CheckModal
+              activeRow={activeRow}
+              ruleExists={ruleExists}
+              recheck={handleRecheck}
+              isOpen={COMP_SUPPORT.isOpen}
+              onClose={COMP_SUPPORT.onClose}
             />
           )}
 

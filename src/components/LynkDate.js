@@ -23,6 +23,7 @@ const LynkDate = (props) => {
   return (
     <Datetime
       {...props}
+      utc={true}
       timeFormat={false}
       closeOnSelect={true}
       className={react_datatime}

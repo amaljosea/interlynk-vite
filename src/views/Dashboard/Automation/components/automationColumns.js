@@ -189,6 +189,16 @@ export const useAutomationColumns = ({
       name: 'CHANGES',
       selector: (row) => {
         const { automationActions } = row
+        const getValue = (item) => {
+          switch (item?.field) {
+            case 'component_support_level':
+              return item?.value?.replaceAll('_', ' ')
+            case 'component_end_of_support':
+              return new Date(item?.value).toLocaleDateString()
+            default:
+              return item?.value
+          }
+        }
         return (
           <List spacing={3} my={3} color={primaryTextColor}>
             {automationActions.map((item, index) => (
@@ -198,7 +208,7 @@ export const useAutomationColumns = ({
                     (sub) => sub?.key === item?.field
                   )?.name
                 }{' '}
-                - {item?.value}
+                - {item?.value ? getValue(item) : 'N/A'}
               </ListItem>
             ))}
           </List>
