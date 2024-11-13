@@ -12,7 +12,6 @@ import {
   InfoIcon,
   PhoneIcon
 } from '@chakra-ui/icons'
-import { AddIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Icon,
@@ -29,6 +28,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import AddButton from 'components/Icons/AddButton'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -126,19 +126,16 @@ const LegalTable = () => {
             authenticity and compliance across the supply chain.
           </Text>
         </Flex>
-
-        <Tooltip label='Add Manufacturer' placement='left'>
-          <IconButton
-            isDisabled={!updateOrg}
-            colorScheme='blue'
-            onClick={() => {
-              setActiveRow(null)
-              EDIT.onOpen()
-            }}
-            aria-label='add_manufacturer'
-            icon={<AddIcon />}
-          />
-        </Tooltip>
+        <AddButton
+          label='Add Manufacturer'
+          tooltipPlacement='left'
+          isDisabled={!updateOrg}
+          onClick={() => {
+            setActiveRow(null)
+            EDIT.onOpen()
+          }}
+          aria-label='add_manufacturer'
+        />
       </Flex>
     )
   }, [primaryTextColor, primaryBlueText, updateOrg, EDIT])

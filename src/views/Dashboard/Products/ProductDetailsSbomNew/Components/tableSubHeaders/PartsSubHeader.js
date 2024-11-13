@@ -1,8 +1,8 @@
 import { useMemo, useRef } from 'react'
 
-import { AddIcon } from '@chakra-ui/icons'
-import { Flex, IconButton, Tooltip } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
 
+import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
 const PartsSubHeader = (isArchived, onOpen, signedUrlParams, updateSboms) => {
@@ -14,19 +14,15 @@ const PartsSubHeader = (isArchived, onOpen, signedUrlParams, updateSboms) => {
         sx={{ w: '100%', gap: 2, alignItems: 'center' }}
         justifyContent={'flex-end'}
       >
-        <Tooltip label='Add Part' placement='top'>
-          <IconButton
-            ref={addBtn}
-            variant='solid'
-            onClick={onOpen}
-            colorScheme='blue'
-            icon={<AddIcon />}
-            hidden={isArchived}
-            aria-label='add_part'
-            sx={{ fontSize: 'sm', fontWeight: 'normal' }}
-            isDisabled={!updateSboms || signedUrlParams}
-          />
-        </Tooltip>
+        <AddButton
+          ref={addBtn}
+          label='Add Part'
+          tooltipPlacement='top'
+          onClick={onOpen}
+          hidden={isArchived}
+          aria-label='add_part'
+          isDisabled={!updateSboms || signedUrlParams}
+        />
         <RefreshBtn />
       </Flex>
     )

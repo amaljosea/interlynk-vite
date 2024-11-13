@@ -3,12 +3,12 @@ import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 
-import { AddIcon } from '@chakra-ui/icons'
 import { Flex, IconButton, Portal, Tag, Text, Tooltip } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 import { useDisclosure } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import AddButton from 'components/Icons/AddButton'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -167,17 +167,12 @@ const CustomFields = () => {
         <Text>
           <strong>Custom Fields</strong> {`(Vulnerabilities)`}
         </Text>
-        <Tooltip
+        <AddButton
           label={nodes?.length === 2 ? 'Not allowed' : 'Add fields'}
-          placement='left'
-        >
-          <IconButton
-            colorScheme='blue'
-            icon={<AddIcon />}
-            onClick={onCreate}
-            isDisabled={disabled}
-          />
-        </Tooltip>
+          tooltipPlacement='left'
+          onClick={onCreate}
+          isDisabled={disabled}
+        />
       </Flex>
     )
   }, [nodes?.length, isFreeTier, isSuperAdmin, FIELD])

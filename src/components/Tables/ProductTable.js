@@ -15,7 +15,6 @@ import StatusModal from 'views/Dashboard/Products/components/StatusModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import ProductSearchFilter from 'views/Sbom/components/ProductSearchFilter'
 
-import { AddIcon } from '@chakra-ui/icons'
 import {
   Box,
   Divider,
@@ -35,6 +34,7 @@ import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 import TagDrawer from 'components/Drawer/TagDrawer'
+import AddButton from 'components/Icons/AddButton'
 import IconBox from 'components/Icons/IconBox'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import ProdLabel from 'components/Label/ProdLabel'
@@ -317,22 +317,19 @@ const ProductTable = ({
                   ? 'Limit reached for free tier'
                   : 'Add product'
               }
-              placement='bottom'
               isDisabled={false} // Ensure the tooltip is never disabled
             >
               <Box>
-                <IconButton
+                <AddButton
                   aria-label='Add product'
                   onClick={() => {
                     setActiveRow(null)
                     onOpen()
                   }}
-                  icon={<AddIcon />}
-                  colorScheme='blue'
-                  hidden={signedUrlParams}
                   isDisabled={
                     !canAddProduct || (isFreeTier && totalCount === 5)
                   }
+                  hidden={signedUrlParams}
                 />
               </Box>
             </Tooltip>

@@ -9,6 +9,7 @@ import { Tag, TagLabel } from '@chakra-ui/react'
 import { MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import SearchFilter from 'components/Licenses/LicenseSearchFilter'
 
@@ -19,7 +20,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { RequestCancel, RequestResend } from 'graphQL/Mutation'
 
 import { FaEllipsisV } from 'react-icons/fa'
-import { FaPlus } from 'react-icons/fa6'
 
 import Pagination from '../../../components/Pagination'
 import ConfirmationModal from '../Products/components/ConfirmationModal'
@@ -29,7 +29,7 @@ import RequestModal from './RequestModal'
 
 const RequestTable = (props) => {
   const { data, loading, filters, setFilters, paginationProps } = props
-  
+
   const { showToast } = useCustomToast()
 
   const addReq = useHasPermission({
@@ -144,19 +144,15 @@ const RequestTable = (props) => {
           <Filters setFilters={setFilters} />
         </Stack>
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          <Tooltip label='Request SBOM'>
-            <IconButton
-              isDisabled={!addReq}
-              colorScheme='blue'
-              onClick={() => {
-                setActiveRow(null)
-                onOpen()
-              }}
-              aria-label='request_sbom'
-              icon={<FaPlus />}
-            />
-          </Tooltip>
-
+          <AddButton
+            label='Request SBOM'
+            isDisabled={!addReq}
+            onClick={() => {
+              setActiveRow(null)
+              onOpen()
+            }}
+            aria-label='request_sbom'
+          />
           <RefreshBtn />
         </Stack>
       </Flex>

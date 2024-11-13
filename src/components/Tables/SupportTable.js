@@ -24,6 +24,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import CpeCard from 'components/Misc/CpeCard'
 import LynkSwitch from 'components/Misc/LynkSwitch'
@@ -34,7 +35,6 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaEllipsisV } from 'react-icons/fa'
-import { FaPlus } from 'react-icons/fa6'
 
 const SupportTable = ({
   data,
@@ -155,18 +155,15 @@ const SupportTable = ({
         />
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
           {!sbomId && (
-            <Tooltip label='Create Support'>
-              <IconButton
-                colorScheme='blue'
-                aria-label='add_support'
-                isDisabled={!editSup}
-                onClick={() => {
-                  setActiveRow(null)
-                  onOpen()
-                }}
-                icon={<FaPlus />}
-              />
-            </Tooltip>
+            <AddButton
+              label='Create Support'
+              aria-label='add_support'
+              isDisabled={!editSup}
+              onClick={() => {
+                setActiveRow(null)
+                onOpen()
+              }}
+            />
           )}
           <RefreshBtn />
         </Stack>

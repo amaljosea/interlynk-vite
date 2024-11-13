@@ -25,6 +25,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import AddButton from 'components/Icons/AddButton'
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
@@ -35,7 +36,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { CreateShareLynk } from 'graphQL/Mutation'
 
 import { BiShare } from 'react-icons/bi'
-import { FaCheck, FaPlus, FaRegCopy } from 'react-icons/fa6'
+import { FaCheck, FaRegCopy } from 'react-icons/fa6'
 import { PiFileSvgDuotone } from 'react-icons/pi'
 
 const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
@@ -125,13 +126,11 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
             />
           </Tooltip>
         )}
-        <Tooltip label='Add ShareLynk' placement='left'>
-          <IconButton
-            colorScheme='blue'
-            icon={<FaPlus />}
-            onClick={onShareLynkOpen}
-          />
-        </Tooltip>
+        <AddButton
+          label='Add ShareLynk'
+          tooltipPlacement='left'
+          onClick={onShareLynkOpen}
+        />
       </Flex>
     )
   }, [svgLink, onShareLynkOpen, data])

@@ -1,6 +1,6 @@
-import { AddIcon } from '@chakra-ui/icons'
-import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
+import { Flex, Stack } from '@chakra-ui/react'
 
+import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
 import Filter from './Filter'
@@ -18,20 +18,15 @@ export const SubHeaderComponent = ({
       </Stack>
 
       {/* ADD LICNESE */}
-      <Tooltip label='Add License'>
-        <IconButton
-          variant='solid'
-          icon={<AddIcon />}
-          colorScheme='blue'
-          isDisabled={!createLic}
-          onClick={() => {
-            setActiveRow(null)
-            onOpen()
-          }}
-          aria-label='add_license'
-          sx={{ fontSize: 'sm', fontWeight: 'normal' }}
-        />
-      </Tooltip>
+      <AddButton
+        label='Add License'
+        isDisabled={!createLic}
+        onClick={() => {
+          setActiveRow(null)
+          onOpen()
+        }}
+        aria-label='add_license'
+      />
       <RefreshBtn />
     </Flex>
   )

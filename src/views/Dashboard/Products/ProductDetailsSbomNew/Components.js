@@ -11,7 +11,7 @@ import { openSsf } from 'variables/general'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { AddIcon, ViewIcon } from '@chakra-ui/icons'
+import { ViewIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -33,6 +33,7 @@ import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import { HealthScore } from 'components/HealthScore'
+import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import CpeCard from 'components/Misc/CpeCard'
 import ExternalLink from 'components/Misc/ExternalLink'
@@ -901,19 +902,14 @@ const Components = ({ sbomData }) => {
             />
           </Tooltip>
           {/* CREATE COMPONENT */}
-          <Tooltip label='Add Component'>
-            <IconButton
-              ref={compBtn}
-              onClick={onCreateComponent}
-              icon={<AddIcon />}
-              colorScheme='blue'
-              variant='solid'
-              name='add_component'
-              isDisabled={restricted}
-              hidden={signedUrlParams || isArchived}
-              sx={{ fontSize: 'sm', fontWeight: 'normal' }}
-            />
-          </Tooltip>
+          <AddButton
+            label='Add Component'
+            ref={compBtn}
+            onClick={onCreateComponent}
+            name='add_component'
+            isDisabled={restricted}
+            hidden={signedUrlParams || isArchived}
+          />
           {/* EXPORT CSV */}
           <ExportCsv
             tableType='SBOM Components View'

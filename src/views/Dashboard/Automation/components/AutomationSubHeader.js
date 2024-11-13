@@ -2,9 +2,9 @@ import { gql, useLazyQuery } from '@apollo/client'
 import { useCallback, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { AddIcon } from '@chakra-ui/icons'
 import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
 
+import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
 import { FaFileExport, FaFileImport } from 'react-icons/fa'
@@ -72,17 +72,14 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
               isLoading={exportLoading}
             />
           </Tooltip>
-          <Tooltip label='Add Rule'>
-            <IconButton
-              onClick={() => {
-                setActiveRow(null)
-                RULE.onOpen()
-              }}
-              colorScheme='blue'
-              icon={<AddIcon />}
-              aria-label='add_automation_rule'
-            />
-          </Tooltip>
+          <AddButton
+            label='Add Rule'
+            onClick={() => {
+              setActiveRow(null)
+              RULE.onOpen()
+            }}
+            aria-label='add_automation_rule'
+          />
           <RefreshBtn />
         </Stack>
       </Flex>

@@ -5,7 +5,6 @@ import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import CreateRole from 'views/Dashboard/Profile/components/CreateRole'
 import DeleteRole from 'views/Dashboard/Profile/components/DeleteRole'
 
-import { AddIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
@@ -21,6 +20,7 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import PermissionDrawer from 'components/Drawer/PermissionDrawer'
+import AddButton from 'components/Icons/AddButton'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -169,15 +169,11 @@ const RoleTable = () => {
             your system.
           </Text>
         </Flex>
-
-        <Tooltip label='Add Role'>
-          <IconButton
-            icon={<AddIcon />}
-            colorScheme='blue'
-            onClick={onRoleOpen}
-            isDisabled={!updateOrgs}
-          />
-        </Tooltip>
+        <AddButton
+          label='Add Role'
+          onClick={onRoleOpen}
+          isDisabled={!updateOrgs}
+        />
       </Flex>
     )
   }, [updateOrgs, onRoleOpen, primaryTextColor])

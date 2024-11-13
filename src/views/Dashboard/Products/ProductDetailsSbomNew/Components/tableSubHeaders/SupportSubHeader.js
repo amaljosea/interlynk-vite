@@ -2,11 +2,10 @@ import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
+import { Flex, Stack } from '@chakra-ui/react'
 
+import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
-
-import { FaPlus } from 'react-icons/fa6'
 
 const SupportSubHeader = (
   reset,
@@ -35,16 +34,13 @@ const SupportSubHeader = (
         )}
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
           {!params?.sbomid && (
-            <Tooltip label='Create Support'>
-              <IconButton
-                colorScheme='blue'
-                onClick={() => {
-                  setActiveRow(null)
-                  onOpen()
-                }}
-                icon={<FaPlus />}
-              />
-            </Tooltip>
+            <AddButton
+              label='Create Support'
+              onClick={() => {
+                setActiveRow(null)
+                onOpen()
+              }}
+            />
           )}
           <RefreshBtn onClick={() => reset()} />
         </Stack>

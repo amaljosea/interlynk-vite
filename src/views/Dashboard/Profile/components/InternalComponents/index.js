@@ -5,10 +5,10 @@ import { customStyles } from 'utils'
 import { getFullDateAndTime } from 'utils'
 import { timeSince } from 'utils'
 
-import { AddIcon } from '@chakra-ui/icons'
-import { Flex, IconButton, Text, Tooltip } from '@chakra-ui/react'
+import { Flex, Text, Tooltip } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import AddButton from 'components/Icons/AddButton'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 import { RegexHighlighter } from 'components/RegexHighlighter'
 
@@ -166,17 +166,14 @@ export const InternalComponents = () => {
             expression
           </Text>
         </Flex>
-
-        <Tooltip label='Add Internal components' placement='left'>
-          <IconButton
-            icon={<AddIcon />}
-            colorScheme='blue'
-            onClick={() => {
-              setIsOpen(true)
-            }}
-            isDisabled={!manageListing}
-          />
-        </Tooltip>
+        <AddButton
+          label='Add Internal components'
+          tooltipPlacement={'left'}
+          onClick={() => {
+            setIsOpen(true)
+          }}
+          isDisabled={!manageListing}
+        />
       </Flex>
     )
   }, [manageListing, primaryTextColor])

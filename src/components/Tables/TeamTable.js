@@ -6,7 +6,6 @@ import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { AddIcon } from '@chakra-ui/icons'
 import {
   Avatar,
   Badge,
@@ -27,6 +26,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkModal from 'components/LynkModal'
 
@@ -335,12 +335,8 @@ const TeamTable = () => {
               isDisabled={false} // Ensure the tooltip is never disabled
             >
               <Box>
-                <IconButton
-                  variant='solid'
-                  icon={<AddIcon />}
-                  colorScheme='blue'
+                <AddButton
                   onClick={TEAM.onOpen}
-                  sx={{ fontSize: 'sm', fontWeight: 'normal' }}
                   isDisabled={
                     !inviteUser || (isFreeTier && numberOfUsers === 2)
                   }

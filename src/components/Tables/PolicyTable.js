@@ -15,7 +15,6 @@ import PolicyModal from 'views/Dashboard/Policies/PolicyModal'
 import RuleModal from 'views/Dashboard/Policies/RuleModal'
 import WarnModal from 'views/Dashboard/Policies/WarnModal'
 
-import { AddIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
@@ -41,6 +40,7 @@ import {
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 import Pagination from 'components/Pagination'
@@ -153,19 +153,16 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         {/* SEARCH COMPONENTS */}
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          <Tooltip label='Create Policy'>
-            <IconButton
-              hidden={productId}
-              colorScheme='blue'
-              aria-label='add_policy'
-              isDisabled={!updatePolicy}
-              onClick={() => {
-                setActiveRow(null)
-                UPDATE.onOpen()
-              }}
-              icon={<AddIcon />}
-            />
-          </Tooltip>
+          <AddButton
+            label='Create Policy'
+            hidden={productId}
+            aria-label='add_policy'
+            isDisabled={!updatePolicy}
+            onClick={() => {
+              setActiveRow(null)
+              UPDATE.onOpen()
+            }}
+          />
           <RefreshBtn />
         </Stack>
       </Flex>
