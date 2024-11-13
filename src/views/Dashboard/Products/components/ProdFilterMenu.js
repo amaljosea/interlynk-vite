@@ -134,6 +134,7 @@ const ProdFilterMenu = ({
             maxW={'400px'}
             minH='auto'
             maxH={'320px'}
+            fontSize={'sm'}
             overflowY={'scroll'}
           >
             <MenuOptionGroup

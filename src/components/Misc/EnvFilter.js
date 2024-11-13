@@ -45,7 +45,7 @@ const EnvFilter = ({ data }) => {
   return (
     <Menu closeOnSelect={true}>
       <EnvList data={data} />
-      <MenuList width={'200px'}>
+      <MenuList width={'200px'} fontSize={'sm'}>
         <MenuOptionGroup
           value={envName}
           onChange={(value) => handleEnvChange(value)}

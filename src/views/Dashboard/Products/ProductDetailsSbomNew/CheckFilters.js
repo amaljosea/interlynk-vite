@@ -79,6 +79,7 @@ const CheckFilters = ({ filters, setCheckState }) => {
             <Menu closeOnSelect={false}>
               <MenuHeading title={'Check ID'} active={rules.length !== 0} />
               <MenuList
+                fontSize={'sm'}
                 minHeight={'auto'}
                 maxHeight={'300px'}
                 overflow={'hidden'}

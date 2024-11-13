@@ -71,7 +71,7 @@ const GlobalEnvFilter = () => {
       >
         {envName || 'Default'}
       </MenuButton>
-      <MenuList width={'200px'}>
+      <MenuList width={'200px'} fontSize={'sm'}>
         <MenuOptionGroup
           value={envName}
           onChange={(value) => handleEnvChange(value)}

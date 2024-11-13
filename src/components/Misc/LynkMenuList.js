@@ -18,7 +18,7 @@ const LynkMenuList = ({ type, options, value, loading, onFilter }) => {
   const listHeight = Math.min(itemCount * 35, 320)
 
   return (
-    <MenuList py={2} minH='auto' overflow={'hidden'}>
+    <MenuList py={2} minH='auto' overflow={'hidden'} fontSize={'sm'}>
       {loading ? (
         <Stack spacing={2} px={2}>
           {[1, 2, 3, 4, 5].map((item) => (

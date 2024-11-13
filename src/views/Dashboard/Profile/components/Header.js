@@ -192,7 +192,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
             <ChevronDownIcon ml='4px' boxSize='20px' />
           </Flex>
         </MenuButton>
-        <MenuList>
+        <MenuList fontSize={'sm'}>
           {tabs.map((tab, index) => (
             <MenuOptionGroup key={index} value={selectedTab} type='radio'>
               <MenuItemOption

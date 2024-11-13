@@ -262,7 +262,7 @@ const PartsColumns = (
                 color={secondaryTextColor}
               />
               <Portal>
-                <MenuList size='sm'>
+                <MenuList fontSize={'sm'}>
                   <MenuItem
                     data-testid='delete_part'
                     isDisabled={!updateSboms || signedUrlParams}

@@ -11,7 +11,7 @@ import {
 const CustomList = ({ type, options, value, onChange, loading }) => {
   const filterOptions = ['all', ...options]
   return (
-    <MenuList minH='auto' maxH={'350px'} overflowY={'scroll'}>
+    <MenuList minH='auto' maxH={'350px'} overflowY={'scroll'} fontSize={'sm'}>
       {loading ? (
         <Stack spacing={2} pl={2.5} pr={1}>
           {[1, 2, 3, 4, 5].map((item) => (

@@ -252,7 +252,7 @@ const CompFilters = ({ reset }) => {
       <Box width={'fit-content'}>
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Include'} active={include.length !== 0} />
-          <MenuList>
+          <MenuList fontSize={'sm'}>
             <MenuOptionGroup
               type='checkbox'
               value={include}

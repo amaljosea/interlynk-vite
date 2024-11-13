@@ -389,7 +389,7 @@ const TokenInfo = () => {
               data-testid={`token_actions_${index}`}
             />
             <Portal>
-              <MenuList size='sm'>
+              <MenuList fontSize={'sm'}>
                 {row.revoked === false && (
                   <MenuItem
                     onClick={() => handleRevoked(row.id)}

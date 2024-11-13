@@ -41,7 +41,7 @@ const ToolsFilterMenu = () => {
         <Menu placement='top' closeOnSelect={false}>
           {difference !== 'all' && difference !== '' && <CheckMark />}
           <MenuHeading title={'Difference'} />
-          <MenuList>
+          <MenuList fontSize={'sm'}>
             <MenuOptionGroup
               type='radio'
               value={difference}
@@ -68,6 +68,7 @@ const ToolsFilterMenu = () => {
           <MenuHeading title={'Components'} />
           <MenuList
             minW='auto'
+            fontSize={'sm'}
             maxW={'320px'}
             minH={'auto'}
             maxH={'300px'}

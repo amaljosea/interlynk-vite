@@ -165,7 +165,7 @@ function SBOMLinkRow(props) {
             color={secondaryTextColor}
           />
           <Portal>
-            <MenuList>
+            <MenuList fontSize={'sm'}>
               <MenuItem onClick={handleStatus}>
                 {enabled ? 'Deactivate' : 'Activate'}
               </MenuItem>

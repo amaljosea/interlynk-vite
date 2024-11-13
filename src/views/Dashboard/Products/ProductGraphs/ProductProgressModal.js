@@ -89,7 +89,7 @@ const FilterMenu = ({ title, icon, value, onChange, options }) => {
   return (
     <Menu>
       <MenuHeading title={title} icon={icon} active={!!value} />
-      <MenuList>
+      <MenuList fontSize={'sm'}>
         <MenuOptionGroup value={value} onChange={handleChange} type='radio'>
           {options.map((item, index) => (
             <MenuItemOption
@@ -260,7 +260,7 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
                 icon={FaFilter}
                 active={env.length > 0 && !env.includes('all')}
               />
-              <MenuList>
+              <MenuList fontSize={'sm'}>
                 <MenuOptionGroup
                   value={env}
                   onChange={onFilterEnv}

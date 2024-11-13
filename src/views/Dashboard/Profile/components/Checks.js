@@ -143,7 +143,7 @@ const Checks = () => {
               {options.find((option) => option.value === severity)?.label ||
                 'Select option'}
             </MenuButton>
-            <MenuList w='100px' minW='50px'>
+            <MenuList w='100px' minW='50px' fontSize={'sm'}>
               {options.map((itm, index) => (
                 <MenuItem
                   key={index}

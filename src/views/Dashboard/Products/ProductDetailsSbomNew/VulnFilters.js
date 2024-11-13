@@ -118,6 +118,7 @@ const VulnFilters = ({ reset }) => {
           <MenuList
             minH={'auto'}
             maxH={'300px'}
+            fontSize={'sm'}
             overflow={'hidden'}
             overflowY={'scroll'}
           >
@@ -167,6 +168,7 @@ const VulnFilters = ({ reset }) => {
           <MenuList
             minH={'auto'}
             maxH={'300px'}
+            fontSize={'sm'}
             overflow={'hidden'}
             overflowY={'scroll'}
           >
@@ -248,7 +250,7 @@ const VulnFilters = ({ reset }) => {
             onClick={onOpen}
             active={epss !== '' && epss !== 'all'}
           />
-          <MenuList>
+          <MenuList fontSize={'sm'}>
             <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
@@ -320,7 +322,7 @@ const VulnFilters = ({ reset }) => {
       <Box width={'fit-content'}>
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Include'} active={include.length !== 0} />
-          <MenuList>
+          <MenuList fontSize={'sm'}>
             <MenuOptionGroup
               type='checkbox'
               value={include}

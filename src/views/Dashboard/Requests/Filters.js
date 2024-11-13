@@ -77,7 +77,7 @@ const Filters = ({ setFilters }) => {
             title={'Email'}
             active={email.length !== 0 && !email.includes('all')}
           />
-          <MenuList>
+          <MenuList fontSize={'sm'}>
             <MenuOptionGroup
               type='checkbox'
               value={email}
@@ -102,7 +102,7 @@ const Filters = ({ setFilters }) => {
             title={'Product'}
             active={product.length !== 0 && !product.includes('all')}
           />
-          <MenuList>
+          <MenuList fontSize={'sm'}>
             <MenuOptionGroup
               type='checkbox'
               value={product}
@@ -127,7 +127,7 @@ const Filters = ({ setFilters }) => {
             title={'Status'}
             active={status.length !== 0 && !status.includes('all')}
           />
-          <MenuList>
+          <MenuList fontSize={'sm'}>
             <MenuOptionGroup
               type='checkbox'
               value={status}

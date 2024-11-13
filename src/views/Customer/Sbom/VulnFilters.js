@@ -113,6 +113,7 @@ const VulnFilters = ({ reset }) => {
         <MenuList
           minH={'auto'}
           maxH={'350px'}
+          fontSize={'sm'}
           overflow={'hidden'}
           overflowY={'scroll'}
         >
@@ -165,6 +166,7 @@ const VulnFilters = ({ reset }) => {
         <MenuList
           minH={'auto'}
           maxH={'400px'}
+          fontSize={'sm'}
           overflow={'hidden'}
           overflowY={'scroll'}
         >
@@ -244,7 +246,7 @@ const VulnFilters = ({ reset }) => {
       {/* KEV */}
       <Menu closeOnSelect={false}>
         <MenuHeading title={'KEV'} active={kev !== 'all' && kev !== ''} />
-        <MenuList>
+        <MenuList fontSize={'sm'}>
           <MenuOptionGroup type='radio' value={kev} onChange={onFilterKev}>
             {['all', 'yes', 'no'].map((item, index) => (
               <MenuItemOption
@@ -266,7 +268,7 @@ const VulnFilters = ({ reset }) => {
           onClick={onOpen}
           active={epss !== '' && epss !== 'all'}
         />
-        <MenuList>
+        <MenuList fontSize={'sm'}>
           <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
             <MenuItemOption value={'all'} fontSize={'sm'}>
               All
@@ -336,7 +338,7 @@ const VulnFilters = ({ reset }) => {
       {/* INCLUDE */}
       <Menu closeOnSelect={false}>
         <MenuHeading title={'Include'} active={include.length !== 0} />
-        <MenuList>
+        <MenuList fontSize={'sm'}>
           <MenuOptionGroup
             type='checkbox'
             value={include}

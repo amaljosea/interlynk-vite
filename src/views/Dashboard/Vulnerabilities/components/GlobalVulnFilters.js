@@ -174,7 +174,12 @@ const GlobalVulnsFilters = ({ setFilters }) => {
       >
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Product'} active={getStatus('products')} />
-          <MenuList minH={'auto'} maxH={'300px'} overflowY={'scroll'}>
+          <MenuList
+            minH={'auto'}
+            maxH={'300px'}
+            overflowY={'scroll'}
+            fontSize={'sm'}
+          >
             <MenuOptionGroup
               type='checkbox'
               value={products}
@@ -248,7 +253,7 @@ const GlobalVulnsFilters = ({ setFilters }) => {
             onClick={onOpen}
             active={getStatus('epss')}
           />
-          <MenuList>
+          <MenuList fontSize={'sm'}>
             <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All

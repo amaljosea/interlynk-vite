@@ -123,7 +123,7 @@ const RoleTable = () => {
               color={secondaryTextColor}
             />
             <Portal>
-              <MenuList size='sm'>
+              <MenuList fontSize={'sm'}>
                 <MenuItem
                   onClick={() => {
                     setSelectedRole(name)

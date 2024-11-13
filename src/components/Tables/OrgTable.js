@@ -306,12 +306,12 @@ const OrgTable = ({ data, activeOrg }) => {
             />
             <Portal>
               {invitationStatus === 'invited' ? (
-                <MenuList size='sm'>
+                <MenuList fontSize='sm'>
                   <MenuItem onClick={() => onAccept(row.id)}>Accept</MenuItem>
                   <MenuItem onClick={() => onDecline(row.id)}>Decline</MenuItem>
                 </MenuList>
               ) : (
-                <MenuList size='sm'>
+                <MenuList fontSize='sm'>
                   {activeOrg !== id && (
                     <MenuItem onClick={() => onSwitch(row)}>Switch To</MenuItem>
                   )}

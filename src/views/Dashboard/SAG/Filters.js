@@ -51,7 +51,7 @@ const SagFilters = ({
         <Menu placement='top' closeOnSelect={false}>
           {supplier !== 'all' && supplier !== '' && <CheckMark />}
           <MenuHeading title={'Supplier'} />
-          <MenuList>
+          <MenuList fontSize={'sm'}>
             <MenuOptionGroup
               type='radio'
               value={supplier}
@@ -78,7 +78,7 @@ const SagFilters = ({
         <Menu placement='top' closeOnSelect={false}>
           {category !== 'all' && category !== '' && <CheckMark />}
           <MenuHeading title={'Product Category'} />
-          <MenuList>
+          <MenuList fontSize={'sm'}>
             <MenuOptionGroup
               type='radio'
               value={category}
@@ -105,6 +105,7 @@ const SagFilters = ({
           <MenuHeading title={'Label Type'} />
           <MenuList
             minW='auto'
+            fontSize={'sm'}
             maxW={'320px'}
             minH={'auto'}
             maxH={'300px'}

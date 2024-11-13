@@ -54,7 +54,7 @@ const LicenseFilter = ({ onFilter }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
           <MenuHeading title={'Status'} active={status[0]} />
-          <MenuList>
+          <MenuList fontSize={'sm'}>
             <MenuOptionGroup
               type='checkbox'
               value={status}
@@ -68,7 +68,7 @@ const LicenseFilter = ({ onFilter }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
           <MenuHeading title={'License Type'} active={spdx[0]} />
-          <MenuList>
+          <MenuList fontSize={'sm'}>
             <MenuOptionGroup
               type='checkbox'
               value={spdx}

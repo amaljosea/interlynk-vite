@@ -84,7 +84,7 @@ const Organizations = () => {
         >
           {truncatedValue(organization?.name, 20)}
         </MenuButton>
-        <MenuList maxHeight='400px' overflowY='auto'>
+        <MenuList maxHeight='400px' overflowY='auto' fontSize={'sm'}>
           <MenuItem fontSize='sm' icon={<AddIcon />} onClick={onOpen}>
             Add Organization
           </MenuItem>

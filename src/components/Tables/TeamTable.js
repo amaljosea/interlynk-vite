@@ -235,7 +235,7 @@ const TeamTable = () => {
               color={secondaryTextColor}
             />
             <Portal>
-              <MenuList size='sm'>
+              <MenuList fontSize={'sm'}>
                 <MenuItem
                   isDisabled={row.email === email || !editUserRole}
                   onClick={() => {

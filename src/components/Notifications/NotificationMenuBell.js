@@ -115,7 +115,7 @@ const NotificationMenuBell = () => {
         <MenuButton as={IconButton} colorScheme='blue'>
           <Icon as={FaBell} mt={1} />
         </MenuButton>
-        <MenuList>
+        <MenuList fontSize={'sm'}>
           <MenuOptionGroup
             type='checkbox'
             value={preference}
