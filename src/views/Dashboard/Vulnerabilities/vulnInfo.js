@@ -2,20 +2,9 @@ import { useQuery } from '@apollo/client'
 import { Link, useParams } from 'react-router-dom'
 import { getFullDateAndTime, linkURl } from 'utils'
 
-import {
-  Flex,
-  Grid,
-  GridItem,
-  Icon,
-  Stack,
-  Stat,
-  StatLabel,
-  StatNumber,
-  Tag,
-  TagLabel,
-  Text,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Grid, GridItem, SimpleGrid } from '@chakra-ui/react'
+import { Flex, Icon, Stack, Text, useDisclosure } from '@chakra-ui/react'
+import { Stat, StatLabel, StatNumber } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
@@ -63,15 +52,12 @@ const VulnInfo = () => {
   const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const { primaryBlueText, secondaryBlueText } = useThemeColor([
-    'primaryBlueText',
-    'secondaryBlueText'
-  ])
+  const { primaryBlueText, secondaryBlueText, primaryTextColor } =
+    useThemeColor(['primaryBlueText', 'secondaryBlueText', 'primaryTextColor'])
+
   const { data } = useQuery(GetGlobalVulnData, {
     skip: vulnId ? false : true,
-    variables: {
-      id: vulnId
-    }
+    variables: { id: vulnId }
   })
 
   const { vuln } = data || ''
@@ -89,6 +75,11 @@ const VulnInfo = () => {
     sbomVersionsCount
   } = vuln || ''
   const { kev, epssScore } = vulnInfo || ''
+
+  const cvssColor =
+    cvssVector && !cvssVector?.startsWith('[')
+      ? primaryBlueText
+      : primaryTextColor
 
   return (
     <>
@@ -123,13 +114,7 @@ const VulnInfo = () => {
                 <Text fontSize={'sm'} my={0.5}>
                   {desc || ''}
                 </Text>
-                <Flex
-                  mt={6}
-                  gap={6}
-                  width={'100%'}
-                  alignItems={'flex-start'}
-                  justifyContent={'space-between'}
-                >
+                <SimpleGrid mt={6} columnGap={6} columns={3}>
                   {/* Published At  */}
                   <Stack dir='column' fontSize={'sm'}>
                     <Text fontWeight={'medium'}>Published:</Text>
@@ -143,30 +128,15 @@ const VulnInfo = () => {
                   {/* CVSS Vector */}
                   <Stack dir={'column'} fontSize={'sm'}>
                     <Text fontWeight={'medium'}>CVSS Vector</Text>
-                    <Flex flexDir={'column'} alignItems={'center'}>
-                      {cvssVector ? (
-                        <Tag
-                          variant='subtle'
-                          width={'full'}
-                          colorScheme={'cyan'}
-                          cursor={'pointer'}
-                          onClick={onOpen}
-                        >
-                          <TagLabel mx={'auto'}>{cvssVector || '-'}</TagLabel>
-                        </Tag>
-                      ) : (
-                        <Tag
-                          variant='subtle'
-                          width={'full'}
-                          colorScheme={'cyan'}
-                          cursor={'pointer'}
-                        >
-                          <TagLabel mx={'auto'}>{cvssVector || '-'}</TagLabel>
-                        </Tag>
-                      )}
-                    </Flex>
+                    <Text
+                      color={cvssColor}
+                      cursor={'pointer'}
+                      onClick={cvssVector ? onOpen : null}
+                    >
+                      {cvssVector || 'N/A'}
+                    </Text>
                   </Stack>
-                </Flex>
+                </SimpleGrid>
               </Flex>
             </Flex>
           </CardBody>
