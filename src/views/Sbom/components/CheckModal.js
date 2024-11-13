@@ -97,7 +97,7 @@ const CheckModal = (props) => {
     isComponentLicense ||
     isComponentSupport
 
-  const isInvalidLicense = isComponentLicense && details?.licenses?.value === ''
+  const isInvalidLicense = isComponentLicense && details?.licenses?.length === 0
 
   const isEmptyVersion = isComponentVersion && compVersion === ''
 
@@ -124,6 +124,7 @@ const CheckModal = (props) => {
     } else {
       const license =
         details?.licenses?.length > 0 ? details?.licenses[0].value : ''
+      const licensesExp = { licensesExp: license }
       updateComponent({
         variables: {
           sbomId: sbomId,
@@ -133,9 +134,7 @@ const CheckModal = (props) => {
           primary: isPrimary ? true : undefined,
           kind: isComponentType ? compType : undefined,
           version: isComponentVersion ? compVersion : undefined,
-          licenses: {
-            licensesExp: isPrimary ? undefined : license
-          }
+          licenses: license && !isPrimary ? licensesExp : undefined
         }
       }).then((res) => {
         const { errors } = res?.data?.componentUpdate || ''
