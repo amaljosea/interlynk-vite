@@ -14,7 +14,7 @@ const LicensesSubHeader = () => {
         width={'100%'}
         alignItems={'center'}
         justifyContent='flex-end'
-        gap={3}
+        gap={2}
       >
         {/* EXPORT CSV */}
         {!customerView && <ExportCsv tableType='SBOM License View' />}

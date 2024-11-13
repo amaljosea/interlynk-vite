@@ -55,7 +55,7 @@ const ChecksSubHeader = (
           )}
         </Stack>
 
-        <Stack spacing={3} direction={'row'}>
+        <Stack spacing={2} direction={'row'}>
           <Tooltip label='Re-Check'>
             <IconButton
               fontSize={'sm'}

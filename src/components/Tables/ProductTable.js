@@ -286,7 +286,7 @@ const ProductTable = ({
             />
           )}
         </Stack>
-        <Stack direction={'row'} spacing={3} alignItems={'center'}>
+        <Stack direction={'row'} spacing={2} alignItems={'center'}>
           {/* ADD GITHUB PROJECT */}
           {shouldShowDemoFeatures && isGithubConfigSaved && (
             <Tooltip label='Add GitHub Project'>

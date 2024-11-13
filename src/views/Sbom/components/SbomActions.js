@@ -272,7 +272,7 @@ const SbomActions = ({ sbom }) => {
           isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
         />
       </Box>
-      <Flex direction={'row'} gap={3} justifyContent='flex-end'>
+      <Flex direction={'row'} gap={2} justifyContent='flex-end'>
         {/* UPDATE PRIMARY COMPONENT */}
         <Tooltip
           label={

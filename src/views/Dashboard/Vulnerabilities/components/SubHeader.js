@@ -14,7 +14,7 @@ const SubHeader = ({ filters, setFilters }) => {
       <Stack spacing={isVuln ? 3 : 1} direction={'row'}>
         <Filters filters={filters} setFilters={setFilters} />
       </Stack>
-      <Flex gap={3}>
+      <Flex gap={2}>
         {/* EXPORT CSV */}
         <ExportCsv tableType='Vulnerability View' filters={{ ...filters }} />
         <RefreshBtn />
