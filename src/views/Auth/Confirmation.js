@@ -47,6 +47,16 @@ const Confirmation = () => {
           description: 'Registration Successful 👍',
           status: 'success'
         })
+        // Trigger Google Tag for Sign-up tracking
+        if (window.gtag) {
+          window.gtag('event', 'conversion', {
+            send_to: 'AW-16659732873/gm2GCKLthOgZEImz_Yc-',
+            event_category: 'user_registration',
+            event_label: 'User Registration Completion'
+          })
+        } else {
+          console.warn('Google Tag Manager is not loaded yet.')
+        }
       }
     })
   }, [emailConfirmation, showToast, token])
