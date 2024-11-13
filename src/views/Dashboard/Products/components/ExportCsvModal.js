@@ -138,7 +138,14 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
           const fetchedNodes = fetchNodes(res, queryInfo.selector)
           const dataToExport = mapDataForExport(fetchedNodes)
           const csvContent = convertToCSV(dataToExport, selectedColumns)
-          downloadCSV(csvContent, fileName)
+          if (dataToExport.length === 0) {
+            showToast({
+              description: 'No data available for export.',
+              status: 'warning'
+            })
+          } else {
+            downloadCSV(csvContent, fileName)
+          }
         }
       }
     } catch (error) {
