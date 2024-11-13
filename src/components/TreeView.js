@@ -82,9 +82,19 @@ const CustomNode = ({ nodeDatum, click, foreignObjectProps }) => {
             cx='30'
             cy='30'
             r='15'
-            fill='dodgerBlue'
+            fill={primaryBlueText}
             stroke='transparent'
           />
+          <text
+            x='30'
+            y='31'
+            className='small'
+            textAnchor='middle'
+            fontFamily='inherit'
+            dominantBaseline='middle'
+          >
+            {nodeDatum?.count || 0}
+          </text>
         </svg>
         <foreignObject {...foreignObjectProps} x={10} y={15}>
           <Flex
@@ -154,6 +164,7 @@ const TreeView = ({ isOpen, onClose, compId }) => {
           compId: relation?.toComp?.id,
           name: relation?.toComp?.name,
           version: relation?.toComp?.version,
+          count: relation?.toComp?.dependsOnCount,
           children: []
         }
       })
@@ -162,6 +173,7 @@ const TreeView = ({ isOpen, onClose, compId }) => {
         compId,
         name,
         version,
+        count: dependsOn?.length || 0,
         children: dependsOnNodes
       })
     })
@@ -182,6 +194,7 @@ const TreeView = ({ isOpen, onClose, compId }) => {
             compId: relation?.toComp?.id,
             name: relation?.toComp?.name,
             version: relation?.toComp?.version,
+            count: relation?.toComp?.dependsOnCount,
             children: []
           }
         })

@@ -939,7 +939,6 @@ const Components = ({ sbomData }) => {
     searchInput,
     field,
     direction,
-    sbomData?.sbomParts?.length,
     reset
   ])
 

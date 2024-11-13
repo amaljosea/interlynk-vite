@@ -1988,6 +1988,7 @@ export const GetCompDependency = gql`
           id
           name
           version
+          dependsOnCount
         }
         updatedAt
       }
