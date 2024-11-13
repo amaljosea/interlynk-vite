@@ -12,6 +12,7 @@ import {
   Grid,
   GridItem,
   IconButton,
+  Input,
   Select,
   Stack,
   Tag,
@@ -33,6 +34,7 @@ import {
   getVexJustifications,
   getVexStatuses
 } from 'graphQL/Queries'
+import { GetCustomFields } from 'graphQL/Queries'
 
 import { FaTimes } from 'react-icons/fa'
 import { FaPenToSquare } from 'react-icons/fa6'
@@ -51,7 +53,8 @@ const VexModal = ({
   const sbomId = params.sbomid
   const vulnId = useQueryParam('vulnId')
 
-  const { fixedVersions } = selectedVulns?.length > 0 ? selectedVulns[0] : []
+  const { fixedVersions, componentVulnCustomFields } =
+    selectedVulns?.length > 0 ? selectedVulns[0] : []
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
@@ -67,11 +70,28 @@ const VexModal = ({
   const [stagOne, setStagOne] = useState('')
   const [stagTwo, setStagTwo] = useState('')
   const [stagThree, setStagThree] = useState('')
+  const [stagCustom, setStagCustom] = useState('')
 
   const { headingTextSecondary, headingTextColor } = useThemeColor([
     'headingTextSecondary',
     'headingTextColor'
   ])
+
+  const { data: fields } = useQuery(GetCustomFields)
+  const { componentVulnCustomFieldDefinitions } = fields || ''
+  const { nodes } = componentVulnCustomFieldDefinitions || ''
+
+  const fieldOne = nodes?.find((item) => item?.fieldType === 'RANGE')
+  const fieldTwo = nodes?.find((item) => item?.fieldType === 'TEXT')
+
+  const [formValues, setFormValues] = useState(null)
+
+  const handleChange = (id, value) => {
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [id]: value
+    }))
+  }
 
   const { data: allVexStatus } = useQuery(getVexStatuses)
   const { data: allVexJustify } = useQuery(getVexJustifications)
@@ -91,8 +111,17 @@ const VexModal = ({
     }
   })
 
+  const isValuePresent =
+    nodes?.length > 0 && formValues && formValues[fieldOne?.id] !== ''
+
+  const isInvalid =
+    statusName === 'Affected' &&
+    componentVulnCustomFields?.length > 0 &&
+    isValuePresent === false
+
   const generateControl = useCallback(
     (status) => {
+      isValuePresent ? setStagCustom('green') : setStagCustom('red')
       switch (status) {
         case 'In Triage':
           setStagOne('green')
@@ -135,7 +164,15 @@ const VexModal = ({
           break
       }
     },
-    [actionStatement, details, impactData, justification, notes, response]
+    [
+      actionStatement,
+      details,
+      impactData,
+      isValuePresent,
+      justification,
+      notes,
+      response
+    ]
   )
 
   const handleStatusChange = (e) => {
@@ -168,6 +205,22 @@ const VexModal = ({
     setJustification(value)
   }
 
+  const getId = (key) => {
+    const output = componentVulnCustomFields?.find(
+      (item) => item?.componentVulnCustomFieldDefinitionId === key
+    )
+    return output ? output?.id : undefined
+  }
+
+  const result = formValues
+    ? Object.entries(formValues)?.map(([key, value]) => ({
+        value: value,
+        _destroy: value === '' ? true : undefined,
+        componentVulnCustomFieldDefinitionId: key,
+        id: componentVulnCustomFields?.length > 0 ? getId(key) : undefined
+      }))
+    : undefined
+
   const handleSave = () => {
     setToggleClear(false)
     const vulnIds = selectedVulns?.map((item) => item?.id)
@@ -183,7 +236,8 @@ const VexModal = ({
         cdxResponseId: response !== '' ? response : undefined,
         impact: impactData === '' ? undefined : impactData,
         action: actionStatement !== '' ? actionStatement : undefined,
-        fixedIn: selectedTag !== '' ? selectedTag : undefined
+        fixedIn: selectedTag !== '' ? selectedTag : undefined,
+        componentVulnCustomFieldAttributes: result
       }
     }).then((res) => {
       const errors = res?.data?.componentVexBulkUpdate?.errors
@@ -216,6 +270,22 @@ const VexModal = ({
     generateControl(statusName)
   }, [generateControl, statusName])
 
+  useEffect(() => {
+    if (componentVulnCustomFields?.length > 0) {
+      const result = componentVulnCustomFields?.reduce((acc, item) => {
+        acc[item.componentVulnCustomFieldDefinitionId] = item.value
+        return acc
+      }, {})
+      setFormValues(result)
+    } else {
+      const data = nodes?.reduce((acc, field) => {
+        acc[field.id] = ''
+        return acc
+      }, {})
+      setFormValues(data || null)
+    }
+  }, [componentVulnCustomFields, nodes])
+
   return (
     <LynkModal
       isOpen={isOpen}
@@ -224,6 +294,7 @@ const VexModal = ({
       Icon={FaPenToSquare}
       onSubmit={handleSave}
       onClose={handleClose}
+      isDisabled={isInvalid}
       title={'Vulnerabilty Status'}
     >
       {sbomId && (
@@ -262,6 +333,19 @@ const VexModal = ({
               colorScheme={stagThree}
               hidden={!statusTitle || statusName === 'Fixed'}
             />
+            <Box
+              w={'1px'}
+              h={'60px'}
+              bg={headingTextSecondary}
+              hidden={!statusTitle || nodes?.length === 0}
+            />
+            <IconButton
+              size='xs'
+              isRound={true}
+              colorScheme={stagCustom}
+              hidden={!statusTitle || nodes?.length === 0}
+              icon={stagCustom === 'red' ? <FaTimes /> : <CheckIcon />}
+            />
           </Stack>
         </GridItem>
         <GridItem as={Flex} flexDir='column' gap={4} colSpan={11}>
@@ -291,7 +375,7 @@ const VexModal = ({
           </FormControl>
           {/* JUSTIFICATION */}
           {statusName === 'Not Affected' && (
-            <FormControl isRequired>
+            <FormControl>
               <FormLabel htmlFor='justification' fontSize='sm'>
                 Justification
               </FormLabel>
@@ -325,7 +409,7 @@ const VexModal = ({
           </Text>
           {/* IMPACT STATEMENT */}
           {statusName === 'Not Affected' && (
-            <FormControl isRequired>
+            <FormControl>
               <FormLabel htmlFor='impactStatement' fontSize='sm'>
                 Impact Statement
               </FormLabel>
@@ -352,7 +436,7 @@ const VexModal = ({
             )}
           {/* ACTION STATEMENT */}
           {statusName === 'Affected' && (
-            <FormControl isRequired>
+            <FormControl>
               <FormLabel htmlFor='actionStatement' fontSize='sm'>
                 Action Statement
               </FormLabel>
@@ -451,6 +535,37 @@ const VexModal = ({
               placeholder='Example: John Appleseed has scanned the codebase and found two instances of function alls encrypt(). Next step: exploitability analysis.'
             />
           </FormControl>
+          {/* CUSTOM FIELDS */}
+          {nodes?.length > 0 && statusTitle && (
+            <Stack spacing={4}>
+              <FormControl>
+                <FormLabel>{fieldOne?.displayName}</FormLabel>
+                <Select
+                  fontSize='sm'
+                  value={formValues ? formValues[fieldOne?.id] : ''}
+                  onChange={(e) => handleChange(fieldOne?.id, e.target.value)}
+                >
+                  <option value={''}>-- Select --</option>
+                  {Array.from(
+                    { length: fieldOne?.maxValue - fieldOne?.minValue + 1 },
+                    (_, i) => (
+                      <option key={i} value={fieldOne?.minValue + i}>
+                        {fieldOne?.minValue + i}
+                      </option>
+                    )
+                  )}
+                </Select>
+              </FormControl>
+              <FormControl>
+                <FormLabel>{fieldTwo?.displayName}</FormLabel>
+                <Input
+                  fontSize={'sm'}
+                  value={formValues ? formValues[fieldTwo?.id] : ''}
+                  onChange={(e) => handleChange(fieldTwo?.id, e.target.value)}
+                />
+              </FormControl>
+            </Stack>
+          )}
           {/* UPSTERAM PRODUCT */}
           <FormControl>
             <Checkbox

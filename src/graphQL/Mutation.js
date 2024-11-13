@@ -1496,6 +1496,7 @@ export const updateBulkCompVex = gql`
     $detail: String
     $action: String
     $fixedIn: String
+    $componentVulnCustomFieldAttributes: [ComponentVulnCustomFieldAttributesInput!]
   ) {
     componentVexBulkUpdate(
       input: {
@@ -1510,6 +1511,7 @@ export const updateBulkCompVex = gql`
         detail: $detail
         action: $action
         fixedIn: $fixedIn
+        componentVulnCustomFieldAttributes: $componentVulnCustomFieldAttributes
       }
     ) {
       clientMutationId

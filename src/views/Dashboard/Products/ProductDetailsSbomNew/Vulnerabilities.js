@@ -169,7 +169,6 @@ const Vulnerabilities = ({ sbomData }) => {
   const JIRA = useDisclosure()
   const CVSS = useDisclosure()
   const IMPORT = useDisclosure()
-  const STATUS = useDisclosure()
 
   // GET VULN FILTER HEADS
   useQuery(signedUrlParams ? ShareVulnFilters : GetVulnFilterData, {
@@ -402,18 +401,6 @@ const Vulnerabilities = ({ sbomData }) => {
           isOpen={CVSS.isOpen}
           onClose={CVSS.onClose}
           value={activeRow?.vuln?.cvssVector}
-        />
-      )}
-
-      {STATUS.isOpen && selectedVulns?.length > 0 && (
-        <VexModal
-          checkEquals={true}
-          isOpen={STATUS.isOpen}
-          onClose={STATUS.onClose}
-          selectedVulns={selectedVulns}
-          selectedGroup={params.productgroupid}
-          setSelectedVulns={setSelectedVulns}
-          setToggleClear={setToggleClear}
         />
       )}
     </>
