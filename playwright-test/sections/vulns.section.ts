@@ -155,9 +155,7 @@ export default class VulnsSection {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
 
-      const product = this.page
-        .locator(`//p[@aria-label='product_name']`)
-        .nth(0)
+      const product = this.page.getByTestId(`product_Test`)
 
       if (product.isVisible()) {
         await product.click()
@@ -174,47 +172,61 @@ export default class VulnsSection {
 
           await this.page.getByRole('tab', { name: 'vulnerabilities' }).click()
 
-          await this.page.getByTestId('vuln-actions').first().click()
-          await this.page.getByTestId('edit_vuln_links').first().click()
+          const action = this.page.getByTestId('vuln-actions').first()
 
-          await this.page.getByLabel('Type*').selectOption('issue-tracker')
-          await this.page.getByPlaceholder('Add URL').fill('google.com')
-          await this.page.waitForTimeout(2000)
+          if (action.isVisible()) {
+            await action.click()
+            await this.page.waitForTimeout(1000)
 
-          await this.page.locator("button[type='submit']").click()
+            const edit = this.page.getByTestId('edit_vuln_links').first()
 
-          await this.page.waitForTimeout(4000)
+            if (edit.isVisible()) {
+              await edit.click()
+              await this.page.waitForTimeout(2000)
 
-          await this.page.getByLabel('Type*').selectOption('issue-tracker')
-          const errMsg = await this.page
-            .getByTestId('vuln_link_error')
-            .isVisible()
-          await this.page.waitForTimeout(2000)
+              await this.page.getByLabel('Type*').selectOption('issue-tracker')
+              await this.page.getByPlaceholder('Add URL').fill('google.com')
+              await this.page.waitForTimeout(2000)
 
-          if (errMsg === false) {
-            errors?.push('Link validation not working')
+              await this.page.locator("button[type='submit']").click()
+              await this.page.waitForTimeout(4000)
+
+              await this.page.getByLabel('Type*').selectOption('issue-tracker')
+              const errMsg = await this.page
+                .getByTestId('vuln_link_error')
+                .isVisible()
+              await this.page.waitForTimeout(2000)
+
+              if (errMsg === false) {
+                errors?.push('Link validation not working')
+              } else {
+                await this.page.getByTestId('delete_vuln_link').first().click()
+
+                await this.page.waitForTimeout(4000)
+                await this.page
+                  .locator("//button[@aria-label='save_vuln_links']")
+                  .click()
+
+                await this.page.waitForTimeout(2000)
+
+                await this.page.locator("//a[@aria-label='products']").click()
+                await this.page
+                  .locator(`//button[@aria-label='dropdown menu for Test']`)
+                  .click()
+                await this.page.waitForTimeout(2000)
+
+                await this.page
+                  .locator(`//button[@aria-label='Delete product Test']`)
+                  .click()
+                await this.page.locator("button[type='submit']").click()
+
+                await this.page.waitForTimeout(2000)
+              }
+            } else {
+              errors.push(`Edit action not found`)
+            }
           } else {
-            await this.page.getByTestId('delete_vuln_link').first().click()
-
-            await this.page.waitForTimeout(4000)
-            await this.page
-              .locator("//button[@aria-label='save_vuln_links']")
-              .click()
-
-            await this.page.waitForTimeout(2000)
-
-            await this.page.locator("//a[@aria-label='products']").click()
-            await this.page
-              .locator(`//button[@aria-label='dropdown menu for Test']`)
-              .click()
-            await this.page.waitForTimeout(2000)
-
-            await this.page
-              .locator(`//button[@aria-label='Delete product Test']`)
-              .click()
-            await this.page.locator("button[type='submit']").click()
-
-            await this.page.waitForTimeout(2000)
+            errors.push(`Action not found`)
           }
         } else {
           errors.push(`Version not found`)
@@ -232,9 +244,7 @@ export default class VulnsSection {
   public async importStatus() {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
-      const product = this.page
-        .locator(`//p[@aria-label='product_name']`)
-        .nth(0)
+      const product = this.page.getByTestId(`product_Test`)
 
       if (product.isVisible()) {
         await product.click()
