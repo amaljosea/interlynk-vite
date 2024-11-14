@@ -141,7 +141,7 @@ const Kbar = () => {
             if (version?.projectVersion) {
               data.push({
                 id: version?.id,
-                name: `${truncatedValue(item?.name, 20)} - ${version.projectVersion} (${project?.name})`,
+                name: `${truncatedValue(item?.name, 20)} - ${truncatedValue(version?.projectVersion, 20)} (${project?.name})`,
                 section: 'product versions',
                 icon: <FaScrewdriverWrench color={sameSecondaryText} />,
                 perform: () => {
