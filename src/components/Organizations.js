@@ -18,6 +18,7 @@ import {
 import { Button, useDisclosure } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import { SwitchOrganization } from 'graphQL/Mutation'
 import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
@@ -31,6 +32,11 @@ const Organizations = () => {
   const isSuperAdmin = organization?.currentUser?.superAdmin
 
   const [switchOrg] = useMutation(SwitchOrganization)
+
+  const updateOrg = useHasPermission({
+    parentKey: 'view_organization',
+    childKey: 'update_organization'
+  })
 
   const [options, setOptions] = useState([])
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -85,7 +91,12 @@ const Organizations = () => {
           {truncatedValue(organization?.name, 20)}
         </MenuButton>
         <MenuList maxHeight='400px' overflowY='auto' fontSize={'sm'}>
-          <MenuItem fontSize='sm' icon={<AddIcon />} onClick={onOpen}>
+          <MenuItem
+            fontSize='sm'
+            icon={<AddIcon />}
+            onClick={onOpen}
+            isDisabled={!updateOrg}
+          >
             Add Organization
           </MenuItem>
           <MenuDivider />
