@@ -1266,3 +1266,17 @@ export const listItemsForDoc = (listArray, key) => {
   })
   return listString
 }
+
+// Reusable function to parse EPSS range into min and max values
+export const parseEpssRange = (epss) => {
+  // Check if epss is valid (not empty, 'all', or undefined)
+  if (epss && epss !== 'all' && epss !== '') {
+    const [min, max] = epss.split('-').map((val) => parseFloat(val) / 100)
+    return {
+      min,
+      max
+    }
+  }
+  // Return undefined if epss is invalid
+  return undefined
+}

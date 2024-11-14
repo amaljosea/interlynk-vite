@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
 import { getSignedUrlParams } from 'utils'
+import { parseEpssRange } from 'utils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 
@@ -103,18 +104,8 @@ const Vulnerabilities = ({ sbomData }) => {
     },
     [prodVulnState?.direction, prodVulnState?.field]
   )
-
-  const setEPSS = (epss) => {
-    const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
-    if (epss !== '' && epss !== 'all') {
-      return {
-        min: parseFloat(vulnEpss[0]) / 100,
-        max: parseFloat(vulnEpss[1]) / 100
-      }
-    } else {
-      return undefined
-    }
-  }
+  /*   getEpssRangeArray */
+  const epssRange = parseEpssRange(epss)
 
   const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
     GetVulnData,
@@ -131,7 +122,7 @@ const Vulnerabilities = ({ sbomData }) => {
         componentName: components.length > 0 ? components : undefined,
         status: statues.length > 0 ? statues : undefined,
         kev: setKEV(kev),
-        epss: setEPSS(epss),
+        epss: epssRange,
         direct: direct === 'direct only' ? true : undefined,
         includeRetracted: include.includes('retracted') ? true : false,
         vexComplete: vexComplete === 'all' ? undefined : false,

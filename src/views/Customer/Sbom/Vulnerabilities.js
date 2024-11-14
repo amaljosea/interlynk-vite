@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { customStyles, getSignedUrlParams } from 'utils'
+import { parseEpssRange } from 'utils'
 import VulnerabilityColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/VulnerabilityColumns'
 import ExpandedComponent from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/VulnerabilityExpanded'
 import VulnerabilitySubHeader from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableSubHeaders/VulnerabilitySubHeader'
@@ -56,12 +57,8 @@ const Vulnerabilities = ({ sbomData }) => {
     }
   }, [prodVulnDispatch, sbomData?.sbom?.sbomParts?.length])
 
-  const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
-
-  const range = {
-    min: parseFloat(vulnEpss[0]) / 100,
-    max: parseFloat(vulnEpss[1]) / 100
-  }
+  /*   getEpssRangeArray */
+  const epssRange = parseEpssRange(epss)
 
   const { nodes, paginationProps, reset, loading } = usePaginatedQuery(
     ShareVulnData,
@@ -81,7 +78,7 @@ const Vulnerabilities = ({ sbomData }) => {
             : kev === 'yes'
               ? true
               : false,
-        epss: epss !== '' && epss !== 'all' ? range : undefined,
+        epss: epss !== '' && epss !== 'all' ? epssRange : undefined,
         direct: direct === 'direct only' ? true : undefined,
         includeRetracted: include.includes('retracted') ? true : false,
         vexComplete: vexComplete === 'all' ? undefined : false,
