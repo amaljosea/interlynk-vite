@@ -3933,7 +3933,7 @@ export const GetRequests = gql`
 export const GetProductNamesForRequest = gql`
   query GetProductNamesForRequest {
     organization {
-      projectGroups(enabled: true) {
+      projectGroups(first: 500, enabled: true) {
         nodes {
           id
           name
