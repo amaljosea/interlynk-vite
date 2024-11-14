@@ -1023,7 +1023,7 @@ export const sortByUpdatedAt = (data) => {
 }
 
 export const truncatedValue = (name = '', length = 10) => {
-  return name.length > length ? `${name.substring(0, length)}...` : name
+  return name?.length > length ? `${name.substring(0, length)}...` : name
 }
 
 export const parseJSONSafely = (str) => {
