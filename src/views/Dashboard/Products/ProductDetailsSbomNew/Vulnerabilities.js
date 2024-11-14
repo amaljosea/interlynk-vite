@@ -3,8 +3,7 @@ import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
-import { getSignedUrlParams } from 'utils'
-import { parseEpssRange } from 'utils'
+import { getSignedUrlParams, parseEpssRange, setKEV } from 'utils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 
@@ -80,16 +79,6 @@ const Vulnerabilities = ({ sbomData }) => {
   const { prodVulnDispatch } = dispatch
 
   const { data: allCdx } = useQuery(GetCdxResponses)
-
-  const setKEV = (kev) => {
-    if (kev === 'all' || kev === '') {
-      return undefined
-    } else if (kev === 'yes') {
-      return true
-    } else {
-      return false
-    }
-  }
 
   const setOrder = useMemo(
     () => (value) => {

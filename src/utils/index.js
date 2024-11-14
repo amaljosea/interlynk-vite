@@ -1267,6 +1267,17 @@ export const listItemsForDoc = (listArray, key) => {
   return listString
 }
 
+//Function for KEV filterting used under vulnerabilities
+export const setKEV = (kev) => {
+  if (kev === 'all' || kev === '') {
+    return undefined
+  } else if (kev === 'yes') {
+    return true
+  } else {
+    return false
+  }
+}
+
 // Reusable function to parse EPSS range into min and max values
 export const parseEpssRange = (epss) => {
   // Check if epss is valid (not empty, 'all', or undefined)
