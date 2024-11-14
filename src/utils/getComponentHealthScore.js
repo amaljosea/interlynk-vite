@@ -2,7 +2,7 @@ import { isPast, isValid } from 'date-fns'
 import { round } from 'lodash'
 
 const logError = (type) => {
-  console.error(`Wrongs data - ${type}`)
+  console.warn(`Missing data - ${type}`)
 }
 
 const weightAge = 0.25

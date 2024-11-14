@@ -2,22 +2,22 @@ import { getComponentHealthScore } from './getComponentHealthScore'
 
 describe('getComponentHealthScore', () => {
   beforeAll(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => {})
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
   })
 
   afterAll(() => {
-    console.error.mockRestore()
+    console.warn.mockRestore()
   })
 
   afterEach(() => {
-    console.error.mockClear()
+    console.warn.mockClear()
   })
 
   test('basic check', () => {
     expect(getComponentHealthScore()).toStrictEqual({
       healthScore: 0
     })
-    expect(console.error.mock.calls[0][0]).toContain('componentData')
+    expect(console.warn.mock.calls[0][0]).toContain('componentData')
   })
 
   test('Identifiable check', () => {
@@ -63,7 +63,7 @@ describe('getComponentHealthScore', () => {
     ).toStrictEqual({
       healthScore: 0
     })
-    expect(console.error.mock.calls[0][0]).toContain('Release Age')
+    expect(console.warn.mock.calls[0][0]).toContain('Release Age')
   })
 
   test('Contributors Count not number', () => {
@@ -77,6 +77,6 @@ describe('getComponentHealthScore', () => {
     ).toStrictEqual({
       healthScore: 0
     })
-    expect(console.error.mock.calls[0][0]).toContain('Contributors Count')
+    expect(console.warn.mock.calls[0][0]).toContain('Contributors Count')
   })
 })
