@@ -876,10 +876,10 @@ const Components = ({ sbomData }) => {
   const subHeader = useMemo(() => {
     return (
       <Flex
-        sx={{ w: '100%', alignItems: 'center' }}
+        sx={{ w: '100%', alignItems: 'flex-start', gap: 2 }}
         justifyContent={'space-between'}
       >
-        <Flex sx={{ w: '100%', gap: 4, alignItems: 'center' }}>
+        <Flex sx={{ flexWrap: 'wrap', gap: 3, alignItems: 'flex-start' }}>
           {/* SEARCH COMPONENTS */}
           <SearchFilter
             id='component'
@@ -891,7 +891,7 @@ const Components = ({ sbomData }) => {
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           <CompFilters reset={() => reset()} />
         </Flex>
-        <Flex sx={{ w: '100%', gap: 2, justifyContent: 'flex-end' }}>
+        <Flex sx={{ gap: 2, justifyContent: 'flex-end' }}>
           {/* SHOW HEATMAP */}
           <Tooltip label='View Health Map'>
             <IconButton

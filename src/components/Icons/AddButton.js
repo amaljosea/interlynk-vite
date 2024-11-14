@@ -10,7 +10,7 @@ const AddButton = ({
   variant = 'solid', //default variant
   ...props
 }) => {
-  console.log('props', props)
+  // console.log('props', props)
   return (
     <Tooltip label={label} placement={tooltipPlacement}>
       <IconButton
