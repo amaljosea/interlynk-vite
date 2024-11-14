@@ -216,10 +216,10 @@ const SupplierModal = (props) => {
               mr={'auto'}
               fontSize={'sm'}
               variant='ghost'
+              isLoading={rlLoading}
               onClick={handleRuleCreate}
-              isLoading={rlLoading || loading}
               hidden={friendlyId ? false : true}
-              isDisabled={isInvalid || formData?.name === ''}
+              isDisabled={isInvalid || formData?.name === '' || loading}
               colorScheme={ruleExists ? 'green' : 'blue'}
             >
               {ruleExists ? 'View' : 'Save as'} Rule
