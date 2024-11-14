@@ -6,7 +6,15 @@ import { infoData } from 'variables/general'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 
 import { AddIcon } from '@chakra-ui/icons'
-import { Button, Flex, Skeleton, Text, useDisclosure } from '@chakra-ui/react'
+import {
+  Button,
+  Flex,
+  Skeleton,
+  Stack,
+  Text,
+  Tooltip,
+  useDisclosure
+} from '@chakra-ui/react'
 import { Tag, TagCloseButton, TagLabel, TagRightIcon } from '@chakra-ui/react'
 import { Table, Tbody, Td, Tr } from '@chakra-ui/react'
 
@@ -166,6 +174,16 @@ const General = ({ data, loading, error }) => {
     )
   }
 
+  const toolInfo = (item) => {
+    return (
+      <Stack dir='column' spacing={1}>
+        <Text>Name: {item?.name}</Text>
+        {item?.version && <Text>Version: {item?.version}</Text>}
+        {item?.vendor && <Text>Vendor: {item?.vendor}</Text>}
+      </Stack>
+    )
+  }
+
   // KEYBOARD EVENT LISTNER FOR SBOM DRAWER
   useEffect(() => {
     window.addEventListener('keydown', handleSBMDown)
@@ -252,25 +270,26 @@ const General = ({ data, loading, error }) => {
               <Td width={'85%'}>
                 <Flex alignItems={'center'} flexWrap={'wrap'} gap={2}>
                   {tools?.map((item, index) => (
-                    <Tag
-                      key={index}
-                      variant='subtle'
-                      colorScheme='teal'
-                      sx={{ w: 'fit-content', h: 7 }}
-                    >
-                      <TagLabel>
-                        {item.name} - {item.version}
-                      </TagLabel>
-                      {updateComponent && (
-                        <TagCloseButton
-                          hidden={isArchived}
-                          onClick={() => {
-                            setActiveTool(item)
-                            DELETE_TOOL?.onOpen()
-                          }}
-                        />
-                      )}
-                    </Tag>
+                    <Tooltip key={index} label={toolInfo(item)}>
+                      <Tag
+                        variant='subtle'
+                        colorScheme='teal'
+                        sx={{ w: 'fit-content', h: 7, cursor: 'pointer' }}
+                      >
+                        <TagLabel>
+                          {item.name} - {item.version}
+                        </TagLabel>
+                        {updateComponent && (
+                          <TagCloseButton
+                            hidden={isArchived}
+                            onClick={() => {
+                              setActiveTool(item)
+                              DELETE_TOOL?.onOpen()
+                            }}
+                          />
+                        )}
+                      </Tag>
+                    </Tooltip>
                   ))}
                   <ActiveBtn
                     label={'add_tool'}
