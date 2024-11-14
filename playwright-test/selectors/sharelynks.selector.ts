@@ -1,8 +1,7 @@
 class ShareLynkSelectors {
   public static productLink = "a[href='/vendor/products']"
   public static productsHeader = "//a[text()='products']"
-  public static addProductButton =
-    "((//div[@class='chakra-stack css-rmxdag'])[2]//button)[3]"
+  public static addProductButton = "//button[@aria-label='Add product']"
   public static popup = "//section[contains(@id, 'chakra') and @role='dialog']"
   public static addProductName = "input[placeholder='Add product name']"
   public static addProductDescription =
