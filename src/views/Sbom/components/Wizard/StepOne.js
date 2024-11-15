@@ -4,10 +4,13 @@ import { envOrderList } from 'utils'
 
 import {
   Box,
+  Flex,
   FormControl,
   FormLabel,
   Heading,
   Select,
+  Skeleton,
+  Spinner,
   Stack,
   Text
 } from '@chakra-ui/react'
@@ -20,7 +23,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetProject, GetProjectGroups } from 'graphQL/Queries'
 
 const StepOne = ({
-  setProductId,
   setSbomId,
   currentSbomId,
   currentProductId,
@@ -36,7 +38,7 @@ const StepOne = ({
   const { totalRows, prodState } = useGlobalState()
   const { enabled, field, direction } = prodState
   const { headingTextColor } = useThemeColor(['headingTextColor'])
-  const { data } = useQuery(GetProjectGroups, {
+  const { data, loading: projectGrpLoading } = useQuery(GetProjectGroups, {
     variables: {
       first: totalRows,
       enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
@@ -66,14 +68,14 @@ const StepOne = ({
         (item) => item.id === currentProductId
       )
       setSelectedProd(currentProd?.id)
-      setProductId(currentProd?.id)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const [getProduct] = useLazyQuery(GetProject)
+  const [getProduct, { loading }] = useLazyQuery(GetProject)
 
   const handleSelectGroup = (e) => {
+    setUniqVersions([])
     setSelectedVersion('')
     setSelectedProd('')
     setSelectedGroup(e.target.value)
@@ -83,7 +85,6 @@ const StepOne = ({
     const { value } = e.target
     setSelectedVersion('')
     setSelectedProd(value)
-    setProductId(value)
   }
 
   useEffect(() => {
@@ -105,6 +106,44 @@ const StepOne = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedProd])
+
+  const LoadingSkeleton = (
+    <Skeleton height='40px' width='100%' borderRadius='md' />
+  )
+
+  const NoVersionAlert = <LynkAlert status='info' msg='No version available' />
+
+  const NoEnvironmentAlert = (
+    <LynkAlert status='info' msg='No Environment selected' />
+  )
+
+  const VersionSelect = (
+    <Select
+      name='versions'
+      id='versions'
+      value={selectedVersion}
+      onChange={(e) => {
+        setSelectedVersion(e.target.value)
+        setSbomId(e.target.value)
+      }}
+    >
+      <option value=''>-- Select --</option>
+      {uniqVersions?.map((item, index) => (
+        <option key={index} value={item.id}>
+          {item?.projectVersion}
+        </option>
+      ))}
+    </Select>
+  )
+
+  if (projectGrpLoading) {
+    return (
+      <Flex alignItems={'center'} gap={2}>
+        <Spinner />
+        <Text>LOADING....</Text>
+      </Flex>
+    )
+  }
 
   return (
     <>
@@ -198,26 +237,13 @@ const StepOne = ({
               >
                 Version
               </FormLabel>
-              {uniqVersions.length > 0 ? (
-                <Select
-                  name='versions'
-                  id='versions'
-                  value={selectedVersion}
-                  onChange={(e) => {
-                    setSelectedVersion(e.target.value)
-                    setSbomId(e.target.value)
-                  }}
-                >
-                  <option value={''}>-- Select --</option>
-                  {uniqVersions.map((item, index) => (
-                    <option key={index} value={item.id}>
-                      {item?.projectVersion}
-                    </option>
-                  ))}
-                </Select>
-              ) : (
-                <LynkAlert status='info' msg={'No version available'} />
-              )}
+              {loading
+                ? LoadingSkeleton
+                : uniqVersions?.length === 0 && selectedProd !== ''
+                  ? NoVersionAlert
+                  : selectedProd === ''
+                    ? NoEnvironmentAlert
+                    : VersionSelect}
             </FormControl>
           </Stack>
         )}

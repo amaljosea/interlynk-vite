@@ -32,7 +32,6 @@ const ImportWizard = ({
 
   const { nextStep, prevStep, activeStep } = useSteps({ initialStep: 0 })
 
-  const [productId, setProductId] = useState('')
   const [sbomId, setSbomId] = useState('')
   const [selectedGroup, setSelectedGroup] = useState(groupId || '')
   const [selectedProd, setSelectedProd] = useState('')
@@ -59,7 +58,6 @@ const ImportWizard = ({
       label: 'Product',
       component: (
         <StepOne
-          setProductId={setProductId}
           setSbomId={setSbomId}
           currentSbomId={currentSbomId}
           currentProductId={currentProductId}
