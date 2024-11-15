@@ -69,9 +69,9 @@ const UploadModal = ({ isOpen, onClose, group }) => {
       variables: { doc: selectedFile, projectId: selectedEnv }
     })
       .then((res) => {
-        if (res?.data?.sbomUpload.errors?.length > 0) {
+        if (res?.data?.sbomUpload?.errors?.length > 0) {
           showToast({
-            description: 'Upload failed !',
+            description: res?.data?.sbomUpload?.errors[0],
             status: 'error'
           })
         } else {
