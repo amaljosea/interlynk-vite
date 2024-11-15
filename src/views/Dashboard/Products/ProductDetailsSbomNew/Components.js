@@ -631,6 +631,11 @@ const Components = ({ sbomData }) => {
       workBreak: 'break-all'
     }
 
+    const onCheckRelation = (item) => {
+      setActiveComp(item)
+      GRAPH.onOpen()
+    }
+
     return (
       <Box
         sx={{ w: '100%', p: 5 }}
@@ -661,10 +666,11 @@ const Components = ({ sbomData }) => {
                       key={index}
                       variant='subtle'
                       colorScheme={'blue'}
-                      sx={{ p: 1, workBreak: 'break-all' }}
+                      onClick={() => onCheckRelation(comp?.toComp)}
+                      sx={{ p: 1, workBreak: 'break-all', cursor: 'pointer' }}
                     >
                       <Text wordBreak={'break-all'}>
-                        {comp.toComp.name}-{comp.toComp.version}
+                        {comp?.toComp?.name}-{comp?.toComp?.version}
                       </Text>
                     </Tag>
                   ))
@@ -680,13 +686,14 @@ const Components = ({ sbomData }) => {
                 dependencyOf?.map((comp, index) => (
                   <Tag
                     size='sm'
-                    padding={1}
                     key={index}
                     variant='subtle'
                     colorScheme={'blue'}
+                    sx={{ p: 1, cursor: 'pointer' }}
+                    onClick={() => onCheckRelation(comp?.fromComp)}
                   >
                     <Text wordBreak={'break-all'}>
-                      {comp.fromComp.name}-{comp.fromComp.version}
+                      {comp?.fromComp?.name}-{comp?.fromComp?.version}
                     </Text>
                   </Tag>
                 ))
