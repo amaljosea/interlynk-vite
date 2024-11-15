@@ -1,29 +1,10 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
-import { envOrderList, sortByUpdatedAt } from 'utils'
-import { truncatedValue } from 'utils'
+import { sortByUpdatedAt } from 'utils'
 
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  GridItem,
-  HStack,
-  Heading,
-  Icon,
-  IconButton,
-  Select,
-  Stack,
-  Tag,
-  Text
-} from '@chakra-ui/react'
+import { Flex, Grid, HStack, Icon, Stack, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import LynkAlert from 'components/LynkAlert'
-import LynkSelect from 'components/LynkSelect'
-import SbomInfo from 'components/SbomInfo'
 import DiffTable from 'components/Tables/DiffTable'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -37,7 +18,9 @@ import {
   GetSbomDrift
 } from 'graphQL/Queries'
 
-import { FaCodeCompare, FaScaleUnbalanced, FaX } from 'react-icons/fa6'
+import { FaScaleUnbalanced } from 'react-icons/fa6'
+
+import SbomCompare from './SbomCompare'
 
 const Compare = ({ selectedSboms }) => {
   const { showToast } = useCustomToast()
@@ -45,31 +28,34 @@ const Compare = ({ selectedSboms }) => {
   const { field, direction } = prodState
   const { toolsDispatch } = dispatch
 
-  const {
-    primaryTextColor,
-    primaryRedBorder,
-    primaryGreenBorder,
-    secondaryBlueText
-  } = useThemeColor([
+  const { primaryTextColor, secondaryBlueText } = useThemeColor([
     'primaryTextColor',
-    'primaryRedBorder',
-    'primaryGreenBorder',
     'secondaryBlueText'
   ])
 
   const [isLoading, setIsLoading] = useState(false)
 
-  const [getProduct] = useLazyQuery(GetProject, { fetchPolicy: 'network-only' })
+  const [getProduct] = useLazyQuery(GetProject, {
+    fetchPolicy: 'network-only'
+  })
   const [getSbomData] = useLazyQuery(GetProductData, {
     fetchPolicy: 'network-only'
   })
   const [getDrift, { data: driftData }] = useLazyQuery(GetSbomDrift, {
     fetchPolicy: 'network-only'
   })
-  const { data } = useQuery(GetProductsForSbomDrift, {
-    fetchPolicy: 'network-only',
-    variables: { first: 200, enabled: true, field: field, direction: direction }
-  })
+  const { data, loading: projectGrpLoading } = useQuery(
+    GetProductsForSbomDrift,
+    {
+      fetchPolicy: 'network-only',
+      variables: {
+        first: 200,
+        enabled: true,
+        field: field,
+        direction: direction
+      }
+    }
+  )
 
   // -------------- SBOM 1 --------------
   const [selectedGroupOne, setSelectedGroupOne] = useState('')
@@ -79,6 +65,7 @@ const Compare = ({ selectedSboms }) => {
   const [productListOne, setProductListOne] = useState([])
   const [firstSbomInfo, setFirstSbomInfo] = useState(null)
   const [disabled, setDisabled] = useState(false)
+  const [isSbomOneLoading, setIsSbomOneLoading] = useState(false)
 
   const onSelectGroupOne = (e) => {
     setSelectedGroupOne(e.target.value)
@@ -130,6 +117,7 @@ const Compare = ({ selectedSboms }) => {
 
   useEffect(() => {
     if (selectedProdOne !== '' && selectedVersionOne === null) {
+      setIsSbomOneLoading(true)
       getProduct({ variables: { id: selectedProdOne } }).then((res) => {
         if (res.data) {
           const data = sortByUpdatedAt(res?.data?.project?.sboms)
@@ -138,9 +126,11 @@ const Compare = ({ selectedSboms }) => {
             data?.map((sbom) => {
               versions.push({ label: sbom?.projectVersion, value: sbom?.id })
             })
+            setIsSbomOneLoading(false)
             setUniqVersionsOne(versions)
             setSelectedVersionOne(null)
           } else {
+            setIsSbomOneLoading(false)
             setUniqVersionsOne([])
             setSelectedVersionOne(null)
           }
@@ -156,6 +146,7 @@ const Compare = ({ selectedSboms }) => {
   const [uniqVersionsTwo, setUniqVersionsTwo] = useState([])
   const [productListTwo, setProductListTwo] = useState([])
   const [secondSbomInfo, setSecondSbomInfo] = useState(null)
+  const [isSbomTwoLoading, setIsSbomTwoLoading] = useState(false)
 
   const onSelectGroupTwo = (e) => {
     setSelectedGroupTwo(e.target.value)
@@ -178,7 +169,11 @@ const Compare = ({ selectedSboms }) => {
           projectId: selectedProdTwo,
           sbomId: selectedVersionTwo?.value
         }
-      }).then((res) => res?.data && setSecondSbomInfo(res.data.sbom))
+      }).then((res) => {
+        if (res?.data) {
+          setSecondSbomInfo(res.data.sbom)
+        }
+      })
     }
   }
 
@@ -230,6 +225,7 @@ const Compare = ({ selectedSboms }) => {
 
   useEffect(() => {
     if (selectedProdTwo !== '' && selectedVersionTwo === null) {
+      setIsSbomTwoLoading(true)
       getProduct({ variables: { id: selectedProdTwo } }).then((res) => {
         if (res.data) {
           const data = sortByUpdatedAt(res?.data?.project?.sboms)
@@ -238,9 +234,11 @@ const Compare = ({ selectedSboms }) => {
             data?.map((sbom) => {
               versions.push({ label: sbom?.projectVersion, value: sbom?.id })
             })
+            setIsSbomTwoLoading(false)
             setUniqVersionsTwo(versions)
             setSelectedVersionTwo(null)
           } else {
+            setIsSbomTwoLoading(false)
             setSelectedVersionTwo(null)
             setUniqVersionsTwo([])
           }
@@ -283,6 +281,15 @@ const Compare = ({ selectedSboms }) => {
     !secondSbomInfo && onSubmitSbomTwo()
   }
 
+  const compareButtonProps = {
+    firstSbomInfo,
+    secondSbomInfo,
+    handleCompare,
+    selectedVersionOne,
+    selectedVersionTwo,
+    disabled
+  }
+
   return (
     <Flex flexDirection='column' gap={6}>
       {/* HEADER */}
@@ -315,285 +322,42 @@ const Compare = ({ selectedSboms }) => {
       {/* SBOM SELECTIONS */}
       <Grid templateColumns='repeat(2, 1fr)' gap={6} color={primaryTextColor}>
         {/* SBOM ONE */}
-        <GridItem w='100%'>
-          <Card
-            border={`2px solid ${primaryGreenBorder}`}
-            p={8}
-            h='450px'
-            overflowY='scroll'
-          >
-            <Flex
-              alignItems={'flex-start'}
-              flexWrap={'wrap'}
-              justifyContent={'space-between'}
-            >
-              {firstSbomInfo ? (
-                <Stack>
-                  <Heading
-                    fontWeight={'semibold'}
-                    fontFamily={'inherit'}
-                    size='md'
-                  >
-                    {truncatedValue(
-                      firstSbomInfo?.project?.projectGroup?.name,
-                      20
-                    )}{' '}
-                    : {truncatedValue(firstSbomInfo?.projectVersion, 20)}
-                  </Heading>
-                  <Tag
-                    variant='solid'
-                    colorScheme='green'
-                    width={'fit-content'}
-                    textTransform={'capitalize'}
-                  >
-                    {firstSbomInfo?.project?.name}
-                  </Tag>
-                </Stack>
-              ) : (
-                <Heading
-                  fontWeight={'semibold'}
-                  fontFamily={'inherit'}
-                  size='md'
-                >
-                  Select First SBOM
-                </Heading>
-              )}
-              {firstSbomInfo && !selectedSboms && (
-                <IconButton
-                  icon={<FaX color={primaryTextColor} />}
-                  size='sm'
-                  onClick={onClearOne}
-                />
-              )}
-            </Flex>
-            {firstSbomInfo ? (
-              <SbomInfo data={firstSbomInfo} />
-            ) : (
-              <Stack spacing={4} direction={'column'} gap={2} mt={6}>
-                {/* PROJECT GROUPS */}
-                {data?.organization?.projectGroups?.nodes?.length > 0 && (
-                  <FormControl fontSize={'sm'}>
-                    <FormLabel htmlFor='groupOne' fontSize='md'>
-                      Product
-                    </FormLabel>
-                    <Select
-                      name='groupOne'
-                      id='groupOne'
-                      isDisabled={selectedSboms?.length > 0}
-                      value={selectedGroupOne}
-                      onChange={onSelectGroupOne}
-                    >
-                      <option value=''>-- Select --</option>
-                      {data?.organization?.projectGroups?.nodes?.map(
-                        (item, index) => (
-                          <option key={index} value={item.id}>
-                            {truncatedValue(item.name, 20)}
-                          </option>
-                        )
-                      )}
-                    </Select>
-                  </FormControl>
-                )}
-                {/* ENVIRONMENT */}
-                <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='productOne' fontSize='md'>
-                    Environment
-                  </FormLabel>
-                  <Select
-                    name='productOne'
-                    id='productOne'
-                    isDisabled={selectedSboms?.length > 0}
-                    value={selectedProdOne}
-                    onChange={onSelectProductOne}
-                    textTransform={'capitalize'}
-                  >
-                    <option value={''}>-- Select --</option>
-                    {productListOne?.length > 0 &&
-                      envOrderList(productListOne).map((item, index) => (
-                        <option
-                          key={index}
-                          value={item.value}
-                          style={{ textTransform: 'capitalize' }}
-                        >
-                          {item.label}
-                        </option>
-                      ))}
-                  </Select>
-                </FormControl>
-                {/* VERSION */}
-                <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='versionOne' fontSize='md'>
-                    Version
-                  </FormLabel>
-                  {uniqVersionsOne.length > 0 ? (
-                    <LynkSelect
-                      components={{
-                        DropdownIndicator: () => null
-                      }}
-                      value={selectedVersionOne}
-                      onChange={(value) => onVersionOneChange(value)}
-                      isSearchable
-                      type='text'
-                      placeholder='Select versions'
-                      name='versions'
-                      isDisabled={selectedSboms?.length > 0}
-                      options={uniqVersionsOne}
-                      noOptionsMessage={() => null}
-                    />
-                  ) : (
-                    <LynkAlert msg='No version available' />
-                  )}
-                </FormControl>
-              </Stack>
-            )}
-          </Card>
-        </GridItem>
+        <SbomCompare
+          isSbomOne={true}
+          data={data}
+          selectedVersion={selectedVersionOne}
+          projectGrpLoading={projectGrpLoading}
+          onVersionChange={onVersionOneChange}
+          selectedSboms={selectedSboms}
+          uniqueVersions={uniqVersionsOne}
+          sbomInfo={firstSbomInfo}
+          selectedGroup={selectedGroupOne}
+          selectedProd={selectedProdOne}
+          onClear={onClearOne}
+          onSelectGroup={onSelectGroupOne}
+          loading={isSbomOneLoading}
+          onSelectProduct={onSelectProductOne}
+          productList={productListOne}
+        />
         {/* SBOM TWO */}
-        <GridItem w='100%'>
-          <Card
-            border={`2px solid ${primaryRedBorder}`}
-            p={8}
-            h='450px'
-            overflowY='scroll'
-          >
-            <Flex alignItems={'flex-start'} justifyContent={'space-between'}>
-              {secondSbomInfo ? (
-                <Stack>
-                  <Heading
-                    fontWeight={'semibold'}
-                    fontFamily={'inherit'}
-                    size='md'
-                  >
-                    {truncatedValue(
-                      secondSbomInfo?.project?.projectGroup?.name,
-                      20
-                    )}{' '}
-                    : {truncatedValue(secondSbomInfo?.projectVersion, 20)}
-                  </Heading>
-                  <Tag
-                    variant='solid'
-                    colorScheme='red'
-                    width={'fit-content'}
-                    textTransform={'capitalize'}
-                  >
-                    {secondSbomInfo?.project?.name}
-                  </Tag>
-                </Stack>
-              ) : (
-                <Heading
-                  fontWeight={'semibold'}
-                  fontFamily={'inherit'}
-                  size='md'
-                >
-                  Select Second SBOM
-                </Heading>
-              )}
-              {secondSbomInfo && !selectedSboms && (
-                <IconButton
-                  icon={<FaX color={primaryTextColor} />}
-                  size='sm'
-                  onClick={onClearTwo}
-                />
-              )}
-            </Flex>
-            {secondSbomInfo ? (
-              <SbomInfo data={secondSbomInfo} />
-            ) : (
-              <Stack spacing={4} direction={'column'} gap={2} mt={6}>
-                {/* PROJECT GROUPS */}
-                {data?.organization?.projectGroups?.nodes?.length > 0 && (
-                  <FormControl fontSize={'sm'}>
-                    <FormLabel htmlFor='groupTwo' fontSize='md'>
-                      Product
-                    </FormLabel>
-                    <Select
-                      name='groupTwo'
-                      id='groupTwo'
-                      isDisabled={selectedVersionOne === null}
-                      value={selectedGroupTwo}
-                      onChange={onSelectGroupTwo}
-                    >
-                      <option value=''>-- Select --</option>
-                      {data?.organization?.projectGroups?.nodes?.map(
-                        (item, index) => (
-                          <option key={index} value={item.id}>
-                            {truncatedValue(item.name, 20)}
-                          </option>
-                        )
-                      )}
-                    </Select>
-                  </FormControl>
-                )}
-                {/* ENVIRONMENT */}
-                <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='productTwo' fontSize='md'>
-                    Environment
-                  </FormLabel>
-                  <Select
-                    name='productTwo'
-                    id='productTwo'
-                    value={selectedProdTwo}
-                    onChange={onSelectProductTwo}
-                    isDisabled={selectedVersionOne === null}
-                    textTransform={'capitalize'}
-                  >
-                    <option value={''}>-- Select --</option>
-                    {productListTwo?.length > 0 &&
-                      envOrderList(productListTwo).map((item, index) => (
-                        <option
-                          key={index}
-                          value={item.value}
-                          style={{ textTransform: 'capitalize' }}
-                        >
-                          {item.label}
-                        </option>
-                      ))}
-                  </Select>
-                </FormControl>
-                {/* VERSION */}
-                <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='versionTwo' fontSize='md'>
-                    Version
-                  </FormLabel>
-                  {uniqVersionsTwo?.length > 0 ? (
-                    <LynkSelect
-                      components={{
-                        DropdownIndicator: () => null
-                      }}
-                      value={selectedVersionTwo}
-                      onChange={(value) => onVersionTwoChange(value)}
-                      isSearchable
-                      type='text'
-                      placeholder='Select versions'
-                      name='versions'
-                      options={uniqVersionsTwo}
-                      noOptionsMessage={() => null}
-                      isDisabled={selectedVersionOne === null}
-                    />
-                  ) : (
-                    <LynkAlert msg='No version available' />
-                  )}
-                </FormControl>
-              </Stack>
-            )}
-            {/* SUBMIT */}
-            {(!firstSbomInfo || !secondSbomInfo) && (
-              <Flex justifyContent={'flex-end'} mt={6}>
-                <Button
-                  colorScheme='blue'
-                  width={'fit-content'}
-                  leftIcon={<FaCodeCompare />}
-                  onClick={handleCompare}
-                  isDisabled={
-                    !selectedVersionOne || !selectedVersionTwo || disabled
-                  }
-                >
-                  Compare
-                </Button>
-              </Flex>
-            )}
-          </Card>
-        </GridItem>
+        <SbomCompare
+          isSbomOne={false}
+          data={data}
+          selectedVersion={selectedVersionTwo}
+          projectGrpLoading={projectGrpLoading}
+          onVersionChange={onVersionTwoChange}
+          selectedSboms={selectedSboms}
+          uniqueVersions={uniqVersionsTwo}
+          sbomInfo={secondSbomInfo}
+          selectedGroup={selectedGroupTwo}
+          selectedProd={selectedProdTwo}
+          onClear={onClearTwo}
+          onSelectGroup={onSelectGroupTwo}
+          loading={isSbomTwoLoading}
+          onSelectProduct={onSelectProductTwo}
+          productList={productListTwo}
+          compareButtonProps={compareButtonProps}
+        />
       </Grid>
       {/* SBOM DIFFERENCE */}
       <Card width='100%'>
