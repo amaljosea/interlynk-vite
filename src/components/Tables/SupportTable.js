@@ -10,9 +10,7 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { CheckIcon } from '@chakra-ui/icons'
 import {
   Flex,
-  IconButton,
   Menu,
-  MenuButton,
   MenuItem,
   MenuList,
   Portal,
@@ -27,14 +25,13 @@ import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import CpeCard from 'components/Misc/CpeCard'
+import LynkAction from 'components/Misc/LynkAction'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
-
-import { FaEllipsisV } from 'react-icons/fa'
 
 const SupportTable = ({
   data,
@@ -45,8 +42,6 @@ const SupportTable = ({
 }) => {
   const params = useParams()
   const sbomId = params.sbomid
-
-  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
   const editSup = useHasPermission({
     parentKey: 'view_support',
@@ -331,14 +326,7 @@ const SupportTable = ({
       selector: (row) => {
         return (
           <Menu>
-            <MenuButton
-              width={'10%'}
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color={secondaryTextColor}
-              aria-label={`support action ${row?.productName}`}
-            />
+            <LynkAction aria-label={`support action ${row?.productName}`} />
             <Portal>
               <MenuList fontSize={'sm'}>
                 {/* EDIT SUPPORT */}

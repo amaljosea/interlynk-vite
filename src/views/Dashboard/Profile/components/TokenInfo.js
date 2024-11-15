@@ -14,7 +14,6 @@ import {
   IconButton,
   Input,
   Menu,
-  MenuButton,
   MenuItem,
   MenuList,
   Portal,
@@ -31,6 +30,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
+import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import useQueryParam from 'hooks/useQueryParam'
@@ -44,7 +44,6 @@ import {
 } from 'graphQL/Mutation'
 
 import { BiCheck, BiShieldQuarter } from 'react-icons/bi'
-import { FaEllipsisV } from 'react-icons/fa'
 
 const GetApiKeys = gql`
   query GetApiKeys {
@@ -73,17 +72,9 @@ const TokenInfo = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const {
-    headingTextColor,
-    primaryTextColor,
-    grayBorderColor,
-    secondaryTextColor
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'grayBorderColor',
-    'secondaryTextColor'
-  ])
+  const { headingTextColor, primaryTextColor, grayBorderColor } = useThemeColor(
+    ['headingTextColor', 'primaryTextColor', 'grayBorderColor']
+  )
 
   const paddingCell = 0
   const paddingHeadCell = 0
@@ -381,13 +372,7 @@ const TokenInfo = () => {
 
         return (
           <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color={secondaryTextColor}
-              data-testid={`token_actions_${index}`}
-            />
+            <LynkAction data-testid={`token_actions_${index}`} />
             <Portal>
               <MenuList fontSize={'sm'}>
                 {row.revoked === false && (

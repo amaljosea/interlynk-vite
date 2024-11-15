@@ -11,9 +11,7 @@ import {
   Badge,
   Box,
   Flex,
-  IconButton,
   Menu,
-  MenuButton,
   MenuItem,
   MenuList,
   Portal,
@@ -29,6 +27,7 @@ import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkModal from 'components/LynkModal'
+import LynkAction from 'components/Misc/LynkAction'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -40,7 +39,6 @@ import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
 import { GetUsers } from 'graphQL/Queries'
 
 import { BiTrash } from 'react-icons/bi'
-import { FaEllipsisV } from 'react-icons/fa'
 
 function userTimeStart(row) {
   let timeStart
@@ -58,12 +56,10 @@ const TeamTable = () => {
   const { organization } = useGlobalState()
   const SERVER_URL = process.env.REACT_APP_SERVER
 
-  const { headingTextColor, primaryTextColor, secondaryTextColor } =
-    useThemeColor([
-      'headingTextColor',
-      'primaryTextColor',
-      'secondaryTextColor'
-    ])
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
   const paddingCell = 0
   const paddingHeadCell = 0
 
@@ -228,12 +224,7 @@ const TeamTable = () => {
         const { invitationStatus } = row
         return (
           <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color={secondaryTextColor}
-            />
+            <LynkAction />
             <Portal>
               <MenuList fontSize={'sm'}>
                 <MenuItem

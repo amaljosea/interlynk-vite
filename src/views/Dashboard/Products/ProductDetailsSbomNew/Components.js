@@ -26,7 +26,7 @@ import {
 } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
-import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 import { useColorMode, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
@@ -37,6 +37,7 @@ import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import CpeCard from 'components/Misc/CpeCard'
 import ExternalLink from 'components/Misc/ExternalLink'
+import LynkAction from 'components/Misc/LynkAction'
 import PurlCard from 'components/Misc/PurlCard'
 import ComponentAddModal from 'components/Modal/ComponentAddModal'
 import Pagination from 'components/Pagination'
@@ -54,7 +55,7 @@ import { deleteComSupplier } from 'graphQL/Mutation'
 import { GetComponentData, GetComponentPath } from 'graphQL/Queries'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
-import { FaEllipsisV, FaGlobe, FaLightbulb, FaSitemap } from 'react-icons/fa'
+import { FaGlobe, FaLightbulb, FaSitemap } from 'react-icons/fa'
 import { FaListCheck } from 'react-icons/fa6'
 import { RiFundsBoxFill } from 'react-icons/ri'
 
@@ -81,7 +82,6 @@ const Components = ({ sbomData }) => {
     primaryTextColor,
     inverseSecondaryBgColor,
     primaryBlueText,
-    secondaryTextColor,
     secondaryTextInverse,
     primaryErrorColor
   } = useThemeColor([
@@ -89,7 +89,6 @@ const Components = ({ sbomData }) => {
     'primaryTextColor',
     'inverseSecondaryBgColor',
     'primaryBlueText',
-    'secondaryTextColor',
     'secondaryTextInverse',
     'primaryErrorColor'
   ])
@@ -515,13 +514,7 @@ const Components = ({ sbomData }) => {
             />
             {!customerView ? (
               <Menu>
-                <MenuButton
-                  as={IconButton}
-                  icon={<FaEllipsisV />}
-                  variant='none'
-                  color={secondaryTextColor}
-                  data-testid='component-actions'
-                />
+                <LynkAction data-testid='component-actions' />
                 <Portal>
                   <MenuList fontSize={'sm'}>
                     <MenuItem

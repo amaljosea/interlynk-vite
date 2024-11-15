@@ -3,14 +3,13 @@ import { useParams } from 'react-router-dom'
 import { getEolStatusColor, getFullDateAndTime, timeSince } from 'utils'
 
 import { CheckIcon } from '@chakra-ui/icons'
-import { IconButton, Portal, Stack, Tag, Text, Tooltip } from '@chakra-ui/react'
-import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { Portal, Stack, Tag, Text, Tooltip } from '@chakra-ui/react'
+import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
+import LynkAction from 'components/Misc/LynkAction'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import { useThemeColor } from 'hooks/useThemeColors'
-
-import { FaEllipsisV } from 'react-icons/fa'
 
 const SupportColumns = (
   setActiveRow,
@@ -21,12 +20,10 @@ const SupportColumns = (
   isArchived
 ) => {
   const params = useParams()
-  const { primaryTextColor, primaryErrorColor, secondaryTextColor } =
-    useThemeColor([
-      'primaryTextColor',
-      'primaryErrorColor',
-      'secondaryTextColor'
-    ])
+  const { primaryTextColor, primaryErrorColor } = useThemeColor([
+    'primaryTextColor',
+    'primaryErrorColor'
+  ])
 
   return useMemo(() => {
     const columns = [
@@ -176,12 +173,7 @@ const SupportColumns = (
         selector: (row) => {
           return (
             <Menu>
-              <MenuButton
-                as={IconButton}
-                icon={<FaEllipsisV />}
-                variant='none'
-                color={secondaryTextColor}
-              />
+              <LynkAction />
               <Portal>
                 <MenuList fontSize={'sm'}>
                   {/* EDIT SUPPORT */}
@@ -223,7 +215,6 @@ const SupportColumns = (
     primaryTextColor,
     onCardOpen,
     primaryErrorColor,
-    secondaryTextColor,
     onOpen,
     onDeleteOpen
   ])

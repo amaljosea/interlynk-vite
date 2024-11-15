@@ -1,15 +1,12 @@
 import { useMutation } from '@apollo/client'
 import { useRef, useState } from 'react'
-import { timeSince } from 'utils'
-import { getFullDateAndTime } from 'utils'
+import { getFullDateAndTime, timeSince } from 'utils'
 
 import {
   Button,
   Flex,
-  IconButton,
   Input,
   Menu,
-  MenuButton,
   MenuItem,
   MenuList,
   Portal,
@@ -23,20 +20,16 @@ import {
 } from '@chakra-ui/react'
 
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
+import LynkAction from 'components/Misc/LynkAction'
 import LynkSwitch from 'components/Misc/LynkSwitch'
-
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateShareLynk } from 'graphQL/Mutation'
 import { DeleteShareLynk } from 'graphQL/Mutation'
-
-import { FaEllipsisV } from 'react-icons/fa'
 
 function SBOMLinkRow(props) {
   const { id, signedUrlParams, updatedAt, contents, shareUsers, enabled } =
     props
 
-  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const btnRef = useRef()
@@ -157,13 +150,7 @@ function SBOMLinkRow(props) {
       </Td>
       <Td pl={0}>
         <Menu>
-          <MenuButton
-            as={IconButton}
-            aria-label='Options'
-            icon={<FaEllipsisV />}
-            variant='none'
-            color={secondaryTextColor}
-          />
+          <LynkAction aria-label='Options' />
           <Portal>
             <MenuList fontSize={'sm'}>
               <MenuItem onClick={handleStatus}>

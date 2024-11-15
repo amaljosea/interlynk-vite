@@ -4,11 +4,9 @@ import { timeSince, updatedValue } from 'utils'
 import { capitalizeFirstLetter, getFullDateAndTime } from 'utils'
 
 import {
-  IconButton,
   List,
   ListItem,
   Menu,
-  MenuButton,
   MenuItem,
   MenuList,
   Portal,
@@ -17,6 +15,7 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 
+import LynkAction from 'components/Misc/LynkAction'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -25,7 +24,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { AutomationRuleUpdate } from 'graphQL/Mutation'
 
-import { FaEllipsisV } from 'react-icons/fa'
 import { MdDragIndicator } from 'react-icons/md'
 
 export const useAutomationColumns = ({
@@ -52,10 +50,7 @@ export const useAutomationColumns = ({
     childKey: 'edit_product_automations'
   })
 
-  const { primaryTextColor, secondaryTextColor } = useThemeColor([
-    'primaryTextColor',
-    'secondaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const filterProjects = projects?.filter((item) => item?.id !== productId)
 
@@ -272,14 +267,7 @@ export const useAutomationColumns = ({
         const { isSystem, name } = row
         return (
           <Menu>
-            <MenuButton
-              size='sm'
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color={secondaryTextColor}
-              data-testid={`automation_actions_${name}`}
-            />
+            <LynkAction data-testid={`automation_actions_${name}`} />
             <Portal>
               <MenuList fontSize={'sm'}>
                 {/* EDIT POLICY */}

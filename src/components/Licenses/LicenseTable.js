@@ -14,14 +14,14 @@ import {
 } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
-import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkAction from 'components/Misc/LynkAction'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaEllipsisV } from 'react-icons/fa'
 import { FaScaleBalanced } from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
@@ -30,17 +30,9 @@ import { SubHeaderComponent } from './SubHeaderComponent'
 
 const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
   const [activeRow, setActiveRow] = useState(null)
-  const {
-    headingTextColor,
-    primaryTextColor,
-    primaryBlueText,
-    secondaryTextColor
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'primaryBlueText',
-    'secondaryTextColor'
-  ])
+  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
+    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
+  )
 
   const updateLic = useHasPermission({
     parentKey: 'view_license',
@@ -234,13 +226,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
       selector: (row) => {
         return (
           <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color={secondaryTextColor}
-              aria-label={`license action ${row?.content?.name}`}
-            />
+            <LynkAction aria-label={`license action ${row?.content?.name}`} />
             <Portal>
               <MenuList fontSize={'sm'}>
                 {/* Edit License */}

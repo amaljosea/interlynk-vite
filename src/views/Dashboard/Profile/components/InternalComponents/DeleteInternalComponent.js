@@ -2,22 +2,14 @@ import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
-import {
-  Checkbox,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal
-} from '@chakra-ui/react'
+import { Checkbox, Menu, MenuItem, MenuList, Portal } from '@chakra-ui/react'
+
+import LynkAction from 'components/Misc/LynkAction'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { deleteOrgComp } from 'graphQL/Mutation'
-
-import { FaEllipsisV } from 'react-icons/fa'
 
 export const DeleteInternalComponent = ({
   internalComponent,
@@ -28,10 +20,7 @@ export const DeleteInternalComponent = ({
   const [untag, setUntag] = useState(false)
   const { showToast } = useCustomToast()
 
-  const { secondaryTextColor, primaryErrorColor } = useThemeColor([
-    'secondaryTextColor',
-    'primaryErrorColor'
-  ])
+  const { primaryErrorColor } = useThemeColor(['secondaryTextColor'])
 
   const onCancel = () => setIsConfirming(false)
 
@@ -57,13 +46,7 @@ export const DeleteInternalComponent = ({
   return (
     <>
       <Menu>
-        <MenuButton
-          as={IconButton}
-          icon={<FaEllipsisV />}
-          variant='none'
-          color={secondaryTextColor}
-          data-testid='tag-actions'
-        />
+        <LynkAction data-testid='tag-actions' />
         <Portal>
           <MenuList fontSize={'sm'}>
             <MenuItem

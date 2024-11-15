@@ -14,7 +14,6 @@ import {
   IconButton,
   Link,
   Menu,
-  MenuButton,
   MenuItem,
   MenuList,
   Portal,
@@ -29,6 +28,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import LynkAction from 'components/Misc/LynkAction'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -41,24 +41,15 @@ import {
 } from 'graphQL/Mutation'
 
 import { BiExit } from 'react-icons/bi'
-import { FaEllipsisV } from 'react-icons/fa'
 
 const OrgTable = ({ data, activeOrg }) => {
   const navigate = useNavigate()
   const { showToast } = useCustomToast()
   const [leaveError, setLeaveError] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    headingTextColor,
-    primaryTextColor,
-    primaryBlueText,
-    secondaryTextColor
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'primaryBlueText',
-    'secondaryTextColor'
-  ])
+  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
+    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
+  )
 
   const {
     isOpen: isWarningOpen,
@@ -297,13 +288,7 @@ const OrgTable = ({ data, activeOrg }) => {
         const { id, invitationStatus, superAdmin } = row
         return (
           <Menu>
-            <MenuButton
-              as={IconButton}
-              aria-label='Options'
-              icon={<FaEllipsisV />}
-              variant='none'
-              color={secondaryTextColor}
-            />
+            <LynkAction aria-label='Options' />
             <Portal>
               {invitationStatus === 'invited' ? (
                 <MenuList fontSize='sm'>

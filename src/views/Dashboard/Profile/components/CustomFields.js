@@ -3,20 +3,19 @@ import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 
-import { Flex, IconButton, Portal, Tag, Text, Tooltip } from '@chakra-ui/react'
-import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { Flex, Portal, Tag, Text, Tooltip } from '@chakra-ui/react'
+import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 import { useDisclosure } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
+import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCustomFields } from 'graphQL/Queries'
-
-import { FaEllipsisV } from 'react-icons/fa'
 
 import FieldModal from './FieldModal'
 import FieldWarning from './FieldWarning'
@@ -30,17 +29,8 @@ const CustomFields = () => {
   const { componentVulnCustomFieldDefinitions } = data || ''
   const { nodes } = componentVulnCustomFieldDefinitions || ''
 
-  const {
-    headingTextColor,
-    primaryTextColor,
-    secondaryTextColor,
-    primaryErrorColor
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'secondaryTextColor',
-    'primaryErrorColor'
-  ])
+  const { headingTextColor, primaryTextColor, primaryErrorColor } =
+    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
 
   const [activeRow, setActiveRow] = useState(null)
 
@@ -126,12 +116,7 @@ const CustomFields = () => {
       selector: (row) => {
         return (
           <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color={secondaryTextColor}
-            />
+            <LynkAction />
             <Portal>
               <MenuList fontSize={'sm'}>
                 <MenuItem onClick={() => onUpdate(row)}>Edit Field</MenuItem>

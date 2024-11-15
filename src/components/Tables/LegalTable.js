@@ -15,9 +15,7 @@ import {
 import {
   Flex,
   Icon,
-  IconButton,
   Menu,
-  MenuButton,
   MenuItem,
   MenuList,
   Portal,
@@ -29,6 +27,7 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
+import LynkAction from 'components/Misc/LynkAction'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -39,8 +38,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { OrganizationManufacturerDelete } from 'graphQL/Mutation'
 import { GetOrgManufacturers } from 'graphQL/Queries'
 
-import { FaEllipsisV } from 'react-icons/fa'
-
 const LegalTable = () => {
   const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
@@ -49,14 +46,12 @@ const LegalTable = () => {
     headingTextColor,
     primaryTextColor,
     primaryErrorColor,
-    primaryBlueText,
-    secondaryTextColor
+    primaryBlueText
   } = useThemeColor([
     'headingTextColor',
     'primaryTextColor',
     'primaryErrorColor',
-    'primaryBlueText',
-    'secondaryTextColor'
+    'primaryBlueText'
   ])
 
   const updateOrg = useHasPermission({
@@ -263,12 +258,7 @@ const LegalTable = () => {
       selector: (row) => {
         return (
           <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color={secondaryTextColor}
-            />
+            <LynkAction />
             <Portal>
               <MenuList fontSize={'sm'}>
                 <MenuItem

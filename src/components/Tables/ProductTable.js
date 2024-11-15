@@ -39,6 +39,7 @@ import IconBox from 'components/Icons/IconBox'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import ProdLabel from 'components/Label/ProdLabel'
 import EnvList from 'components/Misc/EnvList'
+import LynkAction from 'components/Misc/LynkAction'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
@@ -497,14 +498,10 @@ const ProductTable = ({
         const { enabled, labels, name } = row
         return (
           <Menu>
-            <MenuButton
-              variant='none'
-              as={IconButton}
-              aria-label={`dropdown menu for ${name}`}
-              color={secondaryTextColor}
-              icon={<FaEllipsisV />}
+            <LynkAction
               data-testid='product-actions'
               onClick={() => setOpenTagMenu(false)}
+              aria-label={`dropdown menu for ${name}`}
             />
             <Portal>
               <MenuList fontSize={'sm'}>

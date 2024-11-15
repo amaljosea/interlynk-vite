@@ -5,14 +5,14 @@ import { GetIcon, isValidPurl } from 'utils'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { IconButton, Link, Portal, Stack, Text } from '@chakra-ui/react'
 import { Grid, GridItem, SimpleGrid } from '@chakra-ui/react'
-import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
+import LynkAction from 'components/Misc/LynkAction'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
-import { FaEllipsisV } from 'react-icons/fa'
 
 const PartsColumns = (
   onFilterSev,
@@ -25,17 +25,12 @@ const PartsColumns = (
   onSelectPart,
   generateProductVersionDetailPageUrlFromCurrentUrl
 ) => {
-  const {
-    primaryTextColor,
-    primaryBlueText,
-    secondaryTextColor,
-    inverseSecondaryBgColor
-  } = useThemeColor([
-    'primaryTextColor',
-    'primaryBlueText',
-    'secondaryTextColor',
-    'inverseSecondaryBgColor'
-  ])
+  const { primaryTextColor, primaryBlueText, inverseSecondaryBgColor } =
+    useThemeColor([
+      'primaryTextColor',
+      'primaryBlueText',
+      'inverseSecondaryBgColor'
+    ])
   const navigate = useNavigate()
 
   return useMemo(() => {
@@ -254,13 +249,7 @@ const PartsColumns = (
         selector: (row) => {
           return (
             <Menu>
-              <MenuButton
-                as={IconButton}
-                icon={<FaEllipsisV />}
-                variant='none'
-                data-testid='part-actions'
-                color={secondaryTextColor}
-              />
+              <LynkAction data-testid='part-actions' />
               <Portal>
                 <MenuList fontSize={'sm'}>
                   <MenuItem
@@ -290,7 +279,6 @@ const PartsColumns = (
     inverseSecondaryBgColor,
     primaryTextColor,
     primaryBlueText,
-    secondaryTextColor,
     updateSboms,
     signedUrlParams,
     onDeleteOpen,

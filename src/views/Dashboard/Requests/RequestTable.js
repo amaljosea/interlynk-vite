@@ -12,6 +12,7 @@ import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import SearchFilter from 'components/Licenses/LicenseSearchFilter'
+import LynkAction from 'components/Misc/LynkAction'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -288,14 +289,7 @@ const RequestTable = (props) => {
       selector: (row) => {
         return (
           <Menu>
-            <MenuButton
-              width={'10%'}
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color={secondaryTextColor}
-              aria-label={`req action for ${row?.email}`}
-            />
+            <LynkAction aria-label={`req action for ${row?.email}`} />
             <Portal>
               <MenuList fontSize={'sm'}>
                 <MenuItem

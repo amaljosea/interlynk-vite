@@ -7,9 +7,7 @@ import DeleteRole from 'views/Dashboard/Profile/components/DeleteRole'
 
 import {
   Flex,
-  IconButton,
   Menu,
-  MenuButton,
   MenuItem,
   MenuList,
   Portal,
@@ -21,6 +19,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 import AddButton from 'components/Icons/AddButton'
+import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -28,8 +27,6 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetRoles } from 'graphQL/Queries'
-
-import { FaEllipsisV } from 'react-icons/fa'
 
 const RoleTable = () => {
   const activetab = useQueryParam('tab')
@@ -63,17 +60,8 @@ const RoleTable = () => {
     onOpen: onRoleOpen,
     onClose: onRoleClose
   } = useDisclosure()
-  const {
-    headingTextColor,
-    primaryTextColor,
-    primaryErrorColor,
-    secondaryTextColor
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'primaryErrorColor',
-    'secondaryTextColor'
-  ])
+  const { headingTextColor, primaryTextColor, primaryErrorColor } =
+    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
   const paddingCell = 0
   const paddingHeadCell = 0
 
@@ -116,12 +104,7 @@ const RoleTable = () => {
         const { name } = row
         return (
           <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color={secondaryTextColor}
-            />
+            <LynkAction />
             <Portal>
               <MenuList fontSize={'sm'}>
                 <MenuItem

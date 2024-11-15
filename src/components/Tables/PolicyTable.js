@@ -19,7 +19,6 @@ import {
   Box,
   Flex,
   Heading,
-  IconButton,
   Portal,
   Select,
   Stack,
@@ -37,11 +36,12 @@ import {
   Thead,
   Tr
 } from '@chakra-ui/react'
-import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import LynkAction from 'components/Misc/LynkAction'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 import Pagination from 'components/Pagination'
 
@@ -52,8 +52,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
-
-import { FaEllipsisV } from 'react-icons/fa'
 
 const PolicyTable = ({ data, loading, paginationProps }) => {
   const { showToast } = useCustomToast()
@@ -80,13 +78,11 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
   const {
     headingTextColor,
     primaryTextColor,
-    secondaryTextColor,
     secondaryTextInverse,
     primaryErrorColor
   } = useThemeColor([
     'headingTextColor',
     'primaryTextColor',
-    'secondaryTextColor',
     'secondaryTextInverse',
     'primaryErrorColor'
   ])
@@ -297,13 +293,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
       selector: (row, index) => {
         return (
           <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              data-testid={`policy_actions_${index}`}
-              color={secondaryTextColor}
-            />
+            <LynkAction data-testid={`policy_actions_${index}`} />
             <Portal>
               <MenuList fontSize={'sm'}>
                 {/* EDIT POLICY */}

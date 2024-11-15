@@ -3,7 +3,7 @@ import { useTour } from '@reactour/tour'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFormat, getFullDateAndTime } from 'utils'
 import { getLink, getType, timeSince } from 'utils'
 import { getSignedUrlParams } from 'utils'
@@ -15,13 +15,14 @@ import { Flex, useDisclosure } from '@chakra-ui/react'
 import { Link as Olink, Portal, SimpleGrid, Stack } from '@chakra-ui/react'
 import { Divider, Grid, GridItem, Icon, IconButton } from '@chakra-ui/react'
 import { Box, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
-import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import ArchivedVersions from 'components/Drawer/ArchivedVersions'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ToolsDrawer from 'components/Drawer/ToolsDrawer'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import LynkAction from 'components/Misc/LynkAction'
 import VulnBadge from 'components/Misc/VulnBadge'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 import DeleteSbom from 'components/Modal/DeleteSbom'
@@ -39,7 +40,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
 
-import { FaEllipsisV } from 'react-icons/fa'
 import { FaBoxArchive, FaCodeCompare } from 'react-icons/fa6'
 import { FaScrewdriverWrench } from 'react-icons/fa6'
 import { HiOutlineDuplicate } from 'react-icons/hi'
@@ -91,14 +91,12 @@ const VersionsTable = (props) => {
     headingTextColor,
     primaryTextColor,
     primaryErrorColor,
-    primaryBlueText,
-    secondaryTextColor
+    primaryBlueText
   } = useThemeColor([
     'headingTextColor',
     'primaryTextColor',
     'primaryErrorColor',
-    'primaryBlueText',
-    'secondaryTextColor'
+    'primaryBlueText'
   ])
 
   const LIST = useDisclosure()
@@ -432,13 +430,7 @@ const VersionsTable = (props) => {
       selector: (row) => {
         return (
           <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color={secondaryTextColor}
-              aria-label={`sbom-${row?.projectVersion}-actions`}
-            />
+            <LynkAction aria-label={`sbom-${row?.projectVersion}-actions`} />
             <Portal>
               <MenuList fontSize={'sm'}>
                 <MenuItem
