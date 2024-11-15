@@ -76,7 +76,6 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
     const { value } = e.target
     const trimmedLink = value.trim()
     setLink(value)
-    setError('')
     setLinkError('')
     if (trimmedLink.length > 1024) {
       setLinkError('Input must be 1024 characters')
@@ -163,6 +162,9 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
     />
   )
 
+  const isDisabled =
+    !validateUrl(link.trim()) || linkError !== '' || error !== ''
+
   useEffect(() => {
     if (externalUrls?.length > 0) {
       const urls = []
@@ -248,11 +250,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
                 <FormErrorMessage>{linkError}</FormErrorMessage>
               </FormControl>
               {/* ACTIONS */}
-              <Button
-                colorScheme='blue'
-                type='submit'
-                isDisabled={!validateUrl(link.trim()) || linkError !== ''}
-              >
+              <Button colorScheme='blue' type='submit' isDisabled={isDisabled}>
                 Add
               </Button>
               {/* TABLE */}
