@@ -6,7 +6,15 @@ import { v4 as uuidv4 } from 'uuid'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { InfoIcon } from '@chakra-ui/icons'
-import { Box, Flex, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  IconButton,
+  Select,
+  Stack,
+  Text,
+  Tooltip
+} from '@chakra-ui/react'
 import {
   Drawer,
   DrawerBody,
@@ -144,8 +152,15 @@ const TreeView = ({ isOpen, onClose, compId }) => {
   const [getData] = useLazyQuery(GetCompDependency)
 
   const [tree, setTree] = useState({})
+  const [gap, setGap] = useState(2)
   const [filterText, setFilterText] = useState('')
+  const [orientation, setOrientation] = useState('horizontal')
   const [zoom, setZoom] = useState(Number(0.8))
+  const [depthFactor, setDepthFactor] = useState(450)
+  const [translate, setTranslate] = useState({
+    x: 30,
+    y: 300
+  })
 
   const handleZoomIn = () => setZoom(zoom + Number(0.1))
   const handleZoomOut = () => setZoom(zoom - Number(0.1))
@@ -234,14 +249,22 @@ const TreeView = ({ isOpen, onClose, compId }) => {
     }
   }
 
-  console.log('tree', tree)
-
   const nodeSize = { x: 1000, y: 500 }
   const foreignObjectProps = {
     width: nodeSize.x,
     height: nodeSize.y,
     x: -10,
     y: 12
+  }
+
+  const onChangeDirection = (e) => {
+    const { value } = e.target
+    const isVertical = value === 'vertical'
+    const positions = { x: isVertical ? 500 : 30, y: isVertical ? 100 : 300 }
+    setTranslate(positions)
+    setGap(isVertical ? 3 : 2)
+    setDepthFactor(isVertical ? 300 : 450)
+    setOrientation(value)
   }
 
   useEffect(() => {
@@ -271,14 +294,25 @@ const TreeView = ({ isOpen, onClose, compId }) => {
                   alignItems={'center'}
                   justifyContent={'space-between'}
                 >
-                  <SearchFilter
-                    id='relationship'
-                    filterText={filterText}
-                    onFilter={handleSearch}
-                    onClear={handleClear}
-                    onChange={onSearchInputChange}
-                  />
-                  <Flex gap={2}>
+                  <Flex gap={2} alignItems={'center'}>
+                    <SearchFilter
+                      id='relationship'
+                      filterText={filterText}
+                      onFilter={handleSearch}
+                      onClear={handleClear}
+                      onChange={onSearchInputChange}
+                    />
+                    <Select
+                      fontSize={'sm'}
+                      w={'160px'}
+                      value={orientation}
+                      onChange={onChangeDirection}
+                    >
+                      <option value='horizontal'>Horizontal</option>
+                      <option value='vertical'>Vertical</option>
+                    </Select>
+                  </Flex>
+                  <Flex gap={2} alignItems={'center'}>
                     <Tooltip label='Zoom In'>
                       <IconButton
                         variant='outline'
@@ -301,8 +335,11 @@ const TreeView = ({ isOpen, onClose, compId }) => {
                   draggable
                   data={tree}
                   zoom={Number(zoom)}
+                  translate={translate}
                   pathFunc={'diagonal'}
-                  depthFactor={450}
+                  depthFactor={depthFactor}
+                  orientation={orientation}
+                  separation={{ siblings: gap, nonSiblings: gap }}
                   renderCustomNodeElement={(rd3tProps) => (
                     <CustomNode
                       {...rd3tProps}
@@ -310,10 +347,6 @@ const TreeView = ({ isOpen, onClose, compId }) => {
                       foreignObjectProps={foreignObjectProps}
                     />
                   )}
-                  translate={{
-                    x: 30,
-                    y: 300
-                  }}
                 />
               </Stack>
             ) : (
