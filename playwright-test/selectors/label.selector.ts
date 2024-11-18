@@ -1,8 +1,7 @@
 class LabelSelectors {
   public static productLink = "a[href='/vendor/products']"
   public static productsHeader = "//a[text()='products']"
-  public static addLabelButton =
-    "((//div[@class='chakra-stack css-rmxdag'])[2]//button)[1]"
+  public static addLabelButton = "//button[@aria-label='Manage Labels']"
   public static labelPopup =
     "//div[contains(@id, 'chakra-modal') and @role='dialog']"
   public static labelHeader = "//header[text()='Manage Labels']"

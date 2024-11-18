@@ -301,6 +301,7 @@ const ProductTable = ({
           {/* EDIT LABEL */}
           <Tooltip label='Manage Labels'>
             <IconButton
+              aria-label='Manage Labels'
               icon={<FaTag />}
               variant='outline'
               onClick={onOpenLabel}
