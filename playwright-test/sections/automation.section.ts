@@ -1,8 +1,6 @@
 import * as dotenv from 'dotenv'
 import { Page, expect } from '@playwright/test'
 
-import { generateUniqueId } from '../utils/utils'
-
 dotenv.config({ path: '.env' })
 
 const errors: string[] = []
@@ -15,34 +13,21 @@ export default class AutomationSection {
     this.page = page
   }
 
-  public async add() {
-    try {
-      await this.page.locator("//a[@aria-label='products']").click()
+  public async createRule() {
+    const automationTab = await this.page
+      .getByRole('tab', { name: 'automation rules' })
+      .isVisible()
 
-      await this.page.locator("//button[@aria-label='Add product']").click()
-      await this.page.getByPlaceholder('Add product name').fill('Test')
-      await this.page
-        .getByPlaceholder('Add product description')
-        .fill('for testing')
-      await this.page.locator("button[type='submit']").click()
-      await this.page.waitForTimeout(3000)
+    if (automationTab) {
+      await this.page.getByRole('tab', { name: 'automation rules' }).click()
+      await this.page.waitForTimeout(2000)
 
-      const product = this.page
-        .locator(`//p[@aria-label='product_name']`)
-        .nth(0)
+      const addBtn = `//button[@aria-label='add_automation_rule']`
+      const addAutomation = await this.page.locator(addBtn).isVisible()
 
-      if (product.isVisible()) {
-        await product.click()
+      if (addAutomation) {
+        await this.page.locator(addBtn).click()
         await this.page.waitForTimeout(2000)
-
-        await this.page.getByRole('tab', { name: 'automation rules' }).click()
-        await this.page.waitForTimeout(2000)
-
-        await this.page
-          .locator(`//button[@aria-label='add_automation_rule']`)
-          .click()
-        await this.page.waitForTimeout(2000)
-
         await this.page.getByPlaceholder('Enter rule name').fill(ruleName)
         await this.page
           .getByTestId(`auto_conditon_subject_0`)
@@ -61,7 +46,39 @@ export default class AutomationSection {
         await this.page.locator("button[type='submit']").click()
         await this.page.waitForTimeout(3000)
       } else {
-        errors.push(`Product not found`)
+        errors.push('Add action not found')
+      }
+    } else {
+      errors.push('Automation tab not found')
+    }
+  }
+
+  public async add() {
+    try {
+      await this.page.locator("//a[@aria-label='products']").click()
+      await this.page.waitForTimeout(3000)
+
+      const product = await this.page.getByTestId(`product_Test`).isVisible()
+
+      if (product) {
+        console.log('Product "test" exists. Creating rule.')
+        await this.page.getByTestId(`product_Test`).click()
+        await this.page.waitForTimeout(3000)
+        await this.createRule()
+        await this.page.waitForTimeout(3000)
+      } else {
+        console.log('Product "test" does not exist. Creating it.')
+        await this.page.locator("//button[@aria-label='Add product']").click()
+        await this.page.getByPlaceholder('Add product name').fill('Test')
+        await this.page
+          .getByPlaceholder('Add product description')
+          .fill('for testing')
+        await this.page.locator("button[type='submit']").click()
+        await this.page.waitForTimeout(3000)
+        await this.page.getByTestId(`product_Test`).click()
+        await this.page.waitForTimeout(3000)
+        await this.createRule()
+        await this.page.waitForTimeout(3000)
       }
 
       expect(errors.length).toBe(0)
@@ -126,6 +143,7 @@ export default class AutomationSection {
         await this.page
           .locator(`//button[@aria-label='dropdown menu for Test']`)
           .click()
+
         await this.page
           .locator(`//button[@aria-label='Delete product Test']`)
           .click()

@@ -15,70 +15,74 @@ export default class GeneralSection {
     this.page = page
   }
 
+  public async addSBOM() {
+    await this.page
+      .locator(`//button[@aria-label='dropdown menu for Test']`)
+      .click()
+    await this.page
+      .locator(`//button[@aria-label='upload sbom for Test']`)
+      .click()
+
+    const jsonFiles = getFileNamesFromResource('.json')
+
+    const sbom = path.resolve(__dirname, '../resources', jsonFiles[0])
+    await this.page.locator("//input[@id='fileInput']").setInputFiles(sbom)
+    await this.page.waitForTimeout(2000)
+
+    await this.page.locator("button[type='submit']").click()
+    await this.page.waitForTimeout(2000)
+
+    await this.page.getByTestId(`product_Test`).click()
+    await this.page.waitForTimeout(2000)
+
+    const version = await this.page.getByTestId('version').nth(0).isVisible()
+
+    if (version) {
+      await this.page.getByTestId('version').nth(0).click()
+      await this.page.waitForTimeout(2000)
+
+      await this.page.locator(`//button[@aria-label='add_tool']`).click()
+      await this.page.getByPlaceholder('Add vendor').fill('SPDX')
+      await this.page.getByPlaceholder('Add name').fill('Maven')
+      await this.page.getByPlaceholder('Add version').fill('4.5.6')
+      await this.page.getByRole('button', { name: 'Save' }).click()
+      await this.page.waitForTimeout(3000)
+
+      await this.page.getByLabel('close').nth(1).click()
+      await this.page.waitForTimeout(3000)
+
+      await this.page.getByRole('button', { name: 'Yes' }).click()
+    } else {
+      errors.push('Version not found')
+    }
+  }
+
   // TOOLS
   public async tools() {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
-
-      await this.page.locator("//button[@aria-label='Add product']").click()
-      await this.page.getByPlaceholder('Add product name').fill('Test')
-      await this.page
-        .getByPlaceholder('Add product description')
-        .fill('for testing')
-      await this.page.locator("button[type='submit']").click()
-
       await this.page.waitForTimeout(3000)
 
-      const product = this.page
-        .locator(`//p[@aria-label='product_name']`)
-        .nth(0)
+      const product = await this.page.getByTestId(`product_Test`).isVisible()
 
-      if (product.isVisible()) {
-        await this.page
-          .locator(`//button[@aria-label='dropdown menu for Test']`)
-          .click()
-        await this.page
-          .locator(`//button[@aria-label='upload sbom for Test']`)
-          .click()
-
-        const jsonFiles = getFileNamesFromResource('.json')
-
-        const sbom = path.resolve(__dirname, '../resources', jsonFiles[0])
-        await this.page.locator("//input[@id='fileInput']").setInputFiles(sbom)
-        await this.page.waitForTimeout(2000)
-
-        await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(2000)
-
-        await product.click()
-        await this.page.waitForTimeout(2000)
-
-        const version = this.page.getByTestId('version').nth(0)
-
-        if (version.isVisible()) {
-          await version.click()
-          await this.page.waitForTimeout(2000)
-
-          await this.page.locator(`//button[@aria-label='add_tool']`).click()
-          await this.page.getByPlaceholder('Add vendor').fill('SPDX')
-          await this.page.getByPlaceholder('Add name').fill('Maven')
-          await this.page.getByPlaceholder('Add version').fill('4.5.6')
-          await this.page.getByRole('button', { name: 'Save' }).click()
-          await this.page.waitForTimeout(3000)
-
-          await this.page.getByLabel('close').nth(1).click()
-          await this.page.waitForTimeout(3000)
-
-          await this.page.getByRole('button', { name: 'Yes' }).click()
-          await this.page.waitForTimeout(3000)
-        } else {
-          errors.push('Version not found')
-        }
+      if (product) {
+        console.log('Product "test" exists. Uploading SBOM.')
+        await this.page.waitForTimeout(3000)
+        await this.addSBOM()
+        await this.page.waitForTimeout(3000)
       } else {
-        errors.push('Product not found')
+        console.log('Product "test" does not exist. Creating it.')
+        await this.page.locator("//button[@aria-label='Add product']").click()
+        await this.page.getByPlaceholder('Add product name').fill('Test')
+        await this.page
+          .getByPlaceholder('Add product description')
+          .fill('for testing')
+        await this.page.locator("button[type='submit']").click()
+        await this.page.waitForTimeout(3000)
+        await this.addSBOM()
+        await this.page.waitForTimeout(3000)
       }
 
-      await this.page.waitForTimeout(2000)
       expect(errors.length).toBe(0)
     } catch (error) {
       throw error

@@ -7,6 +7,8 @@ import { getFileNamesFromResource } from '../utils/utils'
 dotenv.config({ path: '.env' })
 
 const errors: string[] = []
+const menuBtn = `//button[@aria-label='dropdown menu for Test']`
+const uploadBtn = `//button[@aria-label='upload sbom for Test']`
 
 export default class VulnsSection {
   page: Page
@@ -15,135 +17,129 @@ export default class VulnsSection {
     this.page = page
   }
 
+  public async handleUpdate() {
+    await this.page.locator(menuBtn).click()
+    await this.page.locator(uploadBtn).click()
+
+    const jsonFiles = getFileNamesFromResource('.json')
+
+    const sbomOne = path.resolve(__dirname, '../resources', jsonFiles[0])
+    await this.page.locator("//input[@id='fileInput']").setInputFiles(sbomOne)
+    await this.page.waitForTimeout(2000)
+
+    await this.page.locator("button[type='submit']").click()
+    await this.page.waitForTimeout(3000)
+
+    await this.page.locator(menuBtn).click()
+    await this.page.locator(uploadBtn).click()
+
+    const sbomTwo = path.resolve(__dirname, '../resources', jsonFiles[1])
+    await this.page.locator("//input[@id='fileInput']").setInputFiles(sbomTwo)
+    await this.page.waitForTimeout(2000)
+
+    await this.page.locator("button[type='submit']").click()
+    await this.page.waitForTimeout(2000)
+
+    await this.page.getByTestId(`product_Test`).click()
+    await this.page.waitForTimeout(60000)
+
+    const version = await this.page.getByTestId('version').nth(0).isVisible()
+
+    if (version) {
+      await this.page.getByTestId('version').nth(0).click()
+      await this.page.waitForTimeout(2000)
+
+      await this.page.getByRole('tab', { name: 'vulnerabilities' }).click()
+      await this.page.waitForTimeout(2000)
+
+      await this.page.locator('//button[@aria-label="refresh"]').click()
+      await this.page.waitForTimeout(5000)
+
+      const vulnOne = await this.page
+        .getByTestId('vexStatus')
+        .nth(0)
+        .isVisible()
+      const vulnTwo = await this.page
+        .getByTestId('vexStatus')
+        .nth(1)
+        .isVisible()
+
+      if (vulnOne) {
+        await this.page.getByTestId('vexStatus').nth(0).click()
+
+        await this.page
+          .locator('//select[@aria-label="vex_status"]')
+          .selectOption({ index: 2 })
+        await this.page
+          .locator('//select[@aria-label="vex_justification"]')
+          .selectOption({ index: 2 })
+        await this.page
+          .locator('//textarea[@aria-label="vex_notes"]')
+          .fill('test')
+
+        await this.page.getByRole('button', { name: 'Save' }).click()
+        await this.page.waitForTimeout(2000)
+        await this.page.getByTestId('vexStatus').nth(0).click()
+      } else {
+        errors.push('Vuln 1 not found')
+      }
+
+      await this.page.waitForTimeout(2000)
+
+      if (vulnTwo) {
+        await this.page.getByTestId('vexStatus').nth(1).click()
+
+        await this.page
+          .locator('//select[@aria-label="vex_status"]')
+          .selectOption({ index: 2 })
+        await this.page
+          .locator('//select[@aria-label="vex_justification"]')
+          .selectOption({ index: 3 })
+        await this.page
+          .locator('//textarea[@aria-label="vex_notes"]')
+          .fill('test')
+
+        await this.page.getByRole('button', { name: 'Save' }).click()
+        await this.page.waitForTimeout(2000)
+
+        await this.page.getByRole('button', { name: 'Show History' }).click()
+        await this.page.waitForTimeout(2000)
+
+        await this.page.getByLabel('Close').click()
+      } else {
+        errors.push('Vuln 2 not found')
+      }
+    } else {
+      errors.push('Version not found')
+    }
+  }
+
   // STATUS
   public async vexStatus() {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
-
-      await this.page.locator("//button[@aria-label='Add product']").click()
-      await this.page.getByPlaceholder('Add product name').fill('Test')
-      await this.page
-        .getByPlaceholder('Add product description')
-        .fill('for testing')
-      await this.page.locator("button[type='submit']").click()
-
       await this.page.waitForTimeout(3000)
 
-      const product = this.page
-        .locator(`//p[@aria-label='product_name']`)
-        .nth(0)
+      const product = await this.page.getByTestId(`product_Test`).isVisible()
 
-      if (product.isVisible()) {
+      if (product) {
+        console.log('Product "test" exists. Uploading SBOM.')
+        await this.page.waitForTimeout(3000)
+        await this.handleUpdate()
+        await this.page.waitForTimeout(3000)
+      } else {
+        console.log('Product "test" does not exist. Creating it.')
+        await this.page.locator("//button[@aria-label='Add product']").click()
+        await this.page.getByPlaceholder('Add product name').fill('Test')
         await this.page
-          .locator(`//button[@aria-label='dropdown menu for Test']`)
-          .click()
-        await this.page
-          .locator(`//button[@aria-label='upload sbom for Test']`)
-          .click()
-
-        const jsonFiles = getFileNamesFromResource('.json')
-
-        const sbomOne = path.resolve(__dirname, '../resources', jsonFiles[0])
-        await this.page
-          .locator("//input[@id='fileInput']")
-          .setInputFiles(sbomOne)
-        await this.page.waitForTimeout(2000)
-
+          .getByPlaceholder('Add product description')
+          .fill('for testing')
         await this.page.locator("button[type='submit']").click()
         await this.page.waitForTimeout(3000)
-
-        await this.page
-          .locator(`//button[@aria-label='dropdown menu for Test']`)
-          .click()
-        await this.page
-          .locator(`//button[@aria-label='upload sbom for Test']`)
-          .click()
-
-        const sbomTwo = path.resolve(__dirname, '../resources', jsonFiles[1])
-        await this.page
-          .locator("//input[@id='fileInput']")
-          .setInputFiles(sbomTwo)
-        await this.page.waitForTimeout(2000)
-
-        await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(2000)
-
-        await product.click()
-
-        await this.page.reload()
-        await this.page.waitForTimeout(20000)
-        await this.page.reload()
-
-        const version = this.page.getByTestId('version').nth(0)
-
-        if (version.isVisible()) {
-          await version.click()
-          await this.page.waitForTimeout(2000)
-
-          await this.page.getByRole('tab', { name: 'vulnerabilities' }).click()
-          await this.page.waitForTimeout(1000)
-
-          await this.page.locator('//button[@aria-label="refresh"]').click()
-          await this.page.waitForTimeout(2000)
-
-          const vulnOne = this.page.getByTestId('vexStatus').nth(0)
-          const vulnTwo = this.page.getByTestId('vexStatus').nth(1)
-
-          if (vulnOne.isVisible()) {
-            await vulnOne.click()
-
-            await this.page
-              .locator('//select[@aria-label="vex_status"]')
-              .selectOption({ index: 2 })
-            await this.page
-              .locator('//select[@aria-label="vex_justification"]')
-              .selectOption({ index: 2 })
-            await this.page
-              .locator('//textarea[@aria-label="vex_notes"]')
-              .fill('test')
-
-            await this.page.getByRole('button', { name: 'Save' }).click()
-            await this.page.waitForTimeout(2000)
-            await vulnOne.click()
-          } else {
-            errors.push('Vuln 1 not found')
-          }
-
-          await this.page.waitForTimeout(2000)
-
-          if (vulnTwo.isVisible()) {
-            await vulnTwo.click()
-
-            await this.page
-              .locator('//select[@aria-label="vex_status"]')
-              .selectOption({ index: 2 })
-            await this.page
-              .locator('//select[@aria-label="vex_justification"]')
-              .selectOption({ index: 3 })
-            await this.page
-              .locator('//textarea[@aria-label="vex_notes"]')
-              .fill('test')
-
-            await this.page.getByRole('button', { name: 'Save' }).click()
-            await this.page.waitForTimeout(2000)
-
-            await this.page
-              .getByRole('button', { name: 'Show History' })
-              .click()
-            await this.page.waitForTimeout(2000)
-
-            await this.page.getByLabel('Close').click()
-          } else {
-            errors.push('Vuln 2 not found')
-          }
-        } else {
-          errors.push('Version not found')
-        }
-      } else {
-        errors.push('Product not found')
+        await this.handleUpdate()
+        await this.page.waitForTimeout(3000)
       }
 
-      await this.page.waitForTimeout(2000)
       expect(errors.length).toBe(0)
     } catch (error) {
       throw error
@@ -154,15 +150,13 @@ export default class VulnsSection {
   public async vulnLinks() {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
+      await this.page.waitForTimeout(3000)
 
-      const product = this.page.getByTestId(`product_Test`)
+      const product = await this.page.getByTestId(`product_Test`).isVisible()
 
-      if (product.isVisible()) {
-        await product.click()
-        await this.page.waitForTimeout(2000)
-
-        await this.page.reload()
-        await this.page.waitForTimeout(2000)
+      if (product) {
+        await this.page.getByTestId(`product_Test`).click()
+        await this.page.waitForTimeout(3000)
 
         const version = this.page.getByTestId('version').nth(0)
 
@@ -244,14 +238,13 @@ export default class VulnsSection {
   public async importStatus() {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
-      const product = this.page.getByTestId(`product_Test`)
+      await this.page.waitForTimeout(3000)
 
-      if (product.isVisible()) {
-        await product.click()
+      const product = this.page.getByTestId(`product_Test`).isVisible()
 
-        await this.page.reload()
-        await this.page.waitForTimeout(20000)
-        await this.page.reload()
+      if (product) {
+        await this.page.getByTestId(`product_Test`).click()
+        await this.page.waitForTimeout(2000)
 
         const version = this.page.getByTestId('version').nth(1)
 
