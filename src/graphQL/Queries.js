@@ -2196,6 +2196,9 @@ export const GetVulnData = gql`
           fixedIn
           componentVulnCustomFields {
             id
+            componentVulnCustomFieldDefinition {
+              displayName
+            }
             componentVulnCustomFieldDefinitionId
             value
           }

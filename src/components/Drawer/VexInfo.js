@@ -1,16 +1,15 @@
 import styled from 'styled-components'
 import { timeSince } from 'utils'
 
-import { Box, Stack, Text } from '@chakra-ui/react'
+import { Box, SimpleGrid, Text } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const VexInfo = ({ data }) => {
+const VexInfo = ({ data, fields }) => {
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const CustomText = styled(Text)`
     font-size: 13px;
-    font-weight: bold;
     color: #718096;
     letter-spacing: 0.6px;
   `
@@ -18,7 +17,7 @@ const VexInfo = ({ data }) => {
   const style = { color: primaryTextColor, mt: 1, fontSize: 14 }
 
   return (
-    <Stack spacing={4} pt={2} px={4}>
+    <SimpleGrid columns={2} gap={4} pt={2} px={4}>
       <Box>
         <CustomText>Status</CustomText>
         <Text sx={style}>{data?.status || 'N/A'}</Text>
@@ -47,6 +46,15 @@ const VexInfo = ({ data }) => {
         <CustomText>Details</CustomText>
         <Text sx={style}>{data?.detail || 'N/A'}</Text>
       </Box>
+      {fields?.length > 0 &&
+        fields?.map((item) => (
+          <Box key={item?.id}>
+            <CustomText>
+              {item?.componentVulnCustomFieldDefinition?.displayName || ''}
+            </CustomText>
+            <Text sx={style}>{item?.value || ''}</Text>
+          </Box>
+        ))}
       <Box>
         <CustomText>Created By</CustomText>
         <Text sx={style}>{data?.changedBy || 'N/A'}</Text>
@@ -57,7 +65,7 @@ const VexInfo = ({ data }) => {
           {data?.updatedAt ? timeSince(data?.updatedAt) : 'N/A'}
         </Text>
       </Box>
-    </Stack>
+    </SimpleGrid>
   )
 }
 
