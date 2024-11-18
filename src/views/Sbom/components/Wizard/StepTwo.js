@@ -48,10 +48,10 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
       id: 'cve',
       name: 'ID',
       selector: (row) => {
-        const { toVuln } = row
+        const { fromVuln } = row
         return (
           <Link
-            href={linkURl(toVuln?.vuln?.source, toVuln?.vuln?.vulnId)}
+            href={linkURl(fromVuln?.vuln?.source, fromVuln?.vuln?.vulnId)}
             target={'_blank'}
           >
             <Flex direction='row' alignItems={'center'} gap={2}>
@@ -61,9 +61,9 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
                 w={'16px'}
                 color={primaryBlueText}
               />
-              <Tooltip label={toVuln?.vuln?.vulnId} placement={'top'}>
+              <Tooltip label={fromVuln?.vuln?.vulnId} placement={'top'}>
                 <Text fontSize='sm' color={primaryTextColor}>
-                  {toVuln?.vuln?.vulnId || ''}
+                  {fromVuln?.vuln?.vulnId || ''}
                 </Text>
               </Tooltip>
             </Flex>
@@ -77,14 +77,14 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
     {
       id: 'serverity',
       name: 'SEVERITY',
-      selector: (row) => <SeverityTag value={row?.toVuln?.vuln?.sev} />
+      selector: (row) => <SeverityTag value={row?.fromVuln?.vuln?.sev} />
     },
     // COMPONENT
     {
       id: 'COMPONENTS_NAME',
       name: 'COMPONENT',
       selector: (row) => {
-        const { toVuln } = row
+        const { fromVuln } = row
         return (
           <Stack
             direction='column'
@@ -93,10 +93,10 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
             my={3}
           >
             <Text color={primaryTextColor}>
-              {toVuln?.component?.name || ''}
+              {fromVuln?.component?.name || 'N/A'}
             </Text>
             <Text color={primaryTextColor}>
-              {toVuln?.component?.version || ''}
+              {fromVuln?.component?.version || ''}
             </Text>
           </Stack>
         )
@@ -172,6 +172,8 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
     })
   }
 
+  const conditionalRowDisabled = (row) => row?.toVuln === null
+
   if (error)
     return (
       <Text mt={6} textAlign={'center'}>
@@ -200,6 +202,7 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
           persistTableHead
           fixedHeaderScrollHeight='50vh'
           onSelectedRowsChange={handleChange}
+          selectableRowDisabled={conditionalRowDisabled}
         />
       </Flex>
     </Box>

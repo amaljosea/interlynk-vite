@@ -4308,15 +4308,6 @@ export const IntersectingVulns = gql`
     intersectingVulns(fromSbomId: $fromSbomId, toSbomId: $toSbomId) {
       fromVuln {
         id
-        vuln {
-          vulnId
-        }
-        vexStatus {
-          name
-        }
-      }
-      toVuln {
-        id
         component {
           name
           version
@@ -4325,6 +4316,15 @@ export const IntersectingVulns = gql`
           vulnId
           source
           sev
+        }
+        vexStatus {
+          name
+        }
+      }
+      toVuln {
+        id
+        vuln {
+          vulnId
         }
         vexStatus {
           name
