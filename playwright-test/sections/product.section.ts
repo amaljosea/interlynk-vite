@@ -175,13 +175,14 @@ export default class ProductSection {
               state: 'visible',
               timeout: 5000
             })
-            await this.page.fill(ps.productSelect, '')
-            await this.page.waitForTimeout(2000)
+            await this.page.locator(ps.productSelect).fill('')
+            await this.page.waitForTimeout(200)
             const value = productNameArr[j]
-            await this.page.locator(ps.productSelect).type(value)
-            // await this.page.fill(ps.productSelect, productNameArr[j])
-            await this.page.press(ps.productSelect, 'Tab', { delay: 500 })
-            await this.page.waitForTimeout(2000)
+            await this.page
+              .locator(ps.productSelect)
+              .type(value, { delay: 100 })
+            await this.page.locator(ps.productSelect).press('Tab')
+            await this.page.waitForTimeout(200)
 
             const versionListLen = (await this.page.$$(ps.versionList)).length
             if (versionListLen > 1) {
@@ -210,11 +211,15 @@ export default class ProductSection {
                   }
                   await waitForSelectorWithMinTime(this.page, ps.versionSelect)
                   if (versionListarr.length > 1) {
-                    await this.page.fill(ps.versionSelect, versionListarr[l])
+                    await this.page.locator(ps.versionSelect).fill('')
+                    await this.page.waitForTimeout(200)
+                    const value = versionListarr[l]
+                    await this.page
+                      .locator(ps.versionSelect)
+                      .type(value, { delay: 100 })
+                    await this.page.locator(ps.versionSelect).press('Tab')
+                    await this.page.waitForTimeout(2000)
                   }
-                  // await this.page.press(ps.versionSelect, 'Enter')
-                  await this.page.press(ps.versionSelect, 'Tab')
-                  await this.page.waitForTimeout(2000)
                   const versionNameElementText: any = await this.page
                     .locator(ps.versionNameElement)
                     .textContent()
@@ -233,6 +238,9 @@ export default class ProductSection {
         errors.push('products header verification failed')
       }
 
+      if (errors.length > 0) {
+        throw new Error(`Errors encountered:\n${errors.join('\n')}`)
+      }
       expect(errors.length).toBe(0)
     } catch (error) {
       throw error
@@ -378,18 +386,25 @@ export default class ProductSection {
                                 .locator(ps.productName(productName))
                                 .isVisible()
 
-                              await this.page.locator(ps.activeFilter).click()
-                              await this.page.waitForTimeout(1000)
+                              await this.page.locator(ps.menuBtn).click()
+                              await waitForSelectorWithMinTime(
+                                this.page,
+                                ps.deleteBtn
+                              )
+                              await this.page.locator(ps.deleteBtn).click()
 
-                              await this.page.locator(ps.activeNoBtn).click()
-                              await this.page.waitForTimeout(1000)
-
-                              const pName = await this.page
-                                .locator(ps.productName(productName))
+                              const deletePoupup = await this.page
+                                .locator(ps.popup)
                                 .isVisible()
 
-                              if (pName) {
-                                errors.push('product enabling failed!')
+                              if (deletePoupup) {
+                                const deleteProductHeader = await this.page
+                                  .locator(ps.deleteProductHeader)
+                                  .isVisible()
+
+                                if (deleteProductHeader) {
+                                  await this.page.locator(ps.yesBtn).click()
+                                }
                               }
                             }
                           }

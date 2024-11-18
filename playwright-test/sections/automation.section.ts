@@ -123,7 +123,9 @@ export default class AutomationSection {
         await this.page.locator("//a[@aria-label='products']").click()
         await this.page.waitForTimeout(2000)
 
-        await this.page.getByLabel('Dropdown menu for Test').click()
+        await this.page
+          .locator(`//button[@aria-label='dropdown menu for Test']`)
+          .click()
         await this.page
           .locator(`//button[@aria-label='Delete product Test']`)
           .click()
