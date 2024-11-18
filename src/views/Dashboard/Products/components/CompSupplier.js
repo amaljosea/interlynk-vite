@@ -147,6 +147,7 @@ const CompSupplier = ({ data }) => {
   }
 
   const checkData = () => {
+    // eslint-disable-next-line no-unused-vars
     const { supplier, ...rest } = unsavedChanges
     return Object.values(rest).some((value) => value === true)
   }

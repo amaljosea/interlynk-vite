@@ -28,7 +28,7 @@ import {
   Tooltip,
   useDisclosure
 } from '@chakra-ui/react'
-import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
@@ -53,7 +53,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import { GetLabels, GetSharelynks, GetTotalProduct } from 'graphQL/Queries'
 
-import { FaEllipsisV, FaGithub } from 'react-icons/fa'
+import { FaGithub } from 'react-icons/fa'
 import { FaTag } from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
@@ -87,7 +87,6 @@ const ProductTable = ({
     secondaryBgColor,
     semiTransparentBorder,
     lightAndDarkBgColor,
-    secondaryTextColor,
     primaryErrorColor
   } = useThemeColor([
     'primaryBlueText',
@@ -97,7 +96,6 @@ const ProductTable = ({
     'secondaryBgColor',
     'semiTransparentBorder',
     'lightAndDarkBgColor',
-    'secondaryTextColor',
     'primaryErrorColor'
   ])
 

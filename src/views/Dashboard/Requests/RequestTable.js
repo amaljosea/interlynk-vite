@@ -3,10 +3,10 @@ import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 
-import { Flex, IconButton, Menu, Portal, Stack, Text } from '@chakra-ui/react'
+import { Flex, Menu, Portal, Stack, Text } from '@chakra-ui/react'
 import { Tooltip, useDisclosure } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
-import { MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
@@ -19,8 +19,6 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { RequestCancel, RequestResend } from 'graphQL/Mutation'
-
-import { FaEllipsisV } from 'react-icons/fa'
 
 import Pagination from '../../../components/Pagination'
 import ConfirmationModal from '../Products/components/ConfirmationModal'
@@ -38,17 +36,8 @@ const RequestTable = (props) => {
     childKey: 'create_request'
   })
 
-  const {
-    headingTextColor,
-    primaryTextColor,
-    secondaryTextColor,
-    primaryErrorColor
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'secondaryTextColor',
-    'primaryErrorColor'
-  ])
+  const { headingTextColor, primaryTextColor, primaryErrorColor } =
+    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
 
   const [resendRequest] = useMutation(RequestResend)
   const [cancelRequest] = useMutation(RequestCancel)

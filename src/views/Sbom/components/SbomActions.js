@@ -203,7 +203,7 @@ const SbomActions = ({ sbom }) => {
     if (noPrimaryComp) {
       setSBMClose()
     }
-  }, [noPrimaryComp])
+  }, [noPrimaryComp, setSBMClose])
 
   const activeRow = nodes?.length > 0 ? nodes[0] : null
 

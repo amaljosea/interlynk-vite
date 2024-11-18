@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Stack } from '@chakra-ui/react'
+import { Button, ButtonGroup } from '@chakra-ui/react'
 
 import { FaGithub } from 'react-icons/fa6'
 import { FcGoogle } from 'react-icons/fc'

@@ -140,6 +140,7 @@ const CompLinks = ({ data }) => {
   }
 
   const checkData = () => {
+    // eslint-disable-next-line no-unused-vars
     const { links, ...rest } = unsavedChanges
     return Object.values(rest).some((value) => value === true)
   }

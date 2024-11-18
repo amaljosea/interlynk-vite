@@ -79,31 +79,17 @@ const Automation = ({ projects }) => {
 
   // COLUMNS
 
-  const columns = useMemo(
-    () =>
-      useAutomationColumns({
-        setActiveRow,
-        activeRow,
-        RULE_ACTIVE,
-        RULE,
-        subOperators,
-        projects,
-        setActiveEnv,
-        RULE_COPY,
-        RULE_DELETE
-      }),
-    [
-      setActiveRow,
-      activeRow,
-      RULE_ACTIVE,
-      RULE,
-      subOperators,
-      projects,
-      setActiveEnv,
-      RULE_COPY,
-      RULE_DELETE
-    ]
-  )
+  const columns = useAutomationColumns({
+    setActiveRow,
+    activeRow,
+    RULE_ACTIVE,
+    RULE,
+    subOperators,
+    projects,
+    setActiveEnv,
+    RULE_COPY,
+    RULE_DELETE
+  })
 
   return (
     <>
