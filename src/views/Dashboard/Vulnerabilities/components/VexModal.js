@@ -114,11 +114,6 @@ const VexModal = ({
   const isValuePresent =
     nodes?.length > 0 && formValues && formValues[fieldOne?.id] !== ''
 
-  const isInvalid =
-    statusName === 'Affected' &&
-    componentVulnCustomFields?.length > 0 &&
-    isValuePresent === false
-
   const generateControl = useCallback(
     (status) => {
       isValuePresent ? setStagCustom('green') : setStagCustom('red')
@@ -266,6 +261,9 @@ const VexModal = ({
     }
   }
 
+  const disabled =
+    statusTitle === '' && formValues && formValues[fieldOne?.id] === ''
+
   useEffect(() => {
     generateControl(statusName)
   }, [generateControl, statusName])
@@ -294,8 +292,8 @@ const VexModal = ({
       Icon={FaPenToSquare}
       onSubmit={handleSave}
       onClose={handleClose}
-      isDisabled={isInvalid}
       title={'Vulnerabilty Status'}
+      disabled={disabled}
     >
       {sbomId && (
         <Box mb={4}>
@@ -350,7 +348,7 @@ const VexModal = ({
         </GridItem>
         <GridItem as={Flex} flexDir='column' gap={4} colSpan={11}>
           {/* STATUS */}
-          <FormControl>
+          <FormControl isRequired={nodes?.length === 0}>
             <FormLabel htmlFor='vexType' fontSize='sm'>
               Status
             </FormLabel>
@@ -536,7 +534,7 @@ const VexModal = ({
             />
           </FormControl>
           {/* CUSTOM FIELDS */}
-          {nodes?.length > 0 && statusTitle && (
+          {nodes?.length > 0 && (
             <Stack spacing={4}>
               <FormControl>
                 <FormLabel>{fieldOne?.displayName}</FormLabel>
