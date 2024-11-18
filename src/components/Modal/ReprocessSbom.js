@@ -20,6 +20,8 @@ const ReprocessSbom = ({ isOpen, onClose, data, projectGroup }) => {
       const { errors } = res?.data?.sbomReprocess || ''
       if (errors?.length > 0) {
         showToast({ description: errors[0], status: 'error' })
+        setIsLoading(false)
+        onClose()
       } else {
         setIsLoading(false)
         onClose()
