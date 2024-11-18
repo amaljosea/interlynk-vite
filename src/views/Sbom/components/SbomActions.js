@@ -9,6 +9,7 @@ import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationM
 import { DeleteIcon, EditIcon, SearchIcon } from '@chakra-ui/icons'
 import { Box, Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -35,6 +36,7 @@ import DownloadModal from './DownloadModal'
 import SigningModal from './SigningModal'
 
 const SbomActions = ({ sbom }) => {
+  const { showToast } = useCustomToast()
   const signedUrlParams = getSignedUrlParams()
   const {
     generateProductVersionDetailPageUrlFromCurrentUrl,
@@ -148,7 +150,30 @@ const SbomActions = ({ sbom }) => {
       })
     })
 
+  // GET PRIMARY COMPONENT DATA
+  const {
+    nodes: primaryComponent,
+    loading: primaryCompLoading,
+    error
+  } = usePaginatedQuery(GetComponentData, {
+    skip: signedUrlParams,
+    selector: 'sbom.components',
+    variables: {
+      primary: true,
+      sbomId: sbomId,
+      projectId: productId
+    }
+  })
+
   const onDownload = () => {
+    if (primaryCompLoading) {
+      showToast({
+        description:
+          'Primary component is still getting uploaded. Please try in some time',
+        status: 'warning'
+      })
+      return
+    }
     if (signedUrlParams) {
       onOpen()
     } else {
@@ -184,19 +209,6 @@ const SbomActions = ({ sbom }) => {
     }
   })
 
-  // GET PRIMARY COMPONENT DATA
-  const { nodes: primaryComponent, error } = usePaginatedQuery(
-    GetComponentData,
-    {
-      skip: signedUrlParams,
-      selector: 'sbom.components',
-      variables: {
-        primary: true,
-        sbomId: sbomId,
-        projectId: productId
-      }
-    }
-  )
   const noPrimaryComp = primaryComponent?.length === 0
 
   useEffect(() => {
@@ -208,6 +220,14 @@ const SbomActions = ({ sbom }) => {
   const activeRow = nodes?.length > 0 ? nodes[0] : null
 
   const handleEditSbom = () => {
+    if (primaryCompLoading) {
+      showToast({
+        description:
+          'Primary component is still getting uploaded. Please try in some time',
+        status: 'warning'
+      })
+      return
+    }
     if (sbom?.primaryComponent) {
       sbomDispatch({ type: 'SET_LICENSES', payload: sbom?.primaryComponent })
       setSBMOpen()
