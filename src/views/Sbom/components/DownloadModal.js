@@ -312,13 +312,15 @@ const DownloadModal = (props) => {
           </FormControl>
           <Divider />
 
-          {format !== 'pdf' && (
+          {(format !== 'pdf' || (format === 'pdf' && original)) && (
             <>
               <Checkbox
                 hidden={signedUrlParams}
-                isChecked={excludeParts}
+                isChecked={excludeParts && format !== 'pdf'}
                 onChange={() => setExcludeParts(!excludeParts)}
-                isDisabled={isFreeTier || spec === 'SPDX' || original}
+                isDisabled={
+                  isFreeTier || spec === 'SPDX' || original || format === 'pdf'
+                }
               >
                 Exclude Parts
               </Checkbox>
