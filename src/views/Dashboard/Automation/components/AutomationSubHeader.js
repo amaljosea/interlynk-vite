@@ -7,6 +7,8 @@ import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
+import { useHasPermission } from 'hooks/useHasPermission'
+
 import { FaFileExport, FaFileImport } from 'react-icons/fa'
 
 const RuleExport = gql`
@@ -24,6 +26,11 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
   const [exportRule, { loading: exportLoading }] = useLazyQuery(RuleExport)
 
   const activeProject = projects?.find((item) => item?.id === productId)
+
+  const canEditAutomations = useHasPermission({
+    parentKey: 'view_product_group',
+    childKey: 'edit_product_automations'
+  })
 
   const downloadJsonFile = useCallback(
     (data) => {
@@ -62,6 +69,7 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
               colorScheme='blue'
               icon={<FaFileImport />}
               onClick={RULE_IMPORT.onOpen}
+              isDisabled={!canEditAutomations}
             />
           </Tooltip>
           <Tooltip label='Export Rules'>
@@ -79,12 +87,20 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
               RULE.onOpen()
             }}
             aria-label='add_automation_rule'
+            isDisabled={!canEditAutomations}
           />
           <RefreshBtn />
         </Stack>
       </Flex>
     ),
-    [RULE, RULE_IMPORT, handleExport, exportLoading, setActiveRow]
+    [
+      RULE,
+      RULE_IMPORT,
+      handleExport,
+      exportLoading,
+      setActiveRow,
+      canEditAutomations
+    ]
   )
 }
 

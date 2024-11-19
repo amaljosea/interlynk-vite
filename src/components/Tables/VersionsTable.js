@@ -154,6 +154,11 @@ const VersionsTable = (props) => {
     childKey: 'archive_sbom'
   })
 
+  const canReprocessSbom = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'reprocess_sbom'
+  })
+
   const onFilterSev = async (value, id) => {
     const selectedSBOM = nodes?.find((item) => item?.id === id)
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
@@ -444,6 +449,7 @@ const VersionsTable = (props) => {
                   aria-label={`sbom-${row?.projectVersion}-reprocess`}
                   onClick={() => handleRepSbom(row)}
                   hidden={signedUrlParams}
+                  isDisabled={!canReprocessSbom}
                 >
                   Reprocess
                 </MenuItem>

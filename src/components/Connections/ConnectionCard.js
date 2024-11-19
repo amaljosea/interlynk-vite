@@ -1,6 +1,7 @@
 import { CheckIcon } from '@chakra-ui/icons'
 import { Button, Flex, Text } from '@chakra-ui/react'
 
+import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import Card from '../Card/Card'
@@ -25,6 +26,11 @@ const ConnectionCard = ({
     'secondaryTextInverse',
     'lightAndDarkBgColor'
   ])
+
+  const canUpdate = useHasPermission({
+    parentKey: 'view_connections',
+    childKey: 'create_update_connection'
+  })
 
   return (
     <Card
@@ -83,6 +89,7 @@ const ConnectionCard = ({
           }
           onClick={onConfigure}
           border={!isConnected && '1px solid'}
+          isDisabled={!canUpdate}
         >
           {isConnected ? 'Configured' : 'Configure'}
         </Button>

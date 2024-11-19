@@ -38,7 +38,7 @@ const Checks = () => {
   const paddingCell = 0
   const paddingHeadCell = 0
 
-  const updateOrg = useHasPermission({
+  const canEdit = useHasPermission({
     parentKey: 'view_organization',
     childKey: 'update_organization'
   })
@@ -72,7 +72,7 @@ const Checks = () => {
           <LynkSwitch
             name={rule.friendlyId}
             id={rule.friendlyId}
-            isDisabled={!updateOrg}
+            isDisabled={!canEdit}
             isChecked={enabled ? true : false}
             onChange={(e) => handleChange(e.target.checked, id)}
           />
@@ -135,6 +135,7 @@ const Checks = () => {
               padding='0'
               paddingLeft='4px'
               paddingRight='8px'
+              isDisabled={!canEdit}
               rightIcon={<ChevronDownIcon boxSize={5} />}
               _hover={{ bg: sevColor(severity.toLowerCase()).bg }}
               _focus={{ boxShadow: 'none' }}

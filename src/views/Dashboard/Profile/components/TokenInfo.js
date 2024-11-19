@@ -33,6 +33,7 @@ import LynkModal from 'components/LynkModal'
 import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -95,6 +96,11 @@ const TokenInfo = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
   const [isValidDate, setIsValidDate] = useState(true)
+
+  const canAddToken = useHasPermission({
+    parentKey: 'view_organization',
+    childKey: 'update_organization'
+  })
 
   const handleChange = (event) => {
     const { value } = event.target
@@ -234,11 +240,12 @@ const TokenInfo = () => {
             variant='solid'
             fontWeight='normal'
             fontSize={'sm'}
+            isDisabled={!canAddToken}
           />
         </Tooltip>
       </Flex>
     )
-  }, [onOpen, primaryTextColor])
+  }, [onOpen, primaryTextColor, canAddToken])
 
   useEffect(() => {
     if (activeRow) {

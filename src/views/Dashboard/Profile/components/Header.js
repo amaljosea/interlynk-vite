@@ -30,6 +30,7 @@ import LynkAlert from 'components/LynkAlert'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UploadProfileImage } from 'graphQL/Mutation'
@@ -67,6 +68,11 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
   const PERSONAL = useDisclosure()
   const ORG = useDisclosure()
+
+  const canEditOrg = useHasPermission({
+    parentKey: 'view_organization',
+    childKey: 'update_organization'
+  })
 
   //Function to change tab (org <> personal)
   const handleTabChange = (name) => {
@@ -345,6 +351,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   aria-label='Edit'
                   colorScheme='blue'
                   icon={<EditIcon />}
+                  isDisabled={!canEditOrg}
                   onClick={handleEditOrgClick}
                 />
               </Tooltip>
