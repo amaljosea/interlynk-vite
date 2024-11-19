@@ -108,19 +108,19 @@ export default class GeneralSection {
           await version.click()
           await this.page.waitForTimeout(2000)
 
+          await this.page
+            .getByRole('row', { name: 'Authors STERIS -' })
+            .getByLabel('close')
+            .click()
+          await this.page.getByRole('button', { name: 'Yes' }).click()
+          await this.page.waitForTimeout(3000)
+
           await this.page.locator(`//button[@aria-label='add_author']`).click()
           await this.page.getByPlaceholder('Add name').fill('Abhisek Paul')
           await this.page
             .getByPlaceholder('Add email address')
             .fill('abhisek@sofueled.com')
           await this.page.getByRole('button', { name: 'Save' }).click()
-          await this.page.waitForTimeout(3000)
-
-          await this.page
-            .getByRole('row', { name: 'Authors Abhisek Paul -' })
-            .getByLabel('close')
-            .click()
-          await this.page.getByRole('button', { name: 'Yes' }).click()
           await this.page.waitForTimeout(3000)
         } else {
           errors.push('Version not found')
@@ -155,6 +155,13 @@ export default class GeneralSection {
           await version.click()
           await this.page.waitForTimeout(2000)
 
+          await this.page
+            .getByRole('gridcell', { name: 'STERIS close' })
+            .getByLabel('close')
+            .click()
+          await this.page.getByRole('button', { name: 'Yes' }).click()
+          await this.page.waitForTimeout(3000)
+
           await this.page.getByRole('button', { name: 'Add Supplier' }).click()
           await this.page
             .getByPlaceholder('Enter organization name')
@@ -171,13 +178,6 @@ export default class GeneralSection {
             .getByPlaceholder('Enter URL')
             .fill('https://microsoft.com')
           await this.page.getByRole('button', { name: 'Update' }).click()
-          await this.page.waitForTimeout(3000)
-
-          await this.page
-            .getByRole('gridcell', { name: 'Micorosft close' })
-            .getByLabel('close')
-            .click()
-          await this.page.getByRole('button', { name: 'Yes' }).click()
           await this.page.waitForTimeout(3000)
         } else {
           errors.push('Version not found')
@@ -212,6 +212,10 @@ export default class GeneralSection {
           await version.click()
           await this.page.waitForTimeout(2000)
 
+          await this.page.getByTestId('delete_license').click()
+          await this.page.locator("button[type='submit']").click()
+          await this.page.waitForTimeout(3000)
+
           await this.page.getByRole('button', { name: 'Add License' }).click()
           await this.page.getByRole('combobox').fill('ap')
           await this.page.waitForTimeout(3000)
@@ -226,10 +230,6 @@ export default class GeneralSection {
           await this.page.waitForTimeout(3000)
           await this.page.keyboard.press('Enter')
 
-          await this.page.locator("button[type='submit']").click()
-          await this.page.waitForTimeout(3000)
-
-          await this.page.getByTestId('delete_license').click()
           await this.page.locator("button[type='submit']").click()
           await this.page.waitForTimeout(3000)
 

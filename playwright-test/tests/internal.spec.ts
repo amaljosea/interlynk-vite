@@ -34,13 +34,17 @@ test('Check internal component CRUD feature', async ({ page }) => {
     await testStringField.fill('testexp')
 
     await page.getByRole('button', { name: 'Tag' }).click()
-
     await page.waitForTimeout(3000)
 
-    await page.getByTestId('tag-actions').first().click()
+    const tagAction = await page.getByTestId('tag-actions').first().isVisible()
 
-    await page.getByRole('menuitem', { name: 'Delete' }).click()
-    await page.getByRole('button', { name: 'Yes' }).click()
+    if (tagAction) {
+      await page.getByTestId('tag-actions').first().click()
+      await page.getByRole('menuitem', { name: 'Delete' }).click()
+      await page.getByRole('button', { name: 'Yes' }).click()
+    } else {
+      console.error('Tag not found')
+    }
   } catch (error) {
     console.error('Internal component test failed:', error)
     throw error

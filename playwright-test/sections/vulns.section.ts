@@ -7,6 +7,7 @@ import { getFileNamesFromResource } from '../utils/utils'
 dotenv.config({ path: '.env' })
 
 const errors: string[] = []
+const selector = `span#vulnCritical`
 const menuBtn = `//button[@aria-label='dropdown menu for Test']`
 const uploadBtn = `//button[@aria-label='upload sbom for Test']`
 
@@ -15,6 +16,37 @@ export default class VulnsSection {
 
   constructor(page: Page) {
     this.page = page
+  }
+
+  public async handleImport() {
+    await this.page.locator(`//button[@aria-label='import_status']`).click()
+    await this.page.waitForTimeout(2000)
+
+    await this.page.getByLabel('Environment').selectOption({ index: 1 })
+    await this.page.getByLabel('Version').selectOption({ index: 1 })
+    await this.page.waitForTimeout(2000)
+
+    await this.page
+      .getByLabel('Import Vulnerability Status')
+      .getByRole('button', { name: 'Next' })
+      .click()
+
+    const vulnOne = this.page
+      .locator(`//input[@aria-label='select-row-undefined']`)
+      .nth(0)
+
+    if (vulnOne.isVisible()) {
+      await vulnOne.check()
+      await this.page.waitForTimeout(2000)
+
+      await this.page.getByRole('button', { name: 'Submit' }).click()
+      await this.page.waitForTimeout(2000)
+
+      await this.page.getByRole('button', { name: 'Done' }).click()
+      await this.page.waitForTimeout(2000)
+    } else {
+      errors.push('Vuln not found')
+    }
   }
 
   public async handleUpdate() {
@@ -41,7 +73,7 @@ export default class VulnsSection {
     await this.page.waitForTimeout(2000)
 
     await this.page.getByTestId(`product_Test`).click()
-    await this.page.waitForTimeout(60000)
+    await this.page.waitForTimeout(2000)
 
     const version = await this.page.getByTestId('version').nth(0).isVisible()
 
@@ -50,65 +82,79 @@ export default class VulnsSection {
       await this.page.waitForTimeout(2000)
 
       await this.page.getByRole('tab', { name: 'vulnerabilities' }).click()
-      await this.page.waitForTimeout(2000)
+      await this.page.waitForTimeout(3000)
 
-      await this.page.locator('//button[@aria-label="refresh"]').click()
-      await this.page.waitForTimeout(5000)
+      await this.page.locator(`//button[@aria-label='scan_vulns']`).click()
+      await this.page.waitForTimeout(3000)
+      await this.page.getByRole('tab', { name: 'general' }).click()
 
-      const vulnOne = await this.page
-        .getByTestId('vexStatus')
-        .nth(0)
-        .isVisible()
-      const vulnTwo = await this.page
-        .getByTestId('vexStatus')
-        .nth(1)
-        .isVisible()
+      await this.page
+        .waitForSelector(selector, { state: 'visible' })
+        .then(async () => {
+          await this.page.getByRole('tab', { name: 'vulnerabilities' }).click()
+          await this.page.waitForTimeout(2000)
 
-      if (vulnOne) {
-        await this.page.getByTestId('vexStatus').nth(0).click()
+          await this.page.locator('//button[@aria-label="refresh"]').click()
+          await this.page.waitForTimeout(5000)
 
-        await this.page
-          .locator('//select[@aria-label="vex_status"]')
-          .selectOption({ index: 2 })
-        await this.page
-          .locator('//select[@aria-label="vex_justification"]')
-          .selectOption({ index: 2 })
-        await this.page
-          .locator('//textarea[@aria-label="vex_notes"]')
-          .fill('test')
+          const vulnOne = await this.page
+            .getByTestId('vexStatus')
+            .nth(0)
+            .isVisible()
+          const vulnTwo = await this.page
+            .getByTestId('vexStatus')
+            .nth(1)
+            .isVisible()
 
-        await this.page.getByRole('button', { name: 'Save' }).click()
-        await this.page.waitForTimeout(2000)
-        await this.page.getByTestId('vexStatus').nth(0).click()
-      } else {
-        errors.push('Vuln 1 not found')
-      }
+          if (vulnOne) {
+            await this.page.getByTestId('vexStatus').nth(0).click()
 
-      await this.page.waitForTimeout(2000)
+            await this.page
+              .locator('//select[@aria-label="vex_status"]')
+              .selectOption({ index: 2 })
+            await this.page
+              .locator('//select[@aria-label="vex_justification"]')
+              .selectOption({ index: 2 })
+            await this.page
+              .locator('//textarea[@aria-label="vex_notes"]')
+              .fill('test')
 
-      if (vulnTwo) {
-        await this.page.getByTestId('vexStatus').nth(1).click()
+            await this.page.getByRole('button', { name: 'Save' }).click()
+            await this.page.waitForTimeout(2000)
+            await this.page.getByTestId('vexStatus').nth(0).click()
+          } else {
+            errors.push('Vuln 1 not found')
+          }
 
-        await this.page
-          .locator('//select[@aria-label="vex_status"]')
-          .selectOption({ index: 2 })
-        await this.page
-          .locator('//select[@aria-label="vex_justification"]')
-          .selectOption({ index: 3 })
-        await this.page
-          .locator('//textarea[@aria-label="vex_notes"]')
-          .fill('test')
+          await this.page.waitForTimeout(2000)
 
-        await this.page.getByRole('button', { name: 'Save' }).click()
-        await this.page.waitForTimeout(2000)
+          if (vulnTwo) {
+            await this.page.getByTestId('vexStatus').nth(1).click()
 
-        await this.page.getByRole('button', { name: 'Show History' }).click()
-        await this.page.waitForTimeout(2000)
+            await this.page
+              .locator('//select[@aria-label="vex_status"]')
+              .selectOption({ index: 2 })
+            await this.page
+              .locator('//select[@aria-label="vex_justification"]')
+              .selectOption({ index: 3 })
+            await this.page
+              .locator('//textarea[@aria-label="vex_notes"]')
+              .fill('test')
 
-        await this.page.getByLabel('Close').click()
-      } else {
-        errors.push('Vuln 2 not found')
-      }
+            await this.page.getByRole('button', { name: 'Save' }).click()
+            await this.page.waitForTimeout(2000)
+
+            await this.page
+              .getByRole('button', { name: 'Show History' })
+              .click()
+            await this.page.waitForTimeout(2000)
+
+            await this.page.getByLabel('Close').click()
+          } else {
+            await this.page.locator('//button[@aria-label="refresh"]').click()
+          }
+        })
+        .catch((error) => errors.push(error))
     } else {
       errors.push('Version not found')
     }
@@ -253,37 +299,24 @@ export default class VulnsSection {
           await this.page.waitForTimeout(2000)
 
           await this.page.getByRole('tab', { name: 'vulnerabilities' }).click()
+          await this.page.waitForTimeout(3000)
+
+          await this.page.locator(`//button[@aria-label='scan_vulns']`).click()
+          await this.page.waitForTimeout(3000)
+          await this.page.getByRole('tab', { name: 'general' }).click()
 
           await this.page
-            .locator(`//button[@aria-label='import_status']`)
-            .click()
-          await this.page.waitForTimeout(2000)
-
-          await this.page.getByLabel('Environment').selectOption({ index: 1 })
-          await this.page.getByLabel('Version').selectOption({ index: 1 })
-          await this.page.waitForTimeout(2000)
-
-          await this.page
-            .getByLabel('Import Vulnerability Status')
-            .getByRole('button', { name: 'Next' })
-            .click()
-
-          const vulnOne = this.page
-            .locator(`//input[@aria-label='select-row-undefined']`)
-            .nth(0)
-
-          if (vulnOne.isVisible()) {
-            await vulnOne.check()
-            await this.page.waitForTimeout(2000)
-
-            await this.page.getByRole('button', { name: 'Submit' }).click()
-            await this.page.waitForTimeout(2000)
-
-            await this.page.getByRole('button', { name: 'Done' }).click()
-            await this.page.waitForTimeout(2000)
-          } else {
-            errors.push('Vuln not found')
-          }
+            .waitForSelector(selector, {
+              state: 'visible'
+            })
+            .then(async () => {
+              await this.page
+                .getByRole('tab', { name: 'vulnerabilities' })
+                .click()
+              await this.page.waitForTimeout(3000)
+              await this.handleImport()
+            })
+            .catch((error) => errors.push(error))
         } else {
           errors.push('Version not found')
         }

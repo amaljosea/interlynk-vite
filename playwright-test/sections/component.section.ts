@@ -50,9 +50,7 @@ export default class ComponentSection {
         await this.page.waitForTimeout(2000)
 
         await product.click()
-        await this.page.waitForTimeout(2000)
-
-        await this.page.reload()
+        await this.page.waitForTimeout(5000)
 
         const version = this.page.getByTestId('version').nth(0)
 
@@ -61,6 +59,7 @@ export default class ComponentSection {
           await this.page.waitForTimeout(2000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
+          await this.page.waitForTimeout(3000)
           await this.page.locator("button[name='add_component']").click()
 
           const createModal = await this.page
@@ -521,17 +520,31 @@ export default class ComponentSection {
           await this.page.getByRole('tab', { name: 'identifiers' }).click()
 
           await this.page.getByTestId('purl_expand').first().click()
-          await this.page.waitForTimeout(1000)
+          await this.page.waitForTimeout(3000)
 
-          await this.page.getByLabel('Package Type').selectOption('npm')
-          await this.page.getByPlaceholder('Enter namespace').fill('react')
-          await this.page.getByLabel('Name*', { exact: true }).fill('react-dom')
-          await this.page.getByTestId('version').fill('2.3.5')
-          await this.page.getByPlaceholder('Enter qualifiers').fill('type=jar')
+          await this.page.click('select#packageType')
+          for (let i = 0; i < 22; i++) {
+            await this.page.keyboard.press('ArrowDown')
+          }
+          await this.page.keyboard.press('Enter')
+          await this.page.keyboard.press('Tab')
+          await this.page.getByTestId('namespace').fill('react')
+          await this.page.waitForTimeout(3000)
+          await this.page.getByTestId('namespace').press('ArrowDown')
+          await this.page.getByTestId('namespace').press('Enter')
+          await this.page.waitForTimeout(3000)
+          await this.page.getByTestId('name').fill('react-dom')
+          await this.page.waitForTimeout(3000)
+          await this.page.getByTestId('name').press('ArrowDown')
+          await this.page.getByTestId('name').press('Enter')
+          await this.page.waitForTimeout(3000)
+          await this.page.getByTestId('version').fill('16.14.0')
+          await this.page.keyboard.press('Tab')
+          await this.page.waitForTimeout(3000)
           await this.page.getByRole('button', { name: 'Save PURL' }).click()
-
-          await this.page.getByRole('button', { name: 'Save' }).click()
           await this.page.waitForTimeout(2000)
+          await this.page.getByRole('button', { name: 'Save' }).click()
+          await this.page.waitForTimeout(3000)
 
           await this.page.getByLabel('Close').click()
           await this.page.waitForTimeout(2000)

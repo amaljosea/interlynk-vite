@@ -24,7 +24,11 @@ const VulnBadge = ({ color, children, label, status, onClick }) => {
           p={sbomId ? 0 : 'inherit'}
           fontSize={[sbomId ? '12px' : '13px', sbomId ? '13px' : '14px']}
         >
-          {status === 'IN_PROGRESS' ? <Spinner size='xs' mt={0.5} /> : children}
+          {status === 'IN_PROGRESS' ? (
+            <Spinner size='xs' mt={0.5} />
+          ) : (
+            <span id={`vuln${label}`}>{children}</span>
+          )}
         </TagLabel>
       </Tag>
     </Tooltip>
