@@ -1,4 +1,4 @@
-import { useLazyQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
 import Tree from 'react-d3-tree'
 import { useParams } from 'react-router-dom'
@@ -7,6 +7,7 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
+  Badge,
   Box,
   Flex,
   IconButton,
@@ -27,6 +28,7 @@ import {
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCompDependency } from 'graphQL/Queries'
+import { GetComponentPath } from 'graphQL/Queries'
 
 import { BiZoomIn, BiZoomOut } from 'react-icons/bi'
 
@@ -77,7 +79,7 @@ const updateTreeData = (treeData, nodeId, newData) => {
   return updateNode(treeData)
 }
 
-const CustomNode = ({ nodeDatum, click, foreignObjectProps }) => {
+const CustomNode = ({ nodeDatum, compId, click, foreignObjectProps }) => {
   const { primaryBgColor, primaryBlueText, secondaryTextColor } = useThemeColor(
     ['primaryBgColor', 'primaryBlueText', 'secondaryTextColor']
   )
@@ -120,7 +122,13 @@ const CustomNode = ({ nodeDatum, click, foreignObjectProps }) => {
               border={`1px solid rgba(0,0,0,0.09)`}
               sx={{ p: 3, left: 12, borderRadius: 5, minW: 'fit-content' }}
             >
-              <Stack direction={'column'}>
+              <Stack
+                spacing={nodeDatum?.compId === compId ? 1 : 0}
+                direction={'column'}
+              >
+                {nodeDatum?.compId === compId && (
+                  <Badge w={'fit-content'}>Active</Badge>
+                )}
                 <Text
                   wordBreak={'break-all'}
                   sx={{ fontSize: 16, fontWeight: 'medium', lineHeight: 1.3 }}
@@ -146,10 +154,34 @@ const CustomNode = ({ nodeDatum, click, foreignObjectProps }) => {
   return null
 }
 
+const buildTree = (path, leafNode) => {
+  if (path?.length === 0) return leafNode
+  const [current, ...remainingPath] = path
+  // console.log('current', current)
+  return {
+    ...current,
+    id: uuidv4(),
+    isPrimary: true,
+    compId: current?.id,
+    name: current?.name,
+    version: current?.version,
+    count: 1,
+    children: [buildTree(remainingPath, leafNode)]
+  }
+}
+
 const TreeView = ({ isOpen, onClose, compId }) => {
   const params = useParams()
 
   const [getData] = useLazyQuery(GetCompDependency)
+
+  const { data } = useQuery(GetComponentPath, {
+    skip: isOpen ? false : true,
+    variables: { compId: compId, sbomId: params?.sbomid }
+  })
+
+  const { pathToPrimary } = data?.component || ''
+  const { path } = pathToPrimary?.length > 0 ? pathToPrimary[0] : ''
 
   const [tree, setTree] = useState({})
   const [gap, setGap] = useState(2)
@@ -183,16 +215,24 @@ const TreeView = ({ isOpen, onClose, compId }) => {
           children: []
         }
       })
-      setTree({
+      const defaultValue = {
         id,
         compId,
         name,
         version,
         count: dependsOn?.length || 0,
         children: dependsOnNodes
-      })
+      }
+      if (path?.length > 0) {
+        const treeView = buildTree(path?.slice(0, -1), defaultValue)
+        setTree(treeView)
+      } else {
+        setTree(defaultValue)
+      }
     })
-  }, [compId, getData, params?.sbomid])
+  }, [compId, getData, params?.sbomid, path])
+
+  // console.log('tree', tree)
 
   const handleNodeClick = (datum) => {
     getData({
@@ -343,6 +383,7 @@ const TreeView = ({ isOpen, onClose, compId }) => {
                   renderCustomNodeElement={(rd3tProps) => (
                     <CustomNode
                       {...rd3tProps}
+                      compId={compId}
                       click={handleNodeClick}
                       foreignObjectProps={foreignObjectProps}
                     />
