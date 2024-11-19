@@ -11,7 +11,6 @@ import {
   Box,
   Flex,
   IconButton,
-  Select,
   Stack,
   Text,
   Tooltip
@@ -31,6 +30,7 @@ import { GetCompDependency } from 'graphQL/Queries'
 import { GetComponentPath } from 'graphQL/Queries'
 
 import { BiZoomIn, BiZoomOut } from 'react-icons/bi'
+import { LuMoveHorizontal, LuMoveVertical } from 'react-icons/lu'
 
 const InteractionsTooltip = () => (
   <Tooltip
@@ -89,15 +89,15 @@ const CustomNode = ({ nodeDatum, compId, click, foreignObjectProps }) => {
       <g transform='translate(-40,-30)' onClick={() => click(nodeDatum)}>
         <svg xmlns='http://www.w3.org/2000/svg'>
           <circle
-            cx='30'
-            cy='30'
-            r='15'
+            cx='35'
+            cy='35'
+            r='17.5'
             fill={primaryBlueText}
             stroke='transparent'
           />
           <text
-            x='30'
-            y='31'
+            x='35'
+            y='35'
             className='small'
             textAnchor='middle'
             fontFamily='inherit'
@@ -297,8 +297,7 @@ const TreeView = ({ isOpen, onClose, compId }) => {
     y: 12
   }
 
-  const onChangeDirection = (e) => {
-    const { value } = e.target
+  const onChangeDirection = (value) => {
     const isVertical = value === 'vertical'
     const positions = { x: isVertical ? 500 : 30, y: isVertical ? 100 : 300 }
     setTranslate(positions)
@@ -306,6 +305,9 @@ const TreeView = ({ isOpen, onClose, compId }) => {
     setDepthFactor(isVertical ? 300 : 450)
     setOrientation(value)
   }
+
+  const isHorizontal = orientation === 'horizontal'
+  const isVertical = orientation === 'vertical'
 
   useEffect(() => {
     if (isOpen && compId) {
@@ -334,25 +336,30 @@ const TreeView = ({ isOpen, onClose, compId }) => {
                   alignItems={'center'}
                   justifyContent={'space-between'}
                 >
+                  <SearchFilter
+                    id='relationship'
+                    filterText={filterText}
+                    onFilter={handleSearch}
+                    onClear={handleClear}
+                    onChange={onSearchInputChange}
+                  />
                   <Flex gap={2} alignItems={'center'}>
-                    <SearchFilter
-                      id='relationship'
-                      filterText={filterText}
-                      onFilter={handleSearch}
-                      onClear={handleClear}
-                      onChange={onSearchInputChange}
-                    />
-                    <Select
-                      fontSize={'sm'}
-                      w={'160px'}
-                      value={orientation}
-                      onChange={onChangeDirection}
-                    >
-                      <option value='horizontal'>Horizontal</option>
-                      <option value='vertical'>Vertical</option>
-                    </Select>
-                  </Flex>
-                  <Flex gap={2} alignItems={'center'}>
+                    <Tooltip label='Horizontal'>
+                      <IconButton
+                        icon={<LuMoveHorizontal size={20} />}
+                        variant={isHorizontal ? 'solid' : 'outline'}
+                        colorScheme={isHorizontal ? 'blue' : 'gray'}
+                        onClick={() => onChangeDirection('horizontal')}
+                      />
+                    </Tooltip>
+                    <Tooltip label='Vertical'>
+                      <IconButton
+                        icon={<LuMoveVertical size={20} />}
+                        variant={isVertical ? 'solid' : 'outline'}
+                        colorScheme={isVertical ? 'blue' : 'gray'}
+                        onClick={() => onChangeDirection('vertical')}
+                      />
+                    </Tooltip>
                     <Tooltip label='Zoom In'>
                       <IconButton
                         variant='outline'
