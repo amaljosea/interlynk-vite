@@ -20,10 +20,7 @@ const EnvList = ({ data }) => {
   const activeEnv = projects?.find((item) => item?.id === params?.productid)
   const { name } = activeEnv || ''
 
-  const { primaryBlueBorder, secondaryBlueBorder } = useThemeColor([
-    'primaryBlueBorder',
-    'secondaryBlueBorder'
-  ])
+  const { secondaryBlueBorder } = useThemeColor(['secondaryBlueBorder'])
 
   const handleClick = (value) => {
     const env = projects?.find((item) => item.name === value)
@@ -39,7 +36,7 @@ const EnvList = ({ data }) => {
     return project ? project.sbomsCount : 0
   }
 
-  const borderColor = productId ? secondaryBlueBorder : primaryBlueBorder
+  const borderColor = secondaryBlueBorder
   const variant = (env) =>
     name === env ? 'solid' : productId ? 'ghost' : 'outline'
   const colorScheme = (env) =>
