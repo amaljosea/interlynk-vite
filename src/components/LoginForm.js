@@ -200,6 +200,7 @@ const LoginForm = () => {
           <Button
             width='full'
             type='submit'
+            title='Login'
             colorScheme='blue'
             isDisabled={email === '' || password === ''}
           >

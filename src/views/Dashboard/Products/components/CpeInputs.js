@@ -373,10 +373,11 @@ const CpeInputs = ({ onClose, value, setValue }) => {
         </FormControl>
       </Grid>
       <Flex alignItems={'center'} justifyContent={'flex-end'} gap={2}>
-        <Button fontSize={'sm'} onClick={onClose} variant='ghost'>
+        <Button title='Close' fontSize={'sm'} onClick={onClose} variant='ghost'>
           Close
         </Button>
         <Button
+          title='Save CPE'
           fontSize={'sm'}
           variant='outline'
           colorScheme='blue'

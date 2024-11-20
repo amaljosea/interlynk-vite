@@ -500,6 +500,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             onClick={handleRuleCreate}
             hidden={friendlyId ? false : true}
             colorScheme={ruleExists ? 'green' : 'blue'}
+            title={`${ruleExists ? 'View' : 'Save as'} Rule`}
             isDisabled={ruleLoading || loading || isInvalid}
           >
             {ruleExists ? 'View' : 'Save as'} Rule

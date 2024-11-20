@@ -246,6 +246,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
               <Button
                 key={index}
                 size='xs'
+                title={column}
                 colorScheme='gray'
                 onClick={() => addColumn(column)}
                 bg={secondaryBgColor}

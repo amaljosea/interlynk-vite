@@ -172,7 +172,7 @@ const PlanTable = () => {
       {/* Upgrade Modal Button */}
       {isFreeTier && (
         <Flex justify='left' marginTop={'40px'}>
-          <Button colorScheme='blue' onClick={onOpen}>
+          <Button title='Upgrade plan' colorScheme='blue' onClick={onOpen}>
             Upgrade Plan
           </Button>
         </Flex>

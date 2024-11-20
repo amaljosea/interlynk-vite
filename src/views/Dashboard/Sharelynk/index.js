@@ -35,6 +35,7 @@ const Sharelynk = () => {
               fontSize={'sm'}
               leftIcon={<AddIcon />}
               onClick={onOpen}
+              title='Sharelynk'
             >
               Share Lynk
             </Button>

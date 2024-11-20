@@ -238,6 +238,7 @@ const Components = ({ sbomData }) => {
             {cpes?.length > 0 && (
               <Button
                 size='xs'
+                title='CPE'
                 color={primaryTextColor}
                 onClick={() => onCheckCpe(row)}
               >
@@ -247,6 +248,7 @@ const Components = ({ sbomData }) => {
             {purl && (
               <Button
                 size='xs'
+                title='PURL'
                 color={primaryTextColor}
                 onClick={() => onCheckPurl(row)}
               >

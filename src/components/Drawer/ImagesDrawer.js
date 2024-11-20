@@ -353,10 +353,12 @@ function ImagesDrawer({ isOpen, onClose, activeImageId }) {
         </DrawerBody>
 
         <DrawerFooter>
-          <Button variant='outline' mr={3} onClick={onClose}>
+          <Button title='Cancel' variant='outline' mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button colorScheme='blue'>Save</Button>
+          <Button title='Save' colorScheme='blue'>
+            Save
+          </Button>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

@@ -139,6 +139,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
                       <Tooltip label='View' placement='top'>
                         <IconButton
                           variant='outline'
+                          title='View archived version'
                           onClick={() => onView(item)}
                           icon={<FaEye size={16} color={primaryTextColor} />}
                         />

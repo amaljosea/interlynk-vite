@@ -378,6 +378,7 @@ const DownloadModal = (props) => {
                     size='xs'
                     minW={'60px'}
                     cursor={'default'}
+                    title='Compliance score'
                     isLoading={item?.loading}
                     isDisabled={item?.score === 0}
                   >

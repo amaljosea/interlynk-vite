@@ -85,6 +85,7 @@ const OrgDrawer = ({ isOpen, onClose }) => {
 
           <Button
             colorScheme='blue'
+            title='Update organization name'
             isLoading={updateLoading}
             onClick={handleUpdateOrgName}
           >

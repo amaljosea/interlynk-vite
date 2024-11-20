@@ -113,7 +113,13 @@ const OrgRegister = ({ loading }) => {
         >
           Register or join an organization to get started
         </Heading>
-        <Button mt={10} variant='solid' colorScheme='blue' onClick={onOpen}>
+        <Button
+          mt={10}
+          variant='solid'
+          colorScheme='blue'
+          onClick={onOpen}
+          title='Register organization'
+        >
           Register Organization
         </Button>
       </Card>

@@ -312,6 +312,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
               colorScheme='blue'
               fontWeight='normal'
               fontSize={'sm'}
+              title='Set vuln status'
               onClick={STATUS.onOpen}
               isDisabled={signedUrlParams || !manageFeeds}
             >

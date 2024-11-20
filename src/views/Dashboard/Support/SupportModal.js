@@ -419,6 +419,7 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
               onClick={addRow}
               colorScheme='blue'
               leftIcon={<FaPlus />}
+              title='Add support ID'
               sx={{ fontSize: 'sm', fontWeight: 'medium' }}
             >
               Add ID

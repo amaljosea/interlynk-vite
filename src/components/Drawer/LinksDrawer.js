@@ -171,8 +171,9 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId }) => {
                 </FormControl>
                 {/* ACTIONS */}
                 <Button
-                  colorScheme='blue'
                   type='submit'
+                  title='Submit'
+                  colorScheme='blue'
                   isDisabled={
                     !validateUrl(link.trim()) ||
                     error !== '' ||

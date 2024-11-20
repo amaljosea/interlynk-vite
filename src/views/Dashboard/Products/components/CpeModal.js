@@ -317,6 +317,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
               fontSize={'sm'}
               onClick={handleRuleCreate}
               hidden={friendlyId ? false : true}
+              title={`${ruleExists ? 'View' : 'Save as'} Rule`}
               isDisabled={ruleLoading || loading || isInvalid}
               colorScheme={ruleExists ? 'green' : 'blue'}
             >

@@ -50,7 +50,13 @@ function VulnerabilityRow(props) {
       <Td>{version}</Td>
       <Td>{recommendation}</Td>
       <Td>
-        <Button p='0px' bg='transparent' ref={btnRef} onClick={onOpen}>
+        <Button
+          title='Risk actions'
+          p='0px'
+          bg='transparent'
+          ref={btnRef}
+          onClick={onOpen}
+        >
           <Icon as={FaEllipsisV} color={secondaryTextColor} cursor='pointer' />
         </Button>
       </Td>

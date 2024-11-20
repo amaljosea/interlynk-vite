@@ -67,6 +67,7 @@ function SidebarResponsive(props) {
 
     return (
       <Button
+        title={prop.name}
         boxSize='initial'
         justifyContent='flex-start'
         alignItems='center'

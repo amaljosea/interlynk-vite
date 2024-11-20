@@ -143,7 +143,11 @@ function SBOMLinkRow(props) {
             disabled
             fontSize={'sm'}
           />
-          <Button onClick={() => sbomLink.onCopy()} fontSize={'sm'}>
+          <Button
+            title='Copy sbom link'
+            onClick={() => sbomLink.onCopy()}
+            fontSize={'sm'}
+          >
             {sbomLink.hasCopied ? 'Copied!' : 'Copy'}
           </Button>
         </Flex>

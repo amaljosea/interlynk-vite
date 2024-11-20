@@ -250,7 +250,12 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
                 <FormErrorMessage>{linkError}</FormErrorMessage>
               </FormControl>
               {/* ACTIONS */}
-              <Button colorScheme='blue' type='submit' isDisabled={isDisabled}>
+              <Button
+                type='submit'
+                title='Add link'
+                colorScheme='blue'
+                isDisabled={isDisabled}
+              >
                 Add
               </Button>
               {/* TABLE */}
@@ -313,10 +318,11 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
           </form>
         </DrawerBody>
         <DrawerFooter>
-          <Button variant='outline' mr={3} onClick={onClose}>
+          <Button title='Cancel' variant='outline' mr={3} onClick={onClose}>
             Cancel
           </Button>
           <Button
+            title='Save'
             colorScheme='blue'
             onClick={handleSave}
             isLoading={loading}

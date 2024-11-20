@@ -132,7 +132,11 @@ const ColorDisplay = () => {
             labelStyle={{ color: '#4A5568', fontWeight: 600 }}
             label={'Get import statement for useThemeColor'}
           >
-            <Button colorScheme='teal' onClick={handleGetImportStatement}>
+            <Button
+              colorScheme='teal'
+              title='Copy Import Statement'
+              onClick={handleGetImportStatement}
+            >
               Copy Import Statement
             </Button>
           </Tooltip>
@@ -140,6 +144,7 @@ const ColorDisplay = () => {
           {/* Copy to clipboard button */}
           <Tooltip label={'Select colors to copy the function'}>
             <Button
+              title='Copy color code'
               isDisabled={selectedColors.length < 1}
               colorScheme='blue'
               onClick={handleCopyToClipboard}
@@ -151,6 +156,7 @@ const ColorDisplay = () => {
           {/* Reset Button */}
           <Tooltip label={'Reset selected colors'}>
             <Button
+              title='Reset selected colors'
               isDisabled={selectedColors.length < 1}
               colorScheme='red'
               onClick={handleReset}

@@ -104,6 +104,7 @@ function SignIn() {
                 mb='20px'
                 color='white'
                 mt='20px'
+                title='Sign in'
                 // eslint-disable-next-line
                 _hover={{ bg: 'teal.200' }}
                 // eslint-disable-next-line

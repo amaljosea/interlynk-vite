@@ -434,6 +434,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
             onClick={addRow}
             colorScheme='blue'
             leftIcon={<FaPlus />}
+            title='Add policy condition'
             data-testid='add_policy_condition'
             sx={{ fontSize: 'sm', fontWeight: 'medium', pl: '2px' }}
           >

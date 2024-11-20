@@ -235,6 +235,7 @@ function SignUp() {
               w='100%'
               h='45'
               mb='24px'
+              title='Sign up'
               // eslint-disable-next-line
               _hover={{ bg: 'teal.200' }}
               // eslint-disable-next-line

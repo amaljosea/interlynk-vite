@@ -89,6 +89,7 @@ const GeneralFeed = () => {
               <Button
                 mt={3}
                 variant='solid'
+                title={'message'}
                 colorScheme={'blue'}
                 onClick={handleUpdate}
                 disabled={message === 'Saving....' || orgName === ''}

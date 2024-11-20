@@ -47,6 +47,7 @@ const BuiltByDevelopers = ({ title, name, description, image }) => {
             <Flex align='center'>
               <Button
                 p='0px'
+                title='Read more'
                 variant='no-hover'
                 bg='transparent'
                 my={{ sm: '1.5rem', lg: '0px' }}

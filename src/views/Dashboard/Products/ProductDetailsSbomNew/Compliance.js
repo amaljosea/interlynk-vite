@@ -168,6 +168,7 @@ const Compliance = ({ sbomData }) => {
                 fontSize={'xs'}
                 hidden={!item?.score}
                 isDisabled={isArchived}
+                title='Compliance score'
                 onClick={() => onCheck(index)}
               >
                 {item?.score === '0 %' ? 'N/A' : item?.score}

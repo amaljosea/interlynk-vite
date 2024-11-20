@@ -520,7 +520,7 @@ const PurlInputs = ({ value, setValue, onClose }) => {
         />
       </FormControl>
       <Flex alignItems={'center'} justifyContent={'flex-end'} gap={2}>
-        <Button fontSize={'sm'} onClick={onClose} variant='ghost'>
+        <Button title='Close' fontSize={'sm'} onClick={onClose} variant='ghost'>
           Close
         </Button>
         <Button
@@ -528,6 +528,7 @@ const PurlInputs = ({ value, setValue, onClose }) => {
           variant='outline'
           colorScheme='blue'
           onClick={handleSave}
+          title='Save PURL'
           isDisabled={isInvalid}
         >
           Save PURL

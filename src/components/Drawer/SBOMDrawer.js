@@ -280,11 +280,12 @@ function SBOMDrawer(props) {
           </Stack>
         </DrawerBody>
         <DrawerFooter borderTopWidth='1px'>
-          <Button mr={3} onClick={onClose}>
+          <Button title='Cancel' mr={3} onClick={onClose}>
             Cancel
           </Button>
           {id ? (
             <Button
+              title='Update'
               colorScheme='blue'
               onClick={handleUpdate}
               isDisabled={emailList.length === 0}
@@ -293,6 +294,7 @@ function SBOMDrawer(props) {
             </Button>
           ) : (
             <Button
+              title='Save'
               colorScheme='blue'
               onClick={handleSave}
               isDisabled={emailList.length === 0}

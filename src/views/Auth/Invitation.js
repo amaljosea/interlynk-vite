@@ -143,10 +143,16 @@ const Invitation = () => {
             variant='solid'
             colorScheme='blue'
             onClick={onAccept}
+            title='Accept invitation'
           >
             Accept Invitation
           </Button>
-          <Button variant='ghost' colorScheme='blue' onClick={onReject}>
+          <Button
+            title='Decline'
+            variant='ghost'
+            colorScheme='blue'
+            onClick={onReject}
+          >
             Decline
           </Button>
         </Stack>

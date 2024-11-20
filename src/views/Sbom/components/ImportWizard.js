@@ -123,7 +123,12 @@ const ImportWizard = ({
         pr={8}
       >
         {hasCompletedAllSteps ? (
-          <Button variant='solid' colorScheme='green' onClick={onClose}>
+          <Button
+            title='Done'
+            variant='solid'
+            colorScheme='green'
+            onClick={onClose}
+          >
             Done
           </Button>
         ) : (
@@ -131,6 +136,7 @@ const ImportWizard = ({
             {activeStep === 1 && (
               <Button
                 variant='solid'
+                title='Back'
                 isDisabled={activeStep === 0}
                 onClick={() => {
                   prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
@@ -145,6 +151,7 @@ const ImportWizard = ({
             {activeStep === 0 && (
               <Button
                 variant='solid'
+                title='Next'
                 colorScheme='blue'
                 onClick={nextStep}
                 disabled={
@@ -159,6 +166,7 @@ const ImportWizard = ({
 
             {activeStep === 1 && (
               <Button
+                title='Submit'
                 variant='solid'
                 colorScheme='blue'
                 onClick={handleSubmit}

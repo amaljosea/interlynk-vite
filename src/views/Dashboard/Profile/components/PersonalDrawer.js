@@ -413,6 +413,7 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
         <DrawerFooter>
           <Flex gap={1}>
             <Button
+              title='Cancel'
               fontWeight={400}
               color={secondaryTextInverse}
               variant='ghost'
@@ -421,6 +422,7 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
               Cancel
             </Button>
             <Button
+              title='Save'
               colorScheme='blue'
               onClick={handleSave}
               isDisabled={isSaveDisabled}

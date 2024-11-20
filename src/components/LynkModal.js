@@ -109,6 +109,7 @@ const LynkModal = ({
               {leftFooterContent && <Box>{leftFooterContent}</Box>}
               <ButtonGroup ml={'auto'}>
                 <Button
+                  title='Cancel'
                   onClick={onClose}
                   variant='ghost'
                   hidden={hideCancelButton}
@@ -118,6 +119,7 @@ const LynkModal = ({
                 </Button>
                 <Button
                   type='submit'
+                  title='Submit'
                   minWidth={!isLoading && 93}
                   isDisabled={isDisabled}
                   colorScheme={buttonColor ?? colorScheme}

@@ -86,6 +86,7 @@ const LabelCreator = ({ onAddLabel }) => {
           variant='outline'
           colorScheme='blue'
           leftIcon={<AddIcon />}
+          title='Add product label'
           isDisabled={name === '' || previewColor === ''}
           sx={{ mt: 4, w: 'fit-content', fontSize: 'sm' }}
         >

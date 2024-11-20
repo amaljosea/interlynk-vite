@@ -391,6 +391,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
           leftIcon={<FaPlus />}
           onClick={onAddCondtion}
           isDisabled={isSystem}
+          title='Add automation condition'
         >
           Add condition
         </Button>
@@ -417,6 +418,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
           leftIcon={<FaPlus />}
           onClick={onAddAction}
           isDisabled={isSystem}
+          title='Add automation action'
           sx={{ fontSize: 'sm', fontWeight: 'medium' }}
         >
           Add action

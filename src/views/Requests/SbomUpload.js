@@ -140,6 +140,7 @@ const SbomUpload = () => {
 
             <Stack>
               <Button
+                title='Upload SBOM'
                 isDisabled={
                   selectedFile === null || errorMessage !== '' || loading
                 }
@@ -149,6 +150,7 @@ const SbomUpload = () => {
                 Upload
               </Button>
               <Button
+                title='Decline SBOM upload'
                 onClick={() => {
                   onDecline()
                 }}

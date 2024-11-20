@@ -240,6 +240,7 @@ const JiraConfigModal = ({
             colorScheme='red'
             onClick={handleDelete}
             isDisabled={!updateCon}
+            title='Delete Jira Configuration'
           >
             Delete
           </Button>

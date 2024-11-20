@@ -34,6 +34,7 @@ const Pagination = ({
         <Button
           fontSize={'sm'}
           colorScheme='blue'
+          title='Previous page'
           onClick={onPreviousPage}
           isDisabled={!hasPreviousPage || loading}
         >
@@ -41,6 +42,7 @@ const Pagination = ({
         </Button>
         <Button
           fontSize={'sm'}
+          title='Next page'
           colorScheme='blue'
           onClick={onNextPage}
           isDisabled={!hasNextPage || loading}

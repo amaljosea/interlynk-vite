@@ -383,6 +383,7 @@ const RelationshipDrawer = (props) => {
                             fontSize={'sm'}
                             onClick={handleRuleCreate}
                             colorScheme={ruleExists ? 'green' : 'blue'}
+                            title={`${ruleExists ? 'View' : 'Save as'} Rule`}
                           >
                             {ruleExists ? 'View' : 'Save as'} Rule
                           </Button>
@@ -398,6 +399,7 @@ const RelationshipDrawer = (props) => {
                             component === '' ||
                             list.length > 0
                           }
+                          title={shortDesc ? 'Save' : 'Add'}
                         >
                           {shortDesc ? 'Save' : 'Add'}
                         </Button>

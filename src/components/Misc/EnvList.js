@@ -64,6 +64,7 @@ const EnvList = ({ data }) => {
             size='sm'
             leftIcon={<FaInbox />}
             borderColor={borderColor}
+            title='Default environment'
             variant={variant('default')}
             colorScheme={colorScheme('default')}
             sx={{ w: '60px', fontWeight: 400 }}
@@ -84,6 +85,7 @@ const EnvList = ({ data }) => {
             size='sm'
             leftIcon={<FaCode />}
             borderColor={borderColor}
+            title='Development environment'
             variant={variant('development')}
             colorScheme={colorScheme('development')}
             sx={{ w: '60px', fontWeight: 400 }}
@@ -104,6 +106,7 @@ const EnvList = ({ data }) => {
             size='sm'
             leftIcon={<FaDesktop />}
             borderColor={borderColor}
+            title='Production environment'
             variant={variant('production')}
             colorScheme={colorScheme('production')}
             sx={{ w: '60px', fontWeight: 400 }}

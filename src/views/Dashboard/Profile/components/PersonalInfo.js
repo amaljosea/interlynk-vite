@@ -203,6 +203,7 @@ const PersonalInfo = () => {
               {/* ACTION */}
               <Button
                 variant='solid'
+                title='Update'
                 colorScheme='blue'
                 isLoading={loading}
                 onClick={handleUpdate}
@@ -308,6 +309,7 @@ const PersonalInfo = () => {
               {/* ACTION */}
               <Button
                 variant='solid'
+                title='Update'
                 colorScheme='blue'
                 isDisabled={
                   oldPassword === '' ||

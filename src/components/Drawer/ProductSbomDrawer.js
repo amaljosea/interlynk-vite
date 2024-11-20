@@ -346,6 +346,7 @@ function ProductSbomDrawer({ isOpen, onClose }) {
                 </Flex>
               </FormControl>
               <Button
+                title='Save SBOM'
                 colorScheme='blue'
                 variant={'outline'}
                 width={'fit-content'}

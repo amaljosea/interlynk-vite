@@ -115,6 +115,7 @@ const ComplianceChecks = ({
               width={'60px'}
               isLoading={loading}
               cursor={'default'}
+              title='Compliance score'
               bg={getBgColor(item?.score)}
               _hover={{ background: getBgColor(item?.score) }}
             >
@@ -213,7 +214,12 @@ const ComplianceChecks = ({
           <Text fontSize={'sm'} fontWeight={'medium'}>
             Score
           </Text>
-          <Button size='xs' width={'60px'} cursor={'default'}>
+          <Button
+            size='xs'
+            width={'60px'}
+            cursor={'default'}
+            title='Compliance score'
+          >
             {data?.score === 0 ? 'N/A' : `${Math.round(data?.score)} %`}
           </Button>
         </Flex>

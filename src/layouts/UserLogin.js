@@ -164,7 +164,7 @@ const Login = () => {
                     </FormControl>
                   </Box>
                   <Box mt={8}>
-                    <Button type='submit' colorScheme='blue'>
+                    <Button title='Submit' type='submit' colorScheme='blue'>
                       Submit
                     </Button>
                   </Box>

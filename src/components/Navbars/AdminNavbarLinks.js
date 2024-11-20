@@ -75,11 +75,21 @@ export default function AdminNavbarLinks(props) {
       {/* JOIN WAITLIST */}
       {signedUrlParams && (
         <Flex alignItems={'center'} gap={3}>
-          <Button size='sm' onClick={onStartTour} hidden={!productId}>
+          <Button
+            title='Start tour'
+            size='sm'
+            onClick={onStartTour}
+            hidden={!productId}
+          >
             Start Tour
           </Button>
           <Link to={`/register`} target='_blank'>
-            <Button className='signup' colorScheme='blue' size='sm'>
+            <Button
+              title='Sign up'
+              className='signup'
+              colorScheme='blue'
+              size='sm'
+            >
               Sign up
             </Button>
           </Link>

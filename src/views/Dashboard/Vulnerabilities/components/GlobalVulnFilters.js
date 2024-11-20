@@ -301,6 +301,7 @@ const GlobalVulnsFilters = ({ setFilters }) => {
                 my={3}
                 size='sm'
                 onClick={handleSubmit}
+                title='Vuln EPSS filter submit'
                 isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}
               >
                 Submit

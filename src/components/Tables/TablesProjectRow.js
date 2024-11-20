@@ -52,7 +52,7 @@ function DashboardTableRow(props) {
         </Flex>
       </Td>
       <Td>
-        <Button p='0px' bg='transparent'>
+        <Button title='Project action' p='0px' bg='transparent'>
           <Icon as={FaEllipsisV} color={secondaryTextColor} cursor='pointer' />
         </Button>
       </Td>

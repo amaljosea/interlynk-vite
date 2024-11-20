@@ -116,7 +116,7 @@ function CustomerComponentRow(props) {
       </Td>
       <Td>{updated}</Td> */}
       <Td>
-        <Button p='0px' bg='transparent'>
+        <Button title='Component actions' p='0px' bg='transparent'>
           <Icon as={FaEllipsisV} color={secondaryTextColor} cursor='pointer' />
         </Button>
       </Td>

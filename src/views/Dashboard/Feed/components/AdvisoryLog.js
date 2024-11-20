@@ -102,6 +102,7 @@ const AdvisoryLog = ({
           justifyContent={'flex-start'}
         >
           <Button
+            title='Previous'
             colorScheme='blue'
             onClick={onPreviousPage}
             isDisabled={!data.pageInfo.hasPreviousPage}
@@ -109,6 +110,7 @@ const AdvisoryLog = ({
             Previous
           </Button>
           <Button
+            title='Next'
             colorScheme='blue'
             onClick={onNextPage}
             isDisabled={!data.pageInfo.hasNextPage}

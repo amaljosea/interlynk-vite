@@ -281,6 +281,7 @@ const CompSupplier = ({ data }) => {
           {suppliers?.length > 0 && (
             <Button
               variant='ghost'
+              title='Remove supplier'
               onClick={handleRemove}
               isDisabled={isDisabled}
               sx={{

@@ -181,6 +181,7 @@ function ProductAssembleDrawer(props) {
                   me='100px'
                   p='10px'
                   maxW='100px'
+                  title='Assemble product'
                   onClick={handleAdd}
                 >
                   Add
@@ -241,10 +242,15 @@ function ProductAssembleDrawer(props) {
           </Stack>
         </DrawerBody>
         <DrawerFooter borderTopWidth='1px'>
-          <Button variant='outline' mr={3} onClick={onClose}>
+          <Button title='Cancel' variant='outline' mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button colorScheme='blue' type='submit' onClick={handleSave}>
+          <Button
+            title='Save'
+            colorScheme='blue'
+            type='submit'
+            onClick={handleSave}
+          >
             Save
           </Button>
         </DrawerFooter>

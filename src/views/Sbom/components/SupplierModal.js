@@ -219,6 +219,7 @@ const SupplierModal = (props) => {
               isLoading={rlLoading}
               onClick={handleRuleCreate}
               hidden={friendlyId ? false : true}
+              title={`${ruleExists ? 'View' : 'Save as'} Rule`}
               isDisabled={isInvalid || formData?.name === '' || loading}
               colorScheme={ruleExists ? 'green' : 'blue'}
             >

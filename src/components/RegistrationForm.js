@@ -295,6 +295,7 @@ const RegistrationForm = () => {
         <Button
           mt={5}
           width='full'
+          title='Register'
           colorScheme='blue'
           isLoading={loading}
           onClick={handleSubmit}

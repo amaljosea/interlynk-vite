@@ -327,6 +327,7 @@ const VulnFilters = ({ reset }) => {
               ml={8}
               my={3}
               size='sm'
+              title='Vuln EPSS filter submit'
               onClick={handleSubmit}
               isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}
             >

@@ -102,6 +102,7 @@ const useCustomToast = () => {
           </Flex>
           <Button
             variant='link'
+            title='Close toast'
             color={'#1A202C99'}
             onClick={() => toast.closeAll()}
           >

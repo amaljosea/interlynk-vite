@@ -150,6 +150,7 @@ const ChecksColumns = (
                   fontWeight='normal'
                   colorScheme='whatsapp'
                   leftIcon={<CheckIcon />}
+                  title={isPrimary ? 'Fixed' : 'View'}
                   onClick={() => (isPrimary ? null : FIXED.onOpen())}
                   disabled={customerView || !editChecks || isArchived}
                 >
@@ -165,6 +166,7 @@ const ChecksColumns = (
                   colorScheme='whatsapp'
                   isDisabled={isArchived}
                   leftIcon={<CheckIcon />}
+                  title={isPrimary ? 'Fixed' : 'View'}
                   onClick={() => (isPrimary ? null : onCheckOpen(row))}
                   isLoading={activeRow?.id === id && loadingRules}
                 >
@@ -175,6 +177,7 @@ const ChecksColumns = (
               {status === 'ignored' && (
                 <Button
                   size='sm'
+                  title='Ignored'
                   width={'74px'}
                   fontSize={'xs'}
                   variant='solid'

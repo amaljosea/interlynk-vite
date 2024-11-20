@@ -285,6 +285,7 @@ const CompLinks = ({ data }) => {
                         <ButtonGroup>
                           <Button
                             size='sm'
+                            title='No'
                             fontSize={'sm'}
                             variant='outline'
                             onClick={() => setActiveLink(null)}
@@ -293,6 +294,7 @@ const CompLinks = ({ data }) => {
                           </Button>
                           <Button
                             size='sm'
+                            title='Yes'
                             fontSize={'sm'}
                             variant='outline'
                             colorScheme='red'

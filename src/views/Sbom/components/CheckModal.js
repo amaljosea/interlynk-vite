@@ -391,6 +391,7 @@ const CheckModal = (props) => {
             hidden={
               !isComponentLicense && !isComponentVersion && !isComponentSupport
             }
+            title={`${ruleExists ? 'View' : 'Save as'} Rule`}
             isDisabled={isInvalidLicense || isEmptyVersion || isDisabled}
             colorScheme={ruleExists ? 'green' : 'blue'}
           >

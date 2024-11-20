@@ -65,6 +65,7 @@ const ProjectCard = ({ image, name, category, avatars, description }) => {
             h='36px'
             fontSize='xs'
             px='1.5rem'
+            title='View project'
           >
             VIEW PROJECT
           </Button>

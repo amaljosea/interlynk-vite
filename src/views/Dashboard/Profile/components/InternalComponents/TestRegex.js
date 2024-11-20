@@ -136,6 +136,7 @@ export const TextRegex = ({ regex, ignoreCase }) => {
         fontSize={'sm'}
         variant='link'
         paddingLeft={'2px'}
+        title='Add more test'
       >
         Add more test
       </Button>

@@ -244,6 +244,7 @@ const PriSupplierModal = (props) => {
               isLoading={rlLoading}
               onClick={handleRuleCreate}
               hidden={friendlyId ? false : true}
+              title={`${ruleExists ? 'View' : 'Save as'} Rule`}
               colorScheme={ruleExists ? 'green' : 'blue'}
               isDisabled={
                 isInvalid || crLoading || upLoading || !formData?.name

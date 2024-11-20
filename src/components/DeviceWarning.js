@@ -45,6 +45,7 @@ const DeviceWarning = () => {
           browser settings.
         </Text>
         <Button
+          title='Retry'
           colorScheme='gray'
           sx={{ fontSize: 14, mt: 8 }}
           onClick={() => window.location.reload()}

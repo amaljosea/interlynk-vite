@@ -196,6 +196,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
             isLoading={ruleLoading}
             hidden={friendlyId ? false : true}
             colorScheme={ruleExists ? 'green' : 'blue'}
+            title={`${ruleExists ? 'View' : 'Save as'} Rule`}
             isDisabled={!authorData?.name || !authorData?.email}
           >
             {ruleExists ? 'View' : 'Save as'} Rule

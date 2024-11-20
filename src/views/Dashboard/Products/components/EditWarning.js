@@ -39,10 +39,15 @@ const EditWarning = ({ isOpen, onClose, handleSave }) => {
           </AlertDialogBody>
 
           <AlertDialogFooter>
-            <Button ref={cancelRef} onClick={onClose}>
+            <Button title='Cancel' ref={cancelRef} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme='blue' onClick={handleSubmit} ml={3}>
+            <Button
+              title='Save anyway'
+              colorScheme='blue'
+              onClick={handleSubmit}
+              ml={3}
+            >
               Save Anyway
             </Button>
           </AlertDialogFooter>

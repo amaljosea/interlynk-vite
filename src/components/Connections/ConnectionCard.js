@@ -72,6 +72,7 @@ const ConnectionCard = ({
         <Button
           colorScheme={isConnected ? 'blue' : 'white'}
           size='md'
+          title='Configure'
           width={isConnected ? '150px' : '120px'}
           color={isConnected ? lightAndDarkBgColor : primaryBlueText}
           bg={isConnected ? primaryBlueText : ''}

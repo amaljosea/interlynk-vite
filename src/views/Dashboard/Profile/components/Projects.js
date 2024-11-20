@@ -77,6 +77,7 @@ const Projects = ({ title, description }) => {
             color={sameSecondaryText}
             border='1px solid lightgray'
             borderRadius='15px'
+            title='Create a New Project'
             minHeight={{ sm: '200px', md: '100%' }}
           >
             <Flex direction='column' justifyContent='center' align='center'>

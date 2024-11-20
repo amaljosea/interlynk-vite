@@ -264,8 +264,9 @@ const ResetForm = () => {
             </FormControl>
             <Button
               width='full'
-              colorScheme='blue'
               type='submit'
+              title='Submit'
+              colorScheme='blue'
               isLoading={isLoading}
               isDisabled={
                 passError !== '' ||
@@ -320,8 +321,9 @@ const ResetForm = () => {
           </FormControl>
           <Button
             width='full'
-            colorScheme='blue'
             type='submit'
+            title='submit'
+            colorScheme='blue'
             isLoading={isLoading}
             isDisabled={email === ''}
           >

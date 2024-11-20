@@ -1,6 +1,8 @@
 export const SentryTest = () => {
   return (
     // eslint-disable-next-line no-undef
-    <button onClick={() => methodDoesNotExist999()}>Break the world</button>
+    <button title='Break the world' onClick={() => methodDoesNotExist999()}>
+      Break the world
+    </button>
   )
 }

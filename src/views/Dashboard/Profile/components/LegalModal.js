@@ -384,6 +384,7 @@ const LegalModal = ({ data, isOpen, onClose }) => {
             ))}
         </Stack>
         <Button
+          title='Add config'
           aria-label='Add config'
           w={'fit-content'}
           onClick={addRow}

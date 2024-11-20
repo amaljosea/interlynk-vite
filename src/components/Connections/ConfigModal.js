@@ -379,6 +379,7 @@ const ConfigModal = ({
         ))}
         {updateCon && (
           <Button
+            title='Add new connection'
             onClick={handleAddConfig}
             alignSelf={'flex-start'}
             paddingLeft={'2px'}

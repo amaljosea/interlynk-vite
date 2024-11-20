@@ -56,6 +56,7 @@ const SocialLogin = () => {
     <ButtonGroup>
       <Button
         width={'100%'}
+        title='Google'
         variant='outline'
         colorScheme='blue'
         onClick={() => onAuth('google')}
@@ -65,6 +66,7 @@ const SocialLogin = () => {
       </Button>
       <Button
         width={'100%'}
+        title='Github'
         variant='outline'
         colorScheme='blue'
         leftIcon={<FaGithub />}

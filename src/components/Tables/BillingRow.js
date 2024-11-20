@@ -59,6 +59,7 @@ function BillingRow(props) {
         >
           <Button
             p='0px'
+            title='Delete bill'
             bg='transparent'
             mb={{ sm: '10px', md: '0px' }}
             me={{ md: '12px' }}
@@ -75,7 +76,7 @@ function BillingRow(props) {
               </Text>
             </Flex>
           </Button>
-          <Button p='0px' bg='transparent'>
+          <Button title='Edit bill' p='0px' bg='transparent'>
             <Flex
               color={inverseSecondaryBgColor}
               cursor='pointer'

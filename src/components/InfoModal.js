@@ -31,6 +31,7 @@ const InfoModal = ({ isOpen, onClose, heading, body, url }) => {
           <Button
             size='sm'
             mt={5}
+            title='Learn more'
             rightIcon={<ArrowForwardIcon />}
             colorScheme='blue'
             variant='link'

@@ -80,6 +80,7 @@ const SagTable = ({ data }) => {
       name: 'SAG SCORE',
       selector: (row) => (
         <Button
+          title={'SAG score'}
           pointerEvents={'none'}
           size='xs'
           variant='outline'

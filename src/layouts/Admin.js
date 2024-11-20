@@ -193,7 +193,7 @@ export default function Admin() {
         <Text mt={2}>
           {displayErrorMessage(error?.networkError?.statusCode, error?.message)}
         </Text>
-        <Button colorScheme='blue' mt={4} onClick={handleLogout}>
+        <Button title='Logout' colorScheme='blue' mt={4} onClick={handleLogout}>
           Logout
         </Button>
         <Img alt='Not found' src={NotFound} width={'36%'} />

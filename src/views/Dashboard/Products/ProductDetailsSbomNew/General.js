@@ -161,6 +161,7 @@ const General = ({ data, loading, error }) => {
     return (
       <Button
         size='xs'
+        title={label}
         onClick={onClick}
         variant='unstyled'
         hidden={isArchived}
