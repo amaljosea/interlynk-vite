@@ -1,7 +1,6 @@
-import { useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
-import { getFullDateAndTime, isCustomerView, timeSince } from 'utils'
-import { truncatedValue } from 'utils'
+import { getFullDateAndTime, timeSince, truncatedValue } from 'utils'
 
 import {
   Drawer,
@@ -9,31 +8,61 @@ import {
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay
+  DrawerOverlay,
+  IconButton
 } from '@chakra-ui/react'
 import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
 import { Stack, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
-import { GetShareSbomAlternatives } from 'graphQL/Queries'
+import useCustomToast from 'hooks/useCustomToast'
+
+import { sbomUpdate } from 'graphQL/Mutation'
 import { GetSbomAlternatives } from 'graphQL/Queries'
+
+import { FaArrowUp } from 'react-icons/fa6'
 
 const SbomList = ({ sbomId, isOpen, onClose }) => {
   const params = useParams()
-  const customerView = isCustomerView()
-  const columns = ['UPLOADED', 'COMPONENTS', 'LICENSES', 'STATUS', 'UPDATED AT']
+  const { showToast } = useCustomToast()
 
-  const { data: sbomAlts, loading } = useQuery(
-    customerView ? GetShareSbomAlternatives : GetSbomAlternatives,
-    {
-      skip: isOpen ? false : true,
-      variables: {
-        projectId: customerView ? undefined : params?.productid,
-        sbomId: sbomId
-      }
+  const columns = [
+    'UPLOADED',
+    'COMPONENTS',
+    'LICENSES',
+    'STATUS',
+    'UPDATED AT',
+    ''
+  ]
+
+  const [updateSbom] = useMutation(sbomUpdate)
+
+  const { data: sbomAlts, loading } = useQuery(GetSbomAlternatives, {
+    skip: isOpen ? false : true,
+    variables: {
+      projectId: params?.productid,
+      sbomId: sbomId
     }
-  )
+  })
 
-  const data = customerView ? sbomAlts?.shareLynkQuery?.sbom : sbomAlts?.sbom
+  const handlePromote = async (item) => {
+    await updateSbom({
+      variables: { id: item?.id, spec: item?.spec, promoteToDirect: true }
+    })
+      .then((res) => {
+        if (res?.sbomUpdate?.errors?.length > 0) {
+          showToast({
+            description: res?.sbomUpdate?.errors[0],
+            status: 'error'
+          })
+        } else {
+          showToast({
+            description: `Sbom updated successfully`,
+            status: 'success'
+          })
+        }
+      })
+      .finally(() => onClose())
+  }
 
   if (loading) return null
 
@@ -43,22 +72,22 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
       <DrawerContent>
         <DrawerCloseButton mt={1} />
         <DrawerHeader borderBottomWidth='1px'>
-          {truncatedValue(data?.projectVersion, 40) + ' SBOM List'}
+          {truncatedValue(sbomAlts?.sbom?.projectVersion, 40) + ' SBOM List'}
         </DrawerHeader>
         <DrawerBody>
           <Table variant='simple' m={0} p={0}>
             <Thead>
               <Tr>
                 {columns.map((item, index) => (
-                  <Th px={0} fontFamily={'inherit'} key={index}>
+                  <Th px={0} key={index} fontFamily={'inherit'}>
                     {item}
                   </Th>
                 ))}
               </Tr>
             </Thead>
             <Tbody>
-              {data?.alternatives?.length > 0 &&
-                [...data.alternatives]
+              {sbomAlts?.sbom?.alternatives?.length > 0 &&
+                [...sbomAlts.sbom.alternatives]
                   .sort((a, b) => {
                     const dateA = new Date(a.updatedAt)
                     const dateB = new Date(b.updatedAt)
@@ -111,6 +140,18 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
                             placement='top'
                           >
                             <Text>{timeSince(updatedAt)}</Text>
+                          </Tooltip>
+                        </Td>
+                        <Td px={0} fontSize={'sm'}>
+                          <Tooltip
+                            placement='left'
+                            label={'Promote to version'}
+                          >
+                            <IconButton
+                              size='sm'
+                              icon={<FaArrowUp />}
+                              onClick={() => handlePromote(item)}
+                            />
                           </Tooltip>
                         </Td>
                       </Tr>

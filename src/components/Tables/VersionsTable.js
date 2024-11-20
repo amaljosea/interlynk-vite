@@ -453,7 +453,7 @@ const VersionsTable = (props) => {
                 >
                   Reprocess
                 </MenuItem>
-                <Divider />
+                <Divider hidden={signedUrlParams} />
                 <MenuItem
                   aria-label={`sbom-${row?.projectVersion}-archive`}
                   isDisabled={!archiveSbom || signedUrlParams}

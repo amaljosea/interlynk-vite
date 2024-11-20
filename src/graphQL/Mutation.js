@@ -1277,6 +1277,7 @@ export const sbomUpdate = gql`
     $format: String
     $licenses: LicenseInput
     $archived: Boolean
+    $promoteToDirect: Boolean
     $generateUniqueId: Boolean
   ) {
     sbomUpdate(
@@ -1287,6 +1288,7 @@ export const sbomUpdate = gql`
         format: $format
         licenses: $licenses
         archived: $archived
+        promoteToDirect: $promoteToDirect
         generateUniqueId: $generateUniqueId
       }
     ) {
