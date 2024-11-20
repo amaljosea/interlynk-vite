@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import Card from 'components/Card/Card'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'

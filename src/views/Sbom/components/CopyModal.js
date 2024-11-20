@@ -3,7 +3,6 @@ import { useState } from 'react'
 
 import { CopyIcon } from '@chakra-ui/icons'
 import {
-  Alert,
   Flex,
   FormControl,
   FormLabel,

@@ -108,12 +108,6 @@ const FilterMenu = ({ title, icon, value, onChange, options }) => {
   )
 }
 
-const customDrawerStyle = {
-  width: '960px',
-  maxWidth: '960px',
-  margin: 'auto'
-}
-
 const ProductProgressModal = ({ isOpen, onClose, name }) => {
   const [targetComponent, setTargetComponent] = useState('')
   const [targetVulnerability, setTargetVulnerability] = useState('')

@@ -1,5 +1,5 @@
 import { TabProvider } from 'context/TabContext'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 

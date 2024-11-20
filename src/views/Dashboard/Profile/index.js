@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 

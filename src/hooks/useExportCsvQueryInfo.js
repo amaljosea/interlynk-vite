@@ -93,7 +93,15 @@ const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
       default:
         return { query: null, variables: {}, skip: true, selector: null }
     }
-  }, [tableType, sbomId, productId, vulnId, rowsToExport, searchFilters])
+  }, [
+    tableType,
+    sbomId,
+    productId,
+    productGroupId,
+    vulnId,
+    rowsToExport,
+    searchFilters
+  ])
 
   return queryInfo
 }
