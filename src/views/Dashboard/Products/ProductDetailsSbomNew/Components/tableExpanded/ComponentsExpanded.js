@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react'
 import { getFullDateAndTime, getSignedUrlParams, isCustomerView } from 'utils'
-import { CustomText } from 'utils/styleComponents'
 import { openSsf } from 'variables/general'
 
 import { Box, Flex, Text, VStack } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Tag } from '@chakra-ui/react'
 
+import { CustomText } from 'components/Misc/CustomText'
 import SupplierTag from 'components/SupplierTag'
 
 import { useThemeColor } from 'hooks/useThemeColors'

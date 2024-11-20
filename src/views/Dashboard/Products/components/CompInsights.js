@@ -1,5 +1,4 @@
 import { useQuery } from '@apollo/client'
-import styled from '@emotion/styled'
 import { useParams } from 'react-router-dom'
 import { getFullDateAndTime, truncatedValue } from 'utils'
 import { pkgData, pkgVersionData, repositoryData } from 'variables/general'
@@ -42,10 +41,6 @@ const LynkTag = ({ value }) => {
     </Tag>
   )
 }
-
-const Label = styled(Text)`
-  cursor: pointer;
-`
 
 const CompInsights = ({ isOpen, onClose, id }) => {
   const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
@@ -131,7 +126,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                     <Stack spacing={3}>
                       <Container>
                         <Tooltip label={onCheck('package', 'Deprecated')}>
-                          <Label>Deprecated</Label>
+                          <Text cursor={'pointer'}>Deprecated</Text>
                         </Tooltip>
                         <LynkTag
                           value={enrichedContent?.package?.isDeprecated}
@@ -139,7 +134,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('package', 'Last Updated')}>
-                          <Label>Last Updated</Label>
+                          <Text cursor={'pointer'}>Last Updated</Text>
                         </Tooltip>
                         <Text>
                           {getFullDateAndTime(
@@ -157,7 +152,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                     <Stack spacing={3}>
                       <Container>
                         <Tooltip label={onCheck('packageVersion', 'License')}>
-                          <Label>License</Label>
+                          <Text cursor={'pointer'}>License</Text>
                         </Tooltip>
                         <Text>{getLicense(latestPackageVersion?.license)}</Text>
                       </Container>
@@ -165,13 +160,13 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                         <Tooltip
                           label={onCheck('packageVersion', 'Deprecated')}
                         >
-                          <Label>Deprecated</Label>
+                          <Text cursor={'pointer'}>Deprecated</Text>
                         </Tooltip>
                         <LynkTag value={latestPackageVersion?.isDeprecated} />
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('packageVersion', 'Archived')}>
-                          <Label>Archived</Label>
+                          <Text cursor={'pointer'}>Archived</Text>
                         </Tooltip>
                         <LynkTag value={latestPackageVersion?.isArchived} />
                       </Container>
@@ -179,13 +174,13 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                         <Tooltip
                           label={onCheck('packageVersion', 'Pre-release')}
                         >
-                          <Label>Pre-release</Label>
+                          <Text cursor={'pointer'}>Pre-release</Text>
                         </Tooltip>
                         <LynkTag value={latestPackageVersion?.isPreRelease} />
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('packageVersion', 'Outdated')}>
-                          <Label>Outdated</Label>
+                          <Text cursor={'pointer'}>Outdated</Text>
                         </Tooltip>
                         <LynkTag
                           value={
@@ -202,7 +197,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                             'Most Recent Version'
                           )}
                         >
-                          <Label>Most Recent Version</Label>
+                          <Text cursor={'pointer'}>Most Recent Version</Text>
                         </Tooltip>
                         <Text>{latestPackageVersion?.version}</Text>
                       </Container>
@@ -210,7 +205,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                         <Tooltip
                           label={onCheck('packageVersion', 'Last Updated')}
                         >
-                          <Label>Last Updated</Label>
+                          <Text cursor={'pointer'}>Last Updated</Text>
                         </Tooltip>
                         <Text>
                           {getFullDateAndTime(latestPackageVersion?.updatedAt)}
@@ -226,19 +221,19 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                     <Stack spacing={3}>
                       <Container>
                         <Tooltip label={onCheck('repository', 'Name')}>
-                          <Label>Name</Label>
+                          <Text cursor={'pointer'}>Name</Text>
                         </Tooltip>
                         <Text>{repository?.name}</Text>
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('repository', 'Owner')}>
-                          <Label>Owner</Label>
+                          <Text cursor={'pointer'}>Owner</Text>
                         </Tooltip>
                         <Text>{repository?.owner}</Text>
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('repository', 'Description')}>
-                          <Label>Description</Label>
+                          <Text cursor={'pointer'}>Description</Text>
                         </Tooltip>
                         <Text>{repository?.description}</Text>
                       </Container>
@@ -246,43 +241,43 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                         <Tooltip
                           label={onCheck('repository', 'Source Archived')}
                         >
-                          <Label>Source Archived</Label>
+                          <Text cursor={'pointer'}>Source Archived</Text>
                         </Tooltip>
                         <LynkTag value={repository?.isArchived} />
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('repository', 'Stars')}>
-                          <Label>Stars</Label>
+                          <Text cursor={'pointer'}>Stars</Text>
                         </Tooltip>
                         <Text>{repository?.starsCount}</Text>
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('repository', 'Forks')}>
-                          <Label>Forks</Label>
+                          <Text cursor={'pointer'}>Forks</Text>
                         </Tooltip>
                         <Text>{repository?.forksCount}</Text>
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('repository', 'Watchers')}>
-                          <Label>Watchers</Label>
+                          <Text cursor={'pointer'}>Watchers</Text>
                         </Tooltip>
                         <Text>{repository?.watchersCount}</Text>
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('repository', 'Contibutors')}>
-                          <Label>Contibutors</Label>
+                          <Text cursor={'pointer'}>Contibutors</Text>
                         </Tooltip>
                         <Text>{repository?.contributorCount}</Text>
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('repository', 'Relases')}>
-                          <Label>Relases</Label>
+                          <Text cursor={'pointer'}>Relases</Text>
                         </Tooltip>
                         <Text>{JSON.stringify(repository?.releases)}</Text>
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('repository', 'Issues')}>
-                          <Label>Issues</Label>
+                          <Text cursor={'pointer'}>Issues</Text>
                         </Tooltip>
                         <Text>{JSON.stringify(repository?.issues)}</Text>
                       </Container>
@@ -290,13 +285,13 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                         <Tooltip
                           label={onCheck('repository', 'OpenSSF Scorecard')}
                         >
-                          <Label>OpenSSF Scorecard</Label>
+                          <Text cursor={'pointer'}>OpenSSF Scorecard</Text>
                         </Tooltip>
                         <Text>{repository?.scorecardScore}</Text>
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('repository', 'License')}>
-                          <Label>License</Label>
+                          <Text cursor={'pointer'}>License</Text>
                         </Tooltip>
                         <Tag colorScheme='blue' w='fit-content'>
                           <TagLabel fontSize={'xs'}>
@@ -306,7 +301,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                       </Container>
                       <Container>
                         <Tooltip label={onCheck('repository', 'Last Updated')}>
-                          <Label>Last Updated</Label>
+                          <Text cursor={'pointer'}>Last Updated</Text>
                         </Tooltip>
                         <Text>{getFullDateAndTime(repository?.updatedAt)}</Text>
                       </Container>

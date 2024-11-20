@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react'
-import { CustomText } from 'utils/styleComponents'
 
 import {
   Box,
@@ -18,6 +17,8 @@ import {
   Tooltip,
   Tr
 } from '@chakra-ui/react'
+
+import { CustomText } from 'components/Misc/CustomText'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 

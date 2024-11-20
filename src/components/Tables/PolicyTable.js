@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from '@apollo/client'
-import styled from '@emotion/styled'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
@@ -358,13 +357,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
   // EXPAND VIEW
   const ExpandedComponent = ({ data }) => {
     const { description, policyRules } = data
-    const CustomText = styled(Text)`
-      font-size: 13px;
-      font-weight: bold;
-      color: ${secondaryTextInverse};
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-    `
+
     return (
       <Flex
         p={5}
@@ -374,7 +367,15 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Box>
-          <CustomText>Description :</CustomText>
+          <Text
+            fontSize='13px'
+            fontWeight='bold'
+            color={secondaryTextInverse}
+            textTransform='uppercase'
+            letterSpacing='0.6px'
+          >
+            Description :
+          </Text>
           <Text
             width={'90%'}
             mt={1}
