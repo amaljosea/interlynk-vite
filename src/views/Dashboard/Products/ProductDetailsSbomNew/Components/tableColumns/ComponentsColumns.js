@@ -1,0 +1,491 @@
+import { useMemo } from 'react'
+import { GetIcon, isValidPurl, truncatedValue } from 'utils'
+import { timeSince } from 'utils'
+import { getFullDateAndTime, isCustomerView } from 'utils'
+
+import { ViewIcon } from '@chakra-ui/icons'
+import {
+  Box,
+  Button,
+  Divider,
+  Flex,
+  IconButton,
+  Portal,
+  Stack,
+  Text,
+  Tooltip
+} from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+
+import { HealthScore } from 'components/HealthScore'
+import ExternalLink from 'components/Misc/ExternalLink'
+
+import { useThemeColor } from 'hooks/useThemeColors'
+
+import { BsFillPatchQuestionFill } from 'react-icons/bs'
+import { FaEllipsisV, FaGlobe, FaLightbulb, FaSitemap } from 'react-icons/fa'
+import { FaHouseUser, FaListCheck } from 'react-icons/fa6'
+
+const ComponentsColumns = ({
+  onOpen = () => {},
+  colorMode,
+  isFreeTier,
+  sbomId,
+  onEditOpen,
+  updateComponent,
+  onRelOpen,
+  totalComp,
+  hanldeAnalysis,
+  setActiveRow,
+  onCheckCpe,
+  onCheckPurl,
+  DELETE,
+  GRAPH,
+  isArchived,
+  setActiveComp
+}) => {
+  const {
+    primaryTextColor,
+    inverseSecondaryBgColor,
+    primaryBlueText,
+    secondaryTextColor,
+    primaryErrorColor
+  } = useThemeColor([
+    'primaryTextColor',
+    'inverseSecondaryBgColor',
+    'primaryBlueText',
+    'secondaryTextColor',
+    'primaryErrorColor'
+  ])
+
+  const customerView = isCustomerView()
+  return useMemo(() => {
+    const handleGraphView = (row) => {
+      setActiveComp(row)
+      GRAPH.onOpen()
+    }
+
+    const columns = [
+      // COMPONENT
+      {
+        id: 'COMPONENTS_NAME',
+        name: 'NAME',
+        selector: (row) => {
+          const { purl, name, primary, internal, sbomId: bomId, sbom } = row
+          const { projectVersion, project } = sbom || ''
+          const { projectGroup } = project || ''
+          const isPart = sbomId !== bomId
+          const validPurl = isValidPurl(purl)
+          const icon = validPurl ? (
+            GetIcon(purl?.split('/')[0], colorMode)
+          ) : (
+            <BsFillPatchQuestionFill
+              fontSize={24}
+              color={inverseSecondaryBgColor}
+            />
+          )
+          return (
+            <Flex sx={{ alignItems: 'center', gap: 2, my: 3 }}>
+              <Box width={'50px'}>
+                <IconButton icon={icon} isRound={true} variant='solid' />
+              </Box>
+              <Flex
+                flexDirection={'column'}
+                sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}
+              >
+                {/* COMPONENT NAME */}
+                <Tooltip label={name}>
+                  <Text
+                    color={primaryTextColor}
+                    aria-label='component_name'
+                    data-tag='allowRowEvents'
+                  >
+                    {truncatedValue(name, 30)}
+                  </Text>
+                </Tooltip>
+                {isPart && (
+                  <Text
+                    sx={{
+                      fontSize: 'xs',
+                      color: primaryTextColor,
+                      w: 'fit-content'
+                    }}
+                    fontWeight={'medium'}
+                  >
+                    {projectGroup?.name &&
+                      truncatedValue(projectGroup?.name, 10)}
+                    {projectVersion &&
+                      `: ${truncatedValue(projectVersion, 10)}`}
+                  </Text>
+                )}
+                {/* COMPONENT TYPE */}
+                <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
+                  {primary && (
+                    <Tag
+                      width={'fit-content'}
+                      size={'sm'}
+                      variant='subtle'
+                      colorScheme='blue'
+                    >
+                      <TagLabel textTransform={'capitalize'}>Primary</TagLabel>
+                    </Tag>
+                  )}
+                  {internal && (
+                    <Tag
+                      width={'fit-content'}
+                      size={'sm'}
+                      variant='subtle'
+                      colorScheme='cyan'
+                    >
+                      <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
+                    </Tag>
+                  )}
+                </Flex>
+              </Flex>
+            </Flex>
+          )
+        },
+        width: customerView ? '30%' : '25%',
+        wrap: true,
+        sortable: true
+      },
+      // VERSION
+      {
+        id: 'COMPONENTS_VERSION',
+        name: 'VERSION',
+        selector: (row) => <Text color={primaryTextColor}>{row?.version}</Text>,
+        wrap: true,
+        width: customerView ? '12%' : '10%',
+        sortable: true
+      },
+      // COMPONENT HEALTH
+      {
+        id: 'COMPONENTS_HEALTH',
+        name: 'HEALTH',
+        selector: (row) => {
+          const { healthScore } = row
+          return <HealthScore isComponent value={healthScore} />
+        },
+        width: '10%',
+        omit: isFreeTier || customerView
+      },
+      // IDENTIFIERS
+      {
+        id: 'IDENTIFIERS',
+        name: 'IDENTIFIERS',
+        selector: (row) => {
+          const { purl, cpes } = row
+          return (
+            <Flex gap={2}>
+              {cpes?.length > 0 && (
+                <Tooltip label={cpes[0]}>
+                  <Button
+                    size='xs'
+                    color={primaryTextColor}
+                    onClick={() => onCheckCpe(row)}
+                  >
+                    CPE
+                  </Button>
+                </Tooltip>
+              )}
+              {purl && (
+                <Tooltip label={purl}>
+                  <Button
+                    size='xs'
+                    color={primaryTextColor}
+                    onClick={() => onCheckPurl(row)}
+                  >
+                    PURL
+                  </Button>
+                </Tooltip>
+              )}
+            </Flex>
+          )
+        },
+        width: '12%',
+        wrap: true
+      },
+      // LICENSES
+      {
+        id: 'COMPONENTS_LICENSES_EXP',
+        name: 'LICENSES',
+        selector: (row) => {
+          const { licenses, licensesExp, licensesCustom } = row
+          const totalSpdx = licenses?.length > 1 && licenses.slice(1)
+          const totalCustom =
+            licensesCustom?.length > 1 && licensesCustom.slice(1)
+          return (
+            <Flex
+              justifyContent={'flex-end'}
+              sx={{ my: 2, gap: 2, alignItems: 'flex-end', flexWrap: 'wrap' }}
+            >
+              {/* SPDX */}
+              {licenses && (
+                <Stack direction={'row'} spacing={2}>
+                  {licenses.length > 0 && (
+                    <Tooltip label={licenses[0]} placement={'top'}>
+                      <Tag
+                        width={'150px'}
+                        size={'md'}
+                        variant='subtle'
+                        colorScheme='green'
+                      >
+                        <TagLabel mx={'auto'}>{licenses[0]}</TagLabel>
+                      </Tag>
+                    </Tooltip>
+                  )}
+                  {totalSpdx.length > 0 && (
+                    <Tooltip
+                      label={JSON.stringify(totalSpdx)
+                        .slice(1, -1)
+                        .replace(/"/g, '')}
+                      placement={'top'}
+                    >
+                      <Tag
+                        width={'150px'}
+                        size={'md'}
+                        variant='subtle'
+                        colorScheme='green'
+                      >
+                        <TagLabel
+                          mx={'auto'}
+                        >{`+${totalSpdx.length}`}</TagLabel>
+                      </Tag>
+                    </Tooltip>
+                  )}
+                </Stack>
+              )}
+              {/* EXPRESSION */}
+              {licensesExp && licensesExp !== '' && (
+                <Tooltip label={licensesExp} placement={'top'}>
+                  <Tag
+                    width={'150px'}
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                  >
+                    <TagLabel mx={'auto'}>{licensesExp}</TagLabel>
+                  </Tag>
+                </Tooltip>
+              )}
+              {/* CUSTOM */}
+              {licensesCustom && (
+                <Stack direction={'row'} spacing={2}>
+                  {licensesCustom.length > 0 && (
+                    <Tooltip label={licensesCustom[0]} placement={'top'}>
+                      <Tag
+                        width={'150px'}
+                        size={'md'}
+                        variant='subtle'
+                        colorScheme='green'
+                      >
+                        <TagLabel mx={'auto'}>{licensesCustom[0]}</TagLabel>
+                      </Tag>
+                    </Tooltip>
+                  )}
+                  {totalCustom && (
+                    <Tooltip
+                      label={JSON.stringify(totalCustom)
+                        .slice(1, -1)
+                        .replace(/"/g, '')}
+                      placement={'top'}
+                    >
+                      <Tag
+                        width={'150px'}
+                        size={'md'}
+                        variant='subtle'
+                        colorScheme='green'
+                      >
+                        <TagLabel
+                          mx={'auto'}
+                        >{`+${totalCustom.length}`}</TagLabel>
+                      </Tag>
+                    </Tooltip>
+                  )}
+                </Stack>
+              )}
+            </Flex>
+          )
+        },
+        width: '13%',
+        sortable: true,
+        wrap: true
+      },
+      // UPDATED AT
+      {
+        id: 'COMPONENTS_UPDATED_AT',
+        name: 'UPDATED',
+        selector: (row) => (
+          <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
+            <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
+          </Tooltip>
+        ),
+        sortable: true,
+        sortFunction: (a, b) => {
+          const dateA = new Date(a.updatedAt)
+          const dateB = new Date(b.updatedAt)
+          return dateA - dateB // Sort in descending order
+        },
+        width: '12%',
+        wrap: true
+      },
+      // ACTION
+      {
+        id: 'action',
+        name: 'ACTION',
+        selector: (row) => {
+          const { status, primary, externalUrls } = row
+          const website = externalUrls?.find((item) => item.name === 'website')
+          const distribution = externalUrls?.find(
+            (item) => item.name === 'distribution'
+          )
+          const issueTracker = externalUrls?.find(
+            (item) => item.name === 'issue-tracker'
+          )
+          const vcs = externalUrls?.find((item) => item.name === 'vcs')
+          const onCheck = (item) => (item ? primaryBlueText : primaryTextColor)
+
+          return (
+            <Stack direction={'row'} alignItems={'center'}>
+              {/* WEBSITE */}
+              <ExternalLink
+                link={website}
+                icon={<FaGlobe color={onCheck(website)} fontSize={16} />}
+              />
+              {/* DISTRIBUTION */}
+              <ExternalLink
+                link={vcs}
+                icon={<FaSitemap color={onCheck(vcs)} fontSize={16} />}
+              />
+              {/* ADVISORIES */}
+              <ExternalLink
+                link={issueTracker}
+                icon={
+                  customerView ? (
+                    <FaHouseUser color={onCheck(issueTracker)} fontSize={16} />
+                  ) : (
+                    <FaListCheck color={onCheck(issueTracker)} fontSize={16} />
+                  )
+                }
+              />
+              {/* SUPPORT */}
+              <ExternalLink
+                link={distribution}
+                icon={
+                  <FaLightbulb color={onCheck(distribution)} fontSize={16} />
+                }
+              />
+              {!customerView ? (
+                <Menu>
+                  <MenuButton
+                    as={IconButton}
+                    icon={<FaEllipsisV />}
+                    variant='none'
+                    color={secondaryTextColor}
+                    data-testid='component-actions'
+                  />
+                  <Portal>
+                    <MenuList fontSize={'sm'}>
+                      <MenuItem
+                        data-testid='edit_component'
+                        onClick={() => onEditOpen(row)}
+                        isDisabled={status === 'signed' || !updateComponent}
+                      >
+                        Edit Component
+                      </MenuItem>
+                      <MenuItem
+                        hidden
+                        onClick={() => onRelOpen(row)}
+                        isDisabled={!updateComponent}
+                      >
+                        Edit Relationships
+                      </MenuItem>
+                      <MenuItem
+                        data-testid='view_relation'
+                        onClick={() => handleGraphView(row)}
+                        isDisabled={
+                          status === 'signed' ||
+                          !updateComponent ||
+                          totalComp?.length === 1
+                        }
+                      >
+                        View Relationships
+                      </MenuItem>
+                      <MenuItem
+                        data-testid='view_insights'
+                        onClick={() => hanldeAnalysis(row)}
+                        isDisabled={status === 'signed'}
+                        hidden={isFreeTier}
+                      >
+                        Insights
+                      </MenuItem>
+                      <Divider />
+                      {primary === false && (
+                        <MenuItem
+                          color={primaryErrorColor}
+                          onClick={() => {
+                            setActiveRow(row)
+                            DELETE.onOpen()
+                          }}
+                          isDisabled={
+                            status === 'signed' ||
+                            !updateComponent ||
+                            totalComp?.length === 1
+                          }
+                          data-testid='delete_component'
+                        >
+                          Delete
+                        </MenuItem>
+                      )}
+                    </MenuList>
+                  </Portal>
+                </Menu>
+              ) : (
+                <IconButton
+                  size='sm'
+                  sx={{ ml: 2, color: primaryTextColor }}
+                  icon={<ViewIcon />}
+                  onClick={() => {
+                    setActiveRow(row)
+                    onOpen()
+                  }}
+                />
+              )}
+            </Stack>
+          )
+        },
+        wrap: true,
+        right: 'true',
+        omit: isArchived
+      }
+    ]
+
+    return columns
+  }, [
+    onOpen,
+    colorMode,
+    primaryTextColor,
+    inverseSecondaryBgColor,
+    isFreeTier,
+    DELETE,
+    customerView,
+    hanldeAnalysis,
+    isArchived,
+    onEditOpen,
+    onRelOpen,
+    primaryBlueText,
+    primaryErrorColor,
+    sbomId,
+    secondaryTextColor,
+    setActiveRow,
+    totalComp?.length,
+    updateComponent,
+    GRAPH,
+    setActiveComp,
+    onCheckCpe,
+    onCheckPurl
+  ])
+}
+
+export default ComponentsColumns
