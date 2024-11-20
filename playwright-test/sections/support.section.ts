@@ -19,12 +19,12 @@ export default class SupportSection {
       await this.page.locator(`//button[@aria-label='add_support']`).click()
       await this.page.waitForTimeout(2000)
 
-      const name = 'Biotronix'
+      const name = 'Test'
       await this.page.getByPlaceholder('Enter Product Name').fill(name)
       await this.page.getByPlaceholder('Enter Product Version').fill('1.0.1')
       await this.page
         .getByPlaceholder('Enter PURL / CPE')
-        .fill('pkg:nuget/Azure.Core@1.22.0')
+        .fill('pkg:npm/example-package@1.0.0?platform=linux#src')
       await this.page.locator("button[type='submit']").click()
       await this.page.waitForTimeout(3000)
 
@@ -44,13 +44,13 @@ export default class SupportSection {
         await this.page.locator("button[type='submit']").click()
         await this.page.waitForTimeout(2000)
 
-        await this.page.locator('.chakra-switch__thumb').click()
+        await this.page.locator('.chakra-switch__thumb').nth(0).click()
         await this.page.waitForTimeout(2000)
 
         await this.page.locator("button[type='submit']").click()
         await this.page.waitForTimeout(3000)
 
-        await this.page.locator('.chakra-switch__thumb').click()
+        await this.page.locator('.chakra-switch__thumb').nth(0).click()
         await this.page.waitForTimeout(2000)
 
         await this.page.locator("button[type='submit']").click()

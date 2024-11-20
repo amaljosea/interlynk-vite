@@ -42,6 +42,7 @@ test('Check internal component CRUD feature', async ({ page }) => {
       await page.getByTestId('tag-actions').first().click()
       await page.getByRole('menuitem', { name: 'Delete' }).click()
       await page.getByRole('button', { name: 'Yes' }).click()
+      await page.waitForTimeout(3000)
     } else {
       console.error('Tag not found')
     }
