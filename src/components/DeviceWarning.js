@@ -15,6 +15,7 @@ const DeviceWarning = () => {
     <Box w='100%' h='100vh' bgGradient='linear(to-br, #4299e1, #1A365D)'>
       <Flex width={'100%'} gap={1} alignItems={'center'} p={5}>
         <Img
+          alt='Interlynk'
           src={InterlynkLogo}
           sx={{ w: '40px', h: '40px' }}
           filter={'brightness(0) invert(1)'}

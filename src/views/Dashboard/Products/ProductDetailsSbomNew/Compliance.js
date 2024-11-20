@@ -66,7 +66,13 @@ const Compliance = ({ sbomData }) => {
     {
       id: 1,
       icon: (
-        <Img src={NTIA} mr={'auto'} objectFit={'contain'} height={'46px'} />
+        <Img
+          alt='NTIA'
+          src={NTIA}
+          mr={'auto'}
+          height={'46px'}
+          objectFit={'contain'}
+        />
       ),
       title: 'NTIA Minimum Elements',
       description: `The NTIA (National Telecommunications and Information Administration) Minimum Elements for a Software Bill of Materials (SBOM) are a set of guidelines and recommendations that define the essential information an SBOM should contain.`,
@@ -79,7 +85,15 @@ const Compliance = ({ sbomData }) => {
     },
     {
       id: 2,
-      icon: <Img src={FDA} mr={'auto'} objectFit={'contain'} height={'44px'} />,
+      icon: (
+        <Img
+          alt='FDA'
+          src={FDA}
+          mr={'auto'}
+          height={'44px'}
+          objectFit={'contain'}
+        />
+      ),
       title: 'FDA Cybersecurity Compliance',
       description:
         'SBOM requirements from FDA issued the final guidance Cybersecurity in Medical Devices: Quality System Considerations and Content of Premarket Submissions.',
@@ -88,7 +102,15 @@ const Compliance = ({ sbomData }) => {
     },
     {
       id: 3,
-      icon: <Img src={BSI} mr={'auto'} objectFit={'contain'} height={'46px'} />,
+      icon: (
+        <Img
+          alt='BSI'
+          src={BSI}
+          mr={'auto'}
+          height={'46px'}
+          objectFit={'contain'}
+        />
+      ),
       title: 'BSI TR-03183',
       description:
         'The Technical Guideline TR-03183: Cyber Resilience Requirements for Manufacturers and Products aims to provide manufacturers with advance access to the type of requirements that will be imposed on them by the future Cyber Resilience Act (CRA) of the EU.',

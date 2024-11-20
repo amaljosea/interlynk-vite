@@ -23,6 +23,7 @@ const AuthContainer = ({ children }) => {
             w='40px'
             h='40px'
             me='5px'
+            alt='Interlynk'
             src={InterlynkLogo}
             filter={'brightness(0) invert(1)'}
           />

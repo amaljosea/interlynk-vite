@@ -196,7 +196,7 @@ export default function Admin() {
         <Button colorScheme='blue' mt={4} onClick={handleLogout}>
           Logout
         </Button>
-        <Img src={NotFound} width={'36%'} />
+        <Img alt='Not found' src={NotFound} width={'36%'} />
       </Center>
     )
   }

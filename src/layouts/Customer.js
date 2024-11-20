@@ -304,7 +304,7 @@ export default function Customer() {
         <Text>
           Please recheck or ask the sender to re-share the link address.
         </Text>
-        <Img src={NotFound} width={'36%'} />
+        <Img alt='Not found' src={NotFound} width={'36%'} />
       </Center>
     )
 

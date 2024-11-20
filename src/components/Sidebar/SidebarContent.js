@@ -82,7 +82,13 @@ const SidebarContent = ({ routes }) => {
   return (
     <Flex gap={4} py={5} flexDirection={'column'} alignItems={'center'}>
       <Link to={signedUrlParams ? `/customer/products` : `/vendor/dashboard`}>
-        <Img src={InterlynkLogo} w='32px' h='32px' className='welcome' />
+        <Img
+          w='32px'
+          h='32px'
+          alt='Interlynk'
+          src={InterlynkLogo}
+          className='welcome'
+        />
       </Link>
       <Divider />
       <Flex
