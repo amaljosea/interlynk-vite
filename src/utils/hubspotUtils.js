@@ -8,7 +8,5 @@ export const loadHubSpotScript = (hostname) => {
     return () => {
       document.body.removeChild(script)
     }
-  } else {
-    return null
   }
 }

@@ -3,17 +3,9 @@ import { useParams } from 'react-router-dom'
 import { timeSince, updatedValue } from 'utils'
 import { capitalizeFirstLetter, getFullDateAndTime } from 'utils'
 
-import {
-  List,
-  ListItem,
-  Menu,
-  MenuItem,
-  MenuList,
-  Portal,
-  Tag,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
+import { List, ListItem } from '@chakra-ui/react'
+import { Portal, Tag, Text, Tooltip } from '@chakra-ui/react'
+import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import LynkAction from 'components/Misc/LynkAction'
 import LynkSwitch from 'components/Misc/LynkSwitch'
@@ -26,7 +18,7 @@ import { AutomationRuleUpdate } from 'graphQL/Mutation'
 
 import { MdDragIndicator } from 'react-icons/md'
 
-export const useAutomationColumns = ({
+export const useAutomationColumns = (
   setActiveRow,
   activeRow,
   RULE_ACTIVE,
@@ -36,7 +28,7 @@ export const useAutomationColumns = ({
   setActiveEnv,
   RULE_COPY,
   RULE_DELETE
-}) => {
+) => {
   const { showToast } = useCustomToast()
   const params = useParams()
   const productId = params.productid

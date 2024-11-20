@@ -233,13 +233,16 @@ const GlobalVulnTable = (props) => {
     }))
   }
 
+  const data = vulns?.map((row, index) => ({ ...row, key: index }))
+
   return (
     <>
       {/* TABLE */}
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={vulns}
+          data={data}
+          keyField='key'
           onSort={handleSort}
           defaultSortFieldId={field}
           customStyles={customStyles(headingTextColor)}

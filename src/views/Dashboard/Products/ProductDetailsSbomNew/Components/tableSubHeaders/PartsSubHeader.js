@@ -6,7 +6,7 @@ import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
 const PartsSubHeader = (isArchived, onOpen, signedUrlParams, updateSboms) => {
-  const addBtn = useRef()
+  const addBtn = useRef(null)
 
   const subHeader = useMemo(() => {
     return (
@@ -26,7 +26,7 @@ const PartsSubHeader = (isArchived, onOpen, signedUrlParams, updateSboms) => {
         <RefreshBtn />
       </Flex>
     )
-  }, [isArchived, onOpen, signedUrlParams, updateSboms])
+  }, [isArchived, onOpen, signedUrlParams, updateSboms, addBtn])
 
   return subHeader
 }

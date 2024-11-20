@@ -617,8 +617,6 @@ const ProductTable = ({
     persistTableHead: true
   }
 
-  console.log(activeRow)
-
   return (
     <>
       <Card pos={'relative'}>

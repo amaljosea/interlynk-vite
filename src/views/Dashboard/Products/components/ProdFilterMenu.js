@@ -1,16 +1,12 @@
 import { useQuery } from '@apollo/client'
 import { getSignedUrlParams } from 'utils'
 
+import { Box, Kbd, Stack, Text } from '@chakra-ui/react'
 import {
-  Box,
-  IconButton,
-  Kbd,
   Menu,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup,
-  Stack,
-  Text
+  MenuOptionGroup
 } from '@chakra-ui/react'
 
 import ProdLabel from 'components/Label/ProdLabel'
@@ -24,12 +20,6 @@ import { GetLabels } from 'graphQL/Queries'
 
 import { FaCheck } from 'react-icons/fa6'
 import { RxDotFilled } from 'react-icons/rx'
-
-const ItemCheck = ({ icon }) => {
-  return (
-    <IconButton size='12' bg={'none'} _hover={{ bg: 'none' }} icon={icon} />
-  )
-}
 
 const ProdFilterMenu = ({
   filters,
@@ -151,20 +141,9 @@ const ProdFilterMenu = ({
                   onClick={(e) => handleMenuClick(e, item?.name)}
                   icon={
                     filterMode === 'AND' ? (
-                      <ItemCheck
-                        icon={
-                          <RxDotFilled
-                            size={16}
-                            color={inverseSecondaryBgColor}
-                          />
-                        }
-                      />
+                      <RxDotFilled size={16} color={inverseSecondaryBgColor} />
                     ) : (
-                      <ItemCheck
-                        icon={
-                          <FaCheck size={14} color={inverseSecondaryBgColor} />
-                        }
-                      />
+                      <FaCheck size={14} color={inverseSecondaryBgColor} />
                     )
                   }
                 >

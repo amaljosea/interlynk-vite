@@ -78,8 +78,7 @@ const Automation = ({ projects }) => {
   )
 
   // COLUMNS
-
-  const columns = useAutomationColumns({
+  const columns = useAutomationColumns(
     setActiveRow,
     activeRow,
     RULE_ACTIVE,
@@ -89,7 +88,7 @@ const Automation = ({ projects }) => {
     setActiveEnv,
     RULE_COPY,
     RULE_DELETE
-  })
+  )
 
   return (
     <>
