@@ -173,6 +173,8 @@ const buildTree = (path, leafNode) => {
 const TreeView = ({ isOpen, onClose, compId }) => {
   const params = useParams()
 
+  const { grayBorderColor } = useThemeColor(['grayBorderColor'])
+
   const [getData] = useLazyQuery(GetCompDependency)
 
   const { data } = useQuery(GetComponentPath, {
@@ -308,6 +310,7 @@ const TreeView = ({ isOpen, onClose, compId }) => {
 
   const isHorizontal = orientation === 'horizontal'
   const isVertical = orientation === 'vertical'
+  const variant = (value) => (orientation === value ? 'solid' : 'ghost')
 
   useEffect(() => {
     if (isOpen && compId) {
@@ -343,39 +346,57 @@ const TreeView = ({ isOpen, onClose, compId }) => {
                     onClear={handleClear}
                     onChange={onSearchInputChange}
                   />
-                  <Flex gap={2} alignItems={'center'}>
-                    <Tooltip label='Horizontal'>
-                      <IconButton
-                        icon={<LuMoveHorizontal size={20} />}
-                        variant={isHorizontal ? 'solid' : 'outline'}
-                        colorScheme={isHorizontal ? 'blue' : 'gray'}
-                        onClick={() => onChangeDirection('horizontal')}
-                      />
-                    </Tooltip>
-                    <Tooltip label='Vertical'>
-                      <IconButton
-                        icon={<LuMoveVertical size={20} />}
-                        variant={isVertical ? 'solid' : 'outline'}
-                        colorScheme={isVertical ? 'blue' : 'gray'}
-                        onClick={() => onChangeDirection('vertical')}
-                      />
-                    </Tooltip>
-                    <Tooltip label='Zoom In'>
-                      <IconButton
-                        variant='outline'
-                        onClick={handleZoomIn}
-                        isDisabled={zoom > 0.8}
-                        icon={<BiZoomIn size={20} />}
-                      />
-                    </Tooltip>
-                    <Tooltip label='Zoom Out'>
-                      <IconButton
-                        variant='outline'
-                        onClick={handleZoomOut}
-                        isDisabled={zoom < 0.2}
-                        icon={<BiZoomOut size={20} />}
-                      />
-                    </Tooltip>
+                  <Flex gap={4} alignItems={'center'}>
+                    {/* ORIENTATION */}
+                    <Flex gap={2} alignItems={'center'}>
+                      <Text>Orientation</Text>
+                      <Stack
+                        direction={'row'}
+                        spacing={0}
+                        sx={{
+                          borderRadius: '6px',
+                          alignItems: 'center'
+                        }}
+                        border={`1px solid ${grayBorderColor}`}
+                      >
+                        <Tooltip label='Horizontal'>
+                          <IconButton
+                            variant={variant('horizontal')}
+                            icon={<LuMoveHorizontal size={20} />}
+                            colorScheme={isHorizontal ? 'blue' : 'gray'}
+                            onClick={() => onChangeDirection('horizontal')}
+                          />
+                        </Tooltip>
+                        <Tooltip label='Vertical'>
+                          <IconButton
+                            variant={variant('vertical')}
+                            icon={<LuMoveVertical size={20} />}
+                            colorScheme={isVertical ? 'blue' : 'gray'}
+                            onClick={() => onChangeDirection('vertical')}
+                          />
+                        </Tooltip>
+                      </Stack>
+                    </Flex>
+                    {/* ZOOM */}
+                    <Flex gap={2} alignItems={'center'}>
+                      <Text>Zoom</Text>
+                      <Tooltip label='Zoom In'>
+                        <IconButton
+                          variant='outline'
+                          onClick={handleZoomIn}
+                          isDisabled={zoom > 0.8}
+                          icon={<BiZoomIn size={20} />}
+                        />
+                      </Tooltip>
+                      <Tooltip label='Zoom Out'>
+                        <IconButton
+                          variant='outline'
+                          onClick={handleZoomOut}
+                          isDisabled={zoom < 0.2}
+                          icon={<BiZoomOut size={20} />}
+                        />
+                      </Tooltip>
+                    </Flex>
                   </Flex>
                 </Flex>
                 <Tree
