@@ -55,6 +55,7 @@ const Parts = ({ data }) => {
   const partsContext = usePartsContext()
   const sbomId = params.sbomid
   const prodId = params.productid
+  const productGrpId = params.productgroupid
   const activeTab = useQueryParam('tab')
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
@@ -252,6 +253,11 @@ const Parts = ({ data }) => {
     return actualVersions
   }
 
+  //Filters out currently selected project so that sbom from same project is not added as parts
+  const projectsActual = allProjects?.organization?.projectGroups?.nodes.filter(
+    (project) => project.id !== productGrpId
+  )
+
   const versionsActual = getActualVersion(sbomVersions, sbomParts)
 
   const onSelectPart = () => partsContext.push()
@@ -341,13 +347,11 @@ const Parts = ({ data }) => {
                 value={selectedGroup}
                 onChange={handleSelectGroup}
               >
-                {allProjects?.organization?.projectGroups?.nodes.map(
-                  (item, index) => (
-                    <option key={index} value={item.id}>
-                      {truncatedValue(item.name, 30)}
-                    </option>
-                  )
-                )}
+                {projectsActual?.map((item, index) => (
+                  <option key={index} value={item.id}>
+                    {truncatedValue(item.name, 30)}
+                  </option>
+                ))}
               </LynkSelect>
             </FormControl>
             {/* ENVIRONMENTS */}
