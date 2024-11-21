@@ -182,6 +182,12 @@ export const settingActions = [
     name: 'Security Tokens',
     section: 'Personal',
     path: '/vendor/settings?tab=security tokens'
+  },
+  {
+    id: 'custom-fields',
+    name: 'Custom Fields',
+    section: 'Organization',
+    path: '/vendor/settings?tab=custom-fields'
   }
 ]
 

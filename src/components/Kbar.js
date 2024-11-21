@@ -95,7 +95,8 @@ const Kbar = () => {
     'legal',
     'integrations-org',
     'plan',
-    'integrations'
+    'integrations',
+    'custom-fields'
   )
 
   const actions = isFreeTier ? freeTierActions : allDefaultActions
