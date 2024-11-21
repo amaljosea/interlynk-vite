@@ -31,6 +31,7 @@ import { GetComponentData, GetComponentPath } from 'graphQL/Queries'
 
 import CompDrawer from '../components/CompDrawer'
 import CompInsights from '../components/CompInsights'
+import ConfirmationModal from '../components/ConfirmationModal'
 import HealthMap from '../components/HealthMap'
 import ComponentsColumns from './Components/tableColumns/ComponentsColumns'
 import ExpandedComponent from './Components/tableExpanded/ComponentsExpanded'
@@ -128,6 +129,7 @@ const Components = ({ sbomData }) => {
   const RELATION = useDisclosure()
   const COMPONENT = useDisclosure()
   const INSIGHTS = useDisclosure()
+  const DELETE_SUPPLIER = useDisclosure()
 
   const onCreateComponent = useCallback(() => {
     setActiveRow(null)
@@ -137,6 +139,11 @@ const Components = ({ sbomData }) => {
   const onEditOpen = (row) => {
     setActiveRow(row)
     EDIT.onOpen()
+  }
+
+  const onDeleteSup = (item) => {
+    setActiveRow(item)
+    DELETE_SUPPLIER?.onOpen()
   }
 
   const onRelOpen = (row) => {
@@ -188,11 +195,12 @@ const Components = ({ sbomData }) => {
     setActiveComp
   })
 
-  const [deleteSupplier] = useMutation(deleteComSupplier)
+  const [deleteSupplier, { loading: supLoading }] =
+    useMutation(deleteComSupplier)
 
-  const handleSupRemove = async (item) => {
-    await deleteSupplier({ variables: { id: item?.id } }).then(
-      (res) => res.data
+  const handleSupRemove = async (id) => {
+    await deleteSupplier({ variables: { id: id } }).then(() =>
+      DELETE_SUPPLIER.onClose()
     )
   }
 
@@ -304,7 +312,7 @@ const Components = ({ sbomData }) => {
           expandableRowExpanded={(row) => expandedRows?.includes(row?.name)}
           expandableRowsComponentProps={{
             isArchived,
-            handleSupRemove,
+            onDeleteSup,
             onCheckPurl,
             onCheckCpe
           }}
@@ -366,6 +374,17 @@ const Components = ({ sbomData }) => {
           onClose={CPE.onClose}
         />
       )}
+
+      {/* SUPPLIER DELETE MODAL */}
+      <ConfirmationModal
+        isLoading={supLoading}
+        name={activeRow?.name}
+        title={'Remove Supplier'}
+        isOpen={DELETE_SUPPLIER?.isOpen}
+        onClose={DELETE_SUPPLIER?.onClose}
+        onConfirm={() => handleSupRemove(activeRow?.id)}
+        description={`You are about to delete the Supplier : ${activeRow?.name} from this component.`}
+      />
 
       {MAP.isOpen && <HealthMap isOpen={MAP.isOpen} onClose={MAP.onClose} />}
 
