@@ -26,11 +26,11 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
 
   const columns = [
-    'UPLOADED',
+    'IMPORTED',
     'COMPONENTS',
     'LICENSES',
     'STATUS',
-    'UPDATED AT',
+    'UPDATED',
     ''
   ]
 
@@ -94,12 +94,12 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
                     return dateB - dateA
                   })
                   .map((item, index) => {
-                    const { creationAt, stats, lifecycle, updatedAt } = item
+                    const { createdAt, stats, lifecycle, updatedAt } = item
                     return (
                       <Tr key={index}>
                         <Td px={0} fontSize={'sm'} width='240px'>
                           <Stack direction={'row'}>
-                            <Text>{getFullDateAndTime(creationAt)}</Text>
+                            <Text>{getFullDateAndTime(createdAt)}</Text>
                           </Stack>
                         </Td>
                         <Td px={0} fontSize={'sm'} width='130px'>
@@ -143,16 +143,12 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
                           </Tooltip>
                         </Td>
                         <Td px={0} fontSize={'sm'}>
-                          <Tooltip
-                            placement='left'
-                            label={'Promote to version'}
-                          >
-                            <IconButton
-                              size='sm'
-                              icon={<FaArrowUp />}
-                              onClick={() => handlePromote(item)}
-                            />
-                          </Tooltip>
+                          <IconButton
+                            size='sm'
+                            colorScheme='blue'
+                            icon={<FaArrowUp />}
+                            onClick={() => handlePromote(item)}
+                          />
                         </Td>
                       </Tr>
                     )

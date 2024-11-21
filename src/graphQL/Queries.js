@@ -1284,7 +1284,7 @@ export const GetSbomAlternatives = gql`
       alternatives {
         id
         spec
-        creationAt
+        createdAt
         updatedAt
         lifecycle
         projectVersion
