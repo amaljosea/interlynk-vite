@@ -76,7 +76,6 @@ const ExpandedComponent = ({
                     )
                     .map((comp, index) => (
                       <Tag
-                        size='sm'
                         key={index}
                         variant='subtle'
                         colorScheme={'blue'}
@@ -98,7 +97,6 @@ const ExpandedComponent = ({
                 {dependencyOf?.length > 0 ? (
                   dependencyOf?.map((comp, index) => (
                     <Tag
-                      size='sm'
                       padding={1}
                       key={index}
                       variant='subtle'
