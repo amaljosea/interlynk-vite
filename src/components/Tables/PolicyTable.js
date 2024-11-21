@@ -40,6 +40,7 @@ import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import { CustomText } from 'components/Misc/CustomText'
 import LynkAction from 'components/Misc/LynkAction'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 import Pagination from 'components/Pagination'
@@ -367,15 +368,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Box>
-          <Text
-            fontSize='13px'
-            fontWeight='bold'
-            color={secondaryTextInverse}
-            textTransform='uppercase'
-            letterSpacing='0.6px'
-          >
-            Description :
-          </Text>
+          <CustomText>Description :</CustomText>
           <Text
             width={'90%'}
             mt={1}
