@@ -6,16 +6,9 @@ import { getSignedUrlParams } from 'utils'
 import { infoData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
-import {
-  Flex,
-  FormControl,
-  FormLabel,
-  Tag,
-  TagLabel,
-  Text,
-  Tooltip,
-  VStack
-} from '@chakra-ui/react'
+import { Flex, Stack, Text, Tooltip, VStack } from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
+import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -89,7 +82,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
               (license) => {
                 return {
                   value: license.value,
-                  label: license.value,
+                  label: license.label,
                   type: license.type
                 }
               }
@@ -148,17 +141,16 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   const Option = (props) => {
     return (
       <components.Option {...props}>
-        <Flex justifyContent={'space-between'} alignItems={'center'}>
+        <Stack spacing={0}>
           <Text>{props.data.label}</Text>
           <Tag
-            width={'fit-content'}
-            size={'sm'}
+            w={'fit-content'}
             variant='subtle'
             colorScheme={colorScheme[props.data.type]}
           >
-            <TagLabel fontSize={'10px'}>{props.data.type}</TagLabel>
+            <TagLabel fontSize={'12px'}>{props.data.value}</TagLabel>
           </Tag>
-        </Flex>
+        </Stack>
       </components.Option>
     )
   }

@@ -149,7 +149,7 @@ const CompDetails = ({ data, primaryComp }) => {
   }
 
   const checkData = () => {
-    // eslint-disable-next-line
+    // eslint-disable-next-line no-unused-vars
     const { details, ...rest } = unsavedChanges
     return Object.values(rest).some((value) => value === true)
   }
