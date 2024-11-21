@@ -189,8 +189,17 @@ function ComponentAddModal(props) {
       }
     })
       .then((res) => {
-        if (res.data) {
+        if (res?.data?.componentCreate?.errors?.length > 0) {
+          showToast({
+            description: res?.data?.componentCreate?.errors[0],
+            status: 'error'
+          })
+        } else {
           prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
+          showToast({
+            description: `Data added successfully`,
+            status: 'success'
+          })
           if (relations?.relType !== '') {
             addRelation({
               variables: {
@@ -203,10 +212,6 @@ function ComponentAddModal(props) {
         }
       })
       .finally(() => {
-        showToast({
-          description: `Data added successfully`,
-          status: 'success'
-        })
         resetData()
         onClose()
       })

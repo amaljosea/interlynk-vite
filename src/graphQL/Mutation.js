@@ -874,13 +874,6 @@ export const CreateComponent = gql`
       component {
         id
         name
-        version
-        group
-        copyright
-        primary
-        internal
-        purl
-        cpes
       }
       errors
     }
