@@ -9,8 +9,10 @@ import { InfoIcon } from '@chakra-ui/icons'
 import {
   Badge,
   Box,
+  Center,
   Flex,
   IconButton,
+  Spinner,
   Stack,
   Text,
   Tooltip
@@ -175,9 +177,10 @@ const TreeView = ({ isOpen, onClose, compId }) => {
 
   const { grayBorderColor } = useThemeColor(['grayBorderColor'])
 
-  const [getData] = useLazyQuery(GetCompDependency)
+  const [getData, { loading: dependencyLoading }] =
+    useLazyQuery(GetCompDependency)
 
-  const { data } = useQuery(GetComponentPath, {
+  const { data, loading: pathLoading } = useQuery(GetComponentPath, {
     skip: isOpen ? false : true,
     variables: { compId: compId, sbomId: params?.sbomid }
   })
@@ -330,98 +333,104 @@ const TreeView = ({ isOpen, onClose, compId }) => {
           </Flex>
         </DrawerHeader>
         <DrawerBody>
-          <Box h={'100vh'}>
-            {compId ? (
-              <Stack height={'100%'} spacing={4}>
-                <Flex
-                  gap={2}
-                  width={'100%'}
-                  alignItems={'center'}
-                  justifyContent={'space-between'}
-                >
-                  <SearchFilter
-                    id='relationship'
-                    filterText={filterText}
-                    onFilter={handleSearch}
-                    onClear={handleClear}
-                    onChange={onSearchInputChange}
-                  />
-                  <Flex gap={4} alignItems={'center'}>
-                    {/* ORIENTATION */}
-                    <Flex gap={2} alignItems={'center'}>
-                      <Text>Orientation</Text>
-                      <Stack
-                        direction={'row'}
-                        spacing={0}
-                        sx={{
-                          borderRadius: '6px',
-                          alignItems: 'center'
-                        }}
-                        border={`1px solid ${grayBorderColor}`}
-                      >
-                        <Tooltip label='Horizontal'>
+          {dependencyLoading || pathLoading ? (
+            <Center h={'90vh'}>
+              <Spinner size='lg' />
+            </Center>
+          ) : (
+            <Box h={'100vh'}>
+              {compId ? (
+                <Stack height={'100%'} spacing={4}>
+                  <Flex
+                    gap={2}
+                    width={'100%'}
+                    alignItems={'center'}
+                    justifyContent={'space-between'}
+                  >
+                    <SearchFilter
+                      id='relationship'
+                      filterText={filterText}
+                      onFilter={handleSearch}
+                      onClear={handleClear}
+                      onChange={onSearchInputChange}
+                    />
+                    <Flex gap={4} alignItems={'center'}>
+                      {/* ORIENTATION */}
+                      <Flex gap={2} alignItems={'center'}>
+                        <Text>Orientation</Text>
+                        <Stack
+                          direction={'row'}
+                          spacing={0}
+                          sx={{
+                            borderRadius: '6px',
+                            alignItems: 'center'
+                          }}
+                          border={`1px solid ${grayBorderColor}`}
+                        >
+                          <Tooltip label='Horizontal'>
+                            <IconButton
+                              variant={variant('horizontal')}
+                              icon={<LuMoveHorizontal size={20} />}
+                              colorScheme={isHorizontal ? 'blue' : 'gray'}
+                              onClick={() => onChangeDirection('horizontal')}
+                            />
+                          </Tooltip>
+                          <Tooltip label='Vertical'>
+                            <IconButton
+                              variant={variant('vertical')}
+                              icon={<LuMoveVertical size={20} />}
+                              colorScheme={isVertical ? 'blue' : 'gray'}
+                              onClick={() => onChangeDirection('vertical')}
+                            />
+                          </Tooltip>
+                        </Stack>
+                      </Flex>
+                      {/* ZOOM */}
+                      <Flex gap={2} alignItems={'center'}>
+                        <Text>Zoom</Text>
+                        <Tooltip label='Zoom In'>
                           <IconButton
-                            variant={variant('horizontal')}
-                            icon={<LuMoveHorizontal size={20} />}
-                            colorScheme={isHorizontal ? 'blue' : 'gray'}
-                            onClick={() => onChangeDirection('horizontal')}
+                            variant='outline'
+                            onClick={handleZoomIn}
+                            isDisabled={zoom > 0.8}
+                            icon={<BiZoomIn size={20} />}
                           />
                         </Tooltip>
-                        <Tooltip label='Vertical'>
+                        <Tooltip label='Zoom Out'>
                           <IconButton
-                            variant={variant('vertical')}
-                            icon={<LuMoveVertical size={20} />}
-                            colorScheme={isVertical ? 'blue' : 'gray'}
-                            onClick={() => onChangeDirection('vertical')}
+                            variant='outline'
+                            onClick={handleZoomOut}
+                            isDisabled={zoom < 0.2}
+                            icon={<BiZoomOut size={20} />}
                           />
                         </Tooltip>
-                      </Stack>
-                    </Flex>
-                    {/* ZOOM */}
-                    <Flex gap={2} alignItems={'center'}>
-                      <Text>Zoom</Text>
-                      <Tooltip label='Zoom In'>
-                        <IconButton
-                          variant='outline'
-                          onClick={handleZoomIn}
-                          isDisabled={zoom > 0.8}
-                          icon={<BiZoomIn size={20} />}
-                        />
-                      </Tooltip>
-                      <Tooltip label='Zoom Out'>
-                        <IconButton
-                          variant='outline'
-                          onClick={handleZoomOut}
-                          isDisabled={zoom < 0.2}
-                          icon={<BiZoomOut size={20} />}
-                        />
-                      </Tooltip>
+                      </Flex>
                     </Flex>
                   </Flex>
-                </Flex>
-                <Tree
-                  draggable
-                  data={tree}
-                  zoom={Number(zoom)}
-                  translate={translate}
-                  pathFunc={'diagonal'}
-                  depthFactor={depthFactor}
-                  orientation={orientation}
-                  separation={{ siblings: gap, nonSiblings: gap }}
-                  renderCustomNodeElement={(rd3tProps) => (
-                    <CustomNode
-                      {...rd3tProps}
-                      compId={compId}
-                      click={handleNodeClick}
-                      foreignObjectProps={foreignObjectProps}
-                    />
-                  )}
-                />
-              </Stack>
-            ) : (
-              <Text>Relationship not found</Text>
-            )}
-          </Box>
+                  <Tree
+                    draggable
+                    data={tree}
+                    zoom={Number(zoom)}
+                    translate={translate}
+                    pathFunc={'diagonal'}
+                    depthFactor={depthFactor}
+                    orientation={orientation}
+                    separation={{ siblings: gap, nonSiblings: gap }}
+                    renderCustomNodeElement={(rd3tProps) => (
+                      <CustomNode
+                        {...rd3tProps}
+                        compId={compId}
+                        click={handleNodeClick}
+                        foreignObjectProps={foreignObjectProps}
+                      />
+                    )}
+                  />
+                </Stack>
+              ) : (
+                <Text>Relationship not found</Text>
+              )}
+            </Box>
+          )}
         </DrawerBody>
       </DrawerContent>
     </Drawer>
