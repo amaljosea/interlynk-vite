@@ -96,7 +96,7 @@ const GlobalStateProvider = ({ children }) => {
     pageIndex: 1,
     severities: [],
     components: [],
-    statues: [],
+    statues: ['Unspecified', 'In Triage', 'Affected', 'Fixed'],
     include: [],
     source: false,
     kev: '',
