@@ -100,6 +100,7 @@ const CheckModal = (props) => {
   const isInvalidLicense = isComponentLicense && details?.licenses?.length === 0
 
   const isEmptyVersion = isComponentVersion && compVersion === ''
+  const isEmptySupport = isComponentSupport && supportLevel === ''
 
   const [updateComponent] = useMutation(UpdateComponent, {
     onCompleted: () => recheck()
@@ -343,6 +344,12 @@ const CheckModal = (props) => {
     isDisabled ||
     (isComponentLicense && details?.licenses?.length === 0)
 
+  const disabledRule =
+    isInvalidLicense || isEmptyVersion || isDisabled || isEmptySupport
+
+  const hideRule =
+    !isComponentLicense && !isComponentVersion && !isComponentSupport
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (compRef.current && !compRef.current.contains(event.target)) {
@@ -384,16 +391,14 @@ const CheckModal = (props) => {
       leftFooterContent={
         !isFreeTier && (
           <Button
-            variant='ghost'
             mr={'auto'}
+            variant='ghost'
             fontSize={'sm'}
+            hidden={hideRule}
+            isDisabled={disabledRule}
             onClick={handleRuleCreate}
-            hidden={
-              !isComponentLicense && !isComponentVersion && !isComponentSupport
-            }
-            title={`${ruleExists ? 'View' : 'Save as'} Rule`}
-            isDisabled={isInvalidLicense || isEmptyVersion || isDisabled}
             colorScheme={ruleExists ? 'green' : 'blue'}
+            title={`${ruleExists ? 'View' : 'Save as'} Rule`}
           >
             {ruleExists ? 'View' : 'Save as'} Rule
           </Button>
