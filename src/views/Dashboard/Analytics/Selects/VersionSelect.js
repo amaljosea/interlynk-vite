@@ -4,6 +4,9 @@ import { CustomSelect } from './Select'
 
 const getVersionOptions = (filters) => {
   const selectedEnv = filters.env?.value
+  if (selectedEnv === undefined) {
+    return
+  }
   const optionsFinal = filters?.product?.reduce((options, singleProduct) => {
     const selectedProject = singleProduct.projects?.find(
       (project) => project.name == selectedEnv
@@ -34,7 +37,7 @@ export const VersionSelect = ({ value, onChange, filters }) => {
   return (
     <CustomSelect
       isMulti
-      isDisabled={!filters?.product?.length}
+      isDisabled={!filters?.product?.length || filters.env?.value === undefined}
       label='Version'
       options={options}
       value={value}
