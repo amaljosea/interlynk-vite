@@ -15,76 +15,82 @@ export default class ComponentSection {
     this.page = page
   }
 
+  public async createComponent() {
+    await this.page
+      .locator(`//button[@aria-label='dropdown menu for Test']`)
+      .click()
+    await this.page
+      .locator(`//button[@aria-label='upload sbom for Test']`)
+      .click()
+
+    const jsonFiles = getFileNamesFromResource('.json')
+    const filePath = path.resolve(__dirname, '../resources', jsonFiles[0])
+    await this.page.locator("//input[@id='fileInput']").setInputFiles(filePath)
+
+    await this.page.waitForTimeout(2000)
+
+    await this.page.locator("button[type='submit']").click()
+    await this.page.waitForTimeout(2000)
+
+    await this.page.getByTestId(`product_Test`).click()
+    await this.page.waitForTimeout(5000)
+
+    const version = this.page.getByTestId('version').nth(0)
+
+    if (version.isVisible()) {
+      await version.click()
+      await this.page.waitForTimeout(2000)
+
+      await this.page.getByRole('tab', { name: 'components' }).click()
+      await this.page.waitForTimeout(3000)
+      await this.page.locator("button[name='add_component']").click()
+
+      const createModal = await this.page
+        .locator('.chakra-modal__content')
+        .isVisible()
+
+      if (createModal) {
+        await this.page.getByPlaceholder('Enter name').fill('Kernel')
+        await this.page.getByPlaceholder('Enter version').fill('1.2.3')
+        await this.page
+          .getByRole('combobox', { name: 'kind' })
+          .selectOption('application')
+        const submitBtn = await this.page.isEnabled("button[type='submit']")
+        if (submitBtn) {
+          await this.page.locator("button[type='submit']").click()
+          await this.page.waitForTimeout(5000)
+        }
+      } else {
+        errors.push('Modal not found')
+      }
+    } else {
+      errors.push('Version not found')
+    }
+  }
+
   // COMPONENT CREATE
   public async create() {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
-
-      await this.page.locator("//button[@aria-label='Add product']").click()
-      await this.page.getByPlaceholder('Add product name').fill('Test')
-      await this.page
-        .getByPlaceholder('Add product description')
-        .fill('for testing')
-      await this.page.locator("button[type='submit']").click()
       await this.page.waitForTimeout(3000)
 
-      const product = this.page.getByTestId(`product_Test`)
+      const product = await this.page.getByTestId(`product_Test`).isVisible()
 
-      if (product.isVisible()) {
-        await this.page
-          .locator(`//button[@aria-label='dropdown menu for Test']`)
-          .click()
-        await this.page
-          .locator(`//button[@aria-label='upload sbom for Test']`)
-          .click()
-
-        const jsonFiles = getFileNamesFromResource('.json')
-        const filePath = path.resolve(__dirname, '../resources', jsonFiles[0])
-        await this.page
-          .locator("//input[@id='fileInput']")
-          .setInputFiles(filePath)
-
-        await this.page.waitForTimeout(2000)
-
-        await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(2000)
-
-        await product.click()
-        await this.page.waitForTimeout(5000)
-
-        const version = this.page.getByTestId('version').nth(0)
-
-        if (version.isVisible()) {
-          await version.click()
-          await this.page.waitForTimeout(2000)
-
-          await this.page.getByRole('tab', { name: 'components' }).click()
-          await this.page.waitForTimeout(3000)
-          await this.page.locator("button[name='add_component']").click()
-
-          const createModal = await this.page
-            .locator('.chakra-modal__content')
-            .isVisible()
-
-          if (createModal) {
-            await this.page.getByPlaceholder('Enter name').fill('Kernel')
-            await this.page.getByPlaceholder('Enter version').fill('1.2.3')
-            await this.page
-              .getByRole('combobox', { name: 'kind' })
-              .selectOption('application')
-            const submitBtn = await this.page.isEnabled("button[type='submit']")
-            if (submitBtn) {
-              await this.page.locator("button[type='submit']").click()
-              await this.page.waitForTimeout(5000)
-            }
-          } else {
-            errors.push('Modal not found')
-          }
-        } else {
-          errors.push('Version not found')
-        }
+      if (product) {
+        console.log('Product "test" exists. Uploading SBOM.')
+        await this.page.waitForTimeout(3000)
+        await this.createComponent()
+        await this.page.waitForTimeout(3000)
       } else {
-        errors.push('Product not found')
+        console.log('Product "test" does not exist. Creating it.')
+        await this.page.locator("//button[@aria-label='Add product']").click()
+        await this.page.getByPlaceholder('Add product name').fill('Test')
+        await this.page
+          .getByPlaceholder('Add product description')
+          .fill('for testing')
+        await this.page.locator("button[type='submit']").click()
+        await this.page.waitForTimeout(3000)
+        await this.createComponent()
       }
 
       expect(errors.length).toBe(0)
