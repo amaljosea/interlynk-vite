@@ -76,7 +76,6 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
     }).then((res) => {
       const errors = res?.data?.policyRuleCreate?.errors
       if (errors?.length > 0) {
-        console.log(errors[0])
         setError(errors[0])
       } else {
         showToast({

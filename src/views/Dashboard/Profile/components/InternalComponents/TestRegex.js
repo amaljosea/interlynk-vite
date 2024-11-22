@@ -15,23 +15,12 @@ import {
 
 import LynkAlert from 'components/LynkAlert'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaCircleCheck, FaPlus } from 'react-icons/fa6'
 import { IoIosCloseCircle } from 'react-icons/io'
 import { MdDeleteOutline } from 'react-icons/md'
-
-const checkIsMatch = ({ ignoreCase, regex, item }) => {
-  let isMatch = false
-  try {
-    isMatch = new RegExp(regex).test(
-      ignoreCase ? item.value.toLowerCase() : item.value
-    )
-  } catch (error) {
-    console.log(error.message)
-  }
-  return { isMatch }
-}
 
 export const TextRegex = ({ regex, ignoreCase }) => {
   const [items, setItems] = useState([{ id: uuidv4(), value: '' }])
@@ -59,6 +48,24 @@ export const TextRegex = ({ regex, ignoreCase }) => {
   const handleDelete = (id) => {
     setError('')
     setItems(items.filter((item) => item.id !== id))
+  }
+
+  const showToast = useCustomToast()
+
+  const checkIsMatch = ({ ignoreCase, regex, item }) => {
+    let isMatch = false
+    try {
+      isMatch = new RegExp(regex).test(
+        ignoreCase ? item.value.toLowerCase() : item.value
+      )
+    } catch (error) {
+      showToast({
+        description: `Something went wrong, please try again.`,
+        status: 'error'
+      })
+      console.log(error.message)
+    }
+    return { isMatch }
   }
 
   return (

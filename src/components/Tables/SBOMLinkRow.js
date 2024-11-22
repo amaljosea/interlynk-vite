@@ -23,6 +23,8 @@ import SBOMDrawer from 'components/Drawer/SBOMDrawer'
 import LynkAction from 'components/Misc/LynkAction'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
+import useCustomToast from 'hooks/useCustomToast'
+
 import { UpdateShareLynk } from 'graphQL/Mutation'
 import { DeleteShareLynk } from 'graphQL/Mutation'
 
@@ -42,6 +44,8 @@ function SBOMLinkRow(props) {
     `${domain}/login?signed_url_params=${signedUrlParams}`
   )
 
+  const showToast = useCustomToast()
+
   const [shareLynkUpdate] = useMutation(UpdateShareLynk)
 
   const [shareLynkDelete] = useMutation(DeleteShareLynk)
@@ -55,7 +59,10 @@ function SBOMLinkRow(props) {
         }
       })
     } catch (error) {
-      console.log(error)
+      showToast({
+        description: `Unable to update status now, please try again.`,
+        status: 'error'
+      })
     }
   }
 
@@ -67,7 +74,10 @@ function SBOMLinkRow(props) {
         }
       })
     } catch (error) {
-      console.log(error)
+      showToast({
+        description: `Unable to Archive now, please try again.`,
+        status: 'error'
+      })
     }
   }
 

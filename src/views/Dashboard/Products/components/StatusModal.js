@@ -1,5 +1,7 @@
 import { useMutation } from '@apollo/client'
 
+import useCustomToast from 'hooks/useCustomToast'
+
 import { UpdateProjectGroup } from 'graphQL/Mutation'
 
 import ConfirmationModal from './ConfirmationModal'
@@ -8,6 +10,7 @@ const StatusModal = ({ isOpen, onClose, group, reset }) => {
   const { id, enabled, name } = group
 
   const [projectGroupUpdate, { loading }] = useMutation(UpdateProjectGroup)
+  const showToast = useCustomToast()
 
   // TOGGLE STATUS
   const toggleStatus = async () => {
@@ -19,7 +22,11 @@ const StatusModal = ({ isOpen, onClose, group, reset }) => {
     }).then((res) => {
       const { errors } = res?.data?.projectGroupUpdate || ''
       if (errors?.length > 0) {
-        console.log(errors[0])
+        showToast({
+          description: `Unable to change status, please try again.`,
+          status: 'error'
+        })
+        onClose()
       } else {
         reset()
         onClose()

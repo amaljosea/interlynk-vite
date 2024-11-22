@@ -19,6 +19,7 @@ import CardHeader from 'components/Card/CardHeader'
 import CustomLoader from 'components/CustomLoader'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
@@ -35,6 +36,7 @@ const Checks = () => {
     'headingTextColor',
     'primaryTextColor'
   ])
+  const showToast = useCustomToast()
   const paddingCell = 0
   const paddingHeadCell = 0
 
@@ -172,7 +174,10 @@ const Checks = () => {
         }
       })
     } catch (error) {
-      console.error('Mutation error:', error)
+      showToast({
+        description: `Unable to change status, please try again.`,
+        status: 'error'
+      })
     }
   }
 
@@ -185,7 +190,10 @@ const Checks = () => {
         }
       })
     } catch (error) {
-      console.log(error)
+      showToast({
+        description: `Unable to change status, please try again.`,
+        status: 'error'
+      })
     }
   }
 

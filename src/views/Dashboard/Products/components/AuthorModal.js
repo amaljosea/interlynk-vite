@@ -156,7 +156,11 @@ const AuthorModal = ({ isOpen, onClose }) => {
       }).then((res) => {
         const errors = res?.data?.automationRuleCreate?.errors
         if (errors?.length > 0) {
-          console.log(errors[0])
+          showToast({
+            description: `Unable to create rule, please try again.`,
+            status: 'error'
+          })
+          onClose()
         } else {
           handleAddAuthor()
         }

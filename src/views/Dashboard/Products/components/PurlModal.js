@@ -21,6 +21,7 @@ import {
 import CpeInput from 'components/CpeInput'
 import LynkModal from 'components/LynkModal'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -53,6 +54,8 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const [namespaceList, setNamespaceList] = useState([])
   const [purlNameList, setPurlNameList] = useState([])
   const [purlVersionList, setPurlVersionList] = useState([])
+
+  const showToast = useCustomToast()
 
   const [purlData, setPurlData] = useState({
     type: '',
@@ -436,7 +439,10 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
       }).then((res) => {
         const errors = res?.data?.automationRuleCreate?.errors
         if (errors?.length > 0) {
-          console.log(errors[0])
+          showToast({
+            description: `Unable to create rule, please try again.`,
+            status: 'error'
+          })
         } else {
           handleComUpdate()
         }

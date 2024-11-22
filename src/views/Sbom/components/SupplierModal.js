@@ -17,6 +17,7 @@ import {
 
 import LynkModal from 'components/LynkModal'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -32,7 +33,7 @@ const SupplierModal = (props) => {
   const navigate = useNavigate()
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
-
+  const showToast = useCustomToast()
   const [createSupplier, { loading }] = useMutation(addComSupplier, {
     onCompleted: () => recheck()
   })
@@ -176,7 +177,11 @@ const SupplierModal = (props) => {
       }).then((res) => {
         const errors = res?.data?.automationRuleCreate?.errors
         if (errors?.length > 0) {
-          console.log(errors[0])
+          showToast({
+            description: `Unable to create rule, please try again.`,
+            status: 'error'
+          })
+          onClose()
         } else {
           component?.suppliers?.length > 0 ? onClose() : handleSave()
         }

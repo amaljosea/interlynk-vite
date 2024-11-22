@@ -149,7 +149,6 @@ const ConfigModal = ({
       const responseData = res?.data
       const connectionKey = Object.keys(responseData)?.[0] // Get the first key
       const errors = responseData?.[connectionKey]?.errors
-      console.log(errors)
 
       if (!errors || errors.length === 0) {
         setError(false)
