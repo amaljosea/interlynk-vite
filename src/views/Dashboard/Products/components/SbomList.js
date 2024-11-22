@@ -14,7 +14,7 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
-import { Stack, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
+import { Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -33,10 +33,10 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
   const [activeSbom, setActiveSbom] = useState(null)
 
   const columns = [
-    'IMPORTED',
     'COMPONENTS',
     'LICENSES',
     'STATUS',
+    'IMPORTED',
     'UPDATED',
     ''
   ]
@@ -110,11 +110,6 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
                       const { createdAt, stats, lifecycle, updatedAt } = item
                       return (
                         <Tr key={index}>
-                          <Td px={0} fontSize={'sm'} width='240px'>
-                            <Stack direction={'row'}>
-                              <Text>{getFullDateAndTime(createdAt)}</Text>
-                            </Stack>
-                          </Td>
                           <Td px={0} fontSize={'sm'} width='130px'>
                             <Tag
                               size='md'
@@ -151,6 +146,14 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
                           </Td>
                           <Td px={0} fontSize={'sm'}>
                             <Tooltip
+                              label={getFullDateAndTime(createdAt)}
+                              placement='top'
+                            >
+                              <Text>{timeSince(createdAt)}</Text>
+                            </Tooltip>
+                          </Td>
+                          <Td px={0} fontSize={'sm'}>
+                            <Tooltip
                               label={getFullDateAndTime(updatedAt)}
                               placement='top'
                             >
@@ -158,12 +161,17 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
                             </Tooltip>
                           </Td>
                           <Td px={0} fontSize={'sm'}>
-                            <IconButton
-                              size='sm'
-                              colorScheme='blue'
-                              icon={<FaArrowUp />}
-                              onClick={() => handleWarning(item)}
-                            />
+                            <Tooltip
+                              label={'Promote to version'}
+                              placement='top'
+                            >
+                              <IconButton
+                                size='sm'
+                                colorScheme='blue'
+                                icon={<FaArrowUp />}
+                                onClick={() => handleWarning(item)}
+                              />
+                            </Tooltip>
                           </Td>
                         </Tr>
                       )
