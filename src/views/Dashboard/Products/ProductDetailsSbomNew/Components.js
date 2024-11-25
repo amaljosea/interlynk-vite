@@ -314,7 +314,8 @@ const Components = ({ sbomData }) => {
             isArchived,
             onDeleteSup,
             onCheckPurl,
-            onCheckCpe
+            onCheckCpe,
+            handleGraphView
           }}
         />
       </Flex>

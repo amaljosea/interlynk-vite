@@ -16,7 +16,8 @@ const ExpandedComponent = ({
   isArchived,
   onDeleteSup,
   onCheckPurl,
-  onCheckCpe
+  onCheckCpe,
+  handleGraphView
 }) => {
   const {
     scope,
@@ -80,6 +81,10 @@ const ExpandedComponent = ({
                         variant='subtle'
                         colorScheme={'blue'}
                         sx={{ p: 1, workBreak: 'break-all' }}
+                        cursor={customerView ? 'inherit' : 'pointer'}
+                        onClick={() =>
+                          !customerView && handleGraphView(comp?.toComp)
+                        }
                       >
                         <Text wordBreak={'break-all'}>
                           {comp.toComp.name}-{comp.toComp.version}
@@ -101,6 +106,10 @@ const ExpandedComponent = ({
                       key={index}
                       variant='subtle'
                       colorScheme={'blue'}
+                      cursor={customerView ? 'inherit' : 'pointer'}
+                      onClick={() =>
+                        !customerView && handleGraphView(comp?.fromComp)
+                      }
                     >
                       <Text wordBreak={'break-all'}>
                         {comp.fromComp.name}-{comp.fromComp.version}
@@ -248,30 +257,31 @@ const ExpandedComponent = ({
       </>
     )
   }, [
-    cpes,
-    data,
-    dependencyOf,
-    dependsOn,
-    description,
-    endOfSupport,
-    onDeleteSup,
-    internal,
-    isArchived,
-    kind,
-    licenses,
-    licensesCustom,
-    licensesExp,
+    primaryTextColor,
     name,
-    onCheckCpe,
-    onCheckPurl,
-    openSSF?.score,
-    purl,
-    scope,
+    description,
+    dependsOn,
+    dependencyOf,
+    kind,
+    internal,
+    customerView,
     signedUrlParams,
     suppliers,
+    purl,
+    cpes,
+    scope,
+    licenses,
+    licensesExp,
+    licensesCustom,
+    openSSF?.score,
     supportLevel,
-    primaryTextColor,
-    customerView
+    endOfSupport,
+    handleGraphView,
+    data,
+    isArchived,
+    onDeleteSup,
+    onCheckPurl,
+    onCheckCpe
   ])
 }
 
