@@ -1,5 +1,5 @@
 import InterlynkLogo from 'assets/img/logo.png'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { Flex, Grid, GridItem, Heading, Img, Text } from '@chakra-ui/react'
 
@@ -7,6 +7,21 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 const AuthContainer = ({ children }) => {
   const { primaryBgColor } = useThemeColor(['primaryBgColor'])
+  const headers = [
+    'Interlynk automates your SBOM compliance without compromising privacy or control.',
+    'Seamlessly manage SBOMs with Interlynk.',
+    'Stay compliant and in control with Interlynk.',
+    'Simplify your SBOM management with automation.',
+    'Ensure SBOM compliance effortlessly with Interlynk.'
+  ]
+  const [selectedHeader, setSelectedHeader] = useState('')
+
+  // Randomly select a header on component mount
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * headers.length)
+    setSelectedHeader(headers[randomIndex])
+  }, []) // Empty dependency array ensures it runs only once
+
   return (
     <Grid width={'100%'} height={'100vh'} templateColumns='repeat(12, 1fr)'>
       <GridItem
@@ -38,8 +53,7 @@ const AuthContainer = ({ children }) => {
           color={'blue.200'}
           fontFamily={'inherit'}
         >
-          Interlynk automates your SBOM compliance without compromising privacy
-          or control.
+          {selectedHeader}
         </Heading>
       </GridItem>
       <GridItem

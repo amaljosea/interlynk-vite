@@ -23,7 +23,7 @@ export default class LoginSection {
 
       const title = await this.page.title()
 
-      if (title == 'Interlynk Platform Dashboard') {
+      if (title == 'Interlynk | Free SBOM Tools, Automation and Management') {
         await waitForSelectorWithMinTime(this.page, ls.email)
         await this.page.fill(ls.email, email)
         await this.page.fill(ls.password, password)
@@ -47,7 +47,7 @@ export default class LoginSection {
 
       const title = await this.page.title()
 
-      if (title == 'Interlynk Platform Dashboard') {
+      if (title == 'Interlynk | Free SBOM Tools, Automation and Management') {
         await waitForSelectorWithMinTime(this.page, ls.email)
         await this.page.fill(ls.email, email)
         await this.page.fill(ls.password, password)
