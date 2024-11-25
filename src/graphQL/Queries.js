@@ -2075,6 +2075,7 @@ export const GetAllComponents = gql`
           id
           name
           version
+          primary
         }
       }
     }
@@ -5018,6 +5019,18 @@ export const GetCustomFields = gql`
         organizationId
         updatedAt
       }
+    }
+  }
+`
+
+export const CveLookup = gql`
+  query CveLookup($cveId: String!) {
+    cveLookup(cveId: $cveId) {
+      cveId
+      description
+      lastModified
+      published
+      severity
     }
   }
 `

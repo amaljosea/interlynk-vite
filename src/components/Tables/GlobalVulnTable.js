@@ -4,7 +4,7 @@ import { customStyles, getFullDateAndTime, linkURl, timeSince } from 'utils'
 import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
 import { ExternalLinkIcon } from '@chakra-ui/icons'
-import { Badge, Flex, Icon, Stack, Text } from '@chakra-ui/react'
+import { Badge, Flex, Icon, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import { Divider, Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 
@@ -13,6 +13,7 @@ import CvssTag from 'components/Misc/CvssTag'
 import EpssTag from 'components/Misc/EpssTag'
 import Round from 'components/Misc/Round'
 import SeverityTag from 'components/Misc/SeverityTag'
+import CustomVuln from 'components/Modal/CustomVuln'
 
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -21,6 +22,8 @@ import Pagination from '../Pagination'
 
 const GlobalVulnTable = (props) => {
   const { vulns, loading, paginationProps, filters, setFilters } = props
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const { field } = filters
   const { generateProductVulnerabilityDetailPageUrlFromCurrentUrl } =
@@ -177,13 +180,20 @@ const GlobalVulnTable = (props) => {
     {
       id: 'VULNS_PUBLISHED_AT',
       name: 'PUBLISHED',
-      selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.publishedAt)} placement={'top'}>
-          <Text color={primaryTextColor} textAlign={'right'}>
-            {timeSince(row?.publishedAt)}
-          </Text>
-        </Tooltip>
-      ),
+      selector: (row) => {
+        const { publishedAt } = row
+        const published = publishedAt ? timeSince(publishedAt) : ''
+        return (
+          <Tooltip
+            label={published ? getFullDateAndTime(publishedAt) : 'N/A'}
+            placement={'top'}
+          >
+            <Text color={primaryTextColor} textAlign={'right'}>
+              {published}
+            </Text>
+          </Tooltip>
+        )
+      },
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a?.publishedAt)
@@ -197,16 +207,20 @@ const GlobalVulnTable = (props) => {
     {
       id: 'VULNS_LAST_MODIFIED_AT',
       name: 'MODIFIED',
-      selector: (row) => (
-        <Tooltip
-          label={getFullDateAndTime(row?.lastModifiedAt)}
-          placement={'top'}
-        >
-          <Text color={primaryTextColor} textAlign={'right'}>
-            {timeSince(row?.lastModifiedAt)}
-          </Text>
-        </Tooltip>
-      ),
+      selector: (row) => {
+        const { lastModifiedAt } = row
+        const modified = lastModifiedAt ? timeSince(lastModifiedAt) : ''
+        return (
+          <Tooltip
+            label={modified ? getFullDateAndTime(lastModifiedAt) : 'N/A'}
+            placement={'top'}
+          >
+            <Text color={primaryTextColor} textAlign={'right'}>
+              {modified}
+            </Text>
+          </Tooltip>
+        )
+      },
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a?.lastModifiedAt)
@@ -221,7 +235,7 @@ const GlobalVulnTable = (props) => {
 
   // HEADER
   const subHeaderComponent = (
-    <SubHeader filters={filters} setFilters={setFilters} />
+    <SubHeader filters={filters} setFilters={setFilters} onOpen={onOpen} />
   )
 
   // SORTING
@@ -255,6 +269,9 @@ const GlobalVulnTable = (props) => {
         />
         <Pagination {...paginationProps} />
       </Flex>
+
+      {/* CUSTOM VULNS */}
+      {isOpen && <CustomVuln isOpen={isOpen} onClose={onClose} />}
     </>
   )
 }

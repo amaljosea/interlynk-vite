@@ -21,6 +21,7 @@ import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
 import CustomLoader from 'components/CustomLoader'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import CvssCard from 'components/Misc/CvssCard'
+import CustomVuln from 'components/Modal/CustomVuln'
 import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -149,6 +150,7 @@ const Vulnerabilities = ({ sbomData }) => {
   const JIRA = useDisclosure()
   const CVSS = useDisclosure()
   const IMPORT = useDisclosure()
+  const CUSTOM_VULNS = useDisclosure()
 
   // GET VULN FILTER HEADS
   useQuery(signedUrlParams ? ShareVulnFilters : GetVulnFilterData, {
@@ -255,7 +257,8 @@ const Vulnerabilities = ({ sbomData }) => {
     reset,
     selectedVulns,
     signedUrlParams,
-    vulnSearch
+    vulnSearch,
+    CUSTOM_VULNS
   })
 
   const handleSort = (column, sortDirection) => {
@@ -381,6 +384,14 @@ const Vulnerabilities = ({ sbomData }) => {
           isOpen={CVSS.isOpen}
           onClose={CVSS.onClose}
           value={activeRow?.vuln?.cvssVector}
+        />
+      )}
+
+      {/* CUSTOM VULNS */}
+      {CUSTOM_VULNS.isOpen && (
+        <CustomVuln
+          isOpen={CUSTOM_VULNS.isOpen}
+          onClose={CUSTOM_VULNS.onClose}
         />
       )}
     </>

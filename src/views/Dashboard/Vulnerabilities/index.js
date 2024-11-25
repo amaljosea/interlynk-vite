@@ -17,7 +17,7 @@ const Vulnerabilities = () => {
   const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
 
   const [filters, setFilters] = useState({
-    field: 'VULNS_VULN_ID',
+    field: 'VULNS_PUBLISHED_AT',
     direction: 'DESC'
   })
 

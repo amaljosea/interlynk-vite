@@ -3013,3 +3013,39 @@ export const EnterpriseUpgradeRequest = gql`
     }
   }
 `
+
+export const CustomVulnCreate = gql`
+  mutation CustomVulnCreate(
+    $vulnIdentifier: String!
+    $desc: String
+    $sev: String
+    $reportedAt: ISO8601DateTime
+    $publishedAt: ISO8601DateTime
+    $lastModifiedAt: ISO8601DateTime
+    $customVulnSbomsAttributes: [CustomVulnSbomsAttributesInput!]
+    $purl: String
+    $cpe: String
+    $componentId: Uuid
+  ) {
+    customVulnCreate(
+      input: {
+        vulnIdentifier: $vulnIdentifier
+        desc: $desc
+        sev: $sev
+        reportedAt: $reportedAt
+        publishedAt: $publishedAt
+        lastModifiedAt: $lastModifiedAt
+        cpe: $cpe
+        componentId: $componentId
+        purl: $purl
+        customVulnSbomsAttributes: $customVulnSbomsAttributes
+      }
+    ) {
+      errors
+      customVuln {
+        id
+        vulnIdentifier
+      }
+    }
+  }
+`
