@@ -1272,6 +1272,7 @@ export const sbomUpdate = gql`
     $archived: Boolean
     $promoteToDirect: Boolean
     $generateUniqueId: Boolean
+    $moveTo: Uuid
   ) {
     sbomUpdate(
       input: {
@@ -1283,6 +1284,7 @@ export const sbomUpdate = gql`
         archived: $archived
         promoteToDirect: $promoteToDirect
         generateUniqueId: $generateUniqueId
+        moveTo: $moveTo
       }
     ) {
       errors

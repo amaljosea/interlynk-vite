@@ -27,6 +27,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 import DeleteSbom from 'components/Modal/DeleteSbom'
 import ReprocessSbom from 'components/Modal/ReprocessSbom'
+import SbomTransfer from 'components/Modal/SbomTransfer'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -102,6 +103,7 @@ const VersionsTable = (props) => {
   const LIST = useDisclosure()
   const TOOL = useDisclosure()
   const SBOM = useDisclosure()
+  const TRANSFER = useDisclosure()
   const REPROCESS = useDisclosure()
   const ARC_VERSIONS = useDisclosure()
   const DELETE_SBOM = useDisclosure()
@@ -170,6 +172,11 @@ const VersionsTable = (props) => {
   const handleListSbom = (row) => {
     setActiveRow(row)
     LIST.onOpen()
+  }
+
+  const handleTransfer = (row) => {
+    setActiveRow(row)
+    TRANSFER.onOpen()
   }
 
   const handleRepSbom = (row) => {
@@ -446,6 +453,13 @@ const VersionsTable = (props) => {
                   List SBOM
                 </MenuItem>
                 <MenuItem
+                  hidden={signedUrlParams}
+                  onClick={() => handleTransfer(row)}
+                  aria-label={`sbom-${row?.projectVersion}-transfer`}
+                >
+                  Transfer SBOM
+                </MenuItem>
+                <MenuItem
                   aria-label={`sbom-${row?.projectVersion}-reprocess`}
                   onClick={() => handleRepSbom(row)}
                   hidden={signedUrlParams}
@@ -684,7 +698,6 @@ const VersionsTable = (props) => {
           projectGroup={{ name }}
         />
       )}
-
       {/* SBOM LIST */}
       {LIST.isOpen && (
         <SbomList
@@ -702,6 +715,14 @@ const VersionsTable = (props) => {
           sbomIdOne={selectedSbom[0]?.id}
           sbomIdTwo={selectedSbom[1]?.id}
           onClose={TOOL.onClose}
+        />
+      )}
+      {/* SBOM TRANSFER */}
+      {TRANSFER.isOpen && (
+        <SbomTransfer
+          sbom={activeRow}
+          isOpen={TRANSFER.isOpen}
+          onClose={TRANSFER.onClose}
         />
       )}
     </>
