@@ -66,7 +66,6 @@ const General = ({ data, loading, error }) => {
   const isArchived = data?.lifecycle === 'archived'
 
   const { sbomState, dispatch } = useGlobalState()
-  const { expLicense } = sbomState
   const { sbomDispatch } = dispatch
 
   const updateComponent = useHasPermission({

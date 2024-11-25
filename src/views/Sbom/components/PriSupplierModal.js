@@ -217,10 +217,10 @@ const PriSupplierModal = (props) => {
   useEffect(() => {
     if (data?.length > 0) {
       setFormData(() => ({
-        name: data[0]?.name,
-        url: data[0]?.url,
-        contactName: data[0]?.contactName,
-        contactEmail: data[0]?.contactEmail
+        name: data[0]?.name || '',
+        url: data[0]?.url || '',
+        contactName: data[0]?.contactName || '',
+        contactEmail: data[0]?.contactEmail || ''
       }))
     } else {
       setFormData(initialData)
