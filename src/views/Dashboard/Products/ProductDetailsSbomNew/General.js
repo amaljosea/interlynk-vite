@@ -2,6 +2,7 @@ import { useMutation } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getFullDateAndTime, isCustomerView } from 'utils'
+import { transformLicenseString } from 'utils'
 import { infoData } from 'variables/general'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 
@@ -120,11 +121,18 @@ const General = ({ data, loading, error }) => {
   }
 
   const onUpdateLicense = async () => {
+    const licenseObj = sbomState?.licenseString
+    const isCustomLicense = licenseObj && licenseObj?.type === 'Custom License'
+
+    const license = isCustomLicense
+      ? transformLicenseString(licenseObj?.value)
+      : licenseObj?.value || ''
+
     await updateSbom({
       variables: {
         id: id,
         spec: spec,
-        licenses: { licensesExp: expLicense || '' }
+        licenses: { licensesExp: license || '' }
       }
     })
       .then((res) => res.data && sbomDispatch({ type: 'CLEAR_LICENSES' }))

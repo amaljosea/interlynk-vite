@@ -3,6 +3,7 @@ import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { disableButtonTemporarily } from 'utils'
+import { transformLicenseString } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { componentTypes } from 'variables/general'
 
@@ -123,8 +124,13 @@ const CheckModal = (props) => {
     if (resolved) {
       onClose()
     } else {
-      const license =
-        details?.licenses?.length > 0 ? details?.licenses[0].value : ''
+      const hasLicense = details?.licenses?.length > 0
+      const isCustomLicense =
+        hasLicense && details.licenses[0].type === 'Custom License'
+
+      const license = isCustomLicense
+        ? transformLicenseString(details.licenses[0].value)
+        : details?.licenses?.[0]?.value || ''
       const licensesExp = { licensesExp: license }
       updateComponent({
         variables: {

@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import React, { useContext, useEffect, useState } from 'react'
-import { isCustomerView } from 'utils'
+import { isCustomerView, transformLicenseString } from 'utils'
 import { infoData } from 'variables/general'
 import { componentTypes } from 'variables/general'
 
@@ -114,8 +114,14 @@ const CompDetails = ({ data, primaryComp }) => {
   }
 
   const handleUpdateCom = () => {
-    const license =
-      details?.licenses?.length > 0 ? details.licenses[0].value : ''
+    const hasLicense = details?.licenses?.length > 0
+    const isCustomLicense =
+      hasLicense && details.licenses[0].type === 'Custom License'
+
+    const license = isCustomLicense
+      ? transformLicenseString(details.licenses[0].value)
+      : details?.licenses?.[0]?.value || ''
+
     updateComponent({
       variables: {
         id: data?.id,

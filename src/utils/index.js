@@ -1291,3 +1291,15 @@ export const parseEpssRange = (epss) => {
   // Return undefined if epss is invalid
   return undefined
 }
+
+export const transformLicenseString = (licenseText) => {
+  if (!licenseText) return ''
+
+  const sanitizedValue = licenseText.trim().replace(/\s+/g, '-')
+  return `LicenseRef-${sanitizedValue}`
+}
+
+// export const parseLicensesName = (license) => {
+//   if (!license) return ''
+//   return license.replace(/^LicenseRef-/, '').replace(/-/g, ' ')
+// }

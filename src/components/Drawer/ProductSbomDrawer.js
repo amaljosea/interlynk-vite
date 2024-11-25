@@ -3,6 +3,7 @@ import { TabContext } from 'context/TabContext'
 import React, { useContext, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { isCustomerView } from 'utils'
+import { transformLicenseString } from 'utils'
 import { componentTypes, infoData, sbomPhases } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -57,10 +58,15 @@ function ProductSbomDrawer({ isOpen, onClose }) {
   const onPhaseChange = (value) => {
     setPhases(value)
   }
-
-  const license = details?.licenses?.length > 0 ? details.licenses[0].value : ''
-
   const handleCreateComp = async (id) => {
+    const hasLicense = details?.licenses?.length > 0
+    const isCustomLicense =
+      hasLicense && details.licenses[0].type === 'Custom License'
+
+    const license = isCustomLicense
+      ? transformLicenseString(details.licenses[0].value)
+      : details?.licenses?.[0]?.value || ''
+
     await createComponent({
       variables: {
         sbomId: id,

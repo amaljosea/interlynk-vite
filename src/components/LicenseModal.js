@@ -1,4 +1,5 @@
 import { useMutation } from '@apollo/client'
+import { transformLicenseString } from 'utils'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -20,12 +21,19 @@ const LicenseModal = ({ data, isOpen, onClose, activeRow, recheck }) => {
   const [updateSbom] = useMutation(sbomUpdate, { onCompleted: () => recheck() })
 
   const handleUpdateSBOM = () => {
+    const licenseObj = sbomState?.licenseString
+    const isCustomLicense = licenseObj && licenseObj?.type === 'Custom License'
+
+    const license = isCustomLicense
+      ? transformLicenseString(licenseObj?.value)
+      : licenseObj?.value || ''
+
     updateSbom({
       variables: {
         id: data?.id,
         spec: data?.spec,
         licenses: {
-          licensesExp: expLicense || ''
+          licensesExp: license || ''
         }
       }
     }).then((res) => res?.data && onClose())

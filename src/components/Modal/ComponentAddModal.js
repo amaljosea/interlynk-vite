@@ -3,8 +3,11 @@ import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
 import React, { useContext, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { isCustomerView } from 'utils'
-import { getSignedUrlParams } from 'utils'
+import {
+  getSignedUrlParams,
+  isCustomerView,
+  transformLicenseString
+} from 'utils'
 import { infoData } from 'variables/general'
 import { componentTypes } from 'variables/general'
 import CpeInputs from 'views/Dashboard/Products/components/CpeInputs'
@@ -166,8 +169,14 @@ function ComponentAddModal(props) {
   }
 
   const handleCreateCom = () => {
-    const license =
-      details?.licenses?.length > 0 ? details.licenses[0].value : ''
+    const hasLicense = details?.licenses?.length > 0
+    const isCustomLicense =
+      hasLicense && details.licenses[0].type === 'Custom License'
+
+    const license = isCustomLicense
+      ? transformLicenseString(details.licenses[0].value)
+      : details?.licenses?.[0]?.value || ''
+
     createComponent({
       variables: {
         id: data?.id,
