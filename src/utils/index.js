@@ -1250,12 +1250,20 @@ export const generateCsvFileName = ({
 }
 
 //Function to print a required list of items with the expected punctuations, used for docs/pdf
-export const listItemsForDoc = (listArray, key) => {
+export const listItemsForDoc = (listArray, key, key2) => {
   if (listArray.length === 0) return undefined
-  if (listArray.length === 1) return `${listArray[0][key]}`
+
+  if (listArray.length === 1) {
+    const singleValue = key2
+      ? `${listArray[0][key]} - ${listArray[0][key2]}`
+      : `${listArray[0][key]}`
+    return singleValue
+  }
+
   let listString = ''
   listArray.map((list, index) => {
-    const value = list?.[key]
+    const value = key2 ? `${list?.[key]} - ${list?.[key2]}` : list?.[key]
+
     if (index === 0) {
       listString += `${value}, `
     } else if (index === listArray.length - 1) {
@@ -1264,6 +1272,7 @@ export const listItemsForDoc = (listArray, key) => {
       listString += ` ${value}, `
     }
   })
+
   return listString
 }
 

@@ -1,7 +1,8 @@
 import InterlynkLogo from 'assets/img/logo.png'
-import { format } from 'date-fns'
+import { parseISO } from 'date-fns'
+import { format as formatWithTZ, toZonedTime } from 'date-fns-tz'
 import jsPDF from 'jspdf'
-import { listItemsForDoc, truncatedValue } from 'utils'
+import { listItemsForDoc } from 'utils'
 
 export const downloadSbomPdf = (
   productName,
@@ -13,7 +14,7 @@ export const downloadSbomPdf = (
   manufacturerData
 ) => {
   const authors = listItemsForDoc(sbom?.authors, 'name')
-  const tools = listItemsForDoc(sbom?.tools, 'name')
+  const tools = listItemsForDoc(sbom?.tools, 'name', 'version')
 
   const doc = new jsPDF()
   const pageWidth = doc.internal.pageSize.getWidth()
@@ -38,15 +39,25 @@ export const downloadSbomPdf = (
     )
   }
 
-  function formatDate(date, dateFormat = 'MMMM dd, yyyy hh:mm a') {
+  function formatDateWithTimeZone(
+    date,
+    dateFormat = 'MMMM dd, yyyy hh:mm a zzz'
+  ) {
     if (!date) return ''
-    return format(new Date(date), dateFormat)
+    const timeZone = date.endsWith('Z')
+      ? 'UTC' // If 'Z', it's UTC
+      : undefined
+
+    const parsedDate = parseISO(date)
+    const zonedDate = timeZone ? toZonedTime(parsedDate, timeZone) : parsedDate
+    return formatWithTZ(zonedDate, dateFormat, { timeZone })
   }
 
   const currentDateTime = (dateFormat = 'MMMM dd, yyyy hh:mm a') => {
-    return format(new Date(), dateFormat)
+    const now = new Date()
+    const utcDate = toZonedTime(now, 'UTC')
+    return formatWithTZ(utcDate, dateFormat) + ' UTC'
   }
-
   //Colors
   const blueColor = [61, 113, 238]
   const grayColor = [128, 128, 128]
@@ -269,7 +280,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      formatDate(sbom.createdAt) || 'NA',
+      formatDateWithTimeZone(sbom.createdAt) || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -277,7 +288,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      formatDate(sbom.updatedAt) || 'NA',
+      formatDateWithTimeZone(sbom.updatedAt) || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -285,7 +296,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      formatDate(sbom.updatedAt) || 'NA',
+      formatDateWithTimeZone(sbom.updatedAt) || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -609,7 +620,7 @@ export const downloadSbomPdf = (
     ),
     formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
     formatValue(
-      formatDate(vulnerability.vuln?.publishedAt) || 'NA',
+      formatDateWithTimeZone(vulnerability.vuln?.publishedAt) || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -666,5 +677,5 @@ export const downloadSbomPdf = (
     currentY += 15
   })
 
-  doc.save(`${truncatedValue(productName, 14)}-${version}.pdf`)
+  doc.save(`${productName}-${version}.pdf`)
 }
