@@ -1295,6 +1295,11 @@ export const parseEpssRange = (epss) => {
 export const transformLicenseString = (licenseText) => {
   if (!licenseText) return ''
 
+  // Check if the license already starts with "LicenseRef-"
+  if (licenseText.startsWith('LicenseRef-')) {
+    return licenseText
+  }
+
   const sanitizedValue = licenseText.trim().replace(/\s+/g, '-')
   return `LicenseRef-${sanitizedValue}`
 }
