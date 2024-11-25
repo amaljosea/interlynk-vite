@@ -135,12 +135,27 @@ const General = ({ data, loading, error }) => {
         licenses: { licensesExp: license || '' }
       }
     })
-      .then((res) => res.data && sbomDispatch({ type: 'CLEAR_LICENSES' }))
-      .finally(() => {
+      .then((res) => {
+        if (res?.data?.sbomUpdate?.errors?.length > 0) {
+          showToast({
+            description: res.data.sbomUpdate.errors[0],
+            status: 'error'
+          })
+        } else {
+          sbomDispatch({ type: 'CLEAR_LICENSES' })
+          showToast({
+            description: 'Licenses updated successfully',
+            status: 'success'
+          })
+        }
+      })
+      .catch((error) => {
         showToast({
-          description: 'Licenses updated successfully',
-          status: 'success'
+          description: error.message || 'Failed to update licenses',
+          status: 'error'
         })
+      })
+      .finally(() => {
         DELETE_LICENSE?.isOpen ? DELETE_LICENSE?.onClose() : LICENSE?.onClose()
       })
   }
