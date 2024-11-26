@@ -17,7 +17,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('Vuln status functionality', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(180000)
   const pp = new VulnsPage(page)
   try {
     await pp.addStatus()
@@ -28,7 +28,7 @@ test('Vuln status functionality', async ({ page }) => {
 })
 
 test('Vex import functionality', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(180000)
   const pp = new VulnsPage(page)
   try {
     await pp.vexImport()

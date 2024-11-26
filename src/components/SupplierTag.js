@@ -46,10 +46,12 @@ const SupplierTag = ({ key, item, premission, onEdit, onDelete, editable }) => {
           onClick={onEdit}
           hidden={premission}
           _hover={{ opacity: 1 }}
+          aria-label='supplier_edit'
           sx={{ fontSize: 12, opacity: 0.5, cursor: 'pointer' }}
         />
       )}
       <TagCloseButton
+        aria-label='supplier_delete'
         hidden={premission || customerView}
         onClick={() => onDelete(item)}
       />

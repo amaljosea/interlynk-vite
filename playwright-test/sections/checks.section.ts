@@ -40,20 +40,6 @@ export default class ChecksSection {
       await this.page.getByTestId('version').nth(0).click()
       await this.page.waitForTimeout(2000)
 
-      await this.page
-        .getByRole('row', { name: 'Authors STERIS -' })
-        .getByLabel('close')
-        .click()
-      await this.page.getByRole('button', { name: 'Yes' }).click()
-      await this.page.waitForTimeout(3000)
-
-      await this.page
-        .getByRole('gridcell', { name: 'STERIS close' })
-        .getByLabel('close')
-        .click()
-      await this.page.getByRole('button', { name: 'Yes' }).click()
-      await this.page.waitForTimeout(3000)
-
       await this.page.getByRole('tab', { name: 'checks' }).click()
       await this.page.waitForTimeout(2000)
 

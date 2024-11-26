@@ -128,6 +128,7 @@ const ImportWizard = ({
             variant='solid'
             colorScheme='green'
             onClick={onClose}
+            aria-label='vulnStepThree'
           >
             Done
           </Button>
@@ -154,6 +155,7 @@ const ImportWizard = ({
                 title='Next'
                 colorScheme='blue'
                 onClick={nextStep}
+                aria-label='vulnStepOne'
                 disabled={
                   selectedVersion === '' ||
                   selectedGroup === '' ||
@@ -170,6 +172,7 @@ const ImportWizard = ({
                 variant='solid'
                 colorScheme='blue'
                 onClick={handleSubmit}
+                aria-label='vulnStepTwo'
                 disabled={selectedVulns?.length === 0}
               >
                 Submit

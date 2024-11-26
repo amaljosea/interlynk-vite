@@ -529,6 +529,7 @@ export default class ComponentSection {
           await this.page.waitForTimeout(3000)
 
           await this.page.click('select#packageType')
+          await this.page.waitForTimeout(3000)
           for (let i = 0; i < 22; i++) {
             await this.page.keyboard.press('ArrowDown')
           }

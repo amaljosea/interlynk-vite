@@ -27,7 +27,7 @@ const VulnBadge = ({ color, children, label, status, onClick }) => {
           {status === 'IN_PROGRESS' ? (
             <Spinner size='xs' mt={0.5} />
           ) : (
-            <span id={`vuln${label}`}>{children}</span>
+            <span id={`vulnCount${label}`}>{children}</span>
           )}
         </TagLabel>
       </Tag>

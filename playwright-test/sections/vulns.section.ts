@@ -7,7 +7,7 @@ import { getFileNamesFromResource } from '../utils/utils'
 dotenv.config({ path: '.env' })
 
 const errors: string[] = []
-const selector = `span#vulnCritical`
+const selector = `span#vulnCountCritical`
 const menuBtn = `//button[@aria-label='dropdown menu for Test']`
 const uploadBtn = `//button[@aria-label='upload sbom for Test']`
 
@@ -16,37 +16,6 @@ export default class VulnsSection {
 
   constructor(page: Page) {
     this.page = page
-  }
-
-  public async handleImport() {
-    await this.page.locator(`//button[@aria-label='import_status']`).click()
-    await this.page.waitForTimeout(2000)
-
-    await this.page.getByLabel('Environment').selectOption({ index: 1 })
-    await this.page.getByLabel('Version').selectOption({ index: 1 })
-    await this.page.waitForTimeout(2000)
-
-    await this.page
-      .getByLabel('Import Vulnerability Status')
-      .getByRole('button', { name: 'Next' })
-      .click()
-
-    const vulnOne = this.page
-      .locator(`//input[@aria-label='select-row-undefined']`)
-      .nth(0)
-
-    if (vulnOne.isVisible()) {
-      await vulnOne.check()
-      await this.page.waitForTimeout(2000)
-
-      await this.page.getByRole('button', { name: 'Submit' }).click()
-      await this.page.waitForTimeout(2000)
-
-      await this.page.getByRole('button', { name: 'Done' }).click()
-      await this.page.waitForTimeout(2000)
-    } else {
-      errors.push('Vuln not found')
-    }
   }
 
   public async handleUpdate() {
@@ -111,13 +80,13 @@ export default class VulnsSection {
 
             await this.page
               .locator('//select[@aria-label="vex_status"]')
-              .selectOption({ index: 2 })
-            await this.page
-              .locator('//select[@aria-label="vex_justification"]')
-              .selectOption({ index: 2 })
+              .selectOption({ index: 1 })
+            await this.page.waitForTimeout(2000)
+
             await this.page
               .locator('//textarea[@aria-label="vex_notes"]')
               .fill('test')
+            await this.page.waitForTimeout(2000)
 
             await this.page.getByRole('button', { name: 'Save' }).click()
             await this.page.waitForTimeout(2000)
@@ -133,13 +102,13 @@ export default class VulnsSection {
 
             await this.page
               .locator('//select[@aria-label="vex_status"]')
-              .selectOption({ index: 2 })
-            await this.page
-              .locator('//select[@aria-label="vex_justification"]')
-              .selectOption({ index: 3 })
+              .selectOption({ index: 4 })
+            await this.page.waitForTimeout(1000)
+
             await this.page
               .locator('//textarea[@aria-label="vex_notes"]')
               .fill('test')
+            await this.page.waitForTimeout(1000)
 
             await this.page.getByRole('button', { name: 'Save' }).click()
             await this.page.waitForTimeout(2000)
@@ -154,10 +123,11 @@ export default class VulnsSection {
             await this.page.locator('//button[@aria-label="refresh"]').click()
           }
         })
-        .catch((error) => errors.push(error))
     } else {
       errors.push('Version not found')
     }
+
+    expect(errors.length).toBe(0)
   }
 
   // STATUS
@@ -185,8 +155,6 @@ export default class VulnsSection {
         await this.handleUpdate()
         await this.page.waitForTimeout(3000)
       }
-
-      expect(errors.length).toBe(0)
     } catch (error) {
       throw error
     }
@@ -314,9 +282,43 @@ export default class VulnsSection {
                 .getByRole('tab', { name: 'vulnerabilities' })
                 .click()
               await this.page.waitForTimeout(3000)
-              await this.handleImport()
+
+              await this.page
+                .locator(`//button[@aria-label='import_status']`)
+                .click()
+              await this.page.waitForTimeout(2000)
+
+              await this.page
+                .getByLabel('Environment')
+                .selectOption({ index: 1 })
+              await this.page.getByLabel('Version').selectOption({ index: 1 })
+              await this.page.waitForTimeout(2000)
+
+              await this.page
+                .locator(`//button[@aria-label='vulnStepOne']`)
+                .click()
+
+              const vulnOne = this.page
+                .locator(`//input[@aria-label='select-row-undefined']`)
+                .nth(0)
+
+              if (vulnOne.isVisible()) {
+                await vulnOne.check()
+                await this.page.waitForTimeout(2000)
+
+                await this.page
+                  .locator(`//button[@aria-label='vulnStepTwo']`)
+                  .click()
+                await this.page.waitForTimeout(2000)
+
+                await this.page
+                  .locator(`//button[@aria-label='vulnStepThree']`)
+                  .click()
+                await this.page.waitForTimeout(2000)
+              } else {
+                errors.push('Vuln not found')
+              }
             })
-            .catch((error) => errors.push(error))
         } else {
           errors.push('Version not found')
         }
