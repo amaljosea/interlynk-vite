@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, truncatedValue } from 'utils'
+import { parseLicenseString } from 'utils'
 
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 import {
@@ -57,7 +58,15 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
       name: 'NAME',
       width: '35%',
       wrap: true,
-      selector: ({ content: { name, shortId, url, spdxId } }) => {
+      selector: ({ content: { name, shortId, url, spdxId, __typename } }) => {
+        const displayName =
+          __typename === 'LicenseCustom' ? parseLicenseString(name) : name
+
+        const tagValue =
+          __typename === 'LicenseCustom'
+            ? parseLicenseString(shortId || spdxId)
+            : shortId || spdxId
+
         return (
           <Grid templateColumns='repeat(12, 1fr)' gap={2} my={3}>
             <GridItem colSpan={1} width={'50px'}>
@@ -83,10 +92,10 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
                 data-tag='allowRowEvents'
                 data-testid={`license_${name}`}
               >
-                {name}
+                {displayName}
               </Text>
               <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
-                {(shortId || spdxId) && (
+                {tagValue && (
                   <Tooltip label={shortId || spdxId}>
                     <Tag
                       width={'fit-content'}
@@ -94,9 +103,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
                       variant='subtle'
                       colorScheme='blue'
                     >
-                      <TagLabel>
-                        {truncatedValue(shortId || spdxId, 45)}
-                      </TagLabel>
+                      <TagLabel>{truncatedValue(tagValue, 45)}</TagLabel>
                     </Tag>
                   </Tooltip>
                 )}

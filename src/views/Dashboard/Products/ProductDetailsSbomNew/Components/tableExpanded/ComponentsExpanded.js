@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import { getFullDateAndTime, getSignedUrlParams, isCustomerView } from 'utils'
+import { parseLicenseString } from 'utils'
 import { openSsf } from 'variables/general'
 
 import { Box, Flex, Text, VStack } from '@chakra-ui/react'
@@ -218,7 +219,9 @@ const ExpandedComponent = ({
                     colorScheme='green'
                     sx={{ py: 1, w: 'fit-content' }}
                   >
-                    <Text wordBreak={'break-all'}>{licensesExp}</Text>
+                    <Text wordBreak={'break-all'}>
+                      {parseLicenseString(licensesExp)}
+                    </Text>
                   </Tag>
                 )}
                 {/* CUSTOM */}

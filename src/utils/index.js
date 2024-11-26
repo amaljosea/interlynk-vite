@@ -1313,7 +1313,12 @@ export const transformLicenseString = (licenseText) => {
   return `LicenseRef-${sanitizedValue}`
 }
 
-// export const parseLicensesName = (license) => {
-//   if (!license) return ''
-//   return license.replace(/^LicenseRef-/, '').replace(/-/g, ' ')
-// }
+export const parseLicenseString = (licenseText) => {
+  if (!licenseText) return ''
+
+  if (licenseText.startsWith('LicenseRef-')) {
+    return licenseText.slice('LicenseRef-'.length)
+  }
+
+  return licenseText
+}

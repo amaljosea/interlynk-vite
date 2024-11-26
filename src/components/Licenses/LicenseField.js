@@ -3,6 +3,7 @@ import { TabContext } from 'context/TabContext'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import ReactSelect, { components } from 'react-select'
 import { getSignedUrlParams } from 'utils'
+import { parseLicenseString } from 'utils'
 import { infoData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -120,6 +121,9 @@ const LicenseField = ({ resolved, sbomView, license }) => {
 
   const licenseString = sbomView ? sbomState.licenseString : details?.licenses
 
+  const normalizedLicenseString = sbomView
+    ? licenseString
+    : licenseString?.[0] || null
   useEffect(() => {
     const payload = license ? [{ value: license, label: license }] : []
     if (sbomView) {
@@ -200,8 +204,21 @@ const LicenseField = ({ resolved, sbomView, license }) => {
               MenuList,
               Option
             }}
-            value={licenseString}
-            options={licenseList}
+            value={
+              normalizedLicenseString
+                ? {
+                    value: normalizedLicenseString.value,
+                    label: parseLicenseString(normalizedLicenseString.label)
+                  }
+                : null
+            }
+            options={licenseList.map((license) => ({
+              ...license,
+              label:
+                license.type === 'Custom License'
+                  ? parseLicenseString(license.label)
+                  : license.label
+            }))}
             onChange={onLicenseChange}
             onInputChange={setSearchText}
             placeholder={'Search for a License'}

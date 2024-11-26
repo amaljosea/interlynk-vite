@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { GetIcon, isValidPurl, truncatedValue } from 'utils'
 import { timeSince } from 'utils'
 import { getFullDateAndTime, isCustomerView } from 'utils'
+import { parseLicenseString } from 'utils'
 
 import { ViewIcon } from '@chakra-ui/icons'
 import {
@@ -265,7 +266,9 @@ const ComponentsColumns = ({
                     variant='subtle'
                     colorScheme='green'
                   >
-                    <TagLabel mx={'auto'}>{licensesExp}</TagLabel>
+                    <TagLabel mx={'auto'}>
+                      {parseLicenseString(licensesExp)}
+                    </TagLabel>
                   </Tag>
                 </Tooltip>
               )}

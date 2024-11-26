@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getFullDateAndTime, isCustomerView } from 'utils'
 import { transformLicenseString } from 'utils'
+import { parseLicenseString } from 'utils'
 import { infoData } from 'variables/general'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 
@@ -412,7 +413,7 @@ const General = ({ data, loading, error }) => {
                     colorScheme='green'
                     sx={{ w: 'fit-content', my: 2, h: 7 }}
                   >
-                    <TagLabel>{licensesExp}</TagLabel>
+                    <TagLabel>{parseLicenseString(licensesExp)}</TagLabel>
                     <TagRightIcon
                       as={FaPen}
                       _hover={{ opacity: 1 }}

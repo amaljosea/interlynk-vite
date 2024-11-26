@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { isCustomerView } from 'utils'
+import { parseLicenseString } from 'utils'
 
 import { Flex, Tag, TagLabel, Text } from '@chakra-ui/react'
 
@@ -21,7 +22,7 @@ const LicenseColumns = () => {
           return (
             <Flex direction='row' alignItems={'center'} gap={2}>
               <Text color={primaryTextColor} my={3} fontWeight={'medium'}>
-                {licenseExpression || 'Not Available'}
+                {parseLicenseString(licenseExpression) || 'Not Available'}
               </Text>
             </Flex>
           )
