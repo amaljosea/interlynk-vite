@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 
 import { QuestionIcon } from '@chakra-ui/icons'
-import { Tag, Text } from '@chakra-ui/react'
+import { Stack, Tag, Text } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
@@ -29,7 +29,9 @@ const PrimaryWarning = ({ isOpen, onClose, primaryComp }) => {
   const allVersions = allSboms?.project?.sboms?.map(
     (item) => item?.projectVersion
   )
-  const isExists = allVersions?.includes(details?.version)
+
+  const isSame = primaryComp?.name === details?.name
+  const isExists = !isSame && allVersions?.includes(details?.version)
 
   const handleSave = () => {
     setTabData((prev) => ({
@@ -52,37 +54,34 @@ const PrimaryWarning = ({ isOpen, onClose, primaryComp }) => {
       buttonColor='red'
       Icon={QuestionIcon}
     >
-      <Text>
-        You are about to change primary component
-        <br />
-        <br />
-        From:
-        <br />
-        <Tag py={1} wordBreak={'break-all'}>
-          {primaryComp?.name ? primaryComp?.name : 'None'}
-          {primaryComp?.version ? `- ${primaryComp?.version}` : ''}
+      <Stack spacing={6}>
+        <Text>You are about to change primary component</Text>
+        <Stack spacing={0}>
+          <Text>From:</Text>
+          <Tag py={1} w={'fit-content'} wordBreak={'break-all'}>
+            {primaryComp?.name ? primaryComp?.name : 'None'}
+            {primaryComp?.version ? `- ${primaryComp?.version}` : ''}
+          </Tag>
+        </Stack>
+        <Stack spacing={0}>
+          <Text>To:</Text>
+          <Tag py={1} w={'fit-content'} wordBreak={'break-all'}>
+            {isSame ? 'None' : details?.name}
+            {isSame ? '' : `- ${details?.version}`}
+          </Tag>
+        </Stack>
+        <Tag
+          py={1}
+          variant='subtle'
+          colorScheme='red'
+          hidden={!isExists}
+          wordBreak={'break-word'}
+        >
+          This version of the product already exists. Continuing will override
+          one of these versions.
         </Tag>
-        <br />
-        <br />
-        To:
-        <br />
-        <Tag py={1} wordBreak={'break-all'}>
-          {primaryComp?.name === name ? 'None' : details?.name}
-          {primaryComp?.name === name ? '' : `- ${details?.version}`}
-        </Tag>
-      </Text>
-      <br />
-      <Tag
-        py={1}
-        variant='subtle'
-        colorScheme='red'
-        hidden={!isExists}
-        wordBreak={'break-word'}
-      >
-        This version of the product already exists. Continuing will override one
-        of these versions.
-      </Tag>
-      <Text mt={6}>Are you sure you wish to continue ?</Text>
+        <Text mt={6}>Are you sure you wish to continue ?</Text>
+      </Stack>
     </LynkModal>
   )
 }
