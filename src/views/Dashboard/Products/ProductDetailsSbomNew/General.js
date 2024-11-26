@@ -201,8 +201,17 @@ const General = ({ data, loading, error }) => {
     return (
       <Stack dir='column' spacing={1}>
         <Text>Name: {item?.name}</Text>
-        {item?.version && <Text>Version: {item?.version}</Text>}
-        {item?.vendor && <Text>Vendor: {item?.vendor}</Text>}
+        {item?.version && <Text>Version: {item?.version || 'N/A'}</Text>}
+        {item?.vendor && <Text>Vendor: {item?.vendor || 'N/A'}</Text>}
+      </Stack>
+    )
+  }
+
+  const authorInfo = (item) => {
+    return (
+      <Stack dir='column' spacing={1}>
+        <Text>Name: {item?.name || 'N/A'}</Text>
+        <Text>Email: {item?.email || 'N/A'}</Text>
       </Stack>
     )
   }
@@ -334,25 +343,26 @@ const General = ({ data, loading, error }) => {
               <Td width={'85%'}>
                 <Flex alignItems={'center'} flexWrap={'wrap'} gap={2}>
                   {authors?.map((item, index) => (
-                    <Tag
-                      key={index}
-                      variant='subtle'
-                      colorScheme='blue'
-                      sx={{ w: 'fit-content', h: 7 }}
-                    >
-                      <TagLabel>
-                        {item.name} - {item.email}
-                      </TagLabel>
-                      {updateComponent && (
-                        <TagCloseButton
-                          hidden={isArchived}
-                          onClick={() => {
-                            setActiveTool(item)
-                            DELETE_AUTHOR?.onOpen()
-                          }}
-                        />
-                      )}
-                    </Tag>
+                    <Tooltip key={index} label={authorInfo(item)}>
+                      <Tag
+                        variant='subtle'
+                        colorScheme='blue'
+                        sx={{ w: 'fit-content', h: 7 }}
+                      >
+                        <TagLabel>
+                          {item.name} - {item.email}
+                        </TagLabel>
+                        {updateComponent && (
+                          <TagCloseButton
+                            hidden={isArchived}
+                            onClick={() => {
+                              setActiveTool(item)
+                              DELETE_AUTHOR?.onOpen()
+                            }}
+                          />
+                        )}
+                      </Tag>
+                    </Tooltip>
                   ))}
                   <ActiveBtn
                     label={'add_author'}

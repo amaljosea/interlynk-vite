@@ -1,15 +1,7 @@
 import { isCustomerView } from 'utils'
 
-import {
-  Link,
-  Stack,
-  Tag,
-  TagCloseButton,
-  TagLabel,
-  TagRightIcon,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
+import { Link, Stack, Text, Tooltip } from '@chakra-ui/react'
+import { Tag, TagCloseButton, TagLabel, TagRightIcon } from '@chakra-ui/react'
 
 import { FaPen } from 'react-icons/fa6'
 
@@ -17,6 +9,18 @@ const SupplierTag = ({ key, item, premission, onEdit, onDelete, editable }) => {
   const customerView = isCustomerView()
   const { contactName, contactEmail, url, name } = item || {}
   const supplierURL = url?.startsWith('http') ? item.url : `http://${url}`
+
+  const supplierInfo = () => {
+    return (
+      <Stack dir='column' spacing={1}>
+        <Text>Name: {name}</Text>
+        {url && <Text>URL: {url || 'N/A'}</Text>}
+        {contactName && <Text>Contact Name: {contactName || 'N/A'}</Text>}
+        {contactEmail && <Text>Contact Email: {contactEmail || 'N/A'}</Text>}
+      </Stack>
+    )
+  }
+
   return (
     <Tag
       key={key}
@@ -24,16 +28,7 @@ const SupplierTag = ({ key, item, premission, onEdit, onDelete, editable }) => {
       colorScheme='orange'
       sx={{ h: 7, w: 'fit-content' }}
     >
-      <Tooltip
-        label={
-          <Stack dir='column' spacing={1}>
-            <Text>Name: {name}</Text>
-            {url && <Text>URL: {url}</Text>}
-            {contactName && <Text>Contact Name: {contactName}</Text>}
-            {contactEmail && <Text>Contact Email: {contactEmail}</Text>}
-          </Stack>
-        }
-      >
+      <Tooltip label={supplierInfo()}>
         <TagLabel>
           <Link href={url ? supplierURL : '#'} isExternal={url}>
             {name}
