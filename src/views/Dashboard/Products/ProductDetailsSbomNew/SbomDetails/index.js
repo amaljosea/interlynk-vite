@@ -1,7 +1,7 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { getFullDateAndTime, timeSince, truncatedValue } from 'utils'
 import { getSignedUrlParams } from 'utils'
 import SbomActions from 'views/Sbom/components/SbomActions'
@@ -53,6 +53,7 @@ const SettingsTag = ({ icon, label, color, isDisabled }) => {
 
 const SbomDetails = ({ sbomData }) => {
   const params = useParams()
+  const navigate = useNavigate()
   const partsContext = usePartsContext()
   const { sbomHookData, isFreeTier } = useGlobalQueryContext()
   const projectId = params.productid
@@ -175,18 +176,24 @@ const SbomDetails = ({ sbomData }) => {
                       versionName: sbomHookData.versionName,
                       url: null
                     }
-                  ].map((part) => {
+                  ].map((part, index) => {
                     return (
                       <BreadcrumbItem
                         isCurrentPage={!!part.url}
                         key={part.url}
                         color={primaryBlueText}
                       >
-                        <BreadcrumbLink _hover={{ textDecoration: 'none' }}>
-                          <Link to={part.url}>
-                            {truncatedValue(part.projectGroupName)} (
-                            {truncatedValue(part.versionName)})
-                          </Link>
+                        <BreadcrumbLink
+                          onClick={() => {
+                            if (part.url) {
+                              partsContext.goTo(index)
+                              navigate(part.url)
+                            }
+                          }}
+                          _hover={{ textDecoration: 'none' }}
+                        >
+                          {truncatedValue(part.projectGroupName)} (
+                          {truncatedValue(part.versionName)})
                         </BreadcrumbLink>
                       </BreadcrumbItem>
                     )
