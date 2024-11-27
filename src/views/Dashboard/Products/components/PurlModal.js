@@ -19,6 +19,7 @@ import {
 } from '@chakra-ui/react'
 
 import CpeInput from 'components/CpeInput'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -45,6 +46,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const navigate = useNavigate()
 
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
+  console.log(purl)
 
   const [value, setValue] = useState('pkg:type/name@version')
 
@@ -54,8 +56,9 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const [namespaceList, setNamespaceList] = useState([])
   const [purlNameList, setPurlNameList] = useState([])
   const [purlVersionList, setPurlVersionList] = useState([])
+  const [error, setError] = useState('')
 
-  const showToast = useCustomToast()
+  const { showToast } = useCustomToast()
 
   const [purlData, setPurlData] = useState({
     type: '',
@@ -87,6 +90,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
 
   const handleInputChange = (field, value) => {
     const filterValue = value?.replace(/\s/g, '')
+    setError('')
     setPurlData((prev) => ({ ...prev, [field]: filterValue }))
   }
 
@@ -452,38 +456,24 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
 
   useEffect(() => {
     if (purl) {
-      const data = PackageURL.fromString(purl)
-      setPurlData((prev) => ({
-        ...prev,
-        type: data?.type || '',
-        namespace: data?.namespace || '',
-        name: data?.name || '',
-        version: data?.version || '',
-        qualifiers: data?.qualifiers
-          ? Object.entries(data.qualifiers)
-              .map(([key, value]) => `${key}=${value}`)
-              .join('&')
-          : ''
-      }))
-    }
-  }, [purl])
-
-  useEffect(() => {
-    if (purl) {
       setValue(purl)
-      const data = PackageURL.fromString(purl)
-      setPurlData((prev) => ({
-        ...prev,
-        type: data?.type || '',
-        namespace: data?.namespace || '',
-        name: data?.name || '',
-        version: data?.version || '',
-        qualifiers: data?.qualifiers
-          ? Object.entries(data.qualifiers)
-              .map(([key, value]) => `${key}=${value}`)
-              .join('&')
-          : ''
-      }))
+      try {
+        const data = PackageURL.fromString(purl)
+        setPurlData((prev) => ({
+          ...prev,
+          type: data?.type || '',
+          namespace: data?.namespace || '',
+          name: data?.name || '',
+          version: data?.version || '',
+          qualifiers: data?.qualifiers
+            ? Object.entries(data.qualifiers)
+                .map(([key, value]) => `${key}=${value}`)
+                .join('&')
+            : ''
+        }))
+      } catch (error) {
+        setError(error?.message)
+      }
     }
   }, [purl])
 
@@ -495,7 +485,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
       title={'PURL Details'}
       Icon={FaCircleInfo}
       hidden={resolved}
-      isDisabled={isInvalid || loading}
+      disabled={isInvalid || loading}
       buttonText={'Save'}
       leftFooterContent={
         !isFreeTier && (
@@ -529,6 +519,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         </Flex>
       )}
       <Flex width={'100%'} direction={'column'} gap={4}>
+        {error && <LynkAlert msg={error} />}
         {/* Package URL */}
         <FormControl isDisabled={resolved}>
           <Textarea
