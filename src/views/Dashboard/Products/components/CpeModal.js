@@ -21,6 +21,7 @@ import {
 } from '@chakra-ui/react'
 
 import CpeInput from 'components/CpeInput'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -272,8 +273,8 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
     if (cpes?.length > 0) {
+      setValue(cpes[0])
       if (validateCpe(cpes[0])) {
-        setValue(cpes[0])
         const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
         const components = cpes[0]?.split(':')
         const isValid =
@@ -293,7 +294,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           other: components[12]?.replace(/\*/g, '') || ''
         }))
       } else {
-        setValue('cpe:2.3:::::*:*:*:*:*:*:*')
+        setError('Invalid CPE')
       }
     }
   }, [cpes])
@@ -341,6 +342,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           </Flex>
         )}
         <Flex width={'100%'} direction={'column'} gap={4}>
+          {error !== '' && <LynkAlert msg={error} />}
           {/* CPE STRING */}
           <FormControl isDisabled={resolved}>
             <FormLabel fontSize={12} htmlFor='cpe'>
@@ -358,7 +360,6 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
               onChange={(e) => setValue(e.target.value)}
               disabled
             />
-            {error !== '' && <FormErrorMessage>{error}</FormErrorMessage>}
           </FormControl>
           <Grid templateColumns='repeat(2, 1fr)' gap={6}>
             {/* PART */}
