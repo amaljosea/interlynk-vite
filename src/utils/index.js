@@ -1304,20 +1304,25 @@ export const parseEpssRange = (epss) => {
 export const transformLicenseString = (licenseText) => {
   if (!licenseText) return ''
 
-  // Check if the license already starts with "LicenseRef-"
+  // Return the string unchanged if it starts with "LicenseRef-interlynk-"
+  if (licenseText.startsWith('LicenseRef-interlynk-')) {
+    return licenseText
+  }
+
+  // Return the string unchanged if it starts with "LicenseRef-"
   if (licenseText.startsWith('LicenseRef-')) {
     return licenseText
   }
 
   const sanitizedValue = licenseText.trim().replace(/\s+/g, '-')
-  return `LicenseRef-${sanitizedValue}`
+  return `LicenseRef-interlynk-${sanitizedValue}`
 }
 
 export const parseLicenseString = (licenseText) => {
   if (!licenseText) return ''
 
-  if (licenseText.startsWith('LicenseRef-')) {
-    return licenseText.slice('LicenseRef-'.length)
+  if (licenseText.startsWith('LicenseRef-interlynk-')) {
+    return licenseText.slice('LicenseRef-interlynk-'.length).replace(/-/g, ' ')
   }
 
   return licenseText
