@@ -44,7 +44,8 @@ const ComponentsColumns = ({
   DELETE,
   GRAPH,
   isArchived,
-  setActiveComp
+  setActiveComp,
+  handleVuln
 }) => {
   const {
     primaryTextColor,
@@ -422,6 +423,14 @@ const ComponentsColumns = ({
                         hidden={isFreeTier}
                       >
                         Insights
+                      </MenuItem>
+                      <MenuItem
+                        data-testid='view_component_vulns'
+                        onClick={() => handleVuln(row)}
+                        isDisabled={status === 'signed'}
+                        hidden={isFreeTier}
+                      >
+                        Vulnerabilities
                       </MenuItem>
                       <Divider />
                       {primary === false && (

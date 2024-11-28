@@ -12,6 +12,7 @@ import { useColorMode, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
+import ComponentVulns from 'components/Drawer/ComponentVulns'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
@@ -129,6 +130,7 @@ const Components = ({ sbomData }) => {
   const RELATION = useDisclosure()
   const COMPONENT = useDisclosure()
   const INSIGHTS = useDisclosure()
+  const VULNS = useDisclosure()
   const DELETE_SUPPLIER = useDisclosure()
 
   const onCreateComponent = useCallback(() => {
@@ -172,6 +174,11 @@ const Components = ({ sbomData }) => {
     GRAPH.onOpen()
   }
 
+  const handleVuln = (row) => {
+    setActiveRow(row)
+    VULNS.onOpen()
+  }
+
   // COLUMNS
   const columns = ComponentsColumns({
     colorMode,
@@ -192,7 +199,8 @@ const Components = ({ sbomData }) => {
     PURL,
     CPE,
     isArchived,
-    setActiveComp
+    setActiveComp,
+    handleVuln
   })
 
   const [deleteSupplier, { loading: supLoading }] =
@@ -403,6 +411,14 @@ const Components = ({ sbomData }) => {
           isOpen={INSIGHTS.isOpen}
           onClose={INSIGHTS.onClose}
           id={activeRow?.id}
+        />
+      )}
+
+      {VULNS.isOpen && (
+        <ComponentVulns
+          data={activeRow}
+          isOpen={VULNS.isOpen}
+          onClose={VULNS.onClose}
         />
       )}
     </>

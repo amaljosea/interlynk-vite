@@ -5034,3 +5034,29 @@ export const CveLookup = gql`
     }
   }
 `
+
+export const GetComponentVulns = gql`
+  query GetComponentVulns(
+    $id: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    component(id: $id, sbomId: $sbomId) {
+      vulns(first: $first, last: $last, after: $after, before: $before) {
+        totalCount
+        nodes {
+          vexStatus {
+            name
+          }
+          vuln {
+            id
+            vulnId
+          }
+        }
+      }
+    }
+  }
+`
