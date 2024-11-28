@@ -1,5 +1,5 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import ReactSelect from 'react-select'
 import { getSignedUrlParams } from 'utils'
@@ -52,13 +52,18 @@ const CustomVuln = ({ isOpen, onClose }) => {
     variables: { ...compState }
   })
 
-  const { data: allComponents } = useQuery(GetAllComponents, {
-    skip: isOpen && params?.sbomid ? false : true,
-    variables: {
-      ...compState,
-      first: compData?.sbom?.components?.totalCount
+  const { data: allComponents, loading: compLoading } = useQuery(
+    GetAllComponents,
+    {
+      skip: isOpen && params?.sbomid ? false : true,
+      variables: {
+        ...compState,
+        first: compData?.sbom?.components?.totalCount
+      }
     }
-  })
+  )
+
+  const { components } = allComponents?.sbom || ''
 
   const [error, setError] = useState('')
   const [cve, setCve] = useState(null)
@@ -151,6 +156,18 @@ const CustomVuln = ({ isOpen, onClose }) => {
       }
     })
   }
+
+  useEffect(() => {
+    if (components) {
+      const component = components?.nodes?.find(
+        (item) => item?.primary === true
+      )
+      setFormData((prev) => ({
+        ...prev,
+        componentId: component?.id
+      }))
+    }
+  }, [components])
 
   return (
     <LynkModal
@@ -283,7 +300,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
             placeholder='Ex. cpe:2.3:a:examplevendor:uniqueproduct:1.0.0:*:*:*:*:*:*:*'
           />
         </FormControl>
-        {allComponents && (
+        {!compLoading && (
           <FormControl>
             <FormLabel htmlFor='componentId' fontSize={12}>
               Component
@@ -295,7 +312,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
               onChange={handleChange}
             >
               <option value=''>-- Select --</option>
-              {[...allComponents.sbom.components.nodes]
+              {[...components.nodes]
                 .sort((a, b) => a?.name?.localeCompare(b?.name))
                 .map((item, idx) => (
                   <option key={idx} value={item?.id}>
