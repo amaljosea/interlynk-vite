@@ -22,6 +22,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { AutomationRuleCreate, addComSupplier } from 'graphQL/Mutation'
+import { updateComSupplier } from 'graphQL/Mutation'
 
 import { BiCube } from 'react-icons/bi'
 
@@ -34,9 +35,18 @@ const SupplierModal = (props) => {
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const showToast = useCustomToast()
-  const [createSupplier, { loading }] = useMutation(addComSupplier, {
-    onCompleted: () => recheck()
-  })
+  const [createSupplier, { loading: createLoading }] = useMutation(
+    addComSupplier,
+    {
+      onCompleted: () => recheck()
+    }
+  )
+  const [updateSupplier, { loading: updateLoading }] = useMutation(
+    updateComSupplier,
+    {
+      onCompleted: () => recheck()
+    }
+  )
   const [createRule, { loading: rlLoading }] = useMutation(AutomationRuleCreate)
 
   const { status, component } = activeRow || ''
@@ -68,15 +78,23 @@ const SupplierModal = (props) => {
   const containsSpace = /\s/.test(formData?.url)
 
   const handleSave = () => {
-    createSupplier({
-      variables: {
-        url: formData?.url,
-        name: formData?.name,
-        componentId: component?.id,
-        contactName: formData?.contactName,
-        contactEmail: formData?.contactEmail
-      }
-    }).finally(() => onClose())
+    const data = {
+      url: formData?.url,
+      name: formData?.name,
+      componentId: component?.id,
+      contactName: formData?.contactName,
+      contactEmail: formData?.contactEmail
+    }
+    if (component?.suppliers?.length > 0) {
+      updateSupplier({
+        variables: {
+          id: component?.suppliers[0].id,
+          ...data
+        }
+      }).finally(() => onClose())
+    } else {
+      createSupplier({ variables: data }).finally(() => onClose())
+    }
   }
 
   const handleCheckUrl = () => {
@@ -190,14 +208,16 @@ const SupplierModal = (props) => {
   }
 
   const isInvalid = formData?.url !== '' && !validateUrl(formData?.url)
+  const disabled =
+    isInvalid || formData?.name === '' || createLoading || updateLoading
 
   useEffect(() => {
     if (component?.suppliers?.length > 0) {
       setFormData(() => ({
-        name: component?.suppliers[0]?.name,
-        url: component?.suppliers[0]?.url,
-        contactName: component?.suppliers[0]?.contactName,
-        contactEmail: component?.suppliers[0]?.contactEmail
+        name: component?.suppliers[0]?.name || '',
+        url: component?.suppliers[0]?.url || '',
+        contactName: component?.suppliers[0]?.contactName || '',
+        contactEmail: component?.suppliers[0]?.contactEmail || ''
       }))
     } else {
       setFormData(initialData)
@@ -213,7 +233,7 @@ const SupplierModal = (props) => {
         onClose={onClose}
         onSubmit={handleSave}
         title={`Add Supplier`}
-        disabled={isInvalid || loading}
+        disabled={isInvalid || createLoading || updateLoading}
         buttonText={suppliers?.length > 0 ? 'Update' : 'Save'}
         leftFooterContent={
           !isFreeTier && (
@@ -225,7 +245,7 @@ const SupplierModal = (props) => {
               onClick={handleRuleCreate}
               hidden={friendlyId ? false : true}
               title={`${ruleExists ? 'View' : 'Save as'} Rule`}
-              isDisabled={isInvalid || formData?.name === '' || loading}
+              isDisabled={disabled}
               colorScheme={ruleExists ? 'green' : 'blue'}
             >
               {ruleExists ? 'View' : 'Save as'} Rule
