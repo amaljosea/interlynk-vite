@@ -32,6 +32,7 @@ import { FaScrewdriverWrench } from 'react-icons/fa6'
 const Kbar = () => {
   const { isFreeTier } = useGlobalQueryContext()
   const { results, rootActionId } = useMatches()
+  const resultsCount = results?.length
   const navigate = useNavigate()
   const params = useParams()
   const location = useLocation()
@@ -178,7 +179,8 @@ const Kbar = () => {
   //.. shortcut
   data.push({
     id: '..',
-    name: '..  Go back a level',
+    name: '.. Go back a level',
+    keywords: ['..'],
     section: 'shortcuts',
     icon: <FaRegFile color={sameSecondaryText} />,
     perform: () => {
@@ -225,6 +227,7 @@ const Kbar = () => {
     id: '/',
     name: '/  Go Back to first level',
     section: 'shortcuts',
+    keywords: ['/'],
     icon: <FaRegFile color={sameSecondaryText} />,
     perform: () => {
       const isVulnerabilityRelatedPage =
@@ -288,6 +291,25 @@ const Kbar = () => {
       parent: 'theme'
     }
   )
+
+  const resultsWithShortcuts = results.filter(
+    (result) => result.id === '..' || result.id === '/'
+  )
+
+  let shortcutsWithTitle = []
+  if (resultsWithShortcuts.length !== 0) {
+    shortcutsWithTitle = ['SHORTCUTS', ...resultsWithShortcuts]
+  }
+  const resultsMinusShortcuts = results.filter(
+    (result) =>
+      result.id !== '..' && result.id !== '/' && result !== 'shortcuts'
+  )
+
+  // results.length < resultsCount = false when KBAR is loaded initially
+  const actualResults =
+    results.length < resultsCount
+      ? [...shortcutsWithTitle, ...resultsMinusShortcuts]
+      : results
 
   const ResultItem = ({ item, active, currentRootActionId }) => {
     const ancestors = useMemo(() => {
@@ -370,7 +392,7 @@ const Kbar = () => {
             {results && results?.length !== 0 && (
               <div className='kbar_result_body'>
                 <KBarResults
-                  items={results}
+                  items={actualResults}
                   onRender={({ item, active }) => (
                     <ResultItem
                       item={item}
