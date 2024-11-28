@@ -1,157 +1,93 @@
+import { useLazyQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import { getSignedUrlParams, validateCpe } from 'utils'
+import { useContext, useEffect, useState } from 'react'
+import { isCustomerView, validateCpe } from 'utils'
+import IdentifierLabel from 'views/Dashboard/Products/components/IdentifierLabel'
 
-import { Box, Input, List, ListItem, VStack } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage } from '@chakra-ui/react'
 
-import { useThemeColor } from 'hooks/useThemeColors'
+import { CpeAutoComplete } from 'graphQL/Queries'
 
-const CpeField = ({ cpeList, setCpeList, inputRef, onChange }) => {
+import LynkSelect from './LynkSelect'
+
+const CpeField = ({ isOpen, onOpen, onClose }) => {
+  const customerView = isCustomerView()
   const { tabData, handleChange } = useContext(TabContext)
   const { identifiers } = tabData || ''
 
-  const signedUrlParams = getSignedUrlParams()
+  const [getCpe, { loading }] = useLazyQuery(CpeAutoComplete)
 
-  const [focusedIndex, setFocusedIndex] = useState(null)
-  const listItemsRef = useRef([])
-  const { primaryBgColor, secondaryBgColor } = useThemeColor([
-    'primaryBgColor',
-    'secondaryBgColor'
-  ])
+  const [value, setValue] = useState(null)
+  const [searchInput, setSearchInput] = useState('')
+  const [options, setOptions] = useState([])
 
-  const handleValidate = (value) => {
-    const matches = validateCpe(value)
-    if (matches) {
-      handleChange('identifiers', 'cpeError', '')
+  const onChange = (item) => {
+    setValue(item)
+    if (item?.value) {
+      handleChange('identifiers', 'cpe', item?.value)
+      const matches = validateCpe(item?.value)
+      handleChange('identifiers', 'cpeError', matches ? '' : 'Invalid CPE')
     } else {
-      handleChange('identifiers', 'cpeError', 'Invalid CPE')
+      handleChange('identifiers', 'cpe', '')
     }
   }
 
-  const onBlur = (e) => handleValidate(e.target.value)
-
-  const handleSelect = (value) => {
-    handleChange('identifiers', 'cpe', value)
-    value !== '' && handleValidate(value)
-    setFocusedIndex(null)
-    setCpeList([])
-  }
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' || e.key === 'Tab') {
-      handleChange('identifiers', 'cpe', identifiers?.cpe)
-      setCpeList([])
-    }
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setFocusedIndex((prevIndex) => {
-        const newIndex =
-          prevIndex === null
-            ? 0
-            : Math.min(prevIndex + 1, listItemsRef.current.length - 1)
-        cpeList.length > 0 &&
-          listItemsRef.current[newIndex].scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest'
-          })
-        return newIndex
+  const onInputChange = (value) => {
+    setSearchInput(value)
+    if (value !== '') {
+      getCpe({
+        variables: {
+          input: { idType: 'cpe', ecosystem: 'cpe', search: { idUri: value } }
+        }
+      }).then((res) => {
+        const { result } = res?.data?.idAutoComplete || ''
+        if (result?.length > 0) {
+          setOptions(() =>
+            result?.map((item) => ({ label: item, value: item }))
+          )
+        } else {
+          setOptions([{ label: value, value: value }])
+        }
       })
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setFocusedIndex((prevIndex) => {
-        const newIndex = prevIndex === null ? 0 : Math.max(prevIndex - 1, 0)
-        cpeList.length > 0 &&
-          listItemsRef.current[newIndex].scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest'
-          })
-        return newIndex
-      })
-    } else if (e.key === 'Enter' && focusedIndex !== null) {
-      const value = cpeList.length > 0 && cpeList[focusedIndex]
-      return handleSelect(value)
+    } else {
+      setOptions([])
     }
   }
 
   useEffect(() => {
-    listItemsRef.current[0]?.focus()
-  }, [])
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (inputRef.current && !inputRef.current.contains(event.target)) {
-        setCpeList([])
-      }
+    if (identifiers?.cpe) {
+      setValue({ label: identifiers?.cpe, value: identifiers?.cpe })
     }
-    document.addEventListener('click', handleClickOutside)
-    return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [inputRef, setCpeList])
+  }, [identifiers?.cpe])
 
   return (
-    <VStack
-      spacing={4}
-      align='stretch'
-      ref={inputRef}
-      sx={{ w: '100%', pos: 'relative' }}
+    <FormControl
+      isReadOnly={customerView}
+      isInvalid={value && identifiers?.cpeError !== ''}
     >
-      <FormControl
-        isInvalid={identifiers?.cpe !== '' && identifiers?.cpeError !== ''}
-      >
-        <Input
-          id={'cpe'}
-          name={'cpe'}
-          size='md'
-          fontSize={'sm'}
-          placeholder={'CPE'}
-          readOnly={signedUrlParams}
-          value={identifiers?.cpe}
-          onChange={onChange}
-          autoComplete='off'
-          onBlur={onBlur}
-          onKeyDown={handleKeyDown}
-        />
-        <FormErrorMessage>{identifiers?.cpeError}</FormErrorMessage>
-      </FormControl>
-      {identifiers?.cpe !== '' && cpeList?.length > 0 && (
-        <Box
-          zIndex={111}
-          pos={'absolute'}
-          bg={primaryBgColor}
-          borderRadius={'md'}
-          overflowY={'scroll'}
-          border={'1px solid #CBD5E0'}
-          sx={{ w: '100%', maxH: '260px', left: 0, right: 0, top: 8 }}
-        >
-          <List>
-            {cpeList.map((item, index) => (
-              <ListItem
-                py={1}
-                px={4}
-                p={2}
-                key={index}
-                ref={(el) => (listItemsRef.current[index] = el)}
-                tabIndex='0'
-                bg={index === focusedIndex ? secondaryBgColor : 'transparent'}
-                _hover={{
-                  bg: focusedIndex === null ? secondaryBgColor : 'transparent'
-                }}
-                onMouseEnter={() => setFocusedIndex(null)}
-                outline='none'
-                data-testid='cpe_list'
-                onClick={() => handleSelect(item)}
-                sx={{ w: '100%', fontSize: 'sm', cursor: 'pointer' }}
-              >
-                {item}
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-      )}
-    </VStack>
+      <IdentifierLabel
+        title={`CPE`}
+        isOpen={isOpen}
+        onOpen={onOpen}
+        onClose={onClose}
+      />
+      <LynkSelect
+        name='cpe'
+        id='cpe'
+        placeholder={''}
+        isClearable={true}
+        isSearchable={true}
+        isLoading={loading}
+        value={value}
+        onChange={onChange}
+        inputValue={searchInput}
+        options={options}
+        filterOption={null}
+        noOptionsMessage={() => null}
+        onInputChange={onInputChange}
+      />
+      <FormErrorMessage>This CPE format is not valid</FormErrorMessage>
+    </FormControl>
   )
 }
 

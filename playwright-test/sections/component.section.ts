@@ -33,7 +33,8 @@ export default class ComponentSection {
     await this.page.waitForTimeout(2000)
 
     await this.page.getByTestId(`product_Test`).click()
-    await this.page.waitForTimeout(5000)
+    await this.page.waitForTimeout(2000)
+    await this.page.reload()
 
     const version = this.page.getByTestId('version').nth(0)
 
@@ -186,16 +187,15 @@ export default class ComponentSection {
 
           await this.page.getByRole('tab', { name: 'identifiers' }).click()
           await this.page
-            .getByPlaceholder('PURL')
+            .locator('input#purl')
             .fill(
               'pkg:deb/debian/libvlc-bin@3.0.10-0+deb10u1+rpt2?arch=armhf&distro=buster'
             )
-          await this.page
-            .getByPlaceholder('CPE')
-            .fill(
-              'cpe:2.3:a:byonepress:social_locker:2.0.2:*:*:*:*:wordpress:*:*'
-            )
-          await this.page.getByTestId('cpe_list').first().click()
+          await this.page.keyboard.press('Tab')
+          await this.page.keyboard.type(
+            'cpe:2.3:a:byonepress:social_locker:2.0.2:*:*:*:*:wordpress:*:*'
+          )
+          await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(1000)
 
           await this.page.getByTestId('Save Identifiers').click()
@@ -516,7 +516,6 @@ export default class ComponentSection {
           await this.page.waitForTimeout(2000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
-
           await this.page.waitForTimeout(3000)
 
           await this.page.getByTestId('component-actions').first().click()
@@ -528,27 +527,28 @@ export default class ComponentSection {
           await this.page.getByTestId('purl_expand').first().click()
           await this.page.waitForTimeout(3000)
 
-          await this.page.locator('select#packageType').click()
+          await this.page.getByTestId('purl_type').click()
           await this.page.waitForTimeout(1000)
-          await this.page.locator('select#packageType').selectOption('npm')
-          await this.page.waitForTimeout(1000)
-          await this.page.getByTestId('namespace').fill('react')
-          await this.page.waitForTimeout(3000)
-          await this.page.getByTestId('namespace').press('ArrowDown')
-          await this.page.getByTestId('namespace').press('Enter')
-          await this.page.waitForTimeout(3000)
-          await this.page.getByTestId('name').fill('react-dom')
-          await this.page.waitForTimeout(3000)
-          await this.page.getByTestId('name').press('ArrowDown')
-          await this.page.getByTestId('name').press('Enter')
-          await this.page.waitForTimeout(3000)
-          await this.page.getByTestId('version').fill('16.14.0')
-          await this.page.keyboard.press('Tab')
-          await this.page.waitForTimeout(3000)
-          await this.page.getByRole('button', { name: 'Save PURL' }).click()
+          await this.page.getByTestId('purl_type').selectOption('npm')
           await this.page.waitForTimeout(2000)
-          await this.page.getByRole('button', { name: 'Save' }).click()
+          await this.page.locator('#purl_namespace').click()
+          await this.page.keyboard.type('react')
           await this.page.waitForTimeout(3000)
+          await this.page.keyboard.press('Enter')
+          await this.page.waitForTimeout(1000)
+          await this.page.locator('#purl_name').click()
+          await this.page.keyboard.type('react-dom')
+          await this.page.waitForTimeout(3000)
+          await this.page.keyboard.press('Enter')
+          await this.page.waitForTimeout(1000)
+          await this.page.locator('#purl_version').click()
+          await this.page.keyboard.type('2.3.5')
+          await this.page.waitForTimeout(3000)
+          await this.page.keyboard.press('Enter')
+          await this.page.waitForTimeout(1000)
+          await this.page.getByTestId('purl_qualifiers').fill('type=jar')
+          await this.page.waitForTimeout(1000)
+          await this.page.getByRole('button', { name: 'Save PURL' }).click()
 
           await this.page.getByLabel('Close').click()
           await this.page.waitForTimeout(2000)
@@ -594,16 +594,24 @@ export default class ComponentSection {
           await this.page.getByTestId('cpe_expand').first().click()
           await this.page.waitForTimeout(2000)
 
-          await this.page.click('select#part')
-          await this.page.keyboard.press('ArrowDown')
+          await this.page.getByTestId('cpe_part').click()
+          await this.page.waitForTimeout(1000)
+          await this.page.getByTestId('cpe_part').selectOption('a')
+          await this.page.waitForTimeout(3000)
+          await this.page.locator('#cpe_vendor').click()
+          await this.page.keyboard.type('calibre-ebook')
+          await this.page.waitForTimeout(3000)
           await this.page.keyboard.press('Enter')
-          await this.page.getByPlaceholder('Enter vendor').fill('windows')
-          await this.page.keyboard.press('Tab')
-          await this.page.getByPlaceholder('Enter product').fill('explorer')
-          await this.page.keyboard.press('Tab')
-          await this.page.getByPlaceholder('Enter cpeVersion').fill('11h2')
-          await this.page.keyboard.press('Tab')
-          await this.page.getByPlaceholder('Enter update').fill('classic')
+          await this.page.waitForTimeout(1000)
+          await this.page.locator('#cpe_product').click()
+          await this.page.keyboard.type('calibre')
+          await this.page.waitForTimeout(3000)
+          await this.page.keyboard.press('Enter')
+          await this.page.waitForTimeout(1000)
+          await this.page.locator('#cpe_version').click()
+          await this.page.keyboard.type('1.0')
+          await this.page.waitForTimeout(3000)
+          await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('button', { name: 'Save CPE' }).click()

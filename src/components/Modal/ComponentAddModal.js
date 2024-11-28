@@ -1,7 +1,6 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
-import { PackageURL } from 'packageurl-js'
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   getSignedUrlParams,
@@ -10,33 +9,30 @@ import {
 } from 'utils'
 import { infoData } from 'variables/general'
 import { componentTypes } from 'variables/general'
-import CpeInputs from 'views/Dashboard/Products/components/CpeInputs'
-import PurlInputs from 'views/Dashboard/Products/components/PurlInputs'
 
 import { InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
+import { chakra, useDisclosure } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import {
   Checkbox,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   Input,
-  Link,
   Select,
   Stack,
   Text,
   Textarea,
-  Tooltip,
-  chakra,
-  useDisclosure
+  Tooltip
 } from '@chakra-ui/react'
 
+import CpeEditor from 'components/CpeEditor'
 import CpeField from 'components/CpeField'
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 import CompInfo from 'components/Misc/CompInfo'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
+import PurlEditor from 'components/PurlEditor'
+import PurlField from 'components/PurlField'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -45,7 +41,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateCompRelation, CreateComponent } from 'graphQL/Mutation'
-import { CpeAutoComplete, GetAllComponents, GetAllSboms } from 'graphQL/Queries'
+import { GetAllComponents, GetAllSboms } from 'graphQL/Queries'
 
 import { BiLayer } from 'react-icons/bi'
 
@@ -83,12 +79,8 @@ function ComponentAddModal(props) {
 
   const [addRelation] = useMutation(CreateCompRelation)
 
-  const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [createComponent, { loading }] = useMutation(CreateComponent)
 
-  const cpeRef = useRef()
-
-  const [cpeData, setCpeData] = useState([])
   const [allComponents, setAllComponents] = useState([])
   const [showPurl, setShowPurl] = useState(false)
   const [showCpe, setShowCpe] = useState(false)
@@ -150,24 +142,6 @@ function ComponentAddModal(props) {
     onClose: onWarningClose
   } = useDisclosure()
 
-  const handlePURLInputChange = (e) => {
-    const { value } = e.target
-    const val = value.replace(/\s/g, '')
-    handleChange('identifiers', 'purl', val)
-  }
-
-  const purlInputBlur = () => {
-    if (identifiers?.purl !== '') {
-      try {
-        PackageURL.fromString(identifiers?.purl)
-        handleChange('identifiers', 'purlError', '')
-      } catch (ex) {
-        console.error('ex', ex)
-        handleChange('identifiers', 'purlError', ex?.message)
-      }
-    }
-  }
-
   const handleCreateCom = () => {
     const hasLicense = details?.licenses?.length > 0
     const isCustomLicense =
@@ -224,21 +198,6 @@ function ComponentAddModal(props) {
         resetData()
         onClose()
       })
-  }
-
-  const handleCpeChange = (e) => {
-    const { value } = e.target
-    const val = value.replace(/\s/g, '')
-    handleChange('identifiers', 'cpe', value)
-    getCpe({
-      variables: {
-        input: { idType: 'cpe', ecosystem: 'cpe', search: { idUri: val } }
-      }
-    }).then((res) => {
-      if (res?.data) {
-        setCpeData(res?.data?.idAutoComplete?.result || [])
-      }
-    })
   }
 
   const onModalClose = () => {
@@ -300,18 +259,20 @@ function ComponentAddModal(props) {
           {/* Name */}
           {signedUrlParams && <CompInfo data={data} />}
           {showPurl ? (
-            <PurlInputs
-              activeComp={data}
+            <PurlEditor
+              isOpen={showPurl}
               value={purlValue}
               setValue={setPurlValue}
-              onClose={handlePurlExpand}
+              onOpen={() => setShowPurl(true)}
+              onClose={() => setShowPurl(false)}
             />
           ) : showCpe ? (
-            <CpeInputs
+            <CpeEditor
+              isOpen={showCpe}
               value={cpeValue}
-              activeComp={data}
               setValue={setCpeValue}
-              onClose={handleCpeExpand}
+              onOpen={() => setShowCpe(true)}
+              onClose={() => setShowCpe(false)}
             />
           ) : (
             <>
@@ -484,62 +445,17 @@ function ComponentAddModal(props) {
                 </Tooltip>
               </Flex>
               {/* PURL INPUI */}
-              <FormControl
-                isReadOnly={customerView}
-                isInvalid={identifiers?.purl && identifiers?.purlError !== ''}
-              >
-                <FormLabel fontSize={12} htmlFor='text'>
-                  Package URL
-                  <Link
-                    color={primaryBlueText}
-                    mx={2}
-                    _hover={{ textDecoration: 'underline' }}
-                    fontWeight={'medium'}
-                    fontSize={'11px'}
-                    onClick={handlePurlExpand}
-                    hidden={customerView}
-                  >
-                    {showPurl ? '(Collapse)' : '(Expand)'}
-                  </Link>
-                </FormLabel>
-                <Input
-                  type='text'
-                  size='md'
-                  id='purl'
-                  name='purl'
-                  fontSize={'sm'}
-                  placeholder='PURL'
-                  value={identifiers?.purl}
-                  autoComplete='off'
-                  onChange={handlePURLInputChange}
-                  onBlur={purlInputBlur}
-                />
-                <FormErrorMessage>{identifiers?.purlError}</FormErrorMessage>
-              </FormControl>
+              <PurlField
+                isOpen={showPurl}
+                onOpen={handlePurlExpand}
+                onClose={() => setShowPurl(false)}
+              />
               {/* CPE INPUT */}
-              <FormControl>
-                <FormLabel fontSize={12} htmlFor='text'>
-                  CPE
-                  <Link
-                    color={primaryBlueText}
-                    mx={2}
-                    _hover={{ textDecoration: 'underline' }}
-                    fontWeight={'medium'}
-                    fontSize={'11px'}
-                    onClick={handleCpeExpand}
-                    hidden={customerView}
-                  >
-                    {showCpe ? '(Collapse)' : '(Expand)'}
-                  </Link>
-                </FormLabel>
-                <CpeField
-                  inputRef={cpeRef}
-                  cpeList={cpeData}
-                  setCpeList={setCpeData}
-                  onChange={handleCpeChange}
-                />
-              </FormControl>
-
+              <CpeField
+                isOpen={showCpe}
+                onOpen={handleCpeExpand}
+                onClose={() => setShowCpe(false)}
+              />
               {/* SCOPE */}
               <FormControl>
                 <FormLabel htmlFor='compScope'>

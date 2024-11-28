@@ -1,37 +1,24 @@
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { isCustomerView, validateCpe } from 'utils'
 
-import {
-  Divider,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Icon,
-  Input,
-  Stack,
-  Text
-} from '@chakra-ui/react'
+import { Divider, Stack } from '@chakra-ui/react'
 
+import CpeEditor from 'components/CpeEditor'
 import CpeField from 'components/CpeField'
 import LynkAlert from 'components/LynkAlert'
+import PurlEditor from 'components/PurlEditor'
+import PurlField from 'components/PurlField'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateComponent } from 'graphQL/Mutation'
-import { CpeAutoComplete } from 'graphQL/Queries'
-
-import { FaChevronDown, FaChevronRight } from 'react-icons/fa6'
 
 import ActionButton from './ActionButton'
-import CpeInputs from './CpeInputs'
-import PurlInputs from './PurlInputs'
 
 const CompIdentifiers = ({ data }) => {
   const { showToast } = useCustomToast()
@@ -39,51 +26,19 @@ const CompIdentifiers = ({ data }) => {
   const sbomId = params.sbomid
   const customerView = isCustomerView()
 
-  const {
-    tabData,
-    setTabData,
-    handleChange,
-    saveChanges,
-    unsavedChanges,
-    alert,
-    setAlert
-  } = useContext(TabContext)
+  const { tabData, setTabData, saveChanges, unsavedChanges, alert, setAlert } =
+    useContext(TabContext)
   const { identifiers } = tabData
-
-  const [getCpe] = useLazyQuery(CpeAutoComplete)
 
   const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
 
   const [updateComponent, { loading }] = useMutation(UpdateComponent)
 
-  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
-
-  const cpeRef = useRef()
   const [purlValue, setPurlValue] = useState('')
   const [cpeValue, setCpeValue] = useState('')
-  const [cpeData, setCpeData] = useState([])
   const [purlOpen, setPurlOpen] = useState(false)
   const [cpeOpen, setCpeOpen] = useState(false)
-
-  const handlePURLInputChange = (e) => {
-    const { value } = e.target
-    const val = value.replace(/\s/g, '')
-    handleChange('identifiers', 'purl', val)
-    handleChange('identifiers', 'purlError', '')
-  }
-
-  const purlInputBlur = (e) => {
-    if (e.target.value !== '') {
-      try {
-        PackageURL.fromString(e.target.value)
-        handleChange('identifiers', 'purlError', '')
-      } catch (ex) {
-        console.error('ex', ex.message)
-        handleChange('identifiers', 'purlError', ex.message)
-      }
-    }
-  }
 
   const handlePurlModal = () => {
     try {
@@ -98,22 +53,6 @@ const CompIdentifiers = ({ data }) => {
   const handleCpeModal = () => {
     setCpeValue(identifiers?.cpe || 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*')
     setCpeOpen(true)
-  }
-
-  const handleCpeChange = (e) => {
-    const { value } = e.target
-    const val = value.replace(/\s/g, '')
-    handleChange('identifiers', 'cpe', val)
-    handleChange('identifiers', 'cpeError', '')
-    getCpe({
-      variables: {
-        input: { idType: 'cpe', ecosystem: 'cpe', search: { idUri: val } }
-      }
-    }).then((res) => {
-      if (res?.data) {
-        setCpeData(res?.data?.idAutoComplete?.result || [])
-      }
-    })
   }
 
   const handleUpdateCom = () => {
@@ -202,82 +141,39 @@ const CompIdentifiers = ({ data }) => {
         height={cpeOpen || purlOpen ? '100%' : '70vh'}
       >
         {/* PURL INPUI */}
-        {purlOpen && (
-          <PurlInputs
+        {purlOpen ? (
+          <PurlEditor
             value={purlValue}
+            isOpen={purlOpen}
             setValue={setPurlValue}
+            onOpen={() => setPurlOpen(true)}
+            onClose={() => setPurlOpen(false)}
+          />
+        ) : (
+          <PurlField
+            isOpen={purlOpen}
+            onOpen={handlePurlModal}
             onClose={() => setPurlOpen(false)}
           />
         )}
-        <FormControl
-          hidden={purlOpen}
-          isReadOnly={customerView}
-          isInvalid={identifiers?.purl !== '' && identifiers?.purlError !== ''}
-        >
-          <FormLabel htmlFor='purl' fontSize={'sm'}>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-              <Icon
-                data-testid='purl_expand'
-                onClick={handlePurlModal}
-                display={customerView ? 'none' : 'flex'}
-                as={purlOpen ? FaChevronDown : FaChevronRight}
-                sx={{
-                  fontSize: 12,
-                  color: sameSecondaryText,
-                  cursor: 'pointer'
-                }}
-              />
-              <Text>Package URL {`(PURL)`}</Text>
-            </Flex>
-          </FormLabel>
-          <Input
-            type='text'
-            size='md'
-            id='purl'
-            name='purl'
-            fontSize={'sm'}
-            placeholder='PURL'
-            value={identifiers?.purl}
-            autoComplete='off'
-            onBlur={purlInputBlur}
-            onChange={handlePURLInputChange}
-          />
-          <FormErrorMessage>{identifiers?.purlError}</FormErrorMessage>
-        </FormControl>
         <Divider />
         {/* CPE INPUT */}
-        {cpeOpen && (
-          <CpeInputs
+        {cpeOpen ? (
+          <CpeEditor
             value={cpeValue}
+            isOpen={cpeOpen}
             setValue={setCpeValue}
+            onOpen={() => setCpeOpen(true)}
+            onClose={() => setCpeOpen(false)}
+          />
+        ) : (
+          <CpeField
+            isOpen={cpeOpen}
+            onOpen={handleCpeModal}
             onClose={() => setCpeOpen(false)}
           />
         )}
-        <FormControl hidden={cpeOpen}>
-          <FormLabel htmlFor='cpe' fontSize={'sm'}>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-              <Icon
-                data-testid='cpe_expand'
-                onClick={handleCpeModal}
-                display={customerView ? 'none' : 'flex'}
-                as={cpeOpen ? FaChevronDown : FaChevronRight}
-                sx={{
-                  fontSize: 12,
-                  color: sameSecondaryText,
-                  cursor: 'pointer'
-                }}
-              />
-              <Text>CPE</Text>
-            </Flex>
-          </FormLabel>
-          <CpeField
-            inputRef={cpeRef}
-            cpeList={cpeData}
-            setCpeList={setCpeData}
-            onChange={handleCpeChange}
-          />
-        </FormControl>
-        <Divider />
+        <Divider hidden={cpeOpen || purlOpen} />
         {alert ? (
           <Stack spacing={4}>
             <LynkAlert

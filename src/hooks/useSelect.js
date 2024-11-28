@@ -6,12 +6,14 @@ export const useSelect = (type) => {
   const isVersion = type === 'version'
 
   const {
+    primaryBlueText,
     primaryTextColor,
     primaryBgColor,
     secondaryTextInverse,
     secondaryBgColor,
     grayBorderColor
   } = useThemeColor([
+    'primaryBlueText',
     'primaryTextColor',
     'primaryBgColor',
     'secondaryTextInverse',
@@ -24,6 +26,7 @@ export const useSelect = (type) => {
       ...baseStyles,
       color: primaryTextColor,
       overflow: 'hidden',
+      opacity: state.isDisabled ? 0.5 : 1,
       maxWidth: isBreadcrumb ? '200px' : 'inherit',
       minWidth: isBreadcrumb ? '120px' : 'inherit',
       minHeight: isBreadcrumb ? '6px' : 'inherit',
@@ -31,12 +34,23 @@ export const useSelect = (type) => {
       fontSize: '14px',
       backgroundColor: isBreadcrumb ? secondaryBgColor : 'transparent',
       '&:hover': {
-        borderColor: isBreadcrumb ? 'transparent' : grayBorderColor,
+        borderColor: isBreadcrumb
+          ? 'transparent'
+          : state.isFocused
+            ? primaryBlueText
+            : grayBorderColor,
         backgroundColor: isBreadcrumb ? grayBorderColor : 'transparent'
       },
+      outline:
+        isBreadcrumb && state.isFocused
+          ? `${primaryBlueText} solid 1px`
+          : 'none',
       boxShadow: state.isFocused ? 'none' : baseStyles?.boxShadow,
-      borderColor:
-        isBreadcrumb && state.isFocused ? 'transparent' : grayBorderColor
+      borderColor: isBreadcrumb
+        ? 'transparent'
+        : state.isFocused
+          ? primaryBlueText
+          : grayBorderColor
     }),
     menu: (provided) => ({
       ...provided,
@@ -57,12 +71,13 @@ export const useSelect = (type) => {
       color: primaryTextColor,
       backgroundColor: 'transparent'
     }),
-    option: (provided) => ({
+    option: (provided, state) => ({
       ...provided,
       color: isBreadcrumb ? primaryTextColor : secondaryTextInverse,
-      backgroundColor: primaryBgColor,
+      backgroundColor: state?.isFocused
+        ? 'rgba(0, 0, 0, 0.04)'
+        : primaryBgColor,
       textOverflow: 'ellipsis',
-      // textTransform: 'capitalize',
       '&:hover': {
         backgroundColor: secondaryBgColor
       }
