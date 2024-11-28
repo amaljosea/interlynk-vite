@@ -411,7 +411,11 @@ const CheckModal = (props) => {
         )
       }
     >
-      {error !== '' && <LynkAlert msg={error} />}
+      {error !== '' && (
+        <Box mb={4}>
+          <LynkAlert msg={error} />
+        </Box>
+      )}
       <Flex
         hidden={component ? false : true}
         width='100%'
