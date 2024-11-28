@@ -1,8 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import AsyncSelect from 'react-select/async'
-import { isCustomerView } from 'utils'
-import { truncatedValue } from 'utils'
+import { isCustomerView, truncatedValue } from 'utils'
 
 import { Spinner } from '@chakra-ui/react'
 

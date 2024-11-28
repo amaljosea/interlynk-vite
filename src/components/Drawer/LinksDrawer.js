@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { validateUrl } from 'utils'
-import { truncatedValue } from 'utils'
+import { truncatedValue, validateUrl } from 'utils'
 
 import { DeleteIcon } from '@chakra-ui/icons'
 import {
@@ -31,12 +30,12 @@ import {
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const LinksDrawer = ({ isOpen, onClose, component, sbomId }) => {
+const LinksDrawer = ({ isOpen, onClose, component }) => {
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
   const [linksData, setLinksData] = useState([])
   const [error, setError] = useState('')
-  const { id, externalUrls } = component
+  const { externalUrls } = component
   const [linkError, setLinkError] = useState('')
   const { primaryErrorColor, secondaryTextInverse } = useThemeColor([
     'primaryErrorColor',

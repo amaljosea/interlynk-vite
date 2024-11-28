@@ -10,7 +10,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 // Custom icons
 
-const SBOMActivities = ({ title, percentage, chart }) => {
+const SBOMActivities = ({ title, chart }) => {
   const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
   return (
     <Card p='28px 10px 16px 0px' mb={{ sm: '26px', lg: '0px' }}>

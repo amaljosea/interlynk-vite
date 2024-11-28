@@ -25,10 +25,6 @@ function ProductLinkDrawer(props) {
   const {
     isOpen,
     onClose,
-    btnRef,
-    uniqProjects,
-    uniqVersions,
-    name,
     shared_with,
     conf_email,
     conf_terms,

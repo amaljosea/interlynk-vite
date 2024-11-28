@@ -1,7 +1,6 @@
 import { useKBar } from 'kbar'
 import React from 'react'
-import { getSignedUrlParams } from 'utils'
-import { detectOS } from 'utils'
+import { detectOS, getSignedUrlParams } from 'utils'
 
 import { SearchIcon } from '@chakra-ui/icons'
 import { Box, Input, InputGroup, InputLeftElement, Kbd } from '@chakra-ui/react'

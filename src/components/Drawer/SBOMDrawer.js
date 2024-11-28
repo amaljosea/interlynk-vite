@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import MultiSelect from 'react-select'
 import { validateEmail } from 'utils'
@@ -34,18 +34,11 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateShareLynk } from 'graphQL/Mutation'
 import { UpdateShareLynk } from 'graphQL/Mutation'
-import { GetImages } from 'graphQL/Queries'
 
 function SBOMDrawer(props) {
   const { showToast } = useCustomToast()
 
   const { isOpen, onClose, id, shareUsers, contents } = props
-
-  const { data: allImages } = useQuery(GetImages, {
-    variables: {
-      first: 10
-    }
-  })
 
   const [shareLynkCreate] = useMutation(CreateShareLynk)
   const [shareLynkUpdate] = useMutation(UpdateShareLynk)
@@ -86,7 +79,7 @@ function SBOMDrawer(props) {
         setSelectedProd(data)
       }
     }
-  }, [id])
+  }, [contents, id, shareUsers])
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {

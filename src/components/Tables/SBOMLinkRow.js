@@ -81,13 +81,11 @@ function SBOMLinkRow(props) {
     }
   }
 
-  let shared, shared_col
+  let shared_col
 
   if (shareUsers.length === 0) {
-    shared = ['Public']
     shared_col = 'green'
   } else {
-    shared = shareUsers
     shared_col = 'blue'
   }
 

@@ -14,7 +14,6 @@ const ChartStatistics = ({ title, amount, icon, percentage }) => {
       'secondaryTextColor'
     ])
 
-  const overlayRef = React.useRef()
   return (
     <Flex direction='column'>
       <Flex alignItems='center'>

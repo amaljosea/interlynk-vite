@@ -28,28 +28,37 @@ const SagTable = ({ data }) => {
   )
 
   // CLEAR SERACH
-  const handleClear = () => {
-    setFilterText('')
-    setSearchInput('')
-  }
+  const handleClear = useMemo(
+    () => () => {
+      setFilterText('')
+      setSearchInput('')
+    },
+    []
+  )
 
   // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    const { value } = e.target
-    if (value === '') {
-      handleClear()
-    } else {
-      setFilterText(value)
-    }
-  }
+  const onSearchInputChange = useMemo(
+    () => (e) => {
+      const { value } = e.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setFilterText(value)
+      }
+    },
+    [handleClear]
+  )
 
   // SEARCH COMPONENT
-  const handleSearch = (event) => {
-    const { value } = event.target
-    if (event.key === 'Enter' && filterText !== '') {
-      setSearchInput(value)
-    }
-  }
+  const handleSearch = useMemo(
+    () => (event) => {
+      const { value } = event.target
+      if (event.key === 'Enter' && filterText !== '') {
+        setSearchInput(value)
+      }
+    },
+    [filterText]
+  )
 
   // COLUMNS
   const columns = [

@@ -15,11 +15,8 @@ import {
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaNeos, FaTools } from 'react-icons/fa'
-
 function AdvisoryLogRow(props) {
   const {
-    id,
     refId,
     desc,
     source,
@@ -31,28 +28,20 @@ function AdvisoryLogRow(props) {
   } = props
   const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
   // set value of icon based on type
-  let icon
-  let color
   let tooltip
   let link
   switch (source) {
     case 'nvd':
-      icon = FaNeos
-      color = 'black'
       tooltip = 'National Vulnerability Database (NVD)'
       link = 'https://nvd.nist.gov/vuln/detail/' + refId
       break
     case 'ghsa':
-      icon = FaTools
       tooltip = 'Github Security Advisory'
       link = 'https://github.com/advisories/' + refId
-      color = 'black'
       break
     case 'usn':
-      icon = FaTools
       tooltip = 'Ubuntu Security Advisory'
       link = 'https://ubuntu.com/security/notices/' + refId
-      color = 'black'
       break
   }
   const sevColor =

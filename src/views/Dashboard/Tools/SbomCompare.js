@@ -1,5 +1,4 @@
-import { truncatedValue } from 'utils'
-import { envOrderList } from 'utils'
+import { envOrderList, truncatedValue } from 'utils'
 
 import {
   Button,

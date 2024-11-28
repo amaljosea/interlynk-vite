@@ -1,15 +1,6 @@
 import React from 'react'
 
-import {
-  Button,
-  Flex,
-  Icon,
-  Tag,
-  Td,
-  Text,
-  Tr,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Button, Flex, Icon, Tag, Td, Text, Tr } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -21,7 +12,6 @@ function VulnerabilityRow(props) {
     'inverseSecondaryBgColor',
     'secondaryTextColor'
   ])
-  const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = React.useRef()
   const sevColor =
     score >= 10
@@ -50,13 +40,7 @@ function VulnerabilityRow(props) {
       <Td>{version}</Td>
       <Td>{recommendation}</Td>
       <Td>
-        <Button
-          title='Risk actions'
-          p='0px'
-          bg='transparent'
-          ref={btnRef}
-          onClick={onOpen}
-        >
+        <Button title='Risk actions' p='0px' bg='transparent' ref={btnRef}>
           <Icon as={FaEllipsisV} color={secondaryTextColor} cursor='pointer' />
         </Button>
       </Td>

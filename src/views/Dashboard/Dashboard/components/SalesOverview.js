@@ -9,7 +9,7 @@ import CardHeader from 'components/Card/CardHeader.js'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const RiskScoreOverview = ({ title, percentage, chart }) => {
+const RiskScoreOverview = ({ title, chart }) => {
   const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
 
   return (

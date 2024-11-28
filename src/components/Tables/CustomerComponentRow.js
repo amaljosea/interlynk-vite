@@ -1,6 +1,5 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
 import { isCustomerView } from 'utils'
 
 import { Button, Flex, Icon, Tag, Td, Text, Tr } from '@chakra-ui/react'
@@ -10,25 +9,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { FaEllipsisV } from 'react-icons/fa'
 
 function CustomerComponentRow(props) {
-  const {
-    logo,
-    component,
-    version,
-    source,
-    depth,
-    dependsOn,
-    language,
-    license,
-    updated,
-    repo,
-    risk_score,
-    critical,
-    high,
-    medium,
-    low,
-    redacted
-  } = props
-  const location = useLocation()
+  const { logo, component, version, dependsOn, license, risk_score, redacted } =
+    props
   const { inverseSecondaryBgColor, secondaryTextColor } = useThemeColor([
     'inverseSecondaryBgColor',
     'secondaryTextColor'

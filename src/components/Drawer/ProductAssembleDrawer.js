@@ -24,7 +24,6 @@ function ProductAssembleDrawer(props) {
   const {
     isOpen,
     onClose,
-    btnRef,
     uniqProjects,
     uniqVersions,
     project,

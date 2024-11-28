@@ -1,5 +1,4 @@
-import { getFullDateAndTime } from 'utils'
-import { truncatedValue } from 'utils'
+import { getFullDateAndTime, truncatedValue } from 'utils'
 
 import {
   Flex,

@@ -25,7 +25,7 @@ jest.mock('@chakra-ui/react', () => ({
       headingTextColor: { light: '#000', dark: '#fff' }
     }
   }),
-  useColorModeValue: (light, dark) => light
+  useColorModeValue: (light) => light
 }))
 
 test('Automation page renders correctly', () => {
