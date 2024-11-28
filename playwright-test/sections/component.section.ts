@@ -528,13 +528,10 @@ export default class ComponentSection {
           await this.page.getByTestId('purl_expand').first().click()
           await this.page.waitForTimeout(3000)
 
-          await this.page.click('select#packageType')
-          await this.page.waitForTimeout(3000)
-          for (let i = 0; i < 22; i++) {
-            await this.page.keyboard.press('ArrowDown')
-          }
-          await this.page.keyboard.press('Enter')
-          await this.page.keyboard.press('Tab')
+          await this.page.locator('select#packageType').click()
+          await this.page.waitForTimeout(1000)
+          await this.page.locator('select#packageType').selectOption('npm')
+          await this.page.waitForTimeout(1000)
           await this.page.getByTestId('namespace').fill('react')
           await this.page.waitForTimeout(3000)
           await this.page.getByTestId('namespace').press('ArrowDown')
