@@ -7,7 +7,6 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
-  Badge,
   Box,
   Center,
   Flex,
@@ -82,11 +81,13 @@ const updateTreeData = (treeData, nodeId, newData) => {
 }
 
 const CustomNode = ({ nodeDatum, compId, click, foreignObjectProps }) => {
-  const { primaryBgColor, primaryBlueText, secondaryTextColor } = useThemeColor(
-    ['primaryBgColor', 'primaryBlueText', 'secondaryTextColor']
-  )
+  const { secondaryBgColor, primaryBlueText } = useThemeColor([
+    'secondaryBgColor',
+    'primaryBlueText'
+  ])
 
   if (nodeDatum?.name) {
+    const isActive = nodeDatum?.compId === compId
     return (
       <g transform='translate(-40,-30)' onClick={() => click(nodeDatum)}>
         <svg xmlns='http://www.w3.org/2000/svg'>
@@ -119,28 +120,19 @@ const CustomNode = ({ nodeDatum, compId, click, foreignObjectProps }) => {
               position={'relative'}
               fontWeight={'medium'}
               wordBreak={'break-all'}
-              bg={primaryBgColor}
-              color={primaryBlueText}
-              border={`1px solid rgba(0,0,0,0.09)`}
+              bg={isActive ? primaryBlueText : secondaryBgColor}
+              color={isActive ? 'white' : primaryBlueText}
               sx={{ p: 3, left: 12, borderRadius: 5, minW: 'fit-content' }}
             >
-              <Stack
-                spacing={nodeDatum?.compId === compId ? 1 : 0}
-                direction={'column'}
+              <Text
+                wordBreak={'break-all'}
+                sx={{ fontSize: 16, fontWeight: 'medium', lineHeight: 1.3 }}
               >
-                {nodeDatum?.compId === compId && (
-                  <Badge w={'fit-content'}>Active</Badge>
-                )}
-                <Text
-                  wordBreak={'break-all'}
-                  sx={{ fontSize: 16, fontWeight: 'medium', lineHeight: 1.3 }}
-                >
-                  {nodeDatum?.name}
-                </Text>
-              </Stack>
+                {nodeDatum?.name}
+              </Text>
               {nodeDatum?.version && (
                 <Text
-                  color={secondaryTextColor}
+                  color={isActive ? 'white' : primaryBlueText}
                   sx={{ mt: 1, fontSize: 14, opacity: 0.8 }}
                 >
                   {nodeDatum?.version}
