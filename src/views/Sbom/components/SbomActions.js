@@ -272,7 +272,6 @@ const SbomActions = ({ sbom }) => {
         <SearchIcon
           top={3}
           left={3}
-          zIndex={111}
           color={secondaryTextColor}
           pos={'absolute'}
         />
