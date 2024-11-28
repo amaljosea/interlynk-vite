@@ -64,8 +64,8 @@ const GlobalStateProvider = ({ children }) => {
     pageIndex: 1
   })
   const [prodCompState, prodCompDispatch] = useReducer(prodCompReducer, {
-    field: 'COMPONENTS_UPDATED_AT',
-    direction: 'DESC',
+    field: '',
+    direction: '',
     after: '',
     before: '',
     totalComp: 0,

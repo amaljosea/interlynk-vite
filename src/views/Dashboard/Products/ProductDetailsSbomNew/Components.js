@@ -97,7 +97,7 @@ const Components = ({ sbomData }) => {
         ...compData,
         sbomId: sbomId,
         projectId: productId,
-        orderBy: searchInput === '' ? { field, direction } : undefined,
+        orderBy: field && direction ? { field, direction } : undefined,
         search: searchInput !== '' ? searchInput : undefined
       },
       onCompleted: (data) => {
