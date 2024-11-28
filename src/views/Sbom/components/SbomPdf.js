@@ -11,7 +11,10 @@ export const downloadSbomPdf = (
   componentsActual,
   vulnActual,
   exportedBy,
-  manufacturerData
+  manufacturerData,
+  excludeVulnStatus,
+  excludeStatusNotes,
+  includeParts
 ) => {
   const authors = listItemsForDoc(sbom?.authors, 'name')
   const tools = listItemsForDoc(sbom?.tools, 'name', 'version')
@@ -434,8 +437,13 @@ export const downloadSbomPdf = (
   const availableWidth = pageWidth - leftMargin - rightMargin - 110
 
   componentsActual.forEach((component) => {
-    const componentName = formatValue(
-      component.name,
+    const projectGroupName = component.sbom?.project?.projectGroup?.name || ''
+    const componentName = component.name
+    const componentText = includeParts
+      ? `${projectGroupName} : ${componentName}`
+      : componentName
+    const componentDesc = formatValue(
+      componentText,
       doc,
       pageWidth,
       80,
@@ -451,9 +459,9 @@ export const downloadSbomPdf = (
       leftMargin
     )
     doc.setTextColor(...grayColor)
-    doc.text(componentName, leftMargin, currentY)
+    doc.text(componentDesc, leftMargin, currentY)
     let initialY = currentY
-    currentY += componentName.length > 1 ? componentName.length * 5 : 5
+    currentY += componentDesc.length > 1 ? componentDesc.length * 5 : 5
     doc.text(version, leftMargin, currentY)
 
     currentY = initialY
@@ -633,8 +641,16 @@ export const downloadSbomPdf = (
   doc.setFontSize(10)
 
   vulnActual.forEach((vuln) => {
-    const vulnId = formatValue(
-      vuln.vuln?.vulnId || 'NA',
+    const projectGroupName =
+      vuln.component?.sbom?.project?.projectGroup?.name || ''
+    const componentName = vuln.component?.name || ''
+    const vulnId = vuln.vuln?.vulnId
+
+    const vulnText = includeParts
+      ? `${projectGroupName}:${componentName} - ${vulnId}`
+      : vulnId
+    const vulnIdPlusParts = formatValue(
+      vulnText || 'NA',
       doc,
       pageWidth,
       80,
@@ -642,13 +658,30 @@ export const downloadSbomPdf = (
       leftMargin
     )
     doc.setTextColor(...grayColor)
-    doc.text(vulnId, leftMargin, currentY)
+    doc.text(vulnIdPlusParts, leftMargin, currentY)
     let initialY = currentY
-    currentY += vulnId.length > 1 ? vulnId.length * 10 : 5
+    currentY += vulnIdPlusParts.length > 1 ? vulnIdPlusParts.length * 10 : 5
     currentY = initialY
+
+    const excludeStatusLabels = ['status']
+
+    const excludeStatusNotesLabels = ['internal notes']
 
     const vulnValues = getVulnValues(vuln)
     VulnLabels.forEach((label, index) => {
+      if (
+        !excludeVulnStatus &&
+        excludeStatusLabels.includes(label.toLowerCase())
+      ) {
+        return
+      }
+
+      if (
+        !excludeStatusNotes &&
+        excludeStatusNotesLabels.includes(label.toLowerCase())
+      ) {
+        return
+      }
       doc.setTextColor(...grayColor) // Gray color
       doc.text(label, leftMargin + 40, currentY)
       doc.setTextColor(...darkGrayColor) // Dark gray for values

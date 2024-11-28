@@ -1,10 +1,19 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getSignedUrlParams, truncatedValue } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
-import { Button, Divider, Flex, Stack, Tag, Text } from '@chakra-ui/react'
+import {
+  Button,
+  Divider,
+  Flex,
+  HStack,
+  Stack,
+  Tag,
+  Text,
+  VStack
+} from '@chakra-ui/react'
 import { Checkbox, FormControl, FormLabel } from '@chakra-ui/react'
 import { Radio, RadioGroup, useDisclosure } from '@chakra-ui/react'
 
@@ -27,8 +36,16 @@ import ComplianceChecks from './ComplianceChecks'
 import { downloadSbomPdf } from './SbomPdf'
 
 const DownloadModal = (props) => {
-  const { isOpen, onClose, productId, productName, version, sbomId, sbom } =
-    props || ''
+  const {
+    isOpen,
+    onClose,
+    productId,
+    productName,
+    version,
+    sbomId,
+    sbom,
+    downloadType
+  } = props || ''
 
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
@@ -40,11 +57,13 @@ const DownloadModal = (props) => {
 
   const [spec, setSpec] = useState('CycloneDX')
   const [format, setFormat] = useState('json')
-  const [includeVulns, setIncludeVulns] = useState(false)
-  const [original, setOriginal] = useState(false)
+  const [includeVulns, setIncludeVulns] = useState(true)
+  const [includeComponents, setIncludeComponents] = useState(true)
   const [encoded, setEncoded] = useState(false)
+  const [excludeVulnStatus, setExcludeVulnStatus] = useState(false)
+  const [excludeStatusNotes, setExcludeStatusNotes] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [excludeParts, setExcludeParts] = useState(false)
+  const [includeParts, setIncludeParts] = useState(true)
 
   const { data: ntia, loading: ntiaLoading } = useQuery(GetSbomQualityScores, {
     skip: isOpen && !signedUrlParams ? false : true,
@@ -64,14 +83,13 @@ const DownloadModal = (props) => {
 
   const DETAILS = useDisclosure()
 
-  const onCheckOrigin = (e) => {
-    const { checked } = e.target
-    setOriginal((prev) => !prev)
-    setSpec(checked ? '' : 'CycloneDX')
-    setFormat(checked ? 'xml' : 'json')
-    setIncludeVulns(false)
-    setEncoded(false)
-  }
+  useEffect(() => {
+    if (downloadType === 'pdf') {
+      setFormat('pdf')
+    } else {
+      setFormat('json')
+    }
+  }, [downloadType])
 
   const { primaryBlueText, primaryTextColor } = useThemeColor([
     'primaryBlueText'
@@ -92,24 +110,12 @@ const DownloadModal = (props) => {
     }
   }
 
-  const downloadXmlFile = (xmlData) => {
-    if (xmlData) {
-      const blob = new Blob([xmlData], { type: 'application/xml' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${productName}-${version}.${type}.xml`
-      a.click()
-      URL.revokeObjectURL(url)
-    }
-  }
-
   const handleDownloadPdf = async () => {
     setIsLoading(true)
     let allComponents = []
     let allVulns = []
-    let componentsHasNextPage = true
-    let vulnsHasNextPage = true
+    let componentsHasNextPage = includeComponents ? true : false
+    let vulnsHasNextPage = includeVulns ? true : false
     let componentsEndCursor = null
     let vulnsEndCursor = null
 
@@ -164,7 +170,10 @@ const DownloadModal = (props) => {
         allComponents,
         allVulns,
         organization?.currentUser.name,
-        manufacturerData
+        manufacturerData,
+        excludeVulnStatus,
+        excludeStatusNotes,
+        includeParts
       )
 
       setIsLoading(false)
@@ -183,7 +192,7 @@ const DownloadModal = (props) => {
   const handleDownload = async () => {
     setIsLoading(true)
     try {
-      if (format === 'pdf') {
+      if (downloadType === 'pdf') {
         handleDownloadPdf()
         return
       }
@@ -192,41 +201,32 @@ const DownloadModal = (props) => {
           includeVulns,
           sbomId: sbomId,
           package: encoded,
-          original: original,
           lite: spec === 'SPDX-Lite' ? true : false,
           projectId: signedUrlParams ? undefined : productId,
-          excludeParts: signedUrlParams ? undefined : excludeParts,
-          spec: original ? undefined : spec === 'SPDX-Lite' ? 'SPDX' : spec
+          excludeParts: signedUrlParams ? undefined : includeParts,
+          spec: spec === 'SPDX-Lite' ? 'SPDX' : spec
+        }
+      }).then((res) => {
+        console.log(`res`, res)
+        const { called, variables } = res || ''
+        if (called) {
+          setIsLoading(false)
+          if (variables?.package === true) {
+            const parsedJson = signedUrlParams
+              ? JSON.parse(res?.data?.shareLynkQuery?.sbom?.download)
+              : JSON.parse(res?.data?.sbom?.download)
+
+            downloadJsonFile(parsedJson)
+          } else {
+            const decodedData = signedUrlParams
+              ? window.atob(res?.data?.shareLynkQuery?.sbom?.download)
+              : window.atob(res?.data?.sbom?.download)
+            const parsedJson = JSON.parse(decodedData)
+
+            downloadJsonFile(parsedJson)
+          }
         }
       })
-        .then((res) => {
-          console.log(`res`, res)
-          const { called, variables } = res || ''
-          if (called) {
-            setIsLoading(false)
-            if (variables?.package === true) {
-              const parsedJson = signedUrlParams
-                ? JSON.parse(res?.data?.shareLynkQuery?.sbom?.download)
-                : JSON.parse(res?.data?.sbom?.download)
-              if (format === 'json') {
-                downloadJsonFile(parsedJson)
-              } else {
-                downloadXmlFile(res?.data?.sbom?.download)
-              }
-            } else {
-              const decodedData = signedUrlParams
-                ? window.atob(res?.data?.shareLynkQuery?.sbom?.download)
-                : window.atob(res?.data?.sbom?.download)
-              const parsedJson = JSON.parse(decodedData)
-              if (format === 'json') {
-                downloadJsonFile(parsedJson)
-              } else {
-                downloadXmlFile(decodedData)
-              }
-            }
-          }
-        })
-        .finally(() => onClose())
     } catch (error) {
       console.log(`Error`, error)
       showToast({
@@ -235,6 +235,7 @@ const DownloadModal = (props) => {
       })
       setIsLoading(false)
     }
+    onClose()
   }
 
   const checklists = [
@@ -268,7 +269,7 @@ const DownloadModal = (props) => {
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={handleDownload}
-        title={'Download SBOM'}
+        title={`Download ${downloadType.toUpperCase()}`}
         Icon={DownloadIcon}
         isLoading={isLoading}
         buttonText={'Download'}
@@ -281,14 +282,10 @@ const DownloadModal = (props) => {
           >
             {format === 'json' ? fileName : pdfFileName}
           </Tag>
-          {format !== 'pdf' && (
+          {downloadType === 'sbom' && (
             <FormControl>
               <FormLabel>Specification</FormLabel>
-              <RadioGroup
-                value={spec}
-                isDisabled={original}
-                onChange={(value) => setSpec(value)}
-              >
+              <RadioGroup value={spec} onChange={(value) => setSpec(value)}>
                 <Stack spacing={4} direction='row'>
                   <Radio value='CycloneDX'>CycloneDX</Radio>
                   <Radio value='SPDX'>SPDX</Radio>
@@ -297,57 +294,85 @@ const DownloadModal = (props) => {
               </RadioGroup>
             </FormControl>
           )}
-          <Divider />
-          <FormControl isDisabled={original}>
-            <FormLabel>File Format</FormLabel>
-            <RadioGroup value={format} onChange={(value) => setFormat(value)}>
-              <Stack spacing={4} direction='row'>
-                <Radio value='json'>JSON</Radio>
-                <Radio isDisabled={isFreeTier} value='pdf'>
-                  PDF
-                </Radio>
-                {/* <Radio value='xml'>XML</Radio> */}
-              </Stack>
-            </RadioGroup>
-          </FormControl>
-          <Divider />
 
-          {(format !== 'pdf' || (format === 'pdf' && original)) && (
-            <>
+          <FormControl>
+            <FormLabel>Content</FormLabel>
+            <VStack align='start'>
+              {downloadType === 'pdf' && (
+                <Checkbox
+                  isChecked={includeComponents}
+                  onChange={() => setIncludeComponents(!includeComponents)}
+                >
+                  Components
+                </Checkbox>
+              )}
+
               <Checkbox
                 hidden={signedUrlParams}
-                isChecked={excludeParts && format !== 'pdf'}
-                onChange={() => setExcludeParts(!excludeParts)}
-                isDisabled={
-                  isFreeTier || spec === 'SPDX' || original || format === 'pdf'
-                }
+                isChecked={includeParts}
+                onChange={() => setIncludeParts(!includeParts)}
+                isDisabled={isFreeTier || spec === 'SPDX'}
               >
-                Exclude Parts
+                Parts
               </Checkbox>
               <Checkbox
                 isChecked={includeVulns}
                 onChange={() => setIncludeVulns(!includeVulns)}
-                isDisabled={spec === 'SPDX' || original}
-              >
-                Include Vulnerabilities
-              </Checkbox>
-              <Checkbox
-                isChecked={original}
-                onChange={onCheckOrigin}
                 isDisabled={spec === 'SPDX'}
               >
-                Original SBOM
+                Vulnerabilities
               </Checkbox>
+
+              {downloadType === 'pdf' && (
+                <Checkbox
+                  isDisabled={!includeVulns}
+                  isChecked={excludeVulnStatus}
+                  onChange={() => {
+                    setExcludeVulnStatus(!excludeVulnStatus)
+                  }}
+                >
+                  Vulnerability Status
+                </Checkbox>
+              )}
+
+              {downloadType === 'pdf' && (
+                <Checkbox
+                  isDisabled={!includeVulns}
+                  isChecked={excludeStatusNotes}
+                  onChange={() => {
+                    setExcludeStatusNotes(!excludeStatusNotes)
+                  }}
+                >
+                  Internal Notes
+                </Checkbox>
+              )}
+              {/* <Checkbox>Redact Internal Components</Checkbox> */}
+            </VStack>
+          </FormControl>
+
+          <FormControl>
+            <FormLabel>Output</FormLabel>
+            <HStack justify='space-between'>
+              <RadioGroup value={format} onChange={(value) => setFormat(value)}>
+                <Stack spacing={4} direction='row'>
+                  <Radio value={downloadType === 'pdf' ? 'pdf' : 'json'}>
+                    {downloadType === 'pdf' ? 'PDF' : 'JSON'}
+                  </Radio>
+                  {/*  <Radio isDisabled={isFreeTier} value='pdf'>
+                    XML
+                  </Radio> */}
+                </Stack>
+              </RadioGroup>
               <Checkbox
                 hidden={!superAdmin}
                 isChecked={encoded}
                 onChange={() => setEncoded(!encoded)}
-                isDisabled={spec === 'SPDX' || original}
+                isDisabled={spec === 'SPDX'}
               >
                 Base64 Unencoded
               </Checkbox>
-            </>
-          )}
+            </HStack>
+          </FormControl>
 
           <Divider hidden={signedUrlParams || format === 'pdf'} />
           <Flex

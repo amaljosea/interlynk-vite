@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ReactSelect from 'react-select'
@@ -7,7 +7,21 @@ import CompDrawer from 'views/Dashboard/Products/components/CompDrawer'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
 import { DeleteIcon, EditIcon, SearchIcon } from '@chakra-ui/icons'
-import { Box, Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
+import {
+  Box,
+  Center,
+  Divider,
+  Flex,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Spinner,
+  Text,
+  Tooltip,
+  useDisclosure
+} from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -20,7 +34,9 @@ import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { recheckHealth, sbomDelete } from 'graphQL/Mutation'
+import { SignedSbomDownload } from 'graphQL/Queries'
 import {
+  DownloadSBOM,
   GetCheckResults,
   GetComponentData,
   GetProject,
@@ -38,6 +54,9 @@ import SigningModal from './SigningModal'
 const SbomActions = ({ sbom }) => {
   const { showToast } = useCustomToast()
   const signedUrlParams = getSignedUrlParams()
+  const [getData] = useLazyQuery(
+    signedUrlParams ? SignedSbomDownload : DownloadSBOM
+  )
   const {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
@@ -48,7 +67,12 @@ const SbomActions = ({ sbom }) => {
   const { dispatch } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch, sbomDispatch } = dispatch
 
-  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
+  const { primaryTextColor, secondaryTextInverse, secondaryTextColor } =
+    useThemeColor([
+      'primaryTextColor',
+      'secondaryTextInverse',
+      'secondaryTextColor'
+    ])
 
   const archiveSboms = useHasPermission({
     parentKey: 'view_sbom',
@@ -70,6 +94,7 @@ const SbomActions = ({ sbom }) => {
   const [signedData, setSignedData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [selectedVersion, setSelectedVersion] = useState(null)
+  const [downloadType, setDownloadType] = useState(null)
 
   const initialRef = useRef(null)
   const finalRef = useRef(null)
@@ -79,6 +104,9 @@ const SbomActions = ({ sbom }) => {
       id: productId
     }
   })
+
+  const productName = sbom?.project?.projectGroup?.name
+  const version = sbom?.projectVersion
 
   const [deleteSbom] = useMutation(sbomDelete)
   const [healthRecheck] = useMutation(recheckHealth)
@@ -150,6 +178,42 @@ const SbomActions = ({ sbom }) => {
       })
     })
 
+  //Download Original Sbom
+  const downloadOriginalSbom = async () => {
+    setIsLoading(true)
+    try {
+      const response = await getData({
+        variables: {
+          sbomId,
+          projectId: signedUrlParams ? undefined : productId,
+          original: true
+        }
+      })
+
+      if (response.called) {
+        const decodedData = signedUrlParams
+          ? window.atob(response?.data?.shareLynkQuery?.sbom?.download)
+          : window.atob(response?.data?.sbom?.download)
+
+        const blob = new Blob([decodedData], { type: 'application/xml' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${productName}-${version}.xml`
+        a.click()
+        URL.revokeObjectURL(url)
+      }
+      setIsLoading(false)
+    } catch (error) {
+      console.error('Error downloading original SBOM:', error)
+      showToast({
+        description: `Internal error during SBOM download. Please try again in a few minutes.`,
+        status: 'error'
+      })
+      setIsLoading(false)
+    }
+  }
+
   // GET PRIMARY COMPONENT DATA
   const {
     nodes: primaryComponent,
@@ -165,6 +229,7 @@ const SbomActions = ({ sbom }) => {
     }
   })
 
+  //Open Modal for sbom for updated SBOM or PDF
   const onDownload = () => {
     if (primaryCompLoading) {
       showToast({
@@ -331,7 +396,7 @@ const SbomActions = ({ sbom }) => {
         </Tooltip>
 
         {/* DOWNLOAD SBOM */}
-        <Tooltip label='Download'>
+        {/*   <Tooltip label='Download'>
           <IconButton
             size='md'
             colorScheme='blue'
@@ -339,6 +404,98 @@ const SbomActions = ({ sbom }) => {
             onClick={onDownload}
             icon={<FaFileDownload />}
           />
+        </Tooltip> */}
+        {isLoading && !isDeleteOpen && (
+          <Center
+            position='fixed'
+            top='0'
+            left='0'
+            width='100vw'
+            height='100vh'
+            bg='rgba(0, 0, 0, 0.6)'
+            zIndex='overlay'
+            flexDirection='column'
+          >
+            <Spinner size='xl' color='white' mb={4} />
+            <Text fontSize='lg' color='white'>
+              Downloading Original Sbom...
+            </Text>
+          </Center>
+        )}
+        <Tooltip label='Download sbom' placement='top' shouldWrapChildren>
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              size='md'
+              colorScheme='blue'
+              className='download'
+              icon={<FaFileDownload />}
+              isDisabled={isLoading}
+            />
+            <MenuList width='220px'>
+              <MenuItem onClick={downloadOriginalSbom}>
+                <Box>
+                  <Box
+                    fontSize='14px'
+                    fontWeight='bold'
+                    mb='4px'
+                    color={primaryTextColor}
+                  >
+                    Original SBOM
+                  </Box>
+                  <Box fontSize='12px' color={secondaryTextInverse}>
+                    Download the original SBOM file that created this version
+                  </Box>
+                </Box>
+              </MenuItem>
+              <Divider />
+              {/* Updated SBOM */}
+              <MenuItem
+                onClick={() => {
+                  onDownload()
+                  setDownloadType('sbom')
+                }}
+              >
+                <Box>
+                  <Box
+                    fontSize='14px'
+                    fontWeight='bold'
+                    mb='4px'
+                    color={primaryTextColor}
+                  >
+                    Updated SBOM
+                  </Box>
+                  <Box fontSize='12px' color={secondaryTextInverse}>
+                    Download the current state of the version as a CycloneDX /
+                    SPDX or SPDX-Lite file
+                  </Box>
+                </Box>
+              </MenuItem>
+              <Divider />
+              {/* PDF */}
+              <MenuItem
+                isDisabled={isFreeTier}
+                onClick={() => {
+                  onDownload()
+                  setDownloadType('pdf')
+                }}
+              >
+                <Box>
+                  <Box
+                    fontSize='14px'
+                    fontWeight='bold'
+                    mb='4px'
+                    color={primaryTextColor}
+                  >
+                    PDF
+                  </Box>
+                  <Box fontSize='12px' color={secondaryTextInverse}>
+                    Download the current state of the version as PDF
+                  </Box>
+                </Box>
+              </MenuItem>
+            </MenuList>
+          </Menu>
         </Tooltip>
 
         {/* DELETE SBOM */}
@@ -367,6 +524,7 @@ const SbomActions = ({ sbom }) => {
           productName={sbom?.project?.projectGroup?.name}
           version={sbom?.projectVersion}
           sbom={sbom}
+          downloadType={downloadType}
         />
       )}
 
