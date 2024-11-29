@@ -1,19 +1,7 @@
 /* eslint-disable */
-// USER IMAGES
-import userOne from 'assets/img/abhi.png'
-import custom from 'assets/img/custom.png'
-import grype from 'assets/img/grype.png'
-import userThree from 'assets/img/rcn.jpg'
-import scout from 'assets/img/scout.png'
-import snyk from 'assets/img/snyk.png'
-import userTwo from 'assets/img/sp.png'
-import trivy from 'assets/img/trivy.png'
-import userNone from 'assets/img/user.png'
 import AlpmIcon from 'assets/svg/alpm.png'
 import CondaIcon from 'assets/svg/anaconda.png'
 import ApkIcon from 'assets/svg/apk.png'
-import AWSIcon from 'assets/svg/aws.svg'
-import AzureIcon from 'assets/svg/azure.svg'
 import BitbucketIcon from 'assets/svg/bitbucket.png'
 import BitnamiIcon from 'assets/svg/bitnami.svg'
 import CargoIcon from 'assets/svg/cargo.png'
@@ -23,7 +11,6 @@ import ConanIcon from 'assets/svg/conan.png'
 import CranIcon from 'assets/svg/cran.svg'
 import DebIcon from 'assets/svg/debian.png'
 import DocIcon from 'assets/svg/docker.png'
-import DockerIcon from 'assets/svg/docker.svg'
 import GemIcon from 'assets/svg/gem.png'
 import GenericIcon from 'assets/svg/generic.png'
 import GitHubIcon from 'assets/svg/github.svg'
@@ -147,19 +134,6 @@ export const getFormat = (name) => {
   }
 }
 
-export const getConImg = (name) => {
-  switch (name) {
-    case 'Docker Hub':
-      return DockerIcon
-    case 'Amazon ECR':
-      return AWSIcon
-    case 'Azure Container Registry':
-      return AzureIcon
-    case 'Github Container Registry':
-      return GitHubIcon
-  }
-}
-
 export const GetIcon = (name, colorMode) => {
   const light = { filter: 'none' }
   const dark = { filter: 'brightness(0) invert(1)' }
@@ -231,21 +205,6 @@ export const GetIcon = (name, colorMode) => {
       return <img src={SwidIcon} width={'20px'} alt='swid' />
     case 'pkg:swift':
       return <img src={SwiftIcon} width={'24px'} alt='swift' />
-  }
-}
-
-export const scanImage = (name) => {
-  switch (name) {
-    case 'Grype':
-      return grype
-    case 'Trivy':
-      return trivy
-    case 'Scout':
-      return scout
-    case 'Snyk':
-      return snyk
-    case 'Custom':
-      return custom
   }
 }
 
@@ -371,19 +330,6 @@ export const getChangelogColor = (type) => {
       return 'red'
     case 'rerun':
       return 'purple'
-  }
-}
-
-export const displayPic = (email) => {
-  switch (email) {
-    case 'abhisek@interlynk.io':
-      return userOne
-    case 'sp@interlynk.io':
-      return userTwo
-    case 'rcn@interlynk.io':
-      return userThree
-    default:
-      return userNone
   }
 }
 

@@ -11,8 +11,6 @@ import ActivitiesOverviewRow from 'components/Tables/ActivitiesOverviewRow'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaEye } from 'react-icons/fa'
-
 const ActivitiesOverview = ({ loading, title, data }) => {
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const [activeRow, setActiveRow] = useState('')
