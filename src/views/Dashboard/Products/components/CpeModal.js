@@ -22,6 +22,7 @@ import Version from 'components/CpeEditor/Version'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -36,6 +37,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const sbomId = params.sbomid
   const productId = params.productid
   const navigate = useNavigate()
+  const { showToast } = useCustomToast()
   const { isFreeTier } = useGlobalQueryContext()
 
   const [value, setValue] = useState('cpe:2.3:*:*:*:*:*:*:*:*:*:*:*')
@@ -151,6 +153,10 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
+          showToast({
+            description: 'Rule added successfully',
+            status: 'success'
+          })
           handleComUpdate()
         }
       })

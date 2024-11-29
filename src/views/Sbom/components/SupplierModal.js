@@ -201,6 +201,10 @@ const SupplierModal = (props) => {
           })
           onClose()
         } else {
+          showToast({
+            description: 'Rule added successfully',
+            status: 'success'
+          })
           component?.suppliers?.length > 0 ? onClose() : handleSave()
         }
       })

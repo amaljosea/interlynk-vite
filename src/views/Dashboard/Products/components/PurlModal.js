@@ -168,6 +168,10 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             status: 'error'
           })
         } else {
+          showToast({
+            description: 'Rule added successfully',
+            status: 'success'
+          })
           handleComUpdate()
         }
       })

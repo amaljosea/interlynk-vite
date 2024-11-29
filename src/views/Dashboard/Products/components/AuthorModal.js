@@ -162,6 +162,10 @@ const AuthorModal = ({ isOpen, onClose }) => {
           })
           onClose()
         } else {
+          showToast({
+            description: 'Rule added successfully',
+            status: 'success'
+          })
           handleAddAuthor()
         }
       })

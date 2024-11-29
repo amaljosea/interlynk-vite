@@ -17,6 +17,7 @@ import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
@@ -34,6 +35,7 @@ const CheckModal = (props) => {
   const productId = params.productid
   const sbomId = params.sbomid
   const navigate = useNavigate()
+  const { showToast } = useCustomToast()
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
@@ -332,6 +334,10 @@ const CheckModal = (props) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
+          showToast({
+            description: 'Rule added successfully',
+            status: 'success'
+          })
           if (isComponent) {
             handleComUpdate()
           } else {

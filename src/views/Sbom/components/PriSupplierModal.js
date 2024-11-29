@@ -208,6 +208,10 @@ const PriSupplierModal = (props) => {
             status: 'error'
           })
         } else {
+          showToast({
+            description: 'Rule added successfully',
+            status: 'success'
+          })
           handleSave()
         }
       })

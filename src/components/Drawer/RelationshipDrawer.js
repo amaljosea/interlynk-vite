@@ -259,6 +259,10 @@ const RelationshipDrawer = (props) => {
           })
           onClose()
         } else {
+          showToast({
+            description: 'Rule added successfully',
+            status: 'success'
+          })
           if (isCompRelation) {
             handleAdd()
           } else {
