@@ -189,7 +189,14 @@ const SbomActions = ({ sbom }) => {
           original: true
         }
       })
-
+      if (response.data.sbom.download === null) {
+        showToast({
+          description: `No valid data available to download for this SBOM`,
+          status: 'error'
+        })
+        setIsLoading(false)
+        return
+      }
       if (response.called) {
         const decodedData = signedUrlParams
           ? window.atob(response?.data?.shareLynkQuery?.sbom?.download)
