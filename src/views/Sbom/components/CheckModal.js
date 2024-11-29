@@ -66,7 +66,7 @@ const CheckModal = (props) => {
     fetchPolicy: 'network-only'
   })
 
-  const [createRule] = useMutation(AutomationRuleCreate)
+  const [createRule, { loading }] = useMutation(AutomationRuleCreate)
 
   const { prodCompState } = useGlobalState()
   const { field, direction } = prodCompState
@@ -334,15 +334,15 @@ const CheckModal = (props) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
-          showToast({
-            description: 'Rule added successfully',
-            status: 'success'
-          })
           if (isComponent) {
             handleComUpdate()
           } else {
             onClose()
           }
+          showToast({
+            description: 'Rule added successfully',
+            status: 'success'
+          })
         }
       })
     }
@@ -407,6 +407,7 @@ const CheckModal = (props) => {
             variant='ghost'
             fontSize={'sm'}
             hidden={hideRule}
+            isLoading={loading}
             isDisabled={disabledRule}
             onClick={handleRuleCreate}
             colorScheme={ruleExists ? 'green' : 'blue'}

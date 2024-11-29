@@ -208,11 +208,11 @@ const PriSupplierModal = (props) => {
             status: 'error'
           })
         } else {
+          handleSave()
           showToast({
             description: 'Rule added successfully',
             status: 'success'
           })
-          handleSave()
         }
       })
     }
@@ -248,11 +248,11 @@ const PriSupplierModal = (props) => {
               mr={'auto'}
               fontSize={'sm'}
               variant='ghost'
-              isLoading={rlLoading}
               onClick={handleRuleCreate}
               hidden={friendlyId ? false : true}
-              title={`${ruleExists ? 'View' : 'Save as'} Rule`}
               colorScheme={ruleExists ? 'green' : 'blue'}
+              isLoading={rlLoading || crLoading || upLoading}
+              title={`${ruleExists ? 'View' : 'Save as'} Rule`}
               isDisabled={
                 isInvalid || crLoading || upLoading || !formData?.name
               }

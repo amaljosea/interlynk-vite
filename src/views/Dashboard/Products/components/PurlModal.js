@@ -168,11 +168,11 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             status: 'error'
           })
         } else {
+          handleComUpdate()
           showToast({
             description: 'Rule added successfully',
             status: 'success'
           })
-          handleComUpdate()
         }
       })
     }
@@ -219,6 +219,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             fontSize={'sm'}
             onClick={handleRuleCreate}
             hidden={friendlyId ? false : true}
+            isLoading={ruleLoading || loading}
             colorScheme={ruleExists ? 'green' : 'blue'}
             title={`${ruleExists ? 'View' : 'Save as'} Rule`}
             isDisabled={ruleLoading || loading || isInvalid}

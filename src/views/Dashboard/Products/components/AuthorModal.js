@@ -156,17 +156,17 @@ const AuthorModal = ({ isOpen, onClose }) => {
       }).then((res) => {
         const errors = res?.data?.automationRuleCreate?.errors
         if (errors?.length > 0) {
+          onClose()
           showToast({
             description: `Unable to create rule, please try again.`,
             status: 'error'
           })
-          onClose()
         } else {
+          handleAddAuthor()
           showToast({
             description: 'Rule added successfully',
             status: 'success'
           })
-          handleAddAuthor()
         }
       })
     }
@@ -201,8 +201,8 @@ const AuthorModal = ({ isOpen, onClose }) => {
             fontSize={'sm'}
             variant='ghost'
             onClick={handleRuleCreate}
-            isLoading={ruleLoading}
             hidden={friendlyId ? false : true}
+            isLoading={ruleLoading || loading}
             colorScheme={ruleExists ? 'green' : 'blue'}
             title={`${ruleExists ? 'View' : 'Save as'} Rule`}
             isDisabled={!authorData?.name || !authorData?.email}

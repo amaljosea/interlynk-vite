@@ -4,16 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { validateUrl } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Tag,
-  Text
-} from '@chakra-ui/react'
+import { Button, Flex, Input, Tag, Text } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
@@ -34,7 +26,7 @@ const SupplierModal = (props) => {
   const navigate = useNavigate()
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
-  const showToast = useCustomToast()
+  const { showToast } = useCustomToast()
   const [createSupplier, { loading: createLoading }] = useMutation(
     addComSupplier,
     {
@@ -195,17 +187,17 @@ const SupplierModal = (props) => {
       }).then((res) => {
         const errors = res?.data?.automationRuleCreate?.errors
         if (errors?.length > 0) {
+          onClose()
           showToast({
             description: `Unable to create rule, please try again.`,
             status: 'error'
           })
-          onClose()
         } else {
+          component?.suppliers?.length > 0 ? onClose() : handleSave()
           showToast({
             description: 'Rule added successfully',
             status: 'success'
           })
-          component?.suppliers?.length > 0 ? onClose() : handleSave()
         }
       })
     }
@@ -243,21 +235,27 @@ const SupplierModal = (props) => {
           !isFreeTier && (
             <Button
               mr={'auto'}
-              fontSize={'sm'}
               variant='ghost'
-              isLoading={rlLoading}
+              fontSize={'sm'}
+              isDisabled={disabled}
               onClick={handleRuleCreate}
               hidden={friendlyId ? false : true}
-              title={`${ruleExists ? 'View' : 'Save as'} Rule`}
-              isDisabled={disabled}
               colorScheme={ruleExists ? 'green' : 'blue'}
+              title={`${ruleExists ? 'View' : 'Save as'} Rule`}
+              isLoading={rlLoading || createLoading || updateLoading}
             >
               {ruleExists ? 'View' : 'Save as'} Rule
             </Button>
           )
         }
       >
-        <Flex mb={6} gap={2} width='100%' alignItems={'center'}>
+        <Flex
+          mb={6}
+          gap={2}
+          width='100%'
+          alignItems={'center'}
+          flexWrap={'wrap'}
+        >
           <Text wordBreak={'break-word'}>{component?.name || '-'}</Text>
           <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
         </Flex>

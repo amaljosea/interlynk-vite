@@ -153,11 +153,11 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         if (errors?.length > 0) {
           setError(errors[0])
         } else {
+          handleComUpdate()
           showToast({
             description: 'Rule added successfully',
             status: 'success'
           })
-          handleComUpdate()
         }
       })
     }
@@ -222,6 +222,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
               fontSize={'sm'}
               onClick={handleRuleCreate}
               hidden={friendlyId ? false : true}
+              isLoading={ruleLoading || loading}
               title={`${ruleExists ? 'View' : 'Save as'} Rule`}
               isDisabled={ruleLoading || loading || isInvalid}
               colorScheme={ruleExists ? 'green' : 'blue'}

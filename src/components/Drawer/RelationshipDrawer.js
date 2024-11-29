@@ -119,7 +119,7 @@ const RelationshipDrawer = (props) => {
     }
   })
 
-  const [createRule] = useMutation(AutomationRuleCreate)
+  const [createRule, { loading }] = useMutation(AutomationRuleCreate)
 
   const { data: allComponents } = useQuery(GetAllComponents, {
     skip: compData ? false : true,
@@ -253,21 +253,21 @@ const RelationshipDrawer = (props) => {
       }).then((res) => {
         const errors = res?.data?.automationRuleCreate?.errors
         if (errors?.length > 0) {
+          onClose()
           showToast({
             description: `Unable to create rule, please try again.`,
             status: 'error'
           })
-          onClose()
         } else {
-          showToast({
-            description: 'Rule added successfully',
-            status: 'success'
-          })
           if (isCompRelation) {
             handleAdd()
           } else {
             onClose()
           }
+          showToast({
+            description: 'Rule added successfully',
+            status: 'success'
+          })
         }
       })
     }
@@ -392,6 +392,7 @@ const RelationshipDrawer = (props) => {
                             hidden
                             mr={'auto'}
                             fontSize={'sm'}
+                            isLoading={loading}
                             onClick={handleRuleCreate}
                             colorScheme={ruleExists ? 'green' : 'blue'}
                             title={`${ruleExists ? 'View' : 'Save as'} Rule`}
