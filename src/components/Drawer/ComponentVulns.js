@@ -1,8 +1,11 @@
 import React from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, statusColor } from 'utils'
+import { useNavigate } from 'react-router-dom'
+import { customStyles, linkURl, statusColor } from 'utils'
 
-import { Stack, Tag, TagLabel, Text } from '@chakra-ui/react'
+import { ExternalLinkIcon } from '@chakra-ui/icons'
+import { Tag, TagLabel } from '@chakra-ui/react'
+import { Flex, Icon, Link, Stack, Text, Tooltip } from '@chakra-ui/react'
 import {
   Drawer,
   DrawerBody,
@@ -14,17 +17,26 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import CompInfo from 'components/Misc/CompInfo'
+import SeverityTag from 'components/Misc/SeverityTag'
 import Pagination from 'components/Pagination'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetComponentVulns } from 'graphQL/Queries'
 
 const ComponentVulns = ({ data, isOpen, onClose }) => {
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
+  const navigate = useNavigate()
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
+  const { dispatch } = useGlobalState()
+  const { prodVulnDispatch } = dispatch
+
+  const { primaryBlueText, headingTextColor } = useThemeColor([
+    'primaryBlueText',
+    'headingTextColor'
   ])
 
   const { nodes, paginationProps, loading } = usePaginatedQuery(
@@ -39,15 +51,48 @@ const ComponentVulns = ({ data, isOpen, onClose }) => {
   const columns = [
     {
       id: 'VULN_ID',
-      name: 'VULN ID',
+      name: 'ID',
       selector: (row) => {
         const { vuln } = row
+        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+          paramsObj: { tab: 'vulnerabilities' }
+        })
+        const onGlobalView = () => {
+          onClose()
+          prodVulnDispatch({
+            type: 'CHANGE_SEARCH_INPUT',
+            payload: vuln?.vulnId
+          })
+          navigate(link)
+        }
         return (
-          <Text color={primaryTextColor} my={2}>
-            {vuln?.vulnId || ''}
-          </Text>
+          <Flex alignItems={'center'} gap={2} my={3}>
+            <Tooltip label={vuln.source === 'osv' ? 'OSV View' : 'NVD View'}>
+              <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
+                <Icon
+                  as={ExternalLinkIcon}
+                  sx={{ w: '16px', h: '16px', color: primaryBlueText }}
+                />
+              </Link>
+            </Tooltip>
+            <Text
+              my={2}
+              cursor={'pointer'}
+              color={primaryBlueText}
+              onClick={onGlobalView}
+            >
+              {vuln?.vulnId || ''}
+            </Text>
+          </Flex>
         )
       },
+      wrap: true
+    },
+    {
+      id: 'VULNS_SEV',
+      name: 'SEVERITY',
+      selector: (row) => <SeverityTag value={row?.vuln?.sev} />,
+      sortable: true,
       wrap: true
     },
     {
@@ -76,7 +121,7 @@ const ComponentVulns = ({ data, isOpen, onClose }) => {
 
   return (
     <Drawer
-      size='md'
+      size='lg'
       isOpen={isOpen}
       placement='right'
       onClose={onClose}

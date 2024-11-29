@@ -5053,6 +5053,8 @@ export const GetComponentVulns = gql`
           }
           vuln {
             id
+            sev
+            source
             vulnId
           }
         }
