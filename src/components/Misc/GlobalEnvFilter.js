@@ -1,32 +1,14 @@
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { ChevronDownIcon } from '@chakra-ui/icons'
-import {
-  Button,
-  Menu,
-  MenuButton,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup
-} from '@chakra-ui/react'
+import { Flex, IconButton, Tooltip } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import useQueryParam from 'hooks/useQueryParam'
+import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaCode, FaInbox, FaSquareArrowUpRight } from 'react-icons/fa6'
-
-const envIcon = (env) => {
-  switch (env) {
-    case 'default':
-      return <FaInbox />
-    case 'development':
-      return <FaCode />
-    case 'production':
-      return <FaSquareArrowUpRight />
-  }
-}
+import { FaCode, FaDesktop, FaInbox } from 'react-icons/fa6'
 
 const GlobalEnvFilter = () => {
   const params = useParams()
@@ -36,9 +18,15 @@ const GlobalEnvFilter = () => {
   const { envName, onChangeEnv, setClearSelect, setSelectedSbom } =
     useGlobalState()
 
+  const { secondaryBlueBorder } = useThemeColor(['secondaryBlueBorder'])
+
   const { projects } = useProjectGroup({
     projectGroupId: params?.productgroupid
   })
+
+  const borderColor = secondaryBlueBorder
+  const variant = (env) => (envName === env ? 'solid' : 'outline')
+  const colorScheme = (env) => (envName === env ? 'blue' : 'blue')
 
   const handleEnvChange = (value) => {
     if (params.productgroupid) {
@@ -57,39 +45,44 @@ const GlobalEnvFilter = () => {
   }
 
   return (
-    <Menu closeOnSelect={true}>
-      <MenuButton
-        as={Button}
-        fontSize='sm'
-        colorScheme='blue'
-        fontWeight='medium'
-        className='environments'
-        textTransform='capitalize'
-        leftIcon={envIcon(envName)}
-        data-testid='global_env_filter'
-        rightIcon={<ChevronDownIcon />}
-      >
-        {envName || 'Default'}
-      </MenuButton>
-      <MenuList width={'200px'} fontSize={'sm'}>
-        <MenuOptionGroup
-          value={envName}
-          onChange={(value) => handleEnvChange(value)}
-          type='radio'
-        >
-          {['default', 'development', 'production'].map((item, index) => (
-            <MenuItemOption
-              key={index}
-              value={item}
-              fontSize='sm'
-              textTransform={'capitalize'}
-            >
-              {item}
-            </MenuItemOption>
-          ))}
-        </MenuOptionGroup>
-      </MenuList>
-    </Menu>
+    <Flex gap={2} alignItems='center'>
+      <Tooltip label='Default' placement='left'>
+        <IconButton
+          size='sm'
+          icon={<FaInbox />}
+          sx={{ fontWeight: 400 }}
+          borderColor={borderColor}
+          title='Default environment'
+          variant={variant('default')}
+          colorScheme={colorScheme('default')}
+          onClick={() => handleEnvChange('default')}
+        />
+      </Tooltip>
+      <Tooltip label='Development' placement='left'>
+        <IconButton
+          size='sm'
+          icon={<FaCode />}
+          sx={{ fontWeight: 400 }}
+          borderColor={borderColor}
+          title='Development environment'
+          variant={variant('development')}
+          colorScheme={colorScheme('development')}
+          onClick={() => handleEnvChange('development')}
+        />
+      </Tooltip>
+      <Tooltip label='Production' placement='left'>
+        <IconButton
+          size='sm'
+          icon={<FaDesktop />}
+          sx={{ fontWeight: 400 }}
+          borderColor={borderColor}
+          title='Production environment'
+          variant={variant('production')}
+          colorScheme={colorScheme('production')}
+          onClick={() => handleEnvChange('production')}
+        />
+      </Tooltip>
+    </Flex>
   )
 }
 
