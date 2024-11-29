@@ -14,7 +14,8 @@ const PurlField = ({ isOpen, onOpen, onClose }) => {
 
   const onChange = (e) => {
     const { value } = e.target
-    handleChange('identifiers', 'purl', value)
+    const inputValue = value?.trim()
+    handleChange('identifiers', 'purl', inputValue)
     handleChange('identifiers', 'purlError', '')
   }
 
