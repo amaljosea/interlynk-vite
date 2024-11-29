@@ -1,15 +1,14 @@
 import { gql, useQuery } from '@apollo/client'
-import React from 'react'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 
 import { CustomSelect } from './Select'
 
 const PRODUCT_OPTION_QUERY = gql`
-  query ProjectOptions {
+  query ProjectOptions($labelIds: [Uuid!]) {
     organization {
       id
-      projectGroups {
+      projectGroups(labelIds: $labelIds) {
         nodes {
           value: id
           label: name
@@ -29,23 +28,27 @@ const PRODUCT_OPTION_QUERY = gql`
   }
 `
 
-export const ProductSelect = ({ value, onChange }) => {
+export const ProductSelect = ({ value, onChange, filters }) => {
   const { orgView } = useGlobalQueryContext()
+  const { env, label } = filters
+
   const { data, loading, error } = useQuery(PRODUCT_OPTION_QUERY, {
-    skip: !orgView
+    skip: !orgView,
+    variables: { labelIds: label ? [label?.value] : undefined }
   })
+  const options = data?.organization?.projectGroups?.nodes || []
 
   if (error) {
     return 'Error'
   }
 
-  const options = data?.organization?.projectGroups?.nodes || []
   return (
     <CustomSelect
       isLoading={loading}
       label='Product'
       options={options}
       value={value}
+      isDisabled={!env}
       onChange={(newValue) => {
         onChange(newValue ? [newValue] : [])
       }}

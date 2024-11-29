@@ -12,6 +12,7 @@ const Analytics = () => {
   const [filters, setFilters] = useState({
     env: null,
     product: [],
+    label: null,
     version: [],
     duration: null
   })
