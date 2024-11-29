@@ -5,8 +5,7 @@ import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFormat, getFullDateAndTime } from 'utils'
-import { getLink, getType, timeSince } from 'utils'
-import { getSignedUrlParams } from 'utils'
+import { getLink, getSignedUrlParams, getType, timeSince } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -213,10 +212,6 @@ const VersionsTable = (props) => {
       name: 'VERSION',
       selector: (row, index) => {
         const { projectVersion, createdAt, alternatives, isReprocess } = row
-        const createdTime = new Date(createdAt)
-        const currentTime = new Date()
-        const timeDifference = currentTime - createdTime
-        const timeDifferenceInSeconds = timeDifference / 1000
         const parsedCreatedDate = parseISO(createdAt)
         const endDate = addDays(parsedCreatedDate, retention)
         const diff = differenceInDays(endDate, currentDate)
@@ -228,8 +223,7 @@ const VersionsTable = (props) => {
             tab: 'general'
           }
         })
-        const showIcon =
-          alternatives?.length > 0 && timeDifferenceInSeconds <= 60
+        const showIcon = alternatives?.length > 0
 
         return (
           <Grid
