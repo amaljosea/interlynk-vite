@@ -38,13 +38,11 @@ const ActivitiesOverview = ({ loading, title, data }) => {
                   return (
                     <ActivitiesOverviewRow
                       key={index}
-                      logo={FaEye}
                       event={row.event}
                       orig={row.orig}
                       updated={row.updated}
                       changedBy={row.changedBy}
                       date={row.updatedAt}
-                      color={'gray'}
                       index={index}
                       arrLength={data?.length}
                       action={row.action}
