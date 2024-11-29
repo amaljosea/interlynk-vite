@@ -19,7 +19,7 @@ const LynkSelect = (props) => {
 
     return (
       <components.ClearIndicator {...props}>
-        <MdClose fontSize={16} color={primaryTextColor} />
+        <MdClose fontSize={16} color={primaryTextColor} cursor='pointer' />
       </components.ClearIndicator>
     )
   }
@@ -28,7 +28,7 @@ const LynkSelect = (props) => {
     if (isGeneral) {
       return (
         <components.DropdownIndicator {...props}>
-          <FaChevronDown size={12} color='darkgray' />
+          <FaChevronDown size={12} color='darkgray' cursor='pointer' />
         </components.DropdownIndicator>
       )
     }

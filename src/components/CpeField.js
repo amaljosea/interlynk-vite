@@ -32,7 +32,8 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
     }
   }
 
-  const onInputChange = (value) => {
+  const onInputChange = (input) => {
+    const value = input?.trim()
     setSearchInput(value)
     if (value !== '') {
       getCpe({
@@ -42,9 +43,13 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
       }).then((res) => {
         const { result } = res?.data?.idAutoComplete || ''
         if (result?.length > 0) {
-          setOptions(() =>
-            result?.map((item) => ({ label: item, value: item }))
-          )
+          const dataExists = result?.some((item) => item === value)
+          const data = result?.map((item) => ({ label: item, value: item }))
+          if (dataExists) {
+            setOptions(data)
+          } else {
+            setOptions([{ label: value, value: value }, ...data])
+          }
         } else {
           setOptions([{ label: value, value: value }])
         }
