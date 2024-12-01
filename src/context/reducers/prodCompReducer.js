@@ -43,6 +43,8 @@ const prodCompReducer = (state, action) => {
       return {
         ...state,
         searchInput: payload,
+        field: '',
+        direction: '',
         pageIndex: 1
       }
     case 'FETCH_DATA_SUCCESS':

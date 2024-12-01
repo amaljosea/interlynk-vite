@@ -88,6 +88,8 @@ const Components = ({ sbomData }) => {
     }
   }, [direct, ecosystems, include, kinds, licenses, scope, suppliers])
 
+  const isSortable = field !== '' && direction !== ''
+
   // GET COMPONENT DATA
   const { nodes, error, paginationProps, reset, loading } = usePaginatedQuery(
     GetComponentData,
@@ -97,7 +99,7 @@ const Components = ({ sbomData }) => {
         ...compData,
         sbomId: sbomId,
         projectId: productId,
-        orderBy: field && direction ? { field, direction } : undefined,
+        orderBy: isSortable ? { field, direction } : undefined,
         search: searchInput !== '' ? searchInput : undefined
       },
       onCompleted: (data) => {
