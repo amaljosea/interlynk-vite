@@ -191,7 +191,7 @@ const SbomActions = ({ sbom }) => {
       })
       if (response.data.sbom.download === null) {
         showToast({
-          description: `No valid data available to download for this SBOM`,
+          description: `No original SBOM present for this version.`,
           status: 'error'
         })
         setIsLoading(false)
