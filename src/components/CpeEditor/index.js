@@ -169,7 +169,7 @@ const CpeEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
         onBlur={onBlur}
         onChange={onChange}
       />
-      <ButtonGroup alignItems={'center'} justifyContent={'flex-end'} gap={2}>
+      <ButtonGroup justifyContent={'flex-end'}>
         <Button fontSize={'sm'} onClick={onClose} variant='ghost'>
           Close
         </Button>

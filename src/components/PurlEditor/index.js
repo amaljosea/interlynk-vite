@@ -87,7 +87,8 @@ const PurlEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
         console.log('Error', error)
       }
     }
-  }, [value])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <Stack spacing={4}>
@@ -139,7 +140,7 @@ const PurlEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
         qualifiers={purlData?.qualifiers}
         onChange={onChange}
       />
-      <ButtonGroup alignItems={'center'} justifyContent={'flex-end'} gap={2}>
+      <ButtonGroup justifyContent={'flex-end'}>
         <Button fontSize={'sm'} onClick={onClose} variant='ghost'>
           Close
         </Button>
