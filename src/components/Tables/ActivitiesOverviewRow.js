@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+  capitalizeFirstLetter,
   getFullDateAndTime,
   valueToColor,
   valueToIcon,
@@ -35,11 +36,10 @@ const ActivitiesOverviewRow = (props) => {
     }
   }
 
-  const tooltipLabel = action?.charAt(0).toUpperCase() + action?.slice(1)
   return (
     <Flex alignItems='flex-start' minH='78px' justifyContent='start' mb='5px'>
       <Flex direction='column' h='100%'>
-        <Tooltip label={tooltipLabel} placement='top'>
+        <Tooltip label={capitalizeFirstLetter(action)} placement='top'>
           <Box>
             <Icon
               as={valueToIcon(action, event, orig, updated)}

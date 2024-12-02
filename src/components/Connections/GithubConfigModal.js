@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { capitalizeFirstLetter } from 'utils'
 
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
@@ -65,7 +66,7 @@ const GithubConfigModal = ({ isOpen, onClose, setGreenCheck, data }) => {
       resetChanges()
       setVerificationDetails({
         email: `${githubUsername}@gmail.com`,
-        name: `${githubUsername.charAt(0).toUpperCase() + githubUsername.slice(1)}`,
+        name: `${capitalizeFirstLetter(githubUsername)}`,
         accountId: '65432345',
         accountType: 'User',
         url: `https://github.com/${githubUsername}`,
