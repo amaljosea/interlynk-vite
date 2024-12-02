@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { validateUrl } from 'utils'
+import { hasWhiteSpace, validateUrl } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import {
@@ -62,7 +62,7 @@ const PriSupplierModal = (props) => {
     }))
   }
 
-  const containsSpace = /\s/.test(formData?.url)
+  const containsSpace = hasWhiteSpace(formData?.url)
 
   const handleCheckUrl = () => {
     if (!validateUrl(formData?.url)) {

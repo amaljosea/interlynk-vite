@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { validateEmail, validateUrl } from 'utils'
-import { disableButtonTemporarily } from 'utils'
+import { disableButtonTemporarily, hasWhiteSpace } from 'utils'
 
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, Input } from '@chakra-ui/react'
@@ -25,7 +25,7 @@ const OrgModal = ({ isOpen, onClose }) => {
   const [isDisabled, setIsDisabled] = useState(false)
   const awsToken = sessionStorage.getItem('awsToken')
 
-  const containsSpace = /\s/.test(url)
+  const containsSpace = hasWhiteSpace(url)
 
   const [registerOrg, { loading: regLoading }] =
     useMutation(RegisterOrganization)

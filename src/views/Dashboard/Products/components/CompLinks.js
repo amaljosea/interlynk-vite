@@ -1,7 +1,7 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useState } from 'react'
-import { truncatedValue, validateUrl } from 'utils'
+import { hasWhiteSpace, truncatedValue, validateUrl } from 'utils'
 
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
@@ -84,7 +84,7 @@ const CompLinks = ({ data }) => {
 
   const [updateLinks, { loading }] = useMutation(UpdateCompLinks)
 
-  const containsSpace = /\s/.test(links?.url)
+  const containsSpace = hasWhiteSpace(links?.url)
 
   const handleTypeChange = (e) => {
     const { value } = e.target

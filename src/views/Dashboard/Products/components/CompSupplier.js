@@ -1,7 +1,12 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
-import { disableButtonTemporarily, validateEmail, validateUrl } from 'utils'
+import {
+  disableButtonTemporarily,
+  hasWhiteSpace,
+  validateEmail,
+  validateUrl
+} from 'utils'
 
 import {
   Button,
@@ -67,7 +72,7 @@ const CompSupplier = ({ data }) => {
   })
   const { suppliers } = result?.component || ''
 
-  const containsSpace = /\s/.test(supplier?.url)
+  const containsSpace = hasWhiteSpace(supplier?.url)
 
   const onSupplierChange = (e) => {
     const { value } = e.target

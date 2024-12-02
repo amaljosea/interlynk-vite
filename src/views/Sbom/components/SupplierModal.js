@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { validateUrl } from 'utils'
+import { hasWhiteSpace, validateUrl } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { Button, Flex, Input, Tag, Text } from '@chakra-ui/react'
@@ -67,7 +67,7 @@ const SupplierModal = (props) => {
     }))
   }
 
-  const containsSpace = /\s/.test(formData?.url)
+  const containsSpace = hasWhiteSpace(formData?.url)
 
   const handleSave = () => {
     const data = {

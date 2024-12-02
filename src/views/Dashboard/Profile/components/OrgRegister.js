@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
-import { validateEmail, validateUrl } from 'utils'
+import { hasWhiteSpace, validateEmail, validateUrl } from 'utils'
 
 import {
   Button,
@@ -34,7 +34,7 @@ const OrgRegister = ({ loading }) => {
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
 
-  const containsSpace = /\s/.test(url)
+  const containsSpace = hasWhiteSpace(url)
 
   const [registerOrg, { loading: regLoading }] =
     useMutation(RegisterOrganization)

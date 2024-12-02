@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { truncatedValue, validateUrl } from 'utils'
+import { hasWhiteSpace, truncatedValue, validateUrl } from 'utils'
 
 import { DeleteIcon } from '@chakra-ui/icons'
 import {
@@ -41,7 +41,7 @@ const LinksDrawer = ({ isOpen, onClose, component }) => {
     'primaryErrorColor',
     'secondaryTextInverse'
   ])
-  const containsSpace = /\s/.test(link)
+  const containsSpace = hasWhiteSpace(link)
 
   useEffect(() => {
     const urls = []
