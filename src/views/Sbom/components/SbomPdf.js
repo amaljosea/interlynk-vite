@@ -242,7 +242,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      sbom.suppliers[0]?.name || 'NA',
+      sbom?.suppliers[0]?.name || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -379,7 +379,7 @@ export const downloadSbomPdf = (
 
   const getComponentValues = (component) => [
     formatValue(
-      component.kind || 'NA',
+      component?.kind || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -387,7 +387,9 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      component.suppliers[0]?.name || 'NA',
+      Array.isArray(component?.suppliers) && component.suppliers[0]?.name
+        ? component.suppliers[0].name
+        : 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -395,7 +397,9 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      component.cpes[0] || 'NA',
+      Array.isArray(component?.cpes) && component.cpes[0]
+        ? component.cpes[0]
+        : 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -403,7 +407,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      component.purl || 'NA',
+      component?.purl || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -413,7 +417,7 @@ export const downloadSbomPdf = (
     formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
 
     formatValue(
-      component.uniqueId || 'NA',
+      component?.uniqueId || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -421,7 +425,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      component.licensesExp || 'NA',
+      component?.licensesExp || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -529,7 +533,7 @@ export const downloadSbomPdf = (
 
   const getVulnValues = (vulnerability) => [
     formatValue(
-      vulnerability.vuln?.desc || 'NA',
+      vulnerability?.vuln?.desc || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -537,7 +541,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      vulnerability.component?.name || 'NA',
+      vulnerability?.component?.name || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -545,7 +549,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      vulnerability.component?.version || 'NA',
+      vulnerability?.component?.version || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -553,7 +557,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      vulnerability.vuln?.source || 'NA',
+      vulnerability?.vuln?.source || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -561,7 +565,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      (vulnerability.vuln?.vulnInfo?.epssPercentile * 100).toFixed() + '%' ||
+      (vulnerability?.vuln?.vulnInfo?.epssPercentile * 100).toFixed() + '%' ||
         'NA',
       doc,
       pageWidth,
@@ -570,7 +574,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      (vulnerability.vuln?.vulnInfo?.epssScores[0] * 100).toFixed(3) + '%' ||
+      (vulnerability?.vuln?.vulnInfo?.epssScores[0] * 100).toFixed(3) + '%' ||
         'NA',
       doc,
       pageWidth,
@@ -579,7 +583,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      vulnerability.vuln?.vulnInfo?.kev === true ? 'Yes' : 'No' || 'NA',
+      vulnerability?.vuln?.vulnInfo?.kev === true ? 'Yes' : 'No' || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -587,7 +591,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      vulnerability.vexStatus?.name || 'Unspeacified',
+      vulnerability?.vexStatus?.name || 'Unspeacified',
       doc,
       pageWidth,
       rightMargin,
@@ -595,7 +599,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      vulnerability.vexJustification || 'NA',
+      vulnerability?.vexJustification || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -603,7 +607,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      vulnerability.impact || 'NA',
+      vulnerability?.impact || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -611,7 +615,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      vulnerability.actionStmt || 'NA',
+      vulnerability?.actionStmt || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -619,7 +623,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      vulnerability.note || 'NA',
+      vulnerability?.note || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -628,7 +632,7 @@ export const downloadSbomPdf = (
     ),
     formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
     formatValue(
-      formatDateWithTimeZone(vulnerability.vuln?.publishedAt) || 'NA',
+      formatDateWithTimeZone(vulnerability?.vuln?.publishedAt) || 'NA',
       doc,
       pageWidth,
       rightMargin,
