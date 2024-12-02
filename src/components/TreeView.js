@@ -25,6 +25,7 @@ import {
   DrawerOverlay
 } from '@chakra-ui/react'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCompDependency } from 'graphQL/Queries'
@@ -166,6 +167,8 @@ const buildTree = (path, leafNode) => {
 
 const TreeView = ({ isOpen, onClose, compId }) => {
   const params = useParams()
+  const { dispatch } = useGlobalState()
+  const { prodCompDispatch } = dispatch
 
   const { grayBorderColor } = useThemeColor(['grayBorderColor'])
 
@@ -307,6 +310,11 @@ const TreeView = ({ isOpen, onClose, compId }) => {
   const isVertical = orientation === 'vertical'
   const variant = (value) => (orientation === value ? 'solid' : 'ghost')
 
+  const handleClose = () => {
+    prodCompDispatch({ type: 'SET_COMPONENT', payload: null })
+    onClose()
+  }
+
   useEffect(() => {
     if (isOpen && compId) {
       getRelations()
@@ -317,7 +325,7 @@ const TreeView = ({ isOpen, onClose, compId }) => {
     <Drawer size='2xl' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton mt={2} />
+        <DrawerCloseButton mt={2} onClick={handleClose} />
         <DrawerHeader>
           <Flex alignItems={'center'} gap={2}>
             <Text>Relationships</Text>

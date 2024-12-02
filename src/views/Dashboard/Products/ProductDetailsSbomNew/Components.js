@@ -64,7 +64,8 @@ const Components = ({ sbomData }) => {
     direct,
     totalComp,
     expandedRows,
-    include
+    include,
+    selectedComp
   } = prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -171,15 +172,32 @@ const Components = ({ sbomData }) => {
     INSIGHTS.onOpen()
   }
 
-  const handleGraphView = (row) => {
-    setActiveComp(row)
-    GRAPH.onOpen()
-  }
-
   const handleVuln = (row) => {
     setActiveRow(row)
     VULNS.onOpen()
   }
+
+  const handleSort = async (column, sortDirection) => {
+    prodCompDispatch({
+      type: 'SET_SORT_ORDER',
+      payload: {
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    })
+  }
+
+  const handleRowClick = (row) => {
+    prodCompDispatch({ type: 'SET_EXPAND', payload: row?.name })
+  }
+
+  const handleGraphView = useMemo(
+    () => (row) => {
+      setActiveComp(row)
+      GRAPH.onOpen()
+    },
+    [GRAPH]
+  )
 
   // COLUMNS
   const columns = ComponentsColumns({
@@ -278,19 +296,12 @@ const Components = ({ sbomData }) => {
     compBtn
   })
 
-  const handleSort = async (column, sortDirection) => {
-    prodCompDispatch({
-      type: 'SET_SORT_ORDER',
-      payload: {
-        field: column.id,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-      }
-    })
-  }
-
-  const handleRowClick = (row) => {
-    prodCompDispatch({ type: 'SET_EXPAND', payload: row?.name })
-  }
+  useEffect(() => {
+    if (selectedComp) {
+      console.log('selectedComp', selectedComp)
+      handleGraphView(selectedComp)
+    }
+  }, [handleGraphView, selectedComp])
 
   if (error) {
     return (

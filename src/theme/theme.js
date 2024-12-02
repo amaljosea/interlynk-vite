@@ -159,6 +159,10 @@ const colors = {
   primarySuccessColor: {
     light: '#48BB78', // green.400
     dark: '#68D391' // green.300
+  },
+  infoTextColor: {
+    light: '#034E78', // dark blue
+    dark: 'gray.300' // white
   }
 }
 

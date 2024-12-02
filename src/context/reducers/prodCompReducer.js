@@ -37,7 +37,8 @@ const prodCompReducer = (state, action) => {
         cpeString: '',
         isCpeValid: true,
         purlString: '',
-        include: []
+        include: [],
+        selectedComp: null
       }
     case 'CHANGE_SEARCH_INPUT':
       return {
@@ -181,6 +182,11 @@ const prodCompReducer = (state, action) => {
       return {
         ...state,
         expandedRows: toggleExpandRow(state, payload)
+      }
+    case 'SET_COMPONENT':
+      return {
+        ...state,
+        selectedComp: payload
       }
     default:
       return state

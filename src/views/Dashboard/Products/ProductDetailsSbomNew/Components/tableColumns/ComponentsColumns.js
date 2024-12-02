@@ -1,8 +1,7 @@
 import { useMemo } from 'react'
 import { GetIcon, isValidPurl, truncatedValue } from 'utils'
-import { timeSince } from 'utils'
+import { parseLicenseString, timeSince } from 'utils'
 import { getFullDateAndTime, isCustomerView } from 'utils'
-import { parseLicenseString } from 'utils'
 
 import { ViewIcon } from '@chakra-ui/icons'
 import {
@@ -36,15 +35,14 @@ const ComponentsColumns = ({
   onEditOpen,
   updateComponent,
   onRelOpen,
+  handleGraphView,
   totalComp,
   hanldeAnalysis,
   setActiveRow,
   onCheckCpe,
   onCheckPurl,
   DELETE,
-  GRAPH,
   isArchived,
-  setActiveComp,
   handleVuln
 }) => {
   const {
@@ -63,11 +61,6 @@ const ComponentsColumns = ({
 
   const customerView = isCustomerView()
   return useMemo(() => {
-    const handleGraphView = (row) => {
-      setActiveComp(row)
-      GRAPH.onOpen()
-    }
-
     const columns = [
       // COMPONENT
       {
@@ -475,28 +468,28 @@ const ComponentsColumns = ({
 
     return columns
   }, [
-    onOpen,
-    colorMode,
-    primaryTextColor,
-    inverseSecondaryBgColor,
-    isFreeTier,
-    DELETE,
     customerView,
-    hanldeAnalysis,
+    isFreeTier,
     isArchived,
+    sbomId,
+    colorMode,
+    inverseSecondaryBgColor,
+    primaryTextColor,
+    onCheckCpe,
+    onCheckPurl,
+    secondaryTextColor,
+    updateComponent,
+    totalComp?.length,
+    primaryErrorColor,
+    primaryBlueText,
     onEditOpen,
     onRelOpen,
-    primaryBlueText,
-    primaryErrorColor,
-    sbomId,
-    secondaryTextColor,
+    handleGraphView,
+    hanldeAnalysis,
+    handleVuln,
     setActiveRow,
-    totalComp?.length,
-    updateComponent,
-    GRAPH,
-    setActiveComp,
-    onCheckCpe,
-    onCheckPurl
+    DELETE,
+    onOpen
   ])
 }
 
