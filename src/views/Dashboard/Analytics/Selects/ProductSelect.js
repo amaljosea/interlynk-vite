@@ -30,7 +30,7 @@ const PRODUCT_OPTION_QUERY = gql`
 
 export const ProductSelect = ({ value, onChange, filters }) => {
   const { orgView } = useGlobalQueryContext()
-  const { env, label } = filters
+  const { label } = filters
 
   const { data, loading, error } = useQuery(PRODUCT_OPTION_QUERY, {
     skip: !orgView,
@@ -48,7 +48,6 @@ export const ProductSelect = ({ value, onChange, filters }) => {
       label='Product'
       options={options}
       value={value}
-      isDisabled={!env}
       onChange={(newValue) => {
         onChange(newValue ? [newValue] : [])
       }}

@@ -78,19 +78,9 @@ export default function Dashboard() {
 
   return (
     <Flex width={'100%'} flexDirection='column' gap={5}>
+      {/* ENVIRONMENT FILTER */}
+      {organization && <GlobalEnvFilter />}
       {/* STATS */}
-      <Flex width='100%' alignItems={'center'} justifyContent={'space-between'}>
-        <Button
-          size='sm'
-          colorScheme='blue'
-          textTransform={'capitalize'}
-          _hover={{ colorScheme: 'blue' }}
-          _active={{ colorScheme: 'blue' }}
-        >
-          {envName}
-        </Button>
-        {organization && <GlobalEnvFilter />}
-      </Flex>
       <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing={5}>
         <MiniStatistics
           title={'Products'}

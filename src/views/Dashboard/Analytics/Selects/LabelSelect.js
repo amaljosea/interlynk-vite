@@ -10,7 +10,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 
 import { GetLabels } from 'graphQL/Queries'
 
-const LabelSelect = ({ value, onChange, filters }) => {
+const LabelSelect = ({ value, onChange }) => {
   const location = useLocation()
   const { orgView } = useGlobalQueryContext()
   const [options, setOptions] = useState([])
@@ -43,7 +43,6 @@ const LabelSelect = ({ value, onChange, filters }) => {
         onChange={onChange}
         name='Product Label'
         placeholder={'Add label'}
-        isDisabled={!filters.env}
       />
     </FormControl>
   )

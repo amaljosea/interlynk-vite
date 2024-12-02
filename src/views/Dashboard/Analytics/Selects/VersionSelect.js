@@ -1,15 +1,9 @@
-import React from 'react'
-
 import { CustomSelect } from './Select'
 
-const getVersionOptions = (filters) => {
-  const selectedEnv = filters.env?.value
-  if (selectedEnv === undefined) {
-    return
-  }
+const getVersionOptions = (filters, env) => {
   const optionsFinal = filters?.product?.reduce((options, singleProduct) => {
     const selectedProject = singleProduct.projects?.find(
-      (project) => project.name == selectedEnv
+      (project) => project.name === env
     )
 
     const optionsInternal = selectedProject.sbomVersions.nodes.reduce(
@@ -31,13 +25,13 @@ const getVersionOptions = (filters) => {
   return optionsFinal
 }
 
-export const VersionSelect = ({ value, onChange, filters }) => {
-  const options = getVersionOptions(filters)
+export const VersionSelect = ({ env, value, onChange, filters }) => {
+  const options = getVersionOptions(filters, env)
 
   return (
     <CustomSelect
       isMulti
-      isDisabled={!filters?.product?.length || filters.env?.value === undefined}
+      isDisabled={!filters?.product?.length}
       label='Version'
       options={options}
       value={value}

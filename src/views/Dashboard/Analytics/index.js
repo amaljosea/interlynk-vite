@@ -1,16 +1,19 @@
 import React, { useState } from 'react'
 
-import { Flex } from '@chakra-ui/react'
+import { Flex, Stack } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
+import GlobalEnvFilter from 'components/Misc/GlobalEnvFilter'
+
+import { useGlobalState } from 'hooks/useGlobalState'
 
 import { Filters } from './Filters'
 import { Graphs } from './Graphs'
 
 const Analytics = () => {
+  const { organization } = useGlobalState()
   const [filters, setFilters] = useState({
-    env: null,
     product: [],
     label: null,
     version: [],
@@ -19,6 +22,8 @@ const Analytics = () => {
 
   return (
     <Flex gap={6} width={'100%'} flexDir={'column'} alignItems={'flex-start'}>
+      {/* ENVIRONMENT FILTER */}
+      {organization && <GlobalEnvFilter />}
       <Card>
         <CardBody>
           <Filters filters={filters} setFilters={setFilters} />
