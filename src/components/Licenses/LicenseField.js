@@ -17,6 +17,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LicenseAutoComplete } from 'graphQL/Queries'
 
+import { MdClose } from 'react-icons/md'
+
 const LicenseField = ({ resolved, sbomView, license }) => {
   const { style } = useSelect('field')
   const signedUrlParams = getSignedUrlParams()
@@ -35,7 +37,10 @@ const LicenseField = ({ resolved, sbomView, license }) => {
 
   const [searchText, setSearchText] = useState('')
   const debouncedSearchTerm = useDebounce(searchText, 300)
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { primaryBlueText, primaryTextColor } = useThemeColor([
+    'primaryBlueText',
+    'primaryTextColor'
+  ])
 
   const formatLicenseString = (str = '') => {
     const matchingWords = ['or', 'and', 'with']
@@ -170,6 +175,14 @@ const LicenseField = ({ resolved, sbomView, license }) => {
     )
   }
 
+  const ClearIndicator = (props) => {
+    return (
+      <components.ClearIndicator {...props}>
+        <MdClose fontSize={16} color={primaryTextColor} cursor='pointer' />
+      </components.ClearIndicator>
+    )
+  }
+
   return (
     <>
       <VStack spacing={4} alignItems={'flex-start'}>
@@ -197,6 +210,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
               resolved || signedUrlParams ? null : `Please search...`
             }
             components={{
+              ClearIndicator,
               DropdownIndicator: () => null,
               IndicatorSeparator: () => null,
               Menu,
