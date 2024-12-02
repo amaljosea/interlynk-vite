@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
+import { isCustomerView } from 'utils'
+import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { Flex, Stack } from '@chakra-ui/react'
@@ -17,6 +19,7 @@ const SupportSubHeader = (
   setActiveRow
 ) => {
   const params = useParams()
+  const customerView = isCustomerView()
 
   const subHeader = useMemo(() => {
     return (
@@ -42,6 +45,7 @@ const SupportSubHeader = (
               }}
             />
           )}
+          {!customerView && <ExportCsv tableType='SBOM Support View' />}
           <RefreshBtn onClick={() => reset()} />
         </Stack>
       </Flex>

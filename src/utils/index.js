@@ -1205,7 +1205,8 @@ export const generateCsvFileName = ({
     'SBOM License View': `${product}-${version}-Licenses-${filterStatus}-${rowCount}.csv`,
     'Vulnerability View': projectGroupName
       ? `${projectGroupName}-Vulnerabilities-${filterStatus}-${rowCount}.csv`
-      : `Vulnerabilities-${filterStatus}-${rowCount}.csv`
+      : `Vulnerabilities-${filterStatus}-${rowCount}.csv`,
+    'SBOM Support View': `${product}-${version}-Support-${filterStatus}-${rowCount}.csv`
   }
 
   return fileNameTemplates[tableType] || ''

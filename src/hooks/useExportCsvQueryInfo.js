@@ -5,6 +5,7 @@ import { GetCompVulnData, GetComponentData } from 'graphQL/Queries'
 import { GetVulnData } from 'graphQL/Queries'
 import { GetSbomLicensesTable } from 'graphQL/Queries'
 import { GetGlobalVulns } from 'graphQL/Queries'
+import { GetSbomSupportTab } from 'graphQL/Queries'
 
 import useQueryParam from './useQueryParam'
 
@@ -88,6 +89,21 @@ const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
           skip: false,
           selector: 'organization.vulns.nodes',
           pageInfoSelector: 'organization.vulns.pageInfo'
+        }
+
+      case 'SBOM Support View':
+        return {
+          query: GetSbomSupportTab,
+          variables: {
+            sbomId,
+            projectId: productId,
+            first: parseInt(rowsToExport, 10) || 0,
+            ...searchFilters
+          },
+
+          skip: !sbomId,
+          selector: 'sbom.supports.nodes',
+          pageInfoSelector: 'sbom.supports.pageInfo'
         }
 
       default:

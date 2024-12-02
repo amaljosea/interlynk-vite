@@ -1318,5 +1318,33 @@ export const exportCsvTableConfig = {
         }
       })
     }
+  },
+  'SBOM Support View': {
+    defaultSelectedColumns: [
+      'Product name',
+      'Product version',
+      'IDs',
+      'Deprecated',
+      'Outdated',
+      'End of Life',
+      'End of Service',
+      'Updated'
+    ],
+    additionalColumns: [],
+    mapDataForExport: (data) => {
+      return data.map((row) => {
+        console.log({ row })
+        return {
+          'Product name': row?.productName || row?.name,
+          'Product version': row?.productVersion || row?.version,
+          IDs: row?.idUri,
+          Deprecated: row?.deprecated ? 'Yes' : 'No',
+          Outdated: row?.outdated ? 'Yes' : 'No',
+          'End of Life': row?.eol,
+          'End of Service': row?.eos,
+          Updated: row?.updatedAt
+        }
+      })
+    }
   }
 }

@@ -187,17 +187,19 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
             <Tag colorScheme='cyan'>{tableType}</Tag>
           </Box>
         )}
-        <Checkbox
-          mt={1}
-          size='md'
-          colorScheme='blue'
-          isChecked={applyFilters}
-          onChange={() => setApplyFilters(!applyFilters)}
-        >
-          <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
-            Apply search and filters
-          </Text>
-        </Checkbox>
+        {filters && (
+          <Checkbox
+            mt={1}
+            size='md'
+            colorScheme='blue'
+            isChecked={applyFilters}
+            onChange={() => setApplyFilters(!applyFilters)}
+          >
+            <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
+              Apply search and filters
+            </Text>
+          </Checkbox>
+        )}
         <Box>
           <Text fontSize='14px' fontWeight='500' mb={2}>
             Rows To Export
