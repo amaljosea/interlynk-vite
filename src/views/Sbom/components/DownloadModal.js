@@ -46,7 +46,6 @@ const DownloadModal = (props) => {
     sbom,
     downloadType
   } = props || ''
-
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
   const { superAdmin } = organization?.currentUser || ''
@@ -60,8 +59,8 @@ const DownloadModal = (props) => {
   const [includeVulns, setIncludeVulns] = useState(true)
   const [includeComponents, setIncludeComponents] = useState(true)
   const [encoded, setEncoded] = useState(false)
-  const [excludeVulnStatus, setExcludeVulnStatus] = useState(false)
-  const [excludeStatusNotes, setExcludeStatusNotes] = useState(false)
+  const [includeVulnStatus, setIncludeVulnStatus] = useState(true)
+  const [includeStatusNotes, setIncludeStatusNotes] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [includeParts, setIncludeParts] = useState(true)
 
@@ -118,6 +117,7 @@ const DownloadModal = (props) => {
     let vulnsHasNextPage = includeVulns ? true : false
     let componentsEndCursor = null
     let vulnsEndCursor = null
+    const parentSbom = sbom?.project.projectGroup.name
 
     try {
       while (componentsHasNextPage || vulnsHasNextPage) {
@@ -128,7 +128,8 @@ const DownloadModal = (props) => {
               projectId: productId,
               sbomId,
               first: 200,
-              after: componentsEndCursor || undefined
+              after: componentsEndCursor || undefined,
+              includeParts
             },
             fetchPolicy: 'no-cache'
           })
@@ -156,8 +157,14 @@ const DownloadModal = (props) => {
 
           const fetchedVulns = vulnRes?.data?.sbom?.vulns?.nodes || []
           const pageInfo = vulnRes?.data?.sbom?.vulns?.pageInfo
-
-          allVulns.push(...fetchedVulns)
+          //Filtering vulnerabilities based on includeParts
+          const actualVulns = includeParts
+            ? fetchedVulns
+            : fetchedVulns.filter(
+                (vuln) =>
+                  vuln.component.sbom.project.projectGroup.name === parentSbom
+              )
+          allVulns.push(...actualVulns)
           vulnsEndCursor = pageInfo?.endCursor
           vulnsHasNextPage = pageInfo?.hasNextPage
         }
@@ -171,8 +178,8 @@ const DownloadModal = (props) => {
         allVulns,
         organization?.currentUser.name,
         manufacturerData,
-        excludeVulnStatus,
-        excludeStatusNotes,
+        includeVulnStatus,
+        includeStatusNotes,
         includeParts
       )
 
@@ -326,9 +333,9 @@ const DownloadModal = (props) => {
               {downloadType === 'pdf' && (
                 <Checkbox
                   isDisabled={!includeVulns}
-                  isChecked={excludeVulnStatus}
+                  isChecked={includeVulnStatus}
                   onChange={() => {
-                    setExcludeVulnStatus(!excludeVulnStatus)
+                    setIncludeVulnStatus(!includeVulnStatus)
                   }}
                 >
                   Vulnerability Status
@@ -338,9 +345,9 @@ const DownloadModal = (props) => {
               {downloadType === 'pdf' && (
                 <Checkbox
                   isDisabled={!includeVulns}
-                  isChecked={excludeStatusNotes}
+                  isChecked={includeStatusNotes}
                   onChange={() => {
-                    setExcludeStatusNotes(!excludeStatusNotes)
+                    setIncludeStatusNotes(!includeStatusNotes)
                   }}
                 >
                   Internal Notes

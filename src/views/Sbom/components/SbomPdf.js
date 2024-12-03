@@ -16,6 +16,7 @@ export const downloadSbomPdf = (
   excludeStatusNotes,
   includeParts
 ) => {
+  const parentSbom = sbom?.project.projectGroup.name
   const authors = listItemsForDoc(sbom?.authors, 'name')
   const tools = listItemsForDoc(sbom?.tools, 'name', 'version')
 
@@ -443,9 +444,12 @@ export const downloadSbomPdf = (
   componentsActual.forEach((component) => {
     const projectGroupName = component.sbom?.project?.projectGroup?.name || ''
     const componentName = component.name
-    const componentText = includeParts
-      ? `${projectGroupName} : ${componentName}`
-      : componentName
+    const componentText =
+      projectGroupName === parentSbom
+        ? `${componentName} - ${component.version}`
+        : includeParts
+          ? `${projectGroupName}: ${componentName} - ${component.version}`
+          : `${componentName} - ${component.version}`
     const componentDesc = formatValue(
       componentText,
       doc,
@@ -454,19 +458,11 @@ export const downloadSbomPdf = (
       80,
       leftMargin
     )
-    const version = formatValue(
-      component.version,
-      doc,
-      pageWidth,
-      80,
-      80,
-      leftMargin
-    )
+
     doc.setTextColor(...grayColor)
     doc.text(componentDesc, leftMargin, currentY)
     let initialY = currentY
     currentY += componentDesc.length > 1 ? componentDesc.length * 5 : 5
-    doc.text(version, leftMargin, currentY)
 
     currentY = initialY
 
@@ -591,7 +587,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      vulnerability?.vexStatus?.name || 'Unspeacified',
+      vulnerability.vexStatus?.name || 'Unspecified',
       doc,
       pageWidth,
       rightMargin,
@@ -650,9 +646,12 @@ export const downloadSbomPdf = (
     const componentName = vuln.component?.name || ''
     const vulnId = vuln.vuln?.vulnId
 
-    const vulnText = includeParts
-      ? `${projectGroupName}:${componentName} - ${vulnId}`
-      : vulnId
+    const vulnText =
+      projectGroupName === parentSbom
+        ? `${vulnId}`
+        : includeParts
+          ? `${projectGroupName}: ${componentName} - ${vulnId}`
+          : `${vulnId}`
     const vulnIdPlusParts = formatValue(
       vulnText || 'NA',
       doc,
