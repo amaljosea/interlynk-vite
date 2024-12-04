@@ -82,6 +82,16 @@ const DownloadModal = (props) => {
 
   const DETAILS = useDisclosure()
 
+  // Remove checks for vulnerabilities, status, and internal notes
+  useEffect(() => {
+    if (includeVulns === false) {
+      setIncludeVulnStatus(false)
+      setIncludeStatusNotes(false)
+    } else if (includeVulnStatus === false) {
+      setIncludeStatusNotes(false)
+    }
+  }, [includeVulns, includeVulnStatus])
+
   useEffect(() => {
     if (downloadType === 'pdf') {
       setFormat('pdf')
@@ -344,7 +354,7 @@ const DownloadModal = (props) => {
 
               {downloadType === 'pdf' && (
                 <Checkbox
-                  isDisabled={!includeVulns}
+                  isDisabled={!includeVulns || !includeVulnStatus}
                   isChecked={includeStatusNotes}
                   onChange={() => {
                     setIncludeStatusNotes(!includeStatusNotes)

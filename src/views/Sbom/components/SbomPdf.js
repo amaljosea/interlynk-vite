@@ -595,7 +595,7 @@ export const downloadSbomPdf = (
       leftMargin
     ),
     formatValue(
-      vulnerability?.vexJustification || 'NA',
+      vulnerability?.vexJustification?.name || 'NA',
       doc,
       pageWidth,
       rightMargin,
@@ -666,7 +666,13 @@ export const downloadSbomPdf = (
     currentY += vulnIdPlusParts.length > 1 ? vulnIdPlusParts.length * 10 : 5
     currentY = initialY
 
-    const excludeStatusLabels = ['status']
+    const excludeStatusLabels = [
+      'status',
+      'justification',
+      'impact statement',
+      'action statement',
+      'internal notes'
+    ]
 
     const excludeStatusNotesLabels = ['internal notes']
 
