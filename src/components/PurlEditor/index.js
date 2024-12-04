@@ -84,6 +84,7 @@ const PurlEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
             : ''
         }))
       } catch (error) {
+        setValue('pkg:type/name@version')
         console.log('Error', error)
       }
     }
