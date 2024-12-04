@@ -1,8 +1,8 @@
 import { useQuery } from '@apollo/client'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { getFullDateAndTime, linkURl } from 'utils'
 
-import { Grid, GridItem, SimpleGrid } from '@chakra-ui/react'
+import { Grid, GridItem, Link, SimpleGrid } from '@chakra-ui/react'
 import { Flex, Icon, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import { Stat, StatLabel, StatNumber } from '@chakra-ui/react'
 
@@ -102,10 +102,14 @@ const VulnInfo = () => {
               />
               <Flex width={'100%'} direction={'column'} gap={0.5}>
                 {/* PRODUCT TITLE */}
-                <Link to={linkURl(source, vuln?.vulnId)} target={'_blank'}>
+                <Link
+                  isExternal
+                  w={'fit-content'}
+                  href={linkURl(source, vuln?.vulnId)}
+                >
                   <Text
-                    fontWeight={'semibold'}
                     fontSize={22}
+                    fontWeight={'semibold'}
                     _hover={{ color: primaryBlueText }}
                   >
                     {vuln?.vulnId}
