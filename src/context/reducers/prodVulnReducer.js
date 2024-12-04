@@ -12,7 +12,7 @@ const prodVulnReducer = (state, action) => {
         pageIndex: 1,
         severities: [],
         components: [],
-        statues: ['Unspecified', 'In Triage', 'Affected', 'Fixed'],
+        statues: [],
         include: [],
         source: false,
         kev: '',
