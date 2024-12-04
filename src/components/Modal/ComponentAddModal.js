@@ -41,7 +41,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateCompRelation, CreateComponent } from 'graphQL/Mutation'
-import { GetAllComponents, GetAllSboms } from 'graphQL/Queries'
+import { GetAllComponents } from 'graphQL/Queries'
 
 import { BiLayer } from 'react-icons/bi'
 
@@ -119,20 +119,6 @@ function ComponentAddModal(props) {
       setTabData((prev) => ({ ...prev, relations: { relType: '', to: '' } }))
     }
   })
-
-  let SBOMs = []
-  const { data: allSboms } = useQuery(GetAllSboms, {
-    fetchPolicy: 'network-only',
-    skip: signedUrlParams === null ? false : true,
-    variables: {
-      id: productId
-    }
-  })
-
-  if (allSboms) {
-    const result = allSboms?.project?.sboms?.map((item) => item?.projectVersion)
-    SBOMs = result
-  }
 
   const inputStyle = { size: 'md', fontSize: 'sm' }
 
