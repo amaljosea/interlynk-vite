@@ -219,7 +219,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
             onChange={handleChange}
           />
         </FormControl>
-        <FormControl>
+        <FormControl isRequired>
           <FormLabel htmlFor='desc' fontSize={12}>
             Description
           </FormLabel>
