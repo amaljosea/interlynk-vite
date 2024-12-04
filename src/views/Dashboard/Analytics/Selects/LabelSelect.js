@@ -7,16 +7,23 @@ import { FormControl, FormLabel } from '@chakra-ui/react'
 import LynkSelect from 'components/LynkSelect'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { GetLabels } from 'graphQL/Queries'
 
 const LabelSelect = ({ value, onChange }) => {
   const location = useLocation()
+  const tab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
   const [options, setOptions] = useState([])
 
+  const enabled =
+    location?.pathname === '/vendor/analytics' ||
+    tab === 'parts' ||
+    tab === 'vulnerabilities'
+
   const { data, loading } = useQuery(GetLabels, {
-    skip: location?.pathname === '/vendor/analytics' && orgView ? false : true,
+    skip: enabled && orgView ? false : true,
     variables: { first: 500 }
   })
   const { nodes } = data?.labels || ''

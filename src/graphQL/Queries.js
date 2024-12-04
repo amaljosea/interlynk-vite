@@ -423,6 +423,7 @@ export const GetProjectGroups = gql`
     $last: Int
     $after: String
     $before: String
+    $labelIds: [Uuid!]
     $field: ProjectGroupOrderByFields!
     $direction: OrderByDirection!
   ) {
@@ -430,6 +431,7 @@ export const GetProjectGroups = gql`
       projectGroups(
         search: $search
         enabled: $enabled
+        labelIds: $labelIds
         first: $first
         last: $last
         after: $after
@@ -4312,6 +4314,7 @@ export const IntersectingVulns = gql`
     intersectingVulns(fromSbomId: $fromSbomId, toSbomId: $toSbomId) {
       fromVuln {
         id
+        isComplete
         component {
           name
           version

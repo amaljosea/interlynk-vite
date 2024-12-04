@@ -7,6 +7,7 @@ import {
   isDefaultEnv,
   truncatedValue
 } from 'utils'
+import LabelSelect from 'views/Dashboard/Analytics/Selects/LabelSelect'
 
 import { FormControl, FormLabel, Select, Stack } from '@chakra-ui/react'
 
@@ -69,6 +70,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
   const [selectedVersion, setSelectedVersion] = useState('')
   const [selectedGroup, setSelectedGroup] = useState('')
   const [envList, setEnvList] = useState([])
+  const [label, setLabel] = useState(null)
 
   const [createSbomPart, { loading }] = useMutation(SbomPartCreate)
 
@@ -78,6 +80,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
     skip: isOpen ? false : true,
     variables: {
       first: totalRows,
+      labelIds: label ? [label?.value] : undefined,
       enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
       field: field,
       direction: direction
@@ -104,6 +107,13 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
     (item) => item?.id === sbomId
   )
 
+  const handleChange = (value) => {
+    setLabel(value)
+    setSelectedGroup('')
+    setSelectedProd('')
+    setSelectedVersion('')
+  }
+
   const getSbomVersions = () => {
     if (!selectedGroup) {
       return []
@@ -121,9 +131,9 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
       (item) => item.id === selectedProd
     )
 
-    const allSboms = activeEnv.sboms
+    const allSboms = activeEnv?.sboms
 
-    const allowedSboms = allSboms.filter((item) => {
+    const allowedSboms = allSboms?.filter((item) => {
       const previousUrls = partsContext.parts.map((i) => i.url)
       const allUrl = [...previousUrls, location.pathname]
       const urlHasId = allUrl.find((url) => url.includes(item.id))
@@ -219,6 +229,8 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
       }
     >
       <Stack spacing={4} direction={'column'} gap={2}>
+        {/* LABEL */}
+        <LabelSelect value={label} onChange={(value) => handleChange(value)} />
         {/* PROJECTS */}
         <FormControl fontSize={'sm'} isRequired>
           <FormLabel htmlFor='groups' fontSize={12}>

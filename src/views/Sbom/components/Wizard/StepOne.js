@@ -1,12 +1,11 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { envOrderList } from 'utils'
+import LabelSelect from 'views/Dashboard/Analytics/Selects/LabelSelect'
 
 import {
   Box,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
   Select,
   Skeleton,
@@ -14,6 +13,7 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
+import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 
@@ -37,15 +37,27 @@ const StepOne = ({
 }) => {
   const { totalRows, prodState } = useGlobalState()
   const { enabled, field, direction } = prodState
+
   const { headingTextColor } = useThemeColor(['headingTextColor'])
+
+  const [label, setLabel] = useState(null)
+
   const { data, loading: projectGrpLoading } = useQuery(GetProjectGroups, {
     variables: {
       first: totalRows,
+      labelIds: label ? [label?.value] : undefined,
       enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
       field: field,
       direction: direction
     }
   })
+
+  const handleChange = (value) => {
+    setLabel(value)
+    setSelectedGroup('')
+    setSelectedProd('')
+    setSelectedVersion('')
+  }
 
   const activeGroup =
     data &&
@@ -121,6 +133,7 @@ const StepOne = ({
     <Select
       name='versions'
       id='versions'
+      fontSize='sm'
       value={selectedVersion}
       onChange={(e) => {
         setSelectedVersion(e.target.value)
@@ -164,89 +177,83 @@ const StepOne = ({
             version to get started
           </Text>
         </Stack>
-        {productList && (
-          <Stack
-            width={'350px'}
-            mx={'auto'}
-            spacing={4}
-            direction={'column'}
-            gap={2}
-            mt={12}
-          >
-            {/* PROJECT GROUPS */}
-            {data?.organization?.projectGroups?.nodes?.length > 0 && (
-              <FormControl fontSize={'sm'}>
-                <FormLabel
-                  htmlFor='product'
-                  fontSize='md'
-                  color={headingTextColor}
-                >
-                  Product
-                </FormLabel>
-                <Select
-                  name='groups'
-                  id='groups'
-                  value={selectedGroup}
-                  onChange={handleSelectGroup}
-                >
-                  {data?.organization?.projectGroups?.nodes?.map(
-                    (item, index) => (
-                      <option key={index} value={item.id}>
-                        {item.name}
-                      </option>
-                    )
-                  )}
-                </Select>
-              </FormControl>
-            )}
-            {/* ENVIRONMENT */}
+        <Stack
+          width={'350px'}
+          mx={'auto'}
+          spacing={4}
+          direction={'column'}
+          gap={2}
+          mt={12}
+        >
+          {/* LABEL */}
+          <LabelSelect
+            value={label}
+            onChange={(value) => handleChange(value)}
+          />
+          {/* PROJECT GROUPS */}
+          {data?.organization?.projectGroups?.nodes?.length > 0 && (
             <FormControl fontSize={'sm'}>
-              <FormLabel
-                htmlFor='product'
-                fontSize='md'
-                color={headingTextColor}
-              >
-                Environment
+              <FormLabel htmlFor='product' color={headingTextColor}>
+                Product
               </FormLabel>
               <Select
-                name='product'
-                id='product'
-                value={selectedProd}
-                onChange={handleSelectProduct}
-                textTransform={'capitalize'}
+                name='groups'
+                id='groups'
+                fontSize='sm'
+                value={selectedGroup}
+                onChange={handleSelectGroup}
               >
                 <option value={''}>-- Select --</option>
-                {productList?.length > 0 &&
-                  envOrderList(productList).map((item, index) => (
-                    <option
-                      key={index}
-                      value={item.value}
-                      style={{ textTransform: 'capitalize' }}
-                    >
-                      {item.label}
+                {data?.organization?.projectGroups?.nodes?.map(
+                  (item, index) => (
+                    <option key={index} value={item.id}>
+                      {item.name}
                     </option>
-                  ))}
+                  )
+                )}
               </Select>
             </FormControl>
-            {/* Version */}
-            <FormControl fontSize={'sm'}>
-              <FormLabel
-                htmlFor='versions'
-                fontSize='md'
-                color={headingTextColor}
-              >
-                Version
-              </FormLabel>
-              {loading
-                ? LoadingSkeleton
-                : uniqVersions?.length === 0 && selectedProd !== ''
-                  ? NoVersionAlert
-                  : selectedProd === ''
-                    ? NoEnvironmentAlert
-                    : VersionSelect}
-            </FormControl>
-          </Stack>
-        )}
+          )}
+          {/* ENVIRONMENT */}
+          <FormControl fontSize={'sm'}>
+            <FormLabel htmlFor='product' color={headingTextColor}>
+              Environment
+            </FormLabel>
+            <Select
+              name='product'
+              id='product'
+              fontSize='sm'
+              value={selectedProd}
+              onChange={handleSelectProduct}
+              textTransform={'capitalize'}
+            >
+              <option value={''}>-- Select --</option>
+              {productList?.length > 0 &&
+                envOrderList(productList).map((item, index) => (
+                  <option
+                    key={index}
+                    value={item.value}
+                    style={{ textTransform: 'capitalize' }}
+                  >
+                    {item.label}
+                  </option>
+                ))}
+            </Select>
+          </FormControl>
+          {/* Version */}
+          <FormControl fontSize={'sm'}>
+            <FormLabel htmlFor='versions' color={headingTextColor}>
+              Version
+            </FormLabel>
+            {loading
+              ? LoadingSkeleton
+              : uniqVersions?.length === 0 && selectedProd !== ''
+                ? NoVersionAlert
+                : selectedProd === ''
+                  ? NoEnvironmentAlert
+                  : VersionSelect}
+          </FormControl>
+        </Stack>
       </Box>
     </>
   )
