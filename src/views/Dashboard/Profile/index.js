@@ -92,6 +92,7 @@ function Profile() {
       Feeds: !manageFeeds,
       Users: !viewUsers,
       roles: isFreeTier,
+      'custom-fields': isFreeTier,
       'security tokens': isFreeTier
     }
     return conditions[item] ? 'none' : 'block'
