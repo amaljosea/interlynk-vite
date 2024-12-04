@@ -2,12 +2,17 @@ import { truncatedValue } from 'utils'
 
 import { Text, useDisclosure } from '@chakra-ui/react'
 
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import ComponentCard from './Misc/ComponentCard'
 
 const RowComponent = ({ content }) => {
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const tab = useQueryParam('tab')
+  const { primaryBlueText, primaryTextColor } = useThemeColor([
+    'primaryBlueText',
+    'primaryTextColor'
+  ])
 
   const { name } = content || ''
 
@@ -25,7 +30,7 @@ const RowComponent = ({ content }) => {
 
   const textStyle = {
     fontSize: 14,
-    textColor: primaryBlueText,
+    textColor: tab === 'licenses' ? primaryTextColor : primaryBlueText,
     cursor: 'pointer'
   }
 
