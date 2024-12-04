@@ -11,12 +11,10 @@ import {
   Icon,
   Link,
   Stack,
-  Tag,
-  TagLabel,
   Text,
-  Tooltip,
   useColorMode
 } from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import SeverityTag from 'components/Misc/SeverityTag'
@@ -26,10 +24,20 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { IntersectingVulns } from 'graphQL/Queries'
 
+import { BsCircleHalf } from 'react-icons/bs'
+
 const StepTwo = ({ sbomId, currentSbomId }) => {
-  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
-    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
-  )
+  const {
+    headingTextColor,
+    primaryTextColor,
+    primaryBlueText,
+    primaryErrorColor
+  } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor',
+    'primaryBlueText',
+    'primaryErrorColor'
+  ])
   const { colorMode } = useColorMode()
   const { prodVulnState, dispatch } = useGlobalState()
   const { selectedVulns } = prodVulnState
@@ -48,30 +56,35 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
       id: 'cve',
       name: 'ID',
       selector: (row) => {
-        const { fromVuln } = row
+        const { fromVuln, toVuln } = row
         return (
-          <Link
-            href={linkURl(fromVuln?.vuln?.source, fromVuln?.vuln?.vulnId)}
-            target={'_blank'}
-          >
-            <Flex direction='row' alignItems={'center'} gap={2}>
-              <Icon
-                as={ExternalLinkIcon}
-                h={'16px'}
-                w={'16px'}
-                color={primaryBlueText}
-              />
-              <Tooltip label={fromVuln?.vuln?.vulnId} placement={'top'}>
+          <Stack spacing={1} my={3}>
+            <Link
+              href={linkURl(fromVuln?.vuln?.source, fromVuln?.vuln?.vulnId)}
+              target={'_blank'}
+            >
+              <Flex direction='row' alignItems={'center'} gap={2}>
+                <Icon
+                  as={ExternalLinkIcon}
+                  h={'16px'}
+                  w={'16px'}
+                  color={primaryBlueText}
+                />
                 <Text fontSize='sm' color={primaryTextColor}>
                   {fromVuln?.vuln?.vulnId || ''}
                 </Text>
-              </Tooltip>
-            </Flex>
-          </Link>
+              </Flex>
+            </Link>
+            {toVuln === null && (
+              <Text fontSize={'sm'} color={primaryErrorColor}>
+                Current vulnerability not available
+              </Text>
+            )}
+          </Stack>
         )
       },
       wrap: true,
-      width: '20%'
+      width: '25%'
     },
     // SEVERITY
     {
@@ -141,7 +154,14 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
               fromVuln?.vexStatus?.name || 'Unspecified'
             )}
           >
-            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
+            <TagLabel
+              mx={'auto'}
+              as={Flex}
+              gap={2}
+              alignItems='center'
+              style={{ textTransform: 'capitalize' }}
+            >
+              {fromVuln?.isComplete === false && <BsCircleHalf />}{' '}
               {fromVuln?.vexStatus?.name || 'Unspecified'}
             </TagLabel>
           </Tag>
