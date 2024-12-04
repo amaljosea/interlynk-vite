@@ -101,17 +101,12 @@ const ComponentsColumns = ({
                 </Tooltip>
                 {isPart && (
                   <Text
-                    sx={{
-                      fontSize: 'xs',
-                      color: primaryTextColor,
-                      w: 'fit-content'
-                    }}
+                    fontSize='sm'
+                    w='fit-content'
                     fontWeight={'medium'}
+                    color={primaryTextColor}
                   >
-                    {projectGroup?.name &&
-                      truncatedValue(projectGroup?.name, 10)}
-                    {projectVersion &&
-                      `: ${truncatedValue(projectVersion, 10)}`}
+                    {projectGroup?.name || ''}: {projectVersion || ''}
                   </Text>
                 )}
                 {/* COMPONENT TYPE */}
