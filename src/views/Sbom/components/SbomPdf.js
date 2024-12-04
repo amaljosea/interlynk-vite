@@ -510,137 +510,181 @@ export const downloadSbomPdf = (
 
   currentY += 10
 
-  const VulnLabels = [
-    'Short Description',
-    'Component Name',
-    'Component Version',
-    'Source',
-    'EPSS Percentile',
-    'EPSS Probability',
-    'Known Exploitable Vulnerability',
-    'Status',
-    'Justification',
-    'Impact Statement',
-    'Action Statement',
-    'Internal Notes',
-    'Created By',
-    'Created On'
-  ]
+  const getVulnValues = (vulnerability) => {
+    const values = [
+      formatValue(
+        vulnerability?.vuln?.desc || 'NA',
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      ),
+      formatValue(
+        vulnerability?.component?.name || 'NA',
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      ),
+      formatValue(
+        vulnerability?.component?.version || 'NA',
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      ),
+      formatValue(
+        vulnerability?.vuln?.source || 'NA',
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      ),
+      formatValue(
+        (vulnerability?.vuln?.vulnInfo?.epssPercentile * 100).toFixed() + '%' ||
+          'NA',
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      ),
+      formatValue(
+        (vulnerability?.vuln?.vulnInfo?.epssScores[0] * 100).toFixed(3) + '%' ||
+          'NA',
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      ),
+      formatValue(
+        vulnerability?.vuln?.vulnInfo?.kev === true ? 'Yes' : 'No' || 'NA',
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      ),
+      formatValue(
+        vulnerability?.vexStatus?.name || 'Unspecified',
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      ),
+      formatValue(
+        vulnerability?.vexJustification?.name || 'NA',
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      ),
+      formatValue(
+        vulnerability?.impact || 'NA',
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      ),
+      formatValue(
+        vulnerability?.actionStmt || 'NA',
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      ),
+      formatValue(
+        vulnerability?.note || 'NA',
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      )
+    ]
 
-  const getVulnValues = (vulnerability) => [
-    formatValue(
-      vulnerability?.vuln?.desc || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      vulnerability?.component?.name || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      vulnerability?.component?.version || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      vulnerability?.vuln?.source || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      (vulnerability?.vuln?.vulnInfo?.epssPercentile * 100).toFixed() + '%' ||
-        'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      (vulnerability?.vuln?.vulnInfo?.epssScores[0] * 100).toFixed(3) + '%' ||
-        'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      vulnerability?.vuln?.vulnInfo?.kev === true ? 'Yes' : 'No' || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      vulnerability.vexStatus?.name || 'Unspecified',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      vulnerability?.vexJustification?.name || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      vulnerability?.impact || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      vulnerability?.actionStmt || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      vulnerability?.note || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
-    formatValue(
-      formatDateWithTimeZone(vulnerability?.vuln?.publishedAt) || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
+    // Insert custom field values
+    if (excludeVulnStatus) {
+      const customFields = vulnerability?.componentVulnCustomFields || []
+      customFields.forEach((field) => {
+        const value = field?.value || 'NA'
+        values.push(
+          formatValue(
+            value,
+            doc,
+            pageWidth,
+            rightMargin,
+            contentGap,
+            leftMargin
+          )
+        )
+      })
+    }
+    // Add the remaining fields
+    values.push(
+      formatValue(
+        '', // Placeholder for 'Created By'
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      ),
+      formatValue(
+        formatDateWithTimeZone(vulnerability?.vuln?.publishedAt) || 'NA',
+        doc,
+        pageWidth,
+        rightMargin,
+        contentGap,
+        leftMargin
+      )
     )
-  ]
+
+    return values
+  }
 
   doc.setTextColor(...grayColor)
   doc.setFontSize(10)
 
   vulnActual.forEach((vuln) => {
+    const VulnLabels = [
+      'Short Description',
+      'Component Name',
+      'Component Version',
+      'Source',
+      'EPSS Percentile',
+      'EPSS Probability',
+      'Known Exploitable Vulnerability',
+      'Status',
+      'Justification',
+      'Impact Statement',
+      'Action Statement',
+      'Internal Notes'
+    ]
+
+    // Insert custom field labels dynamically
+    if (excludeVulnStatus) {
+      const customFieldLabels =
+        vuln?.componentVulnCustomFields?.map(
+          (field) =>
+            field?.componentVulnCustomFieldDefinition?.displayName || 'NA'
+        ) || []
+
+      VulnLabels.push(...customFieldLabels)
+    }
+
+    // Add the remaining labels
+    VulnLabels.push('Created By', 'Created On')
+
     const projectGroupName =
       vuln.component?.sbom?.project?.projectGroup?.name || ''
     const componentName = vuln.component?.name || ''
