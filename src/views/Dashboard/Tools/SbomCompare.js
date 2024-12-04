@@ -49,12 +49,7 @@ const SbomCompare = ({
     selectedVersionTwo,
     disabled
   } = compareButtonProps
-  const { primaryTextColor, primaryRedBorder, primaryGreenBorder } =
-    useThemeColor([
-      'primaryTextColor',
-      'primaryRedBorder',
-      'primaryGreenBorder'
-    ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const VersionSelect = (
     <LynkSelect
       components={{
@@ -88,16 +83,7 @@ const SbomCompare = ({
 
   return (
     <GridItem w='100%'>
-      <Card
-        border={
-          isSbomOne
-            ? `2px solid ${primaryGreenBorder}`
-            : `2px solid ${primaryRedBorder}`
-        }
-        p={8}
-        h='450px'
-        overflowY='scroll'
-      >
+      <Card p={8} h='450px' overflowY='scroll'>
         <Flex
           alignItems={'flex-start'}
           flexWrap={'wrap'}
@@ -111,9 +97,9 @@ const SbomCompare = ({
               </Heading>
               <Tag
                 variant='solid'
-                colorScheme='green'
-                width={'fit-content'}
+                w={'fit-content'}
                 textTransform={'capitalize'}
+                colorScheme={isSbomOne ? 'green' : 'red'}
               >
                 {sbomInfo?.project?.name}
               </Tag>

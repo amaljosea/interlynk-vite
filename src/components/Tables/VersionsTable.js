@@ -563,12 +563,12 @@ const VersionsTable = (props) => {
             onFilter={handleSearch}
           />
           {selectedSbom?.length === 1 && (
-            <Text color={primaryErrorColor}>
+            <Text color={primaryBlueText}>
               ** Select one more version to enable comparison
             </Text>
           )}
           {selectedSbom?.length > 2 && (
-            <Text color={primaryErrorColor}>
+            <Text color={primaryBlueText}>
               ** Comparison is permitted with only two versions
             </Text>
           )}
@@ -616,7 +616,7 @@ const VersionsTable = (props) => {
     handleClear,
     handleSearch,
     selectedSbom?.length,
-    primaryErrorColor,
+    primaryBlueText,
     TOOL.onOpen,
     enabled,
     signedUrlParams,
