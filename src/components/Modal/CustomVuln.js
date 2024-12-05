@@ -64,6 +64,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
   )
 
   const { components } = allComponents?.sbom || ''
+  const { nodes } = components || ''
 
   const [error, setError] = useState('')
   const [cve, setCve] = useState(null)
@@ -300,7 +301,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
             placeholder='Ex. cpe:2.3:a:examplevendor:uniqueproduct:1.0.0:*:*:*:*:*:*:*'
           />
         </FormControl>
-        {!compLoading && (
+        {!compLoading && nodes && (
           <FormControl>
             <FormLabel htmlFor='componentId' fontSize={12}>
               Component
@@ -312,7 +313,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
               onChange={handleChange}
             >
               <option value=''>-- Select --</option>
-              {[...components.nodes]
+              {[...nodes]
                 .sort((a, b) => a?.name?.localeCompare(b?.name))
                 .map((item, idx) => (
                   <option key={idx} value={item?.id}>
