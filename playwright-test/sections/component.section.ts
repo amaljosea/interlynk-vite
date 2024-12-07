@@ -380,7 +380,9 @@ export default class ComponentSection {
           await this.page.waitForTimeout(5000)
 
           await this.page.getByTestId('component-actions').first().click()
+          await this.page.waitForTimeout(1000)
           await this.page.getByTestId('delete_component').first().click()
+          await this.page.waitForTimeout(1000)
           await this.page.locator("button[type='submit']").click()
         } else {
           errors.push('Version not found')
@@ -472,6 +474,7 @@ export default class ComponentSection {
           await this.page.waitForTimeout(5000)
 
           await this.page.getByRole('button', { name: 'Visibility' }).click()
+          await this.page.waitForTimeout(1000)
           await this.page
             .getByRole('menuitemradio', { name: 'primary' })
             .click()
@@ -519,6 +522,7 @@ export default class ComponentSection {
           await this.page.waitForTimeout(3000)
 
           await this.page.getByTestId('component-actions').first().click()
+          await this.page.waitForTimeout(1000)
           await this.page.getByTestId('edit_component').first().click()
           await this.page.waitForTimeout(2000)
 
@@ -579,13 +583,13 @@ export default class ComponentSection {
 
         if (version.isVisible()) {
           await version.click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(3000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
-
           await this.page.waitForTimeout(3000)
 
           await this.page.getByTestId('component-actions').first().click()
+          await this.page.waitForTimeout(1000)
           await this.page.getByTestId('edit_component').first().click()
           await this.page.waitForTimeout(2000)
 
@@ -651,10 +655,10 @@ export default class ComponentSection {
           await this.page.waitForTimeout(2000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
-
-          await this.page.waitForTimeout(5000)
+          await this.page.waitForTimeout(3000)
 
           await this.page.getByTestId('component-actions').first().click()
+          await this.page.waitForTimeout(1000)
           await this.page.getByTestId('view_relation').first().click()
 
           const parentComp = this.page
