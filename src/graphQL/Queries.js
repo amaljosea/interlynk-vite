@@ -5050,6 +5050,12 @@ export const GetComponentVulns = gql`
     component(id: $id, sbomId: $sbomId) {
       vulns(first: $first, last: $last, after: $after, before: $before) {
         totalCount
+        pageInfo {
+          startCursor
+          endCursor
+          hasNextPage
+          hasPreviousPage
+        }
         nodes {
           vexStatus {
             name
