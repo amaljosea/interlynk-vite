@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
@@ -8,7 +8,7 @@ import SbomActions from 'views/Sbom/components/SbomActions'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
 import { Box, Divider, Flex, Text, Tooltip } from '@chakra-ui/react'
-import { Tag, TagLabel, useDisclosure } from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
 import { Icon, IconButton } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react'
@@ -16,21 +16,15 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import { ProgressBar } from 'components/ProgressBar'
-import TreeView from 'components/TreeView'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
-import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import { useSbomScores } from 'hooks/useSbomScores'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import {
-  GetPrimaryComponent,
-  GetProjectSettings,
-  GetSharPrimartComp
-} from 'graphQL/Queries'
+import { GetProjectSettings } from 'graphQL/Queries'
 
 import { FaBug, FaCubes, FaLongArrowAltRight, FaRobot } from 'react-icons/fa'
 import { FaCircleCheck, FaTag } from 'react-icons/fa6'
@@ -71,22 +65,7 @@ const SbomDetails = ({ sbomData }) => {
   } = sbomData || ''
   const { name, version, description } = primaryComponent || ''
 
-  const { prodCompState } = useGlobalState()
-  const { field, direction } = prodCompState
-
   const signedUrlParams = getSignedUrlParams()
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
-
-  // GET PRIMARY COMPONENT
-  const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(
-    signedUrlParams ? GetSharPrimartComp : GetPrimaryComponent,
-    {
-      fetchPolicy: 'network-only'
-    }
-  )
-
-  const { nodes } = primaryComp?.sbom?.components || ''
 
   const { data: settings } = useQuery(GetProjectSettings, {
     variables: { id: projectId }
@@ -100,18 +79,6 @@ const SbomDetails = ({ sbomData }) => {
     automatedFixesEnabled
   } = projectSetting || ''
   const hasFinished = vulnRunStatus === 'FINISHED'
-
-  const handleRelationView = async () => {
-    await getPrimaryComp({
-      variables: {
-        projectId: signedUrlParams ? undefined : projectId,
-        sbomId: sbomId,
-        primary: true,
-        field,
-        direction
-      }
-    }).then((res) => res?.data && onOpen())
-  }
 
   const handlePart = () => {
     partsContext.pop()
@@ -152,7 +119,6 @@ const SbomDetails = ({ sbomData }) => {
         <Icon
           as={FaCubes}
           cursor={'pointer'}
-          onClick={handleRelationView}
           sx={{ w: '64px', h: '64px', color: secondaryBlueText }}
         />
         <Flex width={'100%'} flexDir={'column'} gap={5}>
@@ -329,14 +295,6 @@ const SbomDetails = ({ sbomData }) => {
           </Grid>
         </Flex>
       </Flex>
-
-      {isOpen && primaryComp && (
-        <TreeView
-          isOpen={isOpen}
-          onClose={onClose}
-          compId={nodes?.length > 0 ? nodes[0].id : null}
-        />
-      )}
     </>
   )
 }

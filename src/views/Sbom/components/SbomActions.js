@@ -13,15 +13,14 @@ import {
   Divider,
   Flex,
   IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Spinner,
   Text,
   Tooltip,
   useDisclosure
 } from '@chakra-ui/react'
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+
+import PrimaryTreeView from 'components/PrimaryTreeView'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -34,13 +33,13 @@ import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { recheckHealth, sbomDelete } from 'graphQL/Mutation'
-import { SignedSbomDownload } from 'graphQL/Queries'
 import {
   DownloadSBOM,
   GetCheckResults,
   GetComponentData,
   GetProject,
-  ShareProject
+  ShareProject,
+  SignedSbomDownload
 } from 'graphQL/Queries'
 
 import { FaFileDownload } from 'react-icons/fa'
@@ -333,46 +332,44 @@ const SbomActions = ({ sbom }) => {
 
   const { style } = useSelect('version')
 
+  const updateLabel = noPrimaryComp
+    ? 'No primary component for this SBOM to edit'
+    : 'Edit'
+
   if (error) {
     return null
   }
 
   return (
-    <Flex gap={3} alignItems={'flex-end'} justifyContent={'flex-end'}>
-      {/* SBOM VERSIONS */}
-      <Box className='search-version' pos={'relative'}>
-        <SearchIcon
-          top={3}
-          left={3}
-          color={secondaryTextColor}
-          pos={'absolute'}
-        />
-        <ReactSelect
-          type='text'
-          name='versions'
-          styles={style}
-          value={selectedVersion}
-          className='react-select'
-          onChange={handleSBOMChange}
-          placeholder='Search versions'
-          components={{
-            DropdownIndicator: () => null,
-            IndicatorSeparator: () => null
-          }}
-          options={signedUrlParams ? uniqShareVersions : uniqVersions}
-          isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
-        />
-      </Box>
-      <Flex direction={'row'} gap={2} justifyContent='flex-end'>
+    <>
+      {/* ---------- SBOM ACTIONS ------------- */}
+      <Flex gap={2} alignItems={'center'} justifyContent={'flex-end'}>
+        {/* SELECT SBOM VERSIONS */}
+        <Box className='search-version' pos={'relative'}>
+          <SearchIcon
+            top={3}
+            left={3}
+            color={secondaryTextColor}
+            pos={'absolute'}
+          />
+          <ReactSelect
+            type='text'
+            name='versions'
+            styles={style}
+            value={selectedVersion}
+            className='react-select'
+            onChange={handleSBOMChange}
+            placeholder='Search versions'
+            components={{
+              DropdownIndicator: () => null,
+              IndicatorSeparator: () => null
+            }}
+            options={signedUrlParams ? uniqShareVersions : uniqVersions}
+            isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
+          />
+        </Box>
         {/* UPDATE PRIMARY COMPONENT */}
-        <Tooltip
-          label={
-            noPrimaryComp
-              ? 'No primary component for this SBOM to edit'
-              : 'Edit'
-          }
-          isDisabled={false}
-        >
+        <Tooltip label={updateLabel} isDisabled={false}>
           <Box>
             <IconButton
               display={signedUrlParams ? 'none' : 'flex'}
@@ -383,7 +380,12 @@ const SbomActions = ({ sbom }) => {
             />
           </Box>
         </Tooltip>
-
+        {/* GRAPH VIEW */}
+        <PrimaryTreeView
+          status={status}
+          updateSboms={updateSboms}
+          noPrimaryComp={noPrimaryComp}
+        />
         {/* SIGNED SBOM */}
         <Tooltip label={status === 'signed' ? 'Signed' : 'Unsigned'}>
           <IconButton
@@ -401,34 +403,7 @@ const SbomActions = ({ sbom }) => {
             isDisabled={true}
           />
         </Tooltip>
-
         {/* DOWNLOAD SBOM */}
-        {/*   <Tooltip label='Download'>
-          <IconButton
-            size='md'
-            colorScheme='blue'
-            className='download'
-            onClick={onDownload}
-            icon={<FaFileDownload />}
-          />
-        </Tooltip> */}
-        {isLoading && !isDeleteOpen && (
-          <Center
-            position='fixed'
-            top='0'
-            left='0'
-            width='100vw'
-            height='100vh'
-            bg='rgba(0, 0, 0, 0.6)'
-            zIndex='overlay'
-            flexDirection='column'
-          >
-            <Spinner size='xl' color='white' mb={4} />
-            <Text fontSize='lg' color='white'>
-              Downloading Original Sbom...
-            </Text>
-          </Center>
-        )}
         <Tooltip label='Download sbom' placement='top' shouldWrapChildren>
           <Menu>
             <MenuButton
@@ -504,7 +479,6 @@ const SbomActions = ({ sbom }) => {
             </MenuList>
           </Menu>
         </Tooltip>
-
         {/* DELETE SBOM */}
         <Tooltip label='Delete'>
           <IconButton
@@ -517,8 +491,7 @@ const SbomActions = ({ sbom }) => {
         </Tooltip>
       </Flex>
 
-      {/* {signedUrlParams ? '' : <ScoresProgress />} */}
-
+      {/* ---------- ACTIONS MODALS / DRAWERS ------------- */}
       {/* DOWNLOAD SBOM */}
       {isOpen && (
         <DownloadModal
@@ -597,7 +570,26 @@ const SbomActions = ({ sbom }) => {
           isLoading={isLoading}
         />
       )}
-    </Flex>
+
+      {/* ---------- LOADING ------------- */}
+      {isLoading && !isDeleteOpen && (
+        <Center
+          position='fixed'
+          top='0'
+          left='0'
+          width='100vw'
+          height='100vh'
+          bg='rgba(0, 0, 0, 0.6)'
+          zIndex='overlay'
+          flexDirection='column'
+        >
+          <Spinner size='xl' color='white' mb={4} />
+          <Text fontSize='lg' color='white'>
+            Downloading Original Sbom...
+          </Text>
+        </Center>
+      )}
+    </>
   )
 }
 
