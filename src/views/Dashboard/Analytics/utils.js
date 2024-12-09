@@ -10,16 +10,18 @@ export const getDays = ({ startDate, endDate }) => {
   return { dates }
 }
 
+const generateRandomNumber = () => Math.floor(Math.random() * 181)
+
 const defaultData = {
-  licensesCount: 0,
-  componentsCount: 0,
-  vulnerabilityCount: 0,
-  vulnerabilityCriticalCount: 0,
-  vulnerabilityHighCount: 0,
-  vulnerabilityMediumCount: 0,
-  vulnerabilityLowCount: 0,
-  vulnerabilityUnknownSevCount: 0,
-  averageVulnerabilityDuration: 0
+  licensesCount: generateRandomNumber(),
+  componentsCount: generateRandomNumber(),
+  vulnerabilityCount: generateRandomNumber(),
+  vulnerabilityCriticalCount: generateRandomNumber(),
+  vulnerabilityHighCount: generateRandomNumber(),
+  vulnerabilityMediumCount: generateRandomNumber(),
+  vulnerabilityLowCount: generateRandomNumber(),
+  vulnerabilityUnknownSevCount: generateRandomNumber(),
+  averageVulnerabilityDuration: generateRandomNumber()
 }
 
 export const formatForGraph = ({ nodes, dates }) => {

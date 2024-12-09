@@ -12,6 +12,7 @@ import TeamTable from 'components/Tables/TeamTable'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 
@@ -21,11 +22,14 @@ import CustomFields from './components/CustomFields'
 import Feeds from './components/Feeds'
 import Header from './components/Header'
 import { InternalComponents } from './components/InternalComponents'
+import RiskFields from './components/RiskFields'
 import TokenInfo from './components/TokenInfo'
 
 function Profile() {
   const { organization } = useGlobalState()
   const isFreeTier = organization?.tier === 'free'
+
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const orgTabs = [
     'users',
@@ -36,7 +40,8 @@ function Profile() {
     'legal',
     'integrations-org',
     'plan',
-    'custom-fields'
+    'custom-fields',
+    'risks'
   ]
 
   const psTabs = ['security tokens', 'integrations']
@@ -93,7 +98,8 @@ function Profile() {
       Users: !viewUsers,
       roles: isFreeTier,
       'custom-fields': isFreeTier,
-      'security tokens': isFreeTier
+      'security tokens': isFreeTier,
+      risks: !shouldShowDemoFeatures
     }
     return conditions[item] ? 'none' : 'block'
   }
@@ -174,6 +180,11 @@ function Profile() {
               <TabPanel px={0}>
                 <CustomFields />
               </TabPanel>
+              {shouldShowDemoFeatures && (
+                <TabPanel px={0}>
+                  <RiskFields />
+                </TabPanel>
+              )}
             </TabPanels>
           </Tabs>
         </Card>

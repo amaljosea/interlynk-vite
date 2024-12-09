@@ -15,13 +15,16 @@ import useExportCsvQueryInfo from 'hooks/useExportCsvQueryInfo'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import useQueryParam from 'hooks/useQueryParam'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaFileCsv } from 'react-icons/fa6'
 
 const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
-  const { showToast } = useCustomToast()
   const params = useParams()
+  const { showToast } = useCustomToast()
+
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
 
@@ -197,6 +200,13 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
           >
             <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
               Apply search and filters
+            </Text>
+          </Checkbox>
+        )}
+        {tableType === 'SBOM Support View' && shouldShowDemoFeatures && (
+          <Checkbox mt={1} size='md' colorScheme='blue'>
+            <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
+              Include Actively Supported Components
             </Text>
           </Checkbox>
         )}

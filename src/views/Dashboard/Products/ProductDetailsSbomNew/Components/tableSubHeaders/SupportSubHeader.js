@@ -51,6 +51,7 @@ const SupportSubHeader = (
       </Flex>
     )
   }, [
+    customerView,
     filterText,
     handleClear,
     handleSearch,

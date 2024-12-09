@@ -21,6 +21,7 @@ import {
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import PrimaryTreeView from 'components/PrimaryTreeView'
+import ReleaseDate from 'components/ReleaseDate'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -30,6 +31,7 @@ import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
 import { useSelect } from 'hooks/useSelect'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { recheckHealth, sbomDelete } from 'graphQL/Mutation'
@@ -60,6 +62,7 @@ const SbomActions = ({ sbom }) => {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
   } = useProductUrlContext()
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const { isFreeTier } = useGlobalQueryContext()
 
@@ -381,11 +384,21 @@ const SbomActions = ({ sbom }) => {
           </Box>
         </Tooltip>
         {/* GRAPH VIEW */}
-        <PrimaryTreeView
-          status={status}
-          updateSboms={updateSboms}
-          noPrimaryComp={noPrimaryComp}
-        />
+        {shouldShowDemoFeatures && (
+          <PrimaryTreeView
+            status={status}
+            updateSboms={updateSboms}
+            noPrimaryComp={noPrimaryComp}
+          />
+        )}
+        {/* RELEASE DATE */}
+        {shouldShowDemoFeatures && (
+          <ReleaseDate
+            status={status}
+            updateSboms={updateSboms}
+            noPrimaryComp={noPrimaryComp}
+          />
+        )}
         {/* SIGNED SBOM */}
         <Tooltip label={status === 'signed' ? 'Signed' : 'Unsigned'}>
           <IconButton
