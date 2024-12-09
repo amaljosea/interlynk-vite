@@ -22,36 +22,29 @@ const VexInfo = ({ data, fields }) => {
     fontSize: '14px'
   }
 
+  const infoData = [
+    { label: 'Status', value: data?.status || 'N/A' },
+    { label: 'Justification', value: data?.justification || 'N/A' },
+    { label: 'Impact Statement', value: data?.impact || 'N/A' },
+    { label: 'Internal Notes', value: data?.note || 'N/A' },
+    { label: 'Action Statement', value: data?.actionStmt || 'N/A' },
+    { label: 'Fixed Version', value: data?.fixedIn || 'N/A' },
+    { label: 'Details', value: data?.detail || 'N/A' },
+    { label: 'Created By', value: data?.changedBy || 'N/A' },
+    {
+      label: 'Created On',
+      value: data?.updatedAt ? timeSince(data?.updatedAt) : 'N/A'
+    }
+  ]
+
   return (
     <SimpleGrid columns={2} gap={4} pt={2} px={4}>
-      <Box>
-        <Text sx={labelStyle}>Status</Text>
-        <Text sx={valueStyle}>{data?.status || 'N/A'}</Text>
-      </Box>
-      <Box>
-        <Text sx={labelStyle}>Justification</Text>
-        <Text sx={valueStyle}>{data?.justification || 'N/A'}</Text>
-      </Box>
-      <Box>
-        <Text sx={labelStyle}>Impact Statement</Text>
-        <Text sx={valueStyle}>{data?.impact || 'N/A'}</Text>
-      </Box>
-      <Box>
-        <Text sx={labelStyle}>Internal Notes</Text>
-        <Text sx={valueStyle}>{data?.note || 'N/A'}</Text>
-      </Box>
-      <Box>
-        <Text sx={labelStyle}>Action Statement</Text>
-        <Text sx={valueStyle}>{data?.actionStmt || 'N/A'}</Text>
-      </Box>
-      <Box>
-        <Text sx={labelStyle}>Fixed Version</Text>
-        <Text sx={valueStyle}>{data?.fixedIn || 'N/A'}</Text>
-      </Box>
-      <Box>
-        <Text sx={labelStyle}>Details</Text>
-        <Text sx={valueStyle}>{data?.detail || 'N/A'}</Text>
-      </Box>
+      {infoData?.map((item, index) => (
+        <Box key={index}>
+          <Text sx={labelStyle}>{item?.label}</Text>
+          <Text sx={valueStyle}>{item?.value}</Text>
+        </Box>
+      ))}
       {fields?.length > 0 &&
         fields.map((item) => (
           <Box key={item?.id}>
@@ -61,16 +54,6 @@ const VexInfo = ({ data, fields }) => {
             <Text sx={valueStyle}>{item?.value || ''}</Text>
           </Box>
         ))}
-      <Box>
-        <Text sx={labelStyle}>Created By</Text>
-        <Text sx={valueStyle}>{data?.changedBy || 'N/A'}</Text>
-      </Box>
-      <Box>
-        <Text sx={labelStyle}>Created On</Text>
-        <Text sx={valueStyle}>
-          {data?.updatedAt ? timeSince(data?.updatedAt) : 'N/A'}
-        </Text>
-      </Box>
     </SimpleGrid>
   )
 }
