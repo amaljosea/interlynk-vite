@@ -28,6 +28,27 @@ export const getOrganization = gql`
   }
 `
 
+export const GetApiKeys = gql`
+  query GetApiKeys {
+    organization {
+      currentUser {
+        apiKeys {
+          id
+          rawToken
+          tokenMask
+          revoked
+          expired
+          createdAt
+          updatedAt
+          revokedAt
+          expiresAt
+          tokenName
+        }
+      }
+    }
+  }
+`
+
 export const UserSettings = gql`
   query UserSettings {
     currentUserSettings {

@@ -1,35 +1,21 @@
-import { gql, useMutation, useQuery } from '@apollo/client'
-import { isValid } from 'date-fns'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useMutation, useQuery } from '@apollo/client'
+import { useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, truncatedValue } from 'utils'
 
-import { AddIcon, CopyIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import {
-  Checkbox,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   IconButton,
-  Input,
-  Menu,
-  MenuItem,
-  MenuList,
   Portal,
-  Progress,
-  Stack,
-  Tag,
-  TagLabel,
   Text,
   Tooltip,
-  useClipboard,
   useDisclosure
 } from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
+import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
-import LynkDate from 'components/LynkDate'
-import LynkModal from 'components/LynkModal'
 import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -37,35 +23,10 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-// CSS styling for the date-time picker
-import {
-  createApiToken,
-  deleteApiToken,
-  updateApiToken
-} from 'graphQL/Mutation'
+import { deleteApiToken, updateApiToken } from 'graphQL/Mutation'
+import { GetApiKeys } from 'graphQL/Queries'
 
-import { BiCheck, BiShieldQuarter } from 'react-icons/bi'
-
-const GetApiKeys = gql`
-  query GetApiKeys {
-    organization {
-      currentUser {
-        apiKeys {
-          id
-          rawToken
-          tokenMask
-          revoked
-          expired
-          createdAt
-          updatedAt
-          revokedAt
-          expiresAt
-          tokenName
-        }
-      }
-    }
-  }
-`
+import TokenModal from './TokenModal'
 
 const TokenInfo = () => {
   const activetab = useQueryParam('tab')
@@ -73,9 +34,10 @@ const TokenInfo = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { headingTextColor, primaryTextColor, grayBorderColor } = useThemeColor(
-    ['headingTextColor', 'primaryTextColor', 'grayBorderColor']
-  )
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const paddingCell = 0
   const paddingHeadCell = 0
@@ -88,74 +50,15 @@ const TokenInfo = () => {
 
   const tokenRef = useRef(null)
 
-  const [token, setToken] = useState('')
-  const [keyName, setKeyName] = useState('')
-  const [error, setError] = useState('')
-  const [selectedDate, setSelectedDate] = useState('')
-  const [noExpire, setNoExpire] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
-  const [isValidDate, setIsValidDate] = useState(true)
 
   const canAddToken = useHasPermission({
     parentKey: 'view_organization',
     childKey: 'update_organization'
   })
 
-  const handleChange = (event) => {
-    const { value } = event.target
-    setKeyName(value)
-    setError('')
-  }
-
-  const onTokenBlur = () => {
-    if (keyName.length < 4 || keyName.length > 128) {
-      setError('Input must be between 4 and 128 characters')
-    } else {
-      setError('')
-    }
-  }
-
-  const handleExpireChange = (e) => {
-    const defaultDate = new Date()
-    defaultDate.setDate(defaultDate.getDate() + 90)
-    const { checked } = e.target
-    setNoExpire(checked)
-    setIsValidDate(true)
-    if (checked === true) {
-      setSelectedDate('')
-    } else {
-      setSelectedDate(defaultDate)
-    }
-  }
-
-  const key = useClipboard(token)
-
-  const [generateToken] = useMutation(createApiToken)
   const [deleteToken] = useMutation(deleteApiToken)
   const [updateToken] = useMutation(updateApiToken)
-
-  const handleCreate = () => {
-    setIsLoading(true)
-    generateToken({
-      variables: {
-        tokenName: keyName,
-        expiresAt: selectedDate
-          ? selectedDate.toISOString().replace(/\.\d{3}Z$/, 'Z')
-          : null
-      }
-    }).then((res) => {
-      if (res?.data?.apiTokenCreate?.errors?.length > 0) {
-        setError(res?.data?.apiTokenCreate?.errors[0])
-        setIsLoading(false)
-      } else {
-        setTimeout(() => {
-          setToken(res.data.apiTokenCreate.apiKey.rawToken)
-          setIsLoading(false)
-        }, 3000)
-      }
-    })
-  }
 
   const handleDelete = (id) => {
     deleteToken({
@@ -163,21 +66,6 @@ const TokenInfo = () => {
         apiKeyId: id
       }
     }).then((res) => res && onClose())
-  }
-
-  const handleUpdate = () => {
-    updateToken({
-      variables: {
-        id: activeRow.id,
-        expires: noExpire === true ? null : selectedDate
-      }
-    }).then((res) => {
-      if (res?.data?.apiTokenUpdate?.errors?.length > 0) {
-        setError(res?.data?.apiTokenUpdate?.errors[0])
-      } else {
-        onClose()
-      }
-    })
   }
 
   const handleRevoked = (id) => {
@@ -189,22 +77,18 @@ const TokenInfo = () => {
     }).then((res) => res?.data && onClose())
   }
 
-  const handleSubmit = () => onClose()
-
-  const handleDateChange = (newDate) => {
-    const isValidDate = newDate && !isNaN(newDate)
-    setSelectedDate(newDate._d)
-    if (isValidDate) {
-      setIsValidDate(true)
-    } else {
-      setIsValidDate(false)
-    }
+  const onEdit = (row) => {
+    setActiveRow(row)
+    onOpen()
   }
 
   // HEADER SECTION
   const subHeaderComponent = useMemo(() => {
-    const defaultDate = new Date()
-    defaultDate.setDate(defaultDate.getDate() + 90)
+    const onCreate = () => {
+      setActiveRow(null)
+      onOpen()
+    }
+
     return (
       <Flex
         width={'100%'}
@@ -224,16 +108,7 @@ const TokenInfo = () => {
         <Tooltip label='New Token'>
           <IconButton
             ref={tokenRef}
-            onClick={() => {
-              setKeyName('')
-              setError('')
-              setSelectedDate(defaultDate)
-              setToken('')
-              setNoExpire(false)
-              setActiveRow(null)
-              setIsValidDate(true)
-              onOpen()
-            }}
+            onClick={onCreate}
             data-testid='new_token'
             icon={<AddIcon />}
             colorScheme='blue'
@@ -245,15 +120,7 @@ const TokenInfo = () => {
         </Tooltip>
       </Flex>
     )
-  }, [onOpen, primaryTextColor, canAddToken])
-
-  useEffect(() => {
-    if (activeRow) {
-      setKeyName(activeRow?.tokenName)
-      setSelectedDate(new Date(activeRow.expiresAt))
-      setNoExpire(activeRow.expiresAt === null ? true : false)
-    }
-  }, [activeRow])
+  }, [primaryTextColor, canAddToken, onOpen])
 
   // COLUMNS
   const columns = [
@@ -376,30 +243,22 @@ const TokenInfo = () => {
       name: 'ACTIONS',
       selector: (row, index) => {
         const { revoked } = row
-
         return (
           <Menu>
             <LynkAction data-testid={`token_actions_${index}`} />
             <Portal>
               <MenuList fontSize={'sm'}>
-                {row.revoked === false && (
-                  <MenuItem
-                    onClick={() => handleRevoked(row.id)}
-                    data-testid={`token_revoke_${index}`}
-                  >
-                    Revoke Token
-                  </MenuItem>
-                )}
                 <MenuItem
-                  data-testid={`token_edit_${index}`}
+                  hidden={row?.revoked === true}
+                  onClick={() => handleRevoked(row.id)}
+                  data-testid={`token_revoke_${index}`}
+                >
+                  Revoke Token
+                </MenuItem>
+                <MenuItem
                   isDisabled={revoked}
-                  onClick={() => {
-                    setToken('')
-                    setSelectedDate(row?.expiresAt || '')
-                    setIsValidDate(true)
-                    setActiveRow(row)
-                    onOpen()
-                  }}
+                  onClick={() => onEdit(row)}
+                  data-testid={`token_edit_${index}`}
                 >
                   Edit Expiration
                 </MenuItem>
@@ -418,33 +277,6 @@ const TokenInfo = () => {
       width: '120px'
     }
   ]
-
-  const onButtonClick =
-    token !== '' ? handleSubmit : activeRow ? handleUpdate : handleCreate
-
-  const modalTitle = activeRow
-    ? truncatedValue(activeRow?.tokenName, 20)
-    : 'Create Security Token'
-
-  const buttonName =
-    token !== ''
-      ? 'Done'
-      : activeRow
-        ? 'Update'
-        : isLoading
-          ? 'Creating...'
-          : 'Create'
-
-  const isButtonDisabled =
-    token !== ''
-      ? token === ''
-      : activeRow
-        ? !isValidDate
-        : !keyName ||
-          (selectedDate !== '' && !isValid(selectedDate)) ||
-          isLoading ||
-          error !== '' ||
-          !isValidDate
 
   return (
     <>
@@ -470,83 +302,7 @@ const TokenInfo = () => {
       </Flex>
 
       {isOpen && (
-        <LynkModal
-          isOpen={isOpen}
-          onClose={onClose}
-          onSubmit={onButtonClick}
-          title={modalTitle}
-          Icon={BiShieldQuarter}
-          disabled={isButtonDisabled}
-          buttonText={buttonName}
-        >
-          {!activeRow && (
-            <FormControl
-              mb={5}
-              isRequired
-              isInvalid={keyName !== '' && error !== ''}
-            >
-              <FormLabel fontSize={12} htmlFor='keyName'>
-                Token Name
-              </FormLabel>
-              <Input
-                type='text'
-                id='keyName'
-                name='keyName'
-                value={keyName}
-                minLength={4}
-                maxLength={128}
-                onBlur={onTokenBlur}
-                onChange={handleChange}
-                isDisabled={token !== ''}
-              />
-              <FormErrorMessage>{error}</FormErrorMessage>
-            </FormControl>
-          )}
-          {!noExpire && (
-            <FormControl mb={5} isRequired isInvalid={!isValidDate}>
-              <FormLabel fontSize={12} htmlFor='expire'>
-                Expiration Date
-              </FormLabel>
-              <LynkDate value={selectedDate} onChange={handleDateChange} />
-              {!isValidDate && (
-                <FormErrorMessage>
-                  Please enter a valid datetime
-                </FormErrorMessage>
-              )}
-            </FormControl>
-          )}
-          <FormControl mb={5}>
-            <Checkbox
-              isChecked={noExpire}
-              onChange={handleExpireChange}
-              isDisabled={token !== ''}
-            >
-              <Text fontSize={12}>No Expiration</Text>
-            </Checkbox>
-          </FormControl>
-          {isLoading && <Progress size='xs' isIndeterminate />}
-          {token !== '' && (
-            <Stack direction={'row'} alignItems={'center'}>
-              <FormControl>
-                <Input type={'text'} defaultValue={token} readOnly />
-              </FormControl>
-              {/* ACTION */}
-              <Tooltip
-                label={key.hasCopied ? 'Copied!' : 'Copy'}
-                closeOnClick={false}
-                hasArrow
-                placement='top'
-              >
-                <IconButton
-                  border='1px solid'
-                  borderColor={grayBorderColor}
-                  onClick={() => key.onCopy()}
-                  icon={key.hasCopied ? <BiCheck /> : <CopyIcon />}
-                />
-              </Tooltip>
-            </Stack>
-          )}
-        </LynkModal>
+        <TokenModal data={activeRow} isOpen={isOpen} onClose={onClose} />
       )}
     </>
   )
