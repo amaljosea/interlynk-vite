@@ -99,9 +99,9 @@ const ComponentsColumns = ({
                     {truncatedValue(name, 30)}
                   </Text>
                 </Tooltip>
-                {isPart && (
+                {bomId && isPart && (
                   <Text
-                    fontSize='sm'
+                    fontSize={12}
                     w='fit-content'
                     fontWeight={'medium'}
                     color={primaryTextColor}

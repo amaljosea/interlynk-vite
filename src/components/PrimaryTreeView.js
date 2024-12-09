@@ -6,7 +6,7 @@ import { IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { GetPrimaryComponent, GetSharPrimartComp } from 'graphQL/Queries'
+import { GetPrimaryComponent } from 'graphQL/Queries'
 
 import { PiTreeStructure } from 'react-icons/pi'
 
@@ -20,9 +20,7 @@ const PrimaryTreeView = ({ updateSboms, status, noPrimaryComp }) => {
 
   const { field, direction } = prodCompState
 
-  const [getPrimaryComp, { data, loading }] = useLazyQuery(
-    signedUrlParams ? GetSharPrimartComp : GetPrimaryComponent
-  )
+  const [getPrimaryComp, { data, loading }] = useLazyQuery(GetPrimaryComponent)
 
   const { nodes } = data?.sbom?.components || ''
 

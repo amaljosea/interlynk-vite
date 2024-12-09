@@ -1,10 +1,8 @@
-import { useLazyQuery } from '@apollo/client'
 import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
 import { truncatedValue } from 'utils'
-import { getSignedUrlParams } from 'utils'
 
 import {
   Flex,
@@ -15,11 +13,9 @@ import {
   Tag,
   TagLabel,
   Text,
-  Tooltip,
-  useDisclosure
+  Tooltip
 } from '@chakra-ui/react'
 
-import GraphDrawer from 'components/Drawer/GraphDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -27,7 +23,7 @@ import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GetSharPrimartComp, GetShareProductData } from 'graphQL/Queries'
+import { GetShareProductData } from 'graphQL/Queries'
 
 import {
   FaAngleLeft,
@@ -59,7 +55,7 @@ const SbomDetails = () => {
     })
     navigate(link)
   }
-  const { prodCompState, dispatch } = useGlobalState()
+  const { dispatch } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const { data, loading } = useQuery(GetShareProductData, {
@@ -76,29 +72,6 @@ const SbomDetails = () => {
   } = data?.shareLynkQuery?.sbom || {}
   const { compCount, compLicenseCount, vulnStats } = stats || ''
   const { critical, high, medium, low, unknown } = vulnStats || ''
-
-  const { field, direction } = prodCompState
-
-  const signedUrlParams = getSignedUrlParams()
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
-
-  // GET PRIMARY COMPONENT
-  const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(
-    GetSharPrimartComp,
-    { fetchPolicy: 'network-only' }
-  )
-
-  const handleRelationView = async () => {
-    await getPrimaryComp({
-      variables: {
-        sbomId: sbomId,
-        primary: true,
-        field,
-        direction
-      }
-    }).then((res) => res?.data && onOpen())
-  }
 
   const onSelectComp = () => {
     prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
@@ -141,7 +114,6 @@ const SbomDetails = () => {
           h={'64px'}
           w={'64px'}
           color={secondaryBlueText}
-          onClick={handleRelationView}
           cursor={'pointer'}
         />
         <Flex direction={'column'} gap={0.5}>
@@ -325,19 +297,6 @@ const SbomDetails = () => {
           </Flex>
         </Flex>
       </Flex>
-
-      {isOpen && primaryComp && (
-        <GraphDrawer
-          isOpen={isOpen}
-          onClose={onClose}
-          primaryComp={
-            signedUrlParams
-              ? primaryComp?.shareLynkQuery?.sbom?.components
-              : primaryComp?.sbom?.components
-          }
-          activeComp={null}
-        />
-      )}
     </>
   )
 }

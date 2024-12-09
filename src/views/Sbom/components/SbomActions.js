@@ -373,9 +373,8 @@ const SbomActions = ({ sbom }) => {
         </Box>
         {/* UPDATE PRIMARY COMPONENT */}
         <Tooltip label={updateLabel} isDisabled={false}>
-          <Box>
+          <Box display={signedUrlParams ? 'none' : 'flex'}>
             <IconButton
-              display={signedUrlParams ? 'none' : 'flex'}
               isDisabled={status === 'signed' || !updateSboms || noPrimaryComp}
               colorScheme='blue'
               icon={<EditIcon />}
