@@ -1,12 +1,14 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { isCustomerView, transformLicenseString } from 'utils'
+import { hasWhiteSpace, validateUrl } from 'utils'
 import { componentTypes, infoData, sbomPhases } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
+  Divider,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -25,7 +27,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { CreateComponent, sbomCreate } from 'graphQL/Mutation'
+import { CreateComponent, sbomCreate, supplierCreate } from 'graphQL/Mutation'
 import { GetAllSboms, GetPrimaryComponent } from 'graphQL/Queries'
 
 function ProductSbomDrawer({ id, isOpen, onClose }) {
@@ -35,6 +37,11 @@ function ProductSbomDrawer({ id, isOpen, onClose }) {
   const customerView = isCustomerView()
 
   const { field, direction } = prodCompState
+
+  const { primaryErrorColor, primaryBlueText } = useThemeColor([
+    'primaryErrorColor',
+    'primaryBlueText'
+  ])
 
   // GET PRIMARY COMPONENT
   const { data } = useQuery(GetPrimaryComponent, {
@@ -63,14 +70,76 @@ function ProductSbomDrawer({ id, isOpen, onClose }) {
   const [compKind, setCompKind] = useState('')
   const [compScope, setCompScope] = useState('')
   const [isInternal, setIsInternal] = useState(false)
-  const { primaryErrorColor, primaryBlueText } = useThemeColor([
-    'primaryErrorColor',
-    'primaryBlueText'
-  ])
+  const [error, setError] = useState('')
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  const initialData = useMemo(
+    () => ({
+      name: '',
+      url: '',
+      contactName: '',
+      contactEmail: ''
+    }),
+    []
+  )
+
+  const [formData, setFormData] = useState(initialData)
+  const [isValidUrl, setIsValidUrl] = useState('')
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const containsSpace = hasWhiteSpace(formData?.url)
+
+  const isInvalidSupplier = formData?.url !== '' && !validateUrl(formData?.url)
+  const isInvalidEmail =
+    formData?.contactEmail !== '' && !validateEmail(formData?.contactEmail)
+
+  const handleCheckUrl = () => {
+    if (isInvalidSupplier) {
+      setIsValidUrl('Please enter a valid URL')
+    }
+  }
+
+  const handleCheckEmail = () => {
+    if (isInvalidEmail) {
+      setError('Please enter a valid email')
+    }
+  }
+
+  const [createSupplier, { loading: supLoading }] = useMutation(supplierCreate)
   const [createSbom, { loading: sbomLoading }] = useMutation(sbomCreate)
   const [createComponent, { loading: compLoading }] =
     useMutation(CreateComponent)
+
+  const handleSave = (id) => {
+    createSupplier({
+      variables: {
+        sbomId: id,
+        url: formData?.url,
+        name: formData?.name,
+        contactName: formData?.contactName,
+        contactEmail: formData?.contactEmail
+      }
+    }).then((res) => {
+      if (res?.data) {
+        showToast({
+          description: 'SBOM added successfully',
+          status: 'success'
+        })
+        onClose()
+      }
+    })
+  }
 
   const onPhaseChange = (value) => {
     setPhases(value)
@@ -100,11 +169,7 @@ function ProductSbomDrawer({ id, isOpen, onClose }) {
     }).then((res) => {
       if (res?.data) {
         saveChanges()
-        showToast({
-          description: 'SBOM added successfully',
-          status: 'success'
-        })
-        onClose()
+        handleSave(id)
       }
     })
   }
@@ -154,7 +219,14 @@ function ProductSbomDrawer({ id, isOpen, onClose }) {
 
   const invalidVersion = compVersion !== '' && SBOMs?.includes(compVersion)
 
-  const isInvalid = compKind === '' || compName === '' || compVersion === ''
+  const isInvalid =
+    compKind === '' ||
+    compName === '' ||
+    compVersion === '' ||
+    formData?.name === '' ||
+    isInvalidSupplier ||
+    containsSpace ||
+    isInvalidEmail
 
   useEffect(() => {
     if (nodes?.length > 0) {
@@ -348,6 +420,66 @@ function ProductSbomDrawer({ id, isOpen, onClose }) {
                   <option value='required'>Required</option>
                 </Select>
               </FormControl>
+              {/* SUPPLIER */}
+              <Stack>
+                <Text>Supplier Details</Text>
+                <Divider />
+              </Stack>
+              {/* ORG NAME */}
+              <FormControl isRequired>
+                <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
+                <Input
+                  name='name'
+                  fontSize={'sm'}
+                  autoComplete='off'
+                  onChange={handleChange}
+                  value={formData?.name}
+                  placeholder='Enter organization name'
+                />
+              </FormControl>
+              {/* ORG URL */}
+              <FormControl isInvalid={isInvalidSupplier || containsSpace}>
+                <FormLabel fontSize={'sm'}>URL</FormLabel>
+                <Input
+                  name='url'
+                  fontSize={'sm'}
+                  autoComplete='off'
+                  onChange={handleChange}
+                  placeholder='Enter URL'
+                  onBlur={handleCheckUrl}
+                  value={formData?.url}
+                />
+                <FormErrorMessage>{isValidUrl}</FormErrorMessage>
+              </FormControl>
+              {/* SUPPLIER NAME */}
+              <FormControl>
+                <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
+                <Input
+                  minLength={4}
+                  fontSize={'sm'}
+                  maxLength={256}
+                  autoComplete='no'
+                  name='contactName'
+                  onChange={handleChange}
+                  value={formData?.contactName}
+                  placeholder='Enter supplier name'
+                />
+              </FormControl>
+              {/* SUPPLIER EMAIL */}
+              <FormControl isInvalid={isInvalidEmail}>
+                <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
+                <Input
+                  type='email'
+                  fontSize={'sm'}
+                  autoComplete='off'
+                  name='contactEmail'
+                  onChange={handleChange}
+                  onBlur={handleCheckEmail}
+                  value={formData?.contactEmail}
+                  placeholder='Enter supplier email'
+                />
+                <FormErrorMessage>{error}</FormErrorMessage>
+              </FormControl>
               {/* PRIMARY COMPONENT */}
               <FormControl isReadOnly={customerView} isDisabled>
                 <Flex alignItems={'center'} gap={2}>
@@ -382,7 +514,7 @@ function ProductSbomDrawer({ id, isOpen, onClose }) {
                 width={'fit-content'}
                 isDisabled={isInvalid}
                 onClick={onCreateSBOM}
-                isLoading={sbomLoading || compLoading}
+                isLoading={sbomLoading || compLoading || supLoading}
               >
                 Save
               </Button>
