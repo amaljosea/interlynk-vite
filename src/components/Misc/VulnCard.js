@@ -1,14 +1,14 @@
 import { gql, useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 
-import { Divider, Grid, Stack, Text } from '@chakra-ui/react'
+import { Flex, IconButton, SimpleGrid, Stack, Text } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import LynkModal from 'components/LynkModal'
 
-import { FaCircleInfo } from 'react-icons/fa6'
+import { useThemeColor } from 'hooks/useThemeColors'
 
-import CustomTag from './CustomTag'
+import { FaBug, FaCircleInfo } from 'react-icons/fa6'
 
 export const GetVulnData = gql`
   query GetVulnData(
@@ -40,6 +40,12 @@ export const GetVulnData = gql`
 const VulnCard = ({ value, isOpen, onClose }) => {
   const params = useParams()
 
+  const { primaryBlueText, sameSecondaryText, infoTextColor } = useThemeColor([
+    'primaryBlueText',
+    'sameSecondaryText',
+    'infoTextColor'
+  ])
+
   const { data, loading } = useQuery(GetVulnData, {
     skip: isOpen ? false : true,
     variables: {
@@ -56,6 +62,20 @@ const VulnCard = ({ value, isOpen, onClose }) => {
   const { vulnId, source, cvssScore, vulnInfo } = vuln || ''
   const { epssScores, kev } = vulnInfo || ''
 
+  const label = { fontSize: 12, color: sameSecondaryText }
+  const infoStyle = {
+    fontSize: 14,
+    fontWeight: 600,
+    color: infoTextColor
+  }
+
+  const vulnData = [
+    { label: 'Source', value: source || 'N/A' },
+    { label: 'CVSS Score', value: cvssScore || 'N/A' },
+    { label: 'EPSS', value: epssScores || 'N/A' },
+    { label: 'KEV', value: kev ? 'Yes' : 'No' }
+  ]
+
   return (
     <LynkModal
       maxW={'500px'}
@@ -68,31 +88,21 @@ const VulnCard = ({ value, isOpen, onClose }) => {
       {loading ? (
         <CustomLoader />
       ) : (
-        <Stack spacing={2} py={3}>
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>ID</Text>
-            <CustomTag>{vulnId || '-'}</CustomTag>
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>Source</Text>
-            <CustomTag>{source || '-'}</CustomTag>
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>CVSS Score</Text>
-            <CustomTag>{cvssScore || '-'}</CustomTag>
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>EPSS</Text>
-            <CustomTag>{epssScores || '-'}</CustomTag>
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>KEV</Text>
-            <CustomTag>{kev ? 'Yes' : 'No'}</CustomTag>
-          </Grid>
+        <Stack spacing={6}>
+          <Flex alignItems={'center'} gap={3}>
+            <IconButton size='sm' colorScheme='blue' icon={<FaBug />} />
+            <Text fontSize={17} color={primaryBlueText} fontWeight={600}>
+              {vulnId}
+            </Text>
+          </Flex>
+          <SimpleGrid columns={2} gap={5}>
+            {vulnData?.map((item, index) => (
+              <Stack key={index} spacing={1}>
+                <Text {...label}>{item?.label}</Text>
+                <Text {...infoStyle}>{item?.value}</Text>
+              </Stack>
+            ))}
+          </SimpleGrid>
         </Stack>
       )}
     </LynkModal>
