@@ -146,16 +146,28 @@ const CompRelations = ({ data, compPath }) => {
   )
 
   const handleAdd = () => {
+    const isDependsOn = relations?.relType === 'depends_on'
     addRelation({
-      variables: { from: id, to: relations?.to, relType: relations?.relType }
+      variables: {
+        from: isDependsOn ? id : relations?.to,
+        to: isDependsOn ? relations?.to : id,
+        relType: 'depends_on'
+      }
     }).then((res) => {
       if (res?.data) {
         saveChanges()
         setIsAdded(true)
-        setDependsOnList((prev) => [
-          ...prev,
-          res?.data?.componentRelationCreate?.compRelation
-        ])
+        if (relations?.relType === 'dependency_of') {
+          setDependencyOfList((prev) => [
+            ...prev,
+            res?.data?.componentRelationCreate?.compRelation
+          ])
+        } else {
+          setDependsOnList((prev) => [
+            ...prev,
+            res?.data?.componentRelationCreate?.compRelation
+          ])
+        }
         showToast({
           description: 'Relations updated successfully',
           status: 'success'
@@ -222,13 +234,14 @@ const CompRelations = ({ data, compPath }) => {
               }
             >
               <option value=''>-- Select --</option>
-              {[{ value: 'depends_on', label: 'Depends On' }].map(
-                (item, idx) => (
-                  <option key={idx} value={item.value}>
-                    {item.label}
-                  </option>
-                )
-              )}
+              {[
+                { value: 'depends_on', label: 'Depends On' },
+                { value: 'dependency_of', label: 'Dependency Of' }
+              ].map((item, idx) => (
+                <option key={idx} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
             </Select>
           </FormControl>
           {allComponents && (
@@ -247,7 +260,11 @@ const CompRelations = ({ data, compPath }) => {
                 <option value=''>-- Select --</option>
                 {[...allComponents.sbom.components.nodes]
                   .filter((com) => com?.name !== name)
-                  .sort((a, b) => a?.name?.localeCompare(b?.name))
+                  .sort((a, b) =>
+                    relations?.relType === 'dependency_of'
+                      ? b?.name?.localeCompare(a?.name)
+                      : a?.name?.localeCompare(b?.name)
+                  )
                   .map((item, idx) => (
                     <option key={idx} value={item.id}>
                       {item.name}-{item.version}
