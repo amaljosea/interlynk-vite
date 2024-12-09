@@ -1167,7 +1167,9 @@ export const convertToCSV = (data, columns) => {
 
   // Rows
   data.forEach((row) => {
-    const values = columns.map((column) => row[column])
+    const values = columns.map((column) =>
+      row[column] !== undefined && row[column] !== null ? row[column] : 'NA'
+    )
     csvRows.push(values.join(','))
   })
 

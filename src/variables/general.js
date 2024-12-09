@@ -1263,7 +1263,11 @@ export const exportCsvTableConfig = {
           ].filter(Boolean)
 
           return linksArray.length > 0 ? linksArray.join('; ') : ''
-        })()
+        })(),
+        [row?.componentVulnCustomFields[0]?.componentVulnCustomFieldDefinition
+          .displayName || '']: row?.componentVulnCustomFields[0]?.value || 'NA',
+        [row?.componentVulnCustomFields[1]?.componentVulnCustomFieldDefinition
+          .displayName || '']: row?.componentVulnCustomFields[1]?.value || 'NA'
       }))
   },
   'SBOM License View': {

@@ -1,3 +1,4 @@
+import { useQuery } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -17,6 +18,8 @@ import { useProjectGroup } from 'hooks/useProjectGroup'
 import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
+
+import { GetCustomFields } from 'graphQL/Queries'
 
 import { FaFileCsv } from 'react-icons/fa6'
 
@@ -45,6 +48,10 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
     'grayBorderColor'
   ])
 
+  const { data: customFieldsData } = useQuery(GetCustomFields)
+  const customFieldNodes =
+    customFieldsData?.componentVulnCustomFieldDefinitions?.nodes
+
   const [rowsToExport, setRowsToExport] = useState('200')
   const [selectedColumns, setSelectedColumns] = useState([])
   const [availableColumns, setAvailableColumns] = useState([])
@@ -66,11 +73,22 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
 
   useEffect(() => {
     const config = exportCsvTableConfig[tableType]
+
     if (config) {
       setSelectedColumns(config.defaultSelectedColumns)
-      setAvailableColumns(config.additionalColumns)
+      if (
+        customFieldNodes?.length > 0 &&
+        tableType === 'SBOM Vulnerability View'
+      ) {
+        const customFields =
+          customFieldNodes?.map((node) => node?.displayName) || []
+
+        setAvailableColumns([...config.additionalColumns, ...customFields])
+      } else {
+        setAvailableColumns(config.additionalColumns)
+      }
     }
-  }, [tableType])
+  }, [tableType, customFieldNodes])
 
   const mapDataForExport = (fetchedNodes) => {
     const config = exportCsvTableConfig[tableType]
