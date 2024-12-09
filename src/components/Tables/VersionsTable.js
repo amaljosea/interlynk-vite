@@ -651,6 +651,8 @@ const VersionsTable = (props) => {
     selectableRowDisabled: disableRowCheckBox
   }
 
+  const existingId = nodes?.length > 0 ? nodes[0].id : null
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
@@ -702,7 +704,11 @@ const VersionsTable = (props) => {
       )}
       {/* BUILD SBOM */}
       {SBOM.isOpen && (
-        <ProductSbomDrawer isOpen={SBOM.isOpen} onClose={SBOM.onClose} />
+        <ProductSbomDrawer
+          id={existingId}
+          isOpen={SBOM.isOpen}
+          onClose={SBOM.onClose}
+        />
       )}
       {TOOL.isOpen && (
         <ToolsDrawer

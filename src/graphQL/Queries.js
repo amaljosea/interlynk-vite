@@ -1828,6 +1828,8 @@ export const GetPrimaryComponent = gql`
         totalCount
         nodes {
           id
+          name
+          kind
         }
       }
     }
@@ -1852,6 +1854,8 @@ export const GetSharPrimartComp = gql`
           totalCount
           nodes {
             id
+            name
+            kind
           }
         }
       }

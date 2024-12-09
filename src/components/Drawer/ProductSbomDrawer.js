@@ -1,9 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { isCustomerView } from 'utils'
-import { transformLicenseString } from 'utils'
+import { isCustomerView, transformLicenseString } from 'utils'
 import { componentTypes, infoData, sbomPhases } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -23,15 +22,33 @@ import LicenseField from 'components/Licenses/LicenseField'
 import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateComponent, sbomCreate } from 'graphQL/Mutation'
-import { GetAllSboms } from 'graphQL/Queries'
+import { GetAllSboms, GetPrimaryComponent } from 'graphQL/Queries'
 
-function ProductSbomDrawer({ isOpen, onClose }) {
+function ProductSbomDrawer({ id, isOpen, onClose }) {
   const params = useParams()
+  const { prodCompState } = useGlobalState()
   const { showToast } = useCustomToast()
   const customerView = isCustomerView()
+
+  const { field, direction } = prodCompState
+
+  // GET PRIMARY COMPONENT
+  const { data } = useQuery(GetPrimaryComponent, {
+    skip: !customerView && isOpen && id ? false : true,
+    variables: {
+      projectId: params?.productid,
+      sbomId: id,
+      primary: true,
+      field,
+      direction
+    }
+  })
+
+  const { nodes } = data?.sbom?.components || ''
 
   const { tabData, saveChanges } = useContext(TabContext)
   const { details } = tabData
@@ -138,6 +155,13 @@ function ProductSbomDrawer({ isOpen, onClose }) {
   const invalidVersion = compVersion !== '' && SBOMs?.includes(compVersion)
 
   const isInvalid = compKind === '' || compName === '' || compVersion === ''
+
+  useEffect(() => {
+    if (nodes?.length > 0) {
+      setCompName(nodes[0]?.name || '')
+      setCompKind(nodes[0]?.kind || '')
+    }
+  }, [nodes])
 
   return (
     <>

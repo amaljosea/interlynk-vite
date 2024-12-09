@@ -106,7 +106,8 @@ const ComponentsColumns = ({
                     fontWeight={'medium'}
                     color={primaryTextColor}
                   >
-                    {projectGroup?.name || ''}: {projectVersion || ''}
+                    {projectGroup?.name}{' '}
+                    {projectVersion ? `: ${projectVersion}` : ''}
                   </Text>
                 )}
                 {/* COMPONENT TYPE */}
