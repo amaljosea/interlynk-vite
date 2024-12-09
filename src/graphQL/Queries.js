@@ -2909,33 +2909,6 @@ export const SignedSbomDownload = gql`
   }
 `
 
-// Get all sharelynks
-export const GetAllShareLynks = gql`
-  query getAllShareLynks {
-    shareLynks {
-      id
-      enabled
-      updatedAt
-      signedUrlParams
-      shareUsers {
-        email
-        tos
-      }
-      contents {
-        __typename
-        ... on Image {
-          id
-          name
-        }
-        ... on Project {
-          id
-          name
-        }
-      }
-    }
-  }
-`
-
 // Customer page - Get All shared products
 export const ShareLynkProjectGroups = gql`
   query ShareLynkProjectGroups(
