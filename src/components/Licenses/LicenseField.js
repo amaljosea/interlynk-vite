@@ -57,12 +57,17 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   }
 
   const onLicenseChange = (selected) => {
-    if (sbomView) {
-      sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: selected })
-    } else {
-      handleChange('details', 'licenses', selected ? [selected] : [])
+    const license = {
+      value: selected?.value,
+      label: selected?.value,
+      type: selected?.type
     }
-    setLicenseType(selected?.type || '')
+    if (sbomView) {
+      sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: license })
+    } else {
+      handleChange('details', 'licenses', selected ? [license] : [])
+    }
+    setLicenseType(license?.type || '')
   }
 
   const handleInputChange = useCallback(
@@ -128,6 +133,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   const normalizedLicenseString = sbomView
     ? licenseString
     : licenseString?.[0] || null
+
   useEffect(() => {
     const payload = license ? [{ value: license, label: license }] : []
     if (sbomView) {
