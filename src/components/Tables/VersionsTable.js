@@ -350,27 +350,37 @@ const VersionsTable = (props) => {
           <SimpleGrid gap={1} width={'100%'} columns={5}>
             <Link to={link} onClick={() => onFilterSev(['critical'], id)}>
               <VulnBadge color='red' label='Critical' status={vulnRunStatus}>
-                {stats?.vulnStats?.critical || 0}
+                {vulnRunStatus === 'NOT_STARTED'
+                  ? '-'
+                  : stats?.vulnStats?.critical || 0}
               </VulnBadge>
             </Link>
             <Link to={link} onClick={() => onFilterSev(['high'], id)}>
               <VulnBadge color='orange' label='High' status={vulnRunStatus}>
-                {stats?.vulnStats?.high || 0}
+                {vulnRunStatus === 'NOT_STARTED'
+                  ? '-'
+                  : stats?.vulnStats?.high || 0}
               </VulnBadge>
             </Link>
             <Link to={link} onClick={() => onFilterSev(['medium'], id)}>
               <VulnBadge color='yellow' label='Medium' status={vulnRunStatus}>
-                {stats?.vulnStats?.medium || 0}
+                {vulnRunStatus === 'NOT_STARTED'
+                  ? '-'
+                  : stats?.vulnStats?.medium || 0}
               </VulnBadge>
             </Link>
             <Link to={link} onClick={() => onFilterSev(['low'], id)}>
               <VulnBadge color='green' label='Low' status={vulnRunStatus}>
-                {stats?.vulnStats?.low || 0}
+                {vulnRunStatus === 'NOT_STARTED'
+                  ? '-'
+                  : stats?.vulnStats?.low || 0}
               </VulnBadge>
             </Link>
             <Link to={link} onClick={() => onFilterSev(['unknown'], id)}>
               <VulnBadge color='gray' label='Unknown' status={vulnRunStatus}>
-                {stats?.vulnStats?.unknown || 0}
+                {vulnRunStatus === 'NOT_STARTED'
+                  ? '-'
+                  : stats?.vulnStats?.unknown || 0}
               </VulnBadge>
             </Link>
           </SimpleGrid>
