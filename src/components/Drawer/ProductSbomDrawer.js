@@ -2,13 +2,11 @@ import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { isCustomerView, transformLicenseString } from 'utils'
-import { hasWhiteSpace, validateUrl } from 'utils'
+import { hasWhiteSpace, isCustomerView, validateUrl } from 'utils'
 import { componentTypes, infoData, sbomPhases } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
-  Divider,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -17,7 +15,7 @@ import {
   DrawerOverlay
 } from '@chakra-ui/react'
 import { Button, Flex, Stack, Text, Tooltip, chakra } from '@chakra-ui/react'
-import { Checkbox, Input, Select, Textarea } from '@chakra-ui/react'
+import { Checkbox, Divider, Input, Select, Textarea } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
@@ -30,9 +28,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { CreateComponent, sbomCreate, supplierCreate } from 'graphQL/Mutation'
 import { GetAllSboms, GetPrimaryComponent } from 'graphQL/Queries'
 
-function ProductSbomDrawer({ id, isOpen, onClose }) {
+function ProductSbomDrawer({ sbom, isOpen, onClose }) {
   const params = useParams()
-  const { prodCompState } = useGlobalState()
+  const { prodCompState, sbomState } = useGlobalState()
   const { showToast } = useCustomToast()
   const customerView = isCustomerView()
 
@@ -45,10 +43,10 @@ function ProductSbomDrawer({ id, isOpen, onClose }) {
 
   // GET PRIMARY COMPONENT
   const { data } = useQuery(GetPrimaryComponent, {
-    skip: !customerView && isOpen && id ? false : true,
+    skip: !customerView && isOpen && sbom?.id ? false : true,
     variables: {
       projectId: params?.productid,
-      sbomId: id,
+      sbomId: sbom?.id,
       primary: true,
       field,
       direction
@@ -57,8 +55,7 @@ function ProductSbomDrawer({ id, isOpen, onClose }) {
 
   const { nodes } = data?.sbom?.components || ''
 
-  const { tabData, saveChanges } = useContext(TabContext)
-  const { details } = tabData
+  const { saveChanges } = useContext(TabContext)
 
   const productId = params.productid
 
@@ -144,15 +141,8 @@ function ProductSbomDrawer({ id, isOpen, onClose }) {
   const onPhaseChange = (value) => {
     setPhases(value)
   }
+
   const handleCreateComp = async (id) => {
-    const hasLicense = details?.licenses?.length > 0
-    const isCustomLicense =
-      hasLicense && details.licenses[0].type === 'Custom License'
-
-    const license = isCustomLicense
-      ? transformLicenseString(details.licenses[0].value)
-      : details?.licenses?.[0]?.value || ''
-
     await createComponent({
       variables: {
         sbomId: id,
@@ -163,8 +153,7 @@ function ProductSbomDrawer({ id, isOpen, onClose }) {
         group: groupInfo,
         internal: isInternal,
         version: compVersion,
-        description: compDesc,
-        licenses: { licensesExp: license }
+        description: compDesc
       }
     }).then((res) => {
       if (res?.data) {
@@ -178,13 +167,18 @@ function ProductSbomDrawer({ id, isOpen, onClose }) {
     const lifecycles =
       phases?.length > 0 ? phases?.map((item) => ({ name: item?.value })) : []
 
+    const license = sbomState?.expLicense
+      ? { licensesExp: sbomState?.expLicense }
+      : undefined
+
     createSbom({
       variables: {
         projectId: productId,
         spec: 'cyclonedx',
         specVersion: '1.4',
         format: 'json',
-        phases: lifecycles
+        phases: lifecycles,
+        licenses: license
       }
     }).then((res) => {
       if (res.data.sbomCreate.errors.length === 0) {
@@ -229,9 +223,32 @@ function ProductSbomDrawer({ id, isOpen, onClose }) {
     isInvalidEmail
 
   useEffect(() => {
+    if (sbom) {
+      if (sbom?.phases?.length > 0) {
+        setPhases(() =>
+          sbom?.phases?.map((item) => ({ label: item, value: item }))
+        )
+      }
+      if (sbom?.suppliers?.length > 0) {
+        setFormData({
+          name: sbom?.suppliers[0]?.name || '',
+          url: sbom?.suppliers[0]?.url || '',
+          contactName: sbom?.suppliers[0]?.contactName || '',
+          contactEmail: sbom?.suppliers[0]?.contactEmail || ''
+        })
+      }
+    }
+  }, [sbom])
+
+  useEffect(() => {
     if (nodes?.length > 0) {
-      setCompName(nodes[0]?.name || '')
-      setCompKind(nodes[0]?.kind || '')
+      const component = nodes[0]
+      setInterval(component?.internal)
+      setCompName(component?.name || '')
+      setCompKind(component?.kind || '')
+      setCompScope(component?.scope || '')
+      setGroupInfo(component?.group || '')
+      setCompDesc(component?.description || '')
     }
   }, [nodes])
 
@@ -389,9 +406,9 @@ function ProductSbomDrawer({ id, isOpen, onClose }) {
               </FormControl>
               {/* LICENSES */}
               <LicenseField
-                sbomView={false}
+                sbomView={true}
                 isDisabled={customerView}
-                license={null}
+                license={sbom ? sbom.licensesExp : null}
               />
               {/* SCOPE */}
               <FormControl>

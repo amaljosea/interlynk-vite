@@ -651,7 +651,7 @@ const VersionsTable = (props) => {
     selectableRowDisabled: disableRowCheckBox
   }
 
-  const existingId = nodes?.length > 0 ? nodes[0].id : null
+  const existingSbom = nodes?.length > 0 ? nodes[0] : null
 
   return (
     <>
@@ -705,7 +705,7 @@ const VersionsTable = (props) => {
       {/* BUILD SBOM */}
       {SBOM.isOpen && (
         <ProductSbomDrawer
-          id={existingId}
+          sbom={existingSbom}
           isOpen={SBOM.isOpen}
           onClose={SBOM.onClose}
         />

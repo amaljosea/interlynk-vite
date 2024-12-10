@@ -1140,11 +1140,13 @@ export const GetVersionsTable = gql`
         nodes {
           id
           spec
+          phases
           creationAt
           createdAt
           updatedAt
           lifecycle
           isReprocess
+          licensesExp
           projectVersion
           vulnRunStatus
           alternatives {
@@ -1152,6 +1154,13 @@ export const GetVersionsTable = gql`
           }
           sbomParts {
             id
+          }
+          suppliers {
+            id
+            name
+            url
+            contactEmail
+            contactName
           }
           stats {
             compCount
@@ -1850,7 +1859,13 @@ export const GetPrimaryComponent = gql`
         nodes {
           id
           name
+          internal
           kind
+          copyright
+          publisher
+          description
+          group
+          scope
         }
       }
     }
