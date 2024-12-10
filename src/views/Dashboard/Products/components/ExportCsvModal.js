@@ -48,7 +48,9 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
     'grayBorderColor'
   ])
 
-  const { data: customFieldsData } = useQuery(GetCustomFields)
+  const { data: customFieldsData } = useQuery(GetCustomFields, {
+    skip: tableType !== 'SBOM Vulnerability View'
+  })
   const customFieldNodes =
     customFieldsData?.componentVulnCustomFieldDefinitions?.nodes
 
