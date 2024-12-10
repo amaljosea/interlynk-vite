@@ -1,8 +1,9 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { client } from 'context/ApolloWrapper'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ReactSelect from 'react-select'
-import { getSignedUrlParams } from 'utils'
+import { convertToCSV, downloadCSV, getSignedUrlParams } from 'utils'
 import CompDrawer from 'views/Dashboard/Products/components/CompDrawer'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
@@ -51,6 +52,36 @@ import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
 import DownloadModal from './DownloadModal'
 import SigningModal from './SigningModal'
+
+export const GetComponentSupportData = gql`
+  query GetComponentExportData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $after: String
+    $includeParts: Boolean
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      components(
+        sbomId: $sbomId
+        first: $first
+        after: $after
+        includeParts: $includeParts
+      ) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        nodes {
+          name
+          version
+          supportLevel
+          endOfSupport
+        }
+      }
+    }
+  }
+`
 
 const SbomActions = ({ sbom }) => {
   const { showToast } = useCustomToast()
@@ -333,6 +364,60 @@ const SbomActions = ({ sbom }) => {
     })
   }
 
+  //Download CSV for support status
+  const handleExport = async () => {
+    const selectedColumns = ['name', 'version', 'supportLevel', 'endOfSupport']
+    const fileName = `${productName}-${version}-Support-Level.csv`
+
+    setIsLoading(true)
+    try {
+      let allFetchedData = []
+      let componentsHasNextPage = true
+      let componentsEndCursor = null
+
+      while (componentsHasNextPage) {
+        const componentsRes = await client.query({
+          query: GetComponentSupportData,
+          variables: {
+            projectId: productId,
+            sbomId,
+            first: 200,
+            after: componentsEndCursor || undefined,
+            includeParts: true
+          },
+          fetchPolicy: 'no-cache'
+        })
+
+        const fetchedComponents =
+          componentsRes?.data?.sbom?.components?.nodes || []
+        const pageInfo = componentsRes?.data?.sbom?.components?.pageInfo
+
+        allFetchedData.push(...fetchedComponents)
+        componentsEndCursor = pageInfo?.endCursor // Only assign once
+        componentsHasNextPage = pageInfo?.hasNextPage // Only assign once
+      }
+
+      if (allFetchedData.length > 0) {
+        const csvContent = convertToCSV(allFetchedData, selectedColumns)
+        downloadCSV(csvContent, fileName)
+      } else {
+        showToast({
+          description: 'No data available for export.',
+          status: 'warning'
+        })
+      }
+    } catch (error) {
+      console.error('Export Error:', error)
+      showToast({
+        description:
+          'Internal error during data download. Please try again in a few minutes.',
+        status: 'error'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const { style } = useSelect('version')
 
   const updateLabel = noPrimaryComp
@@ -373,8 +458,9 @@ const SbomActions = ({ sbom }) => {
         </Box>
         {/* UPDATE PRIMARY COMPONENT */}
         <Tooltip label={updateLabel} isDisabled={false}>
-          <Box display={signedUrlParams ? 'none' : 'flex'}>
+          <Box>
             <IconButton
+              display={signedUrlParams ? 'none' : 'flex'}
               isDisabled={status === 'signed' || !updateSboms || noPrimaryComp}
               colorScheme='blue'
               icon={<EditIcon />}
@@ -427,7 +513,12 @@ const SbomActions = ({ sbom }) => {
               isDisabled={isLoading}
             />
             <MenuList width='220px'>
-              <MenuItem onClick={downloadOriginalSbom}>
+              <MenuItem
+                onClick={() => {
+                  downloadOriginalSbom()
+                  setDownloadType('original')
+                }}
+              >
                 <Box>
                   <Box
                     fontSize='14px'
@@ -485,6 +576,27 @@ const SbomActions = ({ sbom }) => {
                   </Box>
                   <Box fontSize='12px' color={secondaryTextInverse}>
                     Download the current state of the version as PDF
+                  </Box>
+                </Box>
+              </MenuItem>
+              {/* Support Level CSV */}
+              <MenuItem
+                onClick={() => {
+                  handleExport()
+                  setDownloadType('csv')
+                }}
+              >
+                <Box>
+                  <Box
+                    fontSize='14px'
+                    fontWeight='bold'
+                    mb='4px'
+                    color={primaryTextColor}
+                  >
+                    Support Level
+                  </Box>
+                  <Box fontSize='12px' color={secondaryTextInverse}>
+                    Download CSV of current Support Level for all components
                   </Box>
                 </Box>
               </MenuItem>
@@ -597,7 +709,9 @@ const SbomActions = ({ sbom }) => {
         >
           <Spinner size='xl' color='white' mb={4} />
           <Text fontSize='lg' color='white'>
-            Downloading Original Sbom...
+            {downloadType === 'csv'
+              ? 'Downloading Support Level...'
+              : 'Downloading Original Sbom...'}
           </Text>
         </Center>
       )}
