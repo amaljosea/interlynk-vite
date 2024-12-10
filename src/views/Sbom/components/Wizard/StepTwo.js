@@ -77,7 +77,7 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
             </Link>
             {toVuln === null && (
               <Text fontSize={'sm'} color={primaryErrorColor}>
-                Current vulnerability not available
+                Data import is restricted
               </Text>
             )}
           </Stack>

@@ -44,11 +44,11 @@ export default class VulnsSection {
     await this.page.getByTestId(`product_Test`).click()
     await this.page.waitForTimeout(2000)
 
-    const version = await this.page.getByTestId('version').nth(0).isVisible()
+    const version = this.page.getByTestId('version').nth(0)
 
-    if (version) {
-      await this.page.getByTestId('version').nth(0).click()
-      await this.page.waitForTimeout(2000)
+    if (version.isVisible()) {
+      await version.click()
+      await this.page.waitForTimeout(3000)
 
       await this.page.getByRole('tab', { name: 'vulnerabilities' }).click()
       await this.page.waitForTimeout(3000)
@@ -66,18 +66,12 @@ export default class VulnsSection {
           await this.page.locator('//button[@aria-label="refresh"]').click()
           await this.page.waitForTimeout(5000)
 
-          const vulnOne = await this.page
-            .getByTestId('vexStatus')
-            .nth(0)
-            .isVisible()
-          const vulnTwo = await this.page
-            .getByTestId('vexStatus')
-            .nth(1)
-            .isVisible()
+          const vulnOne = this.page.getByTestId('vexStatus-GHSA-22wj-vf5f-wrvj')
+          const vulnTwo = this.page.getByTestId('vexStatus-GHSA-c43q-5hpj-4crv')
 
-          if (vulnOne) {
-            await this.page.getByTestId('vexStatus').nth(0).click()
-
+          if (vulnOne.isVisible()) {
+            await vulnOne.click()
+            await this.page.waitForTimeout(1000)
             await this.page
               .locator('//select[@aria-label="vex_status"]')
               .selectOption({ index: 1 })
@@ -90,16 +84,16 @@ export default class VulnsSection {
 
             await this.page.getByRole('button', { name: 'Save' }).click()
             await this.page.waitForTimeout(2000)
-            await this.page.getByTestId('vexStatus').nth(0).click()
+            await vulnOne.click()
           } else {
             errors.push('Vuln 1 not found')
           }
 
           await this.page.waitForTimeout(2000)
 
-          if (vulnTwo) {
-            await this.page.getByTestId('vexStatus').nth(1).click()
-
+          if (vulnTwo.isVisible()) {
+            await vulnTwo.click()
+            await this.page.waitForTimeout(1000)
             await this.page
               .locator('//select[@aria-label="vex_status"]')
               .selectOption({ index: 4 })
@@ -126,8 +120,6 @@ export default class VulnsSection {
     } else {
       errors.push('Version not found')
     }
-
-    expect(errors.length).toBe(0)
   }
 
   // STATUS
@@ -155,6 +147,8 @@ export default class VulnsSection {
         await this.handleUpdate()
         await this.page.waitForTimeout(3000)
       }
+
+      expect(errors.length).toBe(0)
     } catch (error) {
       throw error
     }
