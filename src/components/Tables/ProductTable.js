@@ -494,7 +494,7 @@ const ProductTable = ({
       id: 'ACTIONS',
       name: '',
       selector: (row) => {
-        const { enabled, labels, name } = row
+        const { enabled, name } = row
         return (
           <Menu>
             <LynkAction
@@ -526,7 +526,7 @@ const ProductTable = ({
                   onMouseLeave={() => setOpenTagMenu(false)}
                   isDisabled={!enabled || !canEditProduct}
                 >
-                  {labels?.length > 0 ? 'Update' : 'Add'} Label
+                  Edit Labels
                 </MenuItem>
                 {openTagMenu && !labelLoading && (
                   <Fade initialScale={0.9} in={openTagMenu} delay={0.2}>
