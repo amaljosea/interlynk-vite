@@ -3,7 +3,7 @@ import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
 import { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { isCustomerView, validateCpe } from 'utils'
+import { isCustomerView } from 'utils'
 
 import { Divider, Stack } from '@chakra-ui/react'
 
@@ -120,16 +120,15 @@ const CompIdentifiers = ({ data }) => {
     }
 
     // HANDLE CPE
-    const cpe = cpes?.[0] || ''
-    const isValid = cpe && validateCpe(cpe)
-    setTabData((prev) => ({
-      ...prev,
-      identifiers: {
-        ...prev.identifiers,
-        cpe,
-        cpeError: isValid ? '' : 'Invalid CPE'
-      }
-    }))
+    if (cpes?.length > 0) {
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: {
+          cpe: cpes[0],
+          ...prev.identifiers
+        }
+      }))
+    }
   }, [data, setTabData])
 
   return (

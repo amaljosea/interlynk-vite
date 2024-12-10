@@ -1,7 +1,8 @@
 import { useLazyQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
-import { isCustomerView, validateCpe } from 'utils'
+import { isCustomerView } from 'utils'
+import { validateCPEString } from 'utils/cpeUtils'
 import IdentifierLabel from 'views/Dashboard/Products/components/IdentifierLabel'
 
 import { FormControl, FormErrorMessage } from '@chakra-ui/react'
@@ -21,14 +22,27 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
   const [searchInput, setSearchInput] = useState('')
   const [options, setOptions] = useState([])
 
+  const validation = validateCPEString(identifiers?.cpe)
+  const { isValid, error } = validation || ''
+
   const onChange = (item) => {
     setValue(item)
-    if (item?.value) {
-      handleChange('identifiers', 'cpe', item?.value)
-      const matches = validateCpe(item?.value)
-      handleChange('identifiers', 'cpeError', matches ? '' : 'Invalid CPE')
-    } else {
-      handleChange('identifiers', 'cpe', '')
+    setSearchInput('')
+    handleChange('identifiers', 'cpe', item?.value || '')
+  }
+
+  const onBlur = () => {
+    if (searchInput) {
+      const result = options?.find(
+        (item) => item?.label?.toLowerCase() === searchInput.toLowerCase()
+      )
+      if (result) {
+        setValue(result)
+        handleChange('identifiers', 'cpe', result?.value)
+      } else {
+        alert('No matching option found.')
+      }
+      setSearchInput('')
     }
   }
 
@@ -68,7 +82,7 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
   return (
     <FormControl
       isReadOnly={customerView}
-      isInvalid={value && identifiers?.cpeError !== ''}
+      isInvalid={identifiers?.cpe && !isValid}
     >
       <IdentifierLabel
         title={`CPE`}
@@ -77,21 +91,22 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
         onClose={onClose}
       />
       <LynkSelect
-        name='cpe'
         id='cpe'
+        name='cpe'
+        value={value}
+        onBlur={onBlur}
+        options={options}
         placeholder={''}
         isClearable={true}
         isSearchable={true}
         isLoading={loading}
-        value={value}
         onChange={onChange}
-        inputValue={searchInput}
-        options={options}
         filterOption={null}
+        inputValue={searchInput}
         noOptionsMessage={() => null}
         onInputChange={onInputChange}
       />
-      <FormErrorMessage>This CPE format is not valid</FormErrorMessage>
+      <FormErrorMessage>{error || ''}</FormErrorMessage>
     </FormControl>
   )
 }

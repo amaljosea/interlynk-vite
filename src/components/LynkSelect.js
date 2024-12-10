@@ -37,9 +37,9 @@ const LynkSelect = (props) => {
 
   return props.isCreatable ? (
     <CreatableSelect
+      {...props}
       styles={style}
       className='react-select'
-      {...props}
       components={{
         ClearIndicator,
         DropdownIndicator,
@@ -48,9 +48,9 @@ const LynkSelect = (props) => {
     />
   ) : (
     <ReactSelect
+      {...props}
       styles={style}
       className='react-select'
-      {...props}
       components={{
         ClearIndicator,
         DropdownIndicator,
