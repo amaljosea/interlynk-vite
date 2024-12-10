@@ -43,8 +43,8 @@ const PrimaryTreeView = ({ updateSboms, status, noPrimaryComp }) => {
           colorScheme='blue'
           isLoading={loading}
           onClick={handleClick}
+          hidden={signedUrlParams}
           icon={<PiTreeStructure size={18} />}
-          display={signedUrlParams ? 'none' : 'flex'}
           isDisabled={status === 'signed' || !updateSboms || noPrimaryComp}
         />
       </Tooltip>

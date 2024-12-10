@@ -469,13 +469,11 @@ const SbomActions = ({ sbom }) => {
           </Box>
         </Tooltip>
         {/* GRAPH VIEW */}
-        {shouldShowDemoFeatures && (
-          <PrimaryTreeView
-            status={status}
-            updateSboms={updateSboms}
-            noPrimaryComp={noPrimaryComp}
-          />
-        )}
+        <PrimaryTreeView
+          status={status}
+          updateSboms={updateSboms}
+          noPrimaryComp={noPrimaryComp}
+        />
         {/* RELEASE DATE */}
         {shouldShowDemoFeatures && (
           <ReleaseDate
