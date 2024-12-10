@@ -37,6 +37,7 @@ export default class ChangelogSection {
           `//button[@aria-label='dropdown menu for Test']`
         )
         await actions.click()
+
         await this.page
           .locator(`//button[@aria-label='upload sbom for Test']`)
           .click()
@@ -48,7 +49,7 @@ export default class ChangelogSection {
         await this.page.waitForTimeout(2000)
 
         await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(3000)
 
         await product.click()
         await this.page.waitForTimeout(2000)
@@ -56,12 +57,12 @@ export default class ChangelogSection {
         const version = this.page.getByTestId('version').nth(0)
 
         if (version.isVisible()) {
-          await this.page.reload()
+          await this.page.waitForTimeout(3000)
 
           await version.click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(3000)
 
-          await this.page.getByRole('button', { name: 'Add Phase' }).click()
+          await this.page.getByTitle('add_phase').click()
           await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('combobox').fill('design')
@@ -70,7 +71,7 @@ export default class ChangelogSection {
           await this.page.waitForTimeout(1000)
 
           await this.page.locator("button[type='submit']").click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(3000)
 
           await this.page.getByRole('tab', { name: 'change log' }).click()
           await this.page.waitForTimeout(2000)

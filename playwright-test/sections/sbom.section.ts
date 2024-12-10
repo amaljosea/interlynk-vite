@@ -10,6 +10,7 @@ const errors: string[] = []
 const sbomName = 'python'
 const sbomVersion = '4.5.6'
 const sbomType = 'framework'
+const orgName = 'Interlynk Inc'
 
 export default class SbomSection {
   page: Page
@@ -44,6 +45,9 @@ export default class SbomSection {
         await this.page.getByPlaceholder('Enter name').fill(sbomName)
         await this.page.getByPlaceholder('Enter version').fill(sbomVersion)
         await this.page.getByLabel('Type *').selectOption(sbomType)
+        await this.page
+          .getByPlaceholder('Enter organization name')
+          .fill(orgName)
 
         await this.page.getByRole('button', { name: 'Save' }).click()
         await this.page.waitForTimeout(3000)
@@ -84,6 +88,9 @@ export default class SbomSection {
         await this.page.getByPlaceholder('Enter name').fill(sbomName)
         await this.page.getByPlaceholder('Enter version').fill(sbomVersion)
         await this.page.getByLabel('Type *').selectOption(sbomType)
+        await this.page
+          .getByPlaceholder('Enter organization name')
+          .fill(orgName)
 
         await this.page.getByRole('button', { name: 'Save' }).click()
         await this.page.waitForTimeout(5000)

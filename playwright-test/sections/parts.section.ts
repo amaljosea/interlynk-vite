@@ -138,6 +138,7 @@ export default class PartsSection {
           await this.page.waitForTimeout(2000)
 
           await this.page.getByRole('tab', { name: 'parts' }).click()
+          await this.page.waitForTimeout(3000)
 
           const part = this.page.getByTestId('sbom_part').nth(0)
 
