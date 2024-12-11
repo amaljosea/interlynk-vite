@@ -482,25 +482,8 @@ const SbomActions = ({ sbom }) => {
             noPrimaryComp={noPrimaryComp}
           />
         )}
-        {/* SIGNED SBOM */}
-        <Tooltip label={status === 'signed' ? 'Signed' : 'Unsigned'}>
-          <IconButton
-            display={signedUrlParams ? 'none' : 'flex'}
-            colorScheme='blue'
-            icon={
-              status === 'signed' ? (
-                <TbSignature size={22} />
-              ) : (
-                <TbSignatureOff size={22} />
-              )
-            }
-            onClick={setVerifyOpen}
-            // isDisabled={!signSboms || !updateSboms}
-            isDisabled={true}
-          />
-        </Tooltip>
         {/* DOWNLOAD SBOM */}
-        <Tooltip label='Download sbom' placement='top' shouldWrapChildren>
+        <Tooltip label='Download' placement='top' shouldWrapChildren>
           <Menu>
             <MenuButton
               as={IconButton}
