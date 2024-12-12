@@ -40,6 +40,7 @@ import {
   DownloadSBOM,
   GetCheckResults,
   GetComponentData,
+  GetProductManufacturer,
   GetProject,
   ShareProject,
   SignedSbomDownload
@@ -48,6 +49,7 @@ import {
 import { FaFileDownload } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 
+import { exportExcel } from '../DownloadUtils/excelUtils'
 import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
 import DownloadModal from './DownloadModal'
@@ -84,6 +86,7 @@ export const GetComponentSupportData = gql`
 `
 
 const SbomActions = ({ sbom }) => {
+  const { organization } = useGlobalState()
   const { showToast } = useCustomToast()
   const signedUrlParams = getSignedUrlParams()
   const [getData] = useLazyQuery(
@@ -180,6 +183,10 @@ const SbomActions = ({ sbom }) => {
   const shareFilterVersion = data
     ? data?.shareLynkQuery?.project?.sboms.find((item) => item.id === sbomId)
     : []
+
+  const { data: manufacturerData } = useQuery(GetProductManufacturer, {
+    variables: { id: productId }
+  })
 
   const uniqVersions = []
   const uniqShareVersions = []
@@ -428,6 +435,29 @@ const SbomActions = ({ sbom }) => {
     return null
   }
 
+  //Spreadsheet/Excel download
+  const handleExcelExport = async () => {
+    try {
+      await exportExcel(
+        setIsLoading,
+        productName,
+        version,
+        manufacturerData,
+        sbom,
+        organization,
+        productId,
+        sbomId
+      )
+    } catch (err) {
+      console.log(err)
+      showToast({
+        description:
+          'Error downloading SBOM spreadsheet. Please try again later.',
+        status: 'error'
+      })
+    }
+  }
+
   return (
     <>
       {/* ---------- SBOM ACTIONS ------------- */}
@@ -560,6 +590,7 @@ const SbomActions = ({ sbom }) => {
                   </Box>
                 </Box>
               </MenuItem>
+              <Divider />
               {/* Support Level CSV */}
               <MenuItem
                 onClick={() => {
@@ -578,6 +609,28 @@ const SbomActions = ({ sbom }) => {
                   </Box>
                   <Box fontSize='12px' color={secondaryTextInverse}>
                     Download CSV of current Support Level for all components
+                  </Box>
+                </Box>
+              </MenuItem>
+              <Divider />
+              {/*  SBOM EXCEL DOWNLOAD */}
+              <MenuItem
+                onClick={() => {
+                  setDownloadType('excel')
+                  handleExcelExport()
+                }}
+              >
+                <Box>
+                  <Box
+                    fontSize='14px'
+                    fontWeight='bold'
+                    mb='4px'
+                    color={primaryTextColor}
+                  >
+                    SBOM Spreadsheet
+                  </Box>
+                  <Box fontSize='12px' color={secondaryTextInverse}>
+                    Download Spreadsheet of SBOM
                   </Box>
                 </Box>
               </MenuItem>
@@ -692,7 +745,9 @@ const SbomActions = ({ sbom }) => {
           <Text fontSize='lg' color='white'>
             {downloadType === 'csv'
               ? 'Downloading Support Level...'
-              : 'Downloading Original Sbom...'}
+              : downloadType === 'excel'
+                ? 'Downloading spreadsheet...'
+                : 'Downloading Original Sbom...'}
           </Text>
         </Center>
       )}

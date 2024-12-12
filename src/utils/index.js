@@ -29,6 +29,8 @@ import QpkgIcon from 'assets/svg/qpkg.png'
 import RpmIcon from 'assets/svg/rpm.png'
 import SwidIcon from 'assets/svg/swid.png'
 import SwiftIcon from 'assets/svg/swift.png'
+import { parseISO } from 'date-fns'
+import { format as formatWithTZ, toZonedTime } from 'date-fns-tz'
 import { toLower } from 'lodash'
 import { PackageURL } from 'packageurl-js'
 import { sbomOrigin } from 'variables/general'
@@ -69,6 +71,28 @@ import {
 import { MdDelete, MdOutlineArchive, MdOutlineUnarchive } from 'react-icons/md'
 
 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+//Get formatted time accounting the time zone
+export function formatDateWithTimeZone(
+  date,
+  dateFormat = 'MMMM dd, yyyy hh:mm a zzz'
+) {
+  if (!date) return ''
+  const timeZone = date.endsWith('Z')
+    ? 'UTC' // If 'Z', it's UTC
+    : undefined
+
+  const parsedDate = parseISO(date)
+  const zonedDate = timeZone ? toZonedTime(parsedDate, timeZone) : parsedDate
+  return formatWithTZ(zonedDate, dateFormat, { timeZone })
+}
+
+//Get the formatted current date and time
+export const currentDateTime = (dateFormat = 'MMMM dd, yyyy hh:mm a') => {
+  const now = new Date()
+  const utcDate = toZonedTime(now, 'UTC')
+  return formatWithTZ(utcDate, dateFormat) + ' UTC'
+}
 
 export const isMobileOrTablet = () => {
   const userAgent = navigator.userAgent.toLowerCase()
