@@ -170,7 +170,6 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
     const license = sbomState?.expLicense
       ? { licensesExp: sbomState?.expLicense }
       : undefined
-
     createSbom({
       variables: {
         projectId: productId,
@@ -212,6 +211,8 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
   }
 
   const invalidVersion = compVersion !== '' && SBOMs?.includes(compVersion)
+
+  const isLoading = sbomLoading || compLoading || supLoading
 
   const isInvalid =
     compKind === '' ||
@@ -528,10 +529,10 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
                 title='Save SBOM'
                 colorScheme='blue'
                 variant={'outline'}
+                isLoading={isLoading}
                 width={'fit-content'}
                 isDisabled={isInvalid}
                 onClick={onCreateSBOM}
-                isLoading={sbomLoading || compLoading || supLoading}
               >
                 Save
               </Button>

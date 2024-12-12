@@ -3051,3 +3051,11 @@ export const CustomVulnCreate = gql`
     }
   }
 `
+
+export const RuleExecution = gql`
+  mutation RuleExecution($sbomId: Uuid!) {
+    automationRuleExecution(input: { sbomId: $sbomId }) {
+      errors
+    }
+  }
+`

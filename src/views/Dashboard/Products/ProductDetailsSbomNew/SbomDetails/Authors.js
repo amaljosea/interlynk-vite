@@ -59,7 +59,7 @@ const Authors = ({ data, permission }) => {
               sx={{ w: 'fit-content', h: 7 }}
             >
               <TagLabel>
-                {item?.name} - {item?.email}
+                {item?.name} {item?.email && `- ${item?.email}`}
               </TagLabel>
               <TagCloseButton
                 hidden={permission}
