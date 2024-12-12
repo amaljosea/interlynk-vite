@@ -7,14 +7,15 @@ import { getSignedUrlParams } from 'utils'
 import SbomActions from 'views/Sbom/components/SbomActions'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
-import { Box, Divider, Flex, Text, Tooltip } from '@chakra-ui/react'
+import { Divider, Flex, Text, Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
-import { Icon, IconButton } from '@chakra-ui/react'
+import { Icon } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
+import { SettingsTag } from 'components/Misc/SettingsTag'
 import { ProgressBar } from 'components/ProgressBar'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -28,22 +29,6 @@ import { GetProjectSettings } from 'graphQL/Queries'
 
 import { FaBug, FaCubes, FaLongArrowAltRight, FaRobot } from 'react-icons/fa'
 import { FaCircleCheck, FaTag } from 'react-icons/fa6'
-
-const SettingsTag = ({ icon, label, color, isDisabled }) => {
-  return (
-    <Tooltip label={label}>
-      <Box>
-        <IconButton
-          borderRadius={'full'}
-          size='xs'
-          icon={icon}
-          colorScheme={color}
-          disabled={isDisabled}
-        />
-      </Box>
-    </Tooltip>
-  )
-}
 
 const SbomDetails = ({ sbomData }) => {
   const params = useParams()
@@ -233,44 +218,44 @@ const SbomDetails = ({ sbomData }) => {
                     hidden={signedUrlParams}
                   >
                     <SettingsTag
-                      color={'blue'}
                       label={'Imported'}
                       icon={<DownloadIcon />}
+                      rounded
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
-                      color={'blue'}
                       label={'Checks'}
                       icon={<Search2Icon />}
                       isDisabled={!checksEnabled}
+                      rounded
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
-                      color={'blue'}
                       label={'Internal Labeling'}
                       icon={<FaTag />}
                       isDisabled={!internalComp}
+                      rounded
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
-                      color={'blue'}
                       label={'Automation'}
                       icon={<FaRobot />}
                       isDisabled={!automatedFixesEnabled}
+                      rounded
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
-                      color={'blue'}
                       label={'Vulnerability Scan'}
                       icon={<FaBug />}
                       isDisabled={!hasFinished || !vulnScan}
+                      rounded
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
                       label={'Ready'}
-                      color={'blue'}
                       icon={<FaCircleCheck />}
                       isDisabled={!hasFinished}
+                      rounded
                     />
                   </Flex>
                 </CardBody>

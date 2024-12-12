@@ -9,7 +9,6 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { Search2Icon } from '@chakra-ui/icons'
 import {
-  Box,
   Flex,
   Grid,
   GridItem,
@@ -32,6 +31,7 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
 import EnvList from 'components/Misc/EnvList'
+import { SettingsTag } from 'components/Misc/SettingsTag'
 import NotificationMenuBell from 'components/Notifications/NotificationMenuBell'
 import ChangelogTable from 'components/Tables/ChangelogTable'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
@@ -97,24 +97,6 @@ const GetProjectGroup = gql`
     }
   }
 `
-
-const SettingsTag = ({ icon, label, settings }) => {
-  return (
-    <Tooltip
-      label={`${label} ${settings ? 'Enabled' : 'Disabled'}`}
-      shouldWrapChildren
-    >
-      <Box>
-        <IconButton
-          size='xs'
-          icon={icon}
-          isDisabled={!settings}
-          colorScheme={'blue'}
-        />
-      </Box>
-    </Tooltip>
-  )
-}
 
 const ProductDetailsMain = () => {
   const { isFreeTier } = useGlobalQueryContext()
@@ -411,23 +393,23 @@ const ProductDetailsMain = () => {
                     >
                       <SettingsTag
                         icon={<Search2Icon />}
-                        label={'Checks'}
-                        settings={checksEnabled}
+                        label={`Checks ${checksEnabled ? 'Enabled' : 'Disabled'}`}
+                        isDisabled={!checksEnabled}
                       />
                       <SettingsTag
                         icon={<FaTag />}
-                        label={'Internal Labeling'}
-                        settings={internalCompMatchingEnabled}
+                        label={`Internal Labeling ${internalCompMatchingEnabled ? 'Enabled' : 'Disabled'}`}
+                        isDisabled={!internalCompMatchingEnabled}
                       />
                       <SettingsTag
                         icon={<FaBug />}
-                        label={'Vulnerability Scan'}
-                        settings={vulnScanningEnabled}
+                        label={`Vulnerability Scan ${vulnScanningEnabled ? 'Enabled' : 'Disabled'}`}
+                        isDisabled={!vulnScanningEnabled}
                       />
                       <SettingsTag
                         icon={<FaRobot />}
-                        label={'Automation'}
-                        settings={automatedFixesEnabled}
+                        label={`Automation ${automatedFixesEnabled ? 'Enabled' : 'Disabled'}`}
+                        isDisabled={!automatedFixesEnabled}
                       />
                       {warning && (
                         <Tooltip
