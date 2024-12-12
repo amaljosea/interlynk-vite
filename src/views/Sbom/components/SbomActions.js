@@ -229,7 +229,12 @@ const SbomActions = ({ sbom }) => {
           original: true
         }
       })
-      if (response.data.sbom.download === null) {
+
+      const downloadData = signedUrlParams
+        ? response?.data?.shareLynkQuery?.sbom?.download
+        : response?.data?.sbom?.download
+
+      if (!response.data || downloadData === null) {
         showToast({
           description: `No original SBOM present for this version.`,
           status: 'error'
@@ -238,15 +243,15 @@ const SbomActions = ({ sbom }) => {
         return
       }
       if (response.called) {
-        const decodedData = signedUrlParams
-          ? window.atob(response?.data?.shareLynkQuery?.sbom?.download)
-          : window.atob(response?.data?.sbom?.download)
+        const decodedData = window.atob(downloadData.content)
+        const blob = new Blob([decodedData], { type: downloadData.contentType })
 
-        const blob = new Blob([decodedData], { type: 'application/xml' })
+        const fileExtension =
+          downloadData.contentType === 'application/json' ? 'json' : 'xml'
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `${productName}-${version}.xml`
+        a.download = `${productName}-${version}.${fileExtension}`
         a.click()
         URL.revokeObjectURL(url)
       }

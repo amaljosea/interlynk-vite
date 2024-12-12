@@ -231,14 +231,14 @@ const DownloadModal = (props) => {
           setIsLoading(false)
           if (variables?.package === true) {
             const parsedJson = signedUrlParams
-              ? JSON.parse(res?.data?.shareLynkQuery?.sbom?.download)
-              : JSON.parse(res?.data?.sbom?.download)
+              ? JSON.parse(res?.data?.shareLynkQuery?.sbom?.download?.content)
+              : JSON.parse(res?.data?.sbom?.download?.content)
 
             downloadJsonFile(parsedJson)
           } else {
             const decodedData = signedUrlParams
-              ? window.atob(res?.data?.shareLynkQuery?.sbom?.download)
-              : window.atob(res?.data?.sbom?.download)
+              ? window.atob(res?.data?.shareLynkQuery?.sbom?.download?.content)
+              : window.atob(res?.data?.sbom?.download?.content)
             const parsedJson = JSON.parse(decodedData)
 
             downloadJsonFile(parsedJson)

@@ -2894,7 +2894,11 @@ export const DownloadSBOM = gql`
         dontPackageSbom: $package
         lite: $lite
         excludeParts: $excludeParts
-      )
+      ) {
+        content
+        contentType
+        filename
+      }
     }
   }
 `
@@ -2918,7 +2922,11 @@ export const SignedSbomDownload = gql`
           original: $original
           dontPackageSbom: $package
           lite: $lite
-        )
+        ) {
+          content
+          contentType
+          filename
+        }
       }
     }
   }
