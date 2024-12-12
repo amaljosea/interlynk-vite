@@ -74,6 +74,7 @@ const DownloadModal = (props) => {
   })
 
   const { data: manufacturerData } = useQuery(GetProductManufacturer, {
+    skip: isOpen && !signedUrlParams ? false : true,
     variables: { id: productId }
   })
 

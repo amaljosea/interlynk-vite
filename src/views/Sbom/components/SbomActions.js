@@ -47,7 +47,6 @@ import {
 } from 'graphQL/Queries'
 
 import { FaFileDownload } from 'react-icons/fa'
-import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 
 import { exportExcel } from '../DownloadUtils/excelUtils'
 import CheckModal from './CheckModal'
@@ -185,6 +184,7 @@ const SbomActions = ({ sbom }) => {
     : []
 
   const { data: manufacturerData } = useQuery(GetProductManufacturer, {
+    skip: isOpen && !signedUrlParams ? false : true,
     variables: { id: productId }
   })
 
@@ -529,6 +529,7 @@ const SbomActions = ({ sbom }) => {
                   downloadOriginalSbom()
                   setDownloadType('original')
                 }}
+                hidden={signedUrlParams}
               >
                 <Box>
                   <Box
@@ -544,7 +545,7 @@ const SbomActions = ({ sbom }) => {
                   </Box>
                 </Box>
               </MenuItem>
-              <Divider />
+              <Divider hidden={signedUrlParams} />
               {/* Updated SBOM */}
               <MenuItem
                 onClick={() => {
@@ -567,7 +568,7 @@ const SbomActions = ({ sbom }) => {
                   </Box>
                 </Box>
               </MenuItem>
-              <Divider />
+              <Divider hidden={signedUrlParams} />
               {/* PDF */}
               <MenuItem
                 isDisabled={isFreeTier}
@@ -575,6 +576,7 @@ const SbomActions = ({ sbom }) => {
                   onDownload()
                   setDownloadType('pdf')
                 }}
+                hidden={signedUrlParams}
               >
                 <Box>
                   <Box
@@ -590,13 +592,14 @@ const SbomActions = ({ sbom }) => {
                   </Box>
                 </Box>
               </MenuItem>
-              <Divider />
+              <Divider hidden={signedUrlParams} />
               {/* Support Level CSV */}
               <MenuItem
                 onClick={() => {
                   handleExport()
                   setDownloadType('csv')
                 }}
+                hidden={signedUrlParams}
               >
                 <Box>
                   <Box
@@ -612,13 +615,14 @@ const SbomActions = ({ sbom }) => {
                   </Box>
                 </Box>
               </MenuItem>
-              <Divider />
+              <Divider hidden={signedUrlParams} />
               {/*  SBOM EXCEL DOWNLOAD */}
               <MenuItem
                 onClick={() => {
                   setDownloadType('excel')
                   handleExcelExport()
                 }}
+                hidden={signedUrlParams}
               >
                 <Box>
                   <Box
