@@ -192,7 +192,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   return (
     <>
       <VStack spacing={4} alignItems={'flex-start'}>
-        <FormControl>
+        <FormControl isDisabled={signedUrlParams}>
           <FormLabel htmlFor={licenseType}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>License</Text>

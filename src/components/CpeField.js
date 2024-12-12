@@ -81,7 +81,7 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
 
   return (
     <FormControl
-      isReadOnly={customerView}
+      isDisabled={customerView}
       isInvalid={identifiers?.cpe && !isValid}
     >
       <IdentifierLabel
@@ -97,14 +97,15 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
         onBlur={onBlur}
         options={options}
         placeholder={''}
-        isClearable={true}
         isSearchable={true}
         isLoading={loading}
         onChange={onChange}
         filterOption={null}
+        isDisabled={customerView}
         inputValue={searchInput}
         noOptionsMessage={() => null}
         onInputChange={onInputChange}
+        isClearable={customerView ? false : true}
       />
       <FormErrorMessage>{error || ''}</FormErrorMessage>
     </FormControl>

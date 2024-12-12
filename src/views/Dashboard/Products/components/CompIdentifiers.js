@@ -93,41 +93,39 @@ const CompIdentifiers = ({ data }) => {
   }
 
   useEffect(() => {
-    if (!data) return
-    const { cpes, purl } = data || {}
-
-    // HANDLE PURL
-    const updatePurl = (msg) => {
-      setTabData((prev) => ({
-        ...prev,
-        identifiers: {
-          ...prev.identifiers,
-          purl: purl ? decodeURI(purl) : '',
-          purlError: msg
-        }
-      }))
-    }
-
-    if (purl) {
-      try {
-        PackageURL.fromString(decodeURI(purl))
-        updatePurl('')
-      } catch (ex) {
-        updatePurl(ex?.message)
+    if (data) {
+      const { cpes, purl } = data || {}
+      // HANDLE PURL
+      const updatePurl = (msg) => {
+        setTabData((prev) => ({
+          ...prev,
+          identifiers: {
+            ...prev.identifiers,
+            purl: purl ? decodeURI(purl) : '',
+            purlError: msg
+          }
+        }))
       }
-    } else {
-      updatePurl(true)
-    }
-
-    // HANDLE CPE
-    if (cpes?.length > 0) {
-      setTabData((prev) => ({
-        ...prev,
-        identifiers: {
-          cpe: cpes[0],
-          ...prev.identifiers
+      if (purl) {
+        try {
+          PackageURL.fromString(decodeURI(purl))
+          updatePurl('')
+        } catch (ex) {
+          updatePurl(ex?.message)
         }
-      }))
+      } else {
+        updatePurl(true)
+      }
+      // HANDLE CPE
+      if (cpes?.length > 0) {
+        setTabData((prev) => ({
+          ...prev,
+          identifiers: {
+            ...prev.identifiers,
+            cpe: cpes[0]
+          }
+        }))
+      }
     }
   }, [data, setTabData])
 

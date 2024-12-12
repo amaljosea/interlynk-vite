@@ -204,7 +204,7 @@ const CompDetails = ({ data, primaryComp }) => {
     <>
       <Stack direction={'column'} spacing={4} px={6}>
         {/* Name */}
-        <FormControl isReadOnly={customerView}>
+        <FormControl isDisabled={customerView}>
           <FormLabel htmlFor='name' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>
@@ -227,7 +227,7 @@ const CompDetails = ({ data, primaryComp }) => {
           />
         </FormControl>
         {/* Description */}
-        <FormControl isReadOnly={customerView}>
+        <FormControl isDisabled={customerView}>
           <FormLabel htmlFor='compDescription' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>Description</Text>
@@ -247,7 +247,7 @@ const CompDetails = ({ data, primaryComp }) => {
           />
         </FormControl>
         {/* Copyright */}
-        <FormControl isReadOnly={customerView}>
+        <FormControl isDisabled={customerView}>
           <FormLabel htmlFor='copyright' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>Copyright</Text>
@@ -267,7 +267,7 @@ const CompDetails = ({ data, primaryComp }) => {
           />
         </FormControl>
         {/* Version */}
-        <FormControl isReadOnly={customerView} isInvalid={invalidVersion}>
+        <FormControl isDisabled={customerView} isInvalid={invalidVersion}>
           <FormLabel htmlFor='version' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>
@@ -294,7 +294,7 @@ const CompDetails = ({ data, primaryComp }) => {
           </FormErrorMessage>
         </FormControl>
         {/* GROUP */}
-        <FormControl isReadOnly={customerView}>
+        <FormControl isDisabled={customerView}>
           <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>Group</Text>
@@ -312,7 +312,7 @@ const CompDetails = ({ data, primaryComp }) => {
           />
         </FormControl>
         {/* KIND */}
-        <FormControl>
+        <FormControl isDisabled={customerView}>
           <FormLabel htmlFor='componentType' fontSize={'sm'}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>
@@ -330,7 +330,6 @@ const CompDetails = ({ data, primaryComp }) => {
             name='kind'
             value={details?.kind}
             sx={inputStyle}
-            isDisabled={customerView}
             textTransform={'capitalize'}
             onChange={(e) => handleChange('details', 'kind', e.target.value)}
           >
@@ -353,7 +352,7 @@ const CompDetails = ({ data, primaryComp }) => {
           license={data?.licensesExp}
         />
         {/* SCOPE */}
-        <FormControl>
+        <FormControl isDisabled={customerView}>
           <FormLabel htmlFor='compScope'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>Scope</Text>
@@ -364,9 +363,8 @@ const CompDetails = ({ data, primaryComp }) => {
           </FormLabel>
           <Select
             name='scope'
-            value={details?.scope}
             sx={inputStyle}
-            isDisabled={customerView}
+            value={details?.scope}
             onChange={(e) => handleChange('details', 'scope', e.target.value)}
           >
             <option value='' style={{ background: 'lightgray' }}>
@@ -378,7 +376,7 @@ const CompDetails = ({ data, primaryComp }) => {
           </Select>
         </FormControl>
         {/* SUPPRT LEVEL */}
-        <FormControl hidden={customerView}>
+        <FormControl isDisabled={customerView}>
           <FormLabel htmlFor='supportLevel'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>Support Level</Text>
@@ -425,8 +423,8 @@ const CompDetails = ({ data, primaryComp }) => {
           )}
         </FormControl>
         {/* PRIMARY COMPONENT */}
-        <FormControl isReadOnly={customerView}>
-          <Flex alignItems={'center'} gap={2}>
+        <FormControl isDisabled={customerView}>
+          <FormLabel>
             <Checkbox
               size='sm'
               name='primary'
@@ -437,13 +435,13 @@ const CompDetails = ({ data, primaryComp }) => {
               Primary component
             </Checkbox>
             <Tooltip label={onCheck(`Primary Component`)}>
-              <InfoIcon fontSize={14} color={primaryBlueText} />
+              <InfoIcon ml={2} fontSize={14} color={primaryBlueText} />
             </Tooltip>
-          </Flex>
+          </FormLabel>
         </FormControl>
         {/* INTERNAL COMPONENT */}
-        <FormControl isReadOnly={customerView}>
-          <Flex alignItems={'center'} gap={2}>
+        <FormControl isDisabled={customerView}>
+          <FormLabel>
             <Checkbox
               size='sm'
               name='internal'
@@ -456,11 +454,11 @@ const CompDetails = ({ data, primaryComp }) => {
               Internal component
             </Checkbox>
             <Tooltip label={onCheck(`Internal Component`)}>
-              <InfoIcon fontSize={14} color={primaryBlueText} />
+              <InfoIcon ml={2} fontSize={14} color={primaryBlueText} />
             </Tooltip>
-          </Flex>
+          </FormLabel>
         </FormControl>
-        <Divider />
+        <Divider hidden={customerView} />
         {alert ? (
           <Stack spacing={4}>
             <LynkAlert

@@ -5,7 +5,7 @@ import { FormLabel, Link } from '@chakra-ui/react'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const IdentifierLabel = ({ isOpen, onOpen, onClose, title }) => {
-  const { customerView } = isCustomerView()
+  const customerView = isCustomerView()
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const testId = title?.startsWith('Package') ? 'purl_expand' : 'cpe_expand'
 

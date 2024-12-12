@@ -33,7 +33,7 @@ const PurlField = ({ isOpen, onOpen, onClose }) => {
 
   return (
     <FormControl
-      isReadOnly={customerView}
+      isDisabled={customerView}
       isInvalid={identifiers?.purl !== '' && identifiers?.purlError !== ''}
     >
       <IdentifierLabel
