@@ -69,6 +69,17 @@ export default class VulnsSection {
           const vulnOne = this.page.getByTestId('vexStatus-GHSA-22wj-vf5f-wrvj')
           const vulnTwo = this.page.getByTestId('vexStatus-GHSA-c43q-5hpj-4crv')
 
+          await this.page
+            .getByRole('tab', { name: 'vulnerabilities' })
+            .press('ControlOrMeta+/')
+          await this.page
+            .getByPlaceholder('Search', { exact: true })
+            .fill('GHSA-22wj-vf5f-wrvj')
+          await this.page
+            .getByPlaceholder('Search', { exact: true })
+            .press('Enter')
+          await this.page.waitForTimeout(2000)
+
           if (vulnOne.isVisible()) {
             await vulnOne.click()
             await this.page.waitForTimeout(1000)
@@ -89,6 +100,15 @@ export default class VulnsSection {
             errors.push('Vuln 1 not found')
           }
 
+          await this.page
+            .getByRole('tab', { name: 'vulnerabilities' })
+            .press('ControlOrMeta+/')
+          await this.page
+            .getByPlaceholder('Search', { exact: true })
+            .fill('GHSA-c43q-5hpj-4crv')
+          await this.page
+            .getByPlaceholder('Search', { exact: true })
+            .press('Enter')
           await this.page.waitForTimeout(2000)
 
           if (vulnTwo.isVisible()) {

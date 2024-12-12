@@ -35,10 +35,10 @@ export default class GeneralSection {
     await this.page.getByTestId(`product_Test`).click()
     await this.page.waitForTimeout(2000)
 
-    const version = await this.page.getByTestId('version').nth(0).isVisible()
+    const version = this.page.getByTestId('version').nth(0)
 
-    if (version) {
-      await this.page.getByTestId('version').nth(0).click()
+    if (version.isVisible()) {
+      await version.click()
       await this.page.waitForTimeout(2000)
 
       await this.page.locator(`//button[@aria-label='add_tool']`).click()
@@ -129,7 +129,6 @@ export default class GeneralSection {
         errors.push('Product not found')
       }
 
-      await this.page.waitForTimeout(2000)
       expect(errors.length).toBe(0)
     } catch (error) {
       throw error
@@ -179,7 +178,6 @@ export default class GeneralSection {
         errors.push('Product not found')
       }
 
-      await this.page.waitForTimeout(2000)
       expect(errors.length).toBe(0)
     } catch (error) {
       throw error
@@ -236,6 +234,7 @@ export default class GeneralSection {
             .locator(`//button[@aria-label='Delete product Test']`)
             .click()
           await this.page.locator("button[type='submit']").click()
+          await this.page.waitForTimeout(2000)
         } else {
           errors.push('Version not found')
         }
@@ -243,7 +242,6 @@ export default class GeneralSection {
         errors.push('Product not found')
       }
 
-      await this.page.waitForTimeout(2000)
       expect(errors.length).toBe(0)
     } catch (error) {
       throw error
