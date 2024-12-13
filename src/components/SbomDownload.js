@@ -199,6 +199,7 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
           'Error downloading SBOM spreadsheet. Please try again later.',
         status: 'error'
       })
+      setIsLoading(false)
     }
   }
 

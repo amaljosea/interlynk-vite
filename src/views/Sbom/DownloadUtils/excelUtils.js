@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx'
+import * as XLSX from 'xlsx-js-style'
 import { client } from 'context/ApolloWrapper'
 import { currentDateTime, formatDateWithTimeZone, listItemsForDoc } from 'utils'
 
@@ -25,6 +25,34 @@ const getMaxContentWidths = (data) => {
 const setColumnWidths = (worksheet, data) => {
   const widths = getMaxContentWidths(data)
   worksheet['!cols'] = widths.map((width) => ({ wch: width }))
+}
+
+//Function to style the headers
+function styleExcelHeaders(worksheet, headers, styles = {}) {
+  const {
+    fontSize = 12,
+    bold = true,
+    fontColor = '1A202C', // Default dark text color
+    backgroundColor = 'ADC6F9', // Default light blue background
+    patternType = 'solid'
+  } = styles
+
+  headers.forEach((header, index) => {
+    const cellAddress = XLSX.utils.encode_cell({ r: 0, c: index }) // r: row, c: column
+    if (worksheet[cellAddress]) {
+      worksheet[cellAddress].s = {
+        font: {
+          sz: fontSize,
+          bold: bold,
+          color: { rgb: fontColor }
+        },
+        fill: {
+          patternType: patternType,
+          fgColor: { rgb: backgroundColor }
+        }
+      }
+    }
+  })
 }
 
 export const exportExcel = async (
@@ -180,18 +208,52 @@ export const exportExcel = async (
       formatDateWithTimeZone(vulnerability?.vuln?.publishedAt) || 'NA'
   }))
 
+  let worksheetTwo = []
+  let worksheetThree = []
+
   // Convert data array to worksheet
   const worksheetOne = XLSX.utils.json_to_sheet(dataForSheetOne)
+  const headerKeysOne = Object.keys(dataForSheetOne[0])
+  styleExcelHeaders(worksheetOne, headerKeysOne, {
+    fontSize: 13,
+    bold: true,
+    fontColor: '1A202C', // Black text
+    backgroundColor: 'ADC6F9' // Blue background
+  })
   setColumnWidths(worksheetOne, dataForSheetOne)
-  const worksheetTwo = XLSX.utils.json_to_sheet(dataForSheetTwo)
-  setColumnWidths(worksheetTwo, dataForSheetTwo)
-  const worksheetThree = XLSX.utils.json_to_sheet(dataForSheetThree)
-  setColumnWidths(worksheetThree, dataForSheetThree)
+  if (dataForSheetTwo.length > 0) {
+    worksheetTwo = XLSX.utils.json_to_sheet(dataForSheetTwo)
+    const headerKeysTwo = Object.keys(dataForSheetTwo[0])
+    styleExcelHeaders(worksheetTwo, headerKeysTwo, {
+      fontSize: 13,
+      bold: true,
+      fontColor: '1A202C', // Black text
+      backgroundColor: 'C6EBC9' // Green background
+    })
+    setColumnWidths(worksheetTwo, dataForSheetTwo)
+  }
+  if (dataForSheetThree.length > 0) {
+    worksheetThree = XLSX.utils.json_to_sheet(dataForSheetThree)
+    const headerKeysThree = Object.keys(dataForSheetThree[0])
+    styleExcelHeaders(worksheetThree, headerKeysThree, {
+      fontSize: 13,
+      bold: true,
+      fontColor: '1A202C', // Black text
+      backgroundColor: 'F9D6D6' // Red background
+    })
+    setColumnWidths(worksheetThree, dataForSheetThree)
+  }
+
   // Create a workbook and append the worksheet
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(workbook, worksheetOne, 'Meta Data')
-  XLSX.utils.book_append_sheet(workbook, worksheetTwo, 'Components')
-  XLSX.utils.book_append_sheet(workbook, worksheetThree, 'Vulnerabilities')
+  if (dataForSheetTwo.length > 0) {
+    XLSX.utils.book_append_sheet(workbook, worksheetTwo, 'Components')
+  }
+  if (dataForSheetThree.length > 0) {
+    XLSX.utils.book_append_sheet(workbook, worksheetThree, 'Vulnerabilities')
+  }
+
   // Write the workbook to a file
   XLSX.writeFile(workbook, fileName)
   setIsLoading(false)
