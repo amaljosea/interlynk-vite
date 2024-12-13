@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 
-import { Skeleton, Stat, StatLabel, Tooltip } from '@chakra-ui/react'
+import { Box, Skeleton, Stat, StatLabel, Tooltip } from '@chakra-ui/react'
 
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
@@ -48,7 +48,9 @@ export const ProgressBar = ({ value, loading, text }) => {
             {loading ? (
               <Skeleton width={'100%'} height={4} borderRadius={'md'} />
             ) : (
-              <HealthScore value={value} />
+              <Box>
+                <HealthScore value={value} />
+              </Box>
             )}
           </Tooltip>
         </Stat>
