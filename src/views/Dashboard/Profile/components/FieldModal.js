@@ -1,4 +1,4 @@
-import { gql, useMutation } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
 import { FormControl, FormLabel, Input, Select } from '@chakra-ui/react'
@@ -8,6 +8,8 @@ import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
+
+import { GetCustomFields } from 'graphQL/Queries'
 
 import { FaRegPenToSquare } from 'react-icons/fa6'
 
@@ -69,6 +71,18 @@ const FieldModal = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
   const [createField, { loading: crLoading }] = useMutation(CreateField)
   const [updateField, { loading: upLoading }] = useMutation(UpdateField)
+
+  const { data: customFields } = useQuery(GetCustomFields)
+
+  const customFieldNodes =
+    customFields?.componentVulnCustomFieldDefinitions?.nodes
+
+  const isCustomRangePresent = customFieldNodes?.some(
+    (customFieldNode) => customFieldNode.fieldType === 'RANGE'
+  )
+  const isCustomTextPresent = customFieldNodes?.some(
+    (customFieldNode) => customFieldNode.fieldType === 'TEXT'
+  )
 
   const [formData, setFormData] = useState({
     displayName: '',
@@ -190,8 +204,12 @@ const FieldModal = ({ data, isOpen, onClose }) => {
             onChange={handleChange}
           >
             <option value=''>-- Select --</option>
-            <option value='TEXT'>Text</option>
-            <option value='RANGE'>Range</option>
+            <option disabled={isCustomTextPresent} value='TEXT'>
+              Text
+            </option>
+            <option disabled={isCustomRangePresent} value='RANGE'>
+              Range
+            </option>
           </Select>
         </FormControl>
         {/* VALUE */}
