@@ -5092,3 +5092,33 @@ export const GetComponentVulns = gql`
     }
   }
 `
+
+export const GetComponentSupportData = gql`
+  query GetComponentExportData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $after: String
+    $includeParts: Boolean
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      components(
+        sbomId: $sbomId
+        first: $first
+        after: $after
+        includeParts: $includeParts
+      ) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        nodes {
+          name
+          version
+          supportLevel
+          endOfSupport
+        }
+      }
+    }
+  }
+`

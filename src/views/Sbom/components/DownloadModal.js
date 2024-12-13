@@ -1,6 +1,7 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { getSignedUrlParams, truncatedValue } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
@@ -36,20 +37,16 @@ import ComplianceChecks from './ComplianceChecks'
 import { downloadSbomPdf } from './SbomPdf'
 
 const DownloadModal = (props) => {
-  const {
-    isOpen,
-    onClose,
-    productId,
-    productName,
-    version,
-    sbomId,
-    sbom,
-    downloadType
-  } = props || ''
+  const { isOpen, onClose, productName, version, sbom, downloadType } =
+    props || ''
+  const params = useParams()
+  const sbomId = params?.sbomid
+  const productId = params?.productid
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
   const { superAdmin } = organization?.currentUser || ''
   const signedUrlParams = getSignedUrlParams()
+
   const [getData] = useLazyQuery(
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
   )

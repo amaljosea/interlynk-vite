@@ -1,28 +1,17 @@
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { client } from 'context/ApolloWrapper'
-import { useEffect, useRef, useState } from 'react'
+import { useMutation, useQuery } from '@apollo/client'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ReactSelect from 'react-select'
-import { convertToCSV, downloadCSV, getSignedUrlParams } from 'utils'
+import { getSignedUrlParams } from 'utils'
 import CompDrawer from 'views/Dashboard/Products/components/CompDrawer'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
 import { DeleteIcon, EditIcon, SearchIcon } from '@chakra-ui/icons'
-import {
-  Box,
-  Center,
-  Divider,
-  Flex,
-  IconButton,
-  Spinner,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
-import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { Box, Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 
 import PrimaryTreeView from 'components/PrimaryTreeView'
 import ReleaseDate from 'components/ReleaseDate'
+import SbomDownload from 'components/SbomDownload'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -37,60 +26,20 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { recheckHealth, sbomDelete } from 'graphQL/Mutation'
 import {
-  DownloadSBOM,
   GetCheckResults,
   GetComponentData,
-  GetProductManufacturer,
   GetProject,
-  ShareProject,
-  SignedSbomDownload
+  ShareProject
 } from 'graphQL/Queries'
 
-import { FaFileDownload } from 'react-icons/fa'
-
-import { exportExcel } from '../DownloadUtils/excelUtils'
 import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
-import DownloadModal from './DownloadModal'
 import SigningModal from './SigningModal'
 
-export const GetComponentSupportData = gql`
-  query GetComponentExportData(
-    $projectId: Uuid!
-    $sbomId: Uuid!
-    $first: Int
-    $after: String
-    $includeParts: Boolean
-  ) {
-    sbom(projectId: $projectId, sbomId: $sbomId) {
-      components(
-        sbomId: $sbomId
-        first: $first
-        after: $after
-        includeParts: $includeParts
-      ) {
-        pageInfo {
-          endCursor
-          hasNextPage
-        }
-        nodes {
-          name
-          version
-          supportLevel
-          endOfSupport
-        }
-      }
-    }
-  }
-`
-
 const SbomActions = ({ sbom }) => {
-  const { organization } = useGlobalState()
   const { showToast } = useCustomToast()
   const signedUrlParams = getSignedUrlParams()
-  const [getData] = useLazyQuery(
-    signedUrlParams ? SignedSbomDownload : DownloadSBOM
-  )
+
   const {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     generateProductDetailPageUrlFromCurrentUrl
@@ -102,12 +51,7 @@ const SbomActions = ({ sbom }) => {
   const { dispatch } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch, sbomDispatch } = dispatch
 
-  const { primaryTextColor, secondaryTextInverse, secondaryTextColor } =
-    useThemeColor([
-      'primaryTextColor',
-      'secondaryTextInverse',
-      'secondaryTextColor'
-    ])
+  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
   const archiveSboms = useHasPermission({
     parentKey: 'view_sbom',
@@ -129,10 +73,6 @@ const SbomActions = ({ sbom }) => {
   const [signedData, setSignedData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [selectedVersion, setSelectedVersion] = useState(null)
-  const [downloadType, setDownloadType] = useState(null)
-
-  const initialRef = useRef(null)
-  const finalRef = useRef(null)
 
   const { data } = useQuery(signedUrlParams ? ShareProject : GetProject, {
     variables: {
@@ -140,14 +80,8 @@ const SbomActions = ({ sbom }) => {
     }
   })
 
-  const productName = sbom?.project?.projectGroup?.name
-  const version = sbom?.projectVersion
-
   const [deleteSbom] = useMutation(sbomDelete)
   const [healthRecheck] = useMutation(recheckHealth)
-
-  // DISCLOUSERS
-  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
     isOpen: isSBMOpen,
@@ -183,11 +117,6 @@ const SbomActions = ({ sbom }) => {
     ? data?.shareLynkQuery?.project?.sboms.find((item) => item.id === sbomId)
     : []
 
-  const { data: manufacturerData } = useQuery(GetProductManufacturer, {
-    skip: isOpen && !signedUrlParams ? false : true,
-    variables: { id: productId }
-  })
-
   const uniqVersions = []
   const uniqShareVersions = []
 
@@ -218,54 +147,6 @@ const SbomActions = ({ sbom }) => {
       })
     })
 
-  //Download Original Sbom
-  const downloadOriginalSbom = async () => {
-    setIsLoading(true)
-    try {
-      const response = await getData({
-        variables: {
-          sbomId,
-          projectId: signedUrlParams ? undefined : productId,
-          original: true
-        }
-      })
-
-      const downloadData = signedUrlParams
-        ? response?.data?.shareLynkQuery?.sbom?.download
-        : response?.data?.sbom?.download
-
-      if (!response.data || downloadData === null) {
-        showToast({
-          description: `No original SBOM present for this version.`,
-          status: 'error'
-        })
-        setIsLoading(false)
-        return
-      }
-      if (response.called) {
-        const decodedData = window.atob(downloadData.content)
-        const blob = new Blob([decodedData], { type: downloadData.contentType })
-
-        const fileExtension =
-          downloadData.contentType === 'application/json' ? 'json' : 'xml'
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `${productName}-${version}.${fileExtension}`
-        a.click()
-        URL.revokeObjectURL(url)
-      }
-      setIsLoading(false)
-    } catch (error) {
-      console.error('Error downloading original SBOM:', error)
-      showToast({
-        description: `Internal error during SBOM download. Please try again in a few minutes.`,
-        status: 'error'
-      })
-      setIsLoading(false)
-    }
-  }
-
   // GET PRIMARY COMPONENT DATA
   const {
     nodes: primaryComponent,
@@ -280,25 +161,6 @@ const SbomActions = ({ sbom }) => {
       projectId: productId
     }
   })
-
-  //Open Modal for sbom for updated SBOM or PDF
-  const onDownload = () => {
-    if (primaryCompLoading) {
-      showToast({
-        description:
-          'Primary component is still getting uploaded. Please try in some time',
-        status: 'warning'
-      })
-      return
-    }
-    if (signedUrlParams) {
-      onOpen()
-    } else {
-      healthRecheck({ variables: { sbomId } }).then(
-        (res) => res?.data && onOpen()
-      )
-    }
-  }
 
   const handleSBOMChange = (select) => {
     prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
@@ -376,60 +238,6 @@ const SbomActions = ({ sbom }) => {
     })
   }
 
-  //Download CSV for support status
-  const handleExport = async () => {
-    const selectedColumns = ['name', 'version', 'supportLevel', 'endOfSupport']
-    const fileName = `${productName}-${version}-Support-Level.csv`
-
-    setIsLoading(true)
-    try {
-      let allFetchedData = []
-      let componentsHasNextPage = true
-      let componentsEndCursor = null
-
-      while (componentsHasNextPage) {
-        const componentsRes = await client.query({
-          query: GetComponentSupportData,
-          variables: {
-            projectId: productId,
-            sbomId,
-            first: 200,
-            after: componentsEndCursor || undefined,
-            includeParts: true
-          },
-          fetchPolicy: 'no-cache'
-        })
-
-        const fetchedComponents =
-          componentsRes?.data?.sbom?.components?.nodes || []
-        const pageInfo = componentsRes?.data?.sbom?.components?.pageInfo
-
-        allFetchedData.push(...fetchedComponents)
-        componentsEndCursor = pageInfo?.endCursor // Only assign once
-        componentsHasNextPage = pageInfo?.hasNextPage // Only assign once
-      }
-
-      if (allFetchedData.length > 0) {
-        const csvContent = convertToCSV(allFetchedData, selectedColumns)
-        downloadCSV(csvContent, fileName)
-      } else {
-        showToast({
-          description: 'No data available for export.',
-          status: 'warning'
-        })
-      }
-    } catch (error) {
-      console.error('Export Error:', error)
-      showToast({
-        description:
-          'Internal error during data download. Please try again in a few minutes.',
-        status: 'error'
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const { style } = useSelect('version')
 
   const updateLabel = noPrimaryComp
@@ -438,29 +246,6 @@ const SbomActions = ({ sbom }) => {
 
   if (error) {
     return null
-  }
-
-  //Spreadsheet/Excel download
-  const handleExcelExport = async () => {
-    try {
-      await exportExcel(
-        setIsLoading,
-        productName,
-        version,
-        manufacturerData,
-        sbom,
-        organization,
-        productId,
-        sbomId
-      )
-    } catch (err) {
-      console.log(err)
-      showToast({
-        description:
-          'Error downloading SBOM spreadsheet. Please try again later.',
-        status: 'error'
-      })
-    }
   }
 
   return (
@@ -493,15 +278,13 @@ const SbomActions = ({ sbom }) => {
         </Box>
         {/* UPDATE PRIMARY COMPONENT */}
         <Tooltip label={updateLabel} isDisabled={false}>
-          <Box>
-            <IconButton
-              display={signedUrlParams ? 'none' : 'flex'}
-              isDisabled={status === 'signed' || !updateSboms || noPrimaryComp}
-              colorScheme='blue'
-              icon={<EditIcon />}
-              onClick={handleEditSbom}
-            />
-          </Box>
+          <IconButton
+            display={signedUrlParams ? 'none' : 'flex'}
+            isDisabled={status === 'signed' || !updateSboms || noPrimaryComp}
+            colorScheme='blue'
+            icon={<EditIcon />}
+            onClick={handleEditSbom}
+          />
         </Tooltip>
         {/* GRAPH VIEW */}
         <PrimaryTreeView
@@ -518,134 +301,7 @@ const SbomActions = ({ sbom }) => {
           />
         )}
         {/* DOWNLOAD SBOM */}
-        <Tooltip label='Download' placement='top' shouldWrapChildren>
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              size='md'
-              colorScheme='blue'
-              className='download'
-              icon={<FaFileDownload />}
-              isDisabled={isLoading}
-            />
-            <MenuList width='220px'>
-              <MenuItem
-                onClick={() => {
-                  downloadOriginalSbom()
-                  setDownloadType('original')
-                }}
-                hidden={signedUrlParams}
-              >
-                <Box>
-                  <Box
-                    fontSize='14px'
-                    fontWeight='bold'
-                    mb='4px'
-                    color={primaryTextColor}
-                  >
-                    Original SBOM
-                  </Box>
-                  <Box fontSize='12px' color={secondaryTextInverse}>
-                    Download the original SBOM file that created this version
-                  </Box>
-                </Box>
-              </MenuItem>
-              <Divider hidden={signedUrlParams} />
-              {/* Updated SBOM */}
-              <MenuItem
-                onClick={() => {
-                  onDownload()
-                  setDownloadType('sbom')
-                }}
-              >
-                <Box>
-                  <Box
-                    fontSize='14px'
-                    fontWeight='bold'
-                    mb='4px'
-                    color={primaryTextColor}
-                  >
-                    Updated SBOM
-                  </Box>
-                  <Box fontSize='12px' color={secondaryTextInverse}>
-                    Download the current state of the version as a CycloneDX /
-                    SPDX or SPDX-Lite file
-                  </Box>
-                </Box>
-              </MenuItem>
-              <Divider hidden={signedUrlParams} />
-              {/* PDF */}
-              <MenuItem
-                isDisabled={isFreeTier}
-                onClick={() => {
-                  onDownload()
-                  setDownloadType('pdf')
-                }}
-                hidden={signedUrlParams}
-              >
-                <Box>
-                  <Box
-                    fontSize='14px'
-                    fontWeight='bold'
-                    mb='4px'
-                    color={primaryTextColor}
-                  >
-                    PDF
-                  </Box>
-                  <Box fontSize='12px' color={secondaryTextInverse}>
-                    Download the current state of the version as PDF
-                  </Box>
-                </Box>
-              </MenuItem>
-              <Divider hidden={signedUrlParams} />
-              {/* Support Level CSV */}
-              <MenuItem
-                onClick={() => {
-                  handleExport()
-                  setDownloadType('csv')
-                }}
-                hidden={signedUrlParams}
-              >
-                <Box>
-                  <Box
-                    fontSize='14px'
-                    fontWeight='bold'
-                    mb='4px'
-                    color={primaryTextColor}
-                  >
-                    Support Level
-                  </Box>
-                  <Box fontSize='12px' color={secondaryTextInverse}>
-                    Download CSV of current Support Level for all components
-                  </Box>
-                </Box>
-              </MenuItem>
-              <Divider hidden={signedUrlParams} />
-              {/*  SBOM EXCEL DOWNLOAD */}
-              <MenuItem
-                onClick={() => {
-                  setDownloadType('excel')
-                  handleExcelExport()
-                }}
-                hidden={signedUrlParams}
-              >
-                <Box>
-                  <Box
-                    fontSize='14px'
-                    fontWeight='bold'
-                    mb='4px'
-                    color={primaryTextColor}
-                  >
-                    SBOM Spreadsheet
-                  </Box>
-                  <Box fontSize='12px' color={secondaryTextInverse}>
-                    Download Spreadsheet of SBOM
-                  </Box>
-                </Box>
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </Tooltip>
+        <SbomDownload sbom={sbom} primaryLoading={primaryCompLoading} />
         {/* DELETE SBOM */}
         <Tooltip label='Delete'>
           <IconButton
@@ -654,27 +310,11 @@ const SbomActions = ({ sbom }) => {
             onClick={setDeleteOpen}
             isDisabled={!archiveSboms}
             display={signedUrlParams ? 'none' : 'flex'}
-          ></IconButton>
+          />
         </Tooltip>
       </Flex>
 
       {/* ---------- ACTIONS MODALS / DRAWERS ------------- */}
-      {/* DOWNLOAD SBOM */}
-      {isOpen && (
-        <DownloadModal
-          initialRef={initialRef}
-          finalRef={finalRef}
-          isOpen={isOpen}
-          onClose={onClose}
-          productId={productId}
-          sbomId={sbomId}
-          productName={sbom?.project?.projectGroup?.name}
-          version={sbom?.projectVersion}
-          sbom={sbom}
-          downloadType={downloadType}
-        />
-      )}
-
       {/*  SET PRIMARY COMPONENT */}
       {isPrimaryOpen && (
         <CheckModal
@@ -725,6 +365,7 @@ const SbomActions = ({ sbom }) => {
       {isDeleteOpen && (
         <ConfirmationModal
           isOpen={isDeleteOpen}
+          isLoading={isLoading}
           onClose={setDeleteClose}
           onConfirm={handleDelete}
           name={`${sbom?.project?.projectGroup?.name} - ${sbom?.projectVersion}`}
@@ -734,31 +375,7 @@ const SbomActions = ({ sbom }) => {
             'Remove this versions and its SBOM',
             'Remove access to this version for all users'
           ]}
-          isLoading={isLoading}
         />
-      )}
-
-      {/* ---------- LOADING ------------- */}
-      {isLoading && !isDeleteOpen && (
-        <Center
-          position='fixed'
-          top='0'
-          left='0'
-          width='100vw'
-          height='100vh'
-          bg='rgba(0, 0, 0, 0.6)'
-          zIndex='overlay'
-          flexDirection='column'
-        >
-          <Spinner size='xl' color='white' mb={4} />
-          <Text fontSize='lg' color='white'>
-            {downloadType === 'csv'
-              ? 'Downloading Support Level...'
-              : downloadType === 'excel'
-                ? 'Downloading spreadsheet...'
-                : 'Downloading Original Sbom...'}
-          </Text>
-        </Center>
       )}
     </>
   )
