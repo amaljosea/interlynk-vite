@@ -274,7 +274,7 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
 
           {/* Name Input */}
           <FormControl id='name' mb={6} isRequired isInvalid={nameError !== ''}>
-            <FormLabel fontSize='13px'>Name</FormLabel>
+            <FormLabel>Name</FormLabel>
             <Input
               onChange={handleNameChange}
               placeholder='Enter your name'
@@ -288,7 +288,7 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
           {!isPasswordEdit && (
             <Flex alignItems={'flex-end'} gap={2}>
               <FormControl id='password'>
-                <FormLabel fontSize='13px'>Edit Password</FormLabel>
+                <FormLabel>Edit Password</FormLabel>
                 <Input
                   type='password'
                   isDisabled={true}
@@ -312,7 +312,7 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
             <Flex flexDirection={'column'} gap={6}>
               {/* Old Password */}
               <FormControl>
-                <FormLabel fontSize='13px'>Current Password</FormLabel>
+                <FormLabel>Current Password</FormLabel>
                 <InputGroup>
                   <Input
                     type={showOldPass ? 'text' : 'password'}
@@ -339,7 +339,7 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
                   (newPassword === oldPassword || !validPassword(newPassword))
                 }
               >
-                <FormLabel fontSize='13px'>New Password</FormLabel>
+                <FormLabel>New Password</FormLabel>
                 <InputGroup>
                   <Input
                     type={showNewPass ? 'text' : 'password'}
@@ -380,7 +380,7 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
 
               {/* Confirm Password */}
               <FormControl isInvalid={passError !== ''}>
-                <FormLabel fontSize='13px'>Confirm Password</FormLabel>
+                <FormLabel>Confirm Password</FormLabel>
                 <InputGroup>
                   <Input
                     type={showConfPass ? 'text' : 'password'}

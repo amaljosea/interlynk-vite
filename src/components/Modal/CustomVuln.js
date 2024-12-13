@@ -183,7 +183,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
     >
       <Stack spacing={4}>
         <FormControl>
-          <FormLabel htmlFor='cveLookup' fontSize={12}>
+          <FormLabel htmlFor='cveLookup'>
             CVE Lookup {`( Coming soon )`}
           </FormLabel>
           {/* <ReactSelect
@@ -209,9 +209,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
           /> */}
         </FormControl>
         <FormControl isRequired>
-          <FormLabel htmlFor='vulnIdentifier' fontSize={12}>
-            Identifier
-          </FormLabel>
+          <FormLabel htmlFor='vulnIdentifier'>Identifier</FormLabel>
           <Input
             fontSize={'sm'}
             name='vulnIdentifier'
@@ -221,9 +219,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
           />
         </FormControl>
         <FormControl isRequired>
-          <FormLabel htmlFor='desc' fontSize={12}>
-            Description
-          </FormLabel>
+          <FormLabel htmlFor='desc'>Description</FormLabel>
           <Textarea
             name='desc'
             fontSize={'sm'}
@@ -233,9 +229,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
           />
         </FormControl>
         <FormControl>
-          <FormLabel htmlFor='sev' fontSize={12}>
-            Severity
-          </FormLabel>
+          <FormLabel htmlFor='sev'>Severity</FormLabel>
           <Select
             name='sev'
             fontSize={'sm'}
@@ -251,36 +245,28 @@ const CustomVuln = ({ isOpen, onClose }) => {
           </Select>
         </FormControl>
         <FormControl>
-          <FormLabel mb={1} htmlFor='reportedAt' fontSize={12}>
-            Reported At
-          </FormLabel>
+          <FormLabel htmlFor='reportedAt'>Reported At</FormLabel>
           <LynkDate
             value={formData?.reportedAt}
             onChange={(newDate) => handleDateChange('reportedAt', newDate)}
           />
         </FormControl>
         <FormControl>
-          <FormLabel mb={1} htmlFor='publishedAt' fontSize={12}>
-            Published At
-          </FormLabel>
+          <FormLabel htmlFor='publishedAt'>Published At</FormLabel>
           <LynkDate
             value={formData?.publishedAt}
             onChange={(newDate) => handleDateChange('publishedAt', newDate)}
           />
         </FormControl>
         <FormControl>
-          <FormLabel mb={1} htmlFor='lastModifiedAt' fontSize={12}>
-            Last Modified At
-          </FormLabel>
+          <FormLabel htmlFor='lastModifiedAt'>Last Modified At</FormLabel>
           <LynkDate
             value={formData?.lastModifiedAt}
             onChange={(newDate) => handleDateChange('lastModifiedAt', newDate)}
           />
         </FormControl>
         <FormControl>
-          <FormLabel htmlFor='purl' fontSize={12}>
-            PURL
-          </FormLabel>
+          <FormLabel htmlFor='purl'>PURL</FormLabel>
           <Input
             name='purl'
             fontSize={'sm'}
@@ -290,9 +276,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
           />
         </FormControl>
         <FormControl>
-          <FormLabel htmlFor='cpe' fontSize={12}>
-            CPE
-          </FormLabel>
+          <FormLabel htmlFor='cpe'>CPE</FormLabel>
           <Input
             name='cpe'
             fontSize={'sm'}
@@ -303,9 +287,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
         </FormControl>
         {!compLoading && nodes && (
           <FormControl>
-            <FormLabel htmlFor='componentId' fontSize={12}>
-              Component
-            </FormLabel>
+            <FormLabel htmlFor='componentId'>Component</FormLabel>
             <Select
               fontSize={'sm'}
               name='componentId'

@@ -55,7 +55,7 @@ const EnvModal = ({ groupId, isOpen, onClose }) => {
       <Flex width={'100%'} direction={'column'} gap={4}>
         {error !== '' && <LynkAlert msg={error} />}
         <FormControl isRequired>
-          <FormLabel fontSize={12}>Name</FormLabel>
+          <FormLabel>Name</FormLabel>
           <Input
             type='text'
             value={productName || ''}

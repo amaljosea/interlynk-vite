@@ -93,7 +93,7 @@ const FileUpload = ({
     <Box>
       <Stack spacing={6}>
         <Stack spacing={0}>
-          <FormLabel fontSize={'12px'}>{label}</FormLabel>
+          <FormLabel>{label}</FormLabel>
           <Flex
             p={5}
             height={'110px'}

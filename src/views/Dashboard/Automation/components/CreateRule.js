@@ -352,9 +352,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
     >
       <Flex flexDir={'column'} alignItems={'flex-start'} gap={4}>
         <FormControl isRequired>
-          <FormLabel fontSize={12} htmlFor='ruleName'>
-            Rule Name
-          </FormLabel>
+          <FormLabel htmlFor='ruleName'>Rule Name</FormLabel>
           <Input
             type='text'
             name='ruleName'
@@ -366,9 +364,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
         </FormControl>
         {/* CONDITIONS */}
         <FormControl>
-          <FormLabel fontSize={12} htmlFor='conditions'>
-            Conditions
-          </FormLabel>
+          <FormLabel htmlFor='conditions'>Conditions</FormLabel>
           <RuleConditions
             conditions={conditions}
             setConditions={setConditions}
@@ -398,9 +394,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
         <Divider />
         {/* ACTIONS */}
         <FormControl>
-          <FormLabel fontSize={12} htmlFor='actions'>
-            Actions
-          </FormLabel>
+          <FormLabel htmlFor='actions'>Actions</FormLabel>
           <RuleActions
             actions={actions}
             setActions={setActions}

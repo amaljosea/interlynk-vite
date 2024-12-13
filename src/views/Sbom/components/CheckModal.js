@@ -505,7 +505,7 @@ const CheckModal = (props) => {
       {(shortDesc === 'Component has a type' ||
         shortDesc === 'Component has a valid type') && (
         <FormControl isDisabled={resolved}>
-          <FormLabel fontSize={'sm'}>
+          <FormLabel>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>Type</Text>
               <Tooltip label='Component Type'>
@@ -562,9 +562,7 @@ const CheckModal = (props) => {
           </FormControl>
           {/* END-OF-SUPPORT DATE */}
           <FormControl mb={5} isInvalid={!isValidDate}>
-            <FormLabel mb={1} htmlFor='endOfSupport'>
-              End-Of-Support Date
-            </FormLabel>
+            <FormLabel htmlFor='endOfSupport'>End-Of-Support Date</FormLabel>
             <LynkDate
               name='endOfSupport'
               value={endOfSupport}

@@ -121,7 +121,7 @@ const ImportRule = (props) => {
       <Flex flexDir={'column'} gap={3} alignItems={'flex-start'}>
         {errorMessage !== '' && <LynkAlert msg={errorMessage} />}
         <FormControl>
-          <FormLabel fontSize={12}>Upload JSON File</FormLabel>
+          <FormLabel>Upload JSON File</FormLabel>
           <Flex
             p={5}
             height={'110px'}

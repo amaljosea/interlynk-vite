@@ -86,7 +86,7 @@ const OrgModal = ({ isOpen, onClose }) => {
         {error !== '' && <LynkAlert msg={error} />}
         {/* NAME */}
         <FormControl isRequired>
-          <FormLabel fontSize={12}>Name</FormLabel>
+          <FormLabel>Name</FormLabel>
           <Input
             type='text'
             fontSize={14}
@@ -103,7 +103,7 @@ const OrgModal = ({ isOpen, onClose }) => {
         <FormControl
           isInvalid={(url !== '' && !validateUrl(url)) || containsSpace}
         >
-          <FormLabel fontSize={12}>URL</FormLabel>
+          <FormLabel>URL</FormLabel>
           <Input
             type='text'
             fontSize={14}
@@ -119,7 +119,7 @@ const OrgModal = ({ isOpen, onClose }) => {
         </FormControl>
         {/* EMAIL */}
         <FormControl isInvalid={email !== '' && !validateEmail(email)}>
-          <FormLabel fontSize={12}>Email</FormLabel>
+          <FormLabel>Email</FormLabel>
           <Input
             type='text'
             fontSize={14}

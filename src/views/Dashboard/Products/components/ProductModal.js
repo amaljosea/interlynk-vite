@@ -79,7 +79,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
       <Flex width={'100%'} direction={'column'} gap={4}>
         {error !== '' && <LynkAlert msg={errorMapping[error] || error} />}
         <FormControl isRequired>
-          <FormLabel fontSize={12}>Name</FormLabel>
+          <FormLabel>Name</FormLabel>
           <Input
             name='name'
             type='text'
@@ -89,7 +89,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
           />
         </FormControl>
         <FormControl>
-          <FormLabel fontSize={12}>Description</FormLabel>
+          <FormLabel>Description</FormLabel>
           <Textarea
             rows={5}
             name='desc'

@@ -285,7 +285,7 @@ const LegalModal = ({ data, isOpen, onClose }) => {
     >
       <Stack w={'100%'} spacing={5}>
         <FormControl isRequired>
-          <FormLabel fontSize={12}>Organization Name</FormLabel>
+          <FormLabel>Organization Name</FormLabel>
           <Input
             type='text'
             fontSize={14}
@@ -298,7 +298,7 @@ const LegalModal = ({ data, isOpen, onClose }) => {
           />
         </FormControl>
         <FormControl isInvalid={isValidUrl !== '' || containsSpace}>
-          <FormLabel fontSize={12}>URL</FormLabel>
+          <FormLabel>URL</FormLabel>
           <Input
             type='text'
             value={url}

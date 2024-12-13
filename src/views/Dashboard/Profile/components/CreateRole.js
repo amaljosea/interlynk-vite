@@ -90,12 +90,12 @@ const CreateRole = ({ isOpen, onClose }) => {
         {error !== '' && <LynkAlert msg={error} />}
         {/* NAME */}
         <FormControl isRequired>
-          <FormLabel fontSize={12}>Name</FormLabel>
+          <FormLabel>Name</FormLabel>
           <Input type='text' value={roleName} onChange={onNameChange} />
         </FormControl>
         {/* PERMISSIONS */}
         <FormControl isRequired>
-          <FormLabel fontSize={12}>Copy Permission From</FormLabel>
+          <FormLabel>Copy Permission From</FormLabel>
           <ReactSelect
             styles={style}
             className='react-select'

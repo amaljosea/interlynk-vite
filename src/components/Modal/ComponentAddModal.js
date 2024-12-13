@@ -263,7 +263,7 @@ function ComponentAddModal(props) {
           ) : (
             <>
               <FormControl isReadOnly={customerView}>
-                <FormLabel htmlFor='name' fontSize={'sm'}>
+                <FormLabel htmlFor='name'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Name
@@ -288,7 +288,7 @@ function ComponentAddModal(props) {
               </FormControl>
               {/* Description */}
               <FormControl isReadOnly={customerView}>
-                <FormLabel htmlFor='compDescription' fontSize={'sm'}>
+                <FormLabel htmlFor='compDescription'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Description</Text>
                     <Tooltip label={onCheck(`Component Description`)}>
@@ -308,7 +308,7 @@ function ComponentAddModal(props) {
               </FormControl>
               {/* Copyright */}
               <FormControl isReadOnly={customerView}>
-                <FormLabel htmlFor='copyright' fontSize={'sm'}>
+                <FormLabel htmlFor='copyright'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Copyright</Text>
                     <Tooltip label={onCheck(`Component Copyright`)}>
@@ -328,7 +328,7 @@ function ComponentAddModal(props) {
               </FormControl>
               {/* Version */}
               <FormControl isReadOnly={customerView} isInvalid={invalidVersion}>
-                <FormLabel htmlFor='version' fontSize={'sm'}>
+                <FormLabel htmlFor='version'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Version{' '}
@@ -357,7 +357,7 @@ function ComponentAddModal(props) {
               </FormControl>
               {/* GROUP */}
               <FormControl isReadOnly={customerView}>
-                <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
+                <FormLabel htmlFor='groupInfo'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Group</Text>
                     <Tooltip label={onCheck(`Component Group`)}>
@@ -377,7 +377,7 @@ function ComponentAddModal(props) {
               </FormControl>
               {/* KIND */}
               <FormControl>
-                <FormLabel htmlFor='componentType' fontSize={'sm'}>
+                <FormLabel htmlFor='componentType'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Type{' '}
@@ -507,7 +507,7 @@ function ComponentAddModal(props) {
                 isInvalid={!isValidDate}
                 hidden={signedUrlParams}
               >
-                <FormLabel mb={1} htmlFor='endOfSupport'>
+                <FormLabel htmlFor='endOfSupport'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>End-Of-Support Date</Text>
                     <Tooltip label={onCheck(`End-of-Support Date`)}>

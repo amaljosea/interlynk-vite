@@ -137,7 +137,7 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
         </Box>
         <Flex direction={'column'} gap={3}>
           <FormControl isInvalid={!!errorText} isRequired>
-            <FormLabel fontSize={12}>Regular Expression</FormLabel>
+            <FormLabel>Regular Expression</FormLabel>
             <Input
               required
               autoFocus
@@ -159,7 +159,7 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
             </Checkbox>
           </FormControl>
           <FormControl display='flex' alignItems='center'>
-            <FormLabel marginBlock={0}>Active</FormLabel>
+            <FormLabel>Active</FormLabel>
             <LynkSwitch
               isChecked={enabled}
               onChange={() => {

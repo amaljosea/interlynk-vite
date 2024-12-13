@@ -233,9 +233,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
         <LabelSelect value={label} onChange={(value) => handleChange(value)} />
         {/* PROJECTS */}
         <FormControl fontSize={'sm'} isRequired>
-          <FormLabel htmlFor='groups' fontSize={12}>
-            Product
-          </FormLabel>
+          <FormLabel htmlFor='groups'>Product</FormLabel>
           <LynkSelect
             name='groups'
             value={selectedGroup}
@@ -250,9 +248,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
         </FormControl>
         {/* ENVIRONMENTS */}
         <FormControl fontSize={'sm'} isRequired>
-          <FormLabel htmlFor='products' fontSize={12}>
-            Environment
-          </FormLabel>
+          <FormLabel htmlFor='products'>Environment</FormLabel>
           <LynkSelect
             name='products'
             value={selectedProd}
@@ -276,9 +272,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
         </FormControl>
         {/* Version */}
         <FormControl fontSize={'sm'} isRequired>
-          <FormLabel htmlFor='versions' fontSize={12}>
-            Version
-          </FormLabel>
+          <FormLabel htmlFor='versions'>Version</FormLabel>
           {versionsActual?.length === 0 && sbomVersions.length > 0 ? (
             <LynkAlert
               status='info'

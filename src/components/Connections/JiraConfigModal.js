@@ -249,7 +249,7 @@ const JiraConfigModal = ({
     >
       <Flex direction='column' gap={4}>
         <FormControl isRequired isDisabled={!updateCon}>
-          <FormLabel fontSize={12}>Jira Host URL</FormLabel>
+          <FormLabel>Jira Host URL</FormLabel>
           <Input
             value={jiraHost}
             placeholder='Enter Jira Host URL'
@@ -260,7 +260,7 @@ const JiraConfigModal = ({
           />
         </FormControl>
         <FormControl isRequired isDisabled={!updateCon}>
-          <FormLabel fontSize={12}>User Email</FormLabel>
+          <FormLabel>User Email</FormLabel>
           <Input
             value={jiraUsername}
             onChange={(e) => {
@@ -271,7 +271,7 @@ const JiraConfigModal = ({
           />
         </FormControl>
         <FormControl isRequired isDisabled={!updateCon}>
-          <FormLabel fontSize={12}>API Token</FormLabel>
+          <FormLabel>API Token</FormLabel>
           <InputGroup size='md'>
             <Input
               pr='4.5rem'

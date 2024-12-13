@@ -250,9 +250,7 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
         >
           {!noExpire && (
             <FormControl mb={3} isInvalid={!isValidDate}>
-              <FormLabel mb={1} htmlFor='expire'>
-                Expiration Date
-              </FormLabel>
+              <FormLabel htmlFor='expire'>Expiration Date</FormLabel>
               <LynkDate value={selectedDate} onChange={handleDateChange} />
               {!isValidDate && (
                 <FormErrorMessage>

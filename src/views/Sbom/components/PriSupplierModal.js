@@ -265,7 +265,7 @@ const PriSupplierModal = (props) => {
         <Flex width={'100%'} direction={'column'} gap={4}>
           {/* ORG NAME */}
           <FormControl isRequired isDisabled={resolved}>
-            <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
+            <FormLabel>Organization Name</FormLabel>
             <Input
               name='name'
               autoComplete='off'
@@ -279,7 +279,7 @@ const PriSupplierModal = (props) => {
             isDisabled={resolved}
             isInvalid={isInvalid || containsSpace}
           >
-            <FormLabel fontSize={'sm'}>URL</FormLabel>
+            <FormLabel>URL</FormLabel>
             <Input
               name='url'
               autoComplete='off'
@@ -292,7 +292,7 @@ const PriSupplierModal = (props) => {
           </FormControl>
           {/* SUPPLIER NAME */}
           <FormControl isDisabled={resolved}>
-            <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
+            <FormLabel>Contact Name</FormLabel>
             <Input
               minLength={4}
               maxLength={256}
@@ -305,7 +305,7 @@ const PriSupplierModal = (props) => {
           </FormControl>
           {/* SUPPLIER EMAIL */}
           <FormControl isDisabled={resolved}>
-            <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
+            <FormLabel>Contact Email</FormLabel>
             <Input
               type='email'
               autoComplete='off'

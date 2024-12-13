@@ -264,7 +264,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
             <Stack direction={'column'} spacing={4} pt={2} pb={4}>
               {/* Name */}
               <FormControl isReadOnly={customerView}>
-                <FormLabel htmlFor='compName' fontSize={'sm'}>
+                <FormLabel htmlFor='compName'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Name
@@ -287,7 +287,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               </FormControl>
               {/* Description */}
               <FormControl isReadOnly={customerView}>
-                <FormLabel htmlFor='compDescription' fontSize={'sm'}>
+                <FormLabel htmlFor='compDescription'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Description</Text>
                     <Tooltip label={onCheck(`Component Description`)}>
@@ -305,7 +305,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               </FormControl>
               {/* Version */}
               <FormControl isReadOnly={customerView} isInvalid={invalidVersion}>
-                <FormLabel htmlFor='compVersion' fontSize={'sm'}>
+                <FormLabel htmlFor='compVersion'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Version{' '}
@@ -332,7 +332,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               </FormControl>
               {/* GROUP */}
               <FormControl isReadOnly={customerView}>
-                <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
+                <FormLabel htmlFor='groupInfo'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Group</Text>
                     <Tooltip label={onCheck(`Component Group`)}>
@@ -350,7 +350,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               </FormControl>
               {/* KIND */}
               <FormControl>
-                <FormLabel htmlFor='componentType' fontSize={'sm'}>
+                <FormLabel htmlFor='componentType'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Type{' '}
@@ -386,7 +386,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               </FormControl>
               {/* PHASES */}
               <FormControl hidden={customerView}>
-                <FormLabel htmlFor='compPhases' fontSize={'sm'}>
+                <FormLabel htmlFor='compPhases'>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Phases</Text>
                     <Tooltip label={onCheck(`SBOM Phases`)}>
@@ -440,12 +440,12 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               </FormControl>
               {/* SUPPLIER */}
               <Stack>
-                <Text>Supplier Details</Text>
+                <Text fontWeight={'semibold'}>Supplier Details</Text>
                 <Divider />
               </Stack>
               {/* ORG NAME */}
               <FormControl isRequired>
-                <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
+                <FormLabel>Organization Name</FormLabel>
                 <Input
                   name='name'
                   fontSize={'sm'}
@@ -457,7 +457,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               </FormControl>
               {/* ORG URL */}
               <FormControl isInvalid={isInvalidSupplier || containsSpace}>
-                <FormLabel fontSize={'sm'}>URL</FormLabel>
+                <FormLabel>URL</FormLabel>
                 <Input
                   name='url'
                   fontSize={'sm'}
@@ -471,7 +471,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               </FormControl>
               {/* SUPPLIER NAME */}
               <FormControl>
-                <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
+                <FormLabel>Contact Name</FormLabel>
                 <Input
                   minLength={4}
                   fontSize={'sm'}
@@ -485,7 +485,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               </FormControl>
               {/* SUPPLIER EMAIL */}
               <FormControl isInvalid={isInvalidEmail}>
-                <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
+                <FormLabel>Contact Email</FormLabel>
                 <Input
                   type='email'
                   fontSize={'sm'}

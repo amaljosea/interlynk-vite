@@ -54,13 +54,13 @@ const RoleModal = ({ isOpen, onClose, data }) => {
         {error !== '' && <LynkAlert msg={error} />}
         {/* NAME */}
         <FormControl hidden={!data?.name}>
-          <FormLabel fontSize={12}>Name</FormLabel>
+          <FormLabel>Name</FormLabel>
           <Input type='text' defaultValue={data?.name || ''} disabled />
         </FormControl>
         {/* ROLES */}
         {roles && (
           <FormControl>
-            <FormLabel fontSize={12}>Role</FormLabel>
+            <FormLabel>Role</FormLabel>
             <Select
               value={role}
               onChange={(e) => setRole(e.target.value)}

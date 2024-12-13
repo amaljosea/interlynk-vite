@@ -208,7 +208,7 @@ const CompSupplier = ({ data }) => {
     <Flex width={'100%'} direction={'column'} gap={4} px={6} pb={20}>
       {/* ORG NAME */}
       <FormControl isRequired>
-        <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
+        <FormLabel>Organization Name</FormLabel>
         <Input
           fontSize={'sm'}
           value={supplier?.name}
@@ -222,7 +222,7 @@ const CompSupplier = ({ data }) => {
           (supplier?.url !== '' && !validateUrl(supplier?.url)) || containsSpace
         }
       >
-        <FormLabel fontSize={'sm'}>URL</FormLabel>
+        <FormLabel>URL</FormLabel>
         <Input
           fontSize={'sm'}
           value={supplier?.url}
@@ -234,7 +234,7 @@ const CompSupplier = ({ data }) => {
       </FormControl>
       {/* SUPPLIER NAME */}
       <FormControl isInvalid={supplier?.contactName !== '' && nameError !== ''}>
-        <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
+        <FormLabel>Contact Name</FormLabel>
         <Input
           fontSize={'sm'}
           onChange={onSupplierChange}
@@ -250,7 +250,7 @@ const CompSupplier = ({ data }) => {
           !validateEmail(supplier?.contactEmail)
         }
       >
-        <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
+        <FormLabel>Contact Email</FormLabel>
         <Input
           fontSize={'sm'}
           onBlur={handleCheckEmail}

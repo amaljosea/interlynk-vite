@@ -130,9 +130,7 @@ const SbomCompare = ({
             {/* PROJECT GROUPS */}
             {data?.organization?.projectGroups?.nodes?.length > 0 && (
               <FormControl fontSize={'sm'}>
-                <FormLabel htmlFor='groupOne' fontSize='md'>
-                  Product
-                </FormLabel>
+                <FormLabel htmlFor='groupOne'>Product</FormLabel>
                 <Select
                   name={isSbomOne ? 'groupOne' : 'groupTwo'}
                   id={isSbomOne ? 'groupOne' : 'groupTwo'}
@@ -157,9 +155,7 @@ const SbomCompare = ({
             )}
             {/* ENVIRONMENT */}
             <FormControl fontSize={'sm'}>
-              <FormLabel htmlFor='productOne' fontSize='md'>
-                Environment
-              </FormLabel>
+              <FormLabel htmlFor='productOne'>Environment</FormLabel>
               <Select
                 name={isSbomOne ? 'productOne' : 'productTwo'}
                 id={isSbomOne ? 'productOne' : 'productTwo'}

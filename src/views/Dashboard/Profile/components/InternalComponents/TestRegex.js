@@ -70,7 +70,7 @@ export const TextRegex = ({ regex, ignoreCase }) => {
 
   return (
     <div>
-      <FormLabel fontSize={12}>Test Regular Expression</FormLabel>
+      <FormLabel>Test Regular Expression</FormLabel>
       {items.map((item) => {
         const { isMatch } = checkIsMatch({ regex, ignoreCase, item })
         const color = isMatch ? 'green' : 'red'

@@ -173,7 +173,6 @@ export const config = {
   useSystemColorMode: colorMode ? false : true
 }
 
-// import { mode } from "@chakra-ui/theme-tools";
 export default extendTheme(
   {
     breakpoints,
@@ -181,7 +180,7 @@ export default extendTheme(
       Steps,
       FormLabel: {
         baseStyle: {
-          fontSize: '14px',
+          fontSize: 12,
           marginBottom: '4px'
         }
       }

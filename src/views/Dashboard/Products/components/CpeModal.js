@@ -250,9 +250,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           {error !== '' && <LynkAlert msg={error} />}
           {/* CPE STRING */}
           <FormControl isReadOnly>
-            <FormLabel fontSize={12} htmlFor='cpe'>
-              CPE String
-            </FormLabel>
+            <FormLabel htmlFor='cpe'>CPE String</FormLabel>
             <Textarea
               type='text'
               fontSize='sm'

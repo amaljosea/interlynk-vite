@@ -284,9 +284,7 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
       >
         <Flex width={'100%'} direction={'column'} gap={4}>
           <FormControl isInvalid={name !== '' && idUri === name}>
-            <FormLabel htmlFor='name' fontSize={12}>
-              Product name
-            </FormLabel>
+            <FormLabel htmlFor='name'>Product name</FormLabel>
             <Input
               type='text'
               name='name'
@@ -298,9 +296,7 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
             <FormErrorMessage>Invalid name</FormErrorMessage>
           </FormControl>
           <FormControl isInvalid={version !== '' && idUri === version}>
-            <FormLabel htmlFor='version' fontSize={12}>
-              Product version
-            </FormLabel>
+            <FormLabel htmlFor='version'>Product version</FormLabel>
             <Input
               type='text'
               fontSize={14}
@@ -312,18 +308,14 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
             <FormErrorMessage>Invalid version</FormErrorMessage>
           </FormControl>
           <FormControl>
-            <FormLabel mb={1} htmlFor='eol' fontSize={12}>
-              End of life
-            </FormLabel>
+            <FormLabel htmlFor='eol'>End of life</FormLabel>
             <LynkDate
               value={formData?.eol}
               onChange={(newDate) => handleDateChange('eol', newDate)}
             />
           </FormControl>
           <FormControl>
-            <FormLabel mb={1} htmlFor='eos' fontSize={12}>
-              End of service
-            </FormLabel>
+            <FormLabel htmlFor='eos'>End of service</FormLabel>
             <LynkDate
               value={formData?.eos}
               onChange={(newDate) => handleDateChange('eos', newDate)}
@@ -355,7 +347,7 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
           </HStack>
           <Stack alignItems={'flex-start'} gap={2}>
             <FormControl isRequired>
-              <FormLabel fontSize={12}>IDs</FormLabel>
+              <FormLabel>IDs</FormLabel>
               {data ? (
                 <Input
                   type='text'

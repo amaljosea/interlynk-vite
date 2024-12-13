@@ -62,7 +62,7 @@ function SignIn() {
               Enter your email and password to sign in
             </Text>
             <FormControl>
-              <FormLabel ms='4px' fontSize='sm' fontWeight='normal'>
+              <FormLabel ms='4px' fontWeight='normal'>
                 Email
               </FormLabel>
               <Input
@@ -73,7 +73,7 @@ function SignIn() {
                 placeholder='Your email adress'
                 size='lg'
               />
-              <FormLabel ms='4px' fontSize='sm' fontWeight='normal'>
+              <FormLabel ms='4px' fontWeight='normal'>
                 Password
               </FormLabel>
               <Input

@@ -72,7 +72,7 @@ const CopyModal = ({ isOpen, onClose, product, version }) => {
       <Flex flexDir={'column'} gap={5} mt={6}>
         {data && (
           <FormControl isRequired>
-            <FormLabel fontSize={16}>Product</FormLabel>
+            <FormLabel>Product</FormLabel>
             <Select
               name='product'
               value={selectedProduct}
@@ -89,7 +89,7 @@ const CopyModal = ({ isOpen, onClose, product, version }) => {
         )}
 
         <FormControl isRequired>
-          <FormLabel fontSize={12}>Version</FormLabel>
+          <FormLabel>Version</FormLabel>
           <Input
             type='text'
             value={selectedVersion}

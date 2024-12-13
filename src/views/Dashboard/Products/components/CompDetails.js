@@ -205,7 +205,7 @@ const CompDetails = ({ data, primaryComp }) => {
       <Stack direction={'column'} spacing={4} px={6}>
         {/* Name */}
         <FormControl isDisabled={customerView}>
-          <FormLabel htmlFor='name' fontSize={'sm'}>
+          <FormLabel htmlFor='name'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>
                 Name
@@ -228,7 +228,7 @@ const CompDetails = ({ data, primaryComp }) => {
         </FormControl>
         {/* Description */}
         <FormControl isDisabled={customerView}>
-          <FormLabel htmlFor='compDescription' fontSize={'sm'}>
+          <FormLabel htmlFor='compDescription'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>Description</Text>
               <Tooltip label={onCheck(`Component Description`)}>
@@ -248,7 +248,7 @@ const CompDetails = ({ data, primaryComp }) => {
         </FormControl>
         {/* Copyright */}
         <FormControl isDisabled={customerView}>
-          <FormLabel htmlFor='copyright' fontSize={'sm'}>
+          <FormLabel htmlFor='copyright'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>Copyright</Text>
               <Tooltip label={onCheck(`Component Copyright`)}>
@@ -268,7 +268,7 @@ const CompDetails = ({ data, primaryComp }) => {
         </FormControl>
         {/* Version */}
         <FormControl isDisabled={customerView} isInvalid={invalidVersion}>
-          <FormLabel htmlFor='version' fontSize={'sm'}>
+          <FormLabel htmlFor='version'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>
                 Version{' '}
@@ -295,7 +295,7 @@ const CompDetails = ({ data, primaryComp }) => {
         </FormControl>
         {/* GROUP */}
         <FormControl isDisabled={customerView}>
-          <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
+          <FormLabel htmlFor='groupInfo'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>Group</Text>
               <Tooltip label={onCheck(`Component Group`)}>
@@ -313,7 +313,7 @@ const CompDetails = ({ data, primaryComp }) => {
         </FormControl>
         {/* KIND */}
         <FormControl isDisabled={customerView}>
-          <FormLabel htmlFor='componentType' fontSize={'sm'}>
+          <FormLabel htmlFor='componentType'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
               <Text>
                 Type{' '}
@@ -405,7 +405,7 @@ const CompDetails = ({ data, primaryComp }) => {
         </FormControl>
         {/* END-OF-SUPPORT DATE */}
         <FormControl mb={5} isInvalid={!isValidDate} hidden={customerView}>
-          <FormLabel mb={1} htmlFor='endOfSupport'>
+          <FormLabel htmlFor='endOfSupport'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>End-Of-Support Date</Text>
               <Tooltip label={onCheck(`End-of-Support Date`)}>

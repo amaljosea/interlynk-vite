@@ -154,9 +154,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
     >
       <Stack direction={'column'} spacing={4} alignItems={'flex-start'}>
         <FormControl isRequired isDisabled={!updateLic}>
-          <FormLabel fontSize={12} htmlFor='name'>
-            Name
-          </FormLabel>
+          <FormLabel htmlFor='name'>Name</FormLabel>
           <Input
             name='name'
             id='name'
@@ -170,7 +168,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
         </FormControl>
 
         <FormControl isDisabled={!updateLic}>
-          <FormLabel fontSize={12} htmlFor='text'>
+          <FormLabel htmlFor='text'>
             License Text
             <Link
               color={primaryBlueText}
@@ -201,9 +199,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
         {drawerSize === 'md' && (
           <>
             <FormControl isDisabled={!updateLic}>
-              <FormLabel fontSize={12} htmlFor='url'>
-                URL
-              </FormLabel>
+              <FormLabel htmlFor='url'>URL</FormLabel>
               <Input
                 name='url'
                 id='url'
@@ -216,9 +212,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             </FormControl>
 
             <FormControl isDisabled={!updateLic}>
-              <FormLabel fontSize={12} htmlFor='comment'>
-                Comment
-              </FormLabel>
+              <FormLabel htmlFor='comment'>Comment</FormLabel>
               <Input
                 name='comment'
                 id='name'
@@ -231,9 +225,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             </FormControl>
 
             <FormControl>
-              <FormLabel fontSize={12} htmlFor='attributionKeys'>
-                Attribution Keys
-              </FormLabel>
+              <FormLabel htmlFor='attributionKeys'>Attribution Keys</FormLabel>
               <LynkSelect
                 isCreatable
                 isMulti
@@ -253,9 +245,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             </FormControl>
 
             <FormControl isDisabled={!updateLic}>
-              <FormLabel fontSize={12} htmlFor='warranty'>
-                Warranty
-              </FormLabel>
+              <FormLabel htmlFor='warranty'>Warranty</FormLabel>
               <Input
                 name='warranty'
                 id='warranty'
@@ -267,9 +257,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             </FormControl>
 
             <FormControl isDisabled={!updateLic}>
-              <FormLabel fontSize={12} htmlFor='governingLaws'>
-                Governing Laws
-              </FormLabel>
+              <FormLabel htmlFor='governingLaws'>Governing Laws</FormLabel>
               <Input
                 name='governingLaws'
                 id='governingLaws'
@@ -282,9 +270,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
 
             {/* Attribution */}
             <FormControl isDisabled={!updateLic}>
-              <FormLabel fontSize={12} htmlFor='attribution'>
-                Attribution
-              </FormLabel>
+              <FormLabel htmlFor='attribution'>Attribution</FormLabel>
               <Select
                 aria-label='license_attr'
                 onChange={(e) => setAttribution(e.target.value)}
@@ -299,9 +285,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
 
             {/* CopyLeft */}
             <FormControl isDisabled={!updateLic}>
-              <FormLabel fontSize={12} htmlFor='CopyLeft'>
-                CopyLeft
-              </FormLabel>
+              <FormLabel htmlFor='CopyLeft'>CopyLeft</FormLabel>
               <Select
                 onChange={(e) => setCopyLeft(e.target.value)}
                 value={copyLeft}
@@ -316,7 +300,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
 
             {/* Radios */}
             <FormControl isDisabled={!updateLic}>
-              <FormLabel fontSize={12} htmlFor='requiresSourceCode'>
+              <FormLabel htmlFor='requiresSourceCode'>
                 Requires Source Code
               </FormLabel>
               <RadioGroup
@@ -335,7 +319,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
               </RadioGroup>
             </FormControl>
             <FormControl isDisabled={!updateLic}>
-              <FormLabel fontSize={12} htmlFor='permitsModifications'>
+              <FormLabel htmlFor='permitsModifications'>
                 Permits Modifications
               </FormLabel>
               <RadioGroup
@@ -395,9 +379,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             </Checkbox>
 
             <FormControl isDisabled={!updateLic}>
-              <FormLabel fontSize={12} htmlFor='state'>
-                Status
-              </FormLabel>
+              <FormLabel htmlFor='state'>Status</FormLabel>
               <Select
                 fontSize={'sm'}
                 name='state'

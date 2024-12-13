@@ -178,7 +178,7 @@ function SBOMDrawer(props) {
         <DrawerHeader borderBottomWidth='1px'>Share Lynk</DrawerHeader>
         <DrawerBody>
           <FormControl fontSize={'sm'}>
-            <FormLabel htmlFor='product' fontSize='sm' color={headingTextColor}>
+            <FormLabel htmlFor='product' color={headingTextColor}>
               Product
             </FormLabel>
             <MultiSelect

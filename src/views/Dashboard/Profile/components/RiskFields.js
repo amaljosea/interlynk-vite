@@ -27,7 +27,7 @@ const RiskFields = () => {
           </CardHeader>
           <CardBody mt={2}>
             <FormControl w={'400px'}>
-              <FormLabel fontSize={12}>Inactivity {`(Days)`}</FormLabel>
+              <FormLabel>Inactivity {`(Days)`}</FormLabel>
               <Input
                 value={repoInactivity}
                 onChange={(e) => setRepoInactivity(e.target.value)}
@@ -44,14 +44,14 @@ const RiskFields = () => {
           <CardBody mt={2}>
             <Stack spacing={5}>
               <FormControl w={'400px'}>
-                <FormLabel fontSize={12}>Inactivity {`(Days)`}</FormLabel>
+                <FormLabel>Inactivity {`(Days)`}</FormLabel>
                 <Input
                   value={versionInactivity}
                   onChange={(e) => setVersionInactivity(e.target.value)}
                 />
               </FormControl>
               <FormControl w={'400px'}>
-                <FormLabel fontSize={12}>Version Release {`(Days)`}</FormLabel>
+                <FormLabel>Version Release {`(Days)`}</FormLabel>
                 <Input
                   value={versionRelease}
                   onChange={(e) => setVersionRelease(e.target.value)}

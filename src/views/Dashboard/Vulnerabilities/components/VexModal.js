@@ -349,9 +349,7 @@ const VexModal = ({
         <GridItem as={Flex} flexDir='column' gap={4} colSpan={11}>
           {/* STATUS */}
           <FormControl isRequired={nodes?.length === 0}>
-            <FormLabel htmlFor='vexType' fontSize='sm'>
-              Status
-            </FormLabel>
+            <FormLabel htmlFor='vexType'>Status</FormLabel>
             <Select
               id='vexType'
               name='vexType'
@@ -374,9 +372,7 @@ const VexModal = ({
           {/* JUSTIFICATION */}
           {statusName === 'Not Affected' && (
             <FormControl>
-              <FormLabel htmlFor='justification' fontSize='sm'>
-                Justification
-              </FormLabel>
+              <FormLabel htmlFor='justification'>Justification</FormLabel>
               <Select
                 fontSize='sm'
                 id='justification'
@@ -408,9 +404,7 @@ const VexModal = ({
           {/* IMPACT STATEMENT */}
           {statusName === 'Not Affected' && (
             <FormControl>
-              <FormLabel htmlFor='impactStatement' fontSize='sm'>
-                Impact Statement
-              </FormLabel>
+              <FormLabel htmlFor='impactStatement'>Impact Statement</FormLabel>
               <Textarea
                 type='text'
                 name='impactStatement'
@@ -435,9 +429,7 @@ const VexModal = ({
           {/* ACTION STATEMENT */}
           {statusName === 'Affected' && (
             <FormControl>
-              <FormLabel htmlFor='actionStatement' fontSize='sm'>
-                Action Statement
-              </FormLabel>
+              <FormLabel htmlFor='actionStatement'>Action Statement</FormLabel>
               <Textarea
                 rows={3}
                 name='actionStatement'
@@ -452,9 +444,7 @@ const VexModal = ({
           {/* RESPONSE */}
           {statusName === 'Affected' && (
             <FormControl>
-              <FormLabel htmlFor='response' fontSize='sm'>
-                Response
-              </FormLabel>
+              <FormLabel htmlFor='response'>Response</FormLabel>
               {allCdx && (
                 <Select
                   fontSize='sm'
@@ -477,9 +467,7 @@ const VexModal = ({
           {/* FIXED VERSION */}
           {responseTitle === 'Update' && (
             <FormControl width={'100%'} isRequired>
-              <FormLabel htmlFor='fixedVersion' fontSize='sm'>
-                Fixed Version
-              </FormLabel>
+              <FormLabel htmlFor='fixedVersion'>Fixed Version</FormLabel>
               <Select
                 fontSize='sm'
                 id='fixedVersion'
@@ -504,9 +492,7 @@ const VexModal = ({
           {/* DETAILS */}
           {statusName === 'In Triage' && (
             <FormControl>
-              <FormLabel htmlFor='details' fontSize='sm'>
-                Details
-              </FormLabel>
+              <FormLabel htmlFor='details'>Details</FormLabel>
               <Textarea
                 rows={2}
                 name='details'
@@ -520,9 +506,7 @@ const VexModal = ({
           )}
           {/* INTERNAL NOTES */}
           <FormControl>
-            <FormLabel htmlFor='internalNotes' fontSize='sm'>
-              Internal Notes
-            </FormLabel>
+            <FormLabel htmlFor='internalNotes'>Internal Notes</FormLabel>
             <Textarea
               rows={2}
               name='internalNotes'

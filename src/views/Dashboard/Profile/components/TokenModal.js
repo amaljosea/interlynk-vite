@@ -171,9 +171,7 @@ const TokenModal = ({ data, isOpen, onClose }) => {
           isRequired
           isInvalid={keyName !== '' && error !== ''}
         >
-          <FormLabel fontSize={12} htmlFor='keyName'>
-            Token Name
-          </FormLabel>
+          <FormLabel htmlFor='keyName'>Token Name</FormLabel>
           <Input
             type='text'
             id='keyName'
@@ -190,9 +188,7 @@ const TokenModal = ({ data, isOpen, onClose }) => {
       )}
       {!noExpire && (
         <FormControl mb={5} isRequired isInvalid={!isValidDate}>
-          <FormLabel fontSize={12} htmlFor='expire'>
-            Expiration Date
-          </FormLabel>
+          <FormLabel htmlFor='expire'>Expiration Date</FormLabel>
           <LynkDate value={selectedDate} onChange={handleDateChange} />
           {!isValidDate && (
             <FormErrorMessage>Please enter a valid datetime</FormErrorMessage>

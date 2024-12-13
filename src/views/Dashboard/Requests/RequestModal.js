@@ -66,7 +66,7 @@ const RequestModal = ({ isOpen, onClose }) => {
     >
       <Flex width={'100%'} direction={'column'} gap={4}>
         <FormControl isRequired>
-          <FormLabel fontSize={12}>Email</FormLabel>
+          <FormLabel>Email</FormLabel>
           <Input
             type='email'
             value={email}
@@ -74,7 +74,7 @@ const RequestModal = ({ isOpen, onClose }) => {
           />
         </FormControl>
         <FormControl>
-          <FormLabel fontSize={12}>Product Name</FormLabel>
+          <FormLabel>Product Name</FormLabel>
           <Input
             type='text'
             value={productName}
@@ -82,7 +82,7 @@ const RequestModal = ({ isOpen, onClose }) => {
           />
         </FormControl>
         <FormControl>
-          <FormLabel fontSize={12}>Product Version</FormLabel>
+          <FormLabel>Product Version</FormLabel>
           <Input
             type='text'
             value={productVersion}
@@ -90,7 +90,7 @@ const RequestModal = ({ isOpen, onClose }) => {
           />
         </FormControl>
         <FormControl>
-          <FormLabel fontSize={12}>Notes</FormLabel>
+          <FormLabel>Notes</FormLabel>
           <Textarea
             type='text'
             value={notes}

@@ -112,7 +112,7 @@ const UploadModal = ({ isOpen, onClose, group }) => {
         {errorMessage !== '' && <LynkAlert msg={errorMessage} />}
         <Stack spacing={6} minHeight='290px'>
           <FormControl>
-            <FormLabel fontSize={12}>Environment</FormLabel>
+            <FormLabel>Environment</FormLabel>
             <Select
               id='dataRetention'
               value={selectedEnv}

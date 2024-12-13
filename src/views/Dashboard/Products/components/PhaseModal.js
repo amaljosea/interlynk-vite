@@ -86,9 +86,7 @@ const PhaseModal = ({ data, isOpen, onClose }) => {
       <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
         {error && <LynkAlert msg={error} />}
         <FormControl>
-          <FormLabel htmlFor='phases' fontSize={'sm'}>
-            Phases
-          </FormLabel>
+          <FormLabel htmlFor='phases'>Phases</FormLabel>
           <LynkSelect
             isMulti={true}
             value={phases}

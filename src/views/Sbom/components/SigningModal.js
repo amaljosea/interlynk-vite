@@ -110,7 +110,7 @@ const SigningModal = ({
           </Box>
           {/* Algorithm */}
           <FormControl isRequired>
-            <FormLabel fontSize={14}>Algorithm</FormLabel>
+            <FormLabel>Algorithm</FormLabel>
             <Select
               id='algorithm'
               name='algorithm'
@@ -127,7 +127,7 @@ const SigningModal = ({
             <>
               {/* Cerificate */}
               <FormControl isRequired>
-                <FormLabel fontSize={14}>Cerificate</FormLabel>
+                <FormLabel>Cerificate</FormLabel>
                 <Textarea
                   value={certificate}
                   onChange={(e) => setCertificate(e.target.value)}
@@ -137,7 +137,7 @@ const SigningModal = ({
               </FormControl>
               {/* CycloneDX Signature */}
               <FormControl isRequired>
-                <FormLabel fontSize={14}>CycloneDX Signature</FormLabel>
+                <FormLabel>CycloneDX Signature</FormLabel>
                 <Textarea
                   value={cycloneDxSign}
                   onChange={(e) => setCycloneDxSign(e.target.value)}
@@ -147,7 +147,7 @@ const SigningModal = ({
               </FormControl>
               {/* SPDX Signature */}
               <FormControl isRequired>
-                <FormLabel fontSize={14}>SPDX Signature</FormLabel>
+                <FormLabel>SPDX Signature</FormLabel>
                 <Textarea
                   value={spdxSign}
                   onChange={(e) => setSpdxSign(e.target.value)}

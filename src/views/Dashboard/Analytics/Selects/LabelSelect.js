@@ -38,9 +38,7 @@ const LabelSelect = ({ value, onChange }) => {
 
   return (
     <FormControl>
-      <FormLabel htmlFor='phases' fontSize={'sm'}>
-        Label
-      </FormLabel>
+      <FormLabel htmlFor='phases'>Label</FormLabel>
       <LynkSelect
         value={value}
         options={options}
