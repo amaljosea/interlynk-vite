@@ -809,7 +809,17 @@ export const infoData = [
   },
   {
     title: `Manufacturer`,
-    desc: `This setting allows you to select a manufacturer as the default for the environment. When sboms are exported, this is used to set the manufacturer.`
+    desc: (
+      <Stack>
+        <Text>
+          This setting allows you to select a manufacturer as the default for
+          the environment. When sboms are exported, this is used to set the
+          manufacturer.
+        </Text>
+        <Text>Setup Manufacturer Identities under -</Text>
+        <Text>Settings ➡️ Organization ➡️ Legal</Text>
+      </Stack>
+    )
   },
   {
     title: `Jira Default Project`,

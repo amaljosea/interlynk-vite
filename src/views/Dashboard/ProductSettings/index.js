@@ -3,22 +3,20 @@ import { useEffect, useState } from 'react'
 import { capitalizeFirstLetter } from 'utils'
 import { infoData } from 'variables/general'
 
+import { InfoIcon } from '@chakra-ui/icons'
 import {
   Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  GridItem,
   Select,
   Text,
+  Tooltip,
   VStack,
   useDisclosure
 } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
+import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import CardBody from 'components/Card/CardBody'
-import InfoModal from 'components/InfoModal'
 import LynkSelect from 'components/LynkSelect'
-import Info from 'components/Misc/Info'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -74,19 +72,13 @@ const Settings = ({ enabled, data, mfc }) => {
   const { showToast } = useCustomToast()
   const [checks, setChecks] = useState(false)
   const [internalComp, setInternalComp] = useState(false)
-  const [infoHeading, setInfoHeading] = useState('')
-  const [infoText, setInfoText] = useState('')
-  const [infoUrl, setInfoUrl] = useState('')
   const [options, setOptions] = useState([])
   const [project, setProject] = useState(null)
 
-  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
-
-  const {
-    isOpen: isInfoOpen,
-    onOpen: onInfoOpen,
-    onClose: onInfoClose
-  } = useDisclosure()
+  const { sameSecondaryText, primaryBlueText } = useThemeColor([
+    'sameSecondaryText',
+    'primaryBlueText'
+  ])
 
   const editControls = useHasPermission({
     parentKey: 'view_product_group',
@@ -127,20 +119,8 @@ const Settings = ({ enabled, data, mfc }) => {
 
   const onCheck = (title) => {
     const result = infoData.find((item) => item?.title === title)
-    setInfoHeading(result?.title)
-    setInfoText(result?.desc)
-    setInfoUrl('')
-    onInfoOpen()
+    return result?.desc
   }
-
-  const onCheckVulnScan = () => onCheck(`Vulnerability Scan`)
-  const onCheckVulnStatus = () => onCheck(`Retain Vulnerability Status`)
-  const onCheckHealth = () => onCheck(`Checks`)
-  const onCheckAutomation = () => onCheck(`Automation`)
-  const onCheckComponent = () => onCheck(`Internal Component Labeling`)
-  const onCheckRetaintion = () => onCheck(`Data Retaintion`)
-  const onCheckMfc = () => onCheck(`Manufacturer`)
-  const onCheckJira = () => onCheck(`Jira Default Project`)
 
   return (
     <>
@@ -162,8 +142,10 @@ const Settings = ({ enabled, data, mfc }) => {
                 />
                 <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
                   Vulnerability Scan
-                  <Info ml={2} onClick={onCheckVulnScan} />
                 </Text>
+                <Tooltip label={onCheck(`Vulnerability Scan`)}>
+                  <InfoIcon ml={2} color={primaryBlueText} />
+                </Tooltip>
               </Flex>
               {/* COPY VEX FROM PREVIOUS */}
               <Flex align='center'>
@@ -180,8 +162,10 @@ const Settings = ({ enabled, data, mfc }) => {
                 />
                 <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
                   Retain Vulnerability Status
-                  <Info ml={2} onClick={onCheckVulnStatus} />
                 </Text>
+                <Tooltip label={onCheck(`Retain Vulnerability Status`)}>
+                  <InfoIcon ml={2} color={primaryBlueText} />
+                </Tooltip>
               </Flex>
               {/* APPLY CHECK */}
               <Flex align='center'>
@@ -196,8 +180,10 @@ const Settings = ({ enabled, data, mfc }) => {
                 />
                 <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
                   Checks
-                  <Info ml={2} onClick={onCheckHealth} />
                 </Text>
+                <Tooltip label={onCheck(`Checks`)}>
+                  <InfoIcon ml={2} color={primaryBlueText} />
+                </Tooltip>
               </Flex>
               {/* APPLY AUTOMATION */}
               <Flex align='center'>
@@ -212,8 +198,10 @@ const Settings = ({ enabled, data, mfc }) => {
                 />
                 <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
                   Automation
-                  <Info ml={2} onClick={onCheckAutomation} />
                 </Text>
+                <Tooltip label={onCheck(`Automation`)}>
+                  <InfoIcon ml={2} color={primaryBlueText} />
+                </Tooltip>
               </Flex>
               {/* APPLY INTERNAL COMPONENTS */}
               <Flex align='center'>
@@ -228,8 +216,10 @@ const Settings = ({ enabled, data, mfc }) => {
                 />
                 <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
                   Internal Component Labeling
-                  <Info ml={2} onClick={onCheckComponent} />
                 </Text>
+                <Tooltip label={onCheck(`Internal Component Labeling`)}>
+                  <InfoIcon ml={2} color={primaryBlueText} />
+                </Tooltip>
               </Flex>
             </VStack>
           </GridItem>
@@ -238,7 +228,9 @@ const Settings = ({ enabled, data, mfc }) => {
             <FormControl>
               <FormLabel>
                 Retain Data For
-                <Info ml={2} onClick={onCheckRetaintion} />
+                <Tooltip label={onCheck(`Data Retaintion`)}>
+                  <InfoIcon ml={2} color={primaryBlueText} />
+                </Tooltip>
               </FormLabel>
               <Select
                 width={'400px'}
@@ -258,7 +250,9 @@ const Settings = ({ enabled, data, mfc }) => {
             <FormControl mt={4}>
               <FormLabel>
                 Manufacturer
-                <Info ml={2} onClick={onCheckMfc} />
+                <Tooltip label={onCheck(`Manufacturer`)}>
+                  <InfoIcon ml={2} color={primaryBlueText} />
+                </Tooltip>
               </FormLabel>
               <Select
                 width={'400px'}
@@ -282,7 +276,9 @@ const Settings = ({ enabled, data, mfc }) => {
             >
               <FormLabel>
                 Jira Default Project
-                <Info ml={2} onClick={onCheckJira} />
+                <Tooltip label={onCheck(`Jira Default Project`)}>
+                  <InfoIcon ml={2} color={primaryBlueText} />
+                </Tooltip>
               </FormLabel>
               <LynkSelect
                 options={options}
@@ -326,17 +322,6 @@ const Settings = ({ enabled, data, mfc }) => {
           description={`${internalComp ? 'Disabling' : 'Enabling'} this check will${' '}
                 ${internalComp ? 'stop' : 'start'} marketing internal components
                 to uploaded SBOMs`}
-        />
-      )}
-
-      {/* INFO MODAL */}
-      {isInfoOpen && (
-        <InfoModal
-          isOpen={isInfoOpen}
-          onClose={onInfoClose}
-          heading={infoHeading}
-          body={infoText}
-          url={infoUrl}
         />
       )}
     </>
