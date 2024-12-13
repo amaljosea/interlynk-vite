@@ -273,19 +273,15 @@ export const sevColor = (severity) => {
   switch (toLower(severity)) {
     case 'critical':
     case 'super critical':
-      // eslint-disable-next-line
       return { bg: '#FED7D7', text: '#822727' }
     case 'high':
     case 'super high':
-      // eslint-disable-next-line
       return { bg: '#FEEBC8', text: '#7B341E' }
     case 'medium':
-      // eslint-disable-next-line
       return { bg: '#FEFCBF', text: '#744210' }
     case 'low':
     case 'super low':
     case 'negligible':
-      // eslint-disable-next-line
       return { bg: '#C6F6D5', text: '#22543D' }
     case 'unknown':
       return { bg: '#EDF2F7', text: '#1A202C' }
@@ -401,125 +397,6 @@ export const timeSince = (inputDate) => {
   return formatTime(timeDifference)
 }
 
-export const regions = [
-  {
-    name: 'US East (Ohio) - us-east-2',
-    id: 'us-east-2'
-  },
-  {
-    name: 'US East (N. Virginia) - us-east-1',
-    id: 'us-east-1'
-  },
-  {
-    name: 'US West (N. California) - us-west-1',
-    id: 'us-west-1'
-  },
-  {
-    name: 'US West (Oregon) - us-west-2',
-    id: 'us-west-2'
-  },
-  {
-    name: 'Africa (Cape Town) - af-south-1',
-    id: 'af-south-1'
-  },
-  {
-    name: 'Asia Pacific (Hong Kong) - ap-east-1',
-    id: 'ap-east-1'
-  },
-  {
-    name: 'Asia Pacific (Hyderabad) - ap-south-2',
-    id: 'ap-south-2'
-  },
-  {
-    name: 'Asia Pacific (Jakarta) - ap-southeast-3',
-    id: 'ap-southeast-3'
-  },
-  {
-    name: 'Asia Pacific (Melbourne) - ap-southeast-4',
-    id: 'ap-southeast-4'
-  },
-  {
-    name: 'Asia Pacific (Mumbai) - ap-south-1',
-    id: 'ap-south-1'
-  },
-  {
-    name: 'Asia Pacific (Osaka) - ap-northeast-3',
-    id: 'ap-northeast-3'
-  },
-  {
-    name: 'Asia Pacific (Seoul) - ap-northeast-2',
-    id: 'ap-northeast-2'
-  },
-  {
-    name: 'Asia Pacific (Singapore) - ap-southeast-1',
-    id: 'ap-southeast-1'
-  },
-  {
-    name: 'Asia Pacific (Sydney) - ap-southeast-2',
-    id: 'ap-southeast-2'
-  },
-  {
-    name: 'Asia Pacific (Tokyo) - ap-northeast-1',
-    id: 'ap-northeast-1'
-  },
-  {
-    name: 'Canada (Central) - ca-central-1',
-    id: 'ca-central-1'
-  },
-  {
-    name: 'Europe (Frankfurt) - eu-central-1',
-    id: 'eu-central-1'
-  },
-  {
-    name: 'Europe (Ireland) - eu-west-1',
-    id: 'eu-west-1'
-  },
-  {
-    name: 'Europe (London) - eu-west-2',
-    id: 'eu-west-2'
-  },
-  {
-    name: 'Europe (Milan) - eu-south-1',
-    id: 'eu-south-1'
-  },
-  {
-    name: 'Europe (Paris) - eu-west-3',
-    id: 'eu-west-3'
-  },
-  {
-    name: 'Europe (Spain) - eu-south-2',
-    id: 'eu-south-2'
-  },
-  {
-    name: 'Europe (Stockholm) - eu-north-1',
-    id: 'eu-north-1'
-  },
-  {
-    name: 'Europe (Zurich) - eu-central-2',
-    id: 'eu-central-2'
-  },
-  {
-    name: 'Middle East (Bahrain) - me-south-1',
-    id: 'me-south-1'
-  },
-  {
-    name: 'Middle East (UAE) - me-central-1',
-    id: 'me-central-1'
-  },
-  {
-    name: 'South America (São Paulo) - sa-east-1',
-    id: 'sa-east-1'
-  },
-  {
-    name: 'AWS GovCloud (US-East) - us-gov-east-1',
-    id: 'us-gov-east-1'
-  },
-  {
-    name: 'AWS GovCloud (US-West) - us-gov-west-1',
-    id: 'us-gov-west-1'
-  }
-]
-
 export const formattedTime = (initiated, completed) => {
   const initiatedAt = new Date(initiated)
   const completedAt = new Date(completed)
@@ -562,30 +439,6 @@ export const getDateFormat = (date) => {
 }
 
 export const link_captions = ['Active', 'Shared With', 'Created', 'Link', '']
-
-export const vuln_captions = [
-  '',
-  'CVE ID',
-  'Severity',
-  'CVSS',
-  'Component',
-  'Version',
-  'Fixed (Component)',
-  'Fixed (Product)',
-  'Scanner',
-  'Status',
-  ''
-]
-
-export const img_captions = [
-  'Scan',
-  'Image',
-  'Connector',
-  'Tags',
-  'Last Pushed',
-  'Scanners',
-  'Actions'
-]
 
 export const getActiveRoute = (routes) => {
   let activeRoute = 'Default Brand Text'
@@ -675,70 +528,6 @@ export const getFullDate = (dateString) => {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
 }
 
-export const findSimilarItems = (currentData, selectedData) => {
-  const mergedData = currentData.map((currentItem) => {
-    const matchingSelected = selectedData.find(
-      (selectedItem) => selectedItem.vuln.vulnId === currentItem.vuln.vulnId
-    )
-    if (matchingSelected) {
-      const hasLogs = matchingSelected.componentVulnLogs.length > 0
-      const selectedVuln =
-        hasLogs &&
-        matchingSelected.componentVulnLogs[
-          matchingSelected.componentVulnLogs.length > 1
-            ? matchingSelected.componentVulnLogs.length - 1
-            : 0
-        ]
-      return {
-        ...currentItem,
-        importStatus: matchingSelected.vexStatus,
-        importJustification: matchingSelected.vexJustification,
-        importNotes: selectedVuln.note || null,
-        importDetail: selectedVuln.detail || null,
-        importResponse: matchingSelected.cdxResponseId
-          ? matchingSelected.cdxResponseId
-          : null,
-        importFixedIn: selectedVuln.fixedIn || null,
-        importActionStmt: selectedVuln.actionStmt || null,
-        importStatement: matchingSelected.impact
-      }
-    }
-  })
-
-  const data = [...mergedData]
-  const filterList = data.filter((item) => item !== undefined)
-
-  return filterList
-}
-
-export const findUniqueItems = (currentArray, importArray) => {
-  const uniqueItems = []
-
-  for (const currentItem of currentArray) {
-    const matchingImportItem = importArray.find(
-      (importItem) =>
-        importItem.vuln.vulnId === currentItem.vuln.vulnId &&
-        importItem.component.name === currentItem.component.name &&
-        importItem.component.version === currentItem.component.version
-    )
-
-    if (!matchingImportItem) {
-      uniqueItems.push(currentItem)
-    }
-  }
-
-  return uniqueItems
-}
-
-export function generateRandomId(length = 12) {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-  let randomId = ''
-  for (let i = 0; i < length; i++) {
-    randomId += characters.charAt(Math.floor(Math.random() * characters.length))
-  }
-  return randomId
-}
-
 export const customStyles = (
   headColor,
   dividerColor,
@@ -826,31 +615,6 @@ export const normalizeSBOMVersion = (sbom) => {
   } else {
     return `Uploaded at ${getFullDateAndTime(sbom?.createdAt)}`
   }
-}
-
-// REMOVE DUPLICATE PRODUCTS VERSIONS
-export const removeDuplicates = (arr) => {
-  if (arr === null || arr === undefined) {
-    return []
-  }
-  const uniqueVersions = {}
-
-  for (const item of arr) {
-    const normalizedVersion = normalizeSBOMVersion(item)
-    if (
-      !uniqueVersions[normalizedVersion] ||
-      item.updatedAt > uniqueVersions[normalizedVersion].creationAt
-    ) {
-      uniqueVersions[normalizedVersion] = item
-    }
-  }
-
-  const versions = Object.values(uniqueVersions).sort((a, b) => {
-    const dateA = new Date(a.creationAt)
-    const dateB = new Date(b.creationAt)
-    return dateB - dateA
-  })
-  return versions
 }
 
 export const validateCpe = (value) => {
