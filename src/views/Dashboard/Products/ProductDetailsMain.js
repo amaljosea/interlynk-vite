@@ -1,80 +1,24 @@
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { gql, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { truncatedValue } from 'utils'
-import { getSignedUrlParams } from 'utils'
-import { ProductDetailsTabs } from 'utils/TabsObjects'
+import { useParams } from 'react-router-dom'
 
-import { Search2Icon } from '@chakra-ui/icons'
-import {
-  Flex,
-  Grid,
-  GridItem,
-  Icon,
-  IconButton,
-  Skeleton,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Tag,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Flex, Skeleton, Text, useDisclosure } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
-import EnvList from 'components/Misc/EnvList'
-import { SettingsTag } from 'components/Misc/SettingsTag'
-import NotificationMenuBell from 'components/Notifications/NotificationMenuBell'
-import ChangelogTable from 'components/Tables/ChangelogTable'
-import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
-import PolicyTable from 'components/Tables/PolicyTable'
-import VersionsTable from 'components/Tables/VersionsTable'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useHasPermission } from 'hooks/useHasPermission'
-import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
-import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
-import { useThemeColor } from 'hooks/useThemeColors'
 
-import { DeleteProjectGroup } from 'graphQL/Mutation'
-import {
-  GetGlobalVulns,
-  GetOrgMfc,
-  GetProjectPolicies,
-  GetProjectSettings,
-  GetVersionsDate
-} from 'graphQL/Queries'
+import { GetProjectSettings } from 'graphQL/Queries'
 
-import { FaBug, FaRobot, FaTag } from 'react-icons/fa'
-import {
-  FaDiagramProject,
-  FaPenToSquare,
-  FaToggleOff,
-  FaToggleOn,
-  FaTrash,
-  FaUpload,
-  FaWindowMaximize
-} from 'react-icons/fa6'
-import { IoMdWarning } from 'react-icons/io'
-
-import Automation from '../Automation'
-import Settings from '../ProductSettings'
 import { ProductGraphs } from './ProductGraphs'
-import ProductProgressModal from './ProductGraphs/ProductProgressModal'
-import ConfirmationModal from './components/ConfirmationModal'
-import ProductModal from './components/ProductModal'
-import StatusModal from './components/StatusModal'
-import UploadModal from './components/UploadModal'
+import ProductActions from './components/ProductActions'
+import ProductInfo from './components/ProductInfo'
+import ProductTabs from './components/ProductTabs'
 
 const GetProjectGroup = gql`
   query GetProjectGroup($id: Uuid!) {
@@ -99,193 +43,33 @@ const GetProjectGroup = gql`
 `
 
 const ProductDetailsMain = () => {
-  const { isFreeTier } = useGlobalQueryContext()
-  const navigate = useNavigate()
   const params = useParams()
   const productId = params.productid
   const productGroupId = params.productgroupid
   const sbomId = params.sbomid
-  const { setIsOpen, setCurrentStep } = useTour()
-  const signedUrlParams = getSignedUrlParams()
-  const activeTour = localStorage.getItem('activeTour')
-  const { primaryErrorColor, secondaryBlueText } = useThemeColor([
-    'primaryErrorColor',
-    'secondaryBlueText'
-  ])
-
-  const [warning, setWarning] = useState(false)
-  const [exceedingCount, setExceedingCount] = useState(0)
-
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
-  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
-
-  const onTabChange = (value) => {
-    const link = generateProductDetailPageUrlFromCurrentUrl({
-      paramsObj: {
-        tab: tabs[value]
-      }
-    })
-    navigate(link)
-  }
-
-  const tabs = [
-    'versions',
-    'vulnerabilities',
-    'automation rules',
-    'settings',
-    'policies',
-    'change log'
-  ]
-
-  const getDisplay = (item) => {
-    const conditions = {
-      'automation rules': isFreeTier
-    }
-    return conditions[item] ? 'none' : 'block'
-  }
-
-  const queryParams = useSearchParams()
-  const tab = queryParams[0].get('tab')
-  const activeTabNumber = Math.max(tabs.indexOf(tab), 0)
 
   const { dispatch, envName } = useGlobalState()
+  const { setIsOpen, setCurrentStep } = useTour()
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
+
+  const activeTour = localStorage.getItem('activeTour')
 
   const { prodVulnDispatch } = dispatch
   const [activeEnv, setActiveEnv] = useState(productId || '')
-
-  const updateProduct = useHasPermission({
-    parentKey: 'view_product_group',
-    childKey: 'update_product_group'
-  })
-
-  const archiveProduct = useHasPermission({
-    parentKey: 'view_product_group',
-    childKey: 'archive_product_group'
-  })
-
-  const canCreateSBOM = useHasPermission({
-    parentKey: 'view_sbom',
-    childKey: 'update_sbom'
-  })
 
   // GET PROJECT DATA
   const { data, loading, error } = useQuery(GetProjectGroup, {
     variables: { id: productGroupId }
   })
 
-  const { id, name, description, enabled, projects, defaultProject } =
-    data?.projectGroup || ''
-
-  const { data: settings, loading: settingsLoading } = useQuery(
-    GetProjectSettings,
-    {
-      variables: { id: activeEnv }
-    }
-  )
-
-  const { projectSetting } = settings?.project || ''
-  const {
-    checksEnabled,
-    dataRetentionDays,
-    vulnScanningEnabled,
-    internalCompMatchingEnabled,
-    automatedFixesEnabled
-  } = projectSetting || ''
+  const { name, description, projects } = data?.projectGroup || ''
 
   const [versionFilters, setVersionFilters] = useState({
     field: 'SBOMS_CREATED_AT',
     direction: 'DESC'
   })
 
-  const { data: versions } = useQuery(GetVersionsDate, {
-    skip: signedUrlParams,
-    fetchPolicy: 'network-only',
-    variables: {
-      first: 25,
-      id: productId,
-      ...versionFilters
-    }
-  })
-
-  const { nodes: versionDates } = versions?.project?.sbomVersions || ''
-
-  useEffect(() => {
-    if (versionDates && dataRetentionDays) {
-      const currentDate = new Date()
-      const retentionTimeInt = Math.floor(dataRetentionDays)
-      const exceedingItems = versionDates?.filter((item) => {
-        const createdDate = parseISO(item?.createdAt)
-        const expirationDate = addDays(createdDate, retentionTimeInt)
-        const daysUntilDeletion = differenceInDays(expirationDate, currentDate)
-        return (
-          daysUntilDeletion <= 7 &&
-          daysUntilDeletion >= 0 &&
-          retentionTimeInt !== 0
-        )
-      })
-      setExceedingCount(exceedingItems?.length)
-      setWarning(exceedingItems?.length > 0)
-    } else {
-      setWarning(false)
-    }
-  }, [dataRetentionDays, versionDates])
-
-  // GET VULN DATA
-  const [filters, setFilters] = useState({
-    field: 'VULNS_VULN_ID',
-    direction: 'DESC'
-  })
-  const { VULNERABILITIES } = ProductDetailsTabs
-  const {
-    nodes,
-    paginationProps,
-    reset,
-    loading: globalVulnloading
-  } = usePaginatedQuery(GetGlobalVulns, {
-    skip: tab === VULNERABILITIES ? false : true,
-    selector: 'organization.vulns',
-    variables: {
-      projectGroupIds: [productGroupId],
-      projectIds: [productId],
-      ...filters
-    }
-  })
-
-  const { POLICIES } = ProductDetailsTabs
-  // GET POLICY DATA
-  const {
-    nodes: policyData,
-    paginationProps: policyPaginationProps,
-    loading: policyloading
-  } = usePaginatedQuery(GetProjectPolicies, {
-    skip: tab === POLICIES ? false : true,
-    selector: 'projectPolicies',
-    variables: {
-      projectId: activeEnv
-    }
-  })
-  const { SETTINGS } = ProductDetailsTabs
-  const { data: mfc } = useQuery(GetOrgMfc, {
-    skip: tab === SETTINGS ? false : true
-  })
-
-  const [projectDelete] = useMutation(DeleteProjectGroup)
-
-  const PRODUCT = useDisclosure()
-  const UPLOAD = useDisclosure()
-  const WARNING = useDisclosure()
-  const DELETE = useDisclosure()
-  const PROGRESS = useDisclosure()
   const ENV = useDisclosure()
-
-  // DELETE PRODUCT
-  const onProductDelete = async () => {
-    await projectDelete({
-      variables: { id: productGroupId }
-    })
-      .then((res) => res.data && DELETE.onClose())
-      .finally(() => navigate('/vendor/products'))
-  }
 
   useEffect(() => {
     if (sbomId === null) {
@@ -322,6 +106,15 @@ const ProductDetailsMain = () => {
       direction: sortDirection.toUpperCase()
     }))
   }
+
+  const { data: settings, loading: settingsLoading } = useQuery(
+    GetProjectSettings,
+    {
+      variables: { id: activeEnv }
+    }
+  )
+
+  const { projectSetting } = settings?.project || ''
 
   if (loading) {
     return (
@@ -360,146 +153,16 @@ const ProductDetailsMain = () => {
             >
               {/* PRODUCT INFORMATIONS */}
               <GridItem colSpan={8}>
-                <Flex
-                  direction={'row'}
-                  alignItems={'flex-start'}
-                  gap={5}
-                  width={'100%'}
-                >
-                  <Icon
-                    as={FaWindowMaximize}
-                    h={'64px'}
-                    w={'64px'}
-                    color={secondaryBlueText}
-                  />
-                  <Flex gap={1} direction={'column'} alignItems={'flex-start'}>
-                    {/* PRODUCT TITLE */}
-                    <Text
-                      fontWeight={'semibold'}
-                      fontSize={22}
-                      lineHeight={1.2}
-                    >
-                      <Tooltip label={name}>{truncatedValue(name, 50)}</Tooltip>
-                    </Text>
-                    {/* PRODUCT DESCRIPTION */}
-                    <Text fontSize={'sm'} wordBreak={'break-all'}>
-                      {description || ''}
-                    </Text>
-                    {/* SETTINGS */}
-                    <Stack
-                      mt={description ? 1 : 0}
-                      direction='row'
-                      alignItems={'center'}
-                    >
-                      <SettingsTag
-                        icon={<Search2Icon />}
-                        label={`Checks ${checksEnabled ? 'Enabled' : 'Disabled'}`}
-                        isDisabled={!checksEnabled}
-                      />
-                      <SettingsTag
-                        icon={<FaTag />}
-                        label={`Internal Labeling ${internalCompMatchingEnabled ? 'Enabled' : 'Disabled'}`}
-                        isDisabled={!internalCompMatchingEnabled}
-                      />
-                      <SettingsTag
-                        icon={<FaBug />}
-                        label={`Vulnerability Scan ${vulnScanningEnabled ? 'Enabled' : 'Disabled'}`}
-                        isDisabled={!vulnScanningEnabled}
-                      />
-                      <SettingsTag
-                        icon={<FaRobot />}
-                        label={`Automation ${automatedFixesEnabled ? 'Enabled' : 'Disabled'}`}
-                        isDisabled={!automatedFixesEnabled}
-                      />
-                      {warning && (
-                        <Tooltip
-                          label={`${exceedingCount} SBOM${exceedingCount > 1 ? 's are' : ' is'} marked for deletion in the next 7 days. This is based on the data retention under Settings tab.`}
-                        >
-                          <IconButton
-                            size='xs'
-                            color={primaryErrorColor}
-                            icon={<IoMdWarning size={16} />}
-                            onClick={() =>
-                              handleSort({ id: 'SBOMS_CREATED_AT' }, 'desc')
-                            }
-                            bg='transparent'
-                          />
-                        </Tooltip>
-                      )}
-                    </Stack>
-                  </Flex>
-                </Flex>
+                <ProductInfo
+                  handleSort={handleSort}
+                  filters={versionFilters}
+                  settings={projectSetting}
+                  data={{ name, description }}
+                />
               </GridItem>
               {/* PRODUCT ACTIONS */}
               <GridItem colSpan={4}>
-                <Flex alignItems={'flex-end'} flexDir={'column'} gap={3}>
-                  <EnvList data={data?.projectGroup} />
-                  <Flex
-                    direction={'row'}
-                    gap={2}
-                    justifyContent='flex-end'
-                    ml={'auto'}
-                    flexWrap={'wrap'}
-                  >
-                    {/* VIEW PRODUCT PROGRESS */}
-                    {shouldShowDemoFeatures && (
-                      <Tooltip label='View Product TrailLynk'>
-                        <IconButton
-                          icon={<FaDiagramProject />}
-                          colorScheme='blue'
-                          onClick={PROGRESS.onOpen}
-                        />
-                      </Tooltip>
-                    )}
-                    {/* Notifications */}
-                    <NotificationMenuBell />
-                    {/* EDIT PRODUCT */}
-                    <Tooltip label='Edit Product'>
-                      <IconButton
-                        isDisabled={
-                          !enabled || !updateProduct || signedUrlParams
-                        }
-                        colorScheme='blue'
-                        aria-label='edit_product'
-                        onClick={PRODUCT.onOpen}
-                        icon={<FaPenToSquare />}
-                      />
-                    </Tooltip>
-                    {/* UPLOAD SBOM */}
-                    <Tooltip label='Upload SBOM'>
-                      <IconButton
-                        isDisabled={
-                          !enabled || signedUrlParams || !canCreateSBOM
-                        }
-                        colorScheme='blue'
-                        onClick={UPLOAD.onOpen}
-                        icon={<FaUpload />}
-                      />
-                    </Tooltip>
-                    {/* UPDATE PRODUCT STATUS */}
-                    <Tooltip
-                      label={enabled ? 'Disable Product' : 'Enable Product'}
-                    >
-                      <IconButton
-                        name='change_status'
-                        colorScheme={'blue'}
-                        onClick={WARNING.onOpen}
-                        isDisabled={signedUrlParams || !updateProduct}
-                        icon={enabled ? <FaToggleOff /> : <FaToggleOn />}
-                      />
-                    </Tooltip>
-                    {/* ARCHIVE PRODUCT */}
-                    <Tooltip label='Delete Product'>
-                      <IconButton
-                        colorScheme='red'
-                        aria-label='delete_product'
-                        onClick={DELETE.onOpen}
-                        icon={<FaTrash />}
-                        isDisabled={!archiveProduct || signedUrlParams}
-                      />
-                    </Tooltip>
-                  </Flex>
-                </Flex>
+                <ProductActions data={data?.projectGroup} />
               </GridItem>
             </Grid>
           </CardBody>
@@ -509,164 +172,24 @@ const ProductDetailsMain = () => {
         {/* TAB SECTION */}
         <Card display={data ? 'block' : 'none'}>
           <CardBody>
-            <Tabs
-              w={'100%'}
-              index={activeTabNumber}
-              onChange={onTabChange}
-              variant='enclosed'
-            >
-              <TabList>
-                {tabs.map((item, index) => (
-                  <Tab
-                    key={index}
-                    display={getDisplay(item)}
-                    _focus={{ outline: 'none' }}
-                    textTransform={'capitalize'}
-                    className={
-                      item === 'automation rules'
-                        ? 'automation-rules'
-                        : item === 'versions'
-                          ? ''
-                          : item
-                    }
-                  >
-                    {item}
-                  </Tab>
-                ))}
-              </TabList>
-              <TabPanels>
-                {/* VERSIONS */}
-                <TabPanel px={0}>
-                  <VersionsTable
-                    handleSort={handleSort}
-                    filters={versionFilters}
-                    setFilters={setVersionFilters}
-                    retentionTime={dataRetentionDays}
-                  />
-                </TabPanel>
-                {/* VULNERABILITIES */}
-                <TabPanel px={0}>
-                  {!settingsLoading && (
-                    <Tag
-                      size='sm'
-                      mb={4}
-                      colorScheme='orange'
-                      hidden={vulnScanningEnabled}
-                    >
-                      Automatic vulnerabilty scan is disabled under Product
-                      Settings
-                    </Tag>
-                  )}
-                  <GlobalVulnTable
-                    loading={globalVulnloading}
-                    vulns={nodes}
-                    paginationProps={paginationProps}
-                    filters={filters}
-                    setFilters={(newFilters) => {
-                      setFilters(newFilters)
-                      reset()
-                    }}
-                  />
-                </TabPanel>
-                {/* AUTOMATIONS */}
-                <TabPanel px={0}>
-                  <Tag
-                    size='sm'
-                    colorScheme='orange'
-                    hidden={automatedFixesEnabled}
-                    mb={4}
-                  >
-                    Automation is disabled under Product Settings
-                  </Tag>
-                  {<Automation projects={projects} />}
-                </TabPanel>
-                {/* SETTINGS */}
-                <TabPanel px={0}>
-                  <Settings
-                    data={projectSetting}
-                    enabled={enabled}
-                    mfc={mfc?.organizationManufacturers}
-                  />
-                </TabPanel>
-                {/* POLICIES */}
-                <TabPanel px={0}>
-                  <PolicyTable
-                    data={policyData}
-                    loading={policyloading}
-                    paginationProps={policyPaginationProps}
-                  />
-                </TabPanel>
-                {/* CHANGE LOG */}
-                <TabPanel px={0}>
-                  <ChangelogTable activeEnv={productId} />
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
+            <ProductTabs
+              activeEnv={activeEnv}
+              filters={versionFilters}
+              data={data?.projectGroup}
+              settings={projectSetting}
+              setFilters={setVersionFilters}
+              settingsLoading={settingsLoading}
+            />
           </CardBody>
         </Card>
       </Flex>
 
-      {/* CREATE PRODUCT */}
-      {PRODUCT.isOpen && (
-        <ProductModal
-          onClose={PRODUCT.onClose}
-          isOpen={PRODUCT.isOpen}
-          data={{ id, name, description }}
-        />
-      )}
-
-      {/* VIEW PRODUCT PROGRESS */}
-      {PROGRESS.isOpen && (
-        <ProductProgressModal
-          onClose={PROGRESS.onClose}
-          isOpen={PROGRESS.isOpen}
-          name={name}
-        />
-      )}
-
-      {/* UPLOAD SBOM */}
-      {UPLOAD.isOpen && (
-        <UploadModal
-          isOpen={UPLOAD.isOpen}
-          onClose={UPLOAD.onClose}
-          group={{ id, name, default: defaultProject?.id }}
-        />
-      )}
-
-      {/* DISABLED */}
-      {WARNING.isOpen && (
-        <StatusModal
-          reset={reset}
-          isOpen={WARNING.isOpen}
-          onClose={WARNING.onClose}
-          group={{ id, enabled }}
-          grouId={productId}
-        />
-      )}
-
-      {/* DELETE */}
-      {DELETE.isOpen && (
-        <ConfirmationModal
-          isOpen={DELETE.isOpen}
-          onClose={DELETE.onClose}
-          onConfirm={onProductDelete}
-          name={name}
-          title='Delete Product'
-          description='Deleting this product will:'
-          items={[
-            'Remove this product, its versions and SBOMs',
-            'Remove access to the product for all users',
-            'Disable uploads of SBOMs to this product'
-          ]}
-        />
-      )}
-
       {/* ENV LIST */}
       {ENV.isOpen && (
         <EnvironmentDrawer
+          data={data}
           isOpen={ENV.isOpen}
           onClose={ENV.onClose}
-          data={data}
           activeEnv={activeEnv}
           setActiveEnv={setActiveEnv}
         />
