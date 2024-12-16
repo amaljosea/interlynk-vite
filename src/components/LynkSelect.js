@@ -5,7 +5,6 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaChevronDown } from 'react-icons/fa6'
 import { MdClose } from 'react-icons/md'
 
 const LynkSelect = (props) => {
@@ -24,17 +23,6 @@ const LynkSelect = (props) => {
     )
   }
 
-  const DropdownIndicator = (props) => {
-    if (isGeneral) {
-      return (
-        <components.DropdownIndicator {...props}>
-          <FaChevronDown size={12} color='darkgray' cursor='pointer' />
-        </components.DropdownIndicator>
-      )
-    }
-    return null
-  }
-
   return props.isCreatable ? (
     <CreatableSelect
       {...props}
@@ -42,7 +30,7 @@ const LynkSelect = (props) => {
       className='react-select'
       components={{
         ClearIndicator,
-        DropdownIndicator,
+        DropdownIndicator: () => null,
         IndicatorSeparator: () => null
       }}
     />
@@ -53,7 +41,7 @@ const LynkSelect = (props) => {
       className='react-select'
       components={{
         ClearIndicator,
-        DropdownIndicator,
+        DropdownIndicator: () => null,
         IndicatorSeparator: () => null
       }}
     />
