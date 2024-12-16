@@ -253,33 +253,32 @@ const VersionsTable = (props) => {
             className={index === 0 ? 'versions' : ''}
             sx={{ my: 3, gap: 2, alignItems: 'center' }}
           >
+            {shouldShowDemoFeatures && (
+              <GridItem colSpan={1} width={'20px'}>
+                <Tooltip label={getFormat(projectVersion)} placement='top'>
+                  <Olink
+                    href={getLink(projectVersion)}
+                    isExternal={getLink(projectVersion) === '#' ? false : true}
+                  >
+                    <IconButton
+                      size='xs'
+                      isRound={true}
+                      color={primaryTextColor}
+                      icon={getType(projectVersion)}
+                      background='transparent'
+                    />
+                  </Olink>
+                </Tooltip>
+              </GridItem>
+            )}
             <GridItem
-              colSpan={1}
-              width={'20px'}
-              hidden={!shouldShowDemoFeatures}
-            >
-              <Tooltip label={getFormat(projectVersion)} placement='top'>
-                <Olink
-                  href={getLink(projectVersion)}
-                  isExternal={getLink(projectVersion) === '#' ? false : true}
-                >
-                  <IconButton
-                    size='xs'
-                    isRound={true}
-                    color={primaryTextColor}
-                    icon={getType(projectVersion)}
-                    background='transparent'
-                  />
-                </Olink>
-              </Tooltip>
-            </GridItem>
-            <GridItem
-              colSpan={6}
+              w={'100%'}
               display={'flex'}
+              colSpan={shouldShowDemoFeatures ? 6 : 7}
               sx={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}
             >
               <Link to={link} onClick={onStartTour} data-testid={`version`}>
-                <Text color={primaryBlueText} minWidth='100%' fontSize={14}>
+                <Text color={primaryBlueText} fontSize={14}>
                   {projectVersion}
                 </Text>
               </Link>
