@@ -1,16 +1,10 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { capitalizeFirstLetter } from 'utils'
 
-import {
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Select,
-  Stack,
-  Tag,
-  Text
-} from '@chakra-ui/react'
+import { Select, Stack, Tag, Text } from '@chakra-ui/react'
+import { FormControl, FormHelperText, FormLabel } from '@chakra-ui/react'
 
 import FileUpload from 'components/FileUpload'
 import LynkAlert from 'components/LynkAlert'
@@ -122,12 +116,8 @@ const UploadModal = ({ isOpen, onClose, group }) => {
               {projects
                 ?.sort((a, b) => a?.name?.localeCompare(b?.name))
                 ?.map((item) => (
-                  <option
-                    key={item.id}
-                    value={item.id}
-                    style={{ textTransform: 'capitalize' }}
-                  >
-                    {item.name}
+                  <option key={item?.id} value={item?.id}>
+                    {capitalizeFirstLetter(item?.name)}
                   </option>
                 ))}
             </Select>
