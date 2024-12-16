@@ -85,25 +85,25 @@ export const exportExcel = async (
   const tools = listItemsForDoc(sbom?.tools, 'name', 'version')
   // First sheet data
   const dataForSheetOne = [
-    {
-      'Product Name': productName,
-      'Product Version': version,
-      Description: sbom?.primaryComponent?.description || 'NA',
-      'Unique Identifier': sbom?.primaryComponent?.uniqueId || 'NA',
-      Supplier: sbom?.suppliers?.[0]?.name || 'NA',
-      Authors: authors || 'NA',
-      Manufacturer:
-        manufacturerData?.project?.projectSetting?.organizationManufacturer
-          ?.organizationName || 'NA',
-      'Manufacturer Contacts': manufacturerContacts,
-      'Creation Tool': tools,
-      'Created At': formatDateWithTimeZone(sbom.createdAt) || 'NA',
-      'Last Modified At': formatDateWithTimeZone(sbom.updatedAt) || 'NA',
-      'Vulnerability Scan At': formatDateWithTimeZone(sbom.updatedAt) || 'NA',
-      'Exported By': organization?.currentUser.name,
-
-      'Exported At': currentDateTime()
-    }
+    ['Interlynk', ''],
+    ['Product Name', productName],
+    ['Product Version', version],
+    ['Description', sbom?.primaryComponent?.description || 'NA'],
+    ['Unique Identifier', sbom?.primaryComponent?.uniqueId || 'NA'],
+    ['Supplier', sbom?.suppliers?.[0]?.name || 'NA'],
+    ['Authors', authors || 'NA'],
+    [
+      'Manufacturer',
+      manufacturerData?.project?.projectSetting?.organizationManufacturer
+        ?.organizationName || 'NA'
+    ],
+    ['Manufacturer Contacts', manufacturerContacts],
+    ['Creation Tool', tools],
+    ['Created At', formatDateWithTimeZone(sbom.createdAt) || 'NA'],
+    ['Last Modified At', formatDateWithTimeZone(sbom.updatedAt) || 'NA'],
+    ['Vulnerability Scan At', formatDateWithTimeZone(sbom.updatedAt) || 'NA'],
+    ['Exported By', organization?.currentUser.name],
+    ['Exported At', currentDateTime()]
   ]
 
   // Second sheet data
@@ -212,15 +212,56 @@ export const exportExcel = async (
   let worksheetThree = []
 
   // Convert data array to worksheet
-  const worksheetOne = XLSX.utils.json_to_sheet(dataForSheetOne)
-  const headerKeysOne = Object.keys(dataForSheetOne[0])
-  styleExcelHeaders(worksheetOne, headerKeysOne, {
-    fontSize: 13,
-    bold: true,
-    fontColor: '1A202C', // Black text
-    backgroundColor: 'ADC6F9' // Blue background
+  const worksheetOne = XLSX.utils.aoa_to_sheet(dataForSheetOne)
+
+  // Merge the first row (A1 and B1)
+  worksheetOne['!merges'] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } } // Merge from A1 to B1
+  ]
+
+  // Style the logo cell
+  worksheetOne['A1'].s = {
+    font: {
+      bold: true,
+      sz: 50, // Huge font size
+      color: { rgb: 'FFFFFF' }
+    },
+    alignment: {
+      vertical: 'center',
+      horizontal: 'center'
+    },
+    fill: {
+      fgColor: { rgb: '3182ce' } // Slight blue background
+    }
+  }
+
+  // Style other rows
+  dataForSheetOne.slice(1).forEach((_, rowIndex) => {
+    const rowCell = XLSX.utils.encode_cell({ r: rowIndex + 1, c: 0 }) // Keys column
+    const valueCell = XLSX.utils.encode_cell({ r: rowIndex + 1, c: 1 }) // Values column
+
+    if (worksheetOne[rowCell]) {
+      worksheetOne[rowCell].s = {
+        font: { bold: true, sz: 13 },
+        alignment: { horizontal: 'left', vertical: 'center' },
+        fill: {
+          fgColor: { rgb: 'DDEBF7' } // Slight blue background
+        }
+      }
+    }
+    if (worksheetOne[valueCell]) {
+      worksheetOne[valueCell].s = {
+        alignment: { horizontal: 'left', vertical: 'center' }
+      }
+    }
   })
-  setColumnWidths(worksheetOne, dataForSheetOne)
+
+  // Adjust column widths
+  worksheetOne['!cols'] = [
+    { wch: 20 }, // Width for keys
+    { wch: 50 } // Width for values
+  ]
+
   if (dataForSheetTwo.length > 0) {
     worksheetTwo = XLSX.utils.json_to_sheet(dataForSheetTwo)
     const headerKeysTwo = Object.keys(dataForSheetTwo[0])
@@ -246,7 +287,7 @@ export const exportExcel = async (
 
   // Create a workbook and append the worksheet
   const workbook = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(workbook, worksheetOne, 'Meta Data')
+  XLSX.utils.book_append_sheet(workbook, worksheetOne, 'General')
   if (dataForSheetTwo.length > 0) {
     XLSX.utils.book_append_sheet(workbook, worksheetTwo, 'Components')
   }
