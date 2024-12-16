@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { gql, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useCallback, useMemo, useState } from 'react'
@@ -24,12 +24,12 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkAction from 'components/Misc/LynkAction'
 import VulnBadge from 'components/Misc/VulnBadge'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
+import AutomationWarning from 'components/Modal/AutomationWarning'
 import DeleteSbom from 'components/Modal/DeleteSbom'
 import ReprocessSbom from 'components/Modal/ReprocessSbom'
 import SbomTransfer from 'components/Modal/SbomTransfer'
 import Pagination from 'components/Pagination'
 
-import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -39,7 +39,6 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { RuleExecution } from 'graphQL/Mutation'
 import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
 
 import { FaBoxArchive, FaCodeCompare } from 'react-icons/fa6'
@@ -75,7 +74,6 @@ const VersionsTable = (props) => {
 
   const navigate = useNavigate()
   const params = useParams()
-  const { showToast } = useCustomToast()
   const productId = params.productid
   const signedUrlParams = getSignedUrlParams()
   const { clearSelect, setClearSelect, selectedSbom } = useGlobalState()
@@ -110,6 +108,7 @@ const VersionsTable = (props) => {
   const ARC_VERSIONS = useDisclosure()
   const DELETE_SBOM = useDisclosure()
   const ARCHIVE_SBOM = useDisclosure()
+  const AUTOMATION = useDisclosure()
 
   const tab = useQueryParam('tab')
 
@@ -129,8 +128,6 @@ const VersionsTable = (props) => {
     ? data?.shareLynkQuery?.projectGroup
     : data?.projectGroup
   const { name, enabled } = result || ''
-
-  const [excuteRule] = useMutation(RuleExecution)
 
   const { nodes, paginationProps, loading, startPolling, stopPolling } =
     usePaginatedQuery(signedUrlParams ? ShareVersionTable : GetVersionsTable, {
@@ -189,19 +186,8 @@ const VersionsTable = (props) => {
   }
 
   const handleAutomation = (row) => {
-    excuteRule({ variables: { sbomId: row?.id } }).then((res) => {
-      if (res?.data?.automationRuleExecution?.errors?.length === 0) {
-        showToast({
-          description: 'Automation run successfully',
-          status: 'success'
-        })
-      } else {
-        showToast({
-          description: res?.data?.automationRuleExecution?.errors[0],
-          status: 'error'
-        })
-      }
-    })
+    setActiveRow(row)
+    AUTOMATION.onOpen()
   }
 
   const onSelectLicenses = (row) => {
@@ -272,7 +258,6 @@ const VersionsTable = (props) => {
               </GridItem>
             )}
             <GridItem
-              w={'100%'}
               display={'flex'}
               colSpan={shouldShowDemoFeatures ? 6 : 7}
               sx={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}
@@ -761,6 +746,14 @@ const VersionsTable = (props) => {
           sbom={activeRow}
           isOpen={TRANSFER.isOpen}
           onClose={TRANSFER.onClose}
+        />
+      )}
+      {/* AUTOMATION RUN WARNING */}
+      {AUTOMATION.isOpen && (
+        <AutomationWarning
+          sbom={activeRow}
+          isOpen={AUTOMATION.isOpen}
+          onClose={AUTOMATION.onClose}
         />
       )}
     </>
