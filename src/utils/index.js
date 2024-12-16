@@ -123,7 +123,7 @@ export const getSignedUrlParams = () => {
 export const getLink = (name) => {
   const result = sbomOrigin?.find((item) => item.value === name)
   const { link } = result || ''
-  return link || ''
+  return link || '#'
 }
 
 export const getType = (name) => {

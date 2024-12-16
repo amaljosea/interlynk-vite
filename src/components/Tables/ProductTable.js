@@ -51,27 +51,22 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
-import { GetLabels, GetSharelynks, GetTotalProduct } from 'graphQL/Queries'
+import { GetLabels, GetTotalProduct } from 'graphQL/Queries'
 
 import { FaGithub } from 'react-icons/fa'
 import { FaTag } from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
 
-const ProductTable = ({
-  data,
-  reset,
-  loading,
-  filters,
-  setFilters,
-  paginationProps
-}) => {
+const ProductTable = (props) => {
   const navigate = useNavigate()
   const { setIsOpen } = useTour()
+  const signedUrlParams = getSignedUrlParams()
   const { orgView, isFreeTier } = useGlobalQueryContext()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
-  const signedUrlParams = getSignedUrlParams()
+
+  const { data, reset, loading, filters, setFilters, paginationProps } = props
 
   const { data: prodData } = useQuery(GetTotalProduct, {
     skip: !orgView,
@@ -100,55 +95,27 @@ const ProductTable = ({
   ])
 
   const { search, field } = filters
-  const { totalRows } = paginationProps
 
   const { setEnvName, setClearSelect, setSelectedSbom, dispatch, envName } =
     useGlobalState()
 
   const environment = envName
-
   const { prodDispatch } = dispatch
 
   const [activeRow, setActiveRow] = useState(null)
   const isGithubConfigSaved = useGithubConfigSaved()
   const [openTagMenu, setOpenTagMenu] = useState(false)
   const [filterText, setFilterText] = useState(search || '')
-
   const [selectedTags, setSelectedTags] = useState([])
   const [filterMode, setFilterMode] = useState('OR')
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const {
-    isOpen: isOpenUpload,
-    onOpen: onOpenUpload,
-    onClose: onCloseUpload
-  } = useDisclosure()
-  const {
-    isOpen: isOpenLabel,
-    onOpen: onOpenLabel,
-    onClose: onCloseLabel
-  } = useDisclosure()
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose
-  } = useDisclosure()
-  const {
-    isOpen: isWarningOpen,
-    onOpen: onWarningOpen,
-    onClose: onWarningClose
-  } = useDisclosure()
-  const {
-    isOpen: isLynkOpen,
-    onOpen: onLynkOpen,
-    onClose: onLynkClose
-  } = useDisclosure()
-  const {
-    isOpen: isGithubOpen,
-    onOpen: onGithubOpen,
-    onClose: onGithubClose
-  } = useDisclosure()
+  const PRODUCT = useDisclosure()
+  const UPLOAD = useDisclosure()
+  const LABEL = useDisclosure()
+  const DELETE = useDisclosure()
+  const WARNING = useDisclosure()
+  const SHARELYNK = useDisclosure()
+  const GITHUB = useDisclosure()
 
   const canAddProduct = useHasPermission({
     parentKey: 'view_product_group',
@@ -175,15 +142,6 @@ const ProductTable = ({
     childKey: 'update_sbom'
   })
 
-  const { data: lynks, error } = useQuery(GetSharelynks, {
-    skip: activeRow && isLynkOpen ? false : true,
-    fetchPolicy: 'network-only',
-    variables: {
-      ids: activeRow ? [activeRow?.id] : undefined,
-      first: totalRows
-    }
-  })
-
   const { data: prodLabels, loading: labelLoading } = useQuery(GetLabels, {
     skip: signedUrlParams || !orgView,
     variables: { first: 100 }
@@ -194,10 +152,10 @@ const ProductTable = ({
     useMutation(DeleteProjectGroup)
 
   const onProductDelete = useCallback(async () => {
-    await deleteProjectGroup({ variables: { id: activeRow.id } }).then(
-      (res) => res.data && onDeleteClose()
+    await deleteProjectGroup({ variables: { id: activeRow?.id } }).then(
+      (res) => res.data && DELETE.onClose()
     )
-  }, [deleteProjectGroup, activeRow, onDeleteClose])
+  }, [deleteProjectGroup, activeRow?.id, DELETE])
 
   const setSearchFilter = useCallback(
     (value) => {
@@ -244,7 +202,7 @@ const ProductTable = ({
 
   const onSharelynkOpen = (row) => {
     setActiveRow(row)
-    onLynkOpen()
+    SHARELYNK.onOpen()
   }
 
   const filteredNodes = data?.filter((node) => {
@@ -292,7 +250,7 @@ const ProductTable = ({
               <IconButton
                 icon={<FaGithub />}
                 variant='outline'
-                onClick={onGithubOpen}
+                onClick={GITHUB.onOpen}
               />
             </Tooltip>
           )}
@@ -302,7 +260,7 @@ const ProductTable = ({
               aria-label='Manage Labels'
               icon={<FaTag />}
               variant='outline'
-              onClick={onOpenLabel}
+              onClick={LABEL.onOpen}
               isDisabled={!canAddProduct}
               hidden={signedUrlParams || isFreeTier}
             />
@@ -324,7 +282,7 @@ const ProductTable = ({
                   aria-label='Add product'
                   onClick={() => {
                     setActiveRow(null)
-                    onOpen()
+                    PRODUCT.onOpen()
                   }}
                   isDisabled={
                     !canAddProduct || (isFreeTier && totalCount === 5)
@@ -348,12 +306,12 @@ const ProductTable = ({
     filterMode,
     shouldShowDemoFeatures,
     isGithubConfigSaved,
-    onGithubOpen,
+    GITHUB.onOpen,
+    LABEL.onOpen,
     canAddProduct,
-    onOpenLabel,
     isFreeTier,
     totalCount,
-    onOpen
+    PRODUCT
   ])
 
   // COLUMNS
@@ -373,7 +331,7 @@ const ProductTable = ({
             isDisabled={signedUrlParams || !canEditProduct}
             onChange={() => {
               setActiveRow(row)
-              onWarningOpen()
+              WARNING.onOpen()
             }}
           />
         )
@@ -508,7 +466,7 @@ const ProductTable = ({
                 <MenuItem
                   onClick={() => {
                     setActiveRow(row)
-                    onOpen()
+                    PRODUCT.onOpen()
                   }}
                   isDisabled={!enabled || !canEditProduct}
                 >
@@ -546,7 +504,7 @@ const ProductTable = ({
                         data={row}
                         nodes={nodes}
                         setOpen={setOpenTagMenu}
-                        onOpenLabel={onOpenLabel}
+                        onOpenLabel={LABEL.onOpen}
                       />
                     </Box>
                   </Fade>
@@ -556,7 +514,7 @@ const ProductTable = ({
                   aria-label={`upload sbom for ${name}`}
                   onClick={() => {
                     setActiveRow(row)
-                    onOpenUpload()
+                    UPLOAD.onOpen()
                   }}
                   isDisabled={!enabled || !canCreateSBOM}
                 >
@@ -577,7 +535,7 @@ const ProductTable = ({
                   color={primaryErrorColor}
                   onClick={() => {
                     setActiveRow(row)
-                    onDeleteOpen()
+                    DELETE.onOpen()
                   }}
                   isDisabled={!canArchiveProduct}
                 >
@@ -627,10 +585,10 @@ const ProductTable = ({
       </Card>
 
       {/* UPLOAD SBOM */}
-      {isOpenUpload && (
+      {UPLOAD.isOpen && (
         <UploadModal
-          isOpen={isOpenUpload}
-          onClose={onCloseUpload}
+          isOpen={UPLOAD.isOpen}
+          onClose={UPLOAD.onClose}
           group={{
             id: activeRow?.id,
             name: activeRow?.name,
@@ -640,23 +598,27 @@ const ProductTable = ({
       )}
 
       {/* UPDATE PRODUCT */}
-      {isOpen && data && (
-        <ProductModal isOpen={isOpen} onClose={onClose} data={activeRow} />
+      {PRODUCT.isOpen && (
+        <ProductModal
+          data={activeRow}
+          isOpen={PRODUCT.isOpen}
+          onClose={PRODUCT.onClose}
+        />
       )}
 
       {/* GITHUB ADD PROJECT */}
-      {isGithubOpen && (
-        <GithubAddModal isOpen={isGithubOpen} onClose={onGithubClose} />
+      {GITHUB.isOpen && (
+        <GithubAddModal isOpen={GITHUB.isOpen} onClose={GITHUB.onClose} />
       )}
 
       {/* DELETE */}
-      {isDeleteOpen && (
+      {DELETE.isOpen && (
         <ConfirmationModal
-          isOpen={isDeleteOpen}
+          isOpen={DELETE.isOpen}
           name={activeRow.name}
           isLoading={dLLoading}
           title='Delete Product'
-          onClose={onDeleteClose}
+          onClose={DELETE.onClose}
           onConfirm={onProductDelete}
           description='Deleting this product will:'
           items={[
@@ -668,28 +630,28 @@ const ProductTable = ({
       )}
 
       {/* DISABLED */}
-      {isWarningOpen && data && (
+      {WARNING.isOpen && (
         <StatusModal
           reset={reset}
           group={activeRow}
-          isOpen={isWarningOpen}
-          onClose={onWarningClose}
+          isOpen={WARNING.isOpen}
+          onClose={WARNING.onClose}
         />
       )}
 
       {/* ShareLynks */}
-      {isLynkOpen && (
+      {SHARELYNK.isOpen && (
         <ShareLynkDrawer
-          error={error}
           groupId={activeRow?.id}
-          data={lynks?.shareLynks}
-          isOpen={isLynkOpen}
-          onClose={onLynkClose}
+          isOpen={SHARELYNK.isOpen}
+          onClose={SHARELYNK.onClose}
         />
       )}
 
       {/* Labels */}
-      {isOpenLabel && <TagDrawer isOpen={isOpenLabel} onClose={onCloseLabel} />}
+      {LABEL.isOpen && (
+        <TagDrawer isOpen={LABEL.isOpen} onClose={LABEL.onClose} />
+      )}
     </>
   )
 }

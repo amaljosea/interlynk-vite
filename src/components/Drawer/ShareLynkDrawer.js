@@ -1,47 +1,37 @@
-import { useMutation } from '@apollo/client'
-import { useMemo, useState } from 'react'
+import { useQuery } from '@apollo/client'
+import { useMemo } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 import { getShareLinklUrl } from 'utils/url'
 
+import { Flex, IconButton, Input, Text, Tooltip } from '@chakra-ui/react'
+import { useClipboard, useDisclosure } from '@chakra-ui/react'
 import {
-  Checkbox,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  IconButton,
-  Input,
-  Text,
-  Tooltip,
-  useClipboard,
-  useDisclosure
+  DrawerOverlay
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import LynkAlert from 'components/LynkAlert'
-import LynkDate from 'components/LynkDate'
-import LynkModal from 'components/LynkModal'
 import LynkSwitch from 'components/Misc/LynkSwitch'
+import CreateSharelynk from 'components/Modal/CreateSharelynk'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { CreateShareLynk } from 'graphQL/Mutation'
+import { GetSharelynks } from 'graphQL/Queries'
 
-import { BiShare } from 'react-icons/bi'
 import { FaCheck, FaRegCopy } from 'react-icons/fa6'
 import { PiFileSvgDuotone } from 'react-icons/pi'
 
-const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
+const ShareLynkDrawer = ({ isOpen, onClose, groupId }) => {
+  const { showToast } = useCustomToast()
   const BACKEND_URL = process.env.REACT_APP_SERVER
-  const [createLynk] = useMutation(CreateShareLynk)
 
   const { headingTextColor, primaryTextColor } = useThemeColor([
     'headingTextColor',
@@ -51,56 +41,16 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
 
-  const {
-    isOpen: isShareLykOpen,
-    onOpen: onShareLynkOpen,
-    onClose: onShareLynkClose
-  } = useDisclosure()
-  const [selectedDate, setSelectedDate] = useState(null)
-  const [isValidDate, setIsValidDate] = useState(true)
-  const [noExpire, setNoExpire] = useState(false)
-
-  const handleDateChange = (newDate) => {
-    const currentDate = new Date()
-    const isValidDate = newDate && !isNaN(newDate) && newDate?._d > currentDate
-    setSelectedDate(newDate._d)
-    if (isValidDate) {
-      setIsValidDate(true)
-    } else {
-      if (typeof newDate === 'string' && newDate === '') {
-        setIsValidDate(true)
-      } else {
-        setIsValidDate(false)
-      }
+  const { data, error, loading } = useQuery(GetSharelynks, {
+    skip: isOpen ? false : true,
+    fetchPolicy: 'network-only',
+    variables: {
+      ids: [groupId]
     }
-  }
+  })
+  const { nodes } = data?.shareLynks || ''
 
-  const handleExpireChange = (e) => {
-    const { checked } = e.target
-    setNoExpire(checked)
-    setIsValidDate(true)
-    if (checked === true) {
-      setSelectedDate('')
-    } else {
-      setSelectedDate(defaultDate)
-    }
-  }
-
-  const handleCreateLynk = () => {
-    createLynk({
-      variables: {
-        enabled: true,
-        id: [groupId],
-        expiresAt: noExpire ? undefined : new Date(selectedDate).toISOString()
-      }
-    }).then((res) => {
-      if (res?.data) {
-        onShareLynkClose()
-      }
-    })
-    setSelectedDate('')
-    setNoExpire(false)
-  }
+  const SHARELYNK = useDisclosure()
 
   const svgLink = useClipboard(
     `${BACKEND_URL}/api/v1/badges?type=hcard&project_group_id=${groupId}`
@@ -108,32 +58,39 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
 
   // HEADER SECTION
   const subHeader = useMemo(() => {
+    const icon = svgLink.hasCopied ? (
+      <FaCheck />
+    ) : (
+      <PiFileSvgDuotone size={26} />
+    )
+    const onCopySvg = () => {
+      svgLink.onCopy()
+      showToast({ description: 'SVG link copied' })
+    }
     return (
       <Flex
+        gap={2}
         width={'100%'}
         alignItems={'center'}
         justifyContent={'flex-end'}
-        gap={2}
       >
         {data?.nodes?.length > 0 && (
           <Tooltip label='SVG Link' placement='left'>
             <IconButton
-              onClick={() => svgLink.onCopy()}
+              icon={icon}
+              onClick={onCopySvg}
               colorScheme={svgLink.hasCopied ? 'whatsapp' : 'blue'}
-              icon={
-                svgLink.hasCopied ? <FaCheck /> : <PiFileSvgDuotone size={26} />
-              }
             />
           </Tooltip>
         )}
         <AddButton
           label='Add ShareLynk'
           tooltipPlacement='left'
-          onClick={onShareLynkOpen}
+          onClick={SHARELYNK.onOpen}
         />
       </Flex>
     )
-  }, [svgLink, onShareLynkOpen, data])
+  }, [svgLink, data?.nodes?.length, SHARELYNK.onOpen, showToast])
 
   // COLUMNS
   const columns = [
@@ -144,7 +101,7 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
       selector: (row) => (
         <LynkSwitch size='md' isChecked={row?.enabled} isReadOnly />
       ),
-      width: '90px'
+      width: '15%'
     },
     // URL
     {
@@ -183,7 +140,7 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
           </Flex>
         )
       },
-      width: '350px',
+      width: '60%',
       wrap: true
     },
     // UPDATED AT
@@ -224,47 +181,24 @@ const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId }) => {
                 persistTableHead
                 responsive={true}
                 columns={columns}
-                data={data?.nodes || []}
-                customStyles={customStyles(headingTextColor)}
-                progressPending={data ? false : true}
-                progressComponent={<CustomLoader />}
+                data={nodes || []}
+                progressPending={loading}
                 subHeaderComponent={subHeader}
+                progressComponent={<CustomLoader />}
+                customStyles={customStyles(headingTextColor)}
               />
             )}
           </DrawerBody>
         </DrawerContent>
       </Drawer>
 
-      {isShareLykOpen && (
-        <LynkModal
-          isOpen={isShareLykOpen}
-          onClose={onShareLynkClose}
-          onSubmit={handleCreateLynk}
-          title={'Create ShareLynk'}
-          Icon={BiShare}
-          disabled={
-            (selectedDate !== '' && !isValidDate) ||
-            (!selectedDate && noExpire === false)
-          }
-          buttonText={'Add'}
-        >
-          {!noExpire && (
-            <FormControl mb={3} isInvalid={!isValidDate}>
-              <FormLabel htmlFor='expire'>Expiration Date</FormLabel>
-              <LynkDate value={selectedDate} onChange={handleDateChange} />
-              {!isValidDate && (
-                <FormErrorMessage>
-                  Please enter a valid expiry date
-                </FormErrorMessage>
-              )}
-            </FormControl>
-          )}
-          <FormControl mb={3}>
-            <Checkbox isChecked={noExpire} onChange={handleExpireChange}>
-              No Expiration
-            </Checkbox>
-          </FormControl>
-        </LynkModal>
+      {SHARELYNK.isOpen && (
+        <CreateSharelynk
+          groupId={groupId}
+          defaultDate={defaultDate}
+          isOpen={SHARELYNK.isOpen}
+          onClose={SHARELYNK.onClose}
+        />
       )}
     </>
   )
