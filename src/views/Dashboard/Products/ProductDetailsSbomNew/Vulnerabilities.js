@@ -375,6 +375,7 @@ const Vulnerabilities = ({ sbomData }) => {
           selectedVulns={selectedVulns}
           setSelectedVulns={setSelectedVulns}
           setToggleClear={setToggleClear}
+          vulnId={selectedVulns[0]?.vuln?.vulnId || ''}
         />
       )}
 

@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { CheckIcon } from '@chakra-ui/icons'
@@ -7,10 +7,6 @@ import {
   Box,
   Checkbox,
   Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  GridItem,
   IconButton,
   Input,
   Select,
@@ -19,6 +15,8 @@ import {
   Text,
   Textarea
 } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
+import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
@@ -30,16 +28,17 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { updateBulkCompVex } from 'graphQL/Mutation'
 import {
   GetCdxResponses,
+  GetCustomFields,
   GetProjectGroup,
   getVexJustifications,
   getVexStatuses
 } from 'graphQL/Queries'
-import { GetCustomFields } from 'graphQL/Queries'
 
 import { FaTimes } from 'react-icons/fa'
 import { FaPenToSquare } from 'react-icons/fa6'
 
 const VexModal = ({
+  vulnId,
   selectedGroup,
   checkEquals,
   isOpen,
@@ -51,7 +50,7 @@ const VexModal = ({
   const { showToast } = useCustomToast()
   const params = useParams()
   const sbomId = params.sbomid
-  const vulnId = useQueryParam('vulnId')
+  const id = useQueryParam('vulnId')
 
   const { fixedVersions, componentVulnCustomFields } =
     selectedVulns?.length > 0 ? selectedVulns[0] : []
@@ -173,9 +172,7 @@ const VexModal = ({
   const handleStatusChange = (e) => {
     const { value } = e.target
     const status = e.target.options[e.target.selectedIndex].text
-    status === 'Not Affected' && !vulnId
-      ? setUpstream(true)
-      : setUpstream(false)
+    status === 'Not Affected' && !id ? setUpstream(true) : setUpstream(false)
     setStatusTitle(value)
     setStatusName(status)
     setJustification('')
@@ -295,13 +292,9 @@ const VexModal = ({
       title={'Vulnerabilty Status'}
       disabled={disabled}
     >
-      {sbomId && (
-        <Box mb={4}>
-          <Tag variant='subtle' colorScheme='blue' wordBreak={'break-all'}>
-            {selectedVulns?.length > 0 ? selectedVulns[0]?.vuln.vulnId : ''}
-          </Tag>
-        </Box>
-      )}
+      <Tag mb={4} colorScheme='blue'>
+        {vulnId}
+      </Tag>
       <Grid width={'100%'} templateColumns='repeat(12, 1fr)' gap={4}>
         <GridItem colSpan={1}>
           <Stack dir='column' spacing={2} alignItems={'center'} height='100%'>

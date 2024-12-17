@@ -49,15 +49,15 @@ const StatsContainer = ({ icon, title, children }) => {
 
 const VulnInfo = () => {
   const params = useParams()
-  const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
+  const id = useQueryParam('vulnId') || params.vulnerabilityid
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { primaryBlueText, secondaryBlueText, primaryTextColor } =
     useThemeColor(['primaryBlueText', 'secondaryBlueText', 'primaryTextColor'])
 
   const { data } = useQuery(GetGlobalVulnData, {
-    skip: vulnId ? false : true,
-    variables: { id: vulnId }
+    skip: id ? false : true,
+    variables: { id }
   })
 
   const { vuln } = data || ''
@@ -189,7 +189,10 @@ const VulnInfo = () => {
 
         {/* Tab List */}
         <Card>
-          <VulnProdTable sbomVersions={sbomVersions} vulnId={vulnId} />
+          <VulnProdTable
+            sbomVersions={sbomVersions}
+            vuln={{ id: id, vulnId: vuln?.vulnId }}
+          />
         </Card>
       </Flex>
 

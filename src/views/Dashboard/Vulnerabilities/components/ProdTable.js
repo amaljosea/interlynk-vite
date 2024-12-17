@@ -3,12 +3,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { areArraysEqual, customStyles, getFullDateAndTime } from 'utils'
-import { getSignedUrlParams, statusColor, timeSince } from 'utils'
+import { statusColor, timeSince } from 'utils'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
-  Button,
   Flex,
   IconButton,
   Stack,
@@ -21,8 +20,6 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import ConnectedSbomDrawer from 'components/Drawer/ConnectedSbomDrawer'
-import ComponentCard from 'components/Misc/ComponentCard'
-import VersionCard from 'components/Misc/VersionCard'
 import Pagination from 'components/Pagination'
 
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -32,18 +29,21 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetCompVulnData, GetConnectedSbom } from 'graphQL/Queries'
 
 import { BsCircleHalf } from 'react-icons/bs'
+import { FaPen } from 'react-icons/fa'
 import { FaFolderTree } from 'react-icons/fa6'
 
 import VexModal from './VexModal'
 import VulnFilters from './VulnsFilter'
 
-const VulnProdTable = ({ vulnId, sbomVersions }) => {
+const VulnProdTable = ({ vuln, sbomVersions }) => {
   const params = useParams()
-  const signedUrlParams = getSignedUrlParams()
+  const productGroupId = params?.productgroupid
   const { headingTextColor, primaryTextColor } = useThemeColor([
     'headingTextColor',
     'primaryTextColor'
   ])
+
+  const { id, vulnId } = vuln || ''
 
   const manageFeeds = useHasPermission({
     parentKey: 'view_feeds',
@@ -57,11 +57,12 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
   const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
     GetCompVulnData,
     {
-      skip: vulnId ? false : true,
+      skip: id ? false : true,
       selector: 'componentVulns',
       variables: {
         ...vulnState,
-        id: vulnId
+        id: id,
+        projectGroupIds: productGroupId ? [productGroupId] : undefined
       }
     }
   )
@@ -70,8 +71,6 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
 
   const STATUS = useDisclosure()
   const SBOM = useDisclosure()
-  const COMPONENT = useDisclosure()
-  const VULN = useDisclosure()
 
   const [statusResults, setStatusResults] = useState([])
   const [selectedVulns, setSelectedVulns] = useState([])
@@ -79,7 +78,6 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
   const [filterInput, setFilterInput] = useState('')
   const [checkEquals, setCheckEquals] = useState(false)
   const [toggleClear, setToggleClear] = useState(false)
-  const [activeRow, setActiveRow] = useState(null)
 
   const handlePreview = async (row) => {
     const { id, component } = row
@@ -115,14 +113,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
                 isDisabled={!component?.sbom?.hasConnectedSboms}
               />
             </Tooltip>
-            <Text
-              color={primaryTextColor}
-              cursor={'pointer'}
-              onClick={() => {
-                setActiveRow(component)
-                VULN.onOpen()
-              }}
-            >
+            <Text color={primaryTextColor}>
               {component?.sbom?.project?.projectGroup?.name || ''}
             </Text>
           </Flex>
@@ -158,12 +149,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
             my={3}
             spacing={1}
             direction='column'
-            cursor={'pointer'}
             alignItems={'flex-start'}
-            onClick={() => {
-              setActiveRow(component)
-              COMPONENT.onOpen()
-            }}
           >
             <Text color={primaryTextColor}>{component?.name || ''}</Text>
             <Text color={primaryTextColor}>{component?.version || ''}</Text>
@@ -304,20 +290,19 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
             tableType={'Vulnerability Detail View'}
             filters={{ ...vulnState }}
           />
-
           {/* UPDATE STATUES */}
           {selectedVulns.length > 0 && (
-            <Button
-              variant='solid'
-              colorScheme='blue'
-              fontWeight='normal'
-              fontSize={'sm'}
-              title='Set vuln status'
-              onClick={STATUS.onOpen}
-              isDisabled={signedUrlParams || !manageFeeds}
-            >
-              Set Status
-            </Button>
+            <Tooltip label={'Set Status'}>
+              <IconButton
+                icon={<FaPen />}
+                variant='solid'
+                colorScheme='blue'
+                fontWeight='normal'
+                title='Set vuln status'
+                onClick={STATUS.onOpen}
+                isDisabled={!manageFeeds}
+              />
+            </Tooltip>
           )}
         </Stack>
       </Flex>
@@ -331,7 +316,6 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
     vulnState,
     selectedVulns.length,
     STATUS.onOpen,
-    signedUrlParams,
     manageFeeds,
     reset
   ])
@@ -399,6 +383,7 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
 
       {STATUS.isOpen && selectedVulns.length > 0 && (
         <VexModal
+          vulnId={vulnId}
           isOpen={STATUS.isOpen}
           onClose={STATUS.onClose}
           checkEquals={checkEquals}
@@ -406,22 +391,6 @@ const VulnProdTable = ({ vulnId, sbomVersions }) => {
           selectedVulns={selectedVulns}
           setSelectedVulns={setSelectedVulns}
           setToggleClear={setToggleClear}
-        />
-      )}
-
-      {COMPONENT.isOpen && (
-        <ComponentCard
-          data={activeRow}
-          isOpen={COMPONENT.isOpen}
-          onClose={COMPONENT.onClose}
-        />
-      )}
-
-      {VULN.isOpen && (
-        <VersionCard
-          data={activeRow}
-          isOpen={VULN.isOpen}
-          onClose={VULN.onClose}
         />
       )}
     </>
