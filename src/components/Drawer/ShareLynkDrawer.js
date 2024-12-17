@@ -74,7 +74,7 @@ const ShareLynkDrawer = ({ isOpen, onClose, groupId }) => {
         alignItems={'center'}
         justifyContent={'flex-end'}
       >
-        {data?.nodes?.length > 0 && (
+        {nodes?.length > 0 && (
           <Tooltip label='SVG Link' placement='left'>
             <IconButton
               icon={icon}
@@ -90,7 +90,7 @@ const ShareLynkDrawer = ({ isOpen, onClose, groupId }) => {
         />
       </Flex>
     )
-  }, [svgLink, data?.nodes?.length, SHARELYNK.onOpen, showToast])
+  }, [svgLink, nodes?.length, SHARELYNK.onOpen, showToast])
 
   // COLUMNS
   const columns = [
