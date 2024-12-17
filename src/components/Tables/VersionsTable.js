@@ -1,7 +1,7 @@
 import { gql, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFormat, getFullDateAndTime } from 'utils'
@@ -76,8 +76,8 @@ const VersionsTable = (props) => {
   const params = useParams()
   const productId = params.productid
   const signedUrlParams = getSignedUrlParams()
-  const { clearSelect, setClearSelect, selectedSbom } = useGlobalState()
-  const { setSelectedSbom, versionState, dispatch } = useGlobalState()
+  const { clearSelect, setClearSelect } = useGlobalState()
+  const { versionState, dispatch } = useGlobalState()
   const { searchInput } = versionState
   const { prodVulnDispatch, prodCompDispatch } = dispatch
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
@@ -85,7 +85,7 @@ const VersionsTable = (props) => {
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const [filterText, setFilterText] = useState(searchInput)
   const [activeRow, setActiveRow] = useState(null)
-
+  const [selectedSbom, setSelectedSbom] = useState([])
   const currentDate = new Date()
 
   const {
@@ -115,6 +115,11 @@ const VersionsTable = (props) => {
   const { setIsOpen } = useTour()
 
   const { VERSIONS } = ProductDetailsTabs
+
+  useEffect(() => {
+    setSelectedSbom([])
+    setClearSelect(true)
+  }, [productId, setClearSelect])
 
   // GET PROJECT DATA
   const { data } = useQuery(
