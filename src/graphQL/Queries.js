@@ -1805,6 +1805,9 @@ export const GetComponentData = gql`
             }
             updatedAt
           }
+          vulns {
+            totalCount
+          }
         }
       }
     }

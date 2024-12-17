@@ -59,6 +59,12 @@ const ComponentsColumns = ({
     'primaryErrorColor'
   ])
 
+  const tagStyle = {
+    size: 'sm',
+    variant: 'subtle',
+    width: 'fit-content'
+  }
+
   const customerView = isCustomerView()
   return useMemo(() => {
     const columns = [
@@ -71,6 +77,7 @@ const ComponentsColumns = ({
           const { projectVersion, project } = sbom || ''
           const { projectGroup } = project || ''
           const isPart = sbomId !== bomId
+          const isVulnerable = row?.vulns?.totalCount > 0
           const validPurl = isValidPurl(purl)
           const icon = validPurl ? (
             GetIcon(purl?.split('/')[0], colorMode)
@@ -110,26 +117,23 @@ const ComponentsColumns = ({
                     {projectVersion ? `: ${projectVersion}` : ''}
                   </Text>
                 )}
-                {/* COMPONENT TYPE */}
-                <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
+                <Flex
+                  alignItems={'center'}
+                  gap={isVulnerable || internal ? 1 : 0}
+                >
+                  {isVulnerable && (
+                    <Tag {...tagStyle} colorScheme='red'>
+                      <TagLabel>Vulnerable</TagLabel>
+                    </Tag>
+                  )}
                   {primary && (
-                    <Tag
-                      width={'fit-content'}
-                      size={'sm'}
-                      variant='subtle'
-                      colorScheme='blue'
-                    >
-                      <TagLabel textTransform={'capitalize'}>Primary</TagLabel>
+                    <Tag {...tagStyle} colorScheme='blue'>
+                      <TagLabel>Primary</TagLabel>
                     </Tag>
                   )}
                   {internal && (
-                    <Tag
-                      width={'fit-content'}
-                      size={'sm'}
-                      variant='subtle'
-                      colorScheme='cyan'
-                    >
-                      <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
+                    <Tag {...tagStyle} colorScheme='cyan'>
+                      <TagLabel>Internal</TagLabel>
                     </Tag>
                   )}
                 </Flex>
