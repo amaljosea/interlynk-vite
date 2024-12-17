@@ -46,7 +46,7 @@ export const ProgressBar = ({ value, loading, text }) => {
             label={value === 0 ? `Run checks to see Quality Score.` : ''}
           >
             {loading ? (
-              <Skeleton width={'100%'} height={4} borderRadius={'md'} />
+              <Skeleton width={'100%'} height={'22px'} />
             ) : (
               <Box>
                 <HealthScore value={value} />
