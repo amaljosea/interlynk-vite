@@ -209,7 +209,7 @@ const VersionsTable = (props) => {
 
   const retention = retentionTime && Math.floor(retentionTime)
 
-  const ignoreMsg = `An SBOM with the same version was recently imported. However, the system found no difference between the two versions, so the newer import has been ignored. On the right, you can still see its record under Action ... > List SBOM`
+  const ignoreMsg = `An SBOM with the same version was recently imported. However, the system found no difference between the two versions, so the newer import has been ignored. On the right, you can still see its record under Action ... > View Alternates`
 
   // COLUMNS
   const columns = [
@@ -455,26 +455,12 @@ const VersionsTable = (props) => {
             <Portal>
               <MenuList fontSize={'sm'}>
                 <MenuItem
-                  hidden={signedUrlParams}
-                  onClick={() => handleListSbom(row)}
-                  aria-label={`sbom-${row?.projectVersion}-list`}
-                >
-                  List SBOM
-                </MenuItem>
-                <MenuItem
-                  hidden={signedUrlParams}
-                  onClick={() => handleTransfer(row)}
-                  aria-label={`sbom-${row?.projectVersion}-transfer`}
-                >
-                  Transfer SBOM
-                </MenuItem>
-                <MenuItem
                   aria-label={`sbom-${row?.projectVersion}-reprocess`}
                   onClick={() => handleRepSbom(row)}
                   hidden={signedUrlParams}
                   isDisabled={!canReprocessSbom}
                 >
-                  Reprocess
+                  Rerun Import
                 </MenuItem>
                 <MenuItem
                   aria-label={`sbom-${row?.projectVersion}-automation`}
@@ -482,9 +468,23 @@ const VersionsTable = (props) => {
                   hidden={signedUrlParams}
                   isDisabled={!canReprocessSbom}
                 >
-                  Run Automation
+                  Rerun Automation
                 </MenuItem>
-                <Divider hidden={signedUrlParams} />
+                <MenuItem
+                  hidden={signedUrlParams}
+                  onClick={() => handleTransfer(row)}
+                  aria-label={`sbom-${row?.projectVersion}-transfer`}
+                >
+                  Switch Environment
+                </MenuItem>
+                <MenuItem
+                  hidden={signedUrlParams}
+                  onClick={() => handleListSbom(row)}
+                  aria-label={`sbom-${row?.projectVersion}-list`}
+                >
+                  View Alternates
+                </MenuItem>
+                <Divider />
                 <MenuItem
                   aria-label={`sbom-${row?.projectVersion}-archive`}
                   isDisabled={!archiveSbom || signedUrlParams}

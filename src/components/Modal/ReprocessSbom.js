@@ -34,8 +34,8 @@ const ReprocessSbom = ({ isOpen, onClose, data, projectGroup }) => {
     onClose,
     onConfirm: onReprocess,
     name: `${projectGroup?.name} - ${projectVersion}`,
-    title: `Reprocess Version`,
-    description: `Reprocessing this version will:`,
+    title: `Rerun Import`,
+    description: `Rerunning import on this version will:`,
     items: [
       `Remove any changes made to this version since its import`,
       `Reprocess the SBOM originally imported to create this version`,

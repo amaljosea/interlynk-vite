@@ -85,7 +85,8 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
         <DrawerContent>
           <DrawerCloseButton mt={1} />
           <DrawerHeader borderBottomWidth='1px'>
-            {truncatedValue(sbomAlts?.sbom?.projectVersion, 40) + ' SBOM List'}
+            {truncatedValue(sbomAlts?.sbom?.projectVersion, 40) +
+              ' Alternative SBOMs'}
           </DrawerHeader>
           <DrawerBody>
             <Table variant='simple' m={0} p={0}>

@@ -80,10 +80,10 @@ const SbomTransfer = ({ sbom, isOpen, onClose }) => {
   return (
     <LynkModal
       isOpen={isOpen}
-      buttonText='Submit'
+      buttonText='Switch'
       onClose={onClose}
       Icon={BiLayerPlus}
-      title={'Transfer SBOM'}
+      title={'Switch Environment'}
       isLoading={loading}
       onSubmit={handleSubmit}
       disabled={disabled}

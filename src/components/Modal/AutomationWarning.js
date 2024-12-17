@@ -33,11 +33,11 @@ const AutomationWarning = ({ isOpen, onClose, sbom }) => {
     onClose,
     onConfirm: handleSubmit,
     name: `${sbom?.projectVersion}`,
-    title: `Run Automation`,
-    description: `Automation is already running on imported SBOMs. Re-running automation on this version will:`,
+    title: `Rerun Automation`,
+    description: `Re-running automation on this version will:`,
     items: [
-      `Recheck the version for all conditions under Automation Rules`,
-      `Apply those automation rules in sequence`
+      `Recheck the version for conditions under the Automation Rules`,
+      `Apply actions in the order listed under the Automation Rules`
     ]
   }
 
