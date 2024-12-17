@@ -7,31 +7,25 @@ import { AddIcon, ArrowDownIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
+  Select,
+  Stack,
+  Text,
+  Tooltip,
+  useDisclosure
+} from '@chakra-ui/react'
+import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
+import { Tag, TagCloseButton, TagLabel } from '@chakra-ui/react'
+import {
   FormControl,
   FormErrorIcon,
   FormErrorMessage,
-  FormLabel,
-  Select,
-  Stack,
-  Table,
-  Tag,
-  TagCloseButton,
-  TagLabel,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tooltip,
-  Tr,
-  useDisclosure
+  FormLabel
 } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import RelDeleteModal from 'components/RelDeleteModal'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -84,8 +78,6 @@ const CompRelations = ({ data, compPath }) => {
   const [activeComp, setActiveComp] = useState(null)
   const [isAdded, setIsAdded] = useState(false)
 
-  const { prodCompState } = useGlobalState()
-  const { field, direction } = prodCompState
   const { primaryBlueText, headingTextColor } = useThemeColor([
     'primaryBlueText',
     'headingTextColor'
@@ -94,8 +86,8 @@ const CompRelations = ({ data, compPath }) => {
   const compState = {
     projectId: productId,
     sbomId: sbomId,
-    field: field,
-    direction: direction
+    field: 'COMPONENTS_UPDATED_AT',
+    direction: 'DESC'
   }
 
   const { data: compData } = useQuery(GetTotalComponents, {
@@ -201,11 +193,13 @@ const CompRelations = ({ data, compPath }) => {
             (item) => item.id !== activeComp.id
           )
           setDependsOnList(filterData)
+          showToast({
+            description: 'Component removed successfully',
+            status: 'success'
+          })
         }
       })
-      .finally(() => {
-        onDelClose()
-      })
+      .finally(() => onDelClose())
   }
 
   const isInvalid =
@@ -244,7 +238,7 @@ const CompRelations = ({ data, compPath }) => {
               ))}
             </Select>
           </FormControl>
-          {allComponents && (
+          {allComponents ? (
             <FormControl isInvalid={list.length > 0}>
               <FormLabel htmlFor='to' color={headingTextColor}>
                 Component
@@ -279,6 +273,8 @@ const CompRelations = ({ data, compPath }) => {
                 </FormErrorMessage>
               )}
             </FormControl>
+          ) : (
+            <Text>Please wait, loading components..</Text>
           )}
 
           {alert ? (
@@ -336,6 +332,13 @@ const CompRelations = ({ data, compPath }) => {
                         {truncatedValue(comp?.fromComp?.name, 20)}-
                         {truncatedValue(comp?.fromComp?.version, 20)}
                       </TagLabel>
+                      <TagCloseButton
+                        data-testid='delete_depends_on'
+                        onClick={() => {
+                          setActiveComp(comp)
+                          onDelOpen()
+                        }}
+                      />
                     </Tag>
                   ))}
                 </Flex>

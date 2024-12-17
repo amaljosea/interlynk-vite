@@ -2,8 +2,7 @@ import { useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext } from 'react'
 import { useParams } from 'react-router-dom'
-import { isCustomerView } from 'utils'
-import { getSignedUrlParams } from 'utils'
+import { getSignedUrlParams, isCustomerView } from 'utils'
 
 import {
   Drawer,
