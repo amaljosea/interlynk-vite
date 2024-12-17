@@ -69,6 +69,7 @@ import {
   FaUserAstronaut
 } from 'react-icons/fa6'
 import { MdDelete, MdOutlineArchive, MdOutlineUnarchive } from 'react-icons/md'
+import { VscDebugRerun } from 'react-icons/vsc'
 
 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
@@ -809,6 +810,7 @@ export const getConfirmatonModalIcon = (title) => {
   if (title.includes('Delete') || title.includes('Remove')) return MdDelete
   if (title.includes('Reprocess')) return FaArrowRotateRight
   if (title.includes('Cancel')) return FaBan
+  if (title.includes('Rerun')) return VscDebugRerun
   return null
 }
 

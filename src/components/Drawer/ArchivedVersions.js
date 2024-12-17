@@ -113,12 +113,17 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
             {loading ? (
               <CustomLoader />
             ) : (
-              <Flex my={2} flexDir={'column'} alignItems={'flex-start'} gap={5}>
+              <Flex
+                my={2}
+                gap={5}
+                flexDir={'column'}
+                alignItems={'flex-center'}
+              >
                 {sbomArchived?.map((item, index) => (
                   <Flex
                     w={'full'}
                     key={index}
-                    alignItems={'flex-start'}
+                    alignItems={'center'}
                     justifyContent={'space-between'}
                   >
                     <Stack spacing={0}>
@@ -138,23 +143,20 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
                     <ButtonGroup>
                       <Tooltip label='View' placement='top'>
                         <IconButton
-                          variant='outline'
+                          size='sm'
+                          colorScheme='blue'
                           title='View archived version'
                           onClick={() => onView(item)}
-                          icon={<FaEye size={16} color={primaryTextColor} />}
+                          icon={<FaEye size={16} />}
                         />
                       </Tooltip>
                       <Tooltip label='Restore' placement='top'>
                         <IconButton
-                          variant='outline'
+                          size='sm'
+                          colorScheme='blue'
                           aria-label={`sbom-${item?.projectVersion}-restore`}
                           onClick={() => onRestore(item)}
-                          icon={
-                            <MdOutlineUnarchive
-                              size={20}
-                              color={primaryTextColor}
-                            />
-                          }
+                          icon={<MdOutlineUnarchive size={20} />}
                         />
                       </Tooltip>
                     </ButtonGroup>

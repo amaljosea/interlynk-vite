@@ -749,6 +749,7 @@ const VersionsTable = (props) => {
       {TRANSFER.isOpen && (
         <SbomTransfer
           sbom={activeRow}
+          productGroup={{ name }}
           isOpen={TRANSFER.isOpen}
           onClose={TRANSFER.onClose}
         />
@@ -757,6 +758,7 @@ const VersionsTable = (props) => {
       {AUTOMATION.isOpen && (
         <AutomationWarning
           sbom={activeRow}
+          productGroup={{ name }}
           isOpen={AUTOMATION.isOpen}
           onClose={AUTOMATION.onClose}
         />

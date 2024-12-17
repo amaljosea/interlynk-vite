@@ -5,7 +5,7 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { RuleExecution } from 'graphQL/Mutation'
 
-const AutomationWarning = ({ isOpen, onClose, sbom }) => {
+const AutomationWarning = ({ isOpen, onClose, sbom, productGroup }) => {
   const { showToast } = useCustomToast()
 
   const [excuteRule, { loading }] = useMutation(RuleExecution)
@@ -32,7 +32,7 @@ const AutomationWarning = ({ isOpen, onClose, sbom }) => {
     isOpen,
     onClose,
     onConfirm: handleSubmit,
-    name: `${sbom?.projectVersion}`,
+    name: `${productGroup?.name} - ${sbom?.projectVersion}`,
     title: `Rerun Automation`,
     description: `Re-running automation on this version will:`,
     items: [

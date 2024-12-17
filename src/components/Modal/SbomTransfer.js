@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { capitalizeFirstLetter, envOrderList, isDefaultEnv } from 'utils'
 
-import { FormControl, FormLabel, Select } from '@chakra-ui/react'
+import { FormControl, FormLabel, Select, Tag, Text } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
@@ -24,7 +24,7 @@ const ProjectGroup = gql`
   }
 `
 
-const SbomTransfer = ({ sbom, isOpen, onClose }) => {
+const SbomTransfer = ({ sbom, isOpen, onClose, productGroup }) => {
   const params = useParams()
   const { showToast } = useCustomToast()
 
@@ -88,6 +88,11 @@ const SbomTransfer = ({ sbom, isOpen, onClose }) => {
       onSubmit={handleSubmit}
       disabled={disabled}
     >
+      <Tag colorScheme='blue' mb={5} py={1.5}>
+        <Text fontWeight={400} wordBreak={'break-all'}>
+          {productGroup?.name} - {sbom?.projectVersion}
+        </Text>
+      </Tag>
       <FormControl isRequired>
         <FormLabel htmlFor='environment'>Environment</FormLabel>
         <Select
