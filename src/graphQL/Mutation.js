@@ -3052,6 +3052,44 @@ export const CustomVulnCreate = gql`
   }
 `
 
+export const CustomVulnUpdate = gql`
+  mutation CustomVulnUpdate(
+    $id: Uuid!
+    $vulnIdentifier: String
+    $desc: String
+    $sev: String
+    $reportedAt: ISO8601DateTime
+    $publishedAt: ISO8601DateTime
+    $lastModifiedAt: ISO8601DateTime
+    $customVulnSbomsAttributes: [CustomVulnSbomsAttributesInput!]
+    $purl: String
+    $cpe: String
+    $componentId: Uuid
+  ) {
+    customVulnUpdate(
+      input: {
+        id: $id
+        vulnIdentifier: $vulnIdentifier
+        desc: $desc
+        sev: $sev
+        reportedAt: $reportedAt
+        publishedAt: $publishedAt
+        lastModifiedAt: $lastModifiedAt
+        cpe: $cpe
+        componentId: $componentId
+        purl: $purl
+        customVulnSbomsAttributes: $customVulnSbomsAttributes
+      }
+    ) {
+      errors
+      customVuln {
+        id
+        vulnIdentifier
+      }
+    }
+  }
+`
+
 export const RuleExecution = gql`
   mutation RuleExecution($sbomId: Uuid!) {
     automationRuleExecution(input: { sbomId: $sbomId }) {

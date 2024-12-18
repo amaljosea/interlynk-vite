@@ -5125,3 +5125,26 @@ export const GetComponentSupportData = gql`
     }
   }
 `
+
+export const GetCustomVuln = gql`
+  query GetCustomVuln($vulnIdentifier: Uuid!) {
+    customVuln(vulnIdentifier: $vulnIdentifier) {
+      componentId
+      cpe
+      createdAt
+      desc
+      id
+      lastModifiedAt
+      organizationId
+      publishedAt
+      purl
+      reportedAt
+      sev
+      updatedAt
+      vulnIdentifier
+      component {
+        id
+      }
+    }
+  }
+`

@@ -19,6 +19,7 @@ import {
 
 import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
 import CustomLoader from 'components/CustomLoader'
+import VulnDrawer from 'components/Drawer/VulnDrawer'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import CvssCard from 'components/Misc/CvssCard'
 import CustomVuln from 'components/Modal/CustomVuln'
@@ -149,6 +150,7 @@ const Vulnerabilities = ({ sbomData }) => {
   const LINK = useDisclosure()
   const JIRA = useDisclosure()
   const CVSS = useDisclosure()
+  const VULN = useDisclosure()
   const IMPORT = useDisclosure()
   const CUSTOM_VULNS = useDisclosure()
 
@@ -280,7 +282,8 @@ const Vulnerabilities = ({ sbomData }) => {
     setActiveRow,
     jiraConnection,
     LINK,
-    JIRA
+    JIRA,
+    VULN
   )
 
   return (
@@ -325,6 +328,14 @@ const Vulnerabilities = ({ sbomData }) => {
           isOpen={LINK.isOpen}
           onClose={LINK.onClose}
           sbomId={sbomId}
+        />
+      )}
+
+      {VULN.isOpen && (
+        <VulnDrawer
+          data={activeRow}
+          isOpen={VULN.isOpen}
+          onClose={VULN.onClose}
         />
       )}
 
