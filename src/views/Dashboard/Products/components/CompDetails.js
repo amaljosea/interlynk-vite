@@ -376,7 +376,7 @@ const CompDetails = ({ data, primaryComp }) => {
           </Select>
         </FormControl>
         {/* SUPPRT LEVEL */}
-        <FormControl isDisabled={customerView}>
+        <FormControl hidden={customerView}>
           <FormLabel htmlFor='supportLevel'>
             <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
               <Text>Support Level</Text>

@@ -1876,7 +1876,7 @@ export const GetPrimaryComponent = gql`
 `
 
 export const GetSharPrimartComp = gql`
-  query ShareComponentData(
+  query GetSharPrimartComp(
     $sbomId: Uuid!
     $primary: Boolean
     $field: ComponentOrderByFields!

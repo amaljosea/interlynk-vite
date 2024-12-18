@@ -1,6 +1,5 @@
-import React, { useMemo } from 'react'
-import { getFullDateAndTime, getSignedUrlParams, isCustomerView } from 'utils'
-import { parseLicenseString } from 'utils'
+import { useMemo } from 'react'
+import { getSignedUrlParams, isCustomerView, parseLicenseString } from 'utils'
 import { openSsf } from 'variables/general'
 
 import { Box, Flex, Tag, Text, VStack } from '@chakra-ui/react'
@@ -11,32 +10,16 @@ import SupplierTag from 'components/SupplierTag'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const ExpandedComponent = ({
-  data,
-  isArchived,
-  onDeleteSup,
-  onCheckPurl,
-  onCheckCpe,
-  handleGraphView
-}) => {
+const ExpandedComponent = (props) => {
   const {
-    scope,
-    suppliers,
-    purl,
-    description,
-    cpes,
-    name,
-    kind,
-    internal,
-    licenses,
-    licensesExp,
-    licensesCustom,
-    supportLevel,
-    endOfSupport,
-    dependencyOf,
-    dependsOn
-  } = data
-  const openSSF = openSsf?.find((item) => item?.name === purl)
+    data,
+    isArchived,
+    onDeleteSup,
+    onCheckPurl,
+    onCheckCpe,
+    handleGraphView
+  } = props
+  const openSSF = openSsf?.find((item) => item?.name === data?.purl)
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const customerView = isCustomerView()
   const signedUrlParams = getSignedUrlParams()
@@ -48,6 +31,8 @@ const ExpandedComponent = ({
       fontSize: 14,
       workBreak: 'break-all'
     }
+    const getDate = (value) =>
+      value ? `${new Date(value).toLocaleDateString()}` : `N/A`
     return (
       <Box
         sx={{ w: '100%', p: 5 }}
@@ -57,20 +42,20 @@ const ExpandedComponent = ({
           <GridItem colSpan={3}>
             <CustomText>Name :</CustomText>
             <Text sx={textStyle} width={'90%'}>
-              {name || 'N/A'}
+              {data?.name || 'N/A'}
             </Text>
           </GridItem>
           <GridItem colSpan={3}>
             <CustomText>Description :</CustomText>
             <Text sx={textStyle} width={'90%'}>
-              {description !== null ? description : 'N/A'}
+              {data?.description !== null ? data?.description : 'N/A'}
             </Text>
           </GridItem>
           <GridItem colSpan={3}>
             <CustomText>Depends On :</CustomText>
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-              {dependsOn?.length > 0 ? (
-                [...dependsOn]
+              {data?.dependsOn?.length > 0 ? (
+                [...data.dependsOn]
                   .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
                   .map((comp, index) => (
                     <Tag
@@ -96,8 +81,8 @@ const ExpandedComponent = ({
           <GridItem>
             <CustomText>Dependency Of :</CustomText>
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-              {dependencyOf?.length > 0 ? (
-                dependencyOf?.map((comp, index) => (
+              {data?.dependencyOf?.length > 0 ? (
+                data.dependencyOf?.map((comp, index) => (
                   <Tag
                     padding={1}
                     key={index}
@@ -120,19 +105,19 @@ const ExpandedComponent = ({
           </GridItem>
           <GridItem>
             <CustomText>Type :</CustomText>
-            <Text sx={textStyle}>{kind || 'N/A'}</Text>
+            <Text sx={textStyle}>{data?.kind || 'N/A'}</Text>
           </GridItem>
           <GridItem>
             <CustomText>Internal :</CustomText>
-            <Text sx={textStyle}>{internal ? 'True' : 'False'}</Text>
+            <Text sx={textStyle}>{data?.internal ? 'True' : 'False'}</Text>
           </GridItem>
           <GridItem>
             <CustomText>Supplier :</CustomText>
             <VStack spacing={4} mt={1} alignItems={'left'}>
               {!customerView ? (
-                !signedUrlParams && suppliers?.length > 0 ? (
+                !signedUrlParams && data?.suppliers?.length > 0 ? (
                   <>
-                    {suppliers.map((item, index) => (
+                    {data?.suppliers.map((item, index) => (
                       <SupplierTag
                         key={index}
                         item={item}
@@ -145,9 +130,9 @@ const ExpandedComponent = ({
                 ) : (
                   <Text sx={textStyle}>N/A</Text>
                 )
-              ) : suppliers?.length > 0 ? (
+              ) : data?.suppliers?.length > 0 ? (
                 <>
-                  {suppliers.map((item, index) => (
+                  {data?.suppliers.map((item, index) => (
                     <SupplierTag key={index} item={item} editable={false} />
                   ))}
                 </>
@@ -163,18 +148,18 @@ const ExpandedComponent = ({
               cursor={'pointer'}
               onClick={() => onCheckPurl(data)}
             >
-              {purl !== null && purl !== '' ? decodeURI(purl) : 'N/A'}
+              {data?.purl ? decodeURI(data?.purl) : 'N/A'}
             </Text>
           </GridItem>
           <GridItem>
             <CustomText>CPES :</CustomText>
-            {cpes?.length > 0 ? (
+            {data?.cpes?.length > 0 ? (
               <Text
                 sx={textStyle}
                 cursor={'pointer'}
                 onClick={() => onCheckCpe(data)}
               >
-                {cpes[0]}
+                {data?.cpes[0]}
               </Text>
             ) : (
               <Text sx={textStyle}>N/A</Text>
@@ -183,26 +168,28 @@ const ExpandedComponent = ({
           <GridItem>
             <CustomText>Scope :</CustomText>
             <Text sx={textStyle} textTransform={'capitalize'}>
-              {scope || 'N/A'}
+              {data?.scope || 'N/A'}
             </Text>
           </GridItem>
           <GridItem>
             <CustomText>Licenses :</CustomText>
             <Flex alignItems={'center'} gap={2} flexWrap={'wrap'} my={2}>
               {/* SPDX */}
-              {licenses?.length > 0 &&
-                licenses.map((item, index) => (
+              {data?.licenses?.length > 0 &&
+                data?.licenses.map((item, index) => (
                   <Text key={index} sx={textStyle}>
                     {item}
                   </Text>
                 ))}
               {/* EXPRESSION */}
-              {licensesExp && licensesExp !== '' && (
-                <Text sx={textStyle}>{parseLicenseString(licensesExp)}</Text>
+              {data?.licensesExp && data?.licensesExp !== '' && (
+                <Text sx={textStyle}>
+                  {parseLicenseString(data?.licensesExp)}
+                </Text>
               )}
               {/* CUSTOM */}
-              {licensesCustom?.length > 0 &&
-                licensesCustom?.map((item, index) => (
+              {data?.licensesCustom?.length > 0 &&
+                data?.licensesCustom?.map((item, index) => (
                   <Text key={index} sx={textStyle}>
                     {item}
                   </Text>
@@ -213,41 +200,24 @@ const ExpandedComponent = ({
             <CustomText>OpenSSF Scorecard :</CustomText>
             <Text sx={textStyle}>{openSSF?.score || 'N/A'}</Text>
           </GridItem>
-          <GridItem>
+          <GridItem hidden={customerView}>
             <CustomText>Support Level :</CustomText>
-            <Text sx={textStyle}>{supportLevel || 'N/A'}</Text>
+            <Text sx={textStyle}>{data?.supportLevel || 'N/A'}</Text>
           </GridItem>
-          <GridItem>
+          <GridItem hidden={customerView}>
             <CustomText>End-of-Support Date :</CustomText>
-            <Text sx={textStyle}>
-              {endOfSupport ? getFullDateAndTime(endOfSupport) : 'N/A'}
-            </Text>
+            <Text sx={textStyle}>{getDate(data?.endOfSupport)}</Text>
           </GridItem>
         </Grid>
       </Box>
     )
   }, [
     primaryTextColor,
-    name,
-    description,
-    dependsOn,
-    dependencyOf,
-    kind,
-    internal,
+    data,
     customerView,
     signedUrlParams,
-    suppliers,
-    purl,
-    cpes,
-    scope,
-    licenses,
-    licensesExp,
-    licensesCustom,
     openSSF?.score,
-    supportLevel,
-    endOfSupport,
     handleGraphView,
-    data,
     isArchived,
     onDeleteSup,
     onCheckPurl,

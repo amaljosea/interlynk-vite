@@ -170,7 +170,7 @@ const CompIdentifiers = ({ data }) => {
             onClose={() => setCpeOpen(false)}
           />
         )}
-        <Divider hidden={cpeOpen || purlOpen} />
+        <Divider hidden={cpeOpen || purlOpen || customerView} />
         {alert ? (
           <Stack spacing={4}>
             <LynkAlert
