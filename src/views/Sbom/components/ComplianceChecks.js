@@ -4,27 +4,19 @@ import { useParams } from 'react-router-dom'
 import { complianceData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
+import { Box, Divider, Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 import {
-  Box,
-  Button,
-  Divider,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Tag,
-  Text,
-  Tooltip
+  DrawerOverlay
 } from '@chakra-ui/react'
+
+import CustomLoader from 'components/CustomLoader'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -33,16 +25,19 @@ import { recheckHealth } from 'graphQL/Mutation'
 
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 
-const ComplianceChecks = ({
-  name,
-  isOpen,
-  onClose,
-  ntia,
-  fda,
-  ntiaLoading,
-  fdaLoading,
-  activeTab
-}) => {
+const sbomCategory = ['Timestamp', 'Supplier Name', 'Unique ID', 'Author']
+
+const ComplianceChecks = (props) => {
+  const {
+    name,
+    isOpen,
+    onClose,
+    ntia,
+    fda,
+    ntiaLoading,
+    fdaLoading,
+    activeTab
+  } = props
   const params = useParams()
   const { showToast } = useCustomToast()
   const { secondaryBgColor, lightBlueBg, primaryBlueText, sameSecondaryText } =
@@ -59,18 +54,13 @@ const ComplianceChecks = ({
 
   const [healthRecheck] = useMutation(recheckHealth)
 
-  const sbomCategory = ['Timestamp', 'Supplier Name', 'Unique ID', 'Author']
-
   const getBgColor = (score) => {
     if (score === 0) {
-      // eslint-disable-next-line
-      return '#FED7D7'
+      return 'red'
     } else if (score === 100) {
-      // eslint-disable-next-line
-      return '#C6F6D5'
+      return 'green'
     } else {
-      // eslint-disable-next-line
-      return '#FEEBC8'
+      return 'orange'
     }
   }
 
@@ -79,8 +69,13 @@ const ComplianceChecks = ({
     return result?.desc
   }
 
-  const ComplianceReport = ({ key, item, loading }) => {
-    const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const ComplianceReport = ({ key, item }) => {
+    const { primaryBlueText, primarySuccessColor, primaryErrorColor } =
+      useThemeColor([
+        'primaryBlueText',
+        'primarySuccessColor',
+        'primaryErrorColor'
+      ])
     return (
       <Flex
         gap={6}
@@ -97,30 +92,26 @@ const ComplianceChecks = ({
             <InfoIcon fontSize={'sm'} color={primaryBlueText} />
           </Tooltip>
         </Stack>
-
         <Box fontSize={'xs'} ml={'auto'}>
           {sbomCategory?.includes(item?.category) ? (
             <>
               {item?.score === 100 ? (
-                <FaCheckCircle color='green' size={20} />
+                <FaCheckCircle color={primarySuccessColor} size={22} />
               ) : (
-                <FaTimesCircle color='red' size={20} />
+                <FaTimesCircle color={primaryErrorColor} size={22} />
               )}
             </>
           ) : (
-            <Button
-              size='xs'
-              // eslint-disable-next-line
-              color={'#000'}
-              width={'60px'}
-              isLoading={loading}
-              cursor={'default'}
+            <Tag
+              w={'60px'}
+              variant='subtle'
               title='Compliance score'
-              bg={getBgColor(item?.score)}
-              _hover={{ background: getBgColor(item?.score) }}
+              colorScheme={getBgColor(item?.score)}
             >
-              <span> {Math.round(item?.score)} %</span>
-            </Button>
+              <TagLabel ml={'auto'} fontSize={'sm'}>
+                {Math.round(item?.score)} %
+              </TagLabel>
+            </Tag>
           )}
         </Box>
       </Flex>
@@ -183,6 +174,8 @@ const ComplianceChecks = ({
       item?.category?.startsWith('Component')
     )
 
+    if (loading) return <CustomLoader />
+
     return (
       <Flex flexDir={'column'} alignItems={'flex-start'} gap={3}>
         <Flex
@@ -192,16 +185,16 @@ const ComplianceChecks = ({
           hidden={data?.score === 0}
         >
           <Text fontSize={'sm'} fontWeight={'medium'}>
-            Details
+            General Details
           </Text>
           {sbomData?.map((item, index) => (
-            <ComplianceReport key={index} item={item} loading={loading} />
+            <ComplianceReport key={index} item={item} />
           ))}
           <Text mt={3} fontSize={'sm'} fontWeight={'medium'}>
             Component Details
           </Text>
           {compData?.map((item, index) => (
-            <ComplianceReport key={index} item={item} loading={loading} />
+            <ComplianceReport key={index} item={item} />
           ))}
           <Divider mt={1} />
         </Flex>
@@ -214,14 +207,11 @@ const ComplianceChecks = ({
           <Text fontSize={'sm'} fontWeight={'medium'}>
             Score
           </Text>
-          <Button
-            size='xs'
-            width={'60px'}
-            cursor={'default'}
-            title='Compliance score'
-          >
-            {data?.score === 0 ? 'N/A' : `${Math.round(data?.score)} %`}
-          </Button>
+          <Tag w={'60px'} title='Compliance score'>
+            <TagLabel ml={'auto'}>
+              {data?.score === 0 ? 'N/A' : `${Math.round(data?.score)} %`}
+            </TagLabel>
+          </Tag>
         </Flex>
         {data?.score === 0 && <RunAlert />}
       </Flex>
