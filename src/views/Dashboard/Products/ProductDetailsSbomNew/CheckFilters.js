@@ -1,24 +1,27 @@
 import { useQuery } from '@apollo/client'
-import { useState } from 'react'
 
 import {
-  Box,
   Menu,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup,
-  Stack
+  MenuOptionGroup
 } from '@chakra-ui/react'
+import { Box, Stack } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { GetOrgRules } from 'graphQL/Queries'
 
-const CheckFilters = ({ filters, setCheckState }) => {
+const CheckFilters = ({ filters, reset }) => {
   const activeTab = useQueryParam('tab')
+  const { sbomCheckState, dispatch } = useGlobalState()
+  const { sbomCheckDispatch } = dispatch
+
+  const { checkId, category, severity, status } = sbomCheckState
 
   const { data } = useQuery(GetOrgRules, {
     skip: activeTab === 'checks' ? false : true,
@@ -30,44 +33,24 @@ const CheckFilters = ({ filters, setCheckState }) => {
 
   const { checkCategories, checkStatuses } = filters || ''
 
-  const [rules, setRules] = useState([])
   const onFilterCheckId = (value) => {
-    const filterValue = value?.includes('all') ? undefined : value
-    setRules(value?.includes('all') ? [] : value)
-    setCheckState((oldFilters) => ({
-      ...oldFilters,
-      checkId: filterValue
-    }))
+    sbomCheckDispatch({ type: 'SET_CHECKID', payload: value })
+    reset()
   }
 
-  const [categories, setCategories] = useState([])
   const onFilterCategory = (value) => {
-    const filterValue = value?.includes('all') ? undefined : value
-    setCategories(value?.includes('all') ? [] : value)
-    setCheckState((oldFilters) => ({
-      ...oldFilters,
-      category: filterValue
-    }))
+    sbomCheckDispatch({ type: 'SET_CATEGORY', payload: value })
+    reset()
   }
 
-  const [severities, setSeverities] = useState([])
   const onFilterSeverity = (value) => {
-    const filterValue = value?.includes('all') ? undefined : value
-    setSeverities(value?.includes('all') ? [] : value)
-    setCheckState((oldFilters) => ({
-      ...oldFilters,
-      severity: filterValue
-    }))
+    sbomCheckDispatch({ type: 'SET_SEVERITY', payload: value })
+    reset()
   }
 
-  const [statues, setStatues] = useState([])
   const onFilterStatus = (value) => {
-    const filterValue = value?.includes('all') ? undefined : value
-    setStatues(value?.includes('all') ? [] : value)
-    setCheckState((oldFilters) => ({
-      ...oldFilters,
-      status: filterValue
-    }))
+    sbomCheckDispatch({ type: 'SET_STATUS', payload: value })
+    reset()
   }
 
   if (filters) {
@@ -77,7 +60,7 @@ const CheckFilters = ({ filters, setCheckState }) => {
         {data && (
           <Box width={'fit-content'}>
             <Menu closeOnSelect={false}>
-              <MenuHeading title={'Check ID'} active={rules.length !== 0} />
+              <MenuHeading title={'Check ID'} active={checkId?.length !== 0} />
               <MenuList
                 fontSize={'sm'}
                 minHeight={'auto'}
@@ -87,7 +70,7 @@ const CheckFilters = ({ filters, setCheckState }) => {
               >
                 <MenuOptionGroup
                   type='checkbox'
-                  value={rules}
+                  value={checkId}
                   onChange={onFilterCheckId}
                 >
                   <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -123,10 +106,10 @@ const CheckFilters = ({ filters, setCheckState }) => {
         {/* CATEGORY */}
         <Box width={'fit-content'}>
           <Menu closeOnSelect={false}>
-            <MenuHeading title={'Category'} active={categories.length !== 0} />
+            <MenuHeading title={'Category'} active={category?.length !== 0} />
             <CustomList
+              value={category}
               options={checkCategories}
-              value={categories}
               onChange={onFilterCategory}
             />
           </Menu>
@@ -134,21 +117,21 @@ const CheckFilters = ({ filters, setCheckState }) => {
         {/* SEVERITY */}
         <Box width={'fit-content'}>
           <Menu closeOnSelect={false}>
-            <MenuHeading title={'Severity'} active={severities.length !== 0} />
+            <MenuHeading title={'Severity'} active={severity?.length !== 0} />
             <CustomList
-              options={['critical', 'high', 'medium', 'low']}
-              value={severities}
+              value={severity}
               onChange={onFilterSeverity}
+              options={['critical', 'high', 'medium', 'low']}
             />
           </Menu>
         </Box>
         {/* STATUS */}
         <Box width={'fit-content'}>
           <Menu closeOnSelect={false}>
-            <MenuHeading title={'Resolution'} active={statues.length !== 0} />
+            <MenuHeading title={'Resolution'} active={status?.length !== 0} />
             <CustomList
+              value={status}
               options={checkStatuses}
-              value={statues}
               onChange={onFilterStatus}
             />
           </Menu>

@@ -1,9 +1,8 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles } from 'utils'
-import { isCustomerView } from 'utils'
+import { customStyles, isCustomerView } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckModal from 'views/Sbom/components/CheckModal'
@@ -43,6 +42,9 @@ import FixedModal from '../components/FixedModal'
 import ChecksColumns from './Components/tableColumns/ChecksColumns'
 import ChecksSubHeader from './Components/tableSubHeaders/ChecksSubHeader'
 
+const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
+  value.includes(allValue) || value.length === 0 ? undefined : value
+
 const Checks = ({ sbomData }) => {
   const { showToast } = useCustomToast()
   const params = useParams()
@@ -55,8 +57,24 @@ const Checks = ({ sbomData }) => {
 
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 
-  const { dispatch } = useGlobalState()
-  const { prodCompDispatch, sbomDispatch } = dispatch
+  const { sbomCheckState, dispatch } = useGlobalState()
+  const { prodCompDispatch, sbomDispatch, sbomCheckDispatch } = dispatch
+
+  const { field, direction, checkId, category, severity, status, search } =
+    sbomCheckState
+
+  const [activeRow, setActiveRow] = useState(null)
+  const [ruleExists, setRuleExists] = useState(false)
+  const [checkSearch, setCheckSearch] = useState(search || '')
+
+  const checksData = useMemo(() => {
+    return {
+      checkId: getUndefinedIfEmptyOrAll(checkId),
+      category: getUndefinedIfEmptyOrAll(category),
+      severity: getUndefinedIfEmptyOrAll(severity),
+      status: getUndefinedIfEmptyOrAll(status)
+    }
+  }, [category, checkId, severity, status])
 
   const { data: prodData } = useQuery(GetProductData, {
     skip: activeTab === 'checks' ? false : true,
@@ -69,20 +87,18 @@ const Checks = ({ sbomData }) => {
 
   const { sbom } = prodData || ''
 
-  const [checkState, setCheckState] = useState({
-    field: 'CHECK_RESULTS_UPDATED_AT',
-    direction: 'DESC'
-  })
-
   const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
     GetCheckResults,
     {
       skip: activeTab === 'checks' ? false : true,
       selector: 'sbom.checkResults',
       variables: {
+        ...checksData,
         sbomId: sbomId,
         projectId: productId,
-        ...checkState
+        field: field !== '' ? field : undefined,
+        search: search !== '' ? search : undefined,
+        direction: direction !== '' ? direction : undefined
       }
     }
   )
@@ -118,10 +134,6 @@ const Checks = ({ sbomData }) => {
     parentKey: 'view_sbom',
     childKey: 'update_sbom_components'
   })
-
-  const [checkSearch, setCheckSearch] = useState('')
-  const [activeRow, setActiveRow] = useState(null)
-  const [ruleExists, setRuleExists] = useState(false)
 
   const [getRules, { loading: loadingRules }] = useLazyQuery(GetExistingRules)
   const [updateResult] = useMutation(checkResultUpdate)
@@ -164,26 +176,12 @@ const Checks = ({ sbomData }) => {
     reset()
   }, [healthRecheck, sbomId, showToast, reset])
 
-  const setSearchFilter = useCallback(
-    (value) => {
-      setCheckState((oldFilter) => ({
-        ...oldFilter,
-        search: value
-      }))
-      reset()
-    },
-    [reset]
-  )
-
   // CLEAR SERACH
   const handleClear = useCallback(() => {
     setCheckSearch('')
-    setCheckState((oldFilter) => ({
-      ...oldFilter,
-      search: undefined
-    }))
+    sbomCheckDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     reset()
-  }, [reset])
+  }, [sbomCheckDispatch, reset])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -201,15 +199,13 @@ const Checks = ({ sbomData }) => {
   // SEARCH COMPONENT
   const handleSearch = useCallback(
     (event) => {
-      const {
-        key,
-        target: { value }
-      } = event
-      if (key === 'Enter' && value !== '') {
-        setSearchFilter(value)
+      const { value } = event.target
+      if (event.key === 'Enter' && value !== '') {
+        sbomCheckDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        reset()
       }
     },
-    [setSearchFilter]
+    [reset, sbomCheckDispatch]
   )
 
   const handleOpenLicense = () => {
@@ -421,7 +417,6 @@ const Checks = ({ sbomData }) => {
     handleSearch,
     handleClear,
     filterHead,
-    setCheckState,
     reset,
     handleReCheck,
     isArchived,
@@ -430,11 +425,13 @@ const Checks = ({ sbomData }) => {
 
   // SORTING
   const handleSort = (column, sortDirection) => {
-    setCheckState((oldFilters) => ({
-      ...oldFilters,
-      field: column?.id,
-      direction: sortDirection.toUpperCase()
-    }))
+    sbomCheckDispatch({
+      type: 'SET_SORT_ORDER',
+      payload: {
+        field: column?.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    })
   }
 
   return (
@@ -449,10 +446,10 @@ const Checks = ({ sbomData }) => {
           onSort={handleSort}
           defaultSortAsc={false}
           progressPending={loading}
-          customStyles={customStyles(headingTextColor)}
+          defaultSortFieldId={field}
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
-          defaultSortFieldId={checkState?.field}
+          customStyles={customStyles(headingTextColor)}
         />
         {/* PAGINATION */}
         <Pagination {...paginationProps} />

@@ -15,7 +15,6 @@ const ChecksSubHeader = (
   handleSearch,
   handleClear,
   filterHead,
-  setCheckState,
   reset,
   handleReCheck,
   isArchived,
@@ -45,13 +44,7 @@ const ChecksSubHeader = (
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {filterHead && (
-            <CheckFilters
-              filters={filterHead?.sbom?.filters}
-              setCheckState={(newFilters) => {
-                setCheckState(newFilters)
-                reset()
-              }}
-            />
+            <CheckFilters reset={reset} filters={filterHead?.sbom?.filters} />
           )}
         </Stack>
 
@@ -81,8 +74,7 @@ const ChecksSubHeader = (
     filterHead,
     handleReCheck,
     editChecks,
-    reset,
-    setCheckState
+    reset
   ])
 
   return subHeader

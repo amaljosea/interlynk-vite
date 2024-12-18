@@ -1,3 +1,4 @@
+import { sbomCheckReducer } from 'context/reducers'
 import {
   compVulnReducer,
   prodCompReducer,
@@ -126,6 +127,15 @@ const GlobalStateProvider = ({ children }) => {
     upstream: false,
     retracted: false
   })
+  const [sbomCheckState, sbomCheckDispatch] = useReducer(sbomCheckReducer, {
+    field: 'CHECK_RESULTS_UPDATED_AT',
+    direction: 'DESC',
+    category: [],
+    severity: [],
+    checkId: [],
+    status: [],
+    search: ''
+  })
   const [sbomState, sbomDispatch] = useReducer(sbomReducer, {
     licenseType: 'license_exp',
     expLicense: '',
@@ -183,6 +193,7 @@ const GlobalStateProvider = ({ children }) => {
         versionState,
         toolsState,
         onChangeEnv,
+        sbomCheckState,
         dispatch: {
           compVulnDispatch,
           prodDispatch,
@@ -191,7 +202,8 @@ const GlobalStateProvider = ({ children }) => {
           prodRulesDispatch,
           sbomDispatch,
           versionDispatch,
-          toolsDispatch
+          toolsDispatch,
+          sbomCheckDispatch
         }
       }}
     >
