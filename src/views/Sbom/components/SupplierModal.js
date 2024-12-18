@@ -4,10 +4,11 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { hasWhiteSpace, validateUrl } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
-import { Button, Flex, Input, Tag, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Input } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
+import CompInfo from 'components/Misc/CompInfo'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -207,6 +208,22 @@ const SupplierModal = (props) => {
   const disabled =
     isInvalid || formData?.name === '' || createLoading || updateLoading
 
+  const ActionBtn = () => (
+    <Button
+      mr={'auto'}
+      variant='ghost'
+      fontSize={'sm'}
+      isDisabled={disabled}
+      onClick={handleRuleCreate}
+      hidden={friendlyId ? false : true}
+      colorScheme={ruleExists ? 'green' : 'blue'}
+      title={`${ruleExists ? 'View' : 'Save as'} Rule`}
+      isLoading={rlLoading || createLoading || updateLoading}
+    >
+      {ruleExists ? 'View' : 'Save as'} Rule
+    </Button>
+  )
+
   useEffect(() => {
     if (component?.suppliers?.length > 0) {
       setFormData(() => ({
@@ -229,36 +246,15 @@ const SupplierModal = (props) => {
         onClose={onClose}
         onSubmit={handleSave}
         title={`Add Supplier`}
+        leftFooterContent={!isFreeTier && <ActionBtn />}
         disabled={isInvalid || createLoading || updateLoading}
         buttonText={suppliers?.length > 0 ? 'Update' : 'Save'}
-        leftFooterContent={
-          !isFreeTier && (
-            <Button
-              mr={'auto'}
-              variant='ghost'
-              fontSize={'sm'}
-              isDisabled={disabled}
-              onClick={handleRuleCreate}
-              hidden={friendlyId ? false : true}
-              colorScheme={ruleExists ? 'green' : 'blue'}
-              title={`${ruleExists ? 'View' : 'Save as'} Rule`}
-              isLoading={rlLoading || createLoading || updateLoading}
-            >
-              {ruleExists ? 'View' : 'Save as'} Rule
-            </Button>
-          )
-        }
       >
-        <Flex
-          mb={6}
-          gap={2}
-          width='100%'
-          alignItems={'center'}
-          flexWrap={'wrap'}
-        >
-          <Text wordBreak={'break-word'}>{component?.name || '-'}</Text>
-          <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
-        </Flex>
+        {component && (
+          <Box mb={4}>
+            <CompInfo data={component} />
+          </Box>
+        )}
         <Flex width={'100%'} direction={'column'} gap={4}>
           {/* ORG NAME */}
           <FormControl isRequired isDisabled={resolved}>

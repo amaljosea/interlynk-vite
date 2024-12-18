@@ -2,20 +2,26 @@ import { useLazyQuery, useMutation } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { disableButtonTemporarily } from 'utils'
-import { transformLicenseString } from 'utils'
+import { disableButtonTemporarily, transformLicenseString } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { componentTypes } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
-import { FormErrorMessage, List, ListItem, Stack } from '@chakra-ui/react'
-import { Box, Button, Flex, Icon, Tag, Text, Tooltip } from '@chakra-ui/react'
+import {
+  FormErrorMessage,
+  List,
+  ListItem,
+  Spacer,
+  Stack
+} from '@chakra-ui/react'
+import { Box, Button, Flex, Icon, Text, Tooltip } from '@chakra-ui/react'
 import { FormControl, FormLabel, Input, Select } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
+import CompInfo from 'components/Misc/CompInfo'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -423,21 +429,12 @@ const CheckModal = (props) => {
           <LynkAlert msg={error} />
         </Box>
       )}
-      <Flex
-        hidden={component ? false : true}
-        width='100%'
-        direction={'row'}
-        alignItems={'center'}
-        justifyContent={'flex-start'}
-        wrap={'wrap'}
-        gap={2}
-        mb={6}
-      >
-        <Text fontWeight={'medium'} wordBreak={'break-all'}>
-          {component?.name || '-'}
-        </Text>
-        <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
-      </Flex>
+
+      {component && (
+        <Box mb={4}>
+          <CompInfo data={component} />
+        </Box>
+      )}
 
       {shortDesc === 'Document has a primary component' && (
         <Flex

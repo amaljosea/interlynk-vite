@@ -5,7 +5,7 @@ import { validateCpe } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import { InfoIcon } from '@chakra-ui/icons'
-import { Button, Flex, Grid, Tag, Text, Textarea } from '@chakra-ui/react'
+import { Box, Button, Flex, Grid, Textarea } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import Edition from 'components/CpeEditor/Edition'
@@ -21,6 +21,7 @@ import Vendor from 'components/CpeEditor/Vendor'
 import Version from 'components/CpeEditor/Version'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import CompInfo from 'components/Misc/CompInfo'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -174,6 +175,22 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     setValue(cpe)
   }
 
+  const ActionBtn = () => (
+    <Button
+      mr={'auto'}
+      variant='ghost'
+      fontSize={'sm'}
+      onClick={handleRuleCreate}
+      hidden={friendlyId ? false : true}
+      isLoading={ruleLoading || loading}
+      colorScheme={ruleExists ? 'green' : 'blue'}
+      title={`${ruleExists ? 'View' : 'Save as'} Rule`}
+      isDisabled={ruleLoading || loading || isInvalid}
+    >
+      {ruleExists ? 'View' : 'Save as'} Rule
+    </Button>
+  )
+
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
     if (cpes?.length > 0) {
@@ -209,42 +226,17 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         Icon={InfoIcon}
         isOpen={isOpen}
         onClose={onClose}
+        buttonText={'Save'}
         title={'CPE Details'}
         onSubmit={handleComUpdate}
-        disabled={isInvalid || loading}
         hidden={status === 'resolved'}
-        buttonText={'Save'}
-        leftFooterContent={
-          !isFreeTier && (
-            <Button
-              variant='ghost'
-              mr={'auto'}
-              fontSize={'sm'}
-              onClick={handleRuleCreate}
-              hidden={friendlyId ? false : true}
-              isLoading={ruleLoading || loading}
-              title={`${ruleExists ? 'View' : 'Save as'} Rule`}
-              isDisabled={ruleLoading || loading || isInvalid}
-              colorScheme={ruleExists ? 'green' : 'blue'}
-            >
-              {ruleExists ? 'View' : 'Save as'} Rule
-            </Button>
-          )
-        }
+        disabled={isInvalid || loading}
+        leftFooterContent={!isFreeTier && <ActionBtn />}
       >
         {component && (
-          <Flex
-            width='100%'
-            direction={'row'}
-            alignItems={'center'}
-            justifyContent={'flex-start'}
-            wrap={'wrap'}
-            gap={2}
-            mb={6}
-          >
-            <Text wordBreak={'break-all'}>{component?.name || ''}</Text>
-            <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
-          </Flex>
+          <Box mb={4}>
+            <CompInfo data={component} />
+          </Box>
         )}
         <Flex width={'100%'} direction={'column'} gap={4}>
           {error !== '' && <LynkAlert msg={error} />}

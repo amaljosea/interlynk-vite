@@ -6,37 +6,35 @@ import { ArrowDownIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
+  Flex,
+  Select,
+  Stack,
+  Text,
+  Tooltip,
+  useDisclosure
+} from '@chakra-ui/react'
+import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
+import { Tag, TagCloseButton, TagLabel } from '@chakra-ui/react'
+import {
+  FormControl,
+  FormErrorIcon,
+  FormErrorMessage,
+  FormLabel
+} from '@chakra-ui/react'
+import {
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormErrorIcon,
-  FormErrorMessage,
-  FormLabel,
-  Select,
-  Stack,
-  Table,
-  Tag,
-  TagCloseButton,
-  TagLabel,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tooltip,
-  Tr,
-  useDisclosure
+  DrawerOverlay
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import LoadingSpinner from 'components/LoadingSpinner'
+import CompInfo from 'components/Misc/CompInfo'
 import RelDeleteModal from 'components/RelDeleteModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -273,6 +271,11 @@ const RelationshipDrawer = (props) => {
     }
   }
 
+  const compInfo = {
+    name: compName || '',
+    version: activeRow?.version || compVersion
+  }
+
   return (
     <Drawer
       size='lg'
@@ -292,21 +295,7 @@ const RelationshipDrawer = (props) => {
             <DrawerBody>
               <Card px={0} mx={0}>
                 <CardHeader>
-                  <Flex
-                    width='100%'
-                    direction={'row'}
-                    alignItems={'center'}
-                    justifyContent={'flex-start'}
-                    wrap={'wrap'}
-                    gap={2}
-                  >
-                    <Text fontWeight={'medium'}>{name || compName}</Text>
-                    {(activeRow?.version || compVersion) && (
-                      <Tag colorScheme='blue'>
-                        {activeRow?.version || compVersion}
-                      </Tag>
-                    )}
-                  </Flex>
+                  <CompInfo data={compInfo} />
                 </CardHeader>
                 <CardBody>
                   <Flex

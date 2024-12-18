@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
-import { Button, Flex, Tag, Text } from '@chakra-ui/react'
+import { Box, Button, Flex } from '@chakra-ui/react'
 import { FormControl, Textarea } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import CompInfo from 'components/Misc/CompInfo'
 import Name from 'components/PurlEditor/Name'
 import Namespace from 'components/PurlEditor/Namespace'
 import PackageType from 'components/PurlEditor/PackageType'
@@ -178,6 +179,22 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     }
   }
 
+  const ActionBtn = () => (
+    <Button
+      variant='ghost'
+      mr={'auto'}
+      fontSize={'sm'}
+      onClick={handleRuleCreate}
+      hidden={friendlyId ? false : true}
+      isLoading={ruleLoading || loading}
+      colorScheme={ruleExists ? 'green' : 'blue'}
+      title={`${ruleExists ? 'View' : 'Save as'} Rule`}
+      isDisabled={ruleLoading || loading || isInvalid}
+    >
+      {ruleExists ? 'View' : 'Save as'} Rule
+    </Button>
+  )
+
   useEffect(() => {
     if (purl) {
       setValue(purl)
@@ -205,43 +222,18 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     <LynkModal
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={handleComUpdate}
-      title={'PURL Details'}
-      Icon={FaCircleInfo}
       hidden={resolved}
-      disabled={isInvalid || loading}
       buttonText={'Save'}
-      leftFooterContent={
-        !isFreeTier && (
-          <Button
-            variant='ghost'
-            mr={'auto'}
-            fontSize={'sm'}
-            onClick={handleRuleCreate}
-            hidden={friendlyId ? false : true}
-            isLoading={ruleLoading || loading}
-            colorScheme={ruleExists ? 'green' : 'blue'}
-            title={`${ruleExists ? 'View' : 'Save as'} Rule`}
-            isDisabled={ruleLoading || loading || isInvalid}
-          >
-            {ruleExists ? 'View' : 'Save as'} Rule
-          </Button>
-        )
-      }
+      Icon={FaCircleInfo}
+      title={'PURL Details'}
+      onSubmit={handleComUpdate}
+      disabled={isInvalid || loading}
+      leftFooterContent={!isFreeTier && <ActionBtn />}
     >
       {component && (
-        <Flex
-          width='100%'
-          direction={'row'}
-          alignItems={'center'}
-          justifyContent={'flex-start'}
-          wrap={'wrap'}
-          gap={2}
-          mb={6}
-        >
-          <Text wordBreak={'break-all'}>{component?.name || ''}</Text>
-          <Tag colorScheme='blue'>{component?.version || '-'}</Tag>
-        </Flex>
+        <Box mb={4}>
+          <CompInfo data={component} />
+        </Box>
       )}
       <Flex width={'100%'} direction={'column'} gap={4}>
         {error && <LynkAlert msg={error} />}
