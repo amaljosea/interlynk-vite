@@ -154,6 +154,9 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
     (project) => project.id !== productGrpId
   )
 
+  //Checks if any product is available after applying the labels
+  const isProductAvailable = !(label !== null && projectsActual?.length === 0)
+
   const handleSelectGroup = (e) => {
     const { value } = e.target
     if (value !== '') {
@@ -234,66 +237,77 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
         {/* PROJECTS */}
         <FormControl fontSize={'sm'} isRequired>
           <FormLabel htmlFor='groups'>Product</FormLabel>
-          <LynkSelect
-            name='groups'
-            value={selectedGroup}
-            onChange={handleSelectGroup}
-          >
-            {projectsActual?.map((item, index) => (
-              <option key={index} value={item.id}>
-                {truncatedValue(item.name, 30)}
-              </option>
-            ))}
-          </LynkSelect>
-        </FormControl>
-        {/* ENVIRONMENTS */}
-        <FormControl fontSize={'sm'} isRequired>
-          <FormLabel htmlFor='products'>Environment</FormLabel>
-          <LynkSelect
-            name='products'
-            value={selectedProd}
-            onChange={handleSelectProduct}
-          >
-            {envList?.length > 0 &&
-              envOrderList(envList).map((item, index) => (
-                <option
-                  key={index}
-                  value={item.value}
-                  label={
-                    isDefaultEnv(item.label)
-                      ? capitalizeFirstLetter(item.label)
-                      : item.label
-                  }
-                >
-                  {item.label}
-                </option>
-              ))}
-          </LynkSelect>
-        </FormControl>
-        {/* Version */}
-        <FormControl fontSize={'sm'} isRequired>
-          <FormLabel htmlFor='versions'>Version</FormLabel>
-          {versionsActual?.length === 0 && sbomVersions.length > 0 ? (
-            <LynkAlert
-              status='info'
-              msg='All available versions from this project have already been added.'
-            />
-          ) : sbomVersions?.length === 0 ? (
-            <LynkAlert status='info' msg='No versions available.' />
-          ) : (
+          {isProductAvailable ? (
             <LynkSelect
-              name='versions'
-              value={selectedVersion}
-              onChange={(e) => setSelectedVersion(e.target.value)}
+              name='groups'
+              value={selectedGroup}
+              onChange={handleSelectGroup}
             >
-              {versionsActual.map((item, index) => (
-                <option key={index} value={item.value}>
-                  {truncatedValue(item?.label, 30)}
+              {projectsActual?.map((item, index) => (
+                <option key={index} value={item.id}>
+                  {truncatedValue(item.name, 30)}
                 </option>
               ))}
             </LynkSelect>
+          ) : (
+            <LynkAlert
+              status='info'
+              msg='No Products available for the selected Label'
+            />
           )}
         </FormControl>
+        {/* ENVIRONMENTS */}
+        {isProductAvailable && (
+          <FormControl fontSize={'sm'} isRequired>
+            <FormLabel htmlFor='products'>Environment</FormLabel>
+            <LynkSelect
+              name='products'
+              value={selectedProd}
+              onChange={handleSelectProduct}
+            >
+              {envList?.length > 0 &&
+                envOrderList(envList).map((item, index) => (
+                  <option
+                    key={index}
+                    value={item.value}
+                    label={
+                      isDefaultEnv(item.label)
+                        ? capitalizeFirstLetter(item.label)
+                        : item.label
+                    }
+                  >
+                    {item.label}
+                  </option>
+                ))}
+            </LynkSelect>
+          </FormControl>
+        )}
+        {/* Version */}
+        {isProductAvailable && (
+          <FormControl fontSize={'sm'} isRequired>
+            <FormLabel htmlFor='versions'>Version</FormLabel>
+            {versionsActual?.length === 0 && sbomVersions.length > 0 ? (
+              <LynkAlert
+                status='info'
+                msg='All available versions from this project have already been added.'
+              />
+            ) : sbomVersions?.length === 0 && selectedProd !== '' ? (
+              <LynkAlert status='info' msg='No versions available.' />
+            ) : (
+              <LynkSelect
+                name='versions'
+                value={selectedVersion}
+                onChange={(e) => setSelectedVersion(e.target.value)}
+              >
+                {versionsActual.map((item, index) => (
+                  <option key={index} value={item.value}>
+                    {truncatedValue(item?.label, 30)}
+                  </option>
+                ))}
+              </LynkSelect>
+            )}
+          </FormControl>
+        )}
         {(isExists === true || existingNodes) && (
           <LynkAlert msg='Same version already exists inside selected SBOM' />
         )}
