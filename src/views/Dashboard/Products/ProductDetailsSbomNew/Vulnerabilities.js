@@ -35,7 +35,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { ManualVulnScan } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
-  GetCdxResponses,
   GetOrgConnections,
   GetVulnData,
   GetVulnFilterData,
@@ -79,8 +78,6 @@ const Vulnerabilities = ({ sbomData }) => {
     vexComplete
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
-
-  const { data: allCdx } = useQuery(GetCdxResponses)
 
   const setOrder = useMemo(
     () => (value) => {
@@ -308,10 +305,8 @@ const Vulnerabilities = ({ sbomData }) => {
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
           expandableRowsComponentProps={{
-            allCdx,
             setActiveRow,
-            onCvssOpen,
-            isArchived
+            onCvssOpen
           }}
           selectableRows={!signedUrlParams}
           clearSelectedRows={toggleClear}

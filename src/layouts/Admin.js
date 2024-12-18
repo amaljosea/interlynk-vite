@@ -21,7 +21,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { getOrganization } from 'graphQL/Queries'
+import { GetOrganization } from 'graphQL/Queries'
 
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 
@@ -59,7 +59,7 @@ export default function Admin() {
 
   document.documentElement.dir = 'ltr'
 
-  const { data, error, loading } = useQuery(getOrganization, {
+  const { data, error, loading } = useQuery(GetOrganization, {
     skip: location.pathname.startsWith('/vendor') && authToken ? false : true
   })
 

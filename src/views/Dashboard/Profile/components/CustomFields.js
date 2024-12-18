@@ -13,6 +13,7 @@ import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCustomFields } from 'graphQL/Queries'
@@ -21,9 +22,13 @@ import FieldModal from './FieldModal'
 import FieldWarning from './FieldWarning'
 
 const CustomFields = () => {
+  const activetab = useQueryParam('tab')
   const { organization } = useGlobalState()
   const { isFreeTier } = useGlobalQueryContext()
-  const { data, loading } = useQuery(GetCustomFields)
+
+  const { data, loading } = useQuery(GetCustomFields, {
+    skip: !organization ? true : activetab === 'custom-fields' ? false : true
+  })
   const isSuperAdmin = organization?.currentUser?.superAdmin
 
   const { componentVulnCustomFieldDefinitions } = data || ''

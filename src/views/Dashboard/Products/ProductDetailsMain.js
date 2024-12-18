@@ -20,8 +20,8 @@ import ProductActions from './components/ProductActions'
 import ProductInfo from './components/ProductInfo'
 import ProductTabs from './components/ProductTabs'
 
-const GetProjectGroup = gql`
-  query GetProjectGroup($id: Uuid!) {
+const GetProjectDetails = gql`
+  query GetProjectDetails($id: Uuid!) {
     projectGroup(id: $id) {
       id
       description
@@ -58,7 +58,7 @@ const ProductDetailsMain = () => {
   const [activeEnv, setActiveEnv] = useState(productId || '')
 
   // GET PROJECT DATA
-  const { data, loading, error } = useQuery(GetProjectGroup, {
+  const { data, loading, error } = useQuery(GetProjectDetails, {
     variables: { id: productGroupId }
   })
 

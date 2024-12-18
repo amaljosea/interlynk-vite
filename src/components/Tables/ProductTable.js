@@ -69,7 +69,7 @@ const ProductTable = (props) => {
   const { data, reset, loading, filters, setFilters, paginationProps } = props
 
   const { data: prodData } = useQuery(GetTotalProduct, {
-    skip: !orgView,
+    skip: orgView && isFreeTier ? false : true,
     variables: { first: 100 }
   })
   const { totalCount } = prodData?.organization?.projectGroups || ''
@@ -143,7 +143,7 @@ const ProductTable = (props) => {
   })
 
   const { data: prodLabels, loading: labelLoading } = useQuery(GetLabels, {
-    skip: signedUrlParams || !orgView,
+    skip: openTagMenu ? false : true,
     variables: { first: 100 }
   })
   const { nodes } = prodLabels?.labels || ''
@@ -445,7 +445,8 @@ const ProductTable = (props) => {
       name: 'ENVIRONMENTS',
       selector: (row) => <EnvList data={row} />,
       width: '20%',
-      wrap: true
+      wrap: true,
+      right: signedUrlParams ? true : false
     },
     // ACTIONS
     {

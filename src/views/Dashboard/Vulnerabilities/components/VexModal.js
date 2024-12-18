@@ -94,7 +94,9 @@ const VexModal = ({
 
   const { data: allVexStatus } = useQuery(getVexStatuses)
   const { data: allVexJustify } = useQuery(getVexJustifications)
-  const { data: allCdx } = useQuery(GetCdxResponses)
+  const { data: allCdx } = useQuery(GetCdxResponses, {
+    skip: statusName === 'Affected' ? false : true
+  })
 
   const { data: groups } = useQuery(GetProjectGroup, {
     skip: checkEquals ? false : true,

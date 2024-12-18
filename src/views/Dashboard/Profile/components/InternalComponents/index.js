@@ -19,7 +19,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { updateOrgComp } from 'graphQL/Mutation'
-import { getInternalComponents } from 'graphQL/Queries'
+import { GetInternalComponents } from 'graphQL/Queries'
 
 import { DeleteInternalComponent } from './DeleteInternalComponent'
 import { UpdateInternalComponent } from './MutateInternalComponent'
@@ -29,7 +29,7 @@ export const InternalComponents = () => {
   const { orgView } = useGlobalQueryContext()
   const [isOpen, setIsOpen] = useState(false)
   const [editingRow, setEditingRow] = useState(null)
-  const { data, loading } = useQuery(getInternalComponents, {
+  const { data, loading } = useQuery(GetInternalComponents, {
     skip: !orgView ? true : activetab === 'lists' ? false : true
   })
   const { showToast } = useCustomToast()

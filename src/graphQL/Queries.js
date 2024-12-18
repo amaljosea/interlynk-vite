@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 // GET ORG NAME
-export const getOrganization = gql`
-  query getOrganization {
+export const GetOrganization = gql`
+  query GetOrganization {
     organization {
       id
       name
@@ -4568,8 +4568,8 @@ export const CompareQueryVendor = gql`
   }
 `
 
-export const getInternalComponents = gql`
-  query Organization {
+export const GetInternalComponents = gql`
+  query GetInternalComponents {
     organization {
       id
       organizationComponents {
