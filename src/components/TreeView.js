@@ -34,7 +34,9 @@ import { GetComponentPath } from 'graphQL/Queries'
 import { BiZoomIn, BiZoomOut } from 'react-icons/bi'
 import { LuMoveHorizontal, LuMoveVertical } from 'react-icons/lu'
 
-const InteractionsTooltip = () => (
+import CompInfo from './Misc/CompInfo'
+
+const InteractionsTooltip = ({ color }) => (
   <Tooltip
     label={
       <Stack mt={1} spacing={1} p={1}>
@@ -50,13 +52,7 @@ const InteractionsTooltip = () => (
     placement='bottom'
     hasArrow
   >
-    <IconButton
-      size='sm'
-      colorScheme='blue'
-      icon={<InfoIcon />}
-      aria-label='Tree Interactions Info'
-      variant='ghost'
-    />
+    <InfoIcon fontSize={16} color={color} />
   </Tooltip>
 )
 
@@ -165,12 +161,17 @@ const buildTree = (path, leafNode) => {
   }
 }
 
-const TreeView = ({ isOpen, onClose, compId }) => {
+const TreeView = ({ isOpen, onClose, component }) => {
   const params = useParams()
   const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
 
-  const { grayBorderColor } = useThemeColor(['grayBorderColor'])
+  const { id: compId } = component || ''
+
+  const { grayBorderColor, primaryBlueText } = useThemeColor([
+    'grayBorderColor',
+    'primaryBlueText'
+  ])
 
   const [getData, { loading: dependencyLoading }] =
     useLazyQuery(GetCompDependency)
@@ -231,8 +232,6 @@ const TreeView = ({ isOpen, onClose, compId }) => {
       }
     })
   }, [compId, getData, params?.sbomid, path])
-
-  // console.log('tree', tree)
 
   const handleNodeClick = (datum) => {
     getData({
@@ -327,9 +326,10 @@ const TreeView = ({ isOpen, onClose, compId }) => {
       <DrawerContent>
         <DrawerCloseButton mt={2} onClick={handleClose} />
         <DrawerHeader>
-          <Flex alignItems={'center'} gap={2}>
+          <Flex alignItems={'center'} gap={3}>
             <Text>Relationships</Text>
-            <InteractionsTooltip />
+            {component && <CompInfo data={component} />}
+            <InteractionsTooltip color={primaryBlueText} />
           </Flex>
         </DrawerHeader>
         <DrawerBody>

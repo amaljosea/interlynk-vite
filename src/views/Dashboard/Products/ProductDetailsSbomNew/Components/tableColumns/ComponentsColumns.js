@@ -475,6 +475,7 @@ const ComponentsColumns = ({
     colorMode,
     inverseSecondaryBgColor,
     primaryTextColor,
+    tagStyle,
     onCheckCpe,
     onCheckPurl,
     secondaryTextColor,

@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
-import { getFullDateAndTime, truncatedValue } from 'utils'
+import { getFullDateAndTime } from 'utils'
 import { pkgData, pkgVersionData, repositoryData } from 'variables/general'
 
 import { Flex, SimpleGrid, Skeleton, Spacer, Stack } from '@chakra-ui/react'
@@ -17,6 +17,7 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import { HealthScore } from 'components/HealthScore'
+import CompInfo from 'components/Misc/CompInfo'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -93,10 +94,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
             <Skeleton mt={2} w={'50%'} h={3} />
           ) : (
             <Flex alignItems={'center'} gap={2} justifyContent={'flex-start'}>
-              <Text fontWeight={'normal'} fontSize={'sm'}>
-                {truncatedValue(data?.component?.name, 15)} -{' '}
-                {truncatedValue(data?.component?.version, 15)}
-              </Text>
+              {data && <CompInfo data={data?.component || ''} />}
               <HealthScore isComponent value={healthScore} />
             </Flex>
           )}

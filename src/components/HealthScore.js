@@ -13,7 +13,6 @@ export const HealthScore = ({ value, isComponent }) => {
 
   return (
     <Box
-      mt={0.5}
       height={'22px'}
       overflow={'hidden'}
       position='relative'

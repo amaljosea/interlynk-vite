@@ -348,7 +348,7 @@ const Components = ({ sbomData }) => {
         <TreeView
           isOpen={GRAPH.isOpen}
           onClose={GRAPH.onClose}
-          compId={activeComp ? activeComp?.id : null}
+          component={activeComp}
         />
       )}
 

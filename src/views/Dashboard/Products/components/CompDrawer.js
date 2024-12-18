@@ -4,20 +4,16 @@ import { useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams, isCustomerView } from 'utils'
 
+import { Text } from '@chakra-ui/react'
 import {
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text
+  DrawerOverlay
 } from '@chakra-ui/react'
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
 import CompInfo from 'components/Misc/CompInfo'
 
