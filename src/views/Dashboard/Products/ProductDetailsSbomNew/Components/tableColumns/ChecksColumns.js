@@ -135,7 +135,7 @@ const ChecksColumns = (
                       colorScheme='blue'
                       fontWeight='normal'
                       icon={<GoSkip size={18} />}
-                      onClick={() => updateIssue(id)}
+                      onClick={() => updateIssue(id, 'ignored')}
                       disabled={customerView || !editChecks || isArchived}
                     />
                   </Tooltip>
@@ -177,12 +177,13 @@ const ChecksColumns = (
               {status === 'ignored' && (
                 <Button
                   size='sm'
-                  title='Ignored'
+                  title='Unignore'
                   width={'74px'}
                   fontSize={'xs'}
-                  variant='solid'
+                  variant='outline'
+                  onClick={() => updateIssue(id, 'unresolved')}
                 >
-                  Ignored
+                  Unignore
                 </Button>
               )}
             </>

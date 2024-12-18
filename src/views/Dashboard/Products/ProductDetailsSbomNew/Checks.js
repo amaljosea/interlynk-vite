@@ -391,11 +391,11 @@ const Checks = ({ sbomData }) => {
     }
   }
 
-  const updateIssue = async (id) => {
+  const updateIssue = async (id, newStatus) => {
     await updateResult({
       variables: {
         id: id,
-        status: 'ignored'
+        status: newStatus
       }
     })
   }
