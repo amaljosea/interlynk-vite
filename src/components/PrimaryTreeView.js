@@ -53,7 +53,7 @@ const PrimaryTreeView = ({ updateSboms, status, noPrimaryComp }) => {
         <TreeView
           isOpen={isOpen}
           onClose={onClose}
-          compId={nodes?.length > 0 ? nodes[0].id : null}
+          component={nodes?.length > 0 ? nodes[0] : null}
         />
       )}
     </>
