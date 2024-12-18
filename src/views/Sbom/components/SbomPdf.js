@@ -20,7 +20,7 @@ export const downloadSbomPdf = (
   const authors = listItemsForDoc(sbom?.authors, 'name')
   const tools = listItemsForDoc(sbom?.tools, 'name', 'version')
 
-  const doc = new jsPDF()
+  const doc = new jsPDF({ compress: true })
   const pageWidth = doc.internal.pageSize.getWidth()
   const leftMargin = 10
   const rightMargin = 20
