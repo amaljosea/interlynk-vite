@@ -94,6 +94,7 @@ export const componentLabels = [
 
 export const generalValues = ({
   productName,
+  productDescription,
   version,
   sbom,
   authors,
@@ -105,7 +106,7 @@ export const generalValues = ({
 }) => [
   getFormattedValue(productName, config),
   getFormattedValue(version, config),
-  getFormattedValue(sbom?.primaryComponent?.description, config),
+  getFormattedValue(productDescription, config),
   getFormattedValue(sbom?.primaryComponent?.uniqueId, config),
   getFormattedValue(sbom?.suppliers[0]?.name, config),
   getFormattedValue(authors, config),

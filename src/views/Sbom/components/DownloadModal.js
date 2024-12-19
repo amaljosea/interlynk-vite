@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { gql, useLazyQuery, useQuery } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -36,6 +36,14 @@ import { GetComponentData, GetVulnData } from 'graphQL/Queries'
 import ComplianceChecks from './ComplianceChecks'
 import { downloadSbomPdf } from './SbomPdf'
 
+const GetProjectGroup = gql`
+  query GetProjectGroup($id: Uuid!) {
+    projectGroup(id: $id) {
+      description
+    }
+  }
+`
+
 const DownloadModal = (props) => {
   const { isOpen, onClose, productName, version, sbom, downloadType } =
     props || ''
@@ -50,6 +58,16 @@ const DownloadModal = (props) => {
   const [getData] = useLazyQuery(
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
   )
+
+  const {
+    data,
+    loading: prodDescLoading,
+    error: prodDescErr
+  } = useQuery(GetProjectGroup, {
+    variables: { id: params?.productgroupid }
+  })
+
+  const productDescription = data?.projectGroup.description
 
   const [spec, setSpec] = useState('CycloneDX')
   const [format, setFormat] = useState('json')
@@ -181,6 +199,7 @@ const DownloadModal = (props) => {
       downloadSbomPdf(
         productName,
         version,
+        productDescription,
         sbom,
         allComponents,
         allVulns,
@@ -278,6 +297,14 @@ const DownloadModal = (props) => {
 
   const pdfFileName = `${truncatedValue(productName, 14)}-${version}.${format}`
 
+  if (prodDescErr) {
+    showToast({
+      description: `Unable to load some details. Please try again in a few minutes.`,
+      status: 'error'
+    })
+    onClose()
+  }
+
   return (
     <>
       <LynkModal
@@ -288,6 +315,7 @@ const DownloadModal = (props) => {
         Icon={DownloadIcon}
         isLoading={isLoading}
         buttonText={'Download'}
+        disabled={prodDescLoading}
       >
         <Flex flexDirection={'column'} gap={4}>
           <Tag

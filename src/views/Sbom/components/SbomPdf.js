@@ -16,6 +16,7 @@ import {
 export const downloadSbomPdf = (
   productName,
   version,
+  productDescription,
   sbom,
   componentsActual,
   vulnActual,
@@ -183,6 +184,7 @@ export const downloadSbomPdf = (
   const values = generalValues({
     productName,
     version,
+    productDescription,
     sbom,
     authors,
     manufacturerData,
