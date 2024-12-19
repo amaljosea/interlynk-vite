@@ -22,19 +22,15 @@ import {
   FormLabel
 } from '@chakra-ui/react'
 
+import ComponentList from 'components/ComponentList'
 import LynkAlert from 'components/LynkAlert'
 import RelDeleteModal from 'components/RelDeleteModal'
 
 import useCustomToast from 'hooks/useCustomToast'
-import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
-import {
-  GetAllComponents,
-  GetCompDependency,
-  GetTotalComponents
-} from 'graphQL/Queries'
+import { GetCompDependency } from 'graphQL/Queries'
 
 import ActionButton from './ActionButton'
 
@@ -56,10 +52,8 @@ const findShortestPath = (pathArray, currentShortestPath = []) => {
 
 const CompRelations = ({ data, compPath }) => {
   const { showToast } = useCustomToast()
-  const activeTab = useQueryParam('tab')
 
-  const { id, name, version, sbomId, sbom } = data || ''
-  const { id: productId } = sbom?.project || ''
+  const { id, name, version, sbomId } = data || ''
 
   const {
     tab,
@@ -77,39 +71,12 @@ const CompRelations = ({ data, compPath }) => {
   const [dependsOnList, setDependsOnList] = useState([])
   const [activeComp, setActiveComp] = useState(null)
   const [isAdded, setIsAdded] = useState(false)
+  const [component, setComponent] = useState(null)
 
   const { primaryBlueText, headingTextColor } = useThemeColor([
     'primaryBlueText',
     'headingTextColor'
   ])
-
-  const compState = {
-    projectId: productId,
-    sbomId: sbomId,
-    field: 'COMPONENTS_UPDATED_AT',
-    direction: 'DESC'
-  }
-
-  const { data: compData } = useQuery(GetTotalComponents, {
-    skip: tab === 4 ? false : true,
-    fetchPolicy: activeTab === 'components' ? false : true,
-    variables: {
-      ...compState
-    }
-  })
-
-  const { data: allComponents } = useQuery(GetAllComponents, {
-    skip: compData ? false : true,
-    variables: {
-      ...compState,
-      first: compData?.sbom?.components?.totalCount
-    },
-    onCompleted: (data) => {
-      if (data) {
-        setTabData((prev) => ({ ...prev, relations: { to: '', relType: '' } }))
-      }
-    }
-  })
 
   const [addRelation] = useMutation(CreateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
@@ -166,6 +133,7 @@ const CompRelations = ({ data, compPath }) => {
         })
       }
     })
+    setComponent(null)
     setTabData((prev) => ({ ...prev, relations: { to: '', relType: '' } }))
   }
 
@@ -215,6 +183,7 @@ const CompRelations = ({ data, compPath }) => {
           direction={'column'}
           alignItems={'flex-start'}
         >
+          {/* RELATION TYPE */}
           <FormControl>
             <FormLabel htmlFor='relType' color={headingTextColor}>
               Type
@@ -238,45 +207,23 @@ const CompRelations = ({ data, compPath }) => {
               ))}
             </Select>
           </FormControl>
-          {allComponents ? (
-            <FormControl isInvalid={list.length > 0}>
-              <FormLabel htmlFor='to' color={headingTextColor}>
-                Component
-              </FormLabel>
-              <Select
-                fontSize='sm'
-                name='relationTo'
-                value={relations?.to}
-                onChange={(e) =>
-                  handleChange('relations', 'to', e.target.value)
-                }
-              >
-                <option value=''>-- Select --</option>
-                {[...allComponents.sbom.components.nodes]
-                  .filter((com) => com?.name !== name)
-                  .sort((a, b) =>
-                    relations?.relType === 'dependency_of'
-                      ? b?.name?.localeCompare(a?.name)
-                      : a?.name?.localeCompare(b?.name)
-                  )
-                  .map((item, idx) => (
-                    <option key={idx} value={item.id}>
-                      {item.name}-{item.version}
-                      {item.primary ? ` [Primary Component]` : ''}
-                    </option>
-                  ))}
-              </Select>
-              {list.length !== 0 && (
-                <FormErrorMessage>
-                  <FormErrorIcon />
-                  Component dependency already exists
-                </FormErrorMessage>
-              )}
-            </FormControl>
-          ) : (
-            <Text>Please wait, loading components..</Text>
-          )}
-
+          {/* RELATION TO */}
+          <FormControl isInvalid={list?.length > 0}>
+            <FormLabel htmlFor='relationTo' color={headingTextColor}>
+              Component
+            </FormLabel>
+            <ComponentList
+              name={name}
+              id='relationTo'
+              value={component}
+              setValue={setComponent}
+            />
+            <FormErrorMessage>
+              <FormErrorIcon />
+              Component dependency already exists
+            </FormErrorMessage>
+          </FormControl>
+          {/* ACTION */}
           {alert ? (
             <Stack spacing={4}>
               <LynkAlert
