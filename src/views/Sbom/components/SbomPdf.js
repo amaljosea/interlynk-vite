@@ -1,8 +1,17 @@
 import InterlynkLogo from 'assets/img/logo.png'
-import { parseISO } from 'date-fns'
-import { format as formatWithTZ, toZonedTime } from 'date-fns-tz'
 import jsPDF from 'jspdf'
 import { listItemsForDoc } from 'utils'
+
+import {
+  componentLabels,
+  excludeStatusLabels,
+  excludeStatusNotesLabels,
+  formatManufacturerContacts,
+  generalLabels,
+  generalValues,
+  getComponentValues,
+  getVulnValues
+} from '../DownloadUtils/pdfUtils'
 
 export const downloadSbomPdf = (
   productName,
@@ -43,25 +52,6 @@ export const downloadSbomPdf = (
     )
   }
 
-  function formatDateWithTimeZone(
-    date,
-    dateFormat = 'MMMM dd, yyyy hh:mm a zzz'
-  ) {
-    if (!date) return ''
-    const timeZone = date.endsWith('Z')
-      ? 'UTC' // If 'Z', it's UTC
-      : undefined
-
-    const parsedDate = parseISO(date)
-    const zonedDate = timeZone ? toZonedTime(parsedDate, timeZone) : parsedDate
-    return formatWithTZ(zonedDate, dateFormat, { timeZone })
-  }
-
-  const currentDateTime = (dateFormat = 'MMMM dd, yyyy hh:mm a') => {
-    const now = new Date()
-    const utcDate = toZonedTime(now, 'UTC')
-    return formatWithTZ(utcDate, dateFormat) + ' UTC'
-  }
   //Colors
   const blueColor = [61, 113, 238]
   const grayColor = [128, 128, 128]
@@ -178,152 +168,29 @@ export const downloadSbomPdf = (
   doc.setFontSize(14)
   doc.text('General', leftMargin, currentY)
 
-  const labels = [
-    'Product Name',
-    'Product Version',
-    'Description',
-    'Unique Identifier',
-    'Supplier',
-    'Author(s)',
-    'Manufacturer',
-    '',
-    'Creation Tool',
-    'Created At',
-    'Last Modified At',
-    'Vulnerability Scan At',
-    'Exported By',
-    'Exported At'
-  ]
+  const labels = generalLabels
+
   const organizationContactsArray =
     manufacturerData?.project?.projectSetting?.organizationManufacturer
       ?.organizationContacts || []
-  const manufacturerContacts = organizationContactsArray.map((item) => {
-    let manuString = ''
 
-    if (item.name) manuString += `Name: ${item.name}`
-    if (item.phone)
-      manuString += (manuString ? ', ' : '') + `Phone: ${item.phone}`
-    if (item.email)
-      manuString += (manuString ? ', ' : '') + `Email: ${item.email}`
+  const manufacturerContacts = formatManufacturerContacts(
+    organizationContactsArray
+  )
 
-    return manuString
+  const config = { doc, pageWidth, rightMargin, contentGap, leftMargin }
+
+  const values = generalValues({
+    productName,
+    version,
+    sbom,
+    authors,
+    manufacturerData,
+    manufacturerContacts,
+    tools,
+    exportedBy,
+    config
   })
-
-  const values = [
-    formatValue(
-      productName || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      version || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      sbom?.primaryComponent?.description || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      sbom?.primaryComponent?.uniqueId || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      sbom?.suppliers[0]?.name || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      authors || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      manufacturerData?.project?.projectSetting?.organizationManufacturer
-        ?.organizationName || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      manufacturerContacts,
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      tools || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      formatDateWithTimeZone(sbom.createdAt) || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      formatDateWithTimeZone(sbom.updatedAt) || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      formatDateWithTimeZone(sbom.updatedAt) || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      exportedBy || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      currentDateTime() || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    )
-  ]
 
   // Set gray color for section labels on the left side
   doc.setTextColor(...grayColor)
@@ -367,75 +234,6 @@ export const downloadSbomPdf = (
   checkPageHeight()
   currentY += 10
 
-  const componentLabels = [
-    'Type',
-    'Supplier',
-    'Common Platform Enumeration (CPE)',
-    'Package URL (PURL)',
-    'Hash',
-    'Relationship Type',
-    'License',
-    'Hashes'
-  ]
-
-  const getComponentValues = (component) => [
-    formatValue(
-      component?.kind || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      Array.isArray(component?.suppliers) && component.suppliers[0]?.name
-        ? component.suppliers[0].name
-        : 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      Array.isArray(component?.cpes) && component.cpes[0]
-        ? component.cpes[0]
-        : 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      component?.purl || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin),
-
-    formatValue(
-      component?.uniqueId || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue(
-      component?.licensesExp || 'NA',
-      doc,
-      pageWidth,
-      rightMargin,
-      contentGap,
-      leftMargin
-    ),
-    formatValue('', doc, pageWidth, rightMargin, contentGap, leftMargin)
-  ]
-
   doc.setTextColor(...grayColor)
   doc.setFontSize(10)
 
@@ -466,7 +264,7 @@ export const downloadSbomPdf = (
 
     currentY = initialY
 
-    const componentValues = getComponentValues(component)
+    const componentValues = getComponentValues(component, config)
 
     componentLabels.forEach((label, index) => {
       doc.setTextColor(...grayColor)
@@ -509,148 +307,6 @@ export const downloadSbomPdf = (
   checkPageHeight()
 
   currentY += 10
-
-  const getVulnValues = (vulnerability) => {
-    const values = [
-      formatValue(
-        vulnerability?.vuln?.desc || 'NA',
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      ),
-      formatValue(
-        vulnerability?.component?.name || 'NA',
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      ),
-      formatValue(
-        vulnerability?.component?.version || 'NA',
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      ),
-      formatValue(
-        vulnerability?.vuln?.source || 'NA',
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      ),
-      formatValue(
-        (vulnerability?.vuln?.vulnInfo?.epssPercentile * 100).toFixed() + '%' ||
-          'NA',
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      ),
-      formatValue(
-        (vulnerability?.vuln?.vulnInfo?.epssScores[0] * 100).toFixed(3) + '%' ||
-          'NA',
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      ),
-      formatValue(
-        vulnerability?.vuln?.vulnInfo?.kev === true ? 'Yes' : 'No' || 'NA',
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      ),
-      formatValue(
-        vulnerability?.vexStatus?.name || 'Unspecified',
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      ),
-      formatValue(
-        vulnerability?.vexJustification?.name || 'NA',
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      ),
-      formatValue(
-        vulnerability?.impact || 'NA',
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      ),
-      formatValue(
-        vulnerability?.actionStmt || 'NA',
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      ),
-      formatValue(
-        vulnerability?.note || 'NA',
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      )
-    ]
-
-    // Insert custom field values
-    if (excludeVulnStatus) {
-      const customFields = vulnerability?.componentVulnCustomFields || []
-      customFields.forEach((field) => {
-        const value = field?.value || 'NA'
-        values.push(
-          formatValue(
-            value,
-            doc,
-            pageWidth,
-            rightMargin,
-            contentGap,
-            leftMargin
-          )
-        )
-      })
-    }
-    // Add the remaining fields
-    values.push(
-      formatValue(
-        '', // Placeholder for 'Created By'
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      ),
-      formatValue(
-        formatDateWithTimeZone(vulnerability?.vuln?.publishedAt) || 'NA',
-        doc,
-        pageWidth,
-        rightMargin,
-        contentGap,
-        leftMargin
-      )
-    )
-
-    return values
-  }
 
   doc.setTextColor(...grayColor)
   doc.setFontSize(10)
@@ -710,17 +366,7 @@ export const downloadSbomPdf = (
     currentY += vulnIdPlusParts.length > 1 ? vulnIdPlusParts.length * 10 : 5
     currentY = initialY
 
-    const excludeStatusLabels = [
-      'status',
-      'justification',
-      'impact statement',
-      'action statement',
-      'internal notes'
-    ]
-
-    const excludeStatusNotesLabels = ['internal notes']
-
-    const vulnValues = getVulnValues(vuln)
+    const vulnValues = getVulnValues(vuln, excludeVulnStatus, config)
     VulnLabels.forEach((label, index) => {
       if (
         !excludeVulnStatus &&
