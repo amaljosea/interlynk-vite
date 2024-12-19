@@ -71,7 +71,7 @@ const DownloadModal = (props) => {
 
   const [spec, setSpec] = useState('CycloneDX')
   const [format, setFormat] = useState('json')
-  const [includeVulns, setIncludeVulns] = useState(true)
+  const [includeVulns, setIncludeVulns] = useState(false)
   const [includeComponents, setIncludeComponents] = useState(true)
   const [encoded, setEncoded] = useState(false)
   const [includeVulnStatus, setIncludeVulnStatus] = useState(true)
