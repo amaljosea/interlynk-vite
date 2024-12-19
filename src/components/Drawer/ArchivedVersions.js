@@ -38,10 +38,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
     useProductUrlContext()
   const params = useParams()
   const productId = params?.productid
-  const { primaryTextColor, sameSecondaryText } = useThemeColor([
-    'primaryTextColor',
-    'sameSecondaryText'
-  ])
+  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
   const [activeRow, setActiveRow] = useState(null)
 
   const { data: versions } = useQuery(GetVersions, {

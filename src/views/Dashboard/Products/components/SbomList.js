@@ -9,10 +9,9 @@ import {
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay,
-  IconButton,
-  useDisclosure
+  DrawerOverlay
 } from '@chakra-ui/react'
+import { IconButton, Stack, useDisclosure } from '@chakra-ui/react'
 import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
 import { Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
@@ -25,7 +24,7 @@ import { FaArrowUp } from 'react-icons/fa6'
 
 import ConfirmationModal from './ConfirmationModal'
 
-const SbomList = ({ sbomId, isOpen, onClose }) => {
+const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
   const params = useParams()
   const { showToast } = useCustomToast()
 
@@ -50,6 +49,8 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
       sbomId: sbomId
     }
   })
+
+  console.log('sbomAlts', sbomAlts)
 
   const handleWarning = (item) => {
     setActiveSbom(item)
@@ -85,8 +86,15 @@ const SbomList = ({ sbomId, isOpen, onClose }) => {
         <DrawerContent>
           <DrawerCloseButton mt={1} />
           <DrawerHeader borderBottomWidth='1px'>
-            {truncatedValue(sbomAlts?.sbom?.projectVersion, 40) +
-              ' Alternative SBOMs'}
+            <Stack spacing={1}>
+              <Text>Alternative SBOMs</Text>
+              <Tag w={'fit-content'} colorScheme='blue' py={1.5}>
+                <Text fontWeight={400} wordBreak={'break-all'}>
+                  {truncatedValue(projectGroup?.name, 40)} -{' '}
+                  {truncatedValue(sbomAlts?.sbom?.projectVersion, 40)}
+                </Text>
+              </Tag>
+            </Stack>
           </DrawerHeader>
           <DrawerBody>
             <Table variant='simple' m={0} p={0}>

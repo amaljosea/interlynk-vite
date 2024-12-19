@@ -728,6 +728,7 @@ const VersionsTable = (props) => {
           isOpen={LIST.isOpen}
           onClose={LIST.onClose}
           sbomId={activeRow?.id}
+          projectGroup={{ name }}
         />
       )}
       {/* BUILD SBOM */}
