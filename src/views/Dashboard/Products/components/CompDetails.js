@@ -133,7 +133,7 @@ const CompDetails = ({ data, primaryComp }) => {
         primary: details?.primary || undefined,
         internal: details?.internal || undefined,
         version: details?.version || undefined,
-        description: details?.description || undefined,
+        description: details?.description || '',
         copyright: details?.copyright || undefined,
         supportLevel: details?.supportLevel || 'NONE',
         endOfSupport: details?.endOfSupport || '',
