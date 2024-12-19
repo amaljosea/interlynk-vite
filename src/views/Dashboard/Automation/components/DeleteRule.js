@@ -8,7 +8,7 @@ import { AutomationRuleDelete } from 'graphQL/Mutation'
 const DeleteRule = ({ isOpen, onClose, activeRow }) => {
   const { showToast } = useCustomToast()
 
-  const [deleteRule] = useMutation(AutomationRuleDelete)
+  const [deleteRule, { loading }] = useMutation(AutomationRuleDelete)
 
   const handleDelete = async () => {
     await deleteRule({ variables: { id: activeRow?.id } }).then((res) => {
@@ -27,6 +27,7 @@ const DeleteRule = ({ isOpen, onClose, activeRow }) => {
     <ConfirmationModal
       isOpen={isOpen}
       onClose={onClose}
+      isLoading={loading}
       onConfirm={handleDelete}
       title='Archive Automation'
       description='Archiving this entry will:'

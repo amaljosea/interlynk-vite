@@ -4,14 +4,8 @@ import { useParams } from 'react-router-dom'
 import { disableButtonTemporarily } from 'utils'
 
 import { EditIcon } from '@chakra-ui/icons'
-import {
-  Button,
-  Divider,
-  Flex,
-  FormControl,
-  FormLabel,
-  Input
-} from '@chakra-ui/react'
+import { Button, Divider, Flex, Input } from '@chakra-ui/react'
+import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
@@ -74,7 +68,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
     }
   ])
   const [deletedCondition, setDeletedCondition] = useState([])
-  const [deleteAction, setDeleteAction] = useState('')
+  const [deleteAction, setDeleteAction] = useState([])
   const [isDisabled, setIsDisabled] = useState(false)
 
   const isSystem = actions?.some((item) => item?.operator === 'copy')
@@ -82,8 +76,10 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
   const isComponent = conditions?.some((item) => item?.category === 'component')
   // const isVersion = conditions?.some((item) => item?.category === 'version')
 
-  const [createRule] = useMutation(AutomationRuleCreate)
-  const [updateRule] = useMutation(AutomationRuleUpdate)
+  const [createRule, { loading: loadingCreate }] =
+    useMutation(AutomationRuleCreate)
+  const [updateRule, { loading: loadingUpdate }] =
+    useMutation(AutomationRuleUpdate)
 
   const checkActionValidity = (data) => {
     for (let i = 0; i < data.length; i++) {
@@ -204,7 +200,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
 
   const getValue = (item) => {
     if (item?.operator === 'exists' || item?.operator === 'not_exists') {
-      return undefined
+      return null
     } else {
       return item?.value
     }
@@ -212,6 +208,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
 
   const conditionsAttributes = []
   const actionsAttributes = []
+
   conditions?.length > 0 &&
     conditions?.map((item) =>
       conditionsAttributes?.push({
@@ -342,13 +339,14 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
   return (
     <LynkModal
       isOpen={isOpen}
-      onClose={onClose}
-      title={`${data ? 'Edit' : 'Create'} Rule`}
-      onSubmit={data ? handleRuleUpdate : handleRuleCreate}
-      disabled={submitError}
-      noFooter={isSystem}
-      buttonText={data ? 'Update' : 'Create'}
       Icon={EditIcon}
+      onClose={onClose}
+      noFooter={isSystem}
+      disabled={submitError}
+      buttonText={data ? 'Update' : 'Create'}
+      title={`${data ? 'Edit' : 'Create'} Rule`}
+      isLoading={loadingCreate || loadingUpdate}
+      onSubmit={data ? handleRuleUpdate : handleRuleCreate}
     >
       <Flex flexDir={'column'} alignItems={'flex-start'} gap={4}>
         <FormControl isRequired>
@@ -366,17 +364,19 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
         <FormControl>
           <FormLabel htmlFor='conditions'>Conditions</FormLabel>
           <RuleConditions
-            conditions={conditions}
-            setConditions={setConditions}
+            actions={actions}
             isSystem={isSystem}
             setError={setError}
+            conditions={conditions}
+            setActions={setActions}
+            categories={categories}
+            setConditions={setConditions}
+            setDeleteAction={setDeleteAction}
+            optionsByCategory={optionsByCategory}
+            setDeletedCondition={setDeletedCondition}
             automationConditionSubjectFieldMapping={
               automationConditionSubjectFieldMapping
             }
-            categories={categories}
-            optionsByCategory={optionsByCategory}
-            setDeletedCondition={setDeletedCondition}
-            setDeleteAction={setDeleteAction}
           />
         </FormControl>
         <Button
@@ -397,13 +397,14 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
           <FormLabel htmlFor='actions'>Actions</FormLabel>
           <RuleActions
             actions={actions}
-            setActions={setActions}
-            conditions={conditions}
             isSystem={isSystem}
             setError={setError}
-            conditionErrorMessage={conditionErrorMessage}
+            setActions={setActions}
+            conditions={conditions}
             categories={categories}
+            setDeleteAction={setDeleteAction}
             optionsByCategory={optionsByCategory}
+            conditionErrorMessage={conditionErrorMessage}
           />
         </FormControl>
         <Button

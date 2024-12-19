@@ -1,19 +1,9 @@
 import { updatedValue } from 'utils'
 
-import {
-  Box,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  Icon,
-  IconButton,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Select,
-  Tag,
-  Text
-} from '@chakra-ui/react'
+import { Box, Flex, Select, Tag, Text } from '@chakra-ui/react'
+import { Icon, IconButton } from '@chakra-ui/react'
+import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -22,14 +12,17 @@ import { MdDeleteOutline } from 'react-icons/md'
 import SubjectIcon from './SubjectIcon'
 
 const RuleConditions = ({
-  conditions,
-  setConditions,
+  actions,
   isSystem,
   setError,
-  automationConditionSubjectFieldMapping,
   categories,
+  conditions,
+  setActions,
+  setConditions,
+  setDeleteAction,
   optionsByCategory,
-  setDeletedCondition
+  setDeletedCondition,
+  automationConditionSubjectFieldMapping
 }) => {
   const { grayBorderColor, primaryErrorColor } = useThemeColor([
     'grayBorderColor',
@@ -43,6 +36,7 @@ const RuleConditions = ({
         if (field === 'subject' && value === '') {
           return {
             ...item,
+            value: '',
             [field]: value,
             subError: 'Select any subject'
           }
@@ -52,6 +46,7 @@ const RuleConditions = ({
           )
           return {
             ...item,
+            value: '',
             [field]: value,
             subError: '',
             category: result?.subject,
@@ -60,12 +55,14 @@ const RuleConditions = ({
         } else if (field === 'operator' && value === '') {
           return {
             ...item,
+            value: '',
             [field]: value,
             opError: 'Select any operator'
           }
         } else if (field === 'operator' && value !== '') {
           return {
             ...item,
+            value: '',
             [field]: value,
             opError: ''
           }
@@ -76,6 +73,17 @@ const RuleConditions = ({
       return item
     })
     setConditions(newData)
+    actions[0]?.id && setDeleteAction(actions)
+    setActions([
+      {
+        id: 1,
+        value: '',
+        subject: '',
+        status: 'CREATED',
+        operator: 'set',
+        field: ''
+      }
+    ])
   }
 
   const onSubjectBlur = (rule) => {
@@ -197,6 +205,7 @@ const RuleConditions = ({
                 </Select>
                 <FormErrorMessage>{item?.opError}</FormErrorMessage>
               </FormControl>
+              {/* VALUE */}
               {item?.operator !== 'exists' &&
                 item?.operator !== 'not_exists' &&
                 item?.operator !== 'boolean_is' && (

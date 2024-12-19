@@ -29,7 +29,7 @@ const RuleActions = ({
 
   const onActionChange = (value, id, field) => {
     setError('')
-    const newData = actions.map((item) => {
+    const newData = actions?.map((item) => {
       if (item.id === id) {
         if (field === 'field' && value !== '') {
           return {
