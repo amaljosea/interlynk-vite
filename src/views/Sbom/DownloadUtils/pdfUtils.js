@@ -86,10 +86,8 @@ export const componentLabels = [
   'Supplier',
   'Common Platform Enumeration (CPE)',
   'Package URL (PURL)',
-  'Hash',
   'Relationship Type',
-  'License',
-  'Hashes'
+  'License'
 ]
 
 export const generalValues = ({
@@ -136,10 +134,8 @@ export const getComponentValues = (component, config) => [
     config
   ),
   getFormattedValue(component?.purl, config),
-  getFormattedValue('', config),
   getFormattedValue(component?.uniqueId, config),
-  getFormattedValue(component?.licensesExp, config),
-  getFormattedValue('', config)
+  getFormattedValue(component?.licensesExp, config)
 ]
 
 //Vulnerablity Values
