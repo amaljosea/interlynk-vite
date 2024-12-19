@@ -42,9 +42,7 @@ export const ProgressBar = ({ value, loading, text }) => {
           >
             {text}
           </StatLabel>
-          <Tooltip
-            label={value === 0 ? `Run checks to see Quality Score.` : ''}
-          >
+          <Tooltip label={value === 0 ? `Run checks to see ${text}.` : ''}>
             {loading ? (
               <Skeleton width={'100%'} height={'22px'} />
             ) : (
