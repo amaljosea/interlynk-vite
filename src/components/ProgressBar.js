@@ -29,6 +29,16 @@ export const ProgressBar = ({ value, loading, text }) => {
     return null
   }
 
+  //Different tooltip lables for version and quality scores when the value is zero
+  const versionHealthLabel = `${text} is not available`
+  const qualityScoreLabel = `Run checks to see ${text}`
+  const toolTipLabel =
+    value === 0 && text === 'Version Health Score'
+      ? versionHealthLabel
+      : value === 0 && text === 'SBOM Quality Score'
+        ? qualityScoreLabel
+        : ''
+
   return (
     <Card shadow='none' py={0}>
       <CardBody flexDir='column' gap={1}>
@@ -42,7 +52,7 @@ export const ProgressBar = ({ value, loading, text }) => {
           >
             {text}
           </StatLabel>
-          <Tooltip label={value === 0 ? `Run checks to see ${text}.` : ''}>
+          <Tooltip label={toolTipLabel}>
             {loading ? (
               <Skeleton width={'100%'} height={'22px'} />
             ) : (
