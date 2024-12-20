@@ -150,7 +150,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
                   status={status}
                   onClick={() => onFilterVuln(['critical'])}
                 >
-                  {amount?.critical || 0}
+                  {status === 'NOT_STARTED' ? '-' : amount?.critical || 0}
                 </VulnBadge>
                 <VulnBadge
                   color='orange'
@@ -158,7 +158,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
                   status={status}
                   onClick={() => onFilterVuln(['high'])}
                 >
-                  {amount?.high || 0}
+                  {status === 'NOT_STARTED' ? '-' : amount?.high || 0}
                 </VulnBadge>
                 <VulnBadge
                   color='yellow'
@@ -166,7 +166,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
                   status={status}
                   onClick={() => onFilterVuln(['medium'])}
                 >
-                  {amount?.medium || 0}
+                  {status === 'NOT_STARTED' ? '-' : amount?.medium || 0}
                 </VulnBadge>
                 <VulnBadge
                   color='green'
@@ -174,7 +174,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
                   status={status}
                   onClick={() => onFilterVuln(['low'])}
                 >
-                  {amount?.low || 0}
+                  {status === 'NOT_STARTED' ? '-' : amount?.low || 0}
                 </VulnBadge>
                 <VulnBadge
                   color='gray'
@@ -182,7 +182,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
                   status={status}
                   onClick={() => onFilterVuln(['unknown'])}
                 >
-                  {amount?.unknown || 0}
+                  {status === 'NOT_STARTED' ? '-' : amount?.unknown || 0}
                 </VulnBadge>
               </SimpleGrid>
             ) : title === 'Policy Results' ? (
