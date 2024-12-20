@@ -1,4 +1,5 @@
 import { truncatedValue } from 'utils'
+import { isCustomerView } from 'utils'
 
 import { Text, useDisclosure } from '@chakra-ui/react'
 
@@ -9,6 +10,7 @@ import ComponentCard from './Misc/ComponentCard'
 
 const RowComponent = ({ content }) => {
   const tab = useQueryParam('tab')
+  const customerView = isCustomerView()
   const { primaryBlueText, primaryTextColor } = useThemeColor([
     'primaryBlueText',
     'primaryTextColor'
@@ -18,7 +20,7 @@ const RowComponent = ({ content }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const onView = () => onOpen()
+  const onView = () => (customerView ? null : onOpen())
 
   const getValue = () => {
     if (typeof content === 'string') {
