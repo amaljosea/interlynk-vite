@@ -195,6 +195,8 @@ export default class ComponentSection {
           await this.page.keyboard.type(
             'cpe:2.3:a:byonepress:social_locker:2.0.2:*:*:*:*:wordpress:*:*'
           )
+          await this.page.waitForTimeout(5000)
+          await this.page.keyboard.press('ArrowDown')
           await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(1000)
 
@@ -327,12 +329,12 @@ export default class ComponentSection {
           await this.page
             .locator('[name="relationType"]')
             .selectOption({ index: 1 })
-
           await this.page.waitForTimeout(2000)
 
-          await this.page
-            .locator('[name="relationTo"]')
-            .selectOption({ index: 1 })
+          this.page.locator('input#relationTo').fill('antlr')
+          await this.page.waitForTimeout(2000)
+          await this.page.keyboard.press('Enter')
+
           const relationSave = this.page.getByRole('button', { name: 'Add' })
           await relationSave.click()
           await this.page.waitForTimeout(2000)

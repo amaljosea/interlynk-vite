@@ -71,7 +71,7 @@ const ComponentList = ({ id, name, value, setValue }) => {
 
   return (
     <LynkSelect
-      name={id}
+      inputId={id}
       value={value}
       options={options}
       isClearable={true}
