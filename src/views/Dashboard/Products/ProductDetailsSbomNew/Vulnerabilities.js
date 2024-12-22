@@ -104,7 +104,7 @@ const Vulnerabilities = ({ sbomData }) => {
         projectId: productId,
         sbomId: sbomId,
         first: totalRows,
-        search: searchInput !== '' ? searchInput : undefined,
+        search: searchInput !== '' ? searchInput.trim() : undefined,
         severity: severities.length > 0 ? severities : undefined,
         source: include.includes('parts') ? undefined : 'COMPONENT',
         componentName: components.length > 0 ? components : undefined,
