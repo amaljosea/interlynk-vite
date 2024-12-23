@@ -3016,6 +3016,34 @@ export const EnterpriseUpgradeRequest = gql`
   }
 `
 
+export const UpdateCompliance = gql`
+  mutation UpdateCompliance($id: Uuid!, $scoreEnabled: Boolean!) {
+    organizationComplianceUpdate(
+      input: { id: $id, scoreEnabled: $scoreEnabled }
+    ) {
+      compliance {
+        id
+        isEnabled
+        complianceType
+      }
+      errors
+    }
+  }
+`
+
+export const UpdateComplianceList = gql`
+  mutation UpdateComplianceList($compliances: [OrganizationComplianceInput!]!) {
+    organizationComplianceBulkUpdate(input: { compliances: $compliances }) {
+      orgCompliances {
+        id
+        isEnabled
+        complianceType
+      }
+      errors
+    }
+  }
+`
+
 export const CustomVulnCreate = gql`
   mutation CustomVulnCreate(
     $vulnIdentifier: String!

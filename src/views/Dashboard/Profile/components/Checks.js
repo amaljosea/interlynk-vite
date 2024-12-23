@@ -46,7 +46,7 @@ const Checks = () => {
   })
 
   const { data, loading } = useQuery(GetOrgRules, {
-    skip: !orgView ? true : activetab === 'checks' ? false : true,
+    skip: !orgView ? true : activetab === 'compliance' ? false : true,
     variables: {
       field: 'RULES_FRIENDLY_ID',
       direction: 'ASC'

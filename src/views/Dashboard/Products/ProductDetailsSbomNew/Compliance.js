@@ -25,6 +25,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetSbomQualityScores } from 'graphQL/Queries'
+import { ActiveCompliances } from 'graphQL/Queries'
 
 const Compliance = ({ sbomData }) => {
   const params = useParams()
@@ -42,6 +43,9 @@ const Compliance = ({ sbomData }) => {
 
   const [activeTab, setActiveTab] = useState(0)
 
+  const { data: compliances } = useQuery(ActiveCompliances, {
+    skip: tab === 'compliance' ? false : true
+  })
   const { data: ntiaResult, loading: ntiaLoading } = useQuery(
     GetSbomQualityScores,
     {
@@ -57,6 +61,7 @@ const Compliance = ({ sbomData }) => {
     }
   )
 
+  const { activeCompliances } = compliances?.organization || ''
   const { nodes: ntiaData } = ntiaResult?.complianceReports || ''
   const { nodes: fdaData } = fdaResult?.complianceReports || ''
   const fda = fdaData?.length > 0 ? fdaData[0] : []
@@ -65,6 +70,7 @@ const Compliance = ({ sbomData }) => {
   const data = [
     {
       id: 1,
+      type: 'ntia',
       icon: (
         <Img
           alt='NTIA'
@@ -85,6 +91,7 @@ const Compliance = ({ sbomData }) => {
     },
     {
       id: 2,
+      type: 'fda',
       icon: (
         <Img
           alt='FDA'
@@ -102,6 +109,7 @@ const Compliance = ({ sbomData }) => {
     },
     {
       id: 3,
+      type: 'bsi',
       icon: (
         <Img
           alt='BSI'
@@ -124,10 +132,16 @@ const Compliance = ({ sbomData }) => {
     onOpen()
   }
 
+  const filterData = activeCompliances?.map((item) => {
+    const activeItems = data?.find((row) => row?.type === item?.complianceType)
+    return activeItems
+  })
+  const tabs = filterData?.map((item) => item?.type)
+
   return (
     <>
       <SimpleGrid columns={3} spacing={5} mt={2}>
-        {data?.map((item, index) => (
+        {filterData?.map((item, index) => (
           <Card key={item?.id} gap={6} border={`1px solid ${grayBorderColor}`}>
             <Flex gap={4} alignItems={'center'} justifyContent={'flex-start'}>
               <Box>{item?.icon}</Box>
@@ -180,6 +194,7 @@ const Compliance = ({ sbomData }) => {
 
       {isOpen && (
         <ComplianceChecks
+          tabs={tabs}
           fileName={null}
           isOpen={isOpen}
           onClose={onClose}

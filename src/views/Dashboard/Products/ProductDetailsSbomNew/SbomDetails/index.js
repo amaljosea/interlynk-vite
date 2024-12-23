@@ -69,7 +69,11 @@ const SbomDetails = ({ sbomData }) => {
     partsContext.pop()
   }
 
-  const { qualityScore, loading: scoreLoading } = useSbomScores({
+  const {
+    qualityScore,
+    reportFormat,
+    loading: scoreLoading
+  } = useSbomScores({
     sbomId,
     projectId: projectId,
     skip: !shouldShowDemoFeatures
@@ -274,7 +278,7 @@ const SbomDetails = ({ sbomData }) => {
               <ProgressBar
                 value={qualityScore}
                 loading={scoreLoading}
-                text='SBOM Quality Score'
+                text={`SBOM Quality Score ${reportFormat && `(${reportFormat})`}`}
               />
             </GridItem>
           </Grid>

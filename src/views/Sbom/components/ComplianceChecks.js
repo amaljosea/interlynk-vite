@@ -25,6 +25,7 @@ import { recheckHealth } from 'graphQL/Mutation'
 
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 
+const tabs = ['NTIA', 'FDA', 'BSI']
 const sbomCategory = ['Timestamp', 'Supplier Name', 'Unique ID', 'Author']
 
 const ComplianceChecks = (props) => {
@@ -48,7 +49,6 @@ const ComplianceChecks = (props) => {
       'sameSecondaryText'
     ])
 
-  const tabs = ['NTIA', 'FDA', 'BSI']
   const [tab, setTab] = useState(activeTab || 0)
   const onTabChange = (value) => setTab(value)
 
@@ -252,7 +252,7 @@ const ComplianceChecks = (props) => {
                   py={3.5}
                   key={index}
                   fontSize={'sm'}
-                  textTransform={'capitalize'}
+                  textTransform={'uppercase'}
                   _focus={{ outline: 'none', bg: 'none' }}
                 >
                   {item}

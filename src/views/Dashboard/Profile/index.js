@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
+import {
+  Divider,
+  Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs
+} from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import LegalTable from 'components/Tables/LegalTable'
@@ -18,6 +26,7 @@ import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 
 import Connections from '../../../components/Connections/Connections'
 import Checks from './components/Checks'
+import Compliance from './components/Compliance'
 import CustomFields from './components/CustomFields'
 import Feeds from './components/Feeds'
 import Header from './components/Header'
@@ -35,7 +44,7 @@ function Profile() {
     'users',
     'roles',
     'feeds',
-    'checks',
+    'compliance',
     'lists',
     'legal',
     'integrations-org',
@@ -161,7 +170,11 @@ function Profile() {
               </TabPanel>
               {/* RULES */}
               <TabPanel px={0}>
-                <Checks />
+                <Stack spacing={5}>
+                  <Compliance />
+                  <Divider />
+                  <Checks />
+                </Stack>
               </TabPanel>
               {/* LISTS */}
               <TabPanel px={0}>

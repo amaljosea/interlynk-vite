@@ -5050,6 +5050,19 @@ export const GetCustomFields = gql`
   }
 `
 
+export const ActiveCompliances = gql`
+  query ActiveCompliances {
+    organization {
+      activeCompliances {
+        id
+        isEnabled
+        scoreEnabled
+        complianceType
+      }
+    }
+  }
+`
+
 export const CveLookup = gql`
   query CveLookup($cveId: String!) {
     cveLookup(cveId: $cveId) {

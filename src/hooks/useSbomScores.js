@@ -6,9 +6,10 @@ import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthSc
 
 const QUERY = gql`
   query SingleSbomScore($projectId: Uuid!, $sbomId: Uuid!, $sbomIds: [ID!]!) {
-    complianceReports(sbomIds: $sbomIds, reportFormat: NTIA) {
+    complianceReports(sbomIds: $sbomIds) {
       nodes {
         score
+        reportFormat
       }
     }
     sbom(projectId: $projectId, sbomId: $sbomId) {
@@ -61,19 +62,22 @@ export const useSbomScores = ({ projectId, sbomId }) => {
     }
   })
 
-  const { qualityScore, healthScore } = useMemo(() => {
+  const { qualityScore, healthScore, reportFormat } = useMemo(() => {
+    const reportFormat = data?.complianceReports?.nodes[0]?.reportFormat || ''
     const qualityScore = round(data?.complianceReports?.nodes[0]?.score, 2) || 0
     const { healthScore = 0 } = calculateHealthScore(data?.sbom)
 
     return {
       qualityScore,
-      healthScore
+      healthScore,
+      reportFormat
     }
   }, [data])
 
   return {
     loading,
     qualityScore,
-    healthScore
+    healthScore,
+    reportFormat
   }
 }
