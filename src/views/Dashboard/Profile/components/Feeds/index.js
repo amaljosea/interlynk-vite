@@ -29,13 +29,14 @@ const Feeds = () => {
   const { organizationSettings } = data?.organization || ''
 
   const advisoryFeed = organizationSettings?.filter(
-    (item) => item?.setting?.kind === `advisory_feed`
+    (item) => item?.setting?.kind === `advisory_feed` && item?.value
   )
   const exploitFeed = organizationSettings?.filter(
-    (item) => item?.setting?.kind === `exploit_feed`
+    (item) => item?.setting?.kind === `exploit_feed` && item?.value
   )
 
   if (loading) return <CustomLoader />
+  console.log(advisoryFeed)
 
   return (
     <Grid

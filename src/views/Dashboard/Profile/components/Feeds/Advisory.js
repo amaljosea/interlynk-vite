@@ -72,7 +72,7 @@ const AdvisoryFeeds = ({ data, manageFeeds }) => {
                       id={feed.id}
                       isReadOnly
                       colorScheme='blue'
-                      disabled={!manageFeeds}
+                      disabled={true}
                       isChecked={activeFeed?.value}
                       onChange={(e) => handleChange(e, feed.id, activeFeed)}
                     />
