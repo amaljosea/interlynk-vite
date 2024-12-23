@@ -216,7 +216,7 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
     onDownload()
   }
   const downloadSupport = () => {
-    setDownloadType('csv')
+    setDownloadType('support')
     handleExport()
   }
   const downloadExcel = () => {

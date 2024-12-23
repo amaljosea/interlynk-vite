@@ -11,9 +11,11 @@ const Loading = ({ type }) => {
     >
       <Spinner size='xl' color='white' mb={4} />
       <Text fontSize='lg' color='white'>
-        {type === 'csv'
+        {type === 'support'
           ? 'Downloading Support Level...'
-          : 'Downloading Original Sbom...'}
+          : type === 'excel'
+            ? 'Downloading SBOM Spreadsheet...'
+            : 'Downloading Original SBOM...'}
       </Text>
     </Center>
   )
