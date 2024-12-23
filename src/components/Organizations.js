@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import Cookies from 'js-cookie'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { isCustomerView, truncatedValue } from 'utils'
+import { isCustomerView, timeSince, truncatedValue } from 'utils'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
@@ -13,7 +13,9 @@ import {
   MenuItem,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup
+  MenuOptionGroup,
+  Stack,
+  Text
 } from '@chakra-ui/react'
 import { Button, useDisclosure } from '@chakra-ui/react'
 
@@ -50,7 +52,6 @@ const Organizations = () => {
   const organisationList = isSuperAdmin ? allOrgList : myOrgList
 
   const onChange = async (item) => {
-    if (organization.name === item.name) return
     await switchOrg({ variables: { orgId: item?.id } })
       .then((res) => {
         if (res?.data) {
@@ -90,17 +91,12 @@ const Organizations = () => {
           </MenuItem>
           <MenuDivider />
           {options?.map((item, index) => (
-            <MenuOptionGroup
-              key={index}
-              value={organization?.name}
-              type='radio'
-            >
-              <MenuItemOption
-                fontSize='sm'
-                value={item.name}
-                onClick={() => onChange(item)}
-              >
-                {item?.name}
+            <MenuOptionGroup key={index} value={organization?.id} type='radio'>
+              <MenuItemOption value={item.id} onClick={() => onChange(item)}>
+                <Text fontSize={'sm'}>
+                  {item?.name} {`(${item?.id.slice(-5)})`}
+                </Text>
+                <Text fontSize={'xs'}>{timeSince(item?.updatedAt)}</Text>
               </MenuItemOption>
             </MenuOptionGroup>
           ))}
