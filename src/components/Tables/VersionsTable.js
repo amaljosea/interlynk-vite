@@ -357,7 +357,7 @@ const VersionsTable = (props) => {
           }
         })
         return (
-          <SimpleGrid gap={1} width={'100%'} columns={5}>
+          <SimpleGrid gap={1} columns={5} width={'full'}>
             <Link to={link} onClick={() => onFilterSev(['critical'], id)}>
               <VulnBadge color='red' label='Critical' status={vulnRunStatus}>
                 {vulnRunStatus === 'NOT_STARTED'

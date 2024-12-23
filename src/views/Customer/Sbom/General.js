@@ -1,16 +1,8 @@
 import { getFullDateAndTime } from 'utils'
 import { infoData } from 'variables/general'
 
-import {
-  Flex,
-  Grid,
-  GridItem,
-  Skeleton,
-  Stack,
-  Tag,
-  TagLabel,
-  Text
-} from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
+import { Flex, Skeleton, Stack, Tag, TagLabel, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -18,8 +10,7 @@ import InfoLabel from 'components/Misc/InfoLabel'
 import SupplierTag from 'components/SupplierTag'
 
 const General = ({ data, loading, error }) => {
-  const { suppliers, licensesExp, licenses, authors, creationAt, tools } =
-    data || ''
+  const { suppliers, licensesExp, authors, creationAt, tools } = data || ''
 
   const tagStyle = { width: 'fit-content', size: 'md', variant: 'subtle' }
 
@@ -126,24 +117,13 @@ const General = ({ data, loading, error }) => {
           <Text fontSize={'sm'}>Data License</Text>
         </GridItem>
         <GridItem colSpan={10} py={3} w='100%'>
-          <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
-            {/* SPDX */}
-            {licenses?.length > 0 &&
-              licenses?.map((item, index) => (
-                <Tag key={index} colorScheme='green' sx={tagStyle}>
-                  <TagLabel>{item}</TagLabel>
-                </Tag>
-              ))}
-            {/* EXPRESSION */}
-            {licensesExp && licensesExp !== '' && (
-              <Tag my={2} colorScheme='green' sx={tagStyle}>
-                <TagLabel>{licensesExp}</TagLabel>
-              </Tag>
-            )}
-            {licenses?.length === 0 && !licensesExp && (
-              <Tag sx={tagStyle}>N/A</Tag>
-            )}
-          </Flex>
+          {licensesExp && licensesExp !== '' ? (
+            <Tag my={2} colorScheme='green' sx={tagStyle}>
+              <TagLabel>{licensesExp}</TagLabel>
+            </Tag>
+          ) : (
+            <Tag sx={tagStyle}>N/A</Tag>
+          )}
         </GridItem>
       </Grid>
     </CardBody>

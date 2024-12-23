@@ -137,7 +137,7 @@ const ProductsOverview = ({ loading, title, data }) => {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
       wrap: true,
-      width: '150px',
+      width: '130px',
       selector: (row) => {
         const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -171,7 +171,7 @@ const ProductsOverview = ({ loading, title, data }) => {
       id: 'LICENSES',
       name: 'LICENSES',
       wrap: true,
-      width: '120px',
+      width: '100px',
       selector: (row) => {
         const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -198,7 +198,7 @@ const ProductsOverview = ({ loading, title, data }) => {
     {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
-      width: '350px',
+      width: '380px',
       selector: (row) => {
         const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -211,7 +211,7 @@ const ProductsOverview = ({ loading, title, data }) => {
           }
         })
         return (
-          <Flex direction={'row'} flexWrap={'wrap'} gap={2} my={2}>
+          <Flex direction={'row'} flexWrap={'wrap'} gap={1} my={2}>
             <Link
               to={link}
               style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
@@ -267,7 +267,7 @@ const ProductsOverview = ({ loading, title, data }) => {
       name: 'IMPORTED',
       wrap: true,
       right: 'true',
-      width: '130px',
+      width: '150px',
       selector: (row) => {
         const { createdAt } = row
         return (

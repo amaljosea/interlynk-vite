@@ -8,6 +8,7 @@ import {
   Flex,
   HStack,
   Icon,
+  SimpleGrid,
   Skeleton,
   Stack,
   Tag,
@@ -246,7 +247,12 @@ const SbomDetails = () => {
                 as={FaBug}
               />
               <Flex flexDir={'column'} alignItems={'center'}>
-                <Stack fontWeight={'medium'} direction={'row'}>
+                <SimpleGrid
+                  gap={1}
+                  w={'100%'}
+                  columns={5}
+                  fontWeight={'medium'}
+                >
                   <VulnBadge
                     color='red'
                     label='Critical'
@@ -282,7 +288,7 @@ const SbomDetails = () => {
                   >
                     {unknown ? unknown : 0}
                   </VulnBadge>
-                </Stack>
+                </SimpleGrid>
                 <Text
                   mt={1}
                   fontSize={'xs'}
