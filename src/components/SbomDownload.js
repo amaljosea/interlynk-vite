@@ -245,7 +245,7 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
           />
         </Tooltip>
         <MenuList width='220px'>
-          <MenuItem onClick={downloadOriginal}>
+          <MenuItem onClick={downloadOriginal} hidden={signedUrlParams}>
             <Stack spacing={1}>
               <Box {...title}>Original SBOM</Box>
               <Box {...subTitle}>
@@ -253,7 +253,7 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
               </Box>
             </Stack>
           </MenuItem>
-          <Divider />
+          <Divider hidden={signedUrlParams} />
           {/* Updated SBOM */}
           <MenuItem onClick={downloadUpdated}>
             <Stack spacing={1}>
@@ -264,9 +264,13 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
               </Box>
             </Stack>
           </MenuItem>
-          <Divider />
+          <Divider hidden={signedUrlParams} />
           {/* PDF */}
-          <MenuItem isDisabled={isFreeTier} onClick={downloadPdf}>
+          <MenuItem
+            isDisabled={isFreeTier}
+            onClick={downloadPdf}
+            hidden={signedUrlParams}
+          >
             <Stack spacing={1}>
               <Box {...title}>PDF</Box>
               <Box {...subTitle}>
@@ -274,8 +278,9 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
               </Box>
             </Stack>
           </MenuItem>
+          <Divider hidden={signedUrlParams} />
           {/* Support Level CSV */}
-          <MenuItem onClick={downloadSupport}>
+          <MenuItem onClick={downloadSupport} hidden={signedUrlParams}>
             <Stack spacing={1}>
               <Box {...title}>Support Level</Box>
               <Box {...subTitle}>
@@ -283,6 +288,7 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
               </Box>
             </Stack>
           </MenuItem>
+          <Divider hidden={signedUrlParams} />
           {/*  SBOM EXCEL DOWNLOAD */}
           <MenuItem onClick={downloadExcel} hidden={signedUrlParams}>
             <Stack spacing={1}>
