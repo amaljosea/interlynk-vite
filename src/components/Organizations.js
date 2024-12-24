@@ -1,8 +1,8 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import Cookies from 'js-cookie'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { isCustomerView, timeSince, truncatedValue } from 'utils'
+import { timeSince, truncatedValue } from 'utils'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
@@ -13,11 +13,9 @@ import {
   MenuItem,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup,
-  Stack,
-  Text
+  MenuOptionGroup
 } from '@chakra-ui/react'
-import { Button, useDisclosure } from '@chakra-ui/react'
+import { Button, SkeletonText, Text, useDisclosure } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -28,7 +26,6 @@ import { FaBuilding } from 'react-icons/fa'
 
 const Organizations = () => {
   const navigate = useNavigate()
-  const customerView = isCustomerView()
   const { organization } = useGlobalState()
   const isSuperAdmin = organization?.currentUser?.superAdmin
 
@@ -37,19 +34,8 @@ const Organizations = () => {
   const [options, setOptions] = useState([])
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { data: allOrgs } = useQuery(AllOrganizations, {
-    skip: isSuperAdmin === true ? false : true,
-    variables: { first: 100, status: 'approved' }
-  })
-
-  const { data: myOrgs } = useQuery(MyOrganizations, {
-    skip: isSuperAdmin === true || customerView ? true : false,
-    variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
-  })
-
-  const { nodes: allOrgList } = allOrgs?.allOrganizations || ''
-  const { nodes: myOrgList } = myOrgs?.myOrganizations || ''
-  const organisationList = isSuperAdmin ? allOrgList : myOrgList
+  const [getAllOrg, { loading: allOrgLoading }] = useLazyQuery(AllOrganizations)
+  const [getMyOrg, { loading: myOrgLoading }] = useLazyQuery(MyOrganizations)
 
   const onChange = async (item) => {
     await switchOrg({ variables: { orgId: item?.id } })
@@ -66,11 +52,45 @@ const Organizations = () => {
       })
   }
 
-  useEffect(() => {
-    if (organisationList?.length > 0) {
-      setOptions(organisationList)
+  const handleFetch = async () => {
+    if (isSuperAdmin) {
+      await getAllOrg({ variables: { first: 100, status: 'approved' } }).then(
+        (res) => {
+          if (res?.data?.allOrganizations?.nodes?.length > 0) {
+            setOptions(res?.data?.allOrganizations?.nodes)
+          }
+        }
+      )
+    } else {
+      await getMyOrg({
+        variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
+      }).then((res) => {
+        if (res?.data?.myOrganizations?.nodes?.length > 0) {
+          setOptions(res?.data?.myOrganizations?.nodes)
+        }
+      })
     }
-  }, [organisationList])
+  }
+
+  const OrgList = () => {
+    if (options?.length === 0) return null
+    return (
+      <>
+        {options?.map((item, index) => (
+          <MenuOptionGroup key={index} value={organization?.id} type='radio'>
+            <MenuItemOption value={item.id} onClick={() => onChange(item)}>
+              <Text fontSize={'sm'}>
+                {item?.name} {isSuperAdmin && `(${item?.id.slice(-5)})`}
+              </Text>
+              {isSuperAdmin && (
+                <Text fontSize={'xs'}>{timeSince(item?.updatedAt)}</Text>
+              )}
+            </MenuItemOption>
+          </MenuOptionGroup>
+        ))}
+      </>
+    )
+  }
 
   return (
     <>
@@ -79,8 +99,9 @@ const Organizations = () => {
           size='sm'
           as={Button}
           fontSize='sm'
-          isLoading={!organization?.name}
+          onClick={handleFetch}
           leftIcon={<FaBuilding />}
+          isLoading={!organization?.name}
           rightIcon={<ChevronDownIcon />}
         >
           {truncatedValue(organization?.name, 20)}
@@ -90,16 +111,11 @@ const Organizations = () => {
             Add Organization
           </MenuItem>
           <MenuDivider />
-          {options?.map((item, index) => (
-            <MenuOptionGroup key={index} value={organization?.id} type='radio'>
-              <MenuItemOption value={item.id} onClick={() => onChange(item)}>
-                <Text fontSize={'sm'}>
-                  {item?.name} {`(${item?.id.slice(-5)})`}
-                </Text>
-                <Text fontSize={'xs'}>{timeSince(item?.updatedAt)}</Text>
-              </MenuItemOption>
-            </MenuOptionGroup>
-          ))}
+          {allOrgLoading || myOrgLoading ? (
+            <SkeletonText mx='2' noOfLines={4} spacing='4' skeletonHeight='4' />
+          ) : (
+            <OrgList />
+          )}
         </MenuList>
       </Menu>
 
