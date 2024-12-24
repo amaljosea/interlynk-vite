@@ -115,6 +115,7 @@ const Automation = ({ projects }) => {
           isOpen={RULE.isOpen}
           onClose={RULE.onClose}
           subOperators={subOperators}
+          projects={projects}
         />
       )}
 

@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
-import { Box, Button, Flex } from '@chakra-ui/react'
-import { FormControl, Textarea } from '@chakra-ui/react'
+import { Box, Button, Flex, Skeleton, VStack } from '@chakra-ui/react'
+import { Checkbox, FormControl, FormLabel, Textarea } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
@@ -19,6 +19,7 @@ import Version from 'components/PurlEditor/Version'
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useProjectGroup } from 'hooks/useProjectGroup'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 
@@ -38,9 +39,16 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const { showToast } = useCustomToast()
 
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
-  console.log(purl)
 
   const [value, setValue] = useState('pkg:type/name@version')
+
+  const [options, setOptions] = useState([])
+  const [defaultEnv, setDefaultEnv] = useState('')
+  const [selectedEnvironments, setSelectedEnvironments] = useState([])
+
+  const { projects, loading: envLoading } = useProjectGroup({
+    projectGroupId: params.productgroupid
+  })
 
   const [error, setError] = useState('')
   const [purlData, setPurlData] = useState({
@@ -58,6 +66,42 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const [updateComponent, { loading }] = useMutation(UpdateComponent, {
     onCompleted: () => recheck()
   })
+
+  const handleCheckboxChange = (env, isChecked) => {
+    if (env.value === defaultEnv.value) {
+      // Default option cannot be unchecked
+      return
+    }
+
+    if (isChecked) {
+      setSelectedEnvironments((prev) => [...prev, env])
+    } else {
+      setSelectedEnvironments((prev) =>
+        prev.filter((item) => item.value !== env.value)
+      )
+    }
+  }
+
+  useEffect(() => {
+    const defaultOption = projects.find((project) => project.id === productId)
+    if (defaultOption) {
+      const defaultEnvObj = {
+        value: defaultOption.id,
+        label: defaultOption.name
+      }
+      setDefaultEnv(defaultEnvObj)
+      setSelectedEnvironments([defaultEnvObj])
+    }
+
+    const otherOptions = projects
+      .filter((project) => project.id !== productId)
+      .map((project) => ({
+        value: project.id,
+        label: project.name
+      }))
+    setOptions(otherOptions)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [envLoading])
 
   const onChange = (field, value) => {
     const filterValue = value?.replace(/\s/g, '')
@@ -143,27 +187,37 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     }
   })
 
-  const handleRuleCreate = () => {
+  const handleRuleCreate = async () => {
     if (ruleExists) {
       navigate(link)
     } else {
-      createRule({
-        variables: {
-          active: true,
-          name: shortDesc,
-          projectId: productId,
-          checkComponent: name,
-          checkVersion: version,
-          checkIdentifier: friendlyId,
-          automationConditionsAttributes:
-            shortDesc === 'Component has a purl'
-              ? conditionsAttributes
-              : filterConditions,
-          automationActionsAttributes: actionsAttributes
-        }
-      }).then((res) => {
-        const errors = res?.data?.automationRuleCreate?.errors
-        if (errors?.length > 0) {
+      const projectIds = selectedEnvironments?.map((option) => option.value)
+
+      const mutationPromises = projectIds.map((id) =>
+        createRule({
+          variables: {
+            active: true,
+            name: shortDesc,
+            projectId: id,
+            checkComponent: name,
+            checkVersion: version,
+            checkIdentifier: friendlyId,
+            automationConditionsAttributes:
+              shortDesc === 'Component has a purl'
+                ? conditionsAttributes
+                : filterConditions,
+            automationActionsAttributes: actionsAttributes
+          }
+        })
+      )
+
+      try {
+        const results = await Promise.all(mutationPromises)
+        const allErrors = results.flatMap(
+          (res) => res?.data?.automationRuleCreate?.errors || []
+        )
+
+        if (allErrors.length > 0) {
           showToast({
             description: `Unable to create rule, please try again.`,
             status: 'error'
@@ -175,7 +229,13 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             status: 'success'
           })
         }
-      })
+      } catch (error) {
+        console.error('Error during rule creation:', error)
+        showToast({
+          description: 'An unexpected error occurred while creating the rule.',
+          status: 'error'
+        })
+      }
     }
   }
 
@@ -285,6 +345,48 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           disabled={resolved}
           qualifiers={purlData?.qualifiers}
         />
+        {!ruleExists && (
+          <FormControl mt={5}>
+            <FormLabel>
+              Select Environments - only applicable for saving as rule
+            </FormLabel>
+            {envLoading ? (
+              <VStack align='start'>
+                {/* Loading Skeletons */}
+                <Skeleton height='16px' width='150px' />
+                <Skeleton height='16px' width='150px' />
+                <Skeleton height='16px' width='150px' />
+              </VStack>
+            ) : (
+              <VStack align='start'>
+                {/* Default Environment */}
+                <Checkbox
+                  isChecked
+                  isDisabled
+                  value={defaultEnv?.value}
+                  onChange={() => {}}
+                >
+                  {defaultEnv?.label}
+                </Checkbox>
+
+                {/* Other Environments */}
+                {options.map((option) => (
+                  <Checkbox
+                    key={option.value}
+                    isChecked={selectedEnvironments?.some(
+                      (env) => env.value === option.value
+                    )}
+                    onChange={(e) =>
+                      handleCheckboxChange(option, e.target.checked)
+                    }
+                  >
+                    {option.label}
+                  </Checkbox>
+                ))}
+              </VStack>
+            )}
+          </FormControl>
+        )}
       </Flex>
     </LynkModal>
   )

@@ -4,7 +4,14 @@ import { useParams } from 'react-router-dom'
 import { disableButtonTemporarily } from 'utils'
 
 import { EditIcon } from '@chakra-ui/icons'
-import { Button, Divider, Flex, Input } from '@chakra-ui/react'
+import {
+  Button,
+  Checkbox,
+  Divider,
+  Flex,
+  Input,
+  VStack
+} from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
@@ -17,9 +24,13 @@ import { FaPlus } from 'react-icons/fa6'
 import RuleActions from './RuleActions'
 import RuleConditions from './RuleConditions'
 
-const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
+const CreateRule = ({ data, isOpen, onClose, subOperators, projects }) => {
   const params = useParams()
   const projectId = params?.productid
+
+  const [options, setOptions] = useState([])
+  const [defaultEnv, setDefaultEnv] = useState('')
+  const [selectedEnvironments, setSelectedEnvironments] = useState([])
 
   const { automationConditionSubjectFieldMapping } = subOperators || []
 
@@ -240,22 +251,40 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
       )
     } else {
       disableButtonTemporarily(setIsDisabled)
-      createRule({
-        variables: {
-          name: ruleName,
-          active: true,
-          projectId: projectId,
-          automationConditionsAttributes: conditionsAttributes,
-          automationActionsAttributes: actionsAttributes
-        }
-      }).then((res) => {
-        const errors = res?.data?.automationRuleCreate?.errors
-        if (errors?.length > 0) {
-          setError(errors[0])
-        } else {
-          onClose()
-        }
-      })
+      const projectIds = selectedEnvironments?.map((option) => option.value)
+      // Create a list of promises for each mutation call
+      const mutationPromises = projectIds.map((id) =>
+        createRule({
+          variables: {
+            name: ruleName,
+            active: true,
+            projectId: id,
+            automationConditionsAttributes: conditionsAttributes,
+            automationActionsAttributes: actionsAttributes
+          }
+        })
+      )
+
+      // Execute all mutation calls
+      Promise.all(mutationPromises)
+        .then((responses) => {
+          const errors = responses
+            .map((res) => res?.data?.automationRuleCreate?.errors)
+            .flat()
+            .filter(Boolean)
+
+          if (errors.length > 0) {
+            setError(errors[0])
+          } else {
+            onClose()
+          }
+        })
+        .catch((error) => {
+          setError(`An error occurred: ${error.message}`)
+        })
+        .finally(() => {
+          setIsDisabled(false)
+        })
     }
   }
 
@@ -298,6 +327,43 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
       })
     }
   }
+
+  const handleCheckboxChange = (env, isChecked) => {
+    if (env.value === defaultEnv.value) {
+      // Default option cannot be unchecked
+      return
+    }
+
+    if (isChecked) {
+      setSelectedEnvironments((prev) => [...prev, env])
+    } else {
+      setSelectedEnvironments((prev) =>
+        prev.filter((item) => item.value !== env.value)
+      )
+    }
+  }
+
+  useEffect(() => {
+    const defaultOption = projects.find((project) => project.id === projectId)
+    if (defaultOption) {
+      const defaultEnvObj = {
+        value: defaultOption.id,
+        label: defaultOption.name
+      }
+      setDefaultEnv(defaultEnvObj)
+      setSelectedEnvironments([defaultEnvObj])
+    }
+
+    const otherOptions = projects
+      .filter((project) => project.id !== projectId)
+      .map((project) => ({
+        value: project.id,
+
+        label: project.name
+      }))
+    setOptions(otherOptions)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projects])
 
   useEffect(() => {
     if (data) {
@@ -418,6 +484,38 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
         >
           Add action
         </Button>
+        {/* Environment Select */}
+        {!data && (
+          <FormControl>
+            <FormLabel>Select Environments</FormLabel>
+            <VStack align='start'>
+              {/* Default Environment */}
+              <Checkbox
+                isChecked
+                isDisabled
+                value={defaultEnv.value}
+                onChange={() => {}}
+              >
+                {defaultEnv?.label}
+              </Checkbox>
+
+              {/* Other Environments */}
+              {options.map((option) => (
+                <Checkbox
+                  key={option.value}
+                  isChecked={selectedEnvironments?.some(
+                    (env) => env.value === option.value
+                  )}
+                  onChange={(e) =>
+                    handleCheckboxChange(option, e.target.checked)
+                  }
+                >
+                  {option.label}
+                </Checkbox>
+              ))}
+            </VStack>
+          </FormControl>
+        )}
         {/* ERROR HANDLING */}
         {error !== '' && <LynkAlert msg={error} />}
       </Flex>

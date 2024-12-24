@@ -11,10 +11,19 @@ import {
   FormErrorMessage,
   List,
   ListItem,
-  Spacer,
-  Stack
+  Skeleton,
+  Stack,
+  VStack
 } from '@chakra-ui/react'
-import { Box, Button, Flex, Icon, Text, Tooltip } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Checkbox,
+  Flex,
+  Icon,
+  Text,
+  Tooltip
+} from '@chakra-ui/react'
 import { FormControl, FormLabel, Input, Select } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
@@ -27,6 +36,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useProjectGroup } from 'hooks/useProjectGroup'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
@@ -44,7 +54,13 @@ const CheckModal = (props) => {
   const { showToast } = useCustomToast()
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
+  const { projects, loading: envLoading } = useProjectGroup({
+    projectGroupId: params.productgroupid
+  })
 
+  const [options, setOptions] = useState([])
+  const [defaultEnv, setDefaultEnv] = useState('')
+  const [selectedEnvironments, setSelectedEnvironments] = useState([])
   const { tabData } = useContext(TabContext)
   const { details } = tabData
 
@@ -114,6 +130,42 @@ const CheckModal = (props) => {
   const [updateComponent] = useMutation(UpdateComponent, {
     onCompleted: () => recheck()
   })
+
+  const handleCheckboxChange = (env, isChecked) => {
+    if (env.value === defaultEnv.value) {
+      // Default option cannot be unchecked
+      return
+    }
+
+    if (isChecked) {
+      setSelectedEnvironments((prev) => [...prev, env])
+    } else {
+      setSelectedEnvironments((prev) =>
+        prev.filter((item) => item.value !== env.value)
+      )
+    }
+  }
+
+  useEffect(() => {
+    const defaultOption = projects.find((project) => project.id === productId)
+    if (defaultOption) {
+      const defaultEnvObj = {
+        value: defaultOption.id,
+        label: defaultOption.name
+      }
+      setDefaultEnv(defaultEnvObj)
+      setSelectedEnvironments([defaultEnvObj])
+    }
+
+    const otherOptions = projects
+      .filter((project) => project.id !== productId)
+      .map((project) => ({
+        value: project.id,
+        label: project.name
+      }))
+    setOptions(otherOptions)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [envLoading])
 
   const handleDateChange = (newDate) => {
     const isValidDate = newDate && !isNaN(newDate)
@@ -321,23 +373,33 @@ const CheckModal = (props) => {
       navigate(link)
     } else {
       disableButtonTemporarily(setIsDisabled)
-      createRule({
-        variables: {
-          active: true,
-          name: shortDesc,
-          projectId: productId,
-          checkComponent: name,
-          checkVersion: version,
-          checkIdentifier: friendlyId,
-          automationConditionsAttributes:
-            shortDesc === 'Component has license/s specified'
-              ? getConditionsAttributes()
-              : filterConditions,
-          automationActionsAttributes: getActionsAttributes()
-        }
-      }).then((res) => {
-        const errors = res?.data?.automationRuleCreate?.errors
-        if (errors?.length > 0) {
+
+      const projectIds = selectedEnvironments?.map((option) => option.value)
+      const mutationPromises = projectIds.map((id) =>
+        createRule({
+          variables: {
+            active: true,
+            name: shortDesc,
+            projectId: id,
+            checkComponent: name,
+            checkVersion: version,
+            checkIdentifier: friendlyId,
+            automationConditionsAttributes:
+              shortDesc === 'Component has license/s specified'
+                ? getConditionsAttributes()
+                : filterConditions,
+            automationActionsAttributes: getActionsAttributes()
+          }
+        })
+      )
+
+      try {
+        const res = await Promise.all(mutationPromises)
+        const errors = res?.flatMap(
+          (r) => r?.data?.automationRuleCreate?.errors || []
+        )
+
+        if (errors.length > 0) {
           setError(errors[0])
         } else {
           if (isComponent) {
@@ -350,7 +412,10 @@ const CheckModal = (props) => {
             status: 'success'
           })
         }
-      })
+      } catch (error) {
+        console.error('Error during rule creation', error)
+        setError('An unexpected error occurred.')
+      }
     }
   }
 
@@ -578,6 +643,49 @@ const CheckModal = (props) => {
           resolved={resolved}
           license={licensesExp}
         />
+      )}
+      {/* Environment Select */}
+      {!ruleExists && (
+        <FormControl mt={5}>
+          <FormLabel>
+            Select Environments - only applicable for saving as rule
+          </FormLabel>
+          {envLoading ? (
+            <VStack align='start'>
+              {/* Loading Skeletons */}
+              <Skeleton height='16px' width='150px' />
+              <Skeleton height='16px' width='150px' />
+              <Skeleton height='16px' width='150px' />
+            </VStack>
+          ) : (
+            <VStack align='start'>
+              {/* Default Environment */}
+              <Checkbox
+                isChecked
+                isDisabled
+                value={defaultEnv?.value}
+                onChange={() => {}}
+              >
+                {defaultEnv?.label}
+              </Checkbox>
+
+              {/* Other Environments */}
+              {options.map((option) => (
+                <Checkbox
+                  key={option.value}
+                  isChecked={selectedEnvironments?.some(
+                    (env) => env.value === option.value
+                  )}
+                  onChange={(e) =>
+                    handleCheckboxChange(option, e.target.checked)
+                  }
+                >
+                  {option.label}
+                </Checkbox>
+              ))}
+            </VStack>
+          )}
+        </FormControl>
       )}
     </LynkModal>
   )
