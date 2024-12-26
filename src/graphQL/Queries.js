@@ -1603,7 +1603,7 @@ export const GetProductData = gql`
         id
         name
         email
-        updatedAt
+        phone
       }
       suppliers {
         id

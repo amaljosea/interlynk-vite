@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { validatePhoneNumber } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import {
@@ -96,7 +97,8 @@ const AuthorModal = ({ isOpen, onClose }) => {
 
   const initialData = {
     name: '',
-    email: ''
+    email: '',
+    phone: ''
   }
   const [authorData, setAuthorData] = useState(initialData)
   const [error, setError] = useState('')
@@ -145,14 +147,25 @@ const AuthorModal = ({ isOpen, onClose }) => {
       ...prev,
       [name]: value
     }))
+    setError('')
+  }
+
+  const onPhoneBlur = (e) => {
+    const { value } = e.target
+    if (value !== '' && !validatePhoneNumber(value)) {
+      setError('Please enter a valid number')
+    } else {
+      setError('')
+    }
   }
 
   const handleAddAuthor = () => {
     createAuthor({
       variables: {
+        sbomId: params?.sbomid,
         name: authorData?.name,
         email: authorData?.email,
-        sbomId: params?.sbomid
+        phone: authorData?.phone
       }
     }).then((res) => {
       if (res?.data?.authorCreate?.errors?.length > 0) {
@@ -250,6 +263,9 @@ const AuthorModal = ({ isOpen, onClose }) => {
     onClose()
   }
 
+  const isValidPhoneNumber =
+    authorData?.phone && !validatePhoneNumber(authorData?.phone)
+
   useEffect(() => {
     if (sbom?.authors?.length > 0) {
       const { name, email } = sbom.authors[0]
@@ -296,7 +312,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
             onChange={handleChange}
           />
         </FormControl>
-        <FormControl isRequired isDisabled={status === 'resolved'}>
+        <FormControl isDisabled={status === 'resolved'}>
           <FormLabel htmlFor='email'>Email</FormLabel>
           <Input
             type='email'
@@ -305,6 +321,17 @@ const AuthorModal = ({ isOpen, onClose }) => {
             onChange={handleChange}
             value={authorData?.email}
             placeholder='Add email address'
+          />
+        </FormControl>
+        <FormControl isInvalid={isValidPhoneNumber}>
+          <FormLabel htmlFor='phone'>Phone</FormLabel>
+          <Input
+            type='text'
+            name='phone'
+            onBlur={onPhoneBlur}
+            onChange={handleChange}
+            value={authorData?.phone}
+            placeholder='Add phone number'
           />
         </FormControl>
         {!ruleExists && (
@@ -330,7 +357,6 @@ const AuthorModal = ({ isOpen, onClose }) => {
                 >
                   {defaultEnv?.label}
                 </Checkbox>
-
                 {/* Other Environments */}
                 {options.map((option) => (
                   <Checkbox

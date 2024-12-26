@@ -1039,22 +1039,15 @@ export const toolDelete = gql`
 `
 
 export const authorCreate = gql`
-  mutation authorCreate($name: String!, $email: String, $sbomId: Uuid!) {
-    authorCreate(input: { name: $name, email: $email, sbomId: $sbomId }) {
-      author {
-        id
-        name
-        email
-        updatedAt
-      }
-      errors
-    }
-  }
-`
-
-export const authorUpdate = gql`
-  mutation authorUpdate($authorId: Uuid!, $name: String, $email: String) {
-    authorUpdate(input: { authorId: $authorId, name: $name, email: $email }) {
+  mutation authorCreate(
+    $name: String!
+    $email: String
+    $phone: String
+    $sbomId: Uuid!
+  ) {
+    authorCreate(
+      input: { name: $name, email: $email, sbomId: $sbomId, phone: $phone }
+    ) {
       author {
         id
         name
