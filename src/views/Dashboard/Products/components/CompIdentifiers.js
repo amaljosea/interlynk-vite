@@ -153,7 +153,6 @@ const CompIdentifiers = ({ data }) => {
             onClose={() => setPurlOpen(false)}
           />
         )}
-        <Divider />
         {/* CPE INPUT */}
         {cpeOpen ? (
           <CpeEditor

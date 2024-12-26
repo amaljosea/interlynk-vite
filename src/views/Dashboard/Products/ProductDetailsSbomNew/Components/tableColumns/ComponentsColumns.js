@@ -34,10 +34,10 @@ const ComponentsColumns = ({
   sbomId,
   onEditOpen,
   updateComponent,
-  onRelOpen,
   handleGraphView,
   totalComp,
   hanldeAnalysis,
+  handleNotes,
   setActiveRow,
   onCheckCpe,
   onCheckPurl,
@@ -58,12 +58,6 @@ const ComponentsColumns = ({
     'secondaryTextColor',
     'primaryErrorColor'
   ])
-
-  const tagStyle = {
-    size: 'sm',
-    variant: 'subtle',
-    width: 'fit-content'
-  }
 
   const customerView = isCustomerView()
   return useMemo(() => {
@@ -87,6 +81,11 @@ const ComponentsColumns = ({
               color={inverseSecondaryBgColor}
             />
           )
+          const tagStyle = {
+            size: 'sm',
+            variant: 'subtle',
+            width: 'fit-content'
+          }
           return (
             <Flex sx={{ alignItems: 'center', gap: 2, my: 3 }}>
               <Box width={'50px'}>
@@ -392,11 +391,28 @@ const ComponentsColumns = ({
                         Edit Component
                       </MenuItem>
                       <MenuItem
-                        hidden
-                        onClick={() => onRelOpen(row)}
-                        isDisabled={!updateComponent}
+                        data-testid='view_insights'
+                        onClick={() => hanldeAnalysis(row)}
+                        isDisabled={status === 'signed'}
+                        hidden={isFreeTier}
                       >
-                        Edit Relationships
+                        Insights
+                      </MenuItem>
+                      <MenuItem
+                        hidden={isFreeTier}
+                        data-testid='view_notes'
+                        onClick={() => handleNotes(row)}
+                        isDisabled={status === 'signed' || !updateComponent}
+                      >
+                        Notes
+                      </MenuItem>
+                      <MenuItem
+                        data-testid='view_component_vulns'
+                        onClick={() => handleVuln(row)}
+                        isDisabled={status === 'signed'}
+                        hidden={isFreeTier}
+                      >
+                        Vulnerabilities
                       </MenuItem>
                       <MenuItem
                         data-testid='view_relation'
@@ -408,22 +424,6 @@ const ComponentsColumns = ({
                         }
                       >
                         View Relationships
-                      </MenuItem>
-                      <MenuItem
-                        data-testid='view_insights'
-                        onClick={() => hanldeAnalysis(row)}
-                        isDisabled={status === 'signed'}
-                        hidden={isFreeTier}
-                      >
-                        Insights
-                      </MenuItem>
-                      <MenuItem
-                        data-testid='view_component_vulns'
-                        onClick={() => handleVuln(row)}
-                        isDisabled={status === 'signed'}
-                        hidden={isFreeTier}
-                      >
-                        Vulnerabilities
                       </MenuItem>
                       <Divider />
                       {primary === false && (
@@ -475,7 +475,6 @@ const ComponentsColumns = ({
     colorMode,
     inverseSecondaryBgColor,
     primaryTextColor,
-    tagStyle,
     onCheckCpe,
     onCheckPurl,
     secondaryTextColor,
@@ -484,10 +483,10 @@ const ComponentsColumns = ({
     primaryErrorColor,
     primaryBlueText,
     onEditOpen,
-    onRelOpen,
-    handleGraphView,
     hanldeAnalysis,
+    handleNotes,
     handleVuln,
+    handleGraphView,
     setActiveRow,
     DELETE,
     onOpen
