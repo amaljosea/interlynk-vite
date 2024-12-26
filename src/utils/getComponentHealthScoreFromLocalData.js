@@ -21,9 +21,6 @@ export const getComponentHealthScoreFromLocalData = async ({
       item.ComponentVersion === componentVersion
   )
   if (!componentData) {
-    console.warn(
-      `Missing data for component ${componentName} v${componentVersion}`
-    )
     return { healthScore: 0 }
   }
 
