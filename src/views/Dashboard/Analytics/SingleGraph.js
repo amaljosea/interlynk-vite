@@ -34,8 +34,13 @@ export const SingleGraph = ({ data, lines }) => {
     <ResponsiveContainer aspect={2.5} debounce={300}>
       <LineChart data={data}>
         <CartesianGrid strokeDasharray='3 3' />
-        <XAxis dataKey='date' tick={<CustomizedAxisTick xOffset={50} />} />
-        <YAxis tick={<CustomizedAxisTick />} />
+        <XAxis
+          dataKey='date'
+          tick={<CustomizedAxisTick />}
+          xOffset={50}
+          padding={{ right: 20 }}
+        />
+        <YAxis tick={<CustomizedAxisTick />} padding={{ top: 20 }} />
         <Tooltip
           // eslint-disable-next-line
           labelStyle={{ color: '#4A5568' }}
