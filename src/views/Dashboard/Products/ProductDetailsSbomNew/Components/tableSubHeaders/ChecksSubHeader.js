@@ -11,16 +11,65 @@ import CheckFilters from '../../CheckFilters'
 
 const ChecksSubHeader = (
   checkSearch,
-  onSearchInputChange,
-  handleSearch,
-  handleClear,
   filterHead,
   reset,
-  handleReCheck,
   isArchived,
-  editChecks
+  editChecks,
+  showToast,
+  healthRecheck,
+  sbomId,
+  setCheckSearch,
+  sbomCheckDispatch
 ) => {
   const subHeader = useMemo(() => {
+    const handleReCheck =
+      (async () => {
+        showToast({
+          description: 'Checks rescan is in progress',
+          status: 'info'
+        })
+        await healthRecheck({
+          variables: {
+            sbomId: sbomId
+          }
+        }).then((res) => {
+          if (res.data) {
+            showToast({
+              description: 'Health re-check successfully',
+              status: 'success'
+            })
+          }
+        })
+        reset()
+      },
+      [healthRecheck, sbomId, showToast, reset])
+
+    // ON SEARCH INPUT CHANGE
+    const onSearchInputChange = (e) => {
+      const { value } = e.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setCheckSearch(value)
+      }
+    }
+
+    // CLEAR SERACH
+    const handleClear = () => {
+      setCheckSearch('')
+      sbomCheckDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+      reset()
+    }
+
+    // SEARCH COMPONENT
+    const handleSearch = (event) => {
+      const { value } = event.target
+      if (event.key === 'Enter' && value !== '') {
+        sbomCheckDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        reset()
+      }
+    }
+
     return (
       <Flex
         width={'100%'}
@@ -68,13 +117,14 @@ const ChecksSubHeader = (
   }, [
     isArchived,
     checkSearch,
-    onSearchInputChange,
-    handleSearch,
-    handleClear,
     filterHead,
-    handleReCheck,
     editChecks,
-    reset
+    reset,
+    healthRecheck,
+    sbomId,
+    showToast,
+    sbomCheckDispatch,
+    setCheckSearch
   ])
 
   return subHeader

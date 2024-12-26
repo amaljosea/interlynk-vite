@@ -16,19 +16,126 @@ const ChecksColumns = (
   setActiveRow,
   updateComp,
   editChecks,
-  onCheckOpen,
   customerView,
   isArchived,
   activeRow,
   loadingRules,
   FIXED,
-  updateIssue
+  updateResult,
+  getRules,
+  productId,
+  setRuleExists,
+  handleOpen,
+  showToast,
+  sbomId,
+  healthRecheck,
+  updateComponent,
+  updateSbom
 ) => {
   const { primaryTextColor } = useThemeColor([
     'headingTextColor',
     'primaryTextColor'
   ])
+
   return useMemo(() => {
+    const updateIssue = async (id, newStatus) => {
+      await updateResult({
+        variables: {
+          id: id,
+          status: newStatus
+        }
+      })
+    }
+
+    const handleComUpdate = async (row) => {
+      await updateComponent({
+        variables: {
+          id: row.componentId,
+          sbomId: sbomId,
+          uniqueId: true
+        }
+      })
+        .then((res) => {
+          if (res.data) {
+            healthRecheck({
+              variables: {
+                checkId: row.organizationRule.rule.friendlyId,
+                compId: row.componentId,
+                sbomId: sbomId
+              }
+            })
+          }
+        })
+        .finally(() => {
+          setTimeout(() => {
+            showToast({
+              description:
+                'A unique identifier has been added to the component',
+              status: 'success'
+            })
+          }, 1000)
+        })
+    }
+
+    const handleSbomUpdate = async (row) => {
+      await updateSbom({
+        variables: {
+          id: row.sbomId,
+          spec: row.sbom.spec,
+          generateUniqueId: true
+        }
+      })
+        .then((res) => {
+          if (res.data) {
+            healthRecheck({
+              variables: {
+                checkId: row.organizationRule.rule.friendlyId,
+                sbomId: sbomId
+              }
+            })
+          }
+        })
+        .finally(() => {
+          setTimeout(() => {
+            showToast({
+              description:
+                'A unique identifier has been added to the component',
+              status: 'success'
+            })
+          }, 1000)
+        })
+    }
+
+    const onCheckOpen = (row) => {
+      setActiveRow(row)
+      const { component, organizationRule } = row
+      const { name, version } = component || ''
+      const { shortDesc, friendlyId } = organizationRule?.rule || ''
+      if (shortDesc === 'Component has a unique identifier') {
+        handleComUpdate(row)
+      } else if (shortDesc === 'Document has a unique identifier') {
+        handleSbomUpdate(row)
+      } else {
+        getRules({
+          variables: {
+            id: productId,
+            checkIdentifier: friendlyId,
+            checkComponent: component ? name : undefined,
+            checkVersion: component ? version : undefined
+          }
+        })
+          .then((res) => {
+            const result = res?.data?.project?.automationRules?.nodes
+            if (result?.length > 0) {
+              setRuleExists(true)
+            } else {
+              setRuleExists(false)
+            }
+          })
+          .finally(() => handleOpen(row))
+      }
+    }
+
     const columns = [
       // HEALTH CHECK ID
       {
@@ -198,14 +305,22 @@ const ChecksColumns = (
     setActiveRow,
     updateComp,
     editChecks,
-    onCheckOpen,
     customerView,
     isArchived,
     activeRow,
     loadingRules,
     FIXED,
-    updateIssue,
-    primaryTextColor
+    primaryTextColor,
+    updateResult,
+    getRules,
+    healthRecheck,
+    productId,
+    sbomId,
+    setRuleExists,
+    showToast,
+    updateComponent,
+    updateSbom,
+    handleOpen
   ])
 }
 

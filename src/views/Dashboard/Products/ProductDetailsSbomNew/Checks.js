@@ -1,5 +1,5 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { customStyles, isCustomerView } from 'utils'
@@ -156,118 +156,9 @@ const Checks = ({ sbomData }) => {
   const FIXED = useDisclosure()
   const COMP_SUPPORT = useDisclosure()
 
-  const handleReCheck = useCallback(async () => {
-    showToast({
-      description: 'Checks rescan is in progress',
-      status: 'info'
-    })
-    await healthRecheck({
-      variables: {
-        sbomId: sbomId
-      }
-    }).then((res) => {
-      if (res.data) {
-        showToast({
-          description: 'Health re-check successfully',
-          status: 'success'
-        })
-      }
-    })
-    reset()
-  }, [healthRecheck, sbomId, showToast, reset])
-
-  // CLEAR SERACH
-  const handleClear = useCallback(() => {
-    setCheckSearch('')
-    sbomCheckDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-    reset()
-  }, [sbomCheckDispatch, reset])
-
-  // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = useCallback(
-    (e) => {
-      const { value } = e.target
-      if (value === '') {
-        handleClear()
-      } else {
-        setCheckSearch(value)
-      }
-    },
-    [handleClear]
-  )
-
-  // SEARCH COMPONENT
-  const handleSearch = useCallback(
-    (event) => {
-      const { value } = event.target
-      if (event.key === 'Enter' && value !== '') {
-        sbomCheckDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-        reset()
-      }
-    },
-    [reset, sbomCheckDispatch]
-  )
-
   const handleOpenLicense = () => {
     prodCompDispatch({ type: 'CLEAR_LICENSES' })
     COMP_LICENSE.onOpen()
-  }
-
-  const handleComUpdate = async (row) => {
-    await updateComponent({
-      variables: {
-        id: row.componentId,
-        sbomId: sbomId,
-        uniqueId: true
-      }
-    })
-      .then((res) => {
-        if (res.data) {
-          healthRecheck({
-            variables: {
-              checkId: row.organizationRule.rule.friendlyId,
-              compId: row.componentId,
-              sbomId: sbomId
-            }
-          })
-        }
-      })
-      .finally(() => {
-        setTimeout(() => {
-          showToast({
-            description: 'A unique identifier has been added to the component',
-            status: 'success'
-          })
-        }, 1000)
-      })
-  }
-
-  const handleSbomUpdate = async (row) => {
-    await updateSbom({
-      variables: {
-        id: row.sbomId,
-        spec: row.sbom.spec,
-        generateUniqueId: true
-      }
-    })
-      .then((res) => {
-        if (res.data) {
-          healthRecheck({
-            variables: {
-              checkId: row.organizationRule.rule.friendlyId,
-              sbomId: sbomId
-            }
-          })
-        }
-      })
-      .finally(() => {
-        setTimeout(() => {
-          showToast({
-            description: 'A unique identifier has been added to the component',
-            status: 'success'
-          })
-        }, 1000)
-      })
   }
 
   const handleOpen = (row) => {
@@ -357,70 +248,40 @@ const Checks = ({ sbomData }) => {
     }
   }
 
-  const onCheckOpen = (row) => {
-    setActiveRow(row)
-    const { component, organizationRule } = row
-    const { name, version } = component || ''
-    const { shortDesc, friendlyId } = organizationRule?.rule || ''
-    if (shortDesc === 'Component has a unique identifier') {
-      handleComUpdate(row)
-    } else if (shortDesc === 'Document has a unique identifier') {
-      handleSbomUpdate(row)
-    } else {
-      getRules({
-        variables: {
-          id: productId,
-          checkIdentifier: friendlyId,
-          checkComponent: component ? name : undefined,
-          checkVersion: component ? version : undefined
-        }
-      })
-        .then((res) => {
-          const result = res?.data?.project?.automationRules?.nodes
-          if (result?.length > 0) {
-            setRuleExists(true)
-          } else {
-            setRuleExists(false)
-          }
-        })
-        .finally(() => handleOpen(row))
-    }
-  }
-
-  const updateIssue = async (id, newStatus) => {
-    await updateResult({
-      variables: {
-        id: id,
-        status: newStatus
-      }
-    })
-  }
-
   // COLUMNS
   const columns = ChecksColumns(
     setActiveRow,
     updateComp,
     editChecks,
-    onCheckOpen,
     customerView,
     isArchived,
     activeRow,
     loadingRules,
     FIXED,
-    updateIssue
+    updateResult,
+    getRules,
+    productId,
+    setRuleExists,
+    handleOpen,
+    showToast,
+    sbomId,
+    healthRecheck,
+    updateComponent,
+    updateSbom
   )
 
   // SUB HEADER
   const subHeader = ChecksSubHeader(
     checkSearch,
-    onSearchInputChange,
-    handleSearch,
-    handleClear,
     filterHead,
     reset,
-    handleReCheck,
     isArchived,
-    editChecks
+    editChecks,
+    showToast,
+    healthRecheck,
+    sbomId,
+    setCheckSearch,
+    sbomCheckDispatch
   )
 
   // SORTING
