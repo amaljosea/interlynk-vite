@@ -1,5 +1,6 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
+import { timeSince } from 'utils'
 
 import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import { Divider, IconButton, Textarea } from '@chakra-ui/react'
@@ -30,6 +31,8 @@ const GetNotes = gql`
         annotatableId
         annotatableType
         comment
+        createdAt
+        updatedAt
       }
     }
   }
@@ -103,10 +106,11 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
   const [error, setError] = useState('')
   const [noteId, setNoteId] = useState('')
   const [comment, setComment] = useState('')
+  const [warning, setWarning] = useState('')
 
   const [createNote, { loading: createLoading }] = useMutation(CreateNote)
   const [updateNote, { loading: updateLoading }] = useMutation(UpdateNote)
-  const [deleteNote] = useMutation(DeleteNote)
+  const [deleteNote, { loading: deleteLoading }] = useMutation(DeleteNote)
 
   const { data: notes, loading: noteLoading } = useQuery(GetNotes, {
     variables: { id, sbomId }
@@ -125,7 +129,7 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
         if (res?.data?.annotationCreate?.errors?.length > 0) {
           setError(res?.data?.annotationCreate?.errors[0])
         } else {
-          showToast({ description: 'Note created', status: 'success' })
+          showToast({ description: 'Note Created', status: 'success' })
         }
       })
       .finally(() => {
@@ -146,7 +150,7 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
         if (res?.data?.annotationUpdate?.errors?.length > 0) {
           setError(res?.data?.annotationUpdate?.errors[0])
         } else {
-          showToast({ description: 'Note updated', status: 'success' })
+          showToast({ description: 'Note Updated', status: 'success' })
         }
       })
       .finally(() => {
@@ -164,6 +168,7 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
         })
       } else {
         setEdit(false)
+        showToast({ description: 'Note Deleted', status: 'success' })
       }
     })
   }
@@ -179,6 +184,15 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
   const scrollToSection = () => {
     noteForm?.current?.scrollIntoView({ behavior: 'smooth' })
   }
+
+  const filterData =
+    annotations?.length > 0
+      ? [...annotations]?.sort((a, b) => {
+          const dateA = new Date(a?.updatedAt)
+          const dateB = new Date(b?.updatedAt)
+          return dateB - dateA
+        })
+      : []
 
   useEffect(() => {
     if (edit && noteId) scrollToSection()
@@ -245,6 +259,7 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                   setNoteId('')
                   setComment('')
                   setEdit(true)
+                  setWarning('')
                 }}
               >
                 Add Note
@@ -255,9 +270,9 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
               <CustomLoader />
             ) : (
               <Stack>
-                {annotations?.length > 0 ? (
+                {filterData?.length > 0 ? (
                   <Stack spacing={6} mb={4}>
-                    {annotations?.map((note, index) => (
+                    {filterData?.map((note, index) => (
                       <Flex
                         gap={8}
                         key={index}
@@ -266,26 +281,55 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                       >
                         <Flex gap={2} alignItems={'flex-start'}>
                           <Text fontSize={'sm'}>{index + 1}.</Text>
-                          <Text fontSize={'sm'}>{note.comment}</Text>
+                          <Stack spacing={0}>
+                            <Text fontSize={'sm'}>{note.comment}</Text>
+                            <Text fontSize={'xs'} color={sameSecondaryText}>
+                              {timeSince(note?.updatedAt)}
+                            </Text>
+                          </Stack>
                         </Flex>
-                        <Flex gap={2} alignItems={'center'}>
-                          <IconButton
-                            size='sm'
-                            cursor='pointer'
-                            icon={<EditIcon />}
-                            onClick={() => {
-                              setEdit(true)
-                              setNoteId(note?.id)
-                              setComment(note.comment)
-                            }}
-                          />
-                          <IconButton
-                            size='sm'
-                            cursor='pointer'
-                            icon={<DeleteIcon />}
-                            onClick={() => handleDeleteNote(note.id)}
-                          />
-                        </Flex>
+                        {warning === note?.id ? (
+                          <Flex gap={2} alignItems={'center'}>
+                            <Button
+                              size='sm'
+                              fontSize={12}
+                              hidden={deleteLoading}
+                              onClick={() => setWarning('')}
+                            >
+                              No
+                            </Button>
+                            <Button
+                              size='sm'
+                              fontSize={12}
+                              colorScheme='red'
+                              isLoading={deleteLoading}
+                              onClick={() => handleDeleteNote(note?.id)}
+                            >
+                              Yes
+                            </Button>
+                          </Flex>
+                        ) : (
+                          <Flex gap={2} alignItems={'center'}>
+                            <IconButton
+                              size='sm'
+                              cursor='pointer'
+                              icon={<EditIcon />}
+                              onClick={() => {
+                                setEdit(true)
+                                setWarning('')
+                                setNoteId(note?.id)
+                                setComment(note.comment)
+                              }}
+                            />
+                            <IconButton
+                              size='sm'
+                              cursor='pointer'
+                              colorScheme='red'
+                              icon={<DeleteIcon />}
+                              onClick={() => setWarning(note?.id)}
+                            />
+                          </Flex>
+                        )}
                       </Flex>
                     ))}
                   </Stack>
