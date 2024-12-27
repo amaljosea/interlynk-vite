@@ -660,89 +660,6 @@ export const VexVulnCreate = gql`
   }
 `
 
-// export const CreateShareLynk = gql`
-//   mutation CreateShareLynk(
-//     $enabled: Boolean
-//     $emails: [String!]!
-//     $projects: [Uuid!]
-//     $images: [Uuid!]
-//   ) {
-//     shareLynkCreate(
-//       input: {
-//         enabled: $enabled
-//         shareUsers: $emails
-//         projectIds: $projects
-//         imageIds: $images
-//       }
-//     ) {
-//       shareLynk {
-//         id
-//         enabled
-//         contents {
-//           __typename
-//           ... on Project {
-//             id
-//             name
-//             description
-//           }
-//         }
-//         shareUsers {
-//           email
-//         }
-//       }
-//       errors
-//     }
-//   }
-// `
-
-// export const UpdateShareLynk = gql`
-//   mutation UpdateShareLynk(
-//     $shareLynkId: Uuid!
-//     $emails: [String!]
-//     $projects: [Uuid!]
-//     $images: [Uuid!]
-//     $enabled: Boolean
-//   ) {
-//     shareLynkUpdate(
-//       input: {
-//         enabled: $enabled
-//         shareLynkId: $shareLynkId
-//         shareUsers: $emails
-//         projectIds: $projects
-//         imageIds: $images
-//       }
-//     ) {
-//       shareLynk {
-//         id
-//         enabled
-//         contents {
-//           __typename
-//           ... on Project {
-//             id
-//             name
-//             description
-//           }
-//         }
-//         shareUsers {
-//           email
-//         }
-//       }
-//       errors
-//     }
-//   }
-// `
-
-export const DeleteShareLynk = gql`
-  mutation DeleteShareLynk($id: ID!) {
-    shareLynkDelete(input: { id: $id }) {
-      shareLynk {
-        id
-      }
-      errors
-    }
-  }
-`
-
 export const OrgConnectorValidate = gql`
   mutation OrgConnectorValidate($id: ID!) {
     organizationConnectorValidate(input: { id: $id }) {
@@ -1946,6 +1863,15 @@ export const UpdateShareLynk = gql`
         projectGroupIds: $id
       }
     ) {
+      errors
+    }
+  }
+`
+
+// DELETE SHARELYNK
+export const DeleteSharelynk = gql`
+  mutation DeleteSharelynk($id: Uuid!) {
+    shareLynkDelete(input: { id: $id }) {
       errors
     }
   }

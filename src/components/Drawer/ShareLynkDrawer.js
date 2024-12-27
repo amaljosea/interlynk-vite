@@ -1,11 +1,14 @@
-import { useQuery } from '@apollo/client'
-import { useMemo } from 'react'
+import { useMutation, useQuery } from '@apollo/client'
+import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, getFullDate, timeSince } from 'utils'
+import { customStyles, getFullDate, timeSince, truncatedValue } from 'utils'
 import { getShareLinklUrl } from 'utils/url'
 
-import { Flex, IconButton, Input, Text, Tooltip } from '@chakra-ui/react'
-import { useClipboard, useDisclosure } from '@chakra-ui/react'
+import { DeleteIcon } from '@chakra-ui/icons'
+import { Button, Checkbox, Divider, Stack, Tag } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
+import { Flex, IconButton, Text, Tooltip } from '@chakra-ui/react'
+import { useClipboard } from '@chakra-ui/react'
 import {
   Drawer,
   DrawerBody,
@@ -17,21 +20,22 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
-import LynkAlert from 'components/LynkAlert'
-import LynkSwitch from 'components/Misc/LynkSwitch'
-import CreateSharelynk from 'components/Modal/CreateSharelynk'
+import LynkDate from 'components/LynkDate'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
 
+import { CreateShareLynk, DeleteSharelynk } from 'graphQL/Mutation'
 import { GetSharelynks } from 'graphQL/Queries'
 
 import { FaCheck, FaRegCopy } from 'react-icons/fa6'
 import { PiFileSvgDuotone } from 'react-icons/pi'
 
-const ShareLynkDrawer = ({ isOpen, onClose, groupId }) => {
+const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
   const { showToast } = useCustomToast()
   const BACKEND_URL = process.env.REACT_APP_SERVER
+
+  const { name, id: groupId } = prodData || {}
 
   const { headingTextColor, primaryTextColor } = useThemeColor([
     'headingTextColor',
@@ -41,7 +45,15 @@ const ShareLynkDrawer = ({ isOpen, onClose, groupId }) => {
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
 
-  const { data, error, loading } = useQuery(GetSharelynks, {
+  const [selectedDate, setSelectedDate] = useState('')
+  const [isValidDate, setIsValidDate] = useState(true)
+  const [noExpire, setNoExpire] = useState(false)
+  const [show, setShow] = useState(false)
+
+  const [createLynk, { loading: createLoading }] = useMutation(CreateShareLynk)
+  const [deleteLynk] = useMutation(DeleteSharelynk)
+
+  const { data, loading } = useQuery(GetSharelynks, {
     skip: isOpen ? false : true,
     fetchPolicy: 'network-only',
     variables: {
@@ -50,11 +62,77 @@ const ShareLynkDrawer = ({ isOpen, onClose, groupId }) => {
   })
   const { nodes } = data?.shareLynks || ''
 
-  const SHARELYNK = useDisclosure()
-
   const svgLink = useClipboard(
     `${BACKEND_URL}/api/v1/badges?type=hcard&project_group_id=${groupId}`
   )
+
+  const onToggle = useMemo(
+    () => (value) => {
+      setNoExpire(false)
+      setIsValidDate(true)
+      setSelectedDate(null)
+      setShow(value)
+    },
+    []
+  )
+
+  const handleDateChange = (newDate) => {
+    const currentDate = new Date()
+    const isValidDate = newDate && !isNaN(newDate) && newDate?._d > currentDate
+    setSelectedDate(newDate._d)
+    if (isValidDate) {
+      setIsValidDate(true)
+    } else {
+      if (typeof newDate === 'string' && newDate === '') {
+        setIsValidDate(true)
+      } else {
+        setIsValidDate(false)
+      }
+    }
+  }
+
+  const handleExpireChange = (e) => {
+    const { checked } = e.target
+    setNoExpire(checked)
+    setIsValidDate(true)
+    if (checked === true) {
+      setSelectedDate('')
+    } else {
+      setSelectedDate(defaultDate)
+    }
+  }
+
+  const handleCreateLynk = () => {
+    createLynk({
+      variables: {
+        enabled: true,
+        id: [groupId],
+        expiresAt: noExpire ? undefined : new Date(selectedDate).toISOString()
+      }
+    }).then(() => onToggle(false))
+  }
+
+  const handleDeleteLynk = (id) => {
+    deleteLynk({
+      variables: { id: id }
+    }).then((res) => {
+      if (res?.data?.shareLynkDelete?.error?.length > 0) {
+        showToast({
+          description: res?.data?.shareLynkDelete?.error[0],
+          status: 'error'
+        })
+      } else {
+        showToast({
+          description: 'Lynk Delete',
+          status: 'success'
+        })
+      }
+    })
+  }
+
+  const isDisabled =
+    (selectedDate !== '' && !isValidDate) ||
+    (!selectedDate && noExpire === false)
 
   // HEADER SECTION
   const subHeader = useMemo(() => {
@@ -67,13 +145,9 @@ const ShareLynkDrawer = ({ isOpen, onClose, groupId }) => {
       svgLink.onCopy()
       showToast({ description: 'SVG link copied' })
     }
+
     return (
-      <Flex
-        gap={2}
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'flex-end'}
-      >
+      <Flex gap={2} alignItems={'center'} justifyContent={'flex-end'}>
         {nodes?.length > 0 && (
           <Tooltip label='SVG Link' placement='left'>
             <IconButton
@@ -86,23 +160,14 @@ const ShareLynkDrawer = ({ isOpen, onClose, groupId }) => {
         <AddButton
           label='Add ShareLynk'
           tooltipPlacement='left'
-          onClick={SHARELYNK.onOpen}
+          onClick={() => onToggle(true)}
         />
       </Flex>
     )
-  }, [svgLink, nodes?.length, SHARELYNK.onOpen, showToast])
+  }, [svgLink, nodes?.length, showToast, onToggle])
 
   // COLUMNS
   const columns = [
-    // STATUS
-    {
-      id: 'ENABLED',
-      name: 'ACTIVE',
-      selector: (row) => (
-        <LynkSwitch size='md' isChecked={row?.enabled} isReadOnly />
-      ),
-      width: '15%'
-    },
     // URL
     {
       id: 'SIGNED_URL',
@@ -119,24 +184,17 @@ const ShareLynkDrawer = ({ isOpen, onClose, groupId }) => {
           })
         )
         return (
-          <Flex my={2} gap={2} alignItems={'center'}>
-            <Input
-              size='sm'
-              color={primaryTextColor}
-              value={sbomLink.value}
-              onChange={(e) => sbomLink.setValue(e.target.value)}
-              width={'350px'}
-              isReadOnly
-              pointerEvents={'none'}
-              fontSize={'sm'}
-            />
+          <Flex my={4} gap={2} alignItems={'center'}>
             <IconButton
-              isDisabled={!enabled}
               size='sm'
+              isDisabled={!enabled}
               onClick={() => sbomLink.onCopy()}
               colorScheme={sbomLink?.hasCopied ? 'whatsapp' : 'blue'}
               icon={sbomLink?.hasCopied ? <FaCheck /> : <FaRegCopy />}
             />
+            <Text fontSize={'sm'} color={primaryTextColor}>
+              {truncatedValue(sbomLink?.value, 60)}
+            </Text>
           </Flex>
         )
       },
@@ -162,45 +220,89 @@ const ShareLynkDrawer = ({ isOpen, onClose, groupId }) => {
       },
       right: 'true',
       wrap: true
+    },
+    // ACTION
+    {
+      id: 'ACTION',
+      name: 'ACTION',
+      selector: (row) => (
+        <IconButton
+          size='sm'
+          cursor='pointer'
+          colorScheme='red'
+          variant='outline'
+          icon={<DeleteIcon />}
+          onClick={() => handleDeleteLynk(row?.id)}
+        />
+      ),
+      width: '14%',
+      right: 'true'
     }
   ]
 
   return (
-    <>
-      <Drawer size='lg' isOpen={isOpen} placement='right' onClose={onClose}>
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>ShareLynks</DrawerHeader>
-          <DrawerBody>
-            {error ? (
-              <LynkAlert msg={error?.message || 'Something went wrong'} />
-            ) : (
-              <DataTable
-                subHeader
-                persistTableHead
-                responsive={true}
-                columns={columns}
-                data={nodes || []}
-                progressPending={loading}
-                subHeaderComponent={subHeader}
-                progressComponent={<CustomLoader />}
-                customStyles={customStyles(headingTextColor)}
+    <Drawer size='lg' isOpen={isOpen} placement='right' onClose={onClose}>
+      <DrawerOverlay />
+      <DrawerContent>
+        <DrawerCloseButton mt={2} />
+        <DrawerHeader borderBottomWidth='1px'>
+          <Text mb={1}>ShareLynks</Text>
+          <Tag colorScheme='blue' wordBreak={'break-all'}>
+            {name ? truncatedValue(name, 20) : ''}
+          </Tag>
+        </DrawerHeader>
+        <DrawerBody>
+          <Stack hidden={!show} mt={1} spacing={3}>
+            <FormControl isInvalid={!isValidDate} hidden={noExpire}>
+              <FormLabel htmlFor='expire'>Expiration Date</FormLabel>
+              <LynkDate
+                key={selectedDate}
+                value={selectedDate}
+                onChange={handleDateChange}
               />
-            )}
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
-
-      {SHARELYNK.isOpen && (
-        <CreateSharelynk
-          groupId={groupId}
-          defaultDate={defaultDate}
-          isOpen={SHARELYNK.isOpen}
-          onClose={SHARELYNK.onClose}
-        />
-      )}
-    </>
+              {!isValidDate && (
+                <FormErrorMessage>
+                  Please enter a valid expiry date
+                </FormErrorMessage>
+              )}
+            </FormControl>
+            <FormControl>
+              <Checkbox isChecked={noExpire} onChange={handleExpireChange}>
+                No Expiration
+              </Checkbox>
+            </FormControl>
+            <Flex gap={2} justifyContent={'flex-end'} alignItems={'center'}>
+              <Button fontSize={'sm'} onClick={() => onToggle(false)}>
+                Cancel
+              </Button>
+              <Button
+                fontSize={'sm'}
+                colorScheme='blue'
+                isDisabled={isDisabled}
+                isLoading={createLoading}
+                onClick={handleCreateLynk}
+              >
+                Add
+              </Button>
+            </Flex>
+          </Stack>
+          <Divider hidden={!show} my={4} />
+          <DataTable
+            subHeader={!show}
+            persistTableHead
+            responsive={true}
+            columns={columns}
+            data={nodes || []}
+            defaultSortAsc={false}
+            progressPending={loading}
+            subHeaderComponent={subHeader}
+            defaultSortFieldId={'UPDATED_AT'}
+            progressComponent={<CustomLoader />}
+            customStyles={customStyles(headingTextColor)}
+          />
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
   )
 }
 

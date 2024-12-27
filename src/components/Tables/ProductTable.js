@@ -643,9 +643,9 @@ const ProductTable = (props) => {
       {/* ShareLynks */}
       {SHARELYNK.isOpen && (
         <ShareLynkDrawer
-          groupId={activeRow?.id}
           isOpen={SHARELYNK.isOpen}
           onClose={SHARELYNK.onClose}
+          prodData={{ id: activeRow?.id, name: activeRow?.name }}
         />
       )}
 
