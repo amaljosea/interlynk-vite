@@ -4,7 +4,7 @@ import DataTable from 'react-data-table-component'
 import {
   customStyles,
   filterEnvList,
-  getFullDateAndTime,
+  getFullDate,
   isDefaultEnv,
   timeSince
 } from 'utils'
@@ -135,7 +135,7 @@ const EnvironmentDrawer = ({
       id: 'CREATEDAT',
       name: 'CREATED AT',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.updatedAt)}>
+        <Tooltip label={getFullDate(row?.updatedAt)}>
           <Text>{timeSince(row?.updatedAt)}</Text>
         </Tooltip>
       ),

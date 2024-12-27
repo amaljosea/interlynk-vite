@@ -2,7 +2,7 @@ import { useLazyQuery } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { areArraysEqual, customStyles, getFullDateAndTime } from 'utils'
+import { areArraysEqual, customStyles, getFullDate } from 'utils'
 import { statusColor, timeSince } from 'utils'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -202,7 +202,7 @@ const VulnProdTable = ({ vuln, sbomVersions }) => {
       id: 'VEX_UPDATED_AT',
       name: 'UPDATED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
+        <Tooltip label={getFullDate(row?.updatedAt)} placement={'top'}>
           <Text color={primaryTextColor}>{timeSince(row?.updatedAt)}</Text>
         </Tooltip>
       ),

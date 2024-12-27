@@ -1,11 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import {
-  customStyles,
-  getChangelogColor,
-  getFullDateAndTime,
-  timeSince
-} from 'utils'
+import { customStyles, getChangelogColor, getFullDate, timeSince } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -147,7 +142,7 @@ const ChangelogTable = ({ activeEnv }) => {
       id: 'ACTIVITY_LOGS_CREATED_AT',
       name: 'CHANGED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
+        <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
           <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
         </Tooltip>
       ),

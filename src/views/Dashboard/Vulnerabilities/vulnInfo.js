@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
-import { getFullDateAndTime, linkURl } from 'utils'
+import { getFullDate, linkURl } from 'utils'
 
 import { Grid, GridItem, Link, SimpleGrid } from '@chakra-ui/react'
 import { Flex, Icon, Stack, Text, useDisclosure } from '@chakra-ui/react'
@@ -122,12 +122,12 @@ const VulnInfo = () => {
                   {/* Published At  */}
                   <Stack dir='column' fontSize={'sm'}>
                     <Text fontWeight={'medium'}>Published:</Text>
-                    <Text>{getFullDateAndTime(publishedAt)}</Text>
+                    <Text>{getFullDate(publishedAt)}</Text>
                   </Stack>
                   {/* Last Modified At */}
                   <Stack dir='column' fontSize={'sm'}>
                     <Text fontWeight={'medium'}>Last Modified:</Text>
-                    <Text>{getFullDateAndTime(lastModifiedAt)}</Text>
+                    <Text>{getFullDate(lastModifiedAt)}</Text>
                   </Stack>
                   {/* CVSS Vector */}
                   <Stack dir={'column'} fontSize={'sm'}>

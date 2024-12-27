@@ -1,5 +1,5 @@
 import React from 'react'
-import { getFullDateAndTime, timeSince } from 'utils'
+import { getFullDate, timeSince } from 'utils'
 
 import {
   IconButton,
@@ -31,7 +31,7 @@ const VulLinkRow = ({ key, data, vulnId }) => {
           <Text fontSize={'sm'} color={primaryTextColor} mb={0.5}>
             {status}
           </Text>
-          <Tooltip label={getFullDateAndTime(updatedAt)}>
+          <Tooltip label={getFullDate(updatedAt)}>
             <Text fontSize={'xs'} color={sameSecondaryText}>
               {timeSince(updatedAt)}
             </Text>

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { customStyles, getFullDate, timeSince } from 'utils'
 import DeleteModal from 'views/Dashboard/Support/DeleteModal'
 import StatusModal from 'views/Dashboard/Support/StatusModal'
 import SupportModal from 'views/Dashboard/Support/SupportModal'
@@ -307,7 +307,7 @@ const SupportTable = ({
       id: 'COMPONENT_SUPPORT_OVERRIDES_UPDATED_AT',
       name: 'UPDATED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
+        <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
           <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
         </Tooltip>
       ),

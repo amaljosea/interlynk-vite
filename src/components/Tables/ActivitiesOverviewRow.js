@@ -1,7 +1,7 @@
 import React from 'react'
 import {
   capitalizeFirstLetter,
-  getFullDateAndTime,
+  getFullDate,
   valueToColor,
   valueToIcon,
   valueToText
@@ -80,7 +80,7 @@ const ActivitiesOverviewRow = (props) => {
           {valueToText(action, event, orig, updated)}
         </Text>
         <Text fontSize='xs' color={secondaryTextColor} fontWeight='normal'>
-          {getFullDateAndTime(date)}
+          {getFullDate(date)}
         </Text>
       </Stack>
     </Flex>

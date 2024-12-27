@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useRef, useState } from 'react'
-import { getFullDateAndTime, timeSince } from 'utils'
+import { getFullDate, timeSince } from 'utils'
 
 import {
   Button,
@@ -138,7 +138,7 @@ function SBOMLinkRow(props) {
         </Flex>
       </Td>
       <Td width={'200px'}>
-        <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
+        <Tooltip label={getFullDate(updatedAt)} placement='top'>
           {timeSince(updatedAt)}
         </Tooltip>
       </Td>

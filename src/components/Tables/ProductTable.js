@@ -3,7 +3,7 @@ import { useTour } from '@reactour/tour'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
-import { getFullDateAndTime, timeSince } from 'utils'
+import { getFullDate, timeSince } from 'utils'
 import { customStyles, getFormat, getLink, getType } from 'utils'
 import { getSignedUrlParams, truncatedValue } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
@@ -426,7 +426,7 @@ const ProductTable = (props) => {
       selector: (row) => {
         const { updatedAt } = row
         return (
-          <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
+          <Tooltip label={getFullDate(updatedAt)} placement={'top'}>
             <Text color={primaryTextColor}>{timeSince(updatedAt)}</Text>
           </Tooltip>
         )

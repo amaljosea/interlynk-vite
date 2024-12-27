@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { customStyles, getFullDate, timeSince } from 'utils'
 import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -168,7 +168,7 @@ const TeamTable = () => {
       selector: (row) => {
         const timeStart = userTimeStart(row)
         return (
-          <Tooltip label={getFullDateAndTime(timeStart)} placement={'top'}>
+          <Tooltip label={getFullDate(timeStart)} placement={'top'}>
             <Text color={primaryTextColor} textTransform={'capitalize'}>
               {timeStart ? timeSince(timeStart) : ''}
             </Text>

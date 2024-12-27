@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link } from 'react-router-dom'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { customStyles, getFullDate, timeSince } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 
@@ -218,7 +218,7 @@ const LegalTable = () => {
       selector: (row) => {
         const { createdAt } = row
         return (
-          <Tooltip label={getFullDateAndTime(createdAt)} placement='top'>
+          <Tooltip label={getFullDate(createdAt)} placement='top'>
             <Text color={primaryTextColor}>{timeSince(createdAt)}</Text>
           </Tooltip>
         )
@@ -238,7 +238,7 @@ const LegalTable = () => {
       selector: (row) => {
         const { updatedAt } = row
         return (
-          <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
+          <Tooltip label={getFullDate(updatedAt)} placement='top'>
             <Text color={primaryTextColor}>{timeSince(updatedAt)}</Text>
           </Tooltip>
         )

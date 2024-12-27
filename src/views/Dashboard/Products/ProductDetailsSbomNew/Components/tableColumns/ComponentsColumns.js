@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { GetIcon, isValidPurl, truncatedValue } from 'utils'
 import { parseLicenseString, timeSince } from 'utils'
-import { getFullDateAndTime, isCustomerView } from 'utils'
+import { getFullDate, isCustomerView } from 'utils'
 
 import { ViewIcon } from '@chakra-ui/icons'
 import {
@@ -313,7 +313,7 @@ const ComponentsColumns = ({
         id: 'COMPONENTS_UPDATED_AT',
         name: 'UPDATED',
         selector: (row) => (
-          <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
+          <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
             <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
           </Tooltip>
         ),

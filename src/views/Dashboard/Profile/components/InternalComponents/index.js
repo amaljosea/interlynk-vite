@@ -1,9 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles } from 'utils'
-import { getFullDateAndTime } from 'utils'
-import { timeSince } from 'utils'
+import { customStyles, getFullDate, timeSince } from 'utils'
 
 import { Flex, Text, Tooltip } from '@chakra-ui/react'
 
@@ -111,7 +109,7 @@ export const InternalComponents = () => {
       id: 'CREATED',
       name: 'CREATED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row.createdAt)} placement={'top'}>
+        <Tooltip label={getFullDate(row.createdAt)} placement={'top'}>
           <Text color={primaryTextColor} my={2}>
             {timeSince(row.createdAt)}
           </Text>
@@ -122,7 +120,7 @@ export const InternalComponents = () => {
       id: 'UPDATED',
       name: 'UPDATED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
+        <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
           <Text color={primaryTextColor} my={2}>
             {timeSince(row.updatedAt)}
           </Text>

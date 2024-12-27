@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { getEolStatusColor, getFullDateAndTime, timeSince } from 'utils'
+import { getEolStatusColor, getFullDate, timeSince } from 'utils'
 
 import { CheckIcon } from '@chakra-ui/icons'
 import { Portal, Stack, Tag, Text, Tooltip } from '@chakra-ui/react'
@@ -152,7 +152,7 @@ const SupportColumns = (
         id: 'COMPONENT_SUPPORT_OVERRIDES_UPDATED_AT',
         name: 'UPDATED',
         selector: (row) => (
-          <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
+          <Tooltip label={getFullDate(row?.updatedAt)} placement={'top'}>
             <Text color={primaryTextColor}>
               {row?.updatedAt ? timeSince(row?.updatedAt) : ''}
             </Text>

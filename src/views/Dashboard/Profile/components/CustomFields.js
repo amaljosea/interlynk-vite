@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { customStyles, getFullDate, timeSince } from 'utils'
 
 import { Flex, Portal, Tag, Text, Tooltip } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
@@ -102,7 +102,7 @@ const CustomFields = () => {
       selector: (row) => {
         const { updatedAt } = row
         return (
-          <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
+          <Tooltip label={getFullDate(updatedAt)} placement='top'>
             <Text color={primaryTextColor}>{timeSince(updatedAt)}</Text>
           </Tooltip>
         )

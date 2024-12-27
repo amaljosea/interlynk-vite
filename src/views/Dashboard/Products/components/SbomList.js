@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getFullDateAndTime, timeSince, truncatedValue } from 'utils'
+import { getFullDate, timeSince, truncatedValue } from 'utils'
 
 import {
   Drawer,
@@ -155,7 +155,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
                           </Td>
                           <Td px={0} fontSize={'sm'}>
                             <Tooltip
-                              label={getFullDateAndTime(createdAt)}
+                              label={getFullDate(createdAt)}
                               placement='top'
                             >
                               <Text>{timeSince(createdAt)}</Text>
@@ -163,7 +163,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
                           </Td>
                           <Td px={0} fontSize={'sm'}>
                             <Tooltip
-                              label={getFullDateAndTime(updatedAt)}
+                              label={getFullDate(updatedAt)}
                               placement='top'
                             >
                               <Text>{timeSince(updatedAt)}</Text>
@@ -197,7 +197,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
         isOpen={PROMOTE_WARNING?.isOpen}
         onClose={PROMOTE_WARNING?.onClose}
         onConfirm={() => handlePromote(activeSbom)}
-        name={getFullDateAndTime(activeSbom?.createdAt)}
+        name={getFullDate(activeSbom?.createdAt)}
         description={`This will promote the existing one with the new one`}
       />
     </>

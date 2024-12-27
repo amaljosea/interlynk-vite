@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useMemo } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { customStyles, getFullDate, timeSince } from 'utils'
 import { getShareLinklUrl } from 'utils/url'
 
 import { Flex, IconButton, Input, Text, Tooltip } from '@chakra-ui/react'
@@ -148,7 +148,7 @@ const ShareLynkDrawer = ({ isOpen, onClose, groupId }) => {
       id: 'UPDATED_AT',
       name: 'UPDATED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
+        <Tooltip label={getFullDate(row?.updatedAt)} placement={'top'}>
           <Text color={primaryTextColor} textAlign={'right'}>
             {timeSince(row?.updatedAt)}
           </Text>

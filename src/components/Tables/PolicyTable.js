@@ -2,12 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
-import {
-  customStyles,
-  getFullDateAndTime,
-  timeSince,
-  updatedValue
-} from 'utils'
+import { customStyles, getFullDate, timeSince, updatedValue } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import DeleteModal from 'views/Dashboard/Policies/DeleteModal'
 import PolicyModal from 'views/Dashboard/Policies/PolicyModal'
@@ -248,7 +243,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
       id: 'UPDATED',
       name: 'UPDATED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
+        <Tooltip label={getFullDate(row?.updatedAt)} placement={'top'}>
           <Text color={primaryTextColor}>{timeSince(row?.updatedAt)}</Text>
         </Tooltip>
       ),

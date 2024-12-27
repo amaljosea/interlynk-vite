@@ -4,7 +4,7 @@ import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { customStyles, getFormat, getFullDateAndTime } from 'utils'
+import { customStyles, getFormat, getFullDate } from 'utils'
 import { getLink, getSignedUrlParams, getType, timeSince } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
@@ -420,7 +420,7 @@ const VersionsTable = (props) => {
       selector: (row) => {
         const { createdAt } = row
         return (
-          <Tooltip label={getFullDateAndTime(createdAt)} placement='top'>
+          <Tooltip label={getFullDate(createdAt)} placement='top'>
             <Text color={primaryTextColor} textAlign={'right'}>
               {timeSince(createdAt)}
             </Text>
@@ -438,7 +438,7 @@ const VersionsTable = (props) => {
       selector: (row) => {
         const { updatedAt } = row
         return (
-          <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
+          <Tooltip label={getFullDate(updatedAt)} placement='top'>
             <Text color={primaryTextColor} textAlign={'right'}>
               {timeSince(updatedAt)}
             </Text>

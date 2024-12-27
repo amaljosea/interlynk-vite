@@ -1,4 +1,4 @@
-import { getFullDateAndTime } from 'utils'
+import { getFullDate } from 'utils'
 import { infoData } from 'variables/general'
 
 import { Grid, GridItem } from '@chakra-ui/react'
@@ -50,7 +50,7 @@ const General = ({ data, loading, error }) => {
         </GridItem>
         <GridItem colSpan={10} py={3} w='100%'>
           <Text fontSize={'sm'}>
-            {creationAt ? getFullDateAndTime(creationAt) : 'N/A'}
+            {creationAt ? getFullDate(creationAt) : 'N/A'}
           </Text>
         </GridItem>
         {/* CREATION TOOLS */}

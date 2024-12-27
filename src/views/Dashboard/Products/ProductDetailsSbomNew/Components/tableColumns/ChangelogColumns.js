@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import {
   getChangelogColor,
-  getFullDateAndTime,
+  getFullDate,
   timeSince,
   truncatedValue
 } from 'utils'
@@ -293,10 +293,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
         name: 'CHANGED',
         selector: (row) => (
           <Box width={'fit-content'}>
-            <Tooltip
-              label={getFullDateAndTime(row.updatedAt)}
-              placement={'top'}
-            >
+            <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
               <Text color={primaryTextColor} width={'fit-content'}>
                 {timeSince(row.updatedAt)}
               </Text>

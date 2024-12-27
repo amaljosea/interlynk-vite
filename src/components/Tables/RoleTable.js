@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { customStyles, getFullDate, timeSince } from 'utils'
 import CreateRole from 'views/Dashboard/Profile/components/CreateRole'
 import DeleteRole from 'views/Dashboard/Profile/components/DeleteRole'
 
@@ -82,7 +82,7 @@ const RoleTable = () => {
       id: 'createdAt',
       name: 'CREATED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.createdAt)} placement='top'>
+        <Tooltip label={getFullDate(row?.createdAt)} placement='top'>
           <Text color={primaryTextColor} textTransform={'lowercase'}>
             {timeSince(row?.createdAt)}
           </Text>

@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { customStyles, getFullDate, timeSince } from 'utils'
 
 import { Flex, Menu, Portal, Stack, Text } from '@chakra-ui/react'
 import { Tooltip, useDisclosure } from '@chakra-ui/react'
@@ -237,7 +237,7 @@ const RequestTable = (props) => {
       id: 'REQUESTED',
       name: 'REQUESTED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.requestedAt)} placement={'top'}>
+        <Tooltip label={getFullDate(row?.requestedAt)} placement={'top'}>
           <Text color={primaryTextColor}>{timeSince(row?.requestedAt)}</Text>
         </Tooltip>
       ),
@@ -249,10 +249,7 @@ const RequestTable = (props) => {
       selector: (row) => {
         const { uploadedAt } = row
         return (
-          <Tooltip
-            placement={'top'}
-            label={getFullDateAndTime(row?.uploadedAt)}
-          >
+          <Tooltip placement={'top'} label={getFullDate(row?.uploadedAt)}>
             <Text color={primaryTextColor}>
               {uploadedAt ? timeSince(row?.uploadedAt) : ''}
             </Text>

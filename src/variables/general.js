@@ -1,4 +1,4 @@
-import { getFullDateAndTime } from 'utils'
+import { getFullDate } from 'utils'
 
 import { Stack, Text } from '@chakra-ui/react'
 
@@ -1235,9 +1235,8 @@ export const exportCsvTableConfig = {
         Status: row?.vexStatus?.name || 'Unspecified',
         Updated: row?.vuln?.updatedAt || '',
         Description: row?.vuln?.desc || '',
-        Published: `"${getFullDateAndTime(row?.vuln?.publishedAt)}"` || '',
-        'Last Modified':
-          `"${getFullDateAndTime(row?.vuln?.lastModifiedAt)}"` || '',
+        Published: `"${getFullDate(row?.vuln?.publishedAt)}"` || '',
+        'Last Modified': `"${getFullDate(row?.vuln?.lastModifiedAt)}"` || '',
         'Fixed Versions': `"${row?.fixedVersions}"` || '',
         'Last Affected Version': `"${row?.lastAffectedVersions}"` || 'N/A',
         'CVSS Vector': row?.vuln?.cvssVector || '',
@@ -1327,8 +1326,8 @@ export const exportCsvTableConfig = {
               ? `${(row?.vulnInfo?.epssScores[0] * 100).toFixed(3)} %`
               : '-',
           Statuses: formattedStatuses,
-          Published: `"${getFullDateAndTime(row?.publishedAt)}"`,
-          Modified: `"${getFullDateAndTime(row?.lastModifiedAt)}"`
+          Published: `"${getFullDate(row?.publishedAt)}"`,
+          Modified: `"${getFullDate(row?.lastModifiedAt)}"`
         }
       })
     }

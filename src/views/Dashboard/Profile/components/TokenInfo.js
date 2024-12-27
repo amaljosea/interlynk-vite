@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, getFullDateAndTime, truncatedValue } from 'utils'
+import { customStyles, getFullDate, truncatedValue } from 'utils'
 
 import { AddIcon } from '@chakra-ui/icons'
 import {
@@ -153,9 +153,7 @@ const TokenInfo = () => {
       id: 'created',
       name: 'CREATED',
       selector: (row) => (
-        <Text color={primaryTextColor}>
-          {getFullDateAndTime(row.createdAt)}
-        </Text>
+        <Text color={primaryTextColor}>{getFullDate(row.createdAt)}</Text>
       ),
       sortable: true,
       sortFunction: (a, b) => {
@@ -171,9 +169,7 @@ const TokenInfo = () => {
       id: 'updated',
       name: 'UPDATED',
       selector: (row) => (
-        <Text color={primaryTextColor}>
-          {getFullDateAndTime(row.updatedAt)}
-        </Text>
+        <Text color={primaryTextColor}>{getFullDate(row.updatedAt)}</Text>
       ),
       sortable: true,
       sortFunction: (a, b) => {
@@ -190,7 +186,7 @@ const TokenInfo = () => {
       name: 'EXPIRES',
       selector: (row) => (
         <Text color={primaryTextColor}>
-          {row.expiresAt ? getFullDateAndTime(row.expiresAt) : 'No Expiration'}
+          {row.expiresAt ? getFullDate(row.expiresAt) : 'No Expiration'}
         </Text>
       ),
       wrap: true,

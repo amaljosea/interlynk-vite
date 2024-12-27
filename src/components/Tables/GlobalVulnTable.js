@@ -1,6 +1,6 @@
 import DataTable from 'react-data-table-component'
 import { Link, useParams } from 'react-router-dom'
-import { customStyles, getFullDateAndTime, linkURl, timeSince } from 'utils'
+import { customStyles, getFullDate, linkURl, timeSince } from 'utils'
 import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
 import { ExternalLinkIcon } from '@chakra-ui/icons'
@@ -185,7 +185,7 @@ const GlobalVulnTable = (props) => {
         const published = publishedAt ? timeSince(publishedAt) : ''
         return (
           <Tooltip
-            label={published ? getFullDateAndTime(publishedAt) : 'N/A'}
+            label={published ? getFullDate(publishedAt) : 'N/A'}
             placement={'top'}
           >
             <Text color={primaryTextColor} textAlign={'right'}>
@@ -212,7 +212,7 @@ const GlobalVulnTable = (props) => {
         const modified = lastModifiedAt ? timeSince(lastModifiedAt) : ''
         return (
           <Tooltip
-            label={modified ? getFullDateAndTime(lastModifiedAt) : 'N/A'}
+            label={modified ? getFullDate(lastModifiedAt) : 'N/A'}
             placement={'top'}
           >
             <Text color={primaryTextColor} textAlign={'right'}>

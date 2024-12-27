@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
-import { getFullDateAndTime, timeSince, truncatedValue } from 'utils'
+import { getFullDate, timeSince, truncatedValue } from 'utils'
 import { getSignedUrlParams } from 'utils'
 import SbomActions from 'views/Sbom/components/SbomActions'
 
@@ -202,10 +202,7 @@ const SbomDetails = ({ sbomData }) => {
               <Card px={0} shadow='none' py={0}>
                 <CardBody px={0} flexDir='column' gap={1}>
                   {/* UPDATED AT */}
-                  <Tooltip
-                    placement='top'
-                    label={getFullDateAndTime(updatedAt)}
-                  >
+                  <Tooltip placement='top' label={getFullDate(updatedAt)}>
                     <Text
                       fontSize='sm'
                       cursor={'pointer'}

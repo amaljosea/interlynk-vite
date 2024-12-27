@@ -1,7 +1,7 @@
 import React from 'react'
 import DataTable from 'react-data-table-component'
 import { Link } from 'react-router-dom'
-import { getFullDateAndTime, normalizeSBOMVersion, timeSince } from 'utils'
+import { getFullDate, normalizeSBOMVersion, timeSince } from 'utils'
 import { customStyles } from 'utils'
 
 import { Flex, Heading, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
@@ -271,7 +271,7 @@ const ProductsOverview = ({ loading, title, data }) => {
       selector: (row) => {
         const { createdAt } = row
         return (
-          <Tooltip placement='top' label={getFullDateAndTime(createdAt)}>
+          <Tooltip placement='top' label={getFullDate(createdAt)}>
             <Text color={primaryTextColor} textAlign={'right'}>
               {timeSince(createdAt)}
             </Text>

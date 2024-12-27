@@ -1,4 +1,4 @@
-import { getFullDateAndTime } from 'utils'
+import { getFullDate } from 'utils'
 import { infoData } from 'variables/general'
 
 import { Flex, Skeleton, Text } from '@chakra-ui/react'
@@ -77,7 +77,7 @@ const General = ({ data, loading, error }) => {
                 />
               </Td>
               <Td fontSize={'sm'} color={sameSecondaryText} width={'85%'}>
-                {data?.creationAt ? getFullDateAndTime(data?.creationAt) : ''}
+                {data?.creationAt ? getFullDate(data?.creationAt) : ''}
               </Td>
             </Tr>
             {/* PHASES */}

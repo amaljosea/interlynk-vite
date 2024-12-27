@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 import { timeSince, updatedValue } from 'utils'
-import { capitalizeFirstLetter, getFullDateAndTime } from 'utils'
+import { capitalizeFirstLetter, getFullDate } from 'utils'
 
 import { List, ListItem } from '@chakra-ui/react'
 import { Portal, Tag, Text, Tooltip } from '@chakra-ui/react'
@@ -211,7 +211,7 @@ export const useAutomationColumns = (
       selector: (row) => {
         const { createdAt } = row
         return (
-          <Tooltip label={getFullDateAndTime(createdAt)} placement='top'>
+          <Tooltip label={getFullDate(createdAt)} placement='top'>
             <Text color={primaryTextColor} textAlign={'right'}>
               {timeSince(createdAt)}
             </Text>
@@ -234,7 +234,7 @@ export const useAutomationColumns = (
       selector: (row) => {
         const { updatedAt } = row
         return (
-          <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
+          <Tooltip label={getFullDate(updatedAt)} placement='top'>
             <Text color={primaryTextColor} textAlign={'right'}>
               {timeSince(updatedAt)}
             </Text>

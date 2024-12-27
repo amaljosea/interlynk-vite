@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
-import { getFullDateAndTime } from 'utils'
+import { getFullDate } from 'utils'
 import { pkgData, pkgVersionData, repositoryData } from 'variables/general'
 
 import { Flex, SimpleGrid, Skeleton, Spacer, Stack } from '@chakra-ui/react'
@@ -135,9 +135,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                           <Text cursor={'pointer'}>Last Updated</Text>
                         </Tooltip>
                         <Text>
-                          {getFullDateAndTime(
-                            enrichedContent?.package?.updatedAt
-                          )}
+                          {getFullDate(enrichedContent?.package?.updatedAt)}
                         </Text>
                       </Container>
                     </Stack>
@@ -206,7 +204,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                           <Text cursor={'pointer'}>Last Updated</Text>
                         </Tooltip>
                         <Text>
-                          {getFullDateAndTime(latestPackageVersion?.updatedAt)}
+                          {getFullDate(latestPackageVersion?.updatedAt)}
                         </Text>
                       </Container>
                     </Stack>
@@ -301,7 +299,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                         <Tooltip label={onCheck('repository', 'Last Updated')}>
                           <Text cursor={'pointer'}>Last Updated</Text>
                         </Tooltip>
-                        <Text>{getFullDateAndTime(repository?.updatedAt)}</Text>
+                        <Text>{getFullDate(repository?.updatedAt)}</Text>
                       </Container>
                     </Stack>
                   ) : (

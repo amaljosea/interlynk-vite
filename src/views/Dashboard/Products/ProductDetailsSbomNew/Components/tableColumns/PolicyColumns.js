@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { getColor, getFullDateAndTime, timeSince } from 'utils'
+import { getColor, getFullDate, timeSince } from 'utils'
 
 import { Spinner, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
@@ -64,7 +64,7 @@ const PolicyColumns = (isInitialized) => {
         id: 'LAST_CHECKED',
         name: 'LAST CHECKED',
         selector: (row) => (
-          <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
+          <Tooltip label={getFullDate(row?.updatedAt)} placement={'top'}>
             <Text color={primaryTextColor}>{timeSince(row?.updatedAt)}</Text>
           </Tooltip>
         ),

@@ -1,4 +1,4 @@
-import { getFullDateAndTime, truncatedValue } from 'utils'
+import { getFullDate, truncatedValue } from 'utils'
 
 import {
   Flex,
@@ -50,7 +50,7 @@ const SbomInfo = ({ data }) => {
           {/* CREATED AT */}
           <Tr>
             <Td pl={0}>Created At</Td>
-            <Td>{getFullDateAndTime(data?.creationAt)}</Td>
+            <Td>{getFullDate(data?.creationAt)}</Td>
           </Tr>
           {/* AUTHOR */}
           <Tr>

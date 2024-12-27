@@ -3,7 +3,7 @@ import Cookies from 'js-cookie'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
-import { customStyles, getFullDateAndTime, timeSince } from 'utils'
+import { customStyles, getFullDate, timeSince } from 'utils'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -265,7 +265,7 @@ const OrgTable = ({ data, activeOrg }) => {
       selector: (row) => {
         const { updatedAt } = row
         return (
-          <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
+          <Tooltip label={getFullDate(updatedAt)} placement={'top'}>
             <Text color={primaryTextColor} textTransform={'capitalize'}>
               {timeSince(updatedAt)}
             </Text>

@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getFullDateAndTime, timeSince } from 'utils'
+import { getFullDate, timeSince } from 'utils'
 import { truncatedValue } from 'utils'
 
 import {
@@ -168,7 +168,7 @@ const SbomDetails = () => {
             {primaryComponent?.description}
           </Text>
           {/* UPDATED AT */}
-          <Tooltip placement='top' label={getFullDateAndTime(updatedAt)}>
+          <Tooltip placement='top' label={getFullDate(updatedAt)}>
             <Text width={'fit-content'} fontSize='xs' cursor={'pointer'}>
               Updated {timeSince(updatedAt)}
             </Text>

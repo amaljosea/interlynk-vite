@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getFullDateAndTime, timeSince, truncatedValue } from 'utils'
+import { getFullDate, timeSince, truncatedValue } from 'utils'
 
 import {
   ButtonGroup,
@@ -129,7 +129,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
                         : {truncatedValue(item?.projectVersion, 20)}
                       </Text>
                       <Tooltip
-                        label={getFullDateAndTime(item?.createdAt)}
+                        label={getFullDate(item?.createdAt)}
                         placement='top'
                       >
                         <Text color={sameSecondaryText} fontSize={'sm'}>

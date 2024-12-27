@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { getFullDateAndTime, timeSince } from 'utils'
+import { getFullDate, timeSince } from 'utils'
 
 import { CheckIcon } from '@chakra-ui/icons'
 import { Box, Button, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
@@ -196,7 +196,7 @@ const ChecksColumns = (
         id: 'CHECK_RESULTS_UPDATED_AT',
         name: 'UPDATED',
         selector: (row) => (
-          <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
+          <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
             <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
           </Tooltip>
         ),
