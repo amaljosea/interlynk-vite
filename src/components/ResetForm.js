@@ -139,11 +139,11 @@ const ResetForm = () => {
           navigate('/auth')
         }
       })
-      .catch((error) => {
+      .catch((err) => {
+        const { error, errors } = err?.response?.data || ''
+        const { reset_password_token: tokenError } = errors || ''
         showToast({
-          description:
-            error?.response?.data?.errors?.reset_password_token ||
-            error?.response?.data?.errors,
+          description: tokenError?.length > 0 ? tokenError[0] : error,
           status: 'error'
         })
         setIsLoading(false)

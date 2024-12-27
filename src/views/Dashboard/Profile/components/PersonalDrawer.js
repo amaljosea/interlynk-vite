@@ -286,7 +286,11 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
 
           {/* Password Edit */}
           {!isPasswordEdit && (
-            <Flex alignItems={'flex-end'} gap={2}>
+            <Flex
+              gap={2}
+              alignItems={'flex-end'}
+              hidden={!orgData?.currentUser?.isPasswordSet}
+            >
               <FormControl id='password'>
                 <FormLabel>Edit Password</FormLabel>
                 <Input
@@ -301,7 +305,6 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
                   icon={<EditIcon />}
                   aria-label='Edit Password'
                   onClick={() => setIsPasswordEdit(true)}
-                  isDisabled={!orgData?.currentUser?.isPasswordSet}
                 />
               </Tooltip>
             </Flex>

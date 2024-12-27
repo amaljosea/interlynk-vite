@@ -1,5 +1,6 @@
 import InterlynkLogo from 'assets/img/logo.png'
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 import { Flex, Grid, GridItem, Heading, Img, Text } from '@chakra-ui/react'
 
@@ -33,19 +34,21 @@ const AuthContainer = ({ children }) => {
         justifyContent='space-between'
         bgGradient='linear(to-br, #4299e1, #1A365D)'
       >
-        <Flex width={'100%'} gap={1}>
-          <Img
-            w='40px'
-            h='40px'
-            me='5px'
-            alt='Interlynk'
-            src={InterlynkLogo}
-            filter={'brightness(0) invert(1)'}
-          />
-          <Text fontSize={'3xl'} color={'white'} fontWeight={600}>
-            Interlynk
-          </Text>
-        </Flex>
+        <Link to={'/'}>
+          <Flex width={'100%'} gap={1}>
+            <Img
+              w='40px'
+              h='40px'
+              me='5px'
+              alt='Interlynk'
+              src={InterlynkLogo}
+              filter={'brightness(0) invert(1)'}
+            />
+            <Text fontSize={'3xl'} color={'white'} fontWeight={600}>
+              Interlynk
+            </Text>
+          </Flex>
+        </Link>
         <Heading
           opacity={0.8}
           fontSize={'5xl'}
