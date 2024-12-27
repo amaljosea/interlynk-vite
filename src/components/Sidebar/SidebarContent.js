@@ -28,14 +28,15 @@ const SidebarContent = ({ routes }) => {
   useEffect(() => {
     // Filter routes based on the active user and free tier status
     const isFreeTier = organization?.tier === 'free'
-    const updatedRoutes = isFreeTier
-      ? routes.filter(
-          (route) =>
-            !['Requests', 'Licenses', 'Analytics', 'Support'].includes(
-              route.name
-            )
-        )
-      : routes
+    const updatedRoutes =
+      isFreeTier || !organization
+        ? routes.filter(
+            (route) =>
+              !['Requests', 'Licenses', 'Analytics', 'Support'].includes(
+                route.name
+              )
+          )
+        : routes
     setFilteredRoutes(updatedRoutes)
   }, [organization, routes])
 
