@@ -5,14 +5,14 @@ import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 import { Badge, Flex, Icon, Stack, Text, useDisclosure } from '@chakra-ui/react'
-import { Divider, Tooltip } from '@chakra-ui/react'
+import { Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import CvssTag from 'components/Misc/CvssTag'
 import EpssTag from 'components/Misc/EpssTag'
-import Round from 'components/Misc/Round'
 import SeverityTag from 'components/Misc/SeverityTag'
+import VulnBadge from 'components/Misc/VulnBadge'
 import CustomVuln from 'components/Modal/CustomVuln'
 
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
@@ -154,22 +154,21 @@ const GlobalVulnTable = (props) => {
         const { metrics } = row
         return (
           <Stack fontWeight={'medium'} direction={'row'} my={2}>
-            <Round bg='gray' label='Unspecified'>
+            <VulnBadge color='gray' label='Unspecified'>
               {metrics?.unspecifiedCount}
-            </Round>
-            <Round bg='blue' label='In Triage'>
+            </VulnBadge>
+            <VulnBadge color='blue' label='In Triage'>
               {metrics?.inTriageCount}
-            </Round>
-            <Round bg='red' label='Affected'>
+            </VulnBadge>
+            <VulnBadge color='red' label='Affected'>
               {metrics?.affectedCount}
-            </Round>
-            <Divider orientation='vertical' colorScheme={'gray'} height={10} />
-            <Round bg='orange' label='Fixed'>
+            </VulnBadge>
+            <VulnBadge color='orange' label='Fixed'>
               {metrics?.fixedCount}
-            </Round>
-            <Round bg='green' label='Not Affected'>
+            </VulnBadge>
+            <VulnBadge color='green' label='Not Affected'>
               {metrics?.notAffectedCount}
-            </Round>
+            </VulnBadge>
           </Stack>
         )
       },

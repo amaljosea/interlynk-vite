@@ -1167,6 +1167,13 @@ export const GetVersionsTable = gql`
             compLicenseCount
             vulnStats
           }
+          vulnerabilityMetrics {
+            affectedCount
+            notAffectedCount
+            fixedCount
+            unspecifiedCount
+            inTriageCount
+          }
         }
       }
     }

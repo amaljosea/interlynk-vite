@@ -1,20 +1,14 @@
-import { Flex, Stat, StatLabel, StatNumber, Tag } from '@chakra-ui/react'
+import { Flex, IconButton, Stat, StatLabel, StatNumber } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-import IconBox from 'components/Icons/IconBox'
+import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const MiniStatistics = ({ title, amount, icon }) => {
-  const { primaryBlueText, inverseSecondaryBgColor, primaryBgColor } =
-    useThemeColor([
-      'primaryBlueText',
-      'inverseSecondaryBgColor',
-      'primaryBgColor'
-    ])
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
 
-  const fontStyle = { fontSize: title === 'Vulnerabilities' ? '12px' : '14px' }
   return (
     <Card px={4}>
       <CardBody p={0}>
@@ -25,21 +19,21 @@ const MiniStatistics = ({ title, amount, icon }) => {
             </StatLabel>
             {title === 'Vulnerabilities' ? (
               <Flex mt={1} gap={1} direction={'row'} flexWrap={'wrap'}>
-                <Tag variant='subtle' colorScheme='red' sx={fontStyle}>
+                <VulnBadge color='red' label={'Critical'}>
                   {amount?.critical || 0}
-                </Tag>
-                <Tag variant='subtle' colorScheme='orange' sx={fontStyle}>
+                </VulnBadge>
+                <VulnBadge color='orange' label={'High'}>
                   {amount?.high || 0}
-                </Tag>
-                <Tag variant='subtle' colorScheme='yellow' sx={fontStyle}>
+                </VulnBadge>
+                <VulnBadge color='yellow' label={'Medium'}>
                   {amount?.medium || 0}
-                </Tag>
-                <Tag variant='subtle' colorScheme='green' sx={fontStyle}>
+                </VulnBadge>
+                <VulnBadge color='green' label={'Low'}>
                   {amount?.low || 0}
-                </Tag>
-                <Tag variant='subtle' colorScheme='gray' sx={fontStyle}>
+                </VulnBadge>
+                <VulnBadge color='gray' label={'Unknown'}>
                   {amount?.unknown || 0}
-                </Tag>
+                </VulnBadge>
               </Flex>
             ) : (
               <StatNumber fontSize='lg' color={inverseSecondaryBgColor}>
@@ -47,14 +41,7 @@ const MiniStatistics = ({ title, amount, icon }) => {
               </StatNumber>
             )}
           </Stat>
-          <IconBox
-            h={'45px'}
-            w={'45px'}
-            color={primaryBgColor}
-            bg={primaryBlueText}
-          >
-            {icon}
-          </IconBox>
+          <IconButton colorScheme='blue' icon={icon} />
         </Flex>
       </CardBody>
     </Card>

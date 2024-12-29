@@ -2,14 +2,7 @@ import { useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
 
-import {
-  Button,
-  Flex,
-  Grid,
-  GridItem,
-  SimpleGrid,
-  Skeleton
-} from '@chakra-ui/react'
+import { Flex, Grid, GridItem, SimpleGrid, Skeleton } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'

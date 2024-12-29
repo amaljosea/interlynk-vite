@@ -297,7 +297,7 @@ const VersionsTable = (props) => {
           </Grid>
         )
       },
-      width: '15%',
+      width: '250px',
       wrap: true,
       sortable: true
     },
@@ -322,7 +322,7 @@ const VersionsTable = (props) => {
           </Link>
         )
       },
-      width: '10.3%'
+      width: '130px'
     },
     // LICENSES
     {
@@ -342,7 +342,7 @@ const VersionsTable = (props) => {
           </Tag>
         )
       },
-      width: '7.7%'
+      width: '100px'
     },
     // VULNERABILITIES
     {
@@ -357,7 +357,7 @@ const VersionsTable = (props) => {
           }
         })
         return (
-          <SimpleGrid gap={1} columns={5} width={'full'}>
+          <SimpleGrid gap={1} columns={[3, 5]}>
             <Link to={link} onClick={() => onFilterSev(['critical'], id)}>
               <VulnBadge color='red' label='Critical' status={vulnRunStatus}>
                 {vulnRunStatus === 'NOT_STARTED'
@@ -395,23 +395,35 @@ const VersionsTable = (props) => {
             </Link>
           </SimpleGrid>
         )
-      },
-      width: '26.8%'
+      }
     },
-    // STATUS
+    // STATUSES
     {
-      id: 'STATUS',
-      name: 'STATUS',
+      id: 'STATUSES',
+      name: 'STATUSES',
       selector: (row) => {
-        const { lifecycle } = row
-
+        const { vulnerabilityMetrics } = row
         return (
-          <Tag width={24} colorScheme='cyan' textTransform={'capitalize'}>
-            <TagLabel mx={'auto'}>{lifecycle}</TagLabel>
-          </Tag>
+          <SimpleGrid gap={1} my={3} columns={[3, 5]} flexWrap={'wrap'}>
+            <VulnBadge color='gray' label='Unspecified'>
+              {vulnerabilityMetrics?.unspecifiedCount}
+            </VulnBadge>
+            <VulnBadge color='blue' label='In Triage'>
+              {vulnerabilityMetrics?.inTriageCount}
+            </VulnBadge>
+            <VulnBadge color='red' label='Affected'>
+              {vulnerabilityMetrics?.affectedCount}
+            </VulnBadge>
+            <VulnBadge color='orange' label='Fixed'>
+              {vulnerabilityMetrics?.fixedCount}
+            </VulnBadge>
+            <VulnBadge color='green' label='Not Affected'>
+              {vulnerabilityMetrics?.notAffectedCount}
+            </VulnBadge>
+          </SimpleGrid>
         )
       },
-      width: '9%'
+      omit: signedUrlParams
     },
     // CREATED AT
     {
@@ -427,7 +439,7 @@ const VersionsTable = (props) => {
           </Tooltip>
         )
       },
-      width: '10%',
+      width: '150px',
       right: 'true',
       sortable: true
     },
@@ -446,7 +458,7 @@ const VersionsTable = (props) => {
         )
       },
       sortable: true,
-      width: '10%',
+      width: '150px',
       right: 'true'
     },
     // ACTIONS
