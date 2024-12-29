@@ -13,6 +13,7 @@ import {
   Img,
   Link,
   SimpleGrid,
+  Skeleton,
   Spinner,
   Text,
   chakra,
@@ -43,7 +44,7 @@ const Compliance = ({ sbomData }) => {
 
   const [activeTab, setActiveTab] = useState(0)
 
-  const { data: compliances } = useQuery(ActiveCompliances, {
+  const { data: compliances, loading } = useQuery(ActiveCompliances, {
     skip: tab === 'compliance' ? false : true
   })
   const { data: ntiaResult, loading: ntiaLoading } = useQuery(
@@ -137,6 +138,16 @@ const Compliance = ({ sbomData }) => {
     return activeItems
   })
   const tabs = filterData?.map((item) => item?.type)
+
+  if (loading) {
+    return (
+      <SimpleGrid columns={3} spacing={5} mt={2}>
+        {[1, 2, 3].map((item) => (
+          <Skeleton key={item} w={'full'} h={64} />
+        ))}
+      </SimpleGrid>
+    )
+  }
 
   return (
     <>
