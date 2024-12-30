@@ -19,11 +19,11 @@ import { recheckHealth } from 'graphQL/Mutation'
 import {
   DownloadSBOM,
   GetComponentSupportData,
+  GetProductManufacturer,
   SignedSbomDownload
 } from 'graphQL/Queries'
-import { GetProductManufacturer } from 'graphQL/Queries'
 
-import { FaFileDownload } from 'react-icons/fa'
+import { FiDownload } from 'react-icons/fi'
 
 import Loading from './Misc/Loading'
 
@@ -241,7 +241,7 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
             colorScheme='blue'
             className='download'
             isDisabled={isLoading}
-            icon={<FaFileDownload />}
+            icon={<FiDownload />}
           />
         </Tooltip>
         <MenuList width='220px'>

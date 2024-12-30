@@ -16,7 +16,7 @@ const SbomInfo = ({ data, error, loading }) => {
 
   if (loading) {
     return (
-      <Card mb='6'>
+      <Card>
         <Flex alignItems={'center'} gap={6}>
           <Skeleton width={'100%'} height='30px' />
           <Skeleton width={'100%'} height='30px' />

@@ -6,9 +6,17 @@ import { getSignedUrlParams } from 'utils'
 import CompDrawer from 'views/Dashboard/Products/components/CompDrawer'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
-import { DeleteIcon, EditIcon, SearchIcon } from '@chakra-ui/icons'
-import { Box, Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
+import { EditIcon, SearchIcon } from '@chakra-ui/icons'
+import {
+  Box,
+  Flex,
+  IconButton,
+  Stack,
+  Tooltip,
+  useDisclosure
+} from '@chakra-ui/react'
 
+import SystemLogs from 'components/Drawer/SystemLogs'
 import PrimaryTreeView from 'components/PrimaryTreeView'
 import ReleaseDate from 'components/ReleaseDate'
 import SbomDownload from 'components/SbomDownload'
@@ -31,6 +39,9 @@ import {
   GetProject,
   ShareProject
 } from 'graphQL/Queries'
+
+import { BiTrash } from 'react-icons/bi'
+import { FaCheck } from 'react-icons/fa6'
 
 import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
@@ -68,6 +79,12 @@ const SbomActions = ({ sbom }) => {
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
 
+  const SBOM = useDisclosure()
+  const LOGS = useDisclosure()
+  const PRIMARY = useDisclosure()
+  const VERIFY = useDisclosure()
+  const DELETE = useDisclosure()
+
   const [status, setStatus] = useState('created')
   const [checks, setChecks] = useState(false)
   const [signedData, setSignedData] = useState(null)
@@ -82,30 +99,6 @@ const SbomActions = ({ sbom }) => {
 
   const [deleteSbom] = useMutation(sbomDelete)
   const [healthRecheck] = useMutation(recheckHealth)
-
-  const {
-    isOpen: isSBMOpen,
-    onOpen: setSBMOpen,
-    onClose: setSBMClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isPrimaryOpen,
-    onOpen: onPrimaryOpen,
-    onClose: onPrimaryClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isVerifyOpen,
-    onOpen: setVerifyOpen,
-    onClose: setVerifyClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: setDeleteOpen,
-    onClose: setDeleteClose
-  } = useDisclosure()
 
   const { isOpen: isCopied, onClose: onCopiedClose } = useDisclosure()
 
@@ -192,9 +185,9 @@ const SbomActions = ({ sbom }) => {
 
   useEffect(() => {
     if (noPrimaryComp) {
-      setSBMClose()
+      SBOM.onClose()
     }
-  }, [noPrimaryComp, setSBMClose])
+  }, [noPrimaryComp, SBOM])
 
   const activeRow = nodes?.length > 0 ? nodes[0] : null
 
@@ -209,7 +202,7 @@ const SbomActions = ({ sbom }) => {
     }
     if (sbom?.primaryComponent) {
       sbomDispatch({ type: 'SET_LICENSES', payload: sbom?.primaryComponent })
-      setSBMOpen()
+      SBOM.onOpen()
     } else {
       healthRecheck({ variables: { sbomId } })
         .then((res) => {
@@ -219,7 +212,7 @@ const SbomActions = ({ sbom }) => {
             setChecks(true)
           }
         })
-        .finally(() => onPrimaryOpen())
+        .finally(() => PRIMARY.onOpen())
     }
   }
 
@@ -250,8 +243,7 @@ const SbomActions = ({ sbom }) => {
 
   return (
     <>
-      {/* ---------- SBOM ACTIONS ------------- */}
-      <Flex gap={2} alignItems={'center'} justifyContent={'flex-end'}>
+      <Stack spacing={2} alignItems={'flex-end'}>
         {/* SELECT SBOM VERSIONS */}
         <Box className='search-version' pos={'relative'}>
           <SearchIcon
@@ -276,68 +268,86 @@ const SbomActions = ({ sbom }) => {
             isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
           />
         </Box>
-        {/* UPDATE PRIMARY COMPONENT */}
-        <Tooltip label={updateLabel} isDisabled={false}>
-          <IconButton
-            display={signedUrlParams ? 'none' : 'flex'}
-            isDisabled={status === 'signed' || !updateSboms || noPrimaryComp}
-            colorScheme='blue'
-            icon={<EditIcon />}
-            onClick={handleEditSbom}
-          />
-        </Tooltip>
-        {/* GRAPH VIEW */}
-        <PrimaryTreeView
-          status={status}
-          updateSboms={updateSboms}
-          noPrimaryComp={noPrimaryComp}
-        />
-        {/* RELEASE DATE */}
-        {shouldShowDemoFeatures && (
-          <ReleaseDate
+        {/*  SBOM ACTIONS */}
+        <Flex gap={2} alignItems={'center'}>
+          {/* UPDATE PRIMARY COMPONENT */}
+          <Tooltip label={updateLabel} isDisabled={false}>
+            <IconButton
+              colorScheme='blue'
+              icon={<EditIcon />}
+              onClick={handleEditSbom}
+              display={signedUrlParams ? 'none' : 'flex'}
+              isDisabled={status === 'signed' || !updateSboms || noPrimaryComp}
+            />
+          </Tooltip>
+          {/* GRAPH VIEW */}
+          <PrimaryTreeView
             status={status}
             updateSboms={updateSboms}
             noPrimaryComp={noPrimaryComp}
           />
-        )}
-        {/* DOWNLOAD SBOM */}
-        <SbomDownload sbom={sbom} primaryLoading={primaryCompLoading} />
-        {/* DELETE SBOM */}
-        <Tooltip label='Delete'>
-          <IconButton
-            colorScheme='red'
-            icon={<DeleteIcon />}
-            onClick={setDeleteOpen}
-            isDisabled={!archiveSboms}
-            display={signedUrlParams ? 'none' : 'flex'}
-          />
-        </Tooltip>
-      </Flex>
+          {/* RELEASE DATE */}
+          {shouldShowDemoFeatures && (
+            <ReleaseDate
+              status={status}
+              updateSboms={updateSboms}
+              noPrimaryComp={noPrimaryComp}
+            />
+          )}
+          {/* DOWNLOAD SBOM */}
+          <SbomDownload sbom={sbom} primaryLoading={primaryCompLoading} />
+          {/* SYSTEM LOG */}
+          <Tooltip label='System Log'>
+            <IconButton
+              colorScheme='blue'
+              icon={<FaCheck />}
+              onClick={LOGS.onOpen}
+              display={signedUrlParams || isFreeTier ? 'none' : 'flex'}
+            />
+          </Tooltip>
+          {/* DELETE SBOM */}
+          <Tooltip label='Delete'>
+            <IconButton
+              colorScheme='red'
+              onClick={DELETE.onOpen}
+              isDisabled={!archiveSboms}
+              icon={<BiTrash size={18} />}
+              display={signedUrlParams ? 'none' : 'flex'}
+            />
+          </Tooltip>
+        </Flex>
+      </Stack>
 
       {/* ---------- ACTIONS MODALS / DRAWERS ------------- */}
+
+      {/* SYSTEM LOG */}
+      {LOGS.isOpen && (
+        <SystemLogs isOpen={LOGS.isOpen} onClose={LOGS.onClose} />
+      )}
+
       {/*  SET PRIMARY COMPONENT */}
-      {isPrimaryOpen && (
+      {PRIMARY.isOpen && (
         <CheckModal
           ruleExists={null}
-          isOpen={isPrimaryOpen}
-          onClose={onPrimaryClose}
+          isOpen={PRIMARY.isOpen}
+          onClose={PRIMARY.onClose}
           activeRow={activeRow}
           isFreeTier={isFreeTier}
         />
       )}
 
       {/* UPDATE PRIMARY COMPONENT */}
-      {isSBMOpen && !noPrimaryComp && (
+      {SBOM.isOpen && !noPrimaryComp && (
         <CompDrawer
           data={primaryComponent[0]}
-          isOpen={isSBMOpen}
-          onClose={setSBMClose}
+          isOpen={SBOM.isOpen}
+          onClose={SBOM.onClose}
           primaryComp={sbom?.primaryComponent}
         />
       )}
 
       {/* VERIFY SBOM */}
-      {isVerifyOpen && (
+      {VERIFY.isOpen && (
         <SigningModal
           projectId={productId}
           sbomId={sbomId}
@@ -345,8 +355,8 @@ const SbomActions = ({ sbom }) => {
           setStatus={setStatus}
           signedData={signedData}
           setSignedData={setSignedData}
-          isOpen={isVerifyOpen}
-          onClose={setVerifyClose}
+          isOpen={VERIFY.isOpen}
+          onClose={VERIFY.onClose}
           sbomData={sbom}
         />
       )}
@@ -362,11 +372,11 @@ const SbomActions = ({ sbom }) => {
       )}
 
       {/* DELETE SBOM */}
-      {isDeleteOpen && (
+      {DELETE.isOpen && (
         <ConfirmationModal
-          isOpen={isDeleteOpen}
+          isOpen={DELETE.isOpen}
           isLoading={isLoading}
-          onClose={setDeleteClose}
+          onClose={DELETE.onClose}
           onConfirm={handleDelete}
           name={`${sbom?.project?.projectGroup?.name} - ${sbom?.projectVersion}`}
           title='Delete Version'

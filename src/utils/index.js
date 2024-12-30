@@ -29,7 +29,7 @@ import QpkgIcon from 'assets/svg/qpkg.png'
 import RpmIcon from 'assets/svg/rpm.png'
 import SwidIcon from 'assets/svg/swid.png'
 import SwiftIcon from 'assets/svg/swift.png'
-import { parseISO } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import { format as formatWithTZ, toZonedTime } from 'date-fns-tz'
 import { toLower } from 'lodash'
 import { PackageURL } from 'packageurl-js'
@@ -88,9 +88,18 @@ export function formatDateWithTimeZone(
   return formatWithTZ(zonedDate, dateFormat, { timeZone })
 }
 
+export const getFullDateTime = (date) => {
+  const currentDate = new Date(date)
+  const zonedDate = toZonedTime(currentDate, userTimezone)
+  const formattedDate = format(zonedDate, 'yyyy-MM-dd hh:mm:ss a', {
+    userTimezone
+  })
+  return formattedDate
+}
+
 //Get the formatted current date and time
 export const currentDateTime = (dateFormat = 'MMMM dd, yyyy hh:mm a') => {
-  const now = new Date()
+  const now = new Date(dateFormat)
   const utcDate = toZonedTime(now, 'UTC')
   return formatWithTZ(utcDate, dateFormat) + ' UTC'
 }
@@ -509,6 +518,17 @@ export const getFullDate = (dateString, timeZone = userTimezone) => {
   }
   const date = new Date(dateString)
   return date.toLocaleDateString('en-US', options)
+}
+
+export const calculateDuration = (startTime, endTime) => {
+  const start = new Date(startTime)
+  const end = new Date(endTime)
+  const totalSeconds = Math.max(0, Math.floor((end - start) / 1000))
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+
+  return { hours, minutes, seconds }
 }
 
 export const customStyles = (
