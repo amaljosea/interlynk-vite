@@ -3,6 +3,7 @@ import { client } from 'context/ApolloWrapper'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams, truncatedValue } from 'utils'
+import { isCustomerView } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
 import {
@@ -54,6 +55,7 @@ const DownloadModal = (props) => {
   const { organization } = useGlobalState()
   const { superAdmin } = organization?.currentUser || ''
   const signedUrlParams = getSignedUrlParams()
+  const customerView = isCustomerView()
 
   const [getData] = useLazyQuery(
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
@@ -64,7 +66,8 @@ const DownloadModal = (props) => {
     loading: prodDescLoading,
     error: prodDescErr
   } = useQuery(GetProjectGroup, {
-    variables: { id: params?.productgroupid }
+    variables: { id: params?.productgroupid },
+    skip: customerView
   })
 
   const productDescription = data?.projectGroup.description
