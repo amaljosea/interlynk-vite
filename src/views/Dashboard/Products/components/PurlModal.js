@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
-import { Box, Button, Flex, Skeleton, VStack } from '@chakra-ui/react'
-import { Checkbox, FormControl, FormLabel, Textarea } from '@chakra-ui/react'
+import { Box, Button, Flex } from '@chakra-ui/react'
+import { FormControl, Textarea } from '@chakra-ui/react'
 
+import EnvironmentSelector from 'components/EnvironmentSelector'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 import CompInfo from 'components/Misc/CompInfo'
@@ -346,46 +347,14 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           qualifiers={purlData?.qualifiers}
         />
         {!ruleExists && (
-          <FormControl mt={5}>
-            <FormLabel>
-              Select Environments - only applicable for saving as rule
-            </FormLabel>
-            {envLoading ? (
-              <VStack align='start'>
-                {/* Loading Skeletons */}
-                <Skeleton height='16px' width='150px' />
-                <Skeleton height='16px' width='150px' />
-                <Skeleton height='16px' width='150px' />
-              </VStack>
-            ) : (
-              <VStack align='start'>
-                {/* Default Environment */}
-                <Checkbox
-                  isChecked
-                  isDisabled
-                  value={defaultEnv?.value}
-                  onChange={() => {}}
-                >
-                  {defaultEnv?.label}
-                </Checkbox>
-
-                {/* Other Environments */}
-                {options.map((option) => (
-                  <Checkbox
-                    key={option.value}
-                    isChecked={selectedEnvironments?.some(
-                      (env) => env.value === option.value
-                    )}
-                    onChange={(e) =>
-                      handleCheckboxChange(option, e.target.checked)
-                    }
-                  >
-                    {option.label}
-                  </Checkbox>
-                ))}
-              </VStack>
-            )}
-          </FormControl>
+          <EnvironmentSelector
+            ruleExists={ruleExists}
+            envLoading={envLoading}
+            defaultEnv={defaultEnv}
+            options={options}
+            selectedEnvironments={selectedEnvironments}
+            handleCheckboxChange={handleCheckboxChange}
+          />
         )}
       </Flex>
     </LynkModal>

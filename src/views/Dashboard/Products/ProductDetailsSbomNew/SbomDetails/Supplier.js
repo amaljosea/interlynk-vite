@@ -63,6 +63,7 @@ const Supplier = ({ data, permission }) => {
         isFreeTier={isFreeTier}
         isOpen={SUPPLIER?.isOpen}
         onClose={SUPPLIER?.onClose}
+        ruleExists={true}
       />
 
       {/* SUPPLIER DELETE MODAL */}

@@ -4,16 +4,10 @@ import { useParams } from 'react-router-dom'
 import { disableButtonTemporarily } from 'utils'
 
 import { EditIcon } from '@chakra-ui/icons'
-import {
-  Button,
-  Checkbox,
-  Divider,
-  Flex,
-  Input,
-  VStack
-} from '@chakra-ui/react'
+import { Button, Flex, Input } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
+import EnvironmentSelector from 'components/EnvironmentSelector'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
@@ -457,7 +451,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators, projects }) => {
         >
           Add condition
         </Button>
-        <Divider />
+
         {/* ACTIONS */}
         <FormControl>
           <FormLabel htmlFor='actions'>Actions</FormLabel>
@@ -480,41 +474,18 @@ const CreateRule = ({ data, isOpen, onClose, subOperators, projects }) => {
           onClick={onAddAction}
           isDisabled={isSystem}
           title='Add automation action'
-          sx={{ fontSize: 'sm', fontWeight: 'medium' }}
+          sx={{ fontSize: 'sm', fontWeight: 'medium', marginBottom: 1 }}
         >
           Add action
         </Button>
         {/* Environment Select */}
         {!data && (
-          <FormControl>
-            <FormLabel>Select Environments</FormLabel>
-            <VStack align='start'>
-              {/* Default Environment */}
-              <Checkbox
-                isChecked
-                isDisabled
-                value={defaultEnv.value}
-                onChange={() => {}}
-              >
-                {defaultEnv?.label}
-              </Checkbox>
-
-              {/* Other Environments */}
-              {options.map((option) => (
-                <Checkbox
-                  key={option.value}
-                  isChecked={selectedEnvironments?.some(
-                    (env) => env.value === option.value
-                  )}
-                  onChange={(e) =>
-                    handleCheckboxChange(option, e.target.checked)
-                  }
-                >
-                  {option.label}
-                </Checkbox>
-              ))}
-            </VStack>
-          </FormControl>
+          <EnvironmentSelector
+            defaultEnv={defaultEnv}
+            options={options}
+            selectedEnvironments={selectedEnvironments}
+            handleCheckboxChange={handleCheckboxChange}
+          />
         )}
         {/* ERROR HANDLING */}
         {error !== '' && <LynkAlert msg={error} />}

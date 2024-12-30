@@ -6,16 +6,14 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 
 import {
   Button,
-  Checkbox,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Input,
-  Skeleton,
-  VStack
+  Input
 } from '@chakra-ui/react'
 
+import EnvironmentSelector from 'components/EnvironmentSelector'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -380,46 +378,14 @@ const PriSupplierModal = (props) => {
             />
           </FormControl>
           {!ruleExists && (
-            <FormControl mt={5}>
-              <FormLabel>
-                Select Environments - only applicable for saving as rule
-              </FormLabel>
-              {envLoading ? (
-                <VStack align='start'>
-                  {/* Loading Skeletons */}
-                  <Skeleton height='16px' width='150px' />
-                  <Skeleton height='16px' width='150px' />
-                  <Skeleton height='16px' width='150px' />
-                </VStack>
-              ) : (
-                <VStack align='start'>
-                  {/* Default Environment */}
-                  <Checkbox
-                    isChecked
-                    isDisabled
-                    value={defaultEnv?.value}
-                    onChange={() => {}}
-                  >
-                    {defaultEnv?.label}
-                  </Checkbox>
-
-                  {/* Other Environments */}
-                  {options.map((option) => (
-                    <Checkbox
-                      key={option.value}
-                      isChecked={selectedEnvironments?.some(
-                        (env) => env.value === option.value
-                      )}
-                      onChange={(e) =>
-                        handleCheckboxChange(option, e.target.checked)
-                      }
-                    >
-                      {option.label}
-                    </Checkbox>
-                  ))}
-                </VStack>
-              )}
-            </FormControl>
+            <EnvironmentSelector
+              ruleExists={ruleExists}
+              envLoading={envLoading}
+              defaultEnv={defaultEnv}
+              options={options}
+              selectedEnvironments={selectedEnvironments}
+              handleCheckboxChange={handleCheckboxChange}
+            />
           )}
         </Flex>
       </LynkModal>

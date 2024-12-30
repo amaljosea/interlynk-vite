@@ -4,17 +4,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { validatePhoneNumber } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
-import {
-  Button,
-  Checkbox,
-  Flex,
-  FormControl,
-  FormLabel,
-  Input,
-  Skeleton,
-  VStack
-} from '@chakra-ui/react'
+import { Button, Flex, FormControl, FormLabel, Input } from '@chakra-ui/react'
 
+import EnvironmentSelector from 'components/EnvironmentSelector'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
@@ -58,7 +50,6 @@ const AuthorModal = ({ isOpen, onClose }) => {
   const { projects, loading: envLoading } = useProjectGroup({
     projectGroupId: params.productgroupid
   })
-
   const [createRule, { loading: ruleLoading }] =
     useMutation(AutomationRuleCreate)
   const [createAuthor, { loading }] = useMutation(authorCreate)
@@ -85,7 +76,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
     }
   })
 
-  const { data } = useQuery(GetExistingRules, {
+  const { data, loading: existingRulesLoading } = useQuery(GetExistingRules, {
     skip: isOpen ? false : true,
     variables: {
       id: params?.productid,
@@ -120,7 +111,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     const defaultOption = projects.find(
-      (project) => project.id === params.productgroupid
+      (project) => project.id === params.productid
     )
     if (defaultOption) {
       const defaultEnvObj = {
@@ -132,7 +123,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
     }
 
     const otherOptions = projects
-      .filter((project) => project.id !== params.productgroupid)
+      .filter((project) => project.id !== params.productid)
       .map((project) => ({
         value: project.id,
         label: project.name
@@ -334,46 +325,15 @@ const AuthorModal = ({ isOpen, onClose }) => {
             placeholder='Add phone number'
           />
         </FormControl>
-        {!ruleExists && (
-          <FormControl mt={5}>
-            <FormLabel>
-              Select Environments - only applicable for saving as rule
-            </FormLabel>
-            {envLoading ? (
-              <VStack align='start'>
-                {/* Loading Skeletons */}
-                <Skeleton height='16px' width='150px' />
-                <Skeleton height='16px' width='150px' />
-                <Skeleton height='16px' width='150px' />
-              </VStack>
-            ) : (
-              <VStack align='start'>
-                {/* Default Environment */}
-                <Checkbox
-                  isChecked
-                  isDisabled
-                  value={defaultEnv?.value}
-                  onChange={() => {}}
-                >
-                  {defaultEnv?.label}
-                </Checkbox>
-                {/* Other Environments */}
-                {options.map((option) => (
-                  <Checkbox
-                    key={option.value}
-                    isChecked={selectedEnvironments?.some(
-                      (env) => env.value === option.value
-                    )}
-                    onChange={(e) =>
-                      handleCheckboxChange(option, e.target.checked)
-                    }
-                  >
-                    {option.label}
-                  </Checkbox>
-                ))}
-              </VStack>
-            )}
-          </FormControl>
+        {!ruleExists && !existingRulesLoading && (
+          <EnvironmentSelector
+            ruleExists={ruleExists}
+            envLoading={envLoading}
+            defaultEnv={defaultEnv}
+            options={options}
+            selectedEnvironments={selectedEnvironments}
+            handleCheckboxChange={handleCheckboxChange}
+          />
         )}
       </Flex>
     </LynkModal>

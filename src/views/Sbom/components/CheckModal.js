@@ -7,25 +7,11 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { componentTypes } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
-import {
-  FormErrorMessage,
-  List,
-  ListItem,
-  Skeleton,
-  Stack,
-  VStack
-} from '@chakra-ui/react'
-import {
-  Box,
-  Button,
-  Checkbox,
-  Flex,
-  Icon,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
+import { FormErrorMessage, List, ListItem, Stack } from '@chakra-ui/react'
+import { Box, Button, Flex, Icon, Text, Tooltip } from '@chakra-ui/react'
 import { FormControl, FormLabel, Input, Select } from '@chakra-ui/react'
 
+import EnvironmentSelector from 'components/EnvironmentSelector'
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
@@ -634,6 +620,17 @@ const CheckModal = (props) => {
               <FormErrorMessage>Please enter a valid datetime</FormErrorMessage>
             )}
           </FormControl>
+          {/* Environment Select */}
+          {!ruleExists && (
+            <EnvironmentSelector
+              ruleExists={ruleExists}
+              envLoading={envLoading}
+              defaultEnv={defaultEnv}
+              options={options}
+              selectedEnvironments={selectedEnvironments}
+              handleCheckboxChange={handleCheckboxChange}
+            />
+          )}
         </Stack>
       )}
 
@@ -643,49 +640,6 @@ const CheckModal = (props) => {
           resolved={resolved}
           license={licensesExp}
         />
-      )}
-      {/* Environment Select */}
-      {!ruleExists && (
-        <FormControl mt={5}>
-          <FormLabel>
-            Select Environments - only applicable for saving as rule
-          </FormLabel>
-          {envLoading ? (
-            <VStack align='start'>
-              {/* Loading Skeletons */}
-              <Skeleton height='16px' width='150px' />
-              <Skeleton height='16px' width='150px' />
-              <Skeleton height='16px' width='150px' />
-            </VStack>
-          ) : (
-            <VStack align='start'>
-              {/* Default Environment */}
-              <Checkbox
-                isChecked
-                isDisabled
-                value={defaultEnv?.value}
-                onChange={() => {}}
-              >
-                {defaultEnv?.label}
-              </Checkbox>
-
-              {/* Other Environments */}
-              {options.map((option) => (
-                <Checkbox
-                  key={option.value}
-                  isChecked={selectedEnvironments?.some(
-                    (env) => env.value === option.value
-                  )}
-                  onChange={(e) =>
-                    handleCheckboxChange(option, e.target.checked)
-                  }
-                >
-                  {option.label}
-                </Checkbox>
-              ))}
-            </VStack>
-          )}
-        </FormControl>
       )}
     </LynkModal>
   )
