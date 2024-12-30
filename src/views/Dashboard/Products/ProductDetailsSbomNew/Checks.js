@@ -113,10 +113,8 @@ const Checks = ({ sbomData }) => {
     }
   })
 
-  const [recheck] = useMutation(recheckHealth)
-
   const handleRecheck = () => {
-    recheck({
+    recheckHealth({
       variables: {
         sbomId: params?.sbomid,
         checkId: activeRow?.organizationRule?.rule?.friendlyId || undefined,
