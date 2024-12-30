@@ -215,7 +215,13 @@ const ChecksColumns = (
         selector: (row) => {
           const { status, id, componentId } = row
           const { friendlyId } = row?.organizationRule?.rule || ''
-          const fixedIDs = ['SB-HC-4', 'SB-HC-5', 'SB-HC-6', 'SB-HC-16']
+          const fixedIDs = [
+            'SB-HC-4',
+            'SB-HC-5',
+            'SB-HC-6',
+            'SB-HC-16',
+            'SB-HC-11'
+          ]
           const fixedByDefault = fixedIDs.includes(friendlyId)
           const isPrimary = friendlyId === 'SB-HC-10'
           const isEditable = componentId ? updateComp : editChecks
