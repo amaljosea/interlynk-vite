@@ -8,24 +8,22 @@ import {
   Avatar,
   Button,
   Divider,
+  Flex,
+  IconButton,
+  Text,
+  Tooltip
+} from '@chakra-ui/react'
+import {
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  IconButton,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Text,
-  Tooltip
+  DrawerOverlay
 } from '@chakra-ui/react'
+import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -225,12 +223,10 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
   ])
 
   useEffect(() => {
-    if (orgData) {
+    if (orgData && isOpen) {
       setNewUserName(orgData?.currentUser?.name)
-    } else {
-      setNewUserName('')
     }
-  }, [orgData])
+  }, [isOpen, orgData])
 
   return (
     <Drawer
@@ -428,8 +424,8 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
               title='Save'
               colorScheme='blue'
               onClick={handleSave}
-              isDisabled={isSaveDisabled}
               isLoading={userLoading || passLoading}
+              isDisabled={isSaveDisabled || newUserName === ''}
             >
               Save
             </Button>
