@@ -69,11 +69,7 @@ const OrgDrawer = ({ isOpen, onClose }) => {
 
         <DrawerBody>
           <FormControl mb={4}>
-            <FormLabel
-              mb='8px'
-              fontSize='16px'
-              textColor={secondaryTextInverse}
-            >
+            <FormLabel mb='8px' textColor={secondaryTextInverse}>
               Name
             </FormLabel>
             <Input
@@ -82,12 +78,12 @@ const OrgDrawer = ({ isOpen, onClose }) => {
               onChange={(e) => setOrgName(e.target.value)}
             />
           </FormControl>
-
           <Button
             colorScheme='blue'
-            title='Update organization name'
             isLoading={updateLoading}
+            isDisabled={orgName === ''}
             onClick={handleUpdateOrgName}
+            title='Update organization name'
           >
             Update
           </Button>
