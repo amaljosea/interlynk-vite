@@ -408,13 +408,13 @@ const VersionsTable = (props) => {
             <VulnBadge color='gray' label='Unspecified'>
               {vulnerabilityMetrics?.unspecifiedCount}
             </VulnBadge>
-            <VulnBadge color='blue' label='In Triage'>
+            <VulnBadge color='cyan' label='In Triage'>
               {vulnerabilityMetrics?.inTriageCount}
             </VulnBadge>
             <VulnBadge color='red' label='Affected'>
               {vulnerabilityMetrics?.affectedCount}
             </VulnBadge>
-            <VulnBadge color='orange' label='Fixed'>
+            <VulnBadge color='blue' label='Fixed'>
               {vulnerabilityMetrics?.fixedCount}
             </VulnBadge>
             <VulnBadge color='green' label='Not Affected'>
