@@ -48,6 +48,18 @@ const GetActivities = gql`
         sbomActivityDetails {
           subjectType
           subjectId
+          subject {
+            ... on Sbom {
+              id
+            }
+            ... on SbomComponent {
+              id
+              name
+              version
+              purl
+              cpes
+            }
+          }
           action
           result
         }
@@ -95,6 +107,15 @@ const SystemLogs = ({ isOpen, onClose }) => {
         })
       : []
 
+  const setAction = (type, subject) => {
+    switch (type) {
+      case 'cpe':
+        return `CPE: ${subject?.cpe || 'N/A'}`
+      case 'purl':
+        return `PURL: ${subject?.purl || 'N/A'}`
+    }
+  }
+
   const ExpandedComponent = ({ data }) => {
     const { sbomActivityDetails } = data || {}
     return (
@@ -106,8 +127,8 @@ const SystemLogs = ({ isOpen, onClose }) => {
         {sbomActivityDetails?.map((item) => (
           <ListItem key={item?.id}>
             <ListIcon as={MdSettings} color={sameSecondaryText} />
-            {item?.subjectType} {`(${item?.subjectId})`} - {item?.action} -{' '}
-            {item?.result}
+            {`[${item?.subject?.name}:${item?.subject?.version}]`} {'>'}{' '}
+            {setAction(item?.action, item?.subject)} {'>'} {item?.result}
           </ListItem>
         ))}
         <ListItem>
