@@ -27,7 +27,6 @@ const GlobalStateProvider = ({ children }) => {
   const [scanEnabled, setScanEnabled] = useState(false)
   const [envName, setEnvName] = useState(env || 'default')
   const [clearSelect, setClearSelect] = useState(true)
-  const [selectedSbom, setSelectedSbom] = useState([])
 
   // PRODUCTS
   const [prodState, prodDispatch] = useReducer(prodReducer, {
@@ -182,8 +181,6 @@ const GlobalStateProvider = ({ children }) => {
         setEnvName,
         clearSelect,
         setClearSelect,
-        selectedSbom,
-        setSelectedSbom,
         compVulnState,
         prodState,
         prodCompState,

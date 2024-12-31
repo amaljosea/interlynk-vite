@@ -10,7 +10,7 @@ import { sbomDelete } from 'graphQL/Mutation'
 const DeleteSbom = ({ isOpen, onClose, data, projectGroup }) => {
   const { showToast } = useCustomToast()
   const { id, projectVersion } = data || ''
-  const { setClearSelect, setSelectedSbom } = useGlobalState()
+  const { setClearSelect } = useGlobalState()
 
   const [deleteSbom] = useMutation(sbomDelete)
 
@@ -32,7 +32,6 @@ const DeleteSbom = ({ isOpen, onClose, data, projectGroup }) => {
       } else {
         setIsLoading(false)
         setClearSelect(true)
-        setSelectedSbom([])
         onClose()
       }
     })

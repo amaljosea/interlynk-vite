@@ -10,7 +10,7 @@ import { sbomUpdate } from 'graphQL/Mutation'
 const ArchiveSbom = ({ isOpen, onClose, data, projectGroup }) => {
   const { showToast } = useCustomToast()
   const { id, spec, lifecycle, projectVersion } = data || ''
-  const { setClearSelect, setSelectedSbom } = useGlobalState()
+  const { setClearSelect } = useGlobalState()
 
   const isArchived = lifecycle === 'archived'
 
@@ -36,7 +36,6 @@ const ArchiveSbom = ({ isOpen, onClose, data, projectGroup }) => {
       } else {
         setIsLoading(false)
         setClearSelect(true)
-        setSelectedSbom([])
         onClose()
       }
     })

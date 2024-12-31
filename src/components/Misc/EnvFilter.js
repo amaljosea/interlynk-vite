@@ -19,8 +19,7 @@ const EnvFilter = ({ data }) => {
   const navigate = useNavigate()
   const activeTab = useQueryParam('tab')
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
-  const { envName, onChangeEnv, setClearSelect, setSelectedSbom } =
-    useGlobalState()
+  const { envName, onChangeEnv, setClearSelect } = useGlobalState()
 
   const { projects } = useProjectGroup({
     projectGroupId: params?.productgroupid
@@ -39,7 +38,6 @@ const EnvFilter = ({ data }) => {
     }
     onChangeEnv(value)
     setClearSelect(true)
-    setSelectedSbom([])
   }
 
   return (

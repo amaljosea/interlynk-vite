@@ -96,8 +96,7 @@ const ProductTable = (props) => {
 
   const { search, field } = filters
 
-  const { setEnvName, setClearSelect, setSelectedSbom, dispatch, envName } =
-    useGlobalState()
+  const { setEnvName, setClearSelect, dispatch, envName } = useGlobalState()
 
   const environment = envName
   const { prodDispatch } = dispatch
@@ -348,7 +347,6 @@ const ProductTable = (props) => {
         const handleClick = () => {
           setIsOpen(false)
           setClearSelect(true)
-          setSelectedSbom([])
           const env = projects?.find((item) => item.name === environment)
           setEnvName(env ? env?.name : defaultProject?.name)
           prodDispatch({

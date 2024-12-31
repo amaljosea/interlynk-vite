@@ -15,8 +15,7 @@ const GlobalEnvFilter = () => {
   const navigate = useNavigate()
   const activeTab = useQueryParam('tab')
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
-  const { envName, onChangeEnv, setClearSelect, setSelectedSbom } =
-    useGlobalState()
+  const { envName, onChangeEnv, setClearSelect } = useGlobalState()
 
   const { secondaryBlueBorder } = useThemeColor(['secondaryBlueBorder'])
 
@@ -41,7 +40,6 @@ const GlobalEnvFilter = () => {
     }
     onChangeEnv(value)
     setClearSelect(true)
-    setSelectedSbom([])
   }
 
   return (
