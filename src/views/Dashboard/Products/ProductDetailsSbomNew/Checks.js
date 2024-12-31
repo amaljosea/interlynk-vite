@@ -113,16 +113,6 @@ const Checks = ({ sbomData }) => {
     }
   })
 
-  const handleRecheck = () => {
-    recheckHealth({
-      variables: {
-        sbomId: params?.sbomid,
-        checkId: activeRow?.organizationRule?.rule?.friendlyId || undefined,
-        compId: activeRow?.component?.id || undefined
-      }
-    })
-  }
-
   const editChecks = useHasPermission({
     parentKey: 'view_sbom',
     childKey: 'edit_checks'
@@ -153,6 +143,16 @@ const Checks = ({ sbomData }) => {
   const COMP_CPE = useDisclosure()
   const FIXED = useDisclosure()
   const COMP_SUPPORT = useDisclosure()
+
+  const handleRecheck = () => {
+    healthRecheck({
+      variables: {
+        sbomId: params?.sbomid,
+        checkId: activeRow?.organizationRule?.rule?.friendlyId || undefined,
+        compId: activeRow?.component?.id || undefined
+      }
+    })
+  }
 
   const handleOpenLicense = () => {
     prodCompDispatch({ type: 'CLEAR_LICENSES' })

@@ -22,27 +22,25 @@ const ChecksSubHeader = (
   sbomCheckDispatch
 ) => {
   const subHeader = useMemo(() => {
-    const handleReCheck =
-      (async () => {
-        showToast({
-          description: 'Checks rescan is in progress',
-          status: 'info'
-        })
-        await healthRecheck({
-          variables: {
-            sbomId: sbomId
-          }
-        }).then((res) => {
-          if (res.data) {
-            showToast({
-              description: 'Health re-check successfully',
-              status: 'success'
-            })
-          }
-        })
-        reset()
-      },
-      [healthRecheck, sbomId, showToast, reset])
+    const handleReCheck = async () => {
+      showToast({
+        description: 'Checks rescan is in progress',
+        status: 'info'
+      })
+      await healthRecheck({
+        variables: {
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res.data) {
+          showToast({
+            description: 'Health re-check successfully',
+            status: 'success'
+          })
+        }
+      })
+      reset()
+    }
 
     // ON SEARCH INPUT CHANGE
     const onSearchInputChange = (e) => {
