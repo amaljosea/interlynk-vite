@@ -188,7 +188,7 @@ const GlobalVulnTable = (props) => {
             placement={'top'}
           >
             <Text color={primaryTextColor} textAlign={'right'}>
-              {published}
+              {published || 'N/A'}
             </Text>
           </Tooltip>
         )
@@ -215,7 +215,7 @@ const GlobalVulnTable = (props) => {
             placement={'top'}
           >
             <Text color={primaryTextColor} textAlign={'right'}>
-              {modified}
+              {modified || 'N/A'}
             </Text>
           </Tooltip>
         )
