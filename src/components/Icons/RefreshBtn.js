@@ -1,8 +1,8 @@
 import { refetchActiveQueries } from 'context/ApolloWrapper'
-import React from 'react'
 
-import { RepeatIcon } from '@chakra-ui/icons'
 import { IconButton, Tooltip } from '@chakra-ui/react'
+
+import { TbRefresh } from 'react-icons/tb'
 
 const RefreshBtn = ({ onClick }) => {
   return (
@@ -16,7 +16,7 @@ const RefreshBtn = ({ onClick }) => {
         }}
         aria-label='refresh'
         colorScheme='blue'
-        icon={<RepeatIcon />}
+        icon={<TbRefresh fontSize={20} />}
       ></IconButton>
     </Tooltip>
   )

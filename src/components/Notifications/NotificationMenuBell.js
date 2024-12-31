@@ -2,10 +2,8 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
+import { Box, Icon, IconButton } from '@chakra-ui/react'
 import {
-  Box,
-  Icon,
-  IconButton,
   Menu,
   MenuButton,
   MenuItemOption,
@@ -23,7 +21,7 @@ import {
   GetUserNotificationPreferences
 } from 'graphQL/Queries'
 
-import { FaBell } from 'react-icons/fa'
+import { FaRegBell } from 'react-icons/fa6'
 
 import CheckMark from '../Misc/CheckMark'
 
@@ -113,7 +111,7 @@ const NotificationMenuBell = () => {
       <Menu closeOnSelect={false}>
         {preference[0] !== 'none' && <CheckMark zIndex={1} />}
         <MenuButton as={IconButton} colorScheme='blue'>
-          <Icon as={FaBell} mt={1} />
+          <Icon as={FaRegBell} mt={1} />
         </MenuButton>
         <MenuList fontSize={'sm'}>
           <MenuOptionGroup

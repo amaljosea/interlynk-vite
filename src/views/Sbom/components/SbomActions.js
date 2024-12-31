@@ -46,6 +46,7 @@ import { FaCheck } from 'react-icons/fa6'
 import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
 import SigningModal from './SigningModal'
+import { FiCheckCircle } from 'react-icons/fi'
 
 const SbomActions = ({ sbom }) => {
   const { showToast } = useCustomToast()
@@ -300,7 +301,7 @@ const SbomActions = ({ sbom }) => {
           <Tooltip label='System Log'>
             <IconButton
               colorScheme='blue'
-              icon={<FaCheck />}
+              icon={<FiCheckCircle size={16} />}
               onClick={LOGS.onOpen}
               display={signedUrlParams || isFreeTier ? 'none' : 'flex'}
             />

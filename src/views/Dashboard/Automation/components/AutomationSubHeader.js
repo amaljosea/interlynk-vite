@@ -10,6 +10,7 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import { useHasPermission } from 'hooks/useHasPermission'
 
 import { FaFileExport, FaFileImport } from 'react-icons/fa'
+import { TbFileExport, TbFileImport } from 'react-icons/tb'
 
 const RuleExport = gql`
   query RuleExport($id: Uuid!) {
@@ -67,7 +68,7 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
           <Tooltip label='Import Rules'>
             <IconButton
               colorScheme='blue'
-              icon={<FaFileImport />}
+              icon={<TbFileImport size={20} />}
               onClick={RULE_IMPORT.onOpen}
               isDisabled={!canEditAutomations}
             />
@@ -75,7 +76,7 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
           <Tooltip label='Export Rules'>
             <IconButton
               colorScheme='blue'
-              icon={<FaFileExport />}
+              icon={<TbFileExport size={20} />}
               onClick={handleExport}
               isLoading={exportLoading}
             />

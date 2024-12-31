@@ -1,6 +1,6 @@
 import { IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 
-import { FaFileCsv } from 'react-icons/fa6'
+import { GrDocumentCsv } from 'react-icons/gr'
 
 import ExportCsvModal from './ExportCsvModal'
 
@@ -12,7 +12,7 @@ const ExportCsv = ({ tableType, filters }) => {
       <Tooltip label='Export CSV'>
         <IconButton
           onClick={onOpen}
-          icon={<FaFileCsv fontSize={18} />}
+          icon={<GrDocumentCsv fontSize={18} />}
           colorScheme='blue'
           variant='solid'
           name='export_csv'

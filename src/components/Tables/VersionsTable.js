@@ -41,10 +41,10 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
 
-import { FaBoxArchive, FaCodeCompare } from 'react-icons/fa6'
-import { FaScrewdriverWrench } from 'react-icons/fa6'
+import {  FaPlus } from 'react-icons/fa6'
 import { HiOutlineDuplicate } from 'react-icons/hi'
 import { IoMdWarning } from 'react-icons/io'
+import { LuArchive, LuGitCompare } from 'react-icons/lu'
 
 // GET ACTIVCE PROJECT GROUP FOR PUBLIC VIEW
 export const GetShareProjectGroup = gql`
@@ -620,7 +620,7 @@ const VersionsTable = (props) => {
               <IconButton
                 onClick={TOOL.onOpen}
                 colorScheme='blue'
-                icon={<FaCodeCompare />}
+                icon={<LuGitCompare size={20} />}
               />
             </Tooltip>
           )}
@@ -632,7 +632,7 @@ const VersionsTable = (props) => {
               colorScheme='blue'
               aria-label='show_archive_sboms'
               onClick={ARC_VERSIONS.onOpen}
-              icon={<FaBoxArchive />}
+              icon={<LuArchive size={20} />}
             />
           </Tooltip>
           {/* BUILD SBOM */}
@@ -643,7 +643,7 @@ const VersionsTable = (props) => {
               colorScheme='blue'
               onClick={onBuildSbom}
               aria-label='build_sbom'
-              icon={<FaScrewdriverWrench />}
+              icon={<FaPlus />}
             />
           </Tooltip>
           <RefreshBtn />

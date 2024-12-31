@@ -12,14 +12,14 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 
+import { FaRegTrashAlt } from 'react-icons/fa'
 import {
   FaDiagramProject,
-  FaPenToSquare,
+  FaRegPenToSquare,
   FaToggleOff,
-  FaToggleOn,
-  FaTrash,
-  FaUpload
+  FaToggleOn
 } from 'react-icons/fa6'
+import { TbUpload } from 'react-icons/tb'
 
 import ProductProgressModal from '../ProductGraphs/ProductProgressModal'
 import ConfirmationModal from './ConfirmationModal'
@@ -94,7 +94,7 @@ const ProductActions = ({ data }) => {
               colorScheme='blue'
               aria-label='edit_product'
               onClick={PRODUCT.onOpen}
-              icon={<FaPenToSquare />}
+              icon={<FaRegPenToSquare />}
             />
           </Tooltip>
           {/* UPLOAD SBOM */}
@@ -103,7 +103,7 @@ const ProductActions = ({ data }) => {
               isDisabled={!enabled || signedUrlParams || !canCreateSBOM}
               colorScheme='blue'
               onClick={UPLOAD.onOpen}
-              icon={<FaUpload />}
+              icon={<TbUpload size={18} />}
             />
           </Tooltip>
           {/* UPDATE PRODUCT STATUS */}
@@ -122,7 +122,7 @@ const ProductActions = ({ data }) => {
               colorScheme='red'
               aria-label='delete_product'
               onClick={DELETE.onOpen}
-              icon={<FaTrash />}
+              icon={<FaRegTrashAlt />}
               isDisabled={!archiveProduct || signedUrlParams}
             />
           </Tooltip>

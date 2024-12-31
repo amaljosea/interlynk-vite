@@ -5,7 +5,7 @@ import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
 
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
-import { FaCheckDouble } from 'react-icons/fa'
+import { BiScan } from 'react-icons/bi'
 
 import CheckFilters from '../../CheckFilters'
 
@@ -105,7 +105,7 @@ const ChecksSubHeader = (
               onClick={handleReCheck}
               hidden={isArchived}
               isDisabled={!editChecks}
-              icon={<FaCheckDouble size={16} />}
+              icon={<BiScan size={20} />}
             />
           </Tooltip>
           <RefreshBtn />
