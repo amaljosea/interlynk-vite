@@ -30,15 +30,13 @@ class ShareLynkSelectors {
     "//section[contains(@id, 'chakra') and @role='dialog']//form"
   public static createShareLynkHeader = "//p[text()='Create ShareLynk']"
   public static expirationDate = "input[placeholder='Select Date and Time']"
-  public static addBtn =
-    "//section[contains(@id, 'chakra') and @role='dialog']//form//button[text()='Add']"
+  public static addBtn = "//button[@aria-label='save_sharelynk']"
   public static noExpirationCheckBox =
     "//section[contains(@id, 'chakra') and @role='dialog']//form//input[@type='checkbox']"
   public static copyBtn =
     "(//div[contains(@id, 'chakra-modal') and @role='dialog']//button)[4]"
   public static noExpirationSpan = "//span[text()='No Expiration']"
-  public static link =
-    "(//div[contains(@id, 'chakra-modal') and @role='dialog']//div[@data-column-id='SIGNED_URL']//input)[1]"
+  public static link = "//input[@aria-label='lynk_url']"
   public static productNameParagraph =
     "(//p[contains(@class,'chakra-text')])[1]"
 }

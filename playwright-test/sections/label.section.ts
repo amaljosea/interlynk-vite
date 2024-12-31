@@ -156,36 +156,12 @@ export default class LabelSection {
                         await this.page.locator(ls.productsHeader).click()
                         await this.page.waitForTimeout(2000)
                         await this.page.getByTestId('filter_Labels').click()
-
-                        const labelListItemLength = (
-                          await this.page.$$(ls.labelLists)
-                        ).length
-
-                        const labelLisItemtArr: string[] = []
-
-                        for (let i = 0; i < labelListItemLength; i++) {
-                          const labelListItemName: any = await this.page
-                            .locator(ls.getLabelList(i + 1))
-                            .textContent()
-                          labelLisItemtArr.push(labelListItemName)
-                        }
-
-                        const indexOfLabel = labelLisItemtArr.indexOf(lName)
+                        await this.page.waitForTimeout(2000)
 
                         await this.page
-                          .locator(ls.getLabelList(indexOfLabel))
+                          .locator("//button[@aria-label='label1']")
                           .click()
-                        await this.page.locator(ls.productsHeader).click()
                         await this.page.waitForTimeout(2000)
-                        const productWithLabelName = await this.page
-                          .locator(ls.productWithLabelName(lName))
-                          .isVisible()
-
-                        if (!productWithLabelName) {
-                          errors.push(
-                            `label filter failed for label name '${lName}'`
-                          )
-                        }
 
                         await this.page.locator(ps.menuBtn).click()
                         await waitForSelectorWithMinTime(

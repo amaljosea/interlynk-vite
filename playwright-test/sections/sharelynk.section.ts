@@ -59,95 +59,78 @@ export default class SharelynkSection {
             await this.page.locator(ss.menuBtn).click()
             await waitForSelectorWithMinTime(this.page, ss.viewShareLink)
             await this.page.locator(ss.viewShareLink).click()
-            await waitForSelectorWithMinTime(this.page, ss.shareLynkHeader)
 
-            const shareLynkPopup = await this.page
-              .locator(ss.shareLynkPopup)
+            const shareLynkCreateBtn = await this.page
+              .locator("//button[@aria-label='add_sharelynk']")
               .isVisible()
 
-            if (!shareLynkPopup) {
-              errors.push('sharelynk popup is not display!')
+            if (!shareLynkCreateBtn) {
+              errors.push('Sharelynk form is not visible!')
             } else {
-              await this.page.locator(ss.addShareLynkButton).click()
-              await waitForSelectorWithMinTime(
-                this.page,
-                ss.createShareLynkPoupup
+              await this.page
+                .locator("//button[@aria-label='add_sharelynk']")
+                .click()
+              await this.page.waitForTimeout(2000)
+
+              //   await this.page.locator(ss.noExpirationCheckBox).click()
+              await this.page.locator(ss.noExpirationSpan).hover()
+              await this.page.locator(ss.noExpirationSpan).click()
+
+              await this.page.locator(ss.addBtn).click()
+              await this.page.waitForTimeout(2000)
+
+              const linkUrl: any = await this.page
+                .locator(ss.link)
+                .getAttribute('value')
+
+              const newPage = await this.page.context().newPage()
+              await newPage.goto(linkUrl)
+              await waitForSelectorWithMinTime(newPage, ss.productNameParagraph)
+              const productNameParagraphTxt: any = await newPage
+                .locator(ss.productNameParagraph)
+                .textContent()
+              const cleanedProductName = productNameParagraphTxt?.replace(
+                /\.\.\.$/,
+                ''
               )
+              if (!productName.includes(cleanedProductName)) {
+                errors.push('sharelynk verification failed')
+              }
 
-              const createShareLynkPoupup = await this.page
-                .locator(ss.createShareLynkPoupup)
-                .isVisible()
+              await newPage.close()
+              await waitForSelectorWithMinTime(this.page, ss.closeBtn)
+              await this.page.locator(ss.closeBtn).click()
+              await waitForSelectorWithMinTime(this.page, ss.menuBtn)
+              await this.page.locator(ss.menuBtn).click()
+              await waitForSelectorWithMinTime(this.page, ss.deleteBtn)
+              await this.page.locator(ss.deleteBtn).click()
 
-              if (!createShareLynkPoupup) {
-                errors.push('create sharelynk popup is not display')
-              } else {
-                //   await this.page.locator(ss.noExpirationCheckBox).click()
-                await this.page.locator(ss.noExpirationSpan).hover()
-                await this.page.locator(ss.noExpirationSpan).click()
+              const deletePoupup = await this.page.locator(ss.popup).isVisible()
 
-                await this.page.locator(ss.addBtn).click()
-                await waitForSelectorWithMinTime(this.page, ss.shareLynkHeader)
-                const linkUrl: any = await this.page
-                  .locator(ss.link)
-                  .getAttribute('value')
-
-                const newPage = await this.page.context().newPage()
-                await newPage.goto(linkUrl)
-                await waitForSelectorWithMinTime(
-                  newPage,
-                  ss.productNameParagraph
-                )
-                const productNameParagraphTxt: any = await newPage
-                  .locator(ss.productNameParagraph)
-                  .textContent()
-                const cleanedProductName = productNameParagraphTxt?.replace(
-                  /\.\.\.$/,
-                  ''
-                )
-                if (!productName.includes(cleanedProductName)) {
-                  errors.push('sharelynk verification failed')
-                }
-
-                await newPage.close()
-                await waitForSelectorWithMinTime(this.page, ss.closeBtn)
-                await this.page.locator(ss.closeBtn).click()
-                await waitForSelectorWithMinTime(this.page, ss.menuBtn)
-                await this.page.locator(ss.menuBtn).click()
-                await waitForSelectorWithMinTime(this.page, ss.deleteBtn)
-                await this.page.locator(ss.deleteBtn).click()
-
-                const deletePoupup = await this.page
-                  .locator(ss.popup)
+              if (deletePoupup) {
+                const deleteProductHeader = await this.page
+                  .locator(ss.deleteProductHeader)
                   .isVisible()
 
-                if (deletePoupup) {
-                  const deleteProductHeader = await this.page
-                    .locator(ss.deleteProductHeader)
+                if (deleteProductHeader) {
+                  await this.page.locator(ss.yesBtn).click()
+                  await waitForSelectorWithMinTime(this.page, ss.productSearch)
+
+                  await this.page.locator(ss.productSearch).clear()
+                  await this.page.waitForTimeout(2000)
+                  await this.page.fill(ss.productSearch, productName)
+                  await this.page.press(ss.productSearch, 'Enter')
+                  await this.page.waitForTimeout(2000)
+
+                  const noRecordMsg = await this.page
+                    .locator(ss.noRecordMsg)
                     .isVisible()
 
-                  if (deleteProductHeader) {
-                    await this.page.locator(ss.yesBtn).click()
-                    await waitForSelectorWithMinTime(
-                      this.page,
-                      ss.productSearch
-                    )
-
-                    await this.page.locator(ss.productSearch).clear()
-                    await this.page.waitForTimeout(2000)
-                    await this.page.fill(ss.productSearch, productName)
-                    await this.page.press(ss.productSearch, 'Enter')
-                    await this.page.waitForTimeout(2000)
-
-                    const noRecordMsg = await this.page
-                      .locator(ss.noRecordMsg)
-                      .isVisible()
-
-                    if (!noRecordMsg) {
-                      errors.push('product deleted failed!')
-                    }
-                  } else {
-                    errors.push('delete product header is not visible!')
+                  if (!noRecordMsg) {
+                    errors.push('product deleted failed!')
                   }
+                } else {
+                  errors.push('delete product header is not visible!')
                 }
               }
             }

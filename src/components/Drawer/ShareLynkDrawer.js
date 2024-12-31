@@ -5,7 +5,7 @@ import { customStyles, getFullDate, timeSince, truncatedValue } from 'utils'
 import { getShareLinklUrl } from 'utils/url'
 
 import { DeleteIcon } from '@chakra-ui/icons'
-import { Button, Checkbox, Divider, Stack, Tag } from '@chakra-ui/react'
+import { Button, Checkbox, Divider, Input, Stack, Tag } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, IconButton, Text, Tooltip } from '@chakra-ui/react'
 import { useClipboard } from '@chakra-ui/react'
@@ -153,6 +153,7 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
             <IconButton
               icon={icon}
               onClick={onCopySvg}
+              aria-label='copy_sharelynk'
               colorScheme={svgLink.hasCopied ? 'whatsapp' : 'blue'}
             />
           </Tooltip>
@@ -160,6 +161,7 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
         <AddButton
           label='Add ShareLynk'
           tooltipPlacement='left'
+          aria-label='add_sharelynk'
           onClick={() => onToggle(true)}
         />
       </Flex>
@@ -186,15 +188,20 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
         return (
           <Flex my={4} gap={2} alignItems={'center'}>
             <IconButton
-              size='sm'
+              size={'sm'}
               isDisabled={!enabled}
               onClick={() => sbomLink.onCopy()}
               colorScheme={sbomLink?.hasCopied ? 'whatsapp' : 'blue'}
               icon={sbomLink?.hasCopied ? <FaCheck /> : <FaRegCopy />}
             />
-            <Text fontSize={'sm'} color={primaryTextColor}>
-              {truncatedValue(sbomLink?.value, 60)}
-            </Text>
+            <Input
+              isReadOnly
+              w={'300px'}
+              fontSize={'sm'}
+              aria-label='lynk_url'
+              color={primaryTextColor}
+              defaultValue={sbomLink?.value || ''}
+            />
           </Flex>
         )
       },
@@ -281,6 +288,7 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
                 isDisabled={isDisabled}
                 isLoading={createLoading}
                 onClick={handleCreateLynk}
+                aria-label='save_sharelynk'
               >
                 Add
               </Button>

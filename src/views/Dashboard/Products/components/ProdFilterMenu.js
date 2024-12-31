@@ -144,6 +144,7 @@ const ProdFilterMenu = (props) => {
                     fontSize={'sm'}
                     value={item?.id}
                     wordBreak={'break-all'}
+                    aria-label={`label${index}`}
                     onClick={(e) => handleMenuClick(e, item?.name)}
                     icon={
                       filterMode === 'AND' ? (
