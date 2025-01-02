@@ -1,5 +1,8 @@
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { useMemo } from 'react'
+import { useParams } from 'react-router-dom'
 import { getFullDate, timeSince } from 'utils'
+import { isCustomerView } from 'utils'
 
 import { CheckIcon } from '@chakra-ui/icons'
 import { Box, Button, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
@@ -7,35 +10,54 @@ import { Box, Button, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
 import SeverityTag from 'components/Misc/SeverityTag'
 import RowComponent from 'components/RowComponent'
 
+import useCustomToast from 'hooks/useCustomToast'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
+
+import { checkResultUpdate } from 'graphQL/Mutation'
+import { recheckHealth } from 'graphQL/Mutation'
+import { UpdateComponent } from 'graphQL/Mutation'
+import { sbomUpdate } from 'graphQL/Mutation'
+import { GetExistingRules } from 'graphQL/Queries'
 
 import { BiSolidWrench } from 'react-icons/bi'
 import { GoSkip } from 'react-icons/go'
 
 const ChecksColumns = (
   setActiveRow,
-  updateComp,
-  editChecks,
-  customerView,
   isArchived,
   activeRow,
-  loadingRules,
   FIXED,
-  updateResult,
-  getRules,
-  productId,
   setRuleExists,
-  handleOpen,
-  showToast,
-  sbomId,
-  healthRecheck,
-  updateComponent,
-  updateSbom
+  handleOpen
 ) => {
+  const { showToast } = useCustomToast()
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
+
+  const customerView = isCustomerView()
+
   const { primaryTextColor } = useThemeColor([
     'headingTextColor',
     'primaryTextColor'
   ])
+
+  const editChecks = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'edit_checks'
+  })
+
+  const updateComp = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom_components'
+  })
+
+  const [getRules, { loading: loadingRules }] = useLazyQuery(GetExistingRules)
+  const [updateResult] = useMutation(checkResultUpdate)
+  const [healthRecheck] = useMutation(recheckHealth)
+  const [updateComponent] = useMutation(UpdateComponent)
+  const [updateSbom] = useMutation(sbomUpdate)
 
   return useMemo(() => {
     const updateIssue = async (id, newStatus) => {

@@ -1,26 +1,54 @@
-import { useMemo } from 'react'
+import { useMutation } from '@apollo/client'
+import { useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
+import { Flex, IconButton, Stack, Tooltip, useQuery } from '@chakra-ui/react'
 
 import RefreshBtn from 'components/Icons/RefreshBtn'
+
+import useCustomToast from 'hooks/useCustomToast'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
+import useQueryParam from 'hooks/useQueryParam'
+
+import { recheckHealth } from 'graphQL/Mutation'
+import { GetCheckFilterData } from 'graphQL/Queries'
 
 import { BiScan } from 'react-icons/bi'
 
 import CheckFilters from '../../CheckFilters'
 
-const ChecksSubHeader = (
-  checkSearch,
-  filterHead,
-  reset,
-  isArchived,
-  editChecks,
-  showToast,
-  healthRecheck,
-  sbomId,
-  setCheckSearch,
-  sbomCheckDispatch
-) => {
+const ChecksSubHeader = (reset, isArchived) => {
+  const { showToast } = useCustomToast()
+
+  const activeTab = useQueryParam('tab')
+  const params = useParams()
+  const productId = params.productid
+  const sbomId = params.sbomid
+
+  const [checkSearch, setCheckSearch] = useState(search || '')
+
+  const editChecks = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'edit_checks'
+  })
+
+  const { sbomCheckState, dispatch } = useGlobalState()
+  const { sbomCheckDispatch } = dispatch
+  const { search } = sbomCheckState
+
+  const [healthRecheck] = useMutation(recheckHealth)
+
+  // GET HEALTH CHECK FILTER HEADS
+  const { data: filterHead } = useQuery(GetCheckFilterData, {
+    fetchPolicy: 'network-only',
+    skip: activeTab === 'checks' ? false : true,
+    variables: {
+      projectId: productId,
+      sbomId
+    }
+  })
   const subHeader = useMemo(() => {
     const handleReCheck = async () => {
       showToast({

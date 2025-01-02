@@ -2,7 +2,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles, isCustomerView } from 'utils'
+import { customStyles } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckModal from 'views/Sbom/components/CheckModal'
@@ -16,25 +16,13 @@ import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import LicenseModal from 'components/LicenseModal'
 import Pagination from 'components/Pagination'
 
-import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import {
-  UpdateComponent,
-  checkResultUpdate,
-  recheckHealth,
-  sbomUpdate
-} from 'graphQL/Mutation'
-import {
-  GetCheckFilterData,
-  GetCheckResults,
-  GetExistingRules,
-  GetProductData
-} from 'graphQL/Queries'
+import { recheckHealth } from 'graphQL/Mutation'
+import { GetCheckResults, GetProductData } from 'graphQL/Queries'
 import { GetComponentPath } from 'graphQL/Queries'
 
 import AuthorModal from '../components/AuthorModal'
@@ -46,12 +34,10 @@ const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
   value.includes(allValue) || value.length === 0 ? undefined : value
 
 const Checks = ({ sbomData }) => {
-  const { showToast } = useCustomToast()
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
-  const customerView = isCustomerView()
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
@@ -65,7 +51,6 @@ const Checks = ({ sbomData }) => {
 
   const [activeRow, setActiveRow] = useState(null)
   const [ruleExists, setRuleExists] = useState(false)
-  const [checkSearch, setCheckSearch] = useState(search || '')
 
   const checksData = useMemo(() => {
     return {
@@ -103,31 +88,7 @@ const Checks = ({ sbomData }) => {
     }
   )
 
-  // GET HEALTH CHECK FILTER HEADS
-  const { data: filterHead } = useQuery(GetCheckFilterData, {
-    fetchPolicy: 'network-only',
-    skip: activeTab === 'checks' ? false : true,
-    variables: {
-      projectId: productId,
-      sbomId
-    }
-  })
-
-  const editChecks = useHasPermission({
-    parentKey: 'view_sbom',
-    childKey: 'edit_checks'
-  })
-
-  const updateComp = useHasPermission({
-    parentKey: 'view_sbom',
-    childKey: 'update_sbom_components'
-  })
-
-  const [getRules, { loading: loadingRules }] = useLazyQuery(GetExistingRules)
-  const [updateResult] = useMutation(checkResultUpdate)
-  const [updateComponent] = useMutation(UpdateComponent)
   const [healthRecheck] = useMutation(recheckHealth)
-  const [updateSbom] = useMutation(sbomUpdate)
 
   const DOC_CREATION_TIME = useDisclosure()
   const DOC_LICENSE = useDisclosure()
@@ -249,38 +210,15 @@ const Checks = ({ sbomData }) => {
   // COLUMNS
   const columns = ChecksColumns(
     setActiveRow,
-    updateComp,
-    editChecks,
-    customerView,
     isArchived,
     activeRow,
-    loadingRules,
     FIXED,
-    updateResult,
-    getRules,
-    productId,
     setRuleExists,
-    handleOpen,
-    showToast,
-    sbomId,
-    healthRecheck,
-    updateComponent,
-    updateSbom
+    handleOpen
   )
 
   // SUB HEADER
-  const subHeader = ChecksSubHeader(
-    checkSearch,
-    filterHead,
-    reset,
-    isArchived,
-    editChecks,
-    showToast,
-    healthRecheck,
-    sbomId,
-    setCheckSearch,
-    sbomCheckDispatch
-  )
+  const subHeader = ChecksSubHeader(reset, isArchived)
 
   // SORTING
   const handleSort = (column, sortDirection) => {
