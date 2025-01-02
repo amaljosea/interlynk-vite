@@ -1,13 +1,15 @@
 import { gql, useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 import { calculateDuration, getFullDateTime } from 'utils'
+import { timeSince } from 'utils'
 
 import {
   Accordion,
   AccordionButton,
   AccordionIcon,
   AccordionItem,
-  AccordionPanel
+  AccordionPanel,
+  Tooltip
 } from '@chakra-ui/react'
 import { Flex, SimpleGrid, Stack, Text } from '@chakra-ui/react'
 import { List, ListIcon, ListItem } from '@chakra-ui/react'
@@ -167,9 +169,11 @@ const SystemLogs = ({ isOpen, onClose }) => {
       <Stack spacing={1.5} my={3}>
         <Flex gap={2} alignItems={'center'}>
           <FaRegCalendar fontSize={14} color={sameSecondaryText} />
-          <Text fontSize={'xs'} color={sameSecondaryText}>
-            {row?.endTime ? getFullDateTime(row?.endTime) : ''}
-          </Text>
+          <Tooltip label={getFullDateTime(row?.endTime)}>
+            <Text fontSize={'xs'} color={sameSecondaryText}>
+              {row?.endTime ? timeSince(row?.endTime) : ''}
+            </Text>
+          </Tooltip>
         </Flex>
         <Flex gap={2} alignItems={'center'}>
           <FaRegClock fontSize={14} color={sameSecondaryText} />
