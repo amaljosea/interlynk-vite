@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { getSignedUrlParams, isCustomerView, parseLicenseString } from 'utils'
+import { getSignedUrlParams, isCustomerView } from 'utils'
 import { openSsf } from 'variables/general'
 
 import { Box, Flex, Tag, Text, VStack } from '@chakra-ui/react'
@@ -39,11 +39,45 @@ const ExpandedComponent = (props) => {
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Grid templateColumns='repeat(3, 1fr)' py={2} gap={6}>
-          <GridItem colSpan={3}>
+          <GridItem>
             <CustomText>Name :</CustomText>
             <Text sx={textStyle} width={'90%'}>
               {data?.name || 'N/A'}
             </Text>
+          </GridItem>
+          <GridItem>
+            <CustomText>Type :</CustomText>
+            <Text sx={textStyle}>{data?.kind || 'N/A'}</Text>
+          </GridItem>
+          <GridItem>
+            <CustomText>Supplier :</CustomText>
+            <VStack spacing={4} mt={1} alignItems={'left'}>
+              {!customerView ? (
+                !signedUrlParams && data?.suppliers?.length > 0 ? (
+                  <>
+                    {data?.suppliers.map((item, index) => (
+                      <SupplierTag
+                        key={index}
+                        item={item}
+                        editable={false}
+                        premission={isArchived}
+                        onDelete={() => onDeleteSup(item)}
+                      />
+                    ))}
+                  </>
+                ) : (
+                  <Text sx={textStyle}>N/A</Text>
+                )
+              ) : data?.suppliers?.length > 0 ? (
+                <>
+                  {data?.suppliers.map((item, index) => (
+                    <SupplierTag key={index} item={item} editable={false} />
+                  ))}
+                </>
+              ) : (
+                <Text sx={textStyle}>N/A</Text>
+              )}
+            </VStack>
           </GridItem>
           <GridItem colSpan={3}>
             <CustomText>Description :</CustomText>
@@ -78,7 +112,7 @@ const ExpandedComponent = (props) => {
               )}
             </Flex>
           </GridItem>
-          <GridItem>
+          <GridItem colSpan={3}>
             <CustomText>Dependency Of :</CustomText>
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
               {data?.dependencyOf?.length > 0 ? (
@@ -102,44 +136,6 @@ const ExpandedComponent = (props) => {
                 <Text sx={textStyle}>N/A</Text>
               )}
             </Flex>
-          </GridItem>
-          <GridItem>
-            <CustomText>Type :</CustomText>
-            <Text sx={textStyle}>{data?.kind || 'N/A'}</Text>
-          </GridItem>
-          <GridItem>
-            <CustomText>Internal :</CustomText>
-            <Text sx={textStyle}>{data?.internal ? 'True' : 'False'}</Text>
-          </GridItem>
-          <GridItem>
-            <CustomText>Supplier :</CustomText>
-            <VStack spacing={4} mt={1} alignItems={'left'}>
-              {!customerView ? (
-                !signedUrlParams && data?.suppliers?.length > 0 ? (
-                  <>
-                    {data?.suppliers.map((item, index) => (
-                      <SupplierTag
-                        key={index}
-                        item={item}
-                        editable={false}
-                        premission={isArchived}
-                        onDelete={() => onDeleteSup(item)}
-                      />
-                    ))}
-                  </>
-                ) : (
-                  <Text sx={textStyle}>N/A</Text>
-                )
-              ) : data?.suppliers?.length > 0 ? (
-                <>
-                  {data?.suppliers.map((item, index) => (
-                    <SupplierTag key={index} item={item} editable={false} />
-                  ))}
-                </>
-              ) : (
-                <Text sx={textStyle}>N/A</Text>
-              )}
-            </VStack>
           </GridItem>
           <GridItem>
             <CustomText>PURL :</CustomText>
@@ -173,28 +169,17 @@ const ExpandedComponent = (props) => {
           </GridItem>
           <GridItem>
             <CustomText>Licenses :</CustomText>
-            <Flex alignItems={'center'} gap={2} flexWrap={'wrap'} my={2}>
-              {/* SPDX */}
-              {data?.licenses?.length > 0 &&
-                data?.licenses.map((item, index) => (
+            {data?.licenses?.length > 0 ? (
+              <Flex alignItems={'center'} gap={2} flexWrap={'wrap'} my={2}>
+                {data?.licenses.map((item, index) => (
                   <Text key={index} sx={textStyle}>
                     {item}
                   </Text>
                 ))}
-              {/* EXPRESSION */}
-              {data?.licensesExp && data?.licensesExp !== '' && (
-                <Text sx={textStyle}>
-                  {parseLicenseString(data?.licensesExp)}
-                </Text>
-              )}
-              {/* CUSTOM */}
-              {data?.licensesCustom?.length > 0 &&
-                data?.licensesCustom?.map((item, index) => (
-                  <Text key={index} sx={textStyle}>
-                    {item}
-                  </Text>
-                ))}
-            </Flex>
+              </Flex>
+            ) : (
+              <Text sx={textStyle}>N/A</Text>
+            )}
           </GridItem>
           <GridItem>
             <CustomText>OpenSSF Scorecard :</CustomText>
